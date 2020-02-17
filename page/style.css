@@ -1,0 +1,459 @@
+@import "reset.css";
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+* {
+	box-sizing: border-box;
+	overflow-wrap: break-word;
+}
+
+html {
+	background-color: rgb(20, 20, 60);
+}
+
+.page__body {
+	font-family: Open Sans, Helvetica, Arial, sans-serif;
+	line-height: 1.3333;
+	color: #b1b1b1;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+/* mobile first */
+.page__outer {
+	padding: .5rem;
+}
+
+@media (min-width: 60rem) {
+	.page__outer {
+		padding: 1rem;
+	}
+}
+
+.page__outer--content {
+	background-color: rgb(20, 20, 60);
+	flex: auto;
+}
+
+.page__outer--footer {
+	background-color: rgb(0, 50, 150);
+}
+
+.page__h1 {
+	font-size: 3rem;
+	font-weight: 700;
+	margin-bottom: 3rem;
+}
+
+.page__h3 {
+	margin-bottom: 0.25rem;
+}
+
+.page__breadcrumbs {
+	font-size: .8rem;
+	color: #999999;
+}
+
+.page__breadcrumb:after {
+	content: " » ";
+}
+
+.page__h2 {
+	font-size: 2rem;
+	font-weight: 700;
+	border-bottom: .0625rem solid #606060;
+}
+
+.page__dateline {
+	font-size: .8rem;
+	color: #999999;
+}
+
+.page__controls {
+	margin: 1rem 0;
+	display: flex;
+	flex-wrap: wrap;
+	row-gap: 1rem; /* Firefox only. One day... */
+}
+
+.page__control {
+	margin-inline-end: 1rem;
+}
+
+.page__control:last-child {
+	margin-inline-end: 0;
+}
+
+.page__button-form {
+	display: inline;
+	border-width: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.page__control-link {
+	display: inline-block;
+	padding: .5rem .75rem;
+	background-color: #efa200;
+	color: white;
+	line-height: 1rem;
+}
+
+.page__control-link:hover,
+.page__control-link:active,
+.page__control-link:focus {
+	background-color: #ab6f00;
+	color: inherit;
+}
+
+/* also used on page `re_en` */
+.page__button {
+	border: 0;
+	font-size: 1em; /* avoid shrinkage */
+	font-family: inherit;
+	padding: .5rem .75rem;
+	background-color: rgb(16, 82, 225);
+	color: white;
+	cursor: pointer;
+	line-height: 1rem;
+}
+
+.page__button:hover,
+.page__button:active,
+.page__button:focus {
+	background-color: rgb(5, 52, 185);
+}
+
+.page__content {
+	margin: 2rem 0 0;
+}
+
+.page__content > *:first-child {
+	margin-top: 0;
+}
+
+.page__content > *:last-child {
+	margin-bottom: 0;
+}
+
+.page__ancestors {
+	text-align: right;
+	margin: 2rem 0 0;
+}
+
+.page__credit {
+	font-size: .8rem;
+	color: #383838;
+}
+
+.page__regular-form > *:first-child {
+	margin-top: 0;
+}
+
+.page__regular-form > *:last-child {
+	margin-bottom: 0;
+}
+
+.footer {
+	flex-shrink: 0;
+}
+
+.page__footer {
+	display: flex;
+	font-size: .8rem;
+	flex-wrap: wrap;
+	align-items: baseline;
+	color: #ffffff;
+}
+
+.page__footer-entry {
+	margin-inline-end: 1rem;
+}
+
+.page__footer > *:last-child {
+	margin-inline-end: 0;
+}
+
+/* Globals... */
+
+a {
+	color: #008ba3; /* blue */
+	text-decoration: none;
+	cursor: pointer;
+}
+
+a:hover,
+a:active,
+a:focus {
+	color: #00d9ff; /* sky blue */
+}
+
+h5 {
+	font-weight: bold;
+	margin: 1rem 0;
+}
+
+p {
+	margin: 1rem 0;
+}
+
+p.rant {
+	font-weight: bold;
+	font-size: 2rem;
+}
+
+blockquote {
+	margin: 1rem 0 1rem 2rem;
+}
+
+blockquote > *:first-child {
+	margin-top: 0;
+}
+
+blockquote > *:last-child {
+	margin-bottom: 0;
+}
+
+hr {
+	height: 0;
+	border-width: 0;
+	border-top: .0625rem dotted #a0a0a0;
+}
+
+big {
+	/* can be nested */
+	font-size: 1.25em;
+}
+
+small {
+	/* can be nested */
+	font-size: .8em;
+}
+
+sup {
+	font-size: .8em;
+	vertical-align: super;
+}
+
+sub {
+	font-size: .8em;
+	vertical-align: sub;
+}
+
+var,
+em,
+i {
+	font-style: italic;
+}
+
+i em,
+em i {
+	font-style: normal;
+}
+
+strong {
+	font-weight: bold;
+}
+
+pre {
+	font-size: .8rem;
+	margin: 1rem 0 1rem 2rem;
+	white-space: pre-wrap;
+	font-family: consolas, courier new, monospace;
+	color: #00d9ff; /* sky blue */
+
+	/* for `re_ar` */
+	direction: ltr;
+}
+
+code,
+tt,
+kbd {
+	font-family: consolas, courier new, monospace;
+	color: #00d9ff; /* sky blue */
+
+	/* for `re_ar` */
+	direction: ltr;
+}
+
+var {
+	color: #78C6B9; /* pale green */
+}
+
+table {
+	border-collapse: collapse;
+	font-size: .8rem;
+
+	/* extra-wide tables, you can just scroll to see */
+	display: block;
+	overflow: auto;
+}
+
+th {
+	border: 1px solid #555555;
+	font-weight: bold;
+	color: rgb(77, 181, 215);
+	padding: .25rem;
+	text-align: center;
+	margin-top:0;
+	margin-bottom:0;
+}
+
+td {
+	border: 1px solid #555555;
+	padding: .25rem;
+	margin-top:0;
+	margin-bottom:0;
+}
+
+ul,
+ol {
+	margin: 1rem 0;
+	padding-inline-start: 1.5rem;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+ul {
+	list-style-type: disc;
+}
+
+ul ul {
+	list-style-type: circle;
+}
+
+ul ul ul {
+	list-style-type: square;
+}
+
+dl {
+	margin: 1rem 0 1rem 2rem;
+}
+
+dt {
+	margin: 1rem 0;
+	font-weight: bold;
+}
+
+dd {
+	margin: 1rem 0;
+}
+
+select, input {
+	background-color: #383838;
+	color: #c7c7c7;
+	border-color: #555555;
+	text-align: center;
+	border-style: solid;
+	height: 1.5em;
+	margin:auto;
+	vertical-align: bottom;
+}
+
+input[disabled] {
+	background-color: #000000;
+	border-color: #000000;
+}
+
+button {
+	background-color: #383838;
+	color: #c7c7c7;
+	border-color: #555555;
+	text-align: center;
+	height: 1.5em;
+	border-bottom:1px solid;
+	border-top:1px solid;
+	border-left:1px solid;
+	border-right:1px solid;
+}
+
+button[disabled] {
+	background-color: #000000;
+	border-color: #000000;
+	visibility: hidden;
+}
+
+/* Use for marking stats as local to a part. */
+.part_local {
+	background-color: rgb(11, 48, 133);
+	color: #ffffff;
+}
+
+.inner_table {
+	padding: 0px;
+	margin: 0px;
+	border: 1px solid #555555;
+	vertical-align: top;
+}
+
+/* rules container */
+.rules {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.rules table{
+	padding: .25rem;
+}
+
+.rules th {
+	border: .0625rem solid #00d9ff;
+	font-weight: bold;
+	color: rgb(77, 181, 215);
+	padding: .25rem;
+}
+
+.rules td {
+	border: .0625rem solid #00d9ff;
+	padding: .25rem;
+}
+
+/* The actual popup (appears on top) */
+.rules .rulestext {
+  visibility: hidden;
+  background-color: #383838;
+  color: #c7c7c7;
+  text-align: left;
+  border-radius: 12px;
+  padding: 8px;
+  position: absolute;
+  max-width: 700px;
+  width:max-content;
+  /* display:block; */
+  z-index: 1;
+  top: 125%;
+  left: 50%;
+}
+
+/* Popup arrow */
+.rules .rulestext::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 15px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #555 transparent;
+}
+
+/* Toggle this class when clicking on the popup container (hide and show the popup) */
+.rules .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}

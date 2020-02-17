@@ -1,0 +1,639 @@
+{
+    "era": {
+        "rules": "<b>Era</b><br/>Your Era will determine some factors about your aircraft to start. Regular Flying Circus is generally WW1 Era.<br/><table><tr><th>Era</th><th>Starting Stats</th></tr>{0}</table>",
+        "options": [
+            {
+                "name": "Pioneer",
+                "liftbleed": 30
+            },
+            {
+                "name": "WWI",
+                "liftbleed": 25
+            },
+            {
+                "name": "Interbellum",
+                "liftbleed": 22
+            },
+            {
+                "name": "WWII",
+                "liftbleed": 20
+            },
+            {
+                "name": "Last Hurrah",
+                "liftbleed": 18
+            }
+        ]
+    },
+    "cockpit": {
+        "rules": "<b>Cockpits</b><br/>Firstly, decide below how the cockpit is constructed by selecting one below for each crew position.<br/>Flight Stress modifiers only apply to the pilot. The Escape stat counts for the pilot as well: if you have PCs in other seats, record that seat’s Escape stat separately.<br/><table><tr><th>Type</th><th>Description</th><th>Effects</th><th>Cost</th></tr>{0}</table><br/>To each cockpit, you can add the following upgrades.<br/><table><tr><th>Upgrade</th><th>Description</th><th>Effects</th><th>Cost</th></tr>{1}</table><br/>These cockpit options can represent different ideas depending on the crew area. The Basic Cockpit could equally represent the glass panels of the B-17’s cockpit and the hole cut out in the wall for the waist gunner, for example.",
+        "options": [
+            {
+                "name": "Open",
+                "description": "The pilot is fully exposed to the air.",
+                "mass": 1,
+                "drag": 3,
+                "control": 0,
+                "escape": 2,
+                "cost": 0,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Windscreen",
+                "description": "A piece of glass in front of the pilot.",
+                "mass": 2,
+                "drag": 1,
+                "control": 0,
+                "escape": 2,
+                "cost": 1,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Sealed",
+                "description": "There is no window or external view.",
+                "mass": 2,
+                "drag": 0,
+                "control": 0,
+                "escape": -3,
+                "cost": 1,
+                "flightstress": -1,
+                "visibility": 0
+            },
+            {
+                "name": "Narrow Canopy",
+                "description": "A frame with small windows.",
+                "mass": 3,
+                "drag": 0,
+                "control": 0,
+                "escape": 0,
+                "cost": 3,
+                "flightstress": -1,
+                "visibility": -1
+            },
+            {
+                "name": "Bubble Canopy",
+                "description": "A cockpit made from curved glass.",
+                "mass": 3,
+                "drag": -3,
+                "control": 0,
+                "escape": 0,
+                "cost": 8,
+                "flightstress": -1,
+                "visibility": 0
+            }
+        ],
+        "upgrades": [
+            {
+                "name": "Co-Pilot Controls",
+                "description": "Allows this seat to also control the aircraft.",
+                "mass": 0,
+                "drag": 0,
+                "control": 3,
+                "escape": 0,
+                "cost": 1,
+                "flightstress": -1,
+                "visibility": 0
+            },
+            {
+                "name": "Escape Hatch",
+                "description": "Help the pilot escape.",
+                "mass": 1,
+                "drag": 0,
+                "control": 0,
+                "escape": 3,
+                "cost": 2,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Ejection Seat",
+                "description": "Eject the pilot from the cockpit.",
+                "mass": 2,
+                "drag": 0,
+                "control": 0,
+                "escape": 5,
+                "cost": 4,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Connectivity",
+                "description": "Connects this cockpit to any other cockpit with the same upgrade.",
+                "mass": 1,
+                "drag": 0,
+                "control": 0,
+                "escape": 0,
+                "cost": 0,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Oxygen Mask",
+                "description": "The pilot ignores the effects of high altitude and negates up to 2 G-Penalty. Requires 1 Charge Continuous.",
+                "mass": 0,
+                "drag": 0,
+                "control": 0,
+                "escape": 0,
+                "cost": 2,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Isolated",
+                "description": "A basket or box allowing unusual mounts (like in front of a propeller) completely ignoring the usual system.",
+                "mass": 1,
+                "drag": 5,
+                "control": 0,
+                "escape": 0,
+                "cost": 1,
+                "flightstress": 0,
+                "visibility": 0
+            }
+        ]
+    },
+    "passengers": {
+        "rules": "<b>Passenger Capacity</b><br/>Capacity for 5 passengers takes up 2 hull sections that cannot be used for anything else. In-flight snacks must be purchased separately. The passenger area is treated collectively as a crew position, so can be connected to the crew positions with a Connectivity upgrade.<br/>A bed, stretcher, or first class accomodations take up 2 passenger seats."
+    },
+    "engines": {
+        "rules": "<b>Engines</b><br/><br/>Engines come in two general types, Pusher engines and Tractor engines. Tractor engines have the propeller ahead of the plane pulling it, while pushers have it behind the plane pushing it away.<br/><br/><b>Choosing your Engine</b><br/><br/>Your engine can be chosen from the list of premade engines in this book or any of the aircraft books.<br/><br/>Generally speaking, air cooled engines are lighter but less powerful while water cooled engines are heavier but more powerful.<br/><br/><b>Mounting your Engine</b><br/><br/>Engines can be mounted in a variety of ways.<br/><br/>A rear-mounted pusher represents an engine mounted at the far end of the aircraft’s body, like the pusher engines of a Kyushu J7W. A center-mounted pusher engine represents a pusher engine that still has a tail, using an extended driveshaft or farman tail to avoid imbalance.<br/><table><tr><th>Type</th><th>Requires Frame Slot?</th><th>Description</th></tr>{0}</table>If you wanted to, you could build a plane asymmetrical, with different engine types on either side of a wing, or a single large engine on one wing. In these cases, take -3 Lateral Stability, and reduce your total final Structure to the average between it and your Max Strain.<br/><br/><b>Engine Torque and Rotaries</b><br/><br/>Engines have Torque, which is subtracted from their Lateral Stability directly if it uses any hull mounts. Wing mounts minimize the effect of Torque, so ignore it there.<br/><br/>Rotary engines are usually the only engines that you need to worry about this with in early aircraft, seeing as they are a giant chunk of metal spinning at high speeds.<br/><br/>Wing mounted rotary engines reduce your Strain by the Torque (use all engines), representing the force against the wing. In a push-pull configuration, you can choose to reduce Structure instead.<br/><br/><b>Push-Pull Configuration</b><br/><br/>A Push-Pull configuration allows two engines to be mounted along the same line. This requires the same engine model be used for both.<br/><br/>In any Push-Pull configuration, use only the Drag from one engine, and apply the following modifiers.<table><tr><th>Type</th><th>Description</th></tr>{1}</table>",
+        "rules_upgrades": "<b>Extended Driveshafts</b><br/><br/>An extended driveshaft basically means that, while the engine is mounted in the middle of the plane, the propeller can still be at either end because the rod connecting the two is longer than usual and runs through the length of the plane.<br/><br/>1 Mass and 2 þ for every 10 engine power (rounding down). For engines under 10 power, it just costs 1þ.<br/><br/>This can be done for a variety of reasons. On tractor planes, this can allow a weapon to be mounted internally, firing through the propeller without the use of the sync gear by running the barrel directly through the prop hub. This could be due to a weapon nestled around the engine block (like the 20mm cannon on a BF109) or a weapon mounted ahead of the engine in a dedicated space (like the 37mm autocannon in the nose of the P-39 Airacobra)<br/><br/>On a central engine mount pusher plane, an extended driveshaft eliminates the need for a Farman Tail. You can just mount a conventional tail around the engine without any problems.<br/><br/><b>Geared Propeller</b><br/><br/>This  upgrade can be applied to any engine. It costs +1þ for each iteration.<br/><br/>Adding this will add +50% to the engine’s Overspeed, and give -1 Reliability. You can add this as many times as you want.<br/><br/>You can play an additional 1þ to negate Reliability penalty from the geared prop only, 1-1.",
+        "rules_cooling": "<b>Cooling (Air)</b><br/><br/>If your engine is air-cooled, awesome! Just plop that bad boy in there and it’ll go on it’s own.<br/><br/><b>Cooling (Rotary)</b><br/><br/>If your engine is rotary, you’ll need to add 1 Mass for the engine’s Oil Tank. This is a seperate Vital Component.<br/><br/><b>Cooling (Liquid)</b><br/><br/>If your engine is liquid-cooled, you’ll need to add a radiator. A radiator weighs 3 Mass and has a variable amount of Drag, which you choose. You cannot have more radiators than you have engines, but you can opt to connect multiple engines to the same enlarged radiator. This’ll save weight, but be a single point of failure.<br/><br/>The Drag of a radiator is how much of the surface of the radiator is exposed to the air. Every point of Drag gives +2 Cooling. You must have a Cooling valuable equal to the Cooling of your engine(s) to get the Radiator’s value. Every point of radiator you have less than that gives -1 Reliability. Having more Cooling than your Engine requires will not make it more reliable.<br/><br/>The Type is the design of the radiator, and the Mount of the radiator is where it is in relation to the engine (not the aircraft as a whole) and it affects radiator performance after it gets shot. Both of these can give straight reliability bonuses to the engine due to mechanical simplicity or efficiency.<br/><br/>Radiators can have different types. If the radiator gains more Drag, it will not add more Reliability: this is from the other parts of the design like hoses or framework.<br/><br/><b>Radiator Type</b><br/><table><tr><th>Type</th><th>Effects</th><th>Cost</th></tr>{0}</table><br/><b>Radiator Mount</b><br/><table><tr><th>Location</th><th>Description</th></tr>{1}</table>Radiator Examples:<br/><br/>Panel radiators are any radiator design that air “passes over”, while Box radiators are radiators designed for air to “pass through”. In simplest terms, if it sticks out all ugly like or is in the nose, it’s a box, if it’s flat against a surface like a wing or the skin its a panel.<br/><br/>Intake radiators are specifically radiators built inside specialized housings designed to funnel air and reduce drag.<br/><br/><b>Special Coolant</b><br/><br/>Normally, a radiator is just full of water. If you want to be a fancy engineer, you can load your radiator with special coolant  as follows. Remember to round down with cooling!<br/><br/><b>Rare Radiator Fluid</b><br/><table><tr><th>Liquid</th><th>Effects</th><th>Cost</th></tr>{2}</table><br/><br/><b>Evaporative Cooling</b><br/><br/>An alternate way to cool a liquid cooled engine is evaporative cooling. This requires a sufficiently large wing (at least 5 Area per engine) with some sort of metal skin. Rather than running water to a radiator, the water is sprayed as steam into a cavity in the wings to cool it, where it is collected and fed back into the engine. This is more streamlined, but is very fragile.<br/><br/>Evaporative cooling only costs the +3 Mass you’d pay to get a radiator. There’s no Drag involved, you’re just ready to go.<br/><br/>The downside is that any attack with a Crit roll of 16+ will knock out the radiator, in addition to any other damage done or other parts damaged.",
+        "mounts": [
+            {
+                "name": "Tractor",
+                "description": "Normal.<br/>Forward-firing fixed weapons will need sync gears spinner mounts.<br/>Turrets cannot fire forward.",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "push-pull": "fuselage"
+            },
+            {
+                "name": "Center-Mounted Tractor",
+                "description": "Forward-firing fixed weapons will need Sync gears. Will require an Extended Driveshaft.<br/>With the space free at the front of the aircraft, you can mount a single weapon that fires through the spinner.<br/>(Represents P-39 style engine mounts.)",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": -2,
+                "visibility": 1,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "push-pull": "fuselage",
+                "reqED": true
+            },
+            {
+                "name": "Rear-Mounted Pusher",
+                "description": "Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward.<br/>(Represents engines mounted at the rear of the aircraft)",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": -4,
+                "visibility": 2,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "push-pull": "fuselage"
+            },
+            {
+                "name": "Center-Mounted Pusher",
+                "description": "Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders,  or Boom Tail. <br/>Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward.<br/>(Represents engines mounted in the center of the aircraft a la the DH2)",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": -2,
+                "visibility": 2,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "push-pull": "fuselage",
+                "reqTail": true
+            },
+            {
+                "name": "Pod",
+                "description": "Keeps the engine out of the way of everything.",
+                "drag": 5,
+                "reqsections": 1,
+                "pitchstab": 0,
+                "visibility": -2,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "push-pull": "pod"
+            },
+            {
+                "name": "Nacelle (Inside)",
+                "description": "Reduces Max Strain by half the mass of the engine.",
+                "drag": 0,
+                "reqsections": 0,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": 1,
+                "strainfactor": 0.5,
+                "dragfactor": 0,
+                "push-pull": "wing"
+            },
+            {
+                "name": "Nacelle (Offset)",
+                "description": "Adds Drag equal to the mass of the Engine.",
+                "drag": 0,
+                "reqsections": 0,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 1,
+                "push-pull": "wing"
+            },
+            {
+                "name": "Channel Tractor",
+                "description": " Reduces Max Strain equal to the mass of the engine.",
+                "drag": 0,
+                "reqsections": 0,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": -1,
+                "strainfactor": 1,
+                "dragfactor": 0,
+                "push-pull": "fuselage"
+            }
+        ],
+        "push-pull": [
+            {
+                "type": "fuselage",
+                "name": "Tractor + Pusher/Rearward",
+                "description": "90% Engine Power",
+                "powerfactor": 0.9
+            },
+            {
+                "type": "wing",
+                "name": "Nacelle/Nacelle",
+                "description": "80% Engine Power. Only apply the nacelle penalty for one engine.",
+                "powerfactor": 0.8
+            },
+            {
+                "type": "pod",
+                "name": "Tandem Pod",
+                "description": "90% Engine Power. Only apply the +5 Drag Penalty once.",
+                "powerfactor": 0.9
+            }
+        ],
+        "radiator-type": [
+            {
+                "name": "Panel",
+                "description": "Default",
+                "drag": 0,
+                "mass": 0,
+                "cost": 0,
+                "cooling": 0,
+                "dragpercool": 0.5
+            },
+            {
+                "name": "Box",
+                "description": "",
+                "drag": 2,
+                "mass": -1,
+                "cost": 0,
+                "cooling": 0,
+                "dragpercool": 0.5
+            },
+            {
+                "name": "Intake",
+                "description": "",
+                "drag": 0,
+                "mass": 0,
+                "cost": 3,
+                "cooling": 2,
+                "dragpercool": 0.5
+            },
+            {
+                "name": "Evaporation",
+                "description": "Requires Metal Wing Skin. No Drag. Vulnerable to Crits.",
+                "drag": 0,
+                "mass": 0,
+                "cost": 0,
+                "cooling": 0,
+                "dragpercool": 0
+            }
+        ],
+        "radiator-mount": [
+            {
+                "name": "Low",
+                "description": "Force Cool Down when shot.",
+                "reliability": 1,
+                "drag": 0,
+                "latstab": 0
+            },
+            {
+                "name": "Inline",
+                "description": "Default",
+                "reliability": 0,
+                "drag": 0,
+                "latstab": 0
+            },
+            {
+                "name": "High",
+                "description": "Bonus persists for 1 Cool Down after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!",
+                "reliability": 0,
+                "drag": 1,
+                "latstab": 0
+            },
+            {
+                "name": "High Offset",
+                "description": "Bonus persists for 1 Cool Down after being shot. Requires a Parasol Wing.",
+                "reliability": 0,
+                "drag": 1,
+                "latstab": -1
+            }
+        ],
+        "radiator-coolant": [
+            {
+                "name": "Water",
+                "description": "",
+                "cost": 0,
+                "reliability": 0
+            },
+            {
+                "name": "Salt Water",
+                "description": "",
+                "cost": 3,
+                "reliability": 1
+            },
+            {
+                "name": "Mineral Oil",
+                "description": "Absorbs 1 Miss to Cool Down. Flammable.",
+                "cost": 3,
+                "reliability": 0
+            },
+            {
+                "name": "Castor Oil",
+                "description": "Absorbs 1 Miss to Cool Down. Flammable. +2 Stress if leaking.",
+                "cost": 0,
+                "reliability": 0
+            },
+            {
+                "name": "Glycol",
+                "description": "",
+                "reliability": 2,
+                "cost": 2
+            },
+            {
+                "name": "Freon",
+                "description": "Caps RPM to 3.",
+                "reliability": 1,
+                "cost": 3
+            },
+            {
+                "name": "Ammonia",
+                "description": "Caps RPM to 3. Causes 2 Injury when leaking.",
+                "reliability": 1,
+                "cost": 2
+            }
+        ]
+    },
+    "propellers": {
+        "rules": "<b>Propeller</b><br/>When you mount your propeller, it gains a Pitch. Note this down for later calculations.<br/><table><tr><th>Propeller Mod</th><th>Pitch Speed Mod</th><th>Pitch Boost Mod</th></tr>{0}</table><br/>Each of these pitch values represents a unique propeller, with each propeller having a cost of 1þ. Your first propeller per engine is always free, and can be built any way you choose.<br/>You can upgrade your propeller to one of the following instead.<ul><li>Manually Variable Propeller: Allows blade pitch to be adjusted on the ground without replacing it. (2þ)</li><li>Automatic Variable Propeller: Eliminates prop tuning. Pitch Speed Mod to 1.1 and Pitch Boost Mod to 0.7. 1 Mass, 8þ</li></ul>",
+        "props": [
+            {
+                "name": "Very Coarse",
+                "pitchspeed": 0.8,
+                "pitchboost": 0.8,
+                "cost": 0,
+                "automatic": false
+            },
+            {
+                "name": "Coarse",
+                "pitchspeed": 0.9,
+                "pitchboost": 0.7,
+                "cost": 0,
+                "automatic": false
+            },
+            {
+                "name": "Default",
+                "pitchspeed": 1.0,
+                "pitchboost": 0.6,
+                "cost": 0,
+                "automatic": false
+            },
+            {
+                "name": "Fine",
+                "pitchspeed": 1.1,
+                "pitchboost": 0.4,
+                "cost": 0,
+                "automatic": false
+            },
+            {
+                "name": "Very Fine",
+                "pitchspeed": 1.2,
+                "pitchboost": 0.3,
+                "cost": 0,
+                "automatic": false
+            },
+            {
+                "name": "Automatic",
+                "pitchspeed": 1.1,
+                "pitchboost": 0.7,
+                "mass": 1,
+                "cost": 8,
+                "automatic": true
+            }
+        ]
+    },
+    "frames": {
+        "rules": "<b>Covering & Frame</b><br/>Now that you have the sections your aircraft needs, you’ll need to build them. To start, build a frame. The frame gives a basic Structure, plus some bonuses as the plane gets bigger. Choose just one, whatever the majority of the frame is built from, and add 1 piece per section.<br/><br/>Generally, we split airplanes into being made of Spars, or being made of Ribs. If your plane is kept together by tension wires with the frame providing compression, its made of a Spars. If its just a big set of solid pieces, its made of Ribs.<br/>A Sopwith Camel is made of Wooden Spars. A Fokker DR.1 is made of Steel Spars. The Junkers J.1/J4 is made of Aluminum Spars. The Polikarpov I-16 is made of Wooden Ribs. The P-47 is made of Steel Ribs. The P-51 is made of Aluminum Ribs.<br/><br/><table><tr><th>Frame Material</th><th>Base Effect</th><th>Base Cost</th><th>Effect per Piece</th><th>Cost per Piece</th><th>Geodesic Possible?</th></tr>{0}</table><br/>Titanium is a special case and cannot be used for whole frames.<br/><br/>Geodesic frames double the cost per piece, but add +50% Structure per piece.<br/><br/>Then, cover these elements to make them streamlined. For each section, choose a covering from below. You may mix and match these coverings.<br/><table><tr><th>Skin Material</th><th>Effects</th><th>Cost</th><th>Monocoque Structure</th></tr>{1}</table><br/><b>Monocoque</b><br/>You can build a monocoque (one-shell) or semi-monocoque plane if you wish.<br/><br/> A monocoque or semi-monocoque plane can be built by substituting the mass and structural bonus from a piece of frame for a monocoque-compatible skin piece. The frame still exists: few monocoque aircraft is truly without a frame, these frameworks are just minimized and incorporated into the shell structure.<br/><br/>Monocoque skin pieces costs +1þ each, representing the labour cost of designing and building it. This is in addition to the frame cost: that doesn’t go away.<br/><br/><b>Lifting Body</b><br/>A lifting body is an incredibly complicated engineering achievement and requires the aircraft to have a solid skin (can be Monocoque).<br/><br/>Building a lifting body gives 2 effective Wing Area per aircraft section. This will induce double drag on these sections, so lifting bodies should use as few as possible. You could, if you are light and fast enough, fly without wings at all (calculate modifiers as though your longest wing was 0m.)<br/><br/>Lifting bodies still have tails, even if they are blended into the rest of the machine.<br/><br/><b>Internal Bracing</b><br/>To increase the resilience of an aircraft, you can add Internal Bracing. This is basically extra Frame Pieces that you don’t have to put Skin on, because it is on the inside. You can have 1 Internal Bracing piece per actual frame section. They do not have to be the same material as everything else: you can build a wooden aircraft with some steel bracing, for example.<br/><br/>Titanium can only be used for internal bracing. Making a whole plane out of Titanium is like making an entire ring out of diamonds: cool, but way too expensive to be worth it.",
+        "rules-tail": "<b>Tail Length</b><br/>We consider the tail as the Sections of the aircraft which is left mostly empty. They add extra frame sections, and also change the pitch stability of the aircraft. Be very careful with your selection: a short tail seems optimal, but pitch stability offsets the effects of things like torque, short wings, and the natural roll instability of aircraft, so taking it in too much will result in aircraft that are uncontrollable.<br/><br/>Most of the best WW1 fighters would be Stubby, as would WW2 aircraft like the I-16, F2A Buffalo, and Me-163 rocket fighter. As a general rule, if you look at it and go “that looks like a toy”, you’re Stubby. It if looks reasonable, you’re Standard. Most large bombers and such will use Long.<br/><table><tr><th>Type</th><th>Effects</th></tr>{0}</table>Tail sections are as a rule empty. Tail sections aren’t necessarily at the “back” of an aircraft, they just bulk it out and help balance it. For example, think of tailgun positions in bombers.<br/><br/><b>Farman</b><br/>If you want to mount controls behind a pusher propeller (or ahead of a tractor!), you use a Farman Tail. This is a structure of struts built around the propeller that allows the control surfaces to hang from it.<br/><br/>This is built like a regular tail, above. A farman tail weighs half as much as a conventional Tail, but cannot be given a surface: it is always a naked tail.<br/><br/>A farman tail does not count as part of a monocoque aircraft (as that wouldn’t work), so just select a type of frame material.<br/><br/><b>Boom Tails</b><br/>Boom tails are another option useful for both pusher planes and some planes with nacelles. It allows the same things as a farman tail, but is in many ways more sophisticated. It does have some aerodynamic difficulties, however.<br/><br/>A Boom Tail is built like a regular tail, and uses all the same rules. It subtracts the Mass of the Tail from the Strain of the wings, and a Boom Tail that isn’t connected to tractor engine nacelles generates +50% Drag.",
+        "frames": [
+            {
+                "name": "Wooden Spars",
+                "basestructure": 15,
+                "basecost": 0,
+                "mass": 1,
+                "structure": 2,
+                "cost": 0,
+                "geodesic": false
+            },
+            {
+                "name": "Steel Spars",
+                "basestructure": 25,
+                "basecost": 1,
+                "mass": 1,
+                "structure": 5,
+                "cost": 1,
+                "geodesic": false
+            },
+            {
+                "name": "Aluminum Spars",
+                "basestructure": 25,
+                "basecost": 2,
+                "mass": 1,
+                "structure": 4,
+                "cost": 2,
+                "geodesic": false
+            },
+            {
+                "name": "Wooden Ribs",
+                "basestructure": 30,
+                "basecost": 1,
+                "mass": 2,
+                "structure": 5,
+                "cost": 0.5,
+                "geodesic": true
+            },
+            {
+                "name": "Steel Ribs",
+                "basestructure": 60,
+                "basecost": 2,
+                "mass": 3,
+                "structure": 12,
+                "cost": 2,
+                "geodesic": true
+            },
+            {
+                "name": "Aluminum Ribs",
+                "basestructure": 50,
+                "basecost": 3,
+                "mass": 2,
+                "structure": 8,
+                "cost": 3,
+                "geodesic": true
+            },
+            {
+                "name": "Titanium",
+                "basestructure": 0,
+                "basecost": 0,
+                "mass": 1,
+                "structure": 10,
+                "cost": 8,
+                "geodesic": false
+            },
+            {
+                "name": "Living Grove",
+                "basestructure": 30,
+                "basecost": 8,
+                "mass": 2,
+                "structure": 4,
+                "cost": 0,
+                "geodesic": true
+            }
+        ],
+        "skin": [
+            {
+                "name": "Naked",
+                "drag": 5,
+                "mass": -1,
+                "visibility": 1,
+                "flammable": false,
+                "monocoque": false
+            },
+            {
+                "name": "Cloth Canvas",
+                "drag": 2,
+                "flammable": false,
+                "monocoque": false
+            },
+            {
+                "name": "Transparent Celluloid",
+                "drag": 2,
+                "visibility": 1,
+                "cost": 1,
+                "flammable": true,
+                "monocoque": false
+            },
+            {
+                "name": "Treated Paper",
+                "drag": 2,
+                "mass": -1,
+                "flammable": true,
+                "monocoque": false
+            },
+            {
+                "name": "Tense Silk",
+                "drag": 2,
+                "toughness": 1,
+                "cost": 1,
+                "flammable": false,
+                "monocoque": false
+            },
+            {
+                "name": "Dragon Skin",
+                "drag": 2,
+                "mass": 2,
+                "cost": 4,
+                "flammable": false,
+                "monocoque": false
+            },
+            {
+                "name": "Molded Plywood",
+                "drag": 1,
+                "mass": 1,
+                "cost": 0.5,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 3
+            },
+            {
+                "name": "Clinker Build",
+                "drag": 2,
+                "mass": 1,
+                "cost": 0,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": -3
+            },
+            {
+                "name": "Glass Reinforced Plastic",
+                "drag": 1,
+                "cost": 1,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Currugated Duralumin",
+                "drag": 2,
+                "mass": 2,
+                "toughness": 3,
+                "cost": 1,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 10
+            },
+            {
+                "name": "Steel Sheet",
+                "drag": 1,
+                "mass": 3,
+                "cost": 1.5,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 8
+            },
+            {
+                "name": "Aluminum Sheet",
+                "drag": 1,
+                "mass": 2,
+                "cost": 2,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 6
+            }
+        ],
+        "tail": [
+            {
+                "name": "Stubby",
+                "reqsections": 1,
+                "pitchstab": -3
+            },
+            {
+                "name": "Standard",
+                "reqsections": 2,
+                "pitchstab": 0
+            },
+            {
+                "name": "Long",
+                "reqsections": 3,
+                "pitchstab": 3
+            }
+        ]
+    }
+}
