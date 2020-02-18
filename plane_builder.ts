@@ -296,12 +296,13 @@ class Aircraft {
         this.stats = this.stats.Add(this.engines.PartStats());
         this.stats = this.stats.Add(this.propeller.PartStats());
 
-        this.cockpits.UpdateCrewStats(this.stats);
-        this.engines.UpdateReliability(this.stats);
-
         this.frames.SetRequiredSections(this.stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.stats = this.stats.Add(this.frames.PartStats());
+
+        //Update Part Local stuff
+        this.cockpits.UpdateCrewStats(this.stats);
+        this.engines.UpdateReliability(this.stats);
 
         if (this.DisplayCallback)
             this.DisplayCallback();
@@ -1097,7 +1098,10 @@ class Engines extends Part {
 
     public UpdateReliability(stats: Stats) {
         for (let elem of this.engines) {
-            elem.UpdateReliability(stats.reliability);
+            if (elem.GetRadiator() < this.radiators.length) {
+                let rad_stats = this.radiators[elem.GetRadiator()].PartStats();
+                elem.UpdateReliability(stats.reliability + rad_stats.reliability);
+            }
         }
     }
 
@@ -1127,6 +1131,9 @@ class Engines extends Part {
 
         if (this.is_asymmetric)
             stats.latstab -= 3;
+
+        //Part local, gets handled in UpdateReliability
+        stats.reliability = 0;
         return stats;
     }
 
@@ -2582,10 +2589,6 @@ class Frames extends Part {
         if (is_clinker)
             stats.structure += 30;
 
-        stats.structure = Math.floor(stats.structure);
-        stats.cost = Math.floor(stats.cost);
-        stats.visibility = Math.min(stats.visibility, 3);
-
         stats = stats.Add(this.tail_list[this.sel_tail].stats);
 
         if (this.boom) {
@@ -2595,6 +2598,10 @@ class Frames extends Part {
         }
 
         stats = stats.Add(tail_stats);
+
+        stats.structure = Math.floor(stats.structure);
+        stats.cost = Math.floor(stats.cost);
+        stats.visibility = Math.min(stats.visibility, 3);
 
         return stats;
     }
