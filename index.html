@@ -59,7 +59,7 @@
 						<tr>
 							<th>Option</th>
 							<th>Upgrade</th>
-							<th>Total Stats</th>
+							<th>Per Cockpit Total Stats</th>
 						</tr>
 					</table>
 				</div>
@@ -116,7 +116,7 @@
 						<tr>
 							<th>Engine Type</th>
 							<th>Options</th>
-							<th>Total Stats</th>
+							<th>Per Engine Total Stats</th>
 						</tr>
 					</table>
 					<br />
@@ -148,20 +148,43 @@
 						<span id="rules_frames" class="rulestext">I failed to load my rules. Please file a bug
 							report.</span>
 					</span>
-					<span class="rules" onclick="RulesPopup(this)">(<u>Tail Rules</u>)
-						<span id="rules_tail_frames" class="rulestext">I failed to load my rules. Please file a bug
-							report.</span>
-					</span> <br />
 					<table id="table_frames">
 						<tr>
 							<th>Frame Type</th>
 							<th>Skin Type</th>
-							<th>Options</th>
+							<th>Frame Options</th>
 							<th>Total Stats</th>
 						</tr>
 					</table>
 				</h3>
 			</div>
+			<br />
+			<div class="Tail">
+				<h3 class="page__h3">Tail
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
+						<span id="rules_tail_frames" class="rulestext">I failed to load my rules. Please file a bug
+							report.</span>
+					</span>
+					<br />
+					<span> Tail Length: <select id="tail_type"></select></span>
+					<span> Farman Tail: <input type="checkbox" id="tail_farman" /></span>
+					<span> Boom Tail: <input type="checkbox" id="tail_boom" /></span>
+				</h3>
+			</div>
+			<br />
+			<!-- <div class="Wings">
+				<h3 class="page__h3">Tail
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
+						<span id="rules_wings" class="rulestext">I failed to load my rules. Please file a bug
+							report.</span>
+					</span>
+					<br />
+					<span> Number of Wings: <input type="number" id="wing_count"></input></span>
+					<span> Wing Stagger: <select id="wing_stagger"></select></span>
+				</h3>
+				<br/>
+				<table><tr><th>Wing Deck</th><th>Wing Surface</th><th>Wing Dimensions</th></tr></table>
+			</div> -->
 		</div>
 	</div>
 

@@ -304,6 +304,11 @@ td {
 	padding: .25rem;
 	margin-top:0;
 	margin-bottom:0;
+	max-width: 100%;
+}
+
+span {
+	white-space: nowrap;
 }
 
 ul,
@@ -350,6 +355,10 @@ select, input {
 	height: 1.5em;
 	margin:auto;
 	vertical-align: bottom;
+}
+
+input[type=number] {
+	width:4em;
 }
 
 input[disabled] {
@@ -422,6 +431,7 @@ button[disabled] {
   position: absolute;
   max-width: 700px;
   width:max-content;
+  white-space: normal;
   /* display:block; */
   z-index: 1;
   top: 125%;

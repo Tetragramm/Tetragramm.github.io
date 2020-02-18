@@ -240,6 +240,7 @@ class Aircraft {
         this.propeller.SetCalculateStats(() => { this.CalculateStats(); });
         this.frames.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetNumberOfCockpits(1);
+        this.frames.SetTailType(1);
     }
     SetDisplayCallback(callback) {
         this.DisplayCallback = callback;
@@ -254,6 +255,7 @@ class Aircraft {
         this.cockpits.UpdateCrewStats(this.stats);
         this.engines.UpdateReliability(this.stats);
         this.frames.SetRequiredSections(this.stats.reqsections);
+        this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.stats = this.stats.Add(this.frames.PartStats());
         if (this.DisplayCallback)
             this.DisplayCallback();
@@ -504,16 +506,19 @@ class Cockpit_HTML extends Display {
         //Add all the upgrades as checkboxes
         var upg_index = 0;
         for (let elem of js["upgrades"]) {
+            let span = document.createElement("SPAN");
             let txt = document.createElement("SPAN");
-            txt.innerHTML = elem["name"] + "<br/>";
+            txt.innerHTML = elem["name"];
             let upg = document.createElement("INPUT");
             upg.setAttribute("type", "checkbox");
             upg.checked = false;
             let local_index = upg_index;
             upg_index += 1;
             upg.onchange = () => { this.cockpit.SetUpgrade(local_index, upg.checked); };
-            upgrades.appendChild(upg);
-            upgrades.appendChild(txt);
+            span.appendChild(upg);
+            span.appendChild(txt);
+            upgrades.appendChild(span);
+            upgrades.appendChild(document.createElement("BR"));
         }
         //Set the change event, add the box, and execute it.
         select.onchange = () => { this.cockpit.SetType(select.selectedIndex); };
@@ -925,6 +930,14 @@ class Engines extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    GetHasTractorNacelles() {
+        let has = 0;
+        for (let en of this.engines) {
+            if (en.GetIsTractorNacelle())
+                has++;
+        }
+        return has > 1;
+    }
 }
 class Engine extends Part {
     constructor(el, ml, ppl) {
@@ -1154,6 +1167,13 @@ class Engine extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    GetIsTractorNacelle() {
+        if (!this.GetIsPulsejet()
+            && !this.GetUsePushPull()
+            && this.mount_list[this.selected_mount].pp_type == "wing")
+            return true;
+        return false;
+    }
 }
 class Engine_HTML extends Display {
     constructor(eng, r) {
@@ -1189,6 +1209,8 @@ class Engine_HTML extends Display {
         this.e_torq = document.createElement("INPUT");
         this.e_rumb = document.createElement("INPUT");
         this.e_cost = document.createElement("INPUT");
+        this.e_oil = document.createElement("INPUT");
+        this.e_pulsejet = document.createElement("INPUT");
         this.cool_count = document.createElement("INPUT");
         this.cool_count.setAttribute("type", "number");
         var tcell = this.row.insertCell(0);
@@ -1219,23 +1241,8 @@ class Engine_HTML extends Display {
         this.CreateInput("  Torque", this.e_torq, tcell);
         this.CreateInput("  Rumble", this.e_rumb, tcell);
         this.CreateInput("  Cost", this.e_cost, tcell);
-        var oilSpan = document.createElement("SPAN");
-        oilSpan.innerHTML = "  Oil Tank";
-        this.e_oil = document.createElement("INPUT");
-        this.e_oil.setAttribute("type", "checkbox");
-        this.e_oil.checked = false;
-        this.e_oil.style.width = "3.5em";
-        tcell.appendChild(this.e_oil);
-        tcell.appendChild(oilSpan);
-        tcell.appendChild(document.createElement("BR"));
-        var pjSpan = document.createElement("SPAN");
-        pjSpan.innerHTML = "  Pulsejet";
-        this.e_pulsejet = document.createElement("INPUT");
-        this.e_pulsejet.setAttribute("type", "checkbox");
-        this.e_pulsejet.checked = false;
-        this.e_pulsejet.style.width = "3.5em";
-        tcell.appendChild(this.e_pulsejet);
-        tcell.appendChild(pjSpan);
+        this.CreateCheckbox(" Oil Tank", this.e_oil, tcell);
+        this.CreateCheckbox(" Pulsejet", this.e_pulsejet, tcell);
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
             if (this.e_select.selectedIndex == this.engine_list.length) {
@@ -1280,42 +1287,24 @@ class Engine_HTML extends Display {
         mount_cell.appendChild(this.mount_select);
         mount_cell.appendChild(document.createElement("BR"));
         this.pushpull_input = document.createElement("INPUT");
-        this.pushpull_input.setAttribute("type", "checkbox");
-        this.pushpull_input.checked = this.engine.GetUsePushPull();
-        this.pushpull_input.style.width = "3.5em";
-        this.pushpull_input.onchange = () => { this.engine.SetUsePushPull(this.pushpull_input.checked); };
-        mount_cell.appendChild(this.pushpull_input);
-        var txtSpan = document.createElement("SPAN");
-        txtSpan.innerHTML = "Push Pull";
-        mount_cell.appendChild(txtSpan);
-        mount_cell.appendChild(document.createElement("BR"));
         this.torque_input = document.createElement("INPUT");
-        this.torque_input.setAttribute("type", "checkbox");
+        this.CreateCheckbox(" Push Pull", this.pushpull_input, mount_cell);
+        this.CreateCheckbox(" Torque To Structure", this.torque_input, mount_cell);
+        this.pushpull_input.checked = this.engine.GetUsePushPull();
         this.torque_input.checked = this.engine.GetUsePushPull();
-        this.torque_input.style.width = "3.5em";
+        this.pushpull_input.onchange = () => { this.engine.SetUsePushPull(this.pushpull_input.checked); };
         this.torque_input.onchange = () => { this.engine.SetTorqueToStruct(this.torque_input.checked); };
-        mount_cell.appendChild(this.torque_input);
-        var txtSpan = document.createElement("SPAN");
-        txtSpan.innerHTML = "Torque To Structure";
-        mount_cell.appendChild(txtSpan);
     }
     InitUpgradeSelect(upg_cell) {
-        var ds_span = document.createElement("SPAN");
-        ds_span.innerHTML = "   Extended Driveshafts";
         this.ds_input = document.createElement("INPUT");
-        this.ds_input.setAttribute("type", "checkbox");
-        this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
-        this.ds_input.style.width = "3.5em";
-        this.ds_input.onchange = () => { this.engine.SetUseExtendedDriveshaft(this.ds_input.checked); };
-        upg_cell.appendChild(this.ds_input);
-        upg_cell.appendChild(ds_span);
-        upg_cell.appendChild(document.createElement("BR"));
         this.gp_input = document.createElement("INPUT");
         this.gpr_input = document.createElement("INPUT");
+        this.CreateCheckbox("   Extended Driveshafts", this.ds_input, upg_cell);
         this.CreateInput("  Geared Propeller", this.gp_input, upg_cell);
         this.CreateInput("  Negate Reliability Penalty", this.gpr_input, upg_cell);
         this.gp_input.oninput = () => { this.engine.SetGearCount(this.gp_input.valueAsNumber); };
         this.gpr_input.oninput = () => { this.engine.SetGearReliability(this.gpr_input.valueAsNumber); };
+        this.ds_input.onchange = () => { this.engine.SetUseExtendedDriveshaft(this.ds_input.checked); };
     }
     InitStatDisplay() {
         var stat_cell = this.row.insertCell();
@@ -1421,14 +1410,25 @@ class Engine_HTML extends Display {
         }
     }
     CreateInput(txt, elem, table) {
+        var span = document.createElement("SPAN");
         var txtSpan = document.createElement("SPAN");
         txtSpan.innerHTML = txt;
         elem.setAttribute("type", "number");
         elem.min = (0).toString();
         elem.valueAsNumber = 0;
-        elem.style.width = "4em";
-        table.appendChild(elem);
-        table.appendChild(txtSpan);
+        span.appendChild(elem);
+        span.appendChild(txtSpan);
+        table.appendChild(span);
+        table.appendChild(document.createElement("BR"));
+    }
+    CreateCheckbox(txt, elem, table) {
+        var span = document.createElement("SPAN");
+        var txtSpan = document.createElement("SPAN");
+        txtSpan.innerHTML = txt;
+        elem.setAttribute("type", "checkbox");
+        span.appendChild(elem);
+        span.appendChild(txtSpan);
+        table.appendChild(span);
         table.appendChild(document.createElement("BR"));
     }
     SendCustomStats() {
@@ -1760,11 +1760,10 @@ class Frames extends Part {
                 flammable: elem["flammable"]
             });
         }
-        this.section_list = [];
-        this.SetRequiredSections(1);
         this.farman = false;
         this.boom = false;
-        this.sel_tail = 0;
+        this.has_tractor_nacelles = false;
+        this.sel_tail = 1;
         this.tail_list = [];
         for (let elem of js["tail"]) {
             this.tail_list.push({
@@ -1772,6 +1771,9 @@ class Frames extends Part {
                 stats: new Stats(elem)
             });
         }
+        this.section_list = [];
+        this.tail_section_list = [];
+        this.SetRequiredSections(1);
     }
     DuplicateSection(num) {
         var sec = this.section_list[num];
@@ -1785,6 +1787,18 @@ class Frames extends Part {
         this.section_list.splice(num, 0, new_section);
         this.CalculateStats();
     }
+    DuplicateTailSection(num) {
+        var sec = this.tail_section_list[num];
+        var new_section = {
+            frame: sec.frame, skin: sec.skin, geodesic: sec.geodesic, monocoque: sec.monocoque,
+            lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
+        };
+        if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
+            return;
+        }
+        this.tail_section_list.splice(num, 0, new_section);
+        this.CalculateStats();
+    }
     DeleteSection(num) {
         if (this.required_sections == this.CountSections()
             && !this.section_list[num].internal_bracing)
@@ -1795,7 +1809,7 @@ class Frames extends Part {
     SetRequiredSections(num) {
         this.required_sections = num;
         if (this.required_sections > this.CountSections()) {
-            if (this.CountSections() == 0) {
+            if (this.section_list.length == 0) {
                 this.section_list.push({
                     frame: 0, skin: 0, geodesic: false, monocoque: false,
                     lifting_body: false, internal_bracing: false
@@ -1810,6 +1824,23 @@ class Frames extends Part {
                 }
             }
         }
+    }
+    SetRequiredTailSections(num) {
+        if (num > this.tail_section_list.length) {
+            if (this.tail_section_list.length == 0) {
+                this.tail_section_list.push({
+                    frame: 0, skin: 0, geodesic: false, monocoque: false,
+                    lifting_body: false, internal_bracing: false
+                });
+            }
+            while (num > this.tail_section_list.length) {
+                this.DuplicateTailSection(this.tail_section_list.length - 1);
+            }
+        }
+        while (num < this.tail_section_list.length) {
+            this.tail_section_list.pop();
+        }
+        this.CalculateStats();
     }
     CountSections() {
         var count = 0;
@@ -1889,7 +1920,8 @@ class Frames extends Part {
     SetInternalBracing(num, use) {
         //If we're setting it, it isn't already set, and we have the margin.
         if (use && !this.section_list[num].internal_bracing
-            && this.PossibleInternalBracing()) {
+            && this.PossibleInternalBracing()
+            && this.CountSections() > this.required_sections) {
             console.log("Setting Bracing");
             console.log(this.CountSections());
             console.log(this.required_sections);
@@ -1912,13 +1944,22 @@ class Frames extends Part {
         }
     }
     PossibleInternalBracing() {
-        return this.CountSections() > this.required_sections;
+        return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length;
     }
     PossibleGeodesic(num) {
         return this.frame_list[this.section_list[num].frame].geodesic;
     }
     PossibleMonocoque(num) {
         return this.skin_list[this.section_list[num].skin].monocoque;
+    }
+    PossibleTailGeodesic(num) {
+        return this.frame_list[this.tail_section_list[num].frame].geodesic;
+    }
+    PossibleTailMonocoque(num) {
+        return this.skin_list[this.tail_section_list[num].skin].monocoque;
+    }
+    PossibleRemoveSections() {
+        return this.CountSections() > this.required_sections;
     }
     GetFarmanOrBoom() {
         return this.farman || this.boom;
@@ -1947,7 +1988,7 @@ class Frames extends Part {
     }
     SetTailType(num) {
         this.sel_tail = num;
-        this.CalculateStats();
+        this.SetRequiredTailSections(this.tail_list[num].stats.reqsections);
     }
     GetTailType() {
         return this.sel_tail;
@@ -1962,6 +2003,13 @@ class Frames extends Part {
         this.farman = use;
         if (use && this.boom)
             this.boom = false;
+        if (this.farman) {
+            for (let sec of this.tail_section_list) {
+                sec.skin = 0;
+                sec.monocoque = false;
+                sec.lifting_body = false;
+            }
+        }
         this.CalculateStats();
     }
     GetUseFarman() {
@@ -2013,6 +2061,12 @@ class Frames extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    SetHasTractorNacelles(use) {
+        this.has_tractor_nacelles = true;
+    }
+    GetHasTractorNacelles() {
+        return this.has_tractor_nacelles;
+    }
     PartStats() {
         var stats = new Stats();
         var base_type = this.BaseType();
@@ -2024,11 +2078,24 @@ class Frames extends Part {
             var clinker = this.skin_list[sec.skin].monocoque_structure < 0 && sec.monocoque;
             is_clinker = is_clinker || clinker;
         }
+        var tail_stats = new Stats();
+        for (let sec of this.tail_section_list) {
+            tail_stats = tail_stats.Add(this.SectionStats(sec));
+            var clinker = this.skin_list[sec.skin].monocoque_structure < 0 && sec.monocoque;
+            is_clinker = is_clinker || clinker;
+        }
         if (is_clinker)
             stats.structure += 30;
         stats.structure = Math.floor(stats.structure);
         stats.cost = Math.floor(stats.cost);
         stats.visibility = Math.min(stats.visibility, 3);
+        stats = stats.Add(this.tail_list[this.sel_tail].stats);
+        if (this.boom) {
+            tail_stats.maxstrain += tail_stats.mass;
+            if (this.has_tractor_nacelles)
+                tail_stats.drag = Math.floor(1.5 * tail_stats.drag);
+        }
+        stats = stats.Add(tail_stats);
         return stats;
     }
 }
@@ -2044,6 +2111,7 @@ class Frames_HTML extends Display {
         this.c_options = row.insertCell();
         this.c_stats = row.insertCell();
         this.c_stats.className = "inner_table";
+        this.c_stats.rowSpan = 0;
         var tbl = document.createElement("TABLE");
         tbl.className = "inner_table";
         var h1_row = tbl.insertRow();
@@ -2065,12 +2133,39 @@ class Frames_HTML extends Display {
         var h3_row = tbl.insertRow();
         this.CreateTH(h3_row, "Wing Area");
         this.CreateTH(h3_row, "Flammable");
-        this.CreateTH(h3_row, "");
-        var c2_row = tbl.insertRow();
-        this.d_area = c2_row.insertCell();
-        this.d_flammable = c2_row.insertCell();
-        c2_row.insertCell();
+        this.CreateTH(h3_row, "Pitch Stability");
+        var c3_row = tbl.insertRow();
+        this.d_area = c3_row.insertCell();
+        this.d_flammable = c3_row.insertCell();
+        this.d_pitchstab = c3_row.insertCell();
+        var h4_row = tbl.insertRow();
+        this.CreateTH(h4_row, "Max Strain");
+        this.CreateTH(h4_row, "");
+        this.CreateTH(h4_row, "");
+        var c4_row = tbl.insertRow();
+        this.d_strain = c4_row.insertCell();
+        c4_row.insertCell();
+        c4_row.insertCell();
         this.c_stats.appendChild(tbl);
+        var row3 = table.insertRow();
+        this.CreateTH(row3, "Tail Frame Type");
+        this.CreateTH(row3, "Tail Skin Type");
+        this.CreateTH(row3, "Tail Frame Options");
+        var row4 = table.insertRow();
+        this.t_frame = row4.insertCell();
+        this.t_skin = row4.insertCell();
+        this.t_options = row4.insertCell();
+        this.t_select = document.getElementById("tail_type");
+        this.t_farman = document.getElementById("tail_farman");
+        this.t_boom = document.getElementById("tail_boom");
+        for (let elem of this.frames.GetTailList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = elem.name;
+            this.t_select.add(opt);
+        }
+        this.t_select.onchange = () => { this.frames.SetTailType(this.t_select.selectedIndex); };
+        this.t_farman.onchange = () => { this.frames.SetUseFarman(this.t_farman.checked); };
+        this.t_boom.onchange = () => { this.frames.SetUseBoom(this.t_boom.checked); };
     }
     CreateTH(row, content) {
         var th = document.createElement("TH");
@@ -2117,18 +2212,27 @@ class Frames_HTML extends Display {
             this.c_skin.removeChild(this.c_skin.children[0]);
         while (this.c_options.children.length > 0)
             this.c_options.removeChild(this.c_options.children[0]);
+        while (this.t_frame.children.length > 0)
+            this.t_frame.removeChild(this.t_frame.children[0]);
+        while (this.t_skin.children.length > 0)
+            this.t_skin.removeChild(this.t_skin.children[0]);
+        while (this.t_options.children.length > 0)
+            this.t_options.removeChild(this.t_options.children[0]);
         var section_list = this.frames.GetSectionList();
+        var tail_section_list = this.frames.GetTailSectionList();
         var frame_list = this.frames.GetFrameList();
         var skin_list = this.frames.GetSkinList();
-        var is_flammable;
+        var is_flammable = false;
         for (let i = 0; i < section_list.length; i++) {
             let sec = section_list[i];
+            let type_span = document.createElement("SPAN");
             let rem_button = document.createElement("BUTTON");
             rem_button.textContent = "-";
             rem_button.onclick = () => { this.frames.DeleteSection(i); };
-            rem_button.disabled = !this.frames.PossibleInternalBracing();
+            rem_button.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
             let add_button = document.createElement("BUTTON");
             add_button.textContent = "+";
+            add_button.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
             add_button.onclick = () => { this.frames.DuplicateSection(i); };
             let frame_select = document.createElement("SELECT");
             for (let ft of frame_list) {
@@ -2142,9 +2246,10 @@ class Frames_HTML extends Display {
             }
             frame_select.onchange = () => { this.frames.SetFrame(i, frame_select.selectedIndex); };
             frame_select.selectedIndex = sec.frame;
-            this.c_frame.appendChild(rem_button);
-            this.c_frame.appendChild(add_button);
-            this.c_frame.appendChild(frame_select);
+            type_span.appendChild(rem_button);
+            type_span.appendChild(add_button);
+            type_span.appendChild(frame_select);
+            this.c_frame.appendChild(type_span);
             this.c_frame.appendChild(document.createElement("BR"));
             let skin_select = document.createElement("SELECT");
             for (let st of skin_list) {
@@ -2160,6 +2265,7 @@ class Frames_HTML extends Display {
             skin_select.selectedIndex = sec.skin;
             this.c_skin.appendChild(skin_select);
             this.c_skin.appendChild(document.createElement("BR"));
+            let opt_span = document.createElement("SPAN");
             let geo_input = document.createElement("INPUT");
             geo_input.setAttribute("type", "checkbox");
             geo_input.checked = sec.geodesic;
@@ -2167,8 +2273,8 @@ class Frames_HTML extends Display {
             geo_input.onchange = () => { this.frames.SetGeodesic(i, geo_input.checked); };
             let geo_span = document.createElement("SPAN");
             geo_span.innerText = "  Geodesic    ";
-            this.c_options.appendChild(geo_input);
-            this.c_options.appendChild(geo_span);
+            opt_span.appendChild(geo_input);
+            opt_span.appendChild(geo_span);
             let mono_input = document.createElement("INPUT");
             mono_input.setAttribute("type", "checkbox");
             mono_input.checked = sec.monocoque;
@@ -2176,8 +2282,8 @@ class Frames_HTML extends Display {
             mono_input.onchange = () => { this.frames.SetMonocoque(i, mono_input.checked); };
             let mono_span = document.createElement("SPAN");
             mono_span.innerText = "  Monocoque    ";
-            this.c_options.appendChild(mono_input);
-            this.c_options.appendChild(mono_span);
+            opt_span.appendChild(mono_input);
+            opt_span.appendChild(mono_span);
             let int_input = document.createElement("INPUT");
             int_input.setAttribute("type", "checkbox");
             int_input.checked = sec.internal_bracing;
@@ -2186,8 +2292,8 @@ class Frames_HTML extends Display {
             int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
             let int_span = document.createElement("SPAN");
             int_span.innerText = "  Internal Bracing    ";
-            this.c_options.appendChild(int_input);
-            this.c_options.appendChild(int_span);
+            opt_span.appendChild(int_input);
+            opt_span.appendChild(int_span);
             let lb_input = document.createElement("INPUT");
             lb_input.setAttribute("type", "checkbox");
             lb_input.checked = sec.lifting_body;
@@ -2195,9 +2301,76 @@ class Frames_HTML extends Display {
             lb_input.onchange = () => { this.frames.SetLiftingBody(i, lb_input.checked); };
             let lb_span = document.createElement("SPAN");
             lb_span.innerText = "  Lifting Body    ";
-            this.c_options.appendChild(lb_input);
-            this.c_options.appendChild(lb_span);
+            opt_span.appendChild(lb_input);
+            opt_span.appendChild(lb_span);
+            this.c_options.appendChild(opt_span);
             this.c_options.appendChild(document.createElement("BR"));
+            //Flammable check
+            is_flammable = is_flammable || skin_list[sec.skin].flammable;
+        }
+        this.t_select.selectedIndex = this.frames.GetTailType();
+        this.t_farman.disabled = this.frames.GetUseBoom();
+        this.t_boom.disabled = this.frames.GetUseFarman();
+        for (let i = 0; i < tail_section_list.length; i++) {
+            let sec = tail_section_list[i];
+            let frame_select = document.createElement("SELECT");
+            for (let ft of frame_list) {
+                let opt = document.createElement("OPTION");
+                opt.text = ft.name;
+                if (sec.geodesic && !ft.geodesic)
+                    opt.disabled = true;
+                if (ft.basestruct != 0)
+                    frame_select.add(opt);
+            }
+            frame_select.onchange = () => { this.frames.SetTailFrame(i, frame_select.selectedIndex); };
+            frame_select.selectedIndex = sec.frame;
+            this.t_frame.appendChild(frame_select);
+            this.t_frame.appendChild(document.createElement("BR"));
+            let skin_select = document.createElement("SELECT");
+            for (let st of skin_list) {
+                let opt = document.createElement("OPTION");
+                opt.text = st.name;
+                if (sec.monocoque && !st.monocoque)
+                    opt.disabled = true;
+                skin_select.add(opt);
+            }
+            if (this.frames.GetUseFarman()) {
+                skin_select.disabled = true;
+            }
+            skin_select.onchange = () => { this.frames.SetTailSkin(i, skin_select.selectedIndex); };
+            skin_select.selectedIndex = sec.skin;
+            this.t_skin.appendChild(skin_select);
+            this.t_skin.appendChild(document.createElement("BR"));
+            let opt_span = document.createElement("SPAN");
+            let geo_input = document.createElement("INPUT");
+            geo_input.setAttribute("type", "checkbox");
+            geo_input.checked = sec.geodesic;
+            geo_input.disabled = !this.frames.PossibleTailGeodesic(i);
+            geo_input.onchange = () => { this.frames.SetTailGeodesic(i, geo_input.checked); };
+            let geo_span = document.createElement("SPAN");
+            geo_span.innerText = "  Geodesic    ";
+            opt_span.appendChild(geo_input);
+            opt_span.appendChild(geo_span);
+            let mono_input = document.createElement("INPUT");
+            mono_input.setAttribute("type", "checkbox");
+            mono_input.checked = sec.monocoque;
+            mono_input.disabled = !this.frames.PossibleTailMonocoque(i);
+            mono_input.onchange = () => { this.frames.SetTailMonocoque(i, mono_input.checked); };
+            let mono_span = document.createElement("SPAN");
+            mono_span.innerText = "  Monocoque    ";
+            opt_span.appendChild(mono_input);
+            opt_span.appendChild(mono_span);
+            let lb_input = document.createElement("INPUT");
+            lb_input.setAttribute("type", "checkbox");
+            lb_input.checked = sec.lifting_body;
+            lb_input.disabled = !this.frames.PossibleTailMonocoque(i);
+            lb_input.onchange = () => { this.frames.SetTailLiftingBody(i, lb_input.checked); };
+            let lb_span = document.createElement("SPAN");
+            lb_span.innerText = "  Lifting Body    ";
+            opt_span.appendChild(lb_input);
+            opt_span.appendChild(lb_span);
+            this.t_options.appendChild(opt_span);
+            this.t_options.appendChild(document.createElement("BR"));
             //Flammable check
             is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
@@ -2213,5 +2386,7 @@ class Frames_HTML extends Display {
         this.d_tugh.innerHTML = stats.toughness.toString();
         this.d_visi.innerHTML = stats.visibility.toString();
         this.d_area.innerHTML = stats.wingarea.toString();
+        this.d_pitchstab.innerHTML = stats.pitchstab.toString();
+        this.d_strain.innerHTML = stats.maxstrain.toString();
     }
 }
