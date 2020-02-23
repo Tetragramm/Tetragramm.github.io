@@ -21,7 +21,7 @@ const loadJSON = (path, callback) => {
 }
 
 const init = () => {
-    loadJSON('/parts.json', (response) => {
+    loadJSON('/PlaneBuilder/parts.json', (response) => {
         // Parse JSON string into object
         let actual_JSON = JSON.parse(response);
         aircraft_model = new Aircraft(actual_JSON);
@@ -1031,7 +1031,7 @@ class Engines extends Part {
         this.engines = [];
         this.engine_stats = [];
         this.radiators = [];
-        loadJSON('/engines.json', (response) => {
+        loadJSON('/PlaneBuilder/engines.json', (response) => {
             // Parse JSON string into object
             let actual_JSON = JSON.parse(response) as JSON;
             for (let elem of actual_JSON["engines"]) {
