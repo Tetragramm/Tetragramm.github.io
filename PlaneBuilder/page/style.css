@@ -49,79 +49,10 @@ html {
 	margin-bottom: 0.25rem;
 }
 
-.page__breadcrumbs {
-	font-size: .8rem;
-	color: #999999;
-}
-
-.page__breadcrumb:after {
-	content: " » ";
-}
-
 .page__h2 {
 	font-size: 2rem;
 	font-weight: 700;
 	border-bottom: .0625rem solid #606060;
-}
-
-.page__dateline {
-	font-size: .8rem;
-	color: #999999;
-}
-
-.page__controls {
-	margin: 1rem 0;
-	display: flex;
-	flex-wrap: wrap;
-	row-gap: 1rem; /* Firefox only. One day... */
-}
-
-.page__control {
-	margin-inline-end: 1rem;
-}
-
-.page__control:last-child {
-	margin-inline-end: 0;
-}
-
-.page__button-form {
-	display: inline;
-	border-width: 0;
-	margin: 0;
-	padding: 0;
-}
-
-.page__control-link {
-	display: inline-block;
-	padding: .5rem .75rem;
-	background-color: #efa200;
-	color: white;
-	line-height: 1rem;
-}
-
-.page__control-link:hover,
-.page__control-link:active,
-.page__control-link:focus {
-	background-color: #ab6f00;
-	color: inherit;
-}
-
-/* also used on page `re_en` */
-.page__button {
-	border: 0;
-	font-size: 1em; /* avoid shrinkage */
-	font-family: inherit;
-	padding: .5rem .75rem;
-	background-color: rgb(16, 82, 225);
-	color: white;
-	cursor: pointer;
-	line-height: 1rem;
-}
-
-.page__button:hover,
-.page__button:active,
-.page__button:focus {
-	background-color: rgb(5, 52, 185);
 }
 
 .page__content {
@@ -133,24 +64,6 @@ html {
 }
 
 .page__content > *:last-child {
-	margin-bottom: 0;
-}
-
-.page__ancestors {
-	text-align: right;
-	margin: 2rem 0 0;
-}
-
-.page__credit {
-	font-size: .8rem;
-	color: #383838;
-}
-
-.page__regular-form > *:first-child {
-	margin-top: 0;
-}
-
-.page__regular-form > *:last-child {
 	margin-bottom: 0;
 }
 
