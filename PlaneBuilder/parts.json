@@ -1,5 +1,5 @@
 {
-    "version": "1.0",
+    "version": "9.1",
     "era": {
         "rules": "<b>Era</b><br/>Your Era will determine some factors about your aircraft to start. Regular Flying Circus is generally WW1 Era.<br/><table><tr><th>Era</th><th>Starting Stats</th></tr>{0}</table>",
         "options": [
@@ -739,13 +739,7 @@
                 "name": "Tandem",
                 "sizereq": true,
                 "hstab": false,
-                "pitchstab": 5
-            },
-            {
-                "name": "Semi Tandem",
-                "sizereq": false,
-                "hstab": false,
-                "pitchstab": 3
+                "pitchstab": 4
             },
             {
                 "name": "Extreme Positive",

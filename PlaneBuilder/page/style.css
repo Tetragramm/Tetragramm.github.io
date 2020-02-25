@@ -279,6 +279,12 @@ input[disabled] {
 	border-color: #000000;
 }
 
+select[disabled] {
+	background-color: #000000;
+	border-color: #000000;
+	color: #000000;
+}
+
 button {
 	background-color: #383838;
 	color: #c7c7c7;

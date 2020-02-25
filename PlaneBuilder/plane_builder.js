@@ -2,7 +2,6 @@
 //TODO: Engine as Generator
 //TODO: Weapons
 //TODO: Radiator requries Parasol wing
-//TODO: Torque is Structure or Strain
 const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
@@ -20,13 +19,19 @@ const loadJSON = (path, callback) => {
 const init = () => {
     loadJSON('/PlaneBuilder/parts.json', (response) => {
         // Parse JSON string into object
-        let actual_JSON = JSON.parse(response);
-        aircraft_model = new Aircraft(actual_JSON);
-        aircraft_display = new Aircraft_HTML(actual_JSON, aircraft_model);
-        aircraft_model.CalculateStats();
+        let acft_data = window.localStorage.aircraft;
+        let parts_JSON = JSON.parse(response);
+        loadJSON('/PlaneBuilder/engines.json', (response2) => {
+            engine_json = JSON.parse(response2);
+            aircraft_model = new Aircraft(parts_JSON, true);
+            aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
+            if (acft_data)
+                aircraft_model.fromJSON(JSON.parse(acft_data));
+        });
     });
 };
 window.onload = init;
+var engine_json;
 var aircraft_model;
 var aircraft_display;
 // When the user clicks on div, open the popup
@@ -124,51 +129,80 @@ class Stats {
         this.wingarea = 0;
         this.toughness = 0;
         if (js) {
-            if (js["liftbleed"])
-                this.liftbleed = js["liftbleed"];
-            if (js["wetmass"])
-                this.wetmass = js["wetmass"];
-            if (js["mass"])
-                this.mass = js["mass"];
-            if (js["drag"])
-                this.drag = js["drag"];
-            if (js["control"])
-                this.control = js["control"];
-            if (js["cost"])
-                this.cost = js["cost"];
-            if (js["reqsections"])
-                this.reqsections = js["reqsections"];
-            if (js["visibility"])
-                this.visibility = js["visibility"];
-            if (js["flightstress"])
-                this.flightstress = js["flightstress"];
-            if (js["escape"])
-                this.escape = js["escape"];
-            if (js["pitchstab"])
-                this.pitchstab = js["pitchstab"];
-            if (js["latstab"])
-                this.latstab = js["latstab"];
-            if (js["cooling"])
-                this.cooling = js["cooling"];
-            if (js["reliability"])
-                this.reliability = js["reliability"];
-            if (js["power"])
-                this.power = js["power"];
-            if (js["fuelconsumption"])
-                this.fuelconsumption = js["fuelconsumption"];
-            if (js["maxstrain"])
-                this.maxstrain = js["maxstrain"];
-            if (js["structure"])
-                this.structure = js["structure"];
-            if (js["pitchspeed"])
-                this.pitchspeed = js["pitchspeed"];
-            if (js["pitchboost"])
-                this.pitchboost = js["pitchboost"];
-            if (js["wingarea"])
-                this.wingarea = js["wingarea"];
-            if (js["toughness"])
-                this.toughness = js["toughness"];
+            this.fromJSON(js);
         }
+    }
+    toJSON() {
+        return {
+            liftbleed: this.liftbleed,
+            wetmass: this.wetmass,
+            mass: this.mass,
+            drag: this.drag,
+            control: this.control,
+            cost: this.cost,
+            reqsections: this.reqsections,
+            visibility: this.visibility,
+            flightstress: this.flightstress,
+            escape: this.escape,
+            pitchstab: this.pitchstab,
+            latstab: this.latstab,
+            cooling: this.cooling,
+            reliability: this.reliability,
+            power: this.power,
+            fuelconsumption: this.fuelconsumption,
+            maxstrain: this.maxstrain,
+            structure: this.structure,
+            pitchboost: this.pitchboost,
+            pitchspeed: this.pitchspeed,
+            wingarea: this.wingarea,
+            toughness: this.toughness
+        };
+    }
+    fromJSON(js) {
+        if (js["liftbleed"])
+            this.liftbleed = js["liftbleed"];
+        if (js["wetmass"])
+            this.wetmass = js["wetmass"];
+        if (js["mass"])
+            this.mass = js["mass"];
+        if (js["drag"])
+            this.drag = js["drag"];
+        if (js["control"])
+            this.control = js["control"];
+        if (js["cost"])
+            this.cost = js["cost"];
+        if (js["reqsections"])
+            this.reqsections = js["reqsections"];
+        if (js["visibility"])
+            this.visibility = js["visibility"];
+        if (js["flightstress"])
+            this.flightstress = js["flightstress"];
+        if (js["escape"])
+            this.escape = js["escape"];
+        if (js["pitchstab"])
+            this.pitchstab = js["pitchstab"];
+        if (js["latstab"])
+            this.latstab = js["latstab"];
+        if (js["cooling"])
+            this.cooling = js["cooling"];
+        if (js["reliability"])
+            this.reliability = js["reliability"];
+        if (js["power"])
+            this.power = js["power"];
+        if (js["fuelconsumption"])
+            this.fuelconsumption = js["fuelconsumption"];
+        if (js["maxstrain"])
+            this.maxstrain = js["maxstrain"];
+        if (js["structure"])
+            this.structure = js["structure"];
+        if (js["pitchspeed"])
+            this.pitchspeed = js["pitchspeed"];
+        if (js["pitchboost"])
+            this.pitchboost = js["pitchboost"];
+        if (js["wingarea"])
+            this.wingarea = js["wingarea"];
+        if (js["toughness"])
+            this.toughness = js["toughness"];
     }
     Add(other) {
         var res = new Stats();
@@ -222,6 +256,30 @@ class Stats {
         res.toughness = this.toughness * other;
         return res;
     }
+    Equal(other) {
+        return this.liftbleed == other.liftbleed
+            && this.wetmass == other.wetmass
+            && this.mass == other.mass
+            && this.drag == other.drag
+            && this.control == other.control
+            && this.cost == other.cost
+            && this.reqsections == other.reqsections
+            && this.visibility == other.visibility
+            && this.flightstress == other.flightstress
+            && this.escape == other.escape
+            && this.pitchstab == other.pitchstab
+            && this.latstab == other.latstab
+            && this.cooling == other.cooling
+            && this.reliability == other.reliability
+            && this.power == other.power
+            && this.fuelconsumption == other.fuelconsumption
+            && this.maxstrain == other.maxstrain
+            && this.structure == other.structure
+            && this.pitchspeed == other.pitchspeed
+            && this.pitchboost == other.pitchboost
+            && this.wingarea == other.wingarea
+            && this.toughness == other.toughness;
+    }
 }
 class Part {
 }
@@ -251,8 +309,10 @@ class Aircraft_HTML extends Display {
     }
 }
 class Aircraft {
-    constructor(js) {
+    constructor(js, storage) {
+        this.use_storage = false;
         this.stats = new Stats();
+        this.version = js['version'];
         this.era = new Era(js["era"]);
         this.cockpits = new Cockpits(js["cockpit"]);
         this.passengers = new Passengers(js["passengers"]);
@@ -268,8 +328,36 @@ class Aircraft {
         this.frames.SetCalculateStats(() => { this.CalculateStats(); });
         this.wings.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetNumberOfCockpits(1);
+        this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
         this.wings.SetNumberOfWings(4);
+        this.use_storage = storage;
+    }
+    toJSON() {
+        return {
+            version: this.version,
+            era: this.era.toJSON(),
+            cockpits: this.cockpits.toJSON(),
+            passengers: this.passengers.toJSON(),
+            engines: this.engines.toJSON(),
+            propeller: this.propeller.toJSON(),
+            frames: this.frames.toJSON(),
+            wings: this.wings.toJSON()
+        };
+    }
+    fromJSON(js) {
+        console.log(js);
+        console.log(js["version"]);
+        if (this.version == js["version"]) {
+            this.era.fromJSON(js["era"]);
+            this.cockpits.fromJSON(js["cockpits"]);
+            this.passengers.fromJSON(js["passengers"]);
+            this.engines.fromJSON(js["engines"]);
+            this.propeller.fromJSON(js["propeller"]);
+            this.frames.fromJSON(js["frames"]);
+            this.wings.fromJSON(js["wings"]);
+            this.CalculateStats();
+        }
     }
     SetDisplayCallback(callback) {
         this.DisplayCallback = callback;
@@ -290,6 +378,8 @@ class Aircraft {
         this.engines.UpdateReliability(this.stats);
         if (this.DisplayCallback)
             this.DisplayCallback();
+        if (this.use_storage)
+            window.localStorage.aircraft = JSON.stringify(this);
     }
     GetEra() {
         return this.era;
@@ -356,6 +446,14 @@ class Era extends Part {
             this.vals.push(opt);
         }
     }
+    toJSON() {
+        return {
+            selected: this.selected
+        };
+    }
+    fromJSON(js) {
+        this.selected = js["selected"];
+    }
     SetSelected(index) {
         this.selected = index;
         this.CalculateStats();
@@ -410,27 +508,28 @@ class Cockpits_HTML extends Display {
         tooltip.innerHTML = format(js["rules"], cockpit_table, upgrade_table);
     }
     CounterChange() {
-        while (this.tbl.rows.length - 1 > this.counter.valueAsNumber) {
-            this.RemoveCockpit(this.tbl.rows.length - 1);
+        while (this.positions.length > this.counter.valueAsNumber) {
+            this.RemoveCockpit();
         }
-        while (this.tbl.rows.length - 1 < this.counter.valueAsNumber) {
-            this.AddCockpit(this.tbl.rows.length);
+        while (this.positions.length < this.counter.valueAsNumber) {
+            this.AddCockpit(this.positions.length);
         }
     }
     AddCockpit(num) {
-        var row = this.tbl.insertRow(num);
-        var cp = new Cockpit_HTML(this.json, row, this.cockpits.GetCockpit(num - 1));
+        var row = this.tbl.insertRow();
+        var cp = new Cockpit_HTML(this.json, row, this.cockpits.GetCockpit(num));
         this.positions.push(cp);
     }
-    RemoveCockpit(num) {
+    RemoveCockpit() {
         this.positions.pop();
-        this.tbl.deleteRow(num);
-        aircraft_model.CalculateStats();
+        this.tbl.deleteRow(this.tbl.rows.length - 1);
     }
     UpdateDisplay() {
         this.counter.valueAsNumber = this.cockpits.GetNumberOfCockpits();
         this.CounterChange();
-        for (let pos of this.positions) {
+        for (let i = 0; i < this.positions.length; i++) {
+            let pos = this.positions[i];
+            pos.UpdateCockpit(this.cockpits.GetCockpit(i));
             pos.UpdateDisplay();
         }
     }
@@ -450,6 +549,22 @@ class Cockpits extends Part {
         for (let elem of js["upgrades"]) {
             let upg = { name: elem["name"], stats: new Stats(elem) };
             this.upgrades.push(upg);
+        }
+    }
+    toJSON() {
+        var lst = [];
+        for (let cp of this.positions) {
+            lst.push(cp.toJSON());
+        }
+        return { positions: lst };
+    }
+    fromJSON(js) {
+        this.positions = [];
+        for (let elem of js["positions"]) {
+            let cp = new Cockpit(this.types, this.upgrades);
+            cp.fromJSON(elem);
+            cp.SetCalculateStats(this.CalculateStats);
+            this.positions.push(cp);
         }
     }
     SetNumberOfCockpits(num) {
@@ -494,6 +609,7 @@ class Cockpit_HTML extends Display {
         super();
         this.row = r;
         this.cockpit = cp;
+        this.upg_chbxs = [];
         var option = this.row.insertCell(0);
         var upgrades = this.row.insertCell(1);
         var stat_cell = this.row.insertCell(2);
@@ -521,7 +637,7 @@ class Cockpit_HTML extends Display {
         stat_cell.appendChild(tbl);
         stat_cell.className = "inner_table";
         tbl.className = "inner_table";
-        var select = document.createElement("SELECT");
+        this.sel_type = document.createElement("SELECT");
         // Visibility and Stress and Escape are cockpit local
         // Mark in table for CSS
         this.stress_cell.className = "part_local";
@@ -531,9 +647,9 @@ class Cockpit_HTML extends Display {
         for (let elem of js["options"]) {
             let opt = document.createElement("OPTION");
             opt.text = elem["name"];
-            select.add(opt);
+            this.sel_type.add(opt);
         }
-        option.appendChild(select);
+        option.appendChild(this.sel_type);
         //Add all the upgrades as checkboxes
         var upg_index = 0;
         for (let elem of js["upgrades"]) {
@@ -550,10 +666,13 @@ class Cockpit_HTML extends Display {
             span.appendChild(txt);
             upgrades.appendChild(span);
             upgrades.appendChild(document.createElement("BR"));
+            this.upg_chbxs.push(upg);
         }
         //Set the change event, add the box, and execute it.
-        select.onchange = () => { this.cockpit.SetType(select.selectedIndex); };
-        this.cockpit.SetType(select.selectedIndex);
+        this.sel_type.onchange = () => { this.cockpit.SetType(this.sel_type.selectedIndex); };
+    }
+    UpdateCockpit(cp) {
+        this.cockpit = cp;
     }
     CreateTH(row, content) {
         var th = document.createElement("TH");
@@ -570,6 +689,11 @@ class Cockpit_HTML extends Display {
         this.escape_cell.innerHTML = this.cockpit.GetEscape().toString();
         this.visibility_cell.innerHTML = this.cockpit.GetVisibility().toString();
         this.section_cell.innerHTML = stats.reqsections.toString();
+        this.sel_type.selectedIndex = this.cockpit.GetType();
+        var upgs = this.cockpit.GetSelectedUpgrades();
+        for (let i = 0; i < this.upg_chbxs.length; i++) {
+            this.upg_chbxs[i].checked = upgs[i];
+        }
     }
 }
 class Cockpit extends Part {
@@ -578,17 +702,33 @@ class Cockpit extends Part {
         this.stats = new Stats();
         this.types = tl;
         this.upgrades = ul;
-        this.selected_upgrades = [];
+        this.selected_upgrades = [...Array(this.upgrades.length).fill(false)];
         this.total_stress = 0;
         this.total_escape = 0;
         this.total_visibility = 0;
         this.selected_type = 0;
+    }
+    toJSON() {
+        return {
+            type: this.selected_type,
+            upgrades: this.selected_upgrades
+        };
+    }
+    fromJSON(js) {
+        this.selected_type = js["type"];
+        this.selected_upgrades = js["upgrades"];
+    }
+    GetType() {
+        return this.selected_type;
     }
     SetType(index) {
         if (index >= this.types.length)
             throw "Selected type is not in range of actual types.";
         this.selected_type = index;
         this.CalculateStats();
+    }
+    GetSelectedUpgrades() {
+        return this.selected_upgrades;
     }
     SetUpgrade(index, state) {
         if (index >= this.upgrades.length)
@@ -632,31 +772,28 @@ class Passengers_HTML extends Display {
         this.json = js;
         this.pass = pass;
         this.PopulateRules();
-        var nseats = document.getElementById("num_seats");
-        var nbeds = document.getElementById("num_beds");
+        this.nseats = document.getElementById("num_seats");
+        this.nbeds = document.getElementById("num_beds");
         this.connect = document.getElementById("passenger_connectivity");
         this.mass = document.getElementById("passenger_mass");
         this.reqseq = document.getElementById("passenger_req_seq");
-        nseats.value = "0";
-        nbeds.value = "0";
         this.connect.disabled = true;
-        nseats.oninput = () => {
-            this.pass.SetSeats(nseats.valueAsNumber);
-            this.EnableConnection(nseats.valueAsNumber + nbeds.valueAsNumber);
+        this.nseats.oninput = () => {
+            this.pass.SetSeats(this.nseats.valueAsNumber);
         };
-        nbeds.oninput = () => {
-            this.pass.SetBeds(nbeds.valueAsNumber);
-            this.EnableConnection(nseats.valueAsNumber + nbeds.valueAsNumber);
+        this.nbeds.oninput = () => {
+            this.pass.SetBeds(this.nbeds.valueAsNumber);
         };
         this.connect.oninput = () => {
             this.pass.SetConnected(this.connect.checked);
         };
     }
-    EnableConnection(num) {
-        this.connect.disabled = (num == 0);
-    }
     UpdateDisplay() {
         var stats = this.pass.PartStats();
+        this.nseats.valueAsNumber = this.pass.GetSeats();
+        this.nbeds.valueAsNumber = this.pass.GetBeds();
+        this.connect.checked = this.pass.GetConnected();
+        this.connect.disabled = this.pass.PossibleConnection();
         this.mass.innerHTML = stats.mass.toString();
         this.reqseq.innerHTML = stats.reqsections.toString();
     }
@@ -669,19 +806,41 @@ class Passengers_HTML extends Display {
 class Passengers extends Part {
     constructor(js) {
         super();
-        this.json = js;
-        this.stats = new Stats();
         this.seats = 0;
         this.beds = 0;
         this.connected = false;
+    }
+    toJSON() {
+        return {
+            seats: this.seats,
+            beds: this.beds,
+            connected: this.connected
+        };
+    }
+    fromJSON(js) {
+        this.seats = js["seats"];
+        this.beds = js["beds"];
+        this.connected = js["connected"];
+    }
+    GetSeats() {
+        return this.seats;
     }
     SetSeats(num) {
         this.seats = num;
         this.CalculateStats();
     }
+    GetBeds() {
+        return this.beds;
+    }
     SetBeds(num) {
         this.beds = num;
         this.CalculateStats();
+    }
+    PossibleConnection() {
+        return (this.seats + this.beds) > 0;
+    }
+    GetConnected() {
+        return this.connected;
     }
     SetConnected(sel) {
         this.connected = sel;
@@ -699,35 +858,37 @@ class Passengers extends Part {
         this.CalculateStats = callback;
     }
 }
-class EngineStats extends Stats {
+class EngineStats {
     constructor(js) {
-        super(js);
         this.name = "";
-        this.reliability = 0;
-        this.cooling = 0;
         this.overspeed = 0;
         this.altitude = 0;
         this.torque = 0;
         this.rumble = 0;
         this.oiltank = false;
         this.pulsejet = false;
+        this.stats = new Stats();
         if (js) {
-            this.name = js["name"];
-            this.reliability = js["reliability"];
-            this.cooling = js["cooling"];
-            this.overspeed = js["overspeed"];
-            this.altitude = js["altitude"];
-            this.torque = js["torque"];
-            this.rumble = js["rumble"];
-            this.oiltank = js["oiltank"];
-            this.pulsejet = js["pulsejet"];
+            this.fromJSON(js);
         }
     }
+    toJSON() {
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
+    }
+    fromJSON(js) {
+        this.name = js["name"];
+        this.overspeed = js["overspeed"];
+        this.altitude = js["altitude"];
+        this.torque = js["torque"];
+        this.rumble = js["rumble"];
+        this.oiltank = js["oiltank"];
+        this.pulsejet = js["pulsejet"];
+        this.stats = new Stats(js);
+    }
     Add(other) {
-        let res = super.Add(other);
+        let res = new EngineStats();
+        res.stats = this.stats.Add(other.stats);
         res.name = this.name;
-        res.reliability = this.reliability + other.reliability;
-        res.cooling = this.cooling + other.cooling;
         res.overspeed = this.overspeed + other.overspeed;
         res.altitude = this.altitude + other.altitude;
         res.torque = this.torque + other.torque;
@@ -738,6 +899,15 @@ class EngineStats extends Stats {
     }
     Clone() {
         return this.Add(new EngineStats());
+    }
+    Equal(other) {
+        return this.stats.Equal(other.stats)
+            && this.overspeed == other.overspeed
+            && this.altitude == other.altitude
+            && this.torque == other.torque
+            && this.rumble == other.rumble
+            && this.oiltank == other.oiltank
+            && this.pulsejet == other.pulsejet;
     }
 }
 class Engines_HTML extends Display {
@@ -809,8 +979,12 @@ class Engines_HTML extends Display {
             this.tbl.deleteRow(this.engines.length + 1);
         }
         while (this.engines.length < num) {
-            let en = new Engine_HTML(this.eng.GetEngine(this.engines.length), this.tbl.insertRow());
+            let tst = this.eng.GetEngine(this.engines.length);
+            let en = new Engine_HTML(tst, this.tbl.insertRow());
             this.engines.push(en);
+        }
+        for (let i = 0; i < num; i++) {
+            this.engines[i].UpdateEngine(this.eng.GetEngine(i));
         }
         var rad = this.eng.GetNumberOfRadiators();
         this.num_radiators.valueAsNumber = rad;
@@ -830,6 +1004,9 @@ class Engines_HTML extends Display {
             let en = new Radiator_HTML(this.tblR.insertRow(), this.eng.GetRadiator(this.radiators.length));
             this.radiators.push(en);
         }
+        for (let i = 0; i < rad; i++) {
+            this.radiators[i].UpdateRadiator(this.eng.GetRadiator(i));
+        }
         this.is_asymmetric.checked = this.eng.GetAsymmetry();
         for (let elem of this.engines) {
             elem.UpdateDisplay();
@@ -845,15 +1022,9 @@ class Engines extends Part {
         this.engines = [];
         this.engine_stats = [];
         this.radiators = [];
-        loadJSON('/PlaneBuilder/engines.json', (response) => {
-            // Parse JSON string into object
-            let actual_JSON = JSON.parse(response);
-            for (let elem of actual_JSON["engines"]) {
-                this.engine_stats.push(new EngineStats(elem));
-            }
-            this.SetNumberOfEngines(1);
-            this.SetNumberOfRadiators(1);
-        });
+        for (let elem of engine_json["engines"]) {
+            this.engine_stats.push(new EngineStats(elem));
+        }
         this.mount_list = [];
         for (let elem of js["mounts"]) {
             let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], pp_type: elem["push-pull"], reqED: false, reqTail: false };
@@ -881,6 +1052,39 @@ class Engines extends Part {
             this.r_coolant_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
     }
+    toJSON() {
+        var eng = [];
+        for (let en of this.engines) {
+            eng.push(en.toJSON());
+        }
+        var rad = [];
+        for (let rd of this.radiators) {
+            rad.push(rd.toJSON());
+        }
+        return {
+            engines: eng,
+            radiators: rad,
+            is_asymmetric: this.is_asymmetric
+        };
+    }
+    fromJSON(js) {
+        this.radiators = [];
+        for (let elem of js["radiators"]) {
+            let rad = new Radiator(this.r_type_list, this.r_mount_list, this.r_coolant_list);
+            rad.fromJSON(elem);
+            rad.SetCalculateStats(this.CalculateStats);
+            this.radiators.push(rad);
+        }
+        this.engines = [];
+        for (let elem of js["engines"]) {
+            let eng = new Engine(this.engine_stats, this.mount_list, this.pp_list);
+            eng.fromJSON(elem);
+            eng.SetCalculateStats(this.CalculateStats);
+            this.engines.push(eng);
+            eng.SetNumRadiators(this.GetNumberOfRadiators());
+        }
+        this.is_asymmetric = js["is_asymmetric"];
+    }
     SetNumberOfEngines(num) {
         while (this.engines.length > num) {
             this.engines.pop();
@@ -889,6 +1093,7 @@ class Engines extends Part {
             let en = new Engine(this.engine_stats, this.mount_list, this.pp_list);
             en.SetCalculateStats(this.CalculateStats);
             this.engines.push(en);
+            en.SetNumRadiators(this.GetNumberOfRadiators());
         }
         this.CalculateStats();
     }
@@ -931,10 +1136,11 @@ class Engines extends Part {
     }
     UpdateReliability(stats) {
         for (let elem of this.engines) {
-            if (elem.GetRadiator() < this.radiators.length) {
-                let rad_stats = this.radiators[elem.GetRadiator()].PartStats();
-                elem.UpdateReliability(stats.reliability + rad_stats.reliability);
+            let rad_stats = new Stats();
+            if (elem.GetRadiator() < this.radiators.length && elem.GetRadiator() >= 0) {
+                rad_stats = this.radiators[elem.GetRadiator()].PartStats();
             }
+            elem.UpdateReliability(stats.reliability + rad_stats.reliability);
         }
     }
     SetAsymmetry(use) {
@@ -980,8 +1186,8 @@ class Engine extends Part {
         super();
         this.engine_list = el;
         this.selected_index = 0;
-        this.etype_stats = this.engine_list[0];
-        this.cooling_count = this.etype_stats.cooling;
+        this.etype_stats = this.engine_list[0].Clone();
+        this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
         if (this.cooling_count > 0)
             this.radiator_index = 0;
@@ -994,16 +1200,48 @@ class Engine extends Part {
         this.torque_to_struct = false;
         this.gp_count = 0;
         this.gpr_count = 0;
+        this.total_reliability = 0;
         if (el.length <= 0)
             throw "No Engine Stats Found.  Should be at least one.";
     }
+    toJSON() {
+        return {
+            selected_stats: this.etype_stats.toJSON(),
+            cooling_count: this.cooling_count,
+            radiator_index: this.radiator_index,
+            selected_mount: this.selected_mount,
+            use_pushpull: this.use_pp,
+            pp_torque_to_struct: this.torque_to_struct,
+            use_driveshafts: this.use_ds,
+            geared_propeller_ratio: this.gp_count,
+            geared_propeller_reliability: this.gpr_count
+        };
+    }
+    fromJSON(js) {
+        this.etype_stats.fromJSON(js["selected_stats"]);
+        this.cooling_count = js["cooling_count"];
+        this.radiator_index = js["radiator_index"];
+        this.selected_mount = js["selected_mount"];
+        this.use_pp = js["use_pushpull"];
+        this.torque_to_struct = js["pp_torque_to_struct"];
+        this.use_ds = js["use_driveshafts"];
+        this.gp_count = js["geared_propeller_ratio"];
+        this.gpr_count = js["geared_propeller_reliability"];
+        this.selected_index = -1;
+        for (let i = 0; i < this.engine_list.length; i++) {
+            if (this.etype_stats.Equal(this.engine_list[i])) {
+                this.selected_index = i;
+                break;
+            }
+        }
+    }
     SetSelectedIndex(num) {
         this.selected_index = num;
-        this.etype_stats = this.engine_list[this.selected_index];
+        this.etype_stats = this.engine_list[this.selected_index].Clone();
         if (num >= this.engine_list.length)
             throw "Index is out of range of engine_list.";
         this.PulseJetCheck();
-        this.cooling_count = this.etype_stats.cooling;
+        this.cooling_count = this.etype_stats.stats.cooling;
         this.CalculateStats();
     }
     GetSelectedIndex() {
@@ -1013,7 +1251,7 @@ class Engine extends Part {
         this.selected_index = -1;
         this.etype_stats = stats;
         this.PulseJetCheck();
-        this.cooling_count = Math.min(this.cooling_count, this.etype_stats.cooling);
+        this.cooling_count = Math.min(this.cooling_count, this.etype_stats.stats.cooling);
         this.CalculateStats();
     }
     GetCurrentStats() {
@@ -1025,7 +1263,7 @@ class Engine extends Part {
         return this.cooling_count > 0;
     }
     WarnCoolingReliability() {
-        return (this.cooling_count < this.etype_stats.cooling);
+        return (this.cooling_count < this.etype_stats.stats.cooling);
     }
     SetCooling(num) {
         this.cooling_count = num;
@@ -1120,9 +1358,9 @@ class Engine extends Part {
     PartStats() {
         let stats = new Stats;
         if (this.selected_index > 0)
-            stats = stats.Add(this.etype_stats);
+            stats = stats.Add(this.etype_stats.stats);
         else
-            stats = stats.Add(this.etype_stats);
+            stats = stats.Add(this.etype_stats.stats);
         if (this.etype_stats.oiltank)
             stats.mass += 1;
         if (this.mount_list[this.selected_mount].pp_type == "fuselage")
@@ -1149,9 +1387,12 @@ class Engine extends Part {
             stats.power = Math.floor(this.pp_list[pp_type].powerfactor * stats.power);
         }
         // Mounting modifiers (only get applied once, even with push/pull)
-        stats = stats.Add(this.mount_stats);
-        stats.maxstrain += Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.mass);
-        stats.drag += Math.floor(this.mount_list[this.selected_mount].dragfactor * this.etype_stats.mass);
+        //No Mounting for pulse-jets, just bolted on
+        if (!this.etype_stats.pulsejet) {
+            stats = stats.Add(this.mount_stats);
+            stats.maxstrain += Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
+            stats.drag += Math.floor(this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
+        }
         //Upgrades
         if (this.use_ds) {
             stats.mass += Math.floor(stats.power / 10);
@@ -1163,8 +1404,8 @@ class Engine extends Part {
         return stats;
     }
     UpdateReliability(num) {
-        this.total_reliability = this.etype_stats.reliability;
-        this.total_reliability -= (this.etype_stats.cooling - this.cooling_count);
+        this.total_reliability = this.etype_stats.stats.reliability;
+        this.total_reliability -= (this.etype_stats.stats.cooling - this.cooling_count);
         this.total_reliability -= (this.gp_count - this.gpr_count);
         this.total_reliability += num;
     }
@@ -1179,7 +1420,7 @@ class Engine extends Part {
     }
     PulseJetCheck() {
         if (this.GetIsPulsejet()) {
-            this.etype_stats.cooling = 0;
+            this.etype_stats.stats.cooling = 0;
             this.etype_stats.overspeed = 100;
             this.etype_stats.altitude = 100;
             this.etype_stats.torque = 0;
@@ -1304,6 +1545,9 @@ class Engine_HTML extends Display {
         this.e_cost.oninput = trigger;
         this.e_oil.onchange = trigger;
         this.e_pulsejet.onchange = trigger;
+    }
+    UpdateEngine(en) {
+        this.engine = en;
     }
     InitMountSelect(mount_cell) {
         var txtSpan = document.createElement("SPAN");
@@ -1436,7 +1680,7 @@ class Engine_HTML extends Display {
             txtSpan2.innerHTML = "    Cooling Amount";
             this.cool_count.min = "0";
             this.cool_count.valueAsNumber = this.engine.GetCooling();
-            this.cool_count.max = this.engine.GetCurrentStats().cooling.toString();
+            this.cool_count.max = this.engine.GetCurrentStats().stats.cooling.toString();
             if (this.cool_count.valueAsNumber > this.e_cool.valueAsNumber) {
                 this.cool_count.valueAsNumber = this.e_cool.valueAsNumber;
             }
@@ -1468,21 +1712,21 @@ class Engine_HTML extends Display {
         table.appendChild(document.createElement("BR"));
     }
     SendCustomStats() {
-        var stats = new EngineStats();
-        stats.power = this.e_pwr.valueAsNumber;
-        stats.mass = this.e_mass.valueAsNumber;
-        stats.drag = this.e_drag.valueAsNumber;
-        stats.reliability = this.e_rely.valueAsNumber;
-        stats.cooling = this.e_cool.valueAsNumber;
-        stats.overspeed = this.e_over.valueAsNumber;
-        stats.fuelconsumption = this.e_fuel.valueAsNumber;
-        stats.altitude = this.e_alti.valueAsNumber;
-        stats.torque = this.e_torq.valueAsNumber;
-        stats.rumble = this.e_rumb.valueAsNumber;
-        stats.cost = this.e_cost.valueAsNumber;
-        stats.oiltank = this.e_oil.checked;
-        stats.pulsejet = this.e_pulsejet.checked;
-        this.engine.SetCustomStats(stats);
+        var e_stats = new EngineStats();
+        e_stats.stats.power = this.e_pwr.valueAsNumber;
+        e_stats.stats.mass = this.e_mass.valueAsNumber;
+        e_stats.stats.drag = this.e_drag.valueAsNumber;
+        e_stats.stats.reliability = this.e_rely.valueAsNumber;
+        e_stats.stats.cooling = this.e_cool.valueAsNumber;
+        e_stats.overspeed = this.e_over.valueAsNumber;
+        e_stats.stats.fuelconsumption = this.e_fuel.valueAsNumber;
+        e_stats.altitude = this.e_alti.valueAsNumber;
+        e_stats.torque = this.e_torq.valueAsNumber;
+        e_stats.rumble = this.e_rumb.valueAsNumber;
+        e_stats.stats.cost = this.e_cost.valueAsNumber;
+        e_stats.oiltank = this.e_oil.checked;
+        e_stats.pulsejet = this.e_pulsejet.checked;
+        this.engine.SetCustomStats(e_stats);
     }
     SetInputDisable(b) {
         this.e_pwr.disabled = b;
@@ -1510,20 +1754,20 @@ class Engine_HTML extends Display {
         else {
             this.SetInputDisable(true);
         }
-        var stats = this.engine.GetCurrentStats();
-        this.e_pwr.valueAsNumber = stats.power;
-        this.e_mass.valueAsNumber = stats.mass;
-        this.e_drag.valueAsNumber = stats.drag;
-        this.e_rely.valueAsNumber = stats.reliability;
-        this.e_cool.valueAsNumber = stats.cooling;
-        this.e_over.valueAsNumber = stats.overspeed;
-        this.e_fuel.valueAsNumber = stats.fuelconsumption;
-        this.e_alti.valueAsNumber = stats.altitude;
-        this.e_torq.valueAsNumber = stats.torque;
-        this.e_rumb.valueAsNumber = stats.rumble;
-        this.e_cost.valueAsNumber = stats.cost;
-        this.e_oil.checked = stats.oiltank;
-        this.e_pulsejet.checked = stats.pulsejet;
+        var e_stats = this.engine.GetCurrentStats();
+        this.e_pwr.valueAsNumber = e_stats.stats.power;
+        this.e_mass.valueAsNumber = e_stats.stats.mass;
+        this.e_drag.valueAsNumber = e_stats.stats.drag;
+        this.e_rely.valueAsNumber = e_stats.stats.reliability;
+        this.e_cool.valueAsNumber = e_stats.stats.cooling;
+        this.e_over.valueAsNumber = e_stats.overspeed;
+        this.e_fuel.valueAsNumber = e_stats.stats.fuelconsumption;
+        this.e_alti.valueAsNumber = e_stats.altitude;
+        this.e_torq.valueAsNumber = e_stats.torque;
+        this.e_rumb.valueAsNumber = e_stats.rumble;
+        this.e_cost.valueAsNumber = e_stats.stats.cost;
+        this.e_oil.checked = e_stats.oiltank;
+        this.e_pulsejet.checked = e_stats.pulsejet;
         this.InitCoolingSelect();
         this.mount_select.selectedIndex = this.engine.GetMountIndex();
         this.pushpull_input.checked = this.engine.GetUsePushPull();
@@ -1532,7 +1776,8 @@ class Engine_HTML extends Display {
         this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
         this.gp_input.valueAsNumber = this.engine.GetGearCount();
         this.gpr_input.valueAsNumber = this.engine.GetGearReliability();
-        if (stats.pulsejet) {
+        if (e_stats.pulsejet) {
+            this.mount_select.disabled = true;
             this.pushpull_input.disabled = true;
             this.ds_input.disabled = true;
             this.gp_input.disabled = true;
@@ -1544,6 +1789,7 @@ class Engine_HTML extends Display {
             }
         }
         else {
+            this.mount_select.disabled = false;
             this.pushpull_input.disabled = false;
             this.ds_input.disabled = false;
             this.gp_input.disabled = false;
@@ -1560,7 +1806,7 @@ class Engine_HTML extends Display {
         this.d_visi.innerHTML = full_stats.visibility.toString();
         this.d_over.innerHTML = this.engine.GetOverspeed().toString();
         this.d_cost.innerHTML = full_stats.cost.toString();
-        this.d_alti.innerHTML = stats.altitude.toString();
+        this.d_alti.innerHTML = e_stats.altitude.toString();
         this.d_fuel.innerHTML = full_stats.fuelconsumption.toString();
         this.d_pstb.innerHTML = full_stats.pitchstab.toString();
         this.d_lstb.innerHTML = full_stats.latstab.toString();
@@ -1580,6 +1826,18 @@ class Radiator extends Part {
         this.type_list = tl;
         this.mount_list = ml;
         this.coolant_list = cl;
+    }
+    toJSON() {
+        return {
+            type: this.idx_type,
+            mount: this.idx_mount,
+            coolant: this.idx_coolant
+        };
+    }
+    fromJSON(js) {
+        this.idx_type = js["type"];
+        this.idx_mount = js["mount"];
+        this.idx_coolant = js["coolant"];
     }
     GetTypeList() {
         return this.type_list;
@@ -1679,6 +1937,9 @@ class Radiator_HTML extends Display {
         this.c_lstb = c1_row.insertCell();
         stats_cell.appendChild(tbl);
     }
+    UpdateRadiator(rad) {
+        this.radiator = rad;
+    }
     CreateTH(row, content) {
         var th = document.createElement("TH");
         th.innerHTML = content;
@@ -1705,6 +1966,16 @@ class Propeller extends Part {
         for (let elem of json["props"]) {
             this.prop_list.push({ name: elem["name"], stats: new Stats(elem), automatic: elem["automatic"] });
         }
+    }
+    toJSON() {
+        return {
+            type: this.idx_prop,
+            use_variable: this.use_variable
+        };
+    }
+    fromJSON(js) {
+        this.idx_prop = js["type"];
+        this.use_variable = js["use_variable"];
     }
     GetPropList() {
         return this.prop_list;
@@ -1811,13 +2082,43 @@ class Frames extends Part {
         this.tail_section_list = [];
         this.SetRequiredSections(1);
     }
+    toJSON() {
+        return {
+            sections: this.section_list,
+            tail_sections: this.tail_section_list,
+            tail_index: this.sel_tail,
+            use_farman: this.farman,
+            use_boom: this.boom
+        };
+    }
+    fromJSON(js) {
+        this.section_list = [];
+        for (let elem of js["sections"]) {
+            this.section_list.push({
+                frame: elem["frame"], skin: elem["skin"], geodesic: elem["geodesic"],
+                monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
+                internal_bracing: elem["internal_bracing"]
+            });
+        }
+        this.tail_section_list = [];
+        for (let elem of js["tail_sections"]) {
+            this.tail_section_list.push({
+                frame: elem["frame"], skin: elem["skin"], geodesic: elem["geodesic"],
+                monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
+                internal_bracing: elem["internal_bracing"]
+            });
+        }
+        this.farman = js["use_farman"];
+        this.boom = js["use_boom"];
+        this.sel_tail = js["tail_index"];
+    }
     DuplicateSection(num) {
         var sec = this.section_list[num];
         var new_section = {
             frame: sec.frame, skin: sec.skin, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
-        if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
+        if (new_section.internal_bracing && this.CountSections() + this.tail_section_list.length == this.CountInternalBracing()) {
             return;
         }
         this.section_list.splice(num, 0, new_section);
@@ -1875,6 +2176,14 @@ class Frames extends Part {
         }
         while (num < this.tail_section_list.length) {
             this.tail_section_list.pop();
+        }
+        while (this.CountSections() + num < this.CountInternalBracing()) {
+            let idx = this.section_list.length - 1;
+            for (; idx > 0; idx--) {
+                if (this.section_list[idx].internal_bracing)
+                    break;
+            }
+            this.DeleteSection(idx);
         }
         this.CalculateStats();
     }
@@ -1958,10 +2267,6 @@ class Frames extends Part {
         if (use && !this.section_list[num].internal_bracing
             && this.PossibleInternalBracing()
             && this.CountSections() > this.required_sections) {
-            console.log("Setting Bracing");
-            console.log(this.CountSections());
-            console.log(this.required_sections);
-            console.log(this.CountInternalBracing());
             this.section_list[num].internal_bracing = true;
             this.section_list[num].skin = 0;
             this.section_list[num].monocoque = false;
@@ -1971,12 +2276,6 @@ class Frames extends Part {
         else if (!use) { // If we're un-setting it.
             this.section_list[num].internal_bracing = false;
             this.CalculateStats();
-        }
-        else {
-            console.log("Not Setting Bracing");
-            console.log(this.CountSections());
-            console.log(this.required_sections);
-            console.log(this.CountInternalBracing());
         }
     }
     PossibleInternalBracing() {
@@ -2323,7 +2622,7 @@ class Frames_HTML extends Display {
             let int_input = document.createElement("INPUT");
             int_input.setAttribute("type", "checkbox");
             int_input.checked = sec.internal_bracing;
-            if (!sec.internal_bracing && !this.frames.PossibleInternalBracing())
+            if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing() || !this.frames.PossibleRemoveSections()))
                 int_input.disabled = true;
             int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
             let int_span = document.createElement("SPAN");
@@ -2449,6 +2748,11 @@ class Wings extends Part {
         }
         this.wing_stagger = Math.floor(this.stagger_list.length / 2);
         this.wing_list = [];
+    }
+    toJSON() {
+        return {};
+    }
+    fromJSON(js) {
     }
     SetNumberOfWings(num) {
         while (this.wing_list.length < num)
