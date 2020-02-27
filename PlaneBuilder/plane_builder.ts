@@ -3355,9 +3355,9 @@ class Frames_HTML extends Display {
 
 
 type WingType = {
-    deck: number, surface: number, area: number, span: number,
-    dihedral: number, anhedral: number, primary_dihedral: boolean,
-    swept: boolean, lead_wing: boolean
+    surface: number, area: number, span: number,
+    dihedral: number, anhedral: number,
+    swept: boolean
 };
 class Wings extends Part {
     //Possible selections
@@ -3372,7 +3372,7 @@ class Wings extends Part {
     }[];
     //Actual selections
     private wing_stagger: number;
-    private wing_list: WingType[];
+    private wing_list: WingType[][];
 
 
     constructor(js: JSON) {
@@ -3399,7 +3399,7 @@ class Wings extends Part {
         }
 
         this.wing_stagger = Math.floor(this.stagger_list.length / 2);
-        this.wing_list = [];
+        this.wing_list = [...Array(this.deck_list.length).fill([])];;
     }
 
     public toJSON() {
@@ -3410,68 +3410,56 @@ class Wings extends Part {
 
     }
 
-    public SetNumberOfWings(num: number) {
-        while (this.wing_list.length < num)
-            this.AddWing();
-        while (this.wing_list.length > num)
-            this.RemoveWing();
-        this.CalculateStats();
-    }
-
-    private AddWing() {
-        this.wing_list.push({
-            deck: 0, surface: 0, area: 10, span: 5,
-            dihedral: 0, anhedral: 0, primary_dihedral: false,
-            swept: false, lead_wing: true
+    private AddWing(deck: number) {
+        this.wing_list[deck].push({
+            surface: 0, area: 10, span: 5,
+            dihedral: 0, anhedral: 0,
+            swept: false
         });
-    }
-
-    private RemoveWing() {
-        this.wing_list.pop();
     }
 
     private GetDeckList(deck: number) {
         return this.wing_list.filter((element) => { return element.deck == deck; });
     }
 
-    private CountLeadWing(list: WingType[]) {
-        var count = 0;
-        for (let elem of list) {
-            if (elem.lead_wing)
-                count++;
+    public CanAddToDecks() {
+        var can_add = [...Array(this.deck_list.length).fill(0)];
+        //Any # of parasol or gear wings
+        can_add[0] = true;
+        can_add[this.deck_list.length - 1] = true;
+        //Count in use
+        var use_deck = [...Array(this.deck_list.length).fill(0)];
+        for (let w of this.wing_list) {
+            use_deck[w.deck]++;
         }
-        return count;
-    }
-
-    private EnforceLeadWing() {
-        for (let i = 0; i < this.deck_list.length; i++) {
-            let deck_array = this.GetDeckList(i);
-            if (deck_array.length > 0) {
-                let count = this.CountLeadWing(deck_array);
-                if (count == 0)
-                    deck_array[0].lead_wing = true;
-                else if (count == 1)
-                    continue;
-                else {
-                    for (let j = deck_array.length - 1; j > 0; j--) {
-                        if (deck_array[j].lead_wing) {
-                            deck_array[j].lead_wing = false;
-                            count--;
-                            if (count == 1)
-                                break;
-                        } //If is extra leading wing.
-                    }//for backward on wings
-                }//else has extra
-            }//If we have wings
-        }//For each deck
-    }
-
-    private GetLeadWing(deck: number) {
-        return this.wing_list.filter((elem) => { return elem.lead_wing && elem.deck == deck; })[0];
+        //tandem case
+        if (this.stagger_list[this.wing_stagger].hstab) {
+            var has_tandem = false;
+            var has_any = false;
+            for (let i = 1; i < use_deck.length - 1; i++) {
+                has_tandem = has_tandem || use_deck[i] == 2;
+                has_any = has_any || use_deck[i] > 0;
+            }
+            //if we have a tandem wing, no new
+            if (!has_tandem && has_any) {
+                for (let i = 1; i < use_deck.length - 1; i++) {
+                    can_add[i] = use_deck[i] == 1;
+                }
+            } else if (!has_tandem && !has_any) {
+                for (let i = 1; i < use_deck.length - 1; i++) {
+                    can_add[i] = use_deck[i] == 0;
+                }
+            }
+        }
+        else {
+            for (let i = 1; i < use_deck.length - 1; i++) {
+                can_add[i] = use_deck[i] == 0;
+            }
+        }
+        return can_add;
     }
 
     public PartStats() {
-        this.EnforceLeadWing();
         var stats = new Stats();
 
         var have_wing = false;
