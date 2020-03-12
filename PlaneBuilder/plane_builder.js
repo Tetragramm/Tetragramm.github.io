@@ -3461,7 +3461,6 @@ class Stabilizers extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        console.log("PART STATS");
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
@@ -3471,7 +3470,6 @@ class Stabilizers extends Part {
             stats.pitchstab -= Math.floor(this.wing_area / 2);
             stats.liftbleed += 5;
         }
-        console.log(stats);
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
@@ -3480,10 +3478,8 @@ class Stabilizers extends Part {
         else if (this.vstab_list[this.vstab_sel].increment != 0) {
             stats.latstab -= this.wing_area;
         }
-        console.log(stats);
         //Additional stabilizers
         stats.drag += 2 * (Math.max(0, this.hstab_count - 1) + Math.max(0, this.vstab_count - 1));
-        console.log(stats);
         //Pairs of stabilizers
         var pairs = 0;
         if (this.vstab_list[this.vstab_sel].is_vtail) //V-Tail
@@ -3494,7 +3490,6 @@ class Stabilizers extends Part {
         var es_pairs = Math.min(this.engine_count, pairs);
         leftovers += 2 * (pairs - es_pairs);
         stats.control += 3 * es_pairs + leftovers;
-        console.log(stats);
         return stats;
     }
 }
