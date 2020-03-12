@@ -20,7 +20,7 @@
 			</div>
 
 			<h2 class="page__h2">
-				Ohara Airworks (9.1)
+				Ohara Airworks (9.3)
 			</h2>
 
 			<div class="page__content">
@@ -180,16 +180,32 @@
 							report.</span>
 					</span>
 					<br />
-					<span> Number of Wings: <input type="number" id="wing_count"></input></span>
 					<span> Wing Stagger: <select id="wing_stagger"></select></span>
 					<span> Closed Wing: <input type="checkbox" id="wing_closed" /></span>
+					<span> Swept Wings: <input type="checkbox" id="wing_swept" /></span>
 				</h3>
-				<table>
+				<table id="wing_table">
 					<tr>
-						<th>Wing Deck</th>
-						<th>Wing Surface</th>
-						<th>Wing Dimensions</th>
+						<th>Wing Type</th>
 						<th>Wing Options</th>
+						<th>Total Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div class="Stabilizers">
+				<h3 class="page__h3">Stabilizers
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
+						<span id="rules_wings" class="rulestext">I failed to load my rules. Please file a bug
+							report.</span>
+					</span>
+					<br />
+				</h3>
+				<table id="stab_table">
+					<tr>
+						<th>Horizontal Stabilizers</th>
+						<th>Vertical Stabilizers</th>
+						<th>Total Stats</th>
 					</tr>
 				</table>
 			</div>

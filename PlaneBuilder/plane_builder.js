@@ -61,6 +61,40 @@ function format(fmt, ...args) {
         }
     });
 }
+function CreateTH(row, content) {
+    var th = document.createElement("TH");
+    th.innerHTML = content;
+    row.appendChild(th);
+}
+function CreateInput(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("SPAN");
+    txtSpan.innerHTML = txt;
+    elem.setAttribute("type", "number");
+    elem.min = (0).toString();
+    elem.valueAsNumber = 0;
+    span.appendChild(elem);
+    span.appendChild(txtSpan);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
+function CreateSpace(table) {
+    var span = document.createElement("SPAN");
+    span.textContent = " ";
+    table.appendChild(span);
+}
+function CreateCheckbox(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("SPAN");
+    txtSpan.innerHTML = txt;
+    elem.setAttribute("type", "checkbox");
+    span.appendChild(elem);
+    span.appendChild(txtSpan);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
 //Handles Mass, Drag, Control, Escape, Flight Stress, Visibility
 function Effects2String(input) {
     if (!(input instanceof Stats))
@@ -128,6 +162,7 @@ class Stats {
         this.pitchboost = 0;
         this.wingarea = 0;
         this.toughness = 0;
+        this.upkeep = 0;
         if (js) {
             this.fromJSON(js);
         }
@@ -155,7 +190,8 @@ class Stats {
             pitchboost: this.pitchboost,
             pitchspeed: this.pitchspeed,
             wingarea: this.wingarea,
-            toughness: this.toughness
+            toughness: this.toughness,
+            upkeep: this.upkeep
         };
     }
     fromJSON(js) {
@@ -203,6 +239,8 @@ class Stats {
             this.wingarea = js["wingarea"];
         if (js["toughness"])
             this.toughness = js["toughness"];
+        if (js["upkeep"])
+            this.upkeep = js["upkeep"];
     }
     Add(other) {
         var res = new Stats();
@@ -228,6 +266,7 @@ class Stats {
         res.pitchspeed = this.pitchspeed + other.pitchspeed;
         res.wingarea = this.wingarea + other.wingarea;
         res.toughness = this.toughness + other.toughness;
+        res.upkeep = this.upkeep + other.upkeep;
         return res;
     }
     Multiply(other) {
@@ -254,6 +293,7 @@ class Stats {
         res.pitchspeed = this.pitchspeed * other;
         res.wingarea = this.wingarea * other;
         res.toughness = this.toughness * other;
+        res.upkeep = this.upkeep * other;
         return res;
     }
     Equal(other) {
@@ -278,7 +318,33 @@ class Stats {
             && this.pitchspeed == other.pitchspeed
             && this.pitchboost == other.pitchboost
             && this.wingarea == other.wingarea
-            && this.toughness == other.toughness;
+            && this.toughness == other.toughness
+            && this.upkeep == other.upkeep;
+    }
+    Round() {
+        this.liftbleed = Math.floor(this.liftbleed);
+        this.wetmass = Math.floor(this.wetmass);
+        this.mass = Math.floor(this.mass);
+        this.drag = Math.floor(this.drag);
+        this.control = Math.floor(this.control);
+        this.cost = Math.floor(this.cost);
+        this.reqsections = Math.floor(this.reqsections);
+        this.visibility = Math.floor(this.visibility);
+        this.flightstress = Math.floor(this.flightstress);
+        this.escape = Math.floor(this.escape);
+        this.pitchstab = Math.floor(this.pitchstab);
+        this.latstab = Math.floor(this.latstab);
+        this.cooling = Math.floor(this.cooling);
+        this.reliability = Math.floor(this.reliability);
+        this.power = Math.floor(this.power);
+        this.fuelconsumption = Math.floor(this.fuelconsumption);
+        this.maxstrain = Math.floor(this.maxstrain);
+        this.structure = Math.floor(this.structure);
+        this.pitchspeed = Math.floor(this.pitchspeed);
+        this.pitchboost = Math.floor(this.pitchboost);
+        this.wingarea = Math.floor(this.wingarea);
+        this.toughness = Math.floor(this.toughness);
+        this.upkeep = Math.floor(this.upkeep);
     }
 }
 class Part {
@@ -289,12 +355,14 @@ class Aircraft_HTML extends Display {
     constructor(js, aircraft) {
         super();
         this.acft = aircraft;
-        this.era = new Era_HTML(js["era"], this.acft.GetEra());
-        this.cockpits = new Cockpits_HTML(js["cockpit"], aircraft.GetCockpits());
-        this.passengers = new Passengers_HTML(js["passengers"], aircraft.GetPassengers());
-        this.engines = new Engines_HTML(js["engines"], aircraft.GetEngines());
-        this.propeller = new Propeller_HTML(js["propellers"], aircraft.GetPropeller());
-        this.frames = new Frames_HTML(js["frames"], aircraft.GetFrames());
+        this.era = new Era_HTML(this.acft.GetEra());
+        this.cockpits = new Cockpits_HTML(aircraft.GetCockpits());
+        this.passengers = new Passengers_HTML(aircraft.GetPassengers());
+        this.engines = new Engines_HTML(aircraft.GetEngines());
+        this.propeller = new Propeller_HTML(aircraft.GetPropeller());
+        this.frames = new Frames_HTML(aircraft.GetFrames());
+        this.wings = new Wings_HTML(aircraft.GetWings());
+        this.stabilizers = new Stabilizers_HTML(aircraft.GetStabilizers());
         // this.engines.Initialize();
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
         this.UpdateDisplay();
@@ -306,6 +374,8 @@ class Aircraft_HTML extends Display {
         this.engines.UpdateDisplay();
         this.propeller.UpdateDisplay();
         this.frames.UpdateDisplay();
+        this.wings.UpdateDisplay();
+        this.stabilizers.UpdateDisplay();
     }
 }
 class Aircraft {
@@ -320,6 +390,7 @@ class Aircraft {
         this.propeller = new Propeller(js["propellers"]);
         this.frames = new Frames(js["frames"]);
         this.wings = new Wings(js["wings"]);
+        this.stabilizers = new Stabilizers(js["stabilizers"]);
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
         this.passengers.SetCalculateStats(() => { this.CalculateStats(); });
@@ -327,10 +398,10 @@ class Aircraft {
         this.propeller.SetCalculateStats(() => { this.CalculateStats(); });
         this.frames.SetCalculateStats(() => { this.CalculateStats(); });
         this.wings.SetCalculateStats(() => { this.CalculateStats(); });
+        this.stabilizers.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
-        this.wings.SetNumberOfWings(4);
         this.use_storage = storage;
     }
     toJSON() {
@@ -368,11 +439,18 @@ class Aircraft {
         this.stats = this.stats.Add(this.cockpits.PartStats());
         this.stats = this.stats.Add(this.passengers.PartStats());
         this.stats = this.stats.Add(this.engines.PartStats());
+        this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
         this.stats = this.stats.Add(this.propeller.PartStats());
+        this.wings.SetNumFrames(this.frames.GetNumFrames());
         this.stats = this.stats.Add(this.wings.PartStats());
         this.frames.SetRequiredSections(this.stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.stats = this.stats.Add(this.frames.PartStats());
+        this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
+        this.stabilizers.SetIsTandem(this.wings.GetTandem());
+        this.stabilizers.SetIsSwept(this.wings.GetSwept());
+        this.stabilizers.SetWingArea(this.stats.wingarea);
+        this.stats = this.stats.Add(this.stabilizers.PartStats());
         //Update Part Local stuff
         this.cockpits.UpdateCrewStats(this.stats);
         this.engines.UpdateReliability(this.stats);
@@ -399,40 +477,35 @@ class Aircraft {
     GetFrames() {
         return this.frames;
     }
+    GetWings() {
+        return this.wings;
+    }
+    GetStabilizers() {
+        return this.stabilizers;
+    }
 }
 class Era_HTML extends Display {
-    constructor(js, m) {
+    constructor(m) {
         super();
         this.model = m;
-        this.PopulateRules(js);
         //Get used elements
-        var sel = document.getElementById("select_era");
+        this.select = document.getElementById("select_era");
         this.bleed = document.getElementById("liftbleed_era");
-        sel.required = true;
+        this.select.required = true;
         //When selection changes, change value and RecalculateTotals
-        sel.onchange = () => {
-            this.model.SetSelected(sel.selectedIndex);
+        this.select.onchange = () => {
+            this.model.SetSelected(this.select.selectedIndex);
         };
         //For each element create an option,
         //    add it to the select
         for (let elem of this.model.GetEraOptions()) {
             var opt = document.createElement("OPTION");
             opt.text = elem.name;
-            sel.add(opt);
+            this.select.add(opt);
         }
-        sel.onchange(new Event("Origin"));
-    }
-    PopulateRules(js) {
-        //Format the rules and set the tooltip.
-        var tooltip = document.getElementById("rules_era");
-        var era_table = "";
-        for (let elem of this.model.GetEraOptions()) {
-            era_table += "<tr><td>" + elem.name + "</td><td>" + elem.value;
-            +"</td></tr>";
-        }
-        tooltip.innerHTML = format(js["rules"], era_table);
     }
     UpdateDisplay() {
+        this.select.selectedIndex = this.model.GetSelected();
         this.bleed.innerHTML = this.model.GetLiftBleed().toString();
     }
 }
@@ -454,6 +527,9 @@ class Era extends Part {
     fromJSON(js) {
         this.selected = js["selected"];
     }
+    GetSelected() {
+        return this.selected;
+    }
     SetSelected(index) {
         this.selected = index;
         this.CalculateStats();
@@ -474,38 +550,15 @@ class Era extends Part {
     }
 }
 class Cockpits_HTML extends Display {
-    constructor(js, cockpits) {
+    constructor(cockpits) {
         super();
-        this.json = js;
         this.cockpits = cockpits;
         this.tbl = document.getElementById("table_cockpit");
         this.counter = document.getElementById("num_cockpits");
         this.positions = [];
-        this.PopulateRules(js);
         this.counter.oninput = (e) => {
             this.cockpits.SetNumberOfCockpits(this.counter.valueAsNumber);
         };
-    }
-    PopulateRules(js) {
-        var tooltip = document.getElementById("rules_cockpit");
-        //For each element add it to the rules table
-        var cockpit_table = "";
-        for (let elem of js["options"]) {
-            cockpit_table += "<tr><td>" + elem["name"] + "</td><td>" + elem["description"] + "</td>";
-            cockpit_table += "<td>" + Effects2String(elem) + "</td>";
-            cockpit_table += "<td>" + elem["cost"] + "</td>";
-            cockpit_table += "</tr>";
-        }
-        // Also the upgrades, in their own table
-        var upgrade_table = "";
-        for (let elem of js["upgrades"]) {
-            upgrade_table += "<tr><td>" + elem["name"] + "</td><td>" + elem["description"] + "</td>";
-            upgrade_table += "<td>" + Effects2String(elem) + "</td>";
-            upgrade_table += "<td>" + elem["cost"] + "</td>";
-            upgrade_table += "</tr>";
-        }
-        //Format and set the rules tooltip
-        tooltip.innerHTML = format(js["rules"], cockpit_table, upgrade_table);
     }
     CounterChange() {
         while (this.positions.length > this.counter.valueAsNumber) {
@@ -517,7 +570,7 @@ class Cockpits_HTML extends Display {
     }
     AddCockpit(num) {
         var row = this.tbl.insertRow();
-        var cp = new Cockpit_HTML(this.json, row, this.cockpits.GetCockpit(num));
+        var cp = new Cockpit_HTML(row, this.cockpits.GetCockpit(num));
         this.positions.push(cp);
     }
     RemoveCockpit() {
@@ -605,7 +658,7 @@ class Cockpits extends Part {
     }
 }
 class Cockpit_HTML extends Display {
-    constructor(js, r, cp) {
+    constructor(r, cp) {
         super();
         this.row = r;
         this.cockpit = cp;
@@ -615,20 +668,20 @@ class Cockpit_HTML extends Display {
         var stat_cell = this.row.insertCell(2);
         var tbl = document.createElement("TABLE");
         var h1_row = tbl.insertRow();
-        this.CreateTH(h1_row, "Mass");
-        this.CreateTH(h1_row, "Drag");
-        this.CreateTH(h1_row, "Cost");
-        this.CreateTH(h1_row, "Control");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, "Control");
         var c1_row = tbl.insertRow();
         this.mass_cell = c1_row.insertCell();
         this.drag_cell = c1_row.insertCell();
         this.cost_cell = c1_row.insertCell();
         this.control_cell = c1_row.insertCell();
         var h2_row = tbl.insertRow();
-        this.CreateTH(h2_row, "Flight Stress");
-        this.CreateTH(h2_row, "Escape");
-        this.CreateTH(h2_row, "Visibility");
-        this.CreateTH(h2_row, "Required Sections");
+        CreateTH(h2_row, "Flight Stress");
+        CreateTH(h2_row, "Escape");
+        CreateTH(h2_row, "Visibility");
+        CreateTH(h2_row, "Required Sections");
         var c2_row = tbl.insertRow();
         this.stress_cell = c2_row.insertCell();
         this.escape_cell = c2_row.insertCell();
@@ -644,18 +697,18 @@ class Cockpit_HTML extends Display {
         this.visibility_cell.className = "part_local";
         this.escape_cell.className = "part_local";
         //Add all the cockpit types to the select box
-        for (let elem of js["options"]) {
+        for (let elem of cp.GetTypeList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem["name"];
+            opt.text = elem.name;
             this.sel_type.add(opt);
         }
         option.appendChild(this.sel_type);
         //Add all the upgrades as checkboxes
         var upg_index = 0;
-        for (let elem of js["upgrades"]) {
+        for (let elem of cp.GetUpgradeList()) {
             let span = document.createElement("SPAN");
             let txt = document.createElement("SPAN");
-            txt.innerHTML = elem["name"];
+            txt.innerHTML = elem.name;
             let upg = document.createElement("INPUT");
             upg.setAttribute("type", "checkbox");
             upg.checked = false;
@@ -673,11 +726,6 @@ class Cockpit_HTML extends Display {
     }
     UpdateCockpit(cp) {
         this.cockpit = cp;
-    }
-    CreateTH(row, content) {
-        var th = document.createElement("TH");
-        th.innerHTML = content;
-        row.appendChild(th);
     }
     UpdateDisplay() {
         let stats = this.cockpit.PartStats();
@@ -717,6 +765,12 @@ class Cockpit extends Part {
     fromJSON(js) {
         this.selected_type = js["type"];
         this.selected_upgrades = js["upgrades"];
+    }
+    GetTypeList() {
+        return this.types;
+    }
+    GetUpgradeList() {
+        return this.upgrades;
     }
     GetType() {
         return this.selected_type;
@@ -767,11 +821,9 @@ class Cockpit extends Part {
     }
 }
 class Passengers_HTML extends Display {
-    constructor(js, pass) {
+    constructor(pass) {
         super();
-        this.json = js;
         this.pass = pass;
-        this.PopulateRules();
         this.nseats = document.getElementById("num_seats");
         this.nbeds = document.getElementById("num_beds");
         this.connect = document.getElementById("passenger_connectivity");
@@ -793,14 +845,9 @@ class Passengers_HTML extends Display {
         this.nseats.valueAsNumber = this.pass.GetSeats();
         this.nbeds.valueAsNumber = this.pass.GetBeds();
         this.connect.checked = this.pass.GetConnected();
-        this.connect.disabled = this.pass.PossibleConnection();
+        this.connect.disabled = !this.pass.PossibleConnection();
         this.mass.innerHTML = stats.mass.toString();
         this.reqseq.innerHTML = stats.reqsections.toString();
-    }
-    PopulateRules() {
-        //Format the rules and set the tooltip.
-        var tooltip = document.getElementById("rules_passengers");
-        tooltip.innerHTML = format(this.json["rules"]);
     }
 }
 class Passengers extends Part {
@@ -911,12 +958,11 @@ class EngineStats {
     }
 }
 class Engines_HTML extends Display {
-    constructor(js, eng) {
+    constructor(eng) {
         super();
         this.eng = eng;
         this.engines = [];
         this.radiators = [];
-        this.PopulateRules(js);
         this.tbl = document.getElementById("table_engine");
         this.tblR = document.getElementById("table_radiator");
         this.num_engines = document.getElementById("num_engines");
@@ -928,44 +974,6 @@ class Engines_HTML extends Display {
         this.is_asymmetric = document.getElementById("asymmetric");
         this.is_asymmetric.oninput = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
         this.is_asymmetric.checked = this.eng.GetAsymmetry();
-    }
-    PopulateRules(js) {
-        //Get used elements
-        var rules_e = document.getElementById("rules_engine");
-        var rules_u = document.getElementById("rules_engine_upgrades");
-        var rules_c = document.getElementById("rules_engine_cooling");
-        var enginesHTML = "";
-        for (let elem of js["mounts"]) {
-            enginesHTML += "<tr><td>" + elem["name"] + "</td><td>";
-            if (elem["reqsections"])
-                enginesHTML += "Yes";
-            else
-                enginesHTML += "No";
-            enginesHTML += "</td><td>" + Effects2String(elem) + elem["description"] + "</td></tr>";
-        }
-        var pushpullHTML = "";
-        for (let elem of js["push-pull"]) {
-            pushpullHTML += "<tr><td>" + elem["name"] + "</td><td>";
-            pushpullHTML += Effects2String(elem) + elem["description"] + "</td></tr>";
-        }
-        var radiatorTypeHTML = "";
-        for (let elem of js["radiator-type"]) {
-            radiatorTypeHTML += "<tr><td>" + elem["name"] + "</td><td>";
-            radiatorTypeHTML += Effects2String(elem) + elem["description"] + "</td><td>" + elem["cost"] + "</td></tr>";
-        }
-        var radiatorMountHTML = "";
-        for (let elem of js["radiator-mount"]) {
-            radiatorMountHTML += "<tr><td>" + elem["name"] + "</td><td>";
-            radiatorMountHTML += Effects2String(elem) + elem["description"] + "</td></tr>";
-        }
-        var radiatorCoolantHTML = "";
-        for (let elem of js["radiator-coolant"]) {
-            radiatorCoolantHTML += "<tr><td>" + elem["name"] + "</td><td>";
-            radiatorCoolantHTML += Effects2String(elem) + elem["description"] + "</td><td>" + elem["cost"] + "</td></tr>";
-        }
-        rules_e.innerHTML = format(js["rules"], enginesHTML, pushpullHTML);
-        rules_u.innerHTML = format(js["rules_upgrades"]);
-        rules_c.innerHTML = format(js["rules_cooling"], radiatorTypeHTML, radiatorMountHTML, radiatorCoolantHTML);
     }
     UpdateDisplay() {
         var num = this.eng.GetNumberOfEngines();
@@ -1150,19 +1158,31 @@ class Engines extends Part {
     GetAsymmetry() {
         return this.is_asymmetric;
     }
+    GetHavePropeller() {
+        for (let e of this.engines) {
+            if (e.GetHavePropeller())
+                return true;
+        }
+        return false;
+    }
     PartStats() {
         var stats = new Stats;
         var needCool = [...Array(this.radiators.length).fill(0)];
+        //Engine stuff
         for (let en of this.engines) {
             stats = stats.Add(en.PartStats());
             if (en.NeedCooling())
                 needCool[en.GetRadiator()] += en.GetCooling();
         }
+        //Upkeep calc only uses engine costs
+        stats.upkeep = Math.floor(Math.min(stats.power / 10, stats.cost));
+        //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
             rad.SetNeedCool(needCool[i]);
             stats = stats.Add(rad.PartStats());
         }
+        //Asymmetric planes
         if (this.is_asymmetric)
             stats.latstab -= 3;
         //Part local, gets handled in UpdateReliability
@@ -1369,7 +1389,7 @@ class Engine extends Part {
             if (this.torque_to_struct)
                 stats.structure -= this.etype_stats.torque;
             else
-                stats.maxstrain += this.etype_stats.torque;
+                stats.maxstrain -= this.etype_stats.torque;
         }
         stats.structure -= this.etype_stats.rumble;
         stats.flightstress += this.etype_stats.rumble;
@@ -1390,7 +1410,7 @@ class Engine extends Part {
         //No Mounting for pulse-jets, just bolted on
         if (!this.etype_stats.pulsejet) {
             stats = stats.Add(this.mount_stats);
-            stats.maxstrain += Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
+            stats.maxstrain -= Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
         //Upgrades
@@ -1441,6 +1461,9 @@ class Engine extends Part {
             this.etype_stats.rumble = 0;
         }
     }
+    GetHavePropeller() {
+        return !this.GetIsPulsejet(); //TODO: Charge and Generators
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -1463,11 +1486,11 @@ class Engine_HTML extends Display {
         option_cell.className = "inner_table";
         var opt_table = document.createElement("TABLE");
         opt_table.className = "inner_table";
-        this.CreateTH(opt_table.insertRow(), "Cooling");
+        CreateTH(opt_table.insertRow(), "Cooling");
         this.cool_cell = opt_table.insertRow().insertCell();
-        this.CreateTH(opt_table.insertRow(), "Mounting");
+        CreateTH(opt_table.insertRow(), "Mounting");
         var mount_cell = opt_table.insertRow().insertCell();
-        this.CreateTH(opt_table.insertRow(), "Upgrades");
+        CreateTH(opt_table.insertRow(), "Upgrades");
         var upg_cell = opt_table.insertRow().insertCell();
         option_cell.appendChild(opt_table);
         this.InitMountSelect(mount_cell);
@@ -1507,19 +1530,19 @@ class Engine_HTML extends Display {
         opt.value = (-1).toString();
         this.e_select.add(opt);
         //Set up the individual stat input boxes
-        this.CreateInput("  Power", this.e_pwr, tcell);
-        this.CreateInput("  Mass", this.e_mass, tcell);
-        this.CreateInput("  Drag", this.e_drag, tcell);
-        this.CreateInput("  Reliability", this.e_rely, tcell);
-        this.CreateInput("  Cooling", this.e_cool, tcell);
-        this.CreateInput("  Overspeed", this.e_over, tcell);
-        this.CreateInput("  Fuel Consumption", this.e_fuel, tcell);
-        this.CreateInput("  Altitude", this.e_alti, tcell);
-        this.CreateInput("  Torque", this.e_torq, tcell);
-        this.CreateInput("  Rumble", this.e_rumb, tcell);
-        this.CreateInput("  Cost", this.e_cost, tcell);
-        this.CreateCheckbox(" Oil Tank", this.e_oil, tcell);
-        this.CreateCheckbox(" Pulsejet", this.e_pulsejet, tcell);
+        CreateInput("  Power", this.e_pwr, tcell);
+        CreateInput("  Mass", this.e_mass, tcell);
+        CreateInput("  Drag", this.e_drag, tcell);
+        CreateInput("  Reliability", this.e_rely, tcell);
+        CreateInput("  Cooling", this.e_cool, tcell);
+        CreateInput("  Overspeed", this.e_over, tcell);
+        CreateInput("  Fuel Consumption", this.e_fuel, tcell);
+        CreateInput("  Altitude", this.e_alti, tcell);
+        CreateInput("  Torque", this.e_torq, tcell);
+        CreateInput("  Rumble", this.e_rumb, tcell);
+        CreateInput("  Cost", this.e_cost, tcell);
+        CreateCheckbox(" Oil Tank", this.e_oil, tcell);
+        CreateCheckbox(" Pulsejet", this.e_pulsejet, tcell);
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
             if (this.e_select.selectedIndex == this.engine_list.length) {
@@ -1568,8 +1591,8 @@ class Engine_HTML extends Display {
         mount_cell.appendChild(document.createElement("BR"));
         this.pushpull_input = document.createElement("INPUT");
         this.torque_input = document.createElement("INPUT");
-        this.CreateCheckbox(" Push Pull", this.pushpull_input, mount_cell);
-        this.CreateCheckbox(" Torque To Structure", this.torque_input, mount_cell);
+        CreateCheckbox(" Push Pull", this.pushpull_input, mount_cell);
+        CreateCheckbox(" Torque To Structure", this.torque_input, mount_cell);
         this.pushpull_input.checked = this.engine.GetUsePushPull();
         this.torque_input.checked = this.engine.GetUsePushPull();
         this.pushpull_input.onchange = () => { this.engine.SetUsePushPull(this.pushpull_input.checked); };
@@ -1579,9 +1602,9 @@ class Engine_HTML extends Display {
         this.ds_input = document.createElement("INPUT");
         this.gp_input = document.createElement("INPUT");
         this.gpr_input = document.createElement("INPUT");
-        this.CreateCheckbox("   Extended Driveshafts", this.ds_input, upg_cell);
-        this.CreateInput("  Geared Propeller", this.gp_input, upg_cell);
-        this.CreateInput("  Negate Reliability Penalty", this.gpr_input, upg_cell);
+        CreateCheckbox("   Extended Driveshafts", this.ds_input, upg_cell);
+        CreateInput("  Geared Propeller", this.gp_input, upg_cell);
+        CreateInput("  Negate Reliability Penalty", this.gpr_input, upg_cell);
         this.gp_input.oninput = () => { this.engine.SetGearCount(this.gp_input.valueAsNumber); };
         this.gpr_input.oninput = () => { this.engine.SetGearReliability(this.gpr_input.valueAsNumber); };
         this.ds_input.onchange = () => { this.engine.SetUseExtendedDriveshaft(this.ds_input.checked); };
@@ -1593,51 +1616,46 @@ class Engine_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        this.CreateTH(h1_row, "Power");
-        this.CreateTH(h1_row, "Mass");
-        this.CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Power");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Drag");
         var c1_row = tbl_stat.insertRow();
         this.d_powr = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        this.CreateTH(h2_row, "Reliability");
-        this.CreateTH(h2_row, "Visibility");
-        this.CreateTH(h2_row, "Overspeed");
+        CreateTH(h2_row, "Reliability");
+        CreateTH(h2_row, "Visibility");
+        CreateTH(h2_row, "Overspeed");
         var c2_row = tbl_stat.insertRow();
         this.d_rely = c2_row.insertCell();
         this.d_rely.className = "part_local";
         this.d_visi = c2_row.insertCell();
         this.d_over = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        this.CreateTH(h3_row, "Cost");
-        this.CreateTH(h3_row, "Altitude");
-        this.CreateTH(h3_row, "Fuel Consumption");
+        CreateTH(h3_row, "Cost");
+        CreateTH(h3_row, "Altitude");
+        CreateTH(h3_row, "Fuel Consumption");
         var c3_row = tbl_stat.insertRow();
         this.d_cost = c3_row.insertCell();
         this.d_alti = c3_row.insertCell();
         this.d_fuel = c3_row.insertCell();
         var h4_row = tbl_stat.insertRow();
-        this.CreateTH(h4_row, "Pitch Stab");
-        this.CreateTH(h4_row, "Lateral Stab");
-        this.CreateTH(h4_row, "Max Strain");
+        CreateTH(h4_row, "Pitch Stab");
+        CreateTH(h4_row, "Lateral Stab");
+        CreateTH(h4_row, "Max Strain");
         var c4_row = tbl_stat.insertRow();
         this.d_pstb = c4_row.insertCell();
         this.d_lstb = c4_row.insertCell();
         this.d_maxs = c4_row.insertCell();
         var h5_row = tbl_stat.insertRow();
-        this.CreateTH(h5_row, "Structure");
-        this.CreateTH(h5_row, "Flight Stress");
-        this.CreateTH(h5_row, "Frame Sections");
+        CreateTH(h5_row, "Structure");
+        CreateTH(h5_row, "Flight Stress");
+        CreateTH(h5_row, "Frame Sections");
         var c5_row = tbl_stat.insertRow();
         this.d_strc = c5_row.insertCell();
         this.d_fstr = c5_row.insertCell();
         this.d_sect = c5_row.insertCell();
-    }
-    CreateTH(row, content) {
-        var th = document.createElement("TH");
-        th.innerHTML = content;
-        row.appendChild(th);
     }
     InitCoolingSelect() {
         while (this.cool_cell.children.length > 0)
@@ -1688,28 +1706,6 @@ class Engine_HTML extends Display {
             this.cool_cell.appendChild(this.cool_count);
             this.cool_cell.appendChild(txtSpan2);
         }
-    }
-    CreateInput(txt, elem, table) {
-        var span = document.createElement("SPAN");
-        var txtSpan = document.createElement("SPAN");
-        txtSpan.innerHTML = txt;
-        elem.setAttribute("type", "number");
-        elem.min = (0).toString();
-        elem.valueAsNumber = 0;
-        span.appendChild(elem);
-        span.appendChild(txtSpan);
-        table.appendChild(span);
-        table.appendChild(document.createElement("BR"));
-    }
-    CreateCheckbox(txt, elem, table) {
-        var span = document.createElement("SPAN");
-        var txtSpan = document.createElement("SPAN");
-        txtSpan.innerHTML = txt;
-        elem.setAttribute("type", "checkbox");
-        span.appendChild(elem);
-        span.appendChild(txtSpan);
-        table.appendChild(span);
-        table.appendChild(document.createElement("BR"));
     }
     SendCustomStats() {
         var e_stats = new EngineStats();
@@ -1778,6 +1774,7 @@ class Engine_HTML extends Display {
         this.gpr_input.valueAsNumber = this.engine.GetGearReliability();
         if (e_stats.pulsejet) {
             this.mount_select.disabled = true;
+            this.mount_select.selectedIndex = -1;
             this.pushpull_input.disabled = true;
             this.ds_input.disabled = true;
             this.gp_input.disabled = true;
@@ -1924,11 +1921,11 @@ class Radiator_HTML extends Display {
         stats_cell.className = "inner_table";
         tbl.className = "inner_table";
         var h1_row = tbl.insertRow();
-        this.CreateTH(h1_row, "Mass");
-        this.CreateTH(h1_row, "Cost");
-        this.CreateTH(h1_row, "Drag");
-        this.CreateTH(h1_row, "Reliability");
-        this.CreateTH(h1_row, "Lateral Stab");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Reliability");
+        CreateTH(h1_row, "Lateral Stab");
         var c1_row = tbl.insertRow();
         this.c_mass = c1_row.insertCell();
         this.c_cost = c1_row.insertCell();
@@ -1939,11 +1936,6 @@ class Radiator_HTML extends Display {
     }
     UpdateRadiator(rad) {
         this.radiator = rad;
-    }
-    CreateTH(row, content) {
-        var th = document.createElement("TH");
-        th.innerHTML = content;
-        row.appendChild(th);
     }
     UpdateDisplay() {
         this.type_select.selectedIndex = this.radiator.GetTypeIndex();
@@ -1962,6 +1954,7 @@ class Propeller extends Part {
         super();
         this.idx_prop = 2;
         this.use_variable = false;
+        this.have_propellers = true;
         this.prop_list = [];
         for (let elem of json["props"]) {
             this.prop_list.push({ name: elem["name"], stats: new Stats(elem), automatic: elem["automatic"] });
@@ -2002,11 +1995,23 @@ class Propeller extends Part {
     CanBeVariable() {
         return !this.prop_list[this.idx_prop].automatic;
     }
+    SetHavePropeller(have) {
+        this.have_propellers = have;
+    }
+    GetHavePropeller() {
+        return this.have_propellers;
+    }
     PartStats() {
         var stats = new Stats();
-        stats = stats.Add(this.prop_list[this.idx_prop].stats);
-        if (this.use_variable)
-            stats.cost += 2;
+        if (this.have_propellers) {
+            stats = stats.Add(this.prop_list[this.idx_prop].stats);
+            if (this.use_variable)
+                stats.cost += 2;
+        }
+        else {
+            stats.pitchboost = 1;
+            stats.pitchspeed = 1;
+        }
         return stats;
     }
     SetCalculateStats(callback) {
@@ -2014,10 +2019,9 @@ class Propeller extends Part {
     }
 }
 class Propeller_HTML extends Display {
-    constructor(js, prop) {
+    constructor(prop) {
         super();
         this.prop = prop;
-        this.PopulateRules(js);
         this.select_prop = document.getElementById("propeller_pitch");
         for (let elem of prop.GetPropList()) {
             let opt = document.createElement("OPTION");
@@ -2028,20 +2032,16 @@ class Propeller_HTML extends Display {
         this.input_variable = document.getElementById("propeller_variable");
         this.input_variable.onchange = () => { this.prop.SetVariable(this.input_variable.checked); };
     }
-    PopulateRules(js) {
-        //Get used elements
-        var rules = document.getElementById("rules_propeller");
-        var propellerHTML = "";
-        for (let elem of js["props"]) {
-            propellerHTML += "<tr><td>" + elem["name"] + "</td><td>";
-            propellerHTML += elem["pitchspeed"] + "</td><td>" + elem["pitchboost"] + "</td></tr>";
-        }
-        rules.innerHTML = format(js["rules"], propellerHTML);
-    }
     UpdateDisplay() {
         this.input_variable.checked = this.prop.GetVariable();
         this.input_variable.disabled = !this.prop.CanBeVariable();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
+        this.select_prop.disabled = false;
+        if (!this.prop.GetHavePropeller()) {
+            this.input_variable.disabled = true;
+            this.select_prop.disabled = true;
+            this.select_prop.selectedIndex = -1;
+        }
     }
 }
 class Frames extends Part {
@@ -2194,6 +2194,9 @@ class Frames extends Part {
                 count++;
         }
         return count;
+    }
+    GetNumFrames() {
+        return this.CountSections() + this.tail_section_list.length;
     }
     CountInternalBracing() {
         var count = 0;
@@ -2423,7 +2426,7 @@ class Frames extends Part {
             stats.structure += 30;
         stats = stats.Add(this.tail_list[this.sel_tail].stats);
         if (this.boom) {
-            tail_stats.maxstrain += tail_stats.mass;
+            tail_stats.maxstrain -= tail_stats.mass;
             if (this.has_tractor_nacelles)
                 tail_stats.drag = Math.floor(1.5 * tail_stats.drag);
         }
@@ -2435,10 +2438,9 @@ class Frames extends Part {
     }
 }
 class Frames_HTML extends Display {
-    constructor(js, frames) {
+    constructor(frames) {
         super();
         this.frames = frames;
-        this.PopulateRules(js);
         var table = document.getElementById("table_frames");
         var row = table.insertRow();
         this.c_frame = row.insertCell();
@@ -2450,42 +2452,42 @@ class Frames_HTML extends Display {
         var tbl = document.createElement("TABLE");
         tbl.className = "inner_table";
         var h1_row = tbl.insertRow();
-        this.CreateTH(h1_row, "Mass");
-        this.CreateTH(h1_row, "Drag");
-        this.CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Cost");
         var c1_row = tbl.insertRow();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl.insertRow();
-        this.CreateTH(h2_row, "Structure");
-        this.CreateTH(h2_row, "Toughness");
-        this.CreateTH(h2_row, "Visibility");
+        CreateTH(h2_row, "Structure");
+        CreateTH(h2_row, "Toughness");
+        CreateTH(h2_row, "Visibility");
         var c2_row = tbl.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_tugh = c2_row.insertCell();
         this.d_visi = c2_row.insertCell();
         var h3_row = tbl.insertRow();
-        this.CreateTH(h3_row, "Wing Area");
-        this.CreateTH(h3_row, "Flammable");
-        this.CreateTH(h3_row, "Pitch Stability");
+        CreateTH(h3_row, "Wing Area");
+        CreateTH(h3_row, "Flammable");
+        CreateTH(h3_row, "Pitch Stability");
         var c3_row = tbl.insertRow();
         this.d_area = c3_row.insertCell();
         this.d_flammable = c3_row.insertCell();
         this.d_pitchstab = c3_row.insertCell();
         var h4_row = tbl.insertRow();
-        this.CreateTH(h4_row, "Max Strain");
-        this.CreateTH(h4_row, "");
-        this.CreateTH(h4_row, "");
+        CreateTH(h4_row, "Max Strain");
+        CreateTH(h4_row, "");
+        CreateTH(h4_row, "");
         var c4_row = tbl.insertRow();
         this.d_strain = c4_row.insertCell();
         c4_row.insertCell();
         c4_row.insertCell();
         this.c_stats.appendChild(tbl);
         var row3 = table.insertRow();
-        this.CreateTH(row3, "Tail Frame Type");
-        this.CreateTH(row3, "Tail Skin Type");
-        this.CreateTH(row3, "Tail Frame Options");
+        CreateTH(row3, "Tail Frame Type");
+        CreateTH(row3, "Tail Skin Type");
+        CreateTH(row3, "Tail Frame Options");
         var row4 = table.insertRow();
         this.t_frame = row4.insertCell();
         this.t_skin = row4.insertCell();
@@ -2501,44 +2503,6 @@ class Frames_HTML extends Display {
         this.t_select.onchange = () => { this.frames.SetTailType(this.t_select.selectedIndex); };
         this.t_farman.onchange = () => { this.frames.SetUseFarman(this.t_farman.checked); };
         this.t_boom.onchange = () => { this.frames.SetUseBoom(this.t_boom.checked); };
-    }
-    CreateTH(row, content) {
-        var th = document.createElement("TH");
-        th.innerHTML = content;
-        row.appendChild(th);
-    }
-    PopulateRules(js) {
-        var tooltip = document.getElementById("rules_frames");
-        var frame_table = "";
-        for (let elem of this.frames.GetFrameList()) {
-            frame_table += "<tr><td>";
-            frame_table += elem.name + "</td><td>+" + elem.basestruct + " Structure</td><td>";
-            frame_table += elem.basecost + "</td><td>" + Effects2String(elem.stats) + "</td><td>";
-            frame_table += elem.stats.cost + "</td><td>";
-            if (elem.geodesic)
-                frame_table += "Yes";
-            else
-                frame_table += "No";
-            frame_table += "</td></tr>";
-        }
-        var skin_table = "";
-        for (let elem of this.frames.GetSkinList()) {
-            skin_table += "<tr><td>";
-            skin_table += elem.name + "</td><td>" + Effects2String(elem.stats) + "</td><td>";
-            skin_table += elem.stats.cost + "</td><td>";
-            if (elem.monocoque)
-                skin_table += elem.monocoque_structure;
-            else
-                skin_table += "-";
-            skin_table += "</td></tr>";
-        }
-        tooltip.innerHTML = format(js["rules"], frame_table, skin_table);
-        var tooltip_tail = document.getElementById("rules_tail_frames");
-        var tail_table = "";
-        for (let elem of this.frames.GetTailList()) {
-            tail_table += "<tr><td>" + elem.name + "</td><td>" + Effects2String(elem.stats) + "</td></tr>";
-        }
-        tooltip_tail.innerHTML = format(js["rules-tail"], tail_table);
     }
     UpdateDisplay() {
         while (this.c_frame.children.length > 0)
@@ -2728,131 +2692,895 @@ class Frames_HTML extends Display {
 class Wings extends Part {
     constructor(js) {
         super();
-        this.deck_list = [];
-        for (let elem of js["decks"]) {
-            this.deck_list.push({ name: elem["name"], stats: new Stats(elem) });
-        }
         this.skin_list = [];
         for (let elem of js["surface"]) {
             this.skin_list.push({
                 name: elem["name"], flammable: elem["flammable"],
-                stats: new Stats(elem), strainfactor: elem["strainfactor"]
+                stats: new Stats(elem), strainfactor: elem["strainfactor"],
+                dragfactor: elem["dragfactor"]
             });
         }
         this.stagger_list = [];
         for (let elem of js["stagger"]) {
             this.stagger_list.push({
-                name: elem["name"], sizereq: elem["sizereq"],
-                hstab: elem["hstab"], stats: new Stats(elem)
+                name: elem["name"], inline: elem["inline"],
+                wing_count: elem["wing_count"], hstab: elem["hstab"], stats: new Stats(elem)
             });
         }
+        this.deck_list = [];
+        for (let elem of js["decks"]) {
+            this.deck_list.push({
+                name: elem["name"], limited: elem["limited"], stats: new Stats(elem)
+            });
+        }
+        this.wing_list = [];
+        this.mini_wing_list = [];
         this.wing_stagger = Math.floor(this.stagger_list.length / 2);
-        this.wing_list = [...Array(this.deck_list.length).fill([])];
-        ;
+        this.is_swept = false;
+        this.is_closed = false;
     }
     toJSON() {
-        return {};
+        return {
+            wing_list: this.wing_list,
+            mini_wing_list: this.mini_wing_list,
+            wing_stagger: this.wing_stagger,
+            is_swept: this.is_swept,
+            is_closed: this.is_closed
+        };
     }
     fromJSON(js) {
+        this.wing_list = js["wing_list"];
+        this.mini_wing_list = js["mini_wing_list"];
+        this.wing_stagger = js["wing_stagger"];
+        this.is_swept = js["is_swept"];
+        this.is_closed = js["is_closed"];
     }
-    AddWing(deck) {
-        this.wing_list[deck].push({
-            surface: 0, area: 10, span: 5,
-            dihedral: 0, anhedral: 0,
-            swept: false
-        });
+    GetWingList() {
+        return this.wing_list;
     }
-    GetDeckList(deck) {
-        return this.wing_list.filter((element) => { return element.deck == deck; });
+    GetMiniWingList() {
+        return this.mini_wing_list;
     }
-    CanAddToDecks() {
-        var can_add = [...Array(this.deck_list.length).fill(0)];
-        //Any # of parasol or gear wings
-        can_add[0] = true;
-        can_add[this.deck_list.length - 1] = true;
-        //Count in use
-        var use_deck = [...Array(this.deck_list.length).fill(0)];
+    GetSkinList() {
+        return this.skin_list;
+    }
+    GetStaggerList() {
+        return this.stagger_list;
+    }
+    GetDeckList() {
+        return this.deck_list;
+    }
+    DeckCountFull() {
+        var count = [...Array(this.deck_list.length).fill(0)];
         for (let w of this.wing_list) {
-            use_deck[w.deck]++;
+            count[w.deck]++;
         }
-        //tandem case
-        if (this.stagger_list[this.wing_stagger].hstab) {
-            var has_tandem = false;
-            var has_any = false;
-            for (let i = 1; i < use_deck.length - 1; i++) {
-                has_tandem = has_tandem || use_deck[i] == 2;
-                has_any = has_any || use_deck[i] > 0;
-            }
-            //if we have a tandem wing, no new
-            if (!has_tandem && has_any) {
-                for (let i = 1; i < use_deck.length - 1; i++) {
-                    can_add[i] = use_deck[i] == 1;
-                }
-            }
-            else if (!has_tandem && !has_any) {
-                for (let i = 1; i < use_deck.length - 1; i++) {
-                    can_add[i] = use_deck[i] == 0;
+        return count;
+    }
+    DeckCountMini() {
+        var count = [...Array(this.deck_list.length).fill(0)];
+        for (let w of this.mini_wing_list) {
+            count[w.deck]++;
+        }
+        return count;
+    }
+    SetStagger(index) {
+        this.wing_stagger = index;
+        while (this.stagger_list[index].wing_count < this.wing_list.length) {
+            this.wing_list.pop();
+        }
+        if (!this.stagger_list[index].inline) {
+            var count = this.DeckCountFull();
+            for (let i = this.wing_list.length - 1; i >= 0; i--) {
+                let w = this.wing_list[i];
+                if (count[w.deck] > 1) {
+                    count[w.deck]--;
+                    this.wing_list.splice(i, 1);
                 }
             }
         }
         else {
-            for (let i = 1; i < use_deck.length - 1; i++) {
-                can_add[i] = use_deck[i] == 0;
+            var count = this.DeckCountFull();
+            for (let i = this.wing_list.length - 1; i >= 0; i--) {
+                let w = this.wing_list[i];
+                if (count[w.deck] == 1 && this.wing_list.length > 1) {
+                    count[w.deck]--;
+                    this.wing_list.splice(i, 1);
+                }
             }
         }
-        return can_add;
+        this.CalculateStats();
+    }
+    GetStagger() {
+        return this.wing_stagger;
+    }
+    CanAddFullWing(deck) {
+        if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
+            return false;
+        var full_count = this.DeckCountFull();
+        if (this.stagger_list[this.wing_stagger].inline) {
+            if (full_count[deck] == 2)
+                return false;
+            if (full_count[deck] == 0 && this.wing_list.length > 0)
+                return false;
+        }
+        else if (full_count[deck] == 1 && this.deck_list[deck].limited)
+            return false;
+        var mini_count = this.DeckCountMini();
+        if (mini_count[deck] != 0)
+            return false;
+        return true;
+    }
+    CanAddMiniWing(deck) {
+        var full_count = this.DeckCountFull();
+        var mini_count = this.DeckCountMini();
+        if (full_count[deck] != 0 || mini_count[deck] != 0)
+            return false;
+        return true;
+    }
+    CanMoveFullWing(idx, deck) {
+        var w = this.wing_list[idx];
+        this.wing_list.splice(idx, 1);
+        var can = this.CanAddFullWing(deck);
+        this.wing_list.splice(idx, 0, w);
+        return can;
+    }
+    CanMoveMiniWing(idx, deck) {
+        var w = this.mini_wing_list[idx];
+        this.mini_wing_list.splice(idx, 1);
+        var can = this.CanAddMiniWing(deck);
+        this.mini_wing_list.splice(idx, 0, w);
+        return can;
+    }
+    CanClosed() {
+        return this.wing_list.length > 1 && !this.stagger_list[this.wing_stagger].inline;
+    }
+    SetClosed(use) {
+        this.is_closed = use;
+        this.CalculateStats();
+    }
+    GetClosed() {
+        return this.is_closed;
+    }
+    SetSwept(use) {
+        this.is_swept = use;
+        this.CalculateStats();
+    }
+    GetSwept() {
+        return this.is_swept;
+    }
+    GetTandem() {
+        return this.stagger_list[this.wing_stagger].wing_count == 2;
+    }
+    SetFullWing(idx, w) {
+        if (this.wing_list.length != idx)
+            this.wing_list.splice(idx, 1);
+        if (w.deck >= 0) {
+            w.area = Math.max(w.area, 3);
+            w.span = Math.max(w.span, 1);
+            while (w.anhedral + w.dihedral > w.span - 1) {
+                if (w.anhedral > w.dihedral) {
+                    w.anhedral--;
+                }
+                else {
+                    w.dihedral--;
+                }
+            }
+            if (this.CanAddFullWing(w.deck))
+                this.wing_list.splice(idx, 0, w);
+        }
+        this.CalculateStats();
+    }
+    SetMiniWing(idx, w) {
+        if (this.mini_wing_list.length != idx)
+            this.mini_wing_list.splice(idx, 1);
+        if (w.deck >= 0) {
+            w.area = Math.max(w.area, 1);
+            w.area = Math.min(w.area, 2);
+            w.span = Math.max(w.span, 1);
+            w.dihedral = 0;
+            w.anhedral = 0;
+            if (this.CanAddMiniWing(w.deck))
+                this.mini_wing_list.splice(idx, 0, w);
+        }
+        this.CalculateStats();
+    }
+    IsFlammable() {
+        for (let w of this.wing_list) {
+            if (this.skin_list[w.surface].flammable)
+                return true;
+        }
+        for (let w of this.mini_wing_list) {
+            if (this.skin_list[w.surface].flammable)
+                return true;
+        }
+        return false;
+    }
+    SetNumFrames(num) {
+        this.num_frames = num;
+    }
+    NeedHStab() {
+        return this.stagger_list[this.wing_stagger].hstab;
+    }
+    NeedTail() {
+        return this.NeedHStab() || !this.is_swept;
     }
     PartStats() {
         var stats = new Stats();
+        var deck_count = this.DeckCountFull();
         var have_wing = false;
         var have_mini_wing = false;
         var longest_span = 0;
-        var use_deck = [...Array(this.deck_list.length).fill(0)];
+        let drag_reduction = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
-            if (w.area > 2) { //Is not miniature wing
-                if (!have_wing) { //Is first wing
-                    have_wing = true;
-                }
-                else { //Is not first wing
-                    stats.control += 3;
-                    stats.liftbleed += 3;
-                    stats.visibility -= 1;
-                }
-                use_deck[w.deck]++;
+            if (!have_wing) { //Is first wing
+                have_wing = true;
             }
-            else { //Is miniature wing
-                if (!have_mini_wing) { //Is first miniature wing
-                    have_mini_wing = true;
-                    stats.control += 1;
-                }
-                else { //Is not first miniature wing
-                    stats.control += 1;
-                    stats.liftbleed += 1;
-                }
+            else { //Is not first wing
+                stats.control += 3;
+                stats.liftbleed += 5;
+                stats.visibility -= 1;
             }
+            //Actual stats
             var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
-            wStats.maxstrain += 2 * wspan + w.area - 10;
+            wStats.wingarea = w.area;
+            wStats.maxstrain -= 2 * w.span + w.area - 10;
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
-            wStats.drag = Math.max(1, wStats.drag + w.area - wspan);
-            if (w.swept) {
-                wStats.liftbleed += 5;
-                wStats.latstab--;
-            }
+            //Drag is modified by area, span, and the leading wing
+            wStats.drag = Math.max(1, wStats.drag + 2 * w.area - w.span - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
+            //stability from -hedral
+            wStats.latstab += w.dihedral - w.anhedral;
+            wStats.liftbleed += w.dihedral + w.anhedral;
+            //If tandem, set leading wing drag reduction
+            if (this.stagger_list[this.wing_stagger].inline && drag_reduction == 0)
+                drag_reduction = Math.floor(w.area / 2);
+            wStats.Round();
+            stats = stats.Add(wStats);
         }
-        return new Stats();
+        for (let w of this.mini_wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            longest_span = Math.max(longest_span, wspan);
+            if (!have_mini_wing) { //Is first miniature wing
+                have_mini_wing = true;
+            }
+            else { //Is not first miniature wing
+                stats.control += 1;
+                stats.liftbleed += 1;
+            }
+            //Actual stats
+            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats.maxstrain -= 2 * wspan + w.area - 10;
+            wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
+            //Drag is modified by area, span, and the leading wing
+            wStats.drag = Math.max(1, wStats.drag + w.area - wspan);
+            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
+            wStats.Round();
+            stats = stats.Add(wStats);
+        }
+        for (let i = 0; i < deck_count.length; i++) {
+            if (deck_count[i] > 0)
+                stats = stats.Add(this.deck_list[i].stats);
+        }
+        //Longest wing effects
+        stats.control += 8 - longest_span;
+        stats.latstab += Math.min(0, longest_span - 8);
+        stats.latstab += Math.floor(longest_span / this.num_frames);
+        //Wing Sweep effects
+        if (this.is_swept) {
+            stats.liftbleed += 5;
+            stats.latstab--;
+        }
+        //Closed Wing effects
+        if (this.is_closed) {
+            stats.mass += 1;
+            stats.control -= 5;
+            stats.maxstrain += 20;
+        }
+        //Stagger effects, monoplane is nothing.
+        if (this.wing_list.length > 1) {
+            stats = stats.Add(this.stagger_list[this.wing_stagger].stats);
+        }
+        return stats;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
 }
 class Wings_HTML extends Display {
-    constructor(js, w) {
+    constructor(w) {
         super();
         this.wings = w;
+        this.stagger = document.getElementById("wing_stagger");
+        this.closed = document.getElementById("wing_closed");
+        this.swept = document.getElementById("wing_swept");
+        for (let s of w.GetStaggerList()) {
+            let opt = document.createElement("OPTION");
+            opt.textContent = s.name;
+            this.stagger.append(opt);
+        }
+        this.stagger.onchange = () => { this.wings.SetStagger(this.stagger.selectedIndex); };
+        this.closed.onchange = () => { this.wings.SetClosed(this.closed.checked); };
+        this.swept.onchange = () => { this.wings.SetSwept(this.swept.checked); };
+        var tbl = document.getElementById("wing_table");
+        var full_row = tbl.insertRow();
+        var mini_row = tbl.insertRow();
+        var full_type = document.createElement("TH");
+        full_type.textContent = "Full Wings";
+        full_row.appendChild(full_type);
+        var mini_type = document.createElement("TH");
+        mini_type.textContent = "Miniature Wings";
+        mini_row.appendChild(mini_type);
+        this.full_cell = full_row.insertCell();
+        this.mini_cell = mini_row.insertCell();
+        var stat_cell = full_row.insertCell();
+        stat_cell.rowSpan = 0;
+        this.InitStatDisplay(stat_cell);
+    }
+    InitStatDisplay(stat_cell) {
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Wing Area");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Drag");
+        var c1_row = tbl_stat.insertRow();
+        this.d_area = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_drag = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Control");
+        CreateTH(h2_row, "Pitch Stability");
+        CreateTH(h2_row, "Lateral Stability");
+        var c2_row = tbl_stat.insertRow();
+        this.d_cont = c2_row.insertCell();
+        this.d_pstb = c2_row.insertCell();
+        this.d_lstb = c2_row.insertCell();
+        var h3_row = tbl_stat.insertRow();
+        CreateTH(h3_row, "Max Strain");
+        CreateTH(h3_row, "Escape");
+        CreateTH(h3_row, "Lift Bleed");
+        var c3_row = tbl_stat.insertRow();
+        this.d_maxs = c3_row.insertCell();
+        this.d_escp = c3_row.insertCell();
+        this.d_lift = c3_row.insertCell();
+        var h4_row = tbl_stat.insertRow();
+        CreateTH(h4_row, "Cost");
+        CreateTH(h4_row, "Charge");
+        CreateTH(h4_row, "Flammable?");
+        var c4_row = tbl_stat.insertRow();
+        this.d_cost = c4_row.insertCell();
+        this.d_chrg = c4_row.insertCell();
+        this.d_flam = c4_row.insertCell();
     }
     UpdateDisplay() {
+        this.stagger.selectedIndex = this.wings.GetStagger();
+        this.closed.checked = this.wings.GetClosed();
+        this.closed.disabled = !this.wings.CanClosed();
+        this.swept.checked = this.wings.GetSwept();
+        while (this.full_cell.children.length > 0)
+            this.full_cell.removeChild(this.full_cell.children[0]);
+        while (this.mini_cell.children.length > 0)
+            this.mini_cell.removeChild(this.mini_cell.children[0]);
+        var wl = this.wings.GetWingList();
+        for (let i = 0; i < wl.length; i++) {
+            this.AddFullWing(this.full_cell, i, wl[i]);
+        }
+        var mwl = this.wings.GetMiniWingList();
+        for (let i = 0; i < mwl.length; i++) {
+            this.AddMiniWing(this.mini_cell, i, mwl[i]);
+        }
+        this.AddAddFullWing(this.full_cell, wl.length);
+        this.AddAddMiniWing(this.mini_cell, mwl.length);
+        var stats = this.wings.PartStats();
+        this.d_area.innerText = stats.wingarea.toString();
+        this.d_mass.innerText = stats.mass.toString();
+        this.d_drag.innerText = stats.drag.toString();
+        this.d_cont.innerText = stats.control.toString();
+        this.d_pstb.innerText = stats.pitchstab.toString();
+        this.d_lstb.innerText = stats.latstab.toString();
+        this.d_maxs.innerText = stats.maxstrain.toString();
+        this.d_lift.innerText = stats.liftbleed.toString();
+        this.d_chrg.innerText = "0"; //stats.charge.toString(); //TODO: Charge
+        this.d_escp.innerText = stats.escape.toString();
+        this.d_cost.innerText = stats.cost.toString();
+        if (this.wings.IsFlammable())
+            this.d_flam.innerText = "Yes";
+        else
+            this.d_flam.innerText = "No";
+    }
+    AddFullWing(cell, idx, wing) {
+        var span = document.createElement("SPAN");
+        var deck = document.createElement("SELECT");
+        span.appendChild(deck);
+        var dlist = this.wings.GetDeckList();
+        var none_opt = document.createElement("OPTION");
+        none_opt.textContent = "None";
+        deck.append(none_opt);
+        for (let i = 0; i < dlist.length; i++) {
+            let d = dlist[i];
+            let opt = document.createElement("OPTION");
+            opt.textContent = d.name;
+            if (wing.deck != i && !this.wings.CanAddFullWing(i) && !this.wings.CanMoveFullWing(idx, i)) {
+                opt.disabled = true;
+            }
+            deck.append(opt);
+        }
+        deck.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.deck = deck.selectedIndex - 1;
+            this.wings.SetFullWing(idx, w);
+        };
+        deck.selectedIndex = wing.deck + 1;
+        CreateSpace(span);
+        var skin = document.createElement("SELECT");
+        span.appendChild(skin);
+        var slist = this.wings.GetSkinList();
+        for (let s of this.wings.GetSkinList()) {
+            let opt = document.createElement("OPTION");
+            opt.textContent = s.name;
+            skin.append(opt);
+        }
+        skin.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.surface = skin.selectedIndex;
+            this.wings.SetFullWing(idx, w);
+        };
+        skin.selectedIndex = wing.surface;
+        CreateSpace(span);
+        var area = document.createElement("INPUT");
+        CreateInput(" Area ", area, span, false);
+        area.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.area = area.valueAsNumber;
+            this.wings.SetFullWing(idx, w);
+        };
+        area.min = "3";
+        area.valueAsNumber = wing.area;
+        CreateSpace(span);
+        var wspan = document.createElement("INPUT");
+        CreateInput(" Span ", wspan, span, false);
+        wspan.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.span = wspan.valueAsNumber;
+            this.wings.SetFullWing(idx, w);
+        };
+        wspan.min = "1";
+        wspan.valueAsNumber = wing.span;
+        CreateSpace(span);
+        var dihedral = document.createElement("INPUT");
+        CreateInput(" Dihedral ", dihedral, span, false);
+        dihedral.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.dihedral = dihedral.valueAsNumber;
+            this.wings.SetFullWing(idx, w);
+        };
+        dihedral.min = "0";
+        dihedral.max = (wing.span - wing.anhedral - 1).toString();
+        dihedral.valueAsNumber = wing.dihedral;
+        CreateSpace(span);
+        var anhedral = document.createElement("INPUT");
+        CreateInput(" Anhedral ", anhedral, span, false);
+        anhedral.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.anhedral = anhedral.valueAsNumber;
+            this.wings.SetFullWing(idx, w);
+        };
+        anhedral.min = "0";
+        anhedral.max = (wing.span - wing.dihedral - 1).toString();
+        anhedral.valueAsNumber = wing.anhedral;
+        cell.appendChild(span);
+        cell.appendChild(document.createElement("BR"));
+    }
+    AddMiniWing(cell, idx, wing) {
+        var span = document.createElement("SPAN");
+        var deck = document.createElement("SELECT");
+        span.appendChild(deck);
+        var dlist = this.wings.GetDeckList();
+        var none_opt = document.createElement("OPTION");
+        none_opt.textContent = "None";
+        deck.append(none_opt);
+        for (let i = 0; i < dlist.length; i++) {
+            let d = dlist[i];
+            let opt = document.createElement("OPTION");
+            opt.textContent = d.name;
+            if (wing.deck != i && !this.wings.CanAddMiniWing(i) && !this.wings.CanMoveMiniWing(idx, i)) {
+                opt.disabled = true;
+            }
+            deck.append(opt);
+        }
+        deck.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.deck = deck.selectedIndex - 1;
+            this.wings.SetMiniWing(idx, w);
+        };
+        deck.selectedIndex = wing.deck + 1;
+        CreateSpace(span);
+        var skin = document.createElement("SELECT");
+        span.appendChild(skin);
+        var slist = this.wings.GetSkinList();
+        for (let s of this.wings.GetSkinList()) {
+            let opt = document.createElement("OPTION");
+            opt.textContent = s.name;
+            skin.append(opt);
+        }
+        skin.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.surface = skin.selectedIndex;
+            this.wings.SetMiniWing(idx, w);
+        };
+        skin.selectedIndex = wing.surface;
+        CreateSpace(span);
+        var area = document.createElement("INPUT");
+        CreateInput(" Area ", area, span, false);
+        area.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.area = area.valueAsNumber;
+            this.wings.SetMiniWing(idx, w);
+        };
+        area.min = "1";
+        area.max = "2";
+        area.valueAsNumber = wing.area;
+        CreateSpace(span);
+        var wspan = document.createElement("INPUT");
+        CreateInput(" Span ", wspan, span, false);
+        wspan.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.span = wspan.valueAsNumber;
+            this.wings.SetMiniWing(idx, w);
+        };
+        wspan.min = "1";
+        wspan.valueAsNumber = wing.span;
+        cell.appendChild(span);
+        cell.appendChild(document.createElement("BR"));
+    }
+    AddAddFullWing(cell, idx) {
+        var span = document.createElement("SPAN");
+        var deck = document.createElement("SELECT");
+        span.appendChild(deck);
+        var dlist = this.wings.GetDeckList();
+        var none_opt = document.createElement("OPTION");
+        none_opt.textContent = "None";
+        deck.append(none_opt);
+        var can = false;
+        for (let i = 0; i < dlist.length; i++) {
+            let d = dlist[i];
+            let opt = document.createElement("OPTION");
+            opt.textContent = d.name;
+            if (!this.wings.CanAddFullWing(i)) {
+                opt.disabled = true;
+            }
+            else {
+                can = true;
+            }
+            deck.append(opt);
+        }
+        deck.oninput = () => {
+            let w = { surface: 0, area: 10, span: 5, dihedral: 0, anhedral: 0, deck: deck.selectedIndex - 1 };
+            this.wings.SetFullWing(idx, w);
+        };
+        deck.selectedIndex = 0;
+        deck.disabled = !can;
+        cell.appendChild(span);
+        cell.appendChild(document.createElement("BR"));
+    }
+    AddAddMiniWing(cell, idx) {
+        var span = document.createElement("SPAN");
+        var deck = document.createElement("SELECT");
+        span.appendChild(deck);
+        var dlist = this.wings.GetDeckList();
+        var none_opt = document.createElement("OPTION");
+        none_opt.textContent = "None";
+        deck.append(none_opt);
+        var can = false;
+        for (let i = 0; i < dlist.length; i++) {
+            let d = dlist[i];
+            let opt = document.createElement("OPTION");
+            opt.textContent = d.name;
+            if (!this.wings.CanAddMiniWing(i)) {
+                opt.disabled = true;
+            }
+            else {
+                can = true;
+            }
+            deck.append(opt);
+        }
+        deck.oninput = () => {
+            let w = { surface: 0, area: 2, span: 2, dihedral: 0, anhedral: 0, deck: deck.selectedIndex - 1 };
+            this.wings.SetMiniWing(idx, w);
+        };
+        deck.selectedIndex = 0;
+        deck.disabled = !can;
+        cell.appendChild(span);
+        cell.appendChild(document.createElement("BR"));
+    }
+}
+class Stabilizers extends Part {
+    constructor(js) {
+        super();
+        this.have_tail = false;
+        this.is_tandem = false;
+        this.is_swept = false;
+        this.hstab_sel = 0;
+        this.hstab_count = 1;
+        this.hstab_list = [];
+        for (let elem of js["hstab"]) {
+            this.hstab_list.push({
+                name: elem["name"],
+                is_canard: elem["is_canard"],
+                increment: elem["increment"],
+                stats: new Stats(elem),
+                dragfactor: elem["dragfactor"],
+                is_vtail: elem["is_vtail"]
+            });
+        }
+        this.vstab_sel = 0;
+        this.vstab_count = 1;
+        this.vstab_list = [];
+        for (let elem of js["vstab"]) {
+            this.vstab_list.push({
+                name: elem["name"],
+                increment: elem["increment"],
+                stats: new Stats(elem),
+                dragfactor: elem["dragfactor"],
+                is_vtail: elem["is_vtail"]
+            });
+        }
+    }
+    GetHStabList() {
+        return this.hstab_list;
+    }
+    GetVStabList() {
+        return this.vstab_list;
+    }
+    GetHStabType() {
+        return this.hstab_sel;
+    }
+    SetHStabType(num) {
+        if (this.hstab_list[num].name == "Tandem Wings" && !this.is_tandem)
+            return;
+        if (this.hstab_list[num].is_vtail)
+            this.SetVTail();
+        else if (this.hstab_list[this.hstab_sel].is_vtail) {
+            this.vstab_sel = 0;
+            this.vstab_count = 1;
+        }
+        this.hstab_sel = num;
+        this.SetHStabCount(this.hstab_count);
+        this.CalculateStats();
+    }
+    GetHValidList() {
+        var lst = [];
+        for (let t of this.hstab_list) {
+            if (t.name == "Tandem Wings" && !this.is_tandem)
+                lst.push(false);
+            else
+                lst.push(true);
+        }
+        return lst;
+    }
+    SetVTail() {
+        for (let i = 0; i < this.hstab_list.length; i++) {
+            if (this.hstab_list[i].is_vtail)
+                this.hstab_sel = i;
+        }
+        for (let i = 0; i < this.vstab_list.length; i++) {
+            if (this.vstab_list[i].is_vtail)
+                this.vstab_sel = i;
+        }
+        this.hstab_count = 1;
+        this.vstab_count = 0;
+    }
+    GetVStabType() {
+        return this.vstab_sel;
+    }
+    SetVStabType(num) {
+        if (this.vstab_list[num].name == "Outboard" && !this.GetVOutboard())
+            return;
+        if (this.vstab_list[num].is_vtail)
+            this.SetVTail();
+        else if (this.vstab_list[this.vstab_sel].is_vtail) {
+            this.hstab_sel = 0;
+        }
+        this.vstab_sel = num;
+        this.SetVStabCount(this.vstab_count);
+        this.CalculateStats();
+    }
+    GetVValidList() {
+        var lst = [];
+        for (let t of this.vstab_list) {
+            if (t.name == "Outboard" && !this.GetVOutboard())
+                lst.push(false);
+            else
+                lst.push(true);
+        }
+        return lst;
+    }
+    GetHStabCount() {
+        return this.hstab_count;
+    }
+    SetHStabCount(num) {
+        this.hstab_count = num;
+        if (this.hstab_list[this.hstab_sel].increment != 0) {
+            while ((this.hstab_count % this.hstab_list[this.hstab_sel].increment) != 0) {
+                this.hstab_count++;
+            }
+        }
+        else {
+            this.hstab_count = 0;
+        }
+        this.CalculateStats();
+    }
+    GetHStabIncrement() {
+        return this.hstab_list[this.hstab_sel].increment;
+    }
+    GetVStabCount() {
+        return this.vstab_count;
+    }
+    SetVStabCount(num) {
+        this.vstab_count = num;
+        if (this.vstab_list[this.vstab_sel].increment != 0) {
+            while ((this.vstab_count % this.vstab_list[this.vstab_sel].increment) != 0) {
+                this.vstab_count++;
+            }
+        }
+        else {
+            this.vstab_count = 0;
+        }
+        this.CalculateStats();
+    }
+    GetVStabIncrement() {
+        return this.vstab_list[this.vstab_sel].increment;
+    }
+    SetEngineCount(num) {
+        this.engine_count = num;
+    }
+    GetIsTandem() {
+        return this.is_tandem;
+    }
+    SetIsTandem(is) {
+        this.is_tandem = is;
+    }
+    SetIsSwept(is) {
+        this.is_swept = is;
+    }
+    GetVOutboard() {
+        return this.is_swept || this.is_tandem || this.hstab_list[this.hstab_sel].is_canard;
+    }
+    SetWingArea(num) {
+        this.wing_area = num;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        console.log("PART STATS");
+        //HSTAB
+        if (this.hstab_count > 0) {
+            stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
+            stats.drag += Math.floor(this.wing_area / 5 * this.hstab_list[this.hstab_sel].dragfactor);
+        }
+        else if (this.hstab_list[this.hstab_sel].increment != 0) {
+            stats.pitchstab -= Math.floor(this.wing_area / 2);
+            stats.liftbleed += 5;
+        }
+        console.log(stats);
+        //VSTAB
+        if (this.vstab_count > 0) {
+            stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
+            stats.drag += Math.floor(this.wing_area / 10 * this.vstab_list[this.vstab_sel].dragfactor);
+        }
+        else if (this.vstab_list[this.vstab_sel].increment != 0) {
+            stats.latstab -= this.wing_area;
+        }
+        console.log(stats);
+        //Additional stabilizers
+        stats.drag += 2 * (Math.max(0, this.hstab_count - 1) + Math.max(0, this.vstab_count - 1));
+        console.log(stats);
+        //Pairs of stabilizers
+        var pairs = 0;
+        if (this.vstab_list[this.vstab_sel].is_vtail) //V-Tail
+            pairs = this.hstab_count;
+        else
+            pairs = Math.min(this.hstab_count, this.vstab_count);
+        var leftovers = Math.max(this.hstab_count, this.vstab_count) - pairs;
+        var es_pairs = Math.min(this.engine_count, pairs);
+        leftovers += 2 * (pairs - es_pairs);
+        stats.control += 3 * es_pairs + leftovers;
+        console.log(stats);
+        return stats;
+    }
+}
+class Stabilizers_HTML extends Display {
+    constructor(s) {
+        super();
+        this.stab = s;
+        var tbl = document.getElementById("stab_table");
+        var row = tbl.insertRow();
+        var hcell = row.insertCell();
+        var vcell = row.insertCell();
+        this.h_type = document.createElement("SELECT");
+        this.h_count = document.createElement("INPUT");
+        hcell.appendChild(this.h_type);
+        hcell.append(document.createElement("BR"));
+        CreateInput(" Stabilizers", this.h_count, hcell);
+        this.h_count.min = "0";
+        this.h_count.max = "20";
+        this.h_count.oninput = () => { this.stab.SetHStabCount(this.h_count.valueAsNumber); };
+        this.h_type.onchange = () => { this.stab.SetHStabType(this.h_type.selectedIndex); };
+        for (let elem of s.GetHStabList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = elem.name;
+            this.h_type.add(opt);
+        }
+        this.v_type = document.createElement("SELECT");
+        this.v_count = document.createElement("INPUT");
+        vcell.appendChild(this.v_type);
+        vcell.appendChild(document.createElement("BR"));
+        CreateInput(" Stabilizers", this.v_count, vcell);
+        this.v_count.min = "0";
+        this.v_count.max = "20";
+        this.v_count.oninput = () => { this.stab.SetVStabCount(this.v_count.valueAsNumber); };
+        this.v_type.onchange = () => { this.stab.SetVStabType(this.v_type.selectedIndex); };
+        for (let elem of s.GetVStabList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = elem.name;
+            this.v_type.add(opt);
+        }
+        var stat_cell = row.insertCell();
+        stat_cell.rowSpan = 0;
+        this.InitStatDisplay(stat_cell);
+    }
+    InitStatDisplay(stat_cell) {
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Control");
+        CreateTH(h1_row, "Cost");
+        var c1_row = tbl_stat.insertRow();
+        this.d_drag = c1_row.insertCell();
+        this.d_cont = c1_row.insertCell();
+        this.d_cost = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Pitch Stability");
+        CreateTH(h2_row, "Lateral Stability");
+        CreateTH(h2_row, "Lift Bleed");
+        var c2_row = tbl_stat.insertRow();
+        this.d_pstb = c2_row.insertCell();
+        this.d_lstb = c2_row.insertCell();
+        this.d_lift = c2_row.insertCell();
+    }
+    UpdateDisplay() {
+        this.h_type.selectedIndex = this.stab.GetHStabType();
+        this.v_type.selectedIndex = this.stab.GetVStabType();
+        var valid = this.stab.GetHValidList();
+        for (let i = 0; i < valid.length; i++) {
+            this.h_type.options[i].disabled = !valid[i];
+        }
+        valid = this.stab.GetVValidList();
+        for (let i = 0; i < valid.length; i++) {
+            this.v_type.options[i].disabled = !valid[i];
+        }
+        this.h_count.valueAsNumber = this.stab.GetHStabCount();
+        this.h_count.step = this.stab.GetHStabIncrement().toString();
+        this.v_count.valueAsNumber = this.stab.GetVStabCount();
+        this.v_count.step = this.stab.GetVStabIncrement().toString();
+        var stats = this.stab.PartStats();
+        this.d_drag.innerText = stats.drag.toString();
+        this.d_cont.innerText = stats.control.toString();
+        this.d_cost.innerText = stats.cost.toString();
+        this.d_pstb.innerText = stats.pitchstab.toString();
+        this.d_lstb.innerText = stats.latstab.toString();
+        this.d_lift.innerText = stats.liftbleed.toString();
     }
 }
