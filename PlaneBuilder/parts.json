@@ -666,24 +666,28 @@
             {
                 "name": "Cloth Canvas",
                 "flammable": false,
-                "strainfactor": 1.0
+                "strainfactor": 1.0,
+                "dragfactor": 1.0
             },
             {
                 "name": "Treated Paper",
                 "flammable": true,
                 "strainfactor": 1.0,
+                "dragfactor": 1.0,
                 "mass": -0.25
             },
             {
                 "name": "Tense Silk Layers",
                 "flammable": false,
                 "strainfactor": 0.9,
+                "dragfactor": 1.0,
                 "cost": 0.2
             },
             {
                 "name": "Plywood",
                 "flammable": false,
                 "strainfactor": 0.9,
+                "dragfactor": 1.0,
                 "mass": 0.2,
                 "cost": 0.1
             },
@@ -698,6 +702,7 @@
                 "name": "Courrugated Steel",
                 "flammable": false,
                 "strainfactor": 0.6,
+                "dragfactor": 1.0,
                 "mass": 0.25,
                 "cost": 0.2
             },
@@ -713,6 +718,7 @@
                 "name": "Grand Eagle Feather",
                 "flammable": false,
                 "strainfactor": 1.0,
+                "dragfactor": 1.0,
                 "control": 0.2,
                 "cost": 0.6
             },
@@ -720,6 +726,7 @@
                 "name": "Solar Fiber",
                 "flammable": false,
                 "strainfactor": 1.0,
+                "dragfactor": 1.0,
                 "charge": 0.2,
                 "cost": 0.4
             },
@@ -727,6 +734,7 @@
                 "name": "Dragon Skin",
                 "flammable": false,
                 "strainfactor": 0.4,
+                "dragfactor": 1.0,
                 "cost": 0.8
             }
         ],

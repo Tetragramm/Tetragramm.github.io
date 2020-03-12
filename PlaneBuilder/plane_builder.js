@@ -441,11 +441,11 @@ class Aircraft {
         this.stats = this.stats.Add(this.engines.PartStats());
         this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
         this.stats = this.stats.Add(this.propeller.PartStats());
-        this.wings.SetNumFrames(this.frames.GetNumFrames());
-        this.stats = this.stats.Add(this.wings.PartStats());
         this.frames.SetRequiredSections(this.stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.stats = this.stats.Add(this.frames.PartStats());
+        this.wings.SetNumFrames(this.frames.GetNumFrames());
+        this.stats = this.stats.Add(this.wings.PartStats());
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
         this.stabilizers.SetIsTandem(this.wings.GetTandem());
         this.stabilizers.SetIsSwept(this.wings.GetSwept());
