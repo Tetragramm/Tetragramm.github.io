@@ -28,7 +28,6 @@
         "options": [
             {
                 "name": "Open",
-                "description": "The pilot is fully exposed to the air.",
                 "mass": 1,
                 "drag": 3,
                 "control": 0,
@@ -39,7 +38,6 @@
             },
             {
                 "name": "Windscreen",
-                "description": "A piece of glass in front of the pilot.",
                 "mass": 2,
                 "drag": 1,
                 "control": 0,
@@ -50,7 +48,6 @@
             },
             {
                 "name": "Sealed",
-                "description": "There is no window or external view.",
                 "mass": 2,
                 "drag": 0,
                 "control": 0,
@@ -61,7 +58,6 @@
             },
             {
                 "name": "Narrow Canopy",
-                "description": "A frame with small windows.",
                 "mass": 3,
                 "drag": 0,
                 "control": 0,
@@ -72,7 +68,6 @@
             },
             {
                 "name": "Bubble Canopy",
-                "description": "A cockpit made from curved glass.",
                 "mass": 3,
                 "drag": -3,
                 "control": 0,
@@ -85,7 +80,6 @@
         "upgrades": [
             {
                 "name": "Co-Pilot Controls",
-                "description": "Allows this seat to also control the aircraft.",
                 "mass": 0,
                 "drag": 0,
                 "control": 3,
@@ -96,7 +90,6 @@
             },
             {
                 "name": "Escape Hatch",
-                "description": "Help the pilot escape.",
                 "mass": 1,
                 "drag": 0,
                 "control": 0,
@@ -107,7 +100,6 @@
             },
             {
                 "name": "Ejection Seat",
-                "description": "Eject the pilot from the cockpit.",
                 "mass": 2,
                 "drag": 0,
                 "control": 0,
@@ -118,7 +110,6 @@
             },
             {
                 "name": "Connectivity",
-                "description": "Connects this cockpit to any other cockpit with the same upgrade.",
                 "mass": 1,
                 "drag": 0,
                 "control": 0,
@@ -129,7 +120,7 @@
             },
             {
                 "name": "Oxygen Mask",
-                "description": "The pilot ignores the effects of high altitude and negates up to 2 G-Penalty. Requires 1 Charge Continuous.",
+                "warning": "The pilot ignores the effects of high altitude and negates up to 2 G-Penalty.",
                 "mass": 0,
                 "drag": 0,
                 "control": 0,
@@ -140,7 +131,6 @@
             },
             {
                 "name": "Isolated",
-                "description": "A basket or box allowing unusual mounts (like in front of a propeller) completely ignoring the usual system.",
                 "mass": 1,
                 "drag": 5,
                 "control": 0,
@@ -168,7 +158,7 @@
             },
             {
                 "name": "Center-Mounted Tractor",
-                "description": "Forward-firing fixed weapons will need Sync gears. Will require an Extended Driveshaft.<br/>With the space free at the front of the aircraft, you can mount a single weapon that fires through the spinner.<br/>(Represents P-39 style engine mounts.)",
+                "warning": "Forward-firing fixed weapons will need Sync gears. Will require an Extended Driveshaft. With the space free at the front of the aircraft, you can mount a single weapon that fires through the spinner. (Represents P-39 style engine mounts.)",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -2,
@@ -181,7 +171,7 @@
             },
             {
                 "name": "Rear-Mounted Pusher",
-                "description": "Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward.<br/>(Represents engines mounted at the rear of the aircraft)",
+                "warning": "Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward. (Represents engines mounted at the rear of the aircraft)",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -4,
@@ -193,7 +183,7 @@
             },
             {
                 "name": "Center-Mounted Pusher",
-                "description": "Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders,  or Boom Tail. <br/>Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward.<br/>(Represents engines mounted in the center of the aircraft a la the DH2)",
+                "warning": "Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders,  or Boom Tail.  Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward. (Represents engines mounted in the center of the aircraft a la the DH2)",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -2,
@@ -206,7 +196,6 @@
             },
             {
                 "name": "Pod",
-                "description": "Keeps the engine out of the way of everything.",
                 "drag": 5,
                 "reqsections": 1,
                 "pitchstab": 0,
@@ -218,7 +207,6 @@
             },
             {
                 "name": "Nacelle (Inside)",
-                "description": "Reduces Max Strain by half the mass of the engine.",
                 "drag": 0,
                 "reqsections": 0,
                 "pitchstab": 0,
@@ -230,7 +218,6 @@
             },
             {
                 "name": "Nacelle (Offset)",
-                "description": "Adds Drag equal to the mass of the Engine.",
                 "drag": 0,
                 "reqsections": 0,
                 "pitchstab": 0,
@@ -242,7 +229,6 @@
             },
             {
                 "name": "Channel Tractor",
-                "description": " Reduces Max Strain equal to the mass of the engine.",
                 "drag": 0,
                 "reqsections": 0,
                 "pitchstab": 0,
@@ -257,26 +243,22 @@
             {
                 "type": "fuselage",
                 "name": "Tractor + Pusher/Rearward",
-                "description": "90% Engine Power",
                 "powerfactor": 0.9
             },
             {
                 "type": "wing",
                 "name": "Nacelle/Nacelle",
-                "description": "80% Engine Power. Only apply the nacelle penalty for one engine.",
                 "powerfactor": 0.8
             },
             {
                 "type": "pod",
                 "name": "Tandem Pod",
-                "description": "90% Engine Power. Only apply the +5 Drag Penalty once.",
                 "powerfactor": 0.9
             }
         ],
         "radiator-type": [
             {
                 "name": "Panel",
-                "description": "Default",
                 "drag": 0,
                 "mass": 0,
                 "cost": 0,
@@ -285,7 +267,6 @@
             },
             {
                 "name": "Box",
-                "description": "",
                 "drag": 2,
                 "mass": -1,
                 "cost": 0,
@@ -294,7 +275,6 @@
             },
             {
                 "name": "Intake",
-                "description": "",
                 "drag": 0,
                 "mass": 0,
                 "cost": 3,
@@ -303,7 +283,7 @@
             },
             {
                 "name": "Evaporation",
-                "description": "Requires Metal Wing Skin. No Drag. Vulnerable to Crits.",
+                "warning": "Requires Metal Wing Skin. Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.",
                 "drag": 0,
                 "mass": 0,
                 "cost": 0,
@@ -314,28 +294,27 @@
         "radiator-mount": [
             {
                 "name": "Low",
-                "description": "Force Cool Down when shot.",
+                "warning": "Force Cool Down when shot.",
                 "reliability": 1,
                 "drag": 0,
                 "latstab": 0
             },
             {
                 "name": "Inline",
-                "description": "Default",
                 "reliability": 0,
                 "drag": 0,
                 "latstab": 0
             },
             {
                 "name": "High",
-                "description": "Bonus persists for 1 Cool Down after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!",
+                "warning": "Bonus persists for 1 Cool Down after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!",
                 "reliability": 0,
                 "drag": 1,
                 "latstab": 0
             },
             {
                 "name": "High Offset",
-                "description": "Bonus persists for 1 Cool Down after being shot. Requires a Parasol Wing.",
+                "warning": "Bonus persists for 1 Cool Down after being shot. Requires a Parasol Wing.",
                 "reliability": 0,
                 "drag": 1,
                 "latstab": -1
@@ -344,43 +323,42 @@
         "radiator-coolant": [
             {
                 "name": "Water",
-                "description": "",
                 "cost": 0,
                 "reliability": 0
             },
             {
                 "name": "Salt Water",
-                "description": "",
                 "cost": 3,
                 "reliability": 1
             },
             {
                 "name": "Mineral Oil",
-                "description": "Absorbs 1 Miss to Cool Down. Flammable.",
+                "warning": "Absorbs 1 Miss to Cool Down.",
                 "cost": 3,
-                "reliability": 0
+                "reliability": 0,
+                "flammable": true
             },
             {
                 "name": "Castor Oil",
-                "description": "Absorbs 1 Miss to Cool Down. Flammable. +2 Stress if leaking.",
+                "warning": "Absorbs 1 Miss to Cool Down. +2 Stress if leaking.",
                 "cost": 0,
-                "reliability": 0
+                "reliability": 0,
+                "flammable": true
             },
             {
                 "name": "Glycol",
-                "description": "",
                 "reliability": 2,
                 "cost": 2
             },
             {
                 "name": "Freon",
-                "description": "Caps RPM to 3.",
+                "warning": "Caps RPM to 3.",
                 "reliability": 1,
                 "cost": 3
             },
             {
                 "name": "Ammonia",
-                "description": "Caps RPM to 3. Causes 2 Injury when leaking.",
+                "warning": "Caps RPM to 3. Causes 2 Injury when leaking.",
                 "reliability": 1,
                 "cost": 2
             }
@@ -429,9 +407,11 @@
                 "pitchboost": 0.7,
                 "mass": 1,
                 "cost": 8,
-                "automatic": true
+                "automatic": true,
+                "warning": "Eliminates propeller tuning."
             }
-        ]
+        ],
+        "MVP_Warning": "Allows blad pitch to be adjusted on the ground without replacing it."
     },
     "frames": {
         "frames": [
@@ -649,7 +629,7 @@
             {
                 "name": "Low",
                 "pitchstab": -2,
-                "escape": -1,
+                "crashsafety": -1,
                 "liftbleed": -1,
                 "limited": true
             },
@@ -657,7 +637,7 @@
                 "name": "Gear",
                 "pitchstab": -3,
                 "maxstrain": -10,
-                "escape": -1,
+                "crashsafety": -1,
                 "liftbleed": -2,
                 "limited": false
             }
@@ -803,7 +783,7 @@
                 "is_vtail": false
             },
             {
-                "name": "Tandem Wings",
+                "name": "The Wings",
                 "dragfactor": 0,
                 "is_canard": false,
                 "increment": 0,
@@ -841,7 +821,8 @@
                 "dragfactor": 0.5,
                 "is_canard": false,
                 "increment": 1,
-                "is_vtail": false
+                "is_vtail": false,
+                "warning": "In the event of a spin/stall while above stall speed and under power, you are at a Disadvantage to recover."
             }
         ],
         "vstab": [
@@ -863,6 +844,221 @@
                 "dragfactor": 0,
                 "increment": 0,
                 "is_vtail": true
+            }
+        ]
+    },
+    "controls": {
+        "ailerons": [
+            {
+                "name": "Flap Ailerons",
+                "warping": false
+            },
+            {
+                "name": "Wing Warping",
+                "drag": -1,
+                "warping": true,
+                "warning": "Get +1 to Dogfight! at 15 speed and below."
+            },
+            {
+                "name": "Spoilerons",
+                "cost": 2,
+                "warping": false,
+                "warning": "When you Dogfight!, spend double speed but take +1"
+            },
+            {
+                "name": "None",
+                "warping": false,
+                "control": -5,
+                "cost": -2
+            }
+        ],
+        "rudders": [
+            {
+                "name": "Flap Rudder"
+            },
+            {
+                "name": "Flying Rudder",
+                "latstab": -2,
+                "control": 3
+            }
+        ],
+        "elevators": [
+            {
+                "name": "Flap Elevator"
+            },
+            {
+                "name": "Flying Elevator",
+                "pitchstab": -2,
+                "control": 2
+            }
+        ],
+        "flaps": [
+            {
+                "name": "None"
+            },
+            {
+                "name": "Basic Flaps",
+                "liftbleed": -3,
+                "costfactor": 0.333333333333
+            },
+            {
+                "name": "Advanced Flaps",
+                "liftbleed": -5,
+                "costfactor": 0.666666666666
+            },
+            {
+                "name": "Control Flaps",
+                "liftbleed": -5,
+                "control": 3,
+                "costfactor": 1
+            },
+            {
+                "name": "Lift Dumpers",
+                "crashsafety": 2,
+                "costfactor": 1,
+                "warning": "Activate for +1 to Dogfight!, then immediately induce a stall."
+            }
+        ],
+        "slats": [
+            {
+                "name": "None"
+            },
+            {
+                "name": "Fixed Slots",
+                "drag": 5,
+                "liftbleed": -3,
+                "cost": 1
+            },
+            {
+                "name": "Automatic Slats",
+                "liftbleed": -1,
+                "control": 3,
+                "cost": 4
+            }
+        ],
+        "drag_inducers": [
+            {
+                "name": "Air Brake",
+                "mass": 1,
+                "cost": 3,
+                "warning": "When deployed, immediately bleed of speed equal to Speed Factor and gain +1 to Dogfight!."
+            },
+            {
+                "name": "Dive Brake",
+                "mass": 2,
+                "cost": 4,
+                "warning": "When deployed, steep dives trade altitude for speed at 1-2 instead of 1-3."
+            },
+            {
+                "name": "Drogue Chute",
+                "cost": 3,
+                "crashsafety": 3,
+                "warning": "Can be activated as a weapon or a one-use Air-Brake."
+            }
+        ]
+    },
+    "reinforcement": {
+        "external": [
+            {
+                "name": "Parallel Struts",
+                "drag": 3,
+                "mass": 1,
+                "structure": 5,
+                "maxstrain": 5,
+                "tension": 30,
+                "cost": 1,
+                "config": true
+            },
+            {
+                "name": "N-Strut",
+                "drag": 3,
+                "mass": 1,
+                "structure": 6,
+                "maxstrain": 8,
+                "tension": 20,
+                "cost": 1,
+                "config": true
+            },
+            {
+                "name": "V-Strut",
+                "drag": 2,
+                "mass": 1,
+                "structure": -5,
+                "maxstrain": 5,
+                "tension": 30,
+                "cost": 1,
+                "config": true
+            },
+            {
+                "name": "I-Strut",
+                "drag": 2,
+                "mass": 1,
+                "maxstrain": 20,
+                "tension": 15,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "W-Strut",
+                "drag": 4,
+                "mass": 1,
+                "maxstrain": 35,
+                "tension": 0,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "Star Strut",
+                "drag": 8,
+                "mass": 2,
+                "structure": 10,
+                "maxstrain": 30,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "Wing Truss",
+                "drag": 6,
+                "tension": 40,
+                "cost": 1,
+                "config": false
+            }
+        ],
+        "cantilever": [
+            {
+                "name": "Birch",
+                "mass": 2,
+                "maxstrain": 20,
+                "cost": 1,
+                "limited": true
+            },
+            {
+                "name": "Duralumin",
+                "mass": 2,
+                "maxstrain": 30,
+                "cost": 2,
+                "limited": true
+            },
+            {
+                "name": "Steel",
+                "mass": 3,
+                "maxstrain": 60,
+                "cost": 3,
+                "limited": true
+            },
+            {
+                "name": "Aluminium",
+                "mass": 2,
+                "maxstrain": 40,
+                "cost": 4,
+                "limited": true
+            },
+            {
+                "name": "Whalebone",
+                "mass": -10,
+                "maxstrain": 15,
+                "cost": 8,
+                "limited": false
             }
         ]
     }

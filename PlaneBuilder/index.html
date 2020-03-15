@@ -27,10 +27,7 @@
 
 				<div class="Era">
 					<h3 class="page__h3">Era
-						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-							<span id="rules_era" class="rulestext">I failed to load my rules. Please file a bug
-								report.</span>
-						</span>
+						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
 					</h3>
 					<table style="width:100%" id="table_era">
 						<tr>
@@ -48,10 +45,7 @@
 				<br />
 				<div class="Cockpit">
 					<h3 class="page__h3">Cockpits
-						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-							<span id="rules_cockpit" class="rulestext">I failed to load my rules. Please file a bug
-								report.</span>
-						</span>
+						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
 						<br />
 						<span> Number of Cockpits: <input type="number" id="num_cockpits" min="1" max="20"
 								value="1" /></span>
@@ -60,17 +54,14 @@
 						<tr>
 							<th>Option</th>
 							<th>Upgrade</th>
-							<th>Per Cockpit Total Stats</th>
+							<th>Cockpit Stats</th>
 						</tr>
 					</table>
 				</div>
 				<br />
 				<div class="Passengers">
 					<h3 class="page__h3">Passengers
-						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-							<span id="rules_passengers" class="rulestext">I failed to load my rules. Please file a bug
-								report.</span>
-						</span>
+						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
 					</h3>
 					<table style="width:100%" id="table_passengers">
 						<tr>
@@ -92,20 +83,9 @@
 				<br />
 				<div class="Engines">
 					<h3 class="page__h3">Engines
-						<span class="rules" onclick="RulesPopup(this)">(<u>Engine Rules</u>)
-							<span id="rules_engine" class="rulestext">I failed to load my rules. Please file a bug
-								report.</span>
-						</span>
-						<span class="rules" onclick="RulesPopup(this)">(<u>Upgrade Rules</u>)
-							<span id="rules_engine_upgrades" class="rulestext">I failed to load my rules. Please file a
-								bug
-								report.</span>
-						</span>
-						<span class="rules" onclick="RulesPopup(this)">(<u>Cooling Rules</u>)
-							<span id="rules_engine_cooling" class="rulestext">I failed to load my rules. Please file a
-								bug
-								report.</span>
-						</span>
+						<span class="rules" onclick="RulesPopup(this)">(<u>Engine Rules</u>)</span>
+						<span class="rules" onclick="RulesPopup(this)">(<u>Upgrade Rules</u>)</span>
+						<span class="rules" onclick="RulesPopup(this)">(<u>Cooling Rules</u>)</span>
 						<br />
 						<span> Number of Engines: <input type="number" id="num_engines" min="0" max="20"
 								value="1" /></span>
@@ -117,7 +97,7 @@
 						<tr>
 							<th>Engine Type</th>
 							<th>Options</th>
-							<th>Per Engine Total Stats</th>
+							<th>Engine Stats</th>
 						</tr>
 					</table>
 					<br />
@@ -126,7 +106,7 @@
 							<th>Radiator Type</th>
 							<th>Mounting</th>
 							<th>Coolant</th>
-							<th>Total Stats</th>
+							<th>Radiator Stats</th>
 						</tr>
 					</table>
 				</div>
@@ -134,10 +114,7 @@
 			<br />
 			<div class="Propeller">
 				<h3 class="page__h3">Propeller
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-						<span id="rules_propeller" class="rulestext">I failed to load my rules. Please file a bug
-							report.</span>
-					</span> <br />
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span> <br />
 					<span> Propeller Pitch: <select id="propeller_pitch"></select></span>
 					<span>Manually Variable Propeller: <input type="checkbox" id="propeller_variable" /></span>
 				</h3>
@@ -145,16 +122,13 @@
 			<br />
 			<div class="Frames">
 				<h3 class="page__h3">Frames and Covering
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-						<span id="rules_frames" class="rulestext">I failed to load my rules. Please file a bug
-							report.</span>
-					</span>
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
 					<table id="table_frames">
 						<tr>
 							<th>Frame Type</th>
 							<th>Skin Type</th>
 							<th>Frame Options</th>
-							<th>Total Stats</th>
+							<th>Frame Stats</th>
 						</tr>
 					</table>
 				</h3>
@@ -162,23 +136,16 @@
 			<br />
 			<div class="Tail">
 				<h3 class="page__h3">Tail
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-						<span id="rules_tail_frames" class="rulestext">I failed to load my rules. Please file a bug
-							report.</span>
-					</span>
-					<br />
-					<span> Tail Length: <select id="tail_type"></select></span>
-					<span> Farman Tail: <input type="checkbox" id="tail_farman" /></span>
-					<span> Boom Tail: <input type="checkbox" id="tail_boom" /></span>
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)<br />
+						<span> Tail Length: <select id="tail_type"></select></span>
+						<span> Farman Tail: <input type="checkbox" id="tail_farman" /></span>
+						<span> Boom Tail: <input type="checkbox" id="tail_boom" /></span>
 				</h3>
 			</div>
 			<br />
 			<div class="Wings">
 				<h3 class="page__h3">Wings
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-						<span id="rules_wings" class="rulestext">I failed to load my rules. Please file a bug
-							report.</span>
-					</span>
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
 					<br />
 					<span> Wing Stagger: <select id="wing_stagger"></select></span>
 					<span> Closed Wing: <input type="checkbox" id="wing_closed" /></span>
@@ -188,24 +155,34 @@
 					<tr>
 						<th>Wing Type</th>
 						<th>Wing Options</th>
-						<th>Total Stats</th>
+						<th>Wing Stats</th>
 					</tr>
 				</table>
 			</div>
 			<br />
 			<div class="Stabilizers">
 				<h3 class="page__h3">Stabilizers
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)
-						<span id="rules_wings" class="rulestext">I failed to load my rules. Please file a bug
-							report.</span>
-					</span>
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
 					<br />
 				</h3>
 				<table id="stab_table">
 					<tr>
 						<th>Horizontal Stabilizers</th>
 						<th>Vertical Stabilizers</th>
-						<th>Total Stats</th>
+						<th>Stabilizer Stats</th>
+					</tr>
+				</table>
+			</div><br />
+			<div class="ControlSurfaces">
+				<h3 class="page__h3">Control Surfaces
+					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<table id="tbl_control_surfaces">
+					<tr>
+						<th>Control Surfaces</th>
+						<th>Drag Inducers</th>
+						<th class="changed">Control Surface Stats</th>
 					</tr>
 				</table>
 			</div>

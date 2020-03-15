@@ -1,7 +1,9 @@
-//TODO: Warnings
 //TODO: Engine as Generator
 //TODO: Weapons
 //TODO: Radiator requries Parasol wing
+//TODO: Radiator requires Metal wing
+//TODO: MVP Warning
+//TODO: Center Pusher needs tail or extended driveshafts.
 const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
@@ -34,6 +36,7 @@ window.onload = init;
 var engine_json;
 var aircraft_model;
 var aircraft_display;
+var internal_id = 0;
 // When the user clicks on div, open the popup
 const RulesPopup = (e) => {
     var children = e.children;
@@ -61,6 +64,10 @@ function format(fmt, ...args) {
         }
     });
 }
+function GenerateID() {
+    internal_id++;
+    return "internal_id_" + internal_id.toString();
+}
 function CreateTH(row, content) {
     var th = document.createElement("TH");
     th.innerHTML = content;
@@ -68,8 +75,10 @@ function CreateTH(row, content) {
 }
 function CreateInput(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
-    var txtSpan = document.createElement("SPAN");
-    txtSpan.innerHTML = txt;
+    var txtSpan = document.createElement("LABEL");
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     elem.setAttribute("type", "number");
     elem.min = (0).toString();
     elem.valueAsNumber = 0;
@@ -79,21 +88,46 @@ function CreateInput(txt, elem, table, br = true) {
     if (br)
         table.appendChild(document.createElement("BR"));
 }
+function CreateSelect(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("LABEL");
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    span.appendChild(elem);
+    span.appendChild(txtSpan);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
 function CreateSpace(table) {
     var span = document.createElement("SPAN");
-    span.textContent = " ";
+    span.innerHTML = "&nbsp;";
     table.appendChild(span);
 }
 function CreateCheckbox(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
-    var txtSpan = document.createElement("SPAN");
-    txtSpan.innerHTML = txt;
+    var txtSpan = document.createElement("LABEL");
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     elem.setAttribute("type", "checkbox");
     span.appendChild(elem);
     span.appendChild(txtSpan);
     table.appendChild(span);
     if (br)
         table.appendChild(document.createElement("BR"));
+}
+function Blink(elem) {
+    elem.classList.toggle("changed", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed");
+}
+function BlinkIfChanged(elem, str) {
+    if (elem.innerText != str) {
+        Blink(elem);
+    }
+    elem.innerText = str;
 }
 //Handles Mass, Drag, Control, Escape, Flight Stress, Visibility
 function Effects2String(input) {
@@ -163,6 +197,8 @@ class Stats {
         this.wingarea = 0;
         this.toughness = 0;
         this.upkeep = 0;
+        this.crashsafety = 0;
+        this.warnings = [];
         if (js) {
             this.fromJSON(js);
         }
@@ -191,7 +227,8 @@ class Stats {
             pitchspeed: this.pitchspeed,
             wingarea: this.wingarea,
             toughness: this.toughness,
-            upkeep: this.upkeep
+            upkeep: this.upkeep,
+            crashsafety: this.crashsafety,
         };
     }
     fromJSON(js) {
@@ -241,6 +278,10 @@ class Stats {
             this.toughness = js["toughness"];
         if (js["upkeep"])
             this.upkeep = js["upkeep"];
+        if (js["crashsafety"])
+            this.crashsafety = js["crashsafety"];
+        if (js["warning"])
+            this.warnings.push({ source: js["name"], warning: js["warning"] });
     }
     Add(other) {
         var res = new Stats();
@@ -267,7 +308,25 @@ class Stats {
         res.wingarea = this.wingarea + other.wingarea;
         res.toughness = this.toughness + other.toughness;
         res.upkeep = this.upkeep + other.upkeep;
+        res.crashsafety = this.crashsafety + other.crashsafety;
+        res.warnings = this.MergeWarnings(other.warnings);
         return res;
+    }
+    MergeWarnings(owarn) {
+        var newList = [];
+        for (let w2 of this.warnings) {
+            newList.push(w2);
+        }
+        for (let w of owarn) {
+            let dup = false;
+            for (let w2 of this.warnings) {
+                if (w.source == w2.source && w.warning == w2.warning)
+                    dup = true;
+            }
+            if (!dup)
+                newList.push(w);
+        }
+        return newList;
     }
     Multiply(other) {
         var res = new Stats();
@@ -294,6 +353,7 @@ class Stats {
         res.wingarea = this.wingarea * other;
         res.toughness = this.toughness * other;
         res.upkeep = this.upkeep * other;
+        res.warnings = this.warnings;
         return res;
     }
     Equal(other) {
@@ -363,6 +423,7 @@ class Aircraft_HTML extends Display {
         this.frames = new Frames_HTML(aircraft.GetFrames());
         this.wings = new Wings_HTML(aircraft.GetWings());
         this.stabilizers = new Stabilizers_HTML(aircraft.GetStabilizers());
+        this.controlsurfaces = new ControlSurfaces_HTML(aircraft.GetControlSurfaces());
         // this.engines.Initialize();
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
         this.UpdateDisplay();
@@ -376,6 +437,7 @@ class Aircraft_HTML extends Display {
         this.frames.UpdateDisplay();
         this.wings.UpdateDisplay();
         this.stabilizers.UpdateDisplay();
+        this.controlsurfaces.UpdateDisplay();
     }
 }
 class Aircraft {
@@ -391,6 +453,7 @@ class Aircraft {
         this.frames = new Frames(js["frames"]);
         this.wings = new Wings(js["wings"]);
         this.stabilizers = new Stabilizers(js["stabilizers"]);
+        this.controlsurfaces = new ControlSurfaces(js["controls"]);
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
         this.passengers.SetCalculateStats(() => { this.CalculateStats(); });
@@ -399,6 +462,7 @@ class Aircraft {
         this.frames.SetCalculateStats(() => { this.CalculateStats(); });
         this.wings.SetCalculateStats(() => { this.CalculateStats(); });
         this.stabilizers.SetCalculateStats(() => { this.CalculateStats(); });
+        this.controlsurfaces.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
@@ -413,7 +477,9 @@ class Aircraft {
             engines: this.engines.toJSON(),
             propeller: this.propeller.toJSON(),
             frames: this.frames.toJSON(),
-            wings: this.wings.toJSON()
+            wings: this.wings.toJSON(),
+            stabilizers: this.stabilizers.toJSON(),
+            controlsurfaces: this.controlsurfaces.toJSON(),
         };
     }
     fromJSON(js) {
@@ -427,6 +493,8 @@ class Aircraft {
             this.propeller.fromJSON(js["propeller"]);
             this.frames.fromJSON(js["frames"]);
             this.wings.fromJSON(js["wings"]);
+            this.stabilizers.fromJSON(js["stabilizers"]);
+            this.controlsurfaces.fromJSON(js["controlsurfaces"]);
             this.CalculateStats();
         }
     }
@@ -434,26 +502,32 @@ class Aircraft {
         this.DisplayCallback = callback;
     }
     CalculateStats() {
-        this.stats = new Stats();
-        this.stats = this.stats.Add(this.era.PartStats());
-        this.stats = this.stats.Add(this.cockpits.PartStats());
-        this.stats = this.stats.Add(this.passengers.PartStats());
-        this.stats = this.stats.Add(this.engines.PartStats());
+        this.updated_stats = false;
+        var stats = new Stats();
+        stats = stats.Add(this.era.PartStats());
+        stats = stats.Add(this.cockpits.PartStats());
+        stats = stats.Add(this.passengers.PartStats());
+        stats = stats.Add(this.engines.PartStats());
         this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
-        this.stats = this.stats.Add(this.propeller.PartStats());
-        this.frames.SetRequiredSections(this.stats.reqsections);
+        stats = stats.Add(this.propeller.PartStats());
+        this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
-        this.stats = this.stats.Add(this.frames.PartStats());
+        stats = stats.Add(this.frames.PartStats());
         this.wings.SetNumFrames(this.frames.GetNumFrames());
-        this.stats = this.stats.Add(this.wings.PartStats());
+        stats = stats.Add(this.wings.PartStats());
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
         this.stabilizers.SetIsTandem(this.wings.GetTandem());
         this.stabilizers.SetIsSwept(this.wings.GetSwept());
-        this.stabilizers.SetWingArea(this.stats.wingarea);
-        this.stats = this.stats.Add(this.stabilizers.PartStats());
+        this.stabilizers.SetWingArea(stats.wingarea);
+        stats = stats.Add(this.stabilizers.PartStats());
+        this.controlsurfaces.SetWingArea(stats.wingarea);
+        this.controlsurfaces.SetSpan(this.wings.GetSpan());
+        stats = stats.Add(this.controlsurfaces.PartStats());
         //Update Part Local stuff
-        this.cockpits.UpdateCrewStats(this.stats);
-        this.engines.UpdateReliability(this.stats);
+        this.cockpits.UpdateCrewStats(stats);
+        this.engines.UpdateReliability(stats);
+        if (!this.updated_stats)
+            this.stats = stats;
         if (this.DisplayCallback)
             this.DisplayCallback();
         if (this.use_storage)
@@ -483,6 +557,9 @@ class Aircraft {
     GetStabilizers() {
         return this.stabilizers;
     }
+    GetControlSurfaces() {
+        return this.controlsurfaces;
+    }
 }
 class Era_HTML extends Display {
     constructor(m) {
@@ -506,7 +583,7 @@ class Era_HTML extends Display {
     }
     UpdateDisplay() {
         this.select.selectedIndex = this.model.GetSelected();
-        this.bleed.innerHTML = this.model.GetLiftBleed().toString();
+        BlinkIfChanged(this.bleed, this.model.GetLiftBleed().toString());
     }
 }
 class Era extends Part {
@@ -673,29 +750,29 @@ class Cockpit_HTML extends Display {
         CreateTH(h1_row, "Cost");
         CreateTH(h1_row, "Control");
         var c1_row = tbl.insertRow();
-        this.mass_cell = c1_row.insertCell();
-        this.drag_cell = c1_row.insertCell();
-        this.cost_cell = c1_row.insertCell();
-        this.control_cell = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_drag = c1_row.insertCell();
+        this.d_cost = c1_row.insertCell();
+        this.d_cont = c1_row.insertCell();
         var h2_row = tbl.insertRow();
         CreateTH(h2_row, "Flight Stress");
         CreateTH(h2_row, "Escape");
         CreateTH(h2_row, "Visibility");
         CreateTH(h2_row, "Required Sections");
         var c2_row = tbl.insertRow();
-        this.stress_cell = c2_row.insertCell();
-        this.escape_cell = c2_row.insertCell();
-        this.visibility_cell = c2_row.insertCell();
-        this.section_cell = c2_row.insertCell();
+        this.d_strs = c2_row.insertCell();
+        this.d_escp = c2_row.insertCell();
+        this.d_visi = c2_row.insertCell();
+        this.d_rseq = c2_row.insertCell();
         stat_cell.appendChild(tbl);
         stat_cell.className = "inner_table";
         tbl.className = "inner_table";
         this.sel_type = document.createElement("SELECT");
         // Visibility and Stress and Escape are cockpit local
         // Mark in table for CSS
-        this.stress_cell.className = "part_local";
-        this.visibility_cell.className = "part_local";
-        this.escape_cell.className = "part_local";
+        this.d_strs.className = "part_local";
+        this.d_visi.className = "part_local";
+        this.d_escp.className = "part_local";
         //Add all the cockpit types to the select box
         for (let elem of cp.GetTypeList()) {
             let opt = document.createElement("OPTION");
@@ -729,14 +806,14 @@ class Cockpit_HTML extends Display {
     }
     UpdateDisplay() {
         let stats = this.cockpit.PartStats();
-        this.mass_cell.innerHTML = stats.mass.toString();
-        this.drag_cell.innerHTML = stats.drag.toString();
-        this.cost_cell.innerHTML = stats.cost.toString();
-        this.control_cell.innerHTML = stats.control.toString();
-        this.stress_cell.innerHTML = this.cockpit.GetFlightStress().toString();
-        this.escape_cell.innerHTML = this.cockpit.GetEscape().toString();
-        this.visibility_cell.innerHTML = this.cockpit.GetVisibility().toString();
-        this.section_cell.innerHTML = stats.reqsections.toString();
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_cont, stats.control.toString());
+        BlinkIfChanged(this.d_strs, this.cockpit.GetFlightStress().toString());
+        BlinkIfChanged(this.d_escp, this.cockpit.GetEscape().toString());
+        BlinkIfChanged(this.d_visi, this.cockpit.GetVisibility().toString());
+        BlinkIfChanged(this.d_rseq, stats.reqsections.toString());
         this.sel_type.selectedIndex = this.cockpit.GetType();
         var upgs = this.cockpit.GetSelectedUpgrades();
         for (let i = 0; i < this.upg_chbxs.length; i++) {
@@ -846,8 +923,8 @@ class Passengers_HTML extends Display {
         this.nbeds.valueAsNumber = this.pass.GetBeds();
         this.connect.checked = this.pass.GetConnected();
         this.connect.disabled = !this.pass.PossibleConnection();
-        this.mass.innerHTML = stats.mass.toString();
-        this.reqseq.innerHTML = stats.reqsections.toString();
+        BlinkIfChanged(this.mass, stats.mass.toString());
+        BlinkIfChanged(this.reqseq, stats.reqsections.toString());
     }
 }
 class Passengers extends Part {
@@ -1330,6 +1407,8 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetMountIndex() {
+        if (this.GetIsPulsejet())
+            return -1;
         return this.selected_mount;
     }
     SetUsePushPull(use) {
@@ -1765,13 +1844,35 @@ class Engine_HTML extends Display {
         this.e_oil.checked = e_stats.oiltank;
         this.e_pulsejet.checked = e_stats.pulsejet;
         this.InitCoolingSelect();
-        this.mount_select.selectedIndex = this.engine.GetMountIndex();
-        this.pushpull_input.checked = this.engine.GetUsePushPull();
-        this.torque_input.checked = this.engine.GetTorqueToStruct();
+        if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {
+            this.mount_select.selectedIndex = this.engine.GetMountIndex();
+            Blink(this.mount_select.parentElement);
+        }
+        if (this.pushpull_input.checked != this.engine.GetUsePushPull()) {
+            this.pushpull_input.checked = this.engine.GetUsePushPull();
+            Blink(this.pushpull_input.parentElement);
+        }
+        if (this.torque_input.checked != this.engine.GetTorqueToStruct()) {
+            this.torque_input.checked = this.engine.GetTorqueToStruct();
+            Blink(this.torque_input.parentElement);
+        }
+        if (this.torque_input.checked != this.engine.GetTorqueToStruct()) {
+            this.torque_input.checked = this.engine.GetTorqueToStruct();
+            Blink(this.torque_input.parentElement);
+        }
         this.torque_input.disabled = !this.engine.CanTorqueToStruct();
-        this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
-        this.gp_input.valueAsNumber = this.engine.GetGearCount();
-        this.gpr_input.valueAsNumber = this.engine.GetGearReliability();
+        if (this.ds_input.checked != this.engine.GetUseExtendedDriveshaft()) {
+            this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
+            Blink(this.ds_input.parentElement);
+        }
+        if (this.gp_input.valueAsNumber != this.engine.GetGearCount()) {
+            this.gp_input.valueAsNumber = this.engine.GetGearCount();
+            Blink(this.gp_input.parentElement);
+        }
+        if (this.gpr_input.valueAsNumber != this.engine.GetGearReliability()) {
+            this.gpr_input.valueAsNumber = this.engine.GetGearReliability();
+            Blink(this.gpr_input.parentElement);
+        }
         if (e_stats.pulsejet) {
             this.mount_select.disabled = true;
             this.mount_select.selectedIndex = -1;
@@ -1796,21 +1897,21 @@ class Engine_HTML extends Display {
             }
         }
         var full_stats = this.engine.PartStats();
-        this.d_powr.innerHTML = full_stats.power.toString();
-        this.d_mass.innerHTML = full_stats.mass.toString();
-        this.d_drag.innerHTML = full_stats.drag.toString();
-        this.d_rely.innerHTML = this.engine.GetReliability().toString();
-        this.d_visi.innerHTML = full_stats.visibility.toString();
-        this.d_over.innerHTML = this.engine.GetOverspeed().toString();
-        this.d_cost.innerHTML = full_stats.cost.toString();
-        this.d_alti.innerHTML = e_stats.altitude.toString();
-        this.d_fuel.innerHTML = full_stats.fuelconsumption.toString();
-        this.d_pstb.innerHTML = full_stats.pitchstab.toString();
-        this.d_lstb.innerHTML = full_stats.latstab.toString();
-        this.d_maxs.innerHTML = full_stats.maxstrain.toString();
-        this.d_strc.innerHTML = full_stats.structure.toString();
-        this.d_fstr.innerHTML = full_stats.flightstress.toString();
-        this.d_sect.innerHTML = full_stats.reqsections.toString();
+        BlinkIfChanged(this.d_powr, full_stats.power.toString());
+        BlinkIfChanged(this.d_mass, full_stats.mass.toString());
+        BlinkIfChanged(this.d_drag, full_stats.drag.toString());
+        BlinkIfChanged(this.d_rely, this.engine.GetReliability().toString());
+        BlinkIfChanged(this.d_visi, full_stats.visibility.toString());
+        BlinkIfChanged(this.d_over, this.engine.GetOverspeed().toString());
+        BlinkIfChanged(this.d_cost, full_stats.cost.toString());
+        BlinkIfChanged(this.d_alti, e_stats.altitude.toString());
+        BlinkIfChanged(this.d_fuel, full_stats.fuelconsumption.toString());
+        BlinkIfChanged(this.d_pstb, full_stats.pitchstab.toString());
+        BlinkIfChanged(this.d_lstb, full_stats.latstab.toString());
+        BlinkIfChanged(this.d_maxs, full_stats.maxstrain.toString());
+        BlinkIfChanged(this.d_strc, full_stats.structure.toString());
+        BlinkIfChanged(this.d_fstr, full_stats.flightstress.toString());
+        BlinkIfChanged(this.d_sect, full_stats.reqsections.toString());
     }
 }
 class Radiator extends Part {
@@ -1942,11 +2043,11 @@ class Radiator_HTML extends Display {
         this.mount_select.selectedIndex = this.radiator.GetMountIndex();
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         var stats = this.radiator.PartStats();
-        this.c_mass.innerHTML = stats.mass.toString();
-        this.c_cost.innerHTML = stats.cost.toString();
-        this.c_drag.innerHTML = stats.drag.toString();
-        this.c_rely.innerHTML = stats.reliability.toString();
-        this.c_lstb.innerHTML = stats.latstab.toString();
+        BlinkIfChanged(this.c_mass, stats.mass.toString());
+        BlinkIfChanged(this.c_cost, stats.cost.toString());
+        BlinkIfChanged(this.c_drag, stats.drag.toString());
+        BlinkIfChanged(this.c_rely, stats.reliability.toString());
+        BlinkIfChanged(this.c_lstb, stats.latstab.toString());
     }
 }
 class Propeller extends Part {
@@ -2285,13 +2386,13 @@ class Frames extends Part {
         return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length;
     }
     PossibleGeodesic(num) {
-        return this.frame_list[this.section_list[num].frame].geodesic;
+        return this.frame_list[this.section_list[num].frame].geodesic && !this.section_list[num].monocoque;
     }
     PossibleMonocoque(num) {
         return this.skin_list[this.section_list[num].skin].monocoque;
     }
     PossibleTailGeodesic(num) {
-        return this.frame_list[this.tail_section_list[num].frame].geodesic;
+        return this.frame_list[this.tail_section_list[num].frame].geodesic && !this.tail_section_list[num].monocoque;
     }
     PossibleTailMonocoque(num) {
         return this.skin_list[this.tail_section_list[num].skin].monocoque;
@@ -2474,13 +2575,13 @@ class Frames_HTML extends Display {
         var c3_row = tbl.insertRow();
         this.d_area = c3_row.insertCell();
         this.d_flammable = c3_row.insertCell();
-        this.d_pitchstab = c3_row.insertCell();
+        this.d_pstb = c3_row.insertCell();
         var h4_row = tbl.insertRow();
         CreateTH(h4_row, "Max Strain");
         CreateTH(h4_row, "");
         CreateTH(h4_row, "");
         var c4_row = tbl.insertRow();
-        this.d_strain = c4_row.insertCell();
+        this.d_strn = c4_row.insertCell();
         c4_row.insertCell();
         c4_row.insertCell();
         this.c_stats.appendChild(tbl);
@@ -2519,91 +2620,11 @@ class Frames_HTML extends Display {
             this.t_options.removeChild(this.t_options.children[0]);
         var section_list = this.frames.GetSectionList();
         var tail_section_list = this.frames.GetTailSectionList();
-        var frame_list = this.frames.GetFrameList();
         var skin_list = this.frames.GetSkinList();
         var is_flammable = false;
         for (let i = 0; i < section_list.length; i++) {
             let sec = section_list[i];
-            let type_span = document.createElement("SPAN");
-            let rem_button = document.createElement("BUTTON");
-            rem_button.textContent = "-";
-            rem_button.onclick = () => { this.frames.DeleteSection(i); };
-            rem_button.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
-            let add_button = document.createElement("BUTTON");
-            add_button.textContent = "+";
-            add_button.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
-            add_button.onclick = () => { this.frames.DuplicateSection(i); };
-            let frame_select = document.createElement("SELECT");
-            for (let ft of frame_list) {
-                let opt = document.createElement("OPTION");
-                opt.text = ft.name;
-                if (sec.geodesic && !ft.geodesic)
-                    opt.disabled = true;
-                if (!sec.internal_bracing && ft.basestruct == 0)
-                    opt.disabled = true;
-                frame_select.add(opt);
-            }
-            frame_select.onchange = () => { this.frames.SetFrame(i, frame_select.selectedIndex); };
-            frame_select.selectedIndex = sec.frame;
-            type_span.appendChild(rem_button);
-            type_span.appendChild(add_button);
-            type_span.appendChild(frame_select);
-            this.c_frame.appendChild(type_span);
-            this.c_frame.appendChild(document.createElement("BR"));
-            let skin_select = document.createElement("SELECT");
-            for (let st of skin_list) {
-                let opt = document.createElement("OPTION");
-                opt.text = st.name;
-                if (sec.monocoque && !st.monocoque)
-                    opt.disabled = true;
-                skin_select.add(opt);
-            }
-            if (sec.internal_bracing)
-                skin_select.disabled = true;
-            skin_select.onchange = () => { this.frames.SetSkin(i, skin_select.selectedIndex); };
-            skin_select.selectedIndex = sec.skin;
-            this.c_skin.appendChild(skin_select);
-            this.c_skin.appendChild(document.createElement("BR"));
-            let opt_span = document.createElement("SPAN");
-            let geo_input = document.createElement("INPUT");
-            geo_input.setAttribute("type", "checkbox");
-            geo_input.checked = sec.geodesic;
-            geo_input.disabled = !this.frames.PossibleGeodesic(i);
-            geo_input.onchange = () => { this.frames.SetGeodesic(i, geo_input.checked); };
-            let geo_span = document.createElement("SPAN");
-            geo_span.innerText = "  Geodesic    ";
-            opt_span.appendChild(geo_input);
-            opt_span.appendChild(geo_span);
-            let mono_input = document.createElement("INPUT");
-            mono_input.setAttribute("type", "checkbox");
-            mono_input.checked = sec.monocoque;
-            mono_input.disabled = !this.frames.PossibleMonocoque(i);
-            mono_input.onchange = () => { this.frames.SetMonocoque(i, mono_input.checked); };
-            let mono_span = document.createElement("SPAN");
-            mono_span.innerText = "  Monocoque    ";
-            opt_span.appendChild(mono_input);
-            opt_span.appendChild(mono_span);
-            let int_input = document.createElement("INPUT");
-            int_input.setAttribute("type", "checkbox");
-            int_input.checked = sec.internal_bracing;
-            if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing() || !this.frames.PossibleRemoveSections()))
-                int_input.disabled = true;
-            int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
-            let int_span = document.createElement("SPAN");
-            int_span.innerText = "  Internal Bracing    ";
-            opt_span.appendChild(int_input);
-            opt_span.appendChild(int_span);
-            let lb_input = document.createElement("INPUT");
-            lb_input.setAttribute("type", "checkbox");
-            lb_input.checked = sec.lifting_body;
-            lb_input.disabled = !this.frames.PossibleMonocoque(i);
-            lb_input.onchange = () => { this.frames.SetLiftingBody(i, lb_input.checked); };
-            let lb_span = document.createElement("SPAN");
-            lb_span.innerText = "  Lifting Body    ";
-            opt_span.appendChild(lb_input);
-            opt_span.appendChild(lb_span);
-            this.c_options.appendChild(opt_span);
-            this.c_options.appendChild(document.createElement("BR"));
+            this.UpdateSection(i, sec);
             //Flammable check
             is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
@@ -2612,81 +2633,142 @@ class Frames_HTML extends Display {
         this.t_boom.disabled = this.frames.GetUseFarman();
         for (let i = 0; i < tail_section_list.length; i++) {
             let sec = tail_section_list[i];
-            let frame_select = document.createElement("SELECT");
-            for (let ft of frame_list) {
-                let opt = document.createElement("OPTION");
-                opt.text = ft.name;
-                if (sec.geodesic && !ft.geodesic)
-                    opt.disabled = true;
-                if (ft.basestruct != 0)
-                    frame_select.add(opt);
-            }
-            frame_select.onchange = () => { this.frames.SetTailFrame(i, frame_select.selectedIndex); };
-            frame_select.selectedIndex = sec.frame;
-            this.t_frame.appendChild(frame_select);
-            this.t_frame.appendChild(document.createElement("BR"));
-            let skin_select = document.createElement("SELECT");
-            for (let st of skin_list) {
-                let opt = document.createElement("OPTION");
-                opt.text = st.name;
-                if (sec.monocoque && !st.monocoque)
-                    opt.disabled = true;
-                skin_select.add(opt);
-            }
-            if (this.frames.GetUseFarman()) {
-                skin_select.disabled = true;
-            }
-            skin_select.onchange = () => { this.frames.SetTailSkin(i, skin_select.selectedIndex); };
-            skin_select.selectedIndex = sec.skin;
-            this.t_skin.appendChild(skin_select);
-            this.t_skin.appendChild(document.createElement("BR"));
-            let opt_span = document.createElement("SPAN");
-            let geo_input = document.createElement("INPUT");
-            geo_input.setAttribute("type", "checkbox");
-            geo_input.checked = sec.geodesic;
-            geo_input.disabled = !this.frames.PossibleTailGeodesic(i);
-            geo_input.onchange = () => { this.frames.SetTailGeodesic(i, geo_input.checked); };
-            let geo_span = document.createElement("SPAN");
-            geo_span.innerText = "  Geodesic    ";
-            opt_span.appendChild(geo_input);
-            opt_span.appendChild(geo_span);
-            let mono_input = document.createElement("INPUT");
-            mono_input.setAttribute("type", "checkbox");
-            mono_input.checked = sec.monocoque;
-            mono_input.disabled = !this.frames.PossibleTailMonocoque(i);
-            mono_input.onchange = () => { this.frames.SetTailMonocoque(i, mono_input.checked); };
-            let mono_span = document.createElement("SPAN");
-            mono_span.innerText = "  Monocoque    ";
-            opt_span.appendChild(mono_input);
-            opt_span.appendChild(mono_span);
-            let lb_input = document.createElement("INPUT");
-            lb_input.setAttribute("type", "checkbox");
-            lb_input.checked = sec.lifting_body;
-            lb_input.disabled = !this.frames.PossibleTailMonocoque(i);
-            lb_input.onchange = () => { this.frames.SetTailLiftingBody(i, lb_input.checked); };
-            let lb_span = document.createElement("SPAN");
-            lb_span.innerText = "  Lifting Body    ";
-            opt_span.appendChild(lb_input);
-            opt_span.appendChild(lb_span);
-            this.t_options.appendChild(opt_span);
-            this.t_options.appendChild(document.createElement("BR"));
+            this.UpdateTailSection(i, sec);
             //Flammable check
             is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
         if (is_flammable)
-            this.d_flammable.innerText = "Yes";
+            BlinkIfChanged(this.d_flammable, "Yes");
         else
-            this.d_flammable.innerText = "No";
+            BlinkIfChanged(this.d_flammable, "No");
         var stats = this.frames.PartStats();
-        this.d_mass.innerHTML = stats.mass.toString();
-        this.d_drag.innerHTML = stats.drag.toString();
-        this.d_cost.innerHTML = stats.cost.toString();
-        this.d_strc.innerHTML = stats.structure.toString();
-        this.d_tugh.innerHTML = stats.toughness.toString();
-        this.d_visi.innerHTML = stats.visibility.toString();
-        this.d_area.innerHTML = stats.wingarea.toString();
-        this.d_pitchstab.innerHTML = stats.pitchstab.toString();
-        this.d_strain.innerHTML = stats.maxstrain.toString();
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_strc, stats.structure.toString());
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
+        BlinkIfChanged(this.d_visi, stats.visibility.toString());
+        BlinkIfChanged(this.d_area, stats.wingarea.toString());
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
+        BlinkIfChanged(this.d_strn, stats.maxstrain.toString());
+    }
+    UpdateSection(i, sec) {
+        var frame_list = this.frames.GetFrameList();
+        var skin_list = this.frames.GetSkinList();
+        var type_span = document.createElement("SPAN");
+        var rem_button = document.createElement("BUTTON");
+        rem_button.textContent = "-";
+        rem_button.onclick = () => { this.frames.DeleteSection(i); };
+        rem_button.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
+        var add_button = document.createElement("BUTTON");
+        add_button.textContent = "+";
+        add_button.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
+        add_button.onclick = () => { this.frames.DuplicateSection(i); };
+        var frame_select = document.createElement("SELECT");
+        for (let ft of frame_list) {
+            let opt = document.createElement("OPTION");
+            opt.text = ft.name;
+            if (sec.geodesic && !ft.geodesic)
+                opt.disabled = true;
+            if (!sec.internal_bracing && ft.basestruct == 0)
+                opt.disabled = true;
+            frame_select.add(opt);
+        }
+        frame_select.onchange = () => { this.frames.SetFrame(i, frame_select.selectedIndex); };
+        frame_select.selectedIndex = sec.frame;
+        type_span.appendChild(rem_button);
+        type_span.appendChild(add_button);
+        type_span.appendChild(frame_select);
+        this.c_frame.appendChild(type_span);
+        this.c_frame.appendChild(document.createElement("BR"));
+        var skin_select = document.createElement("SELECT");
+        for (let st of skin_list) {
+            let opt = document.createElement("OPTION");
+            opt.text = st.name;
+            if (sec.monocoque && !st.monocoque)
+                opt.disabled = true;
+            skin_select.add(opt);
+        }
+        if (sec.internal_bracing)
+            skin_select.disabled = true;
+        skin_select.onchange = () => { this.frames.SetSkin(i, skin_select.selectedIndex); };
+        skin_select.selectedIndex = sec.skin;
+        this.c_skin.appendChild(skin_select);
+        this.c_skin.appendChild(document.createElement("BR"));
+        var opt_span = document.createElement("SPAN");
+        var geo_input = document.createElement("INPUT");
+        CreateCheckbox("Geodesic", geo_input, opt_span, false);
+        geo_input.checked = sec.geodesic;
+        geo_input.disabled = !this.frames.PossibleGeodesic(i);
+        geo_input.onchange = () => { this.frames.SetGeodesic(i, geo_input.checked); };
+        var mono_input = document.createElement("INPUT");
+        CreateCheckbox("Monocoque", mono_input, opt_span, false);
+        mono_input.checked = sec.monocoque;
+        mono_input.disabled = !this.frames.PossibleMonocoque(i);
+        mono_input.onchange = () => { this.frames.SetMonocoque(i, mono_input.checked); };
+        var int_input = document.createElement("INPUT");
+        CreateCheckbox("Internal Bracing", int_input, opt_span, false);
+        int_input.checked = sec.internal_bracing;
+        if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing() || !this.frames.PossibleRemoveSections()))
+            int_input.disabled = true;
+        int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
+        var lb_input = document.createElement("INPUT");
+        CreateCheckbox("Lifing Botdy", lb_input, opt_span, false);
+        lb_input.checked = sec.lifting_body;
+        lb_input.disabled = !this.frames.PossibleMonocoque(i);
+        lb_input.onchange = () => { this.frames.SetLiftingBody(i, lb_input.checked); };
+        this.c_options.appendChild(opt_span);
+        this.c_options.appendChild(document.createElement("BR"));
+    }
+    UpdateTailSection(i, sec) {
+        var frame_list = this.frames.GetFrameList();
+        var skin_list = this.frames.GetSkinList();
+        var frame_select = document.createElement("SELECT");
+        for (let ft of frame_list) {
+            let opt = document.createElement("OPTION");
+            opt.text = ft.name;
+            if (sec.geodesic && !ft.geodesic)
+                opt.disabled = true;
+            if (ft.basestruct != 0)
+                frame_select.add(opt);
+        }
+        frame_select.onchange = () => { this.frames.SetTailFrame(i, frame_select.selectedIndex); };
+        frame_select.selectedIndex = sec.frame;
+        this.t_frame.appendChild(frame_select);
+        this.t_frame.appendChild(document.createElement("BR"));
+        var skin_select = document.createElement("SELECT");
+        for (let st of skin_list) {
+            let opt = document.createElement("OPTION");
+            opt.text = st.name;
+            if (sec.monocoque && !st.monocoque)
+                opt.disabled = true;
+            skin_select.add(opt);
+        }
+        if (this.frames.GetUseFarman()) {
+            skin_select.disabled = true;
+        }
+        skin_select.onchange = () => { this.frames.SetTailSkin(i, skin_select.selectedIndex); };
+        skin_select.selectedIndex = sec.skin;
+        this.t_skin.appendChild(skin_select);
+        this.t_skin.appendChild(document.createElement("BR"));
+        var opt_span = document.createElement("SPAN");
+        var geo_input = document.createElement("INPUT");
+        CreateCheckbox("Geodesic", geo_input, opt_span, false);
+        geo_input.checked = sec.geodesic;
+        geo_input.disabled = !this.frames.PossibleTailGeodesic(i);
+        geo_input.onchange = () => { this.frames.SetTailGeodesic(i, geo_input.checked); };
+        var mono_input = document.createElement("INPUT");
+        CreateCheckbox("Monocoque", mono_input, opt_span, false);
+        mono_input.checked = sec.monocoque;
+        mono_input.disabled = !this.frames.PossibleTailMonocoque(i);
+        mono_input.onchange = () => { this.frames.SetTailMonocoque(i, mono_input.checked); };
+        var lb_input = document.createElement("INPUT");
+        CreateCheckbox("Lifting Body", lb_input, opt_span, false);
+        lb_input.checked = sec.lifting_body;
+        lb_input.disabled = !this.frames.PossibleTailMonocoque(i);
+        lb_input.onchange = () => { this.frames.SetTailLiftingBody(i, lb_input.checked); };
+        this.t_options.appendChild(opt_span);
+        this.t_options.appendChild(document.createElement("BR"));
     }
 }
 class Wings extends Part {
@@ -2905,6 +2987,20 @@ class Wings extends Part {
     NeedTail() {
         return this.NeedHStab() || !this.is_swept;
     }
+    GetSpan() {
+        var longest_span = 0;
+        for (let w of this.wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            longest_span = Math.max(longest_span, wspan);
+        }
+        for (let w of this.mini_wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            longest_span = Math.max(longest_span, wspan);
+        }
+        return longest_span;
+    }
     PartStats() {
         var stats = new Stats();
         var deck_count = this.DeckCountFull();
@@ -3044,16 +3140,16 @@ class Wings_HTML extends Display {
         this.d_lstb = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
         CreateTH(h3_row, "Max Strain");
-        CreateTH(h3_row, "Escape");
+        CreateTH(h3_row, "Crash Safety");
         CreateTH(h3_row, "Lift Bleed");
         var c3_row = tbl_stat.insertRow();
         this.d_maxs = c3_row.insertCell();
-        this.d_escp = c3_row.insertCell();
+        this.d_crsh = c3_row.insertCell();
         this.d_lift = c3_row.insertCell();
         var h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, "Cost");
         CreateTH(h4_row, "Charge");
-        CreateTH(h4_row, "Flammable?");
+        CreateTH(h4_row, "Flammable");
         var c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
         this.d_chrg = c4_row.insertCell();
@@ -3079,26 +3175,27 @@ class Wings_HTML extends Display {
         this.AddAddFullWing(this.full_cell, wl.length);
         this.AddAddMiniWing(this.mini_cell, mwl.length);
         var stats = this.wings.PartStats();
-        this.d_area.innerText = stats.wingarea.toString();
-        this.d_mass.innerText = stats.mass.toString();
-        this.d_drag.innerText = stats.drag.toString();
-        this.d_cont.innerText = stats.control.toString();
-        this.d_pstb.innerText = stats.pitchstab.toString();
-        this.d_lstb.innerText = stats.latstab.toString();
-        this.d_maxs.innerText = stats.maxstrain.toString();
-        this.d_lift.innerText = stats.liftbleed.toString();
-        this.d_chrg.innerText = "0"; //stats.charge.toString(); //TODO: Charge
-        this.d_escp.innerText = stats.escape.toString();
-        this.d_cost.innerText = stats.cost.toString();
+        BlinkIfChanged(this.d_area, stats.wingarea.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_cont, stats.control.toString());
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
+        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_chrg, "0"); //stats.charge.toString(); //TODO: Charge
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
         if (this.wings.IsFlammable())
-            this.d_flam.innerText = "Yes";
+            BlinkIfChanged(this.d_flam, "Yes");
         else
-            this.d_flam.innerText = "No";
+            BlinkIfChanged(this.d_flam, "No");
     }
     AddFullWing(cell, idx, wing) {
         var span = document.createElement("SPAN");
         var deck = document.createElement("SELECT");
         span.appendChild(deck);
+        CreateSpace(span);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
         none_opt.textContent = "None";
@@ -3118,9 +3215,9 @@ class Wings_HTML extends Display {
             this.wings.SetFullWing(idx, w);
         };
         deck.selectedIndex = wing.deck + 1;
-        CreateSpace(span);
         var skin = document.createElement("SELECT");
         span.appendChild(skin);
+        CreateSpace(span);
         var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION");
@@ -3133,7 +3230,6 @@ class Wings_HTML extends Display {
             this.wings.SetFullWing(idx, w);
         };
         skin.selectedIndex = wing.surface;
-        CreateSpace(span);
         var area = document.createElement("INPUT");
         CreateInput(" Area ", area, span, false);
         area.oninput = () => {
@@ -3143,7 +3239,6 @@ class Wings_HTML extends Display {
         };
         area.min = "3";
         area.valueAsNumber = wing.area;
-        CreateSpace(span);
         var wspan = document.createElement("INPUT");
         CreateInput(" Span ", wspan, span, false);
         wspan.oninput = () => {
@@ -3153,7 +3248,6 @@ class Wings_HTML extends Display {
         };
         wspan.min = "1";
         wspan.valueAsNumber = wing.span;
-        CreateSpace(span);
         var dihedral = document.createElement("INPUT");
         CreateInput(" Dihedral ", dihedral, span, false);
         dihedral.oninput = () => {
@@ -3164,7 +3258,6 @@ class Wings_HTML extends Display {
         dihedral.min = "0";
         dihedral.max = (wing.span - wing.anhedral - 1).toString();
         dihedral.valueAsNumber = wing.dihedral;
-        CreateSpace(span);
         var anhedral = document.createElement("INPUT");
         CreateInput(" Anhedral ", anhedral, span, false);
         anhedral.oninput = () => {
@@ -3201,7 +3294,6 @@ class Wings_HTML extends Display {
             this.wings.SetMiniWing(idx, w);
         };
         deck.selectedIndex = wing.deck + 1;
-        CreateSpace(span);
         var skin = document.createElement("SELECT");
         span.appendChild(skin);
         var slist = this.wings.GetSkinList();
@@ -3216,7 +3308,6 @@ class Wings_HTML extends Display {
             this.wings.SetMiniWing(idx, w);
         };
         skin.selectedIndex = wing.surface;
-        CreateSpace(span);
         var area = document.createElement("INPUT");
         CreateInput(" Area ", area, span, false);
         area.oninput = () => {
@@ -3227,7 +3318,6 @@ class Wings_HTML extends Display {
         area.min = "1";
         area.max = "2";
         area.valueAsNumber = wing.area;
-        CreateSpace(span);
         var wspan = document.createElement("INPUT");
         CreateInput(" Span ", wspan, span, false);
         wspan.oninput = () => {
@@ -3333,6 +3423,20 @@ class Stabilizers extends Part {
             });
         }
     }
+    toJSON() {
+        return {
+            hstab_sel: this.hstab_sel,
+            hstab_count: this.hstab_count,
+            vstab_sel: this.vstab_sel,
+            vstab_count: this.vstab_count,
+        };
+    }
+    fromJSON(js) {
+        this.hstab_sel = js["hstab_sel"];
+        this.hstab_count = js["hstab_count"];
+        this.vstab_sel = js["vstab_sel"];
+        this.vstab_count = js["vstab_count"];
+    }
     GetHStabList() {
         return this.hstab_list;
     }
@@ -3343,7 +3447,7 @@ class Stabilizers extends Part {
         return this.hstab_sel;
     }
     SetHStabType(num) {
-        if (this.hstab_list[num].name == "Tandem Wings" && !this.is_tandem)
+        if (this.hstab_list[num].name == "The Wings" && !(this.is_tandem || this.is_swept))
             return;
         if (this.hstab_list[num].is_vtail)
             this.SetVTail();
@@ -3358,7 +3462,7 @@ class Stabilizers extends Part {
     GetHValidList() {
         var lst = [];
         for (let t of this.hstab_list) {
-            if (t.name == "Tandem Wings" && !this.is_tandem)
+            if (t.name == "The Wings" && !(this.is_tandem || this.is_swept))
                 lst.push(false);
             else
                 lst.push(true);
@@ -3571,11 +3675,415 @@ class Stabilizers_HTML extends Display {
         this.v_count.valueAsNumber = this.stab.GetVStabCount();
         this.v_count.step = this.stab.GetVStabIncrement().toString();
         var stats = this.stab.PartStats();
-        this.d_drag.innerText = stats.drag.toString();
-        this.d_cont.innerText = stats.control.toString();
-        this.d_cost.innerText = stats.cost.toString();
-        this.d_pstb.innerText = stats.pitchstab.toString();
-        this.d_lstb.innerText = stats.latstab.toString();
-        this.d_lift.innerText = stats.liftbleed.toString();
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_cont, stats.control.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+    }
+}
+class ControlSurfaces extends Part {
+    constructor(js) {
+        super();
+        this.span = 0;
+        this.is_cantilever = false;
+        this.wing_area = 0;
+        this.aileron_sel = 0;
+        this.aileron_list = [];
+        for (let elem of js["ailerons"]) {
+            this.aileron_list.push({ name: elem["name"], warping: elem["warping"], stats: new Stats(elem) });
+        }
+        this.rudder_sel = 0;
+        this.rudder_list = [];
+        for (let elem of js["rudders"]) {
+            this.rudder_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.elevator_sel = 0;
+        this.elevator_list = [];
+        for (let elem of js["elevators"]) {
+            this.elevator_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.flaps_sel = 0;
+        this.flaps_list = [];
+        for (let elem of js["flaps"]) {
+            this.flaps_list.push({ name: elem["name"], costfactor: elem["costfactor"], stats: new Stats(elem) });
+        }
+        this.slats_sel = 0;
+        this.slats_list = [];
+        for (let elem of js["slats"]) {
+            this.slats_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.drag_list = [];
+        for (let elem of js["drag_inducers"]) {
+            this.drag_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.drag_sel = [...Array(this.drag_list.length).fill(false)];
+    }
+    toJSON() {
+        return {
+            aileron_sel: this.aileron_sel,
+            rudder_sel: this.rudder_sel,
+            elevator_sel: this.elevator_sel,
+            flaps_sel: this.flaps_sel,
+            slats_sel: this.slats_sel,
+            drag_sel: this.drag_sel,
+        };
+    }
+    fromJSON(js) {
+        this.aileron_sel = js["aileron_sel"];
+        this.rudder_sel = js["rudder_sel"];
+        this.elevator_sel = js["elevator_sel"];
+        this.flaps_sel = js["flaps_sel"];
+        this.slats_sel = js["slats_sel"];
+        this.drag_sel = js["drag_sel"];
+    }
+    GetAileronList() {
+        return this.aileron_list;
+    }
+    GetAileron() {
+        return this.aileron_sel;
+    }
+    SetAileron(num) {
+        this.aileron_sel = num;
+        this.CalculateStats();
+    }
+    GetRudderList() {
+        return this.rudder_list;
+    }
+    GetRudder() {
+        return this.rudder_sel;
+    }
+    SetRudder(num) {
+        this.rudder_sel = num;
+        this.CalculateStats();
+    }
+    GetElevatorList() {
+        return this.elevator_list;
+    }
+    GetElevator() {
+        return this.elevator_sel;
+    }
+    SetElevator(num) {
+        this.elevator_sel = num;
+        this.CalculateStats();
+    }
+    GetFlapsList() {
+        return this.flaps_list;
+    }
+    GetFlaps() {
+        return this.flaps_sel;
+    }
+    SetFlaps(num) {
+        this.flaps_sel = num;
+        this.CalculateStats();
+    }
+    GetSlatsList() {
+        return this.slats_list;
+    }
+    GetSlats() {
+        return this.slats_sel;
+    }
+    SetSlats(num) {
+        this.slats_sel = num;
+        this.CalculateStats();
+    }
+    GetDragList() {
+        return this.drag_list;
+    }
+    GetDrag() {
+        return this.drag_sel;
+    }
+    SetDrag(num, use) {
+        this.drag_sel[num] = use;
+        this.CalculateStats();
+    }
+    SetIsCantilever(use) {
+        this.is_cantilever = use;
+    }
+    SetSpan(span) {
+        this.span = span;
+    }
+    SetWingArea(wa) {
+        this.wing_area = wa;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats = stats.Add(this.aileron_list[this.aileron_sel].stats);
+        if (this.aileron_list[this.aileron_sel].warping) {
+            stats.maxstrain -= this.span;
+            if (this.is_cantilever)
+                stats.cost += 2 * this.wing_area;
+        }
+        stats = stats.Add(this.rudder_list[this.rudder_sel].stats);
+        stats = stats.Add(this.elevator_list[this.elevator_sel].stats);
+        stats = stats.Add(this.flaps_list[this.flaps_sel].stats);
+        stats = stats.Add(this.slats_list[this.slats_sel].stats);
+        for (let i = 0; i < this.drag_list.length; i++) {
+            if (this.drag_sel[i])
+                stats = stats.Add(this.drag_list[i].stats);
+        }
+        return stats;
+    }
+}
+class ControlSurfaces_HTML extends Display {
+    constructor(cs) {
+        super();
+        this.cs = cs;
+        var tbl = document.getElementById("tbl_control_surfaces");
+        var row = tbl.insertRow();
+        var cs_cell = row.insertCell();
+        this.aileron_select = document.createElement("SELECT");
+        for (let a of cs.GetAileronList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = a.name;
+            this.aileron_select.add(opt);
+        }
+        this.aileron_select.onchange = () => { this.cs.SetAileron(this.aileron_select.selectedIndex); };
+        this.rudder_select = document.createElement("SELECT");
+        for (let a of cs.GetRudderList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = a.name;
+            this.rudder_select.add(opt);
+        }
+        this.rudder_select.onchange = () => { this.cs.SetRudder(this.rudder_select.selectedIndex); };
+        this.elevator_select = document.createElement("SELECT");
+        for (let a of cs.GetElevatorList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = a.name;
+            this.elevator_select.add(opt);
+        }
+        this.elevator_select.onchange = () => { this.cs.SetElevator(this.elevator_select.selectedIndex); };
+        this.flaps_select = document.createElement("SELECT");
+        for (let a of cs.GetFlapsList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = a.name;
+            this.flaps_select.add(opt);
+        }
+        this.flaps_select.onchange = () => { this.cs.SetFlaps(this.flaps_select.selectedIndex); };
+        this.slats_select = document.createElement("SELECT");
+        for (let a of cs.GetSlatsList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = a.name;
+            this.slats_select.add(opt);
+        }
+        this.slats_select.onchange = () => { this.cs.SetSlats(this.slats_select.selectedIndex); };
+        CreateSelect("Ailerons", this.aileron_select, cs_cell);
+        CreateSelect("Rudders", this.rudder_select, cs_cell);
+        CreateSelect("Elevators", this.elevator_select, cs_cell);
+        CreateSelect("Flaps", this.flaps_select, cs_cell);
+        CreateSelect("Slats", this.slats_select, cs_cell);
+        var drag_cell = row.insertCell();
+        this.drag_chbx = [];
+        var dlist = cs.GetDragList();
+        for (let i = 0; i < dlist.length; i++) {
+            let cbx = document.createElement("INPUT");
+            CreateCheckbox(dlist[i].name, cbx, drag_cell, true);
+            cbx.onchange = () => { this.cs.SetDrag(i, cbx.checked); };
+            this.drag_chbx.push(cbx);
+        }
+        this.InitStatDisplay(row.insertCell());
+    }
+    InitStatDisplay(stat_cell) {
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Cost");
+        var c1_row = tbl_stat.insertRow();
+        this.d_drag = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_cost = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Control");
+        CreateTH(h2_row, "Pitch Stability");
+        CreateTH(h2_row, "Lateral Stability");
+        var c2_row = tbl_stat.insertRow();
+        this.d_cont = c2_row.insertCell();
+        this.d_pstb = c2_row.insertCell();
+        this.d_lstb = c2_row.insertCell();
+        var h3_row = tbl_stat.insertRow();
+        CreateTH(h3_row, "Lift Bleed");
+        CreateTH(h3_row, "Crash Safety");
+        CreateTH(h3_row, " ");
+        var c3_row = tbl_stat.insertRow();
+        this.d_lift = c3_row.insertCell();
+        this.d_crsh = c3_row.insertCell();
+        this.d_none = c3_row.insertCell();
+    }
+    UpdateDisplay() {
+        this.aileron_select.selectedIndex = this.cs.GetAileron();
+        this.rudder_select.selectedIndex = this.cs.GetRudder();
+        this.elevator_select.selectedIndex = this.cs.GetElevator();
+        this.flaps_select.selectedIndex = this.cs.GetFlaps();
+        this.slats_select.selectedIndex = this.cs.GetSlats();
+        var drag = this.cs.GetDrag();
+        for (let i = 0; i < this.drag_chbx.length; i++) {
+            this.drag_chbx[i].checked = drag[i];
+        }
+        var stats = this.cs.PartStats();
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_cont, stats.control.toString());
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+    }
+}
+class Reinforcement extends Part {
+    constructor(js) {
+        super();
+        this.ext_list = [];
+        for (let elem of js["external"]) {
+            this.ext_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+        }
+        this.ext_wood_count = [...Array(this.ext_list.length).fill(0)];
+        this.ext_steel_count = [...Array(this.ext_list.length).fill(0)];
+        this.cant_list = [];
+        for (let elem of js["cantilever"]) {
+            this.cant_list.push({ name: elem["name"], limited: elem["limited"], stats: new Stats(elem) });
+        }
+        this.cant_count = [...Array(this.cant_list.length).fill(0)];
+        this.wires = false;
+        this.is_staggered = false;
+        this.is_tandem = false;
+        this.is_monoplane = false;
+        this.acft_structure = 0;
+    }
+    GetExternalWoodCount() {
+        return this.ext_wood_count;
+    }
+    SetExternalWoodCount(idx, count) {
+        this.ext_wood_count[idx] = count;
+        this.CalculateStats();
+    }
+    GetExternalSteelCount() {
+        return this.ext_steel_count;
+    }
+    SetExternalSteelCount(idx, count) {
+        this.ext_steel_count[idx] = count;
+        this.CalculateStats();
+    }
+    GetCantileverCount() {
+        return this.cant_count;
+    }
+    SetCantileverCount(idx, count) {
+        this.ImplSCC(idx, count);
+        this.CalculateStats();
+    }
+    ImplSCC(idx, count) {
+        var diff = count - this.cant_count[idx];
+        if (this.cant_list[idx].limited && diff > 0) {
+            var total_structure = this.TotalStructure();
+            for (let i = 0; i < this.cant_list.length; i++) {
+                if (this.cant_list[i].limited) {
+                    total_structure -= 5 * this.cant_count[i] * this.cant_list[i].stats.mass;
+                }
+            }
+            diff = Math.min(diff, Math.floor(total_structure / (5 * this.cant_list[idx].stats.mass)));
+        }
+        this.cant_count[idx] += diff;
+    }
+    GetWires() {
+        return this.wires;
+    }
+    SetWires(use) {
+        this.wires = use;
+        this.CalculateStats();
+    }
+    SetStaggered(is) {
+        this.is_staggered = is;
+    }
+    SetTandem(is) {
+        this.is_tandem = is;
+    }
+    SetMonoplane(is) {
+        this.is_monoplane = is;
+    }
+    SetAcftStructure(struct) {
+        if (struct < this.acft_structure) {
+            for (let i = this.cant_list.length - 1; i >= 0; i--)
+                this.ImplSCC(i, this.cant_count[i]);
+        }
+        this.acft_structure = struct;
+    }
+    TotalStructure() {
+        var struct_count = 0;
+        for (let i = 0; i < this.ext_list.length; i++) {
+            struct_count += this.ext_wood_count[i] * this.ext_list[i].stats.structure;
+            struct_count += this.ext_steel_count[i] * 2 * this.ext_list[i].stats.structure;
+        }
+        return this.acft_structure + struct_count;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        var tension_multiple = 1;
+        if (this.is_monoplane)
+            tension_multiple = 0.6;
+        else if (this.is_tandem)
+            tension_multiple = 0.8;
+        else if (this.is_staggered)
+            tension_multiple = 0.9;
+        var tension = 0;
+        var strut_count = 0;
+        //Wood Struts
+        for (let i = 0; i < this.ext_list.length; i++) {
+            strut_count += this.ext_wood_count[i];
+            let ts = this.ext_list[i].stats;
+            ts = ts.Multiply(this.ext_wood_count[i]);
+            stats.Add(ts);
+            if (this.ext_list[i].config)
+                tension += tension_multiple * this.ext_list[i].tension * this.ext_wood_count[i];
+            else
+                tension += this.ext_list[i].tension * this.ext_wood_count[i];
+        }
+        //Steel Struts
+        for (let i = 0; i < this.ext_list.length; i++) {
+            strut_count += this.ext_steel_count[i];
+            let ts = this.ext_list[i].stats;
+            ts.structure *= 2;
+            ts.cost *= 2;
+            ts.maxstrain += 5;
+            ts = ts.Multiply(this.ext_steel_count[i]);
+            stats.Add(ts);
+            if (this.ext_list[i].config)
+                tension += tension_multiple * this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+            else
+                tension += this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+        }
+        if (this.wires) {
+            stats.maxstrain += Math.floor(tension);
+            stats.drag += 3 * strut_count;
+        }
+        var use_cant = false;
+        for (let i = 0; i < this.cant_list.length; i++) {
+            if (this.cant_count[i] > 0)
+                use_cant = true;
+            let ts = this.cant_list[i].stats;
+            ts = ts.Multiply(this.cant_count[i]);
+            stats.Add(ts);
+        }
+        if (use_cant)
+            stats.cost += 5;
+        return stats;
+    }
+}
+class Reinforcement_HTML extends Display {
+    constructor(rf) {
+        super();
+        this.rf = rf;
+    }
+    UpdateDisplay() {
     }
 }

@@ -279,6 +279,54 @@ input[disabled] {
 	border-color: #000000;
 }
 
+input[type='checkbox'][disabled]{
+	width: 1em !important;
+	height: 1em !important;
+	margin: 0.285em;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	appearance:none;
+	background-color: #000000;
+	border-color: #000000;
+	color: #000000;
+	outline: 1px solid #000000;
+	box-shadow: none;
+	font-size: 1em;
+	text-align: left;
+	line-height: 0.75em;
+}
+input[type='checkbox']{
+	width: 1em !important;
+	height: 1em !important;
+	margin: 0.285em;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	appearance:none;
+	background-color: #383838;
+	border-color: #383838;
+	color: #c7c7c7;
+	outline: 1px solid #555555;
+	box-shadow: none;
+	font-size: 1em;
+	text-align: left;
+	line-height: 0.75em;
+}
+
+input[type='checkbox']:not(checked):after {
+	content: '';
+}
+
+input[type='checkbox']:checked:after {
+	content: '\2713\0020';
+}
+
+/* hover style just for information */
+span:hover:before {
+  border: 2px solid #4778d9!important;
+}
+
 select[disabled] {
 	background-color: #000000;
 	border-color: #000000;
@@ -316,73 +364,30 @@ button[disabled] {
 	vertical-align: top;
 }
 
-/* rules container */
-.rules {
-  position: relative;
-  display: inline-block;
-  cursor: pointer;
+/* Change Animations */
+@-webkit-keyframes changed {
+	from {background-color: #FF0000;}
+	to {background-color: inherit;}
 }
 
-.rules table{
-	padding: .25rem;
+@-moz-keyframes changed {
+	from {background-color: #FF0000;}
+	to {background-color: inherit;}
 }
 
-.rules th {
-	border: .0625rem solid #00d9ff;
-	font-weight: bold;
-	color: rgb(77, 181, 215);
-	padding: .25rem;
+@-o-keyframes changed {
+	from {background-color: #FF0000;}
+	to {background-color: inherit;}
 }
 
-.rules td {
-	border: .0625rem solid #00d9ff;
-	padding: .25rem;
+@keyframes changed {
+	from {background-color: #FF0000;}
+	to {background-color: inherit;}
 }
 
-/* The actual popup (appears on top) */
-.rules .rulestext {
-  visibility: hidden;
-  background-color: #383838;
-  color: #c7c7c7;
-  text-align: left;
-  border-radius: 12px;
-  padding: 8px;
-  position: absolute;
-  max-width: 700px;
-  width:max-content;
-  white-space: normal;
-  /* display:block; */
-  z-index: 1;
-  top: 125%;
-  left: 50%;
-}
-
-/* Popup arrow */
-.rules .rulestext::before {
-  content: "";
-  position: absolute;
-  bottom: 100%;
-  left: 15px;
-  margin-left: -5px;
-  border-width: 5px;
-  border-style: solid;
-  border-color: transparent transparent #555 transparent;
-}
-
-/* Toggle this class when clicking on the popup container (hide and show the popup) */
-.rules .show {
-  visibility: visible;
-  -webkit-animation: fadeIn 1s;
-  animation: fadeIn 1s
-}
-
-/* Add animation (fade in the popup) */
-@-webkit-keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
-}
-
-@keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity:1 ;}
+.changed {
+	-webkit-animation: changed 1s 1;
+	-moz-animation: changed 1s 1;
+	-o-animation: changed 1s 1;
+	animation: changed 1s 1;
 }
