@@ -15,19 +15,17 @@
 	<div class="page__outer page__outer--content">
 		<div class="page__wrapper">
 
-			<div class="page__breadcrumbs" dir="ltr">
-
-			</div>
-
 			<h2 class="page__h2">
-				Ohara Airworks (9.3)
+				<a
+					href="https://forums.sufficientvelocity.com/threads/aircraft-design-company-matsuras-planes-are-always-fastest.48927/post-11017886">
+					Ohara Airworks (9.3) </a>
 			</h2>
 
 			<div class="page__content">
 
 				<div class="Era">
 					<h3 class="page__h3">Era
-						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+						<span class="rules">(<u>Rules</u>)</span>
 					</h3>
 					<table style="width:100%" id="table_era">
 						<tr>
@@ -45,7 +43,7 @@
 				<br />
 				<div class="Cockpit">
 					<h3 class="page__h3">Cockpits
-						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+						<span class="rules">(<u>Rules</u>)</span>
 						<br />
 						<span> Number of Cockpits: <input type="number" id="num_cockpits" min="1" max="20"
 								value="1" /></span>
@@ -54,6 +52,8 @@
 						<tr>
 							<th>Option</th>
 							<th>Upgrade</th>
+							<th>Safety Options</th>
+							<th>Gunsights</th>
 							<th>Cockpit Stats</th>
 						</tr>
 					</table>
@@ -61,7 +61,7 @@
 				<br />
 				<div class="Passengers">
 					<h3 class="page__h3">Passengers
-						<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+						<span class="rules">(<u>Rules</u>)</span>
 					</h3>
 					<table style="width:100%" id="table_passengers">
 						<tr>
@@ -74,7 +74,7 @@
 						<tr>
 							<td><input type="number" id="num_seats" min="0" value="0" /></td>
 							<td><input type="number" id="num_beds" min="0" value="0" /></td>
-							<td><span>Connectivity <input type="checkbox" id="passenger_connectivity" /></span></td>
+							<td id="passenger_upg"></td>
 							<td id="passenger_mass"></td>
 							<td id="passenger_req_seq"></td>
 						</tr>
@@ -83,9 +83,9 @@
 				<br />
 				<div class="Engines">
 					<h3 class="page__h3">Engines
-						<span class="rules" onclick="RulesPopup(this)">(<u>Engine Rules</u>)</span>
-						<span class="rules" onclick="RulesPopup(this)">(<u>Upgrade Rules</u>)</span>
-						<span class="rules" onclick="RulesPopup(this)">(<u>Cooling Rules</u>)</span>
+						<span class="rules">(<u>Engine Rules</u>)</span>
+						<span class="rules">(<u>Upgrade Rules</u>)</span>
+						<span class="rules">(<u>Cooling Rules</u>)</span>
 						<br />
 						<span> Number of Engines: <input type="number" id="num_engines" min="0" max="20"
 								value="1" /></span>
@@ -114,7 +114,7 @@
 			<br />
 			<div class="Propeller">
 				<h3 class="page__h3">Propeller
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span> <br />
+					<span class="rules">(<u>Rules</u>)</span> <br />
 					<span> Propeller Pitch: <select id="propeller_pitch"></select></span>
 					<span>Manually Variable Propeller: <input type="checkbox" id="propeller_variable" /></span>
 				</h3>
@@ -122,7 +122,7 @@
 			<br />
 			<div class="Frames">
 				<h3 class="page__h3">Frames and Covering
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+					<span class="rules">(<u>Rules</u>)</span>
 					<table id="table_frames">
 						<tr>
 							<th>Frame Type</th>
@@ -136,7 +136,7 @@
 			<br />
 			<div class="Tail">
 				<h3 class="page__h3">Tail
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)<br />
+					<span class="rules">(<u>Rules</u>)<br />
 						<span> Tail Length: <select id="tail_type"></select></span>
 						<span> Farman Tail: <input type="checkbox" id="tail_farman" /></span>
 						<span> Boom Tail: <input type="checkbox" id="tail_boom" /></span>
@@ -145,7 +145,7 @@
 			<br />
 			<div class="Wings">
 				<h3 class="page__h3">Wings
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+					<span class="rules">(<u>Rules</u>)</span>
 					<br />
 					<span> Wing Stagger: <select id="wing_stagger"></select></span>
 					<span> Closed Wing: <input type="checkbox" id="wing_closed" /></span>
@@ -162,7 +162,7 @@
 			<br />
 			<div class="Stabilizers">
 				<h3 class="page__h3">Stabilizers
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+					<span class="rules">(<u>Rules</u>)</span>
 					<br />
 				</h3>
 				<table id="stab_table">
@@ -172,17 +172,81 @@
 						<th>Stabilizer Stats</th>
 					</tr>
 				</table>
-			</div><br />
+			</div>
+			<br />
 			<div class="ControlSurfaces">
 				<h3 class="page__h3">Control Surfaces
-					<span class="rules" onclick="RulesPopup(this)">(<u>Rules</u>)</span>
+					<span class="rules">(<u>Rules</u>)</span>
 					<br />
 				</h3>
 				<table id="tbl_control_surfaces">
 					<tr>
 						<th>Control Surfaces</th>
 						<th>Drag Inducers</th>
-						<th class="changed">Control Surface Stats</th>
+						<th>Control Surface Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div class="Reinforcements">
+				<h3 class="page__h3">Reinforcements
+					<span class="rules">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<table id="tbl_reinforcements">
+					<tr>
+						<th>External Reinforcements</th>
+						<th>Internal Reinforcements</th>
+						<th>Reinforcement Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div class="Load">
+				<h3 class="page__h3">Load
+					<span class="rules">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<table id="tbl_load">
+					<tr>
+						<th>Fuel</th>
+						<th>Munitions</th>
+						<th>Cargo and Passengers</th>
+						<th>Load Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div class="Landing Gear">
+				<h3 class="page__h3">Landing Gear
+					<span class="rules">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<table id="tbl_gear">
+					<tr>
+						<th>Landing Gear</th>
+						<th>Extras</th>
+						<th>Gear Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div class="Accessories">
+				<h3 class="page__h3">Additional Parts
+					<span class="rules">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<table id="tbl_accessories">
+					<tr>
+						<th>Armour</th>
+						<th>Electrical</th>
+						<th>Information</th>
+						<th>Additional Part Stats</th>
+					</tr>
+					<tr>
+						<th>Visibility</th>
+						<th>Climate</th>
+						<th>Control</th>
 					</tr>
 				</table>
 			</div>
@@ -190,7 +254,7 @@
 	</div>
 
 
-
+	<!-- python -m http.server 8080 -->
 	<footer class="page__outer page__outer--footer footer" dir="ltr">
 		<div class="page__wrapper">
 			<div class="page__footer">

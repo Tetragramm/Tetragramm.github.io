@@ -1,5 +1,6 @@
 //TODO: Engine as Generator
 //TODO: Weapons
+//TODO: Handle attack
 //TODO: Radiator requries Parasol wing
 //TODO: Radiator requires Metal wing
 //TODO: MVP Warning
@@ -68,6 +69,19 @@ function GenerateID() {
     internal_id++;
     return "internal_id_" + internal_id.toString();
 }
+function CreateFlexSection(elem) {
+    var fs = {
+        div0: document.createElement("DIV"), div1: document.createElement("DIV"),
+        div2: document.createElement("DIV")
+    };
+    fs.div0.classList.add("flex-container");
+    fs.div1.classList.add("flex-container");
+    fs.div2.classList.add("flex-container");
+    fs.div0.appendChild(fs.div1);
+    fs.div0.appendChild(fs.div2);
+    elem.appendChild(fs.div0);
+    return fs;
+}
 function CreateTH(row, content) {
     var th = document.createElement("TH");
     th.innerHTML = content;
@@ -80,30 +94,43 @@ function CreateInput(txt, elem, table, br = true) {
     txtSpan.htmlFor = elem.id;
     txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     elem.setAttribute("type", "number");
-    elem.min = (0).toString();
+    elem.min = "0";
+    elem.step = "1";
     elem.valueAsNumber = 0;
-    span.appendChild(elem);
     span.appendChild(txtSpan);
+    span.appendChild(elem);
     table.appendChild(span);
     if (br)
         table.appendChild(document.createElement("BR"));
 }
-function CreateSelect(txt, elem, table, br = true) {
-    var span = document.createElement("SPAN");
-    var txtSpan = document.createElement("LABEL");
-    elem.id = GenerateID();
-    txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    span.appendChild(elem);
-    span.appendChild(txtSpan);
-    table.appendChild(span);
-    if (br)
-        table.appendChild(document.createElement("BR"));
+function FlexInput(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    inp.setAttribute("type", "number");
+    inp.min = "0";
+    inp.step = "1";
+    inp.valueAsNumber = 0;
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
 }
-function CreateSpace(table) {
+function FlexSelect(txt, sel, fs) {
+    var lbl = document.createElement("LABEL");
+    sel.id = GenerateID();
+    lbl.htmlFor = sel.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.classList.add("flex-item");
+    sel.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(sel);
+}
+function CreateSpace(elem) {
     var span = document.createElement("SPAN");
     span.innerHTML = "&nbsp;";
-    table.appendChild(span);
+    elem.appendChild(span);
 }
 function CreateCheckbox(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
@@ -112,11 +139,28 @@ function CreateCheckbox(txt, elem, table, br = true) {
     txtSpan.htmlFor = elem.id;
     txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     elem.setAttribute("type", "checkbox");
-    span.appendChild(elem);
     span.appendChild(txtSpan);
+    span.appendChild(elem);
     table.appendChild(span);
     if (br)
         table.appendChild(document.createElement("BR"));
+}
+function FlexCheckbox(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    inp.setAttribute("type", "checkbox");
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+function FlexLabel(txt, div1) {
+    var lbl = document.createElement("LABEL");
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.classList.add("flex-item");
+    div1.appendChild(lbl);
 }
 function Blink(elem) {
     elem.classList.toggle("changed", false);
@@ -198,6 +242,9 @@ class Stats {
         this.toughness = 0;
         this.upkeep = 0;
         this.crashsafety = 0;
+        this.bomb_mass = 0;
+        this.fuel = 0;
+        this.charge = 0;
         this.warnings = [];
         if (js) {
             this.fromJSON(js);
@@ -229,6 +276,9 @@ class Stats {
             toughness: this.toughness,
             upkeep: this.upkeep,
             crashsafety: this.crashsafety,
+            bomb_mass: this.bomb_mass,
+            fuel: this.fuel,
+            charge: this.charge,
         };
     }
     fromJSON(js) {
@@ -280,6 +330,12 @@ class Stats {
             this.upkeep = js["upkeep"];
         if (js["crashsafety"])
             this.crashsafety = js["crashsafety"];
+        if (js["bomb_mass"])
+            this.bomb_mass = js["bomb_mass"];
+        if (js["fuel"])
+            this.fuel = js["fuel"];
+        if (js["charge"])
+            this.charge = js["charge"];
         if (js["warning"])
             this.warnings.push({ source: js["name"], warning: js["warning"] });
     }
@@ -309,6 +365,9 @@ class Stats {
         res.toughness = this.toughness + other.toughness;
         res.upkeep = this.upkeep + other.upkeep;
         res.crashsafety = this.crashsafety + other.crashsafety;
+        res.bomb_mass = this.bomb_mass + other.bomb_mass;
+        res.fuel = this.fuel + other.fuel;
+        res.charge = this.charge + other.charge;
         res.warnings = this.MergeWarnings(other.warnings);
         return res;
     }
@@ -353,6 +412,10 @@ class Stats {
         res.wingarea = this.wingarea * other;
         res.toughness = this.toughness * other;
         res.upkeep = this.upkeep * other;
+        res.crashsafety = this.crashsafety * other;
+        res.bomb_mass = this.bomb_mass * other;
+        res.fuel = this.fuel * other;
+        res.charge = this.charge * other;
         res.warnings = this.warnings;
         return res;
     }
@@ -379,7 +442,11 @@ class Stats {
             && this.pitchboost == other.pitchboost
             && this.wingarea == other.wingarea
             && this.toughness == other.toughness
-            && this.upkeep == other.upkeep;
+            && this.upkeep == other.upkeep
+            && this.crashsafety == other.crashsafety
+            && this.bomb_mass == other.bomb_mass
+            && this.fuel == other.fuel
+            && this.charge == other.charge;
     }
     Round() {
         this.liftbleed = Math.floor(this.liftbleed);
@@ -405,6 +472,13 @@ class Stats {
         this.wingarea = Math.floor(this.wingarea);
         this.toughness = Math.floor(this.toughness);
         this.upkeep = Math.floor(this.upkeep);
+        this.crashsafety = Math.floor(this.crashsafety);
+        this.bomb_mass = Math.floor(this.bomb_mass);
+        this.fuel = Math.floor(this.fuel);
+        this.charge = Math.floor(this.charge);
+    }
+    Clone() {
+        return this.Add(new Stats());
     }
 }
 class Part {
@@ -424,6 +498,10 @@ class Aircraft_HTML extends Display {
         this.wings = new Wings_HTML(aircraft.GetWings());
         this.stabilizers = new Stabilizers_HTML(aircraft.GetStabilizers());
         this.controlsurfaces = new ControlSurfaces_HTML(aircraft.GetControlSurfaces());
+        this.reinforcements = new Reinforcement_HTML(aircraft.GetReinforcements());
+        this.load = new Load_HTML(aircraft.GetFuel(), aircraft.GetMunitions(), aircraft.GetCargoAndPassengers());
+        this.gear = new LandingGear_HTML(aircraft.GetLandingGear());
+        this.accessories = new Accessories_HTML(aircraft.GetAccessories());
         // this.engines.Initialize();
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
         this.UpdateDisplay();
@@ -438,6 +516,10 @@ class Aircraft_HTML extends Display {
         this.wings.UpdateDisplay();
         this.stabilizers.UpdateDisplay();
         this.controlsurfaces.UpdateDisplay();
+        this.reinforcements.UpdateDisplay();
+        this.load.UpdateDisplay();
+        this.gear.UpdateDisplay();
+        this.accessories.UpdateDisplay();
     }
 }
 class Aircraft {
@@ -454,6 +536,12 @@ class Aircraft {
         this.wings = new Wings(js["wings"]);
         this.stabilizers = new Stabilizers(js["stabilizers"]);
         this.controlsurfaces = new ControlSurfaces(js["controls"]);
+        this.reinforcements = new Reinforcement(js["reinforcement"]);
+        this.fuel = new Fuel(js["fuel"]);
+        this.munitions = new Munitions();
+        this.cargo = new CargoAndPassengers();
+        this.gear = new LandingGear(js["landing_gear"]);
+        this.accessories = new Accessories(js["accessories"]);
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
         this.passengers.SetCalculateStats(() => { this.CalculateStats(); });
@@ -463,6 +551,12 @@ class Aircraft {
         this.wings.SetCalculateStats(() => { this.CalculateStats(); });
         this.stabilizers.SetCalculateStats(() => { this.CalculateStats(); });
         this.controlsurfaces.SetCalculateStats(() => { this.CalculateStats(); });
+        this.reinforcements.SetCalculateStats(() => { this.CalculateStats(); });
+        this.fuel.SetCalculateStats(() => { this.CalculateStats(); });
+        this.munitions.SetCalculateStats(() => { this.CalculateStats(); });
+        this.cargo.SetCalculateStats(() => { this.CalculateStats(); });
+        this.gear.SetCalculateStats(() => { this.CalculateStats(); });
+        this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
@@ -480,6 +574,12 @@ class Aircraft {
             wings: this.wings.toJSON(),
             stabilizers: this.stabilizers.toJSON(),
             controlsurfaces: this.controlsurfaces.toJSON(),
+            reinforcements: this.reinforcements.toJSON(),
+            fuel: this.fuel.toJSON(),
+            munitions: this.munitions.toJSON(),
+            cargo: this.cargo.toJSON(),
+            gear: this.gear.toJSON(),
+            accessories: this.accessories.toJSON(),
         };
     }
     fromJSON(js) {
@@ -495,6 +595,12 @@ class Aircraft {
             this.wings.fromJSON(js["wings"]);
             this.stabilizers.fromJSON(js["stabilizers"]);
             this.controlsurfaces.fromJSON(js["controlsurfaces"]);
+            this.reinforcements.fromJSON(js["reinforcements"]);
+            this.fuel.fromJSON(js["fuel"]);
+            this.munitions.fromJSON(js["munitions"]);
+            this.cargo.fromJSON(js["cargo"]);
+            this.gear.fromJSON(js["gear"]);
+            this.accessories.fromJSON(js["accessories"]);
             this.CalculateStats();
         }
     }
@@ -510,6 +616,10 @@ class Aircraft {
         stats = stats.Add(this.engines.PartStats());
         this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
         stats = stats.Add(this.propeller.PartStats());
+        //Fuel goes here, because it makes sections.
+        stats = stats.Add(this.fuel.PartStats());
+        //Munitions goes here, because it makes sections.
+        stats = stats.Add(this.munitions.PartStats());
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         stats = stats.Add(this.frames.PartStats());
@@ -523,9 +633,26 @@ class Aircraft {
         this.controlsurfaces.SetWingArea(stats.wingarea);
         this.controlsurfaces.SetSpan(this.wings.GetSpan());
         stats = stats.Add(this.controlsurfaces.PartStats());
+        this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
+        this.reinforcements.SetTandem(this.wings.GetTandem());
+        this.reinforcements.SetStaggered(this.wings.GetStaggered());
+        stats = stats.Add(this.reinforcements.PartStats());
+        this.cargo.SetSeats(this.passengers.GetBeds() + this.passengers.GetSeats());
+        stats = stats.Add(this.cargo.PartStats());
+        this.accessories.SetAcftPower(stats.power);
+        this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
+        stats = stats.Add(this.accessories.PartStats());
+        //Gear go last, because they need total mass.
+        this.gear.SetLoadedMass(stats.mass + stats.wetmass);
+        stats = stats.Add(this.gear.PartStats());
         //Update Part Local stuff
         this.cockpits.UpdateCrewStats(stats);
         this.engines.UpdateReliability(stats);
+        //Not really part local, but only affects number limits.
+        this.reinforcements.SetAcftStructure(stats.structure);
+        this.fuel.SetArea(this.wings.GetArea());
+        this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
+        this.munitions.SetAcftStructure(stats.structure);
         if (!this.updated_stats)
             this.stats = stats;
         if (this.DisplayCallback)
@@ -559,6 +686,24 @@ class Aircraft {
     }
     GetControlSurfaces() {
         return this.controlsurfaces;
+    }
+    GetReinforcements() {
+        return this.reinforcements;
+    }
+    GetFuel() {
+        return this.fuel;
+    }
+    GetMunitions() {
+        return this.munitions;
+    }
+    GetCargoAndPassengers() {
+        return this.cargo;
+    }
+    GetLandingGear() {
+        return this.gear;
+    }
+    GetAccessories() {
+        return this.accessories;
     }
 }
 class Era_HTML extends Display {
@@ -633,7 +778,7 @@ class Cockpits_HTML extends Display {
         this.tbl = document.getElementById("table_cockpit");
         this.counter = document.getElementById("num_cockpits");
         this.positions = [];
-        this.counter.oninput = (e) => {
+        this.counter.onchange = (e) => {
             this.cockpits.SetNumberOfCockpits(this.counter.valueAsNumber);
         };
     }
@@ -680,6 +825,18 @@ class Cockpits extends Part {
             let upg = { name: elem["name"], stats: new Stats(elem) };
             this.upgrades.push(upg);
         }
+        this.safety = [];
+        //Add all the safety
+        for (let elem of js["safety"]) {
+            let sft = { name: elem["name"], stats: new Stats(elem) };
+            this.safety.push(sft);
+        }
+        this.gunsights = [];
+        //Add all the gunsights
+        for (let elem of js["gunsights"]) {
+            let gun = { name: elem["name"], stats: new Stats(elem) };
+            this.gunsights.push(gun);
+        }
     }
     toJSON() {
         var lst = [];
@@ -691,18 +848,21 @@ class Cockpits extends Part {
     fromJSON(js) {
         this.positions = [];
         for (let elem of js["positions"]) {
-            let cp = new Cockpit(this.types, this.upgrades);
+            let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
             cp.fromJSON(elem);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
     }
     SetNumberOfCockpits(num) {
+        if (num != num)
+            num = 1;
+        num = Math.floor(num);
         while (this.positions.length > num) {
             this.positions.pop();
         }
         while (this.positions.length < num) {
-            let cp = new Cockpit(this.types, this.upgrades);
+            let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
@@ -740,30 +900,38 @@ class Cockpit_HTML extends Display {
         this.row = r;
         this.cockpit = cp;
         this.upg_chbxs = [];
-        var option = this.row.insertCell(0);
-        var upgrades = this.row.insertCell(1);
-        var stat_cell = this.row.insertCell(2);
+        this.sft_chbxs = [];
+        this.gun_chbxs = [];
+        var option = this.row.insertCell();
+        var upgrades = this.row.insertCell();
+        var safety = this.row.insertCell();
+        var gunsights = this.row.insertCell();
+        var stat_cell = this.row.insertCell();
         var tbl = document.createElement("TABLE");
         var h1_row = tbl.insertRow();
         CreateTH(h1_row, "Mass");
         CreateTH(h1_row, "Drag");
         CreateTH(h1_row, "Cost");
-        CreateTH(h1_row, "Control");
         var c1_row = tbl.insertRow();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
-        this.d_cont = c1_row.insertCell();
         var h2_row = tbl.insertRow();
-        CreateTH(h2_row, "Flight Stress");
-        CreateTH(h2_row, "Escape");
-        CreateTH(h2_row, "Visibility");
+        CreateTH(h2_row, "Control");
         CreateTH(h2_row, "Required Sections");
+        CreateTH(h2_row, "Crash Safety");
         var c2_row = tbl.insertRow();
-        this.d_strs = c2_row.insertCell();
-        this.d_escp = c2_row.insertCell();
-        this.d_visi = c2_row.insertCell();
+        this.d_cont = c2_row.insertCell();
         this.d_rseq = c2_row.insertCell();
+        this.d_crsh = c2_row.insertCell();
+        var h3_row = tbl.insertRow();
+        CreateTH(h3_row, "Flight Stress");
+        CreateTH(h3_row, "Escape");
+        CreateTH(h3_row, "Visibility");
+        var c3_row = tbl.insertRow();
+        this.d_strs = c3_row.insertCell();
+        this.d_escp = c3_row.insertCell();
+        this.d_visi = c3_row.insertCell();
         stat_cell.appendChild(tbl);
         stat_cell.className = "inner_table";
         tbl.className = "inner_table";
@@ -780,23 +948,38 @@ class Cockpit_HTML extends Display {
             this.sel_type.add(opt);
         }
         option.appendChild(this.sel_type);
+        var fs = CreateFlexSection(upgrades);
         //Add all the upgrades as checkboxes
         var upg_index = 0;
         for (let elem of cp.GetUpgradeList()) {
-            let span = document.createElement("SPAN");
-            let txt = document.createElement("SPAN");
-            txt.innerHTML = elem.name;
             let upg = document.createElement("INPUT");
-            upg.setAttribute("type", "checkbox");
-            upg.checked = false;
+            FlexCheckbox(elem.name, upg, fs);
             let local_index = upg_index;
             upg_index += 1;
             upg.onchange = () => { this.cockpit.SetUpgrade(local_index, upg.checked); };
-            span.appendChild(upg);
-            span.appendChild(txt);
-            upgrades.appendChild(span);
-            upgrades.appendChild(document.createElement("BR"));
             this.upg_chbxs.push(upg);
+        }
+        var fs = CreateFlexSection(safety);
+        //Add all the safties as checkboxes
+        var sft_index = 0;
+        for (let elem of cp.GetSafetyList()) {
+            let sft = document.createElement("INPUT");
+            FlexCheckbox(elem.name, sft, fs);
+            let local_index = sft_index;
+            sft_index += 1;
+            sft.onchange = () => { this.cockpit.SetSafety(local_index, sft.checked); };
+            this.sft_chbxs.push(sft);
+        }
+        var fs = CreateFlexSection(gunsights);
+        //Add all the safties as checkboxes
+        var gun_index = 0;
+        for (let elem of cp.GetGunsightList()) {
+            let gun = document.createElement("INPUT");
+            FlexCheckbox(elem.name, gun, fs);
+            let local_index = gun_index;
+            gun_index += 1;
+            gun.onchange = () => { this.cockpit.SetGunsight(local_index, gun.checked); };
+            this.gun_chbxs.push(gun);
         }
         //Set the change event, add the box, and execute it.
         this.sel_type.onchange = () => { this.cockpit.SetType(this.sel_type.selectedIndex); };
@@ -810,44 +993,65 @@ class Cockpit_HTML extends Display {
         BlinkIfChanged(this.d_drag, stats.drag.toString());
         BlinkIfChanged(this.d_cost, stats.cost.toString());
         BlinkIfChanged(this.d_cont, stats.control.toString());
+        BlinkIfChanged(this.d_rseq, stats.reqsections.toString());
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
         BlinkIfChanged(this.d_strs, this.cockpit.GetFlightStress().toString());
         BlinkIfChanged(this.d_escp, this.cockpit.GetEscape().toString());
         BlinkIfChanged(this.d_visi, this.cockpit.GetVisibility().toString());
-        BlinkIfChanged(this.d_rseq, stats.reqsections.toString());
         this.sel_type.selectedIndex = this.cockpit.GetType();
         var upgs = this.cockpit.GetSelectedUpgrades();
         for (let i = 0; i < this.upg_chbxs.length; i++) {
             this.upg_chbxs[i].checked = upgs[i];
         }
+        var sfty = this.cockpit.GetSelectedSafety();
+        for (let i = 0; i < this.sft_chbxs.length; i++) {
+            this.sft_chbxs[i].checked = sfty[i];
+        }
+        var guns = this.cockpit.GetSelectedGunsights();
+        for (let i = 0; i < this.gun_chbxs.length; i++) {
+            this.gun_chbxs[i].checked = guns[i];
+        }
     }
 }
 class Cockpit extends Part {
-    constructor(tl, ul) {
+    constructor(tl, ul, sl, gl) {
         super();
         this.stats = new Stats();
         this.types = tl;
         this.upgrades = ul;
+        this.safety = sl;
+        this.gunsights = gl;
+        this.selected_type = 0;
         this.selected_upgrades = [...Array(this.upgrades.length).fill(false)];
+        this.selected_safety = [...Array(this.safety.length).fill(false)];
+        this.selected_gunsights = [...Array(this.gunsights.length).fill(false)];
         this.total_stress = 0;
         this.total_escape = 0;
         this.total_visibility = 0;
-        this.selected_type = 0;
     }
     toJSON() {
         return {
             type: this.selected_type,
-            upgrades: this.selected_upgrades
+            upgrades: this.selected_upgrades,
+            safety: this.selected_safety,
         };
     }
     fromJSON(js) {
         this.selected_type = js["type"];
         this.selected_upgrades = js["upgrades"];
+        this.selected_safety = js["safety"];
     }
     GetTypeList() {
         return this.types;
     }
     GetUpgradeList() {
         return this.upgrades;
+    }
+    GetSafetyList() {
+        return this.safety;
+    }
+    GetGunsightList() {
+        return this.gunsights;
     }
     GetType() {
         return this.selected_type;
@@ -867,6 +1071,24 @@ class Cockpit extends Part {
         this.selected_upgrades[index] = state;
         this.CalculateStats();
     }
+    GetSelectedSafety() {
+        return this.selected_safety;
+    }
+    SetSafety(index, state) {
+        if (index >= this.safety.length)
+            throw "Selected type is not in range of actual safties.";
+        this.selected_safety[index] = state;
+        this.CalculateStats();
+    }
+    GetSelectedGunsights() {
+        return this.selected_gunsights;
+    }
+    SetGunsight(index, state) {
+        if (index >= this.safety.length)
+            throw "Selected type is not in range of actual gunsights.";
+        this.selected_gunsights[index] = state;
+        this.CalculateStats();
+    }
     GetVisibility() {
         return this.total_visibility;
     }
@@ -884,6 +1106,14 @@ class Cockpit extends Part {
             if (this.selected_upgrades[i])
                 this.stats = this.stats.Add(this.upgrades[i].stats);
         }
+        for (let i = 0; i < this.selected_safety.length; i++) {
+            if (this.selected_safety[i])
+                this.stats = this.stats.Add(this.safety[i].stats);
+        }
+        for (let i = 0; i < this.selected_gunsights.length; i++) {
+            if (this.selected_gunsights[i])
+                this.stats = this.stats.Add(this.gunsights[i].stats);
+        }
         var stats = new Stats();
         stats = stats.Add(this.stats);
         return stats;
@@ -891,6 +1121,7 @@ class Cockpit extends Part {
     CrewUpdate(stats) {
         this.total_escape = this.stats.escape + stats.escape;
         this.total_stress = this.stats.flightstress + stats.flightstress;
+        this.total_stress = Math.max(0, this.total_stress);
         this.total_visibility = this.stats.visibility + stats.visibility;
     }
     SetCalculateStats(callback) {
@@ -903,17 +1134,20 @@ class Passengers_HTML extends Display {
         this.pass = pass;
         this.nseats = document.getElementById("num_seats");
         this.nbeds = document.getElementById("num_beds");
-        this.connect = document.getElementById("passenger_connectivity");
         this.mass = document.getElementById("passenger_mass");
         this.reqseq = document.getElementById("passenger_req_seq");
+        var upg_cell = document.getElementById("passenger_upg");
+        this.connect = document.createElement("INPUT");
+        var fs = CreateFlexSection(upg_cell);
+        FlexCheckbox("Connectivity", this.connect, fs);
         this.connect.disabled = true;
-        this.nseats.oninput = () => {
+        this.nseats.onchange = () => {
             this.pass.SetSeats(this.nseats.valueAsNumber);
         };
-        this.nbeds.oninput = () => {
+        this.nbeds.onchange = () => {
             this.pass.SetBeds(this.nbeds.valueAsNumber);
         };
-        this.connect.oninput = () => {
+        this.connect.onchange = () => {
             this.pass.SetConnected(this.connect.checked);
         };
     }
@@ -950,6 +1184,9 @@ class Passengers extends Part {
         return this.seats;
     }
     SetSeats(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         this.seats = num;
         this.CalculateStats();
     }
@@ -957,6 +1194,9 @@ class Passengers extends Part {
         return this.beds;
     }
     SetBeds(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         this.beds = num;
         this.CalculateStats();
     }
@@ -1043,10 +1283,10 @@ class Engines_HTML extends Display {
         this.tbl = document.getElementById("table_engine");
         this.tblR = document.getElementById("table_radiator");
         this.num_engines = document.getElementById("num_engines");
-        this.num_engines.oninput = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };
+        this.num_engines.onchange = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };
         this.num_engines.valueAsNumber = this.eng.GetNumberOfEngines();
         this.num_radiators = document.getElementById("num_radiators");
-        this.num_radiators.oninput = () => { this.eng.SetNumberOfRadiators(this.num_radiators.valueAsNumber); };
+        this.num_radiators.onchange = () => { this.eng.SetNumberOfRadiators(this.num_radiators.valueAsNumber); };
         this.num_radiators.valueAsNumber = this.eng.GetNumberOfRadiators();
         this.is_asymmetric = document.getElementById("asymmetric");
         this.is_asymmetric.oninput = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
@@ -1171,6 +1411,10 @@ class Engines extends Part {
         this.is_asymmetric = js["is_asymmetric"];
     }
     SetNumberOfEngines(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.min(20, num);
         while (this.engines.length > num) {
             this.engines.pop();
         }
@@ -1192,6 +1436,9 @@ class Engines extends Part {
         return this.radiators[num];
     }
     SetNumberOfRadiators(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         while (this.radiators.length > num) {
             this.radiators.pop();
         }
@@ -1363,6 +1610,9 @@ class Engine extends Part {
         return (this.cooling_count < this.etype_stats.stats.cooling);
     }
     SetCooling(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         this.cooling_count = num;
         this.CalculateStats();
     }
@@ -1429,6 +1679,9 @@ class Engine extends Part {
         return this.use_ds;
     }
     SetGearCount(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         this.gp_count = num;
         this.SetGearReliability(this.gpr_count);
     }
@@ -1436,6 +1689,9 @@ class Engine extends Part {
         return this.gp_count;
     }
     SetGearReliability(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         this.gpr_count = Math.min(num, this.gp_count);
         this.CalculateStats();
     }
@@ -1608,20 +1864,21 @@ class Engine_HTML extends Display {
         opt.text = "Custom";
         opt.value = (-1).toString();
         this.e_select.add(opt);
+        var fs = CreateFlexSection(tcell);
         //Set up the individual stat input boxes
-        CreateInput("  Power", this.e_pwr, tcell);
-        CreateInput("  Mass", this.e_mass, tcell);
-        CreateInput("  Drag", this.e_drag, tcell);
-        CreateInput("  Reliability", this.e_rely, tcell);
-        CreateInput("  Cooling", this.e_cool, tcell);
-        CreateInput("  Overspeed", this.e_over, tcell);
-        CreateInput("  Fuel Consumption", this.e_fuel, tcell);
-        CreateInput("  Altitude", this.e_alti, tcell);
-        CreateInput("  Torque", this.e_torq, tcell);
-        CreateInput("  Rumble", this.e_rumb, tcell);
-        CreateInput("  Cost", this.e_cost, tcell);
-        CreateCheckbox(" Oil Tank", this.e_oil, tcell);
-        CreateCheckbox(" Pulsejet", this.e_pulsejet, tcell);
+        FlexInput("Power", this.e_pwr, fs);
+        FlexInput("Mass", this.e_mass, fs);
+        FlexInput("Drag", this.e_drag, fs);
+        FlexInput("Reliability", this.e_rely, fs);
+        FlexInput("Cooling", this.e_cool, fs);
+        FlexInput("Overspeed", this.e_over, fs);
+        FlexInput("Fuel Consumption", this.e_fuel, fs);
+        FlexInput("Altitude", this.e_alti, fs);
+        FlexInput("Torque", this.e_torq, fs);
+        FlexInput("Rumble", this.e_rumb, fs);
+        FlexInput("Cost", this.e_cost, fs);
+        FlexCheckbox("Oil Tank", this.e_oil, fs);
+        FlexCheckbox("Pulsejet", this.e_pulsejet, fs);
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
             if (this.e_select.selectedIndex == this.engine_list.length) {
@@ -1634,17 +1891,17 @@ class Engine_HTML extends Display {
             }
         };
         var trigger = () => { this.SendCustomStats(); };
-        this.e_pwr.oninput = trigger;
-        this.e_mass.oninput = trigger;
-        this.e_drag.oninput = trigger;
-        this.e_rely.oninput = trigger;
-        this.e_cool.oninput = trigger;
-        this.e_over.oninput = trigger;
-        this.e_fuel.oninput = trigger;
-        this.e_alti.oninput = trigger;
-        this.e_torq.oninput = trigger;
-        this.e_rumb.oninput = trigger;
-        this.e_cost.oninput = trigger;
+        this.e_pwr.onchange = trigger;
+        this.e_mass.onchange = trigger;
+        this.e_drag.onchange = trigger;
+        this.e_rely.onchange = trigger;
+        this.e_cool.onchange = trigger;
+        this.e_over.onchange = trigger;
+        this.e_fuel.onchange = trigger;
+        this.e_alti.onchange = trigger;
+        this.e_torq.onchange = trigger;
+        this.e_rumb.onchange = trigger;
+        this.e_cost.onchange = trigger;
         this.e_oil.onchange = trigger;
         this.e_pulsejet.onchange = trigger;
     }
@@ -1670,8 +1927,9 @@ class Engine_HTML extends Display {
         mount_cell.appendChild(document.createElement("BR"));
         this.pushpull_input = document.createElement("INPUT");
         this.torque_input = document.createElement("INPUT");
-        CreateCheckbox(" Push Pull", this.pushpull_input, mount_cell);
-        CreateCheckbox(" Torque To Structure", this.torque_input, mount_cell);
+        var fs = CreateFlexSection(mount_cell);
+        FlexCheckbox(" Push Pull", this.pushpull_input, fs);
+        FlexCheckbox(" Torque To Structure", this.torque_input, fs);
         this.pushpull_input.checked = this.engine.GetUsePushPull();
         this.torque_input.checked = this.engine.GetUsePushPull();
         this.pushpull_input.onchange = () => { this.engine.SetUsePushPull(this.pushpull_input.checked); };
@@ -1681,11 +1939,12 @@ class Engine_HTML extends Display {
         this.ds_input = document.createElement("INPUT");
         this.gp_input = document.createElement("INPUT");
         this.gpr_input = document.createElement("INPUT");
-        CreateCheckbox("   Extended Driveshafts", this.ds_input, upg_cell);
-        CreateInput("  Geared Propeller", this.gp_input, upg_cell);
-        CreateInput("  Negate Reliability Penalty", this.gpr_input, upg_cell);
-        this.gp_input.oninput = () => { this.engine.SetGearCount(this.gp_input.valueAsNumber); };
-        this.gpr_input.oninput = () => { this.engine.SetGearReliability(this.gpr_input.valueAsNumber); };
+        var fs = CreateFlexSection(upg_cell);
+        FlexCheckbox("Extended Driveshafts", this.ds_input, fs);
+        FlexInput("Geared Propeller", this.gp_input, fs);
+        FlexInput("Negate Reliability Penalty", this.gpr_input, fs);
+        this.gp_input.onchange = () => { this.engine.SetGearCount(this.gp_input.valueAsNumber); };
+        this.gpr_input.onchange = () => { this.engine.SetGearReliability(this.gpr_input.valueAsNumber); };
         this.ds_input.onchange = () => { this.engine.SetUseExtendedDriveshaft(this.ds_input.checked); };
     }
     InitStatDisplay() {
@@ -1781,7 +2040,7 @@ class Engine_HTML extends Display {
             if (this.cool_count.valueAsNumber > this.e_cool.valueAsNumber) {
                 this.cool_count.valueAsNumber = this.e_cool.valueAsNumber;
             }
-            this.cool_count.oninput = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
+            this.cool_count.onchange = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
             this.cool_cell.appendChild(this.cool_count);
             this.cool_cell.appendChild(txtSpan2);
         }
@@ -1846,32 +2105,25 @@ class Engine_HTML extends Display {
         this.InitCoolingSelect();
         if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {
             this.mount_select.selectedIndex = this.engine.GetMountIndex();
-            Blink(this.mount_select.parentElement);
         }
         if (this.pushpull_input.checked != this.engine.GetUsePushPull()) {
             this.pushpull_input.checked = this.engine.GetUsePushPull();
-            Blink(this.pushpull_input.parentElement);
         }
         if (this.torque_input.checked != this.engine.GetTorqueToStruct()) {
             this.torque_input.checked = this.engine.GetTorqueToStruct();
-            Blink(this.torque_input.parentElement);
         }
         if (this.torque_input.checked != this.engine.GetTorqueToStruct()) {
             this.torque_input.checked = this.engine.GetTorqueToStruct();
-            Blink(this.torque_input.parentElement);
         }
         this.torque_input.disabled = !this.engine.CanTorqueToStruct();
         if (this.ds_input.checked != this.engine.GetUseExtendedDriveshaft()) {
             this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
-            Blink(this.ds_input.parentElement);
         }
         if (this.gp_input.valueAsNumber != this.engine.GetGearCount()) {
             this.gp_input.valueAsNumber = this.engine.GetGearCount();
-            Blink(this.gp_input.parentElement);
         }
         if (this.gpr_input.valueAsNumber != this.engine.GetGearReliability()) {
             this.gpr_input.valueAsNumber = this.engine.GetGearReliability();
-            Blink(this.gpr_input.parentElement);
         }
         if (e_stats.pulsejet) {
             this.mount_select.disabled = true;
@@ -2713,7 +2965,7 @@ class Frames_HTML extends Display {
             int_input.disabled = true;
         int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
         var lb_input = document.createElement("INPUT");
-        CreateCheckbox("Lifing Botdy", lb_input, opt_span, false);
+        CreateCheckbox("Lifting Body", lb_input, opt_span, false);
         lb_input.checked = sec.lifting_body;
         lb_input.disabled = !this.frames.PossibleMonocoque(i);
         lb_input.onchange = () => { this.frames.SetLiftingBody(i, lb_input.checked); };
@@ -2934,9 +3186,27 @@ class Wings extends Part {
     GetTandem() {
         return this.stagger_list[this.wing_stagger].wing_count == 2;
     }
+    GetMonoplane() {
+        return this.wing_list.length == 1;
+    }
+    GetStaggered() {
+        return this.stagger_list[this.wing_stagger].stats.liftbleed != 0;
+    }
     SetFullWing(idx, w) {
         if (this.wing_list.length != idx)
             this.wing_list.splice(idx, 1);
+        if (w.area != w.area)
+            w.area = 3;
+        w.area = Math.floor(w.area);
+        if (w.span != w.span)
+            w.span = 1;
+        w.span = Math.floor(w.span);
+        if (w.dihedral != w.dihedral)
+            w.dihedral = 0;
+        w.dihedral = Math.floor(w.dihedral);
+        if (w.anhedral != w.anhedral)
+            w.anhedral = 0;
+        w.anhedral = Math.floor(w.anhedral);
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 3);
             w.span = Math.max(w.span, 1);
@@ -2956,6 +3226,18 @@ class Wings extends Part {
     SetMiniWing(idx, w) {
         if (this.mini_wing_list.length != idx)
             this.mini_wing_list.splice(idx, 1);
+        if (w.area != w.area)
+            w.area = 2;
+        w.area = Math.floor(w.area);
+        if (w.span != w.span)
+            w.span = 1;
+        w.span = Math.floor(w.span);
+        if (w.dihedral != w.dihedral)
+            w.dihedral = 0;
+        w.dihedral = Math.floor(w.dihedral);
+        if (w.anhedral != w.anhedral)
+            w.anhedral = 0;
+        w.anhedral = Math.floor(w.anhedral);
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 1);
             w.area = Math.min(w.area, 2);
@@ -3000,6 +3282,16 @@ class Wings extends Part {
             longest_span = Math.max(longest_span, wspan);
         }
         return longest_span;
+    }
+    GetArea() {
+        var area = 0;
+        for (let w of this.wing_list) {
+            area += w.area;
+        }
+        for (let w of this.mini_wing_list) {
+            area += w.area;
+        }
+        return area;
     }
     PartStats() {
         var stats = new Stats();
@@ -3091,6 +3383,8 @@ class Wings_HTML extends Display {
     constructor(w) {
         super();
         this.wings = w;
+        this.fw_list = [];
+        this.mw_list = [];
         this.stagger = document.getElementById("wing_stagger");
         this.closed = document.getElementById("wing_closed");
         this.swept = document.getElementById("wing_swept");
@@ -3160,20 +3454,30 @@ class Wings_HTML extends Display {
         this.closed.checked = this.wings.GetClosed();
         this.closed.disabled = !this.wings.CanClosed();
         this.swept.checked = this.wings.GetSwept();
-        while (this.full_cell.children.length > 0)
-            this.full_cell.removeChild(this.full_cell.children[0]);
-        while (this.mini_cell.children.length > 0)
-            this.mini_cell.removeChild(this.mini_cell.children[0]);
+        if (this.fw_add)
+            this.full_cell.removeChild(this.fw_add);
+        if (this.mw_add)
+            this.mini_cell.removeChild(this.mw_add);
         var wl = this.wings.GetWingList();
         for (let i = 0; i < wl.length; i++) {
-            this.AddFullWing(this.full_cell, i, wl[i]);
+            if (this.fw_list.length == i)
+                this.AddFullWing();
+            this.UpdateFullWing(this.fw_list[i], i, wl[i]);
+        }
+        while (this.fw_list.length > wl.length) {
+            this.PopFullWing();
         }
         var mwl = this.wings.GetMiniWingList();
         for (let i = 0; i < mwl.length; i++) {
-            this.AddMiniWing(this.mini_cell, i, mwl[i]);
+            if (this.mw_list.length == i)
+                this.AddMiniWing();
+            this.UpdateMiniWing(this.mw_list[i], i, mwl[i]);
         }
-        this.AddAddFullWing(this.full_cell, wl.length);
-        this.AddAddMiniWing(this.mini_cell, mwl.length);
+        while (this.mw_list.length > mwl.length) {
+            this.PopMiniWing();
+        }
+        this.CreateFWAdd(wl.length);
+        this.CreateMWAdd(mwl.length);
         var stats = this.wings.PartStats();
         BlinkIfChanged(this.d_area, stats.wingarea.toString());
         BlinkIfChanged(this.d_mass, stats.mass.toString());
@@ -3191,153 +3495,183 @@ class Wings_HTML extends Display {
         else
             BlinkIfChanged(this.d_flam, "No");
     }
-    AddFullWing(cell, idx, wing) {
-        var span = document.createElement("SPAN");
-        var deck = document.createElement("SELECT");
-        span.appendChild(deck);
-        CreateSpace(span);
+    AddFullWing() {
+        var wing = {
+            span: document.createElement("SPAN"),
+            deck: document.createElement("SELECT"),
+            skin: document.createElement("SELECT"),
+            area: document.createElement("INPUT"),
+            wspan: document.createElement("INPUT"),
+            dihedral: document.createElement("INPUT"),
+            anhedral: document.createElement("INPUT"),
+            br: document.createElement("BR")
+        };
+        wing.span.appendChild(wing.deck);
+        CreateSpace(wing.span);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
         none_opt.textContent = "None";
-        deck.append(none_opt);
+        wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION");
             opt.textContent = d.name;
+            wing.deck.append(opt);
+        }
+        wing.span.appendChild(wing.skin);
+        CreateSpace(wing.span);
+        var slist = this.wings.GetSkinList();
+        for (let s of this.wings.GetSkinList()) {
+            let opt = document.createElement("OPTION");
+            opt.textContent = s.name;
+            wing.skin.append(opt);
+        }
+        CreateInput(" Area ", wing.area, wing.span, false);
+        wing.area.min = "3";
+        CreateInput(" Span ", wing.wspan, wing.span, false);
+        wing.wspan.min = "1";
+        CreateInput(" Dihedral ", wing.dihedral, wing.span, false);
+        wing.dihedral.min = "0";
+        CreateInput(" Anhedral ", wing.anhedral, wing.span, false);
+        wing.anhedral.min = "0";
+        this.full_cell.appendChild(wing.span);
+        this.full_cell.appendChild(wing.br);
+        this.fw_list.push(wing);
+    }
+    PopFullWing() {
+        var wing = this.fw_list.pop();
+        this.full_cell.removeChild(wing.span);
+        this.full_cell.removeChild(wing.br);
+    }
+    UpdateFullWing(ht, idx, wing) {
+        for (let i = 0; i < ht.deck.options.length; i++) {
+            let opt = ht.deck.options[i];
             if (wing.deck != i && !this.wings.CanAddFullWing(i) && !this.wings.CanMoveFullWing(idx, i)) {
                 opt.disabled = true;
             }
-            deck.append(opt);
         }
-        deck.oninput = () => {
+        ht.deck.oninput = () => {
             let w = Object.assign({}, wing);
-            w.deck = deck.selectedIndex - 1;
+            w.deck = ht.deck.selectedIndex - 1;
             this.wings.SetFullWing(idx, w);
         };
-        deck.selectedIndex = wing.deck + 1;
-        var skin = document.createElement("SELECT");
-        span.appendChild(skin);
-        CreateSpace(span);
-        var slist = this.wings.GetSkinList();
-        for (let s of this.wings.GetSkinList()) {
-            let opt = document.createElement("OPTION");
-            opt.textContent = s.name;
-            skin.append(opt);
-        }
-        skin.oninput = () => {
+        ht.deck.selectedIndex = wing.deck + 1;
+        ht.skin.oninput = () => {
             let w = Object.assign({}, wing);
-            w.surface = skin.selectedIndex;
+            w.surface = ht.skin.selectedIndex;
             this.wings.SetFullWing(idx, w);
         };
-        skin.selectedIndex = wing.surface;
-        var area = document.createElement("INPUT");
-        CreateInput(" Area ", area, span, false);
-        area.oninput = () => {
+        ht.skin.selectedIndex = wing.surface;
+        ht.area.onchange = () => {
             let w = Object.assign({}, wing);
-            w.area = area.valueAsNumber;
+            w.area = ht.area.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
-        area.min = "3";
-        area.valueAsNumber = wing.area;
-        var wspan = document.createElement("INPUT");
-        CreateInput(" Span ", wspan, span, false);
-        wspan.oninput = () => {
+        ht.area.valueAsNumber = wing.area;
+        ht.wspan.onchange = () => {
             let w = Object.assign({}, wing);
-            w.span = wspan.valueAsNumber;
+            w.span = ht.wspan.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
-        wspan.min = "1";
-        wspan.valueAsNumber = wing.span;
-        var dihedral = document.createElement("INPUT");
-        CreateInput(" Dihedral ", dihedral, span, false);
-        dihedral.oninput = () => {
+        ht.wspan.valueAsNumber = wing.span;
+        ht.dihedral.onchange = () => {
             let w = Object.assign({}, wing);
-            w.dihedral = dihedral.valueAsNumber;
+            w.dihedral = ht.dihedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
-        dihedral.min = "0";
-        dihedral.max = (wing.span - wing.anhedral - 1).toString();
-        dihedral.valueAsNumber = wing.dihedral;
-        var anhedral = document.createElement("INPUT");
-        CreateInput(" Anhedral ", anhedral, span, false);
-        anhedral.oninput = () => {
+        ht.dihedral.max = (wing.span - wing.anhedral - 1).toString();
+        ht.dihedral.valueAsNumber = wing.dihedral;
+        ht.anhedral.onchange = () => {
             let w = Object.assign({}, wing);
-            w.anhedral = anhedral.valueAsNumber;
+            w.anhedral = ht.anhedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
-        anhedral.min = "0";
-        anhedral.max = (wing.span - wing.dihedral - 1).toString();
-        anhedral.valueAsNumber = wing.anhedral;
-        cell.appendChild(span);
-        cell.appendChild(document.createElement("BR"));
+        ht.anhedral.max = (wing.span - wing.dihedral - 1).toString();
+        ht.anhedral.valueAsNumber = wing.anhedral;
     }
-    AddMiniWing(cell, idx, wing) {
-        var span = document.createElement("SPAN");
-        var deck = document.createElement("SELECT");
-        span.appendChild(deck);
+    AddMiniWing() {
+        var wing = {
+            span: document.createElement("SPAN"),
+            deck: document.createElement("SELECT"),
+            skin: document.createElement("SELECT"),
+            area: document.createElement("INPUT"),
+            wspan: document.createElement("INPUT"),
+            dihedral: undefined,
+            anhedral: undefined,
+            br: document.createElement("BR")
+        };
+        wing.span.appendChild(wing.deck);
+        CreateSpace(wing.span);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
         none_opt.textContent = "None";
-        deck.append(none_opt);
+        wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION");
             opt.textContent = d.name;
-            if (wing.deck != i && !this.wings.CanAddMiniWing(i) && !this.wings.CanMoveMiniWing(idx, i)) {
-                opt.disabled = true;
-            }
-            deck.append(opt);
+            wing.deck.append(opt);
         }
-        deck.oninput = () => {
-            let w = Object.assign({}, wing);
-            w.deck = deck.selectedIndex - 1;
-            this.wings.SetMiniWing(idx, w);
-        };
-        deck.selectedIndex = wing.deck + 1;
-        var skin = document.createElement("SELECT");
-        span.appendChild(skin);
+        wing.span.appendChild(wing.skin);
+        CreateSpace(wing.span);
         var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION");
             opt.textContent = s.name;
-            skin.append(opt);
+            wing.skin.append(opt);
         }
-        skin.oninput = () => {
-            let w = Object.assign({}, wing);
-            w.surface = skin.selectedIndex;
-            this.wings.SetMiniWing(idx, w);
-        };
-        skin.selectedIndex = wing.surface;
-        var area = document.createElement("INPUT");
-        CreateInput(" Area ", area, span, false);
-        area.oninput = () => {
-            let w = Object.assign({}, wing);
-            w.area = area.valueAsNumber;
-            this.wings.SetMiniWing(idx, w);
-        };
-        area.min = "1";
-        area.max = "2";
-        area.valueAsNumber = wing.area;
-        var wspan = document.createElement("INPUT");
-        CreateInput(" Span ", wspan, span, false);
-        wspan.oninput = () => {
-            let w = Object.assign({}, wing);
-            w.span = wspan.valueAsNumber;
-            this.wings.SetMiniWing(idx, w);
-        };
-        wspan.min = "1";
-        wspan.valueAsNumber = wing.span;
-        cell.appendChild(span);
-        cell.appendChild(document.createElement("BR"));
+        CreateInput(" Area ", wing.area, wing.span, false);
+        wing.area.min = "1";
+        wing.area.max = "2";
+        CreateInput(" Span ", wing.wspan, wing.span, false);
+        wing.wspan.min = "1";
+        this.mini_cell.appendChild(wing.span);
+        this.mini_cell.appendChild(wing.br);
+        this.mw_list.push(wing);
     }
-    AddAddFullWing(cell, idx) {
-        var span = document.createElement("SPAN");
-        var deck = document.createElement("SELECT");
-        span.appendChild(deck);
+    UpdateMiniWing(ht, idx, wing) {
+        for (let i = 0; i < ht.deck.options.length; i++) {
+            let opt = ht.deck.options[i];
+            if (wing.deck != i && !this.wings.CanAddMiniWing(i) && !this.wings.CanMoveMiniWing(idx, i)) {
+                opt.disabled = true;
+            }
+        }
+        ht.deck.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.deck = ht.deck.selectedIndex - 1;
+            this.wings.SetMiniWing(idx, w);
+        };
+        ht.deck.selectedIndex = wing.deck + 1;
+        ht.skin.oninput = () => {
+            let w = Object.assign({}, wing);
+            w.surface = ht.skin.selectedIndex;
+            this.wings.SetMiniWing(idx, w);
+        };
+        ht.skin.selectedIndex = wing.surface;
+        ht.area.onchange = () => {
+            let w = Object.assign({}, wing);
+            w.area = ht.area.valueAsNumber;
+            this.wings.SetMiniWing(idx, w);
+        };
+        ht.area.valueAsNumber = wing.area;
+        ht.wspan.onchange = () => {
+            let w = Object.assign({}, wing);
+            w.span = ht.wspan.valueAsNumber;
+            this.wings.SetMiniWing(idx, w);
+        };
+        ht.wspan.valueAsNumber = wing.span;
+    }
+    PopMiniWing() {
+        var wing = this.mw_list.pop();
+        this.mini_cell.removeChild(wing.span);
+        this.mini_cell.removeChild(wing.br);
+    }
+    CreateFWAdd(idx) {
+        this.fw_add = document.createElement("SELECT");
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
         none_opt.textContent = "None";
-        deck.append(none_opt);
+        this.fw_add.append(none_opt);
         var can = false;
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
@@ -3349,25 +3683,22 @@ class Wings_HTML extends Display {
             else {
                 can = true;
             }
-            deck.append(opt);
+            this.fw_add.append(opt);
         }
-        deck.oninput = () => {
-            let w = { surface: 0, area: 10, span: 5, dihedral: 0, anhedral: 0, deck: deck.selectedIndex - 1 };
+        this.fw_add.oninput = () => {
+            let w = { surface: 0, area: 10, span: 5, dihedral: 0, anhedral: 0, deck: this.fw_add.selectedIndex - 1 };
             this.wings.SetFullWing(idx, w);
         };
-        deck.selectedIndex = 0;
-        deck.disabled = !can;
-        cell.appendChild(span);
-        cell.appendChild(document.createElement("BR"));
+        this.fw_add.selectedIndex = 0;
+        this.fw_add.disabled = !can;
+        this.full_cell.appendChild(this.fw_add);
     }
-    AddAddMiniWing(cell, idx) {
-        var span = document.createElement("SPAN");
-        var deck = document.createElement("SELECT");
-        span.appendChild(deck);
+    CreateMWAdd(idx) {
+        this.mw_add = document.createElement("SELECT");
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
         none_opt.textContent = "None";
-        deck.append(none_opt);
+        this.mw_add.append(none_opt);
         var can = false;
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
@@ -3379,16 +3710,15 @@ class Wings_HTML extends Display {
             else {
                 can = true;
             }
-            deck.append(opt);
+            this.mw_add.append(opt);
         }
-        deck.oninput = () => {
-            let w = { surface: 0, area: 2, span: 2, dihedral: 0, anhedral: 0, deck: deck.selectedIndex - 1 };
+        this.mw_add.oninput = () => {
+            let w = { surface: 0, area: 2, span: 2, dihedral: 0, anhedral: 0, deck: this.mw_add.selectedIndex - 1 };
             this.wings.SetMiniWing(idx, w);
         };
-        deck.selectedIndex = 0;
-        deck.disabled = !can;
-        cell.appendChild(span);
-        cell.appendChild(document.createElement("BR"));
+        this.mw_add.selectedIndex = 0;
+        this.mw_add.disabled = !can;
+        this.mini_cell.appendChild(this.mw_add);
     }
 }
 class Stabilizers extends Part {
@@ -3510,6 +3840,9 @@ class Stabilizers extends Part {
         return this.hstab_count;
     }
     SetHStabCount(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         this.hstab_count = num;
         if (this.hstab_list[this.hstab_sel].increment != 0) {
             while ((this.hstab_count % this.hstab_list[this.hstab_sel].increment) != 0) {
@@ -3528,6 +3861,9 @@ class Stabilizers extends Part {
         return this.vstab_count;
     }
     SetVStabCount(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
         this.vstab_count = num;
         if (this.vstab_list[this.vstab_sel].increment != 0) {
             while ((this.vstab_count % this.vstab_list[this.vstab_sel].increment) != 0) {
@@ -3612,7 +3948,7 @@ class Stabilizers_HTML extends Display {
         CreateInput(" Stabilizers", this.h_count, hcell);
         this.h_count.min = "0";
         this.h_count.max = "20";
-        this.h_count.oninput = () => { this.stab.SetHStabCount(this.h_count.valueAsNumber); };
+        this.h_count.onchange = () => { this.stab.SetHStabCount(this.h_count.valueAsNumber); };
         this.h_type.onchange = () => { this.stab.SetHStabType(this.h_type.selectedIndex); };
         for (let elem of s.GetHStabList()) {
             let opt = document.createElement("OPTION");
@@ -3626,7 +3962,7 @@ class Stabilizers_HTML extends Display {
         CreateInput(" Stabilizers", this.v_count, vcell);
         this.v_count.min = "0";
         this.v_count.max = "20";
-        this.v_count.oninput = () => { this.stab.SetVStabCount(this.v_count.valueAsNumber); };
+        this.v_count.onchange = () => { this.stab.SetVStabCount(this.v_count.valueAsNumber); };
         this.v_type.onchange = () => { this.stab.SetVStabType(this.v_type.selectedIndex); };
         for (let elem of s.GetVStabList()) {
             let opt = document.createElement("OPTION");
@@ -3871,17 +4207,19 @@ class ControlSurfaces_HTML extends Display {
             this.slats_select.add(opt);
         }
         this.slats_select.onchange = () => { this.cs.SetSlats(this.slats_select.selectedIndex); };
-        CreateSelect("Ailerons", this.aileron_select, cs_cell);
-        CreateSelect("Rudders", this.rudder_select, cs_cell);
-        CreateSelect("Elevators", this.elevator_select, cs_cell);
-        CreateSelect("Flaps", this.flaps_select, cs_cell);
-        CreateSelect("Slats", this.slats_select, cs_cell);
+        var fs = CreateFlexSection(cs_cell);
+        FlexSelect("Ailerons", this.aileron_select, fs);
+        FlexSelect("Rudders", this.rudder_select, fs);
+        FlexSelect("Elevators", this.elevator_select, fs);
+        FlexSelect("Flaps", this.flaps_select, fs);
+        FlexSelect("Slats", this.slats_select, fs);
         var drag_cell = row.insertCell();
+        var fs2 = CreateFlexSection(drag_cell);
         this.drag_chbx = [];
         var dlist = cs.GetDragList();
         for (let i = 0; i < dlist.length; i++) {
             let cbx = document.createElement("INPUT");
-            CreateCheckbox(dlist[i].name, cbx, drag_cell, true);
+            FlexCheckbox(dlist[i].name, cbx, fs2);
             cbx.onchange = () => { this.cs.SetDrag(i, cbx.checked); };
             this.drag_chbx.push(cbx);
         }
@@ -3958,10 +4296,33 @@ class Reinforcement extends Part {
         this.is_monoplane = false;
         this.acft_structure = 0;
     }
+    toJSON() {
+        return {
+            ext_wood_count: this.ext_wood_count,
+            ext_steel_count: this.ext_steel_count,
+            cant_count: this.cant_count,
+            wires: this.wires,
+        };
+    }
+    fromJSON(js) {
+        this.ext_wood_count = js["ext_wood_count"];
+        this.ext_steel_count = js["ext_steel_count"];
+        this.cant_count = js["cant_count"];
+        this.wires = js["wires"];
+    }
+    GetExternalList() {
+        return this.ext_list;
+    }
+    GetCantileverList() {
+        return this.cant_list;
+    }
     GetExternalWoodCount() {
         return this.ext_wood_count;
     }
     SetExternalWoodCount(idx, count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
         this.ext_wood_count[idx] = count;
         this.CalculateStats();
     }
@@ -3969,19 +4330,31 @@ class Reinforcement extends Part {
         return this.ext_steel_count;
     }
     SetExternalSteelCount(idx, count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
         this.ext_steel_count[idx] = count;
         this.CalculateStats();
     }
     GetCantileverCount() {
         return this.cant_count;
     }
+    GetIsCantilever() {
+        var count = 0;
+        for (let c of this.cant_count)
+            count += c;
+        return count > 0;
+    }
     SetCantileverCount(idx, count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
         this.ImplSCC(idx, count);
         this.CalculateStats();
     }
     ImplSCC(idx, count) {
         var diff = count - this.cant_count[idx];
-        if (this.cant_list[idx].limited && diff > 0) {
+        if (this.cant_list[idx].limited && this.cant_count[idx] > 0) {
             var total_structure = this.TotalStructure();
             for (let i = 0; i < this.cant_list.length; i++) {
                 if (this.cant_list[i].limited) {
@@ -3991,6 +4364,7 @@ class Reinforcement extends Part {
             diff = Math.min(diff, Math.floor(total_structure / (5 * this.cant_list[idx].stats.mass)));
         }
         this.cant_count[idx] += diff;
+        return diff != 0;
     }
     GetWires() {
         return this.wires;
@@ -4009,11 +4383,15 @@ class Reinforcement extends Part {
         this.is_monoplane = is;
     }
     SetAcftStructure(struct) {
-        if (struct < this.acft_structure) {
-            for (let i = this.cant_list.length - 1; i >= 0; i--)
-                this.ImplSCC(i, this.cant_count[i]);
-        }
+        var oldstruct = this.acft_structure;
         this.acft_structure = struct;
+        var recalc = false;
+        if (oldstruct > this.acft_structure) {
+            for (let i = this.cant_list.length - 1; i >= 0; i--)
+                recalc = recalc || this.ImplSCC(i, this.cant_count[i]);
+        }
+        if (recalc)
+            this.CalculateStats();
     }
     TotalStructure() {
         var struct_count = 0;
@@ -4028,7 +4406,7 @@ class Reinforcement extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        var tension_multiple = 1;
+        var tension_multiple = 1.0;
         if (this.is_monoplane)
             tension_multiple = 0.6;
         else if (this.is_tandem)
@@ -4040,27 +4418,31 @@ class Reinforcement extends Part {
         //Wood Struts
         for (let i = 0; i < this.ext_list.length; i++) {
             strut_count += this.ext_wood_count[i];
-            let ts = this.ext_list[i].stats;
-            ts = ts.Multiply(this.ext_wood_count[i]);
-            stats.Add(ts);
-            if (this.ext_list[i].config)
-                tension += tension_multiple * this.ext_list[i].tension * this.ext_wood_count[i];
-            else
-                tension += this.ext_list[i].tension * this.ext_wood_count[i];
+            if (this.ext_wood_count[i] > 0) {
+                let ts = this.ext_list[i].stats;
+                ts = ts.Multiply(this.ext_wood_count[i]);
+                stats = stats.Add(ts);
+                if (this.ext_list[i].config)
+                    tension += tension_multiple * this.ext_list[i].tension * this.ext_wood_count[i];
+                else
+                    tension += this.ext_list[i].tension * this.ext_wood_count[i];
+            }
         }
         //Steel Struts
         for (let i = 0; i < this.ext_list.length; i++) {
             strut_count += this.ext_steel_count[i];
-            let ts = this.ext_list[i].stats;
-            ts.structure *= 2;
-            ts.cost *= 2;
-            ts.maxstrain += 5;
-            ts = ts.Multiply(this.ext_steel_count[i]);
-            stats.Add(ts);
-            if (this.ext_list[i].config)
-                tension += tension_multiple * this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
-            else
-                tension += this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+            if (this.ext_steel_count[i] > 0) {
+                let ts = this.ext_list[i].stats.Clone();
+                ts.structure *= 2;
+                ts.cost *= 2;
+                ts.maxstrain += 5;
+                ts = ts.Multiply(this.ext_steel_count[i]);
+                stats = stats.Add(ts);
+                if (this.ext_list[i].config)
+                    tension += tension_multiple * this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+                else
+                    tension += this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+            }
         }
         if (this.wires) {
             stats.maxstrain += Math.floor(tension);
@@ -4068,11 +4450,12 @@ class Reinforcement extends Part {
         }
         var use_cant = false;
         for (let i = 0; i < this.cant_list.length; i++) {
-            if (this.cant_count[i] > 0)
+            if (this.cant_count[i] > 0) {
                 use_cant = true;
-            let ts = this.cant_list[i].stats;
-            ts = ts.Multiply(this.cant_count[i]);
-            stats.Add(ts);
+                let ts = this.cant_list[i].stats;
+                ts = ts.Multiply(this.cant_count[i]);
+                stats = stats.Add(ts);
+            }
         }
         if (use_cant)
             stats.cost += 5;
@@ -4083,7 +4466,1079 @@ class Reinforcement_HTML extends Display {
     constructor(rf) {
         super();
         this.rf = rf;
+        this.ext_wood_inp = [];
+        this.ext_steel_inp = [];
+        this.cant_inp = [];
+        var tbl = document.getElementById("tbl_reinforcements");
+        var row = tbl.insertRow();
+        this.InitExternal(row.insertCell());
+        this.InitInternal(row.insertCell());
+        this.InitStatDisplay(row.insertCell());
+    }
+    InitExternal(cell) {
+        var fs = CreateFlexSection(cell);
+        var div3 = document.createElement("DIV");
+        var div4 = document.createElement("DIV");
+        var div5 = document.createElement("DIV");
+        div3.classList.add("flex-container");
+        div4.classList.add("flex-container");
+        div5.classList.add("flex-container");
+        fs.div0.appendChild(div3);
+        fs.div0.appendChild(div4);
+        fs.div0.appendChild(div5);
+        var fs_wood = { div0: fs.div0, div1: fs.div2, div2: div3 };
+        var fs_steel = { div0: fs.div0, div1: div4, div2: div5 };
+        var lst = this.rf.GetExternalList();
+        for (let i = 0; i < lst.length; i++) {
+            let elem = lst[i];
+            let w_inp = document.createElement("INPUT");
+            let s_inp = document.createElement("INPUT");
+            FlexLabel(elem.name, fs.div1);
+            FlexInput("Wood", w_inp, fs_wood);
+            FlexInput("Steel", s_inp, fs_steel);
+            w_inp.min = "0";
+            s_inp.min = "0";
+            w_inp.onchange = () => { this.rf.SetExternalWoodCount(i, w_inp.valueAsNumber); };
+            s_inp.onchange = () => { this.rf.SetExternalSteelCount(i, s_inp.valueAsNumber); };
+            this.ext_wood_inp.push(w_inp);
+            this.ext_steel_inp.push(s_inp);
+        }
+        this.wires = document.createElement("INPUT");
+        FlexCheckbox("Wires", this.wires, fs);
+        this.wires.onchange = () => { this.rf.SetWires(this.wires.checked); };
+        FlexLabel("", div3);
+        FlexLabel("", div4);
+        FlexLabel("", div5);
+    }
+    InitInternal(cell) {
+        var fs = CreateFlexSection(cell);
+        var lst = this.rf.GetCantileverList();
+        for (let i = 0; i < lst.length; i++) {
+            let elem = lst[i];
+            let inp = document.createElement("INPUT");
+            FlexInput(elem.name, inp, fs);
+            inp.min = "0";
+            inp.onchange = () => { this.rf.SetCantileverCount(i, inp.valueAsNumber); };
+            this.cant_inp.push(inp);
+        }
+    }
+    InitStatDisplay(stat_cell) {
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Cost");
+        var c1_row = tbl_stat.insertRow();
+        this.d_drag = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_cost = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Structure");
+        CreateTH(h2_row, "Max Strain");
+        CreateTH(h2_row, "");
+        var c2_row = tbl_stat.insertRow();
+        this.d_strc = c2_row.insertCell();
+        this.d_maxs = c2_row.insertCell();
+        this.d_none = c2_row.insertCell();
     }
     UpdateDisplay() {
+        var w_count = this.rf.GetExternalWoodCount();
+        for (let i = 0; i < w_count.length; i++) {
+            this.ext_wood_inp[i].valueAsNumber = w_count[i];
+        }
+        var s_count = this.rf.GetExternalSteelCount();
+        for (let i = 0; i < s_count.length; i++) {
+            this.ext_steel_inp[i].valueAsNumber = s_count[i];
+        }
+        var c_count = this.rf.GetCantileverCount();
+        for (let i = 0; i < c_count.length; i++) {
+            this.cant_inp[i].valueAsNumber = c_count[i];
+        }
+        var stats = this.rf.PartStats();
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_strc, stats.structure.toString());
+        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
+    }
+}
+class Fuel extends Part {
+    constructor(js) {
+        super();
+        this.tank_stats = [];
+        this.tank_count = [];
+        for (let elem of js["tanks"]) {
+            this.tank_stats.push({
+                name: elem["name"], stats: new Stats(elem),
+                internal: elem["internal"], cantilever: elem["cantilever"]
+            });
+            this.tank_count.push(0);
+        }
+        this.self_sealing = false;
+        this.is_cantilever = false;
+        this.wing_area = 0;
+    }
+    toJSON() {
+        return {
+            tank_count: this.tank_count,
+            self_sealing: this.self_sealing,
+            fire_extinguisher: this.fire_extinguisher,
+        };
+    }
+    fromJSON(js) {
+        this.tank_count = js["tank_count"];
+        this.self_sealing = js["self_sealing"];
+        this.fire_extinguisher = js["fire_extinguisher"];
+    }
+    GetTankList() {
+        return this.tank_stats;
+    }
+    GetTankEnabled() {
+        var lst = [];
+        for (let e of this.tank_stats) {
+            if (!this.is_cantilever && e.cantilever)
+                lst.push(false);
+            else
+                lst.push(true);
+        }
+        return lst;
+    }
+    GetTankCount() {
+        return this.tank_count;
+    }
+    SetTankCount(idx, count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
+        this.tank_count[idx] = count;
+        this.VerifyOK();
+        this.CalculateStats();
+    }
+    SetCantilever(is) {
+        if (this.is_cantilever && !is) {
+            this.is_cantilever = is;
+            if (this.VerifyOK())
+                this.CalculateStats();
+        }
+        this.is_cantilever = is;
+    }
+    SetArea(num) {
+        if (this.wing_area > num) {
+            this.wing_area = num;
+            if (this.VerifyOK())
+                this.CalculateStats();
+        }
+        this.wing_area = num;
+    }
+    VerifyOK() {
+        //Count cantilever dependent tanks.
+        var ccount = 0;
+        for (let i = 0; i < this.tank_count.length; i++) {
+            if (this.tank_stats[i].cantilever)
+                ccount += this.tank_count[i];
+        }
+        //How many can you have?
+        var allowed = Math.floor(this.wing_area / 10);
+        if (!this.is_cantilever)
+            allowed = 0;
+        //Do you have more than the allowed?
+        var diff = ccount - allowed;
+        var mod = diff > 0;
+        //Loop over and reduce by one until you don't.
+        while (diff > 0) {
+            for (let i = this.tank_count.length - 1; i >= 0; i--) {
+                if (this.tank_stats[i].cantilever) {
+                    this.tank_count[i]--;
+                    diff--;
+                    break;
+                }
+            }
+        }
+        return mod;
+    }
+    GetSealingEnabled() {
+        var internal_count = 0;
+        for (let i = 0; i < this.tank_count.length; i++) {
+            if (this.tank_stats[i].internal)
+                internal_count += this.tank_count[i];
+        }
+        return internal_count > 0;
+    }
+    GetSelfSealing() {
+        return this.self_sealing;
+    }
+    SetSelfSealing(is) {
+        this.self_sealing = is;
+        this.CalculateStats();
+    }
+    GetExtinguisher() {
+        return this.fire_extinguisher;
+    }
+    SetExtinguisher(is) {
+        this.fire_extinguisher = is;
+        this.CalculateStats();
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        var internal_count = 0;
+        for (let i = 0; i < this.tank_count.length; i++) {
+            let ts = this.tank_stats[i].stats.Clone();
+            ts = ts.Multiply(this.tank_count[i]);
+            stats = stats.Add(ts);
+            if (this.tank_stats[i].internal)
+                internal_count += this.tank_count[i];
+        }
+        stats.reqsections = Math.ceil(stats.reqsections);
+        if (this.self_sealing) {
+            stats.mass += internal_count;
+            stats.cost += 2 * internal_count;
+            stats.warnings.push({ source: "Self-Sealing Gas Tank", warning: "Fuel leak penalty will apply only to the next Fuel Check." });
+        }
+        if (this.fire_extinguisher) {
+            stats.mass += 2;
+            stats.cost += 3;
+            stats.warnings.push({ source: "Remote Fire Extinguisher", warning: "Spend to put out a fire." });
+        }
+        //Because it is load, it rounds up to the nearest 5 mass.
+        if ((stats.wetmass % 5) > 0)
+            stats.wetmass += 5 - (stats.wetmass % 5);
+        return stats;
+    }
+}
+class Munitions extends Part {
+    constructor() {
+        super();
+        this.bomb_count = 0;
+        this.rocket_count = 0;
+        this.internal_bay_1 = false;
+        this.internal_bay_2 = false;
+    }
+    toJSON() {
+        return {
+            bomb_count: this.bomb_count,
+            rocket_count: this.rocket_count,
+            bay1: this.internal_bay_1,
+            bay2: this.internal_bay_2,
+        };
+    }
+    fromJSON(js) {
+        this.bomb_count = js["bomb_count"];
+        this.rocket_count = js["rocket_count"];
+        this.internal_bay_1 = js["bay1"];
+        this.internal_bay_2 = js["bay2"];
+    }
+    GetBombCount() {
+        return this.bomb_count;
+    }
+    SetBombCount(count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
+        this.bomb_count = count;
+        this.LimitMass(true);
+        this.CalculateStats();
+    }
+    GetRocketCount() {
+        return this.rocket_count;
+    }
+    SetRocketCount(count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
+        this.rocket_count = count;
+        this.LimitMass(false);
+        this.CalculateStats();
+    }
+    GetBay1() {
+        return this.internal_bay_1;
+    }
+    GetBay2() {
+        return this.internal_bay_2;
+    }
+    SetUseBays(bay1, bay2) {
+        this.internal_bay_1 = bay1;
+        this.internal_bay_2 = bay2;
+        if (!this.internal_bay_1 && this.internal_bay_2) {
+            this.internal_bay_1 = true;
+            this.internal_bay_2 = false;
+        }
+        this.CalculateStats();
+    }
+    LimitMass(bomb) {
+        var reduce = false;
+        while (this.bomb_count + this.rocket_count > this.acft_struct / 5) {
+            reduce = true;
+            if ((bomb && this.bomb_count > 0)
+                || (!bomb && this.rocket_count == 0)) {
+                this.bomb_count--;
+            }
+            else {
+                this.rocket_count--;
+            }
+        }
+        return reduce;
+    }
+    SetAcftStructure(num) {
+        this.acft_struct = num;
+        if (this.LimitMass(false)) {
+            this.CalculateStats();
+        }
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats.wetmass += this.bomb_count;
+        stats.wetmass += this.rocket_count;
+        var ext_bomb_count = this.bomb_count;
+        if (this.internal_bay_1) {
+            stats.reqsections++;
+            ext_bomb_count = Math.floor(ext_bomb_count / 2);
+            if (this.internal_bay_2) {
+                stats.reqsections++;
+                ext_bomb_count = 0;
+            }
+        }
+        var ext_mass = ext_bomb_count + this.rocket_count;
+        var rack_mass = Math.ceil(ext_mass / 5);
+        stats.mass += rack_mass;
+        stats.bomb_mass = ext_mass;
+        stats.reqsections = Math.ceil(stats.reqsections);
+        //Because it is load, it rounds up to the nearest 5 mass.
+        if ((stats.wetmass % 5) > 0)
+            stats.wetmass += 5 - (stats.wetmass % 5);
+        return stats;
+    }
+}
+class CargoAndPassengers extends Part {
+    constructor() {
+        super();
+        this.mass = 0;
+        this.pass = 0;
+    }
+    toJSON() {
+        return {
+            mass: this.mass,
+            pass: this.pass,
+        };
+    }
+    fromJSON(js) {
+        this.mass = js["mass"];
+        this.pass = js["pass"];
+    }
+    GetMass() {
+        return this.mass;
+    }
+    SetMass(count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
+        this.mass = count;
+        this.CalculateStats();
+    }
+    GetPassengers() {
+        return this.pass;
+    }
+    SetPassengers(count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
+        this.pass = count;
+        this.CalculateStats();
+    }
+    SetSeats(count) {
+        this.seats = count;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats.wetmass += Math.max(this.pass, this.seats);
+        //Can be placed in cargo space, if uncomfortably. Takes 3 mass.
+        if (this.pass > this.seats) {
+            stats.wetmass += 3 * (this.pass - this.seats);
+        }
+        else {
+            //Cargo can be placed in empty seats.
+            var emptyseat = this.seats - this.pass;
+            if (this.mass - emptyseat > 0)
+                stats.wetmass += this.mass - emptyseat;
+        }
+        //Because it is load, it rounds up to the nearest 5 mass.
+        if ((stats.wetmass % 5) > 0)
+            stats.wetmass += 5 - (stats.wetmass % 5);
+        return stats;
+    }
+}
+class Load_HTML extends Display {
+    constructor(fuel, boom, cargo) {
+        super();
+        this.fuel = fuel;
+        this.boom = boom;
+        this.cargo = cargo;
+        this.fuel_list = [];
+        var tbl = document.getElementById("tbl_load");
+        var row = tbl.insertRow();
+        this.InitFuel(row.insertCell());
+        this.InitMunitions(row.insertCell());
+        this.InitCargoAndPassengers(row.insertCell());
+        this.InitStats(row.insertCell());
+    }
+    InitFuel(cell) {
+        var lst = this.fuel.GetTankList();
+        var fs = CreateFlexSection(cell);
+        for (let i = 0; i < lst.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexInput(lst[i].name, inp, fs);
+            inp.onchange = () => { this.fuel.SetTankCount(i, inp.valueAsNumber); };
+            this.fuel_list.push(inp);
+        }
+        this.seal = document.createElement("INPUT");
+        FlexCheckbox("Self-Sealing Gas Tank", this.seal, fs);
+        this.seal.onchange = () => { this.fuel.SetSelfSealing(this.seal.checked); };
+        this.extinguish = document.createElement("INPUT");
+        FlexCheckbox("Remote Fire Extinguisher", this.extinguish, fs);
+        this.extinguish.onchange = () => { this.fuel.SetExtinguisher(this.extinguish.checked); };
+    }
+    InitMunitions(cell) {
+        var fs = CreateFlexSection(cell);
+        this.bombs = document.createElement("INPUT");
+        FlexInput("Bombs", this.bombs, fs);
+        this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
+        this.rockets = document.createElement("INPUT");
+        FlexInput("Rockets", this.rockets, fs);
+        this.rockets.onchange = () => { this.boom.SetRocketCount(this.rockets.valueAsNumber); };
+        this.bay1 = document.createElement("INPUT");
+        FlexCheckbox("Internal Bay 1", this.bay1, fs);
+        this.bay1.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
+        this.bay2 = document.createElement("INPUT");
+        FlexCheckbox("Internal Bay 2", this.bay2, fs);
+        this.bay2.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
+    }
+    InitCargoAndPassengers(cell) {
+        var fs = CreateFlexSection(cell);
+        this.carg = document.createElement("INPUT");
+        FlexInput("Cargo", this.carg, fs);
+        this.carg.onchange = () => { this.cargo.SetMass(this.carg.valueAsNumber); };
+        this.pass = document.createElement("INPUT");
+        FlexInput("Passengers", this.pass, fs);
+        this.pass.onchange = () => { this.cargo.SetPassengers(this.pass.valueAsNumber); };
+    }
+    InitStats(stat_cell) {
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Wet Mass");
+        var c1_row = tbl_stat.insertRow();
+        this.d_drag = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_wmas = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Required Sections");
+        CreateTH(h2_row, "Fuel");
+        CreateTH(h2_row, "Cost");
+        var c2_row = tbl_stat.insertRow();
+        this.d_rsec = c2_row.insertCell();
+        this.d_fuel = c2_row.insertCell();
+        this.d_cost = c2_row.insertCell();
+    }
+    UpdateDisplay() {
+        var fl = this.fuel.GetTankCount();
+        var fe = this.fuel.GetTankEnabled();
+        for (let i = 0; i < fl.length; i++) {
+            this.fuel_list[i].valueAsNumber = fl[i];
+            this.fuel_list[i].disabled = !fe[i];
+        }
+        this.seal.checked = this.fuel.GetSelfSealing();
+        this.seal.disabled = !this.fuel.GetSealingEnabled();
+        this.extinguish.checked = this.fuel.GetExtinguisher();
+        this.bombs.valueAsNumber = this.boom.GetBombCount();
+        this.rockets.valueAsNumber = this.boom.GetRocketCount();
+        this.bay1.checked = this.boom.GetBay1();
+        this.bay2.checked = this.boom.GetBay2();
+        if (this.boom.GetBombCount() > 0) {
+            this.bay1.disabled = false;
+            if (this.bay1.checked)
+                this.bay2.disabled = false;
+            else
+                this.bay2.disabled = true;
+        }
+        else {
+            this.bay1.disabled = true;
+            this.bay2.disabled = true;
+        }
+        this.carg.valueAsNumber = this.cargo.GetMass();
+        this.pass.valueAsNumber = this.cargo.GetPassengers();
+        var stats = new Stats();
+        stats = stats.Add(this.fuel.PartStats());
+        stats = stats.Add(this.boom.PartStats());
+        stats = stats.Add(this.cargo.PartStats());
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_wmas, stats.wetmass.toString());
+        BlinkIfChanged(this.d_rsec, stats.reqsections.toString());
+        BlinkIfChanged(this.d_fuel, stats.fuel.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+    }
+}
+class LandingGear extends Part {
+    constructor(js) {
+        super();
+        this.gear_list = [];
+        this.gear_sel = 0;
+        this.retract = false;
+        for (let elem of js["gear"]) {
+            this.gear_list.push({
+                name: elem["name"],
+                stats: new Stats(elem),
+                DpLMP: elem["DpLMP"],
+                SpLMP: elem["SpLMP"],
+                can_retract: elem["can_retract"]
+            });
+        }
+        this.extra_list = [];
+        for (let elem of js["extras"]) {
+            this.extra_list.push({
+                name: elem["name"],
+                stats: new Stats(elem),
+                MpLMP: elem["MpLMP"]
+            });
+        }
+        this.extra_sel = [...Array(this.extra_list.length).fill(false)];
+    }
+    toJSON() {
+        return {
+            gear_sel: this.gear_sel,
+            retract: this.retract,
+            extra_sel: this.extra_sel,
+        };
+    }
+    fromJSON(js) {
+        this.gear_sel = js["gear_sel"];
+        this.retract = js["retract"];
+        this.extra_sel = js["extra_sel"];
+    }
+    GetGearList() {
+        return this.gear_list;
+    }
+    GetGear() {
+        return this.gear_sel;
+    }
+    SetGear(num) {
+        this.gear_sel = num;
+        this.CalculateStats();
+    }
+    CanRetract() {
+        return this.gear_list[this.gear_sel].can_retract;
+    }
+    GetRetract() {
+        return this.retract;
+    }
+    SetRetract(is) {
+        this.retract = is && this.CanRetract();
+        this.CalculateStats();
+    }
+    GetExtraList() {
+        return this.extra_list;
+    }
+    GetExtraSelected() {
+        return this.extra_sel;
+    }
+    SetExtraSelected(idx, is) {
+        this.extra_sel[idx] = is;
+        this.CalculateStats();
+    }
+    SetLoadedMass(mass) {
+        this.loadedMP = Math.floor(mass / 5);
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats = stats.Add(this.gear_list[this.gear_sel].stats);
+        var pdrag = this.gear_list[this.gear_sel].DpLMP * this.loadedMP;
+        if (this.retract) {
+            stats.mass += Math.floor(pdrag / 2);
+            stats.cost += Math.floor(pdrag / 2);
+        }
+        else {
+            stats.drag += pdrag;
+        }
+        stats.structure += this.gear_list[this.gear_sel].SpLMP * this.loadedMP;
+        for (let i = 0; i < this.extra_list.length; i++) {
+            if (this.extra_sel[i]) {
+                stats = stats.Add(this.extra_list[i].stats);
+                stats.mass += this.extra_list[i].MpLMP * this.loadedMP;
+            }
+        }
+        return stats;
+    }
+}
+class LandingGear_HTML extends Display {
+    constructor(gear) {
+        super();
+        this.gear = gear;
+        var tbl = document.getElementById("tbl_gear");
+        var row = tbl.insertRow();
+        this.InitGear(row.insertCell());
+        this.InitExtras(row.insertCell());
+        this.InitStats(row.insertCell());
+    }
+    InitGear(cell) {
+        var lst = this.gear.GetGearList();
+        var fs = CreateFlexSection(cell);
+        this.sel = document.createElement("SELECT");
+        FlexSelect("Type", this.sel, fs);
+        for (let i = 0; i < lst.length; i++) {
+            let opt = document.createElement("OPTION");
+            opt.text = lst[i].name;
+            this.sel.add(opt);
+        }
+        this.sel.onchange = () => { this.gear.SetGear(this.sel.selectedIndex); };
+        this.retract = document.createElement("INPUT");
+        FlexCheckbox("Retractable", this.retract, fs);
+        this.retract.onchange = () => { this.gear.SetRetract(this.retract.checked); };
+    }
+    InitExtras(cell) {
+        this.extras = [];
+        var lst = this.gear.GetExtraList();
+        var fs = CreateFlexSection(cell);
+        for (let i = 0; i < lst.length; i++) {
+            let cbx = document.createElement("INPUT");
+            FlexCheckbox(lst[i].name, cbx, fs);
+            cbx.onchange = () => { this.gear.SetExtraSelected(i, cbx.checked); };
+            this.extras.push(cbx);
+        }
+    }
+    InitStats(stat_cell) {
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Cost");
+        var c1_row = tbl_stat.insertRow();
+        this.d_drag = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_cost = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Structure");
+        CreateTH(h2_row, "Crash Safety");
+        CreateTH(h2_row, "");
+        var c2_row = tbl_stat.insertRow();
+        this.d_strc = c2_row.insertCell();
+        this.d_crsh = c2_row.insertCell();
+        c2_row.insertCell();
+    }
+    UpdateDisplay() {
+        this.sel.selectedIndex = this.gear.GetGear();
+        this.retract.checked = this.gear.GetRetract();
+        this.retract.disabled = !this.gear.CanRetract();
+        var lst = this.gear.GetExtraSelected();
+        for (let i = 0; i < lst.length; i++) {
+            this.extras[i].checked = lst[i];
+        }
+        var stats = this.gear.PartStats();
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_strc, stats.structure.toString());
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+    }
+}
+class Accessories extends Part {
+    constructor(js) {
+        super();
+        this.armour_coverage = 0;
+        this.armour_AP = 0;
+        this.acft_power = 0;
+        this.electric_list = [];
+        for (let elem of js["electrical"]) {
+            this.electric_list.push({
+                name: elem["name"], stats: new Stats(elem),
+                cp10p: elem["cp10p"]
+            });
+        }
+        this.electrical_count = [...Array(this.electric_list.length).fill(0)];
+        this.radio_list = [];
+        this.radio_sel = 0;
+        for (let elem of js["radios"]) {
+            this.radio_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.info_list = [];
+        for (let elem of js["information"]) {
+            this.info_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.info_sel = [...Array(this.info_list.length).fill(false)];
+        this.visi_list = [];
+        for (let elem of js["visibility"]) {
+            this.visi_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.visi_sel = [...Array(this.visi_list.length).fill(false)];
+        this.clim_list = [];
+        for (let elem of js["climate"]) {
+            this.clim_list.push({ name: elem["name"], stats: new Stats(elem), req_radiator: elem["req_radiator"] });
+        }
+        this.clim_sel = [...Array(this.clim_list.length).fill(false)];
+        this.auto_list = [];
+        this.auto_sel = 0;
+        for (let elem of js["autopilots"]) {
+            this.auto_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.cont_list = [];
+        this.cont_sel = 0;
+        for (let elem of js["control"]) {
+            this.cont_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+    }
+    toJSON() {
+        return {
+            armour_coverage: this.armour_coverage,
+            armour_AP: this.armour_AP,
+            electrical_count: this.electrical_count,
+            radio_sel: this.radio_sel,
+            info_sel: this.info_sel,
+            visi_sel: this.visi_sel,
+            clim_sel: this.clim_sel,
+            auto_sel: this.auto_sel,
+            cont_sel: this.cont_sel,
+        };
+    }
+    fromJSON(js) {
+        this.armour_coverage = js["armour_coverage"];
+        this.armour_AP = js["armour_AP"];
+        this.electrical_count = js["electrical_count"];
+        this.radio_sel = js["radio_sel"];
+        this.info_sel = js["info_sel"];
+        this.visi_sel = js["visi_sel"];
+        this.clim_sel = js["clim_sel"];
+        this.auto_sel = js["auto_sel"];
+        this.cont_sel = js["cont_sel"];
+    }
+    GetArmourCoverage() {
+        return this.armour_coverage;
+    }
+    SetArmourCoverage(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        this.armour_coverage = num;
+        this.CalculateStats();
+    }
+    GetArmourAP() {
+        return this.armour_AP;
+    }
+    SetArmourAP(num) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        this.armour_AP = num;
+        this.CalculateStats();
+    }
+    GetElectricalList() {
+        return this.electric_list;
+    }
+    GetElectricalCount() {
+        return this.electrical_count;
+    }
+    SetElectricalCount(idx, count) {
+        if (count != count)
+            count = 0;
+        count = Math.floor(count);
+        count = Math.min(count, 5);
+        this.electrical_count[idx] = count;
+        this.CalculateStats();
+    }
+    GetRadioList() {
+        return this.radio_list;
+    }
+    GetRadioSel() {
+        return this.radio_sel;
+    }
+    SetRadioSel(num) {
+        this.radio_sel = num;
+        this.CalculateStats();
+    }
+    GetInfoList() {
+        return this.info_list;
+    }
+    GetInfoSel() {
+        return this.info_sel;
+    }
+    SetInfoSel(idx, use) {
+        this.info_sel[idx] = use;
+        this.CalculateStats();
+    }
+    GetVisibilityList() {
+        return this.visi_list;
+    }
+    GetVisibilitySel() {
+        return this.visi_sel;
+    }
+    SetVisibilitySel(idx, use) {
+        this.visi_sel[idx] = use;
+        this.CalculateStats();
+    }
+    GetClimateList() {
+        return this.clim_list;
+    }
+    GetClimateSel() {
+        return this.clim_sel;
+    }
+    GetClimateEnable() {
+        var can = [];
+        for (let c of this.clim_list) {
+            if (!this.acft_rad && c.req_radiator)
+                can.push(false);
+            else
+                can.push(true);
+        }
+        return can;
+    }
+    SetClimateSel(idx, use) {
+        this.clim_sel[idx] = use;
+        this.CalculateStats();
+    }
+    GetAutopilotList() {
+        return this.auto_list;
+    }
+    GetAutopilotSel() {
+        return this.auto_sel;
+    }
+    SetAutopilotSel(num) {
+        this.auto_sel = num;
+        this.CalculateStats();
+    }
+    GetControlList() {
+        return this.cont_list;
+    }
+    GetControlSel() {
+        return this.cont_sel;
+    }
+    SetControlSel(num) {
+        this.cont_sel = num;
+        this.CalculateStats();
+    }
+    SetAcftPower(pwr) {
+        this.acft_power = pwr;
+    }
+    SetAcftRadiator(have) {
+        this.acft_rad = have;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        //Armour
+        stats.mass += this.armour_coverage * this.armour_AP;
+        stats.cost += Math.floor(this.armour_coverage * this.armour_AP / 3);
+        stats.toughness += this.armour_coverage * this.armour_AP;
+        //Electrical
+        for (let i = 0; i < this.electrical_count.length; i++) {
+            let ts = this.electric_list[i].stats.Clone();
+            ts = ts.Multiply(this.electrical_count[i]);
+            stats = stats.Add(ts);
+            stats.charge += Math.floor(this.electrical_count[i] * this.electric_list[i].cp10p * this.acft_power / 10);
+        }
+        stats = stats.Add(this.radio_list[this.radio_sel].stats);
+        //Information
+        for (let i = 0; i < this.info_list.length; i++) {
+            if (this.info_sel[i])
+                stats = stats.Add(this.info_list[i].stats);
+        }
+        //Visibility
+        for (let i = 0; i < this.visi_list.length; i++) {
+            if (this.visi_sel[i])
+                stats = stats.Add(this.visi_list[i].stats);
+        }
+        //Climate
+        for (let i = 0; i < this.clim_list.length; i++) {
+            if (this.clim_sel[i] && (!this.clim_list[i].req_radiator || this.acft_rad))
+                stats = stats.Add(this.clim_list[i].stats);
+        }
+        //Control
+        stats = stats.Add(this.auto_list[this.auto_sel].stats);
+        stats = stats.Add(this.cont_list[this.cont_sel].stats);
+        return stats;
+    }
+}
+class Accessories_HTML extends Display {
+    constructor(acc) {
+        super();
+        this.acc = acc;
+        var tbl = document.getElementById("tbl_accessories");
+        var row = tbl.insertRow(1);
+        this.InitArmour(row.insertCell());
+        this.InitElectrical(row.insertCell());
+        this.InitInformation(row.insertCell());
+        this.InitStats(row.insertCell());
+        row = tbl.insertRow();
+        this.InitVisibility(row.insertCell());
+        this.InitClimate(row.insertCell());
+        this.InitControl(row.insertCell());
+    }
+    InitArmour(cell) {
+        var fs = CreateFlexSection(cell);
+        this.a_coverage = document.createElement("INPUT");
+        FlexInput("Coverage", this.a_coverage, fs);
+        this.a_coverage.onchange = () => { this.acc.SetArmourCoverage(this.a_coverage.valueAsNumber); };
+        this.a_AP = document.createElement("INPUT");
+        FlexInput("AP", this.a_AP, fs);
+        this.a_AP.onchange = () => { this.acc.SetArmourAP(this.a_AP.valueAsNumber); };
+    }
+    InitElectrical(cell) {
+        var fs = CreateFlexSection(cell);
+        this.radio = document.createElement("SELECT");
+        FlexSelect("Radio", this.radio, fs);
+        var rlist = this.acc.GetRadioList();
+        for (let i = 0; i < rlist.length; i++) {
+            let opt = document.createElement("OPTION");
+            opt.text = rlist[i].name;
+            this.radio.add(opt);
+        }
+        this.radio.onchange = () => { this.acc.SetRadioSel(this.radio.selectedIndex); };
+        this.elect = [];
+        var elist = this.acc.GetElectricalList();
+        for (let i = 0; i < elist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexInput(elist[i].name, inp, fs);
+            inp.onchange = () => { this.acc.SetElectricalCount(i, inp.valueAsNumber); };
+            this.elect.push(inp);
+        }
+    }
+    InitInformation(cell) {
+        var fs = CreateFlexSection(cell);
+        var ilist = this.acc.GetInfoList();
+        this.info = [];
+        for (let i = 0; i < ilist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexCheckbox(ilist[i].name, inp, fs);
+            inp.onchange = () => { this.acc.SetInfoSel(i, inp.checked); };
+            this.info.push(inp);
+        }
+    }
+    InitVisibility(cell) {
+        var fs = CreateFlexSection(cell);
+        var vlist = this.acc.GetVisibilityList();
+        this.visi = [];
+        for (let i = 0; i < vlist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexCheckbox(vlist[i].name, inp, fs);
+            inp.onchange = () => { this.acc.SetVisibilitySel(i, inp.checked); };
+            this.visi.push(inp);
+        }
+    }
+    InitClimate(cell) {
+        var fs = CreateFlexSection(cell);
+        var clist = this.acc.GetClimateList();
+        this.clim = [];
+        for (let i = 0; i < clist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexCheckbox(clist[i].name, inp, fs);
+            inp.onchange = () => { this.acc.SetClimateSel(i, inp.checked); };
+            this.clim.push(inp);
+        }
+    }
+    InitControl(cell) {
+        var fs = CreateFlexSection(cell);
+        this.auto = document.createElement("SELECT");
+        var alist = this.acc.GetAutopilotList();
+        FlexSelect("Autopilot", this.auto, fs);
+        for (let i = 0; i < alist.length; i++) {
+            let opt = document.createElement("OPTION");
+            opt.text = alist[i].name;
+            this.auto.add(opt);
+        }
+        this.auto.onchange = () => { this.acc.SetAutopilotSel(this.auto.selectedIndex); };
+        var clist = this.acc.GetControlList();
+        this.cont = document.createElement("SELECT");
+        FlexSelect("Control Aids", this.cont, fs);
+        for (let i = 0; i < clist.length; i++) {
+            let opt = document.createElement("OPTION");
+            opt.text = clist[i].name;
+            this.cont.add(opt);
+        }
+        this.cont.onchange = () => { this.acc.SetControlSel(this.cont.selectedIndex); };
+    }
+    InitStats(stat_cell) {
+        stat_cell.rowSpan = 3;
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Mass");
+        CreateTH(h1_row, "Cost");
+        var c1_row = tbl_stat.insertRow();
+        this.d_drag = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_cost = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Structure");
+        CreateTH(h2_row, "Charge");
+        CreateTH(h2_row, "Lift Bleed");
+        var c2_row = tbl_stat.insertRow();
+        this.d_strc = c2_row.insertCell();
+        this.d_chgh = c2_row.insertCell();
+        this.d_lift = c2_row.insertCell();
+        var h3_row = tbl_stat.insertRow();
+        CreateTH(h3_row, "Visibility");
+        CreateTH(h3_row, "Flight Stress");
+        CreateTH(h3_row, "");
+        var c3_row = tbl_stat.insertRow();
+        this.d_visi = c3_row.insertCell();
+        this.d_strs = c3_row.insertCell();
+        c3_row.insertCell();
+    }
+    UpdateDisplay() {
+        this.a_coverage.valueAsNumber = this.acc.GetArmourCoverage();
+        this.a_AP.valueAsNumber = this.acc.GetArmourAP();
+        this.radio.selectedIndex = this.acc.GetRadioSel();
+        var elist = this.acc.GetElectricalCount();
+        for (let i = 0; i < elist.length; i++) {
+            this.elect[i].valueAsNumber = elist[i];
+        }
+        var ilist = this.acc.GetInfoSel();
+        for (let i = 0; i < ilist.length; i++) {
+            this.info[i].checked = ilist[i];
+        }
+        var vlist = this.acc.GetVisibilitySel();
+        for (let i = 0; i < vlist.length; i++) {
+            this.visi[i].checked = vlist[i];
+        }
+        var clist = this.acc.GetClimateSel();
+        var cenab = this.acc.GetClimateEnable();
+        for (let i = 0; i < vlist.length; i++) {
+            this.clim[i].checked = clist[i];
+            this.clim[i].disabled = !cenab[i];
+        }
+        this.auto.selectedIndex = this.acc.GetAutopilotSel();
+        this.cont.selectedIndex = this.acc.GetControlSel();
+        var stats = this.acc.PartStats();
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_strc, stats.structure.toString());
+        BlinkIfChanged(this.d_chgh, stats.charge.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_visi, stats.visibility.toString());
+        BlinkIfChanged(this.d_strs, stats.flightstress.toString());
     }
 }

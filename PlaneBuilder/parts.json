@@ -139,6 +139,61 @@
                 "flightstress": 0,
                 "visibility": 0
             }
+        ],
+        "safety": [
+            {
+                "name": "Padding",
+                "crashsafety": 1,
+                "cost": 1
+            },
+            {
+                "name": "Harness",
+                "crashsafety": 2,
+                "escape": -1,
+                "cost": 1
+            },
+            {
+                "name": "Fast Release System",
+                "escape": 2,
+                "cost": 1
+            },
+            {
+                "name": "Roll Bar",
+                "mass": 2,
+                "crashsafety": 3
+            },
+            {
+                "name": "Flare Slot",
+                "cost": 1,
+                "warning": "Allows flares to be fired out of a closed cockpit without opening the cockpit."
+            }
+        ],
+        "gunsights": [
+            {
+                "name": "X1 Collimated Gunsight",
+                "visibility": -1,
+                "attack": 1,
+                "cost": 2
+            },
+            {
+                "name": "Telescopic Gunsight",
+                "visibility": -1,
+                "cost": 3,
+                "warning": "+2 to attack if you Drew a Bead"
+            },
+            {
+                "name": "Illuminated Reflex Sight",
+                "visibility": -1,
+                "attack": 2,
+                "cost": 6
+            },
+            {
+                "name": "Gyro Gunsight",
+                "visibility": -1,
+                "attack": 2,
+                "cost": 12,
+                "warning": "+2 to attack if you Drew a Bead"
+            }
         ]
     },
     "passengers": {},
@@ -146,7 +201,7 @@
         "mounts": [
             {
                 "name": "Tractor",
-                "description": "Normal.<br/>Forward-firing fixed weapons will need sync gears spinner mounts.<br/>Turrets cannot fire forward.",
+                "warning": "Forward-firing fixed weapons will need sync gears spinner mounts. Turrets cannot fire forward.",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": 0,
@@ -183,7 +238,7 @@
             },
             {
                 "name": "Center-Mounted Pusher",
-                "warning": "Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders,  or Boom Tail.  Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward. (Represents engines mounted in the center of the aircraft a la the DH2)",
+                "warning": "Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders, or Boom Tail. Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward. (Represents engines mounted in the center of the aircraft a la the DH2)",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -2,
@@ -561,7 +616,7 @@
                 "monocoque_structure": 0
             },
             {
-                "name": "Currugated Duralumin",
+                "name": "Corrugated Duralumin",
                 "drag": 2,
                 "mass": 2,
                 "toughness": 3,
@@ -679,7 +734,7 @@
                 "cost": 0.3
             },
             {
-                "name": "Courrugated Steel",
+                "name": "Corrugated Steel",
                 "flammable": false,
                 "strainfactor": 0.6,
                 "dragfactor": 1.0,
@@ -754,6 +809,12 @@
                 "hstab": true,
                 "pitchstab": 1,
                 "liftbleed": -1
+            },
+            {
+                "name": "Unstaggered",
+                "inline": false,
+                "wing_count": 20,
+                "hstab": true
             },
             {
                 "name": "Negative",
@@ -1013,6 +1074,7 @@
                 "mass": 2,
                 "structure": 10,
                 "maxstrain": 30,
+                "tension": 0,
                 "cost": 2,
                 "config": true
             },
@@ -1059,6 +1121,293 @@
                 "maxstrain": 15,
                 "cost": 8,
                 "limited": false
+            }
+        ]
+    },
+    "fuel": {
+        "tanks": [
+            {
+                "name": "Internal Fuselage Tank",
+                "mass": 1,
+                "wetmass": 5,
+                "fuel": 125,
+                "reqsections": 0.5,
+                "internal": true,
+                "cantilever": false
+            },
+            {
+                "name": "External Wing Tank",
+                "mass": 1,
+                "wetmass": 5,
+                "fuel": 125,
+                "drag": 3,
+                "internal": false,
+                "cantilever": false
+            },
+            {
+                "name": "Internal Wing Tank",
+                "mass": 1,
+                "wetmass": 5,
+                "fuel": 125,
+                "internal": true,
+                "cantilever": true
+            },
+            {
+                "name": "Microtank",
+                "mass": 1,
+                "wetmass": 1,
+                "fuel": 25,
+                "internal": true,
+                "cantilever": false
+            }
+        ],
+        "safety": [
+            {
+                "name": "Remote Fire Extinguisher",
+                "mass": 2,
+                "cost": 3,
+                "warning": "Spend to put out a fire."
+            },
+            {
+                "name": "Self-Sealing Gas Tank",
+                "mass": 1,
+                "cost": 2
+            }
+        ]
+    },
+    "landing_gear": {
+        "gear": [
+            {
+                "name": "Landing Gear",
+                "DpLMP": 1,
+                "SpLMP": 0,
+                "can_retract": true
+            },
+            {
+                "name": "Floats",
+                "DpLMP": 1.5,
+                "SpLMP": 0,
+                "can_retract": true
+            },
+            {
+                "name": "Hybrid Floats",
+                "DpLMP": 2,
+                "SpLMP": 0,
+                "can_retract": true
+            },
+            {
+                "name": "Boat Hull",
+                "mass": 5,
+                "DpLMP": 1,
+                "SpLMP": 1,
+                "can_retract": false,
+                "warning": "The engines must be in a pod, above a mid wing in nacelles, or mounted to a high or parasol wing in nacelles."
+            },
+            {
+                "name": "Landing Skid",
+                "DpLMP": 0,
+                "SpLMP": 0,
+                "can_retract": false,
+                "warning": "All landings are crash landings."
+            }
+        ],
+        "extras": [
+            {
+                "name": "Zepplin Hook",
+                "mass": 1,
+                "MpLMP": 0,
+                "warning": "Allows landing inside airships or large planes."
+            },
+            {
+                "name": "Carrier Hook",
+                "MpLMP": 0.5,
+                "warning": "Allows landing on carriers."
+            },
+            {
+                "name": "Underwing Skid",
+                "MpLMP": 0,
+                "drag": 3,
+                "crashsafety": 2
+            }
+        ]
+    },
+    "accessories": {
+        "electrical": [
+            {
+                "name": "Windmill",
+                "drag": 1,
+                "cost": 1,
+                "cp10p": 0,
+                "warning": "Generates 1 charge per 10 speed."
+            },
+            {
+                "name": "Alternator",
+                "mass": 1,
+                "charge": 1,
+                "cost": 2,
+                "cp10p": 1
+            },
+            {
+                "name": "Ram Air Scoop",
+                "charge": 1,
+                "cost": 3,
+                "cp10p": 0
+            },
+            {
+                "name": "Battery",
+                "mass": 1,
+                "cost": 2,
+                "cp10p": 0,
+                "warning": "Stores 5 charge"
+            }
+        ],
+        "radios": [
+            {
+                "name": "No Radio"
+            },
+            {
+                "name": "Intercom System",
+                "charge": -1,
+                "cost": -1
+            },
+            {
+                "name": "Radio Receiver",
+                "mass": 2,
+                "drag": 2,
+                "charge": -1,
+                "cost": 3
+            },
+            {
+                "name": "Radio Transmitter",
+                "mass": 3,
+                "drag": 3,
+                "charge": -2,
+                "cost": 3
+            },
+            {
+                "name": "Radio Transceiver",
+                "mass": 5,
+                "drag": 3,
+                "charge": -2,
+                "cost": 3
+            },
+            {
+                "name": "Whalebone Radio Receiver",
+                "charge": -1,
+                "cost": 5
+            },
+            {
+                "name": "Whalebone Radio Node",
+                "mass": 6,
+                "drag": 1,
+                "charge": -4,
+                "cost": 12
+            }
+        ],
+        "information": [
+            {
+                "name": "Reconnaissance Camera",
+                "cost": 2,
+                "warning": "Can take pictures downward. Capabilities scale with era."
+            },
+            {
+                "name": "Guncam",
+                "cost": 1,
+                "warning": "Confirms your kills for you."
+            }
+        ],
+        "visibility": [
+            {
+                "name": "Wing Cutouts",
+                "visibility": 1,
+                "liftbleed": 1
+            },
+            {
+                "name": "Hull Cutouts",
+                "visibility": 1,
+                "structure": -5
+            },
+            {
+                "name": "Searchlight",
+                "charge": -2,
+                "cost": 1
+            }
+        ],
+        "climate": [
+            {
+                "name": "Electric Heating",
+                "charge": -1,
+                "cost": 1,
+                "req_radiator": false
+            },
+            {
+                "name": "Radiator Loop",
+                "cost": 1,
+                "req_radiator": true
+            },
+            {
+                "name": "Basic Fan",
+                "charge": -1,
+                "req_radiator": false
+            },
+            {
+                "name": "Air Conditioning",
+                "charge": -2,
+                "cost": 4,
+                "req_radiator": false
+            }
+        ],
+        "autopilots": [
+            {
+                "name": "No Autopilot"
+            },
+            {
+                "name": "Gyroscopic",
+                "cost": 3,
+                "warning": "Gives +4 to Empty Seat rolls."
+            },
+            {
+                "name": "Altitude Holding",
+                "mass": 1,
+                "cost": 5,
+                "warning": "Allows the Empty Seat rule to be ignored."
+            },
+            {
+                "name": "Programmable",
+                "mass": 1,
+                "charge": -2,
+                "cost": 6,
+                "warning": "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings."
+            },
+            {
+                "name": "\"Rattegehirn\"",
+                "mass": 3,
+                "charge": -3,
+                "cost": 25,
+                "warning": "Fully automated. For robo-planes."
+            }
+        ],
+        "control": [
+            {
+                "name": "No Aids"
+            },
+            {
+                "name": "Control Rods",
+                "mass": 1,
+                "cost": 2,
+                "flightstress": -1
+            },
+            {
+                "name": "Hydralic-Assisted",
+                "mass": 3,
+                "cost": 5,
+                "flightstress": -3
+            },
+            {
+                "name": "Fly by Wire",
+                "mass": 3,
+                "cost": 10,
+                "flightstress": -9999
             }
         ]
     }
