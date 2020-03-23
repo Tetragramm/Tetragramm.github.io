@@ -45,8 +45,8 @@
 					<h3 class="page__h3">Cockpits
 						<span class="rules">(<u>Rules</u>)</span>
 						<br />
-						<span> Number of Cockpits: <input type="number" id="num_cockpits" min="1" max="20"
-								value="1" /></span>
+						<span> <label for="num_cockpits">Number of Cockpits:</label> <input type="number"
+								id="num_cockpits" min="1" max="20" value="1" /></span>
 					</h3>
 					<table style="width:100%" id="table_cockpit">
 						<tr>
@@ -87,11 +87,12 @@
 						<span class="rules">(<u>Upgrade Rules</u>)</span>
 						<span class="rules">(<u>Cooling Rules</u>)</span>
 						<br />
-						<span> Number of Engines: <input type="number" id="num_engines" min="0" max="20"
-								value="1" /></span>
-						<span> Number of Radiators: <input type="number" id="num_radiators" min="1" max="20"
-								value="0" /></span>
-						<span>Asymmetric Plane: <input type="checkbox" id="asymmetric" /></span>
+						<span> <label for="num_engines">Number of Engines:</label> <input type="number" id="num_engines"
+								min="0" max="20" value="1" /></span>
+						<span> <label for="num_radiators">Number of Radiators:</label> <input type="number"
+								id="num_radiators" min="1" max="20" value="0" /></span>
+						<span><label for="asymmetric">Asymmetric Plane:</label> <input type="checkbox"
+								id="asymmetric" /></span>
 					</h3>
 					<table style="width:100%" id="table_engine">
 						<tr>
@@ -115,8 +116,10 @@
 			<div class="Propeller">
 				<h3 class="page__h3">Propeller
 					<span class="rules">(<u>Rules</u>)</span> <br />
-					<span> Propeller Pitch: <select id="propeller_pitch"></select></span>
-					<span>Manually Variable Propeller: <input type="checkbox" id="propeller_variable" /></span>
+					<span> <label for="propeller_pitch">Propeller Pitch:</label> <select
+							id="propeller_pitch"></select></span>
+					<span><label for="propeller_variable">Manually Variable Propeller:</label> <input type="checkbox"
+							id="propeller_variable" /></span>
 				</h3>
 			</div>
 			<br />
@@ -137,9 +140,10 @@
 			<div class="Tail">
 				<h3 class="page__h3">Tail
 					<span class="rules">(<u>Rules</u>)<br />
-						<span> Tail Length: <select id="tail_type"></select></span>
-						<span> Farman Tail: <input type="checkbox" id="tail_farman" /></span>
-						<span> Boom Tail: <input type="checkbox" id="tail_boom" /></span>
+						<span> <label for="tail_type">Tail Length:</label> <select id="tail_type"></select></span>
+						<span> <label for="tail_farman">Farman Tail:</label> <input type="checkbox"
+								id="tail_farman" /></span>
+						<span> <label for="tail_boom">Boom Tail:</label> <input type="checkbox" id="tail_boom" /></span>
 				</h3>
 			</div>
 			<br />
@@ -147,9 +151,10 @@
 				<h3 class="page__h3">Wings
 					<span class="rules">(<u>Rules</u>)</span>
 					<br />
-					<span> Wing Stagger: <select id="wing_stagger"></select></span>
-					<span> Closed Wing: <input type="checkbox" id="wing_closed" /></span>
-					<span> Swept Wings: <input type="checkbox" id="wing_swept" /></span>
+					<span> <label for="wing_stagger">Wing Stagger:</label> <select id="wing_stagger"></select></span>
+					<span> <label for="wing_closed">Closed Wing:</label> <input type="checkbox"
+							id="wing_closed" /></span>
+					<span> <label for="wing_swept">Swept Wings:</label> <input type="checkbox" id="wing_swept" /></span>
 				</h3>
 				<table id="wing_table">
 					<tr>
@@ -248,6 +253,41 @@
 						<th>Climate</th>
 						<th>Control</th>
 					</tr>
+				</table>
+			</div>
+			<br />
+			<div class="Optimization">
+				<h3 class="page__h3">Optimizations
+					<span class="rules">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<span> <label for="num_opt">Number of Free Optimizations:</label> <input type="number" id="num_opt"
+						min="0" max="20" value="0" /></span><br />
+				<table id="tbl_optimization">
+					<tr>
+						<th>Negative</th>
+						<th>Effect</th>
+						<th>Positive</th>
+						<th>Optimization Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div class="Stats">
+				<h3 class="page__h3">Total Sum of Stats
+					<span class="rules">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<table id="tbl_stats">
+				</table>
+			</div>
+			<br />
+			<div class="Flight">
+				<h3 class="page__h3">Aircraft Derived Statistics
+					<span class="rules">(<u>Rules</u>)</span>
+					<br />
+				</h3>
+				<table id="tbl_derived">
 				</table>
 			</div>
 		</div>

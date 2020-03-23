@@ -1,3 +1,4 @@
+//TODO: Engine Cowlings
 //TODO: Engine as Generator
 //TODO: Weapons
 //TODO: Handle attack
@@ -98,6 +99,7 @@ function CreateTH(row: HTMLElement, content: string) {
     var th = document.createElement("TH") as HTMLTableHeaderCellElement;
     th.innerHTML = content;
     row.appendChild(th);
+    return th;
 }
 
 function CreateInput(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
@@ -450,7 +452,8 @@ class Stats {
         res.bomb_mass = this.bomb_mass * other;
         res.fuel = this.fuel * other;
         res.charge = this.charge * other;
-        res.warnings = this.warnings;
+        if (other != 0)
+            res.warnings = this.warnings;
         return res;
     }
 
@@ -546,6 +549,80 @@ class Aircraft_HTML extends Display {
     private load: Load_HTML;
     private gear: LandingGear_HTML;
     private accessories: Accessories_HTML;
+    private optimization: Optimization_HTML;
+
+    //Stats Display
+    private d_lift: HTMLTableCellElement;
+    private d_drag: HTMLTableCellElement;
+    private d_mass: HTMLTableCellElement;
+    private d_wmas: HTMLTableCellElement;
+    private d_bmas: HTMLTableCellElement;
+    private d_cost: HTMLTableCellElement;
+    private d_upkp: HTMLTableCellElement;
+    private d_cont: HTMLTableCellElement;
+    private d_pstb: HTMLTableCellElement;
+    private d_lstb: HTMLTableCellElement;
+    private d_powr: HTMLTableCellElement;
+    private d_fcom: HTMLTableCellElement;
+    private d_fuel: HTMLTableCellElement;
+    private d_pspd: HTMLTableCellElement;
+    private d_pbst: HTMLTableCellElement;
+    private d_wara: HTMLTableCellElement;
+    private d_mstr: HTMLTableCellElement;
+    private d_strc: HTMLTableCellElement;
+    private d_tugh: HTMLTableCellElement;
+    private d_chrg: HTMLTableCellElement;
+    private d_crsh: HTMLTableCellElement;
+
+    //Final Display
+    private name_inp: HTMLInputElement;
+    private cost_cell: HTMLTableCellElement;
+    private version_cell: HTMLTableCellElement;
+    private bomb_row1: HTMLTableRowElement;
+    private bomb_row2: HTMLTableRowElement;
+    private ts_empty: HTMLTableCellElement;
+    private ss_empty: HTMLTableCellElement;
+    private hand_empty: HTMLTableCellElement;
+    private boost_empty: HTMLTableCellElement;
+    private ts_half: HTMLTableCellElement;
+    private ss_half: HTMLTableCellElement;
+    private hand_half: HTMLTableCellElement;
+    private boost_half: HTMLTableCellElement;
+    private ts_full: HTMLTableCellElement;
+    private ss_full: HTMLTableCellElement;
+    private hand_full: HTMLTableCellElement;
+    private boost_full: HTMLTableCellElement;
+    private ts_halfwB: HTMLTableCellElement;
+    private ss_halfwB: HTMLTableCellElement;
+    private hand_halfwB: HTMLTableCellElement;
+    private boost_halfwB: HTMLTableCellElement;
+    private ts_fullwB: HTMLTableCellElement;
+    private ss_fullwB: HTMLTableCellElement;
+    private hand_fullwB: HTMLTableCellElement;
+    private boost_fullwB: HTMLTableCellElement;
+    private vital_components: HTMLTableCellElement;
+    private dropoff_cell: HTMLTableCellElement;
+    private stability_cell: HTMLTableCellElement;
+    private reliability_cell: HTMLTableCellElement;
+    private flightstress_cell: HTMLTableCellElement;
+    private overspeed_cell: HTMLTableCellElement;
+    private eloss_cell: HTMLTableCellElement;
+    private toughness_cell: HTMLTableCellElement;
+    private visibility_cell: HTMLTableCellElement;
+    private electric_cell: HTMLTableCellElement;
+    private turnbleed_cell: HTMLTableCellElement;
+    private mxstrain_cell: HTMLTableCellElement;
+    private attack_cell: HTMLTableCellElement;
+    private maxfuel_cell: HTMLTableCellElement;
+    private landing_cell: HTMLTableCellElement;
+    private escape_cell: HTMLTableCellElement;
+    private communications_cell: HTMLTableCellElement;
+    private cruiserange_cell: HTMLTableCellElement;
+    private maxalt_cell: HTMLTableCellElement;
+    private crashsafety_cell: HTMLTableCellElement;
+    private cruiserangewbomb_cell: HTMLTableCellElement;
+    private warning_cell: HTMLTableCellElement;
+
 
     constructor(js: JSON, aircraft: Aircraft) {
         super();
@@ -563,10 +640,287 @@ class Aircraft_HTML extends Display {
         this.load = new Load_HTML(aircraft.GetFuel(), aircraft.GetMunitions(), aircraft.GetCargoAndPassengers());
         this.gear = new LandingGear_HTML(aircraft.GetLandingGear());
         this.accessories = new Accessories_HTML(aircraft.GetAccessories());
+        this.optimization = new Optimization_HTML(aircraft.GetOptimization());
 
-        // this.engines.Initialize();
+        var tbl = document.getElementById("tbl_stats") as HTMLTableElement;
+        this.InitStats(tbl);
+
+        var tbl2 = document.getElementById("tbl_derived") as HTMLTableElement;
+        this.InitDerived(tbl2);
+
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
         this.UpdateDisplay();
+    }
+
+    private InitStats(tbl: HTMLTableElement) {
+        var row = tbl.insertRow();
+        CreateTH(row, "Lift Bleed");
+        CreateTH(row, "Drag");
+        CreateTH(row, "Mass");
+        CreateTH(row, "Wet Mass");
+        CreateTH(row, "Bomb Mass");
+        CreateTH(row, "Cost");
+        CreateTH(row, "Upkeep");
+        row = tbl.insertRow();
+        this.d_lift = row.insertCell();
+        this.d_drag = row.insertCell();
+        this.d_mass = row.insertCell();
+        this.d_wmas = row.insertCell();
+        this.d_bmas = row.insertCell();
+        this.d_cost = row.insertCell();
+        this.d_upkp = row.insertCell();
+        row = tbl.insertRow();
+        CreateTH(row, "Control");
+        CreateTH(row, "Pitch Stability");
+        CreateTH(row, "Lateral Stability");
+        CreateTH(row, "Wing Area");
+        CreateTH(row, "Max Strain");
+        CreateTH(row, "Structure");
+        CreateTH(row, "Toughness");
+        row = tbl.insertRow();
+        this.d_cont = row.insertCell();
+        this.d_pstb = row.insertCell();
+        this.d_lstb = row.insertCell();
+        this.d_wara = row.insertCell();
+        this.d_mstr = row.insertCell();
+        this.d_strc = row.insertCell();
+        this.d_tugh = row.insertCell();
+        row = tbl.insertRow();
+        CreateTH(row, "Power");
+        CreateTH(row, "Fuel Consumption");
+        CreateTH(row, "Fuel");
+        CreateTH(row, "Pitch Speed");
+        CreateTH(row, "Pitch Boost");
+        CreateTH(row, "Charge");
+        CreateTH(row, "Crash Safety");
+        row = tbl.insertRow();
+        this.d_powr = row.insertCell();
+        this.d_fcom = row.insertCell();
+        this.d_fuel = row.insertCell();
+        this.d_pspd = row.insertCell();
+        this.d_pbst = row.insertCell();
+        this.d_chrg = row.insertCell();
+        this.d_crsh = row.insertCell();
+    }
+
+    private InitDerived(tbl: HTMLTableElement) {
+        var row0 = tbl.insertRow();
+        var name_cell = row0.insertCell();
+        // Aircraft Name
+        name_cell.colSpan = 5;
+        this.name_inp = document.createElement("INPUT") as HTMLInputElement;
+        this.name_inp.defaultValue = "Aircraft Name";
+        this.name_inp.onchange = () => { this.acft.name = this.name_inp.value; };
+        name_cell.appendChild(this.name_inp);
+        // Aircraft Cost
+        this.cost_cell = row0.insertCell();
+        // Rules Version
+        CreateTH(row0, "Version #");
+        this.version_cell = row0.insertCell();
+
+        var row1 = tbl.insertRow();
+        CreateTH(row1, "Mass Variations");
+        CreateTH(row1, "Top Speed");
+        CreateTH(row1, "Stall Speed");
+        CreateTH(row1, "Handling");
+        CreateTH(row1, "Boost");
+        CreateTH(row1, "Vital Components").colSpan = 3;
+
+        var half = tbl.insertRow();
+        CreateTH(half, "Empty Mass");
+        this.ts_empty = half.insertCell();
+        this.ss_empty = half.insertCell();
+        this.hand_empty = half.insertCell();
+        this.boost_empty = half.insertCell();
+        this.vital_components = half.insertCell();
+        this.vital_components.rowSpan = 3;
+        this.vital_components.colSpan = 3;
+
+        var half = tbl.insertRow();
+        CreateTH(half, "Half Mass");
+        this.ts_half = half.insertCell();
+        this.ss_half = half.insertCell();
+        this.hand_half = half.insertCell();
+        this.boost_half = half.insertCell();
+
+        var full = tbl.insertRow();
+        CreateTH(full, "Full Mass");
+        this.ts_full = full.insertCell();
+        this.ss_full = full.insertCell();
+        this.hand_full = full.insertCell();
+        this.boost_full = full.insertCell();
+
+        this.bomb_row1 = tbl.insertRow();
+        CreateTH(this.bomb_row1, "Half Mass with Bombs");
+        this.ts_halfwB = this.bomb_row1.insertCell();
+        this.ss_halfwB = this.bomb_row1.insertCell();
+        this.hand_halfwB = this.bomb_row1.insertCell();
+        this.boost_halfwB = this.bomb_row1.insertCell();
+
+        this.bomb_row2 = tbl.insertRow();
+        CreateTH(this.bomb_row2, "Full Mass with Bombs");
+        this.ts_fullwB = this.bomb_row2.insertCell();
+        this.ss_fullwB = this.bomb_row2.insertCell();
+        this.hand_fullwB = this.bomb_row2.insertCell();
+        this.boost_fullwB = this.bomb_row2.insertCell();
+
+        var row7 = tbl.insertRow();
+        CreateTH(row7, "Propulsion").colSpan = 2;
+        CreateTH(row7, "Aerodynamics").colSpan = 2;
+        CreateTH(row7, "Survivability").colSpan = 2;
+        CreateTH(row7, "Propulsion").colSpan = 2;
+
+        var row8 = tbl.insertRow();
+        CreateTH(row8, "Dropoff");
+        this.dropoff_cell = row8.insertCell();
+        CreateTH(row8, "Stability");
+        this.stability_cell = row8.insertCell();
+        CreateTH(row8, "Reliability");
+        this.reliability_cell = row8.insertCell();
+        CreateTH(row8, "Flight Stress");
+        this.flightstress_cell = row8.insertCell();
+
+        var row9 = tbl.insertRow();
+        CreateTH(row9, "Overspeed");
+        this.overspeed_cell = row9.insertCell();
+        CreateTH(row9, "Energy Loss");
+        this.eloss_cell = row9.insertCell();
+        CreateTH(row9, "Toughness");
+        this.toughness_cell = row9.insertCell();
+        CreateTH(row9, "Visibiilty");
+        this.visibility_cell = row9.insertCell();
+
+        var row10 = tbl.insertRow();
+        CreateTH(row10, "Fuel Uses");
+        this.maxfuel_cell = row10.insertCell();
+        CreateTH(row10, "Turn Bleed");
+        this.turnbleed_cell = row10.insertCell();
+        CreateTH(row10, "Max Strain");
+        this.mxstrain_cell = row10.insertCell();
+        CreateTH(row10, "Attack Modifier");
+        this.attack_cell = row10.insertCell();
+
+        var row11 = tbl.insertRow();
+        CreateTH(row11, "Cruise Range");
+        this.cruiserange_cell = row11.insertCell();
+        CreateTH(row11, "Landing Gear");
+        this.landing_cell = row11.insertCell();
+        CreateTH(row11, "Escape");
+        this.escape_cell = row11.insertCell();
+        CreateTH(row11, "Communications");
+        this.communications_cell = row11.insertCell();
+
+        var row12 = tbl.insertRow();
+        CreateTH(row12, "Cruise Range with Bombs");
+        this.cruiserangewbomb_cell = row12.insertCell();
+        CreateTH(row12, "Flight Ceiling");
+        this.maxalt_cell = row12.insertCell();
+        CreateTH(row12, "Crash Safety");
+        this.crashsafety_cell = row12.insertCell();
+        CreateTH(row12, "Electrics");
+        this.electric_cell = row12.insertCell();
+
+        CreateTH(tbl.insertRow(), "Special Rules").colSpan = 8;
+        this.warning_cell = tbl.insertRow().insertCell();
+        this.warning_cell.colSpan = 8;
+    }
+
+    private UpdateStats() {
+        var stats = this.acft.GetStats();
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_wmas, stats.wetmass.toString());
+        BlinkIfChanged(this.d_bmas, stats.bomb_mass.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_upkp, stats.upkeep.toString());
+        BlinkIfChanged(this.d_cont, stats.control.toString());
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
+        BlinkIfChanged(this.d_powr, stats.power.toString());
+        BlinkIfChanged(this.d_fcom, stats.fuelconsumption.toString());
+        BlinkIfChanged(this.d_fuel, stats.fuel.toString());
+        BlinkIfChanged(this.d_pspd, stats.pitchspeed.toString());
+        BlinkIfChanged(this.d_pbst, stats.pitchboost.toString());
+        BlinkIfChanged(this.d_wara, stats.wingarea.toString());
+        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_strc, stats.structure.toString());
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
+        BlinkIfChanged(this.d_chrg, stats.charge.toString());
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+    }
+
+    private UpdateDerived() {
+        var stats = this.acft.GetStats();
+        var derived = this.acft.GetDerivedStats();
+        if (this.acft.name)
+            this.name_inp.value = this.acft.name;
+        this.cost_cell.innerText = stats.cost.toString() + "þ";
+        this.version_cell.innerText = this.acft.GetVersion();
+        //Empty
+        this.ts_empty.innerText = Math.floor(derived.MaxSpeedEmpty).toString();
+        this.ss_empty.innerText = derived.StallSpeedEmpty.toString();
+        this.hand_empty.innerText = derived.HandlingEmpty.toString();
+        this.boost_empty.innerText = derived.BoostEmpty.toString();
+        //Half
+        this.ts_half.innerText = Math.floor((derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
+        this.ss_half.innerText = Math.floor((derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
+        this.hand_half.innerText = Math.floor((derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
+        this.boost_half.innerText = Math.floor((derived.BoostEmpty + derived.BoostFull) / 2).toString();
+        //Full
+        this.ts_full.innerText = Math.floor(derived.MaxSpeedFull).toString();
+        this.ss_full.innerText = derived.StallSpeedFull.toString();
+        this.hand_full.innerText = derived.HandlingFull.toString();
+        this.boost_full.innerText = derived.BoostFull.toString();
+
+        if (stats.bomb_mass > 0) {
+            this.bomb_row1.hidden = false;
+            this.bomb_row2.hidden = false;
+            //Half
+            this.ts_halfwB.innerText = Math.floor((derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
+            this.ss_halfwB.innerText = Math.floor((derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
+            this.hand_halfwB.innerText = Math.floor((derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
+            this.boost_halfwB.innerText = Math.floor((derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
+            //Full
+            this.ts_fullwB.innerText = derived.MaxSpeedwBombs.toString();
+            this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
+            this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
+            this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
+
+        } else {
+            this.bomb_row1.hidden = true;
+            this.bomb_row2.hidden = true;
+        }
+
+        this.dropoff_cell.innerText = derived.Dropoff.toString();
+        this.overspeed_cell.innerText = derived.Overspeed.toString();
+        this.maxfuel_cell.innerText = (Math.round(derived.FuelUses * 10) / 10).toString();
+        this.cruiserange_cell.innerText = Math.round(derived.CruiseRange).toString();
+        this.cruiserangewbomb_cell.innerText = Math.round(derived.CruiseRangewBombs).toString();
+
+        this.stability_cell.innerText = derived.Stabiilty.toString();
+        this.eloss_cell.innerText = derived.EnergyLoss.toString();
+        this.turnbleed_cell.innerText = derived.TurnBleed.toString();
+        this.landing_cell.innerText = this.acft.GetGearName();
+        this.maxalt_cell.innerText = this.acft.GetMaxAltitude().toString();
+
+        this.reliability_cell.innerText = this.acft.GetReliabilityList().toString();
+        this.toughness_cell.innerText = derived.Toughness.toString();
+        this.mxstrain_cell.innerText = derived.MaxStrain.toString();
+        this.escape_cell.innerText = this.acft.GetEscapeList().toString();
+        this.crashsafety_cell.innerText = stats.crashsafety.toString();
+
+        this.flightstress_cell.innerText = this.acft.GetStressList().toString();
+        this.visibility_cell.innerText = this.acft.GetVisibilityList().toString();
+        this.attack_cell.innerText = this.acft.GetAttackList().toString();
+        this.electric_cell.innerText = stats.charge.toString(); //TODO Windmill
+        this.communications_cell.innerText = this.acft.GetCommunicationName();
+
+        var warnhtml = "";
+        for (let w of stats.warnings) {
+            warnhtml += w.source + ":  " + w.warning + "<br/>";
+        }
+        this.warning_cell.innerHTML = warnhtml;
     }
 
     public UpdateDisplay() {
@@ -583,12 +937,17 @@ class Aircraft_HTML extends Display {
         this.load.UpdateDisplay();
         this.gear.UpdateDisplay();
         this.accessories.UpdateDisplay();
+        this.optimization.UpdateDisplay();
+
+        this.UpdateStats();
+        this.UpdateDerived();
     }
 }
 
 class Aircraft {
     private use_storage: boolean = false;
     private version: string;
+    public name: string;
     private stats: Stats;
     private updated_stats: boolean;
     private DisplayCallback: () => void;
@@ -607,6 +966,7 @@ class Aircraft {
     private cargo: CargoAndPassengers;
     private gear: LandingGear;
     private accessories: Accessories;
+    private optimization: Optimization;
 
     constructor(js: JSON, storage: boolean) {
         this.stats = new Stats();
@@ -626,6 +986,7 @@ class Aircraft {
         this.cargo = new CargoAndPassengers();
         this.gear = new LandingGear(js["landing_gear"]);
         this.accessories = new Accessories(js["accessories"]);
+        this.optimization = new Optimization();
 
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
@@ -642,6 +1003,7 @@ class Aircraft {
         this.cargo.SetCalculateStats(() => { this.CalculateStats(); });
         this.gear.SetCalculateStats(() => { this.CalculateStats(); });
         this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
+        this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
 
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
@@ -653,6 +1015,7 @@ class Aircraft {
     public toJSON() {
         return {
             version: this.version,
+            name: this.name,
             era: this.era.toJSON(),
             cockpits: this.cockpits.toJSON(),
             passengers: this.passengers.toJSON(),
@@ -668,6 +1031,7 @@ class Aircraft {
             cargo: this.cargo.toJSON(),
             gear: this.gear.toJSON(),
             accessories: this.accessories.toJSON(),
+            optimization: this.optimization.toJSON(),
         };
     }
 
@@ -675,6 +1039,7 @@ class Aircraft {
         console.log(js);
         console.log(js["version"]);
         if (this.version == js["version"]) {
+            this.name = js["name"];
             this.era.fromJSON(js["era"]);
             this.cockpits.fromJSON(js["cockpits"]);
             this.passengers.fromJSON(js["passengers"]);
@@ -690,6 +1055,7 @@ class Aircraft {
             this.cargo.fromJSON(js["cargo"]);
             this.gear.fromJSON(js["gear"]);
             this.accessories.fromJSON(js["accessories"]);
+            this.optimization.fromJSON(js["optimization"]);
             this.CalculateStats();
         }
     }
@@ -748,23 +1114,177 @@ class Aircraft {
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         stats = stats.Add(this.gear.PartStats());
 
-        //Update Part Local stuff
-        this.cockpits.UpdateCrewStats(stats);
-        this.engines.UpdateReliability(stats);
-        //Not really part local, but only affects number limits.
-        this.reinforcements.SetAcftStructure(stats.structure);
-        this.fuel.SetArea(this.wings.GetArea());
-        this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
-        this.munitions.SetAcftStructure(stats.structure);
+        stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
+        this.optimization.SetAcftStats(stats);
+        stats = stats.Add(this.optimization.PartStats());
 
-        if (!this.updated_stats)
+        if (!this.updated_stats) {
+            this.updated_stats = true;
             this.stats = stats;
 
-        if (this.DisplayCallback)
-            this.DisplayCallback();
+            var dreived = this.GetDerivedStats();
 
-        if (this.use_storage)
-            window.localStorage.aircraft = JSON.stringify(this);
+            //Update Part Local stuff
+            this.cockpits.UpdateCrewStats(this.stats.escape, dreived.FlightStress, this.stats.visibility);
+            this.engines.UpdateReliability(stats);
+            //Not really part local, but only affects number limits.
+            this.reinforcements.SetAcftStructure(stats.structure);
+            this.fuel.SetArea(this.wings.GetArea());
+            this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
+            this.munitions.SetAcftStructure(stats.structure);
+
+            if (this.DisplayCallback)
+                this.DisplayCallback();
+
+            if (this.use_storage)
+                window.localStorage.aircraft = JSON.stringify(this);
+        }
+    }
+
+    public GetDerivedStats() {
+        var DryMP = Math.floor(this.stats.mass / 5);
+        var WetMP = Math.floor((this.stats.mass + this.stats.wetmass) / 5);
+        var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
+        var DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
+        var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
+        var DPwBombs = Math.floor((this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
+        var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
+        var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
+        var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
+        var StallSpeedEmpty = Math.floor(this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
+        var StallSpeedFull = Math.floor(this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
+        var StallSpeedFullwBombs = Math.floor(this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
+        var Overspeed = this.engines.GetOverspeed();
+        var BoostEmpty = Math.floor(this.stats.power / DryMP);
+        var BoostFull = Math.floor(this.stats.power / WetMP);
+        var BoostFullwBombs = Math.floor(this.stats.power / WetMPwBombs);
+        var Dropoff = Math.floor(this.stats.pitchboost * MaxSpeedEmpty);
+
+        var Stabiilty = this.stats.pitchstab + this.stats.latstab;
+        if (this.stats.pitchstab > 0 && this.stats.latstab > 0)
+            Stabiilty += 2;
+        else if (this.stats.pitchstab < 0 && this.stats.latstab < 0)
+            Stabiilty -= 2;
+
+        var HandlingEmpty = 100 + this.stats.control - DryMP;
+        if (Stabiilty > 10)
+            HandlingEmpty = -99999;
+        else if (Stabiilty == 10)
+            HandlingEmpty -= 4;
+        else if (Stabiilty > 6)
+            HandlingEmpty -= 3;
+        else if (Stabiilty > 3)
+            HandlingEmpty -= 2;
+        else if (Stabiilty > 0)
+            HandlingEmpty -= 1;
+        else if (Stabiilty == 0)
+            HandlingEmpty += 0;
+        else if (Stabiilty > -4)
+            HandlingEmpty += 1;
+        else if (Stabiilty > -7)
+            HandlingEmpty += 2;
+        else if (Stabiilty > -10)
+            HandlingEmpty += 3;
+        else if (Stabiilty == -10)
+            HandlingEmpty += 4;
+        else
+            HandlingEmpty = -99999;
+
+        var HandlingFull = HandlingEmpty + DryMP - WetMP;
+        var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
+
+        var ElevatorsEmpty = Math.max(1, Math.floor(HandlingEmpty / 10));
+        var ElevatorsFull = Math.max(1, Math.floor(HandlingFull / 10));
+        var ElevatorsFullwBombs = Math.max(1, Math.floor(HandlingFullwBombs / 10));
+        var MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+        var Toughness = this.stats.toughness;
+        var Structure = this.stats.structure;
+        var EnergyLoss = Math.ceil(DPEmpty / 6);
+        var EnergyLosswBombs = EnergyLoss + 1;
+        var TurnBleed = Math.ceil((StallSpeedEmpty + StallSpeedFull) / 12);
+        var TurnBleedwBombs = TurnBleed + 1;
+        var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
+        var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
+        var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
+
+        var FlightStress = 0;
+        if (Stabiilty > 3 || Stabiilty < -3)
+            FlightStress++;
+        FlightStress += Math.floor(DryMP / 10);
+
+        return {
+            DryMP: DryMP,
+            WetMP: WetMP,
+            WetMPwBombs: WetMPwBombs,
+            DPEmpty: DPEmpty,
+            DPFull: DPFull,
+            DPwBombs: DPwBombs,
+            MaxSpeedEmpty: MaxSpeedEmpty,
+            MaxSpeedFull: MaxSpeedFull,
+            MaxSpeedwBombs: MaxSpeedwBombs,
+            StallSpeedEmpty: StallSpeedEmpty,
+            StallSpeedFull: StallSpeedFull,
+            StallSpeedFullwBombs: StallSpeedFullwBombs,
+            Overspeed: Overspeed,
+            BoostEmpty: BoostEmpty,
+            BoostFull: BoostFull,
+            BoostFullwBombs: BoostFullwBombs,
+            Dropoff: Dropoff,
+            Stabiilty: Stabiilty,
+            HandlingEmpty: HandlingEmpty,
+            HandlingFull: HandlingFull,
+            HandlingFullwBombs: HandlingFullwBombs,
+            ElevatorsEmpty: ElevatorsEmpty,
+            ElevatorsFull: ElevatorsFull,
+            ElevatorsFullwBombs: ElevatorsFullwBombs,
+            MaxStrain: MaxStrain,
+            Toughness: Toughness,
+            Structure: Structure,
+            EnergyLoss: EnergyLoss,
+            EnergyLosswBombs: EnergyLosswBombs,
+            TurnBleed: TurnBleed,
+            TurnBleedwBombs: TurnBleedwBombs,
+            FuelUses: FuelUses,
+            CruiseRange: CruiseRange,
+            CruiseRangewBombs: CruiseRangewBombs,
+            FlightStress: FlightStress,
+        }
+    }
+
+    public GetVersion() {
+        return this.version;
+    }
+
+    public GetCommunicationName() {
+        return this.accessories.GetCommunicationName();
+    }
+
+    public GetAttackList() {
+        return this.cockpits.GetAttackList();
+    }
+
+    public GetVisibilityList() {
+        return this.cockpits.GetVisibilityList();
+    }
+
+    public GetStressList() {
+        return this.cockpits.GetStressList();
+    }
+
+    public GetEscapeList() {
+        return this.cockpits.GetEscapeList();
+    }
+
+    public GetReliabilityList() {
+        return this.engines.GetReliabilityList();
+    }
+
+    public GetMaxAltitude() {
+        return this.engines.GetMaxAltitude();
+    }
+
+    public GetGearName() {
+        return this.gear.GetGearName();
     }
 
     public GetEra(): Era {
@@ -811,6 +1331,12 @@ class Aircraft {
     }
     public GetAccessories(): Accessories {
         return this.accessories;
+    }
+    public GetOptimization(): Optimization {
+        return this.optimization;
+    }
+    public GetStats() {
+        return this.stats;
     }
 }
 
@@ -1000,6 +1526,39 @@ class Cockpits extends Part {
         }
     }
 
+    public GetAttackList() {
+        //TODO: Attack
+        var lst = [];
+        for (let c of this.positions) {
+            lst.push(0);
+        }
+        return lst;
+    }
+
+    public GetVisibilityList() {
+        var lst = [];
+        for (let p of this.positions) {
+            lst.push(p.GetVisibility());
+        }
+        return lst;
+    }
+
+    public GetStressList() {
+        var lst = [];
+        for (let p of this.positions) {
+            lst.push(p.GetFlightStress());
+        }
+        return lst;
+    }
+
+    public GetEscapeList() {
+        var lst = [];
+        for (let p of this.positions) {
+            lst.push(p.GetEscape());
+        }
+        return lst;
+    }
+
     public SetNumberOfCockpits(num: number) {
         if (num != num)
             num = 1;
@@ -1035,9 +1594,9 @@ class Cockpits extends Part {
         return s;
     }
 
-    public UpdateCrewStats(stats: Stats) {
+    public UpdateCrewStats(escape: number, flightstress: number, visibility: number) {
         for (let cp of this.positions) {
-            cp.CrewUpdate(stats);
+            cp.CrewUpdate(escape, flightstress, visibility);
         }
     }
 
@@ -1346,11 +1905,11 @@ class Cockpit extends Part {
         return stats;
     }
 
-    public CrewUpdate(stats: Stats) {
-        this.total_escape = this.stats.escape + stats.escape;
-        this.total_stress = this.stats.flightstress + stats.flightstress;
+    public CrewUpdate(escape: number, flightstress: number, visibility: number) {
+        this.total_escape = this.stats.escape + escape;
+        this.total_stress = this.stats.flightstress + flightstress;
         this.total_stress = Math.max(0, this.total_stress);
-        this.total_visibility = this.stats.visibility + stats.visibility;
+        this.total_visibility = this.stats.visibility + visibility;
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -1723,6 +2282,22 @@ class Engines extends Part {
         this.is_asymmetric = js["is_asymmetric"];
     }
 
+    public GetReliabilityList() {
+        var lst = [];
+        for (let e of this.engines) {
+            lst.push(e.GetReliability());
+        }
+        return lst;
+    }
+
+    public GetMaxAltitude() {
+        var m = 100;
+        for (let e of this.engines) {
+            m = Math.min(m, e.GetMaxAltitude());
+        }
+        return m;
+    }
+
     public SetNumberOfEngines(num: number) {
         if (num != num)
             num = 0;
@@ -1812,6 +2387,13 @@ class Engines extends Part {
                 return true;
         }
         return false;
+    }
+
+    public GetOverspeed() {
+        var os = 100;
+        for (let e of this.engines)
+            os = Math.min(os, e.GetOverspeed());
+        return os;
     }
 
     public PartStats(): Stats {
@@ -1944,6 +2526,10 @@ class Engine extends Part {
                 break;
             }
         }
+    }
+
+    public GetMaxAltitude() {
+        return this.etype_stats.altitude;
     }
 
     public SetSelectedIndex(num: number) {
@@ -2165,8 +2751,10 @@ class Engine extends Part {
 
     public UpdateReliability(num: number) {
         this.total_reliability = this.etype_stats.stats.reliability;
-        this.total_reliability -= (this.etype_stats.stats.cooling - this.cooling_count);
         this.total_reliability -= (this.gp_count - this.gpr_count);
+        if (this.NeedCooling()) {
+            this.total_reliability -= (this.etype_stats.stats.cooling - this.cooling_count);
+        }
         this.total_reliability += num;
     }
 
@@ -5943,6 +6531,19 @@ class Munitions extends Part {
         return reduce;
     }
 
+    public GetExternalMass() {
+        var ext_bomb_count = this.bomb_count;
+        if (this.internal_bay_1) {
+            ext_bomb_count = Math.floor(ext_bomb_count / 2);
+            if (this.internal_bay_2) {
+                ext_bomb_count = 0;
+            }
+        }
+
+        var ext_mass = ext_bomb_count + this.rocket_count;
+        return ext_mass;
+    }
+
     public SetAcftStructure(num: number) {
         this.acft_struct = num;
         if (this.LimitMass(false)) {
@@ -5956,8 +6557,8 @@ class Munitions extends Part {
 
     public PartStats() {
         var stats = new Stats();
-        stats.wetmass += this.bomb_count;
-        stats.wetmass += this.rocket_count;
+        // stats.wetmass += this.bomb_count;
+        // stats.wetmass += this.rocket_count;
 
         var ext_bomb_count = this.bomb_count;
         if (this.internal_bay_1) {
@@ -5972,13 +6573,15 @@ class Munitions extends Part {
         var ext_mass = ext_bomb_count + this.rocket_count;
         var rack_mass = Math.ceil(ext_mass / 5);
         stats.mass += rack_mass;
-        stats.bomb_mass = ext_mass;
+        stats.bomb_mass = this.bomb_count + this.rocket_count;
 
         stats.reqsections = Math.ceil(stats.reqsections);
 
         //Because it is load, it rounds up to the nearest 5 mass.
         if ((stats.wetmass % 5) > 0)
             stats.wetmass += 5 - (stats.wetmass % 5);
+        if ((stats.bomb_mass % 5) > 0)
+            stats.bomb_mass += 5 - (stats.bomb_mass % 5);
 
         return stats;
     }
@@ -6047,7 +6650,7 @@ class CargoAndPassengers extends Part {
         if (this.pass > this.seats) {
             stats.wetmass += 3 * (this.pass - this.seats);
         } else {
-            //Cargo can be placed in empty seats.
+            //Cargo can be placed in half seats.
             var emptyseat = this.seats - this.pass;
             if (this.mass - emptyseat > 0)
                 stats.wetmass += this.mass - emptyseat;
@@ -6265,6 +6868,13 @@ class LandingGear extends Part {
         this.gear_sel = js["gear_sel"];
         this.retract = js["retract"];
         this.extra_sel = js["extra_sel"];
+    }
+
+    public GetGearName() {
+        if (this.retract)
+            return "Retractable " + this.gear_list[this.gear_sel].name;
+        else
+            return this.gear_list[this.gear_sel].name;
     }
 
     public GetGearList() {
@@ -6539,6 +7149,10 @@ class Accessories extends Part {
         this.clim_sel = js["clim_sel"];
         this.auto_sel = js["auto_sel"];
         this.cont_sel = js["cont_sel"];
+    }
+
+    public GetCommunicationName() {
+        return this.radio_list[this.radio_sel].name;
     }
 
     public GetArmourCoverage() {
@@ -6940,5 +7554,438 @@ class Accessories_HTML extends Display {
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
         BlinkIfChanged(this.d_visi, stats.visibility.toString());
         BlinkIfChanged(this.d_strs, stats.flightstress.toString());
+    }
+}
+
+class Optimization extends Part {
+    private free_dots: number;
+    private cost: number;
+    private bleed: number;
+    private escape: number;
+    private mass: number;
+    private toughness: number;
+    private maxstrain: number;
+    private reliability: number;
+    private drag: number;
+    private acft_stats: Stats;
+
+    constructor() {
+        super();
+
+        this.free_dots = 0;
+        this.cost = 0;
+        this.bleed = 0;
+        this.escape = 0;
+        this.mass = 0;
+        this.toughness = 0;
+        this.maxstrain = 0;
+        this.reliability = 0;
+        this.drag = 0;
+        this.acft_stats = new Stats;
+    }
+
+    public toJSON() {
+        return {
+            free_dots: this.free_dots,
+            cost: this.cost,
+            bleed: this.bleed,
+            escape: this.escape,
+            mass: this.mass,
+            toughness: this.toughness,
+            maxstrain: this.maxstrain,
+            reliability: this.reliability,
+            drag: this.drag,
+        }
+    }
+
+    public fromJSON(js: JSON) {
+        this.free_dots = js["free_dots"];
+        this.cost = js["cost"];
+        this.bleed = js["bleed"];
+        this.escape = js["escape"];
+        this.mass = js["mass"];
+        this.toughness = js["toughness"];
+        this.maxstrain = js["maxstrain"];
+        this.reliability = js["reliability"];
+        this.drag = js["drag"];
+    }
+
+    public GetUnassignedCount() {
+        return this.free_dots - this.cost - this.bleed
+            - this.escape - this.mass - this.toughness - this.maxstrain
+            - this.reliability - this.drag;
+    }
+
+    public ReduceDots() {
+        var diff = -this.GetUnassignedCount();
+        if (diff > 0) {
+            let d = Math.min(diff, this.drag);
+            d = Math.max(d, 0);
+            this.drag -= d;
+            diff -= d;
+            d = Math.min(diff, this.reliability);
+            d = Math.max(d, 0);
+            this.reliability -= d;
+            diff -= d;
+            d = Math.min(diff, this.maxstrain);
+            d = Math.max(d, 0);
+            this.maxstrain -= d;
+            diff -= d;
+            d = Math.min(diff, this.toughness);
+            d = Math.max(d, 0);
+            this.toughness -= d;
+            diff -= d;
+            d = Math.min(diff, this.mass);
+            d = Math.max(d, 0);
+            this.mass -= d;
+            diff -= d;
+            d = Math.min(diff, this.escape);
+            d = Math.max(d, 0);
+            this.escape -= d;
+            diff -= d;
+            d = Math.min(diff, this.bleed);
+            d = Math.max(d, 0);
+            this.bleed -= d;
+            diff -= d;
+            d = Math.min(diff, this.cost);
+            d = Math.max(d, 0);
+            this.cost -= d;
+            diff -= d;
+        }
+    }
+
+    public GetFreeDots() {
+        return this.free_dots;
+    }
+
+    public SetFreeDots(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, 0);
+        this.free_dots = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetCost() {
+        return this.cost;
+    }
+
+    public SetCost(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.cost = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetBleed() {
+        return this.bleed;
+    }
+
+    public SetBleed(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.bleed = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetEscape() {
+        return this.escape;
+    }
+
+    public SetEscape(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.escape = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetMass() {
+        return this.mass;
+    }
+
+    public SetMass(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.mass = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetToughness() {
+        return this.toughness;
+    }
+
+    public SetToughness(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.toughness = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetMaxStrain() {
+        return this.maxstrain;
+    }
+
+    public SetMaxStrain(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.maxstrain = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetReliabiilty() {
+        return this.reliability;
+    }
+
+    public SetReliability(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.reliability = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public GetDrag() {
+        return this.drag;
+    }
+
+    public SetDrag(num: number) {
+        if (num != num)
+            num = 0;
+        num = Math.floor(num);
+        num = Math.max(num, -3);
+        num = Math.min(num, 3);
+        this.drag = num;
+        this.ReduceDots();
+        this.CalculateStats();
+    }
+
+    public SetAcftStats(stats: Stats) {
+        this.acft_stats = stats;
+    }
+
+    public SetCalculateStats(callback: () => void) {
+        this.CalculateStats = callback;
+    }
+
+    public PartStats() {
+        var stats = new Stats();
+
+        stats.cost = -Math.floor(this.cost * this.acft_stats.cost / 10);
+        stats.liftbleed = -this.bleed * 2;
+        stats.escape = this.escape;
+        stats.visibility = this.escape;
+        stats.mass = -Math.floor(this.mass * this.acft_stats.mass / 20);
+        stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 5);
+        stats.maxstrain = Math.floor(this.maxstrain * this.acft_stats.maxstrain / 10);
+        stats.reliability = this.reliability * 2;
+        stats.drag = -Math.floor(this.drag * this.acft_stats.drag / 20);
+
+        var dot_cost = Math.abs(this.cost) + Math.abs(this.bleed)
+            + Math.abs(this.escape) + Math.abs(this.mass)
+            + Math.abs(this.toughness) + Math.abs(this.maxstrain)
+            + Math.abs(this.reliability) + Math.abs(this.drag) - this.free_dots;
+        stats.cost += Math.max(0, dot_cost);
+
+        return stats;
+    }
+}
+
+class Optimization_HTML extends Display {
+    private opt: Optimization;
+    private free_inp: HTMLInputElement;
+    private cost_cbx: HTMLInputElement[];
+    private bleed_cbx: HTMLInputElement[];
+    private escape_cbx: HTMLInputElement[];
+    private mass_cbx: HTMLInputElement[];
+    private toughness_cbx: HTMLInputElement[];
+    private maxstrain_cbx: HTMLInputElement[];
+    private reliability_cbx: HTMLInputElement[];
+    private drag_cbx: HTMLInputElement[];
+
+    //Display Stat Elements
+    private d_cost: HTMLTableCellElement;
+    private d_lift: HTMLTableCellElement;
+    private d_escp: HTMLTableCellElement;
+    private d_visi: HTMLTableCellElement;
+    private d_mass: HTMLTableCellElement;
+    private d_tugh: HTMLTableCellElement;
+    private d_mstr: HTMLTableCellElement;
+    private d_reli: HTMLTableCellElement;
+    private d_drag: HTMLTableCellElement;
+
+    constructor(opt: Optimization) {
+        super();
+        this.opt = opt;
+
+        this.free_inp = document.getElementById("num_opt") as HTMLInputElement;
+        this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
+        var tbl = document.getElementById("tbl_optimization") as HTMLTableElement;
+        var row1 = tbl.insertRow();
+        this.cost_cbx = this.InitRow(row1, "Expense: +/- 10% Cost", (num: number) => this.opt.SetCost(num));
+        this.bleed_cbx = this.InitRow(tbl.insertRow(), "Lift Efficienty: +/- 2 Lift Bleed", (num: number) => this.opt.SetBleed(num));
+        this.escape_cbx = this.InitRow(tbl.insertRow(), "Leg Room: +/- 1 Escape, Visibility", (num: number) => this.opt.SetEscape(num));
+        this.mass_cbx = this.InitRow(tbl.insertRow(), "Mass: +/- 5% Mass", (num: number) => this.opt.SetMass(num));
+        this.toughness_cbx = this.InitRow(tbl.insertRow(), "Redundancy: +/- 20% Toughness ", (num: number) => this.opt.SetToughness(num));
+        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), "Support: +/- 10% Max Strain", (num: number) => this.opt.SetMaxStrain(num));
+        this.reliability_cbx = this.InitRow(tbl.insertRow(), "Reliability: +/- 2 Reliability", (num: number) => this.opt.SetReliability(num));
+        this.drag_cbx = this.InitRow(tbl.insertRow(), "Streamlining: +/- 5% Drag", (num: number) => this.opt.SetDrag(num));
+        this.InitStatDisplay(row1.insertCell());
+    }
+
+    private InitRow(row: HTMLTableRowElement, txt: string, call: (num: number) => void) {
+        var cbxs = [];
+        for (let i = 0; i < 6; i++) {
+            cbxs.push(document.createElement("INPUT") as HTMLInputElement);
+            cbxs[i].setAttribute("type", "checkbox");
+            if (i < 3)
+                cbxs[i].onchange = () => {
+                    if (cbxs[i].checked)
+                        call(i - 3);
+                    else
+                        call(i - 2);
+                };
+            else
+                cbxs[i].onchange = () => {
+                    if (cbxs[i].checked)
+                        call(i - 2);
+                    else
+                        call(i - 3);
+                };
+        }
+        var ncell = row.insertCell();
+        var ecell = row.insertCell();
+        var pcell = row.insertCell();
+        ncell.appendChild(cbxs[0]);
+        ncell.appendChild(cbxs[1]);
+        ncell.appendChild(cbxs[2]);
+        ecell.innerHTML = txt;
+        pcell.appendChild(cbxs[3]);
+        pcell.appendChild(cbxs[4]);
+        pcell.appendChild(cbxs[5]);
+        return cbxs;
+    }
+
+    private InitStatDisplay(stat_cell: HTMLTableCellElement) {
+        stat_cell.rowSpan = 0;
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE") as HTMLTableElement;
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, "Lift Bleed");
+        CreateTH(h1_row, "Escape");
+        var c1_row = tbl_stat.insertRow();
+        this.d_cost = c1_row.insertCell();
+        this.d_lift = c1_row.insertCell();
+        this.d_escp = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "Visibility");
+        CreateTH(h2_row, "Mass");
+        CreateTH(h2_row, "Toughness");
+        var c2_row = tbl_stat.insertRow();
+        this.d_visi = c2_row.insertCell();
+        this.d_mass = c2_row.insertCell();
+        this.d_tugh = c2_row.insertCell();
+        var h3_row = tbl_stat.insertRow();
+        CreateTH(h3_row, "Max Strain");
+        CreateTH(h3_row, "Reliability");
+        CreateTH(h3_row, "Drag");
+        var c3_row = tbl_stat.insertRow();
+        this.d_mstr = c3_row.insertCell();
+        this.d_reli = c3_row.insertCell();
+        this.d_drag = c3_row.insertCell();
+    }
+
+    private UpdateChecked(num: number, lst: HTMLInputElement[]) {
+        for (let i = 0; i < lst.length; i++)
+            lst[i].checked = false;
+        if (num < 0) {
+            lst[2].checked = true;
+            if (num < -1) {
+                lst[1].checked = true;
+                if (num < -2)
+                    lst[0].checked = true;
+            }
+        } else if (num > 0) {
+            lst[3].checked = true;
+            if (num > 1) {
+                lst[4].checked = true;
+                if (num > 2)
+                    lst[5].checked = true;
+            }
+        }
+    }
+
+    private UpdateEnabled(num: number, lst: HTMLInputElement[]) {
+        var free = 0;
+        for (let i = 3; i < lst.length; i++) {
+            if (!lst[i].checked)
+                free++;
+            lst[i].disabled = free > num;
+        }
+    }
+
+    public UpdateDisplay() {
+        this.free_inp.valueAsNumber = this.opt.GetFreeDots();
+        //Update Checked
+        this.UpdateChecked(this.opt.GetCost(), this.cost_cbx);
+        this.UpdateChecked(this.opt.GetBleed(), this.bleed_cbx);
+        this.UpdateChecked(this.opt.GetEscape(), this.escape_cbx);
+        this.UpdateChecked(this.opt.GetMass(), this.mass_cbx);
+        this.UpdateChecked(this.opt.GetToughness(), this.toughness_cbx);
+        this.UpdateChecked(this.opt.GetMaxStrain(), this.maxstrain_cbx);
+        this.UpdateChecked(this.opt.GetReliabiilty(), this.reliability_cbx);
+        this.UpdateChecked(this.opt.GetDrag(), this.drag_cbx);
+        //Update Enabled
+        var can_dot = this.opt.GetUnassignedCount();
+        this.UpdateEnabled(can_dot, this.cost_cbx);
+        this.UpdateEnabled(can_dot, this.bleed_cbx);
+        this.UpdateEnabled(can_dot, this.escape_cbx);
+        this.UpdateEnabled(can_dot, this.mass_cbx);
+        this.UpdateEnabled(can_dot, this.toughness_cbx);
+        this.UpdateEnabled(can_dot, this.maxstrain_cbx);
+        this.UpdateEnabled(can_dot, this.reliability_cbx);
+        this.UpdateEnabled(can_dot, this.drag_cbx);
+        //Update Stats
+        var stats = this.opt.PartStats();
+        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_escp, stats.escape.toString());
+        BlinkIfChanged(this.d_visi, stats.visibility.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
+        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_reli, stats.reliability.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString());
     }
 }
