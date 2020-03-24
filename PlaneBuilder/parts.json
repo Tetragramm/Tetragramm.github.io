@@ -417,6 +417,68 @@
                 "reliability": 1,
                 "cost": 2
             }
+        ],
+        "cowling": [
+            {
+                "name": "No Cowling",
+                "ed": 1,
+                "mpd": 0,
+                "air": true,
+                "liquid": true,
+                "rotary": true
+            },
+            {
+                "name": "Basic Cowl",
+                "mass": 1,
+                "cost": 1,
+                "ed": 0.8,
+                "mpd": 0,
+                "air": true,
+                "liquid": false,
+                "rotary": false
+            },
+            {
+                "name": "Closed Cowl",
+                "mass": 1,
+                "cost": 1,
+                "reliability": -1,
+                "ed": 0.6,
+                "mpd": 0,
+                "air": false,
+                "liquid": false,
+                "rotary": true
+            },
+            {
+                "name": "Adjustable Slat Cowl",
+                "mass": 2,
+                "reliability": 2,
+                "cost": 2,
+                "ed": 0.5,
+                "mpd": 0,
+                "air": true,
+                "liquid": false,
+                "rotary": false
+            },
+            {
+                "name": "Foil Cowl",
+                "mass": 2,
+                "reliability": 3,
+                "cost": 3,
+                "ed": 0.4,
+                "mpd": 0,
+                "air": true,
+                "liquid": false,
+                "rotary": false
+            },
+            {
+                "name": "Sealed Cowl",
+                "cost": 1,
+                "ed": 0.5,
+                "mpd": 0.333333333333,
+                "air": false,
+                "liquid": true,
+                "rotary": false
+            }
         ]
     },
     "propellers": {
@@ -955,7 +1017,8 @@
         ],
         "flaps": [
             {
-                "name": "None"
+                "name": "None",
+                "costfactor": 0
             },
             {
                 "name": "Basic Flaps",

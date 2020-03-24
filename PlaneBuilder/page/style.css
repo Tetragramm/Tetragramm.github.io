@@ -212,6 +212,13 @@ th {
 	margin-bottom:0;
 }
 
+.btn_th {
+	border: 1px solid #ffffff;
+	padding: 1rem;
+	font-size: 2rem;
+	margin: 1rem;
+}
+
 td {
 	border: 1px solid #555555;
 	padding: .25rem;

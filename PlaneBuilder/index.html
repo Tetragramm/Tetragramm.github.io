@@ -22,7 +22,20 @@
 			</h2>
 
 			<div class="page__content">
-
+				<span>
+					<table>
+						<tr>
+							<th class="btn_th">
+								<label for="acft_save">Save</label>
+							</th>
+							<th class="btn_th">
+								<label for="acft_load">Load</label>
+							</th>
+						</tr>
+					</table>
+				</span>
+				<br />
+				<br />
 				<div class="Era">
 					<h3 class="page__h3">Era
 						<span class="rules">(<u>Rules</u>)</span>
@@ -98,6 +111,7 @@
 						<tr>
 							<th>Engine Type</th>
 							<th>Options</th>
+							<th>Options 2</th>
 							<th>Engine Stats</th>
 						</tr>
 					</table>
@@ -287,10 +301,28 @@
 					<span class="rules">(<u>Rules</u>)</span>
 					<br />
 				</h3>
+				<label for="stats_copy"><u>Copy Stats As Text</u></label><button hidden="true" id="stats_copy"></button>
 				<table id="tbl_derived">
 				</table>
 			</div>
 		</div>
+		<br />
+		<br />
+		<span>
+			<table>
+				<tr>
+					<th class="btn_th">
+						<label for="acft_save">Save</label><button hidden="true" id="acft_save">Save</button>
+					</th>
+					<th class="btn_th">
+						<label for="acft_load">Load</label> <input hidden="true" type="file" id="acft_load" />
+					</th>
+					<!-- <th class="btn_th">
+						<label for="acft_load_text">Load As Text</label> <input type="text" id="acft_load_text" />
+					</th> -->
+				</tr>
+			</table>
+		</span>
 	</div>
 
 
