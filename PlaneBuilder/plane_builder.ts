@@ -1,10 +1,16 @@
+//TODO: Wing selection is screwy. Workaround: Set all to None and try again.
+//TODO: Stabilizers doesn't disable "The Wings" when not tandem.
+//TODO: Copy JSON to clipboard
+//TODO: Paste JSON to page
+//TODO: Connect links to Rules page
 //TODO: Engine as Generator
+//TODO: Add electrics as critical component
+//TODO: Manually Variable Propeller Special Rule
 //TODO: Weapons
 //TODO: Handle attack bonus
 //TODO: High Offset Radiator requires Parasol wing
 //TODO: Evaporator Radiator requires Metal wing
-//TODO: Manually Variable Propeller Warning
-//TODO: Center Pusher requires tail or extended driveshafts.
+//TODO: Center Pusher requires tail or extended driveshafts
 
 
 const loadJSON = (path, callback) => {
@@ -895,36 +901,36 @@ class Aircraft_HTML extends Display {
         this.cost_cell.innerText = stats.cost.toString() + "þ";
         this.copy_text += "Cost " + stats.cost.toString() + "þ\n";
         this.copy_text += "\n";
-        this.copy_text += "Mass\tTop Speed\tStall Speed\tHandling\tBoost\n";
+        this.copy_text += "Mass\t\t\tTop Speed\tStall Speed\tHandling\tBoost\n";
         //Empty
         this.ts_empty.innerText = Math.floor(derived.MaxSpeedEmpty).toString();
         this.ss_empty.innerText = derived.StallSpeedEmpty.toString();
         this.hand_empty.innerText = derived.HandlingEmpty.toString();
         this.boost_empty.innerText = derived.BoostEmpty.toString();
-        this.copy_text += "Empty Mass\t"
-            + this.ts_empty.innerText + "\t"
-            + this.ss_empty.innerText + "\t"
-            + this.hand_empty.innerText + "\t"
+        this.copy_text += "Empty Mass\t\t"
+            + this.ts_empty.innerText + "\t\t"
+            + this.ss_empty.innerText + "\t\t"
+            + this.hand_empty.innerText + "\t\t"
             + this.boost_empty.innerText + "\n";
         //Half
         this.ts_half.innerText = Math.floor((derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
         this.ss_half.innerText = Math.floor((derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
         this.hand_half.innerText = Math.floor((derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
         this.boost_half.innerText = Math.floor((derived.BoostEmpty + derived.BoostFull) / 2).toString();
-        this.copy_text += "Half Mass\t"
-            + this.ts_half.innerText + "\t"
-            + this.ss_half.innerText + "\t"
-            + this.hand_half.innerText + "\t"
+        this.copy_text += "Half Mass\t\t"
+            + this.ts_half.innerText + "\t\t"
+            + this.ss_half.innerText + "\t\t"
+            + this.hand_half.innerText + "\t\t"
             + this.boost_half.innerText + "\n";
         //Full
         this.ts_full.innerText = Math.floor(derived.MaxSpeedFull).toString();
         this.ss_full.innerText = derived.StallSpeedFull.toString();
         this.hand_full.innerText = derived.HandlingFull.toString();
         this.boost_full.innerText = derived.BoostFull.toString();
-        this.copy_text += "Full Mass\t"
-            + this.ts_full.innerText + "\t"
-            + this.ss_full.innerText + "\t"
-            + this.hand_full.innerText + "\t"
+        this.copy_text += "Full Mass\t\t"
+            + this.ts_full.innerText + "\t\t"
+            + this.ss_full.innerText + "\t\t"
+            + this.hand_full.innerText + "\t\t"
             + this.boost_full.innerText + "\n";
         this.copy_text += "\n";
 
@@ -937,9 +943,9 @@ class Aircraft_HTML extends Display {
             this.hand_halfwB.innerText = Math.floor((derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
             this.boost_halfwB.innerText = Math.floor((derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
             this.copy_text += "Half Mass with Bombs\t"
-                + this.ts_halfwB.innerText + "\t"
-                + this.ss_halfwB.innerText + "\t"
-                + this.hand_halfwB.innerText + "\t"
+                + this.ts_halfwB.innerText + "\t\t"
+                + this.ss_halfwB.innerText + "\t\t"
+                + this.hand_halfwB.innerText + "\t\t"
                 + this.boost_halfwB.innerText + "\n";
             //Full
             this.ts_fullwB.innerText = derived.MaxSpeedwBombs.toString();
@@ -947,9 +953,9 @@ class Aircraft_HTML extends Display {
             this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
             this.copy_text += "Full Mass with Bombs\t"
-                + this.ts_fullwB.innerText + "\t"
-                + this.ss_fullwB.innerText + "\t"
-                + this.hand_fullwB.innerText + "\t"
+                + this.ts_fullwB.innerText + "\t\t"
+                + this.ss_fullwB.innerText + "\t\t"
+                + this.hand_fullwB.innerText + "\t\t"
                 + this.boost_fullwB.innerText + "\n";
             this.copy_text += "\n";
 
@@ -5222,9 +5228,10 @@ class Wings_HTML extends Display {
 
         for (let i = 0; i < ht.deck.options.length; i++) {
             let opt = ht.deck.options[i];
-            if (wing.deck != i && !this.wings.CanAddFullWing(i) && !this.wings.CanMoveFullWing(idx, i)) {
+            if (wing.deck != i && !this.wings.CanAddFullWing(i) && !this.wings.CanMoveFullWing(idx, i))
                 opt.disabled = true;
-            }
+            else
+                opt.disabled = false;
         }
         ht.deck.oninput = () => {
             let w = { ...wing };
@@ -5319,9 +5326,10 @@ class Wings_HTML extends Display {
     private UpdateMiniWing(ht: WingHTMLType, idx: number, wing: WingType) {
         for (let i = 0; i < ht.deck.options.length; i++) {
             let opt = ht.deck.options[i];
-            if (wing.deck != i && !this.wings.CanAddMiniWing(i) && !this.wings.CanMoveMiniWing(idx, i)) {
+            if (wing.deck != i && !this.wings.CanAddMiniWing(i) && !this.wings.CanMoveMiniWing(idx, i))
                 opt.disabled = true;
-            }
+            else
+                opt.disabled = false;
         }
         ht.deck.oninput = () => {
             let w = { ...wing };
