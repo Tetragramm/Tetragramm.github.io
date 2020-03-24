@@ -2925,19 +2925,15 @@ class Engine extends Part {
         for (let c of this.cowl_list) {
             if (this.GetIsPulsejet()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
-                console.log("Is Pulsejet");
             }
             else if (this.NeedCooling()) { //Means air cooled
                 lst.push(c.liquid);
-                console.log("Is Liquid");
             }
             else if (this.etype_stats.oiltank) { //Means rotary
                 lst.push(c.rotary);
-                console.log("Is Rotary");
             }
             else { //Means liquid
                 lst.push(c.air);
-                console.log("Is Air");
             }
         }
         return lst;
@@ -4707,6 +4703,8 @@ class Wings extends Part {
     }
 
     public CanAddFullWing(deck: number) {
+        if (deck >= this.deck_list.length)
+            console.log("Deck out of Bounds");
         if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
             return false;
 
@@ -5225,10 +5223,9 @@ class Wings_HTML extends Display {
     }
 
     private UpdateFullWing(ht: WingHTMLType, idx: number, wing: WingType) {
-
-        for (let i = 0; i < ht.deck.options.length; i++) {
+        for (let i = 1; i < ht.deck.options.length; i++) {
             let opt = ht.deck.options[i];
-            if (wing.deck != i && !this.wings.CanAddFullWing(i) && !this.wings.CanMoveFullWing(idx, i))
+            if (wing.deck != i && !this.wings.CanAddFullWing(i - 1) && !this.wings.CanMoveFullWing(idx, i - 1))
                 opt.disabled = true;
             else
                 opt.disabled = false;
@@ -5324,9 +5321,9 @@ class Wings_HTML extends Display {
     }
 
     private UpdateMiniWing(ht: WingHTMLType, idx: number, wing: WingType) {
-        for (let i = 0; i < ht.deck.options.length; i++) {
+        for (let i = 1; i < ht.deck.options.length; i++) {
             let opt = ht.deck.options[i];
-            if (wing.deck != i && !this.wings.CanAddMiniWing(i) && !this.wings.CanMoveMiniWing(idx, i))
+            if (wing.deck != i && !this.wings.CanAddMiniWing(i - 1) && !this.wings.CanMoveMiniWing(idx, i - 1))
                 opt.disabled = true;
             else
                 opt.disabled = false;
@@ -5658,6 +5655,13 @@ class Stabilizers extends Part {
     }
 
     public PartStats() {
+        var vvalid = this.GetVValidList();
+        if (!vvalid[this.vstab_sel])
+            this.vstab_sel = 0;
+        var hvalid = this.GetHValidList();
+        if (!hvalid[this.hstab_sel])
+            this.hstab_sel = 0;
+
         var stats = new Stats();
         //HSTAB
         if (this.hstab_count > 0) {
