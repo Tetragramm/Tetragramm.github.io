@@ -142,14 +142,22 @@ class Aircraft_HTML extends Display {
         var load_button = document.getElementById("acft_load") as HTMLInputElement;
         load_button.multiple = false;
         load_button.accept = "application/JSON";
-        load_button.onchange = (evt) => {
+        load_button.onclick = (evt) => {
             if (load_button.files.length == 0)
                 return;
             var file = load_button.files[0];
             var reader = new FileReader();
             reader.onloadend = () => {
-                var str = reader.result as string;
-                this.acft.fromJSON(JSON.parse(str));
+                try {
+                    var str = JSON.parse(reader.result as string);
+                    var acft = new Aircraft(parts_JSON, engine_json, false);
+                    if(acft.fromJSON(str))
+                    {
+                        this.acft.fromJSON(str)
+                        this.UpdateDisplay();
+                    }
+
+                } catch {}
             };
             reader.readAsText(file);
             load_button.value = "";
@@ -157,6 +165,42 @@ class Aircraft_HTML extends Display {
 
         var copy_button = document.getElementById("stats_copy") as HTMLButtonElement;
         copy_button.onclick = () => { copyStringToClipboard(this.copy_text); };
+
+        var save_text_button = document.getElementById("acft_save_text") as HTMLButtonElement;
+        save_text_button.onclick = () => { copyStringToClipboard(JSON.stringify(this.acft.toJSON())); };
+
+        var load_text_area = document.getElementById("acft_load_text") as HTMLInputElement;
+        load_text_area.oninput = ()=>{
+            try{
+                var str = JSON.parse(load_text_area.value);
+                var acft = new Aircraft(parts_JSON, engine_json, false);
+                if(acft.fromJSON(str))
+                {
+                    this.acft.fromJSON(str)
+                    this.UpdateDisplay();
+                }
+            } catch {
+                Blink(load_text_area.parentElement);
+            } finally {
+                load_text_area.value = "";
+            }
+        };
+        var load_text_area2 = document.getElementById("acft_load_text2") as HTMLInputElement;
+        load_text_area2.oninput = ()=>{
+            try{
+                var str = JSON.parse(load_text_area2.value);
+                var acft = new Aircraft(parts_JSON, engine_json, false);
+                if(acft.fromJSON(str))
+                {
+                    this.acft.fromJSON(str)
+                    this.UpdateDisplay();
+                }
+            } catch {
+                Blink(load_text_area2.parentElement);
+            } finally {
+                load_text_area2.value = "";
+            }
+        };
     }
 
     private InitStats(tbl: HTMLTableElement) {

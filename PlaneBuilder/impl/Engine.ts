@@ -31,6 +31,9 @@ class Engine extends Part {
     private cowl_list: { name: string, stats: Stats, ed: number, mpd: number, air: boolean, liquid: boolean, rotary: boolean }[];
     private cowl_sel: number;
 
+    private is_generator: boolean;
+    private has_alternator: boolean;
+
     private total_reliability: number;
 
     constructor(el: EngineStats[],
@@ -65,6 +68,9 @@ class Engine extends Part {
 
         this.total_reliability = 0;
 
+        this.is_generator = false;
+        this.has_alternator = false;
+
         if (el.length <= 0)
             throw "No Engine Stats Found.  Should be at least one.";
     }
@@ -81,6 +87,8 @@ class Engine extends Part {
             geared_propeller_ratio: this.gp_count,
             geared_propeller_reliability: this.gpr_count,
             cowl_sel: this.cowl_sel,
+            is_generator: this.is_generator,
+            has_alternator: this.has_alternator,
         };
     }
 
@@ -95,6 +103,8 @@ class Engine extends Part {
         this.gp_count = js["geared_propeller_ratio"];
         this.gpr_count = js["geared_propeller_reliability"];
         this.cowl_sel = js["cowl_sel"];
+        this.is_generator = js["is_generator"];
+        this.has_alternator = js["has_alternator"];
         this.selected_index = -1;
         for (let i = 0; i < this.engine_list.length; i++) {
             if (this.etype_stats.Equal(this.engine_list[i])) {
@@ -302,6 +312,8 @@ class Engine extends Part {
             this.gp_count = 0;
             this.gpr_count = 0;
             this.cooling_count = 0;
+            this.has_alternator = false;
+            this.is_generator = false;
             if (this.mount_list[this.selected_mount].pp_type == "fuselage") {
                 for (let i = 0; i < this.mount_list.length; i++) {
                     this.selected_mount = i;
@@ -325,10 +337,6 @@ class Engine extends Part {
             && this.mount_list[this.selected_mount].pp_type == "wing")
             return true;
         return false;
-    }
-
-    public SetCalculateStats(callback: () => void) {
-        this.CalculateStats = callback;
     }
 
     public GetCowlList() {
@@ -369,6 +377,44 @@ class Engine extends Part {
     public SetCowl(num: number) {
         this.VerifyCowl(num);
         this.CalculateStats();
+    }
+
+    public GetGeneratorEnabled(){
+        return !this.GetIsPulsejet();
+    }
+
+    public GetGenerator(){
+        return this.is_generator;
+    }
+
+    public SetGenerator(use: boolean){
+        if(this.GetGeneratorEnabled()) {
+            this.is_generator = use;
+        } else {
+            this.is_generator = false;
+        }
+        this.CalculateStats();
+    }
+
+    public GetAlternatorEnabled(){
+        return !this.GetIsPulsejet() && !this.is_generator;
+    }
+
+    public GetAlternator(){
+        return this.has_alternator;
+    }
+
+    public SetAlternator(use:boolean){
+        if(this.GetAlternatorEnabled()){
+            this.has_alternator = use;
+        } else {
+            this.has_alternator = false;
+        }
+        this.CalculateStats();
+    }
+
+    public SetCalculateStats(callback: () => void) {
+        this.CalculateStats = callback;
     }
 
     public PartStats(): Stats {
@@ -428,6 +474,15 @@ class Engine extends Part {
             stats.cost += 2 * Math.floor(stats.power / 10);
         }
         stats.cost += this.gp_count + this.gpr_count;
+
+        if(this.is_generator){
+            stats.charge = Math.floor(2*stats.power/10)+2;
+            stats.power = 0;
+        } else if(this.has_alternator){
+            stats.charge = Math.floor(stats.power/10)+1;
+            stats.mass += 1;
+            stats.cost += 2;
+        }
 
 
         //Reliability is a part local issue.

@@ -32,6 +32,9 @@ class Engine_HTML extends Display {
     private gpr_input: HTMLInputElement;
     //Cowl Elements
     private cowl_select: HTMLSelectElement;
+    //Electrical Elements
+    private alternator_input: HTMLInputElement;
+    private generator_input: HTMLInputElement;
 
     //Display Stat Elements
     private d_powr: HTMLTableCellElement;
@@ -49,6 +52,7 @@ class Engine_HTML extends Display {
     private d_strc: HTMLTableCellElement;
     private d_fstr: HTMLTableCellElement;
     private d_sect: HTMLTableCellElement;
+    private d_chrg: HTMLTableCellElement;
 
     constructor(eng: Engine, r: HTMLTableRowElement) {
         super();
@@ -76,11 +80,15 @@ class Engine_HTML extends Display {
         CreateTH(opt2_table.insertRow(), "Cowls");
         var cowl_cell = opt2_table.insertRow().insertCell();
         option2_cell.appendChild(opt2_table);
+        CreateTH(opt2_table.insertRow(), "Electrical");
+        var elec_cell = opt2_table.insertRow().insertCell();
+
 
 
         this.InitMountSelect(mount_cell);
         this.InitUpgradeSelect(upg_cell);
         this.InitCowlSelect(cowl_cell);
+        this.InitElectricSelect(elec_cell);
         this.InitStatDisplay(row);
     }
 
@@ -207,6 +215,16 @@ class Engine_HTML extends Display {
 
     }
 
+    private InitElectricSelect(cell: HTMLTableCellElement){
+        var fs = CreateFlexSection(cell);
+        this.alternator_input = document.createElement("INPUT") as HTMLInputElement;
+        this.generator_input = document.createElement("INPUT") as HTMLInputElement;
+        FlexCheckbox("Alternator", this.alternator_input, fs);
+        FlexCheckbox("Generator", this.generator_input, fs);
+        this.alternator_input.oninput = ()=>{ this.engine.SetAlternator(this.alternator_input.checked);};
+        this.generator_input.oninput = ()=>{ this.engine.SetGenerator(this.generator_input.checked);};
+    }
+
     private InitStatDisplay(row: HTMLTableRowElement) {
         var stat_cell = row.insertCell();
         stat_cell.className = "inner_table";
@@ -254,6 +272,14 @@ class Engine_HTML extends Display {
         this.d_strc = c5_row.insertCell();
         this.d_fstr = c5_row.insertCell();
         this.d_sect = c5_row.insertCell();
+        var h6_row = tbl_stat.insertRow();
+        CreateTH(h6_row, "Charge");
+        CreateTH(h6_row, "");
+        CreateTH(h6_row, "");
+        var c6_row = tbl_stat.insertRow();
+        this.d_chrg = c6_row.insertCell();
+        c6_row.insertCell();
+        c6_row.insertCell();
     }
 
     private InitCowlSelect(cell: HTMLTableCellElement) {
@@ -420,6 +446,8 @@ class Engine_HTML extends Display {
                 }
             }
             this.cowl_select.disabled = true;
+            this.alternator_input.disabled = true;
+            this.generator_input.disabled = true;
         }
         else {
             this.mount_select.disabled = false;
@@ -432,6 +460,8 @@ class Engine_HTML extends Display {
                 opt.disabled = false;
             }
             this.cowl_select.disabled = false;
+            this.alternator_input.disabled = false;
+            this.generator_input.disabled = false;
         }
 
         this.cowl_select.selectedIndex = this.engine.GetCowl();
@@ -439,6 +469,11 @@ class Engine_HTML extends Display {
         for (let i = 0; i < cowl_enable.length; i++) {
             this.cowl_select.options[i].disabled = !cowl_enable[i];
         }
+
+        this.generator_input.checked = this.engine.GetGenerator();
+        this.generator_input.disabled = !this.engine.GetGeneratorEnabled();
+        this.alternator_input.checked = this.engine.GetAlternator();
+        this.alternator_input.disabled = !this.engine.GetAlternatorEnabled();
 
         var full_stats = this.engine.PartStats();
         BlinkIfChanged(this.d_powr, full_stats.power.toString());
@@ -456,5 +491,6 @@ class Engine_HTML extends Display {
         BlinkIfChanged(this.d_strc, full_stats.structure.toString());
         BlinkIfChanged(this.d_fstr, full_stats.flightstress.toString());
         BlinkIfChanged(this.d_sect, full_stats.reqsections.toString());
+        BlinkIfChanged(this.d_chrg, full_stats.charge.toString());
     }
 }

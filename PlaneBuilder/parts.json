@@ -1304,13 +1304,6 @@
                 "warning": "Generates 1 charge per 10 speed."
             },
             {
-                "name": "Alternator",
-                "mass": 1,
-                "charge": 1,
-                "cost": 2,
-                "cp10p": 1
-            },
-            {
                 "name": "Ram Air Scoop",
                 "charge": 1,
                 "cost": 3,

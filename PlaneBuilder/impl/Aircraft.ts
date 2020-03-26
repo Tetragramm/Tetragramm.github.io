@@ -176,7 +176,9 @@ class Aircraft {
             this.accessories.fromJSON(js["accessories"]);
             this.optimization.fromJSON(js["optimization"]);
             this.CalculateStats();
+            return true;
         }
+        return false;
     }
 
     public SetDisplayCallback(callback: () => void) {
@@ -370,6 +372,10 @@ class Aircraft {
             CruiseRangewBombs: CruiseRangewBombs,
             FlightStress: FlightStress,
         }
+    }
+
+    public SetStorage(use:boolean){
+        this.use_storage = use;
     }
 
     public GetVersion() {

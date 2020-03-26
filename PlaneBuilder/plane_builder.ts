@@ -1,7 +1,3 @@
-//TODO: Copy JSON to clipboard
-//TODO: Paste JSON to page
-//TODO: Connect links to Rules page
-//TODO: Engine as Generator
 //TODO: Add electrics as critical component
 //TODO: Manually Variable Propeller Special Rule
 //TODO: Weapons
@@ -30,24 +26,92 @@ const loadJSON = (path, callback) => {
 }
  
 const init = () => {
-    loadJSON('/PlaneBuilder/parts.json', (response) => {
+    var ihash = window.location.hash;
+    location.hash = "";
+    loadJSON('/PlaneBuilder/parts.json', (part_resp) => {
 
         // Parse JSON string into object
         let acft_data = window.localStorage.aircraft;
-        let parts_JSON = JSON.parse(response);
+        parts_JSON = JSON.parse(part_resp);
 
-        loadJSON('/PlaneBuilder/engines.json', (response2) => {
-            engine_json = JSON.parse(response2);
+        loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
+            engine_json = JSON.parse(engine_resp);
             aircraft_model = new Aircraft(parts_JSON, engine_json, true);
             aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
 
             if (acft_data)
                 aircraft_model.fromJSON(JSON.parse(acft_data));
+            
+            location.hash = ihash;
+            window.onscroll = SetScroll;
         });
     });
 }
 window.onload = init;
 
+var hash = "";
+function SetScroll(ev){
+    var newhash = "";
+    var off = window.pageYOffset;
+    if(off > document.getElementById("Era").offsetTop){
+        newhash = "Era";
+        if(off > document.getElementById("Cockpit").offsetTop){
+            newhash = "Cockpit";
+            if(off > document.getElementById("Passengers").offsetTop){
+                newhash = "Passengers";
+                if(off > document.getElementById("Engines").offsetTop){
+                    newhash = "Engines";
+                    if(off > document.getElementById("Propeller").offsetTop){
+                        newhash = "Propeller";
+                        if(off > document.getElementById("Frames").offsetTop){
+                            newhash = "Frames";
+                            if(off > document.getElementById("Tail").offsetTop){
+                                newhash = "Tail";
+                                if(off > document.getElementById("Wings").offsetTop){
+                                    newhash = "Wings";
+                                    if(off > document.getElementById("Stabilizers").offsetTop){
+                                        newhash = "Stabilizers";
+                                        if(off > document.getElementById("ControlSurfaces").offsetTop){
+                                            newhash = "ControlSurfaces";
+                                            if(off > document.getElementById("Reinforcements").offsetTop){
+                                                newhash = "Reinforcements";
+                                                if(off > document.getElementById("Load").offsetTop){
+                                                    newhash = "Load";
+                                                    if(off > document.getElementById("Landing_Gear").offsetTop){
+                                                        newhash = "Landing_Gear";
+                                                        if(off > document.getElementById("Accessories").offsetTop){
+                                                            newhash = "Accessories";
+                                                            if(off > document.getElementById("Optimization").offsetTop){
+                                                                newhash = "Optimization";
+                                                                if(off > document.getElementById("Stats").offsetTop){
+                                                                    newhash = "Stats";
+                                                                    if(off > document.getElementById("Flight").offsetTop){
+                                                                        newhash = "Flight";
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if(hash != newhash)
+    {
+        hash = newhash;
+        window.history.replaceState(null, null, "index.html#"+newhash);
+    }
+}
+
+var parts_JSON: JSON;
 var engine_json: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;

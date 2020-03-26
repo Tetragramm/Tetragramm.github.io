@@ -110,23 +110,6 @@ p {
 	margin: 1rem 0;
 }
 
-p.rant {
-	font-weight: bold;
-	font-size: 2rem;
-}
-
-blockquote {
-	margin: 1rem 0 1rem 2rem;
-}
-
-blockquote > *:first-child {
-	margin-top: 0;
-}
-
-blockquote > *:last-child {
-	margin-bottom: 0;
-}
-
 hr {
 	height: 0;
 	border-width: 0;
@@ -168,31 +151,6 @@ strong {
 	font-weight: bold;
 }
 
-pre {
-	font-size: .8rem;
-	margin: 1rem 0 1rem 2rem;
-	white-space: pre-wrap;
-	font-family: consolas, courier new, monospace;
-	color: #00d9ff; /* sky blue */
-
-	/* for `re_ar` */
-	direction: ltr;
-}
-
-code,
-tt,
-kbd {
-	font-family: consolas, courier new, monospace;
-	color: #00d9ff; /* sky blue */
-
-	/* for `re_ar` */
-	direction: ltr;
-}
-
-var {
-	color: #78C6B9; /* pale green */
-}
-
 table {
 	border-collapse: collapse;
 	font-size: .8rem;
@@ -212,11 +170,23 @@ th {
 	margin-bottom:0;
 }
 
+.lbl_action:hover,
+.lbl_action:active,
+.lbl_action:focus {
+	color: #00d9ff; /* sky blue */
+}
+
+.lbl_action:active {
+	color: #ffffff;
+}
+.lbl_action{
+	color: #008ba3; /* blue */
+}
+
 .btn_th {
-	border: 1px solid #ffffff;
-	padding: 1rem;
-	font-size: 2rem;
-	margin: 1rem;
+	padding: 0.5rem;
+	font-size: 1rem;
+	margin: 0.5rem;
 }
 
 td {
@@ -229,41 +199,6 @@ td {
 
 span {
 	white-space: nowrap;
-}
-
-ul,
-ol {
-	margin: 1rem 0;
-	padding-inline-start: 1.5rem;
-}
-
-ol {
-	list-style-type: decimal;
-}
-
-ul {
-	list-style-type: disc;
-}
-
-ul ul {
-	list-style-type: circle;
-}
-
-ul ul ul {
-	list-style-type: square;
-}
-
-dl {
-	margin: 1rem 0 1rem 2rem;
-}
-
-dt {
-	margin: 1rem 0;
-	font-weight: bold;
-}
-
-dd {
-	margin: 1rem 0;
 }
 
 select, input {

@@ -26,19 +26,25 @@
 					<table>
 						<tr>
 							<th class="btn_th">
-								<label for="acft_save">Save</label>
+								<label class="lbl_action" for="acft_save">Save</label>
 							</th>
 							<th class="btn_th">
-								<label for="acft_load">Load</label>
+								<label class="lbl_action" for="acft_load">Load</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_save_text">Copy As Text</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_load_text2">Load Text</label> <input type="text" id="acft_load_text2" />
 							</th>
 						</tr>
 					</table>
 				</span>
 				<br />
 				<br />
-				<div class="Era">
+				<div id="Era">
 					<h3 class="page__h3">Era
-						<span class="rules">(<u>Rules</u>)</span>
+						<span class="rules">(<a href="./Rules/Rules.htm#_yosnw6cvungd"><u>Rules</u></a>)</span>
 					</h3>
 					<table style="width:100%" id="table_era">
 						<tr>
@@ -54,9 +60,9 @@
 					</table>
 				</div>
 				<br />
-				<div class="Cockpit">
+				<div id="Cockpit">
 					<h3 class="page__h3">Cockpits
-						<span class="rules">(<u>Rules</u>)</span>
+						<span class="rules">(<a href="./Rules/Rules.htm#_39ltuebx0622"><u>Rules</u></a>)</span>
 						<br />
 						<span> <label for="num_cockpits">Number of Cockpits:</label> <input type="number"
 								id="num_cockpits" min="1" max="20" value="1" /></span>
@@ -72,9 +78,9 @@
 					</table>
 				</div>
 				<br />
-				<div class="Passengers">
+				<div id="Passengers">
 					<h3 class="page__h3">Passengers
-						<span class="rules">(<u>Rules</u>)</span>
+						<span class="rules">(<a href="./Rules/Rules.htm#_xtnklorouzp2"><u>Rules</u></a>)</span>
 					</h3>
 					<table style="width:100%" id="table_passengers">
 						<tr>
@@ -94,11 +100,11 @@
 					</table>
 				</div>
 				<br />
-				<div class="Engines">
+				<div id="Engines">
 					<h3 class="page__h3">Engines
-						<span class="rules">(<u>Engine Rules</u>)</span>
-						<span class="rules">(<u>Upgrade Rules</u>)</span>
-						<span class="rules">(<u>Cooling Rules</u>)</span>
+						<span class="rules">(<a href="./Rules/Rules.htm#_7z3qybtdwc8"><u>Engine Rules</u></a>)</span>
+						<span class="rules">(<a href="./Rules/Rules.htm#_q8c5kcydj4u"><u>Upgrade Rules</u></a>)</span>
+						<span class="rules">(<a href="./Rules/Rules.htm#_oba9a3riaklv"><u>Cooling Rules</u></a>)</span>
 						<br />
 						<span> <label for="num_engines">Number of Engines:</label> <input type="number" id="num_engines"
 								min="0" max="20" value="1" /></span>
@@ -127,9 +133,9 @@
 				</div>
 			</div>
 			<br />
-			<div class="Propeller">
+			<div id="Propeller">
 				<h3 class="page__h3">Propeller
-					<span class="rules">(<u>Rules</u>)</span> <br />
+					<span class="rules">(<a href="./Rules/Rules.htm#_fuzb5rpxyxfm"><u>Rules</u></a>)</span> <br />
 					<span> <label for="propeller_pitch">Propeller Pitch:</label> <select
 							id="propeller_pitch"></select></span>
 					<span><label for="propeller_variable">Manually Variable Propeller:</label> <input type="checkbox"
@@ -137,9 +143,9 @@
 				</h3>
 			</div>
 			<br />
-			<div class="Frames">
+			<div id="Frames">
 				<h3 class="page__h3">Frames and Covering
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_d5qmsg575qhr"><u>Rules</u></a>)</span>
 					<span><label for="flying_wing">Flying Wing:</label> <input type="checkbox"
 							id="flying_wing" /></span>
 					<table id="table_frames">
@@ -153,9 +159,9 @@
 				</h3>
 			</div>
 			<br />
-			<div class="Tail">
+			<div id="Tail">
 				<h3 class="page__h3">Tail
-					<span class="rules">(<u>Rules</u>)<br />
+					<span class="rules">(<a href="./Rules/Rules.htm#_acy0fm3uj2ja"><u>Rules</u></a>)<br />
 						<span> <label for="tail_type">Tail Length:</label> <select id="tail_type"></select></span>
 						<span> <label for="tail_farman">Farman Tail:</label> <input type="checkbox"
 								id="tail_farman" /></span>
@@ -163,9 +169,9 @@
 				</h3>
 			</div>
 			<br />
-			<div class="Wings">
+			<div id="Wings">
 				<h3 class="page__h3">Wings
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
 					<br />
 					<span> <label for="wing_stagger">Wing Stagger:</label> <select id="wing_stagger"></select></span>
 					<span> <label for="wing_closed">Closed Wing:</label> <input type="checkbox"
@@ -181,9 +187,9 @@
 				</table>
 			</div>
 			<br />
-			<div class="Stabilizers">
+			<div id="Stabilizers">
 				<h3 class="page__h3">Stabilizers
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_yu8eo6k9uu3s"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
 				<table id="stab_table">
@@ -195,9 +201,9 @@
 				</table>
 			</div>
 			<br />
-			<div class="ControlSurfaces">
+			<div id="ControlSurfaces">
 				<h3 class="page__h3">Control Surfaces
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_d531g9ayebhk"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
 				<table id="tbl_control_surfaces">
@@ -209,9 +215,9 @@
 				</table>
 			</div>
 			<br />
-			<div class="Reinforcements">
+			<div id="Reinforcements">
 				<h3 class="page__h3">Reinforcements
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_3utlenwdo4m2"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
 				<table id="tbl_reinforcements">
@@ -223,9 +229,9 @@
 				</table>
 			</div>
 			<br />
-			<div class="Load">
+			<div id="Load">
 				<h3 class="page__h3">Load
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_t1lb2awb6fka"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
 				<table id="tbl_load">
@@ -238,9 +244,9 @@
 				</table>
 			</div>
 			<br />
-			<div class="Landing Gear">
+			<div id="Landing_Gear">
 				<h3 class="page__h3">Landing Gear
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_b9y175l7zqcl"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
 				<table id="tbl_gear">
@@ -252,9 +258,9 @@
 				</table>
 			</div>
 			<br />
-			<div class="Accessories">
+			<div id="Accessories">
 				<h3 class="page__h3">Additional Parts
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_8zv4bba6tuwb"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
 				<table id="tbl_accessories">
@@ -272,9 +278,9 @@
 				</table>
 			</div>
 			<br />
-			<div class="Optimization">
+			<div id="Optimization">
 				<h3 class="page__h3">Optimizations
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_9966tgispmti"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
 				<span> <label for="num_opt">Number of Free Optimizations:</label> <input type="number" id="num_opt"
@@ -289,21 +295,20 @@
 				</table>
 			</div>
 			<br />
-			<div class="Stats">
+			<div id="Stats">
 				<h3 class="page__h3">Total Sum of Stats
-					<span class="rules">(<u>Rules</u>)</span>
 					<br />
 				</h3>
 				<table id="tbl_stats">
 				</table>
 			</div>
 			<br />
-			<div class="Flight">
+			<div id="Flight">
 				<h3 class="page__h3">Aircraft Derived Statistics
-					<span class="rules">(<u>Rules</u>)</span>
+					<span class="rules">(<a href="./Rules/Rules.htm#_x2j3wmcf82xy"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
-				<label for="stats_copy"><u>Copy Stats As Text</u></label><button hidden="true" id="stats_copy"></button>
+				<label class="lbl_action" for="stats_copy"><u>Copy Stats As Text</u></label><button hidden="true" id="stats_copy"></button>
 				<table id="tbl_derived">
 				</table>
 			</div>
@@ -314,14 +319,17 @@
 			<table>
 				<tr>
 					<th class="btn_th">
-						<label for="acft_save">Save</label><button hidden="true" id="acft_save">Save</button>
+						<label class="lbl_action" for="acft_save">Save</label><button hidden="true" id="acft_save">Save</button>
 					</th>
 					<th class="btn_th">
-						<label for="acft_load">Load</label> <input hidden="true" type="file" id="acft_load" />
+						<label class="lbl_action" for="acft_load">Load</label> <input hidden="true" type="file" id="acft_load" />
 					</th>
-					<!-- <th class="btn_th">
-						<label for="acft_load_text">Load As Text</label> <input type="text" id="acft_load_text" />
-					</th> -->
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_save_text">Copy As Text</label><button hidden="true" id="acft_save_text">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_load_text">Load Text</label> <input type="text" id="acft_load_text" />
+					</th>
 				</tr>
 			</table>
 		</span>
