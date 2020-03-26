@@ -5,6 +5,7 @@
 //TODO: High Offset Radiator requires Parasol wing
 //TODO: Evaporator Radiator requires Metal wing
 //TODO: Center Pusher requires tail or extended driveshafts
+//TODO: Fix Armour to have separate coverage per AP
 
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
@@ -24,8 +25,10 @@ const loadJSON = (path, callback) => {
     };
     xobj.send(null);
 }
- 
+
 const init = () => {
+    const sp = new URLSearchParams(location.search);
+    var qp = sp.get("json");
     var ihash = window.location.hash;
     location.hash = "";
     loadJSON('/PlaneBuilder/parts.json', (part_resp) => {
@@ -39,9 +42,20 @@ const init = () => {
             aircraft_model = new Aircraft(parts_JSON, engine_json, true);
             aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
 
-            if (acft_data)
-                aircraft_model.fromJSON(JSON.parse(acft_data));
-            
+            var loaded = false;
+            if (qp && !loaded) {
+                console.log("Used Query Parameter");
+                try {
+                    loaded = aircraft_model.fromJSON(JSON.parse(qp));
+                } catch { }
+            }
+            if (acft_data && !loaded) {
+                console.log("Used Saved Data");
+                try {
+                    loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
+                } catch { }
+            }
+
             location.hash = ihash;
             window.onscroll = SetScroll;
         });
@@ -50,42 +64,42 @@ const init = () => {
 window.onload = init;
 
 var hash = "";
-function SetScroll(ev){
+function SetScroll(ev) {
     var newhash = "";
     var off = window.pageYOffset;
-    if(off > document.getElementById("Era").offsetTop){
+    if (off > document.getElementById("Era").offsetTop) {
         newhash = "Era";
-        if(off > document.getElementById("Cockpit").offsetTop){
+        if (off > document.getElementById("Cockpit").offsetTop) {
             newhash = "Cockpit";
-            if(off > document.getElementById("Passengers").offsetTop){
+            if (off > document.getElementById("Passengers").offsetTop) {
                 newhash = "Passengers";
-                if(off > document.getElementById("Engines").offsetTop){
+                if (off > document.getElementById("Engines").offsetTop) {
                     newhash = "Engines";
-                    if(off > document.getElementById("Propeller").offsetTop){
+                    if (off > document.getElementById("Propeller").offsetTop) {
                         newhash = "Propeller";
-                        if(off > document.getElementById("Frames").offsetTop){
+                        if (off > document.getElementById("Frames").offsetTop) {
                             newhash = "Frames";
-                            if(off > document.getElementById("Tail").offsetTop){
+                            if (off > document.getElementById("Tail").offsetTop) {
                                 newhash = "Tail";
-                                if(off > document.getElementById("Wings").offsetTop){
+                                if (off > document.getElementById("Wings").offsetTop) {
                                     newhash = "Wings";
-                                    if(off > document.getElementById("Stabilizers").offsetTop){
+                                    if (off > document.getElementById("Stabilizers").offsetTop) {
                                         newhash = "Stabilizers";
-                                        if(off > document.getElementById("ControlSurfaces").offsetTop){
+                                        if (off > document.getElementById("ControlSurfaces").offsetTop) {
                                             newhash = "ControlSurfaces";
-                                            if(off > document.getElementById("Reinforcements").offsetTop){
+                                            if (off > document.getElementById("Reinforcements").offsetTop) {
                                                 newhash = "Reinforcements";
-                                                if(off > document.getElementById("Load").offsetTop){
+                                                if (off > document.getElementById("Load").offsetTop) {
                                                     newhash = "Load";
-                                                    if(off > document.getElementById("Landing_Gear").offsetTop){
+                                                    if (off > document.getElementById("Landing_Gear").offsetTop) {
                                                         newhash = "Landing_Gear";
-                                                        if(off > document.getElementById("Accessories").offsetTop){
+                                                        if (off > document.getElementById("Accessories").offsetTop) {
                                                             newhash = "Accessories";
-                                                            if(off > document.getElementById("Optimization").offsetTop){
+                                                            if (off > document.getElementById("Optimization").offsetTop) {
                                                                 newhash = "Optimization";
-                                                                if(off > document.getElementById("Stats").offsetTop){
+                                                                if (off > document.getElementById("Stats").offsetTop) {
                                                                     newhash = "Stats";
-                                                                    if(off > document.getElementById("Flight").offsetTop){
+                                                                    if (off > document.getElementById("Flight").offsetTop) {
                                                                         newhash = "Flight";
                                                                     }
                                                                 }
@@ -104,10 +118,9 @@ function SetScroll(ev){
             }
         }
     }
-    if(hash != newhash)
-    {
+    if (hash != newhash) {
         hash = newhash;
-        window.history.replaceState(null, null, "index.html#"+newhash);
+        window.history.replaceState(null, null, "index.html#" + newhash);
     }
 }
 

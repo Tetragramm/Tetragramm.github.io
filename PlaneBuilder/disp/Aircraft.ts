@@ -151,13 +151,12 @@ class Aircraft_HTML extends Display {
                 try {
                     var str = JSON.parse(reader.result as string);
                     var acft = new Aircraft(parts_JSON, engine_json, false);
-                    if(acft.fromJSON(str))
-                    {
+                    if (acft.fromJSON(str)) {
                         this.acft.fromJSON(str)
                         this.UpdateDisplay();
                     }
 
-                } catch {}
+                } catch { }
             };
             reader.readAsText(file);
             load_button.value = "";
@@ -170,12 +169,11 @@ class Aircraft_HTML extends Display {
         save_text_button.onclick = () => { copyStringToClipboard(JSON.stringify(this.acft.toJSON())); };
 
         var load_text_area = document.getElementById("acft_load_text") as HTMLInputElement;
-        load_text_area.oninput = ()=>{
-            try{
+        load_text_area.oninput = () => {
+            try {
                 var str = JSON.parse(load_text_area.value);
                 var acft = new Aircraft(parts_JSON, engine_json, false);
-                if(acft.fromJSON(str))
-                {
+                if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str)
                     this.UpdateDisplay();
                 }
@@ -186,12 +184,11 @@ class Aircraft_HTML extends Display {
             }
         };
         var load_text_area2 = document.getElementById("acft_load_text2") as HTMLInputElement;
-        load_text_area2.oninput = ()=>{
-            try{
+        load_text_area2.oninput = () => {
+            try {
                 var str = JSON.parse(load_text_area2.value);
                 var acft = new Aircraft(parts_JSON, engine_json, false);
-                if(acft.fromJSON(str))
-                {
+                if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str)
                     this.UpdateDisplay();
                 }
@@ -200,6 +197,13 @@ class Aircraft_HTML extends Display {
             } finally {
                 load_text_area2.value = "";
             }
+        };
+
+        var link_button = document.getElementById("acft_save_link") as HTMLButtonElement;
+        link_button.onclick = () => {
+            var txt = encodeURIComponent(JSON.stringify(this.acft.toJSON()));
+            var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt);
+            copyStringToClipboard(link);
         };
     }
 

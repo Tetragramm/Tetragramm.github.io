@@ -6596,6 +6596,12 @@ class Aircraft_HTML extends Display {
                 load_text_area2.value = "";
             }
         };
+        var link_button = document.getElementById("acft_save_link");
+        link_button.onclick = () => {
+            var txt = encodeURIComponent(JSON.stringify(this.acft.toJSON()));
+            var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt);
+            copyStringToClipboard(link);
+        };
     }
     InitStats(tbl) {
         var row = tbl.insertRow();
@@ -6954,6 +6960,7 @@ class Aircraft_HTML extends Display {
 //TODO: High Offset Radiator requires Parasol wing
 //TODO: Evaporator Radiator requires Metal wing
 //TODO: Center Pusher requires tail or extended driveshafts
+//TODO: Fix Armour to have separate coverage per AP
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
@@ -6972,6 +6979,8 @@ const loadJSON = (path, callback) => {
     xobj.send(null);
 };
 const init = () => {
+    const sp = new URLSearchParams(location.search);
+    var qp = sp.get("json");
     var ihash = window.location.hash;
     location.hash = "";
     loadJSON('/PlaneBuilder/parts.json', (part_resp) => {
@@ -6982,8 +6991,21 @@ const init = () => {
             engine_json = JSON.parse(engine_resp);
             aircraft_model = new Aircraft(parts_JSON, engine_json, true);
             aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
-            if (acft_data)
-                aircraft_model.fromJSON(JSON.parse(acft_data));
+            var loaded = false;
+            if (qp && !loaded) {
+                console.log("Used Query Parameter");
+                try {
+                    loaded = aircraft_model.fromJSON(JSON.parse(qp));
+                }
+                catch (_a) { }
+            }
+            if (acft_data && !loaded) {
+                console.log("Used Saved Data");
+                try {
+                    loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
+                }
+                catch (_b) { }
+            }
             location.hash = ihash;
             window.onscroll = SetScroll;
         });
