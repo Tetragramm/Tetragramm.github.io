@@ -1406,7 +1406,7 @@ class Frames extends Part {
         this.farman = false;
         this.boom = false;
         this.has_tractor_nacelles = false;
-        this.sel_tail = 1;
+        this.sel_tail = 2;
         this.tail_list = [];
         for (let elem of js["tail"]) {
             this.tail_list.push({
@@ -1763,6 +1763,9 @@ class Frames extends Part {
             this.flying_wing = false;
         }
         this.CalculateStats();
+    }
+    GetIsTailless() {
+        return this.tail_section_list.length == 0;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -2175,7 +2178,7 @@ class Wings extends Part {
 class Stabilizers extends Part {
     constructor(js) {
         super();
-        this.have_tail = false;
+        this.have_tail = true;
         this.is_tandem = false;
         this.is_swept = false;
         this.hstab_sel = 0;
@@ -2188,7 +2191,8 @@ class Stabilizers extends Part {
                 increment: elem["increment"],
                 stats: new Stats(elem),
                 dragfactor: elem["dragfactor"],
-                is_vtail: elem["is_vtail"]
+                is_vtail: elem["is_vtail"],
+                is_tail: elem["is_tail"]
             });
         }
         this.vstab_sel = 0;
@@ -2200,7 +2204,8 @@ class Stabilizers extends Part {
                 increment: elem["increment"],
                 stats: new Stats(elem),
                 dragfactor: elem["dragfactor"],
-                is_vtail: elem["is_vtail"]
+                is_vtail: elem["is_vtail"],
+                is_tail: elem["is_tail"]
             });
         }
     }
@@ -2245,6 +2250,8 @@ class Stabilizers extends Part {
         for (let t of this.hstab_list) {
             if (t.name == "The Wings" && !(this.is_tandem || this.is_swept))
                 lst.push(false);
+            else if (t.is_tail && !this.have_tail)
+                lst.push(false);
             else
                 lst.push(true);
         }
@@ -2281,6 +2288,8 @@ class Stabilizers extends Part {
         var lst = [];
         for (let t of this.vstab_list) {
             if (t.name == "Outboard" && !this.GetVOutboard())
+                lst.push(false);
+            else if (t.is_tail && !this.have_tail)
                 lst.push(false);
             else
                 lst.push(true);
@@ -2346,6 +2355,23 @@ class Stabilizers extends Part {
     }
     SetWingArea(num) {
         this.wing_area = num;
+    }
+    SetHaveTail(use) {
+        this.have_tail = use;
+        if (!use) {
+            var hvalid = this.GetHValidList();
+            if (!hvalid[this.hstab_sel]) {
+                this.hstab_sel = 2;
+            }
+            var vvalid = this.GetVValidList();
+            if (!vvalid[this.vstab_sel]) {
+                if (!vvalid[1]) //If it was outboard, set it to canard so we can have outboard vstab.
+                    this.hstab_sel = 2;
+                this.vstab_sel = 1;
+                if (this.vstab_count % 2 != 0)
+                    this.vstab_count++;
+            }
+        }
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -3813,6 +3839,7 @@ class Aircraft {
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
         this.stabilizers.SetIsTandem(this.wings.GetTandem());
         this.stabilizers.SetIsSwept(this.wings.GetSwept());
+        this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
         this.stabilizers.SetWingArea(stats.wingarea);
         stats = stats.Add(this.stabilizers.PartStats());
         this.controlsurfaces.SetWingArea(stats.wingarea);
@@ -5162,8 +5189,8 @@ class Frames_HTML extends Display {
             is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
         this.t_select.selectedIndex = this.frames.GetTailType();
-        this.t_farman.disabled = this.frames.GetUseBoom();
-        this.t_boom.disabled = this.frames.GetUseFarman();
+        this.t_farman.disabled = this.frames.GetUseBoom() || this.frames.GetIsTailless();
+        this.t_boom.disabled = this.frames.GetUseFarman() || this.frames.GetIsTailless();
         this.t_fwing.disabled = !this.frames.CanFlyingWing();
         this.t_fwing.checked = this.frames.GetFlyingWing();
         for (let i = 0; i < tail_section_list.length; i++) {

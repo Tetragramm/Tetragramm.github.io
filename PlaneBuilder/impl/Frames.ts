@@ -61,7 +61,7 @@ class Frames extends Part {
         this.farman = false;
         this.boom = false;
         this.has_tractor_nacelles = false;
-        this.sel_tail = 1;
+        this.sel_tail = 2;
         this.tail_list = [];
         for (let elem of js["tail"]) {
             this.tail_list.push({
@@ -470,6 +470,10 @@ class Frames extends Part {
             this.flying_wing = false;
         }
         this.CalculateStats();
+    }
+
+    public GetIsTailless(){
+        return this.tail_section_list.length == 0;
     }
 
     public SetCalculateStats(callback: () => void) {

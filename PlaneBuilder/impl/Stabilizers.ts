@@ -14,11 +14,11 @@ class Stabilizers extends Part {
 
     private hstab_list: {
         name: string, is_canard: boolean, increment: number, stats: Stats,
-        dragfactor: number, is_vtail: boolean
+        dragfactor: number, is_vtail: boolean, is_tail:boolean
     }[];
     private vstab_list: {
         name: string, increment: number, stats: Stats,
-        dragfactor: number, is_vtail: boolean
+        dragfactor: number, is_vtail: boolean, is_tail:boolean
     }[];
 
     private hstab_sel: number;
@@ -29,7 +29,7 @@ class Stabilizers extends Part {
     constructor(js: JSON) {
         super();
 
-        this.have_tail = false;
+        this.have_tail = true;
         this.is_tandem = false;
         this.is_swept = false;
 
@@ -43,7 +43,8 @@ class Stabilizers extends Part {
                 increment: elem["increment"],
                 stats: new Stats(elem),
                 dragfactor: elem["dragfactor"],
-                is_vtail: elem["is_vtail"]
+                is_vtail: elem["is_vtail"],
+                is_tail: elem["is_tail"]
             });
         }
 
@@ -56,7 +57,8 @@ class Stabilizers extends Part {
                 increment: elem["increment"],
                 stats: new Stats(elem),
                 dragfactor: elem["dragfactor"],
-                is_vtail: elem["is_vtail"]
+                is_vtail: elem["is_vtail"],
+                is_tail: elem["is_tail"]
             });
         }
     }
@@ -112,6 +114,8 @@ class Stabilizers extends Part {
         for (let t of this.hstab_list) {
             if (t.name == "The Wings" && !(this.is_tandem || this.is_swept))
                 lst.push(false);
+            else if(t.is_tail && !this.have_tail)
+                lst.push(false);
             else
                 lst.push(true);
         }
@@ -157,6 +161,8 @@ class Stabilizers extends Part {
         var lst = [];
         for (let t of this.vstab_list) {
             if (t.name == "Outboard" && !this.GetVOutboard())
+                lst.push(false);
+            else if(t.is_tail && !this.have_tail)
                 lst.push(false);
             else
                 lst.push(true);
@@ -234,6 +240,24 @@ class Stabilizers extends Part {
 
     public SetWingArea(num: number) {
         this.wing_area = num;
+    }
+
+    public SetHaveTail(use: boolean){
+        this.have_tail = use;
+        if(!use) {
+            var hvalid = this.GetHValidList();
+            if(!hvalid[this.hstab_sel]){
+                this.hstab_sel = 2;
+            }
+            var vvalid = this.GetVValidList();
+            if(!vvalid[this.vstab_sel]){
+                if(!vvalid[1]) //If it was outboard, set it to canard so we can have outboard vstab.
+                    this.hstab_sel = 2;
+                this.vstab_sel = 1;
+                if(this.vstab_count % 2 != 0)
+                    this.vstab_count++;
+            }
+        }
     }
 
     public SetCalculateStats(callback: () => void) {
