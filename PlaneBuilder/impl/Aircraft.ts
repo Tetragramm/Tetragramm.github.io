@@ -267,11 +267,17 @@ class Aircraft {
 
     public GetDerivedStats() {
         var DryMP = Math.floor(this.stats.mass / 5);
+        DryMP = Math.max(DryMP, 1);
         var WetMP = Math.floor((this.stats.mass + this.stats.wetmass) / 5);
+        WetMP = Math.max(WetMP, 1);
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
+        WetMPwBombs = Math.max(WetMPwBombs, 1);
         var DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
+        DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
+        DPFull = Math.max(DPFull, 1);
         var DPwBombs = Math.floor((this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
+        DPwBombs = Math.max(DPwBombs, 1);
         var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
         var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
         var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
@@ -375,7 +381,7 @@ class Aircraft {
         }
     }
 
-    public SetStorage(use:boolean){
+    public SetStorage(use: boolean) {
         this.use_storage = use;
     }
 
