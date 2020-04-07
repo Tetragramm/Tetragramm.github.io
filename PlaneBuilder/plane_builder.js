@@ -697,7 +697,6 @@ class Engine extends Part {
         this.num_radiators = 0;
         this.mount_list = ml;
         this.selected_mount = 0;
-        this.mount_stats = this.mount_list[0].stats;
         this.pp_list = ppl;
         this.use_pp = false;
         this.torque_to_struct = false;
@@ -825,7 +824,6 @@ class Engine extends Part {
         if (num >= this.mount_list.length)
             throw "Index outside of mount_list range.";
         this.selected_mount = num;
-        this.mount_stats = this.mount_list[num].stats;
         if (this.mount_list[this.selected_mount].reqED)
             this.SetUseExtendedDriveshaft(true);
         this.CalculateStats();
@@ -1044,7 +1042,7 @@ class Engine extends Part {
         // Mounting modifiers (only get applied once, even with push/pull)
         //No Mounting for pulse-jets, just bolted on
         if (!this.etype_stats.pulsejet) {
-            stats = stats.Add(this.mount_stats);
+            stats = stats.Add(this.mount_list[this.selected_mount].stats);
             stats.maxstrain -= Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }

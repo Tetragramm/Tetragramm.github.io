@@ -18,7 +18,6 @@ class Engine extends Part {
 
     private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, pp_type: string, reqED: boolean, reqTail: boolean }[];
     private selected_mount: number;
-    private mount_stats: Stats;
 
     private pp_list: { name: string, powerfactor: number }[];
     private use_pp: boolean;
@@ -54,7 +53,6 @@ class Engine extends Part {
 
         this.mount_list = ml;
         this.selected_mount = 0;
-        this.mount_stats = this.mount_list[0].stats;
 
         this.pp_list = ppl;
         this.use_pp = false;
@@ -207,7 +205,6 @@ class Engine extends Part {
         if (num >= this.mount_list.length)
             throw "Index outside of mount_list range.";
         this.selected_mount = num;
-        this.mount_stats = this.mount_list[num].stats;
         if (this.mount_list[this.selected_mount].reqED)
             this.SetUseExtendedDriveshaft(true);
         this.CalculateStats();
@@ -379,16 +376,16 @@ class Engine extends Part {
         this.CalculateStats();
     }
 
-    public GetGeneratorEnabled(){
+    public GetGeneratorEnabled() {
         return !this.GetIsPulsejet();
     }
 
-    public GetGenerator(){
+    public GetGenerator() {
         return this.is_generator;
     }
 
-    public SetGenerator(use: boolean){
-        if(this.GetGeneratorEnabled()) {
+    public SetGenerator(use: boolean) {
+        if (this.GetGeneratorEnabled()) {
             this.is_generator = use;
         } else {
             this.is_generator = false;
@@ -396,16 +393,16 @@ class Engine extends Part {
         this.CalculateStats();
     }
 
-    public GetAlternatorEnabled(){
+    public GetAlternatorEnabled() {
         return !this.GetIsPulsejet() && !this.is_generator;
     }
 
-    public GetAlternator(){
+    public GetAlternator() {
         return this.has_alternator;
     }
 
-    public SetAlternator(use:boolean){
-        if(this.GetAlternatorEnabled()){
+    public SetAlternator(use: boolean) {
+        if (this.GetAlternatorEnabled()) {
             this.has_alternator = use;
         } else {
             this.has_alternator = false;
@@ -463,7 +460,7 @@ class Engine extends Part {
         // Mounting modifiers (only get applied once, even with push/pull)
         //No Mounting for pulse-jets, just bolted on
         if (!this.etype_stats.pulsejet) {
-            stats = stats.Add(this.mount_stats);
+            stats = stats.Add(this.mount_list[this.selected_mount].stats);
             stats.maxstrain -= Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
@@ -475,11 +472,11 @@ class Engine extends Part {
         }
         stats.cost += this.gp_count + this.gpr_count;
 
-        if(this.is_generator){
-            stats.charge = Math.floor(2*stats.power/10)+2;
+        if (this.is_generator) {
+            stats.charge = Math.floor(2 * stats.power / 10) + 2;
             stats.power = 0;
-        } else if(this.has_alternator){
-            stats.charge = Math.floor(stats.power/10)+1;
+        } else if (this.has_alternator) {
+            stats.charge = Math.floor(stats.power / 10) + 1;
             stats.mass += 1;
             stats.cost += 2;
         }
