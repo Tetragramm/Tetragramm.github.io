@@ -56,6 +56,8 @@ const init = () => {
                 } catch { }
             }
 
+            aircraft_model.CalculateStats();
+
             location.hash = ihash;
             window.onscroll = SetScroll;
         });

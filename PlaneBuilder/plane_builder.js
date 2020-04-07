@@ -6545,7 +6545,7 @@ class Aircraft_HTML extends Display {
         var load_button = document.getElementById("acft_load");
         load_button.multiple = false;
         load_button.accept = "application/JSON";
-        load_button.onclick = (evt) => {
+        load_button.onchange = (evt) => {
             if (load_button.files.length == 0)
                 return;
             var file = load_button.files[0];
@@ -6556,7 +6556,7 @@ class Aircraft_HTML extends Display {
                     var acft = new Aircraft(parts_JSON, engine_json, false);
                     if (acft.fromJSON(str)) {
                         this.acft.fromJSON(str);
-                        this.UpdateDisplay();
+                        this.acft.CalculateStats();
                     }
                 }
                 catch (_a) { }
@@ -6575,7 +6575,7 @@ class Aircraft_HTML extends Display {
                 var acft = new Aircraft(parts_JSON, engine_json, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
-                    this.UpdateDisplay();
+                    this.acft.CalculateStats();
                 }
             }
             catch (_a) {
@@ -6592,7 +6592,7 @@ class Aircraft_HTML extends Display {
                 var acft = new Aircraft(parts_JSON, engine_json, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
-                    this.UpdateDisplay();
+                    this.acft.CalculateStats();
                 }
             }
             catch (_a) {
@@ -7012,6 +7012,7 @@ const init = () => {
                 }
                 catch (_b) { }
             }
+            aircraft_model.CalculateStats();
             location.hash = ihash;
             window.onscroll = SetScroll;
         });

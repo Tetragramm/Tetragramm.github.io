@@ -142,7 +142,7 @@ class Aircraft_HTML extends Display {
         var load_button = document.getElementById("acft_load") as HTMLInputElement;
         load_button.multiple = false;
         load_button.accept = "application/JSON";
-        load_button.onclick = (evt) => {
+        load_button.onchange = (evt) => {
             if (load_button.files.length == 0)
                 return;
             var file = load_button.files[0];
@@ -152,8 +152,8 @@ class Aircraft_HTML extends Display {
                     var str = JSON.parse(reader.result as string);
                     var acft = new Aircraft(parts_JSON, engine_json, false);
                     if (acft.fromJSON(str)) {
-                        this.acft.fromJSON(str)
-                        this.UpdateDisplay();
+                        this.acft.fromJSON(str);
+                        this.acft.CalculateStats();
                     }
 
                 } catch { }
@@ -174,8 +174,8 @@ class Aircraft_HTML extends Display {
                 var str = JSON.parse(load_text_area.value);
                 var acft = new Aircraft(parts_JSON, engine_json, false);
                 if (acft.fromJSON(str)) {
-                    this.acft.fromJSON(str)
-                    this.UpdateDisplay();
+                    this.acft.fromJSON(str);
+                    this.acft.CalculateStats();
                 }
             } catch {
                 Blink(load_text_area.parentElement);
@@ -189,8 +189,8 @@ class Aircraft_HTML extends Display {
                 var str = JSON.parse(load_text_area2.value);
                 var acft = new Aircraft(parts_JSON, engine_json, false);
                 if (acft.fromJSON(str)) {
-                    this.acft.fromJSON(str)
-                    this.UpdateDisplay();
+                    this.acft.fromJSON(str);
+                    this.acft.CalculateStats();
                 }
             } catch {
                 Blink(load_text_area2.parentElement);
