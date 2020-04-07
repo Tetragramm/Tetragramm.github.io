@@ -134,7 +134,9 @@ class Frames_HTML extends Display {
 
         this.t_select.selectedIndex = this.frames.GetTailType();
         this.t_farman.disabled = this.frames.GetUseBoom() || this.frames.GetIsTailless();
+        this.t_farman.checked = this.frames.GetUseFarman();
         this.t_boom.disabled = this.frames.GetUseFarman() || this.frames.GetIsTailless();
+        this.t_boom.checked = this.frames.GetUseBoom();
         this.t_fwing.disabled = !this.frames.CanFlyingWing();
         this.t_fwing.checked = this.frames.GetFlyingWing();
 
