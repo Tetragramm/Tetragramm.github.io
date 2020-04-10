@@ -232,33 +232,33 @@ class Stats {
             && this.charge == other.charge;
     }
     Round() {
-        this.liftbleed = Math.floor(this.liftbleed);
-        this.wetmass = Math.floor(this.wetmass);
-        this.mass = Math.floor(this.mass);
-        this.drag = Math.floor(this.drag);
-        this.control = Math.floor(this.control);
-        this.cost = Math.floor(this.cost);
-        this.reqsections = Math.floor(this.reqsections);
-        this.visibility = Math.floor(this.visibility);
-        this.flightstress = Math.floor(this.flightstress);
-        this.escape = Math.floor(this.escape);
-        this.pitchstab = Math.floor(this.pitchstab);
-        this.latstab = Math.floor(this.latstab);
-        this.cooling = Math.floor(this.cooling);
-        this.reliability = Math.floor(this.reliability);
-        this.power = Math.floor(this.power);
-        this.fuelconsumption = Math.floor(this.fuelconsumption);
-        this.maxstrain = Math.floor(this.maxstrain);
-        this.structure = Math.floor(this.structure);
-        this.pitchspeed = Math.floor(this.pitchspeed);
-        this.pitchboost = Math.floor(this.pitchboost);
-        this.wingarea = Math.floor(this.wingarea);
-        this.toughness = Math.floor(this.toughness);
-        this.upkeep = Math.floor(this.upkeep);
-        this.crashsafety = Math.floor(this.crashsafety);
-        this.bomb_mass = Math.floor(this.bomb_mass);
-        this.fuel = Math.floor(this.fuel);
-        this.charge = Math.floor(this.charge);
+        this.liftbleed = Math.trunc(this.liftbleed);
+        this.wetmass = Math.trunc(this.wetmass);
+        this.mass = Math.trunc(this.mass);
+        this.drag = Math.trunc(this.drag);
+        this.control = Math.trunc(this.control);
+        this.cost = Math.trunc(this.cost);
+        this.reqsections = Math.trunc(this.reqsections);
+        this.visibility = Math.trunc(this.visibility);
+        this.flightstress = Math.trunc(this.flightstress);
+        this.escape = Math.trunc(this.escape);
+        this.pitchstab = Math.trunc(this.pitchstab);
+        this.latstab = Math.trunc(this.latstab);
+        this.cooling = Math.trunc(this.cooling);
+        this.reliability = Math.trunc(this.reliability);
+        this.power = Math.trunc(this.power);
+        this.fuelconsumption = Math.trunc(this.fuelconsumption);
+        this.maxstrain = Math.trunc(this.maxstrain);
+        this.structure = Math.trunc(this.structure);
+        this.pitchspeed = Math.trunc(this.pitchspeed);
+        this.pitchboost = Math.trunc(this.pitchboost);
+        this.wingarea = Math.trunc(this.wingarea);
+        this.toughness = Math.trunc(this.toughness);
+        this.upkeep = Math.trunc(this.upkeep);
+        this.crashsafety = Math.trunc(this.crashsafety);
+        this.bomb_mass = Math.trunc(this.bomb_mass);
+        this.fuel = Math.trunc(this.fuel);
+        this.charge = Math.trunc(this.charge);
     }
     Clone() {
         return this.Add(new Stats());
@@ -999,7 +999,6 @@ class Engine extends Part {
             else
                 stats.maxstrain -= this.etype_stats.torque;
         }
-        stats.flightstress += this.etype_stats.rumble;
         //Push-pull
         if (this.use_pp) {
             var pp_type = this.mount_list[this.selected_mount].pp_type;
@@ -1243,6 +1242,12 @@ class Engines extends Part {
             r += e.GetRumble();
         return r;
     }
+    GetMaxRumble() {
+        var r = 0;
+        for (let e of this.engines)
+            r = Math.max(r, e.GetRumble());
+        return r;
+    }
     PartStats() {
         var stats = new Stats;
         var needCool = [...Array(this.radiators.length).fill(0)];
@@ -1252,6 +1257,7 @@ class Engines extends Part {
             if (en.NeedCooling())
                 needCool[en.GetRadiator()] += en.GetCooling();
         }
+        stats.flightstress += this.GetMaxRumble();
         //Upkeep calc only uses engine costs
         stats.upkeep = Math.floor(Math.min(stats.power / 10, stats.cost));
         //Include radiaators
@@ -2078,8 +2084,11 @@ class Wings extends Part {
                 stats.liftbleed += 5;
                 stats.visibility -= 1;
             }
+            var wStats = new Stats();
+            //Deck Stats
+            wStats = wStats.Add(this.deck_list[w.deck].stats);
             //Actual stats
-            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats = wStats.Add(this.skin_list[w.surface].stats.Multiply(w.area));
             wStats.wingarea = w.area;
             wStats.maxstrain -= 2 * w.span + w.area - 10;
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
@@ -2116,14 +2125,10 @@ class Wings extends Part {
             wStats.Round();
             stats = stats.Add(wStats);
         }
-        for (let i = 0; i < deck_count.length; i++) {
-            if (deck_count[i] > 0)
-                stats = stats.Add(this.deck_list[i].stats);
-        }
         //Longest wing effects
         stats.control += 8 - longest_span;
         stats.latstab += Math.min(0, longest_span - 8);
-        stats.latstab += Math.floor(longest_span / this.num_frames);
+        stats.latstab += Math.max(0, Math.floor(longest_span / this.num_frames) - 1);
         //Wing Sweep effects
         if (this.is_swept) {
             stats.liftbleed += 5;
@@ -7024,7 +7029,7 @@ class Weapon extends Part {
         return this.wing;
     }
     SetWing(use) {
-        if (use) {
+        if (use && this.can_wing) {
             this.wing = true;
             this.synchronization = -1;
         }
@@ -7053,7 +7058,7 @@ class Weapon extends Part {
         return this.free_accessible;
     }
     SetFreeAccessible(use) {
-        if (use) {
+        if (use && this.can_free_accessible) {
             this.free_accessible = true;
             this.accessible = false;
         }
@@ -7076,6 +7081,13 @@ class Weapon extends Part {
         else {
             this.synchronization = -1;
         }
+        this.CalculateStats();
+    }
+    GetPair() {
+        return this.pair;
+    }
+    SetPair(use) {
+        this.pair = use;
         this.CalculateStats();
     }
     SetCalculateStats(callback) {

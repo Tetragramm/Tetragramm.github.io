@@ -234,6 +234,12 @@ class Engines extends Part {
             r += e.GetRumble();
         return r;
     }
+    public GetMaxRumble() {
+        var r = 0;
+        for (let e of this.engines)
+            r = Math.max(r, e.GetRumble());
+        return r;
+    }
 
     public PartStats(): Stats {
         var stats = new Stats;
@@ -244,6 +250,7 @@ class Engines extends Part {
             if (en.NeedCooling())
                 needCool[en.GetRadiator()] += en.GetCooling();
         }
+        stats.flightstress += this.GetMaxRumble();
 
         //Upkeep calc only uses engine costs
         stats.upkeep = Math.floor(Math.min(stats.power / 10, stats.cost));

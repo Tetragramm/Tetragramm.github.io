@@ -374,8 +374,12 @@ class Wings extends Part {
                 stats.visibility -= 1;
             }
 
+            var wStats = new Stats();
+            //Deck Stats
+            wStats = wStats.Add(this.deck_list[w.deck].stats);
+
             //Actual stats
-            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats = wStats.Add(this.skin_list[w.surface].stats.Multiply(w.area));
             wStats.wingarea = w.area;
             wStats.maxstrain -= 2 * w.span + w.area - 10;
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
@@ -419,15 +423,10 @@ class Wings extends Part {
             stats = stats.Add(wStats);
         }
 
-        for (let i = 0; i < deck_count.length; i++) {
-            if (deck_count[i] > 0)
-                stats = stats.Add(this.deck_list[i].stats);
-        }
-
         //Longest wing effects
         stats.control += 8 - longest_span;
         stats.latstab += Math.min(0, longest_span - 8);
-        stats.latstab += Math.floor(longest_span / this.num_frames);
+        stats.latstab += Math.max(0, Math.floor(longest_span / this.num_frames) - 1);
 
         //Wing Sweep effects
         if (this.is_swept) {

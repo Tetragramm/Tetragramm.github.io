@@ -432,8 +432,6 @@ class Engine extends Part {
                 stats.maxstrain -= this.etype_stats.torque;
         }
 
-        stats.flightstress += this.etype_stats.rumble;
-
         //Push-pull
         if (this.use_pp) {
             var pp_type = this.mount_list[this.selected_mount].pp_type;
