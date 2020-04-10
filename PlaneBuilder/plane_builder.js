@@ -1626,8 +1626,10 @@ class Frames extends Part {
     SectionStats(sec) {
         var stats = new Stats();
         stats = stats.Add(this.frame_list[sec.frame].stats);
-        if (sec.geodesic)
+        if (sec.geodesic) {
             stats.structure *= 1.5;
+            stats.cost *= 2;
+        }
         if (sec.lifting_body) {
             stats.drag += 1;
             stats.wingarea += 3;
