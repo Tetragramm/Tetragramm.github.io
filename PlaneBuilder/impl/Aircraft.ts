@@ -289,7 +289,11 @@ class Aircraft {
         var ElevatorsEmpty = Math.max(1, Math.floor(HandlingEmpty / 10));
         var ElevatorsFull = Math.max(1, Math.floor(HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(HandlingFullwBombs / 10));
-        var MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+
+        var MaxStrain = 1 / 0;
+        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)
+            MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+
         var Toughness = this.stats.toughness;
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(DPEmpty / 6);
