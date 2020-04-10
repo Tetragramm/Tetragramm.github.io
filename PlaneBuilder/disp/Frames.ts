@@ -28,6 +28,7 @@ class Frames_HTML extends Display {
     private d_flammable: HTMLTableCellElement;
     private d_pstb: HTMLTableCellElement;
     private d_strn: HTMLTableCellElement;
+    private d_lift: HTMLTableCellElement;
 
     constructor(frames: Frames) {
         super();
@@ -69,11 +70,11 @@ class Frames_HTML extends Display {
         this.d_pstb = c3_row.insertCell();
         var h4_row = tbl.insertRow();
         CreateTH(h4_row, "Max Strain");
-        CreateTH(h4_row, "");
+        CreateTH(h4_row, "Lift Bleed");
         CreateTH(h4_row, "");
         var c4_row = tbl.insertRow();
         this.d_strn = c4_row.insertCell();
-        c4_row.insertCell();
+        this.d_lift = c4_row.insertCell();
         c4_row.insertCell();
 
 
@@ -163,6 +164,7 @@ class Frames_HTML extends Display {
         BlinkIfChanged(this.d_area, stats.wingarea.toString());
         BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
         BlinkIfChanged(this.d_strn, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
     }
 
     private UpdateSection(i: number, sec: {
