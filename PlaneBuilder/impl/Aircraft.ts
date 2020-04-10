@@ -16,6 +16,7 @@
 /// <reference path="./LandingGear.ts" />
 /// <reference path="./Accessories.ts" />
 /// <reference path="./Optimization.ts" />
+/// <reference path="./Weapons.ts" />
 
 class Aircraft {
     private use_storage: boolean = false;
@@ -40,6 +41,7 @@ class Aircraft {
     private gear: LandingGear;
     private accessories: Accessories;
     private optimization: Optimization;
+    private weapons: Weapons;
 
     constructor(js: JSON, engine_json: JSON, storage: boolean) {
         this.stats = new Stats();
@@ -61,6 +63,7 @@ class Aircraft {
         this.gear = new LandingGear(js["landing_gear"]);
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
+        this.weapons = new Weapons(js["weapons"]);
 
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
@@ -78,6 +81,7 @@ class Aircraft {
         this.gear.SetCalculateStats(() => { this.CalculateStats(); });
         this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
         this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
+        this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
 
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
@@ -106,6 +110,7 @@ class Aircraft {
             gear: this.gear.toJSON(),
             accessories: this.accessories.toJSON(),
             optimization: this.optimization.toJSON(),
+            weapons: this.weapons.toJSON(),
         };
     }
 
@@ -130,6 +135,7 @@ class Aircraft {
             this.gear.fromJSON(js["gear"]);
             this.accessories.fromJSON(js["accessories"]);
             this.optimization.fromJSON(js["optimization"]);
+            this.weapons.fromJSON(js["weapons"]);
             this.CalculateStats();
             return true;
         }
@@ -186,6 +192,8 @@ class Aircraft {
         this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         stats = stats.Add(this.accessories.PartStats());
+
+        stats = stats.Add(this.weapons.PartStats());
 
         //Gear go last, because they need total mass.
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
@@ -438,5 +446,8 @@ class Aircraft {
     }
     public GetStats() {
         return this.stats;
+    }
+    public GetWeapons() {
+        return this.weapons;
     }
 }

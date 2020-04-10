@@ -13,6 +13,7 @@
 /// <reference path="./LandingGear.ts" />
 /// <reference path="./Accessories.ts" />
 /// <reference path="./Optimization.ts" />
+/// <reference path="./Weapons.ts" />
 /// <reference path="../impl/Aircraft.ts" />
 
 class Aircraft_HTML extends Display {
@@ -31,6 +32,7 @@ class Aircraft_HTML extends Display {
     private gear: LandingGear_HTML;
     private accessories: Accessories_HTML;
     private optimization: Optimization_HTML;
+    private weapons: Weapons_HTML;
 
     //Stats Display
     private d_lift: HTMLTableCellElement;
@@ -124,6 +126,7 @@ class Aircraft_HTML extends Display {
         this.gear = new LandingGear_HTML(aircraft.GetLandingGear());
         this.accessories = new Accessories_HTML(aircraft.GetAccessories());
         this.optimization = new Optimization_HTML(aircraft.GetOptimization());
+        this.weapons = new Weapons_HTML(aircraft.GetWeapons());
 
         var tbl = document.getElementById("tbl_stats") as HTMLTableElement;
         this.InitStats(tbl);
@@ -577,6 +580,7 @@ class Aircraft_HTML extends Display {
         this.gear.UpdateDisplay();
         this.accessories.UpdateDisplay();
         this.optimization.UpdateDisplay();
+        this.weapons.UpdateDisplay();
 
         this.UpdateStats();
         this.UpdateDerived();

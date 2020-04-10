@@ -234,7 +234,7 @@ class Engine extends Part {
     }
 
     public SetGearCount(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.gp_count = num;
@@ -246,7 +246,7 @@ class Engine extends Part {
     }
 
     public SetGearReliability(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.gpr_count = Math.min(num, this.gp_count);

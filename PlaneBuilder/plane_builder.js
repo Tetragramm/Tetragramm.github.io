@@ -829,7 +829,7 @@ class Engine extends Part {
         return this.use_ds;
     }
     SetGearCount(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.gp_count = num;
@@ -839,7 +839,7 @@ class Engine extends Part {
         return this.gp_count;
     }
     SetGearReliability(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.gpr_count = Math.min(num, this.gp_count);
@@ -3618,6 +3618,201 @@ class Optimization extends Part {
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
+class Weapon extends Part {
+    constructor(js) {
+        super();
+    }
+    toJSON() {
+        return {};
+    }
+    fromJSON(js) {
+    }
+    GetFixed() {
+        return this.fixed;
+    }
+    SetFixed(use) {
+        if (use) {
+            this.fixed = true;
+        }
+        else {
+            this.fixed = false;
+            this.synchronization = -1;
+        }
+        this.CalculateStats();
+    }
+    GetWing() {
+        return this.wing;
+    }
+    SetWing(use) {
+        if (use && this.can_wing) {
+            this.wing = true;
+            this.synchronization = -1;
+        }
+        else {
+            this.wing = false;
+        }
+        this.CalculateStats();
+    }
+    GetCovered() {
+        return this.covered;
+    }
+    SetCovered(use) {
+        this.covered = use;
+        this.CalculateStats();
+    }
+    GetAccessible() {
+        return this.accessible || this.free_accessible;
+    }
+    SetAccessible(use) {
+        if (use && this.free_accessible)
+            use = false;
+        this.accessible = use;
+        this.CalculateStats();
+    }
+    GetFreeAccessible() {
+        return this.free_accessible;
+    }
+    SetFreeAccessible(use) {
+        if (use && this.can_free_accessible) {
+            this.free_accessible = true;
+            this.accessible = false;
+        }
+        else {
+            this.free_accessible = false;
+        }
+        this.CalculateStats();
+    }
+    GetSynchronization() {
+        return this.synchronization;
+    }
+    SetSynchronization(use) {
+        if (use >= 0 && this.weapon_type.synched && this.can_synchronize) {
+            if (use == 3 && !this.can_deflector)
+                use--;
+            if (use == 2 && !this.can_spinner)
+                use--;
+            this.synchronization = use;
+        }
+        else {
+            this.synchronization = -1;
+        }
+        this.CalculateStats();
+    }
+    GetPair() {
+        return this.pair;
+    }
+    SetPair(use) {
+        this.pair = use;
+        this.CalculateStats();
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats = stats.Add(this.weapon_type.stats);
+        if (this.pair)
+            stats = stats.Add(this.weapon_type.stats);
+        if (this.accessible) {
+            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
+        }
+        if (this.covered) {
+            stats.mass += 1;
+            stats.drag = 0;
+        }
+        //If uncovered add 1, if covered, drag is 1.
+        if (this.wing)
+            stats.drag += 1;
+        //Synchronization == -1 is no synch.
+        if (this.synchronization == 0) {
+            stats.cost += 2;
+            if (this.pair)
+                stats.cost += 2;
+        }
+        else if (this.synchronization == 1) {
+            stats.cost += 3;
+            if (this.pair)
+                stats.cost += 3;
+            //synchronization == 2 is spinner and costs nothing.
+        }
+        else if (this.synchronization == 3) {
+            stats.cost += 1;
+            stats.warnings.push({
+                source: this.weapon_type.name,
+                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
+            });
+        }
+        return stats;
+    }
+}
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+/// <reference path="./Weapon.ts" />
+class Weapons extends Part {
+    constructor(js) {
+        super();
+        this.weapon_mass = 0;
+        this.weapon_drag = 0;
+        this.weapon_cost = 0;
+    }
+    toJSON() {
+        return {
+            state: "BETA",
+            weapon_mass: this.weapon_mass,
+            weapon_drag: this.weapon_drag,
+            weapon_cost: this.weapon_cost,
+        };
+    }
+    fromJSON(js) {
+        if (js && js["state"] == "BETA") {
+            this.weapon_cost = js["weapon_cost"];
+            this.weapon_drag = js["weapon_drag"];
+            this.weapon_mass = js["weapon_mass"];
+        }
+    }
+    GetMass() {
+        return this.weapon_mass;
+    }
+    SetMass(num) {
+        if (num != num || num < 0)
+            num = 0;
+        num = Math.floor(num);
+        this.weapon_mass = num;
+        this.CalculateStats();
+    }
+    GetDrag() {
+        return this.weapon_drag;
+    }
+    SetDrag(num) {
+        if (num != num || num < 0)
+            num = 0;
+        num = Math.floor(num);
+        this.weapon_drag = num;
+        this.CalculateStats();
+    }
+    GetCost() {
+        return this.weapon_cost;
+    }
+    SetCost(num) {
+        if (num != num || num < 0)
+            num = 0;
+        num = Math.floor(num);
+        this.weapon_cost = num;
+        this.CalculateStats();
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats.mass = this.weapon_mass;
+        stats.drag = this.weapon_drag;
+        stats.cost = this.weapon_cost;
+        return stats;
+    }
+}
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
 /// <reference path="./Era.ts" />
 /// <reference path="./Cockpits.ts" />
 /// <reference path="./Passengers.ts" />
@@ -3634,6 +3829,7 @@ class Optimization extends Part {
 /// <reference path="./LandingGear.ts" />
 /// <reference path="./Accessories.ts" />
 /// <reference path="./Optimization.ts" />
+/// <reference path="./Weapons.ts" />
 class Aircraft {
     constructor(js, engine_json, storage) {
         this.use_storage = false;
@@ -3656,6 +3852,7 @@ class Aircraft {
         this.gear = new LandingGear(js["landing_gear"]);
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
+        this.weapons = new Weapons(js["weapons"]);
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
         this.passengers.SetCalculateStats(() => { this.CalculateStats(); });
@@ -3672,6 +3869,7 @@ class Aircraft {
         this.gear.SetCalculateStats(() => { this.CalculateStats(); });
         this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
         this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
+        this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
@@ -3697,6 +3895,7 @@ class Aircraft {
             gear: this.gear.toJSON(),
             accessories: this.accessories.toJSON(),
             optimization: this.optimization.toJSON(),
+            weapons: this.weapons.toJSON(),
         };
     }
     fromJSON(js) {
@@ -3720,6 +3919,7 @@ class Aircraft {
             this.gear.fromJSON(js["gear"]);
             this.accessories.fromJSON(js["accessories"]);
             this.optimization.fromJSON(js["optimization"]);
+            this.weapons.fromJSON(js["weapons"]);
             this.CalculateStats();
             return true;
         }
@@ -3764,6 +3964,7 @@ class Aircraft {
         this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         stats = stats.Add(this.accessories.PartStats());
+        stats = stats.Add(this.weapons.PartStats());
         //Gear go last, because they need total mass.
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         stats = stats.Add(this.gear.PartStats());
@@ -3988,6 +4189,9 @@ class Aircraft {
     }
     GetStats() {
         return this.stats;
+    }
+    GetWeapons() {
+        return this.weapons;
     }
 }
 var internal_id = 0;
@@ -6420,6 +6624,25 @@ class Optimization_HTML extends Display {
     }
 }
 /// <reference path="./Display.ts" />
+/// <reference path="../impl/Weapons.ts" />
+class Weapons_HTML extends Display {
+    constructor(weap) {
+        super();
+        this.weap = weap;
+        this.input_mass = document.getElementById("weapon_mass");
+        this.input_mass.onchange = () => { this.weap.SetMass(this.input_mass.valueAsNumber); };
+        this.input_drag = document.getElementById("weapon_drag");
+        this.input_drag.onchange = () => { this.weap.SetDrag(this.input_drag.valueAsNumber); };
+        this.input_cost = document.getElementById("weapon_cost");
+        this.input_cost.onchange = () => { this.weap.SetCost(this.input_cost.valueAsNumber); };
+    }
+    UpdateDisplay() {
+        this.input_mass.valueAsNumber = this.weap.GetMass();
+        this.input_drag.valueAsNumber = this.weap.GetDrag();
+        this.input_cost.valueAsNumber = this.weap.GetCost();
+    }
+}
+/// <reference path="./Display.ts" />
 /// <reference path="./Era.ts" />
 /// <reference path="./Cockpits.ts" />
 /// <reference path="./Passengers.ts" />
@@ -6434,6 +6657,7 @@ class Optimization_HTML extends Display {
 /// <reference path="./LandingGear.ts" />
 /// <reference path="./Accessories.ts" />
 /// <reference path="./Optimization.ts" />
+/// <reference path="./Weapons.ts" />
 /// <reference path="../impl/Aircraft.ts" />
 class Aircraft_HTML extends Display {
     constructor(js, aircraft) {
@@ -6453,6 +6677,7 @@ class Aircraft_HTML extends Display {
         this.gear = new LandingGear_HTML(aircraft.GetLandingGear());
         this.accessories = new Accessories_HTML(aircraft.GetAccessories());
         this.optimization = new Optimization_HTML(aircraft.GetOptimization());
+        this.weapons = new Weapons_HTML(aircraft.GetWeapons());
         var tbl = document.getElementById("tbl_stats");
         this.InitStats(tbl);
         var tbl2 = document.getElementById("tbl_derived");
@@ -6876,6 +7101,7 @@ class Aircraft_HTML extends Display {
         this.gear.UpdateDisplay();
         this.accessories.UpdateDisplay();
         this.optimization.UpdateDisplay();
+        this.weapons.UpdateDisplay();
         this.UpdateStats();
         this.UpdateDerived();
     }
@@ -7004,135 +7230,6 @@ var parts_JSON;
 var engine_json;
 var aircraft_model;
 var aircraft_display;
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
-class Weapon extends Part {
-    constructor(js) {
-        super();
-    }
-    toJSON() {
-        return {};
-    }
-    fromJSON(js) {
-    }
-    GetFixed() {
-        return this.fixed;
-    }
-    SetFixed(use) {
-        if (use) {
-            this.fixed = true;
-        }
-        else {
-            this.fixed = false;
-            this.synchronization = -1;
-        }
-        this.CalculateStats();
-    }
-    GetWing() {
-        return this.wing;
-    }
-    SetWing(use) {
-        if (use && this.can_wing) {
-            this.wing = true;
-            this.synchronization = -1;
-        }
-        else {
-            this.wing = false;
-        }
-        this.CalculateStats();
-    }
-    GetCovered() {
-        return this.covered;
-    }
-    SetCovered(use) {
-        this.covered = use;
-        this.CalculateStats();
-    }
-    GetAccessible() {
-        return this.accessible || this.free_accessible;
-    }
-    SetAccessible(use) {
-        if (use && this.free_accessible)
-            use = false;
-        this.accessible = use;
-        this.CalculateStats();
-    }
-    GetFreeAccessible() {
-        return this.free_accessible;
-    }
-    SetFreeAccessible(use) {
-        if (use && this.can_free_accessible) {
-            this.free_accessible = true;
-            this.accessible = false;
-        }
-        else {
-            this.free_accessible = false;
-        }
-        this.CalculateStats();
-    }
-    GetSynchronization() {
-        return this.synchronization;
-    }
-    SetSynchronization(use) {
-        if (use >= 0 && this.weapon_type.synched && this.can_synchronize) {
-            if (use == 3 && !this.can_deflector)
-                use--;
-            if (use == 2 && !this.can_spinner)
-                use--;
-            this.synchronization = use;
-        }
-        else {
-            this.synchronization = -1;
-        }
-        this.CalculateStats();
-    }
-    GetPair() {
-        return this.pair;
-    }
-    SetPair(use) {
-        this.pair = use;
-        this.CalculateStats();
-    }
-    SetCalculateStats(callback) {
-        this.CalculateStats = callback;
-    }
-    PartStats() {
-        var stats = new Stats();
-        stats = stats.Add(this.weapon_type.stats);
-        if (this.pair)
-            stats = stats.Add(this.weapon_type.stats);
-        if (this.accessible) {
-            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
-        }
-        if (this.covered) {
-            stats.mass += 1;
-            stats.drag = 0;
-        }
-        //If uncovered add 1, if covered, drag is 1.
-        if (this.wing)
-            stats.drag += 1;
-        //Synchronization == -1 is no synch.
-        if (this.synchronization == 0) {
-            stats.cost += 2;
-            if (this.pair)
-                stats.cost += 2;
-        }
-        else if (this.synchronization == 1) {
-            stats.cost += 3;
-            if (this.pair)
-                stats.cost += 3;
-            //synchronization == 2 is spinner and costs nothing.
-        }
-        else if (this.synchronization == 3) {
-            stats.cost += 1;
-            stats.warnings.push({
-                source: this.weapon_type.name,
-                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
-            });
-        }
-        return stats;
-    }
-}
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./Weapon.ts" />
