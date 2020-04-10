@@ -234,11 +234,21 @@
 			</div>
 			<br />
 			<div id="Weapons">
-				<h3 class="page__h3">Weapons (Temporary)
+				<h3 class="page__h3">Weapons (BETA2)
 					<span class="rules">(<a href="./Rules/Rules.htm#_jjg8jcon1xb4"><u>Rules</u></a>)</span> <br />
-					<span> <label for="weapon_mass">Mass:</label> <input type="number" id="weapon_mass"></input></span>
-					<span> <label for="weapon_drag">Drag:</label> <input type="number" id="weapon_drag"></input></span>
-					<span> <label for="weapon_cost">Cost:</label> <input type="number" id="weapon_cost"></input></span>
+					<span> <label for="num_engines">Number of Weapon Sets:</label> <input type="number" id="num_wsets"
+							min="0" max="20" value="1" /></span>
+					<span> <label for="num_radiators">Number of Artillery Pieces:</label> <input type="number"
+							id="num_arty" min="0" max="20" value="0" /></span>
+				</h3>
+				<table style="width:100%" id="table_engine">
+					<tr>
+						<th>Engine Type</th>
+						<th>Options</th>
+						<th>Options 2</th>
+						<th>Engine Stats</th>
+					</tr>
+				</table>
 				</h3>
 			</div>
 			<br />
