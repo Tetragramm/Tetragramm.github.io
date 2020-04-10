@@ -1,7 +1,3 @@
-// export { Stabilizers };
-
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 
@@ -14,11 +10,11 @@ class Stabilizers extends Part {
 
     private hstab_list: {
         name: string, is_canard: boolean, increment: number, stats: Stats,
-        dragfactor: number, is_vtail: boolean, is_tail:boolean
+        dragfactor: number, is_vtail: boolean, is_tail: boolean
     }[];
     private vstab_list: {
         name: string, increment: number, stats: Stats,
-        dragfactor: number, is_vtail: boolean, is_tail:boolean
+        dragfactor: number, is_vtail: boolean, is_tail: boolean
     }[];
 
     private hstab_sel: number;
@@ -114,7 +110,7 @@ class Stabilizers extends Part {
         for (let t of this.hstab_list) {
             if (t.name == "The Wings" && !(this.is_tandem || this.is_swept))
                 lst.push(false);
-            else if(t.is_tail && !this.have_tail)
+            else if (t.is_tail && !this.have_tail)
                 lst.push(false);
             else
                 lst.push(true);
@@ -162,7 +158,7 @@ class Stabilizers extends Part {
         for (let t of this.vstab_list) {
             if (t.name == "Outboard" && !this.GetVOutboard())
                 lst.push(false);
-            else if(t.is_tail && !this.have_tail)
+            else if (t.is_tail && !this.have_tail)
                 lst.push(false);
             else
                 lst.push(true);
@@ -242,19 +238,19 @@ class Stabilizers extends Part {
         this.wing_area = num;
     }
 
-    public SetHaveTail(use: boolean){
+    public SetHaveTail(use: boolean) {
         this.have_tail = use;
-        if(!use) {
+        if (!use) {
             var hvalid = this.GetHValidList();
-            if(!hvalid[this.hstab_sel]){
+            if (!hvalid[this.hstab_sel]) {
                 this.hstab_sel = 2;
             }
             var vvalid = this.GetVValidList();
-            if(!vvalid[this.vstab_sel]){
-                if(!vvalid[1]) //If it was outboard, set it to canard so we can have outboard vstab.
+            if (!vvalid[this.vstab_sel]) {
+                if (!vvalid[1]) //If it was outboard, set it to canard so we can have outboard vstab.
                     this.hstab_sel = 2;
                 this.vstab_sel = 1;
-                if(this.vstab_count % 2 != 0)
+                if (this.vstab_count % 2 != 0)
                     this.vstab_count++;
             }
         }

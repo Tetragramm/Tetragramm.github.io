@@ -1,7 +1,3 @@
-// export { Propeller };
-
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 

@@ -1,8 +1,3 @@
-// export { Cockpits };
-
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
-// import { Cockpit } from "./Cockpit";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./Cockpit.ts" />

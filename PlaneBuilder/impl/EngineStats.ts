@@ -1,6 +1,3 @@
-// export { EngineStats };
-
-// import { Stats } from "./Stats";
 /// <reference path="./Stats.ts" />
 
 class EngineStats {

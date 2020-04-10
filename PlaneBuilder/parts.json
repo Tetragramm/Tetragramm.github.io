@@ -909,7 +909,7 @@
                 "is_canard": false,
                 "increment": 1,
                 "is_vtail": false,
-                "is_tail":true
+                "is_tail": true
             },
             {
                 "name": "The Wings",
@@ -917,7 +917,7 @@
                 "is_canard": false,
                 "increment": 0,
                 "is_vtail": false,
-                "is_tail":false
+                "is_tail": false
             },
             {
                 "name": "Canards",
@@ -926,7 +926,7 @@
                 "is_canard": true,
                 "increment": 1,
                 "is_vtail": false,
-                "is_tail":false
+                "is_tail": false
             },
             {
                 "name": "Outboard",
@@ -935,7 +935,7 @@
                 "is_canard": false,
                 "increment": 2,
                 "is_vtail": false,
-                "is_tail":false
+                "is_tail": false
             },
             {
                 "name": "V-Tail",
@@ -946,7 +946,7 @@
                 "is_canard": false,
                 "increment": 1,
                 "is_vtail": true,
-                "is_tail":true
+                "is_tail": true
             },
             {
                 "name": "T-Tail",
@@ -955,7 +955,7 @@
                 "is_canard": false,
                 "increment": 1,
                 "is_vtail": false,
-                "is_tail":true,
+                "is_tail": true,
                 "warning": "In the event of a spin/stall while above stall speed and under power, you are at a Disadvantage to recover."
             }
         ],
@@ -965,7 +965,7 @@
                 "dragfactor": 1,
                 "increment": 1,
                 "is_vtail": false,
-                "is_tail":true
+                "is_tail": true
             },
             {
                 "name": "Outboard",
@@ -973,14 +973,14 @@
                 "control": 1,
                 "increment": 2,
                 "is_vtail": false,
-                "is_tail":false
+                "is_tail": false
             },
             {
                 "name": "V-Tail",
                 "dragfactor": 0,
                 "increment": 0,
                 "is_vtail": true,
-                "is_tail":true
+                "is_tail": true
             }
         ]
     },

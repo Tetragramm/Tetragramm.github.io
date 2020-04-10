@@ -1,5 +1,3 @@
-// export { Stats };
-
 class Stats {
     public liftbleed: number = 0;
     public wetmass: number = 0;

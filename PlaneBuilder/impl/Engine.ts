@@ -1,8 +1,3 @@
-// export { Engine };
-
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
-// import { EngineStats } from "./EngineStats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />

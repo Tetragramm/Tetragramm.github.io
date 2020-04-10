@@ -212,6 +212,8 @@ class Frames_HTML extends Display {
             skin_select.disabled = true;
         skin_select.onchange = () => { this.frames.SetSkin(i, skin_select.selectedIndex); };
         skin_select.selectedIndex = sec.skin;
+        if (sec.internal_bracing)
+            skin_select.selectedIndex = -1;
         this.c_skin.appendChild(skin_select);
         this.c_skin.appendChild(document.createElement("BR"));
 

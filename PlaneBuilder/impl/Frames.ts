@@ -1,7 +1,3 @@
-// export { Frames };
-
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 
@@ -222,9 +218,14 @@ class Frames extends Part {
             if (!elem.internal_bracing)
                 hist[elem.frame]++;
         }
+        for (let elem of this.tail_section_list) {
+            if (!elem.internal_bracing)
+                hist[elem.frame]++;
+        }
+        console.log(hist);
         var max_index = 0;
         var max = 0;
-        for (let i = hist.length - 1; i > 0; i--) {
+        for (let i = hist.length - 1; i >= 0; i--) {
             if (hist[i] > max) {
                 max = hist[i];
                 max_index = i;
@@ -341,9 +342,7 @@ class Frames extends Part {
             stats.wingarea += 3;
         }
         //If it's internal, no skin.
-        if (sec.internal_bracing)
-            stats.mass -= 1;
-        else {
+        if (!sec.internal_bracing) {
             if (sec.monocoque) {
                 stats.mass = 0;
                 stats.cost += 1;
@@ -472,7 +471,7 @@ class Frames extends Part {
         this.CalculateStats();
     }
 
-    public GetIsTailless(){
+    public GetIsTailless() {
         return this.tail_section_list.length == 0;
     }
 

@@ -1,4 +1,3 @@
-// export { Stats };
 class Stats {
     constructor(js) {
         this.liftbleed = 0;
@@ -265,14 +264,9 @@ class Stats {
         return this.Add(new Stats());
     }
 }
-// export { Part };
-// import { Stats } from "./Stats";
 /// <reference path="./Stats.ts" />
 class Part {
 }
-// export { Era };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Era extends Part {
@@ -315,9 +309,6 @@ class Era extends Part {
         this.CalculateStats = callback;
     }
 }
-// export { Cockpit };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Cockpit extends Part {
@@ -435,10 +426,6 @@ class Cockpit extends Part {
         this.CalculateStats = callback;
     }
 }
-// export { Cockpits };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
-// import { Cockpit } from "./Cockpit";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./Cockpit.ts" />
@@ -556,9 +543,6 @@ class Cockpits extends Part {
         this.CalculateStats = callback;
     }
 }
-// export { Passengers };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Passengers extends Part {
@@ -622,8 +606,6 @@ class Passengers extends Part {
         this.CalculateStats = callback;
     }
 }
-// export { EngineStats };
-// import { Stats } from "./Stats";
 /// <reference path="./Stats.ts" />
 class EngineStats {
     constructor(js) {
@@ -677,10 +659,6 @@ class EngineStats {
             && this.pulsejet == other.pulsejet;
     }
 }
-// export { Engine };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
-// import { EngineStats } from "./EngineStats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
@@ -1066,12 +1044,6 @@ class Engine extends Part {
         return stats;
     }
 }
-// export { Engines };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
-// import { EngineStats } from "./EngineStats";
-// import { Engine } from "./Engine";
-// import { Radiator } from "./Radiator";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
@@ -1299,9 +1271,6 @@ class Engines extends Part {
         return has > 1;
     }
 }
-// export { Propeller };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Propeller extends Part {
@@ -1373,9 +1342,6 @@ class Propeller extends Part {
         this.CalculateStats = callback;
     }
 }
-// export { Frames };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Frames extends Part {
@@ -1549,9 +1515,14 @@ class Frames extends Part {
             if (!elem.internal_bracing)
                 hist[elem.frame]++;
         }
+        for (let elem of this.tail_section_list) {
+            if (!elem.internal_bracing)
+                hist[elem.frame]++;
+        }
+        console.log(hist);
         var max_index = 0;
         var max = 0;
-        for (let i = hist.length - 1; i > 0; i--) {
+        for (let i = hist.length - 1; i >= 0; i--) {
             if (hist[i] > max) {
                 max = hist[i];
                 max_index = i;
@@ -1649,9 +1620,7 @@ class Frames extends Part {
             stats.wingarea += 3;
         }
         //If it's internal, no skin.
-        if (sec.internal_bracing)
-            stats.mass -= 1;
-        else {
+        if (!sec.internal_bracing) {
             if (sec.monocoque) {
                 stats.mass = 0;
                 stats.cost += 1;
@@ -1807,7 +1776,8 @@ class Frames extends Part {
         return stats;
     }
 }
-// export { WingType, Wings };
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
 class Wings extends Part {
     constructor(js) {
         super();
@@ -2168,9 +2138,6 @@ class Wings extends Part {
         this.CalculateStats = callback;
     }
 }
-// export { Stabilizers };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Stabilizers extends Part {
@@ -2414,9 +2381,6 @@ class Stabilizers extends Part {
         return stats;
     }
 }
-// export { ControlSurfaces };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class ControlSurfaces extends Part {
@@ -2571,9 +2535,6 @@ class ControlSurfaces extends Part {
         return stats;
     }
 }
-// export { Reinforcement };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Reinforcement extends Part {
@@ -2762,9 +2723,6 @@ class Reinforcement extends Part {
         return stats;
     }
 }
-// export { Fuel };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Fuel extends Part {
@@ -2913,9 +2871,6 @@ class Fuel extends Part {
         return stats;
     }
 }
-// export { Munitions };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Munitions extends Part {
@@ -3037,9 +2992,6 @@ class Munitions extends Part {
         return stats;
     }
 }
-// export { CargoAndPassengers };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class CargoAndPassengers extends Part {
@@ -3103,9 +3055,6 @@ class CargoAndPassengers extends Part {
         return stats;
     }
 }
-// export { LandingGear };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class LandingGear extends Part {
@@ -3208,9 +3157,6 @@ class LandingGear extends Part {
         return stats;
     }
 }
-// export { Accessories };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Accessories extends Part {
@@ -3433,9 +3379,6 @@ class Accessories extends Part {
         return stats;
     }
 }
-// export { Optimization };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Optimization extends Part {
@@ -3659,51 +3602,6 @@ class Optimization extends Part {
         return stats;
     }
 }
-// export {
-//     Aircraft,
-//     Era,
-//     Cockpits,
-//     Cockpit,
-//     Passengers,
-//     EngineStats,
-//     Engines,
-//     Engine,
-//     Radiator,
-//     Propeller,
-//     Frames,
-//     WingType,
-//     Wings,
-//     Stabilizers,
-//     ControlSurfaces,
-//     Reinforcement,
-//     Fuel,
-//     Munitions,
-//     CargoAndPassengers,
-//     LandingGear,
-//     Accessories,
-//     Optimization,
-// };
-// import { Era } from "./Era";
-// import { Cockpits } from "./Cockpits";
-// import { Cockpit } from "./Cockpit";
-// import { Passengers } from "./Passengers";
-// import { EngineStats } from "./EngineStats";
-// import { Engines } from "./Engines";
-// import { Engine } from "./Engine";
-// import { Radiator } from "./Radiator";
-// import { Propeller } from "./Propeller";
-// import { Frames } from "./Frames";
-// import { WingType, Wings } from "./Wings";
-// import { Stabilizers } from "./Stabilizers";
-// import { ControlSurfaces } from "./ControlSurfaces";
-// import { Reinforcement } from "./Reinforcement";
-// import { Fuel } from "./Fuel";
-// import { Munitions } from "./Munitions";
-// import { CargoAndPassengers } from "./CargoAndPassengers";
-// import { LandingGear } from "./LandingGear";
-// import { Accessories } from "./Accessories";
-// import { Optimization } from "./Optimization";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./Era.ts" />
@@ -4856,9 +4754,6 @@ class Engine_HTML extends Display {
         BlinkIfChanged(this.d_chrg, full_stats.charge.toString());
     }
 }
-// export { Radiator };
-// import { Part } from "./Part";
-// import { Stats } from "./Stats";
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Radiator extends Part {
@@ -5261,6 +5156,8 @@ class Frames_HTML extends Display {
             skin_select.disabled = true;
         skin_select.onchange = () => { this.frames.SetSkin(i, skin_select.selectedIndex); };
         skin_select.selectedIndex = sec.skin;
+        if (sec.internal_bracing)
+            skin_select.selectedIndex = -1;
         this.c_skin.appendChild(skin_select);
         this.c_skin.appendChild(document.createElement("BR"));
         var opt_span = document.createElement("SPAN");
@@ -7083,3 +6980,138 @@ var parts_JSON;
 var engine_json;
 var aircraft_model;
 var aircraft_display;
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+class Weapon extends Part {
+    constructor(js) {
+        super();
+    }
+    toJSON() {
+        return {};
+    }
+    fromJSON(js) {
+    }
+    GetFixed() {
+        return this.fixed;
+    }
+    SetFixed(use) {
+        if (use) {
+            this.fixed = true;
+        }
+        else {
+            this.fixed = false;
+            this.interrupter = false;
+            this.synchronization = false;
+            this.spinner = false;
+            this.deflector = false;
+        }
+        this.CalculateStats();
+    }
+    GetWing() {
+        return this.wing;
+    }
+    SetWing(use) {
+        if (use) {
+            this.wing = true;
+        }
+        else {
+            this.wing = false;
+            this.interrupter = false;
+            this.synchronization = false;
+            this.spinner = false;
+            this.deflector = false;
+        }
+        this.CalculateStats();
+    }
+    GetCovered() {
+        return this.covered;
+    }
+    SetCovered(use) {
+        this.covered = use;
+        this.CalculateStats();
+    }
+    GetAccessible() {
+        return this.accessible || this.free_accessible;
+    }
+    SetAccessible(use) {
+        if (use && this.free_accessible)
+            use = false;
+        this.accessible = use;
+        this.CalculateStats();
+    }
+    GetFreeAccessible() {
+        return this.free_accessible;
+    }
+    SetFreeAccessible(use) {
+        if (use) {
+            this.free_accessible = true;
+            this.accessible = false;
+        }
+        else {
+            this.free_accessible = false;
+        }
+        this.CalculateStats();
+    }
+    GetInterruptor() {
+        return this.interrupter;
+    }
+    SetInterruptor() {
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats = stats.Add(this.weapon_type.stats);
+        if (this.pair)
+            stats = stats.Add(this.weapon_type.stats);
+        if (this.accessible) {
+            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
+        }
+        if (this.covered) {
+            stats.mass += 1;
+            stats.drag = 0;
+        }
+        //If uncovered add 1, if covered, drag is 1.
+        if (this.wing)
+            stats.drag += 1;
+        if (this.interrupter) {
+            stats.cost += 2;
+            if (this.pair)
+                stats.cost += 2;
+        }
+        else if (this.synchronization) {
+            stats.cost += 3;
+            if (this.pair)
+                stats.cost += 3;
+        }
+        else if (this.deflector) {
+            stats.cost += 1;
+            stats.warnings.push({
+                source: this.weapon_type.name,
+                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
+            });
+        }
+        return stats;
+    }
+}
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+/// <reference path="./Weapon.ts" />
+class WeaponSystem extends Part {
+    constructor(js) {
+        super();
+    }
+    toJSON() {
+        return {};
+    }
+    fromJSON(js) {
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+    PartStats() {
+        var stats = new Stats();
+        return stats;
+    }
+}
