@@ -222,7 +222,6 @@ class Frames extends Part {
             if (!elem.internal_bracing)
                 hist[elem.frame]++;
         }
-        console.log(hist);
         var max_index = 0;
         var max = 0;
         for (let i = hist.length - 1; i >= 0; i--) {
