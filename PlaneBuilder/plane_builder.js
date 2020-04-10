@@ -3619,26 +3619,46 @@ class Optimization extends Part {
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Weapon extends Part {
-    constructor(js) {
+    constructor(weapon_type, fixed = false) {
         super();
+        this.weapon_type = weapon_type;
+        this.fixed = fixed;
+        this.wing = true;
+        this.covered = false;
+        this.accessible = false;
+        this.free_accessible = false;
+        if (fixed)
+            this.synchronization = -1;
+        else
+            this.synchronization = 0;
+        this.pair = false;
     }
     toJSON() {
         return {};
     }
     fromJSON(js) {
     }
+    SetWeaponType(weapon_type) {
+        if (weapon_type.size < 16) {
+            this.weapon_type = weapon_type;
+            this.SetPair(this.pair); //Triggers Calculate Stats
+        }
+    }
     GetFixed() {
         return this.fixed;
     }
     SetFixed(use) {
-        if (use) {
-            this.fixed = true;
+        if (use != this.fixed) {
+            if (use) {
+                this.fixed = true;
+                this.synchronization = 0;
+            }
+            else {
+                this.fixed = false;
+                this.synchronization = -1;
+            }
+            this.CalculateStats();
         }
-        else {
-            this.fixed = false;
-            this.synchronization = -1;
-        }
-        this.CalculateStats();
     }
     GetWing() {
         return this.wing;
@@ -3702,6 +3722,8 @@ class Weapon extends Part {
         return this.pair;
     }
     SetPair(use) {
+        if (this.wing && !this.fixed && this.weapon_type.size == 8)
+            use = false;
         this.pair = use;
         this.CalculateStats();
     }
@@ -3713,23 +3735,51 @@ class Weapon extends Part {
         stats = stats.Add(this.weapon_type.stats);
         if (this.pair)
             stats = stats.Add(this.weapon_type.stats);
-        if (this.accessible) {
-            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
-        }
+        //Covered Cost
         if (this.covered) {
             stats.mass += 1;
             stats.drag = 0;
         }
-        //If uncovered add 1, if covered, drag is 1.
+        //If on the wing and uncovered add 1, if covered, drag is min 1.
         if (this.wing)
             stats.drag += 1;
+        //Arty size weapon mounts need a section
+        if (this.pair && this.weapon_type.size == 8)
+            stats.reqsections += 1;
+        //Accessible Cost
+        if (this.accessible) {
+            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
+        }
+        //Turret size cost
+        if (!this.fixed) {
+            var size = this.weapon_type.size;
+            if (this.pair)
+                size *= 2;
+            if (size <= 2) {
+                //Nothing
+            }
+            else if (size == 4) {
+                stats.cost += 1;
+            }
+            else if (size == 8) {
+                stats.mass += 1;
+                stats.cost += 3;
+            }
+            else if (size == 16) {
+                stats.mass += 2;
+                stats.cost += 5;
+            }
+            else {
+                throw "Weapon size screwup in Turret size cost.";
+            }
+        }
         //Synchronization == -1 is no synch.
-        if (this.synchronization == 0) {
+        if (this.synchronization == 0) { //Interruptor Gear
             stats.cost += 2;
             if (this.pair)
                 stats.cost += 2;
         }
-        else if (this.synchronization == 1) {
+        else if (this.synchronization == 1) { // Synch Gear
             stats.cost += 3;
             if (this.pair)
                 stats.cost += 3;
@@ -7236,11 +7286,62 @@ var aircraft_display;
 class WeaponSystem extends Part {
     constructor(js) {
         super();
+        this.direction_list = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
+        for (let e of this.direction_list) {
+            this.directions.push(false);
+        }
     }
     toJSON() {
         return {};
     }
     fromJSON(js) {
+    }
+    GetWeaponList() {
+        return this.weapon_list;
+    }
+    GetWeaponSelected() {
+        return this.weapon_type;
+    }
+    GetDirectionList() {
+        return this.direction_list;
+    }
+    GetFixed() {
+        return this.fixed;
+    }
+    SetFixed(use) {
+        if (this.fixed != use) {
+            this.fixed = use;
+            for (let w of this.weapons) {
+                w.SetFixed(this.fixed);
+            }
+        }
+    }
+    GetDirection() {
+        return this.directions;
+    }
+    SetDirection(num, use) {
+        if (this.fixed && this.directions[num] && !use)
+            use = true;
+        if (this.fixed) {
+            this.directions = [...Array(this.direction_list.length).fill(false)];
+        }
+        this.directions[num] = use;
+        this.CalculateStats();
+    }
+    GetWeaponCount() {
+        return this.weapons.length;
+    }
+    SetWeaponCount(num) {
+        if (num != num || num < 1)
+            num = 1;
+        num = Math.floor(num);
+        while (num < this.weapons.length) {
+            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            this.weapons.push(w);
+        }
+        while (num > this.weapons.length) {
+            this.weapons.pop();
+        }
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;

@@ -1,5 +1,5 @@
 {
-    "tiny": [
+    "weapons": [
         {
             "name": "Submachine Gun",
             "era": "WWI",
@@ -14,10 +14,9 @@
             "synched": false,
             "shells": false,
             "jam": 0.5,
-            "reload": 2
-        }
-    ],
-    "light": [
+            "reload": 2,
+            "size": 1
+        },
         {
             "name": "Scattergun",
             "era": "Pioneer",
@@ -33,7 +32,8 @@
             "shells": false,
             "jam": 0,
             "reload": 0,
-            "warning": "Hits are actually Hits*d5."
+            "warning": "Hits are actually Hits*d5.",
+            "size": 2
         },
         {
             "name": "Light Machine Gun",
@@ -49,10 +49,9 @@
             "synched": false,
             "shells": false,
             "jam": 0.5,
-            "reload": 2
-        }
-    ],
-    "medium": [
+            "reload": 2,
+            "size": 2
+        },
         {
             "name": "Machine Gun",
             "era": "WWI",
@@ -67,7 +66,8 @@
             "synched": true,
             "shells": false,
             "jam": 0.5,
-            "reload": 0
+            "reload": 0,
+            "size": 4
         },
         {
             "name": "Balloon Gun",
@@ -83,7 +83,8 @@
             "synched": true,
             "shells": true,
             "jam": 0.666666666666,
-            "reload": 0
+            "reload": 0,
+            "size": 4
         },
         {
             "name": "Enhanced Machine Gun",
@@ -99,7 +100,8 @@
             "synched": false,
             "shells": false,
             "jam": 0,
-            "reload": 0
+            "reload": 0,
+            "size": 4
         },
         {
             "name": "Heavy Machine Gun",
@@ -115,10 +117,9 @@
             "synched": true,
             "shells": false,
             "jam": 0,
-            "reload": 0
-        }
-    ],
-    "heavy": [
+            "reload": 0,
+            "size": 4
+        },
         {
             "name": "Punt Gun",
             "era": "Pioneer",
@@ -134,7 +135,8 @@
             "shells": false,
             "jam": 0,
             "reload": 0,
-            "warning": "Hits are actually Hits*d10."
+            "warning": "Hits are actually Hits*d10.",
+            "size": 8
         },
         {
             "name": "Light Cannon (Low Velocity)",
@@ -151,7 +153,8 @@
             "shells": true,
             "jam": 0,
             "reload": 2,
-            "warning": "-3 to attack fixed-winged aircraft."
+            "warning": "-3 to attack fixed-winged aircraft.",
+            "size": 8
         },
         {
             "name": "Heavy Cannon (Low Velocity)",
@@ -168,7 +171,8 @@
             "shells": true,
             "jam": 0,
             "reload": 1,
-            "warning": "-3 to attack fixed-winged aircraft."
+            "warning": "-3 to attack fixed-winged aircraft.",
+            "size": 8
         },
         {
             "name": "Light Machine Cannon",
@@ -185,7 +189,8 @@
             "shells": true,
             "jam": 0,
             "reload": 0,
-            "warning": "Costs x2 to Sync. Not currently included."
+            "warning": "Costs x2 to Sync. Not currently included.",
+            "size": 8
         },
         {
             "name": "Heavy Machine Cannon",
@@ -201,7 +206,8 @@
             "synched": false,
             "shells": true,
             "jam": 0,
-            "reload": 0
+            "reload": 0,
+            "size": 8
         },
         {
             "name": "Fliergerflammerwerfer",
@@ -218,10 +224,9 @@
             "shells": false,
             "jam": 0,
             "reload": 0,
-            "warning": "Uses Fuel uses as Ammo. Incendiary. Max range is Knife. Crits start fires but do not destroy parts."
-        }
-    ],
-    "artillery": [
+            "warning": "Uses Fuel uses as Ammo. Incendiary. Max range is Knife. Crits start fires but do not destroy parts.",
+            "size": 8
+        },
         {
             "name": "Recoilless Cannon",
             "era": "WWI",
@@ -237,7 +242,8 @@
             "shells": true,
             "jam": 0,
             "reload": 1,
-            "warning": "-5 to attack fixed-winged aircraft."
+            "warning": "-5 to attack fixed-winged aircraft.",
+            "size": 16
         },
         {
             "name": "Autocannon",
@@ -253,7 +259,8 @@
             "synched": false,
             "shells": true,
             "jam": 0,
-            "reload": 0
+            "reload": 0,
+            "size": 16
         },
         {
             "name": "Battle Cannon",
@@ -269,7 +276,8 @@
             "synched": false,
             "shells": true,
             "jam": 0,
-            "reload": 1
+            "reload": 1,
+            "size": 16
         }
     ]
 }

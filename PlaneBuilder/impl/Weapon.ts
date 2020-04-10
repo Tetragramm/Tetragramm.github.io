@@ -3,7 +3,7 @@
 
 class Weapon extends Part {
     private weapon_type: {
-        name: string, era: string, stats: Stats,
+        name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: number, reload: number,
         rapid: boolean, synched: boolean, shells: boolean
@@ -22,8 +22,24 @@ class Weapon extends Part {
     public can_spinner: boolean;
     public can_deflector: boolean;
 
-    constructor(js: JSON) {
+    constructor(weapon_type: {
+        name: string, era: string, size: number, stats: Stats,
+        damage: number, hits: number, ammo: number,
+        ap: number, jam: number, reload: number,
+        rapid: boolean, synched: boolean, shells: boolean
+    }, fixed: boolean = false) {
         super();
+        this.weapon_type = weapon_type;
+        this.fixed = fixed;
+        this.wing = true;
+        this.covered = false;
+        this.accessible = false;
+        this.free_accessible = false;
+        if (fixed)
+            this.synchronization = -1;
+        else
+            this.synchronization = 0;
+        this.pair = false;
     }
 
     public toJSON() {
@@ -34,18 +50,33 @@ class Weapon extends Part {
     public fromJSON(js: JSON) {
     }
 
+    public SetWeaponType(weapon_type: {
+        name: string, era: string, size: number, stats: Stats,
+        damage: number, hits: number, ammo: number,
+        ap: number, jam: number, reload: number,
+        rapid: boolean, synched: boolean, shells: boolean
+    }) {
+        if (weapon_type.size < 16) {
+            this.weapon_type = weapon_type;
+            this.SetPair(this.pair); //Triggers Calculate Stats
+        }
+    }
+
     public GetFixed() {
         return this.fixed;
     }
 
     public SetFixed(use: boolean) {
-        if (use) {
-            this.fixed = true;
-        } else {
-            this.fixed = false;
-            this.synchronization = -1;
+        if (use != this.fixed) {
+            if (use) {
+                this.fixed = true;
+                this.synchronization = 0;
+            } else {
+                this.fixed = false;
+                this.synchronization = -1;
+            }
+            this.CalculateStats();
         }
-        this.CalculateStats();
     }
 
     public GetWing() {
@@ -119,6 +150,8 @@ class Weapon extends Part {
     }
 
     public SetPair(use: boolean) {
+        if (this.wing && !this.fixed && this.weapon_type.size == 8)
+            use = false;
         this.pair = use;
         this.CalculateStats();
     }
@@ -134,24 +167,50 @@ class Weapon extends Part {
         if (this.pair)
             stats = stats.Add(this.weapon_type.stats);
 
-        if (this.accessible) {
-            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
-        }
-
+        //Covered Cost
         if (this.covered) {
             stats.mass += 1;
             stats.drag = 0;
         }
-        //If uncovered add 1, if covered, drag is 1.
+        //If on the wing and uncovered add 1, if covered, drag is min 1.
         if (this.wing)
             stats.drag += 1;
 
+        //Arty size weapon mounts need a section
+        if (this.pair && this.weapon_type.size == 8)
+            stats.reqsections += 1;
+
+        //Accessible Cost
+        if (this.accessible) {
+            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
+        }
+
+        //Turret size cost
+        if (!this.fixed) {
+            var size = this.weapon_type.size;
+            if (this.pair)
+                size *= 2;
+            if (size <= 2) {
+                //Nothing
+            } else if (size == 4) {
+                stats.cost += 1;
+            } else if (size == 8) {
+                stats.mass += 1;
+                stats.cost += 3;
+            } else if (size == 16) {
+                stats.mass += 2;
+                stats.cost += 5;
+            } else {
+                throw "Weapon size screwup in Turret size cost.";
+            }
+        }
+
         //Synchronization == -1 is no synch.
-        if (this.synchronization == 0) {
+        if (this.synchronization == 0) { //Interruptor Gear
             stats.cost += 2;
             if (this.pair)
                 stats.cost += 2;
-        } else if (this.synchronization == 1) {
+        } else if (this.synchronization == 1) { // Synch Gear
             stats.cost += 3;
             if (this.pair)
                 stats.cost += 3;
