@@ -228,6 +228,13 @@ class Engines extends Part {
         return os;
     }
 
+    public GetRumble() {
+        var r = 0;
+        for (let e of this.engines)
+            r += e.GetRumble();
+        return r;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = [...Array(this.radiators.length).fill(0)];

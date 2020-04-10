@@ -977,6 +977,9 @@ class Engine extends Part {
         }
         this.CalculateStats();
     }
+    GetRumble() {
+        return this.etype_stats.rumble;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -996,7 +999,6 @@ class Engine extends Part {
             else
                 stats.maxstrain -= this.etype_stats.torque;
         }
-        stats.structure -= this.etype_stats.rumble;
         stats.flightstress += this.etype_stats.rumble;
         //Push-pull
         if (this.use_pp) {
@@ -1234,6 +1236,12 @@ class Engines extends Part {
         for (let e of this.engines)
             os = Math.min(os, e.GetOverspeed());
         return os;
+    }
+    GetRumble() {
+        var r = 0;
+        for (let e of this.engines)
+            r += e.GetRumble();
+        return r;
     }
     PartStats() {
         var stats = new Stats;
@@ -3769,6 +3777,13 @@ class Aircraft {
             this.fuel.SetArea(this.wings.GetArea());
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
             this.munitions.SetAcftStructure(stats.structure);
+            if (this.engines.GetRumble() * 10 > stats.structure) {
+                this.stats.power = 0;
+                this.stats.warnings.push({
+                    source: "Rumble",
+                    warning: "Rumble requires a minimum structure of Rumble*10 to fly."
+                });
+            }
             if (this.DisplayCallback)
                 this.DisplayCallback();
             if (this.use_storage)
@@ -6999,10 +7014,7 @@ class Weapon extends Part {
         }
         else {
             this.fixed = false;
-            this.interrupter = false;
-            this.synchronization = false;
-            this.spinner = false;
-            this.deflector = false;
+            this.synchronization = -1;
         }
         this.CalculateStats();
     }
@@ -7012,13 +7024,10 @@ class Weapon extends Part {
     SetWing(use) {
         if (use) {
             this.wing = true;
+            this.synchronization = -1;
         }
         else {
             this.wing = false;
-            this.interrupter = false;
-            this.synchronization = false;
-            this.spinner = false;
-            this.deflector = false;
         }
         this.CalculateStats();
     }
@@ -7051,10 +7060,21 @@ class Weapon extends Part {
         }
         this.CalculateStats();
     }
-    GetInterruptor() {
-        return this.interrupter;
+    GetSynchronization() {
+        return this.synchronization;
     }
-    SetInterruptor() {
+    SetSynchronization(use) {
+        if (use >= 0 && this.weapon_type.synched && this.can_synchronize) {
+            if (use == 3 && !this.can_deflector)
+                use--;
+            if (use == 2 && !this.can_spinner)
+                use--;
+            this.synchronization = use;
+        }
+        else {
+            this.synchronization = -1;
+        }
+        this.CalculateStats();
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -7074,17 +7094,19 @@ class Weapon extends Part {
         //If uncovered add 1, if covered, drag is 1.
         if (this.wing)
             stats.drag += 1;
-        if (this.interrupter) {
+        //Synchronization == -1 is no synch.
+        if (this.synchronization == 0) {
             stats.cost += 2;
             if (this.pair)
                 stats.cost += 2;
         }
-        else if (this.synchronization) {
+        else if (this.synchronization == 1) {
             stats.cost += 3;
             if (this.pair)
                 stats.cost += 3;
+            //synchronization == 2 is spinner and costs nothing.
         }
-        else if (this.deflector) {
+        else if (this.synchronization == 3) {
             stats.cost += 1;
             stats.warnings.push({
                 source: this.weapon_type.name,

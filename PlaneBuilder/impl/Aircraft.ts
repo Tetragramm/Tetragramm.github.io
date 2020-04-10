@@ -212,6 +212,14 @@ class Aircraft {
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
             this.munitions.SetAcftStructure(stats.structure);
 
+            if (this.engines.GetRumble() * 10 > stats.structure) {
+                this.stats.power = 0;
+                this.stats.warnings.push({
+                    source: "Rumble",
+                    warning: "Rumble requires a minimum structure of Rumble*10 to fly."
+                });
+            }
+
             if (this.DisplayCallback)
                 this.DisplayCallback();
 

@@ -405,6 +405,10 @@ class Engine extends Part {
         this.CalculateStats();
     }
 
+    public GetRumble() {
+        return this.etype_stats.rumble;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -428,7 +432,6 @@ class Engine extends Part {
                 stats.maxstrain -= this.etype_stats.torque;
         }
 
-        stats.structure -= this.etype_stats.rumble;
         stats.flightstress += this.etype_stats.rumble;
 
         //Push-pull
