@@ -150,7 +150,7 @@ class Engine extends Part {
     }
 
     public SetCooling(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.cooling_count = num;

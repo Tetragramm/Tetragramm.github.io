@@ -103,7 +103,7 @@ class Optimization extends Part {
     }
 
     public SetFreeDots(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         num = Math.max(num, 0);

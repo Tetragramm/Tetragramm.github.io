@@ -131,7 +131,7 @@ class Engines extends Part {
     }
 
     public SetNumberOfEngines(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         num = Math.min(20, num);
@@ -160,7 +160,7 @@ class Engines extends Part {
     }
 
     public SetNumberOfRadiators(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         while (this.radiators.length > num) {

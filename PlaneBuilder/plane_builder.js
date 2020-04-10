@@ -504,7 +504,7 @@ class Cockpits extends Part {
         return lst;
     }
     SetNumberOfCockpits(num) {
-        if (num != num)
+        if (num != num || num < 1)
             num = 1;
         num = Math.floor(num);
         while (this.positions.length > num) {
@@ -568,7 +568,7 @@ class Passengers extends Part {
         return this.seats;
     }
     SetSeats(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.seats = num;
@@ -578,7 +578,7 @@ class Passengers extends Part {
         return this.beds;
     }
     SetBeds(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.beds = num;
@@ -761,7 +761,7 @@ class Engine extends Part {
         return (this.cooling_count < this.etype_stats.stats.cooling);
     }
     SetCooling(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.cooling_count = num;
@@ -1152,7 +1152,7 @@ class Engines extends Part {
         return m;
     }
     SetNumberOfEngines(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         num = Math.min(20, num);
@@ -1177,7 +1177,7 @@ class Engines extends Part {
         return this.radiators[num];
     }
     SetNumberOfRadiators(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         while (this.radiators.length > num) {
@@ -2279,7 +2279,7 @@ class Stabilizers extends Part {
         return this.hstab_count;
     }
     SetHStabCount(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.hstab_count = num;
@@ -2300,7 +2300,7 @@ class Stabilizers extends Part {
         return this.vstab_count;
     }
     SetVStabCount(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.vstab_count = num;
@@ -2595,7 +2595,7 @@ class Reinforcement extends Part {
         return this.ext_wood_count;
     }
     SetExternalWoodCount(idx, count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.ext_wood_count[idx] = count;
@@ -2605,7 +2605,7 @@ class Reinforcement extends Part {
         return this.ext_steel_count;
     }
     SetExternalSteelCount(idx, count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.ext_steel_count[idx] = count;
@@ -2621,7 +2621,7 @@ class Reinforcement extends Part {
         return count > 0;
     }
     SetCantileverCount(idx, count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.ImplSCC(idx, count);
@@ -2784,7 +2784,7 @@ class Fuel extends Part {
         return this.tank_count;
     }
     SetTankCount(idx, count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.tank_count[idx] = count;
@@ -2913,7 +2913,7 @@ class Munitions extends Part {
         return this.bomb_count;
     }
     SetBombCount(count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.bomb_count = count;
@@ -2924,7 +2924,7 @@ class Munitions extends Part {
         return this.rocket_count;
     }
     SetRocketCount(count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.rocket_count = count;
@@ -3028,7 +3028,7 @@ class CargoAndPassengers extends Part {
         return this.mass;
     }
     SetMass(count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.mass = count;
@@ -3038,7 +3038,7 @@ class CargoAndPassengers extends Part {
         return this.pass;
     }
     SetPassengers(count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.pass = count;
@@ -3249,7 +3249,7 @@ class Accessories extends Part {
         return this.armour_coverage;
     }
     SetArmourCoverage(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.armour_coverage = num;
@@ -3259,7 +3259,7 @@ class Accessories extends Part {
         return this.armour_AP;
     }
     SetArmourAP(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.armour_AP = num;
@@ -3272,7 +3272,7 @@ class Accessories extends Part {
         return this.electrical_count;
     }
     SetElectricalCount(idx, count) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         count = Math.min(count, 5);
@@ -3479,7 +3479,7 @@ class Optimization extends Part {
         return this.free_dots;
     }
     SetFreeDots(num) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         num = Math.max(num, 0);

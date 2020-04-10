@@ -29,7 +29,7 @@ class CargoAndPassengers extends Part {
     }
 
     public SetMass(count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.mass = count;
@@ -41,7 +41,7 @@ class CargoAndPassengers extends Part {
     }
 
     public SetPassengers(count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.pass = count;

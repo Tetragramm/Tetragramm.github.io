@@ -38,7 +38,7 @@ class Munitions extends Part {
     }
 
     public SetBombCount(count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.bomb_count = count;
@@ -51,7 +51,7 @@ class Munitions extends Part {
     }
 
     public SetRocketCount(count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.rocket_count = count;

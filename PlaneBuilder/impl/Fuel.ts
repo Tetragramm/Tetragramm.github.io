@@ -64,7 +64,7 @@ class Fuel extends Part {
     }
 
     public SetTankCount(idx: number, count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.tank_count[idx] = count;

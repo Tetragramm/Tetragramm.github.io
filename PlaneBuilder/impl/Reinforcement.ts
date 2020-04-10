@@ -68,7 +68,7 @@ class Reinforcement extends Part {
     }
 
     public SetExternalWoodCount(idx: number, count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.ext_wood_count[idx] = count;
@@ -80,7 +80,7 @@ class Reinforcement extends Part {
     }
 
     public SetExternalSteelCount(idx: number, count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.ext_steel_count[idx] = count;
@@ -99,7 +99,7 @@ class Reinforcement extends Part {
     }
 
     public SetCantileverCount(idx: number, count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         this.ImplSCC(idx, count);

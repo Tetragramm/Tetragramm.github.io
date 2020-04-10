@@ -32,7 +32,7 @@ class Passengers extends Part {
     }
 
     public SetSeats(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.seats = num;
@@ -44,7 +44,7 @@ class Passengers extends Part {
     }
 
     public SetBeds(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.beds = num;

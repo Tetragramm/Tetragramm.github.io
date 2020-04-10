@@ -118,7 +118,7 @@ class Accessories extends Part {
     }
 
     public SetArmourCoverage(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.armour_coverage = num;
@@ -130,7 +130,7 @@ class Accessories extends Part {
     }
 
     public SetArmourAP(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.armour_AP = num;
@@ -146,7 +146,7 @@ class Accessories extends Part {
     }
 
     public SetElectricalCount(idx: number, count: number) {
-        if (count != count)
+        if (count != count || count < 0)
             count = 0;
         count = Math.floor(count);
         count = Math.min(count, 5);

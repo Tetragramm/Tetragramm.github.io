@@ -171,7 +171,7 @@ class Stabilizers extends Part {
     }
 
     public SetHStabCount(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.hstab_count = num;
@@ -195,7 +195,7 @@ class Stabilizers extends Part {
     }
 
     public SetVStabCount(num: number) {
-        if (num != num)
+        if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
         this.vstab_count = num;
