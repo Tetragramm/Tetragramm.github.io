@@ -3608,7 +3608,6 @@ class Optimization extends Part {
         stats.maxstrain = (this.maxstrain * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
         stats.drag = -(this.drag * this.acft_stats.drag / 20);
-        stats.Round();
         var dot_cost = Math.abs(this.cost) + Math.abs(this.bleed)
             + Math.abs(this.escape) + Math.abs(this.mass)
             + Math.abs(this.toughness) + Math.abs(this.maxstrain)
@@ -3972,6 +3971,8 @@ class Aircraft {
         stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
+        //Have to round after optimizations, because otherwise it's wrong.
+        stats.Round();
         if (!this.updated_stats) {
             this.updated_stats = true;
             this.stats = stats;
