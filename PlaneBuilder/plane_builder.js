@@ -6645,6 +6645,472 @@ class Weapons_HTML extends Display {
         this.input_cost.valueAsNumber = this.weap.GetCost();
     }
 }
+// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.4.4
+var LZString = (function () {
+    // private property
+    var f = String.fromCharCode;
+    var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+    var baseReverseDic = {};
+    function getBaseValue(alphabet, character) {
+        if (!baseReverseDic[alphabet]) {
+            baseReverseDic[alphabet] = {};
+            for (var i = 0; i < alphabet.length; i++) {
+                baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+            }
+        }
+        return baseReverseDic[alphabet][character];
+    }
+    var LZString = {
+        compressToBase64: function (input) {
+            if (input == null)
+                return "";
+            var res = LZString._compress(input, 6, function (a) { return keyStrBase64.charAt(a); });
+            switch (res.length % 4) { // To produce valid Base64
+                default: // When could this happen ?
+                case 0: return res;
+                case 1: return res + "===";
+                case 2: return res + "==";
+                case 3: return res + "=";
+            }
+        },
+        decompressFromBase64: function (input) {
+            if (input == null)
+                return "";
+            if (input == "")
+                return null;
+            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
+        },
+        compressToUTF16: function (input) {
+            if (input == null)
+                return "";
+            return LZString._compress(input, 15, function (a) { return f(a + 32); }) + " ";
+        },
+        decompressFromUTF16: function (compressed) {
+            if (compressed == null)
+                return "";
+            if (compressed == "")
+                return null;
+            return LZString._decompress(compressed.length, 16384, function (index) { return compressed.charCodeAt(index) - 32; });
+        },
+        //compress into uint8array (UCS-2 big endian format)
+        compressToUint8Array: function (uncompressed) {
+            var compressed = LZString.compress(uncompressed);
+            var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
+            for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
+                var current_value = compressed.charCodeAt(i);
+                buf[i * 2] = current_value >>> 8;
+                buf[i * 2 + 1] = current_value % 256;
+            }
+            return buf;
+        },
+        //decompress from uint8array (UCS-2 big endian format)
+        decompressFromUint8Array: function (compressed) {
+            if (compressed === null || compressed === undefined) {
+                return LZString.decompress(compressed);
+            }
+            else {
+                var buf = new Array(compressed.length / 2); // 2 bytes per character
+                for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
+                    buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
+                }
+                var result = [];
+                buf.forEach(function (c) {
+                    result.push(f(c));
+                });
+                return LZString.decompress(result.join(''));
+            }
+        },
+        //compress into a string that is already URI encoded
+        compressToEncodedURIComponent: function (input) {
+            if (input == null)
+                return "";
+            return LZString._compress(input, 6, function (a) { return keyStrUriSafe.charAt(a); });
+        },
+        //decompress from an output of compressToEncodedURIComponent
+        decompressFromEncodedURIComponent: function (input) {
+            if (input == null)
+                return "";
+            if (input == "")
+                return null;
+            input = input.replace(/ /g, "+");
+            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+        },
+        compress: function (uncompressed) {
+            return LZString._compress(uncompressed, 16, function (a) { return f(a); });
+        },
+        _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+            if (uncompressed == null)
+                return "";
+            var i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, // Compensate for the first entry which should not count
+            context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0, ii;
+            for (ii = 0; ii < uncompressed.length; ii += 1) {
+                context_c = uncompressed.charAt(ii);
+                if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
+                    context_dictionary[context_c] = context_dictSize++;
+                    context_dictionaryToCreate[context_c] = true;
+                }
+                context_wc = context_w + context_c;
+                if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
+                    context_w = context_wc;
+                }
+                else {
+                    if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                        if (context_w.charCodeAt(0) < 256) {
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 8; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        }
+                        else {
+                            value = 1;
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1) | value;
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = 0;
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 16; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        }
+                        context_enlargeIn--;
+                        if (context_enlargeIn == 0) {
+                            context_enlargeIn = Math.pow(2, context_numBits);
+                            context_numBits++;
+                        }
+                        delete context_dictionaryToCreate[context_w];
+                    }
+                    else {
+                        value = context_dictionary[context_w];
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    // Add wc to the dictionary.
+                    context_dictionary[context_wc] = context_dictSize++;
+                    context_w = String(context_c);
+                }
+            }
+            // Output the code for w.
+            if (context_w !== "") {
+                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                    if (context_w.charCodeAt(0) < 256) {
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 8; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    else {
+                        value = 1;
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | value;
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = 0;
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 16; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    delete context_dictionaryToCreate[context_w];
+                }
+                else {
+                    value = context_dictionary[context_w];
+                    for (i = 0; i < context_numBits; i++) {
+                        context_data_val = (context_data_val << 1) | (value & 1);
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                        value = value >> 1;
+                    }
+                }
+                context_enlargeIn--;
+                if (context_enlargeIn == 0) {
+                    context_enlargeIn = Math.pow(2, context_numBits);
+                    context_numBits++;
+                }
+            }
+            // Mark the end of the stream
+            value = 2;
+            for (i = 0; i < context_numBits; i++) {
+                context_data_val = (context_data_val << 1) | (value & 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data_position = 0;
+                    context_data.push(getCharFromInt(context_data_val));
+                    context_data_val = 0;
+                }
+                else {
+                    context_data_position++;
+                }
+                value = value >> 1;
+            }
+            // Flush the last char
+            while (true) {
+                context_data_val = (context_data_val << 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data.push(getCharFromInt(context_data_val));
+                    break;
+                }
+                else
+                    context_data_position++;
+            }
+            return context_data.join('');
+        },
+        decompress: function (compressed) {
+            if (compressed == null)
+                return "";
+            if (compressed == "")
+                return null;
+            return LZString._decompress(compressed.length, 32768, function (index) { return compressed.charCodeAt(index); });
+        },
+        _decompress: function (length, resetValue, getNextValue) {
+            var dictionary = [], next, enlargeIn = 4, dictSize = 4, numBits = 3, entry = "", result = [], i, w, bits, resb, maxpower, power, c, data = { val: getNextValue(0), position: resetValue, index: 1 };
+            for (i = 0; i < 3; i += 1) {
+                dictionary[i] = i;
+            }
+            bits = 0;
+            maxpower = Math.pow(2, 2);
+            power = 1;
+            while (power != maxpower) {
+                resb = data.val & data.position;
+                data.position >>= 1;
+                if (data.position == 0) {
+                    data.position = resetValue;
+                    data.val = getNextValue(data.index++);
+                }
+                bits |= (resb > 0 ? 1 : 0) * power;
+                power <<= 1;
+            }
+            switch (next = bits) {
+                case 0:
+                    bits = 0;
+                    maxpower = Math.pow(2, 8);
+                    power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = f(bits);
+                    break;
+                case 1:
+                    bits = 0;
+                    maxpower = Math.pow(2, 16);
+                    power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = f(bits);
+                    break;
+                case 2:
+                    return "";
+            }
+            dictionary[3] = c;
+            w = c;
+            result.push(c);
+            while (true) {
+                if (data.index > length) {
+                    return "";
+                }
+                bits = 0;
+                maxpower = Math.pow(2, numBits);
+                power = 1;
+                while (power != maxpower) {
+                    resb = data.val & data.position;
+                    data.position >>= 1;
+                    if (data.position == 0) {
+                        data.position = resetValue;
+                        data.val = getNextValue(data.index++);
+                    }
+                    bits |= (resb > 0 ? 1 : 0) * power;
+                    power <<= 1;
+                }
+                switch (c = bits) {
+                    case 0:
+                        bits = 0;
+                        maxpower = Math.pow(2, 8);
+                        power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = f(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 1:
+                        bits = 0;
+                        maxpower = Math.pow(2, 16);
+                        power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = f(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 2:
+                        return result.join('');
+                }
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+                if (dictionary[c]) {
+                    entry = dictionary[c];
+                }
+                else {
+                    if (c === dictSize) {
+                        entry = w + w.charAt(0);
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                result.push(entry);
+                // Add w+entry[0] to the dictionary.
+                dictionary[dictSize++] = w + entry.charAt(0);
+                enlargeIn--;
+                w = entry;
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+            }
+        }
+    };
+    return LZString;
+})();
 /// <reference path="./Display.ts" />
 /// <reference path="./Era.ts" />
 /// <reference path="./Cockpits.ts" />
@@ -6662,6 +7128,7 @@ class Weapons_HTML extends Display {
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="../impl/Aircraft.ts" />
+/// <reference path="../lz/lz-string.ts" />
 class Aircraft_HTML extends Display {
     constructor(js, aircraft) {
         super();
@@ -6753,7 +7220,8 @@ class Aircraft_HTML extends Display {
         };
         var link_button = document.getElementById("acft_save_link");
         link_button.onclick = () => {
-            var txt = encodeURIComponent(JSON.stringify(this.acft.toJSON()));
+            var str = JSON.stringify(this.acft.toJSON());
+            var txt = LZString.compressToEncodedURIComponent(str);
             var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt);
             copyStringToClipboard(link);
         };
@@ -7151,16 +7619,23 @@ const init = () => {
             if (qp && !loaded) {
                 console.log("Used Query Parameter");
                 try {
-                    loaded = aircraft_model.fromJSON(JSON.parse(qp));
+                    var str = LZString.decompressFromEncodedURIComponent(qp);
+                    loaded = aircraft_model.fromJSON(JSON.parse(str));
                 }
                 catch (_a) { }
+                if (!loaded) {
+                    try {
+                        loaded = aircraft_model.fromJSON(JSON.parse(qp));
+                    }
+                    catch (_b) { }
+                }
             }
             if (acft_data && !loaded) {
                 console.log("Used Saved Data");
                 try {
                     loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
                 }
-                catch (_b) { }
+                catch (_c) { }
             }
             aircraft_model.CalculateStats();
             location.hash = ihash;
@@ -7233,6 +7708,3882 @@ var parts_JSON;
 var engine_json;
 var aircraft_model;
 var aircraft_display;
+class Alder {
+    constructor() {
+    }
+    static update(adler, array) {
+        let s1 = adler & 0xffff;
+        let s2 = (adler >>> 16) & 0xffff;
+        let len = array.length;
+        let tlen;
+        let i = 0;
+        while (len > 0) {
+            tlen = len > Alder.OptimizationParameter ?
+                Alder.OptimizationParameter : len;
+            len -= tlen;
+            do {
+                s1 += array[i++];
+                s2 += s1;
+            } while (--tlen);
+            s1 %= 65521;
+            s2 %= 65521;
+        }
+        return ((s2 << 16) | s1) >>> 0;
+    }
+}
+Alder.OptimizationParameter = 1024;
+const Adler32 = (array) => {
+    return Alder.update(1, array);
+};
+const USE_TYPEDARRAY = (typeof Uint8Array !== 'undefined') &&
+    (typeof Uint16Array !== 'undefined') &&
+    (typeof Uint32Array !== 'undefined') &&
+    (typeof DataView !== 'undefined');
+/// <reference path="./define/typedarray/hybrid.ts" />
+class BitStream {
+    constructor(buffer, bufferPosition) {
+        BitStream.ReverseTable = this.getReverseTable();
+        this.index = typeof bufferPosition === 'number' ? bufferPosition : 0;
+        this.bitindex = 0;
+        this.buffer = buffer instanceof (USE_TYPEDARRAY ? Uint8Array : Array) ?
+            buffer :
+            new (USE_TYPEDARRAY ? Uint8Array : Array)(BitStream.DefaultBlockSize);
+        if (this.buffer.length * 2 <= this.index) {
+            throw new Error('invalid index');
+        }
+        else if (this.buffer.length <= this.index) {
+            this.expandBuffer();
+        }
+    }
+    expandBuffer() {
+        let oldbuf = this.buffer;
+        let i = 0;
+        let il = oldbuf.length;
+        // copy buffer
+        if (USE_TYPEDARRAY) {
+            let uint8Buffer = new Uint8Array(il << 1);
+            uint8Buffer.set(oldbuf);
+            return (this.buffer = uint8Buffer);
+        }
+        else {
+            let arrayBuffer = new Array(il << 1);
+            for (i = 0; i < il; ++i) {
+                arrayBuffer[i] = oldbuf[i];
+            }
+            return (this.buffer = arrayBuffer);
+        }
+    }
+    writeBits(number, n, reverse) {
+        let buffer = this.buffer;
+        let index = this.index;
+        let bitindex = this.bitindex;
+        let current = buffer[index];
+        let i;
+        const rev32_ = (num) => {
+            return (BitStream.ReverseTable[num & 0xFF] << 24) |
+                (BitStream.ReverseTable[num >>> 8 & 0xFF] << 16) |
+                (BitStream.ReverseTable[num >>> 16 & 0xFF] << 8) |
+                BitStream.ReverseTable[num >>> 24 & 0xFF];
+        };
+        if (reverse && n > 1) {
+            number = n > 8 ?
+                rev32_(number) >> (32 - n) :
+                BitStream.ReverseTable[number] >> (8 - n);
+        }
+        if (n + bitindex < 8) {
+            current = (current << n) | number;
+            bitindex += n;
+        }
+        else {
+            for (i = 0; i < n; ++i) {
+                current = (current << 1) | ((number >> n - i - 1) & 1);
+                // next byte
+                if (++bitindex === 8) {
+                    bitindex = 0;
+                    buffer[index++] = BitStream.ReverseTable[current];
+                    current = 0;
+                    // expand
+                    if (index === buffer.length) {
+                        buffer = this.expandBuffer();
+                    }
+                }
+            }
+        }
+        buffer[index] = current;
+        this.buffer = buffer;
+        this.bitindex = bitindex;
+        this.index = index;
+    }
+    finish() {
+        let buffer = this.buffer;
+        let index = this.index;
+        let output = null;
+        if (this.bitindex > 0) {
+            buffer[index] <<= 8 - this.bitindex;
+            buffer[index] = BitStream.ReverseTable[buffer[index]];
+            index++;
+        }
+        // array truncation
+        if (USE_TYPEDARRAY) {
+            output = buffer.subarray(0, index);
+        }
+        else {
+            buffer.length = index;
+            output = buffer;
+        }
+        return output;
+    }
+    getReverseTable() {
+        let table = new (USE_TYPEDARRAY ? Uint8Array : Array)(256);
+        let i = 0;
+        for (; i < 256; ++i) {
+            table[i] = ((n) => {
+                let r = n;
+                let s = 7;
+                for (n >>>= 1; n; n >>>= 1) {
+                    r <<= 1;
+                    r |= n & 1;
+                    --s;
+                }
+                return (r << s & 0xff) >>> 0;
+            })(i);
+        }
+        return table;
+    }
+}
+BitStream.DefaultBlockSize = 0x8000;
+/// <reference path="./define/typedarray/hybrid.ts" />
+let ZLIB_CRC32_COMPACT = false;
+class CRC32 {
+    constructor() {
+    }
+    static calc(data, pos, length) {
+        return this.update(data, 0, pos, length);
+    }
+    static single(num, crc) {
+        return (CRC32.Table[(num ^ crc) & 0xff] ^ (num >>> 8)) >>> 0;
+    }
+    ;
+    static get Table() {
+        if (ZLIB_CRC32_COMPACT) {
+            let table = new (USE_TYPEDARRAY ? Uint32Array : Array)(256);
+            let c;
+            let i;
+            let j;
+            for (i = 0; i < 256; ++i) {
+                c = i;
+                for (j = 0; j < 8; ++j) {
+                    c = (c & 1) ? (0xedB88320 ^ (c >>> 1)) : (c >>> 1);
+                }
+                table[i] = c >>> 0;
+            }
+            return table;
+        }
+        else if (USE_TYPEDARRAY) {
+            return new Uint32Array(CRC32.Table_);
+        }
+        else {
+            return CRC32.Table_;
+        }
+    }
+}
+CRC32.update = function (data, crc, pos, length) {
+    let table = CRC32.Table;
+    let i = (typeof pos === 'number') ? pos : (pos = 0);
+    let il = (typeof length === 'number') ? length : data.length;
+    crc ^= 0xffffffff;
+    // loop unrolling for performance
+    for (i = il & 7; i--; ++pos) {
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos]) & 0xff];
+    }
+    for (i = il >> 3; i--; pos += 8) {
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos]) & 0xff];
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos + 1]) & 0xff];
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos + 2]) & 0xff];
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos + 3]) & 0xff];
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos + 4]) & 0xff];
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos + 5]) & 0xff];
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos + 6]) & 0xff];
+        crc = (crc >>> 8) ^ table[(crc ^ data[pos + 7]) & 0xff];
+    }
+    return (crc ^ 0xffffffff) >>> 0;
+};
+CRC32.Table_ = [
+    0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
+    0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
+    0x09b64c2b, 0x7eb17cbd, 0xe7b82d07, 0x90bf1d91, 0x1db71064, 0x6ab020f2,
+    0xf3b97148, 0x84be41de, 0x1adad47d, 0x6ddde4eb, 0xf4d4b551, 0x83d385c7,
+    0x136c9856, 0x646ba8c0, 0xfd62f97a, 0x8a65c9ec, 0x14015c4f, 0x63066cd9,
+    0xfa0f3d63, 0x8d080df5, 0x3b6e20c8, 0x4c69105e, 0xd56041e4, 0xa2677172,
+    0x3c03e4d1, 0x4b04d447, 0xd20d85fd, 0xa50ab56b, 0x35b5a8fa, 0x42b2986c,
+    0xdbbbc9d6, 0xacbcf940, 0x32d86ce3, 0x45df5c75, 0xdcd60dcf, 0xabd13d59,
+    0x26d930ac, 0x51de003a, 0xc8d75180, 0xbfd06116, 0x21b4f4b5, 0x56b3c423,
+    0xcfba9599, 0xb8bda50f, 0x2802b89e, 0x5f058808, 0xc60cd9b2, 0xb10be924,
+    0x2f6f7c87, 0x58684c11, 0xc1611dab, 0xb6662d3d, 0x76dc4190, 0x01db7106,
+    0x98d220bc, 0xefd5102a, 0x71b18589, 0x06b6b51f, 0x9fbfe4a5, 0xe8b8d433,
+    0x7807c9a2, 0x0f00f934, 0x9609a88e, 0xe10e9818, 0x7f6a0dbb, 0x086d3d2d,
+    0x91646c97, 0xe6635c01, 0x6b6b51f4, 0x1c6c6162, 0x856530d8, 0xf262004e,
+    0x6c0695ed, 0x1b01a57b, 0x8208f4c1, 0xf50fc457, 0x65b0d9c6, 0x12b7e950,
+    0x8bbeb8ea, 0xfcb9887c, 0x62dd1ddf, 0x15da2d49, 0x8cd37cf3, 0xfbd44c65,
+    0x4db26158, 0x3ab551ce, 0xa3bc0074, 0xd4bb30e2, 0x4adfa541, 0x3dd895d7,
+    0xa4d1c46d, 0xd3d6f4fb, 0x4369e96a, 0x346ed9fc, 0xad678846, 0xda60b8d0,
+    0x44042d73, 0x33031de5, 0xaa0a4c5f, 0xdd0d7cc9, 0x5005713c, 0x270241aa,
+    0xbe0b1010, 0xc90c2086, 0x5768b525, 0x206f85b3, 0xb966d409, 0xce61e49f,
+    0x5edef90e, 0x29d9c998, 0xb0d09822, 0xc7d7a8b4, 0x59b33d17, 0x2eb40d81,
+    0xb7bd5c3b, 0xc0ba6cad, 0xedb88320, 0x9abfb3b6, 0x03b6e20c, 0x74b1d29a,
+    0xead54739, 0x9dd277af, 0x04db2615, 0x73dc1683, 0xe3630b12, 0x94643b84,
+    0x0d6d6a3e, 0x7a6a5aa8, 0xe40ecf0b, 0x9309ff9d, 0x0a00ae27, 0x7d079eb1,
+    0xf00f9344, 0x8708a3d2, 0x1e01f268, 0x6906c2fe, 0xf762575d, 0x806567cb,
+    0x196c3671, 0x6e6b06e7, 0xfed41b76, 0x89d32be0, 0x10da7a5a, 0x67dd4acc,
+    0xf9b9df6f, 0x8ebeeff9, 0x17b7be43, 0x60b08ed5, 0xd6d6a3e8, 0xa1d1937e,
+    0x38d8c2c4, 0x4fdff252, 0xd1bb67f1, 0xa6bc5767, 0x3fb506dd, 0x48b2364b,
+    0xd80d2bda, 0xaf0a1b4c, 0x36034af6, 0x41047a60, 0xdf60efc3, 0xa867df55,
+    0x316e8eef, 0x4669be79, 0xcb61b38c, 0xbc66831a, 0x256fd2a0, 0x5268e236,
+    0xcc0c7795, 0xbb0b4703, 0x220216b9, 0x5505262f, 0xc5ba3bbe, 0xb2bd0b28,
+    0x2bb45a92, 0x5cb36a04, 0xc2d7ffa7, 0xb5d0cf31, 0x2cd99e8b, 0x5bdeae1d,
+    0x9b64c2b0, 0xec63f226, 0x756aa39c, 0x026d930a, 0x9c0906a9, 0xeb0e363f,
+    0x72076785, 0x05005713, 0x95bf4a82, 0xe2b87a14, 0x7bb12bae, 0x0cb61b38,
+    0x92d28e9b, 0xe5d5be0d, 0x7cdcefb7, 0x0bdbdf21, 0x86d3d2d4, 0xf1d4e242,
+    0x68ddb3f8, 0x1fda836e, 0x81be16cd, 0xf6b9265b, 0x6fb077e1, 0x18b74777,
+    0x88085ae6, 0xff0f6a70, 0x66063bca, 0x11010b5c, 0x8f659eff, 0xf862ae69,
+    0x616bffd3, 0x166ccf45, 0xa00ae278, 0xd70dd2ee, 0x4e048354, 0x3903b3c2,
+    0xa7672661, 0xd06016f7, 0x4969474d, 0x3e6e77db, 0xaed16a4a, 0xd9d65adc,
+    0x40df0b66, 0x37d83bf0, 0xa9bcae53, 0xdebb9ec5, 0x47b2cf7f, 0x30b5ffe9,
+    0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693,
+    0x54de5729, 0x23d967bf, 0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94,
+    0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d
+];
+/// <reference path="./define/typedarray/hybrid.ts" />
+class Heap {
+    constructor(length) {
+        this.getChild = function (index) {
+            return 2 * index + 2;
+        };
+        this.buffer = new (USE_TYPEDARRAY ? Uint16Array : Array)(length * 2);
+        this.length = 0;
+    }
+    getParent(index) {
+        return ((index - 2) / 4 | 0) * 2;
+    }
+    ;
+    push(index, value) {
+        let current, parent, heap = this.buffer, swap;
+        current = this.length;
+        heap[this.length++] = value;
+        heap[this.length++] = index;
+        while (current > 0) {
+            parent = this.getParent(current);
+            if (heap[current] > heap[parent]) {
+                swap = heap[current];
+                heap[current] = heap[parent];
+                heap[parent] = swap;
+                swap = heap[current + 1];
+                heap[current + 1] = heap[parent + 1];
+                heap[parent + 1] = swap;
+                current = parent;
+            }
+            else {
+                break;
+            }
+        }
+        return this.length;
+    }
+    pop() {
+        let index, value, heap = this.buffer, swap, current, parent;
+        value = heap[0];
+        index = heap[1];
+        this.length -= 2;
+        heap[0] = heap[this.length];
+        heap[1] = heap[this.length + 1];
+        parent = 0;
+        while (true) {
+            current = this.getChild(parent);
+            if (current >= this.length) {
+                break;
+            }
+            if (current + 2 < this.length && heap[current + 2] > heap[current]) {
+                current += 2;
+            }
+            if (heap[current] > heap[parent]) {
+                swap = heap[parent];
+                heap[parent] = heap[current];
+                heap[current] = swap;
+                swap = heap[parent + 1];
+                heap[parent + 1] = heap[current + 1];
+                heap[current + 1] = swap;
+            }
+            else {
+                break;
+            }
+            parent = current;
+        }
+        return { index: index, value: value, length: this.length };
+    }
+}
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./bitstream.ts" />
+/// <reference path="./heap.ts" />
+var CompressionType;
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./bitstream.ts" />
+/// <reference path="./heap.ts" />
+(function (CompressionType) {
+    CompressionType[CompressionType["NONE"] = 0] = "NONE";
+    CompressionType[CompressionType["FIXED"] = 1] = "FIXED";
+    CompressionType[CompressionType["DYNAMIC"] = 2] = "DYNAMIC";
+    CompressionType[CompressionType["RESERVED"] = 3] = "RESERVED";
+})(CompressionType || (CompressionType = {}));
+;
+class Lz77Match {
+    constructor(length, backwardDistance) {
+        this.length = length;
+        this.backwardDistance = backwardDistance;
+    }
+    static get LengthCodeTable() {
+        const code = (length) => {
+            switch (true) {
+                case (length === 3):
+                    return [257, length - 3, 0];
+                    break;
+                case (length === 4):
+                    return [258, length - 4, 0];
+                    break;
+                case (length === 5):
+                    return [259, length - 5, 0];
+                    break;
+                case (length === 6):
+                    return [260, length - 6, 0];
+                    break;
+                case (length === 7):
+                    return [261, length - 7, 0];
+                    break;
+                case (length === 8):
+                    return [262, length - 8, 0];
+                    break;
+                case (length === 9):
+                    return [263, length - 9, 0];
+                    break;
+                case (length === 10):
+                    return [264, length - 10, 0];
+                    break;
+                case (length <= 12):
+                    return [265, length - 11, 1];
+                    break;
+                case (length <= 14):
+                    return [266, length - 13, 1];
+                    break;
+                case (length <= 16):
+                    return [267, length - 15, 1];
+                    break;
+                case (length <= 18):
+                    return [268, length - 17, 1];
+                    break;
+                case (length <= 22):
+                    return [269, length - 19, 2];
+                    break;
+                case (length <= 26):
+                    return [270, length - 23, 2];
+                    break;
+                case (length <= 30):
+                    return [271, length - 27, 2];
+                    break;
+                case (length <= 34):
+                    return [272, length - 31, 2];
+                    break;
+                case (length <= 42):
+                    return [273, length - 35, 3];
+                    break;
+                case (length <= 50):
+                    return [274, length - 43, 3];
+                    break;
+                case (length <= 58):
+                    return [275, length - 51, 3];
+                    break;
+                case (length <= 66):
+                    return [276, length - 59, 3];
+                    break;
+                case (length <= 82):
+                    return [277, length - 67, 4];
+                    break;
+                case (length <= 98):
+                    return [278, length - 83, 4];
+                    break;
+                case (length <= 114):
+                    return [279, length - 99, 4];
+                    break;
+                case (length <= 130):
+                    return [280, length - 115, 4];
+                    break;
+                case (length <= 162):
+                    return [281, length - 131, 5];
+                    break;
+                case (length <= 194):
+                    return [282, length - 163, 5];
+                    break;
+                case (length <= 226):
+                    return [283, length - 195, 5];
+                    break;
+                case (length <= 257):
+                    return [284, length - 227, 5];
+                    break;
+                case (length === 258):
+                    return [285, length - 258, 0];
+                    break;
+                default: throw 'invalid length: ' + length;
+            }
+        };
+        let table = [];
+        let i = 0;
+        let c = [];
+        for (i = 3; i <= 258; i++) {
+            c = code(i);
+            table[i] = (c[2] << 24) | (c[1] << 16) | c[0];
+        }
+        return USE_TYPEDARRAY ? new Uint32Array(table) : table;
+    }
+    getDistanceCode_(dist) {
+        /** @type {!Array.<number>} distance code table. */
+        let r;
+        switch (true) {
+            case (dist === 1):
+                r = [0, dist - 1, 0];
+                break;
+            case (dist === 2):
+                r = [1, dist - 2, 0];
+                break;
+            case (dist === 3):
+                r = [2, dist - 3, 0];
+                break;
+            case (dist === 4):
+                r = [3, dist - 4, 0];
+                break;
+            case (dist <= 6):
+                r = [4, dist - 5, 1];
+                break;
+            case (dist <= 8):
+                r = [5, dist - 7, 1];
+                break;
+            case (dist <= 12):
+                r = [6, dist - 9, 2];
+                break;
+            case (dist <= 16):
+                r = [7, dist - 13, 2];
+                break;
+            case (dist <= 24):
+                r = [8, dist - 17, 3];
+                break;
+            case (dist <= 32):
+                r = [9, dist - 25, 3];
+                break;
+            case (dist <= 48):
+                r = [10, dist - 33, 4];
+                break;
+            case (dist <= 64):
+                r = [11, dist - 49, 4];
+                break;
+            case (dist <= 96):
+                r = [12, dist - 65, 5];
+                break;
+            case (dist <= 128):
+                r = [13, dist - 97, 5];
+                break;
+            case (dist <= 192):
+                r = [14, dist - 129, 6];
+                break;
+            case (dist <= 256):
+                r = [15, dist - 193, 6];
+                break;
+            case (dist <= 384):
+                r = [16, dist - 257, 7];
+                break;
+            case (dist <= 512):
+                r = [17, dist - 385, 7];
+                break;
+            case (dist <= 768):
+                r = [18, dist - 513, 8];
+                break;
+            case (dist <= 1024):
+                r = [19, dist - 769, 8];
+                break;
+            case (dist <= 1536):
+                r = [20, dist - 1025, 9];
+                break;
+            case (dist <= 2048):
+                r = [21, dist - 1537, 9];
+                break;
+            case (dist <= 3072):
+                r = [22, dist - 2049, 10];
+                break;
+            case (dist <= 4096):
+                r = [23, dist - 3073, 10];
+                break;
+            case (dist <= 6144):
+                r = [24, dist - 4097, 11];
+                break;
+            case (dist <= 8192):
+                r = [25, dist - 6145, 11];
+                break;
+            case (dist <= 12288):
+                r = [26, dist - 8193, 12];
+                break;
+            case (dist <= 16384):
+                r = [27, dist - 12289, 12];
+                break;
+            case (dist <= 24576):
+                r = [28, dist - 16385, 13];
+                break;
+            case (dist <= 32768):
+                r = [29, dist - 24577, 13];
+                break;
+            default: throw 'invalid distance';
+        }
+        return r;
+    }
+    toLz77Array() {
+        let length = this.length;
+        let dist = this.backwardDistance;
+        let codeArray = [];
+        let pos = 0;
+        let code;
+        // length
+        code = Lz77Match.LengthCodeTable[length];
+        codeArray[pos++] = code & 0xffff;
+        codeArray[pos++] = (code >> 16) & 0xff;
+        codeArray[pos++] = code >> 24;
+        // distance
+        code = this.getDistanceCode_(dist);
+        codeArray[pos++] = code[0];
+        codeArray[pos++] = code[1];
+        codeArray[pos++] = code[2];
+        return codeArray;
+    }
+}
+class RawDeflate {
+    constructor(input, opt_params) {
+        this.compressionType = CompressionType.DYNAMIC;
+        this.lazy = 0;
+        this.length = 0;
+        this.backwardDistance = 0;
+        this.input =
+            (USE_TYPEDARRAY && input instanceof Array) ? new Uint8Array(input) : input;
+        this.op = 0;
+        // option parameters
+        if (opt_params) {
+            if (opt_params['lazy']) {
+                this.lazy = opt_params['lazy'];
+            }
+            if (typeof opt_params['compressionType'] === 'number') {
+                this.compressionType = opt_params['compressionType'];
+            }
+            if (opt_params['outputBuffer']) {
+                this.output =
+                    (USE_TYPEDARRAY && opt_params['outputBuffer'] instanceof Array) ?
+                        new Uint8Array(opt_params['outputBuffer']) : opt_params['outputBuffer'];
+            }
+            if (typeof opt_params['outputIndex'] === 'number') {
+                this.op = opt_params['outputIndex'];
+            }
+        }
+        if (!this.output) {
+            this.output = new (USE_TYPEDARRAY ? Uint8Array : Array)(0x8000);
+        }
+    }
+    static get FixedHuffmanTable() {
+        let table = [], i;
+        for (i = 0; i < 288; i++) {
+            switch (true) {
+                case (i <= 143):
+                    table.push([i + 0x030, 8]);
+                    break;
+                case (i <= 255):
+                    table.push([i - 144 + 0x190, 9]);
+                    break;
+                case (i <= 279):
+                    table.push([i - 256 + 0x000, 7]);
+                    break;
+                case (i <= 287):
+                    table.push([i - 280 + 0x0C0, 8]);
+                    break;
+                default:
+                    throw 'invalid literal: ' + i;
+            }
+        }
+        return table;
+    }
+    compress() {
+        let blockArray;
+        let position;
+        let length;
+        let input = this.input;
+        switch (this.compressionType) {
+            case CompressionType.NONE:
+                // each 65535-Byte (length header: 16-bit)
+                for (position = 0, length = input.length; position < length;) {
+                    blockArray = USE_TYPEDARRAY ?
+                        input.subarray(position, position + 0xffff) :
+                        input.slice(position, position + 0xffff);
+                    position += blockArray.length;
+                    this.makeNocompressBlock(blockArray, (position === length));
+                }
+                break;
+            case CompressionType.FIXED:
+                this.output = this.makeFixedHuffmanBlock(input, true);
+                this.op = this.output.length;
+                break;
+            case CompressionType.DYNAMIC:
+                this.output = this.makeDynamicHuffmanBlock(input, true);
+                this.op = this.output.length;
+                break;
+            default:
+                throw 'invalid compression type';
+        }
+        return this.output;
+    }
+    makeNocompressBlock(blockArray, isFinalBlock) {
+        let bfinal;
+        let btype;
+        let len;
+        let nlen;
+        let i;
+        let il;
+        let output = this.output;
+        let op = this.op;
+        // expand buffer
+        if (USE_TYPEDARRAY) {
+            output = new Uint8Array(this.output.buffer);
+            while (output.length <= op + blockArray.length + 5) {
+                output = new Uint8Array(output.length << 1);
+            }
+            output.set(this.output);
+        }
+        // header
+        bfinal = isFinalBlock ? 1 : 0;
+        btype = CompressionType.NONE;
+        output[op++] = (bfinal) | (btype << 1);
+        // length
+        len = blockArray.length;
+        nlen = (~len + 0x10000) & 0xffff;
+        output[op++] = len & 0xff;
+        output[op++] = (len >>> 8) & 0xff;
+        output[op++] = nlen & 0xff;
+        output[op++] = (nlen >>> 8) & 0xff;
+        // copy buffer
+        if (USE_TYPEDARRAY) {
+            output.set(blockArray, op);
+            op += blockArray.length;
+            output = output.subarray(0, op);
+        }
+        else {
+            for (i = 0, il = blockArray.length; i < il; ++i) {
+                output[op++] = blockArray[i];
+            }
+            output.length = op;
+        }
+        this.op = op;
+        this.output = output;
+        return output;
+    }
+    makeFixedHuffmanBlock(blockArray, isFinalBlock) {
+        /** @type {Zlib.BitStream} */
+        let stream = new BitStream(USE_TYPEDARRAY ?
+            new Uint8Array(this.output.buffer) : this.output, this.op);
+        /** @type {number} */
+        let bfinal;
+        /** @type {Zlib.RawDeflate.CompressionType} */
+        let btype;
+        /** @type {!(Array.<number>|Uint16Array)} */
+        let data;
+        // header
+        bfinal = isFinalBlock ? 1 : 0;
+        btype = CompressionType.FIXED;
+        stream.writeBits(bfinal, 1, true);
+        stream.writeBits(btype, 2, true);
+        data = this.lz77(blockArray);
+        this.fixedHuffman(data, stream);
+        return stream.finish();
+    }
+    makeDynamicHuffmanBlock(blockArray, isFinalBlock) {
+        let stream = new BitStream(USE_TYPEDARRAY ?
+            new Uint8Array(this.output.buffer) : this.output, this.op);
+        let bfinal;
+        let btype;
+        let data;
+        let hlit;
+        let hdist;
+        let hclen;
+        let hclenOrder = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+        let litLenLengths;
+        let litLenCodes;
+        let distLengths;
+        let distCodes;
+        let treeSymbols;
+        let treeLengths;
+        let transLengths = new Array(19);
+        let treeCodes;
+        let code;
+        let bitlen;
+        let i;
+        let il;
+        // header
+        bfinal = isFinalBlock ? 1 : 0;
+        btype = CompressionType.DYNAMIC;
+        stream.writeBits(bfinal, 1, true);
+        stream.writeBits(btype, 2, true);
+        data = this.lz77(blockArray);
+        litLenLengths = this.getLengths_(this.freqsLitLen, 15);
+        litLenCodes = this.getCodesFromLengths_(litLenLengths);
+        distLengths = this.getLengths_(this.freqsDist, 7);
+        distCodes = this.getCodesFromLengths_(distLengths);
+        for (hlit = 286; hlit > 257 && litLenLengths[hlit - 1] === 0; hlit--) { }
+        for (hdist = 30; hdist > 1 && distLengths[hdist - 1] === 0; hdist--) { }
+        // HCLEN
+        treeSymbols =
+            this.getTreeSymbols_(hlit, litLenLengths, hdist, distLengths);
+        treeLengths = this.getLengths_(treeSymbols.freqs, 7);
+        for (i = 0; i < 19; i++) {
+            transLengths[i] = treeLengths[hclenOrder[i]];
+        }
+        for (hclen = 19; hclen > 4 && transLengths[hclen - 1] === 0; hclen--) { }
+        treeCodes = this.getCodesFromLengths_(treeLengths);
+        stream.writeBits(hlit - 257, 5, true);
+        stream.writeBits(hdist - 1, 5, true);
+        stream.writeBits(hclen - 4, 4, true);
+        for (i = 0; i < hclen; i++) {
+            stream.writeBits(transLengths[i], 3, true);
+        }
+        for (i = 0, il = treeSymbols.codes.length; i < il; i++) {
+            code = treeSymbols.codes[i];
+            stream.writeBits(treeCodes[code], treeLengths[code], true);
+            // extra bits
+            if (code >= 16) {
+                i++;
+                switch (code) {
+                    case 16:
+                        bitlen = 2;
+                        break;
+                    case 17:
+                        bitlen = 3;
+                        break;
+                    case 18:
+                        bitlen = 7;
+                        break;
+                    default:
+                        throw 'invalid code: ' + code;
+                }
+                stream.writeBits(treeSymbols.codes[i], bitlen, true);
+            }
+        }
+        this.dynamicHuffman(data, [litLenCodes, litLenLengths], [distCodes, distLengths], stream);
+        return stream.finish();
+    }
+    dynamicHuffman(dataArray, litLen, dist, stream) {
+        let index;
+        let length;
+        let literal;
+        let code;
+        let litLenCodes;
+        let litLenLengths;
+        let distCodes;
+        let distLengths;
+        litLenCodes = litLen[0];
+        litLenLengths = litLen[1];
+        distCodes = dist[0];
+        distLengths = dist[1];
+        // 符号を BitStream に書き込んでいく
+        for (index = 0, length = dataArray.length; index < length; ++index) {
+            literal = dataArray[index];
+            // literal or length
+            stream.writeBits(litLenCodes[literal], litLenLengths[literal], true);
+            // 長さ・距離符号
+            if (literal > 256) {
+                // length extra
+                stream.writeBits(dataArray[++index], dataArray[++index], true);
+                // distance
+                code = dataArray[++index];
+                stream.writeBits(distCodes[code], distLengths[code], true);
+                // distance extra
+                stream.writeBits(dataArray[++index], dataArray[++index], true);
+                // 終端
+            }
+            else if (literal === 256) {
+                break;
+            }
+        }
+        return stream;
+    }
+    fixedHuffman(dataArray, stream) {
+        let index;
+        let length;
+        let literal;
+        for (index = 0, length = dataArray.length; index < length; index++) {
+            literal = dataArray[index];
+            BitStream.prototype.writeBits.apply(stream, RawDeflate.FixedHuffmanTable[literal]);
+            if (literal > 0x100) {
+                stream.writeBits(dataArray[++index], dataArray[++index], true);
+                stream.writeBits(dataArray[++index], 5);
+                stream.writeBits(dataArray[++index], dataArray[++index], true);
+            }
+            else if (literal === 0x100) {
+                break;
+            }
+        }
+        return stream;
+    }
+    lz77(dataArray) {
+        let position = 0;
+        let length = 0;
+        let i = 0;
+        let il = 0;
+        let matchKey = 0;
+        let table = {};
+        let windowSize = RawDeflate.WindowSize;
+        let matchsList = [];
+        let longestMatch;
+        let prevMatch;
+        let lz77buf = USE_TYPEDARRAY ?
+            new Uint16Array(dataArray.length * 2) : new Array();
+        let pos = 0;
+        let skipLength = 0;
+        let freqsLitLen = new (USE_TYPEDARRAY ? Uint32Array : Array)(286);
+        let freqsDist = new (USE_TYPEDARRAY ? Uint32Array : Array)(30);
+        let lazy = this.lazy;
+        let tmp;
+        if (!USE_TYPEDARRAY) {
+            for (i = 0; i <= 285;) {
+                freqsLitLen[i++] = 0;
+            }
+            for (i = 0; i <= 29;) {
+                freqsDist[i++] = 0;
+            }
+        }
+        freqsLitLen[256] = 1;
+        const writeMatch = (match, offset) => {
+            let lz77Array = match.toLz77Array();
+            for (i = 0, il = lz77Array.length; i < il; ++i) {
+                lz77buf[pos++] = lz77Array[i];
+            }
+            freqsLitLen[lz77Array[0]]++;
+            freqsDist[lz77Array[3]]++;
+            skipLength = match.length + offset - 1;
+            prevMatch = null;
+        };
+        for (position = 0, length = dataArray.length; position < length; ++position) {
+            for (matchKey = 0, i = 0, il = RawDeflate.Lz77MinLength; i < il; ++i) {
+                if (position + i === length) {
+                    break;
+                }
+                matchKey = (matchKey << 8) | dataArray[position + i];
+            }
+            if (!table[matchKey]) {
+                table[matchKey] = [];
+                matchsList = table[matchKey];
+            }
+            else {
+                matchsList = table[matchKey];
+            }
+            if (skipLength-- > 0) {
+                matchsList.push(position);
+                continue;
+            }
+            while (matchsList.length > 0 && position - matchsList[0] > windowSize) {
+                matchsList.shift();
+            }
+            if (position + RawDeflate.Lz77MinLength >= length) {
+                if (prevMatch) {
+                    writeMatch(prevMatch, -1);
+                }
+                for (i = 0, il = length - position; i < il; ++i) {
+                    tmp = dataArray[position + i];
+                    lz77buf[pos++] = tmp;
+                    ++freqsLitLen[tmp];
+                }
+                break;
+            }
+            if (matchsList.length > 0) {
+                longestMatch = this.searchLongestMatch_(dataArray, position, matchsList);
+                if (prevMatch) {
+                    if (prevMatch.length < longestMatch.length) {
+                        // write previous literal
+                        tmp = dataArray[position - 1];
+                        lz77buf[pos++] = tmp;
+                        ++freqsLitLen[tmp];
+                        // write current match
+                        writeMatch(longestMatch, 0);
+                    }
+                    else {
+                        // write previous match
+                        writeMatch(prevMatch, -1);
+                    }
+                }
+                else if (longestMatch.length < lazy) {
+                    prevMatch = longestMatch;
+                }
+                else {
+                    writeMatch(longestMatch, 0);
+                }
+            }
+            else if (prevMatch) {
+                writeMatch(prevMatch, -1);
+            }
+            else {
+                tmp = dataArray[position];
+                lz77buf[pos++] = tmp;
+                ++freqsLitLen[tmp];
+            }
+            matchsList.push(position);
+        }
+        lz77buf[pos++] = 256;
+        freqsLitLen[256]++;
+        this.freqsLitLen = freqsLitLen;
+        this.freqsDist = freqsDist;
+        return /** @type {!(Uint16Array|Array.<number>)} */ (USE_TYPEDARRAY ? lz77buf.subarray(0, pos) : lz77buf);
+    }
+    searchLongestMatch_(data, position, matchList) {
+        let match, currentMatch, matchMax = 0, matchLength, i, j, l, dl = data.length;
+        permatch: for (i = 0, l = matchList.length; i < l; i++) {
+            match = matchList[l - i - 1];
+            matchLength = RawDeflate.Lz77MinLength;
+            if (matchMax > RawDeflate.Lz77MinLength) {
+                for (j = matchMax; j > RawDeflate.Lz77MinLength; j--) {
+                    if (data[match + j - 1] !== data[position + j - 1]) {
+                        continue permatch;
+                    }
+                }
+                matchLength = matchMax;
+            }
+            while (matchLength < RawDeflate.Lz77MaxLength &&
+                position + matchLength < dl &&
+                data[match + matchLength] === data[position + matchLength]) {
+                ++matchLength;
+            }
+            if (matchLength > matchMax) {
+                currentMatch = match;
+                matchMax = matchLength;
+            }
+            if (matchLength === RawDeflate.Lz77MaxLength) {
+                break;
+            }
+        }
+        return new Lz77Match(matchMax, position - currentMatch);
+    }
+    getTreeSymbols_(hlit, litlenLengths, hdist, distLengths) {
+        let src = new (USE_TYPEDARRAY ? Uint32Array : Array)(hlit + hdist), i, j, runLength, l, result = new (USE_TYPEDARRAY ? Uint32Array : Array)(286 + 30), nResult, rpt, freqs = new (USE_TYPEDARRAY ? Uint8Array : Array)(19);
+        j = 0;
+        for (i = 0; i < hlit; i++) {
+            src[j++] = litlenLengths[i];
+        }
+        for (i = 0; i < hdist; i++) {
+            src[j++] = distLengths[i];
+        }
+        if (!USE_TYPEDARRAY) {
+            for (i = 0, l = freqs.length; i < l; ++i) {
+                freqs[i] = 0;
+            }
+        }
+        nResult = 0;
+        for (i = 0, l = src.length; i < l; i += j) {
+            for (j = 1; i + j < l && src[i + j] === src[i]; ++j) { }
+            runLength = j;
+            if (src[i] === 0) {
+                if (runLength < 3) {
+                    while (runLength-- > 0) {
+                        result[nResult++] = 0;
+                        freqs[0]++;
+                    }
+                }
+                else {
+                    while (runLength > 0) {
+                        rpt = (runLength < 138 ? runLength : 138);
+                        if (rpt > runLength - 3 && rpt < runLength) {
+                            rpt = runLength - 3;
+                        }
+                        if (rpt <= 10) {
+                            result[nResult++] = 17;
+                            result[nResult++] = rpt - 3;
+                            freqs[17]++;
+                        }
+                        else {
+                            result[nResult++] = 18;
+                            result[nResult++] = rpt - 11;
+                            freqs[18]++;
+                        }
+                        runLength -= rpt;
+                    }
+                }
+            }
+            else {
+                result[nResult++] = src[i];
+                freqs[src[i]]++;
+                runLength--;
+                if (runLength < 3) {
+                    while (runLength-- > 0) {
+                        result[nResult++] = src[i];
+                        freqs[src[i]]++;
+                    }
+                }
+                else {
+                    while (runLength > 0) {
+                        rpt = (runLength < 6 ? runLength : 6);
+                        if (rpt > runLength - 3 && rpt < runLength) {
+                            rpt = runLength - 3;
+                        }
+                        result[nResult++] = 16;
+                        result[nResult++] = rpt - 3;
+                        freqs[16]++;
+                        runLength -= rpt;
+                    }
+                }
+            }
+        }
+        return {
+            codes: USE_TYPEDARRAY ? result.subarray(0, nResult) : result.slice(0, nResult),
+            freqs: freqs
+        };
+    }
+    getLengths_(freqs, limit) {
+        let nSymbols = freqs.length;
+        let heap = new Heap(2 * RawDeflate.HUFMAX);
+        let length = new (USE_TYPEDARRAY ? Uint8Array : Array)(nSymbols);
+        let nodes;
+        let values;
+        let codeLength;
+        let i;
+        let il;
+        if (!USE_TYPEDARRAY) {
+            for (i = 0; i < nSymbols; i++) {
+                length[i] = 0;
+            }
+        }
+        for (i = 0; i < nSymbols; ++i) {
+            if (freqs[i] > 0) {
+                heap.push(i, freqs[i]);
+            }
+        }
+        nodes = new Array(heap.length / 2);
+        values = new (USE_TYPEDARRAY ? Uint32Array : Array)(heap.length / 2);
+        if (nodes.length === 1) {
+            length[heap.pop().index] = 1;
+            return length;
+        }
+        for (i = 0, il = heap.length / 2; i < il; ++i) {
+            nodes[i] = heap.pop();
+            values[i] = nodes[i].value;
+        }
+        codeLength = this.reversePackageMerge_(values, values.length, limit);
+        for (i = 0, il = nodes.length; i < il; ++i) {
+            length[nodes[i].index] = codeLength[i];
+        }
+        return length;
+    }
+    reversePackageMerge_(freqs, symbols, limit) {
+        let minimumCost = new (USE_TYPEDARRAY ? Uint16Array : Array)(limit);
+        let flag = new (USE_TYPEDARRAY ? Uint8Array : Array)(limit);
+        let codeLength = new (USE_TYPEDARRAY ? Uint8Array : Array)(symbols);
+        let value = new Array(limit);
+        let type = new Array(limit);
+        let currentPosition = new Array(limit);
+        let excess = (1 << limit) - symbols;
+        let half = (1 << (limit - 1));
+        let i;
+        let j;
+        let t;
+        let weight;
+        let next;
+        const takePackage = (index) => {
+            let x = type[index][currentPosition[index]];
+            if (x === symbols) {
+                takePackage(index + 1);
+                takePackage(index + 1);
+            }
+            else {
+                --codeLength[x];
+            }
+            ++currentPosition[index];
+        };
+        minimumCost[limit - 1] = symbols;
+        for (j = 0; j < limit; ++j) {
+            if (excess < half) {
+                flag[j] = 0;
+            }
+            else {
+                flag[j] = 1;
+                excess -= half;
+            }
+            excess <<= 1;
+            minimumCost[limit - 2 - j] = (minimumCost[limit - 1 - j] / 2 | 0) + symbols;
+        }
+        minimumCost[0] = flag[0];
+        value[0] = new Array(minimumCost[0]);
+        type[0] = new Array(minimumCost[0]);
+        for (j = 1; j < limit; ++j) {
+            if (minimumCost[j] > 2 * minimumCost[j - 1] + flag[j]) {
+                minimumCost[j] = 2 * minimumCost[j - 1] + flag[j];
+            }
+            value[j] = new Array(minimumCost[j]);
+            type[j] = new Array(minimumCost[j]);
+        }
+        for (i = 0; i < symbols; ++i) {
+            codeLength[i] = limit;
+        }
+        for (t = 0; t < minimumCost[limit - 1]; ++t) {
+            value[limit - 1][t] = freqs[t];
+            type[limit - 1][t] = t;
+        }
+        for (i = 0; i < limit; ++i) {
+            currentPosition[i] = 0;
+        }
+        if (flag[limit - 1] === 1) {
+            --codeLength[0];
+            ++currentPosition[limit - 1];
+        }
+        for (j = limit - 2; j >= 0; --j) {
+            i = 0;
+            weight = 0;
+            next = currentPosition[j + 1];
+            for (t = 0; t < minimumCost[j]; t++) {
+                weight = value[j + 1][next] + value[j + 1][next + 1];
+                if (weight > freqs[i]) {
+                    value[j][t] = weight;
+                    type[j][t] = symbols;
+                    next += 2;
+                }
+                else {
+                    value[j][t] = freqs[i];
+                    type[j][t] = i;
+                    ++i;
+                }
+            }
+            currentPosition[j] = 0;
+            if (flag[j] === 1) {
+                takePackage(j);
+            }
+        }
+        return codeLength;
+    }
+    getCodesFromLengths_(lengths) {
+        let codes = new (USE_TYPEDARRAY ? Uint16Array : Array)(lengths.length);
+        let count = [];
+        let startCode = [];
+        let code = 0, i, il, j, m;
+        // Count the codes of each length.
+        for (i = 0, il = lengths.length; i < il; i++) {
+            count[lengths[i]] = (count[lengths[i]] | 0) + 1;
+        }
+        // Determine the starting code for each length block.
+        for (i = 1, il = RawDeflate.MaxCodeLength; i <= il; i++) {
+            startCode[i] = code;
+            code += count[i] | 0;
+            code <<= 1;
+        }
+        // Determine the code for each symbol. Mirrored, of course.
+        for (i = 0, il = lengths.length; i < il; i++) {
+            code = startCode[lengths[i]];
+            startCode[lengths[i]] += 1;
+            codes[i] = 0;
+            for (j = 0, m = lengths[i]; j < m; j++) {
+                codes[i] = (codes[i] << 1) | (code & 1);
+                code >>>= 1;
+            }
+        }
+        return codes;
+    }
+}
+RawDeflate.Lz77MaxLength = 258;
+RawDeflate.WindowSize = 0x8000;
+RawDeflate.MaxCodeLength = 16;
+RawDeflate.HUFMAX = 286;
+RawDeflate.Lz77MinLength = 3;
+var CompressionMethod;
+(function (CompressionMethod) {
+    CompressionMethod[CompressionMethod["STORE"] = 0] = "STORE";
+    CompressionMethod[CompressionMethod["DEFLATE"] = 8] = "DEFLATE";
+    CompressionMethod[CompressionMethod["RESERVED"] = 15] = "RESERVED";
+})(CompressionMethod || (CompressionMethod = {}));
+;
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./adler32.ts" />
+/// <reference path="./rawdeflate.ts" />
+/// <reference path="./define/compress.ts" />
+class Deflate {
+    constructor(input, opt_params) {
+        this.rawDeflateOption = {};
+        this.input = input;
+        this.output =
+            new (USE_TYPEDARRAY ? Uint8Array : Array)(Deflate.DefaultBufferSize);
+        this.compressionType = CompressionType.DYNAMIC;
+        this.rawDeflateOption = {};
+        // option parameters
+        if (opt_params) {
+            if (typeof opt_params['compressionType'] === 'number') {
+                this.compressionType = opt_params['compressionType'];
+            }
+        }
+        // copy options
+        if (opt_params) {
+            const props = Object.keys(opt_params);
+            for (let prop of props) {
+                this.rawDeflateOption[prop] = opt_params[prop];
+            }
+        }
+        // set raw-deflate output buffer
+        this.rawDeflateOption['outputBuffer'] = this.output;
+        this.rawDeflate = new RawDeflate(this.input, this.rawDeflateOption);
+    }
+    static compress(input, opt_params) {
+        return (new Deflate(input, opt_params)).compress();
+    }
+    compress() {
+        /** @type {Zlib.CompressionMethod} */
+        let cm;
+        /** @type {number} */
+        let cinfo;
+        /** @type {number} */
+        let cmf;
+        /** @type {number} */
+        let flg;
+        /** @type {number} */
+        let fcheck;
+        /** @type {number} */
+        let fdict;
+        /** @type {number} */
+        let flevel;
+        /** @type {number} */
+        let adler;
+        /** @type {!(Array|Uint8Array)} */
+        let output;
+        /** @type {number} */
+        let pos = 0;
+        output = this.output;
+        // Compression Method and Flags
+        cm = CompressionMethod.DEFLATE;
+        switch (cm) {
+            case CompressionMethod.DEFLATE:
+                cinfo = Math.LOG2E * Math.log(RawDeflate.WindowSize) - 8;
+                break;
+            default:
+                throw new Error('invalid compression method');
+        }
+        cmf = (cinfo << 4) | cm;
+        output[pos++] = cmf;
+        // Flags
+        fdict = 0;
+        switch (cm) {
+            case CompressionMethod.DEFLATE:
+                switch (this.compressionType) {
+                    case CompressionType.NONE:
+                        flevel = 0;
+                        break;
+                    case CompressionType.FIXED:
+                        flevel = 1;
+                        break;
+                    case CompressionType.DYNAMIC:
+                        flevel = 2;
+                        break;
+                    default: throw new Error('unsupported compression type');
+                }
+                break;
+            default:
+                throw new Error('invalid compression method');
+        }
+        flg = (flevel << 6) | (fdict << 5);
+        fcheck = 31 - (cmf * 256 + flg) % 31;
+        flg |= fcheck;
+        output[pos++] = flg;
+        // Adler-32 checksum
+        adler = Adler32(this.input);
+        this.rawDeflate.op = pos;
+        output = this.rawDeflate.compress();
+        pos = output.length;
+        if (USE_TYPEDARRAY) {
+            output = new Uint8Array(output.buffer);
+            if (output.length <= pos + 4) {
+                this.output = new Uint8Array(output.length + 4);
+                this.output.set(output);
+                output = this.output;
+            }
+            output = output.subarray(0, pos + 4);
+        }
+        // adler32
+        output[pos++] = (adler >> 24) & 0xff;
+        output[pos++] = (adler >> 16) & 0xff;
+        output[pos++] = (adler >> 8) & 0xff;
+        output[pos++] = (adler) & 0xff;
+        return output;
+    }
+}
+Deflate.DefaultBufferSize = 0x8000;
+class GunzipMember {
+    getName() {
+        return this.name;
+    }
+    getData() {
+        return this.data;
+    }
+    getMtime() {
+        return this.mtime;
+    }
+}
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./crc32.ts" />
+/// <reference path="./rawdeflate.ts" />
+var gOperatingSystem;
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./crc32.ts" />
+/// <reference path="./rawdeflate.ts" />
+(function (gOperatingSystem) {
+    gOperatingSystem[gOperatingSystem["FAT"] = 0] = "FAT";
+    gOperatingSystem[gOperatingSystem["AMIGA"] = 1] = "AMIGA";
+    gOperatingSystem[gOperatingSystem["VMS"] = 2] = "VMS";
+    gOperatingSystem[gOperatingSystem["UNIX"] = 3] = "UNIX";
+    gOperatingSystem[gOperatingSystem["VM_CMS"] = 4] = "VM_CMS";
+    gOperatingSystem[gOperatingSystem["ATARI_TOS"] = 5] = "ATARI_TOS";
+    gOperatingSystem[gOperatingSystem["HPFS"] = 6] = "HPFS";
+    gOperatingSystem[gOperatingSystem["MACINTOSH"] = 7] = "MACINTOSH";
+    gOperatingSystem[gOperatingSystem["Z_SYSTEM"] = 8] = "Z_SYSTEM";
+    gOperatingSystem[gOperatingSystem["CP_M"] = 9] = "CP_M";
+    gOperatingSystem[gOperatingSystem["TOPS_20"] = 10] = "TOPS_20";
+    gOperatingSystem[gOperatingSystem["NTFS"] = 11] = "NTFS";
+    gOperatingSystem[gOperatingSystem["QDOS"] = 12] = "QDOS";
+    gOperatingSystem[gOperatingSystem["ACORN_RISCOS"] = 13] = "ACORN_RISCOS";
+    gOperatingSystem[gOperatingSystem["UNKNOWN"] = 255] = "UNKNOWN";
+})(gOperatingSystem || (gOperatingSystem = {}));
+;
+var gFlagsMask;
+(function (gFlagsMask) {
+    gFlagsMask[gFlagsMask["FTEXT"] = 1] = "FTEXT";
+    gFlagsMask[gFlagsMask["FHCRC"] = 2] = "FHCRC";
+    gFlagsMask[gFlagsMask["FEXTRA"] = 4] = "FEXTRA";
+    gFlagsMask[gFlagsMask["FNAME"] = 8] = "FNAME";
+    gFlagsMask[gFlagsMask["FCOMMENT"] = 16] = "FCOMMENT";
+})(gFlagsMask || (gFlagsMask = {}));
+;
+class Gzip {
+    constructor(input, opt_params) {
+        this.input = input;
+        this.ip = 0;
+        this.op = 0;
+        this.flags = {};
+        if (opt_params) {
+            if (opt_params['flags']) {
+                this.flags = opt_params['flags'];
+            }
+            if (typeof opt_params['filename'] === 'string') {
+                this.filename = opt_params['filename'];
+            }
+            if (typeof opt_params['comment'] === 'string') {
+                this.comment = opt_params['comment'];
+            }
+            if (opt_params['deflateOptions']) {
+                this.deflateOptions = opt_params['deflateOptions'];
+            }
+        }
+        if (!this.deflateOptions) {
+            this.deflateOptions = {};
+        }
+    }
+    compress() {
+        let flg;
+        let mtime;
+        let crc16;
+        let crc32;
+        let rawdeflate;
+        let c;
+        let i;
+        let il;
+        let output = new (USE_TYPEDARRAY ? Uint8Array : Array)(Gzip.DefaultBufferSize);
+        let op = 0;
+        let input = this.input;
+        let ip = this.ip;
+        let filename = this.filename;
+        let comment = this.comment;
+        // check signature
+        output[op++] = 0x1f;
+        output[op++] = 0x8b;
+        // check compression method
+        output[op++] = 8; /* XXX: use Zlib const */
+        // flags
+        flg = 0;
+        if (this.flags['fname']) {
+            flg |= Gzip.FlagsMask.FNAME;
+        }
+        if (this.flags['fcomment']) {
+            flg |= Gzip.FlagsMask.FCOMMENT;
+        }
+        if (this.flags['fhcrc']) {
+            flg |= Gzip.FlagsMask.FHCRC;
+        }
+        output[op++] = flg;
+        // modification time
+        mtime = (Date.now ? Date.now() : +new Date()) / 1000 | 0;
+        output[op++] = mtime & 0xff;
+        output[op++] = mtime >>> 8 & 0xff;
+        output[op++] = mtime >>> 16 & 0xff;
+        output[op++] = mtime >>> 24 & 0xff;
+        // extra flags
+        output[op++] = 0;
+        // operating system
+        output[op++] = Gzip.OperatingSystem.UNKNOWN;
+        // extra
+        /* NOP */
+        // fname
+        if (this.flags['fname'] !== void 0) {
+            for (i = 0, il = filename.length; i < il; ++i) {
+                c = filename.charCodeAt(i);
+                if (c > 0xff) {
+                    output[op++] = (c >>> 8) & 0xff;
+                }
+                output[op++] = c & 0xff;
+            }
+            output[op++] = 0; // null termination
+        }
+        // fcomment
+        if (this.flags['comment']) {
+            for (i = 0, il = comment.length; i < il; ++i) {
+                c = comment.charCodeAt(i);
+                if (c > 0xff) {
+                    output[op++] = (c >>> 8) & 0xff;
+                }
+                output[op++] = c & 0xff;
+            }
+            output[op++] = 0; // null termination
+        }
+        // fhcrc
+        if (this.flags['fhcrc']) {
+            crc16 = CRC32.calc(output, 0, op) & 0xffff;
+            output[op++] = (crc16) & 0xff;
+            output[op++] = (crc16 >>> 8) & 0xff;
+        }
+        // add compress option
+        this.deflateOptions['outputBuffer'] = output;
+        this.deflateOptions['outputIndex'] = op;
+        // compress
+        rawdeflate = new RawDeflate(input, this.deflateOptions);
+        output = rawdeflate.compress();
+        op = rawdeflate.op;
+        // expand buffer
+        if (USE_TYPEDARRAY) {
+            if (op + 8 > output.buffer.byteLength) {
+                this.output = new Uint8Array(op + 8);
+                this.output.set(new Uint8Array(output.buffer));
+                output = this.output;
+            }
+            else {
+                output = new Uint8Array(output.buffer);
+            }
+        }
+        // crc32
+        crc32 = CRC32.calc(input);
+        output[op++] = (crc32) & 0xff;
+        output[op++] = (crc32 >>> 8) & 0xff;
+        output[op++] = (crc32 >>> 16) & 0xff;
+        output[op++] = (crc32 >>> 24) & 0xff;
+        // input size
+        il = input.length;
+        output[op++] = (il) & 0xff;
+        output[op++] = (il >>> 8) & 0xff;
+        output[op++] = (il >>> 16) & 0xff;
+        output[op++] = (il >>> 24) & 0xff;
+        this.ip = ip;
+        if (USE_TYPEDARRAY && op < output.length) {
+            this.output = output = output.subarray(0, op);
+        }
+        return output;
+    }
+}
+Gzip.OperatingSystem = gOperatingSystem;
+Gzip.FlagsMask = gFlagsMask;
+Gzip.DefaultBufferSize = 0x8000;
+/// <reference path="./define/typedarray/hybrid.ts" />
+/**
+ * build huffman table from length list.
+ * @param {!(Array.<number>|Uint8Array)} lengths length list.
+ * @return {!Array} huffman table.
+ */
+class Huffman {
+    constructor() {
+    }
+    static buildHuffmanTable(lengths) {
+        let listSize = lengths.length;
+        let maxCodeLength = 0;
+        let minCodeLength = Number.POSITIVE_INFINITY;
+        let size;
+        let table;
+        let bitLength;
+        let code;
+        let skip;
+        let reversed;
+        let rtemp;
+        let i;
+        let il;
+        let j;
+        let value;
+        for (i = 0, il = listSize; i < il; ++i) {
+            if (lengths[i] > maxCodeLength) {
+                maxCodeLength = lengths[i];
+            }
+            if (lengths[i] < minCodeLength) {
+                minCodeLength = lengths[i];
+            }
+        }
+        size = 1 << maxCodeLength;
+        table = new (USE_TYPEDARRAY ? Uint32Array : Array)(size);
+        for (bitLength = 1, code = 0, skip = 2; bitLength <= maxCodeLength;) {
+            for (i = 0; i < listSize; ++i) {
+                if (lengths[i] === bitLength) {
+                    for (reversed = 0, rtemp = code, j = 0; j < bitLength; ++j) {
+                        reversed = (reversed << 1) | (rtemp & 1);
+                        rtemp >>= 1;
+                    }
+                    value = (bitLength << 16) | i;
+                    for (j = reversed; j < size; j += skip) {
+                        table[j] = value;
+                    }
+                    ++code;
+                }
+            }
+            ++bitLength;
+            code <<= 1;
+            skip <<= 1;
+        }
+        return [table, maxCodeLength, minCodeLength];
+    }
+}
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./huffman.ts" />
+var rBufferType;
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./huffman.ts" />
+(function (rBufferType) {
+    rBufferType[rBufferType["BLOCK"] = 0] = "BLOCK";
+    rBufferType[rBufferType["ADAPTIVE"] = 1] = "ADAPTIVE";
+})(rBufferType || (rBufferType = {}));
+;
+class RawInflate {
+    constructor(input, opt_params) {
+        /** @type {boolean} is final block flag. */
+        this.bfinal = false;
+        /** @type {Zlib.RawInflate.BufferType} buffer management. */
+        this.bufferType = RawInflate.BufferType.ADAPTIVE;
+        /** @type {boolean} resize flag for memory size optimization. */
+        this.resize = false;
+        this.blocks = [];
+        this.bufferSize = RawInflate.ZLIB_RAW_INFLATE_BUFFER_SIZE;
+        this.totalpos = 0;
+        this.ip = 0;
+        this.bitsbuf = 0;
+        this.bitsbuflen = 0;
+        this.input = USE_TYPEDARRAY ? new Uint8Array(input) : input;
+        this.bfinal = false;
+        this.bufferType = RawInflate.BufferType.ADAPTIVE;
+        this.resize = false;
+        // option parameters
+        if (opt_params) {
+            if (opt_params['index']) {
+                this.ip = opt_params['index'];
+            }
+            if (opt_params['bufferSize']) {
+                this.bufferSize = opt_params['bufferSize'];
+            }
+            if (opt_params['bufferType']) {
+                this.bufferType = opt_params['bufferType'];
+            }
+            if (opt_params['resize']) {
+                this.resize = opt_params['resize'];
+            }
+        }
+        // initialize
+        switch (this.bufferType) {
+            case RawInflate.BufferType.BLOCK:
+                this.op = RawInflate.MaxBackwardLength;
+                this.output =
+                    new (USE_TYPEDARRAY ? Uint8Array : Array)(RawInflate.MaxBackwardLength +
+                        this.bufferSize +
+                        RawInflate.MaxCopyLength);
+                break;
+            case RawInflate.BufferType.ADAPTIVE:
+                this.op = 0;
+                this.output = new (USE_TYPEDARRAY ? Uint8Array : Array)(this.bufferSize);
+                break;
+            default:
+                throw new Error('invalid inflate mode');
+        }
+    }
+    decompress() {
+        while (!this.bfinal) {
+            this.parseBlock();
+        }
+        switch (this.bufferType) {
+            case RawInflate.BufferType.BLOCK:
+                return this.concatBufferBlock();
+            case RawInflate.BufferType.ADAPTIVE:
+                return this.concatBufferDynamic();
+            default:
+                throw new Error('invalid inflate mode');
+        }
+    }
+    parseBlock() {
+        /** @type {number} header */
+        let hdr = this.readBits(3);
+        // BFINAL
+        if (hdr & 0x1) {
+            this.bfinal = true;
+        }
+        // BTYPE
+        hdr >>>= 1;
+        switch (hdr) {
+            // uncompressed
+            case 0:
+                this.parseUncompressedBlock();
+                break;
+            // fixed huffman
+            case 1:
+                console.log("Fixed Block");
+                this.parseFixedHuffmanBlock();
+                break;
+            // dynamic huffman
+            case 2:
+                console.log("Dynamic Block");
+                this.parseDynamicHuffmanBlock();
+                break;
+            // reserved or other
+            default:
+                throw new Error('unknown BTYPE: ' + hdr);
+        }
+    }
+    readBits(length) {
+        let bitsbuf = this.bitsbuf;
+        let bitsbuflen = this.bitsbuflen;
+        let input = this.input;
+        let ip = this.ip;
+        /** @type {number} */
+        let inputLength = input.length;
+        /** @type {number} input and output byte. */
+        let octet;
+        // input byte
+        if (ip + ((length - bitsbuflen + 7) >> 3) >= inputLength) {
+            throw new Error('input buffer is broken');
+        }
+        // not enough buffer
+        while (bitsbuflen < length) {
+            bitsbuf |= input[ip++] << bitsbuflen;
+            bitsbuflen += 8;
+        }
+        // output byte
+        octet = bitsbuf & /* MASK */ ((1 << length) - 1);
+        bitsbuf >>>= length;
+        bitsbuflen -= length;
+        this.bitsbuf = bitsbuf;
+        this.bitsbuflen = bitsbuflen;
+        this.ip = ip;
+        return octet;
+    }
+    readCodeByTable(table) {
+        let bitsbuf = this.bitsbuf;
+        let bitsbuflen = this.bitsbuflen;
+        let input = this.input;
+        let ip = this.ip;
+        /** @type {number} */
+        let inputLength = input.length;
+        /** @type {!(Array.<number>|Uint8Array)} huffman code table */
+        let codeTable = table[0];
+        /** @type {number} */
+        let maxCodeLength = table[1];
+        /** @type {number} code length & code (16bit, 16bit) */
+        let codeWithLength;
+        /** @type {number} code bits length */
+        let codeLength;
+        // not enough buffer
+        while (bitsbuflen < maxCodeLength) {
+            if (ip >= inputLength) {
+                break;
+            }
+            bitsbuf |= input[ip++] << bitsbuflen;
+            bitsbuflen += 8;
+        }
+        // read max length
+        codeWithLength = codeTable[bitsbuf & ((1 << maxCodeLength) - 1)];
+        codeLength = codeWithLength >>> 16;
+        if (codeLength > bitsbuflen) {
+            throw new Error('invalid code length: ' + codeLength);
+        }
+        this.bitsbuf = bitsbuf >> codeLength;
+        this.bitsbuflen = bitsbuflen - codeLength;
+        this.ip = ip;
+        return codeWithLength & 0xffff;
+    }
+    parseUncompressedBlock() {
+        let input = this.input;
+        let ip = this.ip;
+        let output = this.output;
+        let op = this.op;
+        /** @type {number} */
+        let inputLength = input.length;
+        /** @type {number} block length */
+        let len;
+        /** @type {number} number for check block length */
+        let nlen;
+        /** @type {number} output buffer length */
+        let olength = output.length;
+        /** @type {number} copy counter */
+        let preCopy;
+        // skip buffered header bits
+        this.bitsbuf = 0;
+        this.bitsbuflen = 0;
+        // len
+        if (ip + 1 >= inputLength) {
+            throw new Error('invalid uncompressed block header: LEN');
+        }
+        len = input[ip++] | (input[ip++] << 8);
+        // nlen
+        if (ip + 1 >= inputLength) {
+            throw new Error('invalid uncompressed block header: NLEN');
+        }
+        nlen = input[ip++] | (input[ip++] << 8);
+        // check len & nlen
+        if (len === ~nlen) {
+            throw new Error('invalid uncompressed block header: length verify');
+        }
+        // check size
+        if (ip + len > input.length) {
+            throw new Error('input buffer is broken');
+        }
+        // expand buffer
+        switch (this.bufferType) {
+            case RawInflate.BufferType.BLOCK:
+                // pre copy
+                while (op + len > output.length) {
+                    preCopy = olength - op;
+                    len -= preCopy;
+                    if (USE_TYPEDARRAY) {
+                        output.set(input.subarray(ip, ip + preCopy), op);
+                        op += preCopy;
+                        ip += preCopy;
+                    }
+                    else {
+                        while (preCopy--) {
+                            output[op++] = input[ip++];
+                        }
+                    }
+                    this.op = op;
+                    output = this.expandBufferBlock();
+                    op = this.op;
+                }
+                break;
+            case RawInflate.BufferType.ADAPTIVE:
+                while (op + len > output.length) {
+                    output = this.expandBufferAdaptive({ fixRatio: 2 });
+                }
+                break;
+            default:
+                throw new Error('invalid inflate mode');
+        }
+        // copy
+        if (USE_TYPEDARRAY) {
+            output.set(input.subarray(ip, ip + len), op);
+            op += len;
+            ip += len;
+        }
+        else {
+            while (len--) {
+                output[op++] = input[ip++];
+            }
+        }
+        this.ip = ip;
+        this.op = op;
+        this.output = output;
+    }
+    parseFixedHuffmanBlock() {
+        switch (this.bufferType) {
+            case RawInflate.BufferType.ADAPTIVE:
+                this.decodeHuffmanAdaptive(RawInflate.FixedLiteralLengthTable, RawInflate.FixedDistanceTable);
+                break;
+            case RawInflate.BufferType.BLOCK:
+                this.decodeHuffmanBlock(RawInflate.FixedLiteralLengthTable, RawInflate.FixedDistanceTable);
+                break;
+            default:
+                throw new Error('invalid inflate mode');
+        }
+    }
+    parseDynamicHuffmanBlock() {
+        /** @type {number} number of literal and length codes. */
+        let hlit = this.readBits(5) + 257;
+        /** @type {number} number of distance codes. */
+        let hdist = this.readBits(5) + 1;
+        /** @type {number} number of code lengths. */
+        let hclen = this.readBits(4) + 4;
+        /** @type {!(Uint8Array|Array.<number>)} code lengths. */
+        let codeLengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(RawInflate.Order.length);
+        /** @type {!Array} code lengths table. */
+        let codeLengthsTable;
+        /** @type {!(Uint8Array|Array.<number>)} literal and length code table. */
+        let litlenTable;
+        /** @type {!(Uint8Array|Array.<number>)} distance code table. */
+        let distTable;
+        /** @type {!(Uint8Array|Array.<number>)} code length table. */
+        let lengthTable;
+        /** @type {number} */
+        let code;
+        /** @type {number} */
+        let prev;
+        /** @type {number} */
+        let repeat;
+        /** @type {number} loop counter. */
+        let i;
+        /** @type {number} loop limit. */
+        let il;
+        // decode code lengths
+        for (i = 0; i < hclen; ++i) {
+            codeLengths[RawInflate.Order[i]] = this.readBits(3);
+        }
+        if (!USE_TYPEDARRAY) {
+            for (i = hclen, hclen = codeLengths.length; i < hclen; ++i) {
+                codeLengths[RawInflate.Order[i]] = 0;
+            }
+        }
+        // decode length table
+        codeLengthsTable = RawInflate.buildHuffmanTable(codeLengths);
+        lengthTable = new (USE_TYPEDARRAY ? Uint8Array : Array)(hlit + hdist);
+        for (i = 0, il = hlit + hdist; i < il;) {
+            code = this.readCodeByTable(codeLengthsTable);
+            switch (code) {
+                case 16:
+                    repeat = 3 + this.readBits(2);
+                    while (repeat--) {
+                        lengthTable[i++] = prev;
+                    }
+                    break;
+                case 17:
+                    repeat = 3 + this.readBits(3);
+                    while (repeat--) {
+                        lengthTable[i++] = 0;
+                    }
+                    prev = 0;
+                    break;
+                case 18:
+                    repeat = 11 + this.readBits(7);
+                    while (repeat--) {
+                        lengthTable[i++] = 0;
+                    }
+                    prev = 0;
+                    break;
+                default:
+                    lengthTable[i++] = code;
+                    prev = code;
+                    break;
+            }
+        }
+        litlenTable = USE_TYPEDARRAY
+            ? RawInflate.buildHuffmanTable(lengthTable.subarray(0, hlit))
+            : RawInflate.buildHuffmanTable(lengthTable.slice(0, hlit));
+        distTable = USE_TYPEDARRAY
+            ? RawInflate.buildHuffmanTable(lengthTable.subarray(hlit))
+            : RawInflate.buildHuffmanTable(lengthTable.slice(hlit));
+        switch (this.bufferType) {
+            case RawInflate.BufferType.ADAPTIVE:
+                this.decodeHuffmanAdaptive(litlenTable, distTable);
+                break;
+            case RawInflate.BufferType.BLOCK:
+                this.decodeHuffmanBlock(litlenTable, distTable);
+                break;
+            default:
+                throw new Error('invalid inflate mode');
+        }
+    }
+    decodeHuffmanBlock(litlen, dist) {
+        let output = this.output;
+        let op = this.op;
+        this.currentLitlenTable = litlen;
+        let olength = output.length - RawInflate.MaxCopyLength;
+        let code;
+        let ti;
+        let codeDist;
+        let codeLength;
+        let lengthCodeTable = RawInflate.LengthCodeTable;
+        let lengthExtraTable = RawInflate.LengthExtraTable;
+        let distCodeTable = RawInflate.DistCodeTable;
+        let distExtraTable = RawInflate.DistExtraTable;
+        code = this.readCodeByTable(litlen);
+        while (code !== 256) {
+            // literal
+            if (code < 256) {
+                if (op >= olength) {
+                    this.op = op;
+                    output = this.expandBufferBlock();
+                    op = this.op;
+                }
+                output[op++] = code;
+                continue;
+            }
+            // length code
+            ti = code - 257;
+            codeLength = lengthCodeTable[ti];
+            if (lengthExtraTable[ti] > 0) {
+                codeLength += this.readBits(lengthExtraTable[ti]);
+            }
+            // dist code
+            code = this.readCodeByTable(dist);
+            codeDist = distCodeTable[code];
+            if (distExtraTable[code] > 0) {
+                codeDist += this.readBits(distExtraTable[code]);
+            }
+            // lz77 decode
+            if (op >= olength) {
+                this.op = op;
+                output = this.expandBufferBlock();
+                op = this.op;
+            }
+            while (codeLength--) {
+                output[op] = output[(op++) - codeDist];
+            }
+            code = this.readCodeByTable(litlen);
+        }
+        while (this.bitsbuflen >= 8) {
+            this.bitsbuflen -= 8;
+            this.ip--;
+        }
+        this.op = op;
+    }
+    decodeHuffmanAdaptive(litlen, dist) {
+        let output = this.output;
+        let op = this.op;
+        this.currentLitlenTable = litlen;
+        let olength = output.length;
+        let code;
+        let ti;
+        let codeDist;
+        let codeLength;
+        let lengthCodeTable = RawInflate.LengthCodeTable;
+        let lengthExtraTable = RawInflate.LengthExtraTable;
+        let distCodeTable = RawInflate.DistCodeTable;
+        let distExtraTable = RawInflate.DistExtraTable;
+        var testOP = 25;
+        while ((code = this.readCodeByTable(litlen)) !== 256) {
+            console.log(op.toString());
+            console.log(uint8arrayToStringMethod(output.slice(0, op)));
+            // literal
+            if (code < 256) {
+                if (op >= olength) {
+                    output = this.expandBufferAdaptive();
+                    olength = output.length;
+                }
+                if (op == testOP)
+                    console.log("First");
+                output[op++] = code;
+                continue;
+            }
+            // length code
+            ti = code - 257;
+            codeLength = lengthCodeTable[ti];
+            if (lengthExtraTable[ti] > 0) {
+                codeLength += this.readBits(lengthExtraTable[ti]);
+                if (op == testOP)
+                    console.log("Second");
+            }
+            // dist code
+            code = this.readCodeByTable(dist);
+            codeDist = distCodeTable[code];
+            if (distExtraTable[code] > 0) {
+                codeDist += this.readBits(distExtraTable[code]);
+                if (op == testOP)
+                    console.log("Third");
+            }
+            // lz77 decode
+            if (op + codeLength > olength) {
+                output = this.expandBufferAdaptive();
+                olength = output.length;
+                if (op == testOP)
+                    console.log("Fourth");
+            }
+            while (codeLength--) {
+                if (op == testOP)
+                    console.log("Loop");
+                output[op] = output[(op++) - codeDist];
+            }
+            code = this.readCodeByTable(litlen);
+        }
+        while (this.bitsbuflen >= 8) {
+            this.bitsbuflen -= 8;
+            this.ip--;
+        }
+        this.op = op;
+    }
+    expandBufferBlock() {
+        let buffer = new (USE_TYPEDARRAY ? Uint8Array : Array)(this.op - RawInflate.MaxBackwardLength);
+        let backward = this.op - RawInflate.MaxBackwardLength;
+        let i;
+        let il;
+        let output = this.output;
+        // copy to output buffer
+        if (USE_TYPEDARRAY) {
+            buffer.set(output.subarray(RawInflate.MaxBackwardLength, buffer.length));
+        }
+        else {
+            for (i = 0, il = buffer.length; i < il; ++i) {
+                buffer[i] = output[i + RawInflate.MaxBackwardLength];
+            }
+        }
+        this.blocks.push(buffer);
+        this.totalpos += buffer.length;
+        // copy to backward buffer
+        if (USE_TYPEDARRAY) {
+            output.set(output.subarray(backward, backward + RawInflate.MaxBackwardLength));
+        }
+        else {
+            for (i = 0; i < RawInflate.MaxBackwardLength; ++i) {
+                output[i] = output[backward + i];
+            }
+        }
+        this.op = RawInflate.MaxBackwardLength;
+        return output;
+    }
+    expandBufferAdaptive(opt_param) {
+        let buffer;
+        let ratio = (this.input.length / this.ip + 1) | 0;
+        let maxHuffCode;
+        let newSize;
+        let maxInflateSize;
+        let input = this.input;
+        let output = this.output;
+        if (opt_param) {
+            if (typeof opt_param.fixRatio === 'number') {
+                ratio = opt_param.fixRatio;
+            }
+            if (typeof opt_param.addRatio === 'number') {
+                ratio += opt_param.addRatio;
+            }
+        }
+        // calculate new buffer size
+        if (ratio < 2) {
+            maxHuffCode =
+                (input.length - this.ip) / this.currentLitlenTable[2];
+            maxInflateSize = (maxHuffCode / 2 * 258) | 0;
+            newSize = maxInflateSize < output.length ?
+                output.length + maxInflateSize :
+                output.length << 1;
+        }
+        else {
+            newSize = output.length * ratio;
+        }
+        // buffer expantion
+        if (USE_TYPEDARRAY) {
+            buffer = new Uint8Array(newSize);
+            buffer.set(output);
+        }
+        else {
+            buffer = output;
+        }
+        this.output = buffer;
+        return this.output;
+    }
+    concatBufferBlock() {
+        /** @type {number} buffer pointer. */
+        let pos = 0;
+        /** @type {number} buffer pointer. */
+        let limit = this.totalpos + (this.op - RawInflate.MaxBackwardLength);
+        /** @type {!(Array.<number>|Uint8Array)} output block array. */
+        let output = this.output;
+        /** @type {!Array} blocks array. */
+        let blocks = this.blocks;
+        /** @type {!(Array.<number>|Uint8Array)} output block array. */
+        let block;
+        /** @type {!(Array.<number>|Uint8Array)} output buffer. */
+        let buffer = new (USE_TYPEDARRAY ? Uint8Array : Array)(limit);
+        /** @type {number} loop counter. */
+        let i;
+        /** @type {number} loop limiter. */
+        let il;
+        /** @type {number} loop counter. */
+        let j;
+        /** @type {number} loop limiter. */
+        let jl;
+        // single buffer
+        if (blocks.length === 0) {
+            return USE_TYPEDARRAY ?
+                this.output.subarray(RawInflate.MaxBackwardLength, this.op) :
+                this.output.slice(RawInflate.MaxBackwardLength, this.op);
+        }
+        // copy to buffer
+        for (i = 0, il = blocks.length; i < il; ++i) {
+            block = blocks[i];
+            for (j = 0, jl = block.length; j < jl; ++j) {
+                buffer[pos++] = block[j];
+            }
+        }
+        // current buffer
+        for (i = RawInflate.MaxBackwardLength, il = this.op; i < il; ++i) {
+            buffer[pos++] = output[i];
+        }
+        this.blocks = [];
+        this.buffer = buffer;
+        return this.buffer;
+    }
+    concatBufferDynamic() {
+        let buffer;
+        let op = this.op;
+        if (USE_TYPEDARRAY) {
+            if (this.resize) {
+                buffer = new Uint8Array(op);
+                buffer.set(this.output.subarray(0, op));
+            }
+            else {
+                buffer = this.output.subarray(0, op);
+            }
+        }
+        else {
+            if (this.output.length > op) {
+                this.output = this.output.slice(0, op - 1);
+            }
+            buffer = this.output;
+        }
+        this.buffer = buffer;
+        return this.buffer;
+    }
+}
+RawInflate.ZLIB_RAW_INFLATE_BUFFER_SIZE = 0x8000;
+RawInflate.buildHuffmanTable = Huffman.buildHuffmanTable;
+RawInflate.BufferType = rBufferType;
+RawInflate.MaxBackwardLength = 32768;
+RawInflate.MaxCopyLength = 258;
+RawInflate.Order = (() => {
+    const table = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+    return USE_TYPEDARRAY ? new Uint16Array(table) : table;
+})();
+RawInflate.LengthCodeTable = ((table) => {
+    return USE_TYPEDARRAY ? new Uint16Array(table) : table;
+})([
+    0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b,
+    0x000d, 0x000f, 0x0011, 0x0013, 0x0017, 0x001b, 0x001f, 0x0023, 0x002b,
+    0x0033, 0x003b, 0x0043, 0x0053, 0x0063, 0x0073, 0x0083, 0x00a3, 0x00c3,
+    0x00e3, 0x0102, 0x0102, 0x0102
+]);
+RawInflate.LengthExtraTable = ((table) => {
+    return USE_TYPEDARRAY ? new Uint8Array(table) : table;
+})([
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
+    5, 5, 0, 0, 0
+]);
+RawInflate.DistCodeTable = ((table) => {
+    return USE_TYPEDARRAY ? new Uint16Array(table) : table;
+})([
+    0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0007, 0x0009, 0x000d, 0x0011,
+    0x0019, 0x0021, 0x0031, 0x0041, 0x0061, 0x0081, 0x00c1, 0x0101, 0x0181,
+    0x0201, 0x0301, 0x0401, 0x0601, 0x0801, 0x0c01, 0x1001, 0x1801, 0x2001,
+    0x3001, 0x4001, 0x6001
+]);
+RawInflate.DistExtraTable = (() => {
+    const table = [
+        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11,
+        11, 12, 12, 13, 13
+    ];
+    return USE_TYPEDARRAY ? new Uint8Array(table) : table;
+})();
+RawInflate.FixedLiteralLengthTable = (() => {
+    let lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(288);
+    let i, il;
+    for (i = 0, il = lengths.length; i < il; ++i) {
+        lengths[i] =
+            (i <= 143) ? 8 :
+                (i <= 255) ? 9 :
+                    (i <= 279) ? 7 :
+                        8;
+    }
+    return RawInflate.buildHuffmanTable(lengths);
+})();
+RawInflate.FixedDistanceTable = (() => {
+    let lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(30);
+    let i, il;
+    for (i = 0, il = lengths.length; i < il; ++i) {
+        lengths[i] = 5;
+    }
+    return RawInflate.buildHuffmanTable(lengths);
+})();
+function uint8arrayToStringMethod(myUint8Arr) {
+    return String.fromCharCode.apply(null, myUint8Arr);
+}
+function StringTouint8arrayMethod(str) {
+    var uint = new Uint8Array(str.length);
+    for (var i = 0, j = str.length; i < j; ++i) {
+        uint[i] = str.charCodeAt(i);
+    }
+    return uint;
+}
+/// <reference path="./gunzip_member.ts" />
+/// <reference path="./gzip.ts" />
+/// <reference path="./rawinflate.ts" />
+/// <reference path="./define/typedarray/hybrid.ts" />
+class Gunzip {
+    constructor(input) {
+        this.member = [];
+        this.input = input;
+        this.ip = 0;
+        this.member = [];
+        this.decompressed = false;
+    }
+    getMembers() {
+        if (!this.decompressed) {
+            this.decompress();
+        }
+        return this.member.slice();
+    }
+    ;
+    decompress() {
+        let il = this.input.length;
+        while (this.ip < il) {
+            this.decodeMember();
+        }
+        this.decompressed = true;
+        return this.concatMember();
+    }
+    ;
+    decodeMember() {
+        /** @type {Zlib.GunzipMember} */
+        let member = new GunzipMember();
+        /** @type {number} */
+        let isize;
+        /** @type {Zlib.RawInflate} RawInflate implementation. */
+        let rawinflate;
+        /** @type {!(Array.<number>|Uint8Array)} inflated data. */
+        let inflated;
+        /** @type {number} inflate size */
+        let inflen;
+        /** @type {number} character code */
+        let c;
+        /** @type {number} character index in string. */
+        let ci;
+        /** @type {Array.<string>} character array. */
+        let str;
+        /** @type {number} modification time. */
+        let mtime;
+        /** @type {number} */
+        let crc32;
+        let input = this.input;
+        let ip = this.ip;
+        member.id1 = input[ip++];
+        member.id2 = input[ip++];
+        // check signature
+        if (member.id1 !== 0x1f || member.id2 !== 0x8b) {
+            throw new Error('invalid file signature:' + member.id1 + ',' + member.id2);
+        }
+        // check compression method
+        member.cm = input[ip++];
+        switch (member.cm) {
+            case 8: /* XXX: use Zlib const */
+                break;
+            default:
+                throw new Error('unknown compression method: ' + member.cm);
+        }
+        // flags
+        member.flg = input[ip++];
+        // modification time
+        mtime = (input[ip++]) |
+            (input[ip++] << 8) |
+            (input[ip++] << 16) |
+            (input[ip++] << 24);
+        member.mtime = new Date(mtime * 1000);
+        // extra flags
+        member.xfl = input[ip++];
+        // operating system
+        member.os = input[ip++];
+        // extra
+        if ((member.flg & Gzip.FlagsMask.FEXTRA) > 0) {
+            member.xlen = input[ip++] | (input[ip++] << 8);
+            ip = this.decodeSubField(ip, member.xlen);
+        }
+        // fname
+        if ((member.flg & Gzip.FlagsMask.FNAME) > 0) {
+            c = input[ip];
+            for (str = [], ci = 0; c > 0;) {
+                str[ci++] = String.fromCharCode(c);
+                c = input[++ip];
+            }
+            member.name = str.join('');
+        }
+        // fcomment
+        if ((member.flg & Gzip.FlagsMask.FCOMMENT) > 0) {
+            c = input[ip];
+            for (str = [], ci = 0; c > 0;) {
+                str[ci++] = String.fromCharCode(c);
+                c = input[++ip];
+            }
+            member.comment = str.join('');
+        }
+        // fhcrc
+        if ((member.flg & Gzip.FlagsMask.FHCRC) > 0) {
+            member.crc16 = CRC32.calc(input, 0, ip) & 0xffff;
+            if (member.crc16 !== (input[ip++] | (input[ip++] << 8))) {
+                throw new Error('invalid header crc16');
+            }
+        }
+        // isize を事前に取得すると展開後のサイズが分かるため、
+        // inflate処理のバッファサイズが事前に分かり、高速になる
+        isize = (input[input.length - 4]) | (input[input.length - 3] << 8) |
+            (input[input.length - 2] << 16) | (input[input.length - 1] << 24);
+        // isize の妥当性チェック
+        // ハフマン符号では最小 2-bit のため、最大で 1/4 になる
+        // LZ77 符号では 長さと距離 2-Byte で最大 258-Byte を表現できるため、
+        // 1/128 になるとする
+        // ここから入力バッファの残りが isize の 512 倍以上だったら
+        // サイズ指定のバッファ確保は行わない事とする
+        if (input.length - ip - /* CRC-32 */ 4 - /* ISIZE */ 4 < isize * 512) {
+            inflen = isize;
+        }
+        // compressed block
+        rawinflate = new RawInflate(input, { 'index': ip, 'bufferSize': inflen });
+        member.data = inflated = rawinflate.decompress();
+        ip = rawinflate.ip;
+        // crc32
+        member.crc32 = crc32 =
+            ((input[ip++]) | (input[ip++] << 8) |
+                (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        if (CRC32.calc(inflated) !== crc32) {
+            throw new Error('invalid CRC-32 checksum: 0x' +
+                CRC32.calc(inflated).toString(16) + ' / 0x' + crc32.toString(16));
+        }
+        // input size
+        member.isize = isize =
+            ((input[ip++]) | (input[ip++] << 8) |
+                (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        if ((inflated.length & 0xffffffff) !== isize) {
+            throw new Error('invalid input size: ' +
+                (inflated.length & 0xffffffff) + ' / ' + isize);
+        }
+        this.member.push(member);
+        this.ip = ip;
+    }
+    decodeSubField(ip, length) {
+        return ip + length;
+    }
+    ;
+    concatMember() {
+        /** @type {Array.<Zlib.GunzipMember>} */
+        let member = this.member;
+        /** @type {number} */
+        let i;
+        /** @type {number} */
+        let il;
+        /** @type {number} */
+        let p = 0;
+        /** @type {number} */
+        let size = 0;
+        /** @type {!(Array.<number>|Uint8Array)} */
+        let buffer;
+        for (i = 0, il = member.length; i < il; ++i) {
+            size += member[i].data.length;
+        }
+        if (USE_TYPEDARRAY) {
+            buffer = new Uint8Array(size);
+            for (i = 0; i < il; ++i) {
+                buffer.set(member[i].data, p);
+                p += member[i].data.length;
+            }
+        }
+        else {
+            buffer = [];
+            for (i = 0; i < il; ++i) {
+                buffer[i] = member[i].data;
+            }
+            buffer = Array.prototype.concat.apply([], buffer);
+        }
+        return buffer;
+    }
+}
+/// <reference path="./gzip.ts" />
+/// <reference path="./gunzip.ts" />
+/// <reference path="./define/compress.ts" />
+/// <reference path="./rawinflate.ts" />
+/// <reference path="./adler32.ts" />
+class Inflate {
+    constructor(input, opt_params) {
+        let cmf;
+        let flg;
+        this.input = input;
+        this.ip = 0;
+        // option parameters
+        if (opt_params) {
+            if (opt_params['index']) {
+                this.ip = opt_params['index'];
+            }
+            if (opt_params['verify']) {
+                this.verify = opt_params['verify'];
+            }
+        }
+        // Compression Method and Flags
+        cmf = input[this.ip++];
+        flg = input[this.ip++];
+        // compression method
+        switch (cmf & 0x0f) {
+            case CompressionMethod.DEFLATE:
+                this.method = CompressionMethod.DEFLATE;
+                break;
+            default:
+                throw new Error('unsupported compression method');
+        }
+        // fcheck
+        if (((cmf << 8) + flg) % 31 !== 0) {
+            throw new Error('invalid fcheck flag:' + ((cmf << 8) + flg) % 31);
+        }
+        // fdict (not supported)
+        if (flg & 0x20) {
+            throw new Error('fdict flag is not supported');
+        }
+        let bufferType = null;
+        let bufferSize = null;
+        let resize = false;
+        // RawInflate
+        if (opt_params) {
+            bufferType = opt_params['bufferType'] ? opt_params['bufferType'] : null;
+            bufferSize = opt_params['bufferSize'] ? opt_params['bufferSize'] : null;
+            resize = opt_params['bufferSize'] ? opt_params['bufferSize'] : null;
+        }
+        this.rawinflate = new RawInflate(input, {
+            'index': this.ip,
+            'bufferType': bufferType,
+            'bufferSize': bufferSize,
+            'resize': resize
+        });
+    }
+    decompress() {
+        let input = this.input;
+        let buffer;
+        let adler32;
+        buffer = this.rawinflate.decompress();
+        this.ip = this.rawinflate.ip;
+        // verify adler-32
+        if (this.verify) {
+            adler32 = (input[this.ip++] << 24 | input[this.ip++] << 16 |
+                input[this.ip++] << 8 | input[this.ip++]) >>> 0;
+            if (adler32 !== Adler32(buffer)) {
+                throw new Error('invalid adler-32 checksum');
+            }
+        }
+        return buffer;
+    }
+    ;
+}
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./huffman.ts" />
+const ZLIB_STREAM_RAW_INFLATE_BUFFER_SIZE = 0x8000;
+var rStatus;
+(function (rStatus) {
+    rStatus[rStatus["INITIALIZED"] = 0] = "INITIALIZED";
+    rStatus[rStatus["BLOCK_HEADER_START"] = 1] = "BLOCK_HEADER_START";
+    rStatus[rStatus["BLOCK_HEADER_END"] = 2] = "BLOCK_HEADER_END";
+    rStatus[rStatus["BLOCK_BODY_START"] = 3] = "BLOCK_BODY_START";
+    rStatus[rStatus["BLOCK_BODY_END"] = 4] = "BLOCK_BODY_END";
+    rStatus[rStatus["DECODE_BLOCK_START"] = 5] = "DECODE_BLOCK_START";
+    rStatus[rStatus["DECODE_BLOCK_END"] = 6] = "DECODE_BLOCK_END";
+})(rStatus || (rStatus = {}));
+;
+var rBlockType;
+(function (rBlockType) {
+    rBlockType[rBlockType["UNCOMPRESSED"] = 0] = "UNCOMPRESSED";
+    rBlockType[rBlockType["FIXED"] = 1] = "FIXED";
+    rBlockType[rBlockType["DYNAMIC"] = 2] = "DYNAMIC";
+})(rBlockType || (rBlockType = {}));
+;
+const buildHuffmanTable = Huffman.buildHuffmanTable;
+class RawInflateStream {
+    constructor(input, ip, opt_buffersize) {
+        this.status = 0;
+        /** @type {!Array.<(Array|Uint8Array)>} */
+        this.blocks = [];
+        /** @type {number} block size. */
+        this.bufferSize =
+            opt_buffersize ? opt_buffersize : ZLIB_STREAM_RAW_INFLATE_BUFFER_SIZE;
+        /** @type {!number} total output buffer pointer. */
+        this.totalpos = 0;
+        /** @type {!number} input buffer pointer. */
+        this.ip = ip === void 0 ? 0 : ip;
+        /** @type {!number} bit stream reader buffer. */
+        this.bitsbuf = 0;
+        /** @type {!number} bit stream reader buffer size. */
+        this.bitsbuflen = 0;
+        /** @type {!(Array|Uint8Array)} input buffer. */
+        this.input = USE_TYPEDARRAY ? new Uint8Array(input) : input;
+        /** @type {!(Uint8Array|Array)} output buffer. */
+        this.output = new (USE_TYPEDARRAY ? Uint8Array : Array)(this.bufferSize);
+        /** @type {!number} output buffer pointer. */
+        this.op = 0;
+        /** @type {boolean} is final block flag. */
+        this.bfinal = false;
+        /** @type {number} uncompressed block length. */
+        this.blockLength = 0;
+        /** @type {boolean} resize flag for memory size optimization. */
+        this.resize = false;
+        /** @type {Array} */
+        this.litlenTable = [];
+        /** @type {Array} */
+        this.distTable = [];
+        /** @type {number} */
+        this.sp = 0; // stream pointer
+        /** @type {RawInflateStream.Status} */
+        this.status = RawInflateStream.Status.INITIALIZED;
+        /** @type {!number} */
+        this.ip_ = 0;
+        /** @type {!number} */
+        this.bitsbuflen_ = 0;
+        /** @type {!number} */
+        this.bitsbuf_ = 0;
+        this.currentBlockType = RawInflateStream.BlockType.FIXED;
+    }
+    decompress(newInput, ip) {
+        /** @type {boolean} */
+        let stop = false;
+        if (newInput !== void 0) {
+            this.input = newInput;
+        }
+        if (ip !== void 0) {
+            this.ip = ip;
+        }
+        // decompress
+        while (!stop) {
+            switch (this.status) {
+                // block header
+                case RawInflateStream.Status.INITIALIZED:
+                case RawInflateStream.Status.BLOCK_HEADER_START:
+                    if (this.readBlockHeader() < 0) {
+                        stop = true;
+                    }
+                    break;
+                // block body
+                case RawInflateStream.Status.BLOCK_HEADER_END: /* FALLTHROUGH */
+                case RawInflateStream.Status.BLOCK_BODY_START:
+                    switch (this.currentBlockType) {
+                        case RawInflateStream.BlockType.UNCOMPRESSED:
+                            if (this.readUncompressedBlockHeader() < 0) {
+                                stop = true;
+                            }
+                            break;
+                        case RawInflateStream.BlockType.FIXED:
+                            if (this.parseFixedHuffmanBlock() < 0) {
+                                stop = true;
+                            }
+                            break;
+                        case RawInflateStream.BlockType.DYNAMIC:
+                            if (this.parseDynamicHuffmanBlock() < 0) {
+                                stop = true;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                // decode data
+                case RawInflateStream.Status.BLOCK_BODY_END:
+                case RawInflateStream.Status.DECODE_BLOCK_START:
+                    switch (this.currentBlockType) {
+                        case RawInflateStream.BlockType.UNCOMPRESSED:
+                            if (this.parseUncompressedBlock() < 0) {
+                                stop = true;
+                            }
+                            break;
+                        case RawInflateStream.BlockType.FIXED: /* FALLTHROUGH */
+                        case RawInflateStream.BlockType.DYNAMIC:
+                            if (this.decodeHuffman() < 0) {
+                                stop = true;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+                case RawInflateStream.Status.DECODE_BLOCK_END:
+                    if (this.bfinal) {
+                        stop = true;
+                    }
+                    else {
+                        this.status = RawInflateStream.Status.INITIALIZED;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        return this.concatBuffer();
+    }
+    readBlockHeader() {
+        /** @type {number} header */
+        let hdr;
+        this.status = RawInflateStream.Status.BLOCK_HEADER_START;
+        this.save_();
+        hdr = this.readBits(3);
+        if (hdr < 0) {
+            this.restore_();
+            return -1;
+        }
+        // BFINAL
+        if (hdr & 0x1) {
+            this.bfinal = true;
+        }
+        // BTYPE
+        hdr >>>= 1;
+        switch (hdr) {
+            case 0: // uncompressed
+                this.currentBlockType = RawInflateStream.BlockType.UNCOMPRESSED;
+                break;
+            case 1: // fixed huffman
+                this.currentBlockType = RawInflateStream.BlockType.FIXED;
+                break;
+            case 2: // dynamic huffman
+                this.currentBlockType = RawInflateStream.BlockType.DYNAMIC;
+                break;
+            default: // reserved or other
+                throw new Error('unknown BTYPE: ' + hdr);
+        }
+        this.status = RawInflateStream.Status.BLOCK_HEADER_END;
+    }
+    readBits(length) {
+        let bitsbuf = this.bitsbuf;
+        let bitsbuflen = this.bitsbuflen;
+        let input = this.input;
+        let ip = this.ip;
+        /** @type {number} input and output byte. */
+        let octet;
+        // not enough buffer
+        while (bitsbuflen < length) {
+            // input byte
+            if (input.length <= ip) {
+                return -1;
+            }
+            octet = input[ip++];
+            // concat octet
+            bitsbuf |= octet << bitsbuflen;
+            bitsbuflen += 8;
+        }
+        // output byte
+        octet = bitsbuf & /* MASK */ ((1 << length) - 1);
+        bitsbuf >>>= length;
+        bitsbuflen -= length;
+        this.bitsbuf = bitsbuf;
+        this.bitsbuflen = bitsbuflen;
+        this.ip = ip;
+        return octet;
+    }
+    readCodeByTable(table) {
+        let bitsbuf = this.bitsbuf;
+        let bitsbuflen = this.bitsbuflen;
+        let input = this.input;
+        let ip = this.ip;
+        /** @type {!(Array|Uint8Array)} huffman code table */
+        let codeTable = table[0];
+        /** @type {number} */
+        let maxCodeLength = table[1];
+        /** @type {number} input byte */
+        let octet;
+        /** @type {number} code length & code (16bit, 16bit) */
+        let codeWithLength;
+        /** @type {number} code bits length */
+        let codeLength;
+        // not enough buffer
+        while (bitsbuflen < maxCodeLength) {
+            if (input.length <= ip) {
+                return -1;
+            }
+            octet = input[ip++];
+            bitsbuf |= octet << bitsbuflen;
+            bitsbuflen += 8;
+        }
+        // read max length
+        codeWithLength = codeTable[bitsbuf & ((1 << maxCodeLength) - 1)];
+        codeLength = codeWithLength >>> 16;
+        if (codeLength > bitsbuflen) {
+            throw new Error('invalid code length: ' + codeLength);
+        }
+        this.bitsbuf = bitsbuf >> codeLength;
+        this.bitsbuflen = bitsbuflen - codeLength;
+        this.ip = ip;
+        return codeWithLength & 0xffff;
+    }
+    readUncompressedBlockHeader() {
+        /** @type {number} block length */
+        let len;
+        /** @type {number} number for check block length */
+        let nlen;
+        let input = this.input;
+        let ip = this.ip;
+        this.status = RawInflateStream.Status.BLOCK_BODY_START;
+        if (ip + 4 >= input.length) {
+            return -1;
+        }
+        len = input[ip++] | (input[ip++] << 8);
+        nlen = input[ip++] | (input[ip++] << 8);
+        // check len & nlen
+        if (len === ~nlen) {
+            throw new Error('invalid uncompressed block header: length verify');
+        }
+        // skip buffered header bits
+        this.bitsbuf = 0;
+        this.bitsbuflen = 0;
+        this.ip = ip;
+        this.blockLength = len;
+        this.status = RawInflateStream.Status.BLOCK_BODY_END;
+    }
+    parseUncompressedBlock() {
+        let input = this.input;
+        let ip = this.ip;
+        let output = this.output;
+        let op = this.op;
+        let len = this.blockLength;
+        this.status = RawInflateStream.Status.DECODE_BLOCK_START;
+        // copy
+        // XXX: とりあえず素直にコピー
+        while (len--) {
+            if (op === output.length) {
+                output = this.expandBuffer({ fixRatio: 2 });
+            }
+            // not enough input buffer
+            if (ip >= input.length) {
+                this.ip = ip;
+                this.op = op;
+                this.blockLength = len + 1; // コピーしてないので戻す
+                return -1;
+            }
+            output[op++] = input[ip++];
+        }
+        if (len < 0) {
+            this.status = RawInflateStream.Status.DECODE_BLOCK_END;
+        }
+        this.ip = ip;
+        this.op = op;
+        return 0;
+    }
+    parseFixedHuffmanBlock() {
+        this.status = RawInflateStream.Status.BLOCK_BODY_START;
+        this.litlenTable = RawInflateStream.FixedLiteralLengthTable;
+        this.distTable = RawInflateStream.FixedDistanceTable;
+        this.status = RawInflateStream.Status.BLOCK_BODY_END;
+        return 0;
+    }
+    save_() {
+        this.ip_ = this.ip;
+        this.bitsbuflen_ = this.bitsbuflen;
+        this.bitsbuf_ = this.bitsbuf;
+    }
+    restore_() {
+        this.ip = this.ip_;
+        this.bitsbuflen = this.bitsbuflen_;
+        this.bitsbuf = this.bitsbuf_;
+    }
+    parseDynamicHuffmanBlock() {
+        /** @type {number} number of literal and length codes. */
+        let hlit;
+        /** @type {number} number of distance codes. */
+        let hdist;
+        /** @type {number} number of code lengths. */
+        let hclen;
+        /** @type {!(Uint8Array|Array)} code lengths. */
+        let codeLengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(RawInflateStream.Order.length);
+        /** @type {!Array} code lengths table. */
+        let codeLengthsTable;
+        this.status = RawInflateStream.Status.BLOCK_BODY_START;
+        this.save_();
+        hlit = this.readBits(5) + 257;
+        hdist = this.readBits(5) + 1;
+        hclen = this.readBits(4) + 4;
+        if (hlit < 0 || hdist < 0 || hclen < 0) {
+            this.restore_();
+            return -1;
+        }
+        const parseDynamicHuffmanBlockImpl = () => {
+            /** @type {number} */
+            let bits;
+            let code;
+            let prev = 0;
+            let repeat;
+            /** @type {!(Uint8Array|Array.<number>)} code length table. */
+            let lengthTable;
+            /** @type {number} loop counter. */
+            let i;
+            /** @type {number} loop limit. */
+            let il;
+            // decode code lengths
+            for (i = 0; i < hclen; ++i) {
+                bits = this.readBits(3);
+                if ((bits) < 0) {
+                    throw new Error('not enough input');
+                }
+                codeLengths[RawInflateStream.Order[i]] = bits;
+            }
+            // decode length table
+            codeLengthsTable = buildHuffmanTable(codeLengths);
+            lengthTable = new (USE_TYPEDARRAY ? Uint8Array : Array)(hlit + hdist);
+            for (i = 0, il = hlit + hdist; i < il;) {
+                code = this.readCodeByTable(codeLengthsTable);
+                if (code < 0) {
+                    throw new Error('not enough input');
+                }
+                switch (code) {
+                    case 16:
+                        bits = this.readBits(2);
+                        if (bits < 0) {
+                            throw new Error('not enough input');
+                        }
+                        repeat = 3 + bits;
+                        while (repeat--) {
+                            lengthTable[i++] = prev;
+                        }
+                        break;
+                    case 17:
+                        bits = this.readBits(3);
+                        if (bits < 0) {
+                            throw new Error('not enough input');
+                        }
+                        repeat = 3 + bits;
+                        while (repeat--) {
+                            lengthTable[i++] = 0;
+                        }
+                        prev = 0;
+                        break;
+                    case 18:
+                        bits = this.readBits(7);
+                        if (bits < 0) {
+                            throw new Error('not enough input');
+                        }
+                        repeat = 11 + bits;
+                        while (repeat--) {
+                            lengthTable[i++] = 0;
+                        }
+                        prev = 0;
+                        break;
+                    default:
+                        lengthTable[i++] = code;
+                        prev = code;
+                        break;
+                }
+            }
+            this.litlenTable = USE_TYPEDARRAY
+                ? buildHuffmanTable(lengthTable.subarray(0, hlit))
+                : buildHuffmanTable(lengthTable.slice(0, hlit));
+            this.distTable = USE_TYPEDARRAY
+                ? buildHuffmanTable(lengthTable.subarray(hlit))
+                : buildHuffmanTable(lengthTable.slice(hlit));
+        };
+        try {
+            parseDynamicHuffmanBlockImpl();
+        }
+        catch (e) {
+            this.restore_();
+            return -1;
+        }
+        this.status = RawInflateStream.Status.BLOCK_BODY_END;
+        return 0;
+    }
+    decodeHuffman() {
+        let output = this.output;
+        let op = this.op;
+        /** @type {number} huffman code. */
+        let code;
+        /** @type {number} table index. */
+        let ti;
+        /** @type {number} huffman code distination. */
+        let codeDist;
+        /** @type {number} huffman code length. */
+        let codeLength;
+        let litlen = this.litlenTable;
+        let dist = this.distTable;
+        let olength = output.length;
+        let bits;
+        this.status = RawInflateStream.Status.DECODE_BLOCK_START;
+        while (true) {
+            this.save_();
+            code = this.readCodeByTable(litlen);
+            if (code < 0) {
+                this.op = op;
+                this.restore_();
+                return -1;
+            }
+            if (code === 256) {
+                break;
+            }
+            // literal
+            if (code < 256) {
+                if (op === olength) {
+                    output = this.expandBuffer();
+                    olength = output.length;
+                }
+                output[op++] = code;
+                continue;
+            }
+            // length code
+            ti = code - 257;
+            codeLength = RawInflateStream.LengthCodeTable[ti];
+            if (RawInflateStream.LengthExtraTable[ti] > 0) {
+                bits = this.readBits(RawInflateStream.LengthExtraTable[ti]);
+                if (bits < 0) {
+                    this.op = op;
+                    this.restore_();
+                    return -1;
+                }
+                codeLength += bits;
+            }
+            // dist code
+            code = this.readCodeByTable(dist);
+            if (code < 0) {
+                this.op = op;
+                this.restore_();
+                return -1;
+            }
+            codeDist = RawInflateStream.DistCodeTable[code];
+            if (RawInflateStream.DistExtraTable[code] > 0) {
+                bits = this.readBits(RawInflateStream.DistExtraTable[code]);
+                if (bits < 0) {
+                    this.op = op;
+                    this.restore_();
+                    return -1;
+                }
+                codeDist += bits;
+            }
+            if (op + codeLength >= olength) {
+                output = this.expandBuffer();
+                olength = output.length;
+            }
+            while (codeLength--) {
+                output[op] = output[(op++) - codeDist];
+            }
+            if (this.ip === this.input.length) {
+                this.op = op;
+                return -1;
+            }
+        }
+        while (this.bitsbuflen >= 8) {
+            this.bitsbuflen -= 8;
+            this.ip--;
+        }
+        this.op = op;
+        this.status = RawInflateStream.Status.DECODE_BLOCK_END;
+    }
+    expandBuffer(opt_param) {
+        /** @type {!(Array|Uint8Array)} store buffer. */
+        let buffer;
+        /** @type {number} expantion ratio. */
+        let ratio = (this.input.length / this.ip + 1) | 0;
+        /** @type {number} maximum number of huffman code. */
+        let maxHuffCode;
+        /** @type {number} new output buffer size. */
+        let newSize;
+        /** @type {number} max inflate size. */
+        let maxInflateSize;
+        let input = this.input;
+        let output = this.output;
+        if (opt_param) {
+            if (typeof opt_param.fixRatio === 'number') {
+                ratio = opt_param.fixRatio;
+            }
+            if (typeof opt_param.addRatio === 'number') {
+                ratio += opt_param.addRatio;
+            }
+        }
+        // calculate new buffer size
+        if (ratio < 2) {
+            maxHuffCode =
+                (input.length - this.ip) / this.litlenTable[2];
+            maxInflateSize = (maxHuffCode / 2 * 258) | 0;
+            newSize = maxInflateSize < output.length ?
+                output.length + maxInflateSize :
+                output.length << 1;
+        }
+        else {
+            newSize = output.length * ratio;
+        }
+        // buffer expantion
+        if (USE_TYPEDARRAY) {
+            buffer = new Uint8Array(newSize);
+            buffer.set(output);
+        }
+        else {
+            buffer = output;
+        }
+        this.output = buffer;
+        return this.output;
+    }
+    ;
+    concatBuffer() {
+        /** @type {!(Array|Uint8Array)} output buffer. */
+        let buffer;
+        /** @type {number} */
+        let op = this.op;
+        /** @type {Uint8Array} */
+        let tmp;
+        if (this.resize) {
+            if (USE_TYPEDARRAY) {
+                buffer = new Uint8Array(this.output.subarray(this.sp, op));
+            }
+            else {
+                buffer = this.output.slice(this.sp, op);
+            }
+        }
+        else {
+            buffer =
+                USE_TYPEDARRAY ? this.output.subarray(this.sp, op) : this.output.slice(this.sp, op);
+        }
+        this.sp = op;
+        // compaction
+        if (op > RawInflateStream.MaxBackwardLength + this.bufferSize) {
+            this.op = this.sp = RawInflateStream.MaxBackwardLength;
+            if (USE_TYPEDARRAY) {
+                tmp = /** @type {Uint8Array} */ (this.output);
+                this.output = new Uint8Array(this.bufferSize + RawInflateStream.MaxBackwardLength);
+                this.output.set(tmp.subarray(op - RawInflateStream.MaxBackwardLength, op));
+            }
+            else {
+                this.output = this.output.slice(op - RawInflateStream.MaxBackwardLength);
+            }
+        }
+        return buffer;
+    }
+}
+RawInflateStream.Status = rStatus;
+RawInflateStream.BlockType = rBlockType;
+RawInflateStream.MaxBackwardLength = 32768;
+RawInflateStream.MaxCopyLength = 258;
+RawInflateStream.Order = (() => {
+    let table = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+    return USE_TYPEDARRAY ? new Uint16Array(table) : table;
+})();
+RawInflateStream.LengthCodeTable = (() => {
+    const table = [
+        0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000a, 0x000b,
+        0x000d, 0x000f, 0x0011, 0x0013, 0x0017, 0x001b, 0x001f, 0x0023, 0x002b,
+        0x0033, 0x003b, 0x0043, 0x0053, 0x0063, 0x0073, 0x0083, 0x00a3, 0x00c3,
+        0x00e3, 0x0102, 0x0102, 0x0102
+    ];
+    return USE_TYPEDARRAY ? new Uint16Array(table) : table;
+})();
+RawInflateStream.LengthExtraTable = (() => {
+    const table = [
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5,
+        5, 5, 0, 0, 0
+    ];
+    return USE_TYPEDARRAY ? new Uint8Array(table) : table;
+})();
+RawInflateStream.DistCodeTable = (() => {
+    let table = [
+        0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0007, 0x0009, 0x000d, 0x0011,
+        0x0019, 0x0021, 0x0031, 0x0041, 0x0061, 0x0081, 0x00c1, 0x0101, 0x0181,
+        0x0201, 0x0301, 0x0401, 0x0601, 0x0801, 0x0c01, 0x1001, 0x1801, 0x2001,
+        0x3001, 0x4001, 0x6001
+    ];
+    return USE_TYPEDARRAY ? new Uint16Array(table) : table;
+})();
+RawInflateStream.DistExtraTable = (() => {
+    const table = [
+        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11,
+        11, 12, 12, 13, 13
+    ];
+    return USE_TYPEDARRAY ? new Uint8Array(table) : table;
+})();
+RawInflateStream.FixedLiteralLengthTable = (() => {
+    let lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(288);
+    let i, il;
+    for (i = 0, il = lengths.length; i < il; ++i) {
+        lengths[i] =
+            (i <= 143) ? 8 :
+                (i <= 255) ? 9 :
+                    (i <= 279) ? 7 :
+                        8;
+    }
+    return buildHuffmanTable(lengths);
+})();
+RawInflateStream.FixedDistanceTable = (() => {
+    let lengths = new (USE_TYPEDARRAY ? Uint8Array : Array)(30);
+    let i, il;
+    for (i = 0, il = lengths.length; i < il; ++i) {
+        lengths[i] = 5;
+    }
+    return buildHuffmanTable(lengths);
+})();
+/// <reference path="./define/compress.ts" />
+/// <reference path="./define/typedarray/hybrid.ts" />
+/// <reference path="./rawinflate_stream.ts" />
+class InflateStream {
+    constructor(input) {
+        this.input = input === void 0 ? new (USE_TYPEDARRAY ? Uint8Array : Array)(null) : input;
+        this.ip = 0;
+        this.rawinflate = new RawInflateStream(this.input, this.ip);
+        this.output = this.rawinflate.output;
+    }
+    ;
+    decompress(input) {
+        let buffer;
+        if (input !== void 0) {
+            if (USE_TYPEDARRAY) {
+                let tmp = new Uint8Array(this.input.length + input.length);
+                tmp.set(this.input, 0);
+                tmp.set(input, this.input.length);
+                this.input = tmp;
+            }
+            else {
+                this.input = (this.input).concat(input);
+            }
+        }
+        if (this.method === void 0) {
+            if (this.readHeader() < 0) {
+                return new (USE_TYPEDARRAY ? Uint8Array : Array)(null);
+            }
+        }
+        buffer = this.rawinflate.decompress(this.input, this.ip);
+        if (this.rawinflate.ip !== 0) {
+            this.input = USE_TYPEDARRAY ?
+                this.input.subarray(this.rawinflate.ip) :
+                this.input.slice(this.rawinflate.ip);
+            this.ip = 0;
+        }
+        return buffer;
+    }
+    readHeader() {
+        let ip = this.ip;
+        let input = this.input;
+        // Compression Method and Flags
+        let cmf = input[ip++];
+        let flg = input[ip++];
+        if (cmf === void 0 || flg === void 0) {
+            return -1;
+        }
+        // compression method
+        switch (cmf & 0x0f) {
+            case CompressionMethod.DEFLATE:
+                this.method = CompressionMethod.DEFLATE;
+                break;
+            default:
+                throw new Error('unsupported compression method');
+        }
+        // fcheck
+        if (((cmf << 8) + flg) % 31 !== 0) {
+            throw new Error('invalid fcheck flag:' + ((cmf << 8) + flg) % 31);
+        }
+        // fdict (not supported)
+        if (flg & 0x20) {
+            throw new Error('fdict flag is not supported');
+        }
+        this.ip = ip;
+    }
+}
+/// <reference path="./rawdeflate.ts" />
+/// <reference path="./rawinflate_stream.ts" />
+/// <reference path="./rawinflate.ts" />
+/// <reference path="./rawdeflate.ts" />
+/// <reference path="./crc32.ts" />
+/// <reference path="./define/typedarray/hybrid.ts" />
+var OperatingSystem;
+/// <reference path="./rawdeflate.ts" />
+/// <reference path="./crc32.ts" />
+/// <reference path="./define/typedarray/hybrid.ts" />
+(function (OperatingSystem) {
+    OperatingSystem[OperatingSystem["MSDOS"] = 0] = "MSDOS";
+    OperatingSystem[OperatingSystem["UNIX"] = 3] = "UNIX";
+    OperatingSystem[OperatingSystem["MACINTOSH"] = 7] = "MACINTOSH";
+})(OperatingSystem || (OperatingSystem = {}));
+;
+var Flags;
+(function (Flags) {
+    Flags[Flags["ENCRYPT"] = 1] = "ENCRYPT";
+    Flags[Flags["DESCRIPTOR"] = 8] = "DESCRIPTOR";
+    Flags[Flags["UTF8"] = 2048] = "UTF8";
+})(Flags || (Flags = {}));
+;
+class Zip {
+    constructor(opt_params) {
+        this.files = [];
+        opt_params = opt_params || {};
+        this.files = [];
+        /** @type {(Array.<number>|Uint8Array)} */
+        this.comment = opt_params['comment'];
+        /** @type {(Array.<number>|Uint8Array)} */
+    }
+    addFile(input, opt_params) {
+        opt_params = opt_params || {};
+        let compressed;
+        let size = input.length;
+        let crc32 = 0;
+        if (USE_TYPEDARRAY && input instanceof Array) {
+            input = new Uint8Array(input);
+        }
+        if (typeof opt_params['compressionMethod'] !== 'number') {
+            opt_params['compressionMethod'] = Zip.CompressionMethod.DEFLATE;
+        }
+        if (opt_params['compress']) {
+            switch (opt_params['compressionMethod']) {
+                case Zip.CompressionMethod.STORE:
+                    break;
+                case Zip.CompressionMethod.DEFLATE:
+                    crc32 = CRC32.calc(input);
+                    input = this.deflateWithOption(input, opt_params);
+                    compressed = true;
+                    break;
+                default:
+                    throw new Error('unknown compression method:' + opt_params['compressionMethod']);
+            }
+        }
+        this.files.push({
+            buffer: input,
+            option: opt_params,
+            compressed: compressed,
+            encrypted: false,
+            size: size,
+            crc32: crc32
+        });
+    }
+    setPassword(password) {
+        this.password = password;
+    }
+    compress() {
+        let files = this.files;
+        let file;
+        let output;
+        let op1;
+        let op2;
+        let op3;
+        let localFileSize = 0;
+        let centralDirectorySize = 0;
+        let endOfCentralDirectorySize;
+        let offset;
+        let needVersion;
+        let flags;
+        let compressionMethod;
+        let date;
+        let crc32;
+        let size;
+        let plainSize;
+        let filenameLength;
+        let extraFieldLength;
+        let commentLength;
+        let filename;
+        let extraField;
+        let comment;
+        let buffer;
+        let tmp;
+        let key;
+        let i;
+        let il;
+        let j;
+        let jl;
+        for (i = 0, il = files.length; i < il; ++i) {
+            file = files[i];
+            filenameLength =
+                (file.option['filename']) ? file.option['filename'].length : 0;
+            extraFieldLength =
+                (file.option['extraField']) ? file.option['extraField'].length : 0;
+            commentLength =
+                (file.option['comment']) ? file.option['comment'].length : 0;
+            if (!file.compressed) {
+                file.crc32 = CRC32.calc(file.buffer);
+                switch (file.option['compressionMethod']) {
+                    case Zip.CompressionMethod.STORE:
+                        break;
+                    case Zip.CompressionMethod.DEFLATE:
+                        file.buffer = this.deflateWithOption(file.buffer, file.option);
+                        file.compressed = true;
+                        break;
+                    default:
+                        throw new Error('unknown compression method:' + file.option['compressionMethod']);
+                }
+            }
+            // encryption
+            if (file.option['password'] !== void 0 || this.password !== void 0) {
+                // init encryption
+                key = Zip.createEncryptionKey(file.option['password'] || this.password);
+                // add header
+                buffer = file.buffer;
+                if (USE_TYPEDARRAY) {
+                    tmp = new Uint8Array(buffer.length + 12);
+                    tmp.set(buffer, 12);
+                    buffer = tmp;
+                }
+                else {
+                    buffer.unshift(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                }
+                for (j = 0; j < 12; ++j) {
+                    buffer[j] = this.encode(key, i === 11 ? (file.crc32 & 0xff) : (Math.random() * 256 | 0));
+                }
+                // data encryption
+                for (jl = buffer.length; j < jl; ++j) {
+                    buffer[j] = this.encode(key, buffer[j]);
+                }
+                file.buffer = buffer;
+            }
+            // 必要バッファサイズの計算
+            localFileSize +=
+                // local file header
+                30 + filenameLength +
+                    // file data
+                    file.buffer.length;
+            centralDirectorySize +=
+                // file header
+                46 + filenameLength + commentLength;
+        }
+        // end of central directory
+        endOfCentralDirectorySize = 22 + (this.comment ? this.comment.length : 0);
+        output = new (USE_TYPEDARRAY ? Uint8Array : Array)(localFileSize + centralDirectorySize + endOfCentralDirectorySize);
+        op1 = 0;
+        op2 = localFileSize;
+        op3 = op2 + centralDirectorySize;
+        for (i = 0, il = files.length; i < il; ++i) {
+            file = files[i];
+            filenameLength =
+                file.option['filename'] ? file.option['filename'].length : 0;
+            extraFieldLength = 0; // TODO
+            commentLength =
+                file.option['comment'] ? file.option['comment'].length : 0;
+            //-------------------------------------------------------------------------
+            // local file header & file header
+            //-------------------------------------------------------------------------
+            offset = op1;
+            // signature
+            // local file header
+            output[op1++] = Zip.LocalFileHeaderSignature[0];
+            output[op1++] = Zip.LocalFileHeaderSignature[1];
+            output[op1++] = Zip.LocalFileHeaderSignature[2];
+            output[op1++] = Zip.LocalFileHeaderSignature[3];
+            // file header
+            output[op2++] = Zip.FileHeaderSignature[0];
+            output[op2++] = Zip.FileHeaderSignature[1];
+            output[op2++] = Zip.FileHeaderSignature[2];
+            output[op2++] = Zip.FileHeaderSignature[3];
+            // compressor info
+            needVersion = 20;
+            output[op2++] = needVersion & 0xff;
+            output[op2++] =
+                /** @type {Zlib.Zip.OperatingSystem} */
+                (file.option['os']) ||
+                    Zip.OperatingSystem.MSDOS;
+            // need version
+            output[op1++] = output[op2++] = needVersion & 0xff;
+            output[op1++] = output[op2++] = (needVersion >> 8) & 0xff;
+            // general purpose bit flag
+            flags = 0;
+            if (file.option['password'] || this.password) {
+                flags |= Zip.Flags.ENCRYPT;
+            }
+            output[op1++] = output[op2++] = flags & 0xff;
+            output[op1++] = output[op2++] = (flags >> 8) & 0xff;
+            // compression method
+            compressionMethod =
+                /** @type {Zlib.Zip.CompressionMethod} */
+                (file.option['compressionMethod']);
+            output[op1++] = output[op2++] = compressionMethod & 0xff;
+            output[op1++] = output[op2++] = (compressionMethod >> 8) & 0xff;
+            // date
+            date = /** @type {(Date|undefined)} */ (file.option['date']) || new Date();
+            output[op1++] = output[op2++] =
+                ((date.getMinutes() & 0x7) << 5) |
+                    (date.getSeconds() / 2 | 0);
+            output[op1++] = output[op2++] =
+                (date.getHours() << 3) |
+                    (date.getMinutes() >> 3);
+            //
+            output[op1++] = output[op2++] =
+                ((date.getMonth() + 1 & 0x7) << 5) |
+                    (date.getDate());
+            output[op1++] = output[op2++] =
+                ((date.getFullYear() - 1980 & 0x7f) << 1) |
+                    (date.getMonth() + 1 >> 3);
+            // CRC-32
+            crc32 = file.crc32;
+            output[op1++] = output[op2++] = crc32 & 0xff;
+            output[op1++] = output[op2++] = (crc32 >> 8) & 0xff;
+            output[op1++] = output[op2++] = (crc32 >> 16) & 0xff;
+            output[op1++] = output[op2++] = (crc32 >> 24) & 0xff;
+            // compressed size
+            size = file.buffer.length;
+            output[op1++] = output[op2++] = size & 0xff;
+            output[op1++] = output[op2++] = (size >> 8) & 0xff;
+            output[op1++] = output[op2++] = (size >> 16) & 0xff;
+            output[op1++] = output[op2++] = (size >> 24) & 0xff;
+            // uncompressed size
+            plainSize = file.size;
+            output[op1++] = output[op2++] = plainSize & 0xff;
+            output[op1++] = output[op2++] = (plainSize >> 8) & 0xff;
+            output[op1++] = output[op2++] = (plainSize >> 16) & 0xff;
+            output[op1++] = output[op2++] = (plainSize >> 24) & 0xff;
+            // filename length
+            output[op1++] = output[op2++] = filenameLength & 0xff;
+            output[op1++] = output[op2++] = (filenameLength >> 8) & 0xff;
+            // extra field length
+            output[op1++] = output[op2++] = extraFieldLength & 0xff;
+            output[op1++] = output[op2++] = (extraFieldLength >> 8) & 0xff;
+            // file comment length
+            output[op2++] = commentLength & 0xff;
+            output[op2++] = (commentLength >> 8) & 0xff;
+            // disk number start
+            output[op2++] = 0;
+            output[op2++] = 0;
+            // internal file attributes
+            output[op2++] = 0;
+            output[op2++] = 0;
+            // external file attributes
+            output[op2++] = 0;
+            output[op2++] = 0;
+            output[op2++] = 0;
+            output[op2++] = 0;
+            // relative offset of local header
+            output[op2++] = offset & 0xff;
+            output[op2++] = (offset >> 8) & 0xff;
+            output[op2++] = (offset >> 16) & 0xff;
+            output[op2++] = (offset >> 24) & 0xff;
+            // filename
+            filename = file.option['filename'];
+            if (filename) {
+                if (USE_TYPEDARRAY) {
+                    output.set(filename, op1);
+                    output.set(filename, op2);
+                    op1 += filenameLength;
+                    op2 += filenameLength;
+                }
+                else {
+                    for (j = 0; j < filenameLength; ++j) {
+                        output[op1++] = output[op2++] = filename[j];
+                    }
+                }
+            }
+            // extra field
+            extraField = file.option['extraField'];
+            if (extraField) {
+                if (USE_TYPEDARRAY) {
+                    output.set(extraField, op1);
+                    output.set(extraField, op2);
+                    op1 += extraFieldLength;
+                    op2 += extraFieldLength;
+                }
+                else {
+                    for (j = 0; j < commentLength; ++j) {
+                        output[op1++] = output[op2++] = extraField[j];
+                    }
+                }
+            }
+            // comment
+            comment = file.option['comment'];
+            if (comment) {
+                if (USE_TYPEDARRAY) {
+                    output.set(comment, op2);
+                    op2 += commentLength;
+                }
+                else {
+                    for (j = 0; j < commentLength; ++j) {
+                        output[op2++] = comment[j];
+                    }
+                }
+            }
+            //-------------------------------------------------------------------------
+            // file data
+            //-------------------------------------------------------------------------
+            if (USE_TYPEDARRAY) {
+                output.set(file.buffer, op1);
+                op1 += file.buffer.length;
+            }
+            else {
+                for (j = 0, jl = file.buffer.length; j < jl; ++j) {
+                    output[op1++] = file.buffer[j];
+                }
+            }
+        }
+        //-------------------------------------------------------------------------
+        // end of central directory
+        //-------------------------------------------------------------------------
+        // signature
+        output[op3++] = Zip.CentralDirectorySignature[0];
+        output[op3++] = Zip.CentralDirectorySignature[1];
+        output[op3++] = Zip.CentralDirectorySignature[2];
+        output[op3++] = Zip.CentralDirectorySignature[3];
+        // number of this disk
+        output[op3++] = 0;
+        output[op3++] = 0;
+        // number of the disk with the start of the central directory
+        output[op3++] = 0;
+        output[op3++] = 0;
+        // total number of entries in the central directory on this disk
+        output[op3++] = il & 0xff;
+        output[op3++] = (il >> 8) & 0xff;
+        // total number of entries in the central directory
+        output[op3++] = il & 0xff;
+        output[op3++] = (il >> 8) & 0xff;
+        // size of the central directory
+        output[op3++] = centralDirectorySize & 0xff;
+        output[op3++] = (centralDirectorySize >> 8) & 0xff;
+        output[op3++] = (centralDirectorySize >> 16) & 0xff;
+        output[op3++] = (centralDirectorySize >> 24) & 0xff;
+        // offset of start of central directory with respect to the starting disk number
+        output[op3++] = localFileSize & 0xff;
+        output[op3++] = (localFileSize >> 8) & 0xff;
+        output[op3++] = (localFileSize >> 16) & 0xff;
+        output[op3++] = (localFileSize >> 24) & 0xff;
+        // .ZIP file comment length
+        commentLength = this.comment ? this.comment.length : 0;
+        output[op3++] = commentLength & 0xff;
+        output[op3++] = (commentLength >> 8) & 0xff;
+        // .ZIP file comment
+        if (this.comment) {
+            if (USE_TYPEDARRAY) {
+                output.set(this.comment, op3);
+                op3 += commentLength;
+            }
+            else {
+                for (j = 0, jl = commentLength; j < jl; ++j) {
+                    output[op3++] = this.comment[j];
+                }
+            }
+        }
+        return output;
+    }
+    deflateWithOption(input, opt_params) {
+        /** @type {Zlib.RawDeflate} */
+        const deflator = new RawDeflate(input, opt_params['deflateOption']);
+        return deflator.compress();
+    }
+    static getByte(key) {
+        const tmp = ((key[2] & 0xffff) | 2);
+        return ((tmp * (tmp ^ 1)) >> 8) & 0xff;
+    }
+    ;
+    encode(key, n) {
+        /** @type {number} */
+        const tmp = Zip.getByte(key);
+        Zip.updateKeys(key, n);
+        return tmp ^ n;
+    }
+    ;
+    static createEncryptionKey(password) {
+        /** @type {!(Array.<number>|Uint32Array)} */
+        const keyOrigin = [305419896, 591751049, 878082192];
+        /** @type {number} */
+        let i = 0;
+        /** @type {number} */
+        let il = password.length;
+        let key = USE_TYPEDARRAY ? new Uint32Array(keyOrigin) : keyOrigin;
+        for (; i < il; ++i) {
+            Zip.updateKeys(key, password[i] & 0xff);
+        }
+        return key;
+    }
+}
+Zip.CompressionMethod = CompressionMethod;
+Zip.OperatingSystem = OperatingSystem;
+Zip.Flags = Flags;
+Zip.FileHeaderSignature = [0x50, 0x4b, 0x01, 0x02];
+Zip.LocalFileHeaderSignature = [0x50, 0x4b, 0x03, 0x04];
+Zip.CentralDirectorySignature = [0x50, 0x4b, 0x05, 0x06];
+Zip.updateKeys = function (key, n) {
+    key[0] = CRC32.single(key[0], n);
+    key[1] =
+        (((((key[1] + (key[0] & 0xff)) * 20173 >>> 0) * 6681) >>> 0) + 1) >>> 0;
+    key[2] = CRC32.single(key[2], key[1] >>> 24);
+};
+/// <reference path="./zip.ts" />
+/// <reference path="./rawinflate.ts" />
+/// <reference path="./crc32.ts" />
+/// <reference path="./define/typedarray/hybrid.ts" />
+class FileHeader {
+    constructor(input, ip) {
+        this.input = input;
+        this.offset = ip;
+    }
+}
+FileHeader.Flags = Zip.Flags;
+class LocalFileHeader {
+    constructor(input, ip) {
+        this.input = input;
+        this.offset = ip;
+    }
+}
+LocalFileHeader.Flags = Zip.Flags;
+class Unzip {
+    constructor(input, opt_params) {
+        this.updateKeys = Zip.updateKeys;
+        this.createDecryptionKey = Zip.createEncryptionKey;
+        this.getByte = Zip.getByte;
+        opt_params = opt_params || {};
+        this.input =
+            (USE_TYPEDARRAY && (input instanceof Array)) ?
+                new Uint8Array(input) : input;
+        this.ip = 0;
+        this.verify = opt_params['verify'] || false;
+        this.password = opt_params['password'];
+    }
+    getFileHeaderAttribute(filename, attributeName) {
+        const fileHeaderIndex = this.filenameToIndex[filename];
+        if (fileHeaderIndex) {
+            return this.fileHeaderList[fileHeaderIndex][attributeName];
+        }
+    }
+    parse() {
+        let input = this.input;
+        let ip = this.offset;
+        // central file header signature
+        if (input[ip++] !== Unzip.FileHeaderSignature[0] ||
+            input[ip++] !== Unzip.FileHeaderSignature[1] ||
+            input[ip++] !== Unzip.FileHeaderSignature[2] ||
+            input[ip++] !== Unzip.FileHeaderSignature[3]) {
+            throw new Error('invalid file header signature');
+        }
+        // version made by
+        this.version = input[ip++];
+        this.os = input[ip++];
+        // version needed to extract
+        this.needVersion = input[ip++] | (input[ip++] << 8);
+        // general purpose bit flag
+        this.flags = input[ip++] | (input[ip++] << 8);
+        // compression method
+        this.compression = input[ip++] | (input[ip++] << 8);
+        // last mod file time
+        this.time = input[ip++] | (input[ip++] << 8);
+        //last mod file date
+        this.date = input[ip++] | (input[ip++] << 8);
+        // crc-32
+        this.crc32 = ((input[ip++]) | (input[ip++] << 8) |
+            (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        // compressed size
+        this.compressedSize = ((input[ip++]) | (input[ip++] << 8) |
+            (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        // uncompressed size
+        this.plainSize = ((input[ip++]) | (input[ip++] << 8) |
+            (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        // file name length
+        this.fileNameLength = input[ip++] | (input[ip++] << 8);
+        // extra field length
+        this.extraFieldLength = input[ip++] | (input[ip++] << 8);
+        // file comment length
+        this.fileCommentLength = input[ip++] | (input[ip++] << 8);
+        // disk number start
+        this.diskNumberStart = input[ip++] | (input[ip++] << 8);
+        // internal file attributes
+        this.internalFileAttributes = input[ip++] | (input[ip++] << 8);
+        // external file attributes
+        this.externalFileAttributes =
+            (input[ip++]) | (input[ip++] << 8) |
+                (input[ip++] << 16) | (input[ip++] << 24);
+        // relative offset of local header
+        this.relativeOffset = ((input[ip++]) | (input[ip++] << 8) |
+            (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        // file name
+        this.filename = String.fromCharCode.apply(null, USE_TYPEDARRAY ?
+            input.subarray(ip, ip += this.fileNameLength) :
+            input.slice(ip, ip += this.fileNameLength));
+        // extra field
+        this.extraField = USE_TYPEDARRAY ?
+            input.subarray(ip, ip += this.extraFieldLength) :
+            input.slice(ip, ip += this.extraFieldLength);
+        // file comment
+        this.comment = USE_TYPEDARRAY ?
+            input.subarray(ip, ip + this.fileCommentLength) :
+            input.slice(ip, ip + this.fileCommentLength);
+        this.length = ip - this.offset;
+    }
+    searchEndOfCentralDirectoryRecord() {
+        let input = this.input;
+        let ip;
+        for (ip = input.length - 12; ip > 0; --ip) {
+            if (input[ip] === Unzip.CentralDirectorySignature[0] &&
+                input[ip + 1] === Unzip.CentralDirectorySignature[1] &&
+                input[ip + 2] === Unzip.CentralDirectorySignature[2] &&
+                input[ip + 3] === Unzip.CentralDirectorySignature[3]) {
+                this.eocdrOffset = ip;
+                return;
+            }
+        }
+        throw new Error('End of Central Directory Record not found');
+    }
+    parseEndOfCentralDirectoryRecord() {
+        let input = this.input;
+        let ip;
+        if (!this.eocdrOffset) {
+            this.searchEndOfCentralDirectoryRecord();
+        }
+        ip = this.eocdrOffset;
+        // signature
+        if (input[ip++] !== Unzip.CentralDirectorySignature[0] ||
+            input[ip++] !== Unzip.CentralDirectorySignature[1] ||
+            input[ip++] !== Unzip.CentralDirectorySignature[2] ||
+            input[ip++] !== Unzip.CentralDirectorySignature[3]) {
+            throw new Error('invalid signature');
+        }
+        // number of this disk
+        this.numberOfThisDisk = input[ip++] | (input[ip++] << 8);
+        // number of the disk with the start of the central directory
+        this.startDisk = input[ip++] | (input[ip++] << 8);
+        // total number of entries in the central directory on this disk
+        this.totalEntriesThisDisk = input[ip++] | (input[ip++] << 8);
+        // total number of entries in the central directory
+        this.totalEntries = input[ip++] | (input[ip++] << 8);
+        // size of the central directory
+        this.centralDirectorySize = ((input[ip++]) | (input[ip++] << 8) |
+            (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        // offset of start of central directory with respect to the starting disk number
+        this.centralDirectoryOffset = ((input[ip++]) | (input[ip++] << 8) |
+            (input[ip++] << 16) | (input[ip++] << 24)) >>> 0;
+        // .ZIP file comment length
+        this.commentLength = input[ip++] | (input[ip++] << 8);
+        // .ZIP file comment
+        this.comment = USE_TYPEDARRAY ?
+            input.subarray(ip, ip + this.commentLength) :
+            input.slice(ip, ip + this.commentLength);
+    }
+    parseFileHeader() {
+        /** @type {Array.<Zlib.Unzip.FileHeader>} */
+        let filelist = [];
+        /** @type {Object.<string, number>} */
+        let filetable = {};
+        /** @type {number} */
+        let ip;
+        /** @type {Zlib.Unzip.FileHeader} */
+        let fileHeader;
+        /*: @type {number} */
+        let i;
+        /*: @type {number} */
+        let il;
+        if (this.fileHeaderList) {
+            return;
+        }
+        if (this.centralDirectoryOffset === void 0) {
+            this.parseEndOfCentralDirectoryRecord();
+        }
+        ip = this.centralDirectoryOffset;
+        for (i = 0, il = this.totalEntries; i < il; ++i) {
+            fileHeader = new FileHeader(this.input, ip);
+            fileHeader.parse();
+            ip += fileHeader.length;
+            filelist[i] = fileHeader;
+            filetable[fileHeader.filename] = i;
+        }
+        if (this.centralDirectorySize < ip - this.centralDirectoryOffset) {
+            throw new Error('invalid file header size');
+        }
+        this.fileHeaderList = filelist;
+        this.filenameToIndex = filetable;
+    }
+    getFileData(index, opt_params) {
+        opt_params = opt_params || {};
+        let input = this.input;
+        let fileHeaderList = this.fileHeaderList;
+        let localFileHeader;
+        let offset;
+        let length;
+        let buffer;
+        let crc32;
+        let key;
+        let i;
+        let il;
+        if (!fileHeaderList) {
+            this.parseFileHeader();
+        }
+        if (fileHeaderList[index] === void 0) {
+            throw new Error('wrong index');
+        }
+        offset = fileHeaderList[index].relativeOffset;
+        localFileHeader = new LocalFileHeader(this.input, offset);
+        localFileHeader.parse();
+        offset += localFileHeader.length;
+        length = localFileHeader.compressedSize;
+        // decryption
+        if ((localFileHeader.flags & LocalFileHeader.Flags.ENCRYPT) !== 0) {
+            if (!(opt_params['password'] || this.password)) {
+                throw new Error('please set password');
+            }
+            key = this.createDecryptionKey(opt_params['password'] || this.password);
+            // encryption header
+            for (i = offset, il = offset + 12; i < il; ++i) {
+                this.decode(key, input[i]);
+            }
+            offset += 12;
+            length -= 12;
+            // decryption
+            for (i = offset, il = offset + length; i < il; ++i) {
+                input[i] = this.decode(key, input[i]);
+            }
+        }
+        switch (localFileHeader.compression) {
+            case Unzip.CompressionMethod.STORE:
+                buffer = USE_TYPEDARRAY ?
+                    this.input.subarray(offset, offset + length) :
+                    this.input.slice(offset, offset + length);
+                break;
+            case Unzip.CompressionMethod.DEFLATE:
+                buffer = new RawInflate(this.input, {
+                    'index': offset,
+                    'bufferSize': localFileHeader.plainSize
+                }).decompress();
+                break;
+            default:
+                throw new Error('unknown compression type');
+        }
+        if (this.verify) {
+            crc32 = CRC32.calc(buffer);
+            if (localFileHeader.crc32 !== crc32) {
+                throw new Error('wrong crc: file=0x' + localFileHeader.crc32.toString(16) +
+                    ', data=0x' + crc32.toString(16));
+            }
+        }
+        return buffer;
+    }
+    getFilenames() {
+        let filenameList = [];
+        let i;
+        let il;
+        let fileHeaderList;
+        if (!this.fileHeaderList) {
+            this.parseFileHeader();
+        }
+        fileHeaderList = this.fileHeaderList;
+        for (i = 0, il = fileHeaderList.length; i < il; ++i) {
+            filenameList[i] = fileHeaderList[i].filename;
+        }
+        return filenameList;
+    }
+    decompress(filename, opt_params) {
+        /** @type {number} */
+        let index;
+        if (!this.filenameToIndex) {
+            this.parseFileHeader();
+        }
+        index = this.filenameToIndex[filename];
+        if (index === void 0) {
+            throw new Error(filename + ' not found');
+        }
+        return this.getFileData(index, opt_params);
+    }
+    /**
+     * @param {(Array.<number>|Uint8Array)} password
+     */
+    setPassword(password) {
+        this.password = password;
+    }
+    decode(key, n) {
+        n ^= this.getByte(key);
+        this.updateKeys(key, n);
+        return n;
+    }
+    ;
+}
+Unzip.CompressionMethod = Zip.CompressionMethod;
+Unzip.FileHeaderSignature = Zip.FileHeaderSignature;
+Unzip.LocalFileHeaderSignature = Zip.LocalFileHeaderSignature;
+Unzip.CentralDirectorySignature = Zip.CentralDirectorySignature;
+/// <reference path="./zip.ts" />
+/// <reference path="./unzip.ts" />
+/// <reference path="./deflate.ts" />
+/// <reference path="./inflate_stream.ts" />
+/// <reference path="./inflate.ts" />
+class ZlibT {
+    static LogTest(msg) {
+        console.log(msg);
+    }
+}
+/// <reference path="./adler32.ts" />
+/// <reference path="./crc32.ts" />
+/// <reference path="./heap.ts" />
+/// <reference path="./huffman.ts" />
+// PKZIP
+/// <reference path="./zip.ts" />
+/// <reference path="./unzip.ts" />
+/// <reference path="./gzip.ts" />
+/// <reference path="./gunzip.ts" />
+// RAW
+/// <reference path="./rawinflate.ts" />
+/// <reference path="./rawinflate_stream.ts" />
+/// <reference path="./rawdeflate.ts" />
+// Zlib
+/// <reference path="./inflate_stream.ts" />
+/// <reference path="./inflate.ts" />
+/// <reference path="./deflate.ts" />
+/// <reference path="./define/compress.ts" />
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./Weapon.ts" />

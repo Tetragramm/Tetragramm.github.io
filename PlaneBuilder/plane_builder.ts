@@ -46,8 +46,14 @@ const init = () => {
             if (qp && !loaded) {
                 console.log("Used Query Parameter");
                 try {
-                    loaded = aircraft_model.fromJSON(JSON.parse(qp));
+                    var str = LZString.decompressFromEncodedURIComponent(qp);
+                    loaded = aircraft_model.fromJSON(JSON.parse(str));
                 } catch { }
+                if (!loaded) {
+                    try {
+                        loaded = aircraft_model.fromJSON(JSON.parse(qp));
+                    } catch { }
+                }
             }
             if (acft_data && !loaded) {
                 console.log("Used Saved Data");
