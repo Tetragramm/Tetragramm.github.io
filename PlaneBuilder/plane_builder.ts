@@ -39,27 +39,30 @@ const init = () => {
 
         loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
-            aircraft_model = new Aircraft(parts_JSON, engine_json, true);
-            aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
+            loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
+                weapon_json = JSON.parse(weapon_resp);
+                aircraft_model = new Aircraft(parts_JSON, engine_json, weapon_json, true);
+                aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
 
-            var loaded = false;
-            if (qp && !loaded) {
-                console.log("Used Query Parameter");
-                try {
-                    loaded = aircraft_model.fromJSON(JSON.parse(qp));
-                } catch { }
-            }
-            if (acft_data && !loaded) {
-                console.log("Used Saved Data");
-                try {
-                    loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
-                } catch { }
-            }
+                var loaded = false;
+                if (qp && !loaded) {
+                    console.log("Used Query Parameter");
+                    try {
+                        loaded = aircraft_model.fromJSON(JSON.parse(qp));
+                    } catch { }
+                }
+                if (acft_data && !loaded) {
+                    console.log("Used Saved Data");
+                    try {
+                        loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
+                    } catch { }
+                }
 
-            aircraft_model.CalculateStats();
+                aircraft_model.CalculateStats();
 
-            location.hash = ihash;
-            window.onscroll = SetScroll;
+                location.hash = ihash;
+                window.onscroll = SetScroll;
+            });
         });
     });
 }
@@ -128,5 +131,6 @@ function SetScroll(ev) {
 
 var parts_JSON: JSON;
 var engine_json: JSON;
+var weapon_json: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;

@@ -43,7 +43,7 @@ class Aircraft {
     private optimization: Optimization;
     private weapons: Weapons;
 
-    constructor(js: JSON, engine_json: JSON, storage: boolean) {
+    constructor(js: JSON, engine_json: JSON, weapon_json: JSON, storage: boolean) {
         this.stats = new Stats();
         this.name = "Prototype Aircraft";
         this.version = js['version'];
@@ -63,7 +63,7 @@ class Aircraft {
         this.gear = new LandingGear(js["landing_gear"]);
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
-        this.weapons = new Weapons(js["weapons"]);
+        this.weapons = new Weapons(weapon_json);
 
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });

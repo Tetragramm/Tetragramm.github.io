@@ -48,9 +48,9 @@ function CreateFlexSection(elem: HTMLElement): FlexSection {
         div0: document.createElement("DIV"), div1: document.createElement("DIV"),
         div2: document.createElement("DIV")
     } as FlexSection;
-    fs.div0.classList.add("flex-container");
-    fs.div1.classList.add("flex-container");
-    fs.div2.classList.add("flex-container");
+    fs.div0.classList.add("flex-container-o");
+    fs.div1.classList.add("flex-container-i");
+    fs.div2.classList.add("flex-container-i");
     fs.div0.appendChild(fs.div1);
     fs.div0.appendChild(fs.div2);
     elem.appendChild(fs.div0);

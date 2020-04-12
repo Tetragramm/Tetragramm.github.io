@@ -32,17 +32,9 @@ class Reinforcement_HTML extends Display {
 
     private InitExternal(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
-        var div3 = document.createElement("DIV") as HTMLDivElement;
-        var div4 = document.createElement("DIV") as HTMLDivElement;
-        var div5 = document.createElement("DIV") as HTMLDivElement;
-        div3.classList.add("flex-container");
-        div4.classList.add("flex-container");
-        div5.classList.add("flex-container");
-        fs.div0.appendChild(div3);
-        fs.div0.appendChild(div4);
-        fs.div0.appendChild(div5);
-        var fs_wood = { div0: fs.div0, div1: fs.div2, div2: div3 };
-        var fs_steel = { div0: fs.div0, div1: div4, div2: div5 };
+        var fsr = CreateFlexSection(fs.div2);
+        var fs_wood = CreateFlexSection(fsr.div1);
+        var fs_steel = CreateFlexSection(fsr.div2);
         var lst = this.rf.GetExternalList();
         for (let i = 0; i < lst.length; i++) {
             let elem = lst[i];
@@ -61,9 +53,6 @@ class Reinforcement_HTML extends Display {
         this.wires = document.createElement("INPUT") as HTMLInputElement;
         FlexCheckbox("Wires", this.wires, fs);
         this.wires.onchange = () => { this.rf.SetWires(this.wires.checked); };
-        FlexLabel("", div3);
-        FlexLabel("", div4);
-        FlexLabel("", div5);
     }
 
     private InitInternal(cell: HTMLTableCellElement) {

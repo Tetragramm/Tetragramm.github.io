@@ -223,6 +223,8 @@ class Weapon extends Part {
             });
         }
 
+        stats.Round();
+
         return stats;
     }
 }

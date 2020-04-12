@@ -3,80 +3,107 @@
 /// <reference path="./Weapon.ts" />
 
 class Weapons extends Part {
-    private weapon_mass: number;
-    private weapon_drag: number;
-    private weapon_cost: number;
+    private weapon_sets: WeaponSystem[];
+    private weapon_list: {
+        name: string, era: string, size: number, stats: Stats,
+        damage: number, hits: number, ammo: number,
+        ap: number, jam: number, reload: number,
+        rapid: boolean, synched: boolean, shells: boolean
+    }[];
+    private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
 
     constructor(js: JSON) {
         super();
-        this.weapon_mass = 0;
-        this.weapon_drag = 0;
-        this.weapon_cost = 0;
+
+        this.weapon_list = [];
+        for (let elem of js["weapons"]) {
+            var weap = {
+                name: elem["name"],
+                era: elem["era"],
+                size: elem["size"],
+                stats: new Stats(elem),
+                damage: elem["damage"],
+                hits: elem["hits"],
+                ammo: elem["ammo"],
+                ap: elem["ap"],
+                jam: elem["jam"],
+                reload: elem["reload"],
+                rapid: elem["rapid"],
+                synched: elem["synched"],
+                shells: elem["shells"],
+            };
+            if (weap.size < 16)
+                this.weapon_list.push(weap);
+        }
+
+        this.weapon_sets = [];
     }
 
     public toJSON() {
+        var lst = [];
+        for (let ws of this.weapon_sets) {
+            lst.push(ws.toJSON());
+        }
         return {
-            state: "BETA",
-            weapon_mass: this.weapon_mass,
-            weapon_drag: this.weapon_drag,
-            weapon_cost: this.weapon_cost,
+            state: "BETA2",
+            weapon_systems: lst,
         }
     }
 
     public fromJSON(js: JSON) {
-        if (js && js["state"] == "BETA") {
-            this.weapon_cost = js["weapon_cost"];
-            this.weapon_drag = js["weapon_drag"];
-            this.weapon_mass = js["weapon_mass"];
+        if (js && js["state"] == "BETA2") {
+            var lst = js["weapon_systems"];
+            for (let wsj of lst) {
+                var ws = new WeaponSystem(this.weapon_list);
+                ws.SetCalculateStats(this.CalculateStats);
+                ws.fromJSON(wsj);
+                this.weapon_sets.push(ws);
+            }
         }
     }
 
-    public GetMass() {
-        return this.weapon_mass;
+    public GetWeaponList() {
+        return this.weapon_list;
     }
 
-    public SetMass(num: number) {
-        if (num != num || num < 0)
+    public GetDirectionList() {
+        return this.direction_list;
+    }
+
+    public SetWeaponSetCount(num: number) {
+        if (num != num || num < 1)
             num = 0;
         num = Math.floor(num);
-        this.weapon_mass = num;
+        console.log("Set to " + num.toString());
+        while (num > this.weapon_sets.length) {
+            var w = new WeaponSystem(this.weapon_list);
+            w.SetCalculateStats(this.CalculateStats);
+            this.weapon_sets.push(w);
+        }
+        while (num < this.weapon_sets.length) {
+            this.weapon_sets.pop();
+        }
+        console.log("Set Count");
         this.CalculateStats();
+        console.log("Past CalcStats");
     }
 
-    public GetDrag() {
-        return this.weapon_drag;
-    }
-
-    public SetDrag(num: number) {
-        if (num != num || num < 0)
-            num = 0;
-        num = Math.floor(num);
-        this.weapon_drag = num;
-        this.CalculateStats();
-    }
-
-    public GetCost() {
-        return this.weapon_cost;
-    }
-
-    public SetCost(num: number) {
-        if (num != num || num < 0)
-            num = 0;
-        num = Math.floor(num);
-        this.weapon_cost = num;
-        this.CalculateStats();
+    public GetWeaponSets() {
+        return this.weapon_sets;
     }
 
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
+        for (let set of this.weapon_sets)
+            set.SetCalculateStats(callback);
     }
 
     public PartStats() {
         var stats = new Stats();
 
-        stats.mass = this.weapon_mass;
-        stats.drag = this.weapon_drag;
-        stats.cost = this.weapon_cost;
+        for (let ws of this.weapon_sets) {
+            stats = stats.Add(ws.PartStats());
+        }
 
         return stats;
     }

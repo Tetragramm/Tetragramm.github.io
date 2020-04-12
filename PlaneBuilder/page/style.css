@@ -361,16 +361,16 @@ button[disabled] {
 	animation: changedpl 1s 1;
 }
 
-.flex-container {
+.flex-container-o {
 	display: flex;
 	padding: 1px;
 }
 
-.flex-container .flex-container {
+.flex-container-i {
 	white-space: nowrap;
 	display: grid;
 	grid-auto-columns: 1fr;
-	grid-auto-rows: 1fr;
+	grid-auto-rows: auto;
 	row-gap: 1px;
 	vertical-align: middle;
 }
