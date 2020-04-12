@@ -202,6 +202,8 @@ class Aircraft {
         stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
+        //Have to round after optimizations, because otherwise it's wrong.
+        stats.Round();
 
         if (!this.updated_stats) {
             this.updated_stats = true;
@@ -247,6 +249,7 @@ class Aircraft {
         DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
+        DPFull = DPEmpty; //Based on advice from Discord.
         var DPwBombs = Math.floor((this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
         var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));

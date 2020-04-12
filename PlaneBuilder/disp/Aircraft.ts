@@ -15,6 +15,7 @@
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="../impl/Aircraft.ts" />
+/// <reference path="../lz/lz-string.ts" />
 
 class Aircraft_HTML extends Display {
     private acft: Aircraft;
@@ -204,7 +205,8 @@ class Aircraft_HTML extends Display {
 
         var link_button = document.getElementById("acft_save_link") as HTMLButtonElement;
         link_button.onclick = () => {
-            var txt = encodeURIComponent(JSON.stringify(this.acft.toJSON()));
+            var str = JSON.stringify(this.acft.toJSON());
+            var txt = LZString.compressToEncodedURIComponent(str);
             var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt);
             copyStringToClipboard(link);
         };

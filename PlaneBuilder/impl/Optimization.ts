@@ -243,15 +243,15 @@ class Optimization extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        stats.cost = -Math.floor(this.cost * 1.5 * this.acft_stats.cost / 10);
-        stats.liftbleed = -this.bleed * 2;
+        stats.cost = Math.floor(-(this.cost * 1.5 * this.acft_stats.cost / 10));
+        stats.liftbleed = Math.floor(- this.bleed * 2);
         stats.escape = this.escape;
         stats.visibility = this.escape;
-        stats.mass = -Math.floor(this.mass * this.acft_stats.mass / 20);
+        stats.mass = Math.floor(-(this.mass * this.acft_stats.mass / 20));
         stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 5);
         stats.maxstrain = Math.floor(this.maxstrain * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
-        stats.drag = -Math.floor(this.drag * this.acft_stats.drag / 20);
+        stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 20));
 
         var dot_cost = Math.abs(this.cost) + Math.abs(this.bleed)
             + Math.abs(this.escape) + Math.abs(this.mass)
