@@ -468,7 +468,7 @@ class Aircraft_HTML extends Display {
                 + this.hand_halfwB.innerText + "\t\t"
                 + this.boost_halfwB.innerText + "\n";
             //Full
-            this.ts_fullwB.innerText = derived.MaxSpeedwBombs.toString();
+            this.ts_fullwB.innerText = Math.floor(derived.MaxSpeedwBombs).toString();
             this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
             this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();

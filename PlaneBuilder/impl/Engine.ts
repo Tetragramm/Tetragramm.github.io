@@ -409,6 +409,28 @@ class Engine extends Part {
         return this.etype_stats.rumble;
     }
 
+    public GetTractor() {
+        return {
+            has: this.mount_list[this.selected_mount].name == "Tractor"
+                || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor",
+            spinner: this.GetSpinner()
+        };
+    }
+
+    public GetPusher() {
+        return {
+            has: this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
+                || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher",
+            spinner: this.GetSpinner()
+        };
+    }
+
+    private GetSpinner() {
+        if (this.gp_count > 0 && this.etype_stats.spinner)
+            return true;
+        return false;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

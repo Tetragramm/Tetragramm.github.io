@@ -253,12 +253,6 @@ class Optimization extends Part {
         stats.reliability = this.reliability * 2;
         stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 20));
 
-        var dot_cost = Math.abs(this.cost) + Math.abs(this.bleed)
-            + Math.abs(this.escape) + Math.abs(this.mass)
-            + Math.abs(this.toughness) + Math.abs(this.maxstrain)
-            + Math.abs(this.reliability) + Math.abs(this.drag) - this.free_dots;
-        stats.cost += Math.max(0, dot_cost);
-
         return stats;
     }
 }

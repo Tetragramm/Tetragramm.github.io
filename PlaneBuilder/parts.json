@@ -201,7 +201,6 @@
         "mounts": [
             {
                 "name": "Tractor",
-                "warning": "Forward-firing fixed weapons will need sync gears spinner mounts. Turrets cannot fire forward.",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": 0,
@@ -213,7 +212,6 @@
             },
             {
                 "name": "Center-Mounted Tractor",
-                "warning": "Forward-firing fixed weapons will need Sync gears. Will require an Extended Driveshaft. With the space free at the front of the aircraft, you can mount a single weapon that fires through the spinner. (Represents P-39 style engine mounts.)",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -2,
@@ -226,7 +224,6 @@
             },
             {
                 "name": "Rear-Mounted Pusher",
-                "warning": "Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward. (Represents engines mounted at the rear of the aircraft)",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -4,
@@ -238,7 +235,6 @@
             },
             {
                 "name": "Center-Mounted Pusher",
-                "warning": "Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders, or Boom Tail. Rearward-firing fixed weapons will need sync gears/spinner mounts. Turrets cannot fire backward. (Represents engines mounted in the center of the aircraft a la the DH2)",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -2,

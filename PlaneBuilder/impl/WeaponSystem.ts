@@ -8,6 +8,11 @@ class WeaponSystem extends Part {
     private directions: boolean[];
     private weapons: Weapon[];
 
+    private tractor: boolean;
+    private pusher: boolean;
+    private spinner_t: boolean;
+    private spinner_p: boolean;
+
     private weapon_list: {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
@@ -22,21 +27,39 @@ class WeaponSystem extends Part {
         rapid: boolean, synched: boolean, shells: boolean
     }[]) {
         super();
-        console.log("Start new Weapon System");
         this.weapon_list = weapon_list;
         this.directions = [...Array(6).fill(false)];
+        this.directions[0] = true;
+        this.fixed = true;
         this.weapon_type = 0;
         this.weapons = [];
-        this.SetWeaponCount(1);
-        console.log("End new Weapon System");
+        this.SWC(1);
     }
 
     public toJSON() {
+        var wlist = [];
+        for (let w of this.weapons) {
+            wlist.push(w.toJSON());
+        }
         return {
+            weapon_type: this.weapon_type,
+            fixed: this.fixed,
+            directions: this.directions,
+            weapons: wlist,
         }
     }
 
     public fromJSON(js: JSON) {
+        this.weapon_type = js["weapon_type"];
+        this.fixed = js["fixed"];
+        this.directions = js["directions"];
+        this.weapons = [];
+        for (let elem of js["weapons"]) {
+            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            w.SetCalculateStats(this.CalculateStats);
+            w.fromJSON(elem);
+            this.weapons.push(w);
+        }
     }
 
     public GetWeaponSelected() {
@@ -44,9 +67,25 @@ class WeaponSystem extends Part {
     }
 
     public SetWeaponSelected(num: number) {
-        this.weapon_type = num;
-        for (let w of this.weapons) {
-            w.SetWeaponType(this.weapon_list[num]);
+        if (this.weapon_list[num].size == 16 && this.weapon_list[this.weapon_type].size != 16) {
+            this.weapons = []; //CLear all weapons
+            this.weapon_type = num;
+            this.SetFixed(true);
+            this.directions = [...Array(6).fill(false)];
+            if (this.tractor && this.spinner_t)
+                this.directions[0] = true;
+            else if (this.tractor && this.spinner_p)
+                this.directions[1] = true;
+            else
+                this.directions[3] = true;
+
+            this.SWC(1); //Create a single weapon for arty.
+            this.weapons[0].SetWing(false);
+        } else {
+            this.weapon_type = num;
+            for (let w of this.weapons) {
+                w.SetWeaponType(this.weapon_list[num]);
+            }
         }
         this.CalculateStats();
     }
@@ -61,7 +100,30 @@ class WeaponSystem extends Part {
             for (let w of this.weapons) {
                 w.SetFixed(this.fixed);
             }
+            if (use) {
+                var good = false;
+                for (let i = 0; i < this.directions.length; i++) {
+                    if (this.directions[i] && good)
+                        this.directions[i] = false;
+                    else if (this.directions[i])
+                        good = true;
+                }
+
+            }
         }
+        this.CalculateStats();
+    }
+
+    public CanDirection() {
+        var directions = [...Array(6).fill(true)];
+        if (this.fixed && this.weapon_list[this.weapon_type].size == 16 && this.weapons.length > 0) {
+            var is_spinner = this.weapons[0].GetSynchronization() == SynchronizationType.SPINNER;
+            if (this.tractor && !(this.spinner_t || (is_spinner && this.directions[0])))
+                directions[0] = false;
+            if (this.pusher && !(this.spinner_p || (is_spinner && this.directions[1])))
+                directions[1] = false;
+        }
+        return directions;
     }
 
     public GetDirection() {
@@ -73,6 +135,12 @@ class WeaponSystem extends Part {
             use = true;
         if (this.fixed) {
             this.directions = [...Array(6).fill(false)];
+            if (this.weapon_list[this.weapon_type].size == 16) {
+                if (num == 0 && this.tractor && !this.spinner_t)
+                    num = 1;
+                if (num == 1 && this.pusher && !this.spinner_p)
+                    num = 3;
+            }
         }
         this.directions[num] = use;
         this.CalculateStats();
@@ -82,7 +150,7 @@ class WeaponSystem extends Part {
         return this.weapons.length;
     }
 
-    public SetWeaponCount(num: number) {
+    private SWC(num: number) {
         if (num != num || num < 1)
             num = 1;
         num = Math.floor(num);
@@ -96,8 +164,59 @@ class WeaponSystem extends Part {
         }
     }
 
+    public SetWeaponCount(num: number) {
+        if (this.weapon_list[this.weapon_type].size == 16)
+            num = 1;
+        this.SWC(num);
+        this.CalculateStats();
+    }
+
     public GetWeapons() {
         return this.weapons;
+    }
+
+    public SetCanFreelyAccessible(use: boolean) {
+        for (let w of this.weapons) {
+            if (!w.GetWing())
+                w.can_free_accessible = use;
+            else
+                w.can_free_accessible = false;
+        }
+    }
+
+    public SetTractorPusher(hasT: boolean, can_spinnerT: boolean,
+        hasP: boolean, can_spinnerP: boolean) {
+        this.tractor = hasT;
+        this.pusher = hasP;
+        this.spinner_t = can_spinnerT;
+        this.spinner_p = can_spinnerP;
+
+        if (this.directions[0] && hasT) {
+            for (let w of this.weapons) {
+                if (w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = can_spinnerT;
+                } else {
+                    w.can_synchronize = false;
+                    w.can_spinner = false;
+                }
+            }
+        } else if (this.directions[1] && hasP) {
+            for (let w of this.weapons) {
+                if (w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = can_spinnerT;
+                } else {
+                    w.can_synchronize = false;
+                    w.can_spinner = false;
+                }
+            }
+        } else {
+            for (let w of this.weapons) {
+                w.can_synchronize = false;
+                w.can_spinner = false;
+            }
+        }
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -110,8 +229,9 @@ class WeaponSystem extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        for (let w of this.weapons)
+        for (let w of this.weapons) {
             stats = stats.Add(w.PartStats());
+        }
 
         return stats;
     }

@@ -241,6 +241,32 @@ class Engines extends Part {
         return r;
     }
 
+    public GetTractor() {
+        var ret = { have: false, spin_count: 0 };
+        for (let e of this.engines) {
+            var t = e.GetTractor();
+            if (t.has) {
+                ret.have = true;
+                if (t.spinner)
+                    ret.spin_count++;
+            }
+        }
+        return ret;
+    }
+
+    public GetPusher() {
+        var ret = { have: false, spin_count: 0 };
+        for (let e of this.engines) {
+            var t = e.GetPusher();
+            if (t.has) {
+                ret.have = true;
+                if (t.spinner)
+                    ret.spin_count++;
+            }
+        }
+        return ret;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = [...Array(this.radiators.length).fill(0)];

@@ -616,13 +616,14 @@ class EngineStats {
         this.rumble = 0;
         this.oiltank = false;
         this.pulsejet = false;
+        this.spinner = false;
         this.stats = new Stats();
         if (js) {
             this.fromJSON(js);
         }
     }
     toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet, spinner: this.spinner }, this.stats.toJSON());
     }
     fromJSON(js) {
         this.name = js["name"];
@@ -632,6 +633,9 @@ class EngineStats {
         this.rumble = js["rumble"];
         this.oiltank = js["oiltank"];
         this.pulsejet = js["pulsejet"];
+        this.spinner = js["spinner"];
+        if (this.spinner == null)
+            this.spinner = false;
         this.stats = new Stats(js);
     }
     Add(other) {
@@ -644,6 +648,7 @@ class EngineStats {
         res.rumble = this.rumble + other.rumble;
         res.oiltank = this.oiltank || other.oiltank;
         res.pulsejet = this.pulsejet || other.pulsejet;
+        res.spinner = this.spinner || other.spinner;
         return res;
     }
     Clone() {
@@ -656,7 +661,8 @@ class EngineStats {
             && this.torque == other.torque
             && this.rumble == other.rumble
             && this.oiltank == other.oiltank
-            && this.pulsejet == other.pulsejet;
+            && this.pulsejet == other.pulsejet
+            && this.spinner == other.spinner;
     }
 }
 /// <reference path="./Part.ts" />
@@ -980,6 +986,25 @@ class Engine extends Part {
     GetRumble() {
         return this.etype_stats.rumble;
     }
+    GetTractor() {
+        return {
+            has: this.mount_list[this.selected_mount].name == "Tractor"
+                || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor",
+            spinner: this.GetSpinner()
+        };
+    }
+    GetPusher() {
+        return {
+            has: this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
+                || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher",
+            spinner: this.GetSpinner()
+        };
+    }
+    GetSpinner() {
+        if (this.gp_count > 0 && this.etype_stats.spinner)
+            return true;
+        return false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -1247,6 +1272,30 @@ class Engines extends Part {
         for (let e of this.engines)
             r = Math.max(r, e.GetRumble());
         return r;
+    }
+    GetTractor() {
+        var ret = { have: false, spin_count: 0 };
+        for (let e of this.engines) {
+            var t = e.GetTractor();
+            if (t.has) {
+                ret.have = true;
+                if (t.spinner)
+                    ret.spin_count++;
+            }
+        }
+        return ret;
+    }
+    GetPusher() {
+        var ret = { have: false, spin_count: 0 };
+        for (let e of this.engines) {
+            var t = e.GetPusher();
+            if (t.has) {
+                ret.have = true;
+                if (t.spinner)
+                    ret.spin_count++;
+            }
+        }
+        return ret;
     }
     PartStats() {
         var stats = new Stats;
@@ -3608,16 +3657,21 @@ class Optimization extends Part {
         stats.maxstrain = Math.floor(this.maxstrain * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
         stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 20));
-        var dot_cost = Math.abs(this.cost) + Math.abs(this.bleed)
-            + Math.abs(this.escape) + Math.abs(this.mass)
-            + Math.abs(this.toughness) + Math.abs(this.maxstrain)
-            + Math.abs(this.reliability) + Math.abs(this.drag) - this.free_dots;
-        stats.cost += Math.max(0, dot_cost);
         return stats;
     }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
+var SynchronizationType;
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+(function (SynchronizationType) {
+    SynchronizationType[SynchronizationType["NONE"] = -1] = "NONE";
+    SynchronizationType[SynchronizationType["INTERRUPT"] = 0] = "INTERRUPT";
+    SynchronizationType[SynchronizationType["SYNCH"] = 1] = "SYNCH";
+    SynchronizationType[SynchronizationType["SPINNER"] = 2] = "SPINNER";
+    SynchronizationType[SynchronizationType["DEFLECT"] = 3] = "DEFLECT";
+})(SynchronizationType || (SynchronizationType = {}));
 class Weapon extends Part {
     constructor(weapon_type, fixed = false) {
         super();
@@ -3628,21 +3682,38 @@ class Weapon extends Part {
         this.accessible = false;
         this.free_accessible = false;
         if (fixed)
-            this.synchronization = -1;
+            this.synchronization = SynchronizationType.NONE;
         else
-            this.synchronization = 0;
+            this.synchronization = SynchronizationType.INTERRUPT;
         this.pair = false;
     }
     toJSON() {
-        return {};
+        return {
+            fixed: this.fixed,
+            wing: this.wing,
+            covered: this.covered,
+            accessible: this.accessible,
+            free_accessible: this.free_accessible,
+            synchronization: this.synchronization,
+            pair: this.pair,
+        };
     }
     fromJSON(js) {
+        this.fixed = js["fixed"];
+        this.wing = js["wing"];
+        this.covered = js["covered"];
+        this.accessible = js["accessible"];
+        this.free_accessible = js["free_accessible"];
+        this.synchronization = js["synchronization"];
+        this.pair = js["pair"];
     }
     SetWeaponType(weapon_type) {
-        if (weapon_type.size < 16) {
-            this.weapon_type = weapon_type;
-            this.SetPair(this.pair); //Triggers Calculate Stats
+        this.weapon_type = weapon_type;
+        if (this.weapon_type.size == 16) {
+            this.pair = false;
+            this.wing = false;
         }
+        this.SetPair(this.pair); //Triggers Calculate Stats
     }
     GetFixed() {
         return this.fixed;
@@ -3651,11 +3722,10 @@ class Weapon extends Part {
         if (use != this.fixed) {
             if (use) {
                 this.fixed = true;
-                this.synchronization = 0;
             }
             else {
                 this.fixed = false;
-                this.synchronization = -1;
+                this.synchronization = SynchronizationType.NONE;
             }
             this.CalculateStats();
         }
@@ -3663,10 +3733,13 @@ class Weapon extends Part {
     GetWing() {
         return this.wing;
     }
+    CanWing() {
+        return this.weapon_type.size <= 8;
+    }
     SetWing(use) {
-        if (use && this.can_wing) {
+        if (use && this.CanWing()) {
             this.wing = true;
-            this.synchronization = -1;
+            this.synchronization = SynchronizationType.NONE;
         }
         else {
             this.wing = false;
@@ -3693,7 +3766,7 @@ class Weapon extends Part {
         return this.free_accessible;
     }
     SetFreeAccessible(use) {
-        if (use && this.can_free_accessible) {
+        if (use && !this.wing && this.can_free_accessible) {
             this.free_accessible = true;
             this.accessible = false;
         }
@@ -3707,16 +3780,19 @@ class Weapon extends Part {
     }
     SetSynchronization(use) {
         if (use >= 0 && this.weapon_type.synched && this.can_synchronize) {
-            if (use == 3 && !this.can_deflector)
-                use--;
-            if (use == 2 && !this.can_spinner)
+            if (use == SynchronizationType.SPINNER && !this.can_spinner)
                 use--;
             this.synchronization = use;
         }
         else {
-            this.synchronization = -1;
+            this.synchronization = SynchronizationType.NONE;
         }
+        if (this.synchronization == SynchronizationType.SPINNER)
+            this.pair = false;
         this.CalculateStats();
+    }
+    CanPair() {
+        return this.weapon_type.size <= 8 && this.synchronization != SynchronizationType.SPINNER;
     }
     GetPair() {
         return this.pair;
@@ -3727,11 +3803,26 @@ class Weapon extends Part {
         this.pair = use;
         this.CalculateStats();
     }
+    ResolveSynch() {
+        if (this.can_synchronize && !this.wing) {
+            if (this.synchronization == SynchronizationType.NONE
+                || this.synchronization == SynchronizationType.SPINNER && !this.can_spinner) {
+                this.synchronization = SynchronizationType.INTERRUPT;
+            }
+            if (this.weapon_type.size == 16) {
+                this.synchronization = SynchronizationType.SPINNER;
+            }
+        }
+        else {
+            this.synchronization = SynchronizationType.NONE;
+        }
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
     PartStats() {
         var stats = new Stats();
+        this.ResolveSynch();
         stats = stats.Add(this.weapon_type.stats);
         if (this.pair)
             stats = stats.Add(this.weapon_type.stats);
@@ -3744,7 +3835,7 @@ class Weapon extends Part {
         if (this.wing)
             stats.drag += 1;
         //Arty size weapon mounts need a section
-        if (this.pair && this.weapon_type.size == 8)
+        if (this.pair && this.weapon_type.size == 8 || this.weapon_type.size == 16)
             stats.reqsections += 1;
         //Accessible Cost
         if (this.accessible) {
@@ -3774,18 +3865,18 @@ class Weapon extends Part {
             }
         }
         //Synchronization == -1 is no synch.
-        if (this.synchronization == 0) { //Interruptor Gear
+        if (this.synchronization == SynchronizationType.INTERRUPT) {
             stats.cost += 2;
             if (this.pair)
                 stats.cost += 2;
         }
-        else if (this.synchronization == 1) { // Synch Gear
+        else if (this.synchronization == SynchronizationType.SYNCH) {
             stats.cost += 3;
             if (this.pair)
                 stats.cost += 3;
             //synchronization == 2 is spinner and costs nothing.
         }
-        else if (this.synchronization == 3) {
+        else if (this.synchronization == SynchronizationType.DEFLECT) {
             stats.cost += 1;
             stats.warnings.push({
                 source: this.weapon_type.name,
@@ -3803,6 +3894,7 @@ class Weapons extends Part {
     constructor(js) {
         super();
         this.direction_list = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
+        this.synchronization_list = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
         this.weapon_list = [];
         for (let elem of js["weapons"]) {
             var weap = {
@@ -3820,8 +3912,7 @@ class Weapons extends Part {
                 synched: elem["synched"],
                 shells: elem["shells"],
             };
-            if (weap.size < 16)
-                this.weapon_list.push(weap);
+            this.weapon_list.push(weap);
         }
         this.weapon_sets = [];
     }
@@ -3836,15 +3927,22 @@ class Weapons extends Part {
         };
     }
     fromJSON(js) {
+        console.log(js);
         if (js && js["state"] == "BETA2") {
+            console.log("weapon_systems");
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
+                console.log("Each weapon");
                 var ws = new WeaponSystem(this.weapon_list);
                 ws.SetCalculateStats(this.CalculateStats);
                 ws.fromJSON(wsj);
                 this.weapon_sets.push(ws);
             }
         }
+        else {
+            this.SetWeaponSetCount(0);
+        }
+        console.log("Done Weapons");
     }
     GetWeaponList() {
         return this.weapon_list;
@@ -3852,11 +3950,13 @@ class Weapons extends Part {
     GetDirectionList() {
         return this.direction_list;
     }
+    GetSynchronizationList() {
+        return this.synchronization_list;
+    }
     SetWeaponSetCount(num) {
         if (num != num || num < 1)
             num = 0;
         num = Math.floor(num);
-        console.log("Set to " + num.toString());
         while (num > this.weapon_sets.length) {
             var w = new WeaponSystem(this.weapon_list);
             w.SetCalculateStats(this.CalculateStats);
@@ -3865,12 +3965,90 @@ class Weapons extends Part {
         while (num < this.weapon_sets.length) {
             this.weapon_sets.pop();
         }
-        console.log("Set Count");
         this.CalculateStats();
-        console.log("Past CalcStats");
     }
     GetWeaponSets() {
         return this.weapon_sets;
+    }
+    CountFreelyAccessible() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            var wlist = ws.GetWeapons();
+            for (let w of wlist) {
+                if (w.GetFreeAccessible())
+                    count++;
+            }
+        }
+        return count;
+    }
+    CountTractorSpinner() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            if (ws.GetDirection()[0]) {
+                var wlist = ws.GetWeapons();
+                for (let w of wlist) {
+                    if (w.GetSynchronization() == SynchronizationType.SPINNER)
+                        count++;
+                }
+            }
+        }
+        return count;
+    }
+    CountPusherSpinner() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            if (ws.GetDirection()[1]) {
+                var wlist = ws.GetWeapons();
+                for (let w of wlist) {
+                    if (w.GetSynchronization() == SynchronizationType.SPINNER)
+                        count++;
+                }
+            }
+        }
+        return count;
+    }
+    RemoveOneFreelyAccessible() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            var wlist = this.weapon_sets[i].GetWeapons();
+            for (let j = wlist.length - 1; j >= 0; j--) {
+                if (wlist[j].GetFreeAccessible()) {
+                    wlist[j].SetFreeAccessible(false);
+                    return;
+                }
+            }
+        }
+    }
+    RemoveOneTractorSpinner() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            if (this.weapon_sets[i].GetDirection()[0]) {
+                var wlist = this.weapon_sets[i].GetWeapons();
+                for (let j = wlist.length - 1; j >= 0; j--) {
+                    if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER) {
+                        wlist[j].SetSynchronization(SynchronizationType.INTERRUPT);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    RemoveOnePusherSpinner() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            if (this.weapon_sets[i].GetDirection()[1]) {
+                var wlist = this.weapon_sets[i].GetWeapons();
+                for (let j = wlist.length - 1; j >= 0; j--) {
+                    if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER) {
+                        wlist[j].SetSynchronization(SynchronizationType.INTERRUPT);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    CanTractorSpinner() {
+        return this.CountTractorSpinner() < this.tractor_spinner_count;
+    }
+    CanPusherSpinner() {
+        return this.CountPusherSpinner() < this.pusher_spinner_count;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -3879,7 +4057,19 @@ class Weapons extends Part {
     }
     PartStats() {
         var stats = new Stats();
+        //Update Freely Accessible state.
+        while (this.CountFreelyAccessible() > this.cockpit_count) {
+            this.RemoveOneFreelyAccessible();
+        }
+        while (this.CountTractorSpinner() > this.tractor_spinner_count) {
+            this.RemoveOneTractorSpinner();
+        }
+        while (this.CountPusherSpinner() > this.pusher_spinner_count) {
+            this.RemoveOnePusherSpinner();
+        }
         for (let ws of this.weapon_sets) {
+            ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
+            ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.has_pusher, this.CanPusherSpinner());
             stats = stats.Add(ws.PartStats());
         }
         return stats;
@@ -3994,7 +4184,9 @@ class Aircraft {
             this.accessories.fromJSON(js["accessories"]);
             this.optimization.fromJSON(js["optimization"]);
             this.weapons.fromJSON(js["weapons"]);
+            console.log("Done Loading");
             this.CalculateStats();
+            console.log("Calculated");
             return true;
         }
         return false;
@@ -4015,6 +4207,15 @@ class Aircraft {
         stats = stats.Add(this.fuel.PartStats());
         //Munitions goes here, because it makes sections.
         stats = stats.Add(this.munitions.PartStats());
+        //Weapons go here, because they make sections.
+        this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
+        var tractor = this.engines.GetTractor();
+        this.weapons.has_tractor = tractor.have;
+        this.weapons.tractor_spinner_count = tractor.spin_count;
+        var pusher = this.engines.GetPusher();
+        this.weapons.has_pusher = pusher.have;
+        this.weapons.pusher_spinner_count = pusher.spin_count;
+        stats = stats.Add(this.weapons.PartStats());
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         stats = stats.Add(this.frames.PartStats());
@@ -4038,7 +4239,6 @@ class Aircraft {
         this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         stats = stats.Add(this.accessories.PartStats());
-        stats = stats.Add(this.weapons.PartStats());
         //Gear go last, because they need total mass.
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         stats = stats.Add(this.gear.PartStats());
@@ -4081,6 +4281,8 @@ class Aircraft {
         WetMP = Math.max(WetMP, 1);
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
+        // var span = this.wings.GetSpan();
+        // var DPEmpty = Math.floor((this.stats.drag + DryMP * DryMP / (span * span)) / 5);
         var DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
@@ -4381,6 +4583,18 @@ function CreateCheckbox(txt, elem, table, br = true) {
     txtSpan.htmlFor = elem.id;
     txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     elem.setAttribute("type", "checkbox");
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
+function CreateSelect(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("LABEL");
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     span.appendChild(txtSpan);
     span.appendChild(elem);
     table.appendChild(span);
@@ -6711,7 +6925,7 @@ class Weapons_HTML extends Display {
             fixed: document.createElement("INPUT"),
             wcell: null,
             weaps: [],
-            stats: { mass: null, drag: null, cost: null, damg: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, hits: null, damg: null },
         };
         var wlist = this.weap.GetWeaponList();
         for (let w of wlist) {
@@ -6743,16 +6957,45 @@ class Weapons_HTML extends Display {
         var h1_row = stable.insertRow();
         CreateTH(h1_row, "Mass");
         CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, "Cost");
         var c1_row = stable.insertRow();
         type.stats.mass = c1_row.insertCell();
         type.stats.drag = c1_row.insertCell();
+        type.stats.cost = c1_row.insertCell();
         var h2_row = stable.insertRow();
-        CreateTH(h2_row, "Cost");
+        CreateTH(h2_row, "Required Sections");
+        CreateTH(h2_row, "Hits");
         CreateTH(h2_row, "Damage");
         var c2_row = stable.insertRow();
-        type.stats.cost = c2_row.insertCell();
+        type.stats.sect = c2_row.insertCell();
+        type.stats.hits = c2_row.insertCell();
         type.stats.damg = c2_row.insertCell();
         return type;
+    }
+    CreateWRow(wcell) {
+        var w = {
+            span: document.createElement("SPAN"),
+            wing: document.createElement("INPUT"),
+            covered: document.createElement("INPUT"),
+            accessible: document.createElement("INPUT"),
+            free_access: document.createElement("INPUT"),
+            synch: document.createElement("SELECT"),
+            pair: document.createElement("INPUT"),
+        };
+        CreateCheckbox("Wing Mount", w.wing, w.span, false);
+        CreateCheckbox("Covered", w.covered, w.span, false);
+        CreateCheckbox("Accessible", w.accessible, w.span, false);
+        CreateCheckbox("Free Accessible", w.free_access, w.span, false);
+        CreateCheckbox("Paired", w.pair, w.span, false);
+        CreateSelect("Synchronization", w.synch, w.span, true);
+        var slist = this.weap.GetSynchronizationList();
+        for (let s of slist) {
+            var opt = document.createElement("OPTION");
+            opt.text = s;
+            w.synch.add(opt);
+        }
+        wcell.appendChild(w.span);
+        return w;
     }
     UpdateWSet(set, disp) {
         disp.type.selectedIndex = set.GetWeaponSelected();
@@ -6762,14 +7005,45 @@ class Weapons_HTML extends Display {
         disp.fixed.checked = set.GetFixed();
         disp.fixed.oninput = () => { set.SetFixed(disp.fixed.checked); };
         var dirlist = set.GetDirection();
+        var candir = set.CanDirection();
         for (let i = 0; i < dirlist.length; i++) {
             disp.dirs[i].checked = dirlist[i];
             disp.dirs[i].oninput = () => { set.SetDirection(i, disp.dirs[i].checked); };
+            disp.dirs[i].disabled = !candir[i];
+        }
+        var wlist = set.GetWeapons();
+        while (disp.weaps.length < wlist.length) {
+            disp.weaps.push(this.CreateWRow(disp.wcell));
+        }
+        while (disp.weaps.length > wlist.length) {
+            var w = disp.weaps.pop();
+            disp.wcell.removeChild(w.span);
+        }
+        for (let i = 0; i < wlist.length; i++) {
+            disp.weaps[i].wing.checked = wlist[i].GetWing();
+            disp.weaps[i].wing.oninput = () => { wlist[i].SetWing(disp.weaps[i].wing.checked); };
+            disp.weaps[i].wing.disabled = !wlist[i].CanWing();
+            disp.weaps[i].covered.checked = wlist[i].GetCovered();
+            disp.weaps[i].covered.oninput = () => { wlist[i].SetCovered(disp.weaps[i].covered.checked); };
+            disp.weaps[i].accessible.checked = wlist[i].GetAccessible();
+            disp.weaps[i].accessible.oninput = () => { wlist[i].SetAccessible(disp.weaps[i].accessible.checked); };
+            disp.weaps[i].free_access.checked = wlist[i].GetFreeAccessible();
+            disp.weaps[i].free_access.oninput = () => { wlist[i].SetFreeAccessible(disp.weaps[i].free_access.checked); };
+            disp.weaps[i].free_access.disabled = !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible());
+            disp.weaps[i].pair.checked = wlist[i].GetPair();
+            disp.weaps[i].pair.oninput = () => { wlist[i].SetPair(disp.weaps[i].pair.checked); };
+            disp.weaps[i].pair.disabled = !wlist[i].CanPair();
+            disp.weaps[i].synch.selectedIndex = wlist[i].GetSynchronization() + 1;
+            disp.weaps[i].synch.oninput = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
+            disp.weaps[i].synch.disabled = !wlist[i].can_synchronize;
+            disp.weaps[i].synch.options[SynchronizationType.SPINNER + 1].disabled = !wlist[i].can_spinner;
         }
         var stats = set.PartStats();
         BlinkIfChanged(disp.stats.mass, stats.mass.toString());
         BlinkIfChanged(disp.stats.drag, stats.drag.toString());
         BlinkIfChanged(disp.stats.cost, stats.cost.toString());
+        BlinkIfChanged(disp.stats.sect, stats.reqsections.toString());
+        BlinkIfChanged(disp.stats.hits, "NYI");
         BlinkIfChanged(disp.stats.damg, "NYI");
     }
     UpdateWSets() {
@@ -7610,7 +7884,7 @@ class Aircraft_HTML extends Display {
                 + this.hand_halfwB.innerText + "\t\t"
                 + this.boost_halfwB.innerText + "\n";
             //Full
-            this.ts_fullwB.innerText = derived.MaxSpeedwBombs.toString();
+            this.ts_fullwB.innerText = Math.floor(derived.MaxSpeedwBombs).toString();
             this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
             this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
@@ -7863,26 +8137,61 @@ var aircraft_display;
 class WeaponSystem extends Part {
     constructor(weapon_list) {
         super();
-        console.log("Start new Weapon System");
         this.weapon_list = weapon_list;
         this.directions = [...Array(6).fill(false)];
+        this.directions[0] = true;
+        this.fixed = true;
         this.weapon_type = 0;
         this.weapons = [];
-        this.SetWeaponCount(1);
-        console.log("End new Weapon System");
+        this.SWC(1);
     }
     toJSON() {
-        return {};
+        var wlist = [];
+        for (let w of this.weapons) {
+            wlist.push(w.toJSON());
+        }
+        return {
+            weapon_type: this.weapon_type,
+            fixed: this.fixed,
+            directions: this.directions,
+            weapons: wlist,
+        };
     }
     fromJSON(js) {
+        this.weapon_type = js["weapon_type"];
+        this.fixed = js["fixed"];
+        this.directions = js["directions"];
+        this.weapons = [];
+        for (let elem of js["weapons"]) {
+            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            w.SetCalculateStats(this.CalculateStats);
+            w.fromJSON(elem);
+            this.weapons.push(w);
+        }
     }
     GetWeaponSelected() {
         return this.weapon_type;
     }
     SetWeaponSelected(num) {
-        this.weapon_type = num;
-        for (let w of this.weapons) {
-            w.SetWeaponType(this.weapon_list[num]);
+        if (this.weapon_list[num].size == 16 && this.weapon_list[this.weapon_type].size != 16) {
+            this.weapons = []; //CLear all weapons
+            this.weapon_type = num;
+            this.SetFixed(true);
+            this.directions = [...Array(6).fill(false)];
+            if (this.tractor && this.spinner_t)
+                this.directions[0] = true;
+            else if (this.tractor && this.spinner_p)
+                this.directions[1] = true;
+            else
+                this.directions[3] = true;
+            this.SWC(1); //Create a single weapon for arty.
+            this.weapons[0].SetWing(false);
+        }
+        else {
+            this.weapon_type = num;
+            for (let w of this.weapons) {
+                w.SetWeaponType(this.weapon_list[num]);
+            }
         }
         this.CalculateStats();
     }
@@ -7895,7 +8204,28 @@ class WeaponSystem extends Part {
             for (let w of this.weapons) {
                 w.SetFixed(this.fixed);
             }
+            if (use) {
+                var good = false;
+                for (let i = 0; i < this.directions.length; i++) {
+                    if (this.directions[i] && good)
+                        this.directions[i] = false;
+                    else if (this.directions[i])
+                        good = true;
+                }
+            }
         }
+        this.CalculateStats();
+    }
+    CanDirection() {
+        var directions = [...Array(6).fill(true)];
+        if (this.fixed && this.weapon_list[this.weapon_type].size == 16 && this.weapons.length > 0) {
+            var is_spinner = this.weapons[0].GetSynchronization() == SynchronizationType.SPINNER;
+            if (this.tractor && !(this.spinner_t || (is_spinner && this.directions[0])))
+                directions[0] = false;
+            if (this.pusher && !(this.spinner_p || (is_spinner && this.directions[1])))
+                directions[1] = false;
+        }
+        return directions;
     }
     GetDirection() {
         return this.directions;
@@ -7905,6 +8235,12 @@ class WeaponSystem extends Part {
             use = true;
         if (this.fixed) {
             this.directions = [...Array(6).fill(false)];
+            if (this.weapon_list[this.weapon_type].size == 16) {
+                if (num == 0 && this.tractor && !this.spinner_t)
+                    num = 1;
+                if (num == 1 && this.pusher && !this.spinner_p)
+                    num = 3;
+            }
         }
         this.directions[num] = use;
         this.CalculateStats();
@@ -7912,7 +8248,7 @@ class WeaponSystem extends Part {
     GetWeaponCount() {
         return this.weapons.length;
     }
-    SetWeaponCount(num) {
+    SWC(num) {
         if (num != num || num < 1)
             num = 1;
         num = Math.floor(num);
@@ -7925,8 +8261,58 @@ class WeaponSystem extends Part {
             this.weapons.pop();
         }
     }
+    SetWeaponCount(num) {
+        if (this.weapon_list[this.weapon_type].size == 16)
+            num = 1;
+        this.SWC(num);
+        this.CalculateStats();
+    }
     GetWeapons() {
         return this.weapons;
+    }
+    SetCanFreelyAccessible(use) {
+        for (let w of this.weapons) {
+            if (!w.GetWing())
+                w.can_free_accessible = use;
+            else
+                w.can_free_accessible = false;
+        }
+    }
+    SetTractorPusher(hasT, can_spinnerT, hasP, can_spinnerP) {
+        this.tractor = hasT;
+        this.pusher = hasP;
+        this.spinner_t = can_spinnerT;
+        this.spinner_p = can_spinnerP;
+        if (this.directions[0] && hasT) {
+            for (let w of this.weapons) {
+                if (w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = can_spinnerT;
+                }
+                else {
+                    w.can_synchronize = false;
+                    w.can_spinner = false;
+                }
+            }
+        }
+        else if (this.directions[1] && hasP) {
+            for (let w of this.weapons) {
+                if (w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = can_spinnerT;
+                }
+                else {
+                    w.can_synchronize = false;
+                    w.can_spinner = false;
+                }
+            }
+        }
+        else {
+            for (let w of this.weapons) {
+                w.can_synchronize = false;
+                w.can_spinner = false;
+            }
+        }
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -7936,8 +8322,9 @@ class WeaponSystem extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        for (let w of this.weapons)
+        for (let w of this.weapons) {
             stats = stats.Add(w.PartStats());
+        }
         return stats;
     }
 }

@@ -136,7 +136,9 @@ class Aircraft {
             this.accessories.fromJSON(js["accessories"]);
             this.optimization.fromJSON(js["optimization"]);
             this.weapons.fromJSON(js["weapons"]);
+            console.log("Done Loading");
             this.CalculateStats();
+            console.log("Calculated");
             return true;
         }
         return false;
@@ -161,6 +163,15 @@ class Aircraft {
         stats = stats.Add(this.fuel.PartStats());
         //Munitions goes here, because it makes sections.
         stats = stats.Add(this.munitions.PartStats());
+        //Weapons go here, because they make sections.
+        this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
+        var tractor = this.engines.GetTractor();
+        this.weapons.has_tractor = tractor.have;
+        this.weapons.tractor_spinner_count = tractor.spin_count;
+        var pusher = this.engines.GetPusher();
+        this.weapons.has_pusher = pusher.have;
+        this.weapons.pusher_spinner_count = pusher.spin_count;
+        stats = stats.Add(this.weapons.PartStats());
 
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
@@ -192,8 +203,6 @@ class Aircraft {
         this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         stats = stats.Add(this.accessories.PartStats());
-
-        stats = stats.Add(this.weapons.PartStats());
 
         //Gear go last, because they need total mass.
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
@@ -245,6 +254,8 @@ class Aircraft {
         WetMP = Math.max(WetMP, 1);
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
+        // var span = this.wings.GetSpan();
+        // var DPEmpty = Math.floor((this.stats.drag + DryMP * DryMP / (span * span)) / 5);
         var DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);

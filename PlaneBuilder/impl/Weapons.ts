@@ -11,6 +11,13 @@ class Weapons extends Part {
         rapid: boolean, synched: boolean, shells: boolean
     }[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
+    private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
+
+    public cockpit_count: number;
+    public has_tractor: boolean;
+    public tractor_spinner_count: number;
+    public has_pusher: boolean;
+    public pusher_spinner_count: number;
 
     constructor(js: JSON) {
         super();
@@ -32,8 +39,7 @@ class Weapons extends Part {
                 synched: elem["synched"],
                 shells: elem["shells"],
             };
-            if (weap.size < 16)
-                this.weapon_list.push(weap);
+            this.weapon_list.push(weap);
         }
 
         this.weapon_sets = [];
@@ -51,15 +57,21 @@ class Weapons extends Part {
     }
 
     public fromJSON(js: JSON) {
+        console.log(js);
         if (js && js["state"] == "BETA2") {
+            console.log("weapon_systems");
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
+                console.log("Each weapon");
                 var ws = new WeaponSystem(this.weapon_list);
                 ws.SetCalculateStats(this.CalculateStats);
                 ws.fromJSON(wsj);
                 this.weapon_sets.push(ws);
             }
+        } else {
+            this.SetWeaponSetCount(0);
         }
+        console.log("Done Weapons");
     }
 
     public GetWeaponList() {
@@ -70,11 +82,14 @@ class Weapons extends Part {
         return this.direction_list;
     }
 
+    public GetSynchronizationList() {
+        return this.synchronization_list;
+    }
+
     public SetWeaponSetCount(num: number) {
         if (num != num || num < 1)
             num = 0;
         num = Math.floor(num);
-        console.log("Set to " + num.toString());
         while (num > this.weapon_sets.length) {
             var w = new WeaponSystem(this.weapon_list);
             w.SetCalculateStats(this.CalculateStats);
@@ -83,13 +98,99 @@ class Weapons extends Part {
         while (num < this.weapon_sets.length) {
             this.weapon_sets.pop();
         }
-        console.log("Set Count");
         this.CalculateStats();
-        console.log("Past CalcStats");
     }
 
     public GetWeaponSets() {
         return this.weapon_sets;
+    }
+
+    private CountFreelyAccessible() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            var wlist = ws.GetWeapons();
+            for (let w of wlist) {
+                if (w.GetFreeAccessible())
+                    count++;
+            }
+        }
+        return count;
+    }
+
+    private CountTractorSpinner() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            if (ws.GetDirection()[0]) {
+                var wlist = ws.GetWeapons();
+                for (let w of wlist) {
+                    if (w.GetSynchronization() == SynchronizationType.SPINNER)
+                        count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private CountPusherSpinner() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            if (ws.GetDirection()[1]) {
+                var wlist = ws.GetWeapons();
+                for (let w of wlist) {
+                    if (w.GetSynchronization() == SynchronizationType.SPINNER)
+                        count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    private RemoveOneFreelyAccessible() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            var wlist = this.weapon_sets[i].GetWeapons();
+            for (let j = wlist.length - 1; j >= 0; j--) {
+                if (wlist[j].GetFreeAccessible()) {
+                    wlist[j].SetFreeAccessible(false);
+                    return;
+                }
+            }
+        }
+    }
+
+    private RemoveOneTractorSpinner() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            if (this.weapon_sets[i].GetDirection()[0]) {
+                var wlist = this.weapon_sets[i].GetWeapons();
+                for (let j = wlist.length - 1; j >= 0; j--) {
+                    if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER) {
+                        wlist[j].SetSynchronization(SynchronizationType.INTERRUPT);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    private RemoveOnePusherSpinner() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            if (this.weapon_sets[i].GetDirection()[1]) {
+                var wlist = this.weapon_sets[i].GetWeapons();
+                for (let j = wlist.length - 1; j >= 0; j--) {
+                    if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER) {
+                        wlist[j].SetSynchronization(SynchronizationType.INTERRUPT);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    public CanTractorSpinner() {
+        return this.CountTractorSpinner() < this.tractor_spinner_count;
+    }
+
+    public CanPusherSpinner() {
+        return this.CountPusherSpinner() < this.pusher_spinner_count;
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -101,7 +202,20 @@ class Weapons extends Part {
     public PartStats() {
         var stats = new Stats();
 
+        //Update Freely Accessible state.
+        while (this.CountFreelyAccessible() > this.cockpit_count) {
+            this.RemoveOneFreelyAccessible();
+        }
+        while (this.CountTractorSpinner() > this.tractor_spinner_count) {
+            this.RemoveOneTractorSpinner();
+        }
+        while (this.CountPusherSpinner() > this.pusher_spinner_count) {
+            this.RemoveOnePusherSpinner();
+        }
+
         for (let ws of this.weapon_sets) {
+            ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
+            ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.has_pusher, this.CanPusherSpinner());
             stats = stats.Add(ws.PartStats());
         }
 

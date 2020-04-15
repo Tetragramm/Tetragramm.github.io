@@ -8,6 +8,7 @@ class EngineStats {
     public rumble: number = 0;
     public oiltank: boolean = false;
     public pulsejet: boolean = false;
+    public spinner: boolean = false;
     public stats: Stats = new Stats();
     constructor(js?: JSON) {
         if (js) {
@@ -24,6 +25,7 @@ class EngineStats {
             rumble: this.rumble,
             oiltank: this.oiltank,
             pulsejet: this.pulsejet,
+            spinner: this.spinner,
             ...this.stats.toJSON()
         };
     }
@@ -36,6 +38,9 @@ class EngineStats {
         this.rumble = js["rumble"];
         this.oiltank = js["oiltank"];
         this.pulsejet = js["pulsejet"];
+        this.spinner = js["spinner"];
+        if (this.spinner == null)
+            this.spinner = false;
         this.stats = new Stats(js);
     }
 
@@ -49,6 +54,7 @@ class EngineStats {
         res.rumble = this.rumble + other.rumble;
         res.oiltank = this.oiltank || other.oiltank;
         res.pulsejet = this.pulsejet || other.pulsejet;
+        res.spinner = this.spinner || other.spinner;
         return res;
     }
     public Clone(): EngineStats {
@@ -61,6 +67,7 @@ class EngineStats {
             && this.torque == other.torque
             && this.rumble == other.rumble
             && this.oiltank == other.oiltank
-            && this.pulsejet == other.pulsejet;
+            && this.pulsejet == other.pulsejet
+            && this.spinner == other.spinner;
     }
 }

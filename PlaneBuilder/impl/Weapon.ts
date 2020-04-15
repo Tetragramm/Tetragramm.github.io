@@ -1,6 +1,13 @@
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 
+enum SynchronizationType {
+    NONE = -1,
+    INTERRUPT,
+    SYNCH,
+    SPINNER,
+    DEFLECT,
+}
 class Weapon extends Part {
     private weapon_type: {
         name: string, era: string, size: number, stats: Stats,
@@ -16,11 +23,9 @@ class Weapon extends Part {
     private synchronization: number;
     private pair: boolean;
 
-    public can_wing: boolean;
     public can_free_accessible: boolean;
     public can_synchronize: boolean;
     public can_spinner: boolean;
-    public can_deflector: boolean;
 
     constructor(weapon_type: {
         name: string, era: string, size: number, stats: Stats,
@@ -36,18 +41,32 @@ class Weapon extends Part {
         this.accessible = false;
         this.free_accessible = false;
         if (fixed)
-            this.synchronization = -1;
+            this.synchronization = SynchronizationType.NONE;
         else
-            this.synchronization = 0;
+            this.synchronization = SynchronizationType.INTERRUPT;
         this.pair = false;
     }
 
     public toJSON() {
         return {
+            fixed: this.fixed,
+            wing: this.wing,
+            covered: this.covered,
+            accessible: this.accessible,
+            free_accessible: this.free_accessible,
+            synchronization: this.synchronization,
+            pair: this.pair,
         }
     }
 
     public fromJSON(js: JSON) {
+        this.fixed = js["fixed"];
+        this.wing = js["wing"];
+        this.covered = js["covered"];
+        this.accessible = js["accessible"];
+        this.free_accessible = js["free_accessible"];
+        this.synchronization = js["synchronization"];
+        this.pair = js["pair"];
     }
 
     public SetWeaponType(weapon_type: {
@@ -56,10 +75,12 @@ class Weapon extends Part {
         ap: number, jam: number, reload: number,
         rapid: boolean, synched: boolean, shells: boolean
     }) {
-        if (weapon_type.size < 16) {
-            this.weapon_type = weapon_type;
-            this.SetPair(this.pair); //Triggers Calculate Stats
+        this.weapon_type = weapon_type;
+        if (this.weapon_type.size == 16) {
+            this.pair = false;
+            this.wing = false;
         }
+        this.SetPair(this.pair); //Triggers Calculate Stats
     }
 
     public GetFixed() {
@@ -70,10 +91,9 @@ class Weapon extends Part {
         if (use != this.fixed) {
             if (use) {
                 this.fixed = true;
-                this.synchronization = 0;
             } else {
                 this.fixed = false;
-                this.synchronization = -1;
+                this.synchronization = SynchronizationType.NONE;
             }
             this.CalculateStats();
         }
@@ -83,10 +103,14 @@ class Weapon extends Part {
         return this.wing;
     }
 
+    public CanWing() {
+        return this.weapon_type.size <= 8;
+    }
+
     public SetWing(use: boolean) {
-        if (use && this.can_wing) {
+        if (use && this.CanWing()) {
             this.wing = true;
-            this.synchronization = -1;
+            this.synchronization = SynchronizationType.NONE;
         } else {
             this.wing = false;
         }
@@ -118,7 +142,7 @@ class Weapon extends Part {
     }
 
     public SetFreeAccessible(use: boolean) {
-        if (use && this.can_free_accessible) {
+        if (use && !this.wing && this.can_free_accessible) {
             this.free_accessible = true;
             this.accessible = false;
         } else {
@@ -133,16 +157,20 @@ class Weapon extends Part {
 
     public SetSynchronization(use: number) {
         if (use >= 0 && this.weapon_type.synched && this.can_synchronize) {
-            if (use == 3 && !this.can_deflector)
-                use--;
-
-            if (use == 2 && !this.can_spinner)
+            if (use == SynchronizationType.SPINNER && !this.can_spinner)
                 use--;
             this.synchronization = use;
         } else {
-            this.synchronization = -1;
+            this.synchronization = SynchronizationType.NONE;
         }
+        if (this.synchronization == SynchronizationType.SPINNER)
+            this.pair = false;
+
         this.CalculateStats();
+    }
+
+    public CanPair() {
+        return this.weapon_type.size <= 8 && this.synchronization != SynchronizationType.SPINNER;
     }
 
     public GetPair() {
@@ -156,12 +184,28 @@ class Weapon extends Part {
         this.CalculateStats();
     }
 
+    private ResolveSynch() {
+        if (this.can_synchronize && !this.wing) {
+            if (this.synchronization == SynchronizationType.NONE
+                || this.synchronization == SynchronizationType.SPINNER && !this.can_spinner) {
+                this.synchronization = SynchronizationType.INTERRUPT;
+            }
+            if (this.weapon_type.size == 16) {
+                this.synchronization = SynchronizationType.SPINNER;
+            }
+        } else {
+            this.synchronization = SynchronizationType.NONE;
+        }
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
 
     public PartStats() {
         var stats = new Stats();
+
+        this.ResolveSynch();
 
         stats = stats.Add(this.weapon_type.stats);
         if (this.pair)
@@ -177,7 +221,7 @@ class Weapon extends Part {
             stats.drag += 1;
 
         //Arty size weapon mounts need a section
-        if (this.pair && this.weapon_type.size == 8)
+        if (this.pair && this.weapon_type.size == 8 || this.weapon_type.size == 16)
             stats.reqsections += 1;
 
         //Accessible Cost
@@ -206,16 +250,16 @@ class Weapon extends Part {
         }
 
         //Synchronization == -1 is no synch.
-        if (this.synchronization == 0) { //Interruptor Gear
+        if (this.synchronization == SynchronizationType.INTERRUPT) {
             stats.cost += 2;
             if (this.pair)
                 stats.cost += 2;
-        } else if (this.synchronization == 1) { // Synch Gear
+        } else if (this.synchronization == SynchronizationType.SYNCH) {
             stats.cost += 3;
             if (this.pair)
                 stats.cost += 3;
             //synchronization == 2 is spinner and costs nothing.
-        } else if (this.synchronization == 3) {
+        } else if (this.synchronization == SynchronizationType.DEFLECT) {
             stats.cost += 1;
             stats.warnings.push({
                 source: this.weapon_type.name,

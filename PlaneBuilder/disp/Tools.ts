@@ -129,6 +129,19 @@ function CreateCheckbox(txt: string, elem: HTMLInputElement, table: HTMLElement,
         table.appendChild(document.createElement("BR"));
 }
 
+function CreateSelect(txt: string, elem: HTMLSelectElement, table: HTMLElement, br = true) {
+    var span = document.createElement("SPAN") as HTMLSpanElement;
+    var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
+
 function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
