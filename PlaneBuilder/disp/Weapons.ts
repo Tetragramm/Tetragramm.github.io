@@ -189,6 +189,10 @@ class Weapons_HTML extends Display {
 
     private UpdateWSets() {
         var wsets = this.weap.GetWeaponSets();
+        if (wsets.length == 0)
+            this.tbl.style.display = "none";
+        else
+            this.tbl.style.display = "";
 
         this.inp_w_count.valueAsNumber = wsets.length;
         while (wsets.length > this.wrow.length) {
