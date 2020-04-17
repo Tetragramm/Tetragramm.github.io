@@ -119,7 +119,6 @@ class Engine extends Part {
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
         this.cooling_count = this.etype_stats.stats.cooling;
-        console.log(this.etype_stats);
         this.CalculateStats();
     }
 
