@@ -293,6 +293,13 @@ class Engines extends Part {
             e.SetTailMods(forb, swr);
     }
 
+    public GetEngineHeight() {
+        var min = 2;
+        for (let e of this.engines)
+            min = Math.min(min, e.GetEngineHeight());
+        return min;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = [...Array(this.GetNumberOfRadiators()).fill({ cool: 0, count: 0 })];

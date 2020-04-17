@@ -197,6 +197,13 @@ class Wings extends Part {
         return can;
     }
 
+    public GetWingHeight() {
+        var max = 0;
+        for (let w of this.wing_list)
+            max = Math.max(max, 4 - w.deck);
+        return max;
+    }
+
     public CanClosed() {
         return this.wing_list.length > 1 && !this.stagger_list[this.wing_stagger].inline;
     }

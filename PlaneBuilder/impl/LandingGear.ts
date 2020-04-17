@@ -8,6 +8,7 @@ class LandingGear extends Part {
     private extra_list: { name: string, stats: Stats, MpLMP: number }[];
     private extra_sel: boolean[];
     private loadedMP: number;
+    public can_boat: boolean;
 
     constructor(js: JSON) {
         super();
@@ -61,12 +62,23 @@ class LandingGear extends Part {
         return this.gear_list;
     }
 
+    public CanGear() {
+        var count = [...Array(this.gear_list.length).fill(true)];
+        for (let i = 0; i < this.gear_list.length; i++) {
+            let g = this.gear_list[i];
+            if (g.name == "Boat Hull" && !this.can_boat)
+                count[i] = false;
+        }
+        return count;
+    }
+
     public GetGear() {
         return this.gear_sel;
     }
 
     public SetGear(num: number) {
-        this.gear_sel = num;
+        if (this.CanGear()[num])
+            this.gear_sel = num;
         this.CalculateStats();
     }
 
@@ -100,12 +112,25 @@ class LandingGear extends Part {
         this.loadedMP = Math.floor(mass / 5);
     }
 
+    public CanBoat(engine_height: number, wing_height) {
+        if (engine_height == 2)
+            this.can_boat = true;
+        else if (engine_height == 1 && wing_height >= 3)
+            this.can_boat = true;
+        else if (engine_height == 0 && wing_height >= 4)
+            this.can_boat = true;
+        else
+            this.can_boat = false;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
 
     public PartStats() {
         var stats = new Stats();
+        if (!this.CanGear()[this.gear_sel])
+            this.gear_sel = 0;
 
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
         var pdrag = this.gear_list[this.gear_sel].DpLMP * this.loadedMP;

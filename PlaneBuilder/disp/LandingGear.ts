@@ -79,6 +79,10 @@ class LandingGear_HTML extends Display {
 
     public UpdateDisplay() {
         this.sel.selectedIndex = this.gear.GetGear();
+        var gcan = this.gear.CanGear();
+        for (let i = 0; i < gcan.length; i++)
+            this.sel.options[i].disabled = !gcan[i];
+
         this.retract.checked = this.gear.GetRetract();
         this.retract.disabled = !this.gear.CanRetract();
 

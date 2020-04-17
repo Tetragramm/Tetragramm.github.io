@@ -1013,6 +1013,16 @@ class Engine extends Part {
     IsElectrics() {
         return this.has_alternator || this.is_generator;
     }
+    GetEngineHeight() {
+        if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet)
+            return 2;
+        else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
+            return 1;
+        else if (this.mount_list[this.selected_mount].name == "Nacelle (Inside)"
+            || this.mount_list[this.selected_mount].name == "Channel Tractor")
+            return 0;
+        return -1;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -1325,6 +1335,12 @@ class Engines extends Part {
     SetTailMods(forb, swr) {
         for (let e of this.engines)
             e.SetTailMods(forb, swr);
+    }
+    GetEngineHeight() {
+        var min = 2;
+        for (let e of this.engines)
+            min = Math.min(min, e.GetEngineHeight());
+        return min;
     }
     PartStats() {
         var stats = new Stats;
@@ -2033,6 +2049,12 @@ class Wings extends Part {
         var can = this.CanAddMiniWing(deck);
         this.mini_wing_list.splice(idx, 0, w);
         return can;
+    }
+    GetWingHeight() {
+        var max = 0;
+        for (let w of this.wing_list)
+            max = Math.max(max, 4 - w.deck);
+        return max;
     }
     CanClosed() {
         return this.wing_list.length > 1 && !this.stagger_list[this.wing_stagger].inline;
@@ -3264,11 +3286,21 @@ class LandingGear extends Part {
     GetGearList() {
         return this.gear_list;
     }
+    CanGear() {
+        var count = [...Array(this.gear_list.length).fill(true)];
+        for (let i = 0; i < this.gear_list.length; i++) {
+            let g = this.gear_list[i];
+            if (g.name == "Boat Hull" && !this.can_boat)
+                count[i] = false;
+        }
+        return count;
+    }
     GetGear() {
         return this.gear_sel;
     }
     SetGear(num) {
-        this.gear_sel = num;
+        if (this.CanGear()[num])
+            this.gear_sel = num;
         this.CalculateStats();
     }
     CanRetract() {
@@ -3294,11 +3326,23 @@ class LandingGear extends Part {
     SetLoadedMass(mass) {
         this.loadedMP = Math.floor(mass / 5);
     }
+    CanBoat(engine_height, wing_height) {
+        if (engine_height == 2)
+            this.can_boat = true;
+        else if (engine_height == 1 && wing_height >= 3)
+            this.can_boat = true;
+        else if (engine_height == 0 && wing_height >= 4)
+            this.can_boat = true;
+        else
+            this.can_boat = false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
     PartStats() {
         var stats = new Stats();
+        if (!this.CanGear()[this.gear_sel])
+            this.gear_sel = 0;
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
         var pdrag = this.gear_list[this.gear_sel].DpLMP * this.loadedMP;
         if (this.retract) {
@@ -4371,6 +4415,7 @@ class Aircraft {
         stats = stats.Add(this.accessories.PartStats());
         //Gear go last, because they need total mass.
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
+        this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
         stats = stats.Add(this.gear.PartStats());
         stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
@@ -6761,6 +6806,9 @@ class LandingGear_HTML extends Display {
     }
     UpdateDisplay() {
         this.sel.selectedIndex = this.gear.GetGear();
+        var gcan = this.gear.CanGear();
+        for (let i = 0; i < gcan.length; i++)
+            this.sel.options[i].disabled = !gcan[i];
         this.retract.checked = this.gear.GetRetract();
         this.retract.disabled = !this.gear.CanRetract();
         var lst = this.gear.GetExtraSelected();

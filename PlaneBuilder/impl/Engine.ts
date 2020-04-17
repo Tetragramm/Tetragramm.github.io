@@ -434,6 +434,17 @@ class Engine extends Part {
         return this.has_alternator || this.is_generator;
     }
 
+    public GetEngineHeight() {
+        if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet)
+            return 2;
+        else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
+            return 1;
+        else if (this.mount_list[this.selected_mount].name == "Nacelle (Inside)"
+            || this.mount_list[this.selected_mount].name == "Channel Tractor")
+            return 0;
+        return -1;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
