@@ -139,6 +139,14 @@ class Frames extends Part {
             && !this.section_list[num].internal_bracing)
             return;
         this.section_list.splice(num, 1);
+        if (this.CountInternalBracing() > this.CountSections() + this.tail_section_list.length) {
+            for (let i = this.section_list.length - 1; i >= 0; i--) {
+                if (this.section_list[i].internal_bracing) {
+                    this.section_list.splice(i, 1);
+                    break;
+                }
+            }
+        }
         this.CalculateStats();
     }
 
@@ -287,7 +295,7 @@ class Frames extends Part {
     public SetInternalBracing(num: number, use: boolean) {
         //If we're setting it, it isn't already set, and we have the margin.
         if (use && !this.section_list[num].internal_bracing
-            && this.PossibleInternalBracing()
+            && this.PossibleInternalBracing(true)
             && this.CountSections() > this.required_sections) {
             this.section_list[num].internal_bracing = true;
             this.section_list[num].skin = 0;
@@ -300,8 +308,11 @@ class Frames extends Part {
         }
     }
 
-    public PossibleInternalBracing() {
-        return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length + 1;
+    public PossibleInternalBracing(convert: boolean = false) {
+        if (convert)
+            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length - 1;
+        else
+            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length;
     }
 
     public PossibleGeodesic(num: number) {

@@ -1533,6 +1533,14 @@ class Frames extends Part {
             && !this.section_list[num].internal_bracing)
             return;
         this.section_list.splice(num, 1);
+        if (this.CountInternalBracing() > this.CountSections() + this.tail_section_list.length) {
+            for (let i = this.section_list.length - 1; i >= 0; i--) {
+                if (this.section_list[i].internal_bracing) {
+                    this.section_list.splice(i, 1);
+                    break;
+                }
+            }
+        }
         this.CalculateStats();
     }
     SetRequiredSections(num) {
@@ -1664,7 +1672,7 @@ class Frames extends Part {
     SetInternalBracing(num, use) {
         //If we're setting it, it isn't already set, and we have the margin.
         if (use && !this.section_list[num].internal_bracing
-            && this.PossibleInternalBracing()
+            && this.PossibleInternalBracing(true)
             && this.CountSections() > this.required_sections) {
             this.section_list[num].internal_bracing = true;
             this.section_list[num].skin = 0;
@@ -1677,8 +1685,11 @@ class Frames extends Part {
             this.CalculateStats();
         }
     }
-    PossibleInternalBracing() {
-        return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length + 1;
+    PossibleInternalBracing(convert = false) {
+        if (convert)
+            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length - 1;
+        else
+            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length;
     }
     PossibleGeodesic(num) {
         return this.frame_list[this.section_list[num].frame].geodesic && !this.section_list[num].monocoque;
@@ -5817,7 +5828,7 @@ class Frames_HTML extends Display {
         var int_input = document.createElement("INPUT");
         CreateCheckbox("Internal Bracing", int_input, opt_span, false);
         int_input.checked = sec.internal_bracing;
-        if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing() || !this.frames.PossibleRemoveSections()))
+        if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing(true) || !this.frames.PossibleRemoveSections()))
             int_input.disabled = true;
         int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
         var lb_input = document.createElement("INPUT");

@@ -235,7 +235,7 @@ class Frames_HTML extends Display {
         var int_input = document.createElement("INPUT") as HTMLInputElement;
         CreateCheckbox("Internal Bracing", int_input, opt_span, false);
         int_input.checked = sec.internal_bracing;
-        if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing() || !this.frames.PossibleRemoveSections()))
+        if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing(true) || !this.frames.PossibleRemoveSections()))
             int_input.disabled = true;
         int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
 
