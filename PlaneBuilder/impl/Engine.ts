@@ -190,10 +190,9 @@ class Engine extends Part {
         return this.mount_list[this.selected_mount].reqED;
     }
 
-    public RequiresTailMod(): boolean {
-        if (this.use_ds)
-            return false;
-        return this.mount_list[this.selected_mount].reqTail;
+    public SetTailMods(forb: boolean, swr: boolean) {
+        if (this.mount_list[this.selected_mount].reqTail && !(forb || swr))
+            this.use_ds = true;
     }
 
     public SetMountIndex(num: number) {

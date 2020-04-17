@@ -73,11 +73,15 @@ class Radiator_HTML extends Display {
     }
 
     public UpdateDisplay() {
+        var tcan = this.radiator.CanType();
+        for (let i = 0; i < tcan.length; i++) {
+            this.type_select.options[i].disabled = !tcan[i];
+        }
         this.type_select.selectedIndex = this.radiator.GetTypeIndex();
         this.mount_select.selectedIndex = this.radiator.GetMountIndex();
-        var can = this.radiator.CanMount();
-        for (let i = 0; i < can.length; i++) {
-            this.mount_select.options[i].disabled = !can[i];
+        var mcan = this.radiator.CanMount();
+        for (let i = 0; i < mcan.length; i++) {
+            this.mount_select.options[i].disabled = !mcan[i];
         }
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         var stats = this.radiator.PartStats();

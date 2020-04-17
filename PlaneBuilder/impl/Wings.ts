@@ -16,7 +16,7 @@ class Wings extends Part {
     private skin_list: {
         name: string, flammable: boolean,
         stats: Stats, strainfactor: number,
-        dragfactor: number
+        dragfactor: number, metal: boolean
     }[];
     private deck_list: {
         name: string, limited: boolean,
@@ -36,7 +36,7 @@ class Wings extends Part {
             this.skin_list.push({
                 name: elem["name"], flammable: elem["flammable"],
                 stats: new Stats(elem), strainfactor: elem["strainfactor"],
-                dragfactor: elem["dragfactor"]
+                dragfactor: elem["dragfactor"], metal: elem["metal"]
             });
         }
 
@@ -198,11 +198,14 @@ class Wings extends Part {
     }
 
     public CanClosed() {
-        return this.wing_list.length > 1 && !this.stagger_list[this.wing_stagger].inline
+        return this.wing_list.length > 1 && !this.stagger_list[this.wing_stagger].inline;
     }
 
     public SetClosed(use: boolean) {
-        this.is_closed = use;
+        if (this.wing_list.length > 0)
+            this.is_closed = use;
+        else
+            this.is_closed = false;
 
         this.CalculateStats();
     }
@@ -211,8 +214,15 @@ class Wings extends Part {
         return this.is_closed;
     }
 
+    public CanSwept() {
+        return this.wing_list.length > 0;
+    }
+
     public SetSwept(use: boolean) {
-        this.is_swept = use;
+        if (this.wing_list.length > 0)
+            this.is_swept = use;
+        else
+            this.is_swept = false;
 
         this.CalculateStats();
     }
@@ -363,9 +373,24 @@ class Wings extends Part {
         return false;
     }
 
+    public GetMetalArea() {
+        var area = 0;
+        for (let w of this.wing_list) {
+            if (this.skin_list[w.surface].metal)
+                area += w.area;
+        }
+        for (let w of this.mini_wing_list) {
+            if (this.skin_list[w.surface].metal)
+                area += w.area;
+        }
+        return area;
+    }
+
     public PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
+        if (!this.CanSwept())
+            this.is_swept = false;
 
         var stats = new Stats();
 

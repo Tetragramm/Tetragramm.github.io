@@ -334,7 +334,7 @@
             },
             {
                 "name": "Evaporation",
-                "warning": "Requires Metal Wing Skin. Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.",
+                "warning": "Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.",
                 "drag": 0,
                 "mass": 0,
                 "cost": 0,
@@ -765,21 +765,24 @@
                 "name": "Cloth Canvas",
                 "flammable": false,
                 "strainfactor": 1.0,
-                "dragfactor": 1.0
+                "dragfactor": 1.0,
+                "metal": false
             },
             {
                 "name": "Treated Paper",
                 "flammable": true,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
-                "mass": -0.25
+                "mass": -0.25,
+                "metal": false
             },
             {
                 "name": "Tense Silk Layers",
                 "flammable": false,
                 "strainfactor": 0.9,
                 "dragfactor": 1.0,
-                "cost": 0.2
+                "cost": 0.2,
+                "metal": false
             },
             {
                 "name": "Plywood",
@@ -787,14 +790,16 @@
                 "strainfactor": 0.9,
                 "dragfactor": 1.0,
                 "mass": 0.2,
-                "cost": 0.1
+                "cost": 0.1,
+                "metal": false
             },
             {
                 "name": "Aluminum Sheet",
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 0.8,
-                "cost": 0.3
+                "cost": 0.3,
+                "metal": true
             },
             {
                 "name": "Corrugated Steel",
@@ -802,7 +807,8 @@
                 "strainfactor": 0.6,
                 "dragfactor": 1.0,
                 "mass": 0.25,
-                "cost": 0.2
+                "cost": 0.2,
+                "metal": true
             },
             {
                 "name": "Thin Sheet Steel",
@@ -810,7 +816,8 @@
                 "strainfactor": 0.6,
                 "dragfactor": 0.9,
                 "mass": 0.2,
-                "cost": 0.3
+                "cost": 0.3,
+                "metal": true
             },
             {
                 "name": "Grand Eagle Feather",
@@ -818,7 +825,8 @@
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
                 "control": 0.2,
-                "cost": 0.6
+                "cost": 0.6,
+                "metal": false
             },
             {
                 "name": "Solar Fiber",
@@ -826,14 +834,16 @@
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
                 "charge": 0.2,
-                "cost": 0.4
+                "cost": 0.4,
+                "metal": false
             },
             {
                 "name": "Dragon Skin",
                 "flammable": false,
                 "strainfactor": 0.4,
                 "dragfactor": 1.0,
-                "cost": 0.8
+                "cost": 0.8,
+                "metal": true
             }
         ],
         "stagger": [

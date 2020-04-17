@@ -116,6 +116,7 @@ class Wings_HTML extends Display {
         this.closed.checked = this.wings.GetClosed();
         this.closed.disabled = !this.wings.CanClosed();
         this.swept.checked = this.wings.GetSwept();
+        this.swept.disabled = !this.wings.CanSwept();
 
         if (this.fw_add)
             this.full_cell.removeChild(this.fw_add);

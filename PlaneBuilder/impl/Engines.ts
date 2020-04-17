@@ -234,6 +234,7 @@ class Engines extends Part {
             r += e.GetRumble();
         return r;
     }
+
     public GetMaxRumble() {
         var r = 0;
         for (let e of this.engines)
@@ -281,14 +282,27 @@ class Engines extends Part {
         }
     }
 
+    public SetMetalArea(num: number) {
+        for (let r of this.radiators) {
+            r.SetMetalArea(num);
+        }
+    }
+
+    public SetTailMods(forb: boolean, swr: boolean) {
+        for (let e of this.engines)
+            e.SetTailMods(forb, swr);
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
-        var needCool = [...Array(this.radiators.length).fill(0)];
+        var needCool = [...Array(this.radiators.length).fill({ cool: 0, count: 0 })];
         //Engine stuff
         for (let en of this.engines) {
             stats = stats.Add(en.PartStats());
-            if (en.NeedCooling())
-                needCool[en.GetRadiator()] += en.GetCooling();
+            if (en.NeedCooling()) {
+                needCool[en.GetRadiator()].cool += en.GetCooling();
+                needCool[en.GetRadiator()].count += 1;
+            }
         }
         stats.flightstress += this.GetMaxRumble();
 
@@ -298,7 +312,7 @@ class Engines extends Part {
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
-            rad.SetNeedCool(needCool[i]);
+            rad.SetNeedCool(needCool[i].cool, needCool[i].count);
             stats = stats.Add(rad.PartStats());
         }
 

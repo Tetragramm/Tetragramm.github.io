@@ -108,7 +108,8 @@ class Stabilizers extends Part {
     public GetHValidList() {
         var lst = [];
         for (let t of this.hstab_list) {
-            if (t.name == "The Wings" && !(this.is_tandem || this.is_swept))
+            if ((t.name == "The Wings" || t.name == "Outboard")
+                && !(this.is_tandem || this.is_swept))
                 lst.push(false);
             else if (t.is_tail && !this.have_tail)
                 lst.push(false);
@@ -136,13 +137,14 @@ class Stabilizers extends Part {
     }
 
     public SetVStabType(num: number) {
-        if (this.vstab_list[num].name == "Outboard" && !this.GetVOutboard())
+        if (this.vstab_list[num].name == "Outboard" && !this.CanVOutboard())
             return;
 
         if (this.vstab_list[num].is_vtail)
             this.SetVTail();
         else if (this.vstab_list[this.vstab_sel].is_vtail) {
             this.hstab_sel = 0;
+            this.vstab_count = 1;
         }
 
         this.vstab_sel = num;
@@ -156,7 +158,7 @@ class Stabilizers extends Part {
     public GetVValidList() {
         var lst = [];
         for (let t of this.vstab_list) {
-            if (t.name == "Outboard" && !this.GetVOutboard())
+            if (t.name == "Outboard" && !this.CanVOutboard())
                 lst.push(false);
             else if (t.is_tail && !this.have_tail)
                 lst.push(false);
@@ -230,8 +232,12 @@ class Stabilizers extends Part {
         this.is_swept = is;
     }
 
-    public GetVOutboard() {
+    public CanVOutboard() {
         return this.is_swept || this.is_tandem || this.hstab_list[this.hstab_sel].is_canard;
+    }
+
+    public GetVOutboard() {
+        return this.vstab_list[this.vstab_sel].name == "Outboard";
     }
 
     public SetWingArea(num: number) {
@@ -265,6 +271,7 @@ class Stabilizers extends Part {
         if (!vvalid[this.vstab_sel])
             this.vstab_sel = 0;
         var hvalid = this.GetHValidList();
+        console.log(hvalid);
         if (!hvalid[this.hstab_sel])
             this.hstab_sel = 0;
 

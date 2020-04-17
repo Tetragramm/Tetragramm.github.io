@@ -1,8 +1,3 @@
-//TODO: High Offset Radiator requires Parasol wing
-//TODO: Evaporator Radiator requires Metal wing
-//TODO: Center Pusher requires tail or extended driveshafts
-//TODO: Fix Armour to have separate coverage per AP
-
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />

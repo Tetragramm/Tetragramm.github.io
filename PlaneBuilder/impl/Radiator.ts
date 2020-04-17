@@ -9,7 +9,9 @@ class Radiator extends Part {
     private coolant_list: { name: string, stats: Stats }[];
     private idx_coolant: number;
     private need_cool: number;
+    private engine_count: number;
     private has_parasol: boolean;
+    private metal_area: number;
 
     constructor(tl: { name: string, stats: Stats, dragpercool: number }[],
         ml: { name: string, stats: Stats }[], cl: { name: string, stats: Stats }[]) {
@@ -18,6 +20,8 @@ class Radiator extends Part {
         this.idx_type = 0;
         this.idx_mount = 0;
         this.idx_coolant = 0;
+        this.metal_area = 0;
+        this.engine_count = 0;
         this.type_list = tl;
         this.mount_list = ml;
         this.coolant_list = cl;
@@ -47,6 +51,15 @@ class Radiator extends Part {
 
     public GetCoolantList() {
         return this.coolant_list;
+    }
+
+    public CanType() {
+        var can = [...Array(this.type_list.length).fill(true)];
+        for (let i = 0; i < this.type_list.length; i++) {
+            if (this.type_list[i].name == "Evaporation" && this.metal_area < this.engine_count * 5)
+                can[i] = false;
+        }
+        return can;
     }
 
     public SetTypeIndex(num: number) {
@@ -93,8 +106,15 @@ class Radiator extends Part {
         return this.idx_coolant;
     }
 
-    public SetNeedCool(num: number) {
+    public SetNeedCool(num: number, engnum: number) {
         this.need_cool = num;
+        this.engine_count = engnum;
+    }
+
+    public SetMetalArea(num: number) {
+        this.metal_area = num;
+        if (!this.CanType()[this.idx_type])
+            this.idx_type = 0;
     }
 
     public PartStats(): Stats {

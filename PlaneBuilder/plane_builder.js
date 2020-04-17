@@ -805,10 +805,9 @@ class Engine extends Part {
     RequiresExtendedDriveshafts() {
         return this.mount_list[this.selected_mount].reqED;
     }
-    RequiresTailMod() {
-        if (this.use_ds)
-            return false;
-        return this.mount_list[this.selected_mount].reqTail;
+    SetTailMods(forb, swr) {
+        if (this.mount_list[this.selected_mount].reqTail && !(forb || swr))
+            this.use_ds = true;
     }
     SetMountIndex(num) {
         if (num >= this.mount_list.length)
@@ -1318,14 +1317,25 @@ class Engines extends Part {
             r.SetParasol(has);
         }
     }
+    SetMetalArea(num) {
+        for (let r of this.radiators) {
+            r.SetMetalArea(num);
+        }
+    }
+    SetTailMods(forb, swr) {
+        for (let e of this.engines)
+            e.SetTailMods(forb, swr);
+    }
     PartStats() {
         var stats = new Stats;
-        var needCool = [...Array(this.radiators.length).fill(0)];
+        var needCool = [...Array(this.radiators.length).fill({ cool: 0, count: 0 })];
         //Engine stuff
         for (let en of this.engines) {
             stats = stats.Add(en.PartStats());
-            if (en.NeedCooling())
-                needCool[en.GetRadiator()] += en.GetCooling();
+            if (en.NeedCooling()) {
+                needCool[en.GetRadiator()].cool += en.GetCooling();
+                needCool[en.GetRadiator()].count += 1;
+            }
         }
         stats.flightstress += this.GetMaxRumble();
         //Upkeep calc only uses engine costs
@@ -1333,7 +1343,7 @@ class Engines extends Part {
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
-            rad.SetNeedCool(needCool[i]);
+            rad.SetNeedCool(needCool[i].cool, needCool[i].count);
             stats = stats.Add(rad.PartStats());
         }
         //Asymmetric planes
@@ -1887,7 +1897,7 @@ class Wings extends Part {
             this.skin_list.push({
                 name: elem["name"], flammable: elem["flammable"],
                 stats: new Stats(elem), strainfactor: elem["strainfactor"],
-                dragfactor: elem["dragfactor"]
+                dragfactor: elem["dragfactor"], metal: elem["metal"]
             });
         }
         this.stagger_list = [];
@@ -2028,14 +2038,23 @@ class Wings extends Part {
         return this.wing_list.length > 1 && !this.stagger_list[this.wing_stagger].inline;
     }
     SetClosed(use) {
-        this.is_closed = use;
+        if (this.wing_list.length > 0)
+            this.is_closed = use;
+        else
+            this.is_closed = false;
         this.CalculateStats();
     }
     GetClosed() {
         return this.is_closed;
     }
+    CanSwept() {
+        return this.wing_list.length > 0;
+    }
     SetSwept(use) {
-        this.is_swept = use;
+        if (this.wing_list.length > 0)
+            this.is_swept = use;
+        else
+            this.is_swept = false;
         this.CalculateStats();
     }
     GetSwept() {
@@ -2164,9 +2183,23 @@ class Wings extends Part {
         }
         return false;
     }
+    GetMetalArea() {
+        var area = 0;
+        for (let w of this.wing_list) {
+            if (this.skin_list[w.surface].metal)
+                area += w.area;
+        }
+        for (let w of this.mini_wing_list) {
+            if (this.skin_list[w.surface].metal)
+                area += w.area;
+        }
+        return area;
+    }
     PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
+        if (!this.CanSwept())
+            this.is_swept = false;
         var stats = new Stats();
         var deck_count = this.DeckCountFull();
         var have_wing = false;
@@ -2326,7 +2359,8 @@ class Stabilizers extends Part {
     GetHValidList() {
         var lst = [];
         for (let t of this.hstab_list) {
-            if (t.name == "The Wings" && !(this.is_tandem || this.is_swept))
+            if ((t.name == "The Wings" || t.name == "Outboard")
+                && !(this.is_tandem || this.is_swept))
                 lst.push(false);
             else if (t.is_tail && !this.have_tail)
                 lst.push(false);
@@ -2351,12 +2385,13 @@ class Stabilizers extends Part {
         return this.vstab_sel;
     }
     SetVStabType(num) {
-        if (this.vstab_list[num].name == "Outboard" && !this.GetVOutboard())
+        if (this.vstab_list[num].name == "Outboard" && !this.CanVOutboard())
             return;
         if (this.vstab_list[num].is_vtail)
             this.SetVTail();
         else if (this.vstab_list[this.vstab_sel].is_vtail) {
             this.hstab_sel = 0;
+            this.vstab_count = 1;
         }
         this.vstab_sel = num;
         this.SetVStabCount(this.vstab_count);
@@ -2365,7 +2400,7 @@ class Stabilizers extends Part {
     GetVValidList() {
         var lst = [];
         for (let t of this.vstab_list) {
-            if (t.name == "Outboard" && !this.GetVOutboard())
+            if (t.name == "Outboard" && !this.CanVOutboard())
                 lst.push(false);
             else if (t.is_tail && !this.have_tail)
                 lst.push(false);
@@ -2428,8 +2463,11 @@ class Stabilizers extends Part {
     SetIsSwept(is) {
         this.is_swept = is;
     }
-    GetVOutboard() {
+    CanVOutboard() {
         return this.is_swept || this.is_tandem || this.hstab_list[this.hstab_sel].is_canard;
+    }
+    GetVOutboard() {
+        return this.vstab_list[this.vstab_sel].name == "Outboard";
     }
     SetWingArea(num) {
         this.wing_area = num;
@@ -2459,6 +2497,7 @@ class Stabilizers extends Part {
         if (!vvalid[this.vstab_sel])
             this.vstab_sel = 0;
         var hvalid = this.GetHValidList();
+        console.log(hvalid);
         if (!hvalid[this.hstab_sel])
             this.hstab_sel = 0;
         var stats = new Stats();
@@ -3285,8 +3324,7 @@ class LandingGear extends Part {
 class Accessories extends Part {
     constructor(js) {
         super();
-        this.armour_coverage = 0;
-        this.armour_AP = 0;
+        this.armour_coverage = [...Array(8).fill(0)];
         this.acft_power = 0;
         this.electric_list = [];
         for (let elem of js["electrical"]) {
@@ -3329,8 +3367,8 @@ class Accessories extends Part {
     }
     toJSON() {
         return {
+            v: 2,
             armour_coverage: this.armour_coverage,
-            armour_AP: this.armour_AP,
             electrical_count: this.electrical_count,
             radio_sel: this.radio_sel,
             info_sel: this.info_sel,
@@ -3341,8 +3379,9 @@ class Accessories extends Part {
         };
     }
     fromJSON(js) {
-        this.armour_coverage = js["armour_coverage"];
-        this.armour_AP = js["armour_AP"];
+        if (js["v"] == 2) {
+            this.armour_coverage = js["armour_coverage"];
+        }
         this.electrical_count = js["electrical_count"];
         this.radio_sel = js["radio_sel"];
         this.info_sel = js["info_sel"];
@@ -3357,21 +3396,11 @@ class Accessories extends Part {
     GetArmourCoverage() {
         return this.armour_coverage;
     }
-    SetArmourCoverage(num) {
+    SetArmourCoverage(idx, num) {
         if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
-        this.armour_coverage = num;
-        this.CalculateStats();
-    }
-    GetArmourAP() {
-        return this.armour_AP;
-    }
-    SetArmourAP(num) {
-        if (num != num || num < 0)
-            num = 0;
-        num = Math.floor(num);
-        this.armour_AP = num;
+        this.armour_coverage[idx] = num;
         this.CalculateStats();
     }
     GetElectricalList() {
@@ -3479,9 +3508,12 @@ class Accessories extends Part {
     PartStats() {
         var stats = new Stats();
         //Armour
-        stats.mass += this.armour_coverage * this.armour_AP;
-        stats.cost += Math.floor(this.armour_coverage * this.armour_AP / 3);
-        stats.toughness += this.armour_coverage * this.armour_AP;
+        for (let i = 0; i < this.armour_coverage.length; i++) {
+            let AP = i + 1;
+            stats.mass += this.armour_coverage[i] * AP;
+            stats.cost += Math.floor(this.armour_coverage[i] * AP / 3);
+            stats.toughness += this.armour_coverage[i] * AP;
+        }
         //Electrical
         for (let i = 0; i < this.electrical_count.length; i++) {
             let ts = this.electric_list[i].stats.Clone();
@@ -4301,6 +4333,8 @@ class Aircraft {
         stats = stats.Add(this.era.PartStats());
         stats = stats.Add(this.cockpits.PartStats());
         stats = stats.Add(this.passengers.PartStats());
+        this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard());
+        this.engines.SetMetalArea(this.wings.GetMetalArea());
         this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
         this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
@@ -5397,6 +5431,8 @@ class Radiator extends Part {
         this.idx_type = 0;
         this.idx_mount = 0;
         this.idx_coolant = 0;
+        this.metal_area = 0;
+        this.engine_count = 0;
         this.type_list = tl;
         this.mount_list = ml;
         this.coolant_list = cl;
@@ -5421,6 +5457,14 @@ class Radiator extends Part {
     }
     GetCoolantList() {
         return this.coolant_list;
+    }
+    CanType() {
+        var can = [...Array(this.type_list.length).fill(true)];
+        for (let i = 0; i < this.type_list.length; i++) {
+            if (this.type_list[i].name == "Evaporation" && this.metal_area < this.engine_count * 5)
+                can[i] = false;
+        }
+        return can;
     }
     SetTypeIndex(num) {
         this.idx_type = num;
@@ -5458,8 +5502,14 @@ class Radiator extends Part {
     GetCoolantIndex() {
         return this.idx_coolant;
     }
-    SetNeedCool(num) {
+    SetNeedCool(num, engnum) {
         this.need_cool = num;
+        this.engine_count = engnum;
+    }
+    SetMetalArea(num) {
+        this.metal_area = num;
+        if (!this.CanType()[this.idx_type])
+            this.idx_type = 0;
     }
     PartStats() {
         var stats = new Stats();
@@ -5532,11 +5582,15 @@ class Radiator_HTML extends Display {
         this.radiator = rad;
     }
     UpdateDisplay() {
+        var tcan = this.radiator.CanType();
+        for (let i = 0; i < tcan.length; i++) {
+            this.type_select.options[i].disabled = !tcan[i];
+        }
         this.type_select.selectedIndex = this.radiator.GetTypeIndex();
         this.mount_select.selectedIndex = this.radiator.GetMountIndex();
-        var can = this.radiator.CanMount();
-        for (let i = 0; i < can.length; i++) {
-            this.mount_select.options[i].disabled = !can[i];
+        var mcan = this.radiator.CanMount();
+        for (let i = 0; i < mcan.length; i++) {
+            this.mount_select.options[i].disabled = !mcan[i];
         }
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         var stats = this.radiator.PartStats();
@@ -5967,6 +6021,7 @@ class Wings_HTML extends Display {
         this.closed.checked = this.wings.GetClosed();
         this.closed.disabled = !this.wings.CanClosed();
         this.swept.checked = this.wings.GetSwept();
+        this.swept.disabled = !this.wings.CanSwept();
         if (this.fw_add)
             this.full_cell.removeChild(this.fw_add);
         if (this.mw_add)
@@ -6736,22 +6791,31 @@ class Accessories_HTML extends Display {
         var tbl = document.getElementById("tbl_accessories");
         var row = tbl.insertRow(1);
         this.InitArmour(row.insertCell());
-        this.InitElectrical(row.insertCell());
-        this.InitInformation(row.insertCell());
+        this.InitClimate(row.insertCell());
+        this.InitVisibility(row.insertCell());
         this.InitStats(row.insertCell());
         row = tbl.insertRow();
-        this.InitVisibility(row.insertCell());
-        this.InitClimate(row.insertCell());
+        this.InitInformation(row.insertCell());
+        this.InitElectrical(row.insertCell());
         this.InitControl(row.insertCell());
     }
     InitArmour(cell) {
         var fs = CreateFlexSection(cell);
-        this.a_coverage = document.createElement("INPUT");
-        FlexInput("Coverage", this.a_coverage, fs);
-        this.a_coverage.onchange = () => { this.acc.SetArmourCoverage(this.a_coverage.valueAsNumber); };
-        this.a_AP = document.createElement("INPUT");
-        FlexInput("AP", this.a_AP, fs);
-        this.a_AP.onchange = () => { this.acc.SetArmourAP(this.a_AP.valueAsNumber); };
+        var lfs = CreateFlexSection(fs.div1);
+        var rfs = CreateFlexSection(fs.div2);
+        this.a_AP = [];
+        var len = this.acc.GetArmourCoverage().length;
+        for (let i = 0; i < len; i++)
+            this.a_AP.push(document.createElement("INPUT"));
+        for (let i = 0; i < len / 2; i++) {
+            let AP = i + 1;
+            FlexInput("AP " + AP.toString(), this.a_AP[i], lfs);
+            this.a_AP[i].oninput = () => { this.acc.SetArmourCoverage(AP, this.a_AP[i].valueAsNumber); };
+            let j = i + len / 2;
+            AP = j + 1;
+            FlexInput("AP " + AP.toString(), this.a_AP[j], rfs);
+            this.a_AP[j].oninput = () => { this.acc.SetArmourCoverage(AP, this.a_AP[j].valueAsNumber); };
+        }
     }
     InitElectrical(cell) {
         var fs = CreateFlexSection(cell);
@@ -6859,8 +6923,10 @@ class Accessories_HTML extends Display {
         c3_row.insertCell();
     }
     UpdateDisplay() {
-        this.a_coverage.valueAsNumber = this.acc.GetArmourCoverage();
-        this.a_AP.valueAsNumber = this.acc.GetArmourAP();
+        var AP = this.acc.GetArmourCoverage();
+        for (let i = 0; i < AP.length; i++) {
+            this.a_AP[i].valueAsNumber = AP[i];
+        }
         this.radio.selectedIndex = this.acc.GetRadioSel();
         var elist = this.acc.GetElectricalCount();
         for (let i = 0; i < elist.length; i++) {
@@ -8215,10 +8281,6 @@ class Aircraft_HTML extends Display {
         this.UpdateDerived();
     }
 }
-//TODO: High Offset Radiator requires Parasol wing
-//TODO: Evaporator Radiator requires Metal wing
-//TODO: Center Pusher requires tail or extended driveshafts
-//TODO: Fix Armour to have separate coverage per AP
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />

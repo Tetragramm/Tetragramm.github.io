@@ -4,8 +4,7 @@
 class Accessories_HTML extends Display {
     private acc: Accessories;
     //Armour
-    private a_coverage: HTMLInputElement;
-    private a_AP: HTMLInputElement;
+    private a_AP: HTMLInputElement[];
     //Electrical
     private radio: HTMLSelectElement;
     private elect: HTMLInputElement[];
@@ -36,24 +35,33 @@ class Accessories_HTML extends Display {
         var tbl = document.getElementById("tbl_accessories") as HTMLTableElement;
         var row = tbl.insertRow(1);
         this.InitArmour(row.insertCell());
-        this.InitElectrical(row.insertCell());
-        this.InitInformation(row.insertCell());
+        this.InitClimate(row.insertCell());
+        this.InitVisibility(row.insertCell());
         this.InitStats(row.insertCell());
         row = tbl.insertRow();
-        this.InitVisibility(row.insertCell());
-        this.InitClimate(row.insertCell());
+        this.InitInformation(row.insertCell());
+        this.InitElectrical(row.insertCell());
         this.InitControl(row.insertCell());
     }
 
     private InitArmour(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
-        this.a_coverage = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Coverage", this.a_coverage, fs);
-        this.a_coverage.onchange = () => { this.acc.SetArmourCoverage(this.a_coverage.valueAsNumber); };
+        var lfs = CreateFlexSection(fs.div1);
+        var rfs = CreateFlexSection(fs.div2);
+        this.a_AP = [];
+        var len = this.acc.GetArmourCoverage().length;
+        for (let i = 0; i < len; i++)
+            this.a_AP.push(document.createElement("INPUT") as HTMLInputElement);
 
-        this.a_AP = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("AP", this.a_AP, fs);
-        this.a_AP.onchange = () => { this.acc.SetArmourAP(this.a_AP.valueAsNumber); };
+        for (let i = 0; i < len / 2; i++) {
+            let AP = i + 1;
+            FlexInput("AP " + AP.toString(), this.a_AP[i], lfs);
+            this.a_AP[i].oninput = () => { this.acc.SetArmourCoverage(AP, this.a_AP[i].valueAsNumber); };
+            let j = i + len / 2;
+            AP = j + 1;
+            FlexInput("AP " + AP.toString(), this.a_AP[j], rfs);
+            this.a_AP[j].oninput = () => { this.acc.SetArmourCoverage(AP, this.a_AP[j].valueAsNumber); };
+        }
     }
 
     private InitElectrical(cell: HTMLTableCellElement) {
@@ -172,8 +180,10 @@ class Accessories_HTML extends Display {
 
 
     public UpdateDisplay() {
-        this.a_coverage.valueAsNumber = this.acc.GetArmourCoverage();
-        this.a_AP.valueAsNumber = this.acc.GetArmourAP();
+        var AP = this.acc.GetArmourCoverage();
+        for (let i = 0; i < AP.length; i++) {
+            this.a_AP[i].valueAsNumber = AP[i];
+        }
 
         this.radio.selectedIndex = this.acc.GetRadioSel();
         var elist = this.acc.GetElectricalCount();

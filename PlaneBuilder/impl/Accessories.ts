@@ -2,8 +2,7 @@
 /// <reference path="./Stats.ts" />
 
 class Accessories extends Part {
-    private armour_coverage: number;
-    private armour_AP: number;
+    private armour_coverage: number[];
     //Electrical
     private electric_list: {
         name: string, stats: Stats,
@@ -33,8 +32,7 @@ class Accessories extends Part {
     constructor(js: JSON) {
         super();
 
-        this.armour_coverage = 0;
-        this.armour_AP = 0;
+        this.armour_coverage = [...Array(8).fill(0)];
         this.acft_power = 0;
 
         this.electric_list = [];
@@ -85,8 +83,8 @@ class Accessories extends Part {
 
     public toJSON() {
         return {
+            v: 2,
             armour_coverage: this.armour_coverage,
-            armour_AP: this.armour_AP,
             electrical_count: this.electrical_count,
             radio_sel: this.radio_sel,
             info_sel: this.info_sel,
@@ -98,8 +96,9 @@ class Accessories extends Part {
     }
 
     public fromJSON(js: JSON) {
-        this.armour_coverage = js["armour_coverage"];
-        this.armour_AP = js["armour_AP"];
+        if (js["v"] == 2) {
+            this.armour_coverage = js["armour_coverage"];
+        }
         this.electrical_count = js["electrical_count"];
         this.radio_sel = js["radio_sel"];
         this.info_sel = js["info_sel"];
@@ -117,23 +116,11 @@ class Accessories extends Part {
         return this.armour_coverage;
     }
 
-    public SetArmourCoverage(num: number) {
+    public SetArmourCoverage(idx: number, num: number) {
         if (num != num || num < 0)
             num = 0;
         num = Math.floor(num);
-        this.armour_coverage = num;
-        this.CalculateStats();
-    }
-
-    public GetArmourAP() {
-        return this.armour_AP;
-    }
-
-    public SetArmourAP(num: number) {
-        if (num != num || num < 0)
-            num = 0;
-        num = Math.floor(num);
-        this.armour_AP = num;
+        this.armour_coverage[idx] = num;
         this.CalculateStats();
     }
 
@@ -269,9 +256,12 @@ class Accessories extends Part {
         var stats = new Stats();
 
         //Armour
-        stats.mass += this.armour_coverage * this.armour_AP;
-        stats.cost += Math.floor(this.armour_coverage * this.armour_AP / 3);
-        stats.toughness += this.armour_coverage * this.armour_AP;
+        for (let i = 0; i < this.armour_coverage.length; i++) {
+            let AP = i + 1;
+            stats.mass += this.armour_coverage[i] * AP;
+            stats.cost += Math.floor(this.armour_coverage[i] * AP / 3);
+            stats.toughness += this.armour_coverage[i] * AP;
+        }
 
         //Electrical
         for (let i = 0; i < this.electrical_count.length; i++) {
