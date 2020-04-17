@@ -6,7 +6,7 @@ class Cockpit extends Part {
     private types: { name: string, stats: Stats }[];
     private upgrades: { name: string, stats: Stats }[];
     private safety: { name: string, stats: Stats }[];
-    private gunsights: { name: string, stats: Stats }[];
+    private gunsights: { name: string, attack: number, stats: Stats }[];
     private selected_type: number;
     private selected_upgrades: boolean[];
     private selected_safety: boolean[];
@@ -18,7 +18,7 @@ class Cockpit extends Part {
     constructor(tl: { name: string, stats: Stats }[],
         ul: { name: string, stats: Stats }[],
         sl: { name: string, stats: Stats }[],
-        gl: { name: string, stats: Stats }[]
+        gl: { name: string, attack: number, stats: Stats }[]
     ) {
         super();
         this.stats = new Stats();
@@ -119,6 +119,16 @@ class Cockpit extends Part {
 
     public GetEscape() {
         return this.total_escape;
+    }
+
+    public GetAttack() {
+        var mx = 0;
+        for (let i = 0; i < this.gunsights.length; i++) {
+            if (this.selected_gunsights[i]) {
+                mx = Math.max(mx, this.gunsights[i].attack);
+            }
+        }
+        return mx;
     }
 
     public PartStats(): Stats {

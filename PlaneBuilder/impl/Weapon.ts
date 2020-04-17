@@ -26,6 +26,7 @@ class Weapon extends Part {
     public can_free_accessible: boolean;
     public can_synchronize: boolean;
     public can_spinner: boolean;
+    public wing_reinforcement: boolean;
 
     constructor(weapon_type: {
         name: string, era: string, size: number, stats: Stats,
@@ -110,6 +111,7 @@ class Weapon extends Part {
     public SetWing(use: boolean) {
         if (use && this.CanWing()) {
             this.wing = true;
+            this.free_accessible = false;
             this.synchronization = SynchronizationType.NONE;
         } else {
             this.wing = false;
@@ -266,6 +268,9 @@ class Weapon extends Part {
                 warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
             });
         }
+
+        if (this.wing_reinforcement)
+            stats.mass += 2;
 
         stats.Round();
 

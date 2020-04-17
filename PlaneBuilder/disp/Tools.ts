@@ -162,6 +162,17 @@ function FlexLabel(txt: string, div1: HTMLDivElement) {
     div1.appendChild(lbl);
 }
 
+function FlexSpace(fs: FlexSection) {
+    var lbl = document.createElement("LABEL") as HTMLLabelElement;
+    lbl.innerHTML = "&nbsp;";
+    lbl.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    var lbl2 = document.createElement("LABEL") as HTMLLabelElement;
+    lbl2.innerHTML = "&nbsp;";
+    lbl2.classList.add("flex-item");
+    fs.div2.appendChild(lbl2);
+}
+
 function Blink(elem: HTMLElement) {
     elem.classList.toggle("changed", false);
     elem.offsetHeight;

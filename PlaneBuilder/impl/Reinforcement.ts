@@ -164,6 +164,17 @@ class Reinforcement extends Part {
         return this.acft_structure + struct_count;
     }
 
+    public GetCantileverType() {
+        var wood_count = this.cant_count[0] + this.cant_count[4];
+        var metal_count = this.cant_count[1] + this.cant_count[2] + this.cant_count[3];
+        if (metal_count > 0)
+            return 2;
+        else if (wood_count > 0)
+            return 1;
+        else
+            return 0;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

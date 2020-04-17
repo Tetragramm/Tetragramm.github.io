@@ -250,8 +250,6 @@ class Stats {
         this.fuelconsumption = Math.trunc(this.fuelconsumption);
         this.maxstrain = Math.trunc(this.maxstrain);
         this.structure = Math.trunc(this.structure);
-        this.pitchspeed = Math.trunc(this.pitchspeed);
-        this.pitchboost = Math.trunc(this.pitchboost);
         this.wingarea = Math.trunc(this.wingarea);
         this.toughness = Math.trunc(this.toughness);
         this.upkeep = Math.trunc(this.upkeep);
@@ -396,6 +394,15 @@ class Cockpit extends Part {
     GetEscape() {
         return this.total_escape;
     }
+    GetAttack() {
+        var mx = 0;
+        for (let i = 0; i < this.gunsights.length; i++) {
+            if (this.selected_gunsights[i]) {
+                mx = Math.max(mx, this.gunsights[i].attack);
+            }
+        }
+        return mx;
+    }
     PartStats() {
         this.stats = new Stats();
         this.stats.reqsections = 1;
@@ -454,7 +461,7 @@ class Cockpits extends Part {
         this.gunsights = [];
         //Add all the gunsights
         for (let elem of js["gunsights"]) {
-            let gun = { name: elem["name"], stats: new Stats(elem) };
+            let gun = { name: elem["name"], attack: elem["attack"], stats: new Stats(elem) };
             this.gunsights.push(gun);
         }
     }
@@ -475,10 +482,9 @@ class Cockpits extends Part {
         }
     }
     GetAttackList() {
-        //TODO: Attack
         var lst = [];
         for (let c of this.positions) {
-            lst.push(0);
+            lst.push(c.GetAttack());
         }
         return lst;
     }
@@ -1005,6 +1011,9 @@ class Engine extends Part {
             return true;
         return false;
     }
+    IsElectrics() {
+        return this.has_alternator || this.is_generator;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -1297,6 +1306,18 @@ class Engines extends Part {
         }
         return ret;
     }
+    IsElectrics() {
+        for (let e of this.engines) {
+            if (e.IsElectrics())
+                return true;
+        }
+        return false;
+    }
+    HaveParasol(has) {
+        for (let r of this.radiators) {
+            r.SetParasol(has);
+        }
+    }
     PartStats() {
         var stats = new Stats;
         var needCool = [...Array(this.radiators.length).fill(0)];
@@ -1392,8 +1413,13 @@ class Propeller extends Part {
         var stats = new Stats();
         if (this.have_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats);
-            if (this.use_variable)
+            if (this.use_variable) {
                 stats.cost += 2;
+                stats.warnings.push({
+                    source: "Manually Variable Propeller",
+                    "warning": "Allows blade pitch to be adjusted on the ground without replacing it."
+                });
+            }
         }
         else {
             stats.pitchboost = 1;
@@ -1652,7 +1678,7 @@ class Frames extends Part {
         }
     }
     PossibleInternalBracing() {
-        return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length;
+        return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length + 1;
     }
     PossibleGeodesic(num) {
         return this.frame_list[this.section_list[num].frame].geodesic && !this.section_list[num].monocoque;
@@ -2113,6 +2139,19 @@ class Wings extends Part {
             area += w.area;
         }
         return area;
+    }
+    GetParasol() {
+        for (let w of this.wing_list) {
+            if (w.deck == 0) {
+                return true;
+            }
+        }
+        for (let w of this.mini_wing_list) {
+            if (w.deck == 0) {
+                return true;
+            }
+        }
+        return false;
     }
     PartStats() {
         if (!this.CanClosed())
@@ -2724,6 +2763,16 @@ class Reinforcement extends Part {
             struct_count += this.ext_steel_count[i] * 2 * this.ext_list[i].stats.structure;
         }
         return this.acft_structure + struct_count;
+    }
+    GetCantileverType() {
+        var wood_count = this.cant_count[0] + this.cant_count[4];
+        var metal_count = this.cant_count[1] + this.cant_count[2] + this.cant_count[3];
+        if (metal_count > 0)
+            return 2;
+        else if (wood_count > 0)
+            return 1;
+        else
+            return 0;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -3404,6 +3453,15 @@ class Accessories extends Part {
     SetAcftRadiator(have) {
         this.acft_rad = have;
     }
+    IsElectrics() {
+        for (let e of this.electrical_count) {
+            if (e > 0)
+                return true;
+        }
+        if (this.auto_list[this.auto_sel].stats.charge != 0)
+            return true;
+        return false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -3739,6 +3797,7 @@ class Weapon extends Part {
     SetWing(use) {
         if (use && this.CanWing()) {
             this.wing = true;
+            this.free_accessible = false;
             this.synchronization = SynchronizationType.NONE;
         }
         else {
@@ -3883,6 +3942,8 @@ class Weapon extends Part {
                 warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
             });
         }
+        if (this.wing_reinforcement)
+            stats.mass += 2;
         stats.Round();
         return stats;
     }
@@ -3922,13 +3983,13 @@ class Weapons extends Part {
             lst.push(ws.toJSON());
         }
         return {
-            state: "BETA2",
+            state: "BETA3",
             weapon_systems: lst,
         };
     }
     fromJSON(js) {
         console.log(js);
-        if (js && js["state"] == "BETA2") {
+        if (js && js["state"] == "BETA3") {
             console.log("weapon_systems");
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
@@ -4067,6 +4128,35 @@ class Weapons extends Part {
         while (this.CountPusherSpinner() > this.pusher_spinner_count) {
             this.RemoveOnePusherSpinner();
         }
+        //Wing reinforcement. Do this so it gets included in parts display.
+        var wing_size = 0;
+        if (this.cant_type == 0)
+            wing_size = 4;
+        else if (this.cant_type == 1)
+            wing_size = 8;
+        else
+            wing_size = 16;
+        //Create list of every weapon size and a ref to the weapon
+        var slist = [];
+        for (let ws of this.weapon_sets) {
+            for (let w of ws.GetWeapons()) {
+                var s = { s: 0, w: w };
+                if (w.GetWing()) {
+                    if (w.GetPair())
+                        s.s = (2 * this.weapon_list[ws.GetWeaponSelected()].size);
+                    else
+                        s.s = (this.weapon_list[ws.GetWeaponSelected()].size);
+                    slist.push(s);
+                }
+            }
+        }
+        //Sort by size to we reinforce as few weapons as possible
+        slist.sort(function (a, b) { return a.s - b.s; });
+        for (let s of slist) {
+            wing_size -= s.s;
+            if (wing_size < 0)
+                s.w.wing_reinforcement = true;
+        }
         for (let ws of this.weapon_sets) {
             ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
             ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.has_pusher, this.CanPusherSpinner());
@@ -4200,6 +4290,7 @@ class Aircraft {
         stats = stats.Add(this.era.PartStats());
         stats = stats.Add(this.cockpits.PartStats());
         stats = stats.Add(this.passengers.PartStats());
+        this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
         this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
         stats = stats.Add(this.propeller.PartStats());
@@ -4215,6 +4306,7 @@ class Aircraft {
         var pusher = this.engines.GetPusher();
         this.weapons.has_pusher = pusher.have;
         this.weapons.pusher_spinner_count = pusher.spin_count;
+        this.weapons.cant_type = this.reinforcements.GetCantileverType();
         stats = stats.Add(this.weapons.PartStats());
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
@@ -4472,6 +4564,9 @@ class Aircraft {
     GetWeapons() {
         return this.weapons;
     }
+    IsElectrics() {
+        return this.engines.IsElectrics() || this.accessories.IsElectrics();
+    }
 }
 var internal_id = 0;
 // Function to download data to a file
@@ -4617,6 +4712,16 @@ function FlexLabel(txt, div1) {
     lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     lbl.classList.add("flex-item");
     div1.appendChild(lbl);
+}
+function FlexSpace(fs) {
+    var lbl = document.createElement("LABEL");
+    lbl.innerHTML = "&nbsp;";
+    lbl.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    var lbl2 = document.createElement("LABEL");
+    lbl2.innerHTML = "&nbsp;";
+    lbl2.classList.add("flex-item");
+    fs.div2.appendChild(lbl2);
 }
 function Blink(elem) {
     elem.classList.toggle("changed", false);
@@ -5313,9 +5418,24 @@ class Radiator extends Part {
     GetTypeIndex() {
         return this.idx_type;
     }
+    SetParasol(has) {
+        this.has_parasol = has;
+        if (!this.CanMount()[this.idx_mount])
+            this.idx_mount = 0;
+    }
+    CanMount() {
+        var can = [...Array(this.mount_list.length).fill(true)];
+        for (let i = 0; i < this.mount_list.length; i++) {
+            if (this.mount_list[i].name == "High Offset" && !this.has_parasol)
+                can[i] = false;
+        }
+        return can;
+    }
     SetMountIndex(num) {
-        this.idx_mount = num;
-        this.CalculateStats();
+        if (this.CanMount()[num]) {
+            this.idx_mount = num;
+            this.CalculateStats();
+        }
     }
     GetMountIndex() {
         return this.idx_mount;
@@ -5403,6 +5523,10 @@ class Radiator_HTML extends Display {
     UpdateDisplay() {
         this.type_select.selectedIndex = this.radiator.GetTypeIndex();
         this.mount_select.selectedIndex = this.radiator.GetMountIndex();
+        var can = this.radiator.CanMount();
+        for (let i = 0; i < can.length; i++) {
+            this.mount_select.options[i].disabled = !can[i];
+        }
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         var stats = this.radiator.PartStats();
         BlinkIfChanged(this.c_mass, stats.mass.toString());
@@ -6925,6 +7049,7 @@ class Weapons_HTML extends Display {
             fixed: document.createElement("INPUT"),
             wcell: null,
             weaps: [],
+            ammo: document.createElement("INPUT"),
             stats: { mass: null, drag: null, cost: null, sect: null, hits: null, damg: null },
         };
         var wlist = this.weap.GetWeaponList();
@@ -6938,7 +7063,9 @@ class Weapons_HTML extends Display {
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
         FlexInput("Number", type.count, lfs);
-        FlexCheckbox("Fixed", type.fixed, rfs);
+        FlexInput("Ammunition", type.ammo, rfs);
+        FlexCheckbox("Fixed", type.fixed, lfs);
+        FlexSpace(rfs);
         var dirlist = this.weap.GetDirectionList();
         for (let i = 0; i < dirlist.length; i += 2) {
             var dl = dirlist[i];
@@ -6952,7 +7079,9 @@ class Weapons_HTML extends Display {
         }
         type.wcell = row.insertCell();
         var statcell = row.insertCell();
+        statcell.classList.toggle("inner_table");
         var stable = document.createElement("TABLE");
+        stable.classList.toggle("inner_table");
         statcell.appendChild(stable);
         var h1_row = stable.insertRow();
         CreateTH(h1_row, "Mass");
@@ -6982,12 +7111,13 @@ class Weapons_HTML extends Display {
             synch: document.createElement("SELECT"),
             pair: document.createElement("INPUT"),
         };
-        CreateCheckbox("Wing Mount", w.wing, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, false);
         CreateCheckbox("Accessible", w.accessible, w.span, false);
         CreateCheckbox("Free Accessible", w.free_access, w.span, false);
-        CreateCheckbox("Paired", w.pair, w.span, false);
-        CreateSelect("Synchronization", w.synch, w.span, true);
+        CreateCheckbox("Covered", w.covered, w.span, false);
+        CreateCheckbox("Paired", w.pair, w.span, true);
+        CreateCheckbox("Wing Mount", w.wing, w.span, false);
+        CreateSelect("Synchronization", w.synch, w.span, false);
+        w.span.appendChild(document.createElement("HR"));
         var slist = this.weap.GetSynchronizationList();
         for (let s of slist) {
             var opt = document.createElement("OPTION");
@@ -7011,6 +7141,8 @@ class Weapons_HTML extends Display {
             disp.dirs[i].oninput = () => { set.SetDirection(i, disp.dirs[i].checked); };
             disp.dirs[i].disabled = !candir[i];
         }
+        disp.ammo.valueAsNumber = set.GetAmmo();
+        disp.ammo.oninput = () => { set.SetAmmo(disp.ammo.valueAsNumber); };
         var wlist = set.GetWeapons();
         while (disp.weaps.length < wlist.length) {
             disp.weaps.push(this.CreateWRow(disp.wcell));
@@ -7043,8 +7175,13 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.drag, stats.drag.toString());
         BlinkIfChanged(disp.stats.cost, stats.cost.toString());
         BlinkIfChanged(disp.stats.sect, stats.reqsections.toString());
-        BlinkIfChanged(disp.stats.hits, "NYI");
-        BlinkIfChanged(disp.stats.damg, "NYI");
+        var h = set.GetHits();
+        var hits = h[0].toString() + "\\"
+            + h[1].toString() + "\\"
+            + h[2].toString() + "\\"
+            + h[3].toString();
+        BlinkIfChanged(disp.stats.hits, hits);
+        BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
     }
     UpdateWSets() {
         var wsets = this.weap.GetWeaponSets();
@@ -7799,7 +7936,12 @@ class Aircraft_HTML extends Display {
         this.crashsafety_cell = row12.insertCell();
         CreateTH(row12, "Electrics");
         this.electric_cell = row12.insertCell();
-        CreateTH(tbl.insertRow(), "Special Rules").colSpan = 8;
+        this.weapon_head = CreateTH(tbl.insertRow(), "Weapon Systems");
+        this.weapon_head.colSpan = 8;
+        this.weapon_cell = tbl.insertRow().insertCell();
+        this.weapon_cell.colSpan = 8;
+        this.warning_head = CreateTH(tbl.insertRow(), "Special Rules");
+        this.warning_head.colSpan = 8;
         this.warning_cell = tbl.insertRow().insertCell();
         this.warning_cell.colSpan = 8;
     }
@@ -7873,6 +8015,7 @@ class Aircraft_HTML extends Display {
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
             this.bomb_row2.hidden = false;
+            this.vital_components.rowSpan = 5;
             //Half
             this.ts_halfwB.innerText = Math.floor((derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
             this.ss_halfwB.innerText = Math.floor((derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
@@ -7898,6 +8041,7 @@ class Aircraft_HTML extends Display {
         else {
             this.bomb_row1.hidden = true;
             this.bomb_row2.hidden = true;
+            this.vital_components.rowSpan = 3;
         }
         this.dropoff_cell.innerText = derived.Dropoff.toString();
         this.overspeed_cell.innerText = derived.Overspeed.toString();
@@ -7965,10 +8109,74 @@ class Aircraft_HTML extends Display {
             vital += "<br/>Oil Tank";
             this.copy_text += "Oil Tank\n\t";
         }
+        if (this.acft.IsElectrics()) {
+            vital += "<br/>Electrics";
+            this.copy_text += "Electrics\n\t";
+        }
         this.vital_components.innerHTML = vital;
         this.copy_text += "\n";
-        if (stats.warnings.length > 0)
+        if (aircraft_model.GetWeapons().GetWeaponSets().length > 0) {
+            this.copy_text += "Weapons\n\t";
+            this.weapon_head.hidden = false;
+            this.weapon_cell.hidden = false;
+        }
+        else {
+            this.weapon_head.hidden = true;
+            this.weapon_cell.hidden = true;
+        }
+        var wlist = aircraft_model.GetWeapons().GetWeaponList();
+        var dlist = aircraft_model.GetWeapons().GetDirectionList();
+        var weaphtml = "";
+        for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
+            weaphtml += wlist[w.GetWeaponSelected()].name + " fires ";
+            var ds = w.GetDirection();
+            weaphtml += "[";
+            for (let i = 0; i < dlist.length; i++) {
+                if (ds[i])
+                    weaphtml += dlist[i] + " ";
+            }
+            weaphtml = weaphtml.substr(0, weaphtml.length - 1);
+            weaphtml += "] ";
+            let h = w.GetHits();
+            weaphtml += "for " + wlist[w.GetWeaponSelected()].damage + " damage with " + h[0].toString() + "\\"
+                + h[1].toString() + "\\"
+                + h[2].toString() + "\\"
+                + h[3].toString() + " hits with "
+                + wlist[w.GetWeaponSelected()].ammo * w.GetAmmo() + " ammunition. "; //TODO
+            if (wlist[w.GetWeaponSelected()].rapid || wlist[w.GetWeaponSelected()].shells || wlist[w.GetWeaponSelected()].ap > 0) {
+                weaphtml += "[";
+                var first = false;
+                if (wlist[w.GetWeaponSelected()].rapid) {
+                    weaphtml += "Rapid Fire";
+                    first = true;
+                }
+                if (wlist[w.GetWeaponSelected()].shells) {
+                    if (first)
+                        weaphtml += ", ";
+                    weaphtml += "Shells";
+                    first = true;
+                }
+                if (wlist[w.GetWeaponSelected()].ap > 0) {
+                    if (first)
+                        weaphtml += ", ";
+                    weaphtml += "AP " + wlist[w.GetWeaponSelected()].ap.toString();
+                }
+                weaphtml += "]";
+            }
+            this.copy_text += weaphtml + "\n\t";
+            weaphtml += "<br\>";
+        }
+        this.weapon_cell.innerHTML = weaphtml;
+        this.copy_text += "\n";
+        if (stats.warnings.length > 0) {
             this.copy_text += "Special Rules\n\t";
+            this.warning_head.hidden = false;
+            this.warning_cell.hidden = false;
+        }
+        else {
+            this.warning_head.hidden = true;
+            this.warning_cell.hidden = true;
+        }
         var warnhtml = "";
         for (let w of stats.warnings) {
             warnhtml += w.source + ":  " + w.warning + "<br/>";
@@ -7996,10 +8204,6 @@ class Aircraft_HTML extends Display {
         this.UpdateDerived();
     }
 }
-//TODO: Add electrics as critical component
-//TODO: Manually Variable Propeller Special Rule
-//TODO: Weapons
-//TODO: Handle attack bonus
 //TODO: High Offset Radiator requires Parasol wing
 //TODO: Evaporator Radiator requires Metal wing
 //TODO: Center Pusher requires tail or extended driveshafts
@@ -8141,6 +8345,7 @@ class WeaponSystem extends Part {
         this.directions = [...Array(6).fill(false)];
         this.directions[0] = true;
         this.fixed = true;
+        this.ammo = 1;
         this.weapon_type = 0;
         this.weapons = [];
         this.SWC(1);
@@ -8155,6 +8360,7 @@ class WeaponSystem extends Part {
             fixed: this.fixed,
             directions: this.directions,
             weapons: wlist,
+            ammo: this.ammo,
         };
     }
     fromJSON(js) {
@@ -8168,6 +8374,9 @@ class WeaponSystem extends Part {
             w.fromJSON(elem);
             this.weapons.push(w);
         }
+        this.ammo = js["ammo"];
+        if (this.ammo == null)
+            this.ammo = 1;
     }
     GetWeaponSelected() {
         return this.weapon_type;
@@ -8314,6 +8523,42 @@ class WeaponSystem extends Part {
             }
         }
     }
+    GetHits() {
+        var hits = this.weapon_list[this.weapon_type].hits;
+        var centerline = 0;
+        var wings = 0;
+        for (let w of this.weapons) {
+            if (w.GetWing() && w.GetFixed()) {
+                wings += hits;
+                if (w.GetPair())
+                    wings += hits;
+            }
+            else {
+                centerline += hits;
+                if (w.GetPair())
+                    centerline += hits;
+            }
+        }
+        return [
+            centerline + Math.floor(wings * 0.8),
+            wings + Math.floor(centerline * 0.75),
+            Math.floor(centerline * 0.5) + Math.floor(wings * 0.3),
+            Math.floor(centerline * 0.25) + Math.floor(wings * 0.1)
+        ];
+    }
+    GetDamage() {
+        return this.weapon_list[this.weapon_type].damage;
+    }
+    GetAmmo() {
+        return this.ammo;
+    }
+    SetAmmo(num) {
+        if (num != num || num < 1)
+            num = 1;
+        num = Math.floor(num);
+        this.ammo = num;
+        this.CalculateStats();
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -8322,9 +8567,27 @@ class WeaponSystem extends Part {
     }
     PartStats() {
         var stats = new Stats();
+        var dircount = 0;
+        for (let d of this.directions)
+            if (d)
+                dircount++;
         for (let w of this.weapons) {
             stats = stats.Add(w.PartStats());
+            if (!this.fixed) {
+                //Turret direction costs
+                if (dircount == 2)
+                    stats.cost += 1;
+                else if (dircount == 3 || dircount == 4)
+                    stats.cost += 2;
+                else if (dircount == 5)
+                    stats.cost += 3;
+                else if (dircount == 6)
+                    stats.cost += 4;
+                //Turret Size costs handled in Weapon.ts
+            }
         }
+        //Ammunition Cost
+        stats.mass += (this.ammo - 1) * this.weapons.length;
         return stats;
     }
 }

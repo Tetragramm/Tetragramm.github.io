@@ -365,7 +365,7 @@
             },
             {
                 "name": "High Offset",
-                "warning": "Bonus persists for 1 Cool Down after being shot. Requires a Parasol Wing.",
+                "warning": "Bonus persists for 1 Cool Down after being shot.",
                 "reliability": 0,
                 "drag": 1,
                 "latstab": -1

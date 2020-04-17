@@ -7,6 +7,7 @@ class WeaponSystem extends Part {
     private fixed: boolean;
     private directions: boolean[];
     private weapons: Weapon[];
+    private ammo: number;
 
     private tractor: boolean;
     private pusher: boolean;
@@ -31,6 +32,7 @@ class WeaponSystem extends Part {
         this.directions = [...Array(6).fill(false)];
         this.directions[0] = true;
         this.fixed = true;
+        this.ammo = 1;
         this.weapon_type = 0;
         this.weapons = [];
         this.SWC(1);
@@ -46,6 +48,7 @@ class WeaponSystem extends Part {
             fixed: this.fixed,
             directions: this.directions,
             weapons: wlist,
+            ammo: this.ammo,
         }
     }
 
@@ -60,6 +63,9 @@ class WeaponSystem extends Part {
             w.fromJSON(elem);
             this.weapons.push(w);
         }
+        this.ammo = js["ammo"];
+        if (this.ammo == null)
+            this.ammo = 1;
     }
 
     public GetWeaponSelected() {
@@ -219,6 +225,45 @@ class WeaponSystem extends Part {
         }
     }
 
+    public GetHits() {
+        var hits = this.weapon_list[this.weapon_type].hits;
+        var centerline = 0;
+        var wings = 0;
+        for (let w of this.weapons) {
+            if (w.GetWing() && w.GetFixed()) {
+                wings += hits;
+                if (w.GetPair())
+                    wings += hits;
+            } else {
+                centerline += hits;
+                if (w.GetPair())
+                    centerline += hits;
+            }
+        }
+        return [
+            centerline + Math.floor(wings * 0.8),
+            wings + Math.floor(centerline * 0.75),
+            Math.floor(centerline * 0.5) + Math.floor(wings * 0.3),
+            Math.floor(centerline * 0.25) + Math.floor(wings * 0.1)
+        ];
+    }
+
+    public GetDamage() {
+        return this.weapon_list[this.weapon_type].damage;
+    }
+
+    public GetAmmo() {
+        return this.ammo;
+    }
+
+    public SetAmmo(num: number) {
+        if (num != num || num < 1)
+            num = 1;
+        num = Math.floor(num);
+        this.ammo = num;
+        this.CalculateStats();
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -229,9 +274,30 @@ class WeaponSystem extends Part {
     public PartStats() {
         var stats = new Stats();
 
+        var dircount = 0;
+        for (let d of this.directions)
+            if (d)
+                dircount++;
+
         for (let w of this.weapons) {
             stats = stats.Add(w.PartStats());
+
+            if (!this.fixed) {
+                //Turret direction costs
+                if (dircount == 2)
+                    stats.cost += 1;
+                else if (dircount == 3 || dircount == 4)
+                    stats.cost += 2;
+                else if (dircount == 5)
+                    stats.cost += 3;
+                else if (dircount == 6)
+                    stats.cost += 4;
+                //Turret Size costs handled in Weapon.ts
+            }
         }
+
+        //Ammunition Cost
+        stats.mass += (this.ammo - 1) * this.weapons.length;
 
         return stats;
     }

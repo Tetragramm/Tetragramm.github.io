@@ -18,6 +18,7 @@ class Weapons extends Part {
     public tractor_spinner_count: number;
     public has_pusher: boolean;
     public pusher_spinner_count: number;
+    public cant_type: number;
 
     constructor(js: JSON) {
         super();
@@ -51,14 +52,14 @@ class Weapons extends Part {
             lst.push(ws.toJSON());
         }
         return {
-            state: "BETA2",
+            state: "BETA3",
             weapon_systems: lst,
         }
     }
 
     public fromJSON(js: JSON) {
         console.log(js);
-        if (js && js["state"] == "BETA2") {
+        if (js && js["state"] == "BETA3") {
             console.log("weapon_systems");
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
@@ -213,12 +214,44 @@ class Weapons extends Part {
             this.RemoveOnePusherSpinner();
         }
 
+        //Wing reinforcement. Do this so it gets included in parts display.
+        var wing_size = 0;
+        if (this.cant_type == 0)
+            wing_size = 4;
+        else if (this.cant_type == 1)
+            wing_size = 8;
+        else
+            wing_size = 16;
+
+        //Create list of every weapon size and a ref to the weapon
+        var slist = [];
+        for (let ws of this.weapon_sets) {
+            for (let w of ws.GetWeapons()) {
+                var s = { s: 0, w: w };
+                if (w.GetWing()) {
+                    if (w.GetPair())
+                        s.s = (2 * this.weapon_list[ws.GetWeaponSelected()].size);
+                    else
+                        s.s = (this.weapon_list[ws.GetWeaponSelected()].size);
+
+                    slist.push(s);
+                }
+            }
+        }
+        //Sort by size to we reinforce as few weapons as possible
+        slist.sort(function (a, b) { return a.s - b.s; });
+        for (let s of slist) {
+            wing_size -= s.s;
+            if (wing_size < 0)
+                s.w.wing_reinforcement = true;
+        }
+
+
         for (let ws of this.weapon_sets) {
             ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
             ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.has_pusher, this.CanPusherSpinner());
             stats = stats.Add(ws.PartStats());
         }
-
         return stats;
     }
 }

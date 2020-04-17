@@ -73,8 +73,13 @@ class Propeller extends Part {
         var stats = new Stats();
         if (this.have_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats);
-            if (this.use_variable)
+            if (this.use_variable) {
                 stats.cost += 2;
+                stats.warnings.push({
+                    source: "Manually Variable Propeller",
+                    "warning": "Allows blade pitch to be adjusted on the ground without replacing it."
+                })
+            }
         }
         else {
             stats.pitchboost = 1;

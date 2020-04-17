@@ -431,6 +431,10 @@ class Engine extends Part {
         return false;
     }
 
+    public IsElectrics() {
+        return this.has_alternator || this.is_generator;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

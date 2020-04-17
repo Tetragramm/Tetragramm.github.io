@@ -349,6 +349,20 @@ class Wings extends Part {
         return area;
     }
 
+    public GetParasol() {
+        for (let w of this.wing_list) {
+            if (w.deck == 0) {
+                return true;
+            }
+        }
+        for (let w of this.mini_wing_list) {
+            if (w.deck == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;

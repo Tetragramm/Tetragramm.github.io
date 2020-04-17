@@ -260,8 +260,6 @@ class Stats {
         this.fuelconsumption = Math.trunc(this.fuelconsumption);
         this.maxstrain = Math.trunc(this.maxstrain);
         this.structure = Math.trunc(this.structure);
-        this.pitchspeed = Math.trunc(this.pitchspeed);
-        this.pitchboost = Math.trunc(this.pitchboost);
         this.wingarea = Math.trunc(this.wingarea);
         this.toughness = Math.trunc(this.toughness);
         this.upkeep = Math.trunc(this.upkeep);

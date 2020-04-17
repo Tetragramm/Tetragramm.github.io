@@ -105,6 +105,9 @@ class Aircraft_HTML extends Display {
     private maxalt_cell: HTMLTableCellElement;
     private crashsafety_cell: HTMLTableCellElement;
     private cruiserangewbomb_cell: HTMLTableCellElement;
+    private weapon_head: HTMLTableHeaderCellElement;
+    private weapon_cell: HTMLTableCellElement;
+    private warning_head: HTMLTableHeaderCellElement;
     private warning_cell: HTMLTableCellElement;
 
     private copy_text: string;
@@ -380,7 +383,13 @@ class Aircraft_HTML extends Display {
         CreateTH(row12, "Electrics");
         this.electric_cell = row12.insertCell();
 
-        CreateTH(tbl.insertRow(), "Special Rules").colSpan = 8;
+        this.weapon_head = CreateTH(tbl.insertRow(), "Weapon Systems");
+        this.weapon_head.colSpan = 8;
+        this.weapon_cell = tbl.insertRow().insertCell();
+        this.weapon_cell.colSpan = 8;
+
+        this.warning_head = CreateTH(tbl.insertRow(), "Special Rules");
+        this.warning_head.colSpan = 8;
         this.warning_cell = tbl.insertRow().insertCell();
         this.warning_cell.colSpan = 8;
     }
@@ -457,6 +466,7 @@ class Aircraft_HTML extends Display {
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
             this.bomb_row2.hidden = false;
+            this.vital_components.rowSpan = 5;
             //Half
             this.ts_halfwB.innerText = Math.floor((derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
             this.ss_halfwB.innerText = Math.floor((derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
@@ -482,6 +492,7 @@ class Aircraft_HTML extends Display {
         } else {
             this.bomb_row1.hidden = true;
             this.bomb_row2.hidden = true;
+            this.vital_components.rowSpan = 3;
         }
 
         this.dropoff_cell.innerText = derived.Dropoff.toString();
@@ -554,11 +565,75 @@ class Aircraft_HTML extends Display {
             vital += "<br/>Oil Tank";
             this.copy_text += "Oil Tank\n\t";
         }
+        if (this.acft.IsElectrics()) {
+            vital += "<br/>Electrics";
+            this.copy_text += "Electrics\n\t";
+        }
         this.vital_components.innerHTML = vital;
         this.copy_text += "\n";
 
-        if (stats.warnings.length > 0)
+        if (aircraft_model.GetWeapons().GetWeaponSets().length > 0) {
+            this.copy_text += "Weapons\n\t";
+            this.weapon_head.hidden = false;
+            this.weapon_cell.hidden = false;
+        } else {
+            this.weapon_head.hidden = true;
+            this.weapon_cell.hidden = true;
+        }
+
+        var wlist = aircraft_model.GetWeapons().GetWeaponList();
+        var dlist = aircraft_model.GetWeapons().GetDirectionList();
+        var weaphtml = "";
+        for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
+            weaphtml += wlist[w.GetWeaponSelected()].name + " fires ";
+            var ds = w.GetDirection();
+            weaphtml += "[";
+            for (let i = 0; i < dlist.length; i++) {
+                if (ds[i])
+                    weaphtml += dlist[i] + " ";
+            }
+            weaphtml = weaphtml.substr(0, weaphtml.length - 1);
+            weaphtml += "] ";
+            let h = w.GetHits();
+            weaphtml += "for " + wlist[w.GetWeaponSelected()].damage + " damage with " + h[0].toString() + "\\"
+                + h[1].toString() + "\\"
+                + h[2].toString() + "\\"
+                + h[3].toString() + " hits with "
+                + wlist[w.GetWeaponSelected()].ammo * w.GetAmmo() + " ammunition. ";//TODO
+            if (wlist[w.GetWeaponSelected()].rapid || wlist[w.GetWeaponSelected()].shells || wlist[w.GetWeaponSelected()].ap > 0) {
+                weaphtml += "["
+                var first = false;
+                if (wlist[w.GetWeaponSelected()].rapid) {
+                    weaphtml += "Rapid Fire";
+                    first = true;
+                }
+                if (wlist[w.GetWeaponSelected()].shells) {
+                    if (first)
+                        weaphtml += ", ";
+                    weaphtml += "Shells";
+                    first = true;
+                }
+                if (wlist[w.GetWeaponSelected()].ap > 0) {
+                    if (first)
+                        weaphtml += ", ";
+                    weaphtml += "AP " + wlist[w.GetWeaponSelected()].ap.toString();
+                }
+                weaphtml += "]";
+            }
+            this.copy_text += weaphtml + "\n\t";
+            weaphtml += "<br\>";
+        }
+        this.weapon_cell.innerHTML = weaphtml;
+        this.copy_text += "\n";
+
+        if (stats.warnings.length > 0) {
             this.copy_text += "Special Rules\n\t";
+            this.warning_head.hidden = false;
+            this.warning_cell.hidden = false;
+        } else {
+            this.warning_head.hidden = true;
+            this.warning_cell.hidden = true;
+        }
         var warnhtml = "";
         for (let w of stats.warnings) {
             warnhtml += w.source + ":  " + w.warning + "<br/>";

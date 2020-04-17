@@ -75,6 +75,10 @@ class Radiator_HTML extends Display {
     public UpdateDisplay() {
         this.type_select.selectedIndex = this.radiator.GetTypeIndex();
         this.mount_select.selectedIndex = this.radiator.GetMountIndex();
+        var can = this.radiator.CanMount();
+        for (let i = 0; i < can.length; i++) {
+            this.mount_select.options[i].disabled = !can[i];
+        }
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         var stats = this.radiator.PartStats();
         BlinkIfChanged(this.c_mass, stats.mass.toString());

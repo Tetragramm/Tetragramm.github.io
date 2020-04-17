@@ -3,7 +3,7 @@
 
 type WType = { span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement, accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement, pair: HTMLInputElement };
 type WStatType = { mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement, sect: HTMLTableCellElement, hits: HTMLTableCellElement, damg: HTMLTableCellElement };
-type WSetType = { type: HTMLSelectElement, dirs: HTMLInputElement[], count: HTMLInputElement, fixed: HTMLInputElement, wcell: HTMLTableCellElement, weaps: WType[], stats: WStatType };
+type WSetType = { type: HTMLSelectElement, dirs: HTMLInputElement[], count: HTMLInputElement, fixed: HTMLInputElement, wcell: HTMLTableCellElement, ammo: HTMLInputElement, weaps: WType[], stats: WStatType };
 class Weapons_HTML extends Display {
     private weap: Weapons;
 
@@ -34,6 +34,7 @@ class Weapons_HTML extends Display {
             fixed: document.createElement("INPUT") as HTMLInputElement,
             wcell: null,
             weaps: [],
+            ammo: document.createElement("INPUT") as HTMLInputElement,
             stats: { mass: null, drag: null, cost: null, sect: null, hits: null, damg: null },
         };
 
@@ -50,7 +51,9 @@ class Weapons_HTML extends Display {
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
         FlexInput("Number", type.count, lfs);
-        FlexCheckbox("Fixed", type.fixed, rfs);
+        FlexInput("Ammunition", type.ammo, rfs);
+        FlexCheckbox("Fixed", type.fixed, lfs);
+        FlexSpace(rfs);
 
         var dirlist = this.weap.GetDirectionList();
         for (let i = 0; i < dirlist.length; i += 2) {
@@ -66,7 +69,9 @@ class Weapons_HTML extends Display {
 
         type.wcell = row.insertCell();
         var statcell = row.insertCell();
+        statcell.classList.toggle("inner_table");
         var stable = document.createElement("TABLE") as HTMLTableElement;
+        stable.classList.toggle("inner_table");
         statcell.appendChild(stable);
         var h1_row = stable.insertRow();
         CreateTH(h1_row, "Mass");
@@ -98,12 +103,13 @@ class Weapons_HTML extends Display {
             synch: document.createElement("SELECT") as HTMLSelectElement,
             pair: document.createElement("INPUT") as HTMLInputElement,
         };
-        CreateCheckbox("Wing Mount", w.wing, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, false);
         CreateCheckbox("Accessible", w.accessible, w.span, false);
         CreateCheckbox("Free Accessible", w.free_access, w.span, false);
-        CreateCheckbox("Paired", w.pair, w.span, false);
-        CreateSelect("Synchronization", w.synch, w.span, true);
+        CreateCheckbox("Covered", w.covered, w.span, false);
+        CreateCheckbox("Paired", w.pair, w.span, true);
+        CreateCheckbox("Wing Mount", w.wing, w.span, false);
+        CreateSelect("Synchronization", w.synch, w.span, false);
+        w.span.appendChild(document.createElement("HR"));
 
         var slist = this.weap.GetSynchronizationList();
         for (let s of slist) {
@@ -133,6 +139,8 @@ class Weapons_HTML extends Display {
             disp.dirs[i].oninput = () => { set.SetDirection(i, disp.dirs[i].checked); };
             disp.dirs[i].disabled = !candir[i];
         }
+        disp.ammo.valueAsNumber = set.GetAmmo();
+        disp.ammo.oninput = () => { set.SetAmmo(disp.ammo.valueAsNumber); };
 
         var wlist = set.GetWeapons();
         while (disp.weaps.length < wlist.length) {
@@ -168,8 +176,15 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.drag, stats.drag.toString());
         BlinkIfChanged(disp.stats.cost, stats.cost.toString());
         BlinkIfChanged(disp.stats.sect, stats.reqsections.toString());
-        BlinkIfChanged(disp.stats.hits, "NYI");
-        BlinkIfChanged(disp.stats.damg, "NYI");
+
+        var h = set.GetHits();
+        var hits = h[0].toString() + "\\"
+            + h[1].toString() + "\\"
+            + h[2].toString() + "\\"
+            + h[3].toString();
+
+        BlinkIfChanged(disp.stats.hits, hits);
+        BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
     }
 
     private UpdateWSets() {

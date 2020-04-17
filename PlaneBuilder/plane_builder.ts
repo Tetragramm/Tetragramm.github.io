@@ -1,7 +1,3 @@
-//TODO: Add electrics as critical component
-//TODO: Manually Variable Propeller Special Rule
-//TODO: Weapons
-//TODO: Handle attack bonus
 //TODO: High Offset Radiator requires Parasol wing
 //TODO: Evaporator Radiator requires Metal wing
 //TODO: Center Pusher requires tail or extended driveshafts

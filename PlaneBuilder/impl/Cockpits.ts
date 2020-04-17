@@ -7,7 +7,7 @@ class Cockpits extends Part {
     private types: { name: string, stats: Stats }[];
     private upgrades: { name: string, stats: Stats }[];
     private safety: { name: string, stats: Stats }[];
-    private gunsights: { name: string, stats: Stats }[];
+    private gunsights: { name: string, attack: number, stats: Stats }[];
 
     constructor(js: JSON) {
         super();
@@ -34,7 +34,7 @@ class Cockpits extends Part {
         this.gunsights = [];
         //Add all the gunsights
         for (let elem of js["gunsights"]) {
-            let gun = { name: elem["name"], stats: new Stats(elem) };
+            let gun = { name: elem["name"], attack: elem["attack"], stats: new Stats(elem) };
             this.gunsights.push(gun);
         }
     }
@@ -59,10 +59,9 @@ class Cockpits extends Part {
     }
 
     public GetAttackList() {
-        //TODO: Attack
         var lst = [];
         for (let c of this.positions) {
-            lst.push(0);
+            lst.push(c.GetAttack());
         }
         return lst;
     }

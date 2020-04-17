@@ -267,6 +267,20 @@ class Engines extends Part {
         return ret;
     }
 
+    public IsElectrics() {
+        for (let e of this.engines) {
+            if (e.IsElectrics())
+                return true;
+        }
+        return false;
+    }
+
+    public HaveParasol(has: boolean) {
+        for (let r of this.radiators) {
+            r.SetParasol(has);
+        }
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = [...Array(this.radiators.length).fill(0)];

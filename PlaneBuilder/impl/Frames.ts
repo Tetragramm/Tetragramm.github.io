@@ -301,7 +301,7 @@ class Frames extends Part {
     }
 
     public PossibleInternalBracing() {
-        return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length;
+        return this.CountInternalBracing() < this.CountSections() + this.tail_section_list.length + 1;
     }
 
     public PossibleGeodesic(num: number) {

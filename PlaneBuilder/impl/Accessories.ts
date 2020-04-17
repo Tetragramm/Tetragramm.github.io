@@ -251,6 +251,16 @@ class Accessories extends Part {
         this.acft_rad = have;
     }
 
+    public IsElectrics() {
+        for (let e of this.electrical_count) {
+            if (e > 0)
+                return true;
+        }
+        if (this.auto_list[this.auto_sel].stats.charge != 0)
+            return true;
+        return false;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

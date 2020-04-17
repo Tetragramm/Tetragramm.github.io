@@ -9,6 +9,7 @@ class Radiator extends Part {
     private coolant_list: { name: string, stats: Stats }[];
     private idx_coolant: number;
     private need_cool: number;
+    private has_parasol: boolean;
 
     constructor(tl: { name: string, stats: Stats, dragpercool: number }[],
         ml: { name: string, stats: Stats }[], cl: { name: string, stats: Stats }[]) {
@@ -57,9 +58,26 @@ class Radiator extends Part {
         return this.idx_type;
     }
 
+    public SetParasol(has: boolean) {
+        this.has_parasol = has;
+        if (!this.CanMount()[this.idx_mount])
+            this.idx_mount = 0;
+    }
+
+    public CanMount() {
+        var can = [...Array(this.mount_list.length).fill(true)];
+        for (let i = 0; i < this.mount_list.length; i++) {
+            if (this.mount_list[i].name == "High Offset" && !this.has_parasol)
+                can[i] = false;
+        }
+        return can;
+    }
+
     public SetMountIndex(num: number) {
-        this.idx_mount = num;
-        this.CalculateStats();
+        if (this.CanMount()[num]) {
+            this.idx_mount = num;
+            this.CalculateStats();
+        }
     }
 
     public GetMountIndex() {

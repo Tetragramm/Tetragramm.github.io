@@ -154,6 +154,8 @@ class Aircraft {
         stats = stats.Add(this.era.PartStats());
         stats = stats.Add(this.cockpits.PartStats());
         stats = stats.Add(this.passengers.PartStats());
+
+        this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
 
         this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
@@ -171,6 +173,7 @@ class Aircraft {
         var pusher = this.engines.GetPusher();
         this.weapons.has_pusher = pusher.have;
         this.weapons.pusher_spinner_count = pusher.spin_count;
+        this.weapons.cant_type = this.reinforcements.GetCantileverType();
         stats = stats.Add(this.weapons.PartStats());
 
         this.frames.SetRequiredSections(stats.reqsections);
@@ -463,5 +466,8 @@ class Aircraft {
     }
     public GetWeapons() {
         return this.weapons;
+    }
+    public IsElectrics() {
+        return this.engines.IsElectrics() || this.accessories.IsElectrics();
     }
 }
