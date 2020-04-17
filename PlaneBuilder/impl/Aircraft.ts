@@ -136,9 +136,7 @@ class Aircraft {
             this.accessories.fromJSON(js["accessories"]);
             this.optimization.fromJSON(js["optimization"]);
             this.weapons.fromJSON(js["weapons"]);
-            console.log("Done Loading");
             this.CalculateStats();
-            console.log("Calculated");
             return true;
         }
         return false;

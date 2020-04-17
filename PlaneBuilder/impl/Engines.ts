@@ -295,7 +295,7 @@ class Engines extends Part {
 
     public PartStats(): Stats {
         var stats = new Stats;
-        var needCool = [...Array(this.radiators.length).fill({ cool: 0, count: 0 })];
+        var needCool = [...Array(this.GetNumberOfRadiators()).fill({ cool: 0, count: 0 })];
         //Engine stuff
         for (let en of this.engines) {
             stats = stats.Add(en.PartStats());

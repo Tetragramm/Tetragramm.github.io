@@ -748,6 +748,7 @@ class Engine extends Part {
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
         this.cooling_count = this.etype_stats.stats.cooling;
+        console.log(this.etype_stats);
         this.CalculateStats();
     }
     GetSelectedIndex() {
@@ -1328,7 +1329,7 @@ class Engines extends Part {
     }
     PartStats() {
         var stats = new Stats;
-        var needCool = [...Array(this.radiators.length).fill({ cool: 0, count: 0 })];
+        var needCool = [...Array(this.GetNumberOfRadiators()).fill({ cool: 0, count: 0 })];
         //Engine stuff
         for (let en of this.engines) {
             stats = stats.Add(en.PartStats());
@@ -2497,7 +2498,6 @@ class Stabilizers extends Part {
         if (!vvalid[this.vstab_sel])
             this.vstab_sel = 0;
         var hvalid = this.GetHValidList();
-        console.log(hvalid);
         if (!hvalid[this.hstab_sel])
             this.hstab_sel = 0;
         var stats = new Stats();
@@ -4031,12 +4031,9 @@ class Weapons extends Part {
         };
     }
     fromJSON(js) {
-        console.log(js);
         if (js && js["state"] == "BETA3") {
-            console.log("weapon_systems");
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
-                console.log("Each weapon");
                 var ws = new WeaponSystem(this.weapon_list);
                 ws.SetCalculateStats(this.CalculateStats);
                 ws.fromJSON(wsj);
@@ -4046,7 +4043,6 @@ class Weapons extends Part {
         else {
             this.SetWeaponSetCount(0);
         }
-        console.log("Done Weapons");
     }
     GetWeaponList() {
         return this.weapon_list;
@@ -4317,9 +4313,7 @@ class Aircraft {
             this.accessories.fromJSON(js["accessories"]);
             this.optimization.fromJSON(js["optimization"]);
             this.weapons.fromJSON(js["weapons"]);
-            console.log("Done Loading");
             this.CalculateStats();
-            console.log("Calculated");
             return true;
         }
         return false;

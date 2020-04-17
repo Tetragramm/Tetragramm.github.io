@@ -271,7 +271,6 @@ class Stabilizers extends Part {
         if (!vvalid[this.vstab_sel])
             this.vstab_sel = 0;
         var hvalid = this.GetHValidList();
-        console.log(hvalid);
         if (!hvalid[this.hstab_sel])
             this.hstab_sel = 0;
 

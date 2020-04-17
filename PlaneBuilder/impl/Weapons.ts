@@ -58,12 +58,9 @@ class Weapons extends Part {
     }
 
     public fromJSON(js: JSON) {
-        console.log(js);
         if (js && js["state"] == "BETA3") {
-            console.log("weapon_systems");
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
-                console.log("Each weapon");
                 var ws = new WeaponSystem(this.weapon_list);
                 ws.SetCalculateStats(this.CalculateStats);
                 ws.fromJSON(wsj);
@@ -72,7 +69,6 @@ class Weapons extends Part {
         } else {
             this.SetWeaponSetCount(0);
         }
-        console.log("Done Weapons");
     }
 
     public GetWeaponList() {

@@ -520,8 +520,7 @@
                 "pitchboost": 0.7,
                 "mass": 1,
                 "cost": 8,
-                "automatic": true,
-                "warning": "Eliminates propeller tuning."
+                "automatic": true
             }
         ],
         "MVP_Warning": "Allows blad pitch to be adjusted on the ground without replacing it."
