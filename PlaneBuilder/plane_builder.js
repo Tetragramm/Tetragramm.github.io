@@ -884,7 +884,7 @@ class Engine extends Part {
         this.total_reliability = this.etype_stats.stats.reliability;
         this.total_reliability -= (this.gp_count - this.gpr_count);
         if (this.NeedCooling()) {
-            this.total_reliability -= (this.etype_stats.stats.cooling - this.cooling_count);
+            this.total_reliability -= (this.GetMaxCooling() - this.cooling_count);
         }
         this.total_reliability += num;
     }
