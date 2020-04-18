@@ -264,6 +264,10 @@ input[type='checkbox']:checked:after {
 	content: '\2713\0020';
 }
 
+.skinny {
+	width: 1em;
+}
+
 /* hover style just for information */
 span:hover:before {
   border: 2px solid #4778d9!important;

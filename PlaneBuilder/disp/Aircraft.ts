@@ -213,6 +213,9 @@ class Aircraft_HTML extends Display {
             var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt);
             copyStringToClipboard(link);
         };
+
+        var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
+        reset_button.onclick = () => { aircraft_model.Reset(); };
     }
 
     private InitStats(tbl: HTMLTableElement) {
@@ -422,8 +425,7 @@ class Aircraft_HTML extends Display {
     private UpdateDerived() {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
-        if (this.acft.name)
-            this.name_inp.value = this.acft.name;
+        this.name_inp.value = this.acft.name;
         this.copy_text = this.acft.name + "\n";
         this.version_cell.innerText = this.acft.GetVersion();
         this.copy_text += "Version " + this.acft.GetVersion() + "\n";
