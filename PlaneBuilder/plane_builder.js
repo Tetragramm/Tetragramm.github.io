@@ -782,6 +782,11 @@ class Engine extends Part {
     GetCooling() {
         return this.cooling_count;
     }
+    GetMaxCooling() {
+        if (this.use_pp)
+            return 2 * this.etype_stats.stats.cooling;
+        return this.etype_stats.stats.cooling;
+    }
     SetNumRadiators(num) {
         this.num_radiators = num;
         if (this.radiator_index >= num)
@@ -824,6 +829,10 @@ class Engine extends Part {
     }
     SetUsePushPull(use) {
         this.use_pp = use;
+        if (use)
+            this.cooling_count *= 2;
+        else
+            this.cooling_count /= 2;
         this.CalculateStats();
     }
     GetUsePushPull() {
@@ -5319,10 +5328,7 @@ class Engine_HTML extends Display {
             txtSpan2.innerHTML = "    Cooling Amount";
             this.cool_count.min = "0";
             this.cool_count.valueAsNumber = this.engine.GetCooling();
-            this.cool_count.max = this.engine.GetCurrentStats().stats.cooling.toString();
-            if (this.cool_count.valueAsNumber > this.e_cool.valueAsNumber) {
-                this.cool_count.valueAsNumber = this.e_cool.valueAsNumber;
-            }
+            this.cool_count.max = this.engine.GetMaxCooling().toString();
             this.cool_count.onchange = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
             this.cool_cell.appendChild(this.cool_count);
             this.cool_cell.appendChild(txtSpan2);

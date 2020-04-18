@@ -161,6 +161,12 @@ class Engine extends Part {
         return this.cooling_count;
     }
 
+    public GetMaxCooling(): number {
+        if (this.use_pp)
+            return 2 * this.etype_stats.stats.cooling;
+        return this.etype_stats.stats.cooling;
+    }
+
     public SetNumRadiators(num: number) {
         this.num_radiators = num;
         if (this.radiator_index >= num)
@@ -212,6 +218,10 @@ class Engine extends Part {
 
     public SetUsePushPull(use: boolean) {
         this.use_pp = use;
+        if (use)
+            this.cooling_count *= 2;
+        else
+            this.cooling_count /= 2;
         this.CalculateStats();
     }
 

@@ -215,14 +215,14 @@ class Engine_HTML extends Display {
 
     }
 
-    private InitElectricSelect(cell: HTMLTableCellElement){
+    private InitElectricSelect(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
         this.alternator_input = document.createElement("INPUT") as HTMLInputElement;
         this.generator_input = document.createElement("INPUT") as HTMLInputElement;
         FlexCheckbox("Alternator", this.alternator_input, fs);
         FlexCheckbox("Generator", this.generator_input, fs);
-        this.alternator_input.oninput = ()=>{ this.engine.SetAlternator(this.alternator_input.checked);};
-        this.generator_input.oninput = ()=>{ this.engine.SetGenerator(this.generator_input.checked);};
+        this.alternator_input.oninput = () => { this.engine.SetAlternator(this.alternator_input.checked); };
+        this.generator_input.oninput = () => { this.engine.SetGenerator(this.generator_input.checked); };
     }
 
     private InitStatDisplay(row: HTMLTableRowElement) {
@@ -337,10 +337,7 @@ class Engine_HTML extends Display {
             txtSpan2.innerHTML = "    Cooling Amount";
             this.cool_count.min = "0";
             this.cool_count.valueAsNumber = this.engine.GetCooling();
-            this.cool_count.max = this.engine.GetCurrentStats().stats.cooling.toString();
-            if (this.cool_count.valueAsNumber > this.e_cool.valueAsNumber) {
-                this.cool_count.valueAsNumber = this.e_cool.valueAsNumber;
-            }
+            this.cool_count.max = this.engine.GetMaxCooling().toString();
             this.cool_count.onchange = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
             this.cool_cell.appendChild(this.cool_count);
             this.cool_cell.appendChild(txtSpan2);
