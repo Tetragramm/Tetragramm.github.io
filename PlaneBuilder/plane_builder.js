@@ -4084,6 +4084,7 @@ class Weapons extends Part {
     }
     fromJSON(js) {
         if (js && js["state"] == "BETA3") {
+            this.weapon_sets = [];
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
                 var ws = new WeaponSystem(this.weapon_list);
@@ -4279,6 +4280,7 @@ class Aircraft {
     constructor(js, engine_json, weapon_json, storage) {
         this.use_storage = false;
         this.reset_json = String.raw `{"version":"9.4","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false]}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R - 3 Boxer 6 - Cylinder","overspeed":26,"altitude":3,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"spinner":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false},"wings":{"wing_list":[{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":5,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[3,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay1":false,"bay2":false},"cargo":{"mass":0,"pass":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"state":"BETA3","weapon_systems":[]}}`;
+        this.use_large_airplane_rules = false;
         this.stats = new Stats();
         this.name = "Prototype Aircraft";
         this.version = js['version'];
@@ -4469,9 +4471,12 @@ class Aircraft {
         WetMP = Math.max(WetMP, 1);
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
-        // var span = this.wings.GetSpan();
-        // var DPEmpty = Math.floor((this.stats.drag + DryMP * DryMP / (span * span)) / 5);
-        var DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
+        var span = this.wings.GetSpan();
+        var DPEmpty = 0;
+        if (this.use_large_airplane_rules)
+            DPEmpty = Math.floor((this.stats.drag + DryMP * DryMP / (span * span)) / 5);
+        else
+            DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
@@ -7976,8 +7981,12 @@ class Aircraft_HTML extends Display {
         name_cell.colSpan = 5;
         this.name_inp = document.createElement("INPUT");
         this.name_inp.defaultValue = "Aircraft Name";
-        this.name_inp.onchange = () => { this.acft.name = this.name_inp.value; };
+        this.name_inp.oninput = () => { this.acft.name = this.name_inp.value; };
         name_cell.appendChild(this.name_inp);
+        //New Rules
+        this.rule_check = document.createElement("INPUT");
+        this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
+        CreateCheckbox("Possible New Drag Rules", this.rule_check, name_cell);
         // Aircraft Cost
         this.cost_cell = row0.insertCell();
         // Rules Version
@@ -8110,6 +8119,7 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.name_inp.value = this.acft.name;
+        this.rule_check.checked = this.acft.use_large_airplane_rules;
         this.copy_text = this.acft.name + "\n";
         this.version_cell.innerText = this.acft.GetVersion();
         this.copy_text += "Version " + this.acft.GetVersion() + "\n";

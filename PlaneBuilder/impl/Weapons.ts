@@ -59,6 +59,7 @@ class Weapons extends Part {
 
     public fromJSON(js: JSON) {
         if (js && js["state"] == "BETA3") {
+            this.weapon_sets = [];
             var lst = js["weapon_systems"];
             for (let wsj of lst) {
                 var ws = new WeaponSystem(this.weapon_list);

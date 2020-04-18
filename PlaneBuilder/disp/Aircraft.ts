@@ -59,6 +59,7 @@ class Aircraft_HTML extends Display {
     private d_crsh: HTMLTableCellElement;
 
     //Final Display
+    private rule_check: HTMLInputElement;
     private name_inp: HTMLInputElement;
     private cost_cell: HTMLTableCellElement;
     private version_cell: HTMLTableCellElement;
@@ -276,8 +277,13 @@ class Aircraft_HTML extends Display {
         name_cell.colSpan = 5;
         this.name_inp = document.createElement("INPUT") as HTMLInputElement;
         this.name_inp.defaultValue = "Aircraft Name";
-        this.name_inp.onchange = () => { this.acft.name = this.name_inp.value; };
+        this.name_inp.oninput = () => { this.acft.name = this.name_inp.value; };
         name_cell.appendChild(this.name_inp);
+        //New Rules
+        this.rule_check = document.createElement("INPUT") as HTMLInputElement;
+        this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
+        CreateCheckbox("Possible New Drag Rules", this.rule_check, name_cell);
+
         // Aircraft Cost
         this.cost_cell = row0.insertCell();
         // Rules Version
@@ -426,6 +432,7 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.name_inp.value = this.acft.name;
+        this.rule_check.checked = this.acft.use_large_airplane_rules;
         this.copy_text = this.acft.name + "\n";
         this.version_cell.innerText = this.acft.GetVersion();
         this.copy_text += "Version " + this.acft.GetVersion() + "\n";
