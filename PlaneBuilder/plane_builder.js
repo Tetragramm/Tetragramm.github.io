@@ -1917,6 +1917,7 @@ class Frames extends Part {
 class Wings extends Part {
     constructor(js) {
         super();
+        this.test_drag = false;
         this.skin_list = [];
         for (let elem of js["surface"]) {
             this.skin_list.push({
@@ -2232,7 +2233,6 @@ class Wings extends Part {
         if (!this.CanSwept())
             this.is_swept = false;
         var stats = new Stats();
-        var deck_count = this.DeckCountFull();
         var have_wing = false;
         var have_mini_wing = false;
         var longest_span = 0;
@@ -2258,7 +2258,10 @@ class Wings extends Part {
             wStats.maxstrain -= 2 * w.span + w.area - 10;
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + 2 * w.area - w.span - drag_reduction);
+            if (this.test_drag)
+                wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
+            else
+                wStats.drag = Math.max(1, wStats.drag + 2 * w.area - w.span - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             //stability from -hedral
             wStats.latstab += w.dihedral - w.anhedral;
@@ -7986,7 +7989,10 @@ class Aircraft_HTML extends Display {
         //New Rules
         this.rule_check = document.createElement("INPUT");
         this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("Possible New Drag Rules", this.rule_check, name_cell);
+        CreateCheckbox("DP Test", this.rule_check, name_cell, false);
+        this.rule_check2 = document.createElement("INPUT");
+        this.rule_check2.oninput = () => { this.acft.GetWings().test_drag = this.rule_check2.checked; this.acft.CalculateStats(); };
+        CreateCheckbox("Wing Drag Test", this.rule_check2, name_cell, false);
         // Aircraft Cost
         this.cost_cell = row0.insertCell();
         // Rules Version

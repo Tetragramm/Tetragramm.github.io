@@ -284,6 +284,7 @@ class Aircraft {
         var StallSpeedEmpty = Math.floor(this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFull = Math.floor(this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFullwBombs = Math.floor(this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
+
         var Overspeed = this.engines.GetOverspeed();
         var BoostEmpty = Math.floor(this.stats.power / DryMP);
         var BoostFull = Math.floor(this.stats.power / WetMP);

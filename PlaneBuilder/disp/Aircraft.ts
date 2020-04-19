@@ -60,6 +60,7 @@ class Aircraft_HTML extends Display {
 
     //Final Display
     private rule_check: HTMLInputElement;
+    private rule_check2: HTMLInputElement;
     private name_inp: HTMLInputElement;
     private cost_cell: HTMLTableCellElement;
     private version_cell: HTMLTableCellElement;
@@ -282,7 +283,10 @@ class Aircraft_HTML extends Display {
         //New Rules
         this.rule_check = document.createElement("INPUT") as HTMLInputElement;
         this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("Possible New Drag Rules", this.rule_check, name_cell);
+        CreateCheckbox("DP Test", this.rule_check, name_cell, false);
+        this.rule_check2 = document.createElement("INPUT") as HTMLInputElement;
+        this.rule_check2.oninput = () => { this.acft.GetWings().test_drag = this.rule_check2.checked; this.acft.CalculateStats(); };
+        CreateCheckbox("Wing Drag Test", this.rule_check2, name_cell, false);
 
         // Aircraft Cost
         this.cost_cell = row0.insertCell();

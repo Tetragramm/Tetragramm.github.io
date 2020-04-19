@@ -27,10 +27,12 @@ class Wings extends Part {
     private is_swept: boolean;
     private is_closed: boolean;
     private num_frames: number;
+    public test_drag: boolean;
 
     constructor(js: JSON) {
         super();
 
+        this.test_drag = false;
         this.skin_list = [];
         for (let elem of js["surface"]) {
             this.skin_list.push({
@@ -401,7 +403,6 @@ class Wings extends Part {
 
         var stats = new Stats();
 
-        var deck_count = this.DeckCountFull();
         var have_wing = false;
         var have_mini_wing = false;
         var longest_span = 0;
@@ -430,7 +431,10 @@ class Wings extends Part {
             wStats.maxstrain -= 2 * w.span + w.area - 10;
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + 2 * w.area - w.span - drag_reduction);
+            if (this.test_drag)
+                wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
+            else
+                wStats.drag = Math.max(1, wStats.drag + 2 * w.area - w.span - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
             //stability from -hedral
