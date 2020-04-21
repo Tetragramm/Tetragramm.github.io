@@ -4491,7 +4491,8 @@ class Aircraft {
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
         var span = Math.max(1, this.wings.GetSpan());
-        var DPEmpty = Math.max(DPEmpty, 1);
+        var DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
+        DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
         DPFull = DPEmpty; //Based on advice from Discord.
