@@ -283,7 +283,7 @@ class Aircraft_HTML extends Display {
         //New Rules
         this.rule_check = document.createElement("INPUT") as HTMLInputElement;
         this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("DP Test", this.rule_check, name_cell, false);
+        CreateCheckbox("Stall Test", this.rule_check, name_cell, false);
         this.rule_check2 = document.createElement("INPUT") as HTMLInputElement;
         this.rule_check2.oninput = () => { this.acft.GetWings().test_drag = this.rule_check2.checked; this.acft.CalculateStats(); };
         CreateCheckbox("Wing Drag Test", this.rule_check2, name_cell, false);

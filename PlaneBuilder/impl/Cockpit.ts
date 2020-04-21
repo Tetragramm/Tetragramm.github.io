@@ -14,6 +14,7 @@ class Cockpit extends Part {
     private total_stress: number;
     private total_escape: number;
     private total_visibility: number;
+    private is_primary: boolean;
 
     constructor(tl: { name: string, stats: Stats }[],
         ul: { name: string, stats: Stats }[],
@@ -33,6 +34,7 @@ class Cockpit extends Part {
         this.total_stress = 0;
         this.total_escape = 0;
         this.total_visibility = 0;
+        this.is_primary = false;
     }
 
     public toJSON() {
@@ -129,6 +131,20 @@ class Cockpit extends Part {
             }
         }
         return mx;
+    }
+
+    public SetPrimary() {
+        this.is_primary = true;
+        console.log("Set Primary");
+    }
+
+    public CanUpgrades() {
+        var can = [...Array(this.upgrades.length).fill(true)];
+        if (this.is_primary) {
+            can[0] = false;
+            can[3] = false;
+        }
+        return can;
     }
 
     public PartStats(): Stats {

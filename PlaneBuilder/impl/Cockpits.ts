@@ -51,6 +51,8 @@ class Cockpits extends Part {
         this.positions = [];
         for (let elem of js["positions"]) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
+            if (this.positions.length == 0)
+                cp.SetPrimary();
             cp.fromJSON(elem);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
@@ -99,6 +101,8 @@ class Cockpits extends Part {
         }
         while (this.positions.length < num) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
+            if (this.positions.length == 0)
+                cp.SetPrimary();
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }

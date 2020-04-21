@@ -266,13 +266,8 @@ class Aircraft {
         WetMP = Math.max(WetMP, 1);
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
-        var span = this.wings.GetSpan();
-        var DPEmpty = 0;
-        if (this.use_large_airplane_rules)
-            DPEmpty = Math.floor((this.stats.drag + DryMP * DryMP / (span * span)) / 5);
-        else
-            DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
-        DPEmpty = Math.max(DPEmpty, 1);
+        var span = Math.max(1, this.wings.GetSpan());
+        var DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
         DPFull = DPEmpty; //Based on advice from Discord.
@@ -284,6 +279,12 @@ class Aircraft {
         var StallSpeedEmpty = Math.floor(this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFull = Math.floor(this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFullwBombs = Math.floor(this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
+
+        if (this.use_large_airplane_rules) {
+            StallSpeedEmpty = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFull = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFullwBombs = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
+        }
 
         var Overspeed = this.engines.GetOverspeed();
         var BoostEmpty = Math.floor(this.stats.power / DryMP);

@@ -154,7 +154,7 @@ strong {
 table {
 	border-collapse: collapse;
 	font-size: .8rem;
-
+	
 	/* extra-wide tables, you can just scroll to see */
 	display: block;
 	overflow: auto;

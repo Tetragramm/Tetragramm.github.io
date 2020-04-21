@@ -494,7 +494,7 @@ class Engine extends Part {
 
         //Cowls modify engine stats directly, not mounting or upgrade.
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
-        stats.mass += Math.floor(stats.mass * this.cowl_list[this.cowl_sel].mpd);
+        stats.mass += Math.floor(stats.drag * this.cowl_list[this.cowl_sel].mpd);
         stats.drag = Math.floor(stats.drag * this.cowl_list[this.cowl_sel].ed);
         if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail)
             stats.cost += 2;

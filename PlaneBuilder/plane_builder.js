@@ -324,6 +324,7 @@ class Cockpit extends Part {
         this.total_stress = 0;
         this.total_escape = 0;
         this.total_visibility = 0;
+        this.is_primary = false;
     }
     toJSON() {
         return {
@@ -403,6 +404,18 @@ class Cockpit extends Part {
         }
         return mx;
     }
+    SetPrimary() {
+        this.is_primary = true;
+        console.log("Set Primary");
+    }
+    CanUpgrades() {
+        var can = [...Array(this.upgrades.length).fill(true)];
+        if (this.is_primary) {
+            can[0] = false;
+            can[3] = false;
+        }
+        return can;
+    }
     PartStats() {
         this.stats = new Stats();
         this.stats.reqsections = 1;
@@ -476,6 +489,8 @@ class Cockpits extends Part {
         this.positions = [];
         for (let elem of js["positions"]) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
+            if (this.positions.length == 0)
+                cp.SetPrimary();
             cp.fromJSON(elem);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
@@ -518,6 +533,8 @@ class Cockpits extends Part {
         }
         while (this.positions.length < num) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
+            if (this.positions.length == 0)
+                cp.SetPrimary();
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
@@ -1066,7 +1083,7 @@ class Engine extends Part {
         }
         //Cowls modify engine stats directly, not mounting or upgrade.
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
-        stats.mass += Math.floor(stats.mass * this.cowl_list[this.cowl_sel].mpd);
+        stats.mass += Math.floor(stats.drag * this.cowl_list[this.cowl_sel].mpd);
         stats.drag = Math.floor(stats.drag * this.cowl_list[this.cowl_sel].ed);
         if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail)
             stats.cost += 2;
@@ -4474,13 +4491,8 @@ class Aircraft {
         WetMP = Math.max(WetMP, 1);
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
-        var span = this.wings.GetSpan();
-        var DPEmpty = 0;
-        if (this.use_large_airplane_rules)
-            DPEmpty = Math.floor((this.stats.drag + DryMP * DryMP / (span * span)) / 5);
-        else
-            DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
-        DPEmpty = Math.max(DPEmpty, 1);
+        var span = Math.max(1, this.wings.GetSpan());
+        var DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
         DPFull = DPEmpty; //Based on advice from Discord.
@@ -4492,6 +4504,11 @@ class Aircraft {
         var StallSpeedEmpty = Math.floor(this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFull = Math.floor(this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFullwBombs = Math.floor(this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
+        if (this.use_large_airplane_rules) {
+            StallSpeedEmpty = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFull = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFullwBombs = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
+        }
         var Overspeed = this.engines.GetOverspeed();
         var BoostEmpty = Math.floor(this.stats.power / DryMP);
         var BoostFull = Math.floor(this.stats.power / WetMP);
@@ -4930,13 +4947,18 @@ class Cockpit_HTML extends Display {
         var fs = CreateFlexSection(upgrades);
         //Add all the upgrades as checkboxes
         var upg_index = 0;
-        for (let elem of cp.GetUpgradeList()) {
-            let upg = document.createElement("INPUT");
-            FlexCheckbox(elem.name, upg, fs);
-            let local_index = upg_index;
-            upg_index += 1;
-            upg.onchange = () => { this.cockpit.SetUpgrade(local_index, upg.checked); };
-            this.upg_chbxs.push(upg);
+        var upglst = cp.GetUpgradeList();
+        var can = cp.CanUpgrades();
+        for (let i = 0; i < upglst.length; i++) {
+            if (can[i]) {
+                let elem = upglst[i];
+                let upg = document.createElement("INPUT");
+                FlexCheckbox(elem.name, upg, fs);
+                let local_index = upg_index;
+                upg_index += 1;
+                upg.onchange = () => { this.cockpit.SetUpgrade(local_index, upg.checked); };
+                this.upg_chbxs.push(upg);
+            }
         }
         var fs = CreateFlexSection(safety);
         //Add all the safties as checkboxes
@@ -7989,7 +8011,7 @@ class Aircraft_HTML extends Display {
         //New Rules
         this.rule_check = document.createElement("INPUT");
         this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("DP Test", this.rule_check, name_cell, false);
+        CreateCheckbox("Stall Test", this.rule_check, name_cell, false);
         this.rule_check2 = document.createElement("INPUT");
         this.rule_check2.oninput = () => { this.acft.GetWings().test_drag = this.rule_check2.checked; this.acft.CalculateStats(); };
         CreateCheckbox("Wing Drag Test", this.rule_check2, name_cell, false);
@@ -8739,3 +8761,275 @@ class WeaponSystem extends Part {
         return stats;
     }
 }
+/*global gzip, Base64*/
+var JSONC = (function () {
+    var root, JSONC = { pack: null, compress: null, decompress: null, unpack: null }, isNodeEnvironment, _nCode = -1, toString = {}.toString;
+    /**
+     * set the correct root depending from the environment.
+     * @type {Object}
+     * @private
+     */
+    root = this;
+    /**
+     * Check if JSONC is loaded in Node.js environment
+     * @type {Boolean}
+     * @private
+     */
+    isNodeEnvironment = false;
+    /**
+     * Checks if the value exist in the array.
+     * @param arr
+     * @param v
+     * @returns {boolean}
+     */
+    function contains(arr, v) {
+        var nIndex, nLen = arr.length;
+        for (nIndex = 0; nIndex < nLen; nIndex++) {
+            if (arr[nIndex][1] === v) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Removes duplicated values in an array
+     * @param oldArray
+     * @returns {Array}
+     */
+    function unique(oldArray) {
+        var nIndex, nLen = oldArray.length, aArr = [];
+        for (nIndex = 0; nIndex < nLen; nIndex++) {
+            if (!contains(aArr, oldArray[nIndex][1])) {
+                aArr.push(oldArray[nIndex]);
+            }
+        }
+        return aArr;
+    }
+    /**
+     * Escapes a RegExp
+     * @param text
+     * @returns {*}
+     */
+    function escapeRegExp(text) {
+        return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    }
+    /**
+     * Returns if the obj is an object or not.
+     * @param obj
+     * @returns {boolean}
+     * @private
+     */
+    function _isObject(obj) {
+        return toString.call(obj) === '[object Object]';
+    }
+    /**
+     * Returns if the obj is an array or not
+     * @param obj
+     * @returns {boolean}
+     * @private
+     */
+    function _isArray(obj) {
+        return toString.call(obj) === '[object Array]';
+    }
+    /**
+     * Converts a bidimensional array to object
+     * @param aArr
+     * @returns {{}}
+     * @private
+     */
+    function _biDimensionalArrayToObject(aArr) {
+        var obj = {}, nIndex, nLen = aArr.length, oItem;
+        for (nIndex = 0; nIndex < nLen; nIndex++) {
+            oItem = aArr[nIndex];
+            obj[oItem[0]] = oItem[1];
+        }
+        return obj;
+    }
+    /**
+     * Convert a number to their ascii code/s.
+     * @param index
+     * @param totalChar
+     * @param offset
+     * @returns {Array}
+     * @private
+     */
+    function _numberToKey(index, totalChar, offset) {
+        var sKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=_!?()*', aArr = [], currentChar = index;
+        totalChar = totalChar || sKeys.length;
+        offset = offset || 0;
+        while (currentChar >= totalChar) {
+            aArr.push(sKeys.charCodeAt((currentChar % totalChar) + offset));
+            currentChar = Math.floor(currentChar / totalChar - 1);
+        }
+        aArr.push(sKeys.charCodeAt(currentChar + offset));
+        return aArr.reverse();
+    }
+    /**
+     * Returns the string using an array of ASCII values
+     * @param aKeys
+     * @returns {string}
+     * @private
+     */
+    function _getSpecialKey(aKeys) {
+        return String.fromCharCode.apply(String, aKeys);
+    }
+    /**
+     * Traverse all the objects looking for keys and set an array with the new keys
+     * @param json
+     * @param aKeys
+     * @returns {*}
+     * @private
+     */
+    function _getKeys(json, aKeys) {
+        var aKey, sKey, oItem;
+        for (sKey in json) {
+            if (json.hasOwnProperty(sKey)) {
+                oItem = json[sKey];
+                if (_isObject(oItem) || _isArray(oItem)) {
+                    aKeys = aKeys.concat(unique(_getKeys(oItem, aKeys)));
+                }
+                if (isNaN(Number(sKey))) {
+                    if (!contains(aKeys, sKey)) {
+                        _nCode += 1;
+                        aKey = [];
+                        aKey.push(_getSpecialKey(_numberToKey(_nCode, 0, 0)), sKey);
+                        aKeys.push(aKey);
+                    }
+                }
+            }
+        }
+        return aKeys;
+    }
+    /**
+     * Method to compress array objects
+     * @private
+     * @param json
+     * @param aKeys
+     */
+    function _compressArray(json, aKeys) {
+        var nIndex, nLenKeys;
+        for (nIndex = 0, nLenKeys = json.length; nIndex < nLenKeys; nIndex++) {
+            json[nIndex] = JSONC.compress(json[nIndex], aKeys);
+        }
+    }
+    /**
+     * Method to compress anything but array
+     * @private
+     * @param json
+     * @param aKeys
+     * @returns {*}
+     */
+    function _compressOther(json, aKeys) {
+        var oKeys, aKey, str, nLenKeys, nIndex, obj;
+        aKeys = _getKeys(json, aKeys);
+        aKeys = unique(aKeys);
+        oKeys = _biDimensionalArrayToObject(aKeys);
+        str = JSON.stringify(json);
+        nLenKeys = aKeys.length;
+        for (nIndex = 0; nIndex < nLenKeys; nIndex++) {
+            aKey = aKeys[nIndex];
+            str = str.replace(new RegExp(escapeRegExp('"' + aKey[1] + '"'), 'g'), '"' + aKey[0] + '"');
+        }
+        obj = JSON.parse(str);
+        obj._ = oKeys;
+        return obj;
+    }
+    /**
+     * Method to decompress array objects
+     * @private
+     * @param json
+     */
+    function _decompressArray(json) {
+        var nIndex, nLenKeys;
+        for (nIndex = 0, nLenKeys = json.length; nIndex < nLenKeys; nIndex++) {
+            json[nIndex] = JSONC.decompress(json[nIndex]);
+        }
+    }
+    /**
+     * Method to decompress anything but array
+     * @private
+     * @param jsonCopy
+     * @returns {*}
+     */
+    function _decompressOther(jsonCopy) {
+        var oKeys, str, sKey;
+        oKeys = JSON.parse(JSON.stringify(jsonCopy._));
+        delete jsonCopy._;
+        str = JSON.stringify(jsonCopy);
+        for (sKey in oKeys) {
+            if (oKeys.hasOwnProperty(sKey)) {
+                str = str.replace(new RegExp('"' + sKey + '"', 'g'), '"' + oKeys[sKey] + '"');
+            }
+        }
+        return str;
+    }
+    /**
+     * Compress a RAW JSON
+     * @param json
+     * @param optKeys
+     * @returns {*}
+     */
+    JSONC.compress = function (json, optKeys) {
+        if (!optKeys) {
+            _nCode = -1;
+        }
+        var aKeys = optKeys || [], obj;
+        if (_isArray(json)) {
+            _compressArray(json, aKeys);
+            obj = json;
+        }
+        else {
+            obj = _compressOther(json, aKeys);
+        }
+        return obj;
+    };
+    /**
+     * Use LZString to get the compressed string.
+     * @param json
+     * @param bCompress
+     * @returns {String}
+     */
+    // JSONC.pack = function (json, bCompress) {
+    //   var str = JSON.stringify((bCompress ? JSONC.compress(json) : json));
+    //   return Base64.encode(String.fromCharCode.apply(String, gzip.zip(str, { level: 9 })));
+    // };
+    /**
+     * Decompress a compressed JSON
+     * @param json
+     * @returns {*}
+     */
+    JSONC.decompress = function (json) {
+        var str, jsonCopy = JSON.parse(JSON.stringify(json));
+        if (_isArray(jsonCopy)) {
+            _decompressArray(jsonCopy);
+        }
+        else {
+            str = _decompressOther(jsonCopy);
+        }
+        return str ? JSON.parse(str) : jsonCopy;
+    };
+    function getArr(str) {
+        var nIndex = 0, nLen = str.length, arr = [];
+        for (; nIndex < nLen; nIndex++) {
+            arr.push(str.charCodeAt(nIndex));
+        }
+        return arr;
+    }
+    /**
+     * Returns the JSON object from the LZW string
+     * @param gzipped
+     * @param bDecompress
+     * @returns {Object}
+     */
+    // JSONC.unpack = function (gzipped, bDecompress) {
+    //   var aArr = getArr(Base64.decode(gzipped)),
+    //     str = String.fromCharCode.apply(String, gzip.unzip(aArr, { level: 9 })),
+    //     json = JSON.parse(str);
+    //   return bDecompress ? JSONC.decompress(json) : json;
+    // };
+    /*
+     * Expose Hydra to be used in node.js, as AMD module or as global
+     */
+    root.JSONC = JSONC;
+    return JSONC;
+})();
