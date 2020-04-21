@@ -406,7 +406,6 @@ class Cockpit extends Part {
     }
     SetPrimary() {
         this.is_primary = true;
-        console.log("Set Primary");
     }
     CanUpgrades() {
         var can = [...Array(this.upgrades.length).fill(true)];
@@ -5139,6 +5138,7 @@ class Engine_HTML extends Display {
         this.e_cost = document.createElement("INPUT");
         this.e_oil = document.createElement("INPUT");
         this.e_pulsejet = document.createElement("INPUT");
+        this.e_spinner = document.createElement("INPUT");
         this.cool_count = document.createElement("INPUT");
         this.cool_count.setAttribute("type", "number");
         var tcell = row.insertCell(0);
@@ -5172,6 +5172,7 @@ class Engine_HTML extends Display {
         FlexInput("Cost", this.e_cost, fs);
         FlexCheckbox("Oil Tank", this.e_oil, fs);
         FlexCheckbox("Pulsejet", this.e_pulsejet, fs);
+        FlexCheckbox("Spinner Weapon", this.e_spinner, fs);
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
             if (this.e_select.selectedIndex == this.engine_list.length) {
@@ -5197,6 +5198,7 @@ class Engine_HTML extends Display {
         this.e_cost.onchange = trigger;
         this.e_oil.onchange = trigger;
         this.e_pulsejet.onchange = trigger;
+        this.e_spinner.onchange = trigger;
     }
     UpdateEngine(en) {
         this.engine = en;
@@ -5379,6 +5381,7 @@ class Engine_HTML extends Display {
         e_stats.stats.cost = this.e_cost.valueAsNumber;
         e_stats.oiltank = this.e_oil.checked;
         e_stats.pulsejet = this.e_pulsejet.checked;
+        e_stats.spinner = this.e_spinner.checked;
         this.engine.SetCustomStats(e_stats);
     }
     SetInputDisable(b) {
@@ -5395,6 +5398,7 @@ class Engine_HTML extends Display {
         this.e_cost.disabled = b;
         this.e_oil.disabled = b;
         this.e_pulsejet.disabled = b;
+        this.e_spinner.disabled = b;
     }
     UpdateDisplay() {
         var idx = this.engine.GetSelectedIndex();

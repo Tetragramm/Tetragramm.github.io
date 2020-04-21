@@ -135,7 +135,6 @@ class Cockpit extends Part {
 
     public SetPrimary() {
         this.is_primary = true;
-        console.log("Set Primary");
     }
 
     public CanUpgrades() {
