@@ -60,6 +60,26 @@ class Cockpits extends Part {
         }
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.positions.length);
+        for (let cp of this.positions) {
+            cp.serialize(s);
+        }
+    }
+
+    public deserialize(d: Deserialize) {
+        var len = d.GetNum();
+        this.positions = [];
+        for (let i = 0; i < len; i++) {
+            let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
+            if (this.positions.length == 0)
+                cp.SetPrimary();
+            cp.deserialize(d);
+            cp.SetCalculateStats(this.CalculateStats);
+            this.positions.push(cp);
+        }
+    }
+
     public GetAttackList() {
         var lst = [];
         for (let c of this.positions) {

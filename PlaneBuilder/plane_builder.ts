@@ -40,19 +40,19 @@ const init = () => {
                     console.log("Used Query Parameter");
                     try {
                         var str = LZString.decompressFromEncodedURIComponent(qp);
-                        loaded = aircraft_model.fromJSON(JSON.parse(str));
-                    } catch { }
-                    if (!loaded) {
-                        try {
-                            loaded = aircraft_model.fromJSON(JSON.parse(qp));
-                        } catch { }
-                    }
+                        var arr = _stringToArrayBuffer(str);
+                        var des = new Deserialize(arr);
+                        aircraft_model.deserialize(des);
+                        aircraft_model.CalculateStats();
+                        loaded = true;
+                    } catch { console.log("Compressed Query Parameter Failed."); aircraft_model.Reset(); }
                 }
                 if (acft_data && !loaded) {
                     console.log("Used Saved Data");
                     try {
                         loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
-                    } catch { }
+                        aircraft_model.CalculateStats();
+                    } catch { console.log("Saved Data Failed."); aircraft_model.Reset(); }
                 }
 
                 aircraft_model.CalculateStats();
@@ -124,6 +124,24 @@ function SetScroll(ev) {
         hash = newhash;
         window.history.replaceState(null, null, "index.html#" + newhash);
     }
+}
+
+function _arrayBufferToString(buffer: ArrayBuffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return binary;
+}
+
+function _stringToArrayBuffer(str: string) {
+    var bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+    }
+    return bytes.buffer;
 }
 
 var parts_JSON: JSON;

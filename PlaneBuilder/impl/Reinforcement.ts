@@ -2,28 +2,43 @@
 /// <reference path="./Stats.ts" />
 
 class Reinforcement extends Part {
-    private ext_list: { name: string, tension: number, config: boolean, stats: Stats }[];
+    private ext_wood_list: { name: string, tension: number, config: boolean, stats: Stats }[];
+    private ext_steel_list: { name: string, tension: number, config: boolean, stats: Stats }[];
+    private ext_cabane_list: { name: string, tension: number, stats: Stats }[];
     private ext_wood_count: number[];
     private ext_steel_count: number[];
     private cant_list: { name: string, limited: boolean, stats: Stats }[];
     private cant_count: number[];
     private wires: boolean;
+    private cabane_sel: number;
 
     //Set by Calculate Stats
     private is_staggered: boolean;
     private is_tandem: boolean;
     private is_monoplane: boolean;
     private acft_structure: number;
+    private cant_lift: boolean;
 
     constructor(js: JSON) {
         super();
 
-        this.ext_list = [];
-        for (let elem of js["external"]) {
-            this.ext_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+        this.ext_wood_list = [];
+        for (let elem of js["external_wood"]) {
+            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
         }
-        this.ext_wood_count = [...Array(this.ext_list.length).fill(0)];
-        this.ext_steel_count = [...Array(this.ext_list.length).fill(0)];
+        this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
+
+        this.ext_steel_list = [];
+        for (let elem of js["external_steel"]) {
+            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+        }
+        this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
+
+        this.ext_cabane_list = [];
+        for (let elem of js["cabane"]) {
+            this.ext_cabane_list.push({ name: elem["name"], tension: elem["tension"], stats: new Stats(elem) });
+        }
+        this.cabane_sel = 0;
 
         this.cant_list = [];
         for (let elem of js["cantilever"]) {
@@ -37,6 +52,7 @@ class Reinforcement extends Part {
         this.is_tandem = false;
         this.is_monoplane = false;
         this.acft_structure = 0;
+        this.cant_lift = false;
     }
 
     public toJSON() {
@@ -45,6 +61,7 @@ class Reinforcement extends Part {
             ext_steel_count: this.ext_steel_count,
             cant_count: this.cant_count,
             wires: this.wires,
+            cabane_sel: this.cabane_sel,
         }
     }
 
@@ -53,10 +70,27 @@ class Reinforcement extends Part {
         this.ext_steel_count = js["ext_steel_count"];
         this.cant_count = js["cant_count"];
         this.wires = js["wires"];
+        this.cabane_sel = js["cabane_sel"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNumArr(this.ext_wood_count);
+        s.PushNumArr(this.ext_steel_count);
+        s.PushNumArr(this.cant_count);
+        s.PushBool(this.wires);
+        s.PushNum(this.cabane_sel);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.ext_wood_count = d.GetNumArr();
+        this.ext_steel_count = d.GetNumArr();
+        this.cant_count = d.GetNumArr();
+        this.wires = d.GetBool();
+        this.cabane_sel = d.GetNum();
     }
 
     public GetExternalList() {
-        return this.ext_list;
+        return this.ext_wood_list;
     }
 
     public GetCantileverList() {
@@ -156,10 +190,10 @@ class Reinforcement extends Part {
     }
 
     private TotalStructure() {
-        var struct_count = 0;
-        for (let i = 0; i < this.ext_list.length; i++) {
-            struct_count += this.ext_wood_count[i] * this.ext_list[i].stats.structure;
-            struct_count += this.ext_steel_count[i] * 2 * this.ext_list[i].stats.structure;
+        var struct_count = this.ext_cabane_list[this.cabane_sel].stats.structure;
+        for (let i = 0; i < this.ext_wood_list.length; i++) {
+            struct_count += this.ext_wood_count[i] * this.ext_wood_list[i].stats.structure;
+            struct_count += this.ext_steel_count[i] * this.ext_steel_list[i].stats.structure;
         }
         return this.acft_structure + struct_count;
     }
@@ -173,6 +207,23 @@ class Reinforcement extends Part {
             return 1;
         else
             return 0;
+    }
+
+    public GetCabaneList() {
+        return this.ext_cabane_list;
+    }
+
+    public GetCabane() {
+        return this.cabane_sel;
+    }
+
+    public SetCabane(num: number) {
+        this.cabane_sel = num;
+        this.CalculateStats();
+    }
+
+    public SetCantLift(use: boolean) {
+        this.cant_lift = use;
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -193,34 +244,37 @@ class Reinforcement extends Part {
         var tension = 0;
         var strut_count = 0;
         //Wood Struts
-        for (let i = 0; i < this.ext_list.length; i++) {
+        for (let i = 0; i < this.ext_wood_list.length; i++) {
             strut_count += this.ext_wood_count[i];
             if (this.ext_wood_count[i] > 0) {
-                let ts = this.ext_list[i].stats;
+                let ts = this.ext_wood_list[i].stats;
                 ts = ts.Multiply(this.ext_wood_count[i]);
                 stats = stats.Add(ts);
-                if (this.ext_list[i].config)
-                    tension += tension_multiple * this.ext_list[i].tension * this.ext_wood_count[i];
+                if (this.ext_wood_list[i].config)
+                    tension += tension_multiple * this.ext_wood_list[i].tension * this.ext_wood_count[i];
                 else
-                    tension += this.ext_list[i].tension * this.ext_wood_count[i];
+                    tension += this.ext_wood_list[i].tension * this.ext_wood_count[i];
             }
         }
         //Steel Struts
-        for (let i = 0; i < this.ext_list.length; i++) {
+        for (let i = 0; i < this.ext_steel_list.length; i++) {
             strut_count += this.ext_steel_count[i];
             if (this.ext_steel_count[i] > 0) {
-                let ts = this.ext_list[i].stats.Clone();
-                ts.structure *= 2;
-                ts.cost *= 2;
-                ts.maxstrain += 5;
+                let ts = this.ext_steel_list[i].stats.Clone();
                 ts = ts.Multiply(this.ext_steel_count[i]);
                 stats = stats.Add(ts);
-                if (this.ext_list[i].config)
-                    tension += tension_multiple * this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+                if (this.ext_steel_list[i].config)
+                    tension += tension_multiple * this.ext_steel_list[i].tension * this.ext_steel_count[i];
                 else
-                    tension += this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+                    tension += this.ext_steel_list[i].tension * this.ext_steel_count[i];
             }
         }
+        //Cabane Strut
+        let ts = this.ext_cabane_list[this.cabane_sel].stats.Clone();
+        stats = stats.Add(ts);
+        tension += tension_multiple * this.ext_cabane_list[this.cabane_sel].tension;
+        if (this.cabane_sel > 0)
+            strut_count += 1;
 
         if (this.wires) {
             stats.maxstrain += Math.floor(tension);
@@ -240,6 +294,9 @@ class Reinforcement extends Part {
 
         if (use_cant)
             stats.cost += 5;
+
+        if (use_cant && this.cant_lift)
+            stats.liftbleed -= 4;
 
         return stats;
     }

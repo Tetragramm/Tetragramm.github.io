@@ -121,6 +121,64 @@ class Stats {
         if (js["warning"])
             this.warnings.push({ source: js["name"], warning: js["warning"] });
     }
+    serialize(s) {
+        s.PushNum(this.liftbleed);
+        s.PushNum(this.wetmass);
+        s.PushNum(this.mass);
+        s.PushNum(this.drag);
+        s.PushNum(this.control);
+        s.PushNum(this.cost);
+        s.PushNum(this.reqsections);
+        s.PushNum(this.visibility);
+        s.PushNum(this.flightstress);
+        s.PushNum(this.escape);
+        s.PushNum(this.pitchstab);
+        s.PushNum(this.latstab);
+        s.PushNum(this.cooling);
+        s.PushNum(this.reliability);
+        s.PushNum(this.power);
+        s.PushNum(this.fuelconsumption);
+        s.PushNum(this.maxstrain);
+        s.PushNum(this.structure);
+        s.PushFloat(this.pitchboost);
+        s.PushFloat(this.pitchspeed);
+        s.PushNum(this.wingarea);
+        s.PushNum(this.toughness);
+        s.PushNum(this.upkeep);
+        s.PushNum(this.crashsafety);
+        s.PushNum(this.bomb_mass);
+        s.PushNum(this.fuel);
+        s.PushNum(this.charge);
+    }
+    deserialize(d) {
+        this.liftbleed = d.GetNum();
+        this.wetmass = d.GetNum();
+        this.mass = d.GetNum();
+        this.drag = d.GetNum();
+        this.control = d.GetNum();
+        this.cost = d.GetNum();
+        this.reqsections = d.GetNum();
+        this.visibility = d.GetNum();
+        this.flightstress = d.GetNum();
+        this.escape = d.GetNum();
+        this.pitchstab = d.GetNum();
+        this.latstab = d.GetNum();
+        this.cooling = d.GetNum();
+        this.reliability = d.GetNum();
+        this.power = d.GetNum();
+        this.fuelconsumption = d.GetNum();
+        this.maxstrain = d.GetNum();
+        this.structure = d.GetNum();
+        this.pitchboost = d.GetFloat();
+        this.pitchspeed = d.GetFloat();
+        this.wingarea = d.GetNum();
+        this.toughness = d.GetNum();
+        this.upkeep = d.GetNum();
+        this.crashsafety = d.GetNum();
+        this.bomb_mass = d.GetNum();
+        this.fuel = d.GetNum();
+        this.charge = d.GetNum();
+    }
     Add(other) {
         var res = new Stats();
         res.liftbleed = this.liftbleed + other.liftbleed;
@@ -273,7 +331,10 @@ class Era extends Part {
         this.selected = 0;
         this.vals = [];
         for (let elem of js["options"]) {
-            var opt = { name: elem["name"], value: parseInt(elem["liftbleed"]) };
+            var opt = {
+                name: elem["name"], value: elem["liftbleed"],
+                maxbomb: elem["maxbomb"], cant_lift: elem["cant_lift"]
+            };
             this.vals.push(opt);
         }
     }
@@ -284,6 +345,12 @@ class Era extends Part {
     }
     fromJSON(js) {
         this.selected = js["selected"];
+    }
+    serialize(s) {
+        s.PushNum(this.selected);
+    }
+    deserialize(d) {
+        this.selected = d.GetNum();
     }
     GetSelected() {
         return this.selected;
@@ -297,6 +364,12 @@ class Era extends Part {
     }
     GetLiftBleed() {
         return this.vals[this.selected].value;
+    }
+    GetMaxBomb() {
+        return this.vals[this.selected].maxbomb;
+    }
+    GetCantLift() {
+        return this.vals[this.selected].cant_lift;
     }
     PartStats() {
         var s = new Stats();
@@ -331,12 +404,26 @@ class Cockpit extends Part {
             type: this.selected_type,
             upgrades: this.selected_upgrades,
             safety: this.selected_safety,
+            sights: this.selected_gunsights,
         };
     }
     fromJSON(js) {
         this.selected_type = js["type"];
         this.selected_upgrades = js["upgrades"];
         this.selected_safety = js["safety"];
+        this.selected_gunsights = js["sights"];
+    }
+    serialize(s) {
+        s.PushNum(this.selected_type);
+        s.PushBoolArr(this.selected_upgrades);
+        s.PushBoolArr(this.selected_safety);
+        s.PushBoolArr(this.selected_gunsights);
+    }
+    deserialize(d) {
+        this.selected_type = d.GetNum();
+        this.selected_upgrades = d.GetBoolArr();
+        this.selected_safety = d.GetBoolArr();
+        this.selected_gunsights = d.GetBoolArr();
     }
     GetTypeList() {
         return this.types;
@@ -411,7 +498,6 @@ class Cockpit extends Part {
         var can = [...Array(this.upgrades.length).fill(true)];
         if (this.is_primary) {
             can[0] = false;
-            can[3] = false;
         }
         return can;
     }
@@ -491,6 +577,24 @@ class Cockpits extends Part {
             if (this.positions.length == 0)
                 cp.SetPrimary();
             cp.fromJSON(elem);
+            cp.SetCalculateStats(this.CalculateStats);
+            this.positions.push(cp);
+        }
+    }
+    serialize(s) {
+        s.PushNum(this.positions.length);
+        for (let cp of this.positions) {
+            cp.serialize(s);
+        }
+    }
+    deserialize(d) {
+        var len = d.GetNum();
+        this.positions = [];
+        for (let i = 0; i < len; i++) {
+            let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
+            if (this.positions.length == 0)
+                cp.SetPrimary();
+            cp.deserialize(d);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
@@ -586,6 +690,16 @@ class Passengers extends Part {
         this.beds = js["beds"];
         this.connected = js["connected"];
     }
+    serialize(s) {
+        s.PushNum(this.seats);
+        s.PushNum(this.beds);
+        s.PushBool(this.connected);
+    }
+    deserialize(d) {
+        this.seats = d.GetNum();
+        this.beds = d.GetNum();
+        this.connected = d.GetBool();
+    }
     GetSeats() {
         return this.seats;
     }
@@ -638,14 +752,13 @@ class EngineStats {
         this.rumble = 0;
         this.oiltank = false;
         this.pulsejet = false;
-        this.spinner = false;
         this.stats = new Stats();
         if (js) {
             this.fromJSON(js);
         }
     }
     toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet, spinner: this.spinner }, this.stats.toJSON());
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
     }
     fromJSON(js) {
         this.name = js["name"];
@@ -655,10 +768,27 @@ class EngineStats {
         this.rumble = js["rumble"];
         this.oiltank = js["oiltank"];
         this.pulsejet = js["pulsejet"];
-        this.spinner = js["spinner"];
-        if (this.spinner == null)
-            this.spinner = false;
         this.stats = new Stats(js);
+    }
+    serialize(s) {
+        s.PushString(this.name);
+        s.PushNum(this.overspeed);
+        s.PushNum(this.altitude);
+        s.PushNum(this.torque);
+        s.PushNum(this.rumble);
+        s.PushBool(this.oiltank);
+        s.PushBool(this.pulsejet);
+        this.stats.serialize(s);
+    }
+    deserialize(d) {
+        this.name = d.GetString();
+        this.overspeed = d.GetNum();
+        this.altitude = d.GetNum();
+        this.torque = d.GetNum();
+        this.rumble = d.GetNum();
+        this.oiltank = d.GetBool();
+        this.pulsejet = d.GetBool();
+        this.stats.deserialize(d);
     }
     Add(other) {
         let res = new EngineStats();
@@ -670,7 +800,6 @@ class EngineStats {
         res.rumble = this.rumble + other.rumble;
         res.oiltank = this.oiltank || other.oiltank;
         res.pulsejet = this.pulsejet || other.pulsejet;
-        res.spinner = this.spinner || other.spinner;
         return res;
     }
     Clone() {
@@ -683,8 +812,7 @@ class EngineStats {
             && this.torque == other.torque
             && this.rumble == other.rumble
             && this.oiltank == other.oiltank
-            && this.pulsejet == other.pulsejet
-            && this.spinner == other.spinner;
+            && this.pulsejet == other.pulsejet;
     }
 }
 /// <reference path="./Part.ts" />
@@ -745,6 +873,41 @@ class Engine extends Part {
         this.cowl_sel = js["cowl_sel"];
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
+        this.selected_index = -1;
+        for (let i = 0; i < this.engine_list.length; i++) {
+            if (this.etype_stats.Equal(this.engine_list[i])) {
+                this.selected_index = i;
+                break;
+            }
+        }
+    }
+    serialize(s) {
+        this.etype_stats.serialize(s);
+        s.PushNum(this.cooling_count);
+        s.PushNum(this.radiator_index);
+        s.PushNum(this.selected_mount);
+        s.PushBool(this.use_pp);
+        s.PushBool(this.torque_to_struct);
+        s.PushBool(this.use_ds);
+        s.PushNum(this.gp_count);
+        s.PushNum(this.gpr_count);
+        s.PushNum(this.cowl_sel);
+        s.PushBool(this.is_generator);
+        s.PushBool(this.has_alternator);
+    }
+    deserialize(d) {
+        this.etype_stats.deserialize(d);
+        this.cooling_count = d.GetNum();
+        this.radiator_index = d.GetNum();
+        this.selected_mount = d.GetNum();
+        this.use_pp = d.GetBool();
+        this.torque_to_struct = d.GetBool();
+        this.use_ds = d.GetBool();
+        this.gp_count = d.GetNum();
+        this.gpr_count = d.GetNum();
+        this.cowl_sel = d.GetNum();
+        this.is_generator = d.GetBool();
+        this.has_alternator = d.GetBool();
         this.selected_index = -1;
         for (let i = 0; i < this.engine_list.length; i++) {
             if (this.etype_stats.Equal(this.engine_list[i])) {
@@ -1031,9 +1194,18 @@ class Engine extends Part {
         };
     }
     GetSpinner() {
-        if (this.gp_count > 0 && this.etype_stats.spinner)
-            return true;
-        return false;
+        if (this.gp_count > 0) {
+            if (this.use_ds &&
+                (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
+                    || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")) { //Uses Extended Driveshafts, can be arty, and rotary engine
+                return [true, true];
+            }
+            else if (!this.etype_stats.oiltank) { //Not rotary, so room for gun but not arty.
+                return [true, false];
+            }
+        }
+        //No spinner weapons
+        return [false, false];
     }
     IsElectrics() {
         return this.has_alternator || this.is_generator;
@@ -1095,8 +1267,7 @@ class Engine extends Part {
         }
         //Upgrades
         if (this.use_ds) {
-            stats.mass += Math.floor(stats.power / 10);
-            stats.cost += 2 * Math.floor(stats.power / 10);
+            stats.mass += 1;
         }
         stats.cost += this.gp_count + this.gpr_count;
         if (this.is_generator) {
@@ -1198,6 +1369,39 @@ class Engines extends Part {
         }
         this.is_asymmetric = js["is_asymmetric"];
     }
+    serialize(s) {
+        s.PushNum(this.engines.length);
+        for (let en of this.engines) {
+            en.serialize(s);
+        }
+        s.PushNum(this.radiators.length);
+        for (let rd of this.radiators) {
+            rd.serialize(s);
+        }
+        s.PushBool(this.is_asymmetric);
+    }
+    deserialize(d) {
+        var elen = d.GetNum();
+        this.engines = [];
+        for (let i = 0; i < elen; i++) {
+            let eng = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            eng.deserialize(d);
+            eng.SetCalculateStats(this.CalculateStats);
+            this.engines.push(eng);
+        }
+        var rlen = d.GetNum();
+        this.radiators = [];
+        for (let i = 0; i < rlen; i++) {
+            let rad = new Radiator(this.r_type_list, this.r_mount_list, this.r_coolant_list);
+            rad.derserialize(d);
+            rad.SetCalculateStats(this.CalculateStats);
+            this.radiators.push(rad);
+        }
+        this.is_asymmetric = d.GetBool();
+        for (let en of this.engines) {
+            en.SetNumRadiators(this.GetNumberOfRadiators());
+        }
+    }
     GetHasOilTank() {
         for (let e of this.engines) {
             if (e.GetCurrentStats().oiltank)
@@ -1227,9 +1431,15 @@ class Engines extends Part {
         while (this.engines.length > num) {
             this.engines.pop();
         }
+        var js = null;
+        if (this.engines.length > 0) {
+            js = JSON.parse(JSON.stringify(this.engines[this.engines.length - 1].toJSON()));
+        }
         while (this.engines.length < num) {
             let en = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
+            if (js)
+                en.fromJSON(js);
             this.engines.push(en);
             en.SetNumRadiators(this.GetNumberOfRadiators());
         }
@@ -1317,25 +1527,29 @@ class Engines extends Part {
         return r;
     }
     GetTractor() {
-        var ret = { have: false, spin_count: 0 };
+        var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
             var t = e.GetTractor();
             if (t.has) {
                 ret.have = true;
-                if (t.spinner)
+                if (t.spinner[0])
                     ret.spin_count++;
+                if (t.spinner[1])
+                    ret.arty_spin_count++;
             }
         }
         return ret;
     }
     GetPusher() {
-        var ret = { have: false, spin_count: 0 };
+        var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
             var t = e.GetPusher();
             if (t.has) {
                 ret.have = true;
-                if (t.spinner)
+                if (t.spinner[0])
                     ret.spin_count++;
+                if (t.spinner[1])
+                    ret.arty_spin_count++;
             }
         }
         return ret;
@@ -1390,6 +1604,14 @@ class Engines extends Part {
         //Asymmetric planes
         if (this.is_asymmetric)
             stats.latstab -= 3;
+        var is_pulsejet = false;
+        for (let en of this.engines) {
+            if (en.GetIsPulsejet())
+                is_pulsejet = true;
+        }
+        if (is_pulsejet) {
+            stats.warnings.push({ source: "Pulsejets", warning: "Pulsejets double Boost when above dropoff speed." });
+        }
         //Part local, gets handled in UpdateReliability
         stats.reliability = 0;
         return stats;
@@ -1416,7 +1638,11 @@ class Propeller extends Part {
         this.have_propellers = true;
         this.prop_list = [];
         for (let elem of json["props"]) {
-            this.prop_list.push({ name: elem["name"], stats: new Stats(elem), automatic: elem["automatic"] });
+            this.prop_list.push({
+                name: elem["name"], stats: new Stats(elem),
+                automatic: elem["automatic"],
+                energy: elem["energy"], turn: elem["turn"],
+            });
         }
     }
     toJSON() {
@@ -1428,6 +1654,14 @@ class Propeller extends Part {
     fromJSON(js) {
         this.idx_prop = js["type"];
         this.use_variable = js["use_variable"];
+    }
+    serialize(s) {
+        s.PushNum(this.idx_prop);
+        s.PushBool(this.use_variable);
+    }
+    deserialize(d) {
+        this.idx_prop = d.GetNum();
+        this.use_variable = d.GetBool();
     }
     GetPropList() {
         return this.prop_list;
@@ -1460,6 +1694,18 @@ class Propeller extends Part {
     GetHavePropeller() {
         return this.have_propellers;
     }
+    GetEnergy() {
+        if (this.have_propellers)
+            return this.prop_list[this.idx_prop].energy;
+        else
+            return 5;
+    }
+    GetTurn() {
+        if (this.have_propellers)
+            return this.prop_list[this.idx_prop].turn;
+        else
+            return 7;
+    }
     PartStats() {
         var stats = new Stats();
         if (this.have_propellers) {
@@ -1473,7 +1719,7 @@ class Propeller extends Part {
             }
         }
         else {
-            stats.pitchboost = 1;
+            stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
         }
         return stats;
@@ -1519,6 +1765,7 @@ class Frames extends Part {
             });
         }
         this.flying_wing = false;
+        this.is_tandem = false;
         this.section_list = [];
         this.tail_section_list = [];
         this.SetRequiredSections(1);
@@ -1554,6 +1801,68 @@ class Frames extends Part {
         this.boom = js["use_boom"];
         this.sel_tail = js["tail_index"];
         this.flying_wing = js["flying_wing"];
+    }
+    serialize(s) {
+        s.PushNum(this.section_list.length);
+        for (let i = 0; i < this.section_list.length; i++) {
+            var sec = this.section_list[i];
+            s.PushNum(sec.frame);
+            s.PushNum(sec.skin);
+            s.PushBool(sec.geodesic);
+            s.PushBool(sec.monocoque);
+            s.PushBool(sec.lifting_body);
+            s.PushBool(sec.internal_bracing);
+        }
+        s.PushNum(this.tail_section_list.length);
+        for (let i = 0; i < this.tail_section_list.length; i++) {
+            var sec = this.tail_section_list[i];
+            s.PushNum(sec.frame);
+            s.PushNum(sec.skin);
+            s.PushBool(sec.geodesic);
+            s.PushBool(sec.monocoque);
+            s.PushBool(sec.lifting_body);
+            s.PushBool(sec.internal_bracing);
+        }
+        s.PushNum(this.sel_tail);
+        s.PushBool(this.farman);
+        s.PushBool(this.boom);
+        s.PushBool(this.flying_wing);
+    }
+    deserialize(d) {
+        var slen = d.GetNum();
+        this.section_list = [];
+        for (let i = 0; i < slen; i++) {
+            let sec = {
+                frame: 0, skin: 0, geodesic: false,
+                monocoque: false, lifting_body: false, internal_bracing: false
+            };
+            sec.frame = d.GetNum();
+            sec.skin = d.GetNum();
+            sec.geodesic = d.GetBool();
+            sec.monocoque = d.GetBool();
+            sec.lifting_body = d.GetBool();
+            sec.internal_bracing = d.GetBool();
+            this.section_list.push(sec);
+        }
+        var tlen = d.GetNum();
+        this.tail_section_list = [];
+        for (let i = 0; i < tlen; i++) {
+            let sec = {
+                frame: 0, skin: 0, geodesic: false,
+                monocoque: false, lifting_body: false, internal_bracing: false
+            };
+            sec.frame = d.GetNum();
+            sec.skin = d.GetNum();
+            sec.geodesic = d.GetBool();
+            sec.monocoque = d.GetBool();
+            sec.lifting_body = d.GetBool();
+            sec.internal_bracing = d.GetBool();
+            this.tail_section_list.push(sec);
+        }
+        this.sel_tail = d.GetNum();
+        this.farman = d.GetBool();
+        this.boom = d.GetBool();
+        this.flying_wing = d.GetBool();
     }
     DuplicateSection(num) {
         var sec = this.section_list[num];
@@ -1782,7 +2091,27 @@ class Frames extends Part {
         }
         return stats;
     }
+    CountLiftingBody() {
+        var count = 0;
+        for (let s of this.section_list) {
+            if (s.lifting_body)
+                count++;
+        }
+        for (let s of this.tail_section_list) {
+            if (s.lifting_body)
+                count++;
+        }
+        return count;
+    }
+    SetIsTandem(use) {
+        if (this.is_tandem != use) {
+            this.is_tandem = use;
+            this.SetTailType(this.sel_tail);
+        }
+    }
     SetTailType(num) {
+        if (this.tail_list[num].stats.reqsections == 0 && this.is_tandem)
+            num++;
         this.sel_tail = num;
         this.SetRequiredTailSections(this.tail_list[num].stats.reqsections);
     }
@@ -1886,6 +2215,36 @@ class Frames extends Part {
     GetIsTailless() {
         return this.tail_section_list.length == 0;
     }
+    SetAllFrame(num) {
+        for (let s of this.section_list) {
+            s.frame = num;
+        }
+        for (let s of this.tail_section_list) {
+            s.frame = num;
+        }
+        this.CalculateStats();
+    }
+    SetAllSkin(num) {
+        for (let s of this.section_list) {
+            s.skin = num;
+        }
+        for (let s of this.tail_section_list) {
+            s.skin = num;
+        }
+        this.CalculateStats();
+    }
+    GetArmor() {
+        var count = 0;
+        for (let s of this.section_list) {
+            if (this.skin_list[s.skin].name == "Dragon Skin")
+                count++;
+        }
+        for (let s of this.tail_section_list) {
+            if (this.skin_list[s.skin].name == "Dragon Skin")
+                count++;
+        }
+        return count;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -1912,8 +2271,8 @@ class Frames extends Part {
             stats.structure += 30;
         if (this.flying_wing) {
             stats.liftbleed += 5;
-            stats.drag = 0;
-            tail_stats.drag = 0;
+            stats.drag -= this.CountLiftingBody();
+            ;
         }
         stats = stats.Add(this.tail_list[this.sel_tail].stats);
         if (this.boom) {
@@ -1925,6 +2284,7 @@ class Frames extends Part {
         stats.structure = Math.floor(stats.structure);
         stats.cost = Math.floor(stats.cost);
         stats.visibility = Math.min(stats.visibility, 3);
+        stats.Round();
         return stats;
     }
 }
@@ -1933,7 +2293,6 @@ class Frames extends Part {
 class Wings extends Part {
     constructor(js) {
         super();
-        this.test_drag = false;
         this.skin_list = [];
         for (let elem of js["surface"]) {
             this.skin_list.push({
@@ -1976,6 +2335,60 @@ class Wings extends Part {
         this.wing_stagger = js["wing_stagger"];
         this.is_swept = js["is_swept"];
         this.is_closed = js["is_closed"];
+    }
+    serialize(s) {
+        s.PushNum(this.wing_list.length);
+        for (let i = 0; i < this.wing_list.length; i++) {
+            var w = this.wing_list[i];
+            s.PushNum(w.surface);
+            s.PushNum(w.area);
+            s.PushNum(w.span);
+            s.PushNum(w.dihedral);
+            s.PushNum(w.anhedral);
+            s.PushNum(w.deck);
+        }
+        s.PushNum(this.mini_wing_list.length);
+        for (let i = 0; i < this.mini_wing_list.length; i++) {
+            var w = this.mini_wing_list[i];
+            s.PushNum(w.surface);
+            s.PushNum(w.area);
+            s.PushNum(w.span);
+            s.PushNum(w.dihedral);
+            s.PushNum(w.anhedral);
+            s.PushNum(w.deck);
+        }
+        s.PushNum(this.wing_stagger);
+        s.PushBool(this.is_swept);
+        s.PushBool(this.is_closed);
+    }
+    deserialize(d) {
+        var wlen = d.GetNum();
+        this.wing_list = [];
+        for (let i = 0; i < wlen; i++) {
+            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            wing.surface = d.GetNum();
+            wing.area = d.GetNum();
+            wing.span = d.GetNum();
+            wing.dihedral = d.GetNum();
+            wing.anhedral = d.GetNum();
+            wing.deck = d.GetNum();
+            this.wing_list.push(wing);
+        }
+        var mlen = d.GetNum();
+        this.mini_wing_list = [];
+        for (let i = 0; i < mlen; i++) {
+            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            wing.surface = d.GetNum();
+            wing.area = d.GetNum();
+            wing.span = d.GetNum();
+            wing.dihedral = d.GetNum();
+            wing.anhedral = d.GetNum();
+            wing.deck = d.GetNum();
+            this.mini_wing_list.push(wing);
+        }
+        this.wing_stagger = d.GetNum();
+        this.is_swept = d.GetBool();
+        this.is_closed = d.GetBool();
     }
     GetWingList() {
         return this.wing_list;
@@ -2021,16 +2434,6 @@ class Wings extends Part {
                 }
             }
         }
-        else {
-            var count = this.DeckCountFull();
-            for (let i = this.wing_list.length - 1; i >= 0; i--) {
-                let w = this.wing_list[i];
-                if (count[w.deck] == 1 && this.wing_list.length > 1) {
-                    count[w.deck]--;
-                    this.wing_list.splice(i, 1);
-                }
-            }
-        }
         this.CalculateStats();
     }
     GetStagger() {
@@ -2042,13 +2445,7 @@ class Wings extends Part {
         if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
             return false;
         var full_count = this.DeckCountFull();
-        if (this.stagger_list[this.wing_stagger].inline) {
-            if (full_count[deck] == 2)
-                return false;
-            if (full_count[deck] == 0 && this.wing_list.length > 0)
-                return false;
-        }
-        else if (full_count[deck] == 1 && this.deck_list[deck].limited)
+        if (!this.stagger_list[this.wing_stagger].inline && full_count[deck] == 1 && this.deck_list[deck].limited)
             return false;
         var mini_count = this.DeckCountMini();
         if (mini_count[deck] != 0)
@@ -2109,7 +2506,7 @@ class Wings extends Part {
         return this.is_swept;
     }
     GetTandem() {
-        return this.stagger_list[this.wing_stagger].wing_count == 2;
+        return this.stagger_list[this.wing_stagger].inline;
     }
     GetMonoplane() {
         return this.wing_list.length == 1;
@@ -2250,6 +2647,7 @@ class Wings extends Part {
             this.is_swept = false;
         var stats = new Stats();
         var have_wing = false;
+        var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
         let drag_reduction = 0;
@@ -2266,25 +2664,22 @@ class Wings extends Part {
                 stats.visibility -= 1;
             }
             var wStats = new Stats();
-            //Deck Stats
-            wStats = wStats.Add(this.deck_list[w.deck].stats);
             //Actual stats
             wStats = wStats.Add(this.skin_list[w.surface].stats.Multiply(w.area));
             wStats.wingarea = w.area;
-            wStats.maxstrain -= 2 * w.span + w.area - 10;
+            //Wings cannot generate positive max strain
+            wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            if (this.test_drag)
-                wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
-            else
-                wStats.drag = Math.max(1, wStats.drag + 2 * w.area - w.span - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             //stability from -hedral
             wStats.latstab += w.dihedral - w.anhedral;
             wStats.liftbleed += w.dihedral + w.anhedral;
-            //If tandem, set leading wing drag reduction
-            if (this.stagger_list[this.wing_stagger].inline && drag_reduction == 0)
-                drag_reduction = Math.floor(w.area / 2);
+            //Inline wings
+            if (deck_count[w.deck] > 1) {
+                wStats.drag = Math.floor(0.75 * wStats.drag);
+            }
             wStats.Round();
             stats = stats.Add(wStats);
         }
@@ -2301,13 +2696,18 @@ class Wings extends Part {
             }
             //Actual stats
             var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
-            wStats.maxstrain -= 2 * wspan + w.area - 10;
+            wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
-            //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + w.area - wspan);
+            //Drag is modified by area, span
+            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             wStats.Round();
             stats = stats.Add(wStats);
+        }
+        //Deck Stats
+        for (let i = 0; i < this.deck_list.length; i++) {
+            if (deck_count[i] > 0)
+                stats = stats.Add(this.deck_list[i].stats);
         }
         //Longest wing effects
         stats.control += 8 - longest_span;
@@ -2383,6 +2783,18 @@ class Stabilizers extends Part {
         this.hstab_count = js["hstab_count"];
         this.vstab_sel = js["vstab_sel"];
         this.vstab_count = js["vstab_count"];
+    }
+    serialize(s) {
+        s.PushNum(this.hstab_sel);
+        s.PushNum(this.hstab_count);
+        s.PushNum(this.vstab_sel);
+        s.PushNum(this.vstab_count);
+    }
+    deserialize(d) {
+        this.hstab_sel = d.GetNum();
+        this.hstab_count = d.GetNum();
+        this.vstab_sel = d.GetNum();
+        this.vstab_count = d.GetNum();
     }
     GetHStabList() {
         return this.hstab_list;
@@ -2640,6 +3052,22 @@ class ControlSurfaces extends Part {
         this.slats_sel = js["slats_sel"];
         this.drag_sel = js["drag_sel"];
     }
+    serialize(s) {
+        s.PushNum(this.aileron_sel);
+        s.PushNum(this.rudder_sel);
+        s.PushNum(this.elevator_sel);
+        s.PushNum(this.flaps_sel);
+        s.PushNum(this.slats_sel);
+        s.PushBoolArr(this.drag_sel);
+    }
+    deserialize(d) {
+        this.aileron_sel = d.GetNum();
+        this.rudder_sel = d.GetNum();
+        this.elevator_sel = d.GetNum();
+        this.flaps_sel = d.GetNum();
+        this.slats_sel = d.GetNum();
+        this.drag_sel = d.GetBoolArr();
+    }
     GetAileronList() {
         return this.aileron_list;
     }
@@ -2741,12 +3169,21 @@ class ControlSurfaces extends Part {
 class Reinforcement extends Part {
     constructor(js) {
         super();
-        this.ext_list = [];
-        for (let elem of js["external"]) {
-            this.ext_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+        this.ext_wood_list = [];
+        for (let elem of js["external_wood"]) {
+            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
         }
-        this.ext_wood_count = [...Array(this.ext_list.length).fill(0)];
-        this.ext_steel_count = [...Array(this.ext_list.length).fill(0)];
+        this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
+        this.ext_steel_list = [];
+        for (let elem of js["external_steel"]) {
+            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+        }
+        this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
+        this.ext_cabane_list = [];
+        for (let elem of js["cabane"]) {
+            this.ext_cabane_list.push({ name: elem["name"], tension: elem["tension"], stats: new Stats(elem) });
+        }
+        this.cabane_sel = 0;
         this.cant_list = [];
         for (let elem of js["cantilever"]) {
             this.cant_list.push({ name: elem["name"], limited: elem["limited"], stats: new Stats(elem) });
@@ -2757,6 +3194,7 @@ class Reinforcement extends Part {
         this.is_tandem = false;
         this.is_monoplane = false;
         this.acft_structure = 0;
+        this.cant_lift = false;
     }
     toJSON() {
         return {
@@ -2764,6 +3202,7 @@ class Reinforcement extends Part {
             ext_steel_count: this.ext_steel_count,
             cant_count: this.cant_count,
             wires: this.wires,
+            cabane_sel: this.cabane_sel,
         };
     }
     fromJSON(js) {
@@ -2771,9 +3210,24 @@ class Reinforcement extends Part {
         this.ext_steel_count = js["ext_steel_count"];
         this.cant_count = js["cant_count"];
         this.wires = js["wires"];
+        this.cabane_sel = js["cabane_sel"];
+    }
+    serialize(s) {
+        s.PushNumArr(this.ext_wood_count);
+        s.PushNumArr(this.ext_steel_count);
+        s.PushNumArr(this.cant_count);
+        s.PushBool(this.wires);
+        s.PushNum(this.cabane_sel);
+    }
+    deserialize(d) {
+        this.ext_wood_count = d.GetNumArr();
+        this.ext_steel_count = d.GetNumArr();
+        this.cant_count = d.GetNumArr();
+        this.wires = d.GetBool();
+        this.cabane_sel = d.GetNum();
     }
     GetExternalList() {
-        return this.ext_list;
+        return this.ext_wood_list;
     }
     GetCantileverList() {
         return this.cant_list;
@@ -2856,10 +3310,10 @@ class Reinforcement extends Part {
             this.CalculateStats();
     }
     TotalStructure() {
-        var struct_count = 0;
-        for (let i = 0; i < this.ext_list.length; i++) {
-            struct_count += this.ext_wood_count[i] * this.ext_list[i].stats.structure;
-            struct_count += this.ext_steel_count[i] * 2 * this.ext_list[i].stats.structure;
+        var struct_count = this.ext_cabane_list[this.cabane_sel].stats.structure;
+        for (let i = 0; i < this.ext_wood_list.length; i++) {
+            struct_count += this.ext_wood_count[i] * this.ext_wood_list[i].stats.structure;
+            struct_count += this.ext_steel_count[i] * this.ext_steel_list[i].stats.structure;
         }
         return this.acft_structure + struct_count;
     }
@@ -2872,6 +3326,19 @@ class Reinforcement extends Part {
             return 1;
         else
             return 0;
+    }
+    GetCabaneList() {
+        return this.ext_cabane_list;
+    }
+    GetCabane() {
+        return this.cabane_sel;
+    }
+    SetCabane(num) {
+        this.cabane_sel = num;
+        this.CalculateStats();
+    }
+    SetCantLift(use) {
+        this.cant_lift = use;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -2888,34 +3355,37 @@ class Reinforcement extends Part {
         var tension = 0;
         var strut_count = 0;
         //Wood Struts
-        for (let i = 0; i < this.ext_list.length; i++) {
+        for (let i = 0; i < this.ext_wood_list.length; i++) {
             strut_count += this.ext_wood_count[i];
             if (this.ext_wood_count[i] > 0) {
-                let ts = this.ext_list[i].stats;
+                let ts = this.ext_wood_list[i].stats;
                 ts = ts.Multiply(this.ext_wood_count[i]);
                 stats = stats.Add(ts);
-                if (this.ext_list[i].config)
-                    tension += tension_multiple * this.ext_list[i].tension * this.ext_wood_count[i];
+                if (this.ext_wood_list[i].config)
+                    tension += tension_multiple * this.ext_wood_list[i].tension * this.ext_wood_count[i];
                 else
-                    tension += this.ext_list[i].tension * this.ext_wood_count[i];
+                    tension += this.ext_wood_list[i].tension * this.ext_wood_count[i];
             }
         }
         //Steel Struts
-        for (let i = 0; i < this.ext_list.length; i++) {
+        for (let i = 0; i < this.ext_steel_list.length; i++) {
             strut_count += this.ext_steel_count[i];
             if (this.ext_steel_count[i] > 0) {
-                let ts = this.ext_list[i].stats.Clone();
-                ts.structure *= 2;
-                ts.cost *= 2;
-                ts.maxstrain += 5;
+                let ts = this.ext_steel_list[i].stats.Clone();
                 ts = ts.Multiply(this.ext_steel_count[i]);
                 stats = stats.Add(ts);
-                if (this.ext_list[i].config)
-                    tension += tension_multiple * this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+                if (this.ext_steel_list[i].config)
+                    tension += tension_multiple * this.ext_steel_list[i].tension * this.ext_steel_count[i];
                 else
-                    tension += this.ext_list[i].tension / 2.0 * this.ext_steel_count[i];
+                    tension += this.ext_steel_list[i].tension * this.ext_steel_count[i];
             }
         }
+        //Cabane Strut
+        let ts = this.ext_cabane_list[this.cabane_sel].stats.Clone();
+        stats = stats.Add(ts);
+        tension += tension_multiple * this.ext_cabane_list[this.cabane_sel].tension;
+        if (this.cabane_sel > 0)
+            strut_count += 1;
         if (this.wires) {
             stats.maxstrain += Math.floor(tension);
             stats.drag += 3 * strut_count;
@@ -2931,6 +3401,8 @@ class Reinforcement extends Part {
         }
         if (use_cant)
             stats.cost += 5;
+        if (use_cant && this.cant_lift)
+            stats.liftbleed -= 4;
         return stats;
     }
 }
@@ -2963,6 +3435,16 @@ class Fuel extends Part {
         this.tank_count = js["tank_count"];
         this.self_sealing = js["self_sealing"];
         this.fire_extinguisher = js["fire_extinguisher"];
+    }
+    serialize(s) {
+        s.PushNumArr(this.tank_count);
+        s.PushBool(this.self_sealing);
+        s.PushBool(this.fire_extinguisher);
+    }
+    deserialize(d) {
+        this.tank_count = d.GetNumArr();
+        this.self_sealing = d.GetBool();
+        this.fire_extinguisher = d.GetBool();
     }
     GetTankList() {
         return this.tank_stats;
@@ -3088,23 +3570,35 @@ class Munitions extends Part {
     constructor() {
         super();
         this.bomb_count = 0;
-        this.rocket_count = 0;
+        this.internal_bay_count = 0;
         this.internal_bay_1 = false;
         this.internal_bay_2 = false;
     }
     toJSON() {
         return {
             bomb_count: this.bomb_count,
-            rocket_count: this.rocket_count,
+            bay_count: this.internal_bay_count,
             bay1: this.internal_bay_1,
             bay2: this.internal_bay_2,
         };
     }
     fromJSON(js) {
         this.bomb_count = js["bomb_count"];
-        this.rocket_count = js["rocket_count"];
+        this.internal_bay_count = js["bay_count"];
         this.internal_bay_1 = js["bay1"];
         this.internal_bay_2 = js["bay2"];
+    }
+    serialize(s) {
+        s.PushNum(this.bomb_count);
+        s.PushNum(this.internal_bay_count);
+        s.PushBool(this.internal_bay_1);
+        s.PushBool(this.internal_bay_2);
+    }
+    deserialize(d) {
+        this.bomb_count = d.GetNum();
+        this.internal_bay_count = d.GetNum();
+        this.internal_bay_1 = d.GetBool();
+        this.internal_bay_2 = d.GetBool();
     }
     GetBombCount() {
         return this.bomb_count;
@@ -3117,22 +3611,21 @@ class Munitions extends Part {
         this.LimitMass(true);
         this.CalculateStats();
     }
-    GetRocketCount() {
-        return this.rocket_count;
-    }
-    SetRocketCount(count) {
-        if (count != count || count < 0)
-            count = 0;
-        count = Math.floor(count);
-        this.rocket_count = count;
-        this.LimitMass(false);
-        this.CalculateStats();
+    GetBayCount() {
+        return this.internal_bay_count;
     }
     GetBay1() {
         return this.internal_bay_1;
     }
     GetBay2() {
         return this.internal_bay_2;
+    }
+    SetBayCount(count) {
+        if (count != count || count < 0)
+            count = 0;
+        count = Math.floor(count);
+        this.internal_bay_count = count;
+        this.CalculateStats();
     }
     SetUseBays(bay1, bay2) {
         this.internal_bay_1 = bay1;
@@ -3145,15 +3638,9 @@ class Munitions extends Part {
     }
     LimitMass(bomb) {
         var reduce = false;
-        while (this.bomb_count + this.rocket_count > this.acft_struct / 5) {
+        while (this.bomb_count > this.acft_struct * this.maxbomb) {
             reduce = true;
-            if ((bomb && this.bomb_count > 0)
-                || (!bomb && this.rocket_count == 0)) {
-                this.bomb_count--;
-            }
-            else {
-                this.rocket_count--;
-            }
+            this.bomb_count--;
         }
         return reduce;
     }
@@ -3165,11 +3652,12 @@ class Munitions extends Part {
                 ext_bomb_count = 0;
             }
         }
-        var ext_mass = ext_bomb_count + this.rocket_count;
+        var ext_mass = ext_bomb_count;
         return ext_mass;
     }
-    SetAcftStructure(num) {
+    SetAcftStructure(num, maxbomb) {
         this.acft_struct = num;
+        this.maxbomb = maxbomb;
         if (this.LimitMass(false)) {
             this.CalculateStats();
         }
@@ -3179,25 +3667,32 @@ class Munitions extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        // stats.wetmass += this.bomb_count;
-        // stats.wetmass += this.rocket_count;
-        var ext_bomb_count = this.bomb_count;
-        if (this.internal_bay_1) {
-            stats.reqsections++;
-            ext_bomb_count = Math.floor(ext_bomb_count / 2);
-            if (this.internal_bay_2) {
+        var ext_bomb_count = this.bomb_count - 10 * this.internal_bay_count;
+        ext_bomb_count = Math.max(0, ext_bomb_count);
+        stats.reqsections += this.internal_bay_count;
+        if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+            if (this.internal_bay_1) {
                 stats.reqsections++;
-                ext_bomb_count = 0;
+                if (this.internal_bay_2) {
+                    stats.reqsections++;
+                    var sz = Math.floor(10 * this.internal_bay_count);
+                    stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
+                }
+                else {
+                    var sz = Math.floor(10 * this.internal_bay_count / 2);
+                    stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
+                }
+            }
+            else {
+                var sz = Math.floor(10 * this.internal_bay_count / 4);
+                stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
             }
         }
-        var ext_mass = ext_bomb_count + this.rocket_count;
-        var rack_mass = Math.ceil(ext_mass / 5);
+        var rack_mass = Math.ceil(ext_bomb_count / 5);
         stats.mass += rack_mass;
-        stats.bomb_mass = this.bomb_count + this.rocket_count;
+        stats.bomb_mass = this.bomb_count;
         stats.reqsections = Math.ceil(stats.reqsections);
         //Because it is load, it rounds up to the nearest 5 mass.
-        if ((stats.wetmass % 5) > 0)
-            stats.wetmass += 5 - (stats.wetmass % 5);
         if ((stats.bomb_mass % 5) > 0)
             stats.bomb_mass += 5 - (stats.bomb_mass % 5);
         return stats;
@@ -3206,60 +3701,45 @@ class Munitions extends Part {
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class CargoAndPassengers extends Part {
-    constructor() {
+    constructor(js) {
         super();
-        this.mass = 0;
-        this.pass = 0;
+        this.cargo_list = [];
+        for (let elem of js["spaces"]) {
+            this.cargo_list.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.cargo_sel = 0;
     }
     toJSON() {
         return {
-            mass: this.mass,
-            pass: this.pass,
+            space_sel: this.cargo_sel,
         };
     }
     fromJSON(js) {
-        this.mass = js["mass"];
-        this.pass = js["pass"];
+        this.cargo_sel = js["space_sel"];
     }
-    GetMass() {
-        return this.mass;
+    serialize(s) {
+        s.PushNum(this.cargo_sel);
     }
-    SetMass(count) {
-        if (count != count || count < 0)
-            count = 0;
-        count = Math.floor(count);
-        this.mass = count;
+    deserialize(d) {
+        this.cargo_sel = d.GetNum();
+    }
+    GetSpaceList() {
+        return this.cargo_list;
+    }
+    GetSpace() {
+        return this.cargo_sel;
+    }
+    SetSpace(num) {
+        this.cargo_sel = num;
         this.CalculateStats();
-    }
-    GetPassengers() {
-        return this.pass;
-    }
-    SetPassengers(count) {
-        if (count != count || count < 0)
-            count = 0;
-        count = Math.floor(count);
-        this.pass = count;
-        this.CalculateStats();
-    }
-    SetSeats(count) {
-        this.seats = count;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
     PartStats() {
         var stats = new Stats();
-        stats.wetmass += Math.max(this.pass, this.seats);
-        //Can be placed in cargo space, if uncomfortably. Takes 3 mass.
-        if (this.pass > this.seats) {
-            stats.wetmass += 3 * (this.pass - this.seats);
-        }
-        else {
-            //Cargo can be placed in half seats.
-            var emptyseat = this.seats - this.pass;
-            if (this.mass - emptyseat > 0)
-                stats.wetmass += this.mass - emptyseat;
-        }
+        stats = stats.Add(this.cargo_list[this.cargo_sel].stats);
+        stats.wetmass += stats.reqsections * 3;
         //Because it is load, it rounds up to the nearest 5 mass.
         if ((stats.wetmass % 5) > 0)
             stats.wetmass += 5 - (stats.wetmass % 5);
@@ -3304,6 +3784,16 @@ class LandingGear extends Part {
         this.gear_sel = js["gear_sel"];
         this.retract = js["retract"];
         this.extra_sel = js["extra_sel"];
+    }
+    serialize(s) {
+        s.PushNum(this.gear_sel);
+        s.PushBool(this.retract);
+        s.PushBoolArr(this.extra_sel);
+    }
+    deserialize(d) {
+        this.gear_sel = d.GetNum();
+        this.retract = d.GetBool();
+        this.extra_sel = d.GetBoolArr();
     }
     GetGearName() {
         if (this.retract)
@@ -3397,6 +3887,8 @@ class Accessories extends Part {
         super();
         this.armour_coverage = [...Array(8).fill(0)];
         this.acft_power = 0;
+        this.acft_rad = false;
+        this.skin_armour = 0;
         this.electric_list = [];
         for (let elem of js["electrical"]) {
             this.electric_list.push({
@@ -3460,6 +3952,26 @@ class Accessories extends Part {
         this.clim_sel = js["clim_sel"];
         this.auto_sel = js["auto_sel"];
         this.cont_sel = js["cont_sel"];
+    }
+    serialize(s) {
+        s.PushNumArr(this.armour_coverage);
+        s.PushNumArr(this.electrical_count);
+        s.PushNum(this.radio_sel);
+        s.PushBoolArr(this.info_sel);
+        s.PushBoolArr(this.visi_sel);
+        s.PushBoolArr(this.clim_sel);
+        s.PushNum(this.auto_sel);
+        s.PushNum(this.cont_sel);
+    }
+    deserialize(d) {
+        this.armour_coverage = d.GetNumArr();
+        this.electrical_count = d.GetNumArr();
+        this.radio_sel = d.GetNum();
+        this.info_sel = d.GetBoolArr();
+        this.visi_sel = d.GetBoolArr();
+        this.clim_sel = d.GetBoolArr();
+        this.auto_sel = d.GetNum();
+        this.cont_sel = d.GetNum();
     }
     GetCommunicationName() {
         return this.radio_list[this.radio_sel].name;
@@ -3573,16 +4085,27 @@ class Accessories extends Part {
             return true;
         return false;
     }
+    SetSkinArmor(num) {
+        if (num < this.skin_armour)
+            this.armour_coverage[1] += num - this.skin_armour;
+        this.skin_armour = num;
+        this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
     PartStats() {
         var stats = new Stats();
+        this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
         //Armour
         for (let i = 0; i < this.armour_coverage.length; i++) {
             let AP = i + 1;
-            stats.mass += this.armour_coverage[i] * AP;
-            stats.cost += Math.floor(this.armour_coverage[i] * AP / 3);
+            var count = this.armour_coverage[i];
+            if (AP == 2) {
+                count -= this.skin_armour;
+            }
+            stats.mass += count * AP;
+            stats.cost += Math.floor(count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
         }
         //Electrical
@@ -3653,6 +4176,28 @@ class Optimization extends Part {
         this.maxstrain = js["maxstrain"];
         this.reliability = js["reliability"];
         this.drag = js["drag"];
+    }
+    serialize(s) {
+        s.PushNum(this.free_dots);
+        s.PushNum(this.cost);
+        s.PushNum(this.bleed);
+        s.PushNum(this.escape);
+        s.PushNum(this.mass);
+        s.PushNum(this.toughness);
+        s.PushNum(this.maxstrain);
+        s.PushNum(this.reliability);
+        s.PushNum(this.drag);
+    }
+    deserialize(d) {
+        this.free_dots = d.GetNum();
+        this.cost = d.GetNum();
+        this.bleed = d.GetNum();
+        this.escape = d.GetNum();
+        this.mass = d.GetNum();
+        this.toughness = d.GetNum();
+        this.maxstrain = d.GetNum();
+        this.reliability = d.GetNum();
+        this.drag = d.GetNum();
     }
     GetUnassignedCount() {
         return this.free_dots - this.cost - this.bleed
@@ -3820,15 +4365,15 @@ class Optimization extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        stats.cost = Math.floor(-(this.cost * 1.5 * this.acft_stats.cost / 10));
-        stats.liftbleed = Math.floor(-this.bleed * 2);
+        stats.cost = Math.floor(-(this.cost * 2 * this.acft_stats.cost / 10));
+        stats.liftbleed = Math.floor(-this.bleed * 3);
         stats.escape = this.escape;
         stats.visibility = this.escape;
-        stats.mass = Math.floor(-(this.mass * this.acft_stats.mass / 20));
-        stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 5);
-        stats.maxstrain = Math.floor(this.maxstrain * this.acft_stats.maxstrain / 10);
+        stats.mass = Math.floor(-(this.mass * this.acft_stats.mass / 10));
+        stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 4);
+        stats.maxstrain = Math.floor(this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
-        stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 20));
+        stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 10));
         return stats;
     }
 }
@@ -3843,6 +4388,7 @@ var SynchronizationType;
     SynchronizationType[SynchronizationType["SYNCH"] = 1] = "SYNCH";
     SynchronizationType[SynchronizationType["SPINNER"] = 2] = "SPINNER";
     SynchronizationType[SynchronizationType["DEFLECT"] = 3] = "DEFLECT";
+    SynchronizationType[SynchronizationType["ENUM_MAX"] = 4] = "ENUM_MAX";
 })(SynchronizationType || (SynchronizationType = {}));
 class Weapon extends Part {
     constructor(weapon_type, fixed = false) {
@@ -3858,6 +4404,7 @@ class Weapon extends Part {
         else
             this.synchronization = SynchronizationType.INTERRUPT;
         this.pair = false;
+        this.repeating = false;
     }
     toJSON() {
         return {
@@ -3868,6 +4415,7 @@ class Weapon extends Part {
             free_accessible: this.free_accessible,
             synchronization: this.synchronization,
             pair: this.pair,
+            repeating: this.repeating,
         };
     }
     fromJSON(js) {
@@ -3878,12 +4426,32 @@ class Weapon extends Part {
         this.free_accessible = js["free_accessible"];
         this.synchronization = js["synchronization"];
         this.pair = js["pair"];
+        this.repeating = js["repeating"];
+    }
+    serialize(s) {
+        s.PushBool(this.fixed);
+        s.PushBool(this.wing);
+        s.PushBool(this.covered);
+        s.PushBool(this.accessible);
+        s.PushBool(this.free_accessible);
+        s.PushNum(this.synchronization);
+        s.PushBool(this.pair);
+        s.PushBool(this.repeating);
+    }
+    deserialize(d) {
+        this.fixed = d.GetBool();
+        this.wing = d.GetBool();
+        this.covered = d.GetBool();
+        this.accessible = d.GetBool();
+        this.free_accessible = d.GetBool();
+        this.synchronization = d.GetNum();
+        this.pair = d.GetBool();
+        this.repeating = d.GetBool();
     }
     SetWeaponType(weapon_type) {
         this.weapon_type = weapon_type;
         if (this.weapon_type.size == 16) {
             this.pair = false;
-            this.wing = false;
         }
         this.SetPair(this.pair); //Triggers Calculate Stats
     }
@@ -3906,7 +4474,7 @@ class Weapon extends Part {
         return this.wing;
     }
     CanWing() {
-        return this.weapon_type.size <= 8;
+        return this.weapon_type.size <= 16;
     }
     SetWing(use) {
         if (use && this.CanWing()) {
@@ -3918,6 +4486,9 @@ class Weapon extends Part {
             this.wing = false;
         }
         this.CalculateStats();
+    }
+    CanCovered() {
+        return this.has_cantilever && !(this.weapon_type.size == 16 && !this.fixed);
     }
     GetCovered() {
         return this.covered;
@@ -3948,17 +4519,41 @@ class Weapon extends Part {
         }
         this.CalculateStats();
     }
+    CanSynchronization() {
+        var lst = [];
+        for (let i = -1; i < SynchronizationType.ENUM_MAX; i++) {
+            lst.push(this.CanSynch(i));
+        }
+        return lst;
+    }
+    CanSynch(num) {
+        if (this.can_synchronize && num == SynchronizationType.NONE) {
+            return false;
+        }
+        else if (!this.can_synchronize && num != SynchronizationType.NONE) {
+            return false;
+        }
+        if ((num == SynchronizationType.INTERRUPT || num == SynchronizationType.SYNCH)
+            && !this.weapon_type.synched) {
+            return false;
+        }
+        else if (num == SynchronizationType.SPINNER && !this.CanSpinner()) {
+            return false;
+        }
+        else if (num == SynchronizationType.DEFLECT && this.GetArty()) {
+            return false;
+        }
+        return true;
+    }
     GetSynchronization() {
         return this.synchronization;
     }
     SetSynchronization(use) {
-        if (use >= 0 && this.weapon_type.synched && this.can_synchronize) {
-            if (use == SynchronizationType.SPINNER && !this.can_spinner)
-                use--;
-            this.synchronization = use;
+        if (!this.CanSynch(use)) {
+            this.synchronization = SynchronizationType.NONE;
         }
         else {
-            this.synchronization = SynchronizationType.NONE;
+            this.synchronization = use;
         }
         if (this.synchronization == SynchronizationType.SPINNER)
             this.pair = false;
@@ -3976,18 +4571,65 @@ class Weapon extends Part {
         this.pair = use;
         this.CalculateStats();
     }
+    CanRepeating() {
+        return !this.weapon_type.rapid || this.weapon_type.reload > 0;
+    }
+    GetRepeating() {
+        return this.repeating;
+    }
+    SetRepeating(use) {
+        if (use && this.CanRepeating())
+            this.repeating = true;
+        else
+            this.repeating = false;
+        this.CalculateStats();
+    }
     ResolveSynch() {
-        if (this.can_synchronize && !this.wing) {
-            if (this.synchronization == SynchronizationType.NONE
-                || this.synchronization == SynchronizationType.SPINNER && !this.can_spinner) {
-                this.synchronization = SynchronizationType.INTERRUPT;
+        var use = this.synchronization;
+        this.synchronization = SynchronizationType.ENUM_MAX;
+        if (!this.CanSynch(use)) {
+            for (let i = -1; i < SynchronizationType.ENUM_MAX; i++) {
+                if (this.CanSynch(i)) {
+                    this.synchronization = i;
+                    break;
+                }
             }
-            if (this.weapon_type.size == 16) {
-                this.synchronization = SynchronizationType.SPINNER;
+            if (this.synchronization == SynchronizationType.ENUM_MAX) {
+                //No valid synchronizations
+                this.SetWing(true);
             }
         }
         else {
-            this.synchronization = SynchronizationType.NONE;
+            this.synchronization = use;
+        }
+        if (this.synchronization == SynchronizationType.SPINNER)
+            this.pair = false;
+    }
+    GetArty() {
+        return this.weapon_type.size == 16;
+    }
+    CanSpinner() {
+        if (this.GetArty())
+            return this.can_spinner && this.can_arty_spinner;
+        else
+            return this.can_spinner;
+    }
+    GetJam() {
+        if (this.weapon_type.rapid) {
+            var jams = this.weapon_type.jam.split('/');
+            console.log(jams);
+            var out = [parseInt(jams[0]), parseInt(jams[1])];
+            if (this.synchronization == SynchronizationType.INTERRUPT) {
+                out[0]++;
+                out[1]++;
+            }
+            return out;
+        }
+        else {
+            if (this.synchronization == SynchronizationType.INTERRUPT) {
+                return parseInt(this.weapon_type.jam) + 1;
+            }
+            return parseInt(this.weapon_type.jam);
         }
     }
     SetCalculateStats(callback) {
@@ -3996,16 +4638,41 @@ class Weapon extends Part {
     PartStats() {
         var stats = new Stats();
         this.ResolveSynch();
+        if (!this.CanCovered() && this.covered)
+            this.covered = false;
+        if (this.weapon_type.size == 16 && this.fixed)
+            this.covered = true;
         stats = stats.Add(this.weapon_type.stats);
         if (this.pair)
             stats = stats.Add(this.weapon_type.stats);
+        var size = this.weapon_type.size;
+        if (this.pair)
+            size *= 2;
         //Covered Cost
         if (this.covered) {
-            stats.mass += 1;
-            stats.drag = 0;
+            var cost = 0;
+            if (size == 1) {
+                cost = 0;
+            }
+            else if (size == 2) {
+                cost = 1;
+            }
+            else if (size == 4) {
+                cost = 2;
+            }
+            else if (size == 8) {
+                cost == 5;
+            }
+            else if (size == 16) {
+                cost = 0;
+            }
+            if (!this.fixed)
+                cost *= 2;
+            stats.cost += cost;
+            stats.drag *= 0;
         }
         //If on the wing and uncovered add 1, if covered, drag is min 1.
-        if (this.wing)
+        if (this.wing && !this.covered)
             stats.drag += 1;
         //Arty size weapon mounts need a section
         if (this.pair && this.weapon_type.size == 8 || this.weapon_type.size == 16)
@@ -4016,9 +4683,6 @@ class Weapon extends Part {
         }
         //Turret size cost
         if (!this.fixed) {
-            var size = this.weapon_type.size;
-            if (this.pair)
-                size *= 2;
             if (size <= 2) {
                 //Nothing
             }
@@ -4056,6 +4720,9 @@ class Weapon extends Part {
                 warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
             });
         }
+        //If it's repeating
+        if (this.repeating)
+            stats.cost += 2;
         if (this.wing_reinforcement)
             stats.mass += 2;
         stats.Round();
@@ -4116,6 +4783,22 @@ class Weapons extends Part {
             this.SetWeaponSetCount(0);
         }
     }
+    serialize(s) {
+        s.PushNum(this.weapon_sets.length);
+        for (let ws of this.weapon_sets) {
+            ws.serialize(s);
+        }
+    }
+    deserialize(d) {
+        this.weapon_sets = [];
+        var wlen = d.GetNum();
+        for (let i = 0; i < wlen; i++) {
+            var ws = new WeaponSystem(this.weapon_list);
+            ws.SetCalculateStats(this.CalculateStats);
+            ws.deserialize(d);
+            this.weapon_sets.push(ws);
+        }
+    }
     GetWeaponList() {
         return this.weapon_list;
     }
@@ -4166,6 +4849,19 @@ class Weapons extends Part {
         }
         return count;
     }
+    CountArtyTractorSpinner() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            if (ws.GetDirection()[0]) {
+                var wlist = ws.GetWeapons();
+                for (let w of wlist) {
+                    if (w.GetArty() && w.GetSynchronization() == SynchronizationType.SPINNER)
+                        count++;
+                }
+            }
+        }
+        return count;
+    }
     CountPusherSpinner() {
         var count = 0;
         for (let ws of this.weapon_sets) {
@@ -4173,6 +4869,19 @@ class Weapons extends Part {
                 var wlist = ws.GetWeapons();
                 for (let w of wlist) {
                     if (w.GetSynchronization() == SynchronizationType.SPINNER)
+                        count++;
+                }
+            }
+        }
+        return count;
+    }
+    CountArtyPusherSpinner() {
+        var count = 0;
+        for (let ws of this.weapon_sets) {
+            if (ws.GetDirection()[1]) {
+                var wlist = ws.GetWeapons();
+                for (let w of wlist) {
+                    if (w.GetArty() && w.GetSynchronization() == SynchronizationType.SPINNER)
                         count++;
                 }
             }
@@ -4203,6 +4912,19 @@ class Weapons extends Part {
             }
         }
     }
+    RemoveOneArtyTractorSpinner() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            if (this.weapon_sets[i].GetDirection()[0]) {
+                var wlist = this.weapon_sets[i].GetWeapons();
+                for (let j = wlist.length - 1; j >= 0; j--) {
+                    if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER && wlist[j].GetArty()) {
+                        this.weapon_sets[i].SetDirection(3, true);
+                        return;
+                    }
+                }
+            }
+        }
+    }
     RemoveOnePusherSpinner() {
         for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
             if (this.weapon_sets[i].GetDirection()[1]) {
@@ -4216,11 +4938,40 @@ class Weapons extends Part {
             }
         }
     }
+    RemoveOneArtyPusherSpinner() {
+        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
+            if (this.weapon_sets[i].GetDirection()[1]) {
+                var wlist = this.weapon_sets[i].GetWeapons();
+                for (let j = wlist.length - 1; j >= 0; j--) {
+                    if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER && wlist[j].GetArty()) {
+                        this.weapon_sets[i].SetDirection(3, true);
+                        return;
+                    }
+                }
+            }
+        }
+    }
     CanTractorSpinner() {
-        return this.CountTractorSpinner() < this.tractor_spinner_count;
+        return this.CountTractorSpinner() + this.CountArtyTractorSpinner() < this.tractor_spinner_count;
+    }
+    CanArtyTractorSpinner() {
+        return this.CountArtyTractorSpinner() < this.tractor_arty_spinner_count;
     }
     CanPusherSpinner() {
-        return this.CountPusherSpinner() < this.pusher_spinner_count;
+        return this.CountPusherSpinner() + this.CountArtyTractorSpinner() < this.pusher_spinner_count;
+    }
+    CanArtyPusherSpinner() {
+        return this.CountArtyPusherSpinner() < this.pusher_arty_spinner_count;
+    }
+    SetTractorInfo(info) {
+        this.has_tractor = info.have;
+        this.tractor_spinner_count = info.spin_count;
+        this.tractor_arty_spinner_count = info.arty_spin_count;
+    }
+    SetPusherInfo(info) {
+        this.has_pusher = info.have;
+        this.pusher_spinner_count = info.spin_count;
+        this.pusher_arty_spinner_count = info.arty_spin_count;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -4233,8 +4984,14 @@ class Weapons extends Part {
         while (this.CountFreelyAccessible() > this.cockpit_count) {
             this.RemoveOneFreelyAccessible();
         }
+        while (this.CountArtyTractorSpinner() > this.tractor_arty_spinner_count) {
+            this.RemoveOneArtyTractorSpinner();
+        }
         while (this.CountTractorSpinner() > this.tractor_spinner_count) {
             this.RemoveOneTractorSpinner();
+        }
+        while (this.CountArtyPusherSpinner() > this.pusher_arty_spinner_count) {
+            this.RemoveOneArtyPusherSpinner();
         }
         while (this.CountPusherSpinner() > this.pusher_spinner_count) {
             this.RemoveOnePusherSpinner();
@@ -4270,7 +5027,8 @@ class Weapons extends Part {
         }
         for (let ws of this.weapon_sets) {
             ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
-            ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.has_pusher, this.CanPusherSpinner());
+            ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.CanArtyTractorSpinner(), this.has_pusher, this.CanPusherSpinner(), this.CanArtyPusherSpinner());
+            ws.has_cantilever = this.cant_type > 0;
             stats = stats.Add(ws.PartStats());
         }
         return stats;
@@ -4298,7 +5056,7 @@ class Weapons extends Part {
 class Aircraft {
     constructor(js, engine_json, weapon_json, storage) {
         this.use_storage = false;
-        this.reset_json = String.raw `{"version":"9.4","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false]}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R - 3 Boxer 6 - Cylinder","overspeed":26,"altitude":3,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"spinner":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false},"wings":{"wing_list":[{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":5,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[3,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay1":false,"bay2":false},"cargo":{"mass":0,"pass":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"state":"BETA3","weapon_systems":[]}}`;
+        this.reset_json = String.raw `{"version":"10.0","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false]}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R - 3 Boxer 6 - Cylinder","overspeed":26,"altitude":3,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false},"wings":{"wing_list":[{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[3,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":0},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"state":"BETA3","weapon_systems":[]}}`;
         this.use_large_airplane_rules = false;
         this.stats = new Stats();
         this.name = "Prototype Aircraft";
@@ -4315,7 +5073,7 @@ class Aircraft {
         this.reinforcements = new Reinforcement(js["reinforcement"]);
         this.fuel = new Fuel(js["fuel"]);
         this.munitions = new Munitions();
-        this.cargo = new CargoAndPassengers();
+        this.cargo = new CargoAndPassengers(js["cargo"]);
         this.gear = new LandingGear(js["landing_gear"]);
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
@@ -4395,6 +5153,48 @@ class Aircraft {
         }
         return false;
     }
+    serialize(s) {
+        s.PushString(this.version);
+        s.PushString(this.name);
+        this.era.serialize(s);
+        this.cockpits.serialize(s);
+        this.passengers.serialize(s);
+        this.engines.serialize(s);
+        this.propeller.serialize(s);
+        this.frames.serialize(s);
+        this.wings.serialize(s);
+        this.stabilizers.serialize(s);
+        this.controlsurfaces.serialize(s);
+        this.reinforcements.serialize(s);
+        this.fuel.serialize(s);
+        this.munitions.serialize(s);
+        this.cargo.serialize(s);
+        this.gear.serialize(s);
+        this.accessories.serialize(s);
+        this.optimization.serialize(s);
+        this.weapons.serialize(s);
+    }
+    deserialize(d) {
+        this.version = d.GetString();
+        this.name = d.GetString();
+        this.era.deserialize(d);
+        this.cockpits.deserialize(d);
+        this.passengers.deserialize(d);
+        this.engines.deserialize(d);
+        this.propeller.deserialize(d);
+        this.frames.deserialize(d);
+        this.wings.deserialize(d);
+        this.stabilizers.deserialize(d);
+        this.controlsurfaces.deserialize(d);
+        this.reinforcements.deserialize(d);
+        this.fuel.deserialize(d);
+        this.munitions.deserialize(d);
+        this.cargo.deserialize(d);
+        this.gear.deserialize(d);
+        this.accessories.deserialize(d);
+        this.optimization.deserialize(d);
+        this.weapons.deserialize(d);
+    }
     SetDisplayCallback(callback) {
         this.DisplayCallback = callback;
     }
@@ -4416,16 +5216,15 @@ class Aircraft {
         stats = stats.Add(this.munitions.PartStats());
         //Weapons go here, because they make sections.
         this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
-        var tractor = this.engines.GetTractor();
-        this.weapons.has_tractor = tractor.have;
-        this.weapons.tractor_spinner_count = tractor.spin_count;
-        var pusher = this.engines.GetPusher();
-        this.weapons.has_pusher = pusher.have;
-        this.weapons.pusher_spinner_count = pusher.spin_count;
+        this.weapons.SetTractorInfo(this.engines.GetTractor());
+        this.weapons.SetPusherInfo(this.engines.GetPusher());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         stats = stats.Add(this.weapons.PartStats());
+        //Cargo makes sections
+        stats = stats.Add(this.cargo.PartStats());
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
+        this.frames.SetIsTandem(this.wings.GetTandem());
         stats = stats.Add(this.frames.PartStats());
         this.wings.SetNumFrames(this.frames.GetNumFrames());
         stats = stats.Add(this.wings.PartStats());
@@ -4441,11 +5240,11 @@ class Aircraft {
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
         this.reinforcements.SetTandem(this.wings.GetTandem());
         this.reinforcements.SetStaggered(this.wings.GetStaggered());
+        this.reinforcements.SetCantLift(this.era.GetCantLift());
         stats = stats.Add(this.reinforcements.PartStats());
-        this.cargo.SetSeats(this.passengers.GetBeds() + this.passengers.GetSeats());
-        stats = stats.Add(this.cargo.PartStats());
         this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
+        this.accessories.SetSkinArmor(this.frames.GetArmor());
         stats = stats.Add(this.accessories.PartStats());
         //Gear go last, because they need total mass.
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
@@ -4469,7 +5268,7 @@ class Aircraft {
             this.reinforcements.SetAcftStructure(stats.structure);
             this.fuel.SetArea(this.wings.GetArea());
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
-            this.munitions.SetAcftStructure(stats.structure);
+            this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
             if (this.engines.GetRumble() * 10 > stats.structure) {
                 this.stats.power = 0;
                 this.stats.warnings.push({
@@ -4552,10 +5351,14 @@ class Aircraft {
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         var Toughness = this.stats.toughness;
         var Structure = this.stats.structure;
-        var EnergyLoss = Math.ceil(DPEmpty / 6);
+        var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
-        var TurnBleed = Math.ceil((StallSpeedEmpty + StallSpeedFull) / 12);
+        EnergyLoss = Math.min(EnergyLoss, 10);
+        EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
+        var TurnBleed = Math.ceil((StallSpeedEmpty + StallSpeedFull) / this.propeller.GetTurn());
         var TurnBleedwBombs = TurnBleed + 1;
+        TurnBleed = Math.max(TurnBleed, 1);
+        TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
         var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
@@ -5139,7 +5942,6 @@ class Engine_HTML extends Display {
         this.e_cost = document.createElement("INPUT");
         this.e_oil = document.createElement("INPUT");
         this.e_pulsejet = document.createElement("INPUT");
-        this.e_spinner = document.createElement("INPUT");
         this.cool_count = document.createElement("INPUT");
         this.cool_count.setAttribute("type", "number");
         var tcell = row.insertCell(0);
@@ -5173,7 +5975,6 @@ class Engine_HTML extends Display {
         FlexInput("Cost", this.e_cost, fs);
         FlexCheckbox("Oil Tank", this.e_oil, fs);
         FlexCheckbox("Pulsejet", this.e_pulsejet, fs);
-        FlexCheckbox("Spinner Weapon", this.e_spinner, fs);
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
             if (this.e_select.selectedIndex == this.engine_list.length) {
@@ -5199,7 +6000,6 @@ class Engine_HTML extends Display {
         this.e_cost.onchange = trigger;
         this.e_oil.onchange = trigger;
         this.e_pulsejet.onchange = trigger;
-        this.e_spinner.onchange = trigger;
     }
     UpdateEngine(en) {
         this.engine = en;
@@ -5249,8 +6049,8 @@ class Engine_HTML extends Display {
         this.generator_input = document.createElement("INPUT");
         FlexCheckbox("Alternator", this.alternator_input, fs);
         FlexCheckbox("Generator", this.generator_input, fs);
-        this.alternator_input.oninput = () => { this.engine.SetAlternator(this.alternator_input.checked); };
-        this.generator_input.oninput = () => { this.engine.SetGenerator(this.generator_input.checked); };
+        this.alternator_input.onchange = () => { this.engine.SetAlternator(this.alternator_input.checked); };
+        this.generator_input.onchange = () => { this.engine.SetGenerator(this.generator_input.checked); };
     }
     InitStatDisplay(row) {
         var stat_cell = row.insertCell();
@@ -5382,7 +6182,6 @@ class Engine_HTML extends Display {
         e_stats.stats.cost = this.e_cost.valueAsNumber;
         e_stats.oiltank = this.e_oil.checked;
         e_stats.pulsejet = this.e_pulsejet.checked;
-        e_stats.spinner = this.e_spinner.checked;
         this.engine.SetCustomStats(e_stats);
     }
     SetInputDisable(b) {
@@ -5399,7 +6198,6 @@ class Engine_HTML extends Display {
         this.e_cost.disabled = b;
         this.e_oil.disabled = b;
         this.e_pulsejet.disabled = b;
-        this.e_spinner.disabled = b;
     }
     UpdateDisplay() {
         var idx = this.engine.GetSelectedIndex();
@@ -5534,6 +6332,16 @@ class Radiator extends Part {
         this.idx_type = js["type"];
         this.idx_mount = js["mount"];
         this.idx_coolant = js["coolant"];
+    }
+    serialize(s) {
+        s.PushNum(this.idx_type);
+        s.PushNum(this.idx_mount);
+        s.PushNum(this.idx_coolant);
+    }
+    derserialize(d) {
+        this.idx_type = d.GetNum();
+        this.idx_mount = d.GetNum();
+        this.idx_coolant = d.GetNum();
     }
     GetTypeList() {
         return this.type_list;
@@ -5706,7 +6514,7 @@ class Engines_HTML extends Display {
         this.num_radiators.onchange = () => { this.eng.SetNumberOfRadiators(this.num_radiators.valueAsNumber); };
         this.num_radiators.valueAsNumber = this.eng.GetNumberOfRadiators();
         this.is_asymmetric = document.getElementById("asymmetric");
-        this.is_asymmetric.oninput = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
+        this.is_asymmetric.onchange = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
         this.is_asymmetric.checked = this.eng.GetAsymmetry();
     }
     UpdateDisplay() {
@@ -5847,6 +6655,24 @@ class Frames_HTML extends Display {
         this.t_farman = document.getElementById("tail_farman");
         this.t_boom = document.getElementById("tail_boom");
         this.t_fwing = document.getElementById("flying_wing");
+        this.all_frame = document.getElementById("all_frame");
+        this.all_skin = document.getElementById("all_skin");
+        var spar_list = this.frames.GetFrameList();
+        for (let spar of spar_list) {
+            if (spar.basestruct > 0) {
+                let opt = document.createElement("OPTION");
+                opt.text = spar.name;
+                this.all_frame.add(opt);
+            }
+        }
+        this.all_frame.oninput = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
+        var skin_list = this.frames.GetSkinList();
+        for (let skin of skin_list) {
+            let opt = document.createElement("OPTION");
+            opt.text = skin.name;
+            this.all_skin.add(opt);
+        }
+        this.all_skin.oninput = () => { this.frames.SetAllSkin(this.all_skin.selectedIndex); };
         for (let elem of this.frames.GetTailList()) {
             let opt = document.createElement("OPTION");
             opt.text = elem.name;
@@ -5887,6 +6713,8 @@ class Frames_HTML extends Display {
         this.t_boom.checked = this.frames.GetUseBoom();
         this.t_fwing.disabled = !this.frames.CanFlyingWing();
         this.t_fwing.checked = this.frames.GetFlyingWing();
+        this.all_frame.selectedIndex = -1;
+        this.all_skin.selectedIndex = -1;
         for (let i = 0; i < tail_section_list.length; i++) {
             let sec = tail_section_list[i];
             this.UpdateTailSection(i, sec);
@@ -6205,13 +7033,13 @@ class Wings_HTML extends Display {
             else
                 opt.disabled = false;
         }
-        ht.deck.oninput = () => {
+        ht.deck.onchange = () => {
             let w = Object.assign({}, wing);
             w.deck = ht.deck.selectedIndex - 1;
             this.wings.SetFullWing(idx, w);
         };
         ht.deck.selectedIndex = wing.deck + 1;
-        ht.skin.oninput = () => {
+        ht.skin.onchange = () => {
             let w = Object.assign({}, wing);
             w.surface = ht.skin.selectedIndex;
             this.wings.SetFullWing(idx, w);
@@ -6292,13 +7120,13 @@ class Wings_HTML extends Display {
             else
                 opt.disabled = false;
         }
-        ht.deck.oninput = () => {
+        ht.deck.onchange = () => {
             let w = Object.assign({}, wing);
             w.deck = ht.deck.selectedIndex - 1;
             this.wings.SetMiniWing(idx, w);
         };
         ht.deck.selectedIndex = wing.deck + 1;
-        ht.skin.oninput = () => {
+        ht.skin.onchange = () => {
             let w = Object.assign({}, wing);
             w.surface = ht.skin.selectedIndex;
             this.wings.SetMiniWing(idx, w);
@@ -6341,7 +7169,7 @@ class Wings_HTML extends Display {
             }
             this.fw_add.append(opt);
         }
-        this.fw_add.oninput = () => {
+        this.fw_add.onchange = () => {
             let w = { surface: 0, area: 10, span: 5, dihedral: 0, anhedral: 0, deck: this.fw_add.selectedIndex - 1 };
             this.wings.SetFullWing(idx, w);
         };
@@ -6368,7 +7196,7 @@ class Wings_HTML extends Display {
             }
             this.mw_add.append(opt);
         }
-        this.mw_add.oninput = () => {
+        this.mw_add.onchange = () => {
             let w = { surface: 0, area: 2, span: 2, dihedral: 0, anhedral: 0, deck: this.mw_add.selectedIndex - 1 };
             this.wings.SetMiniWing(idx, w);
         };
@@ -6614,6 +7442,15 @@ class Reinforcement_HTML extends Display {
             this.ext_wood_inp.push(w_inp);
             this.ext_steel_inp.push(s_inp);
         }
+        this.cabane = document.createElement("SELECT");
+        FlexSelect("Cabane", this.cabane, fs);
+        for (let o of this.rf.GetCabaneList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = o.name;
+            this.cabane.add(opt);
+        }
+        this.cabane.onchange = () => { this.rf.SetCabane(this.cabane.selectedIndex); };
+        this.cabane.selectedIndex = 0;
         this.wires = document.createElement("INPUT");
         FlexCheckbox("Wires", this.wires, fs);
         this.wires.onchange = () => { this.rf.SetWires(this.wires.checked); };
@@ -6653,6 +7490,7 @@ class Reinforcement_HTML extends Display {
         this.d_none = c2_row.insertCell();
     }
     UpdateDisplay() {
+        this.cabane.selectedIndex = this.rf.GetCabane();
         this.wires.checked = this.rf.GetWires();
         var w_count = this.rf.GetExternalWoodCount();
         for (let i = 0; i < w_count.length; i++) {
@@ -6711,26 +7549,29 @@ class Load_HTML extends Display {
     InitMunitions(cell) {
         var fs = CreateFlexSection(cell);
         this.bombs = document.createElement("INPUT");
-        FlexInput("Bombs", this.bombs, fs);
+        FlexInput("Bombs and Rockets", this.bombs, fs);
         this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
-        this.rockets = document.createElement("INPUT");
-        FlexInput("Rockets", this.rockets, fs);
-        this.rockets.onchange = () => { this.boom.SetRocketCount(this.rockets.valueAsNumber); };
+        this.bay_count = document.createElement("INPUT");
+        FlexInput("Internal Bay Count", this.bay_count, fs);
+        this.bay_count.onchange = () => { this.boom.SetBayCount(this.bay_count.valueAsNumber); };
         this.bay1 = document.createElement("INPUT");
-        FlexCheckbox("Internal Bay 1", this.bay1, fs);
+        FlexCheckbox("Widen Internal Bay 1", this.bay1, fs);
         this.bay1.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
         this.bay2 = document.createElement("INPUT");
-        FlexCheckbox("Internal Bay 2", this.bay2, fs);
+        FlexCheckbox("Widen Internal Bay 2", this.bay2, fs);
         this.bay2.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
     }
     InitCargoAndPassengers(cell) {
         var fs = CreateFlexSection(cell);
-        this.carg = document.createElement("INPUT");
-        FlexInput("Cargo", this.carg, fs);
-        this.carg.onchange = () => { this.cargo.SetMass(this.carg.valueAsNumber); };
-        this.pass = document.createElement("INPUT");
-        FlexInput("Passengers", this.pass, fs);
-        this.pass.onchange = () => { this.cargo.SetPassengers(this.pass.valueAsNumber); };
+        this.carg = document.createElement("SELECT");
+        FlexSelect("Cargo", this.carg, fs);
+        var lst = this.cargo.GetSpaceList();
+        for (let l of lst) {
+            let opt = document.createElement("OPTION");
+            opt.text = l.name;
+            this.carg.add(opt);
+        }
+        this.carg.onchange = () => { this.cargo.SetSpace(this.carg.selectedIndex); };
     }
     InitStats(stat_cell) {
         stat_cell.className = "inner_table";
@@ -6765,10 +7606,10 @@ class Load_HTML extends Display {
         this.seal.disabled = !this.fuel.GetSealingEnabled();
         this.extinguish.checked = this.fuel.GetExtinguisher();
         this.bombs.valueAsNumber = this.boom.GetBombCount();
-        this.rockets.valueAsNumber = this.boom.GetRocketCount();
+        this.bay_count.valueAsNumber = this.boom.GetBayCount();
         this.bay1.checked = this.boom.GetBay1();
         this.bay2.checked = this.boom.GetBay2();
-        if (this.boom.GetBombCount() > 0) {
+        if (this.boom.GetBayCount() > 0) {
             this.bay1.disabled = false;
             if (this.bay1.checked)
                 this.bay2.disabled = false;
@@ -6779,8 +7620,7 @@ class Load_HTML extends Display {
             this.bay1.disabled = true;
             this.bay2.disabled = true;
         }
-        this.carg.valueAsNumber = this.cargo.GetMass();
-        this.pass.valueAsNumber = this.cargo.GetPassengers();
+        this.carg.selectedIndex = this.cargo.GetSpace();
         var stats = this.fuel.PartStats();
         stats = stats.Add(this.boom.PartStats());
         stats = stats.Add(this.cargo.PartStats());
@@ -6899,11 +7739,11 @@ class Accessories_HTML extends Display {
         for (let i = 0; i < len / 2; i++) {
             let AP = i + 1;
             FlexInput("AP " + AP.toString(), this.a_AP[i], lfs);
-            this.a_AP[i].oninput = () => { this.acc.SetArmourCoverage(i, this.a_AP[i].valueAsNumber); };
+            this.a_AP[i].onchange = () => { this.acc.SetArmourCoverage(i, this.a_AP[i].valueAsNumber); };
             let j = i + len / 2;
             AP = j + 1;
             FlexInput("AP " + AP.toString(), this.a_AP[j], rfs);
-            this.a_AP[j].oninput = () => { this.acc.SetArmourCoverage(j, this.a_AP[j].valueAsNumber); };
+            this.a_AP[j].onchange = () => { this.acc.SetArmourCoverage(j, this.a_AP[j].valueAsNumber); };
         }
     }
     InitElectrical(cell) {
@@ -7058,14 +7898,14 @@ class Optimization_HTML extends Display {
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
         var tbl = document.getElementById("tbl_optimization");
         var row1 = tbl.insertRow();
-        this.cost_cbx = this.InitRow(row1, "Expense: +/- 10% Cost", (num) => this.opt.SetCost(num));
-        this.bleed_cbx = this.InitRow(tbl.insertRow(), "Lift Efficienty: +/- 2 Lift Bleed", (num) => this.opt.SetBleed(num));
+        this.cost_cbx = this.InitRow(row1, "Expense: +/- 20% Cost", (num) => this.opt.SetCost(num));
+        this.bleed_cbx = this.InitRow(tbl.insertRow(), "Lift Efficienty: +/- 3 Lift Bleed", (num) => this.opt.SetBleed(num));
         this.escape_cbx = this.InitRow(tbl.insertRow(), "Leg Room: +/- 1 Escape, Visibility", (num) => this.opt.SetEscape(num));
-        this.mass_cbx = this.InitRow(tbl.insertRow(), "Mass: +/- 5% Mass", (num) => this.opt.SetMass(num));
-        this.toughness_cbx = this.InitRow(tbl.insertRow(), "Redundancy: +/- 20% Toughness ", (num) => this.opt.SetToughness(num));
-        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), "Support: +/- 10% Max Strain", (num) => this.opt.SetMaxStrain(num));
+        this.mass_cbx = this.InitRow(tbl.insertRow(), "Mass: +/- 10% Mass", (num) => this.opt.SetMass(num));
+        this.toughness_cbx = this.InitRow(tbl.insertRow(), "Redundancy: +/- 25% Toughness ", (num) => this.opt.SetToughness(num));
+        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), "Support: +/- 15% Max Strain", (num) => this.opt.SetMaxStrain(num));
         this.reliability_cbx = this.InitRow(tbl.insertRow(), "Reliability: +/- 2 Reliability", (num) => this.opt.SetReliability(num));
-        this.drag_cbx = this.InitRow(tbl.insertRow(), "Streamlining: +/- 5% Drag", (num) => this.opt.SetDrag(num));
+        this.drag_cbx = this.InitRow(tbl.insertRow(), "Streamlining: +/- 10% Drag", (num) => this.opt.SetDrag(num));
         this.InitStatDisplay(row1.insertCell());
     }
     InitRow(row, txt, call) {
@@ -7200,7 +8040,7 @@ class Weapons_HTML extends Display {
         super();
         this.weap = weap;
         this.inp_w_count = document.getElementById("num_wsets");
-        this.inp_w_count.oninput = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
+        this.inp_w_count.onchange = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
         this.tbl = document.getElementById("table_weapons");
         this.wrow = [];
     }
@@ -7276,12 +8116,14 @@ class Weapons_HTML extends Display {
             free_access: document.createElement("INPUT"),
             synch: document.createElement("SELECT"),
             pair: document.createElement("INPUT"),
+            repeating: document.createElement("INPUT"),
         };
         CreateCheckbox("Accessible", w.accessible, w.span, false);
         CreateCheckbox("Free Accessible", w.free_access, w.span, false);
         CreateCheckbox("Covered", w.covered, w.span, false);
         CreateCheckbox("Paired", w.pair, w.span, true);
         CreateCheckbox("Wing Mount", w.wing, w.span, false);
+        CreateCheckbox("Autoloader", w.repeating, w.span, true);
         CreateSelect("Synchronization", w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
         var slist = this.weap.GetSynchronizationList();
@@ -7295,20 +8137,20 @@ class Weapons_HTML extends Display {
     }
     UpdateWSet(set, disp) {
         disp.type.selectedIndex = set.GetWeaponSelected();
-        disp.type.oninput = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
+        disp.type.onchange = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
         disp.count.valueAsNumber = set.GetWeaponCount();
-        disp.count.oninput = () => { set.SetWeaponCount(disp.count.valueAsNumber); };
+        disp.count.onchange = () => { set.SetWeaponCount(disp.count.valueAsNumber); };
         disp.fixed.checked = set.GetFixed();
-        disp.fixed.oninput = () => { set.SetFixed(disp.fixed.checked); };
+        disp.fixed.onchange = () => { set.SetFixed(disp.fixed.checked); };
         var dirlist = set.GetDirection();
         var candir = set.CanDirection();
         for (let i = 0; i < dirlist.length; i++) {
             disp.dirs[i].checked = dirlist[i];
-            disp.dirs[i].oninput = () => { set.SetDirection(i, disp.dirs[i].checked); };
+            disp.dirs[i].onchange = () => { set.SetDirection(i, disp.dirs[i].checked); };
             disp.dirs[i].disabled = !candir[i];
         }
         disp.ammo.valueAsNumber = set.GetAmmo();
-        disp.ammo.oninput = () => { set.SetAmmo(disp.ammo.valueAsNumber); };
+        disp.ammo.onchange = () => { set.SetAmmo(disp.ammo.valueAsNumber); };
         var wlist = set.GetWeapons();
         while (disp.weaps.length < wlist.length) {
             disp.weaps.push(this.CreateWRow(disp.wcell));
@@ -7319,22 +8161,29 @@ class Weapons_HTML extends Display {
         }
         for (let i = 0; i < wlist.length; i++) {
             disp.weaps[i].wing.checked = wlist[i].GetWing();
-            disp.weaps[i].wing.oninput = () => { wlist[i].SetWing(disp.weaps[i].wing.checked); };
+            disp.weaps[i].wing.onchange = () => { wlist[i].SetWing(disp.weaps[i].wing.checked); };
             disp.weaps[i].wing.disabled = !wlist[i].CanWing();
             disp.weaps[i].covered.checked = wlist[i].GetCovered();
-            disp.weaps[i].covered.oninput = () => { wlist[i].SetCovered(disp.weaps[i].covered.checked); };
+            disp.weaps[i].covered.onchange = () => { wlist[i].SetCovered(disp.weaps[i].covered.checked); };
+            disp.weaps[i].covered.disabled = !wlist[i].CanCovered();
             disp.weaps[i].accessible.checked = wlist[i].GetAccessible();
-            disp.weaps[i].accessible.oninput = () => { wlist[i].SetAccessible(disp.weaps[i].accessible.checked); };
+            disp.weaps[i].accessible.onchange = () => { wlist[i].SetAccessible(disp.weaps[i].accessible.checked); };
             disp.weaps[i].free_access.checked = wlist[i].GetFreeAccessible();
-            disp.weaps[i].free_access.oninput = () => { wlist[i].SetFreeAccessible(disp.weaps[i].free_access.checked); };
+            disp.weaps[i].free_access.onchange = () => { wlist[i].SetFreeAccessible(disp.weaps[i].free_access.checked); };
             disp.weaps[i].free_access.disabled = !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible());
             disp.weaps[i].pair.checked = wlist[i].GetPair();
-            disp.weaps[i].pair.oninput = () => { wlist[i].SetPair(disp.weaps[i].pair.checked); };
+            disp.weaps[i].pair.onchange = () => { wlist[i].SetPair(disp.weaps[i].pair.checked); };
             disp.weaps[i].pair.disabled = !wlist[i].CanPair();
+            disp.weaps[i].repeating.checked = wlist[i].GetRepeating();
+            disp.weaps[i].repeating.onchange = () => { wlist[i].SetRepeating(disp.weaps[i].repeating.checked); };
+            disp.weaps[i].repeating.disabled = !wlist[i].CanRepeating();
             disp.weaps[i].synch.selectedIndex = wlist[i].GetSynchronization() + 1;
-            disp.weaps[i].synch.oninput = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
+            disp.weaps[i].synch.onchange = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
             disp.weaps[i].synch.disabled = !wlist[i].can_synchronize;
-            disp.weaps[i].synch.options[SynchronizationType.SPINNER + 1].disabled = !wlist[i].can_spinner;
+            var can = wlist[i].CanSynchronization();
+            for (let j = 0; j < can.length; j++) {
+                disp.weaps[i].synch.options[j].disabled = !can[j];
+            }
         }
         var stats = set.PartStats();
         BlinkIfChanged(disp.stats.mass, stats.mass.toString());
@@ -7911,7 +8760,7 @@ class Aircraft_HTML extends Display {
         var save_text_button = document.getElementById("acft_save_text");
         save_text_button.onclick = () => { copyStringToClipboard(JSON.stringify(this.acft.toJSON())); };
         var load_text_area = document.getElementById("acft_load_text");
-        load_text_area.oninput = () => {
+        load_text_area.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area.value);
                 var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
@@ -7928,7 +8777,7 @@ class Aircraft_HTML extends Display {
             }
         };
         var load_text_area2 = document.getElementById("acft_load_text2");
-        load_text_area2.oninput = () => {
+        load_text_area2.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area2.value);
                 var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
@@ -7946,9 +8795,14 @@ class Aircraft_HTML extends Display {
         };
         var link_button = document.getElementById("acft_save_link");
         link_button.onclick = () => {
-            var str = JSON.stringify(this.acft.toJSON());
-            var txt = LZString.compressToEncodedURIComponent(str);
-            var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt);
+            // var str = JSON.stringify(this.acft.toJSON());
+            // var txt = LZString.compressToEncodedURIComponent(str);
+            var ser = new Serialize();
+            aircraft_model.serialize(ser);
+            var arr = ser.FinalArray();
+            var str2 = _arrayBufferToString(arr);
+            var txt2 = LZString.compressToEncodedURIComponent(str2);
+            var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt2);
             copyStringToClipboard(link);
         };
         var reset_button = document.getElementById("acft_reset");
@@ -8011,15 +8865,8 @@ class Aircraft_HTML extends Display {
         name_cell.colSpan = 5;
         this.name_inp = document.createElement("INPUT");
         this.name_inp.defaultValue = "Aircraft Name";
-        this.name_inp.oninput = () => { this.acft.name = this.name_inp.value; };
+        this.name_inp.onchange = () => { this.acft.name = this.name_inp.value; };
         name_cell.appendChild(this.name_inp);
-        //New Rules
-        this.rule_check = document.createElement("INPUT");
-        this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("Stall Test", this.rule_check, name_cell, false);
-        this.rule_check2 = document.createElement("INPUT");
-        this.rule_check2.oninput = () => { this.acft.GetWings().test_drag = this.rule_check2.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("Wing Drag Test", this.rule_check2, name_cell, false);
         // Aircraft Cost
         this.cost_cell = row0.insertCell();
         // Rules Version
@@ -8152,7 +8999,6 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.name_inp.value = this.acft.name;
-        this.rule_check.checked = this.acft.use_large_airplane_rules;
         this.copy_text = this.acft.name + "\n";
         this.version_cell.innerText = this.acft.GetVersion();
         this.copy_text += "Version " + this.acft.GetVersion() + "\n";
@@ -8238,7 +9084,7 @@ class Aircraft_HTML extends Display {
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
         this.turnbleed_cell.innerText = derived.TurnBleed.toString();
         this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = this.acft.GetMaxAltitude().toString();
+        this.maxalt_cell.innerText = (this.acft.GetMaxAltitude() * 10 - 1).toString();
         this.copy_text += "Aerodynamics\n\t"
             + "Stability\t" + this.stability_cell.innerText + "\n\t"
             + "Energy Loss\t" + this.eloss_cell.innerText + "\n\t"
@@ -8307,7 +9153,14 @@ class Aircraft_HTML extends Display {
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
         var weaphtml = "";
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
-            weaphtml += wlist[w.GetWeaponSelected()].name + " fires ";
+            weaphtml += wlist[w.GetWeaponSelected()].name;
+            if (w.IsPlural()) {
+                weaphtml += "s";
+                weaphtml += " fire ";
+            }
+            else {
+                weaphtml += " fires ";
+            }
             var ds = w.GetDirection();
             weaphtml += "[";
             for (let i = 0; i < dlist.length; i++) {
@@ -8324,23 +9177,20 @@ class Aircraft_HTML extends Display {
                 + wlist[w.GetWeaponSelected()].ammo * w.GetAmmo() + " ammunition. "; //TODO
             if (wlist[w.GetWeaponSelected()].rapid || wlist[w.GetWeaponSelected()].shells || wlist[w.GetWeaponSelected()].ap > 0) {
                 weaphtml += "[";
-                var first = false;
+                weaphtml += " Jam " + w.GetJam();
                 if (wlist[w.GetWeaponSelected()].rapid) {
+                    weaphtml += ", ";
                     weaphtml += "Rapid Fire";
-                    first = true;
                 }
                 if (wlist[w.GetWeaponSelected()].shells) {
-                    if (first)
-                        weaphtml += ", ";
+                    weaphtml += ", ";
                     weaphtml += "Shells";
-                    first = true;
                 }
                 if (wlist[w.GetWeaponSelected()].ap > 0) {
-                    if (first)
-                        weaphtml += ", ";
+                    weaphtml += ", ";
                     weaphtml += "AP " + wlist[w.GetWeaponSelected()].ap.toString();
                 }
-                weaphtml += "]";
+                weaphtml += " ]";
             }
             this.copy_text += weaphtml + "\n\t";
             weaphtml += "<br\>";
@@ -8420,22 +9270,27 @@ const init = () => {
                     console.log("Used Query Parameter");
                     try {
                         var str = LZString.decompressFromEncodedURIComponent(qp);
-                        loaded = aircraft_model.fromJSON(JSON.parse(str));
+                        var arr = _stringToArrayBuffer(str);
+                        var des = new Deserialize(arr);
+                        aircraft_model.deserialize(des);
+                        aircraft_model.CalculateStats();
+                        loaded = true;
                     }
-                    catch (_a) { }
-                    if (!loaded) {
-                        try {
-                            loaded = aircraft_model.fromJSON(JSON.parse(qp));
-                        }
-                        catch (_b) { }
+                    catch (_a) {
+                        console.log("Compressed Query Parameter Failed.");
+                        aircraft_model.Reset();
                     }
                 }
                 if (acft_data && !loaded) {
                     console.log("Used Saved Data");
                     try {
                         loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
+                        aircraft_model.CalculateStats();
                     }
-                    catch (_c) { }
+                    catch (_b) {
+                        console.log("Saved Data Failed.");
+                        aircraft_model.Reset();
+                    }
                 }
                 aircraft_model.CalculateStats();
                 location.hash = ihash;
@@ -8505,11 +9360,139 @@ function SetScroll(ev) {
         window.history.replaceState(null, null, "index.html#" + newhash);
     }
 }
+function _arrayBufferToString(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return binary;
+}
+function _stringToArrayBuffer(str) {
+    var bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
 var parts_JSON;
 var engine_json;
 var weapon_json;
 var aircraft_model;
 var aircraft_display;
+class Serialize {
+    constructor(arr) {
+        this.array = new ArrayBuffer(51200);
+        this.view = new DataView(this.array);
+        this.offset = 0;
+    }
+    Check() {
+        if (this.offset >= this.array.byteLength)
+            throw "Serialization Way too long.";
+    }
+    PushNum(num) {
+        this.view.setInt16(this.offset, num, false);
+        this.offset += 2;
+        this.Check();
+    }
+    PushBool(bool) {
+        if (bool)
+            this.view.setUint8(this.offset, 1);
+        else
+            this.view.setUint8(this.offset, 0);
+        this.offset += 1;
+        this.Check();
+    }
+    PushString(str) {
+        this.PushNum(str.length);
+        for (let i = 0; i < str.length; i++) {
+            this.view.setUint8(this.offset, str.charCodeAt(i));
+            this.offset++;
+        }
+        this.Check();
+    }
+    PushNumArr(nums) {
+        this.PushNum(nums.length);
+        for (let n of nums) {
+            this.PushNum(n);
+        }
+        this.Check();
+    }
+    PushBoolArr(bools) {
+        this.PushNum(bools.length);
+        for (let b of bools) {
+            this.PushBool(b);
+        }
+        this.Check();
+    }
+    PushFloat(flt) {
+        this.view.setFloat32(this.offset, flt, false);
+        this.offset += 4;
+        this.Check();
+    }
+    FinalArray() {
+        return this.array.slice(0, this.offset);
+    }
+}
+class Deserialize {
+    constructor(arr) {
+        this.array = arr;
+        this.view = new DataView(this.array);
+        this.offset = 0;
+    }
+    Check() {
+        if (this.offset >= this.array.byteLength)
+            throw "Deserialization Failed";
+    }
+    GetNum() {
+        this.Check();
+        var num = this.view.getInt16(this.offset, false);
+        this.offset += 2;
+        return num;
+    }
+    GetBool() {
+        this.Check();
+        var bool = this.view.getUint8(this.offset);
+        this.offset += 1;
+        return bool > 0;
+    }
+    GetString() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            var char = this.view.getUint8(this.offset);
+            arr.push(char);
+            this.offset += 1;
+        }
+        return String.fromCharCode(...arr);
+    }
+    GetNumArr() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            arr.push(this.GetNum());
+        }
+        return arr;
+    }
+    GetBoolArr() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            arr.push(this.GetBool());
+        }
+        return arr;
+    }
+    GetFloat() {
+        this.Check();
+        var flt = this.view.getFloat32(this.offset, false);
+        this.offset += 4;
+        return flt;
+    }
+}
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./Weapon.ts" />
@@ -8553,29 +9536,42 @@ class WeaponSystem extends Part {
         if (this.ammo == null)
             this.ammo = 1;
     }
+    serialize(s) {
+        s.PushNum(this.weapon_type);
+        s.PushBool(this.fixed);
+        s.PushBoolArr(this.directions);
+        s.PushNum(this.ammo);
+        s.PushNum(this.weapons.length);
+        for (let w of this.weapons) {
+            w.serialize(s);
+        }
+    }
+    deserialize(d) {
+        this.weapon_type = d.GetNum();
+        this.fixed = d.GetBool();
+        this.directions = d.GetBoolArr();
+        this.ammo = d.GetNum();
+        var wlen = d.GetNum();
+        this.weapons = [];
+        for (let i = 0; i < wlen; i++) {
+            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            w.SetCalculateStats(this.CalculateStats);
+            w.deserialize(d);
+            this.weapons.push(w);
+        }
+    }
     GetWeaponSelected() {
         return this.weapon_type;
     }
     SetWeaponSelected(num) {
-        if (this.weapon_list[num].size == 16 && this.weapon_list[this.weapon_type].size != 16) {
-            this.weapons = []; //CLear all weapons
-            this.weapon_type = num;
-            this.SetFixed(true);
-            this.directions = [...Array(6).fill(false)];
-            if (this.tractor && this.spinner_t)
-                this.directions[0] = true;
-            else if (this.tractor && this.spinner_p)
-                this.directions[1] = true;
-            else
-                this.directions[3] = true;
-            this.SWC(1); //Create a single weapon for arty.
-            this.weapons[0].SetWing(false);
-        }
-        else {
-            this.weapon_type = num;
-            for (let w of this.weapons) {
-                w.SetWeaponType(this.weapon_list[num]);
+        this.weapon_type = num;
+        if (this.weapon_list[num].size == 16) {
+            while (this.weapons.length > 1) {
+                this.weapons.pop();
             }
+        }
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.weapon_list[num]);
         }
         this.CalculateStats();
     }
@@ -8602,7 +9598,7 @@ class WeaponSystem extends Part {
     }
     CanDirection() {
         var directions = [...Array(6).fill(true)];
-        if (this.fixed && this.weapon_list[this.weapon_type].size == 16 && this.weapons.length > 0) {
+        if (this.weapons[0].GetArty() && this.fixed && !this.weapons[0].GetWing()) {
             var is_spinner = this.weapons[0].GetSynchronization() == SynchronizationType.SPINNER;
             if (this.tractor && !(this.spinner_t || (is_spinner && this.directions[0])))
                 directions[0] = false;
@@ -8619,7 +9615,7 @@ class WeaponSystem extends Part {
             use = true;
         if (this.fixed) {
             this.directions = [...Array(6).fill(false)];
-            if (this.weapon_list[this.weapon_type].size == 16) {
+            if (this.weapons[0].GetArty() && !this.weapons[0].GetWing()) {
                 if (num == 0 && this.tractor && !this.spinner_t)
                     num = 1;
                 if (num == 1 && this.pusher && !this.spinner_p)
@@ -8662,20 +9658,22 @@ class WeaponSystem extends Part {
                 w.can_free_accessible = false;
         }
     }
-    SetTractorPusher(hasT, can_spinnerT, hasP, can_spinnerP) {
+    SetTractorPusher(hasT, can_spinnerT, can_arty_spinnerT, hasP, can_spinnerP, can_arty_spinnerP) {
         this.tractor = hasT;
         this.pusher = hasP;
-        this.spinner_t = can_spinnerT;
-        this.spinner_p = can_spinnerP;
+        this.spinner_t = can_arty_spinnerT;
+        this.spinner_p = can_arty_spinnerP;
         if (this.directions[0] && hasT) {
             for (let w of this.weapons) {
                 if (w.GetFixed() && !w.GetWing()) {
                     w.can_synchronize = true;
-                    w.can_spinner = can_spinnerT;
+                    w.can_spinner = can_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
+                    w.can_arty_spinner = can_arty_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
                 }
                 else {
                     w.can_synchronize = false;
                     w.can_spinner = false;
+                    w.can_arty_spinner = false;
                 }
             }
         }
@@ -8683,11 +9681,13 @@ class WeaponSystem extends Part {
             for (let w of this.weapons) {
                 if (w.GetFixed() && !w.GetWing()) {
                     w.can_synchronize = true;
-                    w.can_spinner = can_spinnerT;
+                    w.can_spinner = can_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
+                    w.can_arty_spinner = can_arty_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
                 }
                 else {
                     w.can_synchronize = false;
                     w.can_spinner = false;
+                    w.can_arty_spinner = false;
                 }
             }
         }
@@ -8695,6 +9695,7 @@ class WeaponSystem extends Part {
             for (let w of this.weapons) {
                 w.can_synchronize = false;
                 w.can_spinner = false;
+                w.can_arty_spinner = false;
             }
         }
     }
@@ -8727,6 +9728,27 @@ class WeaponSystem extends Part {
     GetAmmo() {
         return this.ammo;
     }
+    GetJam() {
+        if (this.weapon_list[this.weapon_type].rapid) {
+            var jams = [0, 0];
+            for (let w of this.weapons) {
+                var t = w.GetJam();
+                jams[0] = Math.max(jams[0], t[0]);
+                jams[1] = Math.max(jams[1], t[1]);
+            }
+            return jams[0].toString() + "/" + jams[1].toString();
+        }
+        else {
+            var jam = 0;
+            for (let w of this.weapons) {
+                jam = Math.max(jam, w.GetJam());
+            }
+            return jam.toString();
+        }
+    }
+    IsPlural() {
+        return this.weapons.length > 1 || this.weapons[0].GetPair();
+    }
     SetAmmo(num) {
         if (num != num || num < 1)
             num = 1;
@@ -8747,6 +9769,7 @@ class WeaponSystem extends Part {
             if (d)
                 dircount++;
         for (let w of this.weapons) {
+            w.has_cantilever = this.has_cantilever;
             stats = stats.Add(w.PartStats());
             if (!this.fixed) {
                 //Turret direction costs
@@ -8766,275 +9789,3 @@ class WeaponSystem extends Part {
         return stats;
     }
 }
-/*global gzip, Base64*/
-var JSONC = (function () {
-    var root, JSONC = { pack: null, compress: null, decompress: null, unpack: null }, isNodeEnvironment, _nCode = -1, toString = {}.toString;
-    /**
-     * set the correct root depending from the environment.
-     * @type {Object}
-     * @private
-     */
-    root = this;
-    /**
-     * Check if JSONC is loaded in Node.js environment
-     * @type {Boolean}
-     * @private
-     */
-    isNodeEnvironment = false;
-    /**
-     * Checks if the value exist in the array.
-     * @param arr
-     * @param v
-     * @returns {boolean}
-     */
-    function contains(arr, v) {
-        var nIndex, nLen = arr.length;
-        for (nIndex = 0; nIndex < nLen; nIndex++) {
-            if (arr[nIndex][1] === v) {
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * Removes duplicated values in an array
-     * @param oldArray
-     * @returns {Array}
-     */
-    function unique(oldArray) {
-        var nIndex, nLen = oldArray.length, aArr = [];
-        for (nIndex = 0; nIndex < nLen; nIndex++) {
-            if (!contains(aArr, oldArray[nIndex][1])) {
-                aArr.push(oldArray[nIndex]);
-            }
-        }
-        return aArr;
-    }
-    /**
-     * Escapes a RegExp
-     * @param text
-     * @returns {*}
-     */
-    function escapeRegExp(text) {
-        return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-    }
-    /**
-     * Returns if the obj is an object or not.
-     * @param obj
-     * @returns {boolean}
-     * @private
-     */
-    function _isObject(obj) {
-        return toString.call(obj) === '[object Object]';
-    }
-    /**
-     * Returns if the obj is an array or not
-     * @param obj
-     * @returns {boolean}
-     * @private
-     */
-    function _isArray(obj) {
-        return toString.call(obj) === '[object Array]';
-    }
-    /**
-     * Converts a bidimensional array to object
-     * @param aArr
-     * @returns {{}}
-     * @private
-     */
-    function _biDimensionalArrayToObject(aArr) {
-        var obj = {}, nIndex, nLen = aArr.length, oItem;
-        for (nIndex = 0; nIndex < nLen; nIndex++) {
-            oItem = aArr[nIndex];
-            obj[oItem[0]] = oItem[1];
-        }
-        return obj;
-    }
-    /**
-     * Convert a number to their ascii code/s.
-     * @param index
-     * @param totalChar
-     * @param offset
-     * @returns {Array}
-     * @private
-     */
-    function _numberToKey(index, totalChar, offset) {
-        var sKeys = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=_!?()*', aArr = [], currentChar = index;
-        totalChar = totalChar || sKeys.length;
-        offset = offset || 0;
-        while (currentChar >= totalChar) {
-            aArr.push(sKeys.charCodeAt((currentChar % totalChar) + offset));
-            currentChar = Math.floor(currentChar / totalChar - 1);
-        }
-        aArr.push(sKeys.charCodeAt(currentChar + offset));
-        return aArr.reverse();
-    }
-    /**
-     * Returns the string using an array of ASCII values
-     * @param aKeys
-     * @returns {string}
-     * @private
-     */
-    function _getSpecialKey(aKeys) {
-        return String.fromCharCode.apply(String, aKeys);
-    }
-    /**
-     * Traverse all the objects looking for keys and set an array with the new keys
-     * @param json
-     * @param aKeys
-     * @returns {*}
-     * @private
-     */
-    function _getKeys(json, aKeys) {
-        var aKey, sKey, oItem;
-        for (sKey in json) {
-            if (json.hasOwnProperty(sKey)) {
-                oItem = json[sKey];
-                if (_isObject(oItem) || _isArray(oItem)) {
-                    aKeys = aKeys.concat(unique(_getKeys(oItem, aKeys)));
-                }
-                if (isNaN(Number(sKey))) {
-                    if (!contains(aKeys, sKey)) {
-                        _nCode += 1;
-                        aKey = [];
-                        aKey.push(_getSpecialKey(_numberToKey(_nCode, 0, 0)), sKey);
-                        aKeys.push(aKey);
-                    }
-                }
-            }
-        }
-        return aKeys;
-    }
-    /**
-     * Method to compress array objects
-     * @private
-     * @param json
-     * @param aKeys
-     */
-    function _compressArray(json, aKeys) {
-        var nIndex, nLenKeys;
-        for (nIndex = 0, nLenKeys = json.length; nIndex < nLenKeys; nIndex++) {
-            json[nIndex] = JSONC.compress(json[nIndex], aKeys);
-        }
-    }
-    /**
-     * Method to compress anything but array
-     * @private
-     * @param json
-     * @param aKeys
-     * @returns {*}
-     */
-    function _compressOther(json, aKeys) {
-        var oKeys, aKey, str, nLenKeys, nIndex, obj;
-        aKeys = _getKeys(json, aKeys);
-        aKeys = unique(aKeys);
-        oKeys = _biDimensionalArrayToObject(aKeys);
-        str = JSON.stringify(json);
-        nLenKeys = aKeys.length;
-        for (nIndex = 0; nIndex < nLenKeys; nIndex++) {
-            aKey = aKeys[nIndex];
-            str = str.replace(new RegExp(escapeRegExp('"' + aKey[1] + '"'), 'g'), '"' + aKey[0] + '"');
-        }
-        obj = JSON.parse(str);
-        obj._ = oKeys;
-        return obj;
-    }
-    /**
-     * Method to decompress array objects
-     * @private
-     * @param json
-     */
-    function _decompressArray(json) {
-        var nIndex, nLenKeys;
-        for (nIndex = 0, nLenKeys = json.length; nIndex < nLenKeys; nIndex++) {
-            json[nIndex] = JSONC.decompress(json[nIndex]);
-        }
-    }
-    /**
-     * Method to decompress anything but array
-     * @private
-     * @param jsonCopy
-     * @returns {*}
-     */
-    function _decompressOther(jsonCopy) {
-        var oKeys, str, sKey;
-        oKeys = JSON.parse(JSON.stringify(jsonCopy._));
-        delete jsonCopy._;
-        str = JSON.stringify(jsonCopy);
-        for (sKey in oKeys) {
-            if (oKeys.hasOwnProperty(sKey)) {
-                str = str.replace(new RegExp('"' + sKey + '"', 'g'), '"' + oKeys[sKey] + '"');
-            }
-        }
-        return str;
-    }
-    /**
-     * Compress a RAW JSON
-     * @param json
-     * @param optKeys
-     * @returns {*}
-     */
-    JSONC.compress = function (json, optKeys) {
-        if (!optKeys) {
-            _nCode = -1;
-        }
-        var aKeys = optKeys || [], obj;
-        if (_isArray(json)) {
-            _compressArray(json, aKeys);
-            obj = json;
-        }
-        else {
-            obj = _compressOther(json, aKeys);
-        }
-        return obj;
-    };
-    /**
-     * Use LZString to get the compressed string.
-     * @param json
-     * @param bCompress
-     * @returns {String}
-     */
-    // JSONC.pack = function (json, bCompress) {
-    //   var str = JSON.stringify((bCompress ? JSONC.compress(json) : json));
-    //   return Base64.encode(String.fromCharCode.apply(String, gzip.zip(str, { level: 9 })));
-    // };
-    /**
-     * Decompress a compressed JSON
-     * @param json
-     * @returns {*}
-     */
-    JSONC.decompress = function (json) {
-        var str, jsonCopy = JSON.parse(JSON.stringify(json));
-        if (_isArray(jsonCopy)) {
-            _decompressArray(jsonCopy);
-        }
-        else {
-            str = _decompressOther(jsonCopy);
-        }
-        return str ? JSON.parse(str) : jsonCopy;
-    };
-    function getArr(str) {
-        var nIndex = 0, nLen = str.length, arr = [];
-        for (; nIndex < nLen; nIndex++) {
-            arr.push(str.charCodeAt(nIndex));
-        }
-        return arr;
-    }
-    /**
-     * Returns the JSON object from the LZW string
-     * @param gzipped
-     * @param bDecompress
-     * @returns {Object}
-     */
-    // JSONC.unpack = function (gzipped, bDecompress) {
-    //   var aArr = getArr(Base64.decode(gzipped)),
-    //     str = String.fromCharCode.apply(String, gzip.unzip(aArr, { level: 9 })),
-    //     json = JSON.parse(str);
-    //   return bDecompress ? JSONC.decompress(json) : json;
-    // };
-    /*
-     * Expose Hydra to be used in node.js, as AMD module or as global
-     */
-    root.JSONC = JSONC;
-    return JSONC;
-})();

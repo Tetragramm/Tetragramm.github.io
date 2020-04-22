@@ -3,16 +3,17 @@
 
 class Munitions extends Part {
     private bomb_count: number;
-    private rocket_count: number;
+    private internal_bay_count: number;
     private internal_bay_1: boolean;
     private internal_bay_2: boolean;
     private acft_struct: number;
+    private maxbomb: number;
 
     constructor() {
         super();
 
         this.bomb_count = 0;
-        this.rocket_count = 0;
+        this.internal_bay_count = 0;
         this.internal_bay_1 = false;
         this.internal_bay_2 = false;
     }
@@ -20,7 +21,7 @@ class Munitions extends Part {
     public toJSON() {
         return {
             bomb_count: this.bomb_count,
-            rocket_count: this.rocket_count,
+            bay_count: this.internal_bay_count,
             bay1: this.internal_bay_1,
             bay2: this.internal_bay_2,
         }
@@ -28,9 +29,23 @@ class Munitions extends Part {
 
     public fromJSON(js: JSON) {
         this.bomb_count = js["bomb_count"];
-        this.rocket_count = js["rocket_count"];
+        this.internal_bay_count = js["bay_count"];
         this.internal_bay_1 = js["bay1"];
         this.internal_bay_2 = js["bay2"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNum(this.bomb_count);
+        s.PushNum(this.internal_bay_count);
+        s.PushBool(this.internal_bay_1);
+        s.PushBool(this.internal_bay_2);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.bomb_count = d.GetNum();
+        this.internal_bay_count = d.GetNum();
+        this.internal_bay_1 = d.GetBool();
+        this.internal_bay_2 = d.GetBool();
     }
 
     public GetBombCount() {
@@ -46,17 +61,8 @@ class Munitions extends Part {
         this.CalculateStats();
     }
 
-    public GetRocketCount() {
-        return this.rocket_count;
-    }
-
-    public SetRocketCount(count: number) {
-        if (count != count || count < 0)
-            count = 0;
-        count = Math.floor(count);
-        this.rocket_count = count;
-        this.LimitMass(false);
-        this.CalculateStats();
+    public GetBayCount() {
+        return this.internal_bay_count;
     }
 
     public GetBay1() {
@@ -65,6 +71,14 @@ class Munitions extends Part {
 
     public GetBay2() {
         return this.internal_bay_2;
+    }
+
+    public SetBayCount(count: number) {
+        if (count != count || count < 0)
+            count = 0;
+        count = Math.floor(count);
+        this.internal_bay_count = count;
+        this.CalculateStats();
     }
 
     public SetUseBays(bay1: boolean, bay2: boolean) {
@@ -79,15 +93,9 @@ class Munitions extends Part {
 
     private LimitMass(bomb: boolean) {
         var reduce = false;
-        while (this.bomb_count + this.rocket_count > this.acft_struct / 5) {
+        while (this.bomb_count > this.acft_struct * this.maxbomb) {
             reduce = true;
-            if ((bomb && this.bomb_count > 0)
-                || (!bomb && this.rocket_count == 0)) {
-                this.bomb_count--;
-            }
-            else {
-                this.rocket_count--;
-            }
+            this.bomb_count--;
         }
         return reduce;
     }
@@ -101,12 +109,13 @@ class Munitions extends Part {
             }
         }
 
-        var ext_mass = ext_bomb_count + this.rocket_count;
+        var ext_mass = ext_bomb_count;
         return ext_mass;
     }
 
-    public SetAcftStructure(num: number) {
+    public SetAcftStructure(num: number, maxbomb: number) {
         this.acft_struct = num;
+        this.maxbomb = maxbomb;
         if (this.LimitMass(false)) {
             this.CalculateStats();
         }
@@ -118,29 +127,37 @@ class Munitions extends Part {
 
     public PartStats() {
         var stats = new Stats();
-        // stats.wetmass += this.bomb_count;
-        // stats.wetmass += this.rocket_count;
 
-        var ext_bomb_count = this.bomb_count;
-        if (this.internal_bay_1) {
-            stats.reqsections++;
-            ext_bomb_count = Math.floor(ext_bomb_count / 2);
-            if (this.internal_bay_2) {
+        var ext_bomb_count = this.bomb_count - 10 * this.internal_bay_count;
+        ext_bomb_count = Math.max(0, ext_bomb_count);
+        stats.reqsections += this.internal_bay_count;
+
+        if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+            if (this.internal_bay_1) {
                 stats.reqsections++;
-                ext_bomb_count = 0;
+                if (this.internal_bay_2) {
+                    stats.reqsections++;
+                    var sz = Math.floor(10 * this.internal_bay_count);
+                    stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
+                }
+                else {
+                    var sz = Math.floor(10 * this.internal_bay_count / 2);
+                    stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
+                }
+            }
+            else {
+                var sz = Math.floor(10 * this.internal_bay_count / 4);
+                stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
             }
         }
 
-        var ext_mass = ext_bomb_count + this.rocket_count;
-        var rack_mass = Math.ceil(ext_mass / 5);
+        var rack_mass = Math.ceil(ext_bomb_count / 5);
         stats.mass += rack_mass;
-        stats.bomb_mass = this.bomb_count + this.rocket_count;
+        stats.bomb_mass = this.bomb_count;
 
         stats.reqsections = Math.ceil(stats.reqsections);
 
         //Because it is load, it rounds up to the nearest 5 mass.
-        if ((stats.wetmass % 5) > 0)
-            stats.wetmass += 5 - (stats.wetmass % 5);
         if ((stats.bomb_mass % 5) > 0)
             stats.bomb_mass += 5 - (stats.bomb_mass % 5);
 

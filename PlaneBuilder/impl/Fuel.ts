@@ -44,6 +44,18 @@ class Fuel extends Part {
         this.fire_extinguisher = js["fire_extinguisher"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNumArr(this.tank_count);
+        s.PushBool(this.self_sealing);
+        s.PushBool(this.fire_extinguisher);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.tank_count = d.GetNumArr();
+        this.self_sealing = d.GetBool();
+        this.fire_extinguisher = d.GetBool();
+    }
+
     public GetTankList() {
         return this.tank_stats;
     }

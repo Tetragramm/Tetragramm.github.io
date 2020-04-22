@@ -59,8 +59,6 @@ class Aircraft_HTML extends Display {
     private d_crsh: HTMLTableCellElement;
 
     //Final Display
-    private rule_check: HTMLInputElement;
-    private rule_check2: HTMLInputElement;
     private name_inp: HTMLInputElement;
     private cost_cell: HTMLTableCellElement;
     private version_cell: HTMLTableCellElement;
@@ -178,7 +176,7 @@ class Aircraft_HTML extends Display {
         save_text_button.onclick = () => { copyStringToClipboard(JSON.stringify(this.acft.toJSON())); };
 
         var load_text_area = document.getElementById("acft_load_text") as HTMLInputElement;
-        load_text_area.oninput = () => {
+        load_text_area.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area.value);
                 var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
@@ -193,7 +191,7 @@ class Aircraft_HTML extends Display {
             }
         };
         var load_text_area2 = document.getElementById("acft_load_text2") as HTMLInputElement;
-        load_text_area2.oninput = () => {
+        load_text_area2.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area2.value);
                 var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
@@ -210,9 +208,14 @@ class Aircraft_HTML extends Display {
 
         var link_button = document.getElementById("acft_save_link") as HTMLButtonElement;
         link_button.onclick = () => {
-            var str = JSON.stringify(this.acft.toJSON());
-            var txt = LZString.compressToEncodedURIComponent(str);
-            var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt);
+            // var str = JSON.stringify(this.acft.toJSON());
+            // var txt = LZString.compressToEncodedURIComponent(str);
+            var ser = new Serialize();
+            aircraft_model.serialize(ser);
+            var arr = ser.FinalArray();
+            var str2 = _arrayBufferToString(arr);
+            var txt2 = LZString.compressToEncodedURIComponent(str2);
+            var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt2);
             copyStringToClipboard(link);
         };
 
@@ -278,15 +281,8 @@ class Aircraft_HTML extends Display {
         name_cell.colSpan = 5;
         this.name_inp = document.createElement("INPUT") as HTMLInputElement;
         this.name_inp.defaultValue = "Aircraft Name";
-        this.name_inp.oninput = () => { this.acft.name = this.name_inp.value; };
+        this.name_inp.onchange = () => { this.acft.name = this.name_inp.value; };
         name_cell.appendChild(this.name_inp);
-        //New Rules
-        this.rule_check = document.createElement("INPUT") as HTMLInputElement;
-        this.rule_check.oninput = () => { this.acft.use_large_airplane_rules = this.rule_check.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("Stall Test", this.rule_check, name_cell, false);
-        this.rule_check2 = document.createElement("INPUT") as HTMLInputElement;
-        this.rule_check2.oninput = () => { this.acft.GetWings().test_drag = this.rule_check2.checked; this.acft.CalculateStats(); };
-        CreateCheckbox("Wing Drag Test", this.rule_check2, name_cell, false);
 
         // Aircraft Cost
         this.cost_cell = row0.insertCell();
@@ -436,7 +432,6 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.name_inp.value = this.acft.name;
-        this.rule_check.checked = this.acft.use_large_airplane_rules;
         this.copy_text = this.acft.name + "\n";
         this.version_cell.innerText = this.acft.GetVersion();
         this.copy_text += "Version " + this.acft.GetVersion() + "\n";
@@ -525,7 +520,7 @@ class Aircraft_HTML extends Display {
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
         this.turnbleed_cell.innerText = derived.TurnBleed.toString();
         this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = this.acft.GetMaxAltitude().toString();
+        this.maxalt_cell.innerText = (this.acft.GetMaxAltitude() * 10 - 1).toString();
         this.copy_text += "Aerodynamics\n\t"
             + "Stability\t" + this.stability_cell.innerText + "\n\t"
             + "Energy Loss\t" + this.eloss_cell.innerText + "\n\t"
@@ -598,7 +593,14 @@ class Aircraft_HTML extends Display {
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
         var weaphtml = "";
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
-            weaphtml += wlist[w.GetWeaponSelected()].name + " fires ";
+            weaphtml += wlist[w.GetWeaponSelected()].name;
+            if (w.IsPlural()) {
+                weaphtml += "s";
+                weaphtml += " fire ";
+            }
+            else {
+                weaphtml += " fires ";
+            }
             var ds = w.GetDirection();
             weaphtml += "[";
             for (let i = 0; i < dlist.length; i++) {
@@ -615,23 +617,20 @@ class Aircraft_HTML extends Display {
                 + wlist[w.GetWeaponSelected()].ammo * w.GetAmmo() + " ammunition. ";//TODO
             if (wlist[w.GetWeaponSelected()].rapid || wlist[w.GetWeaponSelected()].shells || wlist[w.GetWeaponSelected()].ap > 0) {
                 weaphtml += "["
-                var first = false;
+                weaphtml += " Jam " + w.GetJam();
                 if (wlist[w.GetWeaponSelected()].rapid) {
+                    weaphtml += ", ";
                     weaphtml += "Rapid Fire";
-                    first = true;
                 }
                 if (wlist[w.GetWeaponSelected()].shells) {
-                    if (first)
-                        weaphtml += ", ";
+                    weaphtml += ", ";
                     weaphtml += "Shells";
-                    first = true;
                 }
                 if (wlist[w.GetWeaponSelected()].ap > 0) {
-                    if (first)
-                        weaphtml += ", ";
+                    weaphtml += ", ";
                     weaphtml += "AP " + wlist[w.GetWeaponSelected()].ap.toString();
                 }
-                weaphtml += "]";
+                weaphtml += " ]";
             }
             this.copy_text += weaphtml + "\n\t";
             weaphtml += "<br\>";

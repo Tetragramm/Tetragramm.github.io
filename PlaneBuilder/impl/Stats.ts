@@ -125,6 +125,66 @@ class Stats {
             this.warnings.push({ source: js["name"], warning: js["warning"] });
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.liftbleed);
+        s.PushNum(this.wetmass);
+        s.PushNum(this.mass);
+        s.PushNum(this.drag);
+        s.PushNum(this.control);
+        s.PushNum(this.cost);
+        s.PushNum(this.reqsections);
+        s.PushNum(this.visibility);
+        s.PushNum(this.flightstress);
+        s.PushNum(this.escape);
+        s.PushNum(this.pitchstab);
+        s.PushNum(this.latstab);
+        s.PushNum(this.cooling);
+        s.PushNum(this.reliability);
+        s.PushNum(this.power);
+        s.PushNum(this.fuelconsumption);
+        s.PushNum(this.maxstrain);
+        s.PushNum(this.structure);
+        s.PushFloat(this.pitchboost);
+        s.PushFloat(this.pitchspeed);
+        s.PushNum(this.wingarea);
+        s.PushNum(this.toughness);
+        s.PushNum(this.upkeep);
+        s.PushNum(this.crashsafety);
+        s.PushNum(this.bomb_mass);
+        s.PushNum(this.fuel);
+        s.PushNum(this.charge);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.liftbleed = d.GetNum();
+        this.wetmass = d.GetNum();
+        this.mass = d.GetNum();
+        this.drag = d.GetNum();
+        this.control = d.GetNum();
+        this.cost = d.GetNum();
+        this.reqsections = d.GetNum();
+        this.visibility = d.GetNum();
+        this.flightstress = d.GetNum();
+        this.escape = d.GetNum();
+        this.pitchstab = d.GetNum();
+        this.latstab = d.GetNum();
+        this.cooling = d.GetNum();
+        this.reliability = d.GetNum();
+        this.power = d.GetNum();
+        this.fuelconsumption = d.GetNum();
+        this.maxstrain = d.GetNum();
+        this.structure = d.GetNum();
+        this.pitchboost = d.GetFloat();
+        this.pitchspeed = d.GetFloat();
+        this.wingarea = d.GetNum();
+        this.toughness = d.GetNum();
+        this.upkeep = d.GetNum();
+        this.crashsafety = d.GetNum();
+        this.bomb_mass = d.GetNum();
+        this.fuel = d.GetNum();
+        this.charge = d.GetNum();
+    }
+
     public Add(other: Stats): Stats {
         var res = new Stats();
         res.liftbleed = this.liftbleed + other.liftbleed;

@@ -56,11 +56,11 @@ class Accessories_HTML extends Display {
         for (let i = 0; i < len / 2; i++) {
             let AP = i + 1;
             FlexInput("AP " + AP.toString(), this.a_AP[i], lfs);
-            this.a_AP[i].oninput = () => { this.acc.SetArmourCoverage(i, this.a_AP[i].valueAsNumber); };
+            this.a_AP[i].onchange = () => { this.acc.SetArmourCoverage(i, this.a_AP[i].valueAsNumber); };
             let j = i + len / 2;
             AP = j + 1;
             FlexInput("AP " + AP.toString(), this.a_AP[j], rfs);
-            this.a_AP[j].oninput = () => { this.acc.SetArmourCoverage(j, this.a_AP[j].valueAsNumber); };
+            this.a_AP[j].onchange = () => { this.acc.SetArmourCoverage(j, this.a_AP[j].valueAsNumber); };
         }
     }
 

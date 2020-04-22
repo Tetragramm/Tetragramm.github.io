@@ -18,7 +18,6 @@ class Engine_HTML extends Display {
     private e_cost: HTMLInputElement;
     private e_oil: HTMLInputElement;
     private e_pulsejet: HTMLInputElement;
-    private e_spinner: HTMLInputElement;
     //Cooling Elements
     private cool_cell: HTMLTableDataCellElement;
     private cool_select: HTMLSelectElement;
@@ -107,7 +106,6 @@ class Engine_HTML extends Display {
         this.e_cost = document.createElement("INPUT") as HTMLInputElement;
         this.e_oil = document.createElement("INPUT") as HTMLInputElement;
         this.e_pulsejet = document.createElement("INPUT") as HTMLInputElement;
-        this.e_spinner = document.createElement("INPUT") as HTMLInputElement;
         this.cool_count = document.createElement("INPUT") as HTMLInputElement;
         this.cool_count.setAttribute("type", "number");
 
@@ -142,7 +140,6 @@ class Engine_HTML extends Display {
         FlexInput("Cost", this.e_cost, fs);
         FlexCheckbox("Oil Tank", this.e_oil, fs);
         FlexCheckbox("Pulsejet", this.e_pulsejet, fs);
-        FlexCheckbox("Spinner Weapon", this.e_spinner, fs);
 
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
@@ -169,7 +166,6 @@ class Engine_HTML extends Display {
         this.e_cost.onchange = trigger;
         this.e_oil.onchange = trigger;
         this.e_pulsejet.onchange = trigger;
-        this.e_spinner.onchange = trigger;
     }
 
     public UpdateEngine(en: Engine) {
@@ -225,8 +221,8 @@ class Engine_HTML extends Display {
         this.generator_input = document.createElement("INPUT") as HTMLInputElement;
         FlexCheckbox("Alternator", this.alternator_input, fs);
         FlexCheckbox("Generator", this.generator_input, fs);
-        this.alternator_input.oninput = () => { this.engine.SetAlternator(this.alternator_input.checked); };
-        this.generator_input.oninput = () => { this.engine.SetGenerator(this.generator_input.checked); };
+        this.alternator_input.onchange = () => { this.engine.SetAlternator(this.alternator_input.checked); };
+        this.generator_input.onchange = () => { this.engine.SetGenerator(this.generator_input.checked); };
     }
 
     private InitStatDisplay(row: HTMLTableRowElement) {
@@ -363,7 +359,6 @@ class Engine_HTML extends Display {
         e_stats.stats.cost = this.e_cost.valueAsNumber;
         e_stats.oiltank = this.e_oil.checked;
         e_stats.pulsejet = this.e_pulsejet.checked;
-        e_stats.spinner = this.e_spinner.checked;
         this.engine.SetCustomStats(e_stats);
     }
 
@@ -381,7 +376,6 @@ class Engine_HTML extends Display {
         this.e_cost.disabled = b;
         this.e_oil.disabled = b;
         this.e_pulsejet.disabled = b;
-        this.e_spinner.disabled = b;
     }
 
     public UpdateDisplay() {

@@ -2,14 +2,17 @@
 /// <reference path="./Stats.ts" />
 
 class Era extends Part {
-    private vals: { name: string, value: number }[];
+    private vals: { name: string, value: number, maxbomb: number, cant_lift: boolean }[];
     private selected: number;
     constructor(js: JSON) {
         super();
         this.selected = 0;
         this.vals = [];
         for (let elem of js["options"]) {
-            var opt = { name: elem["name"], value: parseInt(elem["liftbleed"]) };
+            var opt = {
+                name: elem["name"], value: elem["liftbleed"],
+                maxbomb: elem["maxbomb"], cant_lift: elem["cant_lift"]
+            };
             this.vals.push(opt);
         }
     }
@@ -22,6 +25,14 @@ class Era extends Part {
 
     public fromJSON(js: JSON) {
         this.selected = js["selected"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNum(this.selected);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.selected = d.GetNum();
     }
 
     public GetSelected() {
@@ -39,6 +50,14 @@ class Era extends Part {
 
     public GetLiftBleed(): number {
         return this.vals[this.selected].value;
+    }
+
+    public GetMaxBomb(): number {
+        return this.vals[this.selected].maxbomb;
+    }
+
+    public GetCantLift(): boolean {
+        return this.vals[this.selected].cant_lift;
     }
 
     public PartStats(): Stats {

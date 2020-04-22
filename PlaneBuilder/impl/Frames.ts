@@ -29,6 +29,7 @@ class Frames extends Part {
     }[];
 
     private flying_wing: boolean;
+    private is_tandem: boolean;
 
     constructor(js: JSON) {
         super();
@@ -67,6 +68,7 @@ class Frames extends Part {
         }
 
         this.flying_wing = false;
+        this.is_tandem = false;
 
         this.section_list = [];
         this.tail_section_list = [];
@@ -106,6 +108,70 @@ class Frames extends Part {
         this.boom = js["use_boom"];
         this.sel_tail = js["tail_index"];
         this.flying_wing = js["flying_wing"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNum(this.section_list.length);
+        for (let i = 0; i < this.section_list.length; i++) {
+            var sec = this.section_list[i];
+            s.PushNum(sec.frame);
+            s.PushNum(sec.skin);
+            s.PushBool(sec.geodesic);
+            s.PushBool(sec.monocoque);
+            s.PushBool(sec.lifting_body);
+            s.PushBool(sec.internal_bracing);
+        }
+        s.PushNum(this.tail_section_list.length);
+        for (let i = 0; i < this.tail_section_list.length; i++) {
+            var sec = this.tail_section_list[i];
+            s.PushNum(sec.frame);
+            s.PushNum(sec.skin);
+            s.PushBool(sec.geodesic);
+            s.PushBool(sec.monocoque);
+            s.PushBool(sec.lifting_body);
+            s.PushBool(sec.internal_bracing);
+        }
+        s.PushNum(this.sel_tail);
+        s.PushBool(this.farman);
+        s.PushBool(this.boom);
+        s.PushBool(this.flying_wing);
+    }
+
+    public deserialize(d: Deserialize) {
+        var slen = d.GetNum();
+        this.section_list = [];
+        for (let i = 0; i < slen; i++) {
+            let sec = {
+                frame: 0, skin: 0, geodesic: false,
+                monocoque: false, lifting_body: false, internal_bracing: false
+            };
+            sec.frame = d.GetNum();
+            sec.skin = d.GetNum();
+            sec.geodesic = d.GetBool();
+            sec.monocoque = d.GetBool();
+            sec.lifting_body = d.GetBool();
+            sec.internal_bracing = d.GetBool();
+            this.section_list.push(sec);
+        }
+        var tlen = d.GetNum();
+        this.tail_section_list = [];
+        for (let i = 0; i < tlen; i++) {
+            let sec = {
+                frame: 0, skin: 0, geodesic: false,
+                monocoque: false, lifting_body: false, internal_bracing: false
+            };
+            sec.frame = d.GetNum();
+            sec.skin = d.GetNum();
+            sec.geodesic = d.GetBool();
+            sec.monocoque = d.GetBool();
+            sec.lifting_body = d.GetBool();
+            sec.internal_bracing = d.GetBool();
+            this.tail_section_list.push(sec);
+        }
+        this.sel_tail = d.GetNum();
+        this.farman = d.GetBool();
+        this.boom = d.GetBool();
+        this.flying_wing = d.GetBool();
     }
 
     public DuplicateSection(num: number) {
@@ -365,7 +431,29 @@ class Frames extends Part {
         return stats;
     }
 
+    private CountLiftingBody() {
+        var count = 0;
+        for (let s of this.section_list) {
+            if (s.lifting_body)
+                count++;
+        }
+        for (let s of this.tail_section_list) {
+            if (s.lifting_body)
+                count++;
+        }
+        return count;
+    }
+
+    public SetIsTandem(use: boolean) {
+        if (this.is_tandem != use) {
+            this.is_tandem = use;
+            this.SetTailType(this.sel_tail);
+        }
+    }
+
     public SetTailType(num: number) {
+        if (this.tail_list[num].stats.reqsections == 0 && this.is_tandem)
+            num++;
         this.sel_tail = num;
         this.SetRequiredTailSections(this.tail_list[num].stats.reqsections);
     }
@@ -487,6 +575,39 @@ class Frames extends Part {
         return this.tail_section_list.length == 0;
     }
 
+    public SetAllFrame(num: number) {
+        for (let s of this.section_list) {
+            s.frame = num;
+        }
+        for (let s of this.tail_section_list) {
+            s.frame = num;
+        }
+        this.CalculateStats();
+    }
+
+    public SetAllSkin(num: number) {
+        for (let s of this.section_list) {
+            s.skin = num;
+        }
+        for (let s of this.tail_section_list) {
+            s.skin = num;
+        }
+        this.CalculateStats();
+    }
+
+    public GetArmor() {
+        var count = 0;
+        for (let s of this.section_list) {
+            if (this.skin_list[s.skin].name == "Dragon Skin")
+                count++;
+        }
+        for (let s of this.tail_section_list) {
+            if (this.skin_list[s.skin].name == "Dragon Skin")
+                count++;
+        }
+        return count;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -520,8 +641,7 @@ class Frames extends Part {
 
         if (this.flying_wing) {
             stats.liftbleed += 5;
-            stats.drag = 0;
-            tail_stats.drag = 0;
+            stats.drag -= this.CountLiftingBody();;
         }
 
         stats = stats.Add(this.tail_list[this.sel_tail].stats);
@@ -537,6 +657,8 @@ class Frames extends Part {
         stats.structure = Math.floor(stats.structure);
         stats.cost = Math.floor(stats.cost);
         stats.visibility = Math.min(stats.visibility, 3);
+
+        stats.Round();
 
         return stats;
     }

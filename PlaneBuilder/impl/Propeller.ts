@@ -2,7 +2,7 @@
 /// <reference path="./Stats.ts" />
 
 class Propeller extends Part {
-    private prop_list: { name: string, stats: Stats, automatic: boolean }[];
+    private prop_list: { name: string, stats: Stats, automatic: boolean, energy: number, turn: number }[];
     private idx_prop: number;
     private use_variable: boolean;
     private have_propellers: boolean;
@@ -14,7 +14,11 @@ class Propeller extends Part {
         this.have_propellers = true;
         this.prop_list = [];
         for (let elem of json["props"]) {
-            this.prop_list.push({ name: elem["name"], stats: new Stats(elem), automatic: elem["automatic"] });
+            this.prop_list.push({
+                name: elem["name"], stats: new Stats(elem),
+                automatic: elem["automatic"],
+                energy: elem["energy"], turn: elem["turn"],
+            });
         }
     }
 
@@ -28,6 +32,16 @@ class Propeller extends Part {
     public fromJSON(js: JSON) {
         this.idx_prop = js["type"];
         this.use_variable = js["use_variable"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNum(this.idx_prop);
+        s.PushBool(this.use_variable);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.idx_prop = d.GetNum();
+        this.use_variable = d.GetBool();
     }
 
     public GetPropList() {
@@ -69,6 +83,20 @@ class Propeller extends Part {
         return this.have_propellers;
     }
 
+    public GetEnergy() {
+        if (this.have_propellers)
+            return this.prop_list[this.idx_prop].energy;
+        else
+            return 5;
+    }
+
+    public GetTurn() {
+        if (this.have_propellers)
+            return this.prop_list[this.idx_prop].turn;
+        else
+            return 7;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats();
         if (this.have_propellers) {
@@ -82,7 +110,7 @@ class Propeller extends Part {
             }
         }
         else {
-            stats.pitchboost = 1;
+            stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
         }
         return stats;

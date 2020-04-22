@@ -7,12 +7,13 @@ enum SynchronizationType {
     SYNCH,
     SPINNER,
     DEFLECT,
+    ENUM_MAX,
 }
 class Weapon extends Part {
     private weapon_type: {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
-        ap: number, jam: number, reload: number,
+        ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean
     };
     private fixed: boolean;
@@ -22,16 +23,19 @@ class Weapon extends Part {
     private free_accessible: boolean;
     private synchronization: number;
     private pair: boolean;
+    private repeating: boolean;
 
     public can_free_accessible: boolean;
     public can_synchronize: boolean;
     public can_spinner: boolean;
+    public can_arty_spinner: boolean;
     public wing_reinforcement: boolean;
+    public has_cantilever: boolean;
 
     constructor(weapon_type: {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
-        ap: number, jam: number, reload: number,
+        ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean
     }, fixed: boolean = false) {
         super();
@@ -46,6 +50,7 @@ class Weapon extends Part {
         else
             this.synchronization = SynchronizationType.INTERRUPT;
         this.pair = false;
+        this.repeating = false;
     }
 
     public toJSON() {
@@ -57,6 +62,7 @@ class Weapon extends Part {
             free_accessible: this.free_accessible,
             synchronization: this.synchronization,
             pair: this.pair,
+            repeating: this.repeating,
         }
     }
 
@@ -68,18 +74,40 @@ class Weapon extends Part {
         this.free_accessible = js["free_accessible"];
         this.synchronization = js["synchronization"];
         this.pair = js["pair"];
+        this.repeating = js["repeating"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushBool(this.fixed);
+        s.PushBool(this.wing);
+        s.PushBool(this.covered);
+        s.PushBool(this.accessible);
+        s.PushBool(this.free_accessible);
+        s.PushNum(this.synchronization);
+        s.PushBool(this.pair);
+        s.PushBool(this.repeating);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.fixed = d.GetBool();
+        this.wing = d.GetBool();
+        this.covered = d.GetBool();
+        this.accessible = d.GetBool();
+        this.free_accessible = d.GetBool();
+        this.synchronization = d.GetNum();
+        this.pair = d.GetBool();
+        this.repeating = d.GetBool();
     }
 
     public SetWeaponType(weapon_type: {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
-        ap: number, jam: number, reload: number,
+        ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean
     }) {
         this.weapon_type = weapon_type;
         if (this.weapon_type.size == 16) {
             this.pair = false;
-            this.wing = false;
         }
         this.SetPair(this.pair); //Triggers Calculate Stats
     }
@@ -105,7 +133,7 @@ class Weapon extends Part {
     }
 
     public CanWing() {
-        return this.weapon_type.size <= 8;
+        return this.weapon_type.size <= 16;
     }
 
     public SetWing(use: boolean) {
@@ -117,6 +145,10 @@ class Weapon extends Part {
             this.wing = false;
         }
         this.CalculateStats();
+    }
+
+    public CanCovered() {
+        return this.has_cantilever && !(this.weapon_type.size == 16 && !this.fixed);
     }
 
     public GetCovered() {
@@ -153,17 +185,41 @@ class Weapon extends Part {
         this.CalculateStats();
     }
 
+    public CanSynchronization() {
+        var lst = [];
+        for (let i = -1; i < SynchronizationType.ENUM_MAX; i++) {
+            lst.push(this.CanSynch(i));
+        }
+        return lst;
+    }
+
+    private CanSynch(num: number) {
+        if (this.can_synchronize && num == SynchronizationType.NONE) {
+            return false;
+        } else if (!this.can_synchronize && num != SynchronizationType.NONE) {
+            return false;
+        }
+
+        if ((num == SynchronizationType.INTERRUPT || num == SynchronizationType.SYNCH)
+            && !this.weapon_type.synched) {
+            return false;
+        } else if (num == SynchronizationType.SPINNER && !this.CanSpinner()) {
+            return false;
+        } else if (num == SynchronizationType.DEFLECT && this.GetArty()) {
+            return false;
+        }
+        return true;
+    }
+
     public GetSynchronization() {
         return this.synchronization;
     }
 
     public SetSynchronization(use: number) {
-        if (use >= 0 && this.weapon_type.synched && this.can_synchronize) {
-            if (use == SynchronizationType.SPINNER && !this.can_spinner)
-                use--;
-            this.synchronization = use;
-        } else {
+        if (!this.CanSynch(use)) {
             this.synchronization = SynchronizationType.NONE;
+        } else {
+            this.synchronization = use;
         }
         if (this.synchronization == SynchronizationType.SPINNER)
             this.pair = false;
@@ -186,17 +242,70 @@ class Weapon extends Part {
         this.CalculateStats();
     }
 
+    public CanRepeating() {
+        return !this.weapon_type.rapid || this.weapon_type.reload > 0;
+    }
+
+    public GetRepeating() {
+        return this.repeating;
+    }
+
+    public SetRepeating(use: boolean) {
+        if (use && this.CanRepeating())
+            this.repeating = true;
+        else
+            this.repeating = false;
+        this.CalculateStats();
+    }
+
     private ResolveSynch() {
-        if (this.can_synchronize && !this.wing) {
-            if (this.synchronization == SynchronizationType.NONE
-                || this.synchronization == SynchronizationType.SPINNER && !this.can_spinner) {
-                this.synchronization = SynchronizationType.INTERRUPT;
+        var use = this.synchronization;
+        this.synchronization = SynchronizationType.ENUM_MAX;
+        if (!this.CanSynch(use)) {
+            for (let i = -1; i < SynchronizationType.ENUM_MAX; i++) {
+                if (this.CanSynch(i)) {
+                    this.synchronization = i;
+                    break;
+                }
             }
-            if (this.weapon_type.size == 16) {
-                this.synchronization = SynchronizationType.SPINNER;
+            if (this.synchronization == SynchronizationType.ENUM_MAX) {
+                //No valid synchronizations
+                this.SetWing(true);
             }
         } else {
-            this.synchronization = SynchronizationType.NONE;
+            this.synchronization = use;
+        }
+        if (this.synchronization == SynchronizationType.SPINNER)
+            this.pair = false;
+    }
+
+    public GetArty() {
+        return this.weapon_type.size == 16;
+    }
+
+    public CanSpinner() {
+        if (this.GetArty())
+            return this.can_spinner && this.can_arty_spinner;
+        else
+            return this.can_spinner;
+    }
+
+    public GetJam() {
+        if (this.weapon_type.rapid) {
+            var jams = this.weapon_type.jam.split('/');
+            console.log(jams);
+            var out = [parseInt(jams[0]), parseInt(jams[1])];
+            if (this.synchronization == SynchronizationType.INTERRUPT) {
+                out[0]++;
+                out[1]++;
+            }
+            return out;
+        }
+        else {
+            if (this.synchronization == SynchronizationType.INTERRUPT) {
+                return parseInt(this.weapon_type.jam) + 1;
+            }
+            return parseInt(this.weapon_type.jam);
         }
     }
 
@@ -209,17 +318,40 @@ class Weapon extends Part {
 
         this.ResolveSynch();
 
+        if (!this.CanCovered() && this.covered)
+            this.covered = false;
+        if (this.weapon_type.size == 16 && this.fixed)
+            this.covered = true;
+
         stats = stats.Add(this.weapon_type.stats);
         if (this.pair)
             stats = stats.Add(this.weapon_type.stats);
 
+        var size = this.weapon_type.size;
+        if (this.pair)
+            size *= 2;
+
         //Covered Cost
         if (this.covered) {
-            stats.mass += 1;
-            stats.drag = 0;
+            var cost = 0;
+            if (size == 1) {
+                cost = 0;
+            } else if (size == 2) {
+                cost = 1;
+            } else if (size == 4) {
+                cost = 2;
+            } else if (size == 8) {
+                cost == 5;
+            } else if (size == 16) {
+                cost = 0;
+            }
+            if (!this.fixed)
+                cost *= 2;
+            stats.cost += cost;
+            stats.drag *= 0;
         }
         //If on the wing and uncovered add 1, if covered, drag is min 1.
-        if (this.wing)
+        if (this.wing && !this.covered)
             stats.drag += 1;
 
         //Arty size weapon mounts need a section
@@ -233,9 +365,6 @@ class Weapon extends Part {
 
         //Turret size cost
         if (!this.fixed) {
-            var size = this.weapon_type.size;
-            if (this.pair)
-                size *= 2;
             if (size <= 2) {
                 //Nothing
             } else if (size == 4) {
@@ -268,6 +397,10 @@ class Weapon extends Part {
                 warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
             });
         }
+
+        //If it's repeating
+        if (this.repeating)
+            stats.cost += 2;
 
         if (this.wing_reinforcement)
             stats.mass += 2;

@@ -14,8 +14,7 @@
             "rumble": 0,
             "cost": 6,
             "oiltank": false,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "F-Series 6-Cylinder Inline",
@@ -31,8 +30,7 @@
             "rumble": 0,
             "cost": 5,
             "oiltank": false,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "Ogre-Z Beta V-6",
@@ -48,8 +46,7 @@
             "rumble": 0,
             "cost": 3,
             "oiltank": false,
-            "pulsejet": false,
-            "spinner": true
+            "pulsejet": false
         },
         {
             "name": "TurboGoblin 8-Cylinder Semi-Radial",
@@ -65,8 +62,7 @@
             "rumble": 0,
             "cost": 4,
             "oiltank": false,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "2A-Series 4-Cylinder Inline",
@@ -82,8 +78,7 @@
             "rumble": 0,
             "cost": 4,
             "oiltank": false,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "G-Series 9-Cylinder Rotary",
@@ -99,8 +94,7 @@
             "rumble": 0,
             "cost": 4,
             "oiltank": true,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "SuperPegasus 7-Cylinder Rotary",
@@ -116,8 +110,7 @@
             "rumble": 0,
             "cost": 4,
             "oiltank": true,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "Seguin Σ110 Sigma 7-Cylinder Rotary",
@@ -133,8 +126,7 @@
             "rumble": 0,
             "cost": 10,
             "oiltank": true,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "Hartmann H.IIc Straight-6",
@@ -150,8 +142,7 @@
             "rumble": 0,
             "cost": 10,
             "oiltank": false,
-            "pulsejet": false,
-            "spinner": true
+            "pulsejet": false
         },
         {
             "name": "Maclean-King Tiger MK.1 V-12",
@@ -167,8 +158,7 @@
             "rumble": 0,
             "cost": 8,
             "oiltank": false,
-            "pulsejet": false,
-            "spinner": false
+            "pulsejet": false
         },
         {
             "name": "Pulsejet V1 Large",
@@ -179,13 +169,12 @@
             "cooling": 0,
             "overspeed": 100,
             "fuelconsumption": 80,
-            "altitude": 100,
+            "altitude": 3,
             "torque": 0,
             "rumble": 4,
             "cost": 3,
             "oiltank": false,
-            "pulsejet": true,
-            "spinner": false
+            "pulsejet": true
         },
         {
             "name": "Pulsejet V1 Medium",
@@ -196,13 +185,12 @@
             "cooling": 0,
             "overspeed": 100,
             "fuelconsumption": 48,
-            "altitude": 100,
+            "altitude": 3,
             "torque": 0,
             "rumble": 2,
             "cost": 2,
             "oiltank": false,
-            "pulsejet": true,
-            "spinner": false
+            "pulsejet": true
         },
         {
             "name": "Pulsejet V1 Small",
@@ -213,30 +201,12 @@
             "cooling": 0,
             "overspeed": 100,
             "fuelconsumption": 32,
-            "altitude": 100,
+            "altitude": 3,
             "torque": 0,
             "rumble": 1,
             "cost": 1,
             "oiltank": false,
-            "pulsejet": true,
-            "spinner": false
-        },
-        {
-            "name": "Pulsejet V1 Small",
-            "power": 8,
-            "mass": 1,
-            "drag": 1,
-            "reliability": -2,
-            "cooling": 0,
-            "overspeed": 100,
-            "fuelconsumption": 32,
-            "altitude": 100,
-            "torque": 0,
-            "rumble": 1,
-            "cost": 1,
-            "oiltank": false,
-            "pulsejet": true,
-            "spinner": false
+            "pulsejet": true
         },
         {
             "name": "Aeromarine K-6 100hp",
@@ -250,7 +220,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 7,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -267,7 +236,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 72,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -284,7 +252,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 4,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -301,7 +268,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -318,7 +284,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -335,7 +300,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 1,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -352,7 +316,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 3,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -369,7 +332,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 200,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -386,7 +348,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 9,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -403,7 +364,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 19,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -420,7 +380,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 5,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -437,7 +396,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 13,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -454,7 +412,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 13,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -471,7 +428,6 @@
             "altitude": 3,
             "torque": 4,
             "cost": 5,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -488,7 +444,6 @@
             "altitude": 3,
             "torque": 5,
             "cost": 10,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -505,7 +460,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 12,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -522,7 +476,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 12,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -539,7 +492,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 21,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -556,7 +508,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 19,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -573,7 +524,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 5,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -590,7 +540,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 52,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -607,7 +556,6 @@
             "altitude": 6,
             "torque": 1,
             "cost": 106,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -624,7 +572,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 16,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -641,7 +588,6 @@
             "altitude": 3,
             "torque": 6,
             "cost": 12,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -658,9 +604,8 @@
             "altitude": 3,
             "torque": 0,
             "cost": 26,
-            "spinner": true,
-            "rumble": null,
-            "pulsejet": null,
+            "rumble": 0,
+            "pulsejet": false,
             "oiltank": false
         },
         {
@@ -675,7 +620,6 @@
             "altitude": 3,
             "torque": 3,
             "cost": 6,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -692,7 +636,6 @@
             "altitude": 3,
             "torque": 2,
             "cost": 5,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -709,7 +652,6 @@
             "altitude": 3,
             "torque": 3,
             "cost": 5,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -726,7 +668,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 16,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -743,7 +684,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 3,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -760,7 +700,6 @@
             "altitude": 6,
             "torque": 1,
             "cost": 116,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -777,7 +716,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 18,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -794,7 +732,6 @@
             "altitude": 3,
             "torque": 6,
             "cost": 8,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -811,7 +748,6 @@
             "altitude": 3,
             "torque": 2,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -828,7 +764,6 @@
             "altitude": 3,
             "torque": 2,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -845,7 +780,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 1,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -862,7 +796,6 @@
             "altitude": 3,
             "torque": 2,
             "cost": 5,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -879,7 +812,6 @@
             "altitude": 3,
             "torque": 3,
             "cost": 6,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -896,9 +828,8 @@
             "altitude": 3,
             "torque": 2,
             "cost": 8,
-            "spinner": false,
-            "rumble": null,
-            "pulsejet": null,
+            "rumble": 0,
+            "pulsejet": false,
             "oiltank": true
         },
         {
@@ -913,9 +844,8 @@
             "altitude": 3,
             "torque": 2,
             "cost": 8,
-            "spinner": false,
-            "rumble": null,
-            "pulsejet": null,
+            "rumble": 0,
+            "pulsejet": false,
             "oiltank": true
         },
         {
@@ -930,9 +860,8 @@
             "altitude": 3,
             "torque": 0,
             "cost": 5,
-            "spinner": true,
-            "rumble": null,
-            "pulsejet": null,
+            "rumble": 0,
+            "pulsejet": false,
             "oiltank": false
         },
         {
@@ -947,7 +876,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 6,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -964,7 +892,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 8,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -981,7 +908,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 8,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -998,7 +924,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 16,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1015,7 +940,6 @@
             "altitude": 6,
             "torque": 0,
             "cost": 139,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1032,7 +956,6 @@
             "altitude": 3,
             "torque": 3,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -1049,7 +972,6 @@
             "altitude": 3,
             "torque": 3,
             "cost": 4,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -1066,7 +988,6 @@
             "altitude": 3,
             "torque": 4,
             "cost": 4,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -1083,7 +1004,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 27,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1100,7 +1020,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 26,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1117,7 +1036,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 7,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1134,7 +1052,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 11,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1151,7 +1068,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 11,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1168,7 +1084,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 12,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1185,7 +1100,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 12,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1202,7 +1116,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 18,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1219,7 +1132,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1236,7 +1148,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 28,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1253,7 +1164,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 25,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1270,7 +1180,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 4,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1287,7 +1196,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 2,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1304,7 +1212,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 13,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1321,7 +1228,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 19,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1338,7 +1244,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 11,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1355,7 +1260,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 4,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1372,7 +1276,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1389,7 +1292,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 8,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1406,7 +1308,6 @@
             "altitude": 3,
             "torque": 0,
             "cost": 8,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1423,7 +1324,6 @@
             "altitude": 3,
             "torque": 1,
             "cost": 6,
-            "spinner": true,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": false
@@ -1440,7 +1340,6 @@
             "altitude": 3,
             "torque": 2,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -1457,7 +1356,6 @@
             "altitude": 3,
             "torque": 2,
             "cost": 8,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -1474,7 +1372,6 @@
             "altitude": 3,
             "torque": 2,
             "cost": 5,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -1491,7 +1388,6 @@
             "altitude": 3,
             "torque": 3,
             "cost": 3,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true
@@ -1508,7 +1404,6 @@
             "altitude": 3,
             "torque": 3,
             "cost": 4,
-            "spinner": false,
             "rumble": 0,
             "pulsejet": false,
             "oiltank": true

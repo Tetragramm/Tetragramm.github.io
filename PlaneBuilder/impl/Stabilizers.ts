@@ -75,6 +75,20 @@ class Stabilizers extends Part {
         this.vstab_count = js["vstab_count"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.hstab_sel);
+        s.PushNum(this.hstab_count);
+        s.PushNum(this.vstab_sel);
+        s.PushNum(this.vstab_count);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.hstab_sel = d.GetNum();
+        this.hstab_count = d.GetNum();
+        this.vstab_sel = d.GetNum();
+        this.vstab_count = d.GetNum();
+    }
+
     public GetHStabList() {
         return this.hstab_list;
     }

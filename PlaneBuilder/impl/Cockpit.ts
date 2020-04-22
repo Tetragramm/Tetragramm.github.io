@@ -42,6 +42,7 @@ class Cockpit extends Part {
             type: this.selected_type,
             upgrades: this.selected_upgrades,
             safety: this.selected_safety,
+            sights: this.selected_gunsights,
         };
     }
 
@@ -49,6 +50,21 @@ class Cockpit extends Part {
         this.selected_type = js["type"];
         this.selected_upgrades = js["upgrades"];
         this.selected_safety = js["safety"];
+        this.selected_gunsights = js["sights"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNum(this.selected_type);
+        s.PushBoolArr(this.selected_upgrades);
+        s.PushBoolArr(this.selected_safety);
+        s.PushBoolArr(this.selected_gunsights);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.selected_type = d.GetNum();
+        this.selected_upgrades = d.GetBoolArr();
+        this.selected_safety = d.GetBoolArr();
+        this.selected_gunsights = d.GetBoolArr();
     }
 
     public GetTypeList() {
@@ -141,7 +157,6 @@ class Cockpit extends Part {
         var can = [...Array(this.upgrades.length).fill(true)];
         if (this.is_primary) {
             can[0] = false;
-            can[3] = false;
         }
         return can;
     }

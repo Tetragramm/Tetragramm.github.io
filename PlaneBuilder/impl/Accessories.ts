@@ -28,12 +28,15 @@ class Accessories extends Part {
 
     private acft_power: number;
     private acft_rad: boolean;
+    private skin_armour: number;
 
     constructor(js: JSON) {
         super();
 
         this.armour_coverage = [...Array(8).fill(0)];
         this.acft_power = 0;
+        this.acft_rad = false;
+        this.skin_armour = 0;
 
         this.electric_list = [];
         for (let elem of js["electrical"]) {
@@ -106,6 +109,28 @@ class Accessories extends Part {
         this.clim_sel = js["clim_sel"];
         this.auto_sel = js["auto_sel"];
         this.cont_sel = js["cont_sel"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNumArr(this.armour_coverage);
+        s.PushNumArr(this.electrical_count);
+        s.PushNum(this.radio_sel);
+        s.PushBoolArr(this.info_sel);
+        s.PushBoolArr(this.visi_sel);
+        s.PushBoolArr(this.clim_sel);
+        s.PushNum(this.auto_sel);
+        s.PushNum(this.cont_sel);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.armour_coverage = d.GetNumArr();
+        this.electrical_count = d.GetNumArr();
+        this.radio_sel = d.GetNum();
+        this.info_sel = d.GetBoolArr();
+        this.visi_sel = d.GetBoolArr();
+        this.clim_sel = d.GetBoolArr();
+        this.auto_sel = d.GetNum();
+        this.cont_sel = d.GetNum();
     }
 
     public GetCommunicationName() {
@@ -248,6 +273,13 @@ class Accessories extends Part {
         return false;
     }
 
+    public SetSkinArmor(num: number) {
+        if (num < this.skin_armour)
+            this.armour_coverage[1] += num - this.skin_armour;
+        this.skin_armour = num;
+        this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -255,11 +287,17 @@ class Accessories extends Part {
     public PartStats() {
         var stats = new Stats();
 
+        this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
         //Armour
         for (let i = 0; i < this.armour_coverage.length; i++) {
             let AP = i + 1;
-            stats.mass += this.armour_coverage[i] * AP;
-            stats.cost += Math.floor(this.armour_coverage[i] * AP / 3);
+            var count = this.armour_coverage[i];
+            if (AP == 2) {
+                count -= this.skin_armour;
+            }
+
+            stats.mass += count * AP;
+            stats.cost += Math.floor(count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
         }
 

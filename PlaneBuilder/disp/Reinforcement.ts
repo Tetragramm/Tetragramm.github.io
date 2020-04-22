@@ -6,6 +6,7 @@ class Reinforcement_HTML extends Display {
     private ext_wood_inp: HTMLInputElement[];
     private ext_steel_inp: HTMLInputElement[];
     private wires: HTMLInputElement;
+    private cabane: HTMLSelectElement;
     private cant_inp: HTMLInputElement[];
 
     //Display Stat Elements
@@ -50,6 +51,16 @@ class Reinforcement_HTML extends Display {
             this.ext_wood_inp.push(w_inp);
             this.ext_steel_inp.push(s_inp);
         }
+        this.cabane = document.createElement("SELECT") as HTMLSelectElement;
+        FlexSelect("Cabane", this.cabane, fs)
+        for (let o of this.rf.GetCabaneList()) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = o.name;
+            this.cabane.add(opt);
+        }
+        this.cabane.onchange = () => { this.rf.SetCabane(this.cabane.selectedIndex); };
+        this.cabane.selectedIndex = 0;
+
         this.wires = document.createElement("INPUT") as HTMLInputElement;
         FlexCheckbox("Wires", this.wires, fs);
         this.wires.onchange = () => { this.rf.SetWires(this.wires.checked); };
@@ -92,6 +103,8 @@ class Reinforcement_HTML extends Display {
     }
 
     public UpdateDisplay() {
+
+        this.cabane.selectedIndex = this.rf.GetCabane();
         this.wires.checked = this.rf.GetWires();
 
         var w_count = this.rf.GetExternalWoodCount();

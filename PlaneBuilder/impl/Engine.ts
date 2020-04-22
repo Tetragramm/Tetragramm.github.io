@@ -107,6 +107,43 @@ class Engine extends Part {
         }
     }
 
+    public serialize(s: Serialize) {
+        this.etype_stats.serialize(s);
+        s.PushNum(this.cooling_count);
+        s.PushNum(this.radiator_index);
+        s.PushNum(this.selected_mount);
+        s.PushBool(this.use_pp);
+        s.PushBool(this.torque_to_struct);
+        s.PushBool(this.use_ds);
+        s.PushNum(this.gp_count);
+        s.PushNum(this.gpr_count);
+        s.PushNum(this.cowl_sel);
+        s.PushBool(this.is_generator);
+        s.PushBool(this.has_alternator);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.etype_stats.deserialize(d);
+        this.cooling_count = d.GetNum();
+        this.radiator_index = d.GetNum();
+        this.selected_mount = d.GetNum();
+        this.use_pp = d.GetBool();
+        this.torque_to_struct = d.GetBool();
+        this.use_ds = d.GetBool();
+        this.gp_count = d.GetNum();
+        this.gpr_count = d.GetNum();
+        this.cowl_sel = d.GetNum();
+        this.is_generator = d.GetBool();
+        this.has_alternator = d.GetBool();
+        this.selected_index = -1;
+        for (let i = 0; i < this.engine_list.length; i++) {
+            if (this.etype_stats.Equal(this.engine_list[i])) {
+                this.selected_index = i;
+                break;
+            }
+        }
+    }
+
     public GetMaxAltitude() {
         return this.etype_stats.altitude;
     }
@@ -435,9 +472,19 @@ class Engine extends Part {
     }
 
     private GetSpinner() {
-        if (this.gp_count > 0 && this.etype_stats.spinner)
-            return true;
-        return false;
+        if (this.gp_count > 0) {
+            if (this.use_ds &&
+                (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
+                    || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+                )) { //Uses Extended Driveshafts, can be arty, and rotary engine
+                return [true, true];
+            }
+            else if (!this.etype_stats.oiltank) { //Not rotary, so room for gun but not arty.
+                return [true, false];
+            }
+        }
+        //No spinner weapons
+        return [false, false];
     }
 
     public IsElectrics() {
@@ -509,8 +556,7 @@ class Engine extends Part {
 
         //Upgrades
         if (this.use_ds) {
-            stats.mass += Math.floor(stats.power / 10);
-            stats.cost += 2 * Math.floor(stats.power / 10);
+            stats.mass += 1;
         }
         stats.cost += this.gp_count + this.gpr_count;
 

@@ -1,7 +1,7 @@
 /// <reference path="./Display.ts" />
 /// <reference path="../impl/Weapons.ts" />
 
-type WType = { span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement, accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement, pair: HTMLInputElement };
+type WType = { span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement, accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement, pair: HTMLInputElement, repeating: HTMLInputElement };
 type WStatType = { mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement, sect: HTMLTableCellElement, hits: HTMLTableCellElement, damg: HTMLTableCellElement };
 type WSetType = { type: HTMLSelectElement, dirs: HTMLInputElement[], count: HTMLInputElement, fixed: HTMLInputElement, wcell: HTMLTableCellElement, ammo: HTMLInputElement, weaps: WType[], stats: WStatType };
 class Weapons_HTML extends Display {
@@ -16,7 +16,7 @@ class Weapons_HTML extends Display {
         this.weap = weap;
 
         this.inp_w_count = document.getElementById("num_wsets") as HTMLInputElement;
-        this.inp_w_count.oninput = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
+        this.inp_w_count.onchange = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
 
         this.tbl = document.getElementById("table_weapons") as HTMLTableElement;
         this.wrow = [];
@@ -102,12 +102,14 @@ class Weapons_HTML extends Display {
             free_access: document.createElement("INPUT") as HTMLInputElement,
             synch: document.createElement("SELECT") as HTMLSelectElement,
             pair: document.createElement("INPUT") as HTMLInputElement,
+            repeating: document.createElement("INPUT") as HTMLInputElement,
         };
         CreateCheckbox("Accessible", w.accessible, w.span, false);
         CreateCheckbox("Free Accessible", w.free_access, w.span, false);
         CreateCheckbox("Covered", w.covered, w.span, false);
         CreateCheckbox("Paired", w.pair, w.span, true);
         CreateCheckbox("Wing Mount", w.wing, w.span, false);
+        CreateCheckbox("Autoloader", w.repeating, w.span, true);
         CreateSelect("Synchronization", w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
 
@@ -124,23 +126,23 @@ class Weapons_HTML extends Display {
 
     private UpdateWSet(set: WeaponSystem, disp: WSetType) {
         disp.type.selectedIndex = set.GetWeaponSelected();
-        disp.type.oninput = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
+        disp.type.onchange = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
 
         disp.count.valueAsNumber = set.GetWeaponCount();
-        disp.count.oninput = () => { set.SetWeaponCount(disp.count.valueAsNumber); };
+        disp.count.onchange = () => { set.SetWeaponCount(disp.count.valueAsNumber); };
 
         disp.fixed.checked = set.GetFixed();
-        disp.fixed.oninput = () => { set.SetFixed(disp.fixed.checked); };
+        disp.fixed.onchange = () => { set.SetFixed(disp.fixed.checked); };
 
         var dirlist = set.GetDirection();
         var candir = set.CanDirection();
         for (let i = 0; i < dirlist.length; i++) {
             disp.dirs[i].checked = dirlist[i];
-            disp.dirs[i].oninput = () => { set.SetDirection(i, disp.dirs[i].checked); };
+            disp.dirs[i].onchange = () => { set.SetDirection(i, disp.dirs[i].checked); };
             disp.dirs[i].disabled = !candir[i];
         }
         disp.ammo.valueAsNumber = set.GetAmmo();
-        disp.ammo.oninput = () => { set.SetAmmo(disp.ammo.valueAsNumber); };
+        disp.ammo.onchange = () => { set.SetAmmo(disp.ammo.valueAsNumber); };
 
         var wlist = set.GetWeapons();
         while (disp.weaps.length < wlist.length) {
@@ -152,22 +154,29 @@ class Weapons_HTML extends Display {
         }
         for (let i = 0; i < wlist.length; i++) {
             disp.weaps[i].wing.checked = wlist[i].GetWing();
-            disp.weaps[i].wing.oninput = () => { wlist[i].SetWing(disp.weaps[i].wing.checked); };
+            disp.weaps[i].wing.onchange = () => { wlist[i].SetWing(disp.weaps[i].wing.checked); };
             disp.weaps[i].wing.disabled = !wlist[i].CanWing();
             disp.weaps[i].covered.checked = wlist[i].GetCovered();
-            disp.weaps[i].covered.oninput = () => { wlist[i].SetCovered(disp.weaps[i].covered.checked); };
+            disp.weaps[i].covered.onchange = () => { wlist[i].SetCovered(disp.weaps[i].covered.checked); };
+            disp.weaps[i].covered.disabled = !wlist[i].CanCovered();
             disp.weaps[i].accessible.checked = wlist[i].GetAccessible();
-            disp.weaps[i].accessible.oninput = () => { wlist[i].SetAccessible(disp.weaps[i].accessible.checked); };
+            disp.weaps[i].accessible.onchange = () => { wlist[i].SetAccessible(disp.weaps[i].accessible.checked); };
             disp.weaps[i].free_access.checked = wlist[i].GetFreeAccessible();
-            disp.weaps[i].free_access.oninput = () => { wlist[i].SetFreeAccessible(disp.weaps[i].free_access.checked); };
+            disp.weaps[i].free_access.onchange = () => { wlist[i].SetFreeAccessible(disp.weaps[i].free_access.checked); };
             disp.weaps[i].free_access.disabled = !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible());
             disp.weaps[i].pair.checked = wlist[i].GetPair();
-            disp.weaps[i].pair.oninput = () => { wlist[i].SetPair(disp.weaps[i].pair.checked); };
+            disp.weaps[i].pair.onchange = () => { wlist[i].SetPair(disp.weaps[i].pair.checked); };
             disp.weaps[i].pair.disabled = !wlist[i].CanPair();
+            disp.weaps[i].repeating.checked = wlist[i].GetRepeating();
+            disp.weaps[i].repeating.onchange = () => { wlist[i].SetRepeating(disp.weaps[i].repeating.checked); };
+            disp.weaps[i].repeating.disabled = !wlist[i].CanRepeating();
             disp.weaps[i].synch.selectedIndex = wlist[i].GetSynchronization() + 1;
-            disp.weaps[i].synch.oninput = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
+            disp.weaps[i].synch.onchange = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
             disp.weaps[i].synch.disabled = !wlist[i].can_synchronize;
-            disp.weaps[i].synch.options[SynchronizationType.SPINNER + 1].disabled = !wlist[i].can_spinner;
+            var can = wlist[i].CanSynchronization();
+            for (let j = 0; j < can.length; j++) {
+                disp.weaps[i].synch.options[j].disabled = !can[j];
+            }
         }
 
 

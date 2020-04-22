@@ -8,7 +8,6 @@ class EngineStats {
     public rumble: number = 0;
     public oiltank: boolean = false;
     public pulsejet: boolean = false;
-    public spinner: boolean = false;
     public stats: Stats = new Stats();
     constructor(js?: JSON) {
         if (js) {
@@ -25,7 +24,6 @@ class EngineStats {
             rumble: this.rumble,
             oiltank: this.oiltank,
             pulsejet: this.pulsejet,
-            spinner: this.spinner,
             ...this.stats.toJSON()
         };
     }
@@ -38,10 +36,29 @@ class EngineStats {
         this.rumble = js["rumble"];
         this.oiltank = js["oiltank"];
         this.pulsejet = js["pulsejet"];
-        this.spinner = js["spinner"];
-        if (this.spinner == null)
-            this.spinner = false;
         this.stats = new Stats(js);
+    }
+
+    public serialize(s: Serialize) {
+        s.PushString(this.name);
+        s.PushNum(this.overspeed);
+        s.PushNum(this.altitude);
+        s.PushNum(this.torque);
+        s.PushNum(this.rumble);
+        s.PushBool(this.oiltank);
+        s.PushBool(this.pulsejet);
+        this.stats.serialize(s);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.name = d.GetString();
+        this.overspeed = d.GetNum();
+        this.altitude = d.GetNum();
+        this.torque = d.GetNum();
+        this.rumble = d.GetNum();
+        this.oiltank = d.GetBool();
+        this.pulsejet = d.GetBool();
+        this.stats.deserialize(d);
     }
 
     public Add(other: EngineStats): EngineStats {
@@ -54,7 +71,6 @@ class EngineStats {
         res.rumble = this.rumble + other.rumble;
         res.oiltank = this.oiltank || other.oiltank;
         res.pulsejet = this.pulsejet || other.pulsejet;
-        res.spinner = this.spinner || other.spinner;
         return res;
     }
     public Clone(): EngineStats {
@@ -67,7 +83,6 @@ class EngineStats {
             && this.torque == other.torque
             && this.rumble == other.rumble
             && this.oiltank == other.oiltank
-            && this.pulsejet == other.pulsejet
-            && this.spinner == other.spinner;
+            && this.pulsejet == other.pulsejet;
     }
 }

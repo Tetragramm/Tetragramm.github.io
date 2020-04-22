@@ -13,18 +13,19 @@ class WeaponSystem extends Part {
     private pusher: boolean;
     private spinner_t: boolean;
     private spinner_p: boolean;
+    public has_cantilever: boolean;
 
     private weapon_list: {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
-        ap: number, jam: number, reload: number,
+        ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean
     }[];
 
     constructor(weapon_list: {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
-        ap: number, jam: number, reload: number,
+        ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean
     }[]) {
         super();
@@ -68,30 +69,45 @@ class WeaponSystem extends Part {
             this.ammo = 1;
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.weapon_type);
+        s.PushBool(this.fixed);
+        s.PushBoolArr(this.directions);
+        s.PushNum(this.ammo);
+        s.PushNum(this.weapons.length);
+        for (let w of this.weapons) {
+            w.serialize(s);
+        }
+    }
+
+    public deserialize(d: Deserialize) {
+        this.weapon_type = d.GetNum();
+        this.fixed = d.GetBool();
+        this.directions = d.GetBoolArr();
+        this.ammo = d.GetNum();
+        var wlen = d.GetNum();
+        this.weapons = [];
+        for (let i = 0; i < wlen; i++) {
+            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            w.SetCalculateStats(this.CalculateStats);
+            w.deserialize(d);
+            this.weapons.push(w);
+        }
+    }
+
     public GetWeaponSelected() {
         return this.weapon_type;
     }
 
     public SetWeaponSelected(num: number) {
-        if (this.weapon_list[num].size == 16 && this.weapon_list[this.weapon_type].size != 16) {
-            this.weapons = []; //CLear all weapons
-            this.weapon_type = num;
-            this.SetFixed(true);
-            this.directions = [...Array(6).fill(false)];
-            if (this.tractor && this.spinner_t)
-                this.directions[0] = true;
-            else if (this.tractor && this.spinner_p)
-                this.directions[1] = true;
-            else
-                this.directions[3] = true;
-
-            this.SWC(1); //Create a single weapon for arty.
-            this.weapons[0].SetWing(false);
-        } else {
-            this.weapon_type = num;
-            for (let w of this.weapons) {
-                w.SetWeaponType(this.weapon_list[num]);
+        this.weapon_type = num;
+        if (this.weapon_list[num].size == 16) {
+            while (this.weapons.length > 1) {
+                this.weapons.pop();
             }
+        }
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.weapon_list[num]);
         }
         this.CalculateStats();
     }
@@ -122,7 +138,7 @@ class WeaponSystem extends Part {
 
     public CanDirection() {
         var directions = [...Array(6).fill(true)];
-        if (this.fixed && this.weapon_list[this.weapon_type].size == 16 && this.weapons.length > 0) {
+        if (this.weapons[0].GetArty() && this.fixed && !this.weapons[0].GetWing()) {
             var is_spinner = this.weapons[0].GetSynchronization() == SynchronizationType.SPINNER;
             if (this.tractor && !(this.spinner_t || (is_spinner && this.directions[0])))
                 directions[0] = false;
@@ -141,7 +157,7 @@ class WeaponSystem extends Part {
             use = true;
         if (this.fixed) {
             this.directions = [...Array(6).fill(false)];
-            if (this.weapon_list[this.weapon_type].size == 16) {
+            if (this.weapons[0].GetArty() && !this.weapons[0].GetWing()) {
                 if (num == 0 && this.tractor && !this.spinner_t)
                     num = 1;
                 if (num == 1 && this.pusher && !this.spinner_p)
@@ -190,37 +206,42 @@ class WeaponSystem extends Part {
         }
     }
 
-    public SetTractorPusher(hasT: boolean, can_spinnerT: boolean,
-        hasP: boolean, can_spinnerP: boolean) {
+    public SetTractorPusher(hasT: boolean, can_spinnerT: boolean, can_arty_spinnerT: boolean,
+        hasP: boolean, can_spinnerP: boolean, can_arty_spinnerP: boolean) {
         this.tractor = hasT;
         this.pusher = hasP;
-        this.spinner_t = can_spinnerT;
-        this.spinner_p = can_spinnerP;
+        this.spinner_t = can_arty_spinnerT;
+        this.spinner_p = can_arty_spinnerP;
 
         if (this.directions[0] && hasT) {
             for (let w of this.weapons) {
                 if (w.GetFixed() && !w.GetWing()) {
                     w.can_synchronize = true;
-                    w.can_spinner = can_spinnerT;
+                    w.can_spinner = can_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
+                    w.can_arty_spinner = can_arty_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
                 } else {
                     w.can_synchronize = false;
                     w.can_spinner = false;
+                    w.can_arty_spinner = false;
                 }
             }
         } else if (this.directions[1] && hasP) {
             for (let w of this.weapons) {
                 if (w.GetFixed() && !w.GetWing()) {
                     w.can_synchronize = true;
-                    w.can_spinner = can_spinnerT;
+                    w.can_spinner = can_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
+                    w.can_arty_spinner = can_arty_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
                 } else {
                     w.can_synchronize = false;
                     w.can_spinner = false;
+                    w.can_arty_spinner = false;
                 }
             }
         } else {
             for (let w of this.weapons) {
                 w.can_synchronize = false;
                 w.can_spinner = false;
+                w.can_arty_spinner = false;
             }
         }
     }
@@ -256,6 +277,29 @@ class WeaponSystem extends Part {
         return this.ammo;
     }
 
+    public GetJam() {
+        if (this.weapon_list[this.weapon_type].rapid) {
+            var jams = [0, 0];
+            for (let w of this.weapons) {
+                var t = w.GetJam();
+                jams[0] = Math.max(jams[0], t[0]);
+                jams[1] = Math.max(jams[1], t[1]);
+            }
+            return jams[0].toString() + "/" + jams[1].toString();
+        }
+        else {
+            var jam = 0;
+            for (let w of this.weapons) {
+                jam = Math.max(jam, w.GetJam() as number);
+            }
+            return jam.toString();
+        }
+    }
+
+    public IsPlural() {
+        return this.weapons.length > 1 || this.weapons[0].GetPair();
+    }
+
     public SetAmmo(num: number) {
         if (num != num || num < 1)
             num = 1;
@@ -280,6 +324,7 @@ class WeaponSystem extends Part {
                 dircount++;
 
         for (let w of this.weapons) {
+            w.has_cantilever = this.has_cantilever;
             stats = stats.Add(w.PartStats());
 
             if (!this.fixed) {

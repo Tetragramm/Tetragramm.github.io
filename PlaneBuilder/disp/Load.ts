@@ -14,12 +14,11 @@ class Load_HTML extends Display {
     private extinguish: HTMLInputElement;
     //Munitions
     private bombs: HTMLInputElement;
-    private rockets: HTMLInputElement;
+    private bay_count: HTMLInputElement;
     private bay1: HTMLInputElement;
     private bay2: HTMLInputElement;
     //Cargo and Passengers
-    private carg: HTMLInputElement;
-    private pass: HTMLInputElement;
+    private carg: HTMLSelectElement;
 
     //Display Stat Elements
     private d_drag: HTMLTableCellElement;
@@ -67,31 +66,33 @@ class Load_HTML extends Display {
     private InitMunitions(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
         this.bombs = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Bombs", this.bombs, fs);
+        FlexInput("Bombs and Rockets", this.bombs, fs);
         this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
 
-        this.rockets = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Rockets", this.rockets, fs);
-        this.rockets.onchange = () => { this.boom.SetRocketCount(this.rockets.valueAsNumber); };
+        this.bay_count = document.createElement("INPUT") as HTMLInputElement;
+        FlexInput("Internal Bay Count", this.bay_count, fs);
+        this.bay_count.onchange = () => { this.boom.SetBayCount(this.bay_count.valueAsNumber); };
 
         this.bay1 = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Internal Bay 1", this.bay1, fs);
+        FlexCheckbox("Widen Internal Bay 1", this.bay1, fs);
         this.bay1.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
 
         this.bay2 = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Internal Bay 2", this.bay2, fs);
+        FlexCheckbox("Widen Internal Bay 2", this.bay2, fs);
         this.bay2.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
     }
 
     private InitCargoAndPassengers(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
-        this.carg = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Cargo", this.carg, fs);
-        this.carg.onchange = () => { this.cargo.SetMass(this.carg.valueAsNumber); };
-
-        this.pass = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Passengers", this.pass, fs);
-        this.pass.onchange = () => { this.cargo.SetPassengers(this.pass.valueAsNumber); };
+        this.carg = document.createElement("SELECT") as HTMLSelectElement;
+        FlexSelect("Cargo", this.carg, fs);
+        var lst = this.cargo.GetSpaceList();
+        for (let l of lst) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = l.name;
+            this.carg.add(opt);
+        }
+        this.carg.onchange = () => { this.cargo.SetSpace(this.carg.selectedIndex); };
     }
 
     private InitStats(stat_cell: HTMLTableCellElement) {
@@ -129,10 +130,10 @@ class Load_HTML extends Display {
         this.extinguish.checked = this.fuel.GetExtinguisher();
 
         this.bombs.valueAsNumber = this.boom.GetBombCount();
-        this.rockets.valueAsNumber = this.boom.GetRocketCount();
+        this.bay_count.valueAsNumber = this.boom.GetBayCount();
         this.bay1.checked = this.boom.GetBay1();
         this.bay2.checked = this.boom.GetBay2();
-        if (this.boom.GetBombCount() > 0) {
+        if (this.boom.GetBayCount() > 0) {
             this.bay1.disabled = false;
             if (this.bay1.checked)
                 this.bay2.disabled = false;
@@ -143,8 +144,7 @@ class Load_HTML extends Display {
             this.bay2.disabled = true;
         }
 
-        this.carg.valueAsNumber = this.cargo.GetMass();
-        this.pass.valueAsNumber = this.cargo.GetPassengers();
+        this.carg.selectedIndex = this.cargo.GetSpace();
 
         var stats = this.fuel.PartStats();
         stats = stats.Add(this.boom.PartStats());

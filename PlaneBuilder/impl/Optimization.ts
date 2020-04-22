@@ -54,6 +54,30 @@ class Optimization extends Part {
         this.drag = js["drag"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.free_dots);
+        s.PushNum(this.cost);
+        s.PushNum(this.bleed);
+        s.PushNum(this.escape);
+        s.PushNum(this.mass);
+        s.PushNum(this.toughness);
+        s.PushNum(this.maxstrain);
+        s.PushNum(this.reliability);
+        s.PushNum(this.drag);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.free_dots = d.GetNum();
+        this.cost = d.GetNum();
+        this.bleed = d.GetNum();
+        this.escape = d.GetNum();
+        this.mass = d.GetNum();
+        this.toughness = d.GetNum();
+        this.maxstrain = d.GetNum();
+        this.reliability = d.GetNum();
+        this.drag = d.GetNum();
+    }
+
     public GetUnassignedCount() {
         return this.free_dots - this.cost - this.bleed
             - this.escape - this.mass - this.toughness - this.maxstrain
@@ -243,15 +267,15 @@ class Optimization extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        stats.cost = Math.floor(-(this.cost * 1.5 * this.acft_stats.cost / 10));
-        stats.liftbleed = Math.floor(- this.bleed * 2);
+        stats.cost = Math.floor(-(this.cost * 2 * this.acft_stats.cost / 10));
+        stats.liftbleed = Math.floor(- this.bleed * 3);
         stats.escape = this.escape;
         stats.visibility = this.escape;
-        stats.mass = Math.floor(-(this.mass * this.acft_stats.mass / 20));
-        stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 5);
-        stats.maxstrain = Math.floor(this.maxstrain * this.acft_stats.maxstrain / 10);
+        stats.mass = Math.floor(-(this.mass * this.acft_stats.mass / 10));
+        stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 4);
+        stats.maxstrain = Math.floor(this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
-        stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 20));
+        stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 10));
 
         return stats;
     }

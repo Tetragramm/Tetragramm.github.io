@@ -8,6 +8,9 @@ class Frames_HTML extends Display {
     private c_options: HTMLTableCellElement;
     private c_stats: HTMLTableCellElement;
 
+    private all_frame: HTMLSelectElement;
+    private all_skin: HTMLSelectElement;
+
     private t_frame: HTMLTableCellElement;
     private t_skin: HTMLTableCellElement;
     private t_options: HTMLTableCellElement;
@@ -94,6 +97,26 @@ class Frames_HTML extends Display {
         this.t_farman = document.getElementById("tail_farman") as HTMLInputElement;
         this.t_boom = document.getElementById("tail_boom") as HTMLInputElement;
         this.t_fwing = document.getElementById("flying_wing") as HTMLInputElement;
+        this.all_frame = document.getElementById("all_frame") as HTMLSelectElement;
+        this.all_skin = document.getElementById("all_skin") as HTMLSelectElement;
+
+        var spar_list = this.frames.GetFrameList();
+        for (let spar of spar_list) {
+            if (spar.basestruct > 0) {
+                let opt = document.createElement("OPTION") as HTMLOptionElement;
+                opt.text = spar.name;
+                this.all_frame.add(opt);
+            }
+        }
+        this.all_frame.oninput = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
+        var skin_list = this.frames.GetSkinList();
+        for (let skin of skin_list) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = skin.name;
+            this.all_skin.add(opt);
+        }
+        this.all_skin.oninput = () => { this.frames.SetAllSkin(this.all_skin.selectedIndex); };
+
 
         for (let elem of this.frames.GetTailList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -140,6 +163,8 @@ class Frames_HTML extends Display {
         this.t_boom.checked = this.frames.GetUseBoom();
         this.t_fwing.disabled = !this.frames.CanFlyingWing();
         this.t_fwing.checked = this.frames.GetFlyingWing();
+        this.all_frame.selectedIndex = -1;
+        this.all_skin.selectedIndex = -1;
 
         for (let i = 0; i < tail_section_list.length; i++) {
             let sec = tail_section_list[i];

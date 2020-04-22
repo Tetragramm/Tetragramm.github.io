@@ -30,7 +30,7 @@ class Engines_HTML extends Display {
         this.num_radiators.valueAsNumber = this.eng.GetNumberOfRadiators();
 
         this.is_asymmetric = document.getElementById("asymmetric") as HTMLInputElement;
-        this.is_asymmetric.oninput = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
+        this.is_asymmetric.onchange = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
         this.is_asymmetric.checked = this.eng.GetAsymmetry();
     }
 

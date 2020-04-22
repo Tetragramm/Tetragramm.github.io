@@ -106,6 +106,45 @@ class Engines extends Part {
         this.is_asymmetric = js["is_asymmetric"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.engines.length);
+        for (let en of this.engines) {
+            en.serialize(s);
+        }
+
+        s.PushNum(this.radiators.length);
+        for (let rd of this.radiators) {
+            rd.serialize(s);
+        }
+        s.PushBool(this.is_asymmetric);
+    }
+
+    public deserialize(d: Deserialize) {
+        var elen = d.GetNum();
+        this.engines = [];
+        for (let i = 0; i < elen; i++) {
+            let eng = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            eng.deserialize(d);
+            eng.SetCalculateStats(this.CalculateStats);
+            this.engines.push(eng);
+        }
+
+        var rlen = d.GetNum();
+        this.radiators = [];
+        for (let i = 0; i < rlen; i++) {
+            let rad = new Radiator(this.r_type_list, this.r_mount_list, this.r_coolant_list);
+            rad.derserialize(d);
+            rad.SetCalculateStats(this.CalculateStats);
+            this.radiators.push(rad);
+        }
+
+        this.is_asymmetric = d.GetBool();
+
+        for (let en of this.engines) {
+            en.SetNumRadiators(this.GetNumberOfRadiators());
+        }
+    }
+
     public GetHasOilTank() {
         for (let e of this.engines) {
             if (e.GetCurrentStats().oiltank)
@@ -138,9 +177,15 @@ class Engines extends Part {
         while (this.engines.length > num) {
             this.engines.pop();
         }
+        var js = null;
+        if (this.engines.length > 0) {
+            js = JSON.parse(JSON.stringify(this.engines[this.engines.length - 1].toJSON()));
+        }
         while (this.engines.length < num) {
             let en = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
+            if (js)
+                en.fromJSON(js);
             this.engines.push(en);
             en.SetNumRadiators(this.GetNumberOfRadiators());
         }
@@ -243,26 +288,30 @@ class Engines extends Part {
     }
 
     public GetTractor() {
-        var ret = { have: false, spin_count: 0 };
+        var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
             var t = e.GetTractor();
             if (t.has) {
                 ret.have = true;
-                if (t.spinner)
+                if (t.spinner[0])
                     ret.spin_count++;
+                if (t.spinner[1])
+                    ret.arty_spin_count++;
             }
         }
         return ret;
     }
 
     public GetPusher() {
-        var ret = { have: false, spin_count: 0 };
+        var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
             var t = e.GetPusher();
             if (t.has) {
                 ret.have = true;
-                if (t.spinner)
+                if (t.spinner[0])
                     ret.spin_count++;
+                if (t.spinner[1])
+                    ret.arty_spin_count++;
             }
         }
         return ret;
@@ -326,6 +375,15 @@ class Engines extends Part {
         //Asymmetric planes
         if (this.is_asymmetric)
             stats.latstab -= 3;
+
+        var is_pulsejet = false;
+        for (let en of this.engines) {
+            if (en.GetIsPulsejet())
+                is_pulsejet = true;
+        }
+        if (is_pulsejet) {
+            stats.warnings.push({ source: "Pulsejets", warning: "Pulsejets double Boost when above dropoff speed." });
+        }
 
         //Part local, gets handled in UpdateReliability
         stats.reliability = 0;

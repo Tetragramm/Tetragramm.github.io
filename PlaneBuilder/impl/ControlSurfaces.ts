@@ -79,6 +79,24 @@ class ControlSurfaces extends Part {
         this.drag_sel = js["drag_sel"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.aileron_sel);
+        s.PushNum(this.rudder_sel);
+        s.PushNum(this.elevator_sel);
+        s.PushNum(this.flaps_sel);
+        s.PushNum(this.slats_sel);
+        s.PushBoolArr(this.drag_sel);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.aileron_sel = d.GetNum();
+        this.rudder_sel = d.GetNum();
+        this.elevator_sel = d.GetNum();
+        this.flaps_sel = d.GetNum();
+        this.slats_sel = d.GetNum();
+        this.drag_sel = d.GetBoolArr();
+    }
+
     public GetAileronList() {
         return this.aileron_list;
     }

@@ -41,6 +41,18 @@ class Radiator extends Part {
         this.idx_coolant = js["coolant"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.idx_type);
+        s.PushNum(this.idx_mount);
+        s.PushNum(this.idx_coolant);
+    }
+
+    public derserialize(d: Deserialize) {
+        this.idx_type = d.GetNum();
+        this.idx_mount = d.GetNum();
+        this.idx_coolant = d.GetNum();
+    }
+
     public GetTypeList() {
         return this.type_list;
     }

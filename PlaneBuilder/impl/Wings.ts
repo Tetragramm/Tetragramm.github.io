@@ -27,12 +27,10 @@ class Wings extends Part {
     private is_swept: boolean;
     private is_closed: boolean;
     private num_frames: number;
-    public test_drag: boolean;
 
     constructor(js: JSON) {
         super();
 
-        this.test_drag = false;
         this.skin_list = [];
         for (let elem of js["surface"]) {
             this.skin_list.push({
@@ -81,6 +79,62 @@ class Wings extends Part {
         this.wing_stagger = js["wing_stagger"];
         this.is_swept = js["is_swept"];
         this.is_closed = js["is_closed"];
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNum(this.wing_list.length);
+        for (let i = 0; i < this.wing_list.length; i++) {
+            var w = this.wing_list[i];
+            s.PushNum(w.surface);
+            s.PushNum(w.area);
+            s.PushNum(w.span);
+            s.PushNum(w.dihedral);
+            s.PushNum(w.anhedral);
+            s.PushNum(w.deck);
+        }
+        s.PushNum(this.mini_wing_list.length);
+        for (let i = 0; i < this.mini_wing_list.length; i++) {
+            var w = this.mini_wing_list[i];
+            s.PushNum(w.surface);
+            s.PushNum(w.area);
+            s.PushNum(w.span);
+            s.PushNum(w.dihedral);
+            s.PushNum(w.anhedral);
+            s.PushNum(w.deck);
+        }
+        s.PushNum(this.wing_stagger);
+        s.PushBool(this.is_swept);
+        s.PushBool(this.is_closed);
+    }
+
+    public deserialize(d: Deserialize) {
+        var wlen = d.GetNum();
+        this.wing_list = [];
+        for (let i = 0; i < wlen; i++) {
+            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            wing.surface = d.GetNum();
+            wing.area = d.GetNum();
+            wing.span = d.GetNum();
+            wing.dihedral = d.GetNum();
+            wing.anhedral = d.GetNum();
+            wing.deck = d.GetNum();
+            this.wing_list.push(wing);
+        }
+        var mlen = d.GetNum();
+        this.mini_wing_list = [];
+        for (let i = 0; i < mlen; i++) {
+            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            wing.surface = d.GetNum();
+            wing.area = d.GetNum();
+            wing.span = d.GetNum();
+            wing.dihedral = d.GetNum();
+            wing.anhedral = d.GetNum();
+            wing.deck = d.GetNum();
+            this.mini_wing_list.push(wing);
+        }
+        this.wing_stagger = d.GetNum();
+        this.is_swept = d.GetBool();
+        this.is_closed = d.GetBool();
     }
 
     public GetWingList() {
@@ -134,16 +188,6 @@ class Wings extends Part {
                 }
             }
         }
-        else {
-            var count = this.DeckCountFull();
-            for (let i = this.wing_list.length - 1; i >= 0; i--) {
-                let w = this.wing_list[i];
-                if (count[w.deck] == 1 && this.wing_list.length > 1) {
-                    count[w.deck]--;
-                    this.wing_list.splice(i, 1);
-                }
-            }
-        }
 
         this.CalculateStats();
     }
@@ -159,13 +203,7 @@ class Wings extends Part {
             return false;
 
         var full_count = this.DeckCountFull();
-        if (this.stagger_list[this.wing_stagger].inline) {
-            if (full_count[deck] == 2)
-                return false;
-            if (full_count[deck] == 0 && this.wing_list.length > 0)
-                return false;
-        }
-        else if (full_count[deck] == 1 && this.deck_list[deck].limited)
+        if (!this.stagger_list[this.wing_stagger].inline && full_count[deck] == 1 && this.deck_list[deck].limited)
             return false
 
         var mini_count = this.DeckCountMini();
@@ -241,7 +279,7 @@ class Wings extends Part {
     }
 
     public GetTandem() {
-        return this.stagger_list[this.wing_stagger].wing_count == 2;
+        return this.stagger_list[this.wing_stagger].inline;
     }
 
     public GetMonoplane() {
@@ -404,6 +442,7 @@ class Wings extends Part {
         var stats = new Stats();
 
         var have_wing = false;
+        var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
         let drag_reduction = 0;
@@ -422,28 +461,25 @@ class Wings extends Part {
             }
 
             var wStats = new Stats();
-            //Deck Stats
-            wStats = wStats.Add(this.deck_list[w.deck].stats);
 
             //Actual stats
             wStats = wStats.Add(this.skin_list[w.surface].stats.Multiply(w.area));
             wStats.wingarea = w.area;
-            wStats.maxstrain -= 2 * w.span + w.area - 10;
+            //Wings cannot generate positive max strain
+            wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            if (this.test_drag)
-                wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
-            else
-                wStats.drag = Math.max(1, wStats.drag + 2 * w.area - w.span - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
             //stability from -hedral
             wStats.latstab += w.dihedral - w.anhedral;
             wStats.liftbleed += w.dihedral + w.anhedral;
 
-            //If tandem, set leading wing drag reduction
-            if (this.stagger_list[this.wing_stagger].inline && drag_reduction == 0)
-                drag_reduction = Math.floor(w.area / 2);
+            //Inline wings
+            if (deck_count[w.deck] > 1) {
+                wStats.drag = Math.floor(0.75 * wStats.drag);
+            }
 
             wStats.Round();
             stats = stats.Add(wStats);
@@ -463,14 +499,20 @@ class Wings extends Part {
 
             //Actual stats
             var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
-            wStats.maxstrain -= 2 * wspan + w.area - 10;
+            wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
-            //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + w.area - wspan);
+            //Drag is modified by area, span
+            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
             wStats.Round();
             stats = stats.Add(wStats);
+        }
+
+        //Deck Stats
+        for (let i = 0; i < this.deck_list.length; i++) {
+            if (deck_count[i] > 0)
+                stats = stats.Add(this.deck_list[i].stats);
         }
 
         //Longest wing effects

@@ -51,6 +51,18 @@ class LandingGear extends Part {
         this.extra_sel = js["extra_sel"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.gear_sel);
+        s.PushBool(this.retract);
+        s.PushBoolArr(this.extra_sel);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.gear_sel = d.GetNum();
+        this.retract = d.GetBool();
+        this.extra_sel = d.GetBoolArr();
+    }
+
     public GetGearName() {
         if (this.retract)
             return "Retractable " + this.gear_list[this.gear_sel].name;

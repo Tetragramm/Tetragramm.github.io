@@ -27,6 +27,18 @@ class Passengers extends Part {
         this.connected = js["connected"];
     }
 
+    public serialize(s: Serialize) {
+        s.PushNum(this.seats);
+        s.PushNum(this.beds);
+        s.PushBool(this.connected);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.seats = d.GetNum();
+        this.beds = d.GetNum();
+        this.connected = d.GetBool();
+    }
+
     public GetSeats() {
         return this.seats;
     }

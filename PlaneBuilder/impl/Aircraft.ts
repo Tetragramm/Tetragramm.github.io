@@ -45,7 +45,7 @@ class Aircraft {
 
     public use_large_airplane_rules: boolean
 
-    private reset_json = String.raw`{"version":"9.4","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false]}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R - 3 Boxer 6 - Cylinder","overspeed":26,"altitude":3,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"spinner":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false},"wings":{"wing_list":[{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":5,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[3,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay1":false,"bay2":false},"cargo":{"mass":0,"pass":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"state":"BETA3","weapon_systems":[]}}`;
+    private reset_json = String.raw`{"version":"10.0","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false]}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R - 3 Boxer 6 - Cylinder","overspeed":26,"altitude":3,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false},"wings":{"wing_list":[{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[3,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":0},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"state":"BETA3","weapon_systems":[]}}`;
 
     constructor(js: JSON, engine_json: JSON, weapon_json: JSON, storage: boolean) {
         this.use_large_airplane_rules = false;
@@ -64,7 +64,7 @@ class Aircraft {
         this.reinforcements = new Reinforcement(js["reinforcement"]);
         this.fuel = new Fuel(js["fuel"]);
         this.munitions = new Munitions();
-        this.cargo = new CargoAndPassengers();
+        this.cargo = new CargoAndPassengers(js["cargo"]);
         this.gear = new LandingGear(js["landing_gear"]);
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
@@ -150,6 +150,50 @@ class Aircraft {
         return false;
     }
 
+    public serialize(s: Serialize) {
+        s.PushString(this.version);
+        s.PushString(this.name);
+        this.era.serialize(s);
+        this.cockpits.serialize(s);
+        this.passengers.serialize(s);
+        this.engines.serialize(s);
+        this.propeller.serialize(s);
+        this.frames.serialize(s);
+        this.wings.serialize(s);
+        this.stabilizers.serialize(s);
+        this.controlsurfaces.serialize(s);
+        this.reinforcements.serialize(s);
+        this.fuel.serialize(s);
+        this.munitions.serialize(s);
+        this.cargo.serialize(s);
+        this.gear.serialize(s);
+        this.accessories.serialize(s);
+        this.optimization.serialize(s);
+        this.weapons.serialize(s);
+    }
+
+    public deserialize(d: Deserialize) {
+        this.version = d.GetString();
+        this.name = d.GetString();
+        this.era.deserialize(d);
+        this.cockpits.deserialize(d);
+        this.passengers.deserialize(d);
+        this.engines.deserialize(d);
+        this.propeller.deserialize(d);
+        this.frames.deserialize(d);
+        this.wings.deserialize(d);
+        this.stabilizers.deserialize(d);
+        this.controlsurfaces.deserialize(d);
+        this.reinforcements.deserialize(d);
+        this.fuel.deserialize(d);
+        this.munitions.deserialize(d);
+        this.cargo.deserialize(d);
+        this.gear.deserialize(d);
+        this.accessories.deserialize(d);
+        this.optimization.deserialize(d);
+        this.weapons.deserialize(d);
+    }
+
     public SetDisplayCallback(callback: () => void) {
         this.DisplayCallback = callback;
     }
@@ -175,17 +219,16 @@ class Aircraft {
         stats = stats.Add(this.munitions.PartStats());
         //Weapons go here, because they make sections.
         this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
-        var tractor = this.engines.GetTractor();
-        this.weapons.has_tractor = tractor.have;
-        this.weapons.tractor_spinner_count = tractor.spin_count;
-        var pusher = this.engines.GetPusher();
-        this.weapons.has_pusher = pusher.have;
-        this.weapons.pusher_spinner_count = pusher.spin_count;
+        this.weapons.SetTractorInfo(this.engines.GetTractor());
+        this.weapons.SetPusherInfo(this.engines.GetPusher());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         stats = stats.Add(this.weapons.PartStats());
+        //Cargo makes sections
+        stats = stats.Add(this.cargo.PartStats());
 
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
+        this.frames.SetIsTandem(this.wings.GetTandem());
         stats = stats.Add(this.frames.PartStats());
 
         this.wings.SetNumFrames(this.frames.GetNumFrames());
@@ -206,13 +249,12 @@ class Aircraft {
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
         this.reinforcements.SetTandem(this.wings.GetTandem());
         this.reinforcements.SetStaggered(this.wings.GetStaggered());
+        this.reinforcements.SetCantLift(this.era.GetCantLift());
         stats = stats.Add(this.reinforcements.PartStats());
-
-        this.cargo.SetSeats(this.passengers.GetBeds() + this.passengers.GetSeats());
-        stats = stats.Add(this.cargo.PartStats());
 
         this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
+        this.accessories.SetSkinArmor(this.frames.GetArmor());
         stats = stats.Add(this.accessories.PartStats());
 
         //Gear go last, because they need total mass.
@@ -241,7 +283,7 @@ class Aircraft {
             this.reinforcements.SetAcftStructure(stats.structure);
             this.fuel.SetArea(this.wings.GetArea());
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
-            this.munitions.SetAcftStructure(stats.structure);
+            this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
 
             if (this.engines.GetRumble() * 10 > stats.structure) {
                 this.stats.power = 0;
@@ -336,10 +378,14 @@ class Aircraft {
 
         var Toughness = this.stats.toughness;
         var Structure = this.stats.structure;
-        var EnergyLoss = Math.ceil(DPEmpty / 6);
+        var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
-        var TurnBleed = Math.ceil((StallSpeedEmpty + StallSpeedFull) / 12);
+        EnergyLoss = Math.min(EnergyLoss, 10);
+        EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
+        var TurnBleed = Math.ceil((StallSpeedEmpty + StallSpeedFull) / this.propeller.GetTurn());
         var TurnBleedwBombs = TurnBleed + 1;
+        TurnBleed = Math.max(TurnBleed, 1);
+        TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
         var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;

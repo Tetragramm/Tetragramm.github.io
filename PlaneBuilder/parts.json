@@ -1,26 +1,36 @@
 {
-    "version": "9.4",
+    "version": "10.0",
     "era": {
         "options": [
             {
                 "name": "Pioneer",
-                "liftbleed": 30
+                "liftbleed": 30,
+                "maxbomb": 0.166666666666,
+                "cant_lift": true
             },
             {
                 "name": "WWI",
-                "liftbleed": 25
+                "liftbleed": 25,
+                "maxbomb": 0.2,
+                "cant_lift": true
             },
             {
                 "name": "Interbellum",
-                "liftbleed": 22
+                "liftbleed": 22,
+                "maxbomb": 0.25,
+                "cant_lift": false
             },
             {
                 "name": "WWII",
-                "liftbleed": 20
+                "liftbleed": 20,
+                "maxbomb": 0.333333333333,
+                "cant_lift": false
             },
             {
                 "name": "Last Hurrah",
-                "liftbleed": 18
+                "liftbleed": 18,
+                "maxbomb": 0.5,
+                "cant_lift": false
             }
         ]
     },
@@ -482,15 +492,19 @@
             {
                 "name": "Very Coarse",
                 "pitchspeed": 0.8,
-                "pitchboost": 0.8,
+                "pitchboost": 0.9,
                 "cost": 0,
+                "energy": 4,
+                "turn": 8,
                 "automatic": false
             },
             {
                 "name": "Coarse",
                 "pitchspeed": 0.9,
-                "pitchboost": 0.7,
+                "pitchboost": 0.8,
                 "cost": 0,
+                "energy": 5,
+                "turn": 7,
                 "automatic": false
             },
             {
@@ -498,6 +512,8 @@
                 "pitchspeed": 1.0,
                 "pitchboost": 0.6,
                 "cost": 0,
+                "energy": 6,
+                "turn": 6,
                 "automatic": false
             },
             {
@@ -505,6 +521,8 @@
                 "pitchspeed": 1.1,
                 "pitchboost": 0.4,
                 "cost": 0,
+                "energy": 7,
+                "turn": 5,
                 "automatic": false
             },
             {
@@ -512,6 +530,8 @@
                 "pitchspeed": 1.2,
                 "pitchboost": 0.3,
                 "cost": 0,
+                "energy": 8,
+                "turn": 4,
                 "automatic": false
             },
             {
@@ -520,6 +540,8 @@
                 "pitchboost": 0.7,
                 "mass": 1,
                 "cost": 8,
+                "energy": 5,
+                "turn": 5,
                 "automatic": true
             }
         ],
@@ -547,9 +569,9 @@
             },
             {
                 "name": "Aluminum Spars",
-                "basestructure": 25,
+                "basestructure": 20,
                 "basecost": 2,
-                "mass": 1,
+                "mass": 0.5,
                 "structure": 4,
                 "cost": 2,
                 "geodesic": false
@@ -687,6 +709,7 @@
                 "drag": 1,
                 "mass": 3,
                 "cost": 1.5,
+                "toughness": 3,
                 "flammable": false,
                 "monocoque": true,
                 "monocoque_structure": 8
@@ -696,6 +719,7 @@
                 "drag": 1,
                 "mass": 2,
                 "cost": 2,
+                "toughness": 2,
                 "flammable": false,
                 "monocoque": true,
                 "monocoque_structure": 6
@@ -854,15 +878,8 @@
             },
             {
                 "name": "Tandem",
-                "inline": false,
-                "wing_count": 2,
-                "hstab": false,
-                "pitchstab": 4
-            },
-            {
-                "name": "Inline Tandem",
                 "inline": true,
-                "wing_count": 2,
+                "wing_count": 20,
                 "hstab": false,
                 "pitchstab": 4
             },
@@ -1010,7 +1027,8 @@
             {
                 "name": "None",
                 "warping": false,
-                "control": -5,
+                "control": -15,
+                "crashsafety": -1,
                 "cost": -2
             }
         ],
@@ -1101,7 +1119,7 @@
         ]
     },
     "reinforcement": {
-        "external": [
+        "external_wood": [
             {
                 "name": "Parallel Struts",
                 "drag": 3,
@@ -1151,6 +1169,14 @@
                 "config": true
             },
             {
+                "name": "Single Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 10,
+                "cost": 1,
+                "config": true
+            },
+            {
                 "name": "Star Strut",
                 "drag": 8,
                 "mass": 2,
@@ -1166,6 +1192,206 @@
                 "tension": 40,
                 "cost": 1,
                 "config": false
+            }
+        ],
+        "external_steel": [
+            {
+                "name": "Parallel Struts",
+                "drag": 3,
+                "mass": 1,
+                "structure": 10,
+                "maxstrain": 10,
+                "tension": 15,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "N-Strut",
+                "drag": 3,
+                "mass": 1,
+                "structure": 12,
+                "maxstrain": 13,
+                "tension": 10,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "V-Strut",
+                "drag": 2,
+                "mass": 1,
+                "structure": 0,
+                "maxstrain": 10,
+                "tension": 15,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "I-Strut",
+                "drag": 2,
+                "mass": 1,
+                "maxstrain": 25,
+                "tension": 7,
+                "cost": 4,
+                "config": true
+            },
+            {
+                "name": "W-Strut",
+                "drag": 4,
+                "mass": 1,
+                "maxstrain": 40,
+                "tension": 0,
+                "cost": 4,
+                "config": true
+            },
+            {
+                "name": "Single Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 15,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "Star Strut",
+                "drag": 8,
+                "mass": 2,
+                "structure": 20,
+                "maxstrain": 45,
+                "tension": 0,
+                "cost": 4,
+                "config": true
+            },
+            {
+                "name": "Wing Truss",
+                "drag": 6,
+                "tension": 20,
+                "cost": 2,
+                "config": false
+            }
+        ],
+        "cabane": [
+            {
+                "name": "None",
+                "tension": 0
+            },
+            {
+                "name": "Parallel Strut",
+                "drag": 1,
+                "mass": 1,
+                "structure": 5,
+                "tension": 15,
+                "cost": 1
+            },
+            {
+                "name": "Steel Parallel Strut",
+                "drag": 1,
+                "mass": 1,
+                "structure": 10,
+                "maxstrain": 5,
+                "tension": 7,
+                "cost": 2
+            },
+            {
+                "name": "N-Strut",
+                "drag": 2,
+                "mass": 1,
+                "structure": 6,
+                "maxstrain": 8,
+                "tension": 10,
+                "cost": 1
+            },
+            {
+                "name": "Steel N-Strut",
+                "drag": 2,
+                "mass": 1,
+                "structure": 12,
+                "maxstrain": 13,
+                "tension": 5,
+                "cost": 2
+            },
+            {
+                "name": "V-Strut",
+                "drag": 0,
+                "mass": 1,
+                "structure": -5,
+                "maxstrain": 5,
+                "tension": 15,
+                "cost": 1
+            },
+            {
+                "name": "Steel V-Strut",
+                "drag": 0,
+                "mass": 1,
+                "structure": 0,
+                "maxstrain": 10,
+                "tension": 7,
+                "cost": 1
+            },
+            {
+                "name": "I-Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 20,
+                "tension": 7,
+                "cost": 2
+            },
+            {
+                "name": "Steel I-Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 25,
+                "tension": 3,
+                "cost": 4
+            },
+            {
+                "name": "W-Strut",
+                "drag": 2,
+                "mass": 1,
+                "maxstrain": 35,
+                "tension": 0,
+                "cost": 2
+            },
+            {
+                "name": "Steel W-Strut",
+                "drag": 2,
+                "mass": 1,
+                "maxstrain": 40,
+                "tension": 0,
+                "cost": 4
+            },
+            {
+                "name": "Single Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 10,
+                "tension": 0,
+                "cost": 1
+            },
+            {
+                "name": "Steel Single Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 15,
+                "tension": 0,
+                "cost": 2
+            },
+            {
+                "name": "Star Strut",
+                "drag": 6,
+                "mass": 2,
+                "structure": 10,
+                "maxstrain": 30,
+                "tension": 0,
+                "cost": 2
+            },
+            {
+                "name": "Steel Star Strut",
+                "drag": 6,
+                "mass": 2,
+                "structure": 20,
+                "maxstrain": 45,
+                "tension": 0,
+                "cost": 4
             }
         ],
         "cantilever": [
@@ -1254,6 +1480,33 @@
                 "name": "Self-Sealing Gas Tank",
                 "mass": 1,
                 "cost": 2
+            }
+        ]
+    },
+    "cargo": {
+        "spaces": [
+            {
+                "name": "None"
+            },
+            {
+                "name": "Tiny",
+                "mass": 1
+            },
+            {
+                "name": "Small",
+                "reqsections": 1
+            },
+            {
+                "name": "Medium",
+                "reqsections": 3
+            },
+            {
+                "name": "Large",
+                "reqsections": 5
+            },
+            {
+                "name": "Huge",
+                "reqsections": 10
             }
         ]
     },

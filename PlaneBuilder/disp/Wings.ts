@@ -228,14 +228,14 @@ class Wings_HTML extends Display {
             else
                 opt.disabled = false;
         }
-        ht.deck.oninput = () => {
+        ht.deck.onchange = () => {
             let w = { ...wing };
             w.deck = ht.deck.selectedIndex - 1;
             this.wings.SetFullWing(idx, w);
         };
         ht.deck.selectedIndex = wing.deck + 1;
 
-        ht.skin.oninput = () => {
+        ht.skin.onchange = () => {
             let w = { ...wing };
             w.surface = ht.skin.selectedIndex;
             this.wings.SetFullWing(idx, w);
@@ -326,14 +326,14 @@ class Wings_HTML extends Display {
             else
                 opt.disabled = false;
         }
-        ht.deck.oninput = () => {
+        ht.deck.onchange = () => {
             let w = { ...wing };
             w.deck = ht.deck.selectedIndex - 1;
             this.wings.SetMiniWing(idx, w);
         };
         ht.deck.selectedIndex = wing.deck + 1;
 
-        ht.skin.oninput = () => {
+        ht.skin.onchange = () => {
             let w = { ...wing };
             w.surface = ht.skin.selectedIndex;
             this.wings.SetMiniWing(idx, w);
@@ -379,7 +379,7 @@ class Wings_HTML extends Display {
             }
             this.fw_add.append(opt);
         }
-        this.fw_add.oninput = () => {
+        this.fw_add.onchange = () => {
             let w = { surface: 0, area: 10, span: 5, dihedral: 0, anhedral: 0, deck: this.fw_add.selectedIndex - 1 };
             this.wings.SetFullWing(idx, w);
         };
@@ -406,7 +406,7 @@ class Wings_HTML extends Display {
             }
             this.mw_add.append(opt);
         }
-        this.mw_add.oninput = () => {
+        this.mw_add.onchange = () => {
             let w = { surface: 0, area: 2, span: 2, dihedral: 0, anhedral: 0, deck: this.mw_add.selectedIndex - 1 };
             this.wings.SetMiniWing(idx, w);
         };
