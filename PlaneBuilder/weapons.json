@@ -97,7 +97,7 @@
             "ap": 1,
             "ammo": 8,
             "rapid": true,
-            "synched": false,
+            "synched": true,
             "shells": false,
             "jam": "0/0",
             "reload": 0,
