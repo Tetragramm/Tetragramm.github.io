@@ -1123,13 +1123,13 @@ class Engine extends Part {
             if (this.GetIsPulsejet()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
-            else if (this.NeedCooling()) { //Means air cooled
+            else if (this.NeedCooling()) { //Means liquid
                 lst.push(c.liquid);
             }
             else if (this.etype_stats.oiltank) { //Means rotary
-                lst.push(c.rotary);
+                lst.push(c.rotary || c.air);
             }
-            else { //Means liquid
+            else { //Means air cooled
                 lst.push(c.air);
             }
         }
