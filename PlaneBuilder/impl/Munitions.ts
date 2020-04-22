@@ -52,6 +52,24 @@ class Munitions extends Part {
         return this.bomb_count;
     }
 
+    public GetMaxBombSize() {
+        var sz = 0;
+        if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+            if (this.internal_bay_1) {
+                if (this.internal_bay_2) {
+                    sz = Math.floor(10 * this.internal_bay_count);
+                }
+                else {
+                    sz = Math.floor(10 * this.internal_bay_count / 2);
+                }
+            }
+            else {
+                sz = Math.floor(10 * this.internal_bay_count / 4);
+            }
+        }
+        return sz;
+    }
+
     public SetBombCount(count: number) {
         if (count != count || count < 0)
             count = 0;
@@ -137,17 +155,7 @@ class Munitions extends Part {
                 stats.reqsections++;
                 if (this.internal_bay_2) {
                     stats.reqsections++;
-                    var sz = Math.floor(10 * this.internal_bay_count);
-                    stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
                 }
-                else {
-                    var sz = Math.floor(10 * this.internal_bay_count / 2);
-                    stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
-                }
-            }
-            else {
-                var sz = Math.floor(10 * this.internal_bay_count / 4);
-                stats.warnings.push({ source: "Bombs", warning: "Largest internal bomb is " + sz.toString() + " mass." });
             }
         }
 

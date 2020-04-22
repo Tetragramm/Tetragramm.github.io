@@ -582,17 +582,22 @@ class Aircraft_HTML extends Display {
 
         if (aircraft_model.GetWeapons().GetWeaponSets().length > 0) {
             this.copy_text += "Weapons\n\t";
-            this.weapon_head.hidden = false;
-            this.weapon_cell.hidden = false;
-        } else {
-            this.weapon_head.hidden = true;
-            this.weapon_cell.hidden = true;
         }
 
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
-        var weaphtml = "";
+        this.weapon_cell.innerHTML = "";
+        if (aircraft_model.GetMunitions().GetBombCount() > 0) {
+            var weaphtml = aircraft_model.GetMunitions().GetBombCount().toString() + " Mass of bombs or rockets.";
+            if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
+                weaphtml += " Largest internal bomb allowed is " + aircraft_model.GetMunitions().GetMaxBombSize() + " Mass.";
+            }
+            this.weapon_cell.innerHTML = weaphtml + "<br/>";
+            this.copy_text += weaphtml + "\n\t";
+        }
+
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
+            var weaphtml = "";
             weaphtml += wlist[w.GetWeaponSelected()].name;
             if (w.IsPlural()) {
                 weaphtml += "s";
@@ -634,17 +639,12 @@ class Aircraft_HTML extends Display {
             }
             this.copy_text += weaphtml + "\n\t";
             weaphtml += "<br\>";
+            this.weapon_cell.innerHTML += weaphtml;
         }
-        this.weapon_cell.innerHTML = weaphtml;
         this.copy_text += "\n";
 
         if (stats.warnings.length > 0) {
             this.copy_text += "Special Rules\n\t";
-            this.warning_head.hidden = false;
-            this.warning_cell.hidden = false;
-        } else {
-            this.warning_head.hidden = true;
-            this.warning_cell.hidden = true;
         }
         var warnhtml = "";
         for (let w of stats.warnings) {
