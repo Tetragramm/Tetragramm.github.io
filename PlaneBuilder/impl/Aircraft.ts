@@ -42,6 +42,7 @@ class Aircraft {
     private accessories: Accessories;
     private optimization: Optimization;
     private weapons: Weapons;
+    private alter: AlterStats;
 
     public use_large_airplane_rules: boolean
 
@@ -69,6 +70,7 @@ class Aircraft {
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
         this.weapons = new Weapons(weapon_json);
+        this.alter = new AlterStats();
 
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
@@ -87,6 +89,7 @@ class Aircraft {
         this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
         this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
         this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
+        this.alter.SetCalculateStats(() => { this.CalculateStats(); });
 
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
@@ -239,7 +242,7 @@ class Aircraft {
         this.stabilizers.SetIsSwept(this.wings.GetSwept());
         this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
         this.stabilizers.SetWingArea(stats.wingarea);
-
+        this.stabilizers.wing_drag = this.wings.GetWingDrag();
         stats = stats.Add(this.stabilizers.PartStats());
 
         this.controlsurfaces.SetWingArea(stats.wingarea);
@@ -265,6 +268,9 @@ class Aircraft {
         stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
+
+        stats = stats.Add(this.alter.PartStats());
+
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
 
@@ -534,5 +540,8 @@ class Aircraft {
     }
     public IsElectrics() {
         return this.engines.IsElectrics() || this.accessories.IsElectrics();
+    }
+    public GetAlter() {
+        return this.alter;
     }
 }

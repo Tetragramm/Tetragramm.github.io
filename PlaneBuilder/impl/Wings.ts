@@ -433,6 +433,26 @@ class Wings extends Part {
         return area;
     }
 
+    public GetWingDrag() {
+        var drag = 0;
+        for (let w of this.wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+
+            var wdrag = Math.max(1, 10 * w.area * w.area / (wspan * wspan));
+            drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+        }
+        for (let w of this.mini_wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+
+            //Drag is modified by area, span
+            var wdrag = Math.max(1, 10 * w.area * w.area / (wspan * wspan));
+            drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+        }
+        return drag;
+    }
+
     public PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -469,7 +489,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (wspan * wspan) - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
             //stability from -hedral
@@ -502,7 +522,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span
-            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (wspan * wspan) - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
             wStats.Round();

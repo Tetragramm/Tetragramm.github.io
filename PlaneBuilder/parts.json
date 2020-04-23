@@ -1125,7 +1125,7 @@
                 "drag": 3,
                 "mass": 1,
                 "structure": 5,
-                "maxstrain": 5,
+                "maxstrain": 10,
                 "tension": 30,
                 "cost": 1,
                 "config": true
@@ -1134,8 +1134,8 @@
                 "name": "N-Strut",
                 "drag": 3,
                 "mass": 1,
-                "structure": 6,
-                "maxstrain": 8,
+                "structure": 8,
+                "maxstrain": 12,
                 "tension": 20,
                 "cost": 1,
                 "config": true
@@ -1145,7 +1145,7 @@
                 "drag": 2,
                 "mass": 1,
                 "structure": -5,
-                "maxstrain": 5,
+                "maxstrain": 10,
                 "tension": 30,
                 "cost": 1,
                 "config": true
@@ -1154,7 +1154,7 @@
                 "name": "I-Strut",
                 "drag": 2,
                 "mass": 1,
-                "maxstrain": 20,
+                "maxstrain": 25,
                 "tension": 15,
                 "cost": 2,
                 "config": true
@@ -1163,7 +1163,7 @@
                 "name": "W-Strut",
                 "drag": 4,
                 "mass": 1,
-                "maxstrain": 35,
+                "maxstrain": 40,
                 "tension": 0,
                 "cost": 2,
                 "config": true
@@ -1181,7 +1181,7 @@
                 "drag": 8,
                 "mass": 2,
                 "structure": 10,
-                "maxstrain": 30,
+                "maxstrain": 35,
                 "tension": 0,
                 "cost": 2,
                 "config": true
@@ -1189,7 +1189,7 @@
             {
                 "name": "Wing Truss",
                 "drag": 6,
-                "tension": 40,
+                "tension": 45,
                 "cost": 1,
                 "config": false
             }
@@ -1200,7 +1200,7 @@
                 "drag": 3,
                 "mass": 1,
                 "structure": 10,
-                "maxstrain": 10,
+                "maxstrain": 15,
                 "tension": 15,
                 "cost": 2,
                 "config": true
@@ -1209,8 +1209,8 @@
                 "name": "N-Strut",
                 "drag": 3,
                 "mass": 1,
-                "structure": 12,
-                "maxstrain": 13,
+                "structure": 16,
+                "maxstrain": 24,
                 "tension": 10,
                 "cost": 2,
                 "config": true
@@ -1220,7 +1220,7 @@
                 "drag": 2,
                 "mass": 1,
                 "structure": 0,
-                "maxstrain": 10,
+                "maxstrain": 15,
                 "tension": 15,
                 "cost": 2,
                 "config": true
@@ -1229,7 +1229,7 @@
                 "name": "I-Strut",
                 "drag": 2,
                 "mass": 1,
-                "maxstrain": 25,
+                "maxstrain": 30,
                 "tension": 7,
                 "cost": 4,
                 "config": true
@@ -1238,7 +1238,7 @@
                 "name": "W-Strut",
                 "drag": 4,
                 "mass": 1,
-                "maxstrain": 40,
+                "maxstrain": 45,
                 "tension": 0,
                 "cost": 4,
                 "config": true
@@ -1264,7 +1264,7 @@
             {
                 "name": "Wing Truss",
                 "drag": 6,
-                "tension": 20,
+                "tension": 22,
                 "cost": 2,
                 "config": false
             }

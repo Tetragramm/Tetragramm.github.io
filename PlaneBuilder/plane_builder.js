@@ -2640,6 +2640,23 @@ class Wings extends Part {
         }
         return area;
     }
+    GetWingDrag() {
+        var drag = 0;
+        for (let w of this.wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            var wdrag = Math.max(1, 10 * w.area * w.area / (wspan * wspan));
+            drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+        }
+        for (let w of this.mini_wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            //Drag is modified by area, span
+            var wdrag = Math.max(1, 10 * w.area * w.area / (wspan * wspan));
+            drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+        }
+        return drag;
+    }
     PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -2671,7 +2688,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (wspan * wspan) - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             //stability from -hedral
             wStats.latstab += w.dihedral - w.anhedral;
@@ -2699,7 +2716,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span
-            wStats.drag = Math.max(1, wStats.drag + 2 * w.area / w.span - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (wspan * wspan) - drag_reduction);
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             wStats.Round();
             stats = stats.Add(wStats);
@@ -2965,7 +2982,7 @@ class Stabilizers extends Part {
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
-            stats.drag += Math.floor(this.wing_area / 5 * this.hstab_list[this.hstab_sel].dragfactor);
+            stats.drag += Math.floor(this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
         }
         else if (this.hstab_list[this.hstab_sel].increment != 0) {
             stats.pitchstab -= Math.floor(this.wing_area / 2);
@@ -2974,7 +2991,7 @@ class Stabilizers extends Part {
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
-            stats.drag += Math.floor(this.wing_area / 10 * this.vstab_list[this.vstab_sel].dragfactor);
+            stats.drag += Math.floor(this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
         }
         else if (this.vstab_list[this.vstab_sel].increment != 0) {
             stats.latstab -= this.wing_area;
@@ -5085,6 +5102,7 @@ class Aircraft {
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
         this.weapons = new Weapons(weapon_json);
+        this.alter = new AlterStats();
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
         this.passengers.SetCalculateStats(() => { this.CalculateStats(); });
@@ -5102,6 +5120,7 @@ class Aircraft {
         this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
         this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
         this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
+        this.alter.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
@@ -5240,6 +5259,7 @@ class Aircraft {
         this.stabilizers.SetIsSwept(this.wings.GetSwept());
         this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
         this.stabilizers.SetWingArea(stats.wingarea);
+        this.stabilizers.wing_drag = this.wings.GetWingDrag();
         stats = stats.Add(this.stabilizers.PartStats());
         this.controlsurfaces.SetWingArea(stats.wingarea);
         this.controlsurfaces.SetSpan(this.wings.GetSpan());
@@ -5260,6 +5280,7 @@ class Aircraft {
         stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
+        stats = stats.Add(this.alter.PartStats());
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
         if (!this.updated_stats) {
@@ -5500,6 +5521,9 @@ class Aircraft {
     }
     IsElectrics() {
         return this.engines.IsElectrics() || this.accessories.IsElectrics();
+    }
+    GetAlter() {
+        return this.alter;
     }
 }
 var internal_id = 0;
@@ -8730,6 +8754,8 @@ class Aircraft_HTML extends Display {
         this.accessories = new Accessories_HTML(aircraft.GetAccessories());
         this.optimization = new Optimization_HTML(aircraft.GetOptimization());
         this.weapons = new Weapons_HTML(aircraft.GetWeapons());
+        var tbla = document.getElementById("tbl_alter");
+        this.InitAlter(tbla);
         var tbl = document.getElementById("tbl_stats");
         this.InitStats(tbl);
         var tbl2 = document.getElementById("tbl_derived");
@@ -8814,6 +8840,140 @@ class Aircraft_HTML extends Display {
         };
         var reset_button = document.getElementById("acft_reset");
         reset_button.onclick = () => { aircraft_model.Reset(); };
+    }
+    InitAlter(tbl) {
+        var row = tbl.insertRow();
+        CreateTH(row, "Lift Bleed");
+        CreateTH(row, "Drag");
+        CreateTH(row, "Mass");
+        CreateTH(row, "Wet Mass");
+        CreateTH(row, "Bomb Mass");
+        CreateTH(row, "Cost");
+        CreateTH(row, "Upkeep");
+        row = tbl.insertRow();
+        this.a_lift = document.createElement("INPUT");
+        this.a_drag = document.createElement("INPUT");
+        this.a_mass = document.createElement("INPUT");
+        this.a_wmas = document.createElement("INPUT");
+        this.a_bmas = document.createElement("INPUT");
+        this.a_cost = document.createElement("INPUT");
+        this.a_upkp = document.createElement("INPUT");
+        row.insertCell().appendChild(this.a_lift);
+        row.insertCell().appendChild(this.a_drag);
+        row.insertCell().appendChild(this.a_mass);
+        row.insertCell().appendChild(this.a_wmas);
+        row.insertCell().appendChild(this.a_bmas);
+        row.insertCell().appendChild(this.a_cost);
+        row.insertCell().appendChild(this.a_upkp);
+        this.a_lift.setAttribute("type", "number");
+        this.a_drag.setAttribute("type", "number");
+        this.a_mass.setAttribute("type", "number");
+        this.a_wmas.setAttribute("type", "number");
+        this.a_bmas.setAttribute("type", "number");
+        this.a_cost.setAttribute("type", "number");
+        this.a_upkp.setAttribute("type", "number");
+        this.a_lift.valueAsNumber = 0;
+        this.a_drag.valueAsNumber = 0;
+        this.a_mass.valueAsNumber = 0;
+        this.a_wmas.valueAsNumber = 0;
+        this.a_bmas.valueAsNumber = 0;
+        this.a_cost.valueAsNumber = 0;
+        this.a_upkp.valueAsNumber = 0;
+        this.a_lift.oninput = () => { aircraft_model.GetAlter().stats.liftbleed = this.a_lift.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_drag.oninput = () => { aircraft_model.GetAlter().stats.drag = this.a_drag.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_mass.oninput = () => { aircraft_model.GetAlter().stats.mass = this.a_mass.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_wmas.oninput = () => { aircraft_model.GetAlter().stats.wetmass = this.a_wmas.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_bmas.oninput = () => { aircraft_model.GetAlter().stats.bomb_mass = this.a_bmas.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_cost.oninput = () => { aircraft_model.GetAlter().stats.cost = this.a_cost.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_upkp.oninput = () => { aircraft_model.GetAlter().stats.upkeep = this.a_upkp.valueAsNumber; aircraft_model.CalculateStats(); };
+        row = tbl.insertRow();
+        CreateTH(row, "Control");
+        CreateTH(row, "Pitch Stability");
+        CreateTH(row, "Lateral Stability");
+        CreateTH(row, "Wing Area");
+        CreateTH(row, "Max Strain");
+        CreateTH(row, "Structure");
+        CreateTH(row, "Toughness");
+        row = tbl.insertRow();
+        this.a_cont = document.createElement("INPUT");
+        this.a_pstb = document.createElement("INPUT");
+        this.a_lstb = document.createElement("INPUT");
+        this.a_wara = document.createElement("INPUT");
+        this.a_mstr = document.createElement("INPUT");
+        this.a_strc = document.createElement("INPUT");
+        this.a_tugh = document.createElement("INPUT");
+        row.insertCell().appendChild(this.a_cont);
+        row.insertCell().appendChild(this.a_pstb);
+        row.insertCell().appendChild(this.a_lstb);
+        row.insertCell().appendChild(this.a_wara);
+        row.insertCell().appendChild(this.a_mstr);
+        row.insertCell().appendChild(this.a_strc);
+        row.insertCell().appendChild(this.a_tugh);
+        this.a_cont.setAttribute("type", "number");
+        this.a_pstb.setAttribute("type", "number");
+        this.a_lstb.setAttribute("type", "number");
+        this.a_wara.setAttribute("type", "number");
+        this.a_mstr.setAttribute("type", "number");
+        this.a_strc.setAttribute("type", "number");
+        this.a_tugh.setAttribute("type", "number");
+        this.a_cont.valueAsNumber = 0;
+        this.a_pstb.valueAsNumber = 0;
+        this.a_lstb.valueAsNumber = 0;
+        this.a_wara.valueAsNumber = 0;
+        this.a_mstr.valueAsNumber = 0;
+        this.a_strc.valueAsNumber = 0;
+        this.a_tugh.valueAsNumber = 0;
+        this.a_cont.oninput = () => { aircraft_model.GetAlter().stats.control = this.a_cont.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_pstb.oninput = () => { aircraft_model.GetAlter().stats.pitchstab = this.a_pstb.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_lstb.oninput = () => { aircraft_model.GetAlter().stats.latstab = this.a_lstb.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_wara.oninput = () => { aircraft_model.GetAlter().stats.wingarea = this.a_wara.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_mstr.oninput = () => { aircraft_model.GetAlter().stats.maxstrain = this.a_mstr.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_strc.oninput = () => { aircraft_model.GetAlter().stats.structure = this.a_strc.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_tugh.oninput = () => { aircraft_model.GetAlter().stats.toughness = this.a_tugh.valueAsNumber; aircraft_model.CalculateStats(); };
+        row = tbl.insertRow();
+        CreateTH(row, "Power");
+        CreateTH(row, "Fuel Consumption");
+        CreateTH(row, "Fuel");
+        CreateTH(row, "Pitch Speed");
+        CreateTH(row, "Pitch Boost");
+        CreateTH(row, "Charge");
+        CreateTH(row, "Crash Safety");
+        row = tbl.insertRow();
+        this.a_powr = document.createElement("INPUT");
+        this.a_fcom = document.createElement("INPUT");
+        this.a_fuel = document.createElement("INPUT");
+        this.a_pspd = document.createElement("INPUT");
+        this.a_pbst = document.createElement("INPUT");
+        this.a_chrg = document.createElement("INPUT");
+        this.a_crsh = document.createElement("INPUT");
+        row.insertCell().appendChild(this.a_powr);
+        row.insertCell().appendChild(this.a_fcom);
+        row.insertCell().appendChild(this.a_fuel);
+        row.insertCell().appendChild(this.a_pspd);
+        row.insertCell().appendChild(this.a_pbst);
+        row.insertCell().appendChild(this.a_chrg);
+        row.insertCell().appendChild(this.a_crsh);
+        this.a_powr.setAttribute("type", "number");
+        this.a_fcom.setAttribute("type", "number");
+        this.a_fuel.setAttribute("type", "number");
+        this.a_pspd.setAttribute("type", "number");
+        this.a_pbst.setAttribute("type", "number");
+        this.a_chrg.setAttribute("type", "number");
+        this.a_crsh.setAttribute("type", "number");
+        this.a_powr.valueAsNumber = 0;
+        this.a_fcom.valueAsNumber = 0;
+        this.a_fuel.valueAsNumber = 0;
+        this.a_pspd.valueAsNumber = 0;
+        this.a_pbst.valueAsNumber = 0;
+        this.a_chrg.valueAsNumber = 0;
+        this.a_crsh.valueAsNumber = 0;
+        this.a_powr.oninput = () => { aircraft_model.GetAlter().stats.power = this.a_powr.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_fcom.oninput = () => { aircraft_model.GetAlter().stats.fuelconsumption = this.a_fcom.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_fuel.oninput = () => { aircraft_model.GetAlter().stats.fuel = this.a_fuel.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_pspd.oninput = () => { aircraft_model.GetAlter().stats.pitchspeed = this.a_pspd.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_pbst.oninput = () => { aircraft_model.GetAlter().stats.pitchboost = this.a_pbst.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_chrg.oninput = () => { aircraft_model.GetAlter().stats.charge = this.a_chrg.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_crsh.oninput = () => { aircraft_model.GetAlter().stats.crashsafety = this.a_crsh.valueAsNumber; aircraft_model.CalculateStats(); };
     }
     InitStats(tbl) {
         var row = tbl.insertRow();
@@ -9240,6 +9400,7 @@ class Aircraft_HTML extends Display {
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
+//TODO: air fan
 const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
@@ -9385,6 +9546,22 @@ var engine_json;
 var weapon_json;
 var aircraft_model;
 var aircraft_display;
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+class AlterStats extends Part {
+    constructor() {
+        super();
+        this.stats = new Stats();
+    }
+    PartStats() {
+        var stats = new Stats();
+        stats = stats.Add(this.stats);
+        return stats;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+}
 class Serialize {
     constructor(arr) {
         this.array = new ArrayBuffer(51200);
