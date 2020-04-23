@@ -578,19 +578,35 @@ class Frames extends Part {
     public SetAllFrame(num: number) {
         for (let s of this.section_list) {
             s.frame = num;
+            if (!this.frame_list[num].geodesic)
+                s.geodesic = false;
         }
         for (let s of this.tail_section_list) {
             s.frame = num;
+            if (!this.frame_list[num].geodesic)
+                s.geodesic = false;
         }
         this.CalculateStats();
     }
 
     public SetAllSkin(num: number) {
         for (let s of this.section_list) {
-            s.skin = num;
+            if (!s.internal_bracing) {
+                s.skin = num;
+                if (!this.skin_list[num].monocoque) {
+                    s.monocoque = false;
+                    s.lifting_body = false;
+                }
+            }
         }
         for (let s of this.tail_section_list) {
-            s.skin = num;
+            if (!s.internal_bracing) {
+                s.skin = num;
+                if (!this.skin_list[num].monocoque) {
+                    s.monocoque = false;
+                    s.lifting_body = false;
+                }
+            }
         }
         this.CalculateStats();
     }

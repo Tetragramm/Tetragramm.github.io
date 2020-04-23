@@ -2218,18 +2218,34 @@ class Frames extends Part {
     SetAllFrame(num) {
         for (let s of this.section_list) {
             s.frame = num;
+            if (!this.frame_list[num].geodesic)
+                s.geodesic = false;
         }
         for (let s of this.tail_section_list) {
             s.frame = num;
+            if (!this.frame_list[num].geodesic)
+                s.geodesic = false;
         }
         this.CalculateStats();
     }
     SetAllSkin(num) {
         for (let s of this.section_list) {
-            s.skin = num;
+            if (!s.internal_bracing) {
+                s.skin = num;
+                if (!this.skin_list[num].monocoque) {
+                    s.monocoque = false;
+                    s.lifting_body = false;
+                }
+            }
         }
         for (let s of this.tail_section_list) {
-            s.skin = num;
+            if (!s.internal_bracing) {
+                s.skin = num;
+                if (!this.skin_list[num].monocoque) {
+                    s.monocoque = false;
+                    s.lifting_body = false;
+                }
+            }
         }
         this.CalculateStats();
     }
@@ -2644,13 +2660,13 @@ class Wings extends Part {
         var drag = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             var wdrag = Math.max(1, 10 * w.area * w.area / (wspan * wspan));
             drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             //Drag is modified by area, span
             var wdrag = Math.max(1, 10 * w.area * w.area / (wspan * wspan));
             drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
@@ -2667,7 +2683,6 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
-        let drag_reduction = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
@@ -2688,7 +2703,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (wspan * wspan) - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (w.span * w.span));
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             //stability from -hedral
             wStats.latstab += w.dihedral - w.anhedral;
@@ -2716,7 +2731,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span
-            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (wspan * wspan) - drag_reduction);
+            wStats.drag = Math.max(1, wStats.drag + 10 * w.area * w.area / (w.span * w.span));
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             wStats.Round();
             stats = stats.Add(wStats);
@@ -4641,7 +4656,6 @@ class Weapon extends Part {
     GetJam() {
         if (this.weapon_type.rapid) {
             var jams = this.weapon_type.jam.split('/');
-            console.log(jams);
             var out = [parseInt(jams[0]), parseInt(jams[1])];
             if (this.synchronization == SynchronizationType.INTERRUPT) {
                 out[0]++;
@@ -9555,6 +9569,48 @@ class AlterStats extends Part {
     }
     PartStats() {
         var stats = new Stats();
+        if (!this.stats.liftbleed)
+            this.stats.liftbleed = 0;
+        if (!this.stats.drag)
+            this.stats.drag = 0;
+        if (!this.stats.mass)
+            this.stats.mass = 0;
+        if (!this.stats.wetmass)
+            this.stats.wetmass = 0;
+        if (!this.stats.bomb_mass)
+            this.stats.bomb_mass = 0;
+        if (!this.stats.cost)
+            this.stats.cost = 0;
+        if (!this.stats.upkeep)
+            this.stats.upkeep = 0;
+        if (!this.stats.control)
+            this.stats.control = 0;
+        if (!this.stats.pitchstab)
+            this.stats.pitchstab = 0;
+        if (!this.stats.latstab)
+            this.stats.latstab = 0;
+        if (!this.stats.wingarea)
+            this.stats.wingarea = 0;
+        if (!this.stats.maxstrain)
+            this.stats.maxstrain = 0;
+        if (!this.stats.structure)
+            this.stats.structure = 0;
+        if (!this.stats.toughness)
+            this.stats.toughness = 0;
+        if (!this.stats.power)
+            this.stats.power = 0;
+        if (!this.stats.fuelconsumption)
+            this.stats.fuelconsumption = 0;
+        if (!this.stats.fuel)
+            this.stats.fuel = 0;
+        if (!this.stats.pitchspeed)
+            this.stats.pitchspeed = 0;
+        if (!this.stats.pitchboost)
+            this.stats.pitchboost = 0;
+        if (!this.stats.charge)
+            this.stats.charge = 0;
+        if (!this.stats.crashsafety)
+            this.stats.crashsafety = 0;
         stats = stats.Add(this.stats);
         return stats;
     }

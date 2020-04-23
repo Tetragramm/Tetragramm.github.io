@@ -293,7 +293,6 @@ class Weapon extends Part {
     public GetJam() {
         if (this.weapon_type.rapid) {
             var jams = this.weapon_type.jam.split('/');
-            console.log(jams);
             var out = [parseInt(jams[0]), parseInt(jams[1])];
             if (this.synchronization == SynchronizationType.INTERRUPT) {
                 out[0]++;
