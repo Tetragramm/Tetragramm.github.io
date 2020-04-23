@@ -315,7 +315,7 @@ class Aircraft {
         var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
         var span = Math.max(1, this.wings.GetSpan());
-        var DPEmpty = Math.floor((this.stats.drag + DryMP) / 5);
+        var DPEmpty = Math.floor((this.stats.drag + 5 * Math.sqrt(DryMP)) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
@@ -388,7 +388,7 @@ class Aircraft {
         var EnergyLosswBombs = EnergyLoss + 1;
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
-        var TurnBleed = Math.ceil((StallSpeedEmpty + StallSpeedFull) / this.propeller.GetTurn());
+        var TurnBleed = Math.ceil(((StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
         var TurnBleedwBombs = TurnBleed + 1;
         TurnBleed = Math.max(TurnBleed, 1);
         TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
