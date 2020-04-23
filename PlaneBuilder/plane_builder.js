@@ -934,6 +934,9 @@ class Engine extends Part {
     }
     SetCustomStats(stats) {
         this.selected_index = -1;
+        if (stats.oiltank) {
+            stats.stats.cooling = 0;
+        }
         this.etype_stats = stats;
         this.PulseJetCheck();
         this.cooling_count = Math.min(this.cooling_count, this.etype_stats.stats.cooling);
