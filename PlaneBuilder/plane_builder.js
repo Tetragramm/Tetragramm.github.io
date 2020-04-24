@@ -1587,6 +1587,7 @@ class Engines extends Part {
     PartStats() {
         var stats = new Stats;
         var needCool = [...Array(this.GetNumberOfRadiators()).fill({ cool: 0, count: 0 })];
+        var ecost = 0;
         //Engine stuff
         for (let en of this.engines) {
             stats = stats.Add(en.PartStats());
@@ -1594,10 +1595,11 @@ class Engines extends Part {
                 needCool[en.GetRadiator()].cool += en.GetCooling();
                 needCool[en.GetRadiator()].count += 1;
             }
+            ecost += en.GetCurrentStats().stats.cost;
         }
         stats.flightstress += this.GetMaxRumble();
         //Upkeep calc only uses engine costs
-        stats.upkeep = Math.floor(Math.min(stats.power / 10, stats.cost));
+        stats.upkeep = Math.floor(Math.min(stats.power / 10, ecost));
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
@@ -9046,13 +9048,17 @@ class Aircraft_HTML extends Display {
         var row0 = tbl.insertRow();
         var name_cell = row0.insertCell();
         // Aircraft Name
-        name_cell.colSpan = 5;
+        name_cell.colSpan = 2;
         this.name_inp = document.createElement("INPUT");
         this.name_inp.defaultValue = "Aircraft Name";
         this.name_inp.onchange = () => { this.acft.name = this.name_inp.value; };
         name_cell.appendChild(this.name_inp);
+        CreateTH(row0, "Cost");
         // Aircraft Cost
         this.cost_cell = row0.insertCell();
+        CreateTH(row0, "Upkeep");
+        // Aircraft Upkeep
+        this.upkeep_cell = row0.insertCell();
         // Rules Version
         CreateTH(row0, "Version #");
         this.version_cell = row0.insertCell();
@@ -9100,16 +9106,16 @@ class Aircraft_HTML extends Display {
         CreateTH(row7, "Propulsion").colSpan = 2;
         CreateTH(row7, "Aerodynamics").colSpan = 2;
         CreateTH(row7, "Survivability").colSpan = 2;
-        CreateTH(row7, "Propulsion").colSpan = 2;
+        CreateTH(row7, "Crew Members").colSpan = 2;
         var row8 = tbl.insertRow();
         CreateTH(row8, "Dropoff");
         this.dropoff_cell = row8.insertCell();
         CreateTH(row8, "Stability");
         this.stability_cell = row8.insertCell();
-        CreateTH(row8, "Reliability");
-        this.reliability_cell = row8.insertCell();
-        CreateTH(row8, "Flight Stress");
-        this.flightstress_cell = row8.insertCell();
+        CreateTH(row8, "Crash Safety");
+        this.crashsafety_cell = row8.insertCell();
+        CreateTH(row8, "Crew/Passengers");
+        this.crew_cell = row8.insertCell();
         var row9 = tbl.insertRow();
         CreateTH(row9, "Overspeed");
         this.overspeed_cell = row9.insertCell();
@@ -9129,23 +9135,23 @@ class Aircraft_HTML extends Display {
         CreateTH(row10, "Attack Modifier");
         this.attack_cell = row10.insertCell();
         var row11 = tbl.insertRow();
-        CreateTH(row11, "Cruise Range");
-        this.cruiserange_cell = row11.insertCell();
+        CreateTH(row11, "Reliability");
+        this.reliability_cell = row11.insertCell();
         CreateTH(row11, "Landing Gear");
         this.landing_cell = row11.insertCell();
-        CreateTH(row11, "Escape");
-        this.escape_cell = row11.insertCell();
         CreateTH(row11, "Communications");
         this.communications_cell = row11.insertCell();
+        CreateTH(row11, "Escape");
+        this.escape_cell = row11.insertCell();
         var row12 = tbl.insertRow();
-        CreateTH(row12, "Cruise Range with Bombs");
-        this.cruiserangewbomb_cell = row12.insertCell();
         CreateTH(row12, "Flight Ceiling");
         this.maxalt_cell = row12.insertCell();
-        CreateTH(row12, "Crash Safety");
-        this.crashsafety_cell = row12.insertCell();
+        CreateTH(row12, "---");
+        this.unused_cell = row12.insertCell();
         CreateTH(row12, "Electrics");
         this.electric_cell = row12.insertCell();
+        CreateTH(row12, "Flight Stress");
+        this.flightstress_cell = row12.insertCell();
         this.weapon_head = CreateTH(tbl.insertRow(), "Weapon Systems");
         this.weapon_head.colSpan = 8;
         this.weapon_cell = tbl.insertRow().insertCell();
@@ -9188,6 +9194,8 @@ class Aircraft_HTML extends Display {
         this.copy_text += "Version " + this.acft.GetVersion() + "\n";
         this.cost_cell.innerText = stats.cost.toString() + "þ";
         this.copy_text += "Cost " + stats.cost.toString() + "þ\n";
+        this.upkeep_cell.innerText = stats.upkeep.toString() + "þ";
+        this.copy_text += "Upkeep " + stats.upkeep.toString() + "þ\n";
         this.copy_text += "\n";
         this.copy_text += "Mass\t\t\tTop Speed\tStall Speed\tHandling\tBoost\n";
         //Empty
@@ -9255,26 +9263,23 @@ class Aircraft_HTML extends Display {
         this.dropoff_cell.innerText = derived.Dropoff.toString();
         this.overspeed_cell.innerText = derived.Overspeed.toString();
         this.maxfuel_cell.innerText = (Math.round(derived.FuelUses * 10) / 10).toString();
-        this.cruiserange_cell.innerText = Math.round(derived.CruiseRange).toString();
-        this.cruiserangewbomb_cell.innerText = Math.round(derived.CruiseRangewBombs).toString();
+        this.unused_cell.innerText = "---";
         this.copy_text += "Propulsion\n\t"
             + "Dropoff\t" + this.dropoff_cell.innerText + "\n\t"
             + "Overspeed\t" + this.overspeed_cell.innerText + "\n\t"
             + "Fuel Uses\t" + this.maxfuel_cell.innerText + "\n\t"
-            + "Cruise Range\t" + this.cruiserange_cell.innerText + "\n\t"
-            + "Cruise Range with Bombs\t" + this.cruiserangewbomb_cell.innerText + "\n";
+            + "Flight Ceiling\t" + this.maxalt_cell.innerText + "\n";
         this.copy_text += "\n";
         this.stability_cell.innerText = derived.Stabiilty.toString();
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
         this.turnbleed_cell.innerText = derived.TurnBleed.toString();
         this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = (this.acft.GetMaxAltitude() * 10 - 1).toString();
+        this.maxalt_cell.innerText = (Math.floor(this.acft.GetMaxAltitude() * 10 - 1 + derived.MaxSpeedEmpty - derived.StallSpeedEmpty)).toString();
         this.copy_text += "Aerodynamics\n\t"
             + "Stability\t" + this.stability_cell.innerText + "\n\t"
             + "Energy Loss\t" + this.eloss_cell.innerText + "\n\t"
             + "Turn Bleed\t" + this.turnbleed_cell.innerText + "\n\t"
-            + "Landing Gear\t" + this.landing_cell.innerText + "\n\t"
-            + "Flight Ceiling\t" + this.maxalt_cell.innerText + "\n";
+            + "Landing Gear\t" + this.landing_cell.innerText + "\n";
         this.copy_text += "\n";
         this.reliability_cell.innerText = this.acft.GetReliabilityList().toString();
         this.toughness_cell.innerText = derived.Toughness.toString();
@@ -9288,6 +9293,7 @@ class Aircraft_HTML extends Display {
             + "Escape\t" + this.escape_cell.innerText + "\n\t"
             + "Crash Safety\t" + this.crashsafety_cell.innerText + "\n";
         this.copy_text += "\n";
+        this.crew_cell.innerText = aircraft_model.GetCockpits().GetNumberOfCockpits().toString() + "/" + (aircraft_model.GetPassengers().GetSeats() + aircraft_model.GetPassengers().GetBeds()).toString();
         this.flightstress_cell.innerText = this.acft.GetStressList().toString();
         this.visibility_cell.innerText = this.acft.GetVisibilityList().toString();
         this.attack_cell.innerText = this.acft.GetAttackList().toString();

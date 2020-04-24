@@ -352,6 +352,7 @@ class Engines extends Part {
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = [...Array(this.GetNumberOfRadiators()).fill({ cool: 0, count: 0 })];
+        var ecost = 0;
         //Engine stuff
         for (let en of this.engines) {
             stats = stats.Add(en.PartStats());
@@ -359,11 +360,12 @@ class Engines extends Part {
                 needCool[en.GetRadiator()].cool += en.GetCooling();
                 needCool[en.GetRadiator()].count += 1;
             }
+            ecost += en.GetCurrentStats().stats.cost;
         }
         stats.flightstress += this.GetMaxRumble();
 
         //Upkeep calc only uses engine costs
-        stats.upkeep = Math.floor(Math.min(stats.power / 10, stats.cost));
+        stats.upkeep = Math.floor(Math.min(stats.power / 10, ecost));
 
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
