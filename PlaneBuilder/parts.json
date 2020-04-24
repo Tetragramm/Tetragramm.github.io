@@ -1173,6 +1173,7 @@
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 10,
+                "tension": 0,
                 "cost": 1,
                 "config": true
             },
@@ -1248,6 +1249,7 @@
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 15,
+                "tension": 0,
                 "cost": 2,
                 "config": true
             },
