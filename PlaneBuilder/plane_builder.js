@@ -5453,7 +5453,7 @@ class Aircraft {
         var WetMPwBombs = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
         var span = Math.max(1, this.wings.GetSpan());
-        var DPEmpty = Math.floor(1.0e-6 + (this.stats.drag + 5 * Math.sqrt(DryMP)) / 5);
+        var DPEmpty = Math.floor(1.0e-6 + (this.stats.drag + DryMP) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor(1.0e-6 + (this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
@@ -5467,9 +5467,9 @@ class Aircraft {
         var StallSpeedFull = Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFullwBombs = Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
         if (this.use_large_airplane_rules) {
-            StallSpeedEmpty = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
-            StallSpeedFull = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
-            StallSpeedFullwBombs = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
+            // StallSpeedEmpty = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
+            // StallSpeedFull = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
+            // StallSpeedFullwBombs = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
         }
         var Overspeed = this.engines.GetOverspeed();
         var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
