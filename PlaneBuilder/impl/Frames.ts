@@ -665,13 +665,13 @@ class Frames extends Part {
         if (this.boom) {
             tail_stats.maxstrain -= tail_stats.mass;
             if (this.has_tractor_nacelles)
-                tail_stats.drag = Math.floor(1.5 * tail_stats.drag);
+                tail_stats.drag = Math.floor(1.0e-6 + 1.5 * tail_stats.drag);
         }
 
         stats = stats.Add(tail_stats);
 
-        stats.structure = Math.floor(stats.structure);
-        stats.cost = Math.floor(stats.cost);
+        stats.structure = Math.floor(1.0e-6 + stats.structure);
+        stats.cost = Math.floor(1.0e-6 + stats.cost);
         stats.visibility = Math.min(stats.visibility, 3);
 
         stats.Round();

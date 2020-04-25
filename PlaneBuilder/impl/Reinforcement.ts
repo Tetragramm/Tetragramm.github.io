@@ -104,7 +104,7 @@ class Reinforcement extends Part {
     public SetExternalWoodCount(idx: number, count: number) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.ext_wood_count[idx] = count;
         this.CalculateStats();
     }
@@ -116,7 +116,7 @@ class Reinforcement extends Part {
     public SetExternalSteelCount(idx: number, count: number) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.ext_steel_count[idx] = count;
         this.CalculateStats();
     }
@@ -135,7 +135,7 @@ class Reinforcement extends Part {
     public SetCantileverCount(idx: number, count: number) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.ImplSCC(idx, count);
         this.CalculateStats();
     }
@@ -149,7 +149,7 @@ class Reinforcement extends Part {
                     total_structure -= 5 * this.cant_count[i] * this.cant_list[i].stats.mass;
                 }
             }
-            diff = Math.min(diff, Math.floor(total_structure / (5 * this.cant_list[idx].stats.mass)));
+            diff = Math.min(diff, Math.floor(1.0e-6 + total_structure / (5 * this.cant_list[idx].stats.mass)));
         }
         this.cant_count[idx] += diff;
         return diff != 0;
@@ -277,7 +277,7 @@ class Reinforcement extends Part {
             strut_count += 1;
 
         if (this.wires) {
-            stats.maxstrain += Math.floor(tension);
+            stats.maxstrain += Math.floor(1.0e-6 + tension);
             stats.drag += 3 * strut_count;
         }
 

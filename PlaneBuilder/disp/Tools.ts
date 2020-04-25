@@ -97,6 +97,32 @@ function FlexInput(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     fs.div2.appendChild(inp);
 }
 
+function FlexText(txt: string, inp: HTMLInputElement, fs: FlexSection) {
+    var lbl = document.createElement("LABEL") as HTMLLabelElement;
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    inp.setAttribute("type", "text");
+    inp.value = "Default";
+
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+
+function FlexDisplay(txt: string, inp: HTMLLabelElement, fs: FlexSection) {
+    var lbl = document.createElement("LABEL") as HTMLLabelElement;
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+
 function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     sel.id = GenerateID();

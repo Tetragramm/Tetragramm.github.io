@@ -175,7 +175,7 @@ class WeaponSystem extends Part {
     private SWC(num: number) {
         if (num != num || num < 1)
             num = 1;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (num > this.weapons.length) {
             var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
             w.SetCalculateStats(this.CalculateStats);
@@ -262,10 +262,10 @@ class WeaponSystem extends Part {
             }
         }
         return [
-            centerline + Math.floor(wings * 0.8),
-            wings + Math.floor(centerline * 0.75),
-            Math.floor(centerline * 0.5) + Math.floor(wings * 0.3),
-            Math.floor(centerline * 0.25) + Math.floor(wings * 0.1)
+            centerline + Math.floor(1.0e-6 + wings * 0.8),
+            wings + Math.floor(1.0e-6 + centerline * 0.75),
+            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.3),
+            Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
         ];
     }
 
@@ -303,7 +303,7 @@ class WeaponSystem extends Part {
     public SetAmmo(num: number) {
         if (num != num || num < 1)
             num = 1;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.ammo = num;
         this.CalculateStats();
     }

@@ -172,7 +172,7 @@ class Engines extends Part {
     public SetNumberOfEngines(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.min(20, num);
         while (this.engines.length > num) {
             this.engines.pop();
@@ -207,7 +207,7 @@ class Engines extends Part {
     public SetNumberOfRadiators(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (this.radiators.length > num) {
             this.radiators.pop();
         }
@@ -365,7 +365,7 @@ class Engines extends Part {
         stats.flightstress += this.GetMaxRumble();
 
         //Upkeep calc only uses engine costs
-        stats.upkeep = Math.floor(Math.min(stats.power / 10, ecost));
+        stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.power / 10, ecost));
 
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {

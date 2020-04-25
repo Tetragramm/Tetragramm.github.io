@@ -57,14 +57,14 @@ class Munitions extends Part {
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
             if (this.internal_bay_1) {
                 if (this.internal_bay_2) {
-                    sz = Math.floor(10 * this.internal_bay_count);
+                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count);
                 }
                 else {
-                    sz = Math.floor(10 * this.internal_bay_count / 2);
+                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 2);
                 }
             }
             else {
-                sz = Math.floor(10 * this.internal_bay_count / 4);
+                sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 4);
             }
         }
         return sz;
@@ -73,7 +73,7 @@ class Munitions extends Part {
     public SetBombCount(count: number) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.bomb_count = count;
         this.LimitMass(true);
         this.CalculateStats();
@@ -94,7 +94,7 @@ class Munitions extends Part {
     public SetBayCount(count: number) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.internal_bay_count = count;
         this.CalculateStats();
     }
@@ -121,7 +121,7 @@ class Munitions extends Part {
     public GetExternalMass() {
         var ext_bomb_count = this.bomb_count;
         if (this.internal_bay_1) {
-            ext_bomb_count = Math.floor(ext_bomb_count / 2);
+            ext_bomb_count = Math.floor(1.0e-6 + ext_bomb_count / 2);
             if (this.internal_bay_2) {
                 ext_bomb_count = 0;
             }

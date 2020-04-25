@@ -115,7 +115,7 @@ class Cockpits extends Part {
     public SetNumberOfCockpits(num: number) {
         if (num != num || num < 1)
             num = 1;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (this.positions.length > num) {
             this.positions.pop();
         }

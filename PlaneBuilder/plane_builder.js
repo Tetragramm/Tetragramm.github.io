@@ -630,7 +630,7 @@ class Cockpits extends Part {
     SetNumberOfCockpits(num) {
         if (num != num || num < 1)
             num = 1;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (this.positions.length > num) {
             this.positions.pop();
         }
@@ -706,7 +706,7 @@ class Passengers extends Part {
     SetSeats(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.seats = num;
         this.CalculateStats();
     }
@@ -716,7 +716,7 @@ class Passengers extends Part {
     SetBeds(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.beds = num;
         this.CalculateStats();
     }
@@ -742,7 +742,120 @@ class Passengers extends Part {
         this.CalculateStats = callback;
     }
 }
+class Serialize {
+    constructor(arr) {
+        this.array = new ArrayBuffer(51200);
+        this.view = new DataView(this.array);
+        this.offset = 0;
+    }
+    Check() {
+        if (this.offset >= this.array.byteLength)
+            throw "Serialization Way too long.";
+    }
+    PushNum(num) {
+        this.view.setInt16(this.offset, num, false);
+        this.offset += 2;
+        this.Check();
+    }
+    PushBool(bool) {
+        if (bool)
+            this.view.setUint8(this.offset, 1);
+        else
+            this.view.setUint8(this.offset, 0);
+        this.offset += 1;
+        this.Check();
+    }
+    PushString(str) {
+        this.PushNum(str.length);
+        for (let i = 0; i < str.length; i++) {
+            this.view.setUint8(this.offset, str.charCodeAt(i));
+            this.offset++;
+        }
+        this.Check();
+    }
+    PushNumArr(nums) {
+        this.PushNum(nums.length);
+        for (let n of nums) {
+            this.PushNum(n);
+        }
+        this.Check();
+    }
+    PushBoolArr(bools) {
+        this.PushNum(bools.length);
+        for (let b of bools) {
+            this.PushBool(b);
+        }
+        this.Check();
+    }
+    PushFloat(flt) {
+        this.view.setFloat32(this.offset, flt, false);
+        this.offset += 4;
+        this.Check();
+    }
+    FinalArray() {
+        return this.array.slice(0, this.offset);
+    }
+}
+class Deserialize {
+    constructor(arr) {
+        this.array = arr;
+        this.view = new DataView(this.array);
+        this.offset = 0;
+    }
+    Check() {
+        if (this.offset >= this.array.byteLength)
+            throw "Deserialization Failed";
+    }
+    GetNum() {
+        this.Check();
+        var num = this.view.getInt16(this.offset, false);
+        this.offset += 2;
+        return num;
+    }
+    GetBool() {
+        this.Check();
+        var bool = this.view.getUint8(this.offset);
+        this.offset += 1;
+        return bool > 0;
+    }
+    GetString() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            var char = this.view.getUint8(this.offset);
+            arr.push(char);
+            this.offset += 1;
+        }
+        return String.fromCharCode(...arr);
+    }
+    GetNumArr() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            arr.push(this.GetNum());
+        }
+        return arr;
+    }
+    GetBoolArr() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            arr.push(this.GetBool());
+        }
+        return arr;
+    }
+    GetFloat() {
+        this.Check();
+        var flt = this.view.getFloat32(this.offset, false);
+        this.offset += 4;
+        return flt;
+    }
+}
 /// <reference path="./Stats.ts" />
+/// <reference path="./Serialize.ts"/>
 class EngineStats {
     constructor(js) {
         this.name = "";
@@ -957,7 +1070,7 @@ class Engine extends Part {
     SetCooling(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.cooling_count = num;
         this.CalculateStats();
     }
@@ -1033,7 +1146,7 @@ class Engine extends Part {
     SetGearCount(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.gp_count = num;
         this.SetGearReliability(this.gpr_count);
     }
@@ -1043,7 +1156,7 @@ class Engine extends Part {
     SetGearReliability(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.gpr_count = Math.min(num, this.gp_count);
         this.CalculateStats();
     }
@@ -1074,7 +1187,7 @@ class Engine extends Part {
         return this.total_reliability;
     }
     GetOverspeed() {
-        return this.etype_stats.overspeed + Math.floor(this.gp_count * this.etype_stats.overspeed / 2);
+        return this.etype_stats.overspeed + Math.floor(1.0e-6 + this.gp_count * this.etype_stats.overspeed / 2);
     }
     GetIsPulsejet() {
         return this.etype_stats.pulsejet;
@@ -1253,20 +1366,20 @@ class Engine extends Part {
             stats.latstab *= 2;
             stats.structure *= 2;
             stats.maxstrain *= 2;
-            stats.power = Math.floor(this.pp_list[pp_type].powerfactor * stats.power);
+            stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
         }
         //Cowls modify engine stats directly, not mounting or upgrade.
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
-        stats.mass += Math.floor(stats.drag * this.cowl_list[this.cowl_sel].mpd);
-        stats.drag = Math.floor(stats.drag * this.cowl_list[this.cowl_sel].ed);
+        stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
+        stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
         if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail)
             stats.cost += 2;
         // Mounting modifiers (only get applied once, even with push/pull)
         //No Mounting for pulse-jets, just bolted on
         if (!this.etype_stats.pulsejet) {
             stats = stats.Add(this.mount_list[this.selected_mount].stats);
-            stats.maxstrain -= Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
-            stats.drag += Math.floor(this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
+            stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
+            stats.drag += Math.floor(1.0e-6 + this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
         //Upgrades
         if (this.use_ds) {
@@ -1274,11 +1387,11 @@ class Engine extends Part {
         }
         stats.cost += this.gp_count + this.gpr_count;
         if (this.is_generator) {
-            stats.charge = Math.floor(2 * stats.power / 10) + 2;
+            stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
             stats.power = 0;
         }
         else if (this.has_alternator) {
-            stats.charge = Math.floor(stats.power / 10) + 1;
+            stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
             stats.mass += 1;
             stats.cost += 2;
         }
@@ -1429,7 +1542,7 @@ class Engines extends Part {
     SetNumberOfEngines(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.min(20, num);
         while (this.engines.length > num) {
             this.engines.pop();
@@ -1460,7 +1573,7 @@ class Engines extends Part {
     SetNumberOfRadiators(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (this.radiators.length > num) {
             this.radiators.pop();
         }
@@ -1599,7 +1712,7 @@ class Engines extends Part {
         }
         stats.flightstress += this.GetMaxRumble();
         //Upkeep calc only uses engine costs
-        stats.upkeep = Math.floor(Math.min(stats.power / 10, ecost));
+        stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.power / 10, ecost));
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
@@ -2299,11 +2412,11 @@ class Frames extends Part {
         if (this.boom) {
             tail_stats.maxstrain -= tail_stats.mass;
             if (this.has_tractor_nacelles)
-                tail_stats.drag = Math.floor(1.5 * tail_stats.drag);
+                tail_stats.drag = Math.floor(1.0e-6 + 1.5 * tail_stats.drag);
         }
         stats = stats.Add(tail_stats);
-        stats.structure = Math.floor(stats.structure);
-        stats.cost = Math.floor(stats.cost);
+        stats.structure = Math.floor(1.0e-6 + stats.structure);
+        stats.cost = Math.floor(1.0e-6 + stats.cost);
         stats.visibility = Math.min(stats.visibility, 3);
         stats.Round();
         return stats;
@@ -2337,7 +2450,7 @@ class Wings extends Part {
         }
         this.wing_list = [];
         this.mini_wing_list = [];
-        this.wing_stagger = Math.floor(this.stagger_list.length / 2);
+        this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
         this.is_swept = false;
         this.is_closed = false;
     }
@@ -2540,16 +2653,16 @@ class Wings extends Part {
             this.wing_list.splice(idx, 1);
         if (w.area != w.area)
             w.area = 3;
-        w.area = Math.floor(w.area);
+        w.area = Math.floor(1.0e-6 + w.area);
         if (w.span != w.span)
             w.span = 1;
-        w.span = Math.floor(w.span);
+        w.span = Math.floor(1.0e-6 + w.span);
         if (w.dihedral != w.dihedral)
             w.dihedral = 0;
-        w.dihedral = Math.floor(w.dihedral);
+        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
         if (w.anhedral != w.anhedral)
             w.anhedral = 0;
-        w.anhedral = Math.floor(w.anhedral);
+        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 3);
             w.span = Math.max(w.span, 1);
@@ -2571,16 +2684,16 @@ class Wings extends Part {
             this.mini_wing_list.splice(idx, 1);
         if (w.area != w.area)
             w.area = 2;
-        w.area = Math.floor(w.area);
+        w.area = Math.floor(1.0e-6 + w.area);
         if (w.span != w.span)
             w.span = 1;
-        w.span = Math.floor(w.span);
+        w.span = Math.floor(1.0e-6 + w.span);
         if (w.dihedral != w.dihedral)
             w.dihedral = 0;
-        w.dihedral = Math.floor(w.dihedral);
+        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
         if (w.anhedral != w.anhedral)
             w.anhedral = 0;
-        w.anhedral = Math.floor(w.anhedral);
+        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 1);
             w.area = Math.min(w.area, 2);
@@ -2715,7 +2828,7 @@ class Wings extends Part {
             wStats.liftbleed += w.dihedral + w.anhedral;
             //Inline wings
             if (deck_count[w.deck] > 1) {
-                wStats.drag = Math.floor(0.75 * wStats.drag);
+                wStats.drag = Math.floor(1.0e-6 + 0.75 * wStats.drag);
             }
             wStats.Round();
             stats = stats.Add(wStats);
@@ -2749,7 +2862,7 @@ class Wings extends Part {
         //Longest wing effects
         stats.control += 8 - longest_span;
         stats.latstab += Math.min(0, longest_span - 8);
-        stats.latstab += Math.max(0, Math.floor(longest_span / this.num_frames) - 1);
+        stats.latstab += Math.max(0, Math.floor(1.0e-6 + longest_span / this.num_frames) - 1);
         //Wing Sweep effects
         if (this.is_swept) {
             stats.liftbleed += 5;
@@ -2914,7 +3027,7 @@ class Stabilizers extends Part {
     SetHStabCount(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.hstab_count = num;
         if (this.hstab_list[this.hstab_sel].increment != 0) {
             while ((this.hstab_count % this.hstab_list[this.hstab_sel].increment) != 0) {
@@ -2935,7 +3048,7 @@ class Stabilizers extends Part {
     SetVStabCount(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.vstab_count = num;
         if (this.vstab_list[this.vstab_sel].increment != 0) {
             while ((this.vstab_count % this.vstab_list[this.vstab_sel].increment) != 0) {
@@ -3002,16 +3115,16 @@ class Stabilizers extends Part {
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
-            stats.drag += Math.floor(this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
+            stats.drag += Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
         }
         else if (this.hstab_list[this.hstab_sel].increment != 0) {
-            stats.pitchstab -= Math.floor(this.wing_area / 2);
+            stats.pitchstab -= Math.floor(1.0e-6 + this.wing_area / 2);
             stats.liftbleed += 5;
         }
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
-            stats.drag += Math.floor(this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
+            stats.drag += Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
         }
         else if (this.vstab_list[this.vstab_sel].increment != 0) {
             stats.latstab -= this.wing_area;
@@ -3148,7 +3261,7 @@ class ControlSurfaces extends Part {
     GetFlapCost(mp) {
         if (mp)
             this.mp = mp;
-        return Math.floor(this.flaps_list[this.flaps_sel].costfactor * this.mp);
+        return Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp);
     }
     GetSlatsList() {
         return this.slats_list;
@@ -3275,7 +3388,7 @@ class Reinforcement extends Part {
     SetExternalWoodCount(idx, count) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.ext_wood_count[idx] = count;
         this.CalculateStats();
     }
@@ -3285,7 +3398,7 @@ class Reinforcement extends Part {
     SetExternalSteelCount(idx, count) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.ext_steel_count[idx] = count;
         this.CalculateStats();
     }
@@ -3301,7 +3414,7 @@ class Reinforcement extends Part {
     SetCantileverCount(idx, count) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.ImplSCC(idx, count);
         this.CalculateStats();
     }
@@ -3314,7 +3427,7 @@ class Reinforcement extends Part {
                     total_structure -= 5 * this.cant_count[i] * this.cant_list[i].stats.mass;
                 }
             }
-            diff = Math.min(diff, Math.floor(total_structure / (5 * this.cant_list[idx].stats.mass)));
+            diff = Math.min(diff, Math.floor(1.0e-6 + total_structure / (5 * this.cant_list[idx].stats.mass)));
         }
         this.cant_count[idx] += diff;
         return diff != 0;
@@ -3424,7 +3537,7 @@ class Reinforcement extends Part {
         if (this.cabane_sel > 0)
             strut_count += 1;
         if (this.wires) {
-            stats.maxstrain += Math.floor(tension);
+            stats.maxstrain += Math.floor(1.0e-6 + tension);
             stats.drag += 3 * strut_count;
         }
         var use_cant = false;
@@ -3502,7 +3615,7 @@ class Fuel extends Part {
     SetTankCount(idx, count) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.tank_count[idx] = count;
         this.VerifyOK();
         this.CalculateStats();
@@ -3531,7 +3644,7 @@ class Fuel extends Part {
                 ccount += this.tank_count[i];
         }
         //How many can you have?
-        var allowed = Math.floor(this.wing_area / 10);
+        var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
         if (!this.is_cantilever)
             allowed = 0;
         //Do you have more than the allowed?
@@ -3645,14 +3758,14 @@ class Munitions extends Part {
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
             if (this.internal_bay_1) {
                 if (this.internal_bay_2) {
-                    sz = Math.floor(10 * this.internal_bay_count);
+                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count);
                 }
                 else {
-                    sz = Math.floor(10 * this.internal_bay_count / 2);
+                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 2);
                 }
             }
             else {
-                sz = Math.floor(10 * this.internal_bay_count / 4);
+                sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 4);
             }
         }
         return sz;
@@ -3660,7 +3773,7 @@ class Munitions extends Part {
     SetBombCount(count) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.bomb_count = count;
         this.LimitMass(true);
         this.CalculateStats();
@@ -3677,7 +3790,7 @@ class Munitions extends Part {
     SetBayCount(count) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.internal_bay_count = count;
         this.CalculateStats();
     }
@@ -3701,7 +3814,7 @@ class Munitions extends Part {
     GetExternalMass() {
         var ext_bomb_count = this.bomb_count;
         if (this.internal_bay_1) {
-            ext_bomb_count = Math.floor(ext_bomb_count / 2);
+            ext_bomb_count = Math.floor(1.0e-6 + ext_bomb_count / 2);
             if (this.internal_bay_2) {
                 ext_bomb_count = 0;
             }
@@ -3886,7 +3999,7 @@ class LandingGear extends Part {
         this.CalculateStats();
     }
     SetLoadedMass(mass) {
-        this.loadedMP = Math.floor(mass / 5);
+        this.loadedMP = Math.floor(1.0e-6 + mass / 5);
     }
     CanBoat(engine_height, wing_height) {
         if (engine_height == 2)
@@ -3908,8 +4021,8 @@ class LandingGear extends Part {
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
         var pdrag = this.gear_list[this.gear_sel].DpLMP * this.loadedMP;
         if (this.retract) {
-            stats.mass += Math.floor(pdrag / 2);
-            stats.cost += Math.floor(pdrag / 2);
+            stats.mass += Math.floor(1.0e-6 + pdrag / 2);
+            stats.cost += Math.floor(1.0e-6 + pdrag / 2);
         }
         else {
             stats.drag += pdrag;
@@ -4026,7 +4139,7 @@ class Accessories extends Part {
     SetArmourCoverage(idx, num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.armour_coverage[idx] = num;
         this.CalculateStats();
     }
@@ -4039,7 +4152,7 @@ class Accessories extends Part {
     SetElectricalCount(idx, count) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         count = Math.min(count, 5);
         this.electrical_count[idx] = count;
         this.CalculateStats();
@@ -4149,7 +4262,7 @@ class Accessories extends Part {
                 count -= this.skin_armour;
             }
             stats.mass += count * AP;
-            stats.cost += Math.floor(count * AP / 3);
+            stats.cost += Math.floor(1.0e-6 + count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
         }
         //Electrical
@@ -4157,7 +4270,7 @@ class Accessories extends Part {
             let ts = this.electric_list[i].stats.Clone();
             ts = ts.Multiply(this.electrical_count[i]);
             stats = stats.Add(ts);
-            stats.charge += Math.floor(this.electrical_count[i] * this.electric_list[i].cp10p * this.acft_power / 10);
+            stats.charge += Math.floor(1.0e-6 + this.electrical_count[i] * this.electric_list[i].cp10p * this.acft_power / 10);
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
         //Information
@@ -4291,7 +4404,7 @@ class Optimization extends Part {
     SetFreeDots(num) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, 0);
         this.free_dots = num;
         this.ReduceDots();
@@ -4303,7 +4416,7 @@ class Optimization extends Part {
     SetCost(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.cost = num;
@@ -4316,7 +4429,7 @@ class Optimization extends Part {
     SetBleed(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.bleed = num;
@@ -4329,7 +4442,7 @@ class Optimization extends Part {
     SetEscape(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.escape = num;
@@ -4342,7 +4455,7 @@ class Optimization extends Part {
     SetMass(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.mass = num;
@@ -4355,7 +4468,7 @@ class Optimization extends Part {
     SetToughness(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.toughness = num;
@@ -4368,7 +4481,7 @@ class Optimization extends Part {
     SetMaxStrain(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.maxstrain = num;
@@ -4381,7 +4494,7 @@ class Optimization extends Part {
     SetReliability(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.reliability = num;
@@ -4394,7 +4507,7 @@ class Optimization extends Part {
     SetDrag(num) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.drag = num;
@@ -4409,15 +4522,15 @@ class Optimization extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        stats.cost = Math.floor(-(this.cost * 2 * this.acft_stats.cost / 10));
-        stats.liftbleed = Math.floor(-this.bleed * 3);
+        stats.cost = Math.floor(1.0e-6 + -(this.cost * 2 * this.acft_stats.cost / 10));
+        stats.liftbleed = Math.floor(1.0e-6 + -this.bleed * 3);
         stats.escape = this.escape;
         stats.visibility = this.escape;
-        stats.mass = Math.floor(-(this.mass * this.acft_stats.mass / 10));
-        stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 4);
-        stats.maxstrain = Math.floor(this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
+        stats.mass = Math.floor(1.0e-6 + -(this.mass * this.acft_stats.mass / 10));
+        stats.toughness = Math.floor(1.0e-6 + this.toughness * this.acft_stats.toughness / 4);
+        stats.maxstrain = Math.floor(1.0e-6 + this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
-        stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 10));
+        stats.drag = Math.floor(1.0e-6 + -(this.drag * this.acft_stats.drag / 10));
         return stats;
     }
 }
@@ -4532,7 +4645,10 @@ class Weapon extends Part {
         this.CalculateStats();
     }
     CanCovered() {
-        return this.has_cantilever && !(this.weapon_type.size == 16 && !this.fixed);
+        if (this.wing)
+            return this.has_cantilever && !(this.weapon_type.size == 16 && !this.fixed);
+        else
+            return !(this.GetArty() && !this.fixed);
     }
     GetCovered() {
         return this.covered;
@@ -4722,7 +4838,7 @@ class Weapon extends Part {
             stats.reqsections += 1;
         //Accessible Cost
         if (this.accessible) {
-            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
+            stats.cost += Math.max(1, Math.floor(1.0e-6 + stats.cost / 2));
         }
         //Turret size cost
         if (!this.fixed) {
@@ -4854,7 +4970,7 @@ class Weapons extends Part {
     SetWeaponSetCount(num) {
         if (num != num || num < 1)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (num > this.weapon_sets.length) {
             var w = new WeaponSystem(this.weapon_list);
             w.SetCalculateStats(this.CalculateStats);
@@ -5296,7 +5412,7 @@ class Aircraft {
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
         stats = stats.Add(this.gear.PartStats());
-        stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
+        stats.toughness += Math.floor(1.0e-6 + Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
         stats = stats.Add(this.alter.PartStats());
@@ -5330,36 +5446,36 @@ class Aircraft {
         }
     }
     GetDerivedStats() {
-        var DryMP = Math.floor(this.stats.mass / 5);
+        var DryMP = Math.floor(1.0e-6 + this.stats.mass / 5);
         DryMP = Math.max(DryMP, 1);
-        var WetMP = Math.floor((this.stats.mass + this.stats.wetmass) / 5);
+        var WetMP = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass) / 5);
         WetMP = Math.max(WetMP, 1);
-        var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
+        var WetMPwBombs = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
         var span = Math.max(1, this.wings.GetSpan());
-        var DPEmpty = Math.floor((this.stats.drag + 5 * Math.sqrt(DryMP)) / 5);
+        var DPEmpty = Math.floor(1.0e-6 + (this.stats.drag + 5 * Math.sqrt(DryMP)) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
-        var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
+        var DPFull = Math.floor(1.0e-6 + (this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
         DPFull = DPEmpty; //Based on advice from Discord.
-        var DPwBombs = Math.floor((this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
+        var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
         var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
         var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
         var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
-        var StallSpeedEmpty = Math.floor(this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
-        var StallSpeedFull = Math.floor(this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
-        var StallSpeedFullwBombs = Math.floor(this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
+        var StallSpeedEmpty = Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
+        var StallSpeedFull = Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
+        var StallSpeedFullwBombs = Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
         if (this.use_large_airplane_rules) {
-            StallSpeedEmpty = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
-            StallSpeedFull = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
-            StallSpeedFullwBombs = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
+            StallSpeedEmpty = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFull = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFullwBombs = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
         }
         var Overspeed = this.engines.GetOverspeed();
-        var BoostEmpty = Math.floor(this.stats.power / DryMP);
-        var BoostFull = Math.floor(this.stats.power / WetMP);
-        var BoostFullwBombs = Math.floor(this.stats.power / WetMPwBombs);
-        var Dropoff = Math.floor(this.stats.pitchboost * MaxSpeedEmpty);
+        var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
+        var BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
+        var BoostFullwBombs = Math.floor(1.0e-6 + this.stats.power / WetMPwBombs);
+        var Dropoff = Math.floor(1.0e-6 + this.stats.pitchboost * MaxSpeedEmpty);
         var Stabiilty = this.stats.pitchstab + this.stats.latstab;
         if (this.stats.pitchstab > 0 && this.stats.latstab > 0)
             Stabiilty += 2;
@@ -5390,9 +5506,9 @@ class Aircraft {
             HandlingEmpty = -99999;
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
-        var ElevatorsEmpty = Math.max(1, Math.floor(HandlingEmpty / 10));
-        var ElevatorsFull = Math.max(1, Math.floor(HandlingFull / 10));
-        var ElevatorsFullwBombs = Math.max(1, Math.floor(HandlingFullwBombs / 10));
+        var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
+        var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
+        var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
         var MaxStrain = 1 / 0;
         if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
@@ -5412,7 +5528,7 @@ class Aircraft {
         var FlightStress = this.stats.flightstress;
         if (Stabiilty > 3 || Stabiilty < -3)
             FlightStress++;
-        FlightStress += Math.floor(DryMP / 10);
+        FlightStress += Math.floor(1.0e-6 + DryMP / 10);
         return {
             DryMP: DryMP,
             WetMP: WetMP,
@@ -5628,6 +5744,28 @@ function FlexInput(txt, inp, fs) {
     inp.min = "0";
     inp.step = "1";
     inp.valueAsNumber = 0;
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+function FlexText(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    inp.setAttribute("type", "text");
+    inp.value = "Default";
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+function FlexDisplay(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
@@ -6715,14 +6853,14 @@ class Frames_HTML extends Display {
                 this.all_frame.add(opt);
             }
         }
-        this.all_frame.oninput = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
+        this.all_frame.onchange = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
         var skin_list = this.frames.GetSkinList();
         for (let skin of skin_list) {
             let opt = document.createElement("OPTION");
             opt.text = skin.name;
             this.all_skin.add(opt);
         }
-        this.all_skin.oninput = () => { this.frames.SetAllSkin(this.all_skin.selectedIndex); };
+        this.all_skin.onchange = () => { this.frames.SetAllSkin(this.all_skin.selectedIndex); };
         for (let elem of this.frames.GetTailList()) {
             let opt = document.createElement("OPTION");
             opt.text = elem.name;
@@ -8898,13 +9036,13 @@ class Aircraft_HTML extends Display {
         this.a_bmas.valueAsNumber = 0;
         this.a_cost.valueAsNumber = 0;
         this.a_upkp.valueAsNumber = 0;
-        this.a_lift.oninput = () => { aircraft_model.GetAlter().stats.liftbleed = this.a_lift.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_drag.oninput = () => { aircraft_model.GetAlter().stats.drag = this.a_drag.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_mass.oninput = () => { aircraft_model.GetAlter().stats.mass = this.a_mass.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_wmas.oninput = () => { aircraft_model.GetAlter().stats.wetmass = this.a_wmas.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_bmas.oninput = () => { aircraft_model.GetAlter().stats.bomb_mass = this.a_bmas.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_cost.oninput = () => { aircraft_model.GetAlter().stats.cost = this.a_cost.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_upkp.oninput = () => { aircraft_model.GetAlter().stats.upkeep = this.a_upkp.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_lift.onchange = () => { aircraft_model.GetAlter().stats.liftbleed = this.a_lift.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_drag.onchange = () => { aircraft_model.GetAlter().stats.drag = this.a_drag.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_mass.onchange = () => { aircraft_model.GetAlter().stats.mass = this.a_mass.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_wmas.onchange = () => { aircraft_model.GetAlter().stats.wetmass = this.a_wmas.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_bmas.onchange = () => { aircraft_model.GetAlter().stats.bomb_mass = this.a_bmas.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_cost.onchange = () => { aircraft_model.GetAlter().stats.cost = this.a_cost.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_upkp.onchange = () => { aircraft_model.GetAlter().stats.upkeep = this.a_upkp.valueAsNumber; aircraft_model.CalculateStats(); };
         row = tbl.insertRow();
         CreateTH(row, "Control");
         CreateTH(row, "Pitch Stability");
@@ -8942,13 +9080,13 @@ class Aircraft_HTML extends Display {
         this.a_mstr.valueAsNumber = 0;
         this.a_strc.valueAsNumber = 0;
         this.a_tugh.valueAsNumber = 0;
-        this.a_cont.oninput = () => { aircraft_model.GetAlter().stats.control = this.a_cont.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_pstb.oninput = () => { aircraft_model.GetAlter().stats.pitchstab = this.a_pstb.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_lstb.oninput = () => { aircraft_model.GetAlter().stats.latstab = this.a_lstb.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_wara.oninput = () => { aircraft_model.GetAlter().stats.wingarea = this.a_wara.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_mstr.oninput = () => { aircraft_model.GetAlter().stats.maxstrain = this.a_mstr.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_strc.oninput = () => { aircraft_model.GetAlter().stats.structure = this.a_strc.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_tugh.oninput = () => { aircraft_model.GetAlter().stats.toughness = this.a_tugh.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_cont.onchange = () => { aircraft_model.GetAlter().stats.control = this.a_cont.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_pstb.onchange = () => { aircraft_model.GetAlter().stats.pitchstab = this.a_pstb.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_lstb.onchange = () => { aircraft_model.GetAlter().stats.latstab = this.a_lstb.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_wara.onchange = () => { aircraft_model.GetAlter().stats.wingarea = this.a_wara.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_mstr.onchange = () => { aircraft_model.GetAlter().stats.maxstrain = this.a_mstr.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_strc.onchange = () => { aircraft_model.GetAlter().stats.structure = this.a_strc.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_tugh.onchange = () => { aircraft_model.GetAlter().stats.toughness = this.a_tugh.valueAsNumber; aircraft_model.CalculateStats(); };
         row = tbl.insertRow();
         CreateTH(row, "Power");
         CreateTH(row, "Fuel Consumption");
@@ -8986,13 +9124,13 @@ class Aircraft_HTML extends Display {
         this.a_pbst.valueAsNumber = 0;
         this.a_chrg.valueAsNumber = 0;
         this.a_crsh.valueAsNumber = 0;
-        this.a_powr.oninput = () => { aircraft_model.GetAlter().stats.power = this.a_powr.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_fcom.oninput = () => { aircraft_model.GetAlter().stats.fuelconsumption = this.a_fcom.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_fuel.oninput = () => { aircraft_model.GetAlter().stats.fuel = this.a_fuel.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_pspd.oninput = () => { aircraft_model.GetAlter().stats.pitchspeed = this.a_pspd.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_pbst.oninput = () => { aircraft_model.GetAlter().stats.pitchboost = this.a_pbst.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_chrg.oninput = () => { aircraft_model.GetAlter().stats.charge = this.a_chrg.valueAsNumber; aircraft_model.CalculateStats(); };
-        this.a_crsh.oninput = () => { aircraft_model.GetAlter().stats.crashsafety = this.a_crsh.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_powr.onchange = () => { aircraft_model.GetAlter().stats.power = this.a_powr.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_fcom.onchange = () => { aircraft_model.GetAlter().stats.fuelconsumption = this.a_fcom.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_fuel.onchange = () => { aircraft_model.GetAlter().stats.fuel = this.a_fuel.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_pspd.onchange = () => { aircraft_model.GetAlter().stats.pitchspeed = this.a_pspd.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_pbst.onchange = () => { aircraft_model.GetAlter().stats.pitchboost = this.a_pbst.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_chrg.onchange = () => { aircraft_model.GetAlter().stats.charge = this.a_chrg.valueAsNumber; aircraft_model.CalculateStats(); };
+        this.a_crsh.onchange = () => { aircraft_model.GetAlter().stats.crashsafety = this.a_crsh.valueAsNumber; aircraft_model.CalculateStats(); };
     }
     InitStats(tbl) {
         var row = tbl.insertRow();
@@ -9199,7 +9337,7 @@ class Aircraft_HTML extends Display {
         this.copy_text += "\n";
         this.copy_text += "Mass\t\t\tTop Speed\tStall Speed\tHandling\tBoost\n";
         //Empty
-        this.ts_empty.innerText = Math.floor(derived.MaxSpeedEmpty).toString();
+        this.ts_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
         this.ss_empty.innerText = derived.StallSpeedEmpty.toString();
         this.hand_empty.innerText = derived.HandlingEmpty.toString();
         this.boost_empty.innerText = derived.BoostEmpty.toString();
@@ -9209,17 +9347,17 @@ class Aircraft_HTML extends Display {
             + this.hand_empty.innerText + "\t\t"
             + this.boost_empty.innerText + "\n";
         //Half
-        this.ts_half.innerText = Math.floor((derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
-        this.ss_half.innerText = Math.floor((derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
-        this.hand_half.innerText = Math.floor((derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
-        this.boost_half.innerText = Math.floor((derived.BoostEmpty + derived.BoostFull) / 2).toString();
+        this.ts_half.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
+        this.ss_half.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
+        this.hand_half.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
+        this.boost_half.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
         this.copy_text += "Half Mass\t\t"
             + this.ts_half.innerText + "\t\t"
             + this.ss_half.innerText + "\t\t"
             + this.hand_half.innerText + "\t\t"
             + this.boost_half.innerText + "\n";
         //Full
-        this.ts_full.innerText = Math.floor(derived.MaxSpeedFull).toString();
+        this.ts_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
         this.ss_full.innerText = derived.StallSpeedFull.toString();
         this.hand_full.innerText = derived.HandlingFull.toString();
         this.boost_full.innerText = derived.BoostFull.toString();
@@ -9234,17 +9372,17 @@ class Aircraft_HTML extends Display {
             this.bomb_row2.hidden = false;
             this.vital_components.rowSpan = 5;
             //Half
-            this.ts_halfwB.innerText = Math.floor((derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
-            this.ss_halfwB.innerText = Math.floor((derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
-            this.hand_halfwB.innerText = Math.floor((derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
-            this.boost_halfwB.innerText = Math.floor((derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
+            this.ts_halfwB.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
+            this.ss_halfwB.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
+            this.hand_halfwB.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
+            this.boost_halfwB.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
             this.copy_text += "Half Mass with Bombs\t"
                 + this.ts_halfwB.innerText + "\t\t"
                 + this.ss_halfwB.innerText + "\t\t"
                 + this.hand_halfwB.innerText + "\t\t"
                 + this.boost_halfwB.innerText + "\n";
             //Full
-            this.ts_fullwB.innerText = Math.floor(derived.MaxSpeedwBombs).toString();
+            this.ts_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
             this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
             this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
@@ -9274,7 +9412,7 @@ class Aircraft_HTML extends Display {
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
         this.turnbleed_cell.innerText = derived.TurnBleed.toString();
         this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = (Math.floor(this.acft.GetMaxAltitude() * 10 - 1 + derived.MaxSpeedEmpty - derived.StallSpeedEmpty)).toString();
+        this.maxalt_cell.innerText = (Math.floor(1.0e-6 + this.acft.GetMaxAltitude() * 10 - 1 + derived.MaxSpeedEmpty - derived.StallSpeedEmpty)).toString();
         this.copy_text += "Aerodynamics\n\t"
             + "Stability\t" + this.stability_cell.innerText + "\n\t"
             + "Energy Loss\t" + this.eloss_cell.innerText + "\n\t"
@@ -9627,118 +9765,6 @@ class AlterStats extends Part {
         this.CalculateStats = callback;
     }
 }
-class Serialize {
-    constructor(arr) {
-        this.array = new ArrayBuffer(51200);
-        this.view = new DataView(this.array);
-        this.offset = 0;
-    }
-    Check() {
-        if (this.offset >= this.array.byteLength)
-            throw "Serialization Way too long.";
-    }
-    PushNum(num) {
-        this.view.setInt16(this.offset, num, false);
-        this.offset += 2;
-        this.Check();
-    }
-    PushBool(bool) {
-        if (bool)
-            this.view.setUint8(this.offset, 1);
-        else
-            this.view.setUint8(this.offset, 0);
-        this.offset += 1;
-        this.Check();
-    }
-    PushString(str) {
-        this.PushNum(str.length);
-        for (let i = 0; i < str.length; i++) {
-            this.view.setUint8(this.offset, str.charCodeAt(i));
-            this.offset++;
-        }
-        this.Check();
-    }
-    PushNumArr(nums) {
-        this.PushNum(nums.length);
-        for (let n of nums) {
-            this.PushNum(n);
-        }
-        this.Check();
-    }
-    PushBoolArr(bools) {
-        this.PushNum(bools.length);
-        for (let b of bools) {
-            this.PushBool(b);
-        }
-        this.Check();
-    }
-    PushFloat(flt) {
-        this.view.setFloat32(this.offset, flt, false);
-        this.offset += 4;
-        this.Check();
-    }
-    FinalArray() {
-        return this.array.slice(0, this.offset);
-    }
-}
-class Deserialize {
-    constructor(arr) {
-        this.array = arr;
-        this.view = new DataView(this.array);
-        this.offset = 0;
-    }
-    Check() {
-        if (this.offset >= this.array.byteLength)
-            throw "Deserialization Failed";
-    }
-    GetNum() {
-        this.Check();
-        var num = this.view.getInt16(this.offset, false);
-        this.offset += 2;
-        return num;
-    }
-    GetBool() {
-        this.Check();
-        var bool = this.view.getUint8(this.offset);
-        this.offset += 1;
-        return bool > 0;
-    }
-    GetString() {
-        this.Check();
-        var len = this.GetNum();
-        var arr = [];
-        for (let i = 0; i < len; i++) {
-            var char = this.view.getUint8(this.offset);
-            arr.push(char);
-            this.offset += 1;
-        }
-        return String.fromCharCode(...arr);
-    }
-    GetNumArr() {
-        this.Check();
-        var len = this.GetNum();
-        var arr = [];
-        for (let i = 0; i < len; i++) {
-            arr.push(this.GetNum());
-        }
-        return arr;
-    }
-    GetBoolArr() {
-        this.Check();
-        var len = this.GetNum();
-        var arr = [];
-        for (let i = 0; i < len; i++) {
-            arr.push(this.GetBool());
-        }
-        return arr;
-    }
-    GetFloat() {
-        this.Check();
-        var flt = this.view.getFloat32(this.offset, false);
-        this.offset += 4;
-        return flt;
-    }
-}
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./Weapon.ts" />
@@ -9877,7 +9903,7 @@ class WeaponSystem extends Part {
     SWC(num) {
         if (num != num || num < 1)
             num = 1;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (num > this.weapons.length) {
             var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
             w.SetCalculateStats(this.CalculateStats);
@@ -9962,10 +9988,10 @@ class WeaponSystem extends Part {
             }
         }
         return [
-            centerline + Math.floor(wings * 0.8),
-            wings + Math.floor(centerline * 0.75),
-            Math.floor(centerline * 0.5) + Math.floor(wings * 0.3),
-            Math.floor(centerline * 0.25) + Math.floor(wings * 0.1)
+            centerline + Math.floor(1.0e-6 + wings * 0.8),
+            wings + Math.floor(1.0e-6 + centerline * 0.75),
+            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.3),
+            Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
         ];
     }
     GetDamage() {
@@ -9998,7 +10024,7 @@ class WeaponSystem extends Part {
     SetAmmo(num) {
         if (num != num || num < 1)
             num = 1;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.ammo = num;
         this.CalculateStats();
     }

@@ -78,7 +78,7 @@ class Fuel extends Part {
     public SetTankCount(idx: number, count: number) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         this.tank_count[idx] = count;
         this.VerifyOK();
         this.CalculateStats();
@@ -110,7 +110,7 @@ class Fuel extends Part {
                 ccount += this.tank_count[i];
         }
         //How many can you have?
-        var allowed = Math.floor(this.wing_area / 10);
+        var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
         if (!this.is_cantilever)
             allowed = 0;
         //Do you have more than the allowed?

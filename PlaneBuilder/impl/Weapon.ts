@@ -148,7 +148,10 @@ class Weapon extends Part {
     }
 
     public CanCovered() {
-        return this.has_cantilever && !(this.weapon_type.size == 16 && !this.fixed);
+        if (this.wing)
+            return this.has_cantilever && !(this.weapon_type.size == 16 && !this.fixed);
+        else
+            return !(this.GetArty() && !this.fixed);
     }
 
     public GetCovered() {
@@ -359,7 +362,7 @@ class Weapon extends Part {
 
         //Accessible Cost
         if (this.accessible) {
-            stats.cost += Math.max(1, Math.floor(stats.cost / 2));
+            stats.cost += Math.max(1, Math.floor(1.0e-6 + stats.cost / 2));
         }
 
         //Turret size cost

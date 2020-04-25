@@ -144,7 +144,7 @@ class Accessories extends Part {
     public SetArmourCoverage(idx: number, num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.armour_coverage[idx] = num;
         this.CalculateStats();
     }
@@ -160,7 +160,7 @@ class Accessories extends Part {
     public SetElectricalCount(idx: number, count: number) {
         if (count != count || count < 0)
             count = 0;
-        count = Math.floor(count);
+        count = Math.floor(1.0e-6 + count);
         count = Math.min(count, 5);
         this.electrical_count[idx] = count;
         this.CalculateStats();
@@ -297,7 +297,7 @@ class Accessories extends Part {
             }
 
             stats.mass += count * AP;
-            stats.cost += Math.floor(count * AP / 3);
+            stats.cost += Math.floor(1.0e-6 + count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
         }
 
@@ -306,7 +306,7 @@ class Accessories extends Part {
             let ts = this.electric_list[i].stats.Clone();
             ts = ts.Multiply(this.electrical_count[i]);
             stats = stats.Add(ts);
-            stats.charge += Math.floor(this.electrical_count[i] * this.electric_list[i].cp10p * this.acft_power / 10);
+            stats.charge += Math.floor(1.0e-6 + this.electrical_count[i] * this.electric_list[i].cp10p * this.acft_power / 10);
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
 

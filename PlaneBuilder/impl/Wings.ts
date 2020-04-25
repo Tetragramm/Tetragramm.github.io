@@ -58,7 +58,7 @@ class Wings extends Part {
         this.wing_list = [];
         this.mini_wing_list = [];
 
-        this.wing_stagger = Math.floor(this.stagger_list.length / 2);
+        this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
         this.is_swept = false;
         this.is_closed = false;
     }
@@ -296,16 +296,16 @@ class Wings extends Part {
 
         if (w.area != w.area)
             w.area = 3;
-        w.area = Math.floor(w.area);
+        w.area = Math.floor(1.0e-6 + w.area);
         if (w.span != w.span)
             w.span = 1;
-        w.span = Math.floor(w.span);
+        w.span = Math.floor(1.0e-6 + w.span);
         if (w.dihedral != w.dihedral)
             w.dihedral = 0;
-        w.dihedral = Math.floor(w.dihedral);
+        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
         if (w.anhedral != w.anhedral)
             w.anhedral = 0;
-        w.anhedral = Math.floor(w.anhedral);
+        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
 
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 3);
@@ -331,16 +331,16 @@ class Wings extends Part {
 
         if (w.area != w.area)
             w.area = 2;
-        w.area = Math.floor(w.area);
+        w.area = Math.floor(1.0e-6 + w.area);
         if (w.span != w.span)
             w.span = 1;
-        w.span = Math.floor(w.span);
+        w.span = Math.floor(1.0e-6 + w.span);
         if (w.dihedral != w.dihedral)
             w.dihedral = 0;
-        w.dihedral = Math.floor(w.dihedral);
+        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
         if (w.anhedral != w.anhedral)
             w.anhedral = 0;
-        w.anhedral = Math.floor(w.anhedral);
+        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
 
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 1);
@@ -497,7 +497,7 @@ class Wings extends Part {
 
             //Inline wings
             if (deck_count[w.deck] > 1) {
-                wStats.drag = Math.floor(0.75 * wStats.drag);
+                wStats.drag = Math.floor(1.0e-6 + 0.75 * wStats.drag);
             }
 
             wStats.Round();
@@ -537,7 +537,7 @@ class Wings extends Part {
         //Longest wing effects
         stats.control += 8 - longest_span;
         stats.latstab += Math.min(0, longest_span - 8);
-        stats.latstab += Math.max(0, Math.floor(longest_span / this.num_frames) - 1);
+        stats.latstab += Math.max(0, Math.floor(1.0e-6 + longest_span / this.num_frames) - 1);
 
         //Wing Sweep effects
         if (this.is_swept) {

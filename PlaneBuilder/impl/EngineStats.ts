@@ -1,4 +1,5 @@
 /// <reference path="./Stats.ts" />
+/// <reference path="./Serialize.ts"/>
 
 class EngineStats {
     public name: string = "";

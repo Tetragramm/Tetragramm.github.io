@@ -107,7 +107,7 @@ class Weapons extends Part {
     public SetWeaponSetCount(num: number) {
         if (num != num || num < 1)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         while (num > this.weapon_sets.length) {
             var w = new WeaponSystem(this.weapon_list);
             w.SetCalculateStats(this.CalculateStats);

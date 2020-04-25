@@ -189,7 +189,7 @@ class Stabilizers extends Part {
     public SetHStabCount(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.hstab_count = num;
         if (this.hstab_list[this.hstab_sel].increment != 0) {
             while ((this.hstab_count % this.hstab_list[this.hstab_sel].increment) != 0) {
@@ -213,7 +213,7 @@ class Stabilizers extends Part {
     public SetVStabCount(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.vstab_count = num;
         if (this.vstab_list[this.vstab_sel].increment != 0) {
             while ((this.vstab_count % this.vstab_list[this.vstab_sel].increment) != 0) {
@@ -293,17 +293,17 @@ class Stabilizers extends Part {
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
-            stats.drag += Math.floor(this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
+            stats.drag += Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
         }
         else if (this.hstab_list[this.hstab_sel].increment != 0) {
-            stats.pitchstab -= Math.floor(this.wing_area / 2);
+            stats.pitchstab -= Math.floor(1.0e-6 + this.wing_area / 2);
             stats.liftbleed += 5;
         }
 
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
-            stats.drag += Math.floor(this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
+            stats.drag += Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
         }
         else if (this.vstab_list[this.vstab_sel].increment != 0) {
             stats.latstab -= this.wing_area;

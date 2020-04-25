@@ -46,7 +46,7 @@ class Passengers extends Part {
     public SetSeats(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.seats = num;
         this.CalculateStats();
     }
@@ -58,7 +58,7 @@ class Passengers extends Part {
     public SetBeds(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.beds = num;
         this.CalculateStats();
     }

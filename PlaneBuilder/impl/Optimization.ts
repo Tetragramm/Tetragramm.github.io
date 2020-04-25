@@ -129,7 +129,7 @@ class Optimization extends Part {
     public SetFreeDots(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, 0);
         this.free_dots = num;
         this.ReduceDots();
@@ -143,7 +143,7 @@ class Optimization extends Part {
     public SetCost(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.cost = num;
@@ -158,7 +158,7 @@ class Optimization extends Part {
     public SetBleed(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.bleed = num;
@@ -173,7 +173,7 @@ class Optimization extends Part {
     public SetEscape(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.escape = num;
@@ -188,7 +188,7 @@ class Optimization extends Part {
     public SetMass(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.mass = num;
@@ -203,7 +203,7 @@ class Optimization extends Part {
     public SetToughness(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.toughness = num;
@@ -218,7 +218,7 @@ class Optimization extends Part {
     public SetMaxStrain(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.maxstrain = num;
@@ -233,7 +233,7 @@ class Optimization extends Part {
     public SetReliability(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.reliability = num;
@@ -248,7 +248,7 @@ class Optimization extends Part {
     public SetDrag(num: number) {
         if (num != num)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         num = Math.max(num, -3);
         num = Math.min(num, 3);
         this.drag = num;
@@ -267,15 +267,15 @@ class Optimization extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        stats.cost = Math.floor(-(this.cost * 2 * this.acft_stats.cost / 10));
-        stats.liftbleed = Math.floor(- this.bleed * 3);
+        stats.cost = Math.floor(1.0e-6 + -(this.cost * 2 * this.acft_stats.cost / 10));
+        stats.liftbleed = Math.floor(1.0e-6 + - this.bleed * 3);
         stats.escape = this.escape;
         stats.visibility = this.escape;
-        stats.mass = Math.floor(-(this.mass * this.acft_stats.mass / 10));
-        stats.toughness = Math.floor(this.toughness * this.acft_stats.toughness / 4);
-        stats.maxstrain = Math.floor(this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
+        stats.mass = Math.floor(1.0e-6 + -(this.mass * this.acft_stats.mass / 10));
+        stats.toughness = Math.floor(1.0e-6 + this.toughness * this.acft_stats.toughness / 4);
+        stats.maxstrain = Math.floor(1.0e-6 + this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
-        stats.drag = Math.floor(-(this.drag * this.acft_stats.drag / 10));
+        stats.drag = Math.floor(1.0e-6 + -(this.drag * this.acft_stats.drag / 10));
 
         return stats;
     }

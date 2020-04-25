@@ -121,7 +121,7 @@ class LandingGear extends Part {
     }
 
     public SetLoadedMass(mass: number) {
-        this.loadedMP = Math.floor(mass / 5);
+        this.loadedMP = Math.floor(1.0e-6 + mass / 5);
     }
 
     public CanBoat(engine_height: number, wing_height) {
@@ -147,8 +147,8 @@ class LandingGear extends Part {
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
         var pdrag = this.gear_list[this.gear_sel].DpLMP * this.loadedMP;
         if (this.retract) {
-            stats.mass += Math.floor(pdrag / 2);
-            stats.cost += Math.floor(pdrag / 2);
+            stats.mass += Math.floor(1.0e-6 + pdrag / 2);
+            stats.cost += Math.floor(1.0e-6 + pdrag / 2);
         } else {
             stats.drag += pdrag;
         }

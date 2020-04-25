@@ -265,7 +265,7 @@ class Aircraft {
         this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
         stats = stats.Add(this.gear.PartStats());
 
-        stats.toughness += Math.floor(Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
+        stats.toughness += Math.floor(1.0e-6 + Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
 
@@ -308,38 +308,38 @@ class Aircraft {
     }
 
     public GetDerivedStats() {
-        var DryMP = Math.floor(this.stats.mass / 5);
+        var DryMP = Math.floor(1.0e-6 + this.stats.mass / 5);
         DryMP = Math.max(DryMP, 1);
-        var WetMP = Math.floor((this.stats.mass + this.stats.wetmass) / 5);
+        var WetMP = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass) / 5);
         WetMP = Math.max(WetMP, 1);
-        var WetMPwBombs = Math.floor((this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
+        var WetMPwBombs = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
         var span = Math.max(1, this.wings.GetSpan());
-        var DPEmpty = Math.floor((this.stats.drag + 5 * Math.sqrt(DryMP)) / 5);
+        var DPEmpty = Math.floor(1.0e-6 + (this.stats.drag + 5 * Math.sqrt(DryMP)) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
-        var DPFull = Math.floor((this.stats.drag + WetMP) / 5);
+        var DPFull = Math.floor(1.0e-6 + (this.stats.drag + WetMP) / 5);
         DPFull = Math.max(DPFull, 1);
         DPFull = DPEmpty; //Based on advice from Discord.
-        var DPwBombs = Math.floor((this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
+        var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
         var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
         var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
         var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
-        var StallSpeedEmpty = Math.floor(this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
-        var StallSpeedFull = Math.floor(this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
-        var StallSpeedFullwBombs = Math.floor(this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
+        var StallSpeedEmpty = Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
+        var StallSpeedFull = Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
+        var StallSpeedFullwBombs = Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
 
         if (this.use_large_airplane_rules) {
-            StallSpeedEmpty = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
-            StallSpeedFull = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
-            StallSpeedFullwBombs = Math.floor(Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
+            StallSpeedEmpty = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * DryMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFull = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMP / Math.max(1, this.stats.wingarea)));
+            StallSpeedFullwBombs = Math.floor(1.0e-6 + Math.sqrt(this.stats.liftbleed * 5 * WetMPwBombs / Math.max(1, this.stats.wingarea)));
         }
 
         var Overspeed = this.engines.GetOverspeed();
-        var BoostEmpty = Math.floor(this.stats.power / DryMP);
-        var BoostFull = Math.floor(this.stats.power / WetMP);
-        var BoostFullwBombs = Math.floor(this.stats.power / WetMPwBombs);
-        var Dropoff = Math.floor(this.stats.pitchboost * MaxSpeedEmpty);
+        var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
+        var BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
+        var BoostFullwBombs = Math.floor(1.0e-6 + this.stats.power / WetMPwBombs);
+        var Dropoff = Math.floor(1.0e-6 + this.stats.pitchboost * MaxSpeedEmpty);
 
         var Stabiilty = this.stats.pitchstab + this.stats.latstab;
         if (this.stats.pitchstab > 0 && this.stats.latstab > 0)
@@ -374,9 +374,9 @@ class Aircraft {
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
 
-        var ElevatorsEmpty = Math.max(1, Math.floor(HandlingEmpty / 10));
-        var ElevatorsFull = Math.max(1, Math.floor(HandlingFull / 10));
-        var ElevatorsFullwBombs = Math.max(1, Math.floor(HandlingFullwBombs / 10));
+        var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
+        var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
+        var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
 
         var MaxStrain = 1 / 0;
         if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)
@@ -399,7 +399,7 @@ class Aircraft {
         var FlightStress = this.stats.flightstress;
         if (Stabiilty > 3 || Stabiilty < -3)
             FlightStress++;
-        FlightStress += Math.floor(DryMP / 10);
+        FlightStress += Math.floor(1.0e-6 + DryMP / 10);
 
         return {
             DryMP: DryMP,

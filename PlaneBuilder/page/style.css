@@ -116,7 +116,6 @@ select, input {
 	text-align: center;
 	border-style: solid;
 	height: 1.5em;
-	margin:auto;
 	vertical-align: bottom;
 }
 
@@ -280,6 +279,7 @@ button[disabled] {
 	grid-auto-columns: 1fr;
 	grid-auto-rows: auto;
 	row-gap: 1px;
+	justify-items: left;
 	vertical-align: middle;
 }
 

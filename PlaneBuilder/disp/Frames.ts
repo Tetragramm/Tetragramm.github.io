@@ -108,14 +108,14 @@ class Frames_HTML extends Display {
                 this.all_frame.add(opt);
             }
         }
-        this.all_frame.oninput = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
+        this.all_frame.onchange = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
         var skin_list = this.frames.GetSkinList();
         for (let skin of skin_list) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = skin.name;
             this.all_skin.add(opt);
         }
-        this.all_skin.oninput = () => { this.frames.SetAllSkin(this.all_skin.selectedIndex); };
+        this.all_skin.onchange = () => { this.frames.SetAllSkin(this.all_skin.selectedIndex); };
 
 
         for (let elem of this.frames.GetTailList()) {

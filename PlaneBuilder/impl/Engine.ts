@@ -192,7 +192,7 @@ class Engine extends Part {
     public SetCooling(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.cooling_count = num;
         this.CalculateStats();
     }
@@ -285,7 +285,7 @@ class Engine extends Part {
     public SetGearCount(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.gp_count = num;
         this.SetGearReliability(this.gpr_count);
     }
@@ -297,7 +297,7 @@ class Engine extends Part {
     public SetGearReliability(num: number) {
         if (num != num || num < 0)
             num = 0;
-        num = Math.floor(num);
+        num = Math.floor(1.0e-6 + num);
         this.gpr_count = Math.min(num, this.gp_count);
         this.CalculateStats();
     }
@@ -335,7 +335,7 @@ class Engine extends Part {
     }
 
     public GetOverspeed(): number {
-        return this.etype_stats.overspeed + Math.floor(this.gp_count * this.etype_stats.overspeed / 2);
+        return this.etype_stats.overspeed + Math.floor(1.0e-6 + this.gp_count * this.etype_stats.overspeed / 2);
     }
 
     public GetIsPulsejet(): boolean {
@@ -539,13 +539,13 @@ class Engine extends Part {
             stats.latstab *= 2;
             stats.structure *= 2;
             stats.maxstrain *= 2;
-            stats.power = Math.floor(this.pp_list[pp_type].powerfactor * stats.power);
+            stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
         }
 
         //Cowls modify engine stats directly, not mounting or upgrade.
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
-        stats.mass += Math.floor(stats.drag * this.cowl_list[this.cowl_sel].mpd);
-        stats.drag = Math.floor(stats.drag * this.cowl_list[this.cowl_sel].ed);
+        stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
+        stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
         if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail)
             stats.cost += 2;
 
@@ -553,8 +553,8 @@ class Engine extends Part {
         //No Mounting for pulse-jets, just bolted on
         if (!this.etype_stats.pulsejet) {
             stats = stats.Add(this.mount_list[this.selected_mount].stats);
-            stats.maxstrain -= Math.floor(this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
-            stats.drag += Math.floor(this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
+            stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
+            stats.drag += Math.floor(1.0e-6 + this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
 
         //Upgrades
@@ -564,10 +564,10 @@ class Engine extends Part {
         stats.cost += this.gp_count + this.gpr_count;
 
         if (this.is_generator) {
-            stats.charge = Math.floor(2 * stats.power / 10) + 2;
+            stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
             stats.power = 0;
         } else if (this.has_alternator) {
-            stats.charge = Math.floor(stats.power / 10) + 1;
+            stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
             stats.mass += 1;
             stats.cost += 2;
         }
