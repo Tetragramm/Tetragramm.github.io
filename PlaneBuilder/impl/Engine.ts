@@ -346,7 +346,7 @@ class Engine extends Part {
         if (this.GetIsPulsejet()) {
             this.etype_stats.stats.cooling = 0;
             this.etype_stats.overspeed = 100;
-            this.etype_stats.altitude = 100;
+            this.etype_stats.altitude = 3;
             this.etype_stats.torque = 0;
             this.use_pp = false;
             this.use_ds = false;
