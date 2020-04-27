@@ -1251,6 +1251,12 @@ class Engine extends Part {
         }
         return lst;
     }
+    GetHasOilTank() {
+        return this.etype_stats.oiltank;
+    }
+    GetHasOilCooler() {
+        return this.etype_stats.stats.cooling > 0;
+    }
     VerifyCowl(num) {
         var can = this.GetCowlEnabled();
         if (can[num])
@@ -1367,6 +1373,9 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
+        }
+        if (this.GetHasOilCooler()) {
+            stats.drag += Math.floor(stats.power / 15);
         }
         //Cowls modify engine stats directly, not mounting or upgrade.
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
@@ -3529,6 +3538,12 @@ class Reinforcement extends Part {
                 else
                     tension += this.ext_steel_list[i].tension * this.ext_steel_count[i];
             }
+        }
+        //First Strut Bonus
+        if (strut_count > 0) {
+            stats.structure += 5;
+            stats.maxstrain += 10;
+            tension += 10;
         }
         //Cabane Strut
         let ts = this.ext_cabane_list[this.cabane_sel].stats.Clone();
@@ -9458,9 +9473,15 @@ class Aircraft_HTML extends Display {
             vital += "<br/>Radiator #" + (i + 1).toString();
             this.copy_text += "Radiator #" + (i + 1).toString() + "\n\t";
         }
-        if (this.acft.GetEngines().GetHasOilTank()) {
-            vital += "<br/>Oil Tank";
-            this.copy_text += "Oil Tank\n\t";
+        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+            if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                vital += "<br/>Oil Tank #" + (i + 1).toString();
+                this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
+            }
+            if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                vital += "<br/>Oil Cooler #" + (i + 1).toString();
+                this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
+            }
         }
         if (this.acft.IsElectrics()) {
             vital += "<br/>Electrics";
@@ -9561,7 +9582,11 @@ class Aircraft_HTML extends Display {
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
-//TODO: air fan
+//TODO:Air Cooling Fan
+//TODO:Push/pull on fuselage engines and such?
+//TODO:Weapon description needs Fixed/Flexible/Turret
+//TODO:Crew are vital components
+//TODO:Quad Mounts
 const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");

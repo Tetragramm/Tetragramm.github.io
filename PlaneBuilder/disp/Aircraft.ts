@@ -736,9 +736,15 @@ class Aircraft_HTML extends Display {
             vital += "<br/>Radiator #" + (i + 1).toString();
             this.copy_text += "Radiator #" + (i + 1).toString() + "\n\t";
         }
-        if (this.acft.GetEngines().GetHasOilTank()) {
-            vital += "<br/>Oil Tank";
-            this.copy_text += "Oil Tank\n\t";
+        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+            if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                vital += "<br/>Oil Tank #" + (i + 1).toString();
+                this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
+            }
+            if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                vital += "<br/>Oil Cooler #" + (i + 1).toString();
+                this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
+            }
         }
         if (this.acft.IsElectrics()) {
             vital += "<br/>Electrics";

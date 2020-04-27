@@ -407,6 +407,14 @@ class Engine extends Part {
         return lst;
     }
 
+    public GetHasOilTank() {
+        return this.etype_stats.oiltank;
+    }
+
+    public GetHasOilCooler() {
+        return this.etype_stats.stats.cooling > 0;
+    }
+
     private VerifyCowl(num: number) {
         var can = this.GetCowlEnabled();
         if (can[num])
@@ -516,6 +524,7 @@ class Engine extends Part {
         else
             stats = stats.Add(this.etype_stats.stats);
 
+
         if (this.etype_stats.oiltank)
             stats.mass += 1;
 
@@ -540,6 +549,10 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
+        }
+
+        if (this.GetHasOilCooler()) {
+            stats.drag += Math.floor(stats.power / 15);
         }
 
         //Cowls modify engine stats directly, not mounting or upgrade.

@@ -269,6 +269,14 @@ class Reinforcement extends Part {
                     tension += this.ext_steel_list[i].tension * this.ext_steel_count[i];
             }
         }
+
+        //First Strut Bonus
+        if (strut_count > 0) {
+            stats.structure += 5;
+            stats.maxstrain += 10;
+            tension += 10;
+        }
+
         //Cabane Strut
         let ts = this.ext_cabane_list[this.cabane_sel].stats.Clone();
         stats = stats.Add(ts);
