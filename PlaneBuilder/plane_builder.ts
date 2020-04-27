@@ -6,6 +6,7 @@
 //TODO:Push/pull on fuselage engines and such?
 //TODO:Weapon description needs Fixed/Flexible/Turret
 //TODO:Crew are vital components
+//TODO:Max Strain display by reinforcements
 //TODO:Quad Mounts
 
 const loadJSON = (path, callback) => {

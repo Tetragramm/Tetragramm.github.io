@@ -551,16 +551,17 @@ class Engine extends Part {
             stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
         }
 
-        if (this.GetHasOilCooler()) {
-            stats.drag += Math.floor(stats.power / 15);
-        }
-
         //Cowls modify engine stats directly, not mounting or upgrade.
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
         stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
         stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
         if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail)
             stats.cost += 2;
+
+        //Move here so it doesn't get affected by cowl.
+        if (this.GetHasOilCooler()) {
+            stats.drag += Math.floor(stats.power / 15);
+        }
 
         // Mounting modifiers (only get applied once, even with push/pull)
         //No Mounting for pulse-jets, just bolted on
