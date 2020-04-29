@@ -245,7 +245,7 @@ class Wings extends Part {
     }
 
     public CanClosed() {
-        return this.wing_list.length > 1 && !this.stagger_list[this.wing_stagger].inline;
+        return this.wing_list.length > 1;
     }
 
     public SetClosed(use: boolean) {

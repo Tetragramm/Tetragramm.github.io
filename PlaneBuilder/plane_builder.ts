@@ -3,10 +3,11 @@
 /// <reference path="./disp/Aircraft.ts" />
 
 //TODO:Air Cooling Fan
-//TODO:Push/pull on fuselage engines and such?
 //TODO:Weapon description needs Fixed/Flexible/Turret
 //TODO:Crew are vital components
+//TODO:Push/pull is x2 vital components
 //TODO:Max Strain display by reinforcements
+//TODO:Put Full Mass on top, empty on bottom.
 //TODO:Quad Mounts
 
 const loadJSON = (path, callback) => {
