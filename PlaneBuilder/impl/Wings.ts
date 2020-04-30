@@ -435,12 +435,19 @@ class Wings extends Part {
 
     public GetWingDrag() {
         var drag = 0;
+        var deck_count = this.DeckCountFull();
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span;
 
             var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
-            drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+            wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+            //Inline wings
+            if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
+                wdrag = Math.floor(1.0e-6 + 0.75 * wdrag);
+            }
+            wdrag = Math.floor(1.0e-6 + wdrag);
+            drag += wdrag;
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
@@ -448,7 +455,9 @@ class Wings extends Part {
 
             //Drag is modified by area, span
             var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
-            drag += Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+            wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
+            wdrag = Math.floor(1.0e-6 + wdrag);
+            drag += wdrag;
         }
         return drag;
     }
@@ -508,7 +517,7 @@ class Wings extends Part {
             wStats.liftbleed += w.dihedral + w.anhedral;
 
             //Inline wings
-            if (deck_count[w.deck] > 1) {
+            if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
                 wStats.drag = Math.floor(1.0e-6 + 0.75 * wStats.drag);
             }
 
