@@ -356,7 +356,7 @@ class Weapon extends Part {
             stats.drag += 1;
 
         //Arty size weapon mounts need a section
-        if (this.w_count && this.weapon_type.size == 8 || this.weapon_type.size == 16)
+        if (this.wing && size > 8)
             stats.reqsections += 1;
 
         //Accessible Cost
