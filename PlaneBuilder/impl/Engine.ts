@@ -3,7 +3,6 @@
 /// <reference path="./EngineStats.ts" />
 
 class Engine extends Part {
-    private engine_list: EngineStats[];
     private selected_index: number;
     private etype_stats: EngineStats;
 
@@ -18,6 +17,7 @@ class Engine extends Part {
     private use_pp: boolean;
     private torque_to_struct: boolean;
 
+    private intake_fan: boolean;
     private use_ds: boolean;
     private gp_count: number;
     private gpr_count: number;
@@ -30,15 +30,14 @@ class Engine extends Part {
 
     private total_reliability: number;
 
-    constructor(el: EngineStats[],
+    constructor(
         ml: { name: string, stats: Stats, strainfactor: number, dragfactor: number, pp_type: string, reqED: boolean, reqTail: boolean }[],
         ppl: { name: string, powerfactor: number }[],
         cl: { name: string, stats: Stats, ed: number, mpd: number, air: boolean, liquid: boolean, rotary: boolean }[]) {
 
         super();
-        this.engine_list = el;
         this.selected_index = 0;
-        this.etype_stats = this.engine_list[0].Clone();
+        this.etype_stats = engine_list[0].Clone();
 
         this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
@@ -49,6 +48,7 @@ class Engine extends Part {
         this.mount_list = ml;
         this.selected_mount = 0;
 
+        this.intake_fan = false;
         this.pp_list = ppl;
         this.use_pp = false;
         this.torque_to_struct = false;
@@ -64,7 +64,7 @@ class Engine extends Part {
         this.is_generator = false;
         this.has_alternator = false;
 
-        if (el.length <= 0)
+        if (engine_list.length <= 0)
             throw "No Engine Stats Found.  Should be at least one.";
     }
 
@@ -82,6 +82,7 @@ class Engine extends Part {
             cowl_sel: this.cowl_sel,
             is_generator: this.is_generator,
             has_alternator: this.has_alternator,
+            intake_fan: this.intake_fan,
         };
     }
 
@@ -98,12 +99,17 @@ class Engine extends Part {
         this.cowl_sel = js["cowl_sel"];
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
+        this.intake_fan = js["intake_fan"];
         this.selected_index = -1;
-        for (let i = 0; i < this.engine_list.length; i++) {
-            if (this.etype_stats.Equal(this.engine_list[i])) {
+        for (let i = 0; i < engine_list.length; i++) {
+            if (this.etype_stats.Equal(engine_list[i])) {
                 this.selected_index = i;
                 break;
             }
+        }
+        if (this.selected_index == -1) {
+            this.selected_index = engine_list.length;
+            engine_list.push(this.etype_stats.Clone());
         }
     }
 
@@ -120,6 +126,7 @@ class Engine extends Part {
         s.PushNum(this.cowl_sel);
         s.PushBool(this.is_generator);
         s.PushBool(this.has_alternator);
+        s.PushBool(this.intake_fan);
     }
 
     public deserialize(d: Deserialize) {
@@ -135,12 +142,17 @@ class Engine extends Part {
         this.cowl_sel = d.GetNum();
         this.is_generator = d.GetBool();
         this.has_alternator = d.GetBool();
+        this.intake_fan = d.GetBool();
         this.selected_index = -1;
-        for (let i = 0; i < this.engine_list.length; i++) {
-            if (this.etype_stats.Equal(this.engine_list[i])) {
+        for (let i = 0; i < engine_list.length; i++) {
+            if (this.etype_stats.Equal(engine_list[i])) {
                 this.selected_index = i;
                 break;
             }
+        }
+        if (this.selected_index == -1) {
+            this.selected_index = engine_list.length;
+            engine_list.push(this.etype_stats.Clone());
         }
     }
 
@@ -150,8 +162,8 @@ class Engine extends Part {
 
     public SetSelectedIndex(num: number) {
         this.selected_index = num;
-        this.etype_stats = this.engine_list[this.selected_index].Clone();
-        if (num >= this.engine_list.length)
+        this.etype_stats = engine_list[this.selected_index].Clone();
+        if (num >= engine_list.length)
             throw "Index is out of range of engine_list.";
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
@@ -228,8 +240,17 @@ class Engine extends Part {
         return this.radiator_index;
     }
 
+    public SetIntakeFan(use: boolean) {
+        this.intake_fan = use;
+        this.CalculateStats();
+    }
+
+    public GetIntakeFan() {
+        return this.intake_fan;
+    }
+
     public GetListOfEngines(): EngineStats[] {
-        return this.engine_list;
+        return engine_list;
     }
 
     public RequiresExtendedDriveshafts(): boolean {
@@ -327,6 +348,9 @@ class Engine extends Part {
         if (this.NeedCooling()) {
             this.total_reliability -= (this.GetMaxCooling() - this.cooling_count);
         }
+        if (this.GetIntakeFan()) {
+            this.total_reliability += 6;
+        }
         this.total_reliability += num;
     }
 
@@ -380,6 +404,18 @@ class Engine extends Part {
         return false;
     }
 
+    private IsLiquidCooled() {
+        return this.NeedCooling();
+    }
+
+    private IsRotary() {
+        return this.etype_stats.oiltank;
+    }
+
+    private IsAirCooled() {
+        return !this.GetIsPulsejet() && !this.IsLiquidCooled() && !this.IsRotary();
+    }
+
     public GetCowlList() {
         return this.cowl_list;
     }
@@ -394,11 +430,11 @@ class Engine extends Part {
             if (this.GetIsPulsejet()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
-            else if (this.NeedCooling()) { //Means liquid
+            else if (this.IsLiquidCooled()) {
                 lst.push(c.liquid);
             }
-            else if (this.etype_stats.oiltank) { //Means rotary
-                lst.push(c.rotary || c.air);
+            else if (this.IsRotary()) {
+                lst.push(c.rotary);
             }
             else { //Means air cooled
                 lst.push(c.air);
@@ -524,7 +560,6 @@ class Engine extends Part {
         else
             stats = stats.Add(this.etype_stats.stats);
 
-
         if (this.etype_stats.oiltank)
             stats.mass += 1;
 
@@ -549,6 +584,19 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
+        }
+
+        //Air Cooling Fan
+        if (this.IsAirCooled() && this.intake_fan) {
+            stats.mass += 3;
+            //Double Effect of Torque
+            stats.latstab *= 2;
+            stats.structure *= 2;
+            stats.maxstrain *= 2;
+            stats.cost += 4;
+        }
+        else {
+            this.intake_fan = false;
         }
 
         //Cowls modify engine stats directly, not mounting or upgrade.

@@ -1,7 +1,7 @@
 /// <reference path="./Display.ts" />
 /// <reference path="../impl/Weapons.ts" />
 
-type WType = { span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement, accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement, pair: HTMLInputElement, repeating: HTMLInputElement };
+type WType = { span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement, accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement, count: HTMLInputElement, repeating: HTMLInputElement };
 type WStatType = { mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement, sect: HTMLTableCellElement, hits: HTMLTableCellElement, damg: HTMLTableCellElement };
 type WSetType = { type: HTMLSelectElement, dirs: HTMLInputElement[], count: HTMLInputElement, fixed: HTMLInputElement, wcell: HTMLTableCellElement, ammo: HTMLInputElement, weaps: WType[], stats: WStatType };
 class Weapons_HTML extends Display {
@@ -50,7 +50,7 @@ class Weapons_HTML extends Display {
 
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
-        FlexInput("Number", type.count, lfs);
+        FlexInput("Number of Mounts", type.count, lfs);
         FlexInput("Ammunition", type.ammo, rfs);
         FlexCheckbox("Fixed", type.fixed, lfs);
         FlexSpace(rfs);
@@ -101,14 +101,14 @@ class Weapons_HTML extends Display {
             accessible: document.createElement("INPUT") as HTMLInputElement,
             free_access: document.createElement("INPUT") as HTMLInputElement,
             synch: document.createElement("SELECT") as HTMLSelectElement,
-            pair: document.createElement("INPUT") as HTMLInputElement,
+            count: document.createElement("INPUT") as HTMLInputElement,
             repeating: document.createElement("INPUT") as HTMLInputElement,
         };
-        CreateCheckbox("Accessible", w.accessible, w.span, false);
-        CreateCheckbox("Free Accessible", w.free_access, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, false);
-        CreateCheckbox("Paired", w.pair, w.span, true);
         CreateCheckbox("Wing Mount", w.wing, w.span, false);
+        CreateCheckbox("Accessible", w.accessible, w.span, false);
+        CreateCheckbox("Free Accessible", w.free_access, w.span, true);
+        CreateInput("Weapons at Mount", w.count, w.span, false);
+        CreateCheckbox("Covered", w.covered, w.span, false);
         CreateCheckbox("Autoloader", w.repeating, w.span, true);
         CreateSelect("Synchronization", w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
@@ -164,9 +164,8 @@ class Weapons_HTML extends Display {
             disp.weaps[i].free_access.checked = wlist[i].GetFreeAccessible();
             disp.weaps[i].free_access.onchange = () => { wlist[i].SetFreeAccessible(disp.weaps[i].free_access.checked); };
             disp.weaps[i].free_access.disabled = !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible());
-            disp.weaps[i].pair.checked = wlist[i].GetPair();
-            disp.weaps[i].pair.onchange = () => { wlist[i].SetPair(disp.weaps[i].pair.checked); };
-            disp.weaps[i].pair.disabled = !wlist[i].CanPair();
+            disp.weaps[i].count.valueAsNumber = wlist[i].GetCount();
+            disp.weaps[i].count.onchange = () => { wlist[i].SetCount(disp.weaps[i].count.valueAsNumber); };
             disp.weaps[i].repeating.checked = wlist[i].GetRepeating();
             disp.weaps[i].repeating.onchange = () => { wlist[i].SetRepeating(disp.weaps[i].repeating.checked); };
             disp.weaps[i].repeating.disabled = !wlist[i].CanRepeating();

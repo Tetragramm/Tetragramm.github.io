@@ -5,7 +5,6 @@
 
 class Engines extends Part {
     private engines: Engine[];
-    private engine_stats: EngineStats[];
     private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, pp_type: string, reqED: boolean, reqTail: boolean }[];
     private pp_list: Array<{ name: string, powerfactor: number }>;
     private radiators: Radiator[];
@@ -15,15 +14,10 @@ class Engines extends Part {
     private r_coolant_list: { name: string, stats: Stats }[];
     private cowl_list: { name: string, stats: Stats, ed: number, mpd: number, air: boolean, liquid: boolean, rotary: boolean }[]
 
-    constructor(js: JSON, engine_json: JSON) {
+    constructor(js: JSON) {
         super();
         this.engines = [];
-        this.engine_stats = [];
         this.radiators = [];
-
-        for (let elem of engine_json["engines"]) {
-            this.engine_stats.push(new EngineStats(elem));
-        }
 
         this.mount_list = [];
         for (let elem of js["mounts"]) {
@@ -96,7 +90,7 @@ class Engines extends Part {
 
         this.engines = [];
         for (let elem of js["engines"]) {
-            let eng = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             eng.fromJSON(elem);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -123,7 +117,7 @@ class Engines extends Part {
         var elen = d.GetNum();
         this.engines = [];
         for (let i = 0; i < elen; i++) {
-            let eng = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             eng.deserialize(d);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -182,7 +176,7 @@ class Engines extends Part {
             js = JSON.parse(JSON.stringify(this.engines[this.engines.length - 1].toJSON()));
         }
         while (this.engines.length < num) {
-            let en = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
                 en.fromJSON(js);

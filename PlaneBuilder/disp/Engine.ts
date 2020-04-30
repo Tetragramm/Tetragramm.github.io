@@ -22,6 +22,7 @@ class Engine_HTML extends Display {
     private cool_cell: HTMLTableDataCellElement;
     private cool_select: HTMLSelectElement;
     private cool_count: HTMLInputElement;
+    private intake_fan: HTMLInputElement;
     //Mounting Elements
     private mount_select: HTMLSelectElement;
     private pushpull_input: HTMLInputElement;
@@ -90,6 +91,8 @@ class Engine_HTML extends Display {
         this.InitCowlSelect(cowl_cell);
         this.InitElectricSelect(elec_cell);
         this.InitStatDisplay(row);
+        this.intake_fan = document.createElement("INPUT") as HTMLInputElement;
+        this.intake_fan.onchange = () => { this.engine.SetIntakeFan(this.intake_fan.checked); };
     }
 
     private InitTypeSelect(row: HTMLTableRowElement) {
@@ -307,8 +310,10 @@ class Engine_HTML extends Display {
         }
         else if (this.e_cool.valueAsNumber == 0) {
             var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
-            txtSpan.innerHTML = "Air-Cooled Engine.<br/>All is well.";
+            txtSpan.innerHTML = "Air-Cooled Engine.<br/>";
             this.cool_cell.appendChild(txtSpan);
+            var fs = CreateFlexSection(this.cool_cell);
+            FlexCheckbox("Air Cooling Fan", this.intake_fan, fs);
         }
         else {
             var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
@@ -405,6 +410,7 @@ class Engine_HTML extends Display {
         this.e_oil.checked = e_stats.oiltank;
         this.e_pulsejet.checked = e_stats.pulsejet;
         this.InitCoolingSelect();
+        this.intake_fan.checked = this.engine.GetIntakeFan();
 
         if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {
             this.mount_select.selectedIndex = this.engine.GetMountIndex();

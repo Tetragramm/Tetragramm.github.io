@@ -2,14 +2,6 @@
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 
-//TODO:Air Cooling Fan
-//TODO:Weapon description needs Fixed/Flexible/Turret
-//TODO:Crew are vital components
-//TODO:Push/pull is x2 vital components
-//TODO:Max Strain display by reinforcements
-//TODO:Put Full Mass on top, empty on bottom.
-//TODO:Quad Mounts
-
 const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
@@ -38,9 +30,14 @@ const init = () => {
 
         loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
+
+            for (let elem of engine_json["engines"]) {
+                engine_list.push(new EngineStats(elem));
+            }
+
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
-                aircraft_model = new Aircraft(parts_JSON, engine_json, weapon_json, true);
+                aircraft_model = new Aircraft(parts_JSON, weapon_json, true);
                 aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
 
                 var loaded = false;
@@ -157,3 +154,4 @@ var engine_json: JSON;
 var weapon_json: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
+var engine_list: EngineStats[] = [];

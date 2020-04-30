@@ -1,5 +1,5 @@
 {
-    "version": "10.0",
+    "version": "10.2",
     "era": {
         "options": [
             {
@@ -473,7 +473,7 @@
                 "mpd": 0,
                 "air": true,
                 "liquid": false,
-                "rotary": false
+                "rotary": true
             },
             {
                 "name": "Foil Cowl",
@@ -484,7 +484,7 @@
                 "mpd": 0,
                 "air": true,
                 "liquid": false,
-                "rotary": false
+                "rotary": true
             },
             {
                 "name": "Sealed Cowl",

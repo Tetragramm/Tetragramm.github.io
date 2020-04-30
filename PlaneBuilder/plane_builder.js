@@ -634,10 +634,16 @@ class Cockpits extends Part {
         while (this.positions.length > num) {
             this.positions.pop();
         }
+        var js = null;
+        if (this.positions.length > 0) {
+            js = JSON.parse(JSON.stringify(this.positions[this.positions.length - 1].toJSON()));
+        }
         while (this.positions.length < num) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
             if (this.positions.length == 0)
                 cp.SetPrimary();
+            if (js)
+                cp.fromJSON(js);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
@@ -932,11 +938,10 @@ class EngineStats {
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
 class Engine extends Part {
-    constructor(el, ml, ppl, cl) {
+    constructor(ml, ppl, cl) {
         super();
-        this.engine_list = el;
         this.selected_index = 0;
-        this.etype_stats = this.engine_list[0].Clone();
+        this.etype_stats = engine_list[0].Clone();
         this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
         if (this.cooling_count > 0)
@@ -944,6 +949,7 @@ class Engine extends Part {
         this.num_radiators = 0;
         this.mount_list = ml;
         this.selected_mount = 0;
+        this.intake_fan = false;
         this.pp_list = ppl;
         this.use_pp = false;
         this.torque_to_struct = false;
@@ -954,7 +960,7 @@ class Engine extends Part {
         this.total_reliability = 0;
         this.is_generator = false;
         this.has_alternator = false;
-        if (el.length <= 0)
+        if (engine_list.length <= 0)
             throw "No Engine Stats Found.  Should be at least one.";
     }
     toJSON() {
@@ -971,6 +977,7 @@ class Engine extends Part {
             cowl_sel: this.cowl_sel,
             is_generator: this.is_generator,
             has_alternator: this.has_alternator,
+            intake_fan: this.intake_fan,
         };
     }
     fromJSON(js) {
@@ -986,12 +993,17 @@ class Engine extends Part {
         this.cowl_sel = js["cowl_sel"];
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
+        this.intake_fan = js["intake_fan"];
         this.selected_index = -1;
-        for (let i = 0; i < this.engine_list.length; i++) {
-            if (this.etype_stats.Equal(this.engine_list[i])) {
+        for (let i = 0; i < engine_list.length; i++) {
+            if (this.etype_stats.Equal(engine_list[i])) {
                 this.selected_index = i;
                 break;
             }
+        }
+        if (this.selected_index == -1) {
+            this.selected_index = engine_list.length;
+            engine_list.push(this.etype_stats.Clone());
         }
     }
     serialize(s) {
@@ -1007,6 +1019,7 @@ class Engine extends Part {
         s.PushNum(this.cowl_sel);
         s.PushBool(this.is_generator);
         s.PushBool(this.has_alternator);
+        s.PushBool(this.intake_fan);
     }
     deserialize(d) {
         this.etype_stats.deserialize(d);
@@ -1021,12 +1034,17 @@ class Engine extends Part {
         this.cowl_sel = d.GetNum();
         this.is_generator = d.GetBool();
         this.has_alternator = d.GetBool();
+        this.intake_fan = d.GetBool();
         this.selected_index = -1;
-        for (let i = 0; i < this.engine_list.length; i++) {
-            if (this.etype_stats.Equal(this.engine_list[i])) {
+        for (let i = 0; i < engine_list.length; i++) {
+            if (this.etype_stats.Equal(engine_list[i])) {
                 this.selected_index = i;
                 break;
             }
+        }
+        if (this.selected_index == -1) {
+            this.selected_index = engine_list.length;
+            engine_list.push(this.etype_stats.Clone());
         }
     }
     GetMaxAltitude() {
@@ -1034,8 +1052,8 @@ class Engine extends Part {
     }
     SetSelectedIndex(num) {
         this.selected_index = num;
-        this.etype_stats = this.engine_list[this.selected_index].Clone();
-        if (num >= this.engine_list.length)
+        this.etype_stats = engine_list[this.selected_index].Clone();
+        if (num >= engine_list.length)
             throw "Index is out of range of engine_list.";
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
@@ -1099,8 +1117,15 @@ class Engine extends Part {
     GetRadiator() {
         return this.radiator_index;
     }
+    SetIntakeFan(use) {
+        this.intake_fan = use;
+        this.CalculateStats();
+    }
+    GetIntakeFan() {
+        return this.intake_fan;
+    }
     GetListOfEngines() {
-        return this.engine_list;
+        return engine_list;
     }
     RequiresExtendedDriveshafts() {
         return this.mount_list[this.selected_mount].reqED;
@@ -1181,6 +1206,9 @@ class Engine extends Part {
         if (this.NeedCooling()) {
             this.total_reliability -= (this.GetMaxCooling() - this.cooling_count);
         }
+        if (this.GetIntakeFan()) {
+            this.total_reliability += 6;
+        }
         this.total_reliability += num;
     }
     GetReliability() {
@@ -1227,6 +1255,15 @@ class Engine extends Part {
             return true;
         return false;
     }
+    IsLiquidCooled() {
+        return this.NeedCooling();
+    }
+    IsRotary() {
+        return this.etype_stats.oiltank;
+    }
+    IsAirCooled() {
+        return !this.GetIsPulsejet() && !this.IsLiquidCooled() && !this.IsRotary();
+    }
     GetCowlList() {
         return this.cowl_list;
     }
@@ -1239,11 +1276,11 @@ class Engine extends Part {
             if (this.GetIsPulsejet()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
-            else if (this.NeedCooling()) { //Means liquid
+            else if (this.IsLiquidCooled()) {
                 lst.push(c.liquid);
             }
-            else if (this.etype_stats.oiltank) { //Means rotary
-                lst.push(c.rotary || c.air);
+            else if (this.IsRotary()) {
+                lst.push(c.rotary);
             }
             else { //Means air cooled
                 lst.push(c.air);
@@ -1374,6 +1411,18 @@ class Engine extends Part {
             stats.maxstrain *= 2;
             stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
         }
+        //Air Cooling Fan
+        if (this.IsAirCooled() && this.intake_fan) {
+            stats.mass += 3;
+            //Double Effect of Torque
+            stats.latstab *= 2;
+            stats.structure *= 2;
+            stats.maxstrain *= 2;
+            stats.cost += 4;
+        }
+        else {
+            this.intake_fan = false;
+        }
         //Cowls modify engine stats directly, not mounting or upgrade.
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
         stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
@@ -1415,14 +1464,10 @@ class Engine extends Part {
 /// <reference path="./EngineStats.ts" />
 /// <reference path="./Engine.ts" />
 class Engines extends Part {
-    constructor(js, engine_json) {
+    constructor(js) {
         super();
         this.engines = [];
-        this.engine_stats = [];
         this.radiators = [];
-        for (let elem of engine_json["engines"]) {
-            this.engine_stats.push(new EngineStats(elem));
-        }
         this.mount_list = [];
         for (let elem of js["mounts"]) {
             let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], pp_type: elem["push-pull"], reqED: false, reqTail: false };
@@ -1487,7 +1532,7 @@ class Engines extends Part {
         }
         this.engines = [];
         for (let elem of js["engines"]) {
-            let eng = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             eng.fromJSON(elem);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -1510,7 +1555,7 @@ class Engines extends Part {
         var elen = d.GetNum();
         this.engines = [];
         for (let i = 0; i < elen; i++) {
-            let eng = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             eng.deserialize(d);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -1562,7 +1607,7 @@ class Engines extends Part {
             js = JSON.parse(JSON.stringify(this.engines[this.engines.length - 1].toJSON()));
         }
         while (this.engines.length < num) {
-            let en = new Engine(this.engine_stats, this.mount_list, this.pp_list, this.cowl_list);
+            let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
                 en.fromJSON(js);
@@ -2389,6 +2434,17 @@ class Frames extends Part {
         }
         return count;
     }
+    GetIsFlammable() {
+        for (let s of this.section_list) {
+            if (this.skin_list[s.skin].flammable)
+                return true;
+        }
+        for (let s of this.tail_section_list) {
+            if (this.skin_list[s.skin].flammable)
+                return true;
+        }
+        return false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -2801,6 +2857,17 @@ class Wings extends Part {
         }
         return drag;
     }
+    GetIsFlammable() {
+        for (let s of this.wing_list) {
+            if (this.skin_list[s.surface].flammable)
+                return true;
+        }
+        for (let s of this.mini_wing_list) {
+            if (this.skin_list[s.surface].flammable)
+                return true;
+        }
+        return false;
+    }
     PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -2840,6 +2907,8 @@ class Wings extends Part {
             if (deck_count[w.deck] > 1) {
                 wStats.drag = Math.floor(1.0e-6 + 0.75 * wStats.drag);
             }
+            //Deck Effects
+            stats = stats.Add(this.deck_list[w.deck].stats);
             wStats.Round();
             stats = stats.Add(wStats);
         }
@@ -2863,11 +2932,6 @@ class Wings extends Part {
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             wStats.Round();
             stats = stats.Add(wStats);
-        }
-        //Deck Stats
-        for (let i = 0; i < this.deck_list.length; i++) {
-            if (deck_count[i] > 0)
-                stats = stats.Add(this.deck_list[i].stats);
         }
         //Longest wing effects
         stats.control += 8 - longest_span;
@@ -4576,8 +4640,9 @@ class Weapon extends Part {
             this.synchronization = SynchronizationType.NONE;
         else
             this.synchronization = SynchronizationType.INTERRUPT;
-        this.pair = false;
+        this.w_count = 1;
         this.repeating = false;
+        this.wing_reinforcement = false;
     }
     toJSON() {
         return {
@@ -4587,7 +4652,7 @@ class Weapon extends Part {
             accessible: this.accessible,
             free_accessible: this.free_accessible,
             synchronization: this.synchronization,
-            pair: this.pair,
+            w_count: this.w_count,
             repeating: this.repeating,
         };
     }
@@ -4598,7 +4663,7 @@ class Weapon extends Part {
         this.accessible = js["accessible"];
         this.free_accessible = js["free_accessible"];
         this.synchronization = js["synchronization"];
-        this.pair = js["pair"];
+        this.w_count = js["w_count"];
         this.repeating = js["repeating"];
     }
     serialize(s) {
@@ -4608,7 +4673,7 @@ class Weapon extends Part {
         s.PushBool(this.accessible);
         s.PushBool(this.free_accessible);
         s.PushNum(this.synchronization);
-        s.PushBool(this.pair);
+        s.PushNum(this.w_count);
         s.PushBool(this.repeating);
     }
     deserialize(d) {
@@ -4618,15 +4683,15 @@ class Weapon extends Part {
         this.accessible = d.GetBool();
         this.free_accessible = d.GetBool();
         this.synchronization = d.GetNum();
-        this.pair = d.GetBool();
+        this.w_count = d.GetNum();
         this.repeating = d.GetBool();
     }
     SetWeaponType(weapon_type) {
         this.weapon_type = weapon_type;
         if (this.weapon_type.size == 16) {
-            this.pair = false;
+            this.w_count = 1;
         }
-        this.SetPair(this.pair); //Triggers Calculate Stats
+        this.SetCount(this.w_count); //Triggers Calculate Stats
     }
     GetFixed() {
         return this.fixed;
@@ -4732,19 +4797,19 @@ class Weapon extends Part {
             this.synchronization = use;
         }
         if (this.synchronization == SynchronizationType.SPINNER)
-            this.pair = false;
+            this.w_count = 1;
         this.CalculateStats();
     }
-    CanPair() {
-        return this.weapon_type.size <= 8 && this.synchronization != SynchronizationType.SPINNER;
+    GetCount() {
+        return this.w_count;
     }
-    GetPair() {
-        return this.pair;
-    }
-    SetPair(use) {
-        if (this.wing && !this.fixed && this.weapon_type.size == 8)
-            use = false;
-        this.pair = use;
+    SetCount(use) {
+        if (this.synchronization == SynchronizationType.SPINNER)
+            use = 1;
+        while (use * this.weapon_type.size > 16) {
+            use -= 1;
+        }
+        this.w_count = use;
         this.CalculateStats();
     }
     CanRepeating() {
@@ -4779,7 +4844,7 @@ class Weapon extends Part {
             this.synchronization = use;
         }
         if (this.synchronization == SynchronizationType.SPINNER)
-            this.pair = false;
+            this.w_count = 1;
     }
     GetArty() {
         return this.weapon_type.size == 16;
@@ -4817,28 +4882,27 @@ class Weapon extends Part {
             this.covered = false;
         if (this.weapon_type.size == 16 && this.fixed)
             this.covered = true;
-        stats = stats.Add(this.weapon_type.stats);
-        if (this.pair)
+        var size = 0;
+        for (let i = 0; i < this.w_count; i++) {
             stats = stats.Add(this.weapon_type.stats);
-        var size = this.weapon_type.size;
-        if (this.pair)
-            size *= 2;
+            size += this.weapon_type.size;
+        }
         //Covered Cost
         if (this.covered) {
             var cost = 0;
-            if (size == 1) {
+            if (size <= 1) {
                 cost = 0;
             }
-            else if (size == 2) {
+            else if (size <= 2) {
                 cost = 1;
             }
-            else if (size == 4) {
+            else if (size <= 4) {
                 cost = 2;
             }
-            else if (size == 8) {
+            else if (size <= 8) {
                 cost == 5;
             }
-            else if (size == 16) {
+            else if (size <= 16) {
                 cost = 0;
             }
             if (!this.fixed)
@@ -4850,7 +4914,7 @@ class Weapon extends Part {
         if (this.wing && !this.covered)
             stats.drag += 1;
         //Arty size weapon mounts need a section
-        if (this.pair && this.weapon_type.size == 8 || this.weapon_type.size == 16)
+        if (this.w_count && this.weapon_type.size == 8 || this.weapon_type.size == 16)
             stats.reqsections += 1;
         //Accessible Cost
         if (this.accessible) {
@@ -4861,14 +4925,14 @@ class Weapon extends Part {
             if (size <= 2) {
                 //Nothing
             }
-            else if (size == 4) {
+            else if (size <= 4) {
                 stats.cost += 1;
             }
-            else if (size == 8) {
+            else if (size <= 8) {
                 stats.mass += 1;
                 stats.cost += 3;
             }
-            else if (size == 16) {
+            else if (size <= 16) {
                 stats.mass += 2;
                 stats.cost += 5;
             }
@@ -4878,14 +4942,10 @@ class Weapon extends Part {
         }
         //Synchronization == -1 is no synch.
         if (this.synchronization == SynchronizationType.INTERRUPT) {
-            stats.cost += 2;
-            if (this.pair)
-                stats.cost += 2;
+            stats.cost += this.w_count * 2;
         }
         else if (this.synchronization == SynchronizationType.SYNCH) {
-            stats.cost += 3;
-            if (this.pair)
-                stats.cost += 3;
+            stats.cost += this.w_count * 3;
             //synchronization == 2 is spinner and costs nothing.
         }
         else if (this.synchronization == SynchronizationType.DEFLECT) {
@@ -4897,7 +4957,7 @@ class Weapon extends Part {
         }
         //If it's repeating
         if (this.repeating)
-            stats.cost += 2;
+            stats.cost += this.w_count * 2;
         if (this.wing_reinforcement)
             stats.mass += 2;
         stats.Round();
@@ -4939,23 +4999,17 @@ class Weapons extends Part {
             lst.push(ws.toJSON());
         }
         return {
-            state: "BETA3",
             weapon_systems: lst,
         };
     }
     fromJSON(js) {
-        if (js && js["state"] == "BETA3") {
-            this.weapon_sets = [];
-            var lst = js["weapon_systems"];
-            for (let wsj of lst) {
-                var ws = new WeaponSystem(this.weapon_list);
-                ws.SetCalculateStats(this.CalculateStats);
-                ws.fromJSON(wsj);
-                this.weapon_sets.push(ws);
-            }
-        }
-        else {
-            this.SetWeaponSetCount(0);
+        this.weapon_sets = [];
+        var lst = js["weapon_systems"];
+        for (let wsj of lst) {
+            var ws = new WeaponSystem(this.weapon_list);
+            ws.SetCalculateStats(this.CalculateStats);
+            ws.fromJSON(wsj);
+            this.weapon_sets.push(ws);
         }
     }
     serialize(s) {
@@ -5183,12 +5237,10 @@ class Weapons extends Part {
         var slist = [];
         for (let ws of this.weapon_sets) {
             for (let w of ws.GetWeapons()) {
+                w.wing_reinforcement = false;
                 var s = { s: 0, w: w };
                 if (w.GetWing()) {
-                    if (w.GetPair())
-                        s.s = (2 * this.weapon_list[ws.GetWeaponSelected()].size);
-                    else
-                        s.s = (this.weapon_list[ws.GetWeaponSelected()].size);
+                    s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
                     slist.push(s);
                 }
             }
@@ -5229,9 +5281,9 @@ class Weapons extends Part {
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 class Aircraft {
-    constructor(js, engine_json, weapon_json, storage) {
+    constructor(js, weapon_json, storage) {
         this.use_storage = false;
-        this.reset_json = String.raw `{"version":"10.0","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false]}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R - 3 Boxer 6 - Cylinder","overspeed":26,"altitude":3,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":1,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false},"wings":{"wing_list":[{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[3,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":0},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"state":"BETA3","weapon_systems":[]}}`;
+        this.reset_json = String.raw `{"version":"10.2","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false]}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R-3 Boxer 6-Cylinder","overspeed":26,"altitude":3,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false},"wings":{"wing_list":[{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":1},{"surface":0,"area":5,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":3,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1},"fuel":{"tank_count":[2,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[]}}`;
         this.use_large_airplane_rules = false;
         this.stats = new Stats();
         this.name = "Prototype Aircraft";
@@ -5239,7 +5291,7 @@ class Aircraft {
         this.era = new Era(js["era"]);
         this.cockpits = new Cockpits(js["cockpit"]);
         this.passengers = new Passengers(js["passengers"]);
-        this.engines = new Engines(js["engines"], engine_json);
+        this.engines = new Engines(js["engines"]);
         this.propeller = new Propeller(js["propellers"]);
         this.frames = new Frames(js["frames"]);
         this.wings = new Wings(js["wings"]);
@@ -5615,6 +5667,9 @@ class Aircraft {
     }
     GetGearName() {
         return this.gear.GetGearName();
+    }
+    GetIsFlammable() {
+        return this.frames.GetIsFlammable() || this.wings.GetIsFlammable();
     }
     GetEra() {
         return this.era;
@@ -6131,6 +6186,8 @@ class Engine_HTML extends Display {
         this.InitCowlSelect(cowl_cell);
         this.InitElectricSelect(elec_cell);
         this.InitStatDisplay(row);
+        this.intake_fan = document.createElement("INPUT");
+        this.intake_fan.onchange = () => { this.engine.SetIntakeFan(this.intake_fan.checked); };
     }
     InitTypeSelect(row) {
         this.e_pwr = document.createElement("INPUT");
@@ -6335,8 +6392,10 @@ class Engine_HTML extends Display {
         }
         else if (this.e_cool.valueAsNumber == 0) {
             var txtSpan = document.createElement("SPAN");
-            txtSpan.innerHTML = "Air-Cooled Engine.<br/>All is well.";
+            txtSpan.innerHTML = "Air-Cooled Engine.<br/>";
             this.cool_cell.appendChild(txtSpan);
+            var fs = CreateFlexSection(this.cool_cell);
+            FlexCheckbox("Air Cooling Fan", this.intake_fan, fs);
         }
         else {
             var txtSpan = document.createElement("SPAN");
@@ -6429,6 +6488,7 @@ class Engine_HTML extends Display {
         this.e_oil.checked = e_stats.oiltank;
         this.e_pulsejet.checked = e_stats.pulsejet;
         this.InitCoolingSelect();
+        this.intake_fan.checked = this.engine.GetIntakeFan();
         if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {
             this.mount_select.selectedIndex = this.engine.GetMountIndex();
         }
@@ -7687,11 +7747,11 @@ class Reinforcement_HTML extends Display {
         var h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, "Structure");
         CreateTH(h2_row, "Max Strain");
-        CreateTH(h2_row, "");
+        CreateTH(h2_row, "Aircraft Max Strain");
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
-        this.d_none = c2_row.insertCell();
+        this.d_amax = c2_row.insertCell();
     }
     UpdateDisplay() {
         this.cabane.selectedIndex = this.rf.GetCabane();
@@ -7714,6 +7774,8 @@ class Reinforcement_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString());
         BlinkIfChanged(this.d_strc, stats.structure.toString());
         BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
+        var derivedMS = aircraft_model.GetDerivedStats().MaxStrain;
+        BlinkIfChanged(this.d_amax, derivedMS.toString());
     }
 }
 /// <reference path="./Display.ts" />
@@ -8272,7 +8334,7 @@ class Weapons_HTML extends Display {
         FlexSelect("Type", type.type, fs);
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
-        FlexInput("Number", type.count, lfs);
+        FlexInput("Number of Mounts", type.count, lfs);
         FlexInput("Ammunition", type.ammo, rfs);
         FlexCheckbox("Fixed", type.fixed, lfs);
         FlexSpace(rfs);
@@ -8319,14 +8381,14 @@ class Weapons_HTML extends Display {
             accessible: document.createElement("INPUT"),
             free_access: document.createElement("INPUT"),
             synch: document.createElement("SELECT"),
-            pair: document.createElement("INPUT"),
+            count: document.createElement("INPUT"),
             repeating: document.createElement("INPUT"),
         };
-        CreateCheckbox("Accessible", w.accessible, w.span, false);
-        CreateCheckbox("Free Accessible", w.free_access, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, false);
-        CreateCheckbox("Paired", w.pair, w.span, true);
         CreateCheckbox("Wing Mount", w.wing, w.span, false);
+        CreateCheckbox("Accessible", w.accessible, w.span, false);
+        CreateCheckbox("Free Accessible", w.free_access, w.span, true);
+        CreateInput("Weapons at Mount", w.count, w.span, false);
+        CreateCheckbox("Covered", w.covered, w.span, false);
         CreateCheckbox("Autoloader", w.repeating, w.span, true);
         CreateSelect("Synchronization", w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
@@ -8375,9 +8437,8 @@ class Weapons_HTML extends Display {
             disp.weaps[i].free_access.checked = wlist[i].GetFreeAccessible();
             disp.weaps[i].free_access.onchange = () => { wlist[i].SetFreeAccessible(disp.weaps[i].free_access.checked); };
             disp.weaps[i].free_access.disabled = !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible());
-            disp.weaps[i].pair.checked = wlist[i].GetPair();
-            disp.weaps[i].pair.onchange = () => { wlist[i].SetPair(disp.weaps[i].pair.checked); };
-            disp.weaps[i].pair.disabled = !wlist[i].CanPair();
+            disp.weaps[i].count.valueAsNumber = wlist[i].GetCount();
+            disp.weaps[i].count.onchange = () => { wlist[i].SetCount(disp.weaps[i].count.valueAsNumber); };
             disp.weaps[i].repeating.checked = wlist[i].GetRepeating();
             disp.weaps[i].repeating.onchange = () => { wlist[i].SetRepeating(disp.weaps[i].repeating.checked); };
             disp.weaps[i].repeating.disabled = !wlist[i].CanRepeating();
@@ -8950,7 +9011,7 @@ class Aircraft_HTML extends Display {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result);
-                    var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
+                    var acft = new Aircraft(parts_JSON, weapon_json, false);
                     if (acft.fromJSON(str)) {
                         this.acft.fromJSON(str);
                         this.acft.CalculateStats();
@@ -8969,7 +9030,7 @@ class Aircraft_HTML extends Display {
         load_text_area.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area.value);
-                var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_json, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
@@ -8986,7 +9047,7 @@ class Aircraft_HTML extends Display {
         load_text_area2.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area2.value);
-                var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_json, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
@@ -9223,13 +9284,13 @@ class Aircraft_HTML extends Display {
         CreateTH(row1, "Handling");
         CreateTH(row1, "Boost");
         CreateTH(row1, "Vital Components").colSpan = 3;
-        var half = tbl.insertRow();
-        CreateTH(half, "Empty Mass");
-        this.ts_empty = half.insertCell();
-        this.ss_empty = half.insertCell();
-        this.hand_empty = half.insertCell();
-        this.boost_empty = half.insertCell();
-        this.vital_components = half.insertCell();
+        var full = tbl.insertRow();
+        CreateTH(full, "Full Mass");
+        this.ts_full = full.insertCell();
+        this.ss_full = full.insertCell();
+        this.hand_full = full.insertCell();
+        this.boost_full = full.insertCell();
+        this.vital_components = full.insertCell();
         this.vital_components.rowSpan = 3;
         this.vital_components.colSpan = 3;
         var half = tbl.insertRow();
@@ -9238,24 +9299,24 @@ class Aircraft_HTML extends Display {
         this.ss_half = half.insertCell();
         this.hand_half = half.insertCell();
         this.boost_half = half.insertCell();
-        var full = tbl.insertRow();
-        CreateTH(full, "Full Mass");
-        this.ts_full = full.insertCell();
-        this.ss_full = full.insertCell();
-        this.hand_full = full.insertCell();
-        this.boost_full = full.insertCell();
-        this.bomb_row1 = tbl.insertRow();
-        CreateTH(this.bomb_row1, "Half Mass with Bombs");
-        this.ts_halfwB = this.bomb_row1.insertCell();
-        this.ss_halfwB = this.bomb_row1.insertCell();
-        this.hand_halfwB = this.bomb_row1.insertCell();
-        this.boost_halfwB = this.bomb_row1.insertCell();
+        var empty = tbl.insertRow();
+        CreateTH(empty, "Empty Mass");
+        this.ts_empty = empty.insertCell();
+        this.ss_empty = empty.insertCell();
+        this.hand_empty = empty.insertCell();
+        this.boost_empty = empty.insertCell();
         this.bomb_row2 = tbl.insertRow();
         CreateTH(this.bomb_row2, "Full Mass with Bombs");
         this.ts_fullwB = this.bomb_row2.insertCell();
         this.ss_fullwB = this.bomb_row2.insertCell();
         this.hand_fullwB = this.bomb_row2.insertCell();
         this.boost_fullwB = this.bomb_row2.insertCell();
+        this.bomb_row1 = tbl.insertRow();
+        CreateTH(this.bomb_row1, "Half Mass with Bombs");
+        this.ts_halfwB = this.bomb_row1.insertCell();
+        this.ss_halfwB = this.bomb_row1.insertCell();
+        this.hand_halfwB = this.bomb_row1.insertCell();
+        this.boost_halfwB = this.bomb_row1.insertCell();
         var row7 = tbl.insertRow();
         CreateTH(row7, "Propulsion").colSpan = 2;
         CreateTH(row7, "Aerodynamics").colSpan = 2;
@@ -9300,8 +9361,8 @@ class Aircraft_HTML extends Display {
         var row12 = tbl.insertRow();
         CreateTH(row12, "Flight Ceiling");
         this.maxalt_cell = row12.insertCell();
-        CreateTH(row12, "---");
-        this.unused_cell = row12.insertCell();
+        CreateTH(row12, "Flammable?");
+        this.flammable_cell = row12.insertCell();
         CreateTH(row12, "Electrics");
         this.electric_cell = row12.insertCell();
         CreateTH(row12, "Flight Stress");
@@ -9417,7 +9478,10 @@ class Aircraft_HTML extends Display {
         this.dropoff_cell.innerText = derived.Dropoff.toString();
         this.overspeed_cell.innerText = derived.Overspeed.toString();
         this.maxfuel_cell.innerText = (Math.round(derived.FuelUses * 10) / 10).toString();
-        this.unused_cell.innerText = "---";
+        if (this.acft.GetIsFlammable())
+            this.flammable_cell.innerText = "Yes";
+        else
+            this.flammable_cell.innerText = "No";
         this.copy_text += "Propulsion\n\t"
             + "Dropoff\t" + this.dropoff_cell.innerText + "\n\t"
             + "Overspeed\t" + this.overspeed_cell.innerText + "\n\t"
@@ -9462,27 +9526,53 @@ class Aircraft_HTML extends Display {
         this.copy_text += "\n";
         var vital = "Controls";
         this.copy_text += "Vital Components\n\tControls\n\t";
+        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
+            vital += "<br/>Aircrew #" + (i + 1).toString();
+            this.copy_text += "Aircrew #" + (i + 1).toString() + "\n\t";
+        }
         if (derived.FuelUses > 0) {
             vital += "<br/>Fuel Tanks";
             this.copy_text += "Fuel Tanks\n\t";
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            vital += "<br/>Engine #" + (i + 1).toString();
-            this.copy_text += "Engine #" + (i + 1).toString() + "\n\t";
+            if (this.acft.GetEngines().GetEngine(i).GetUsePushPull()) {
+                vital += "<br/>Engine #" + (i + 1).toString() + " Pusher";
+                this.copy_text += "Engine #" + (i + 1).toString() + " Pusher\n\t";
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Pusher";
+                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Pusher\n\t";
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Pusher";
+                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Pusher\n\t";
+                }
+                vital += "<br/>Engine #" + (i + 1).toString() + " Puller";
+                this.copy_text += "Engine #" + (i + 1).toString() + " Puller\n\t";
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Puller";
+                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Puller\n\t";
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Puller";
+                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Puller\n\t";
+                }
+            }
+            else {
+                vital += "<br/>Engine #" + (i + 1).toString();
+                this.copy_text += "Engine #" + (i + 1).toString() + "\n\t";
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital += "<br/>Oil Tank #" + (i + 1).toString();
+                    this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital += "<br/>Oil Cooler #" + (i + 1).toString();
+                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
+                }
+            }
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
             vital += "<br/>Radiator #" + (i + 1).toString();
             this.copy_text += "Radiator #" + (i + 1).toString() + "\n\t";
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                vital += "<br/>Oil Tank #" + (i + 1).toString();
-                this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
-            }
-            if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                vital += "<br/>Oil Cooler #" + (i + 1).toString();
-                this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
-            }
         }
         if (this.acft.IsElectrics()) {
             vital += "<br/>Electrics";
@@ -9505,7 +9595,19 @@ class Aircraft_HTML extends Display {
             this.copy_text += weaphtml + "\n\t";
         }
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
+            var ds = w.GetDirection();
+            var dircount = 0;
+            for (let d of ds) {
+                if (d)
+                    dircount++;
+            }
             var weaphtml = "";
+            if (dircount == 1 && w.GetFixed())
+                weaphtml += "Fixed ";
+            else if (dircount <= 2)
+                weaphtml += "Flexible ";
+            else
+                weaphtml += "Turreted ";
             weaphtml += wlist[w.GetWeaponSelected()].name;
             if (w.IsPlural()) {
                 weaphtml += "s";
@@ -9514,7 +9616,6 @@ class Aircraft_HTML extends Display {
             else {
                 weaphtml += " fires ";
             }
-            var ds = w.GetDirection();
             weaphtml += "[";
             for (let i = 0; i < dlist.length; i++) {
                 if (ds[i])
@@ -9583,13 +9684,6 @@ class Aircraft_HTML extends Display {
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
-//TODO:Air Cooling Fan
-//TODO:Weapon description needs Fixed/Flexible/Turret
-//TODO:Crew are vital components
-//TODO:Push/pull is x2 vital components
-//TODO:Max Strain display by reinforcements
-//TODO:Put Full Mass on top, empty on bottom.
-//TODO:Quad Mounts
 const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
@@ -9615,9 +9709,12 @@ const init = () => {
         parts_JSON = JSON.parse(part_resp);
         loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
+            for (let elem of engine_json["engines"]) {
+                engine_list.push(new EngineStats(elem));
+            }
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
-                aircraft_model = new Aircraft(parts_JSON, engine_json, weapon_json, true);
+                aircraft_model = new Aircraft(parts_JSON, weapon_json, true);
                 aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
                 var loaded = false;
                 if (qp && !loaded) {
@@ -9735,6 +9832,7 @@ var engine_json;
 var weapon_json;
 var aircraft_model;
 var aircraft_display;
+var engine_list = [];
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class AlterStats extends Part {
@@ -9791,6 +9889,43 @@ class AlterStats extends Part {
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
+    }
+}
+/// <reference path="./Stats.ts" />
+/// <reference path="./EngineStats.ts" />
+class EngineList {
+    constructor(js) {
+        for (let elem of js["engines"]) {
+            this.push(new EngineStats(elem));
+        }
+    }
+    toJSON() {
+        var ret = [];
+        for (let li of this.list) {
+            ret.push(li.toJSON());
+        }
+        return { elist: ret };
+    }
+    serialize(s) {
+        s.PushNum(this.list.length);
+        for (let li of this.list) {
+            li.serialize(s);
+        }
+    }
+    deserialize(d) {
+        var len = d.GetNum();
+        for (let i = 0; i < len; i++) {
+            let stats = new EngineStats();
+            stats.deserialize(d);
+            this.push(stats);
+        }
+    }
+    push(es) {
+        for (let li of this.list) {
+            if (li.Equal(es))
+                return;
+        }
+        this.list.push(es);
     }
 }
 /// <reference path="./Part.ts" />
@@ -10005,14 +10140,10 @@ class WeaponSystem extends Part {
         var wings = 0;
         for (let w of this.weapons) {
             if (w.GetWing() && w.GetFixed()) {
-                wings += hits;
-                if (w.GetPair())
-                    wings += hits;
+                wings += w.GetCount() * hits;
             }
             else {
-                centerline += hits;
-                if (w.GetPair())
-                    centerline += hits;
+                centerline += w.GetCount() * hits;
             }
         }
         return [
@@ -10047,7 +10178,7 @@ class WeaponSystem extends Part {
         }
     }
     IsPlural() {
-        return this.weapons.length > 1 || this.weapons[0].GetPair();
+        return this.weapons.length > 1 || this.weapons[0].GetCount() > 1;
     }
     SetAmmo(num) {
         if (num != num || num < 1)

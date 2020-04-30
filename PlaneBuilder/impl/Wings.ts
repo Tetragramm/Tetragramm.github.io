@@ -453,6 +453,18 @@ class Wings extends Part {
         return drag;
     }
 
+    public GetIsFlammable() {
+        for (let s of this.wing_list) {
+            if (this.skin_list[s.surface].flammable)
+                return true;
+        }
+        for (let s of this.mini_wing_list) {
+            if (this.skin_list[s.surface].flammable)
+                return true;
+        }
+        return false;
+    }
+
     public PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -500,6 +512,9 @@ class Wings extends Part {
                 wStats.drag = Math.floor(1.0e-6 + 0.75 * wStats.drag);
             }
 
+            //Deck Effects
+            stats = stats.Add(this.deck_list[w.deck].stats);
+
             wStats.Round();
             stats = stats.Add(wStats);
         }
@@ -526,12 +541,6 @@ class Wings extends Part {
 
             wStats.Round();
             stats = stats.Add(wStats);
-        }
-
-        //Deck Stats
-        for (let i = 0; i < this.deck_list.length; i++) {
-            if (deck_count[i] > 0)
-                stats = stats.Add(this.deck_list[i].stats);
         }
 
         //Longest wing effects

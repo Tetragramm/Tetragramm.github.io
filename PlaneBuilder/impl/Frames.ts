@@ -624,6 +624,18 @@ class Frames extends Part {
         return count;
     }
 
+    public GetIsFlammable() {
+        for (let s of this.section_list) {
+            if (this.skin_list[s.skin].flammable)
+                return true;
+        }
+        for (let s of this.tail_section_list) {
+            if (this.skin_list[s.skin].flammable)
+                return true;
+        }
+        return false;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

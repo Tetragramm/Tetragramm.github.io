@@ -252,13 +252,9 @@ class WeaponSystem extends Part {
         var wings = 0;
         for (let w of this.weapons) {
             if (w.GetWing() && w.GetFixed()) {
-                wings += hits;
-                if (w.GetPair())
-                    wings += hits;
+                wings += w.GetCount() * hits;
             } else {
-                centerline += hits;
-                if (w.GetPair())
-                    centerline += hits;
+                centerline += w.GetCount() * hits;
             }
         }
         return [
@@ -297,7 +293,7 @@ class WeaponSystem extends Part {
     }
 
     public IsPlural() {
-        return this.weapons.length > 1 || this.weapons[0].GetPair();
+        return this.weapons.length > 1 || this.weapons[0].GetCount() > 1;
     }
 
     public SetAmmo(num: number) {

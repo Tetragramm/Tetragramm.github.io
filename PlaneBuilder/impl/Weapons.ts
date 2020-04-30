@@ -54,23 +54,18 @@ class Weapons extends Part {
             lst.push(ws.toJSON());
         }
         return {
-            state: "BETA3",
             weapon_systems: lst,
         }
     }
 
     public fromJSON(js: JSON) {
-        if (js && js["state"] == "BETA3") {
-            this.weapon_sets = [];
-            var lst = js["weapon_systems"];
-            for (let wsj of lst) {
-                var ws = new WeaponSystem(this.weapon_list);
-                ws.SetCalculateStats(this.CalculateStats);
-                ws.fromJSON(wsj);
-                this.weapon_sets.push(ws);
-            }
-        } else {
-            this.SetWeaponSetCount(0);
+        this.weapon_sets = [];
+        var lst = js["weapon_systems"];
+        for (let wsj of lst) {
+            var ws = new WeaponSystem(this.weapon_list);
+            ws.SetCalculateStats(this.CalculateStats);
+            ws.fromJSON(wsj);
+            this.weapon_sets.push(ws);
         }
     }
 
@@ -326,17 +321,15 @@ class Weapons extends Part {
         var slist = [];
         for (let ws of this.weapon_sets) {
             for (let w of ws.GetWeapons()) {
+                w.wing_reinforcement = false;
                 var s = { s: 0, w: w };
                 if (w.GetWing()) {
-                    if (w.GetPair())
-                        s.s = (2 * this.weapon_list[ws.GetWeaponSelected()].size);
-                    else
-                        s.s = (this.weapon_list[ws.GetWeaponSelected()].size);
-
+                    s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
                     slist.push(s);
                 }
             }
         }
+
         //Sort by size to we reinforce as few weapons as possible
         slist.sort(function (a, b) { return a.s - b.s; });
         for (let s of slist) {

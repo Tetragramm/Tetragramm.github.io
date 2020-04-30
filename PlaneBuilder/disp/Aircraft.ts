@@ -128,7 +128,7 @@ class Aircraft_HTML extends Display {
     private crew_cell: HTMLTableCellElement;
     private maxalt_cell: HTMLTableCellElement;
     private crashsafety_cell: HTMLTableCellElement;
-    private unused_cell: HTMLTableCellElement;
+    private flammable_cell: HTMLTableCellElement;
     private weapon_head: HTMLTableHeaderCellElement;
     private weapon_cell: HTMLTableCellElement;
     private warning_head: HTMLTableHeaderCellElement;
@@ -184,7 +184,7 @@ class Aircraft_HTML extends Display {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result as string);
-                    var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
+                    var acft = new Aircraft(parts_JSON, weapon_json, false);
                     if (acft.fromJSON(str)) {
                         this.acft.fromJSON(str);
                         this.acft.CalculateStats();
@@ -206,7 +206,7 @@ class Aircraft_HTML extends Display {
         load_text_area.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area.value);
-                var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_json, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
@@ -221,7 +221,7 @@ class Aircraft_HTML extends Display {
         load_text_area2.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area2.value);
-                var acft = new Aircraft(parts_JSON, engine_json, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_json, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
@@ -464,13 +464,13 @@ class Aircraft_HTML extends Display {
         CreateTH(row1, "Boost");
         CreateTH(row1, "Vital Components").colSpan = 3;
 
-        var half = tbl.insertRow();
-        CreateTH(half, "Empty Mass");
-        this.ts_empty = half.insertCell();
-        this.ss_empty = half.insertCell();
-        this.hand_empty = half.insertCell();
-        this.boost_empty = half.insertCell();
-        this.vital_components = half.insertCell();
+        var full = tbl.insertRow();
+        CreateTH(full, "Full Mass");
+        this.ts_full = full.insertCell();
+        this.ss_full = full.insertCell();
+        this.hand_full = full.insertCell();
+        this.boost_full = full.insertCell();
+        this.vital_components = full.insertCell();
         this.vital_components.rowSpan = 3;
         this.vital_components.colSpan = 3;
 
@@ -481,19 +481,12 @@ class Aircraft_HTML extends Display {
         this.hand_half = half.insertCell();
         this.boost_half = half.insertCell();
 
-        var full = tbl.insertRow();
-        CreateTH(full, "Full Mass");
-        this.ts_full = full.insertCell();
-        this.ss_full = full.insertCell();
-        this.hand_full = full.insertCell();
-        this.boost_full = full.insertCell();
-
-        this.bomb_row1 = tbl.insertRow();
-        CreateTH(this.bomb_row1, "Half Mass with Bombs");
-        this.ts_halfwB = this.bomb_row1.insertCell();
-        this.ss_halfwB = this.bomb_row1.insertCell();
-        this.hand_halfwB = this.bomb_row1.insertCell();
-        this.boost_halfwB = this.bomb_row1.insertCell();
+        var empty = tbl.insertRow();
+        CreateTH(empty, "Empty Mass");
+        this.ts_empty = empty.insertCell();
+        this.ss_empty = empty.insertCell();
+        this.hand_empty = empty.insertCell();
+        this.boost_empty = empty.insertCell();
 
         this.bomb_row2 = tbl.insertRow();
         CreateTH(this.bomb_row2, "Full Mass with Bombs");
@@ -501,6 +494,13 @@ class Aircraft_HTML extends Display {
         this.ss_fullwB = this.bomb_row2.insertCell();
         this.hand_fullwB = this.bomb_row2.insertCell();
         this.boost_fullwB = this.bomb_row2.insertCell();
+
+        this.bomb_row1 = tbl.insertRow();
+        CreateTH(this.bomb_row1, "Half Mass with Bombs");
+        this.ts_halfwB = this.bomb_row1.insertCell();
+        this.ss_halfwB = this.bomb_row1.insertCell();
+        this.hand_halfwB = this.bomb_row1.insertCell();
+        this.boost_halfwB = this.bomb_row1.insertCell();
 
         var row7 = tbl.insertRow();
         CreateTH(row7, "Propulsion").colSpan = 2;
@@ -551,8 +551,8 @@ class Aircraft_HTML extends Display {
         var row12 = tbl.insertRow();
         CreateTH(row12, "Flight Ceiling");
         this.maxalt_cell = row12.insertCell();
-        CreateTH(row12, "---");
-        this.unused_cell = row12.insertCell();
+        CreateTH(row12, "Flammable?");
+        this.flammable_cell = row12.insertCell();
         CreateTH(row12, "Electrics");
         this.electric_cell = row12.insertCell();
         CreateTH(row12, "Flight Stress");
@@ -674,7 +674,10 @@ class Aircraft_HTML extends Display {
         this.dropoff_cell.innerText = derived.Dropoff.toString();
         this.overspeed_cell.innerText = derived.Overspeed.toString();
         this.maxfuel_cell.innerText = (Math.round(derived.FuelUses * 10) / 10).toString();
-        this.unused_cell.innerText = "---";
+        if (this.acft.GetIsFlammable())
+            this.flammable_cell.innerText = "Yes";
+        else
+            this.flammable_cell.innerText = "No";
         this.copy_text += "Propulsion\n\t"
             + "Dropoff\t" + this.dropoff_cell.innerText + "\n\t"
             + "Overspeed\t" + this.overspeed_cell.innerText + "\n\t"
@@ -724,27 +727,53 @@ class Aircraft_HTML extends Display {
 
         var vital = "Controls";
         this.copy_text += "Vital Components\n\tControls\n\t";
+        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
+            vital += "<br/>Aircrew #" + (i + 1).toString();
+            this.copy_text += "Aircrew #" + (i + 1).toString() + "\n\t";
+        }
         if (derived.FuelUses > 0) {
             vital += "<br/>Fuel Tanks";
             this.copy_text += "Fuel Tanks\n\t";
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            vital += "<br/>Engine #" + (i + 1).toString();
-            this.copy_text += "Engine #" + (i + 1).toString() + "\n\t";
+            if (this.acft.GetEngines().GetEngine(i).GetUsePushPull()) {
+                vital += "<br/>Engine #" + (i + 1).toString() + " Pusher";
+                this.copy_text += "Engine #" + (i + 1).toString() + " Pusher\n\t";
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Pusher";
+                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Pusher\n\t";
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Pusher";
+                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Pusher\n\t";
+                }
+                vital += "<br/>Engine #" + (i + 1).toString() + " Puller";
+                this.copy_text += "Engine #" + (i + 1).toString() + " Puller\n\t";
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Puller";
+                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Puller\n\t";
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Puller";
+                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Puller\n\t";
+                }
+            }
+            else {
+                vital += "<br/>Engine #" + (i + 1).toString();
+                this.copy_text += "Engine #" + (i + 1).toString() + "\n\t";
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital += "<br/>Oil Tank #" + (i + 1).toString();
+                    this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital += "<br/>Oil Cooler #" + (i + 1).toString();
+                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
+                }
+            }
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
             vital += "<br/>Radiator #" + (i + 1).toString();
             this.copy_text += "Radiator #" + (i + 1).toString() + "\n\t";
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                vital += "<br/>Oil Tank #" + (i + 1).toString();
-                this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
-            }
-            if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                vital += "<br/>Oil Cooler #" + (i + 1).toString();
-                this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
-            }
         }
         if (this.acft.IsElectrics()) {
             vital += "<br/>Electrics";
@@ -770,7 +799,20 @@ class Aircraft_HTML extends Display {
         }
 
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
+            var ds = w.GetDirection();
+            var dircount = 0;
+            for (let d of ds) {
+                if (d)
+                    dircount++;
+            }
             var weaphtml = "";
+            if (dircount == 1 && w.GetFixed())
+                weaphtml += "Fixed ";
+            else if (dircount <= 2)
+                weaphtml += "Flexible ";
+            else
+                weaphtml += "Turreted ";
+
             weaphtml += wlist[w.GetWeaponSelected()].name;
             if (w.IsPlural()) {
                 weaphtml += "s";
@@ -779,7 +821,6 @@ class Aircraft_HTML extends Display {
             else {
                 weaphtml += " fires ";
             }
-            var ds = w.GetDirection();
             weaphtml += "[";
             for (let i = 0; i < dlist.length; i++) {
                 if (ds[i])

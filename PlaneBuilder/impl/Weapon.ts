@@ -22,7 +22,7 @@ class Weapon extends Part {
     private accessible: boolean;
     private free_accessible: boolean;
     private synchronization: number;
-    private pair: boolean;
+    private w_count: number;
     private repeating: boolean;
 
     public can_free_accessible: boolean;
@@ -49,8 +49,9 @@ class Weapon extends Part {
             this.synchronization = SynchronizationType.NONE;
         else
             this.synchronization = SynchronizationType.INTERRUPT;
-        this.pair = false;
+        this.w_count = 1;
         this.repeating = false;
+        this.wing_reinforcement = false;
     }
 
     public toJSON() {
@@ -61,7 +62,7 @@ class Weapon extends Part {
             accessible: this.accessible,
             free_accessible: this.free_accessible,
             synchronization: this.synchronization,
-            pair: this.pair,
+            w_count: this.w_count,
             repeating: this.repeating,
         }
     }
@@ -73,7 +74,7 @@ class Weapon extends Part {
         this.accessible = js["accessible"];
         this.free_accessible = js["free_accessible"];
         this.synchronization = js["synchronization"];
-        this.pair = js["pair"];
+        this.w_count = js["w_count"];
         this.repeating = js["repeating"];
     }
 
@@ -84,7 +85,7 @@ class Weapon extends Part {
         s.PushBool(this.accessible);
         s.PushBool(this.free_accessible);
         s.PushNum(this.synchronization);
-        s.PushBool(this.pair);
+        s.PushNum(this.w_count);
         s.PushBool(this.repeating);
     }
 
@@ -95,7 +96,7 @@ class Weapon extends Part {
         this.accessible = d.GetBool();
         this.free_accessible = d.GetBool();
         this.synchronization = d.GetNum();
-        this.pair = d.GetBool();
+        this.w_count = d.GetNum();
         this.repeating = d.GetBool();
     }
 
@@ -107,9 +108,9 @@ class Weapon extends Part {
     }) {
         this.weapon_type = weapon_type;
         if (this.weapon_type.size == 16) {
-            this.pair = false;
+            this.w_count = 1;
         }
-        this.SetPair(this.pair); //Triggers Calculate Stats
+        this.SetCount(this.w_count); //Triggers Calculate Stats
     }
 
     public GetFixed() {
@@ -225,23 +226,22 @@ class Weapon extends Part {
             this.synchronization = use;
         }
         if (this.synchronization == SynchronizationType.SPINNER)
-            this.pair = false;
+            this.w_count = 1;
 
         this.CalculateStats();
     }
 
-    public CanPair() {
-        return this.weapon_type.size <= 8 && this.synchronization != SynchronizationType.SPINNER;
+    public GetCount() {
+        return this.w_count;
     }
 
-    public GetPair() {
-        return this.pair;
-    }
-
-    public SetPair(use: boolean) {
-        if (this.wing && !this.fixed && this.weapon_type.size == 8)
-            use = false;
-        this.pair = use;
+    public SetCount(use: number) {
+        if (this.synchronization == SynchronizationType.SPINNER)
+            use = 1;
+        while (use * this.weapon_type.size > 16) {
+            use -= 1;
+        }
+        this.w_count = use;
         this.CalculateStats();
     }
 
@@ -279,7 +279,7 @@ class Weapon extends Part {
             this.synchronization = use;
         }
         if (this.synchronization == SynchronizationType.SPINNER)
-            this.pair = false;
+            this.w_count = 1;
     }
 
     public GetArty() {
@@ -325,26 +325,25 @@ class Weapon extends Part {
         if (this.weapon_type.size == 16 && this.fixed)
             this.covered = true;
 
-        stats = stats.Add(this.weapon_type.stats);
-        if (this.pair)
+        var size = 0;
+        for (let i = 0; i < this.w_count; i++) {
             stats = stats.Add(this.weapon_type.stats);
 
-        var size = this.weapon_type.size;
-        if (this.pair)
-            size *= 2;
+            size += this.weapon_type.size;
+        }
 
         //Covered Cost
         if (this.covered) {
             var cost = 0;
-            if (size == 1) {
+            if (size <= 1) {
                 cost = 0;
-            } else if (size == 2) {
+            } else if (size <= 2) {
                 cost = 1;
-            } else if (size == 4) {
+            } else if (size <= 4) {
                 cost = 2;
-            } else if (size == 8) {
+            } else if (size <= 8) {
                 cost == 5;
-            } else if (size == 16) {
+            } else if (size <= 16) {
                 cost = 0;
             }
             if (!this.fixed)
@@ -357,7 +356,7 @@ class Weapon extends Part {
             stats.drag += 1;
 
         //Arty size weapon mounts need a section
-        if (this.pair && this.weapon_type.size == 8 || this.weapon_type.size == 16)
+        if (this.w_count && this.weapon_type.size == 8 || this.weapon_type.size == 16)
             stats.reqsections += 1;
 
         //Accessible Cost
@@ -369,12 +368,12 @@ class Weapon extends Part {
         if (!this.fixed) {
             if (size <= 2) {
                 //Nothing
-            } else if (size == 4) {
+            } else if (size <= 4) {
                 stats.cost += 1;
-            } else if (size == 8) {
+            } else if (size <= 8) {
                 stats.mass += 1;
                 stats.cost += 3;
-            } else if (size == 16) {
+            } else if (size <= 16) {
                 stats.mass += 2;
                 stats.cost += 5;
             } else {
@@ -384,13 +383,9 @@ class Weapon extends Part {
 
         //Synchronization == -1 is no synch.
         if (this.synchronization == SynchronizationType.INTERRUPT) {
-            stats.cost += 2;
-            if (this.pair)
-                stats.cost += 2;
+            stats.cost += this.w_count * 2;
         } else if (this.synchronization == SynchronizationType.SYNCH) {
-            stats.cost += 3;
-            if (this.pair)
-                stats.cost += 3;
+            stats.cost += this.w_count * 3;
             //synchronization == 2 is spinner and costs nothing.
         } else if (this.synchronization == SynchronizationType.DEFLECT) {
             stats.cost += 1;
@@ -402,7 +397,7 @@ class Weapon extends Part {
 
         //If it's repeating
         if (this.repeating)
-            stats.cost += 2;
+            stats.cost += this.w_count * 2;
 
         if (this.wing_reinforcement)
             stats.mass += 2;

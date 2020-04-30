@@ -15,7 +15,7 @@ class Reinforcement_HTML extends Display {
     private d_cost: HTMLTableCellElement;
     private d_strc: HTMLTableCellElement;
     private d_maxs: HTMLTableCellElement;
-    private d_none: HTMLTableCellElement;
+    private d_amax: HTMLTableCellElement;
 
     constructor(rf: Reinforcement) {
         super();
@@ -95,11 +95,11 @@ class Reinforcement_HTML extends Display {
         var h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, "Structure");
         CreateTH(h2_row, "Max Strain");
-        CreateTH(h2_row, "");
+        CreateTH(h2_row, "Aircraft Max Strain");
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
-        this.d_none = c2_row.insertCell();
+        this.d_amax = c2_row.insertCell();
     }
 
     public UpdateDisplay() {
@@ -128,5 +128,7 @@ class Reinforcement_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString());
         BlinkIfChanged(this.d_strc, stats.structure.toString());
         BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
+        var derivedMS = aircraft_model.GetDerivedStats().MaxStrain;
+        BlinkIfChanged(this.d_amax, derivedMS.toString());
     }
 }
