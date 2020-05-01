@@ -1,5 +1,6 @@
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
+/// <reference path="./EngineList.ts"/>
 /// <reference path="./Era.ts" />
 /// <reference path="./Cockpits.ts" />
 /// <reference path="./Passengers.ts" />

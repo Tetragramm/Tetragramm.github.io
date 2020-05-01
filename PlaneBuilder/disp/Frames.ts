@@ -102,11 +102,12 @@ class Frames_HTML extends Display {
 
         var spar_list = this.frames.GetFrameList();
         for (let spar of spar_list) {
-            if (spar.basestruct > 0) {
-                let opt = document.createElement("OPTION") as HTMLOptionElement;
-                opt.text = spar.name;
-                this.all_frame.add(opt);
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = spar.name;
+            if (spar.basestruct <= 0) {
+                opt.disabled = true;
             }
+            this.all_frame.add(opt);
         }
         this.all_frame.onchange = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
         var skin_list = this.frames.GetSkinList();
@@ -286,8 +287,9 @@ class Frames_HTML extends Display {
             opt.text = ft.name;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
-            if (ft.basestruct != 0)
-                frame_select.add(opt);
+            if (ft.basestruct == 0)
+                opt.disabled = true;
+            frame_select.add(opt);
         }
         frame_select.onchange = () => { this.frames.SetTailFrame(i, frame_select.selectedIndex); };
         frame_select.selectedIndex = sec.frame;

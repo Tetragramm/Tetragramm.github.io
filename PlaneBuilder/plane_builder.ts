@@ -20,6 +20,7 @@ const loadJSON = (path, callback) => {
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
+    var ep = sp.get("engines");
     var ihash = window.location.hash;
     location.hash = "";
     loadJSON('/PlaneBuilder/parts.json', (part_resp) => {
@@ -30,10 +31,13 @@ const init = () => {
 
         loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
-
-            for (let elem of engine_json["engines"]) {
-                engine_list.push(new EngineStats(elem));
-            }
+            engine_list.fromJSON(engine_json);
+            try {
+                var str = LZString.decompressFromEncodedURIComponent(ep);
+                var arr = _stringToArrayBuffer(str);
+                var des = new Deserialize(arr);
+                engine_list.deserialize(des);
+            } catch { console.log("Compressed Engine Parameter Failed."); }
 
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
@@ -154,4 +158,4 @@ var engine_json: JSON;
 var weapon_json: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
-var engine_list: EngineStats[] = [];
+var engine_list: EngineList = new EngineList();

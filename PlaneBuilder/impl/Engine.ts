@@ -37,7 +37,7 @@ class Engine extends Part {
 
         super();
         this.selected_index = 0;
-        this.etype_stats = engine_list[0].Clone();
+        this.etype_stats = engine_list.get(0).Clone();
 
         this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
@@ -88,6 +88,7 @@ class Engine extends Part {
 
     public fromJSON(js: JSON) {
         this.etype_stats.fromJSON(js["selected_stats"]);
+        engine_list.push(this.etype_stats);
         this.cooling_count = js["cooling_count"];
         this.radiator_index = js["radiator_index"];
         this.selected_mount = js["selected_mount"];
@@ -100,17 +101,7 @@ class Engine extends Part {
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
         this.intake_fan = js["intake_fan"];
-        this.selected_index = -1;
-        for (let i = 0; i < engine_list.length; i++) {
-            if (this.etype_stats.Equal(engine_list[i])) {
-                this.selected_index = i;
-                break;
-            }
-        }
-        if (this.selected_index == -1) {
-            this.selected_index = engine_list.length;
-            engine_list.push(this.etype_stats.Clone());
-        }
+        this.selected_index = engine_list.find(this.etype_stats);
     }
 
     public serialize(s: Serialize) {
@@ -131,6 +122,7 @@ class Engine extends Part {
 
     public deserialize(d: Deserialize) {
         this.etype_stats.deserialize(d);
+        engine_list.push(this.etype_stats);
         this.cooling_count = d.GetNum();
         this.radiator_index = d.GetNum();
         this.selected_mount = d.GetNum();
@@ -143,17 +135,7 @@ class Engine extends Part {
         this.is_generator = d.GetBool();
         this.has_alternator = d.GetBool();
         this.intake_fan = d.GetBool();
-        this.selected_index = -1;
-        for (let i = 0; i < engine_list.length; i++) {
-            if (this.etype_stats.Equal(engine_list[i])) {
-                this.selected_index = i;
-                break;
-            }
-        }
-        if (this.selected_index == -1) {
-            this.selected_index = engine_list.length;
-            engine_list.push(this.etype_stats.Clone());
-        }
+        this.selected_index = engine_list.find(this.etype_stats);
     }
 
     public GetMaxAltitude() {
@@ -162,7 +144,7 @@ class Engine extends Part {
 
     public SetSelectedIndex(num: number) {
         this.selected_index = num;
-        this.etype_stats = engine_list[this.selected_index].Clone();
+        this.etype_stats = engine_list.get(this.selected_index).Clone();
         if (num >= engine_list.length)
             throw "Index is out of range of engine_list.";
         this.PulseJetCheck();
@@ -249,7 +231,7 @@ class Engine extends Part {
         return this.intake_fan;
     }
 
-    public GetListOfEngines(): EngineStats[] {
+    public GetListOfEngines(): EngineList {
         return engine_list;
     }
 

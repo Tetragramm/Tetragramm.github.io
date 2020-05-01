@@ -4,10 +4,8 @@
 class EngineList {
     private list: EngineStats[];
 
-    constructor(js: JSON) {
-        for (let elem of js["engines"]) {
-            this.push(new EngineStats(elem));
-        }
+    constructor() {
+        this.list = [];
     }
 
     public toJSON() {
@@ -15,7 +13,13 @@ class EngineList {
         for (let li of this.list) {
             ret.push(li.toJSON());
         }
-        return { elist: ret };
+        return { engines: ret };
+    }
+
+    public fromJSON(js: JSON) {
+        for (let elem of js["engines"]) {
+            this.push(new EngineStats(elem));
+        }
     }
 
     public serialize(s: Serialize) {
@@ -39,6 +43,22 @@ class EngineList {
             if (li.Equal(es))
                 return;
         }
-        this.list.push(es);
+        this.list.push(es.Clone());
+    }
+
+    public get(i: number) {
+        return this.list[i];
+    }
+
+    public find(es: EngineStats) {
+        for (let i = 0; i < this.length; i++) {
+            if (es.Equal(this.list[i]))
+                return i;
+        }
+        return -1;
+    }
+
+    get length(): number {
+        return this.list.length;
     }
 }

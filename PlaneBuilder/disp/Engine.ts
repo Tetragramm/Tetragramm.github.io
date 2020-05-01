@@ -3,7 +3,6 @@
 
 class Engine_HTML extends Display {
     private engine: Engine;
-    private engine_list: EngineStats[];
     private e_select: HTMLSelectElement;
     private e_pwr: HTMLInputElement;
     private e_mass: HTMLInputElement;
@@ -58,7 +57,6 @@ class Engine_HTML extends Display {
     constructor(eng: Engine, r: HTMLTableRowElement) {
         super();
         this.engine = eng;
-        this.engine_list = eng.GetListOfEngines();
         var row = r;
         this.InitTypeSelect(row);
 
@@ -118,8 +116,8 @@ class Engine_HTML extends Display {
         this.e_select.required = true;
         tcell.appendChild(this.e_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let i = 0; i < this.engine_list.length; i++) {
-            let eng = this.engine_list[i];
+        for (let i = 0; i < engine_list.length; i++) {
+            let eng = engine_list.get(i);
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = eng.name;
             this.e_select.add(opt);
@@ -146,7 +144,7 @@ class Engine_HTML extends Display {
 
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
-            if (this.e_select.selectedIndex == this.engine_list.length) {
+            if (this.e_select.selectedIndex == engine_list.length) {
                 this.SetInputDisable(false);
                 this.SendCustomStats();
             }
@@ -386,10 +384,10 @@ class Engine_HTML extends Display {
     public UpdateDisplay() {
         var idx = this.engine.GetSelectedIndex();
         if (idx < 0)
-            idx = this.engine_list.length;
+            idx = engine_list.length;
         this.e_select.selectedIndex = idx;
 
-        if (this.e_select.selectedIndex == this.engine_list.length) {
+        if (this.e_select.selectedIndex == engine_list.length) {
             this.SetInputDisable(false);
         }
         else {

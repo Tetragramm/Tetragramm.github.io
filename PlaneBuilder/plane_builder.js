@@ -323,6 +323,245 @@ class Stats {
 /// <reference path="./Stats.ts" />
 class Part {
 }
+class Serialize {
+    constructor(arr) {
+        this.array = new ArrayBuffer(51200);
+        this.view = new DataView(this.array);
+        this.offset = 0;
+    }
+    Check() {
+        if (this.offset >= this.array.byteLength)
+            throw "Serialization Way too long.";
+    }
+    PushNum(num) {
+        this.view.setInt16(this.offset, num, false);
+        this.offset += 2;
+        this.Check();
+    }
+    PushBool(bool) {
+        if (bool)
+            this.view.setUint8(this.offset, 1);
+        else
+            this.view.setUint8(this.offset, 0);
+        this.offset += 1;
+        this.Check();
+    }
+    PushString(str) {
+        this.PushNum(str.length);
+        for (let i = 0; i < str.length; i++) {
+            this.view.setUint8(this.offset, str.charCodeAt(i));
+            this.offset++;
+        }
+        this.Check();
+    }
+    PushNumArr(nums) {
+        this.PushNum(nums.length);
+        for (let n of nums) {
+            this.PushNum(n);
+        }
+        this.Check();
+    }
+    PushBoolArr(bools) {
+        this.PushNum(bools.length);
+        for (let b of bools) {
+            this.PushBool(b);
+        }
+        this.Check();
+    }
+    PushFloat(flt) {
+        this.view.setFloat32(this.offset, flt, false);
+        this.offset += 4;
+        this.Check();
+    }
+    FinalArray() {
+        return this.array.slice(0, this.offset);
+    }
+}
+class Deserialize {
+    constructor(arr) {
+        this.array = arr;
+        this.view = new DataView(this.array);
+        this.offset = 0;
+    }
+    Check() {
+        if (this.offset >= this.array.byteLength)
+            throw "Deserialization Failed";
+    }
+    GetNum() {
+        this.Check();
+        var num = this.view.getInt16(this.offset, false);
+        this.offset += 2;
+        return num;
+    }
+    GetBool() {
+        this.Check();
+        var bool = this.view.getUint8(this.offset);
+        this.offset += 1;
+        return bool > 0;
+    }
+    GetString() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            var char = this.view.getUint8(this.offset);
+            arr.push(char);
+            this.offset += 1;
+        }
+        return String.fromCharCode(...arr);
+    }
+    GetNumArr() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            arr.push(this.GetNum());
+        }
+        return arr;
+    }
+    GetBoolArr() {
+        this.Check();
+        var len = this.GetNum();
+        var arr = [];
+        for (let i = 0; i < len; i++) {
+            arr.push(this.GetBool());
+        }
+        return arr;
+    }
+    GetFloat() {
+        this.Check();
+        var flt = this.view.getFloat32(this.offset, false);
+        this.offset += 4;
+        return flt;
+    }
+}
+/// <reference path="./Stats.ts" />
+/// <reference path="./Serialize.ts"/>
+class EngineStats {
+    constructor(js) {
+        this.name = "";
+        this.overspeed = 0;
+        this.altitude = 0;
+        this.torque = 0;
+        this.rumble = 0;
+        this.oiltank = false;
+        this.pulsejet = false;
+        this.stats = new Stats();
+        if (js) {
+            this.fromJSON(js);
+        }
+    }
+    toJSON() {
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
+    }
+    fromJSON(js) {
+        this.name = js["name"];
+        this.overspeed = js["overspeed"];
+        this.altitude = js["altitude"];
+        this.torque = js["torque"];
+        this.rumble = js["rumble"];
+        this.oiltank = js["oiltank"];
+        this.pulsejet = js["pulsejet"];
+        this.stats = new Stats(js);
+    }
+    serialize(s) {
+        s.PushString(this.name);
+        s.PushNum(this.overspeed);
+        s.PushNum(this.altitude);
+        s.PushNum(this.torque);
+        s.PushNum(this.rumble);
+        s.PushBool(this.oiltank);
+        s.PushBool(this.pulsejet);
+        this.stats.serialize(s);
+    }
+    deserialize(d) {
+        this.name = d.GetString();
+        this.overspeed = d.GetNum();
+        this.altitude = d.GetNum();
+        this.torque = d.GetNum();
+        this.rumble = d.GetNum();
+        this.oiltank = d.GetBool();
+        this.pulsejet = d.GetBool();
+        this.stats.deserialize(d);
+    }
+    Add(other) {
+        let res = new EngineStats();
+        res.stats = this.stats.Add(other.stats);
+        res.name = this.name;
+        res.overspeed = this.overspeed + other.overspeed;
+        res.altitude = this.altitude + other.altitude;
+        res.torque = this.torque + other.torque;
+        res.rumble = this.rumble + other.rumble;
+        res.oiltank = this.oiltank || other.oiltank;
+        res.pulsejet = this.pulsejet || other.pulsejet;
+        return res;
+    }
+    Clone() {
+        return this.Add(new EngineStats());
+    }
+    Equal(other) {
+        return this.stats.Equal(other.stats)
+            && this.overspeed == other.overspeed
+            && this.altitude == other.altitude
+            && this.torque == other.torque
+            && this.rumble == other.rumble
+            && this.oiltank == other.oiltank
+            && this.pulsejet == other.pulsejet;
+    }
+}
+/// <reference path="./Stats.ts" />
+/// <reference path="./EngineStats.ts" />
+class EngineList {
+    constructor() {
+        this.list = [];
+    }
+    toJSON() {
+        var ret = [];
+        for (let li of this.list) {
+            ret.push(li.toJSON());
+        }
+        return { engines: ret };
+    }
+    fromJSON(js) {
+        for (let elem of js["engines"]) {
+            this.push(new EngineStats(elem));
+        }
+    }
+    serialize(s) {
+        s.PushNum(this.list.length);
+        for (let li of this.list) {
+            li.serialize(s);
+        }
+    }
+    deserialize(d) {
+        var len = d.GetNum();
+        for (let i = 0; i < len; i++) {
+            let stats = new EngineStats();
+            stats.deserialize(d);
+            this.push(stats);
+        }
+    }
+    push(es) {
+        for (let li of this.list) {
+            if (li.Equal(es))
+                return;
+        }
+        this.list.push(es.Clone());
+    }
+    get(i) {
+        return this.list[i];
+    }
+    find(es) {
+        for (let i = 0; i < this.length; i++) {
+            if (es.Equal(this.list[i]))
+                return i;
+        }
+        return -1;
+    }
+    get length() {
+        return this.list.length;
+    }
+}
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class Era extends Part {
@@ -748,192 +987,6 @@ class Passengers extends Part {
         this.CalculateStats = callback;
     }
 }
-class Serialize {
-    constructor(arr) {
-        this.array = new ArrayBuffer(51200);
-        this.view = new DataView(this.array);
-        this.offset = 0;
-    }
-    Check() {
-        if (this.offset >= this.array.byteLength)
-            throw "Serialization Way too long.";
-    }
-    PushNum(num) {
-        this.view.setInt16(this.offset, num, false);
-        this.offset += 2;
-        this.Check();
-    }
-    PushBool(bool) {
-        if (bool)
-            this.view.setUint8(this.offset, 1);
-        else
-            this.view.setUint8(this.offset, 0);
-        this.offset += 1;
-        this.Check();
-    }
-    PushString(str) {
-        this.PushNum(str.length);
-        for (let i = 0; i < str.length; i++) {
-            this.view.setUint8(this.offset, str.charCodeAt(i));
-            this.offset++;
-        }
-        this.Check();
-    }
-    PushNumArr(nums) {
-        this.PushNum(nums.length);
-        for (let n of nums) {
-            this.PushNum(n);
-        }
-        this.Check();
-    }
-    PushBoolArr(bools) {
-        this.PushNum(bools.length);
-        for (let b of bools) {
-            this.PushBool(b);
-        }
-        this.Check();
-    }
-    PushFloat(flt) {
-        this.view.setFloat32(this.offset, flt, false);
-        this.offset += 4;
-        this.Check();
-    }
-    FinalArray() {
-        return this.array.slice(0, this.offset);
-    }
-}
-class Deserialize {
-    constructor(arr) {
-        this.array = arr;
-        this.view = new DataView(this.array);
-        this.offset = 0;
-    }
-    Check() {
-        if (this.offset >= this.array.byteLength)
-            throw "Deserialization Failed";
-    }
-    GetNum() {
-        this.Check();
-        var num = this.view.getInt16(this.offset, false);
-        this.offset += 2;
-        return num;
-    }
-    GetBool() {
-        this.Check();
-        var bool = this.view.getUint8(this.offset);
-        this.offset += 1;
-        return bool > 0;
-    }
-    GetString() {
-        this.Check();
-        var len = this.GetNum();
-        var arr = [];
-        for (let i = 0; i < len; i++) {
-            var char = this.view.getUint8(this.offset);
-            arr.push(char);
-            this.offset += 1;
-        }
-        return String.fromCharCode(...arr);
-    }
-    GetNumArr() {
-        this.Check();
-        var len = this.GetNum();
-        var arr = [];
-        for (let i = 0; i < len; i++) {
-            arr.push(this.GetNum());
-        }
-        return arr;
-    }
-    GetBoolArr() {
-        this.Check();
-        var len = this.GetNum();
-        var arr = [];
-        for (let i = 0; i < len; i++) {
-            arr.push(this.GetBool());
-        }
-        return arr;
-    }
-    GetFloat() {
-        this.Check();
-        var flt = this.view.getFloat32(this.offset, false);
-        this.offset += 4;
-        return flt;
-    }
-}
-/// <reference path="./Stats.ts" />
-/// <reference path="./Serialize.ts"/>
-class EngineStats {
-    constructor(js) {
-        this.name = "";
-        this.overspeed = 0;
-        this.altitude = 0;
-        this.torque = 0;
-        this.rumble = 0;
-        this.oiltank = false;
-        this.pulsejet = false;
-        this.stats = new Stats();
-        if (js) {
-            this.fromJSON(js);
-        }
-    }
-    toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
-    }
-    fromJSON(js) {
-        this.name = js["name"];
-        this.overspeed = js["overspeed"];
-        this.altitude = js["altitude"];
-        this.torque = js["torque"];
-        this.rumble = js["rumble"];
-        this.oiltank = js["oiltank"];
-        this.pulsejet = js["pulsejet"];
-        this.stats = new Stats(js);
-    }
-    serialize(s) {
-        s.PushString(this.name);
-        s.PushNum(this.overspeed);
-        s.PushNum(this.altitude);
-        s.PushNum(this.torque);
-        s.PushNum(this.rumble);
-        s.PushBool(this.oiltank);
-        s.PushBool(this.pulsejet);
-        this.stats.serialize(s);
-    }
-    deserialize(d) {
-        this.name = d.GetString();
-        this.overspeed = d.GetNum();
-        this.altitude = d.GetNum();
-        this.torque = d.GetNum();
-        this.rumble = d.GetNum();
-        this.oiltank = d.GetBool();
-        this.pulsejet = d.GetBool();
-        this.stats.deserialize(d);
-    }
-    Add(other) {
-        let res = new EngineStats();
-        res.stats = this.stats.Add(other.stats);
-        res.name = this.name;
-        res.overspeed = this.overspeed + other.overspeed;
-        res.altitude = this.altitude + other.altitude;
-        res.torque = this.torque + other.torque;
-        res.rumble = this.rumble + other.rumble;
-        res.oiltank = this.oiltank || other.oiltank;
-        res.pulsejet = this.pulsejet || other.pulsejet;
-        return res;
-    }
-    Clone() {
-        return this.Add(new EngineStats());
-    }
-    Equal(other) {
-        return this.stats.Equal(other.stats)
-            && this.overspeed == other.overspeed
-            && this.altitude == other.altitude
-            && this.torque == other.torque
-            && this.rumble == other.rumble
-            && this.oiltank == other.oiltank
-            && this.pulsejet == other.pulsejet;
-    }
-}
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
@@ -941,7 +994,7 @@ class Engine extends Part {
     constructor(ml, ppl, cl) {
         super();
         this.selected_index = 0;
-        this.etype_stats = engine_list[0].Clone();
+        this.etype_stats = engine_list.get(0).Clone();
         this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
         if (this.cooling_count > 0)
@@ -982,6 +1035,7 @@ class Engine extends Part {
     }
     fromJSON(js) {
         this.etype_stats.fromJSON(js["selected_stats"]);
+        engine_list.push(this.etype_stats);
         this.cooling_count = js["cooling_count"];
         this.radiator_index = js["radiator_index"];
         this.selected_mount = js["selected_mount"];
@@ -994,17 +1048,7 @@ class Engine extends Part {
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
         this.intake_fan = js["intake_fan"];
-        this.selected_index = -1;
-        for (let i = 0; i < engine_list.length; i++) {
-            if (this.etype_stats.Equal(engine_list[i])) {
-                this.selected_index = i;
-                break;
-            }
-        }
-        if (this.selected_index == -1) {
-            this.selected_index = engine_list.length;
-            engine_list.push(this.etype_stats.Clone());
-        }
+        this.selected_index = engine_list.find(this.etype_stats);
     }
     serialize(s) {
         this.etype_stats.serialize(s);
@@ -1023,6 +1067,7 @@ class Engine extends Part {
     }
     deserialize(d) {
         this.etype_stats.deserialize(d);
+        engine_list.push(this.etype_stats);
         this.cooling_count = d.GetNum();
         this.radiator_index = d.GetNum();
         this.selected_mount = d.GetNum();
@@ -1035,24 +1080,14 @@ class Engine extends Part {
         this.is_generator = d.GetBool();
         this.has_alternator = d.GetBool();
         this.intake_fan = d.GetBool();
-        this.selected_index = -1;
-        for (let i = 0; i < engine_list.length; i++) {
-            if (this.etype_stats.Equal(engine_list[i])) {
-                this.selected_index = i;
-                break;
-            }
-        }
-        if (this.selected_index == -1) {
-            this.selected_index = engine_list.length;
-            engine_list.push(this.etype_stats.Clone());
-        }
+        this.selected_index = engine_list.find(this.etype_stats);
     }
     GetMaxAltitude() {
         return this.etype_stats.altitude;
     }
     SetSelectedIndex(num) {
         this.selected_index = num;
-        this.etype_stats = engine_list[this.selected_index].Clone();
+        this.etype_stats = engine_list.get(this.selected_index).Clone();
         if (num >= engine_list.length)
             throw "Index is out of range of engine_list.";
         this.PulseJetCheck();
@@ -5276,6 +5311,7 @@ class Weapons extends Part {
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
+/// <reference path="./EngineList.ts"/>
 /// <reference path="./Era.ts" />
 /// <reference path="./Cockpits.ts" />
 /// <reference path="./Passengers.ts" />
@@ -6171,7 +6207,6 @@ class Engine_HTML extends Display {
     constructor(eng, r) {
         super();
         this.engine = eng;
-        this.engine_list = eng.GetListOfEngines();
         var row = r;
         this.InitTypeSelect(row);
         var option_cell = row.insertCell();
@@ -6224,8 +6259,8 @@ class Engine_HTML extends Display {
         this.e_select.required = true;
         tcell.appendChild(this.e_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let i = 0; i < this.engine_list.length; i++) {
-            let eng = this.engine_list[i];
+        for (let i = 0; i < engine_list.length; i++) {
+            let eng = engine_list.get(i);
             let opt = document.createElement("OPTION");
             opt.text = eng.name;
             this.e_select.add(opt);
@@ -6251,7 +6286,7 @@ class Engine_HTML extends Display {
         FlexCheckbox("Pulsejet", this.e_pulsejet, fs);
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
-            if (this.e_select.selectedIndex == this.engine_list.length) {
+            if (this.e_select.selectedIndex == engine_list.length) {
                 this.SetInputDisable(false);
                 this.SendCustomStats();
             }
@@ -6478,9 +6513,9 @@ class Engine_HTML extends Display {
     UpdateDisplay() {
         var idx = this.engine.GetSelectedIndex();
         if (idx < 0)
-            idx = this.engine_list.length;
+            idx = engine_list.length;
         this.e_select.selectedIndex = idx;
-        if (this.e_select.selectedIndex == this.engine_list.length) {
+        if (this.e_select.selectedIndex == engine_list.length) {
             this.SetInputDisable(false);
         }
         else {
@@ -6936,11 +6971,12 @@ class Frames_HTML extends Display {
         this.all_skin = document.getElementById("all_skin");
         var spar_list = this.frames.GetFrameList();
         for (let spar of spar_list) {
-            if (spar.basestruct > 0) {
-                let opt = document.createElement("OPTION");
-                opt.text = spar.name;
-                this.all_frame.add(opt);
+            let opt = document.createElement("OPTION");
+            opt.text = spar.name;
+            if (spar.basestruct <= 0) {
+                opt.disabled = true;
             }
+            this.all_frame.add(opt);
         }
         this.all_frame.onchange = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
         var skin_list = this.frames.GetSkinList();
@@ -7093,8 +7129,9 @@ class Frames_HTML extends Display {
             opt.text = ft.name;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
-            if (ft.basestruct != 0)
-                frame_select.add(opt);
+            if (ft.basestruct == 0)
+                opt.disabled = true;
+            frame_select.add(opt);
         }
         frame_select.onchange = () => { this.frames.SetTailFrame(i, frame_select.selectedIndex); };
         frame_select.selectedIndex = sec.frame;
@@ -9714,6 +9751,7 @@ const loadJSON = (path, callback) => {
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
+    var ep = sp.get("engines");
     var ihash = window.location.hash;
     location.hash = "";
     loadJSON('/PlaneBuilder/parts.json', (part_resp) => {
@@ -9722,8 +9760,15 @@ const init = () => {
         parts_JSON = JSON.parse(part_resp);
         loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
-            for (let elem of engine_json["engines"]) {
-                engine_list.push(new EngineStats(elem));
+            engine_list.fromJSON(engine_json);
+            try {
+                var str = LZString.decompressFromEncodedURIComponent(ep);
+                var arr = _stringToArrayBuffer(str);
+                var des = new Deserialize(arr);
+                engine_list.deserialize(des);
+            }
+            catch (_a) {
+                console.log("Compressed Engine Parameter Failed.");
             }
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
@@ -9845,7 +9890,7 @@ var engine_json;
 var weapon_json;
 var aircraft_model;
 var aircraft_display;
-var engine_list = [];
+var engine_list = new EngineList();
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class AlterStats extends Part {
@@ -9902,43 +9947,6 @@ class AlterStats extends Part {
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
-    }
-}
-/// <reference path="./Stats.ts" />
-/// <reference path="./EngineStats.ts" />
-class EngineList {
-    constructor(js) {
-        for (let elem of js["engines"]) {
-            this.push(new EngineStats(elem));
-        }
-    }
-    toJSON() {
-        var ret = [];
-        for (let li of this.list) {
-            ret.push(li.toJSON());
-        }
-        return { elist: ret };
-    }
-    serialize(s) {
-        s.PushNum(this.list.length);
-        for (let li of this.list) {
-            li.serialize(s);
-        }
-    }
-    deserialize(d) {
-        var len = d.GetNum();
-        for (let i = 0; i < len; i++) {
-            let stats = new EngineStats();
-            stats.deserialize(d);
-            this.push(stats);
-        }
-    }
-    push(es) {
-        for (let li of this.list) {
-            if (li.Equal(es))
-                return;
-        }
-        this.list.push(es);
     }
 }
 /// <reference path="./Part.ts" />
