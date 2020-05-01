@@ -3200,7 +3200,8 @@ class Stabilizers extends Part {
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
-            stats.drag += Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
+            var drag = Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
+            stats.drag += Math.max(1, drag);
         }
         else if (this.hstab_list[this.hstab_sel].increment != 0) {
             stats.pitchstab -= Math.floor(1.0e-6 + this.wing_area / 2);
@@ -3209,7 +3210,8 @@ class Stabilizers extends Part {
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
-            stats.drag += Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
+            var drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
+            stats.drag += Math.max(1, drag);
         }
         else if (this.vstab_list[this.vstab_sel].increment != 0) {
             stats.latstab -= this.wing_area;
