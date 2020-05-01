@@ -445,6 +445,7 @@ class Wings extends Part {
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
                 wdrag = Math.floor(1.0e-6 + 0.75 * wdrag);
+                wdrag = Math.max(1, wdrag);
             }
             wdrag = Math.floor(1.0e-6 + wdrag);
             drag += wdrag;
@@ -519,6 +520,7 @@ class Wings extends Part {
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
                 wStats.drag = Math.floor(1.0e-6 + 0.75 * wStats.drag);
+                wStats.drag = Math.max(1, wStats.drag);
             }
 
             //Deck Effects
