@@ -816,9 +816,21 @@ class EngineBuilder {
         var Cost = this.UpgradeCost() + (CylinderForce / 10 * (this.num_cyl_per_row + (this.num_rows * 1.3)));
         return Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
     }
+    VerifyValues() {
+        this.engine_displacement = Math.max(0.01, this.engine_displacement);
+        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
+        this.cool_sel = Math.max(0, Math.min(this.CoolingTable.length - 1, this.cool_sel));
+        this.num_cyl_per_row = Math.floor(Math.max(1, this.num_cyl_per_row));
+        this.num_rows = Math.floor(Math.max(1, this.num_rows));
+        this.compression_ratio = Math.max(0.01, this.compression_ratio);
+        this.rpm_boost = Math.max(0.01, this.rpm_boost);
+        this.material_fudge = Math.max(0.01, this.material_fudge);
+        this.quality_fudge = Math.max(0.01, this.quality_fudge);
+    }
     EngineStats() {
         var estats = new EngineStats();
         estats.name = this.name;
+        this.VerifyValues();
         estats.stats.power = this.CalcPower();
         estats.stats.mass = this.CalcMass();
         estats.stats.drag = this.CalcDrag();
@@ -894,6 +906,13 @@ class PulsejetBuilder {
         var Era = this.EraTable[this.era_sel];
         return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
     }
+    VerifyValues() {
+        this.desired_power = Math.max(1, Math.floor(this.desired_power));
+        this.valve_sel = Math.max(0, Math.min(this.ValveTable.length - 1, this.valve_sel));
+        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
+        this.build_quality = Math.max(0.01, this.build_quality);
+        this.overall_quality = Math.max(0.01, this.overall_quality);
+    }
     DesignCost() {
         var Era = this.EraTable[this.era_sel];
         var Valve = this.ValveTable[this.valve_sel];
@@ -905,6 +924,7 @@ class PulsejetBuilder {
     }
     EngineStats() {
         var estats = new EngineStats();
+        this.VerifyValues();
         var valved = "";
         if (this.valve_sel == 0)
             valved = "V";
@@ -1704,13 +1724,17 @@ class EngineBuilder_HTML {
         FlexInput("RPM Boost", this.e_rpmb, fs);
         FlexInput("Material Fudge Factor", this.e_mfdg, fs);
         FlexInput("Quality Fudge Factor", this.e_qfdg, fs);
+        this.e_disp.min = "0.01";
         this.e_disp.step = "0.01";
+        this.e_cmpr.min = "0.01";
         this.e_cmpr.step = "0.01";
-        this.e_rpmb.step = "0.01";
+        this.e_ncyl.min = "1";
+        this.e_nrow.min = "1";
         this.e_rpmb.min = "0.01";
+        this.e_rpmb.step = "0.01";
         this.e_rpmb.max = "2000";
-        this.e_mfdg.step = "0.01";
         this.e_mfdg.min = "0.01";
+        this.e_mfdg.step = "0.01";
         this.e_mfdg.max = "99999";
         this.e_qfdg.step = "0.01";
         this.e_qfdg.min = "0.01";

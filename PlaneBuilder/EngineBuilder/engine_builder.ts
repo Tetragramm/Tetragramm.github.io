@@ -164,13 +164,17 @@ class EngineBuilder_HTML {
         FlexInput("Material Fudge Factor", this.e_mfdg, fs);
         FlexInput("Quality Fudge Factor", this.e_qfdg, fs);
 
+        this.e_disp.min = "0.01";
         this.e_disp.step = "0.01";
+        this.e_cmpr.min = "0.01";
         this.e_cmpr.step = "0.01";
-        this.e_rpmb.step = "0.01";
+        this.e_ncyl.min = "1";
+        this.e_nrow.min = "1";
         this.e_rpmb.min = "0.01";
+        this.e_rpmb.step = "0.01";
         this.e_rpmb.max = "2000";
-        this.e_mfdg.step = "0.01";
         this.e_mfdg.min = "0.01";
+        this.e_mfdg.step = "0.01";
         this.e_mfdg.max = "99999";
         this.e_qfdg.step = "0.01";
         this.e_qfdg.min = "0.01";

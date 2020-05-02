@@ -264,9 +264,23 @@ class EngineBuilder {
         return Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
     }
 
+    private VerifyValues() {
+        this.engine_displacement = Math.max(0.01, this.engine_displacement);
+        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
+        this.cool_sel = Math.max(0, Math.min(this.CoolingTable.length - 1, this.cool_sel));
+        this.num_cyl_per_row = Math.floor(Math.max(1, this.num_cyl_per_row));
+        this.num_rows = Math.floor(Math.max(1, this.num_rows));
+        this.compression_ratio = Math.max(0.01, this.compression_ratio);
+        this.rpm_boost = Math.max(0.01, this.rpm_boost);
+        this.material_fudge = Math.max(0.01, this.material_fudge);
+        this.quality_fudge = Math.max(0.01, this.quality_fudge);
+    }
+
     public EngineStats() {
         var estats = new EngineStats();
         estats.name = this.name;
+
+        this.VerifyValues();
 
         estats.stats.power = this.CalcPower();
         estats.stats.mass = this.CalcMass();

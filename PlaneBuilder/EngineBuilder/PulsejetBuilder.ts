@@ -81,6 +81,14 @@ class PulsejetBuilder {
         return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
     }
 
+    private VerifyValues() {
+        this.desired_power = Math.max(1, Math.floor(this.desired_power));
+        this.valve_sel = Math.max(0, Math.min(this.ValveTable.length - 1, this.valve_sel));
+        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
+        this.build_quality = Math.max(0.01, this.build_quality);
+        this.overall_quality = Math.max(0.01, this.overall_quality);
+    }
+
     public DesignCost() {
         var Era = this.EraTable[this.era_sel];
         var Valve = this.ValveTable[this.valve_sel];
@@ -95,6 +103,8 @@ class PulsejetBuilder {
 
     public EngineStats() {
         var estats = new EngineStats();
+
+        this.VerifyValues();
 
         var valved = "";
         if (this.valve_sel == 0)
