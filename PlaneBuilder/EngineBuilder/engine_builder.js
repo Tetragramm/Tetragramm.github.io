@@ -1,238 +1,3 @@
-var internal_id = 0;
-// Function to download data to a file
-function download(data, filename, type) {
-    var file = new Blob([data], { type: type });
-    if (window.navigator.msSaveOrOpenBlob) // IE10+
-        window.navigator.msSaveOrOpenBlob(file, filename);
-    else { // Others
-        var a = document.createElement("a"), url = URL.createObjectURL(file);
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function () {
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-        }, 0);
-    }
-}
-function copyStringToClipboard(str) {
-    // Create new element
-    var el = document.createElement('textarea');
-    // Set value (string to be copied)
-    el.value = str;
-    // Set non-editable to avoid focus and move outside of view
-    el.setAttribute('readonly', '');
-    el.style.position = "absolute";
-    el.style.left = "-9999px";
-    document.body.appendChild(el);
-    // Select text inside element
-    el.select();
-    // Copy text to clipboard
-    document.execCommand('copy');
-    // Remove temporary element
-    document.body.removeChild(el);
-}
-function GenerateID() {
-    internal_id++;
-    return "internal_id_" + internal_id.toString();
-}
-function CreateFlexSection(elem) {
-    var fs = {
-        div0: document.createElement("DIV"), div1: document.createElement("DIV"),
-        div2: document.createElement("DIV")
-    };
-    fs.div0.classList.add("flex-container-o");
-    fs.div1.classList.add("flex-container-i");
-    fs.div2.classList.add("flex-container-i");
-    fs.div0.appendChild(fs.div1);
-    fs.div0.appendChild(fs.div2);
-    elem.appendChild(fs.div0);
-    return fs;
-}
-function CreateTH(row, content) {
-    var th = document.createElement("TH");
-    th.innerHTML = content;
-    row.appendChild(th);
-    return th;
-}
-function CreateInput(txt, elem, table, br = true) {
-    var span = document.createElement("SPAN");
-    var txtSpan = document.createElement("LABEL");
-    elem.id = GenerateID();
-    txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    elem.setAttribute("type", "number");
-    elem.min = "0";
-    elem.step = "1";
-    elem.valueAsNumber = 0;
-    span.appendChild(txtSpan);
-    span.appendChild(elem);
-    table.appendChild(span);
-    if (br)
-        table.appendChild(document.createElement("BR"));
-}
-function FlexInput(txt, inp, fs) {
-    var lbl = document.createElement("LABEL");
-    inp.id = GenerateID();
-    lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    inp.setAttribute("type", "number");
-    inp.min = "0";
-    inp.step = "1";
-    inp.valueAsNumber = 0;
-    lbl.classList.add("flex-item");
-    inp.classList.add("flex-item");
-    fs.div1.appendChild(lbl);
-    fs.div2.appendChild(inp);
-}
-function FlexText(txt, inp, fs) {
-    var lbl = document.createElement("LABEL");
-    inp.id = GenerateID();
-    lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    inp.setAttribute("type", "text");
-    inp.value = "Default";
-    lbl.classList.add("flex-item");
-    inp.classList.add("flex-item");
-    fs.div1.appendChild(lbl);
-    fs.div2.appendChild(inp);
-}
-function FlexDisplay(txt, inp, fs) {
-    var lbl = document.createElement("LABEL");
-    inp.id = GenerateID();
-    lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    lbl.classList.add("flex-item");
-    inp.classList.add("flex-item");
-    fs.div1.appendChild(lbl);
-    fs.div2.appendChild(inp);
-}
-function FlexSelect(txt, sel, fs) {
-    var lbl = document.createElement("LABEL");
-    sel.id = GenerateID();
-    lbl.htmlFor = sel.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    lbl.classList.add("flex-item");
-    sel.classList.add("flex-item");
-    fs.div1.appendChild(lbl);
-    fs.div2.appendChild(sel);
-}
-function CreateSpace(elem) {
-    var span = document.createElement("SPAN");
-    span.innerHTML = "&nbsp;";
-    elem.appendChild(span);
-}
-function CreateCheckbox(txt, elem, table, br = true) {
-    var span = document.createElement("SPAN");
-    var txtSpan = document.createElement("LABEL");
-    elem.id = GenerateID();
-    txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    elem.setAttribute("type", "checkbox");
-    span.appendChild(txtSpan);
-    span.appendChild(elem);
-    table.appendChild(span);
-    if (br)
-        table.appendChild(document.createElement("BR"));
-}
-function CreateSelect(txt, elem, table, br = true) {
-    var span = document.createElement("SPAN");
-    var txtSpan = document.createElement("LABEL");
-    elem.id = GenerateID();
-    txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    span.appendChild(txtSpan);
-    span.appendChild(elem);
-    table.appendChild(span);
-    if (br)
-        table.appendChild(document.createElement("BR"));
-}
-function CreateButton(txt, elem, table, br = true) {
-    var span = document.createElement("SPAN");
-    var txtSpan = document.createElement("LABEL");
-    elem.hidden = true;
-    elem.id = GenerateID();
-    txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "<b>&nbsp;" + txt + "&nbsp;&nbsp;</b>";
-    txtSpan.classList.add("lbl_action");
-    txtSpan.classList.add("btn_th");
-    span.appendChild(txtSpan);
-    span.appendChild(elem);
-    table.appendChild(span);
-    if (br) {
-        table.appendChild(document.createElement("BR"));
-        table.appendChild(document.createElement("BR"));
-    }
-}
-function FlexCheckbox(txt, inp, fs) {
-    var lbl = document.createElement("LABEL");
-    inp.id = GenerateID();
-    lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    inp.setAttribute("type", "checkbox");
-    lbl.classList.add("flex-item");
-    inp.classList.add("flex-item");
-    fs.div1.appendChild(lbl);
-    fs.div2.appendChild(inp);
-}
-function FlexLabel(txt, div1) {
-    var lbl = document.createElement("LABEL");
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
-    lbl.classList.add("flex-item");
-    div1.appendChild(lbl);
-}
-function FlexSpace(fs) {
-    var lbl = document.createElement("LABEL");
-    lbl.innerHTML = "&nbsp;";
-    lbl.classList.add("flex-item");
-    fs.div1.appendChild(lbl);
-    var lbl2 = document.createElement("LABEL");
-    lbl2.innerHTML = "&nbsp;";
-    lbl2.classList.add("flex-item");
-    fs.div2.appendChild(lbl2);
-}
-function Blink(elem) {
-    elem.classList.toggle("changed", false);
-    elem.offsetHeight;
-    elem.classList.toggle("changed");
-}
-function BlinkIfChanged(elem, str) {
-    if (elem.innerText != str) {
-        Blink(elem);
-    }
-    elem.innerText = str;
-}
-function _arrayBufferToString(buffer) {
-    var binary = '';
-    var bytes = new Uint8Array(buffer);
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return binary;
-}
-function _stringToArrayBuffer(str) {
-    var bytes = new Uint8Array(str.length);
-    for (let i = 0; i < str.length; i++) {
-        bytes[i] = str.charCodeAt(i);
-    }
-    return bytes.buffer;
-}
-const loadJSON = (path, callback) => {
-    let xobj = new XMLHttpRequest();
-    xobj.overrideMimeType("application/json");
-    xobj.open('GET', path, true);
-    // Replace 'my_data' with the path to your file
-    xobj.onreadystatechange = () => {
-        if (xobj.readyState === 4 && xobj.status === 200) {
-            // Required use of an anonymous callback 
-            // as .open() will NOT return a value but simply returns undefined in asynchronous mode
-            callback(xobj.responseText);
-        }
-    };
-    xobj.send(null);
-};
 class Stats {
     constructor(js) {
         this.liftbleed = 0;
@@ -831,6 +596,567 @@ class EngineList {
         return this.list.length;
     }
 }
+/// <reference path="../impl/EngineStats.ts" />
+/// <reference path="../impl/EngineList.ts" />
+class EngineBuilder {
+    constructor() {
+        this.EraTable = [
+            { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
+            { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
+            { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6 },
+            { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4 },
+            { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2 },
+        ];
+        this.CoolingTable = [
+            { name: "Liquid Cooled", forcefactor: 1.2, RPMoff: 0, thrustfactor: 1, radiator: 1, massfactor: 1 },
+            { name: "Air Cooled", forcefactor: 1, RPMoff: 0, thrustfactor: 1, radiator: 0, massfactor: 1 },
+            { name: "Rotary", forcefactor: 1, RPMoff: 8, thrustfactor: 1.5, radiator: 0, massfactor: 1 },
+            { name: "Contrarotary", forcefactor: 1, RPMoff: 8, thrustfactor: 1.25, radiator: 0, massfactor: 1 },
+            { name: "Semi-Radial", forcefactor: 0.8, RPMoff: 0, thrustfactor: 1, radiator: 0, massfactor: 1 },
+            { name: "Liquid Radial", forcefactor: 1, RPMoff: 0, thrustfactor: 1, radiator: 2.5, massfactor: 1.3 },
+        ];
+        this.Upgrades = [
+            { name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
+            { name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
+            { name: "Asperator Boost", powerfactor: 0.11, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: -1, costfactor: 3, reqsection: false },
+            { name: "War Emergency Power", powerfactor: 0, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 5, reqsection: false },
+            { name: "Fuel Injector", powerfactor: 0, fuelfactor: -0.1, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 2, reqsection: false },
+            { name: "Diesel", powerfactor: -0.2, fuelfactor: -0.5, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 0, reqsection: false },
+        ];
+        this.name = "Default Name";
+        this.era_sel = 0;
+        this.cool_sel = 0;
+        this.upg_sel = [...Array(this.Upgrades.length).fill(false)];
+        this.engine_displacement = 1;
+        this.num_cyl_per_row = 2;
+        this.num_rows = 2;
+        this.compression_ratio = 2;
+        this.rpm_boost = 1;
+        this.material_fudge = 1;
+        this.quality_fudge = 1;
+    }
+    UpgradePower() {
+        var power = 1;
+        for (let i = 0; i < this.upg_sel.length; i++) {
+            if (this.upg_sel[i])
+                power += this.Upgrades[i].powerfactor;
+        }
+        if (this.upg_sel[0]) {
+            power *= 1 + this.Upgrades[0].powerfactor;
+        }
+        return power;
+    }
+    RPM() {
+        var Era = this.EraTable[this.era_sel];
+        var Cool = this.CoolingTable[this.cool_sel];
+        return (Era.maxRPM - Cool.RPMoff) * (this.compression_ratio / 10);
+    }
+    GearedRPM() {
+        var GearedRPM = this.RPM() * this.rpm_boost;
+        return GearedRPM;
+    }
+    CalcPower() {
+        var Era = this.EraTable[this.era_sel];
+        var Cool = this.CoolingTable[this.cool_sel];
+        //Calculate Force
+        var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
+        var RawForce = EngineForce * this.UpgradePower();
+        //Output Force
+        var OutputForce = RawForce * (this.GearedRPM() / 10);
+        return Math.floor(1.0e-6 + OutputForce / Era.powerdiv);
+    }
+    UpgradeMass() {
+        var mass = 1;
+        for (let i = 0; i < this.upg_sel.length; i++) {
+            if (this.upg_sel[i])
+                mass += this.Upgrades[i].massfactor;
+        }
+        return mass;
+    }
+    CalcMass() {
+        var Era = this.EraTable[this.era_sel];
+        var Cool = this.CoolingTable[this.cool_sel];
+        var CylMass = Math.pow(this.engine_displacement, 2) * this.compression_ratio / 1000;
+        var CrankMass = (this.engine_displacement * this.num_rows) / 10 + 1;
+        var PistMass = this.engine_displacement / 5;
+        var Mass = Math.floor(1.0e-6 + (CylMass + CrankMass + PistMass) * this.UpgradeMass() * this.material_fudge * Cool.massfactor);
+        return Mass;
+    }
+    UpgradeDrag() {
+        var drag = 1;
+        for (let i = 0; i < this.upg_sel.length; i++) {
+            if (this.upg_sel[i])
+                drag += this.Upgrades[i].dragfactor;
+        }
+        return drag;
+    }
+    CoolDrag() {
+        switch (this.CoolingTable[this.cool_sel].name) {
+            case "Liquid Cooled":
+                return 1;
+            case "Air Cooled":
+                return 1;
+            case "Rotary":
+                return this.GearedRPM() / 10;
+            case "Contrarotary":
+                return this.GearedRPM() / 8;
+            case "Semi-Radial":
+                return 1;
+            case "Liquid Radial":
+                return 1.2;
+        }
+        throw "Error in CoolDrag, no valid switch case.";
+    }
+    CalcDrag() {
+        var RawDrag = 3 + (this.engine_displacement / this.num_rows) / 3;
+        return Math.floor(1.0e-6 + RawDrag * this.CoolDrag() * this.UpgradeDrag());
+    }
+    CoolReliability() {
+        switch (this.CoolingTable[this.cool_sel].name) {
+            case "Liquid Cooled":
+                return (this.num_rows / 2 + 5 * this.num_cyl_per_row) / 10;
+            case "Air Cooled":
+                return 1;
+            case "Rotary":
+                return 1;
+            case "Contrarotary":
+                return 1.1;
+            case "Semi-Radial":
+                return 0.8;
+            case "Liquid Radial":
+                return 1;
+        }
+        throw "Error in CoolReliability, no valid switch case.";
+    }
+    CoolBurnout() {
+        var EraBurnout = this.EraTable[this.era_sel].materials / 2;
+        switch (this.CoolingTable[this.cool_sel].name) {
+            case "Liquid Cooled":
+                return 2;
+            case "Air Cooled":
+                return (2 + (Math.pow(this.num_rows, 2))) * EraBurnout;
+            case "Rotary":
+                return (Math.pow(this.num_rows, 2)) / (this.GearedRPM() / 10);
+            case "Contrarotary":
+                return (Math.pow(this.num_rows, 2)) / (this.GearedRPM() / 10);
+            case "Semi-Radial":
+                return (2 + (Math.pow(this.num_rows, 2)) / 2) * EraBurnout;
+            case "Liquid Radial":
+                return 0.5;
+        }
+        throw "Error in CoolBurnout, no valid switch case.";
+    }
+    MaterialModifier() {
+        var EraBurnout = this.EraTable[this.era_sel].materials;
+        var num_cyl = this.num_cyl_per_row * this.num_rows;
+        var CylinderBurnout = this.engine_displacement / num_cyl * (Math.pow(this.compression_ratio, 2)) * EraBurnout;
+        var GearingBurnout = this.rpm_boost * CylinderBurnout * this.CoolBurnout();
+        return GearingBurnout * this.rpm_boost / (this.material_fudge + this.quality_fudge - 1);
+    }
+    CalcReliability() {
+        var Reliability = 6 - this.MaterialModifier() * this.CoolReliability() / 25;
+        return Math.trunc(Reliability);
+    }
+    IsRotary() {
+        if (this.CoolingTable[this.cool_sel].name == "Rotary"
+            || this.CoolingTable[this.cool_sel].name == "Contrarotary")
+            return true;
+        return false;
+    }
+    CalcCooling() {
+        if (this.IsRotary())
+            return 0;
+        return Math.floor(1.0e-6 + this.MaterialModifier() / 20 * this.CoolingTable[this.cool_sel].radiator);
+    }
+    CalcOverspeed() {
+        return Math.round(1.5 * this.RPM());
+    }
+    UpgradeFuel() {
+        var fuel = 1;
+        for (let i = 0; i < this.upg_sel.length; i++) {
+            if (this.upg_sel[i])
+                fuel += this.Upgrades[i].fuelfactor;
+        }
+        return fuel * this.EraTable[this.era_sel].fuelfactor;
+    }
+    CalcFuelConsumption() {
+        var FuelConsumption = this.engine_displacement * this.RPM() / 100;
+        return Math.floor(1.0e-6 + FuelConsumption * this.UpgradeFuel());
+    }
+    CalcAltitude() {
+        var alt = 0;
+        for (let i = 0; i < this.upg_sel.length; i++) {
+            if (this.upg_sel[i])
+                alt += this.Upgrades[i].idealalt;
+        }
+        return 3 + alt;
+    }
+    CoolTorque() {
+        if (this.IsRotary()) {
+            return this.CalcMass();
+        }
+        return 1;
+    }
+    CalcTorque() {
+        return Math.floor(1.0e-6 + (this.CoolTorque() * this.GearedRPM() / 5) / 4);
+    }
+    UpgradeCost() {
+        var cost = 0;
+        for (let i = 0; i < this.upg_sel.length; i++) {
+            if (this.upg_sel[i])
+                cost += this.Upgrades[i].costfactor;
+        }
+        return cost;
+    }
+    CalcCost() {
+        var Era = this.EraTable[this.era_sel];
+        var Cool = this.CoolingTable[this.cool_sel];
+        var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
+        var CylinderForce = EngineForce / (this.num_rows * this.num_cyl_per_row);
+        var Cost = this.UpgradeCost() + (CylinderForce / 10 * (this.num_cyl_per_row + (this.num_rows * 1.3)));
+        return Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
+    }
+    EngineStats() {
+        var estats = new EngineStats();
+        estats.name = this.name;
+        estats.stats.power = this.CalcPower();
+        estats.stats.mass = this.CalcMass();
+        estats.stats.drag = this.CalcDrag();
+        estats.stats.reliability = this.CalcReliability();
+        estats.stats.cooling = this.CalcCooling();
+        estats.oiltank = this.IsRotary();
+        estats.overspeed = this.CalcOverspeed();
+        estats.stats.fuelconsumption = this.CalcFuelConsumption();
+        estats.altitude = this.CalcAltitude();
+        estats.torque = this.CalcTorque();
+        estats.stats.cost = this.CalcCost();
+        estats.pulsejet = false;
+        estats.rumble = 0;
+        return estats;
+    }
+}
+/// <reference path="../impl/EngineStats.ts" />
+/// <reference path="../impl/EngineList.ts" />
+class PulsejetBuilder {
+    constructor() {
+        this.EraTable = [
+            { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
+            { name: "WWI", cost: 0.75, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
+            { name: "Interbellum", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
+            { name: "WWII", cost: 0.25, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
+            { name: "Last Hurrah", cost: 0.1, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
+        ];
+        this.ValveTable = [
+            { name: "Valved", scale: 1, rumble: 1, designcost: 2, reliability: 1 },
+            { name: "Valveless", scale: 1.1, rumble: 0.9, designcost: 1, reliability: 3 },
+        ];
+        this.desired_power = 1;
+        this.valve_sel = 0;
+        this.era_sel = 0;
+        this.build_quality = 1;
+        this.overall_quality = 1;
+        this.starter = false;
+    }
+    TempMass() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var StarterMass = 0;
+        if (this.starter)
+            StarterMass = 1;
+        var Mass = (this.desired_power / Era.mass) * Valve.scale + StarterMass;
+        return Mass;
+    }
+    CalcMass() {
+        return Math.floor(1.0e-6 + this.TempMass()) + 1;
+    }
+    CalcDrag() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var Drag = (this.desired_power / Era.drag) * Valve.scale + 1;
+        return Math.floor(1.0e-6 + this.TempMass() + Drag + 1);
+    }
+    CalcReliability() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var Reliability = this.desired_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
+        return Math.trunc(-Reliability);
+    }
+    CalcFuelConsumption() {
+        var Era = this.EraTable[this.era_sel];
+        return Math.floor(1.0e-6 + this.desired_power * Era.fuel);
+    }
+    CalcRumble() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        return Math.floor(1.0e-6 + this.desired_power * Valve.rumble / (2 * Era.vibe));
+    }
+    CalcCost() {
+        var Era = this.EraTable[this.era_sel];
+        return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
+    }
+    DesignCost() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var StarterCost = 0;
+        if (this.starter)
+            StarterCost = 3;
+        var Cost = this.desired_power * Era.cost / Valve.designcost;
+        return Math.floor(1.0e-6 + 1 + this.build_quality * (Cost + StarterCost));
+    }
+    EngineStats() {
+        var estats = new EngineStats();
+        var valved = "";
+        if (this.valve_sel == 0)
+            valved = "V";
+        estats.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
+        estats.stats.power = this.desired_power;
+        estats.stats.mass = this.CalcMass();
+        estats.stats.drag = this.CalcDrag();
+        estats.stats.reliability = this.CalcReliability();
+        estats.stats.fuelconsumption = this.CalcFuelConsumption();
+        estats.rumble = this.CalcRumble();
+        estats.stats.cost = this.CalcCost();
+        estats.overspeed = 100;
+        estats.altitude = 3;
+        estats.pulsejet = true;
+        return estats;
+    }
+}
+var internal_id = 0;
+// Function to download data to a file
+function download(data, filename, type) {
+    var file = new Blob([data], { type: type });
+    if (window.navigator.msSaveOrOpenBlob) // IE10+
+        window.navigator.msSaveOrOpenBlob(file, filename);
+    else { // Others
+        var a = document.createElement("a"), url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
+}
+function copyStringToClipboard(str) {
+    // Create new element
+    var el = document.createElement('textarea');
+    // Set value (string to be copied)
+    el.value = str;
+    // Set non-editable to avoid focus and move outside of view
+    el.setAttribute('readonly', '');
+    el.style.position = "absolute";
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+    // Select text inside element
+    el.select();
+    // Copy text to clipboard
+    document.execCommand('copy');
+    // Remove temporary element
+    document.body.removeChild(el);
+}
+function GenerateID() {
+    internal_id++;
+    return "internal_id_" + internal_id.toString();
+}
+function CreateFlexSection(elem) {
+    var fs = {
+        div0: document.createElement("DIV"), div1: document.createElement("DIV"),
+        div2: document.createElement("DIV")
+    };
+    fs.div0.classList.add("flex-container-o");
+    fs.div1.classList.add("flex-container-i");
+    fs.div2.classList.add("flex-container-i");
+    fs.div0.appendChild(fs.div1);
+    fs.div0.appendChild(fs.div2);
+    elem.appendChild(fs.div0);
+    return fs;
+}
+function CreateTH(row, content) {
+    var th = document.createElement("TH");
+    th.innerHTML = content;
+    row.appendChild(th);
+    return th;
+}
+function CreateInput(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("LABEL");
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    elem.setAttribute("type", "number");
+    elem.min = "0";
+    elem.step = "1";
+    elem.valueAsNumber = 0;
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
+function FlexInput(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    inp.setAttribute("type", "number");
+    inp.min = "0";
+    inp.step = "1";
+    inp.valueAsNumber = 0;
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+function FlexText(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    inp.setAttribute("type", "text");
+    inp.value = "Default";
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+function FlexDisplay(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+function FlexSelect(txt, sel, fs) {
+    var lbl = document.createElement("LABEL");
+    sel.id = GenerateID();
+    lbl.htmlFor = sel.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.classList.add("flex-item");
+    sel.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(sel);
+}
+function CreateSpace(elem) {
+    var span = document.createElement("SPAN");
+    span.innerHTML = "&nbsp;";
+    elem.appendChild(span);
+}
+function CreateCheckbox(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("LABEL");
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    elem.setAttribute("type", "checkbox");
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
+function CreateSelect(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("LABEL");
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
+function CreateButton(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("LABEL");
+    elem.hidden = true;
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "<b>&nbsp;" + txt + "&nbsp;&nbsp;</b>";
+    txtSpan.classList.add("lbl_action");
+    txtSpan.classList.add("btn_th");
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br) {
+        table.appendChild(document.createElement("BR"));
+        table.appendChild(document.createElement("BR"));
+    }
+}
+function FlexCheckbox(txt, inp, fs) {
+    var lbl = document.createElement("LABEL");
+    inp.id = GenerateID();
+    lbl.htmlFor = inp.id;
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    inp.setAttribute("type", "checkbox");
+    lbl.classList.add("flex-item");
+    inp.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    fs.div2.appendChild(inp);
+}
+function FlexLabel(txt, div1) {
+    var lbl = document.createElement("LABEL");
+    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.classList.add("flex-item");
+    div1.appendChild(lbl);
+}
+function FlexSpace(fs) {
+    var lbl = document.createElement("LABEL");
+    lbl.innerHTML = "&nbsp;";
+    lbl.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    var lbl2 = document.createElement("LABEL");
+    lbl2.innerHTML = "&nbsp;";
+    lbl2.classList.add("flex-item");
+    fs.div2.appendChild(lbl2);
+}
+function Blink(elem) {
+    elem.classList.toggle("changed", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed");
+}
+function BlinkIfChanged(elem, str) {
+    if (elem.innerText != str) {
+        Blink(elem);
+    }
+    elem.innerText = str;
+}
+function _arrayBufferToString(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return binary;
+}
+function _stringToArrayBuffer(str) {
+    var bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+const loadJSON = (path, callback) => {
+    let xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open('GET', path, true);
+    // Replace 'my_data' with the path to your file
+    xobj.onreadystatechange = () => {
+        if (xobj.readyState === 4 && xobj.status === 200) {
+            // Required use of an anonymous callback 
+            // as .open() will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+        }
+    };
+    xobj.send(null);
+};
 // Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
 // This work is free. You can redistribute it and/or modify it
 // under the terms of the WTFPL, Version 2
@@ -1298,8 +1624,8 @@ var LZString = (function () {
     return LZString;
 })();
 /// <reference path="../disp/Tools.ts" />
-/// <reference path="../impl/EngineStats.ts" />
-/// <reference path="../impl/EngineList.ts" />
+/// <reference path="./EngineBuilder.ts" />
+/// <reference path="./PulsejetBuilder.ts" />
 /// <reference path="../lz/lz-string.ts" />
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -1707,327 +2033,5 @@ class EngineBuilder_HTML {
     }
     SelectEngine(num) {
         this.SetValues(elist.get(num));
-    }
-}
-class EngineBuilder {
-    constructor() {
-        this.EraTable = [
-            { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
-            { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
-            { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6 },
-            { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4 },
-            { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2 },
-        ];
-        this.CoolingTable = [
-            { name: "Liquid Cooled", forcefactor: 1.2, RPMoff: 0, thrustfactor: 1, radiator: 1, massfactor: 1 },
-            { name: "Air Cooled", forcefactor: 1, RPMoff: 0, thrustfactor: 1, radiator: 0, massfactor: 1 },
-            { name: "Rotary", forcefactor: 1, RPMoff: 8, thrustfactor: 1.5, radiator: 0, massfactor: 1 },
-            { name: "Contrarotary", forcefactor: 1, RPMoff: 8, thrustfactor: 1.25, radiator: 0, massfactor: 1 },
-            { name: "Semi-Radial", forcefactor: 0.8, RPMoff: 0, thrustfactor: 1, radiator: 0, massfactor: 1 },
-            { name: "Liquid Radial", forcefactor: 1, RPMoff: 0, thrustfactor: 1, radiator: 2.5, massfactor: 1.3 },
-        ];
-        this.Upgrades = [
-            { name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
-            { name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
-            { name: "Asperator Boost", powerfactor: 0.11, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: -1, costfactor: 3, reqsection: false },
-            { name: "War Emergency Power", powerfactor: 0, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 5, reqsection: false },
-            { name: "Fuel Injector", powerfactor: 0, fuelfactor: -0.1, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 2, reqsection: false },
-            { name: "Diesel", powerfactor: -0.2, fuelfactor: -0.5, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 0, reqsection: false },
-        ];
-        this.name = "Default Name";
-        this.era_sel = 0;
-        this.cool_sel = 0;
-        this.upg_sel = [...Array(this.Upgrades.length).fill(false)];
-        this.engine_displacement = 1;
-        this.num_cyl_per_row = 2;
-        this.num_rows = 2;
-        this.compression_ratio = 2;
-        this.rpm_boost = 1;
-        this.material_fudge = 1;
-        this.quality_fudge = 1;
-    }
-    UpgradePower() {
-        var power = 1;
-        for (let i = 0; i < this.upg_sel.length; i++) {
-            if (this.upg_sel[i])
-                power += this.Upgrades[i].powerfactor;
-        }
-        if (this.upg_sel[0]) {
-            power *= 1 + this.Upgrades[0].powerfactor;
-        }
-        return power;
-    }
-    RPM() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
-        return (Era.maxRPM - Cool.RPMoff) * (this.compression_ratio / 10);
-    }
-    GearedRPM() {
-        var GearedRPM = this.RPM() * this.rpm_boost;
-        return GearedRPM;
-    }
-    CalcPower() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
-        //Calculate Force
-        var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
-        var RawForce = EngineForce * this.UpgradePower();
-        //Output Force
-        var OutputForce = RawForce * (this.GearedRPM() / 10);
-        return Math.floor(1.0e-6 + OutputForce / Era.powerdiv);
-    }
-    UpgradeMass() {
-        var mass = 1;
-        for (let i = 0; i < this.upg_sel.length; i++) {
-            if (this.upg_sel[i])
-                mass += this.Upgrades[i].massfactor;
-        }
-        return mass;
-    }
-    CalcMass() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
-        var CylMass = Math.pow(this.engine_displacement, 2) * this.compression_ratio / 1000;
-        var CrankMass = (this.engine_displacement * this.num_rows) / 10 + 1;
-        var PistMass = this.engine_displacement / 5;
-        var Mass = Math.floor(1.0e-6 + (CylMass + CrankMass + PistMass) * this.UpgradeMass() * this.material_fudge * Cool.massfactor);
-        return Mass;
-    }
-    UpgradeDrag() {
-        var drag = 1;
-        for (let i = 0; i < this.upg_sel.length; i++) {
-            if (this.upg_sel[i])
-                drag += this.Upgrades[i].dragfactor;
-        }
-        return drag;
-    }
-    CoolDrag() {
-        switch (this.CoolingTable[this.cool_sel].name) {
-            case "Liquid Cooled":
-                return 1;
-            case "Air Cooled":
-                return 1;
-            case "Rotary":
-                return this.GearedRPM() / 10;
-            case "Contrarotary":
-                return this.GearedRPM() / 8;
-            case "Semi-Radial":
-                return 1;
-            case "Liquid Radial":
-                return 1.2;
-        }
-        throw "Error in CoolDrag, no valid switch case.";
-    }
-    CalcDrag() {
-        var RawDrag = 3 + (this.engine_displacement / this.num_rows) / 3;
-        return Math.floor(1.0e-6 + RawDrag * this.CoolDrag() * this.UpgradeDrag());
-    }
-    CoolReliability() {
-        switch (this.CoolingTable[this.cool_sel].name) {
-            case "Liquid Cooled":
-                return (this.num_rows / 2 + 5 * this.num_cyl_per_row) / 10;
-            case "Air Cooled":
-                return 1;
-            case "Rotary":
-                return 1;
-            case "Contrarotary":
-                return 1.1;
-            case "Semi-Radial":
-                return 0.8;
-            case "Liquid Radial":
-                return 1;
-        }
-        throw "Error in CoolReliability, no valid switch case.";
-    }
-    CoolBurnout() {
-        var EraBurnout = this.EraTable[this.era_sel].materials / 2;
-        switch (this.CoolingTable[this.cool_sel].name) {
-            case "Liquid Cooled":
-                return 2;
-            case "Air Cooled":
-                return (2 + (Math.pow(this.num_rows, 2))) * EraBurnout;
-            case "Rotary":
-                return (Math.pow(this.num_rows, 2)) / (this.GearedRPM() / 10);
-            case "Contrarotary":
-                return (Math.pow(this.num_rows, 2)) / (this.GearedRPM() / 10);
-            case "Semi-Radial":
-                return (2 + (Math.pow(this.num_rows, 2)) / 2) * EraBurnout;
-            case "Liquid Radial":
-                return 0.5;
-        }
-        throw "Error in CoolBurnout, no valid switch case.";
-    }
-    MaterialModifier() {
-        var EraBurnout = this.EraTable[this.era_sel].materials;
-        var num_cyl = this.num_cyl_per_row * this.num_rows;
-        var CylinderBurnout = this.engine_displacement / num_cyl * (Math.pow(this.compression_ratio, 2)) * EraBurnout;
-        var GearingBurnout = this.rpm_boost * CylinderBurnout * this.CoolBurnout();
-        return GearingBurnout * this.rpm_boost / (this.material_fudge + this.quality_fudge - 1);
-    }
-    CalcReliability() {
-        var Reliability = 6 - this.MaterialModifier() * this.CoolReliability() / 25;
-        return Math.trunc(Reliability);
-    }
-    IsRotary() {
-        if (this.CoolingTable[this.cool_sel].name == "Rotary"
-            || this.CoolingTable[this.cool_sel].name == "Contrarotary")
-            return true;
-        return false;
-    }
-    CalcCooling() {
-        if (this.IsRotary())
-            return 0;
-        return Math.floor(1.0e-6 + this.MaterialModifier() / 20 * this.CoolingTable[this.cool_sel].radiator);
-    }
-    CalcOverspeed() {
-        return Math.round(1.5 * this.RPM());
-    }
-    UpgradeFuel() {
-        var fuel = 1;
-        for (let i = 0; i < this.upg_sel.length; i++) {
-            if (this.upg_sel[i])
-                fuel += this.Upgrades[i].fuelfactor;
-        }
-        return fuel * this.EraTable[this.era_sel].fuelfactor;
-    }
-    CalcFuelConsumption() {
-        var FuelConsumption = this.engine_displacement * this.RPM() / 100;
-        return Math.floor(1.0e-6 + FuelConsumption * this.UpgradeFuel());
-    }
-    CalcAltitude() {
-        var alt = 0;
-        for (let i = 0; i < this.upg_sel.length; i++) {
-            if (this.upg_sel[i])
-                alt += this.Upgrades[i].idealalt;
-        }
-        return 3 + alt;
-    }
-    CoolTorque() {
-        if (this.IsRotary()) {
-            return this.CalcMass();
-        }
-        return 1;
-    }
-    CalcTorque() {
-        return Math.floor(1.0e-6 + (this.CoolTorque() * this.GearedRPM() / 5) / 4);
-    }
-    UpgradeCost() {
-        var cost = 0;
-        for (let i = 0; i < this.upg_sel.length; i++) {
-            if (this.upg_sel[i])
-                cost += this.Upgrades[i].costfactor;
-        }
-        return cost;
-    }
-    CalcCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
-        var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
-        var CylinderForce = EngineForce / (this.num_rows * this.num_cyl_per_row);
-        var Cost = this.UpgradeCost() + (CylinderForce / 10 * (this.num_cyl_per_row + (this.num_rows * 1.3)));
-        return Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
-    }
-    EngineStats() {
-        var estats = new EngineStats();
-        estats.name = this.name;
-        estats.stats.power = this.CalcPower();
-        estats.stats.mass = this.CalcMass();
-        estats.stats.drag = this.CalcDrag();
-        estats.stats.reliability = this.CalcReliability();
-        estats.stats.cooling = this.CalcCooling();
-        estats.oiltank = this.IsRotary();
-        estats.overspeed = this.CalcOverspeed();
-        estats.stats.fuelconsumption = this.CalcFuelConsumption();
-        estats.altitude = this.CalcAltitude();
-        estats.torque = this.CalcTorque();
-        estats.stats.cost = this.CalcCost();
-        estats.pulsejet = false;
-        estats.rumble = 0;
-        return estats;
-    }
-}
-class PulsejetBuilder {
-    constructor() {
-        this.EraTable = [
-            { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
-            { name: "WWI", cost: 0.75, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
-            { name: "Interbellum", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
-            { name: "WWII", cost: 0.25, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
-            { name: "Last Hurrah", cost: 0.1, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
-        ];
-        this.ValveTable = [
-            { name: "Valved", scale: 1, rumble: 1, designcost: 2, reliability: 1 },
-            { name: "Valveless", scale: 1.1, rumble: 0.9, designcost: 1, reliability: 3 },
-        ];
-        this.desired_power = 1;
-        this.valve_sel = 0;
-        this.era_sel = 0;
-        this.build_quality = 1;
-        this.overall_quality = 1;
-        this.starter = false;
-    }
-    TempMass() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var StarterMass = 0;
-        if (this.starter)
-            StarterMass = 1;
-        var Mass = (this.desired_power / Era.mass) * Valve.scale + StarterMass;
-        return Mass;
-    }
-    CalcMass() {
-        return Math.floor(1.0e-6 + this.TempMass()) + 1;
-    }
-    CalcDrag() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var Drag = (this.desired_power / Era.drag) * Valve.scale + 1;
-        return Math.floor(1.0e-6 + this.TempMass() + Drag + 1);
-    }
-    CalcReliability() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var Reliability = this.desired_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
-        return Math.trunc(-Reliability);
-    }
-    CalcFuelConsumption() {
-        var Era = this.EraTable[this.era_sel];
-        return Math.floor(1.0e-6 + this.desired_power * Era.fuel);
-    }
-    CalcRumble() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        return Math.floor(1.0e-6 + this.desired_power * Valve.rumble / (2 * Era.vibe));
-    }
-    CalcCost() {
-        var Era = this.EraTable[this.era_sel];
-        return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
-    }
-    DesignCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var StarterCost = 0;
-        if (this.starter)
-            StarterCost = 3;
-        var Cost = this.desired_power * Era.cost / Valve.designcost;
-        return Math.floor(1.0e-6 + 1 + this.build_quality * (Cost + StarterCost));
-    }
-    EngineStats() {
-        var estats = new EngineStats();
-        var valved = "";
-        if (this.valve_sel == 0)
-            valved = "V";
-        estats.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
-        estats.stats.power = this.desired_power;
-        estats.stats.mass = this.CalcMass();
-        estats.stats.drag = this.CalcDrag();
-        estats.stats.reliability = this.CalcReliability();
-        estats.stats.fuelconsumption = this.CalcFuelConsumption();
-        estats.rumble = this.CalcRumble();
-        estats.stats.cost = this.CalcCost();
-        estats.overspeed = 100;
-        estats.altitude = 3;
-        estats.pulsejet = true;
-        return estats;
     }
 }
