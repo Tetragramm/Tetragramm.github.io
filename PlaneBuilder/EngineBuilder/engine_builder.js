@@ -219,6 +219,20 @@ function _stringToArrayBuffer(str) {
     }
     return bytes.buffer;
 }
+const loadJSON = (path, callback) => {
+    let xobj = new XMLHttpRequest();
+    xobj.overrideMimeType("application/json");
+    xobj.open('GET', path, true);
+    // Replace 'my_data' with the path to your file
+    xobj.onreadystatechange = () => {
+        if (xobj.readyState === 4 && xobj.status === 200) {
+            // Required use of an anonymous callback 
+            // as .open() will NOT return a value but simply returns undefined in asynchronous mode
+            callback(xobj.responseText);
+        }
+    };
+    xobj.send(null);
+};
 class Stats {
     constructor(js) {
         this.liftbleed = 0;
@@ -1292,6 +1306,10 @@ const init = () => {
     var ep = sp.get("engine");
     elist = new EngineList();
     ebuild = new EngineBuilder_HTML();
+    loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
+        var engine_json = JSON.parse(engine_resp);
+        elist.fromJSON(engine_json);
+    });
     if (ep != null) {
         try {
             var str = LZString.decompressFromEncodedURIComponent(ep);

@@ -10,6 +10,11 @@ const init = () => {
     elist = new EngineList();
     ebuild = new EngineBuilder_HTML();
 
+    loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
+        var engine_json = JSON.parse(engine_resp);
+        elist.fromJSON(engine_json);
+    });
+
     if (ep != null) {
         try {
             var str = LZString.decompressFromEncodedURIComponent(ep);
