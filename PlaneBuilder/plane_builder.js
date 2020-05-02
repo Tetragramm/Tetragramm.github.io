@@ -4992,8 +4992,9 @@ class Weapon extends Part {
         //If on the wing and uncovered add 1, if covered, drag is min 1.
         if (this.wing && !this.covered)
             stats.drag += 1;
-        //Arty size weapon mounts need a section
-        if (this.wing && size > 8)
+        //Arty size weapon turrets need a section
+        //Arty weapons in the fuselage need a section
+        if ((!this.fixed && size > 8) || (!this.wing && this.weapon_type.size == 16))
             stats.reqsections += 1;
         //Accessible Cost
         if (this.accessible) {
