@@ -629,7 +629,8 @@
                 "mass": 2,
                 "structure": 4,
                 "cost": 0,
-                "geodesic": true
+                "geodesic": true,
+                "warning": "Free Repairs for Living Grove sections."
             }
         ],
         "skin": [

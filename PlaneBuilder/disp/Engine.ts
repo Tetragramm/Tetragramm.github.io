@@ -145,8 +145,7 @@ class Engine_HTML extends Display {
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
             if (this.e_select.selectedIndex == engine_list.length) {
-                this.SetInputDisable(false);
-                this.SendCustomStats();
+                window.location.href = "engine.html";
             }
             else {
                 this.SetInputDisable(true);
@@ -312,6 +311,7 @@ class Engine_HTML extends Display {
             this.cool_cell.appendChild(txtSpan);
             var fs = CreateFlexSection(this.cool_cell);
             FlexCheckbox("Air Cooling Fan", this.intake_fan, fs);
+            this.intake_fan.disabled = !this.engine.CanIntakeFan();
         }
         else {
             var txtSpan = document.createElement("SPAN") as HTMLSpanElement;

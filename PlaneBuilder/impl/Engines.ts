@@ -378,7 +378,7 @@ class Engines extends Part {
                 is_pulsejet = true;
         }
         if (is_pulsejet) {
-            stats.warnings.push({ source: "Pulsejets", warning: "Pulsejets double Boost when above dropoff speed." });
+            stats.warnings.push({ source: "Pulsejets", warning: "Pulsejets halve Boost when below dropoff speed, instead of above dropoff." });
         }
 
         //Part local, gets handled in UpdateReliability

@@ -487,6 +487,7 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
+
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);

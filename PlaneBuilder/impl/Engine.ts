@@ -159,9 +159,7 @@ class Engine extends Part {
 
     public SetCustomStats(stats: EngineStats) {
         this.selected_index = -1;
-        if (stats.oiltank) {
-            stats.stats.cooling = 0;
-        }
+        stats.Verify();
         this.etype_stats = stats;
         this.PulseJetCheck();
         this.cooling_count = Math.min(this.cooling_count, this.etype_stats.stats.cooling);
@@ -220,6 +218,10 @@ class Engine extends Part {
 
     public GetRadiator(): number {
         return this.radiator_index;
+    }
+
+    public CanIntakeFan() {
+        return this.IsAirCooled();
     }
 
     public SetIntakeFan(use: boolean) {
@@ -350,10 +352,6 @@ class Engine extends Part {
 
     private PulseJetCheck() {
         if (this.GetIsPulsejet()) {
-            this.etype_stats.stats.cooling = 0;
-            this.etype_stats.overspeed = 100;
-            this.etype_stats.altitude = 3;
-            this.etype_stats.torque = 0;
             this.use_pp = false;
             this.use_ds = false;
             this.gp_count = 0;
@@ -368,9 +366,6 @@ class Engine extends Part {
                         break;
                 }
             }
-        }
-        else {
-            this.etype_stats.rumble = 0;
         }
     }
 

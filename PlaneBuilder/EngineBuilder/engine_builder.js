@@ -148,6 +148,23 @@ function CreateSelect(txt, elem, table, br = true) {
     if (br)
         table.appendChild(document.createElement("BR"));
 }
+function CreateButton(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var txtSpan = document.createElement("LABEL");
+    elem.hidden = true;
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "<b>&nbsp;" + txt + "&nbsp;&nbsp;</b>";
+    txtSpan.classList.add("lbl_action");
+    txtSpan.classList.add("btn_th");
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br) {
+        table.appendChild(document.createElement("BR"));
+        table.appendChild(document.createElement("BR"));
+    }
+}
 function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
@@ -185,6 +202,22 @@ function BlinkIfChanged(elem, str) {
         Blink(elem);
     }
     elem.innerText = str;
+}
+function _arrayBufferToString(buffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return binary;
+}
+function _stringToArrayBuffer(str) {
+    var bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+    }
+    return bytes.buffer;
 }
 class Stats {
     constructor(js) {
@@ -693,17 +726,591 @@ class EngineStats {
             && this.oiltank == other.oiltank
             && this.pulsejet == other.pulsejet;
     }
+    Verify() {
+        if (this.oiltank) {
+            this.stats.cooling = 0;
+        }
+        this.PulseJetCheck();
+    }
+    PulseJetCheck() {
+        if (this.pulsejet) {
+            this.stats.cooling = 0;
+            this.overspeed = 100;
+            this.altitude = 3;
+            this.torque = 0;
+        }
+        else {
+            this.rumble = 0;
+        }
+    }
 }
+/// <reference path="./Stats.ts" />
+/// <reference path="./EngineStats.ts" />
+class EngineList {
+    constructor() {
+        this.list = [];
+        var ejson = window.localStorage.engines;
+        if (ejson != null)
+            this.fromJSON(JSON.parse(ejson));
+    }
+    toJSON() {
+        var ret = [];
+        for (let li of this.list) {
+            ret.push(li.toJSON());
+        }
+        return { engines: ret };
+    }
+    fromJSON(js) {
+        for (let elem of js["engines"]) {
+            this.push(new EngineStats(elem));
+        }
+    }
+    serialize(s) {
+        s.PushNum(this.list.length);
+        for (let li of this.list) {
+            li.serialize(s);
+        }
+    }
+    deserialize(d) {
+        var len = d.GetNum();
+        for (let i = 0; i < len; i++) {
+            let stats = new EngineStats();
+            stats.deserialize(d);
+            this.push(stats);
+        }
+    }
+    deserializeEngine(d) {
+        let stats = new EngineStats();
+        stats.deserialize(d);
+        return this.push(stats);
+    }
+    push(es) {
+        for (let i = 0; i < this.length; i++) {
+            let li = this.list[i];
+            if (li.Equal(es))
+                return i;
+        }
+        this.list.push(es.Clone());
+        window.localStorage.engines = JSON.stringify(this.toJSON());
+        this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        return this.find(es);
+    }
+    get(i) {
+        if (i < 0 || i >= this.length)
+            return new EngineStats();
+        return this.list[i];
+    }
+    find(es) {
+        for (let i = 0; i < this.length; i++) {
+            if (es.Equal(this.list[i]))
+                return i;
+        }
+        return -1;
+    }
+    remove(es) {
+        var idx = this.find(es);
+        if (idx >= 0) {
+            this.list.splice(idx, 1);
+        }
+    }
+    get length() {
+        return this.list.length;
+    }
+}
+// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.4.4
+var LZString = (function () {
+    // private property
+    var f = String.fromCharCode;
+    var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+    var baseReverseDic = {};
+    function getBaseValue(alphabet, character) {
+        if (!baseReverseDic[alphabet]) {
+            baseReverseDic[alphabet] = {};
+            for (var i = 0; i < alphabet.length; i++) {
+                baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+            }
+        }
+        return baseReverseDic[alphabet][character];
+    }
+    var LZString = {
+        compressToBase64: function (input) {
+            if (input == null)
+                return "";
+            var res = LZString._compress(input, 6, function (a) { return keyStrBase64.charAt(a); });
+            switch (res.length % 4) { // To produce valid Base64
+                default: // When could this happen ?
+                case 0: return res;
+                case 1: return res + "===";
+                case 2: return res + "==";
+                case 3: return res + "=";
+            }
+        },
+        decompressFromBase64: function (input) {
+            if (input == null)
+                return "";
+            if (input == "")
+                return null;
+            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
+        },
+        compressToUTF16: function (input) {
+            if (input == null)
+                return "";
+            return LZString._compress(input, 15, function (a) { return f(a + 32); }) + " ";
+        },
+        decompressFromUTF16: function (compressed) {
+            if (compressed == null)
+                return "";
+            if (compressed == "")
+                return null;
+            return LZString._decompress(compressed.length, 16384, function (index) { return compressed.charCodeAt(index) - 32; });
+        },
+        //compress into uint8array (UCS-2 big endian format)
+        compressToUint8Array: function (uncompressed) {
+            var compressed = LZString.compress(uncompressed);
+            var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
+            for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
+                var current_value = compressed.charCodeAt(i);
+                buf[i * 2] = current_value >>> 8;
+                buf[i * 2 + 1] = current_value % 256;
+            }
+            return buf;
+        },
+        //decompress from uint8array (UCS-2 big endian format)
+        decompressFromUint8Array: function (compressed) {
+            if (compressed === null || compressed === undefined) {
+                return LZString.decompress(compressed);
+            }
+            else {
+                var buf = new Array(compressed.length / 2); // 2 bytes per character
+                for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
+                    buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
+                }
+                var result = [];
+                buf.forEach(function (c) {
+                    result.push(f(c));
+                });
+                return LZString.decompress(result.join(''));
+            }
+        },
+        //compress into a string that is already URI encoded
+        compressToEncodedURIComponent: function (input) {
+            if (input == null)
+                return "";
+            return LZString._compress(input, 6, function (a) { return keyStrUriSafe.charAt(a); });
+        },
+        //decompress from an output of compressToEncodedURIComponent
+        decompressFromEncodedURIComponent: function (input) {
+            if (input == null)
+                return "";
+            if (input == "")
+                return null;
+            input = input.replace(/ /g, "+");
+            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+        },
+        compress: function (uncompressed) {
+            return LZString._compress(uncompressed, 16, function (a) { return f(a); });
+        },
+        _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+            if (uncompressed == null)
+                return "";
+            var i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, // Compensate for the first entry which should not count
+            context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0, ii;
+            for (ii = 0; ii < uncompressed.length; ii += 1) {
+                context_c = uncompressed.charAt(ii);
+                if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
+                    context_dictionary[context_c] = context_dictSize++;
+                    context_dictionaryToCreate[context_c] = true;
+                }
+                context_wc = context_w + context_c;
+                if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
+                    context_w = context_wc;
+                }
+                else {
+                    if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                        if (context_w.charCodeAt(0) < 256) {
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 8; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        }
+                        else {
+                            value = 1;
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1) | value;
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = 0;
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 16; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        }
+                        context_enlargeIn--;
+                        if (context_enlargeIn == 0) {
+                            context_enlargeIn = Math.pow(2, context_numBits);
+                            context_numBits++;
+                        }
+                        delete context_dictionaryToCreate[context_w];
+                    }
+                    else {
+                        value = context_dictionary[context_w];
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    // Add wc to the dictionary.
+                    context_dictionary[context_wc] = context_dictSize++;
+                    context_w = String(context_c);
+                }
+            }
+            // Output the code for w.
+            if (context_w !== "") {
+                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                    if (context_w.charCodeAt(0) < 256) {
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 8; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    else {
+                        value = 1;
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | value;
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = 0;
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 16; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    delete context_dictionaryToCreate[context_w];
+                }
+                else {
+                    value = context_dictionary[context_w];
+                    for (i = 0; i < context_numBits; i++) {
+                        context_data_val = (context_data_val << 1) | (value & 1);
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                        value = value >> 1;
+                    }
+                }
+                context_enlargeIn--;
+                if (context_enlargeIn == 0) {
+                    context_enlargeIn = Math.pow(2, context_numBits);
+                    context_numBits++;
+                }
+            }
+            // Mark the end of the stream
+            value = 2;
+            for (i = 0; i < context_numBits; i++) {
+                context_data_val = (context_data_val << 1) | (value & 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data_position = 0;
+                    context_data.push(getCharFromInt(context_data_val));
+                    context_data_val = 0;
+                }
+                else {
+                    context_data_position++;
+                }
+                value = value >> 1;
+            }
+            // Flush the last char
+            while (true) {
+                context_data_val = (context_data_val << 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data.push(getCharFromInt(context_data_val));
+                    break;
+                }
+                else
+                    context_data_position++;
+            }
+            return context_data.join('');
+        },
+        decompress: function (compressed) {
+            if (compressed == null)
+                return "";
+            if (compressed == "")
+                return null;
+            return LZString._decompress(compressed.length, 32768, function (index) { return compressed.charCodeAt(index); });
+        },
+        _decompress: function (length, resetValue, getNextValue) {
+            var dictionary = [], next, enlargeIn = 4, dictSize = 4, numBits = 3, entry = "", result = [], i, w, bits, resb, maxpower, power, c, data = { val: getNextValue(0), position: resetValue, index: 1 };
+            for (i = 0; i < 3; i += 1) {
+                dictionary[i] = i;
+            }
+            bits = 0;
+            maxpower = Math.pow(2, 2);
+            power = 1;
+            while (power != maxpower) {
+                resb = data.val & data.position;
+                data.position >>= 1;
+                if (data.position == 0) {
+                    data.position = resetValue;
+                    data.val = getNextValue(data.index++);
+                }
+                bits |= (resb > 0 ? 1 : 0) * power;
+                power <<= 1;
+            }
+            switch (next = bits) {
+                case 0:
+                    bits = 0;
+                    maxpower = Math.pow(2, 8);
+                    power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = f(bits);
+                    break;
+                case 1:
+                    bits = 0;
+                    maxpower = Math.pow(2, 16);
+                    power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = f(bits);
+                    break;
+                case 2:
+                    return "";
+            }
+            dictionary[3] = c;
+            w = c;
+            result.push(c);
+            while (true) {
+                if (data.index > length) {
+                    return "";
+                }
+                bits = 0;
+                maxpower = Math.pow(2, numBits);
+                power = 1;
+                while (power != maxpower) {
+                    resb = data.val & data.position;
+                    data.position >>= 1;
+                    if (data.position == 0) {
+                        data.position = resetValue;
+                        data.val = getNextValue(data.index++);
+                    }
+                    bits |= (resb > 0 ? 1 : 0) * power;
+                    power <<= 1;
+                }
+                switch (c = bits) {
+                    case 0:
+                        bits = 0;
+                        maxpower = Math.pow(2, 8);
+                        power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = f(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 1:
+                        bits = 0;
+                        maxpower = Math.pow(2, 16);
+                        power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = f(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 2:
+                        return result.join('');
+                }
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+                if (dictionary[c]) {
+                    entry = dictionary[c];
+                }
+                else {
+                    if (c === dictSize) {
+                        entry = w + w.charAt(0);
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                result.push(entry);
+                // Add w+entry[0] to the dictionary.
+                dictionary[dictSize++] = w + entry.charAt(0);
+                enlargeIn--;
+                w = entry;
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+            }
+        }
+    };
+    return LZString;
+})();
 /// <reference path="../disp/Tools.ts" />
 /// <reference path="../impl/EngineStats.ts" />
+/// <reference path="../impl/EngineList.ts" />
+/// <reference path="../lz/lz-string.ts" />
 const init = () => {
+    const sp = new URLSearchParams(location.search);
+    var ep = sp.get("engine");
+    elist = new EngineList();
     ebuild = new EngineBuilder_HTML();
+    if (ep != null) {
+        try {
+            var str = LZString.decompressFromEncodedURIComponent(ep);
+            var arr = _stringToArrayBuffer(str);
+            var des = new Deserialize(arr);
+            var num = elist.deserializeEngine(des);
+            ebuild.SelectEngine(num);
+        }
+        catch (_a) {
+            console.log("Compressed Engine Parameter Failed.");
+        }
+    }
 };
 window.onload = init;
 var ebuild;
+var elist;
 class EngineBuilder_HTML {
     constructor() {
-        this.eb = new EngineBuilder();
+        this.enginebuilder = new EngineBuilder();
         this.pulsejetbuilder = new PulsejetBuilder();
         var etbl = document.getElementById("table_engine");
         var erow = etbl.insertRow();
@@ -716,9 +1323,135 @@ class EngineBuilder_HTML {
         this.InitPulsejetInputs(prow.insertCell());
         this.InitPulsejetOutputs(prow.insertCell());
         this.UpdatePulsejet();
+        var mtbl = document.getElementById("table_manual");
+        var mrow = mtbl.insertRow();
+        this.InitManual(mrow.insertCell());
+        this.InitListManagement(mrow.insertCell());
+    }
+    InitEngineInputs(cell) {
+        this.e_name = document.createElement("INPUT");
+        this.e_sera = document.createElement("SELECT");
+        this.e_cool = document.createElement("SELECT");
+        this.e_disp = document.createElement("INPUT");
+        this.e_cmpr = document.createElement("INPUT");
+        this.e_ncyl = document.createElement("INPUT");
+        this.e_nrow = document.createElement("INPUT");
+        this.e_rpmb = document.createElement("INPUT");
+        this.e_mfdg = document.createElement("INPUT");
+        this.e_qfdg = document.createElement("INPUT");
+        for (let e of this.enginebuilder.EraTable) {
+            let opt = document.createElement("OPTION");
+            opt.text = e.name;
+            this.e_sera.add(opt);
+        }
+        for (let c of this.enginebuilder.CoolingTable) {
+            let opt = document.createElement("OPTION");
+            opt.text = c.name;
+            this.e_cool.add(opt);
+        }
+        var fs = CreateFlexSection(cell);
+        FlexText("Name", this.e_name, fs);
+        FlexSelect("Era", this.e_sera, fs);
+        FlexSelect("Engine Type", this.e_cool, fs);
+        FlexInput("Engine Displacement (L)", this.e_disp, fs);
+        FlexInput("Compression Ratio (N:1)", this.e_cmpr, fs);
+        FlexInput("Cylinders per Row", this.e_ncyl, fs);
+        FlexInput("Number of Rows", this.e_nrow, fs);
+        FlexInput("RPM Boost", this.e_rpmb, fs);
+        FlexInput("Material Fudge Factor", this.e_mfdg, fs);
+        FlexInput("Quality Fudge Factor", this.e_qfdg, fs);
+        this.e_disp.step = "0.01";
+        this.e_cmpr.step = "0.01";
+        this.e_rpmb.step = "0.01";
+        this.e_rpmb.min = "0.5";
+        this.e_rpmb.max = "1.5";
+        this.e_mfdg.step = "0.01";
+        this.e_mfdg.min = "0.01";
+        this.e_mfdg.max = "99999";
+        this.e_qfdg.step = "0.01";
+        this.e_qfdg.min = "0.01";
+        this.e_qfdg.max = "99999";
+        this.e_name.onchange = () => { this.enginebuilder.name = this.e_name.value; this.UpdateEngine(); };
+        this.e_sera.onchange = () => { this.enginebuilder.era_sel = this.e_sera.selectedIndex; this.UpdateEngine(); };
+        this.e_cool.onchange = () => { this.enginebuilder.cool_sel = this.e_cool.selectedIndex; this.UpdateEngine(); };
+        this.e_disp.onchange = () => { this.enginebuilder.engine_displacement = this.e_disp.valueAsNumber; this.UpdateEngine(); };
+        this.e_cmpr.onchange = () => { this.enginebuilder.compression_ratio = this.e_cmpr.valueAsNumber; this.UpdateEngine(); };
+        this.e_ncyl.onchange = () => { this.enginebuilder.num_cyl_per_row = this.e_ncyl.valueAsNumber; this.UpdateEngine(); };
+        this.e_nrow.onchange = () => { this.enginebuilder.num_rows = this.e_nrow.valueAsNumber; this.UpdateEngine(); };
+        this.e_rpmb.onchange = () => { this.enginebuilder.rpm_boost = this.e_rpmb.valueAsNumber; this.UpdateEngine(); };
+        this.e_mfdg.onchange = () => { this.enginebuilder.material_fudge = this.e_mfdg.valueAsNumber; this.UpdateEngine(); };
+        this.e_qfdg.onchange = () => { this.enginebuilder.quality_fudge = this.e_qfdg.valueAsNumber; this.UpdateEngine(); };
+    }
+    InitEngineUpgrades(cell) {
+        var fs = CreateFlexSection(cell);
+        this.e_upgs = [];
+        for (let i = 0; i < this.enginebuilder.Upgrades.length; i++) {
+            let u = this.enginebuilder.Upgrades[i];
+            let inp = document.createElement("INPUT");
+            inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
+            FlexCheckbox(u.name, inp, fs);
+            this.e_upgs.push(inp);
+        }
+    }
+    InitEngineOutputs(cell) {
+        this.ed_name = document.createElement("LABEL");
+        this.ed_powr = document.createElement("LABEL");
+        this.ed_mass = document.createElement("LABEL");
+        this.ed_drag = document.createElement("LABEL");
+        this.ed_rely = document.createElement("LABEL");
+        this.ed_cool = document.createElement("LABEL");
+        this.ed_ospd = document.createElement("LABEL");
+        this.ed_fuel = document.createElement("LABEL");
+        this.ed_malt = document.createElement("LABEL");
+        this.ed_torq = document.createElement("LABEL");
+        this.ed_cost = document.createElement("LABEL");
+        this.ed_oilt = document.createElement("LABEL");
+        var fs = CreateFlexSection(cell);
+        FlexDisplay("Name", this.ed_name, fs);
+        FlexDisplay("Power", this.ed_powr, fs);
+        FlexDisplay("Mass", this.ed_mass, fs);
+        FlexDisplay("Drag", this.ed_drag, fs);
+        FlexDisplay("Reliability", this.ed_rely, fs);
+        FlexDisplay("Required Cooling", this.ed_cool, fs);
+        FlexDisplay("Overspeed", this.ed_ospd, fs);
+        FlexDisplay("Fuel Consumption", this.ed_fuel, fs);
+        FlexDisplay("Altitude", this.ed_malt, fs);
+        FlexDisplay("Torque", this.ed_torq, fs);
+        FlexDisplay("Cost", this.ed_cost, fs);
+        FlexDisplay("Oil Tank", this.ed_oilt, fs);
+    }
+    UpdateEngine() {
+        this.e_name.value = this.enginebuilder.name;
+        this.e_sera.selectedIndex = this.enginebuilder.era_sel;
+        this.e_cool.selectedIndex = this.enginebuilder.cool_sel;
+        this.e_disp.valueAsNumber = this.enginebuilder.engine_displacement;
+        this.e_ncyl.valueAsNumber = this.enginebuilder.num_cyl_per_row;
+        this.e_nrow.valueAsNumber = this.enginebuilder.num_rows;
+        this.e_cmpr.valueAsNumber = this.enginebuilder.compression_ratio;
+        this.e_rpmb.valueAsNumber = this.enginebuilder.rpm_boost;
+        this.e_mfdg.valueAsNumber = this.enginebuilder.material_fudge;
+        this.e_qfdg.valueAsNumber = this.enginebuilder.quality_fudge;
+        for (let i = 0; i < this.e_upgs.length; i++) {
+            this.e_upgs[i].checked = this.enginebuilder.upg_sel[i];
+        }
+        var estats = this.enginebuilder.EngineStats();
+        BlinkIfChanged(this.ed_name, estats.name);
+        BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
+        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
+        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString());
+        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString());
+        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString());
+        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString());
+        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString());
+        BlinkIfChanged(this.ed_malt, estats.altitude.toString());
+        BlinkIfChanged(this.ed_torq, estats.torque.toString());
+        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString());
+        if (estats.oiltank)
+            BlinkIfChanged(this.ed_oilt, "Yes");
+        else
+            BlinkIfChanged(this.ed_oilt, "No");
     }
     InitPulsejetInputs(cell) {
-        this.p_name = document.createElement("LABEL");
         this.p_powr = document.createElement("INPUT");
         this.p_type = document.createElement("SELECT");
         this.p_sera = document.createElement("SELECT");
@@ -735,7 +1468,6 @@ class EngineBuilder_HTML {
             opt.text = e.name;
             this.p_sera.add(opt);
         }
-        cell.appendChild(this.p_name);
         var fs = CreateFlexSection(cell);
         FlexInput("Desired Power", this.p_powr, fs);
         FlexSelect("Engine Type", this.p_type, fs);
@@ -796,128 +1528,167 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.pd_malt, estats.altitude.toString());
         BlinkIfChanged(this.pd_dcst, this.pulsejetbuilder.DesignCost().toString());
     }
-    InitEngineInputs(cell) {
-        this.e_name = document.createElement("INPUT");
-        this.e_sera = document.createElement("SELECT");
-        this.e_cool = document.createElement("SELECT");
-        this.e_disp = document.createElement("INPUT");
-        this.e_cmpr = document.createElement("INPUT");
-        this.e_ncyl = document.createElement("INPUT");
-        this.e_nrow = document.createElement("INPUT");
-        this.e_rpmb = document.createElement("INPUT");
-        this.e_mfdg = document.createElement("INPUT");
-        this.e_qfdg = document.createElement("INPUT");
-        for (let e of this.eb.EraTable) {
+    InitManual(cell) {
+        this.m_name = document.createElement("INPUT");
+        this.m_pwr = document.createElement("INPUT");
+        this.m_mass = document.createElement("INPUT");
+        this.m_drag = document.createElement("INPUT");
+        this.m_rely = document.createElement("INPUT");
+        this.m_cool = document.createElement("INPUT");
+        this.m_over = document.createElement("INPUT");
+        this.m_fuel = document.createElement("INPUT");
+        this.m_alti = document.createElement("INPUT");
+        this.m_torq = document.createElement("INPUT");
+        this.m_rumb = document.createElement("INPUT");
+        this.m_cost = document.createElement("INPUT");
+        this.m_oil = document.createElement("INPUT");
+        this.m_pulsejet = document.createElement("INPUT");
+        this.m_turbo = document.createElement("INPUT");
+        var fs = CreateFlexSection(cell);
+        //Set up the individual stat input boxes
+        FlexText("Name", this.m_name, fs);
+        FlexInput("Power", this.m_pwr, fs);
+        FlexInput("Mass", this.m_mass, fs);
+        FlexInput("Drag", this.m_drag, fs);
+        FlexInput("Reliability", this.m_rely, fs);
+        FlexInput("Cooling", this.m_cool, fs);
+        FlexInput("Overspeed", this.m_over, fs);
+        FlexInput("Fuel Consumption", this.m_fuel, fs);
+        FlexInput("Altitude", this.m_alti, fs);
+        FlexInput("Torque", this.m_torq, fs);
+        FlexInput("Rumble", this.m_rumb, fs);
+        FlexInput("Cost", this.m_cost, fs);
+        FlexCheckbox("Oil Tank", this.m_oil, fs);
+        FlexCheckbox("Pulsejet", this.m_pulsejet, fs);
+        FlexCheckbox("Turbocharger", this.m_turbo, fs);
+        var trigger = () => { this.UpdateManual(); };
+        this.m_name.onchange = trigger;
+        this.m_pwr.onchange = trigger;
+        this.m_mass.onchange = trigger;
+        this.m_drag.onchange = trigger;
+        this.m_rely.onchange = trigger;
+        this.m_cool.onchange = trigger;
+        this.m_over.onchange = trigger;
+        this.m_fuel.onchange = trigger;
+        this.m_alti.onchange = trigger;
+        this.m_torq.onchange = trigger;
+        this.m_rumb.onchange = trigger;
+        this.m_cost.onchange = trigger;
+        this.m_oil.onchange = trigger;
+        this.m_pulsejet.onchange = trigger;
+        this.m_turbo.onchange = trigger;
+    }
+    InitListManagement(cell) {
+        this.m_select = document.createElement("SELECT");
+        this.m_add = document.createElement("BUTTON");
+        this.m_delete = document.createElement("BUTTON");
+        this.m_add_eb = document.createElement("BUTTON");
+        this.m_add_pj = document.createElement("BUTTON");
+        this.m_copy = document.createElement("BUTTON");
+        this.m_save = document.createElement("BUTTON");
+        this.m_load = document.createElement("INPUT");
+        this.m_select.onchange = () => { this.SetValues(elist.get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
+        this.m_delete.onclick = () => { elist.remove(this.UpdateManual()); this.UpdateList(); };
+        this.m_add.onclick = () => { elist.push(this.UpdateManual()); this.UpdateList(); };
+        this.m_add_eb.onclick = () => { elist.push(this.enginebuilder.EngineStats()); this.UpdateList(); };
+        this.m_add_pj.onclick = () => { elist.push(this.pulsejetbuilder.EngineStats()); this.UpdateList(); };
+        this.m_save.onclick = () => { download(JSON.stringify(elist.toJSON()), "EngineList.json", "json"); };
+        this.m_load.setAttribute("type", "file");
+        this.m_load.multiple = false;
+        this.m_load.accept = "application/JSON";
+        this.m_load.onchange = (evt) => {
+            if (this.m_load.files.length == 0)
+                return;
+            var file = this.m_load.files[0];
+            var reader = new FileReader();
+            reader.onloadend = () => {
+                try {
+                    var str = JSON.parse(reader.result);
+                    elist.fromJSON(str);
+                    this.UpdateList();
+                }
+                catch (_a) { }
+            };
+            reader.readAsText(file);
+            this.m_load.value = "";
+        };
+        this.m_copy.onclick = () => {
+            var ser = new Serialize();
+            this.UpdateManual().serialize(ser);
+            var arr = ser.FinalArray();
+            var str2 = _arrayBufferToString(arr);
+            var txt2 = LZString.compressToEncodedURIComponent(str2);
+            var link = (location.origin + "/PlaneBuilder/index.html?engine=" + txt2);
+            copyStringToClipboard(link);
+        };
+        CreateSelect("Engines", this.m_select, cell);
+        cell.appendChild(document.createElement("BR"));
+        CreateButton("Copy Single Engine", this.m_copy, cell);
+        CreateButton("Save Engine List", this.m_save, cell);
+        CreateButton("Load Engine List", this.m_load, cell);
+        CreateButton("Add From Engine Builder", this.m_add_eb, cell);
+        CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
+        CreateButton("Add From Manual Input", this.m_add, cell);
+        CreateButton("Delete Engine", this.m_delete, cell);
+        this.UpdateList();
+    }
+    UpdateList() {
+        var idx = this.m_select.selectedIndex;
+        while (this.m_select.options.length > 0) {
+            this.m_select.options.remove(0);
+        }
+        for (let i = 0; i < elist.length; i++) {
             let opt = document.createElement("OPTION");
-            opt.text = e.name;
-            this.e_sera.add(opt);
+            opt.text = elist.get(i).name;
+            this.m_select.add(opt);
         }
-        for (let c of this.eb.CoolingTable) {
-            let opt = document.createElement("OPTION");
-            opt.text = c.name;
-            this.e_cool.add(opt);
+        if (idx >= elist.length) {
+            idx = elist.length - 1;
         }
-        var fs = CreateFlexSection(cell);
-        FlexText("Name", this.e_name, fs);
-        FlexSelect("Era", this.e_sera, fs);
-        FlexSelect("Engine Type", this.e_cool, fs);
-        FlexInput("Engine Displacement (L)", this.e_disp, fs);
-        FlexInput("Compression Ratio (N:1)", this.e_cmpr, fs);
-        FlexInput("Cylinders per Row", this.e_ncyl, fs);
-        FlexInput("Number of Rows", this.e_nrow, fs);
-        FlexInput("RPM Boost", this.e_rpmb, fs);
-        FlexInput("Material Fudge Factor", this.e_mfdg, fs);
-        FlexInput("Quality Fudge Factor", this.e_qfdg, fs);
-        this.e_disp.step = "0.01";
-        this.e_cmpr.step = "0.01";
-        this.e_rpmb.step = "0.01";
-        this.e_rpmb.min = "0.5";
-        this.e_rpmb.max = "1.5";
-        this.e_mfdg.step = "0.01";
-        this.e_mfdg.min = "0.01";
-        this.e_mfdg.max = "99999";
-        this.e_qfdg.step = "0.01";
-        this.e_qfdg.min = "0.01";
-        this.e_qfdg.max = "99999";
-        this.e_name.onchange = () => { this.eb.name = this.e_name.value; this.UpdateEngine(); };
-        this.e_sera.onchange = () => { this.eb.era_sel = this.e_sera.selectedIndex; this.UpdateEngine(); };
-        this.e_cool.onchange = () => { this.eb.cool_sel = this.e_cool.selectedIndex; this.UpdateEngine(); };
-        this.e_disp.onchange = () => { this.eb.engine_displacement = this.e_disp.valueAsNumber; this.UpdateEngine(); };
-        this.e_cmpr.onchange = () => { this.eb.compression_ratio = this.e_cmpr.valueAsNumber; this.UpdateEngine(); };
-        this.e_ncyl.onchange = () => { this.eb.num_cyl_per_row = this.e_ncyl.valueAsNumber; this.UpdateEngine(); };
-        this.e_nrow.onchange = () => { this.eb.num_rows = this.e_nrow.valueAsNumber; this.UpdateEngine(); };
-        this.e_rpmb.onchange = () => { this.eb.rpm_boost = this.e_rpmb.valueAsNumber; this.UpdateEngine(); };
-        this.e_mfdg.onchange = () => { this.eb.material_fudge = this.e_mfdg.valueAsNumber; this.UpdateEngine(); };
-        this.e_qfdg.onchange = () => { this.eb.quality_fudge = this.e_qfdg.valueAsNumber; this.UpdateEngine(); };
+        this.m_select.selectedIndex = idx;
     }
-    InitEngineUpgrades(cell) {
-        var fs = CreateFlexSection(cell);
-        this.e_upgs = [];
-        for (let i = 0; i < this.eb.Upgrades.length; i++) {
-            let u = this.eb.Upgrades[i];
-            let inp = document.createElement("INPUT");
-            inp.onchange = () => { this.eb.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
-            FlexCheckbox(u.name, inp, fs);
-            this.e_upgs.push(inp);
-        }
+    UpdateManual() {
+        var e_stats = new EngineStats();
+        e_stats.name = this.m_name.value;
+        e_stats.stats.power = this.m_pwr.valueAsNumber;
+        e_stats.stats.mass = this.m_mass.valueAsNumber;
+        e_stats.stats.drag = this.m_drag.valueAsNumber;
+        e_stats.stats.reliability = this.m_rely.valueAsNumber;
+        e_stats.stats.cooling = this.m_cool.valueAsNumber;
+        e_stats.overspeed = this.m_over.valueAsNumber;
+        e_stats.stats.fuelconsumption = this.m_fuel.valueAsNumber;
+        e_stats.altitude = this.m_alti.valueAsNumber;
+        e_stats.torque = this.m_torq.valueAsNumber;
+        e_stats.rumble = this.m_rumb.valueAsNumber;
+        e_stats.stats.cost = this.m_cost.valueAsNumber;
+        e_stats.oiltank = this.m_oil.checked;
+        e_stats.pulsejet = this.m_pulsejet.checked;
+        if (this.m_turbo.checked)
+            e_stats.stats.reqsections = 1;
+        e_stats.Verify();
+        this.SetValues(e_stats);
+        return e_stats;
     }
-    InitEngineOutputs(cell) {
-        this.ed_name = document.createElement("LABEL");
-        this.ed_powr = document.createElement("LABEL");
-        this.ed_mass = document.createElement("LABEL");
-        this.ed_drag = document.createElement("LABEL");
-        this.ed_rely = document.createElement("LABEL");
-        this.ed_cool = document.createElement("LABEL");
-        this.ed_ospd = document.createElement("LABEL");
-        this.ed_fuel = document.createElement("LABEL");
-        this.ed_malt = document.createElement("LABEL");
-        this.ed_torq = document.createElement("LABEL");
-        this.ed_cost = document.createElement("LABEL");
-        this.ed_oilt = document.createElement("LABEL");
-        var fs = CreateFlexSection(cell);
-        FlexDisplay("Name", this.ed_name, fs);
-        FlexDisplay("Power", this.ed_powr, fs);
-        FlexDisplay("Mass", this.ed_mass, fs);
-        FlexDisplay("Drag", this.ed_drag, fs);
-        FlexDisplay("Reliability", this.ed_rely, fs);
-        FlexDisplay("Required Cooling", this.ed_cool, fs);
-        FlexDisplay("Overspeed", this.ed_ospd, fs);
-        FlexDisplay("Fuel Consumption", this.ed_fuel, fs);
-        FlexDisplay("Altitude", this.ed_malt, fs);
-        FlexDisplay("Torque", this.ed_torq, fs);
-        FlexDisplay("Cost", this.ed_cost, fs);
-        FlexDisplay("Oil Tank", this.ed_oilt, fs);
+    SetValues(e_stats) {
+        e_stats.Verify();
+        this.m_name.value = e_stats.name;
+        this.m_pwr.valueAsNumber = e_stats.stats.power;
+        this.m_mass.valueAsNumber = e_stats.stats.mass;
+        this.m_drag.valueAsNumber = e_stats.stats.drag;
+        this.m_rely.valueAsNumber = e_stats.stats.reliability;
+        this.m_cool.valueAsNumber = e_stats.stats.cooling;
+        this.m_over.valueAsNumber = e_stats.overspeed;
+        this.m_fuel.valueAsNumber = e_stats.stats.fuelconsumption;
+        this.m_alti.valueAsNumber = e_stats.altitude;
+        this.m_torq.valueAsNumber = e_stats.torque;
+        this.m_rumb.valueAsNumber = e_stats.rumble;
+        this.m_cost.valueAsNumber = e_stats.stats.cost;
+        this.m_oil.checked = e_stats.oiltank;
+        this.m_pulsejet.checked = e_stats.pulsejet;
+        this.m_turbo.checked = e_stats.stats.reqsections > 0;
     }
-    UpdateEngine() {
-        this.e_name.value = this.eb.name;
-        this.e_sera.selectedIndex = this.eb.era_sel;
-        this.e_cool.selectedIndex = this.eb.cool_sel;
-        this.e_disp.valueAsNumber = this.eb.engine_displacement;
-        this.e_ncyl.valueAsNumber = this.eb.num_cyl_per_row;
-        this.e_nrow.valueAsNumber = this.eb.num_rows;
-        this.e_cmpr.valueAsNumber = this.eb.compression_ratio;
-        this.e_rpmb.valueAsNumber = this.eb.rpm_boost;
-        this.e_mfdg.valueAsNumber = this.eb.material_fudge;
-        this.e_qfdg.valueAsNumber = this.eb.quality_fudge;
-        for (let i = 0; i < this.e_upgs.length; i++) {
-            this.e_upgs[i].checked = this.eb.upg_sel[i];
-        }
-        var estats = this.eb.EngineStats();
-        BlinkIfChanged(this.ed_name, estats.name);
-        BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
-        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
-        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString());
-        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString());
-        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString());
-        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString());
-        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString());
-        BlinkIfChanged(this.ed_malt, estats.altitude.toString());
-        BlinkIfChanged(this.ed_torq, estats.torque.toString());
-        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString());
-        if (estats.oiltank)
-            BlinkIfChanged(this.ed_oilt, "Yes");
-        else
-            BlinkIfChanged(this.ed_oilt, "No");
+    SelectEngine(num) {
+        this.SetValues(elist.get(num));
     }
 }
 class EngineBuilder {

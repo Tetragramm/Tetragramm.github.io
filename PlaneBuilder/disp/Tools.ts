@@ -168,6 +168,25 @@ function CreateSelect(txt: string, elem: HTMLSelectElement, table: HTMLElement, 
         table.appendChild(document.createElement("BR"));
 }
 
+function CreateButton(txt: string, elem: HTMLButtonElement, table: HTMLElement, br = true) {
+    var span = document.createElement("SPAN") as HTMLSpanElement;
+    var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
+    elem.hidden = true;
+    elem.id = GenerateID();
+    txtSpan.htmlFor = elem.id;
+    txtSpan.innerHTML = "<b>&nbsp;" + txt + "&nbsp;&nbsp;</b>";
+    txtSpan.classList.add("lbl_action");
+    txtSpan.classList.add("btn_th");
+    span.appendChild(txtSpan);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br) {
+        table.appendChild(document.createElement("BR"));
+        table.appendChild(document.createElement("BR"));
+    }
+
+}
+
 function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
@@ -210,4 +229,22 @@ function BlinkIfChanged(elem: HTMLElement, str: string) {
         Blink(elem);
     }
     elem.innerText = str;
+}
+
+function _arrayBufferToString(buffer: ArrayBuffer) {
+    var binary = '';
+    var bytes = new Uint8Array(buffer);
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return binary;
+}
+
+function _stringToArrayBuffer(str: string) {
+    var bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+        bytes[i] = str.charCodeAt(i);
+    }
+    return bytes.buffer;
 }

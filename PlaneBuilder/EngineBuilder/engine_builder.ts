@@ -1,16 +1,33 @@
 /// <reference path="../disp/Tools.ts" />
 /// <reference path="../impl/EngineStats.ts" />
+/// <reference path="../impl/EngineList.ts" />
+/// <reference path="../lz/lz-string.ts" />
 
 const init = () => {
+    const sp = new URLSearchParams(location.search);
+    var ep = sp.get("engine");
+
+    elist = new EngineList();
     ebuild = new EngineBuilder_HTML();
+
+    if (ep != null) {
+        try {
+            var str = LZString.decompressFromEncodedURIComponent(ep);
+            var arr = _stringToArrayBuffer(str);
+            var des = new Deserialize(arr);
+            var num = elist.deserializeEngine(des);
+            ebuild.SelectEngine(num);
+        } catch { console.log("Compressed Engine Parameter Failed."); }
+    }
 }
 window.onload = init;
 
 var ebuild: EngineBuilder_HTML;
+var elist: EngineList;
 
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
-    private eb: EngineBuilder;
+    private enginebuilder: EngineBuilder;
 
     //Engine Inputs
     private e_name: HTMLInputElement;
@@ -57,8 +74,35 @@ class EngineBuilder_HTML {
     private pd_malt: HTMLLabelElement;
     private pd_dcst: HTMLLabelElement;
 
+    //Manual Inputs
+    private m_name: HTMLInputElement;
+    private m_pwr: HTMLInputElement;
+    private m_mass: HTMLInputElement;
+    private m_drag: HTMLInputElement;
+    private m_rely: HTMLInputElement;
+    private m_cool: HTMLInputElement;
+    private m_over: HTMLInputElement;
+    private m_fuel: HTMLInputElement;
+    private m_alti: HTMLInputElement;
+    private m_torq: HTMLInputElement;
+    private m_rumb: HTMLInputElement;
+    private m_cost: HTMLInputElement;
+    private m_oil: HTMLInputElement;
+    private m_pulsejet: HTMLInputElement;
+    private m_turbo: HTMLInputElement;
+
+    //List Modification
+    private m_select: HTMLSelectElement;
+    private m_add: HTMLButtonElement;
+    private m_delete: HTMLButtonElement;
+    private m_add_eb: HTMLButtonElement;
+    private m_add_pj: HTMLButtonElement;
+    private m_save: HTMLButtonElement;
+    private m_load: HTMLInputElement;
+    private m_copy: HTMLButtonElement;
+
     constructor() {
-        this.eb = new EngineBuilder();
+        this.enginebuilder = new EngineBuilder();
         this.pulsejetbuilder = new PulsejetBuilder();
 
         var etbl = document.getElementById("table_engine") as HTMLTableElement;
@@ -73,10 +117,147 @@ class EngineBuilder_HTML {
         this.InitPulsejetInputs(prow.insertCell());
         this.InitPulsejetOutputs(prow.insertCell());
         this.UpdatePulsejet();
+
+        var mtbl = document.getElementById("table_manual") as HTMLTableElement;
+        var mrow = mtbl.insertRow();
+        this.InitManual(mrow.insertCell());
+        this.InitListManagement(mrow.insertCell());
+    }
+
+    private InitEngineInputs(cell: HTMLTableCellElement) {
+        this.e_name = document.createElement("INPUT") as HTMLInputElement;
+        this.e_sera = document.createElement("SELECT") as HTMLSelectElement;
+        this.e_cool = document.createElement("SELECT") as HTMLSelectElement;
+        this.e_disp = document.createElement("INPUT") as HTMLInputElement;
+        this.e_cmpr = document.createElement("INPUT") as HTMLInputElement;
+        this.e_ncyl = document.createElement("INPUT") as HTMLInputElement;
+        this.e_nrow = document.createElement("INPUT") as HTMLInputElement;
+        this.e_rpmb = document.createElement("INPUT") as HTMLInputElement;
+        this.e_mfdg = document.createElement("INPUT") as HTMLInputElement;
+        this.e_qfdg = document.createElement("INPUT") as HTMLInputElement;
+        for (let e of this.enginebuilder.EraTable) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = e.name;
+            this.e_sera.add(opt);
+        }
+        for (let c of this.enginebuilder.CoolingTable) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = c.name;
+            this.e_cool.add(opt);
+        }
+
+        var fs = CreateFlexSection(cell);
+        FlexText("Name", this.e_name, fs);
+        FlexSelect("Era", this.e_sera, fs);
+        FlexSelect("Engine Type", this.e_cool, fs);
+        FlexInput("Engine Displacement (L)", this.e_disp, fs);
+        FlexInput("Compression Ratio (N:1)", this.e_cmpr, fs);
+        FlexInput("Cylinders per Row", this.e_ncyl, fs);
+        FlexInput("Number of Rows", this.e_nrow, fs);
+        FlexInput("RPM Boost", this.e_rpmb, fs);
+        FlexInput("Material Fudge Factor", this.e_mfdg, fs);
+        FlexInput("Quality Fudge Factor", this.e_qfdg, fs);
+
+        this.e_disp.step = "0.01";
+        this.e_cmpr.step = "0.01";
+        this.e_rpmb.step = "0.01";
+        this.e_rpmb.min = "0.5";
+        this.e_rpmb.max = "1.5";
+        this.e_mfdg.step = "0.01";
+        this.e_mfdg.min = "0.01";
+        this.e_mfdg.max = "99999";
+        this.e_qfdg.step = "0.01";
+        this.e_qfdg.min = "0.01";
+        this.e_qfdg.max = "99999";
+
+        this.e_name.onchange = () => { this.enginebuilder.name = this.e_name.value; this.UpdateEngine(); };
+        this.e_sera.onchange = () => { this.enginebuilder.era_sel = this.e_sera.selectedIndex; this.UpdateEngine(); };
+        this.e_cool.onchange = () => { this.enginebuilder.cool_sel = this.e_cool.selectedIndex; this.UpdateEngine(); };
+        this.e_disp.onchange = () => { this.enginebuilder.engine_displacement = this.e_disp.valueAsNumber; this.UpdateEngine(); };
+        this.e_cmpr.onchange = () => { this.enginebuilder.compression_ratio = this.e_cmpr.valueAsNumber; this.UpdateEngine(); };
+        this.e_ncyl.onchange = () => { this.enginebuilder.num_cyl_per_row = this.e_ncyl.valueAsNumber; this.UpdateEngine(); };
+        this.e_nrow.onchange = () => { this.enginebuilder.num_rows = this.e_nrow.valueAsNumber; this.UpdateEngine(); };
+        this.e_rpmb.onchange = () => { this.enginebuilder.rpm_boost = this.e_rpmb.valueAsNumber; this.UpdateEngine(); };
+        this.e_mfdg.onchange = () => { this.enginebuilder.material_fudge = this.e_mfdg.valueAsNumber; this.UpdateEngine(); };
+        this.e_qfdg.onchange = () => { this.enginebuilder.quality_fudge = this.e_qfdg.valueAsNumber; this.UpdateEngine(); };
+    }
+
+    private InitEngineUpgrades(cell: HTMLTableCellElement) {
+        var fs = CreateFlexSection(cell);
+        this.e_upgs = [];
+        for (let i = 0; i < this.enginebuilder.Upgrades.length; i++) {
+            let u = this.enginebuilder.Upgrades[i];
+            let inp = document.createElement("INPUT") as HTMLInputElement;
+            inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
+            FlexCheckbox(u.name, inp, fs);
+            this.e_upgs.push(inp);
+        }
+    }
+
+    private InitEngineOutputs(cell: HTMLTableCellElement) {
+        this.ed_name = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_powr = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_mass = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_drag = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_rely = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_cool = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_ospd = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_fuel = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_malt = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_torq = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_cost = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_oilt = document.createElement("LABEL") as HTMLLabelElement;
+        var fs = CreateFlexSection(cell);
+        FlexDisplay("Name", this.ed_name, fs);
+        FlexDisplay("Power", this.ed_powr, fs);
+        FlexDisplay("Mass", this.ed_mass, fs);
+        FlexDisplay("Drag", this.ed_drag, fs);
+        FlexDisplay("Reliability", this.ed_rely, fs);
+        FlexDisplay("Required Cooling", this.ed_cool, fs);
+        FlexDisplay("Overspeed", this.ed_ospd, fs);
+        FlexDisplay("Fuel Consumption", this.ed_fuel, fs);
+        FlexDisplay("Altitude", this.ed_malt, fs);
+        FlexDisplay("Torque", this.ed_torq, fs);
+        FlexDisplay("Cost", this.ed_cost, fs);
+        FlexDisplay("Oil Tank", this.ed_oilt, fs);
+    }
+
+    private UpdateEngine() {
+        this.e_name.value = this.enginebuilder.name;
+        this.e_sera.selectedIndex = this.enginebuilder.era_sel;
+        this.e_cool.selectedIndex = this.enginebuilder.cool_sel;
+        this.e_disp.valueAsNumber = this.enginebuilder.engine_displacement;
+        this.e_ncyl.valueAsNumber = this.enginebuilder.num_cyl_per_row;
+        this.e_nrow.valueAsNumber = this.enginebuilder.num_rows;
+        this.e_cmpr.valueAsNumber = this.enginebuilder.compression_ratio;
+        this.e_rpmb.valueAsNumber = this.enginebuilder.rpm_boost;
+        this.e_mfdg.valueAsNumber = this.enginebuilder.material_fudge;
+        this.e_qfdg.valueAsNumber = this.enginebuilder.quality_fudge;
+        for (let i = 0; i < this.e_upgs.length; i++) {
+            this.e_upgs[i].checked = this.enginebuilder.upg_sel[i];
+        }
+
+        var estats = this.enginebuilder.EngineStats();
+        BlinkIfChanged(this.ed_name, estats.name);
+        BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
+        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
+        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString());
+        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString());
+        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString());
+        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString());
+        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString());
+        BlinkIfChanged(this.ed_malt, estats.altitude.toString());
+        BlinkIfChanged(this.ed_torq, estats.torque.toString());
+        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString());
+        if (estats.oiltank)
+            BlinkIfChanged(this.ed_oilt, "Yes");
+        else
+            BlinkIfChanged(this.ed_oilt, "No");
+
+
     }
 
     private InitPulsejetInputs(cell: HTMLTableCellElement) {
-        this.p_name = document.createElement("LABEL") as HTMLLabelElement;
         this.p_powr = document.createElement("INPUT") as HTMLInputElement;
         this.p_type = document.createElement("SELECT") as HTMLSelectElement;
         this.p_sera = document.createElement("SELECT") as HTMLSelectElement;
@@ -94,7 +275,6 @@ class EngineBuilder_HTML {
             this.p_sera.add(opt);
         }
 
-        cell.appendChild(this.p_name);
         var fs = CreateFlexSection(cell);
         FlexInput("Desired Power", this.p_powr, fs);
         FlexSelect("Engine Type", this.p_type, fs);
@@ -161,137 +341,176 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.pd_dcst, this.pulsejetbuilder.DesignCost().toString());
     }
 
-    private InitEngineInputs(cell: HTMLTableCellElement) {
-        this.e_name = document.createElement("INPUT") as HTMLInputElement;
-        this.e_sera = document.createElement("SELECT") as HTMLSelectElement;
-        this.e_cool = document.createElement("SELECT") as HTMLSelectElement;
-        this.e_disp = document.createElement("INPUT") as HTMLInputElement;
-        this.e_cmpr = document.createElement("INPUT") as HTMLInputElement;
-        this.e_ncyl = document.createElement("INPUT") as HTMLInputElement;
-        this.e_nrow = document.createElement("INPUT") as HTMLInputElement;
-        this.e_rpmb = document.createElement("INPUT") as HTMLInputElement;
-        this.e_mfdg = document.createElement("INPUT") as HTMLInputElement;
-        this.e_qfdg = document.createElement("INPUT") as HTMLInputElement;
-        for (let e of this.eb.EraTable) {
+    private InitManual(cell: HTMLTableCellElement) {
+        this.m_name = document.createElement("INPUT") as HTMLInputElement;
+        this.m_pwr = document.createElement("INPUT") as HTMLInputElement;
+        this.m_mass = document.createElement("INPUT") as HTMLInputElement;
+        this.m_drag = document.createElement("INPUT") as HTMLInputElement;
+        this.m_rely = document.createElement("INPUT") as HTMLInputElement;
+        this.m_cool = document.createElement("INPUT") as HTMLInputElement;
+        this.m_over = document.createElement("INPUT") as HTMLInputElement;
+        this.m_fuel = document.createElement("INPUT") as HTMLInputElement;
+        this.m_alti = document.createElement("INPUT") as HTMLInputElement;
+        this.m_torq = document.createElement("INPUT") as HTMLInputElement;
+        this.m_rumb = document.createElement("INPUT") as HTMLInputElement;
+        this.m_cost = document.createElement("INPUT") as HTMLInputElement;
+        this.m_oil = document.createElement("INPUT") as HTMLInputElement;
+        this.m_pulsejet = document.createElement("INPUT") as HTMLInputElement;
+        this.m_turbo = document.createElement("INPUT") as HTMLInputElement;
+
+        var fs = CreateFlexSection(cell);
+        //Set up the individual stat input boxes
+        FlexText("Name", this.m_name, fs);
+        FlexInput("Power", this.m_pwr, fs);
+        FlexInput("Mass", this.m_mass, fs);
+        FlexInput("Drag", this.m_drag, fs);
+        FlexInput("Reliability", this.m_rely, fs);
+        FlexInput("Cooling", this.m_cool, fs);
+        FlexInput("Overspeed", this.m_over, fs);
+        FlexInput("Fuel Consumption", this.m_fuel, fs);
+        FlexInput("Altitude", this.m_alti, fs);
+        FlexInput("Torque", this.m_torq, fs);
+        FlexInput("Rumble", this.m_rumb, fs);
+        FlexInput("Cost", this.m_cost, fs);
+        FlexCheckbox("Oil Tank", this.m_oil, fs);
+        FlexCheckbox("Pulsejet", this.m_pulsejet, fs);
+        FlexCheckbox("Turbocharger", this.m_turbo, fs);
+
+        var trigger = () => { this.UpdateManual(); };
+        this.m_name.onchange = trigger;
+        this.m_pwr.onchange = trigger;
+        this.m_mass.onchange = trigger;
+        this.m_drag.onchange = trigger;
+        this.m_rely.onchange = trigger;
+        this.m_cool.onchange = trigger;
+        this.m_over.onchange = trigger;
+        this.m_fuel.onchange = trigger;
+        this.m_alti.onchange = trigger;
+        this.m_torq.onchange = trigger;
+        this.m_rumb.onchange = trigger;
+        this.m_cost.onchange = trigger;
+        this.m_oil.onchange = trigger;
+        this.m_pulsejet.onchange = trigger;
+        this.m_turbo.onchange = trigger;
+    }
+
+    private InitListManagement(cell: HTMLTableCellElement) {
+        this.m_select = document.createElement("SELECT") as HTMLSelectElement;
+        this.m_add = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_delete = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_add_eb = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_add_pj = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_copy = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_save = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_load = document.createElement("INPUT") as HTMLInputElement;
+
+        this.m_select.onchange = () => { this.SetValues(elist.get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
+        this.m_delete.onclick = () => { elist.remove(this.UpdateManual()); this.UpdateList(); }
+        this.m_add.onclick = () => { elist.push(this.UpdateManual()); this.UpdateList(); }
+        this.m_add_eb.onclick = () => { elist.push(this.enginebuilder.EngineStats()); this.UpdateList(); }
+        this.m_add_pj.onclick = () => { elist.push(this.pulsejetbuilder.EngineStats()); this.UpdateList(); }
+        this.m_save.onclick = () => { download(JSON.stringify(elist.toJSON()), "EngineList.json", "json"); }
+        this.m_load.setAttribute("type", "file");
+        this.m_load.multiple = false;
+        this.m_load.accept = "application/JSON";
+        this.m_load.onchange = (evt) => {
+            if (this.m_load.files.length == 0)
+                return;
+            var file = this.m_load.files[0];
+            var reader = new FileReader();
+            reader.onloadend = () => {
+                try {
+                    var str = JSON.parse(reader.result as string);
+                    elist.fromJSON(str);
+                    this.UpdateList();
+                } catch { }
+            };
+            reader.readAsText(file);
+            this.m_load.value = "";
+        };
+
+        this.m_copy.onclick = () => {
+            var ser = new Serialize();
+            this.UpdateManual().serialize(ser);
+            var arr = ser.FinalArray();
+            var str2 = _arrayBufferToString(arr);
+            var txt2 = LZString.compressToEncodedURIComponent(str2);
+            var link = (location.origin + "/PlaneBuilder/index.html?engine=" + txt2);
+            copyStringToClipboard(link);
+        };
+
+        CreateSelect("Engines", this.m_select, cell);
+        cell.appendChild(document.createElement("BR"));
+        CreateButton("Copy Single Engine", this.m_copy, cell);
+        CreateButton("Save Engine List", this.m_save, cell);
+        CreateButton("Load Engine List", this.m_load, cell);
+        CreateButton("Add From Engine Builder", this.m_add_eb, cell);
+        CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
+        CreateButton("Add From Manual Input", this.m_add, cell);
+        CreateButton("Delete Engine", this.m_delete, cell);
+        this.UpdateList();
+    }
+
+    private UpdateList() {
+        var idx = this.m_select.selectedIndex;
+        while (this.m_select.options.length > 0) {
+            this.m_select.options.remove(0);
+        }
+        for (let i = 0; i < elist.length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = e.name;
-            this.e_sera.add(opt);
+            opt.text = elist.get(i).name;
+            this.m_select.add(opt);
         }
-        for (let c of this.eb.CoolingTable) {
-            let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = c.name;
-            this.e_cool.add(opt);
+        if (idx >= elist.length) {
+            idx = elist.length - 1;
         }
-
-        var fs = CreateFlexSection(cell);
-        FlexText("Name", this.e_name, fs);
-        FlexSelect("Era", this.e_sera, fs);
-        FlexSelect("Engine Type", this.e_cool, fs);
-        FlexInput("Engine Displacement (L)", this.e_disp, fs);
-        FlexInput("Compression Ratio (N:1)", this.e_cmpr, fs);
-        FlexInput("Cylinders per Row", this.e_ncyl, fs);
-        FlexInput("Number of Rows", this.e_nrow, fs);
-        FlexInput("RPM Boost", this.e_rpmb, fs);
-        FlexInput("Material Fudge Factor", this.e_mfdg, fs);
-        FlexInput("Quality Fudge Factor", this.e_qfdg, fs);
-
-        this.e_disp.step = "0.01";
-        this.e_cmpr.step = "0.01";
-        this.e_rpmb.step = "0.01";
-        this.e_rpmb.min = "0.5";
-        this.e_rpmb.max = "1.5";
-        this.e_mfdg.step = "0.01";
-        this.e_mfdg.min = "0.01";
-        this.e_mfdg.max = "99999";
-        this.e_qfdg.step = "0.01";
-        this.e_qfdg.min = "0.01";
-        this.e_qfdg.max = "99999";
-
-        this.e_name.onchange = () => { this.eb.name = this.e_name.value; this.UpdateEngine(); };
-        this.e_sera.onchange = () => { this.eb.era_sel = this.e_sera.selectedIndex; this.UpdateEngine(); };
-        this.e_cool.onchange = () => { this.eb.cool_sel = this.e_cool.selectedIndex; this.UpdateEngine(); };
-        this.e_disp.onchange = () => { this.eb.engine_displacement = this.e_disp.valueAsNumber; this.UpdateEngine(); };
-        this.e_cmpr.onchange = () => { this.eb.compression_ratio = this.e_cmpr.valueAsNumber; this.UpdateEngine(); };
-        this.e_ncyl.onchange = () => { this.eb.num_cyl_per_row = this.e_ncyl.valueAsNumber; this.UpdateEngine(); };
-        this.e_nrow.onchange = () => { this.eb.num_rows = this.e_nrow.valueAsNumber; this.UpdateEngine(); };
-        this.e_rpmb.onchange = () => { this.eb.rpm_boost = this.e_rpmb.valueAsNumber; this.UpdateEngine(); };
-        this.e_mfdg.onchange = () => { this.eb.material_fudge = this.e_mfdg.valueAsNumber; this.UpdateEngine(); };
-        this.e_qfdg.onchange = () => { this.eb.quality_fudge = this.e_qfdg.valueAsNumber; this.UpdateEngine(); };
+        this.m_select.selectedIndex = idx;
     }
 
-    private InitEngineUpgrades(cell: HTMLTableCellElement) {
-        var fs = CreateFlexSection(cell);
-        this.e_upgs = [];
-        for (let i = 0; i < this.eb.Upgrades.length; i++) {
-            let u = this.eb.Upgrades[i];
-            let inp = document.createElement("INPUT") as HTMLInputElement;
-            inp.onchange = () => { this.eb.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
-            FlexCheckbox(u.name, inp, fs);
-            this.e_upgs.push(inp);
-        }
+    private UpdateManual() {
+        var e_stats = new EngineStats();
+        e_stats.name = this.m_name.value;
+        e_stats.stats.power = this.m_pwr.valueAsNumber;
+        e_stats.stats.mass = this.m_mass.valueAsNumber;
+        e_stats.stats.drag = this.m_drag.valueAsNumber;
+        e_stats.stats.reliability = this.m_rely.valueAsNumber;
+        e_stats.stats.cooling = this.m_cool.valueAsNumber;
+        e_stats.overspeed = this.m_over.valueAsNumber;
+        e_stats.stats.fuelconsumption = this.m_fuel.valueAsNumber;
+        e_stats.altitude = this.m_alti.valueAsNumber;
+        e_stats.torque = this.m_torq.valueAsNumber;
+        e_stats.rumble = this.m_rumb.valueAsNumber;
+        e_stats.stats.cost = this.m_cost.valueAsNumber;
+        e_stats.oiltank = this.m_oil.checked;
+        e_stats.pulsejet = this.m_pulsejet.checked;
+        if (this.m_turbo.checked)
+            e_stats.stats.reqsections = 1;
+        e_stats.Verify();
+        this.SetValues(e_stats);
+        return e_stats;
     }
 
-    private InitEngineOutputs(cell: HTMLTableCellElement) {
-        this.ed_name = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_powr = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_mass = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_drag = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_rely = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_cool = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_ospd = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_fuel = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_malt = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_torq = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_cost = document.createElement("LABEL") as HTMLLabelElement;
-        this.ed_oilt = document.createElement("LABEL") as HTMLLabelElement;
-        var fs = CreateFlexSection(cell);
-        FlexDisplay("Name", this.ed_name, fs);
-        FlexDisplay("Power", this.ed_powr, fs);
-        FlexDisplay("Mass", this.ed_mass, fs);
-        FlexDisplay("Drag", this.ed_drag, fs);
-        FlexDisplay("Reliability", this.ed_rely, fs);
-        FlexDisplay("Required Cooling", this.ed_cool, fs);
-        FlexDisplay("Overspeed", this.ed_ospd, fs);
-        FlexDisplay("Fuel Consumption", this.ed_fuel, fs);
-        FlexDisplay("Altitude", this.ed_malt, fs);
-        FlexDisplay("Torque", this.ed_torq, fs);
-        FlexDisplay("Cost", this.ed_cost, fs);
-        FlexDisplay("Oil Tank", this.ed_oilt, fs);
+    private SetValues(e_stats: EngineStats) {
+        e_stats.Verify();
+        this.m_name.value = e_stats.name;
+        this.m_pwr.valueAsNumber = e_stats.stats.power;
+        this.m_mass.valueAsNumber = e_stats.stats.mass;
+        this.m_drag.valueAsNumber = e_stats.stats.drag;
+        this.m_rely.valueAsNumber = e_stats.stats.reliability;
+        this.m_cool.valueAsNumber = e_stats.stats.cooling;
+        this.m_over.valueAsNumber = e_stats.overspeed;
+        this.m_fuel.valueAsNumber = e_stats.stats.fuelconsumption;
+        this.m_alti.valueAsNumber = e_stats.altitude;
+        this.m_torq.valueAsNumber = e_stats.torque;
+        this.m_rumb.valueAsNumber = e_stats.rumble;
+        this.m_cost.valueAsNumber = e_stats.stats.cost;
+        this.m_oil.checked = e_stats.oiltank;
+        this.m_pulsejet.checked = e_stats.pulsejet;
+        this.m_turbo.checked = e_stats.stats.reqsections > 0;
     }
 
-    private UpdateEngine() {
-        this.e_name.value = this.eb.name;
-        this.e_sera.selectedIndex = this.eb.era_sel;
-        this.e_cool.selectedIndex = this.eb.cool_sel;
-        this.e_disp.valueAsNumber = this.eb.engine_displacement;
-        this.e_ncyl.valueAsNumber = this.eb.num_cyl_per_row;
-        this.e_nrow.valueAsNumber = this.eb.num_rows;
-        this.e_cmpr.valueAsNumber = this.eb.compression_ratio;
-        this.e_rpmb.valueAsNumber = this.eb.rpm_boost;
-        this.e_mfdg.valueAsNumber = this.eb.material_fudge;
-        this.e_qfdg.valueAsNumber = this.eb.quality_fudge;
-        for (let i = 0; i < this.e_upgs.length; i++) {
-            this.e_upgs[i].checked = this.eb.upg_sel[i];
-        }
-
-        var estats = this.eb.EngineStats();
-        BlinkIfChanged(this.ed_name, estats.name);
-        BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
-        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
-        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString());
-        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString());
-        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString());
-        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString());
-        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString());
-        BlinkIfChanged(this.ed_malt, estats.altitude.toString());
-        BlinkIfChanged(this.ed_torq, estats.torque.toString());
-        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString());
-        if (estats.oiltank)
-            BlinkIfChanged(this.ed_oilt, "Yes");
-        else
-            BlinkIfChanged(this.ed_oilt, "No");
-
-
+    public SelectEngine(num: number) {
+        this.SetValues(elist.get(num));
     }
 }
 

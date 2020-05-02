@@ -6,6 +6,9 @@ class EngineList {
 
     constructor() {
         this.list = [];
+        var ejson = window.localStorage.engines;
+        if (ejson != null)
+            this.fromJSON(JSON.parse(ejson));
     }
 
     public toJSON() {
@@ -38,15 +41,27 @@ class EngineList {
         }
     }
 
+    public deserializeEngine(d: Deserialize) {
+        let stats = new EngineStats();
+        stats.deserialize(d);
+        return this.push(stats);
+    }
+
     public push(es: EngineStats) {
-        for (let li of this.list) {
+        for (let i = 0; i < this.length; i++) {
+            let li = this.list[i];
             if (li.Equal(es))
-                return;
+                return i;
         }
         this.list.push(es.Clone());
+        window.localStorage.engines = JSON.stringify(this.toJSON());
+        this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        return this.find(es);
     }
 
     public get(i: number) {
+        if (i < 0 || i >= this.length)
+            return new EngineStats();
         return this.list[i];
     }
 
@@ -56,6 +71,13 @@ class EngineList {
                 return i;
         }
         return -1;
+    }
+
+    public remove(es: EngineStats) {
+        var idx = this.find(es);
+        if (idx >= 0) {
+            this.list.splice(idx, 1);
+        }
     }
 
     get length(): number {

@@ -15,7 +15,6 @@
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="../impl/Aircraft.ts" />
-/// <reference path="../lz/lz-string.ts" />
 
 class Aircraft_HTML extends Display {
     private acft: Aircraft;

@@ -1,6 +1,7 @@
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
+/// <reference path="./lz/lz-string.ts" />
 
 const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
@@ -20,7 +21,7 @@ const loadJSON = (path, callback) => {
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
-    var ep = sp.get("engines");
+    var ep = sp.get("engine");
     var ihash = window.location.hash;
     location.hash = "";
     loadJSON('/PlaneBuilder/parts.json', (part_resp) => {
@@ -32,12 +33,14 @@ const init = () => {
         loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
             engine_list.fromJSON(engine_json);
-            try {
-                var str = LZString.decompressFromEncodedURIComponent(ep);
-                var arr = _stringToArrayBuffer(str);
-                var des = new Deserialize(arr);
-                engine_list.deserialize(des);
-            } catch { console.log("Compressed Engine Parameter Failed."); }
+            if (ep != null) {
+                try {
+                    var str = LZString.decompressFromEncodedURIComponent(ep);
+                    var arr = _stringToArrayBuffer(str);
+                    var des = new Deserialize(arr);
+                    engine_list.deserializeEngine(des);
+                } catch { console.log("Compressed Engine Parameter Failed."); }
+            }
 
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
@@ -133,24 +136,6 @@ function SetScroll(ev) {
         hash = newhash;
         window.history.replaceState(null, null, "index.html#" + newhash);
     }
-}
-
-function _arrayBufferToString(buffer: ArrayBuffer) {
-    var binary = '';
-    var bytes = new Uint8Array(buffer);
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return binary;
-}
-
-function _stringToArrayBuffer(str: string) {
-    var bytes = new Uint8Array(str.length);
-    for (let i = 0; i < str.length; i++) {
-        bytes[i] = str.charCodeAt(i);
-    }
-    return bytes.buffer;
 }
 
 var parts_JSON: JSON;

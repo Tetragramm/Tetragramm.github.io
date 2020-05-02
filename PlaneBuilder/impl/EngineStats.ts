@@ -86,4 +86,22 @@ class EngineStats {
             && this.oiltank == other.oiltank
             && this.pulsejet == other.pulsejet;
     }
+    public Verify() {
+        if (this.oiltank) {
+            this.stats.cooling = 0;
+        }
+        this.PulseJetCheck();
+    }
+
+    private PulseJetCheck() {
+        if (this.pulsejet) {
+            this.stats.cooling = 0;
+            this.overspeed = 100;
+            this.altitude = 3;
+            this.torque = 0;
+        }
+        else {
+            this.rumble = 0;
+        }
+    }
 }
