@@ -72,7 +72,7 @@ class EngineBuilder {
         return (Era.maxRPM - Cool.RPMoff) * (this.compression_ratio / 10);
     }
 
-    private GearedRPM() {
+    public GearedRPM() {
         var GearedRPM = this.RPM() * this.rpm_boost;
         return GearedRPM;
     }

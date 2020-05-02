@@ -59,6 +59,7 @@ class EngineBuilder_HTML {
     private ed_torq: HTMLLabelElement;
     private ed_cost: HTMLLabelElement;
     private ed_oilt: HTMLLabelElement;
+    private ed_grpm: HTMLLabelElement;
 
     //Pulsejet Inputs
     private p_powr: HTMLInputElement;
@@ -212,6 +213,7 @@ class EngineBuilder_HTML {
         this.ed_torq = document.createElement("LABEL") as HTMLLabelElement;
         this.ed_cost = document.createElement("LABEL") as HTMLLabelElement;
         this.ed_oilt = document.createElement("LABEL") as HTMLLabelElement;
+        this.ed_grpm = document.createElement("LABEL") as HTMLLabelElement;
         var fs = CreateFlexSection(cell);
         FlexDisplay("Name", this.ed_name, fs);
         FlexDisplay("Power", this.ed_powr, fs);
@@ -225,6 +227,7 @@ class EngineBuilder_HTML {
         FlexDisplay("Torque", this.ed_torq, fs);
         FlexDisplay("Cost", this.ed_cost, fs);
         FlexDisplay("Oil Tank", this.ed_oilt, fs);
+        FlexDisplay("Geared RPM", this.ed_grpm, fs);
     }
 
     private UpdateEngine() {
@@ -258,8 +261,7 @@ class EngineBuilder_HTML {
             BlinkIfChanged(this.ed_oilt, "Yes");
         else
             BlinkIfChanged(this.ed_oilt, "No");
-
-
+        BlinkIfChanged(this.ed_grpm, (Math.round(100 * this.enginebuilder.GearedRPM()) / 100).toString());
     }
 
     private InitPulsejetInputs(cell: HTMLTableCellElement) {
