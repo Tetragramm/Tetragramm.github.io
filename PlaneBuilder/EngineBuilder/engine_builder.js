@@ -1707,8 +1707,8 @@ class EngineBuilder_HTML {
         this.e_disp.step = "0.01";
         this.e_cmpr.step = "0.01";
         this.e_rpmb.step = "0.01";
-        this.e_rpmb.min = "0.5";
-        this.e_rpmb.max = "1.5";
+        this.e_rpmb.min = "0.01";
+        this.e_rpmb.max = "2000";
         this.e_mfdg.step = "0.01";
         this.e_mfdg.min = "0.01";
         this.e_mfdg.max = "99999";
