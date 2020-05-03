@@ -789,7 +789,6 @@ class Cockpit extends Part {
             if (this.selected_upgrades[i])
                 stats = stats.Add(this.upgrades[i].stats);
         }
-        console.log(stats);
         for (let i = 0; i < this.selected_safety.length; i++) {
             if (this.selected_safety[i])
                 stats = stats.Add(this.safety[i].stats);
