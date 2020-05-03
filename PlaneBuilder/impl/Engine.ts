@@ -154,7 +154,7 @@ class Engine extends Part {
     }
 
     public GetSelectedIndex(): number {
-        return this.selected_index;
+        return engine_list.find(this.etype_stats);
     }
 
     public SetCustomStats(stats: EngineStats) {

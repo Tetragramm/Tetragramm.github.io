@@ -636,53 +636,63 @@
         "skin": [
             {
                 "name": "Naked",
-                "drag": 5,
-                "mass": -1,
+                "dragfactor": 1,
+                "massfactor": 0.6,
                 "visibility": 1,
                 "flammable": false,
-                "monocoque": false
+                "monocoque": false,
+                "monocoque_structure": 0
             },
             {
                 "name": "Cloth Canvas",
-                "drag": 2,
+                "dragfactor": 0.5,
+                "massfactor": 1,
                 "flammable": false,
-                "monocoque": false
+                "monocoque": false,
+                "monocoque_structure": 0
             },
             {
                 "name": "Transparent Celluloid",
-                "drag": 2,
+                "dragfactor": 0.6,
+                "massfactor": 1,
                 "visibility": 1,
                 "cost": 1,
                 "flammable": true,
-                "monocoque": false
+                "monocoque": false,
+                "monocoque_structure": 0
             },
             {
                 "name": "Treated Paper",
-                "drag": 2,
+                "dragfactor": 0.5,
+                "massfactor": 1,
                 "mass": -1,
                 "flammable": true,
-                "monocoque": false
+                "monocoque": false,
+                "monocoque_structure": 0
             },
             {
                 "name": "Tense Silk",
-                "drag": 2,
+                "dragfactor": 0.5,
+                "massfactor": 1,
                 "toughness": 1,
                 "cost": 1,
                 "flammable": false,
-                "monocoque": false
+                "monocoque": false,
+                "monocoque_structure": 0
             },
             {
                 "name": "Dragon Skin",
-                "drag": 2,
-                "mass": 2,
+                "dragfactor": 0.5,
+                "massfactor": 1,
                 "cost": 4,
                 "flammable": false,
-                "monocoque": false
+                "monocoque": false,
+                "monocoque_structure": 0
             },
             {
                 "name": "Molded Plywood",
-                "drag": 1,
-                "mass": 1,
+                "dragfactor": 0.4,
+                "massfactor": 1,
                 "cost": 0.5,
                 "flammable": false,
                 "monocoque": true,
@@ -690,8 +700,8 @@
             },
             {
                 "name": "Clinker Build",
-                "drag": 2,
-                "mass": 1,
+                "dragfactor": 0.5,
+                "massfactor": 1,
                 "cost": 0,
                 "flammable": false,
                 "monocoque": true,
@@ -699,7 +709,8 @@
             },
             {
                 "name": "Glass Reinforced Plastic",
-                "drag": 1,
+                "dragfactor": 0.3,
+                "massfactor": 1,
                 "cost": 1,
                 "flammable": false,
                 "monocoque": true,
@@ -707,8 +718,8 @@
             },
             {
                 "name": "Corrugated Duralumin",
-                "drag": 2,
-                "mass": 2,
+                "dragfactor": 0.5,
+                "massfactor": 1,
                 "toughness": 3,
                 "cost": 1,
                 "flammable": false,
@@ -717,8 +728,8 @@
             },
             {
                 "name": "Steel Sheet",
-                "drag": 1,
-                "mass": 3,
+                "dragfactor": 0.35,
+                "massfactor": 1,
                 "cost": 1.5,
                 "toughness": 3,
                 "flammable": false,
@@ -727,8 +738,8 @@
             },
             {
                 "name": "Aluminum Sheet",
-                "drag": 1,
-                "mass": 2,
+                "dragfactor": 0.35,
+                "massfactor": 1,
                 "cost": 2,
                 "toughness": 2,
                 "flammable": false,

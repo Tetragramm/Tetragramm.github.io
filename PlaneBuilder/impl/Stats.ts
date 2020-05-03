@@ -302,31 +302,31 @@ class Stats {
     }
 
     public Round() {
-        this.liftbleed = Math.trunc(this.liftbleed);
-        this.wetmass = Math.trunc(this.wetmass);
-        this.mass = Math.trunc(this.mass);
-        this.drag = Math.trunc(this.drag);
-        this.control = Math.trunc(this.control);
-        this.cost = Math.trunc(this.cost);
-        this.reqsections = Math.trunc(this.reqsections);
-        this.visibility = Math.trunc(this.visibility);
-        this.flightstress = Math.trunc(this.flightstress);
-        this.escape = Math.trunc(this.escape);
-        this.pitchstab = Math.trunc(this.pitchstab);
-        this.latstab = Math.trunc(this.latstab);
-        this.cooling = Math.trunc(this.cooling);
-        this.reliability = Math.trunc(this.reliability);
-        this.power = Math.trunc(this.power);
-        this.fuelconsumption = Math.trunc(this.fuelconsumption);
-        this.maxstrain = Math.trunc(this.maxstrain);
-        this.structure = Math.trunc(this.structure);
-        this.wingarea = Math.trunc(this.wingarea);
-        this.toughness = Math.trunc(this.toughness);
-        this.upkeep = Math.trunc(this.upkeep);
-        this.crashsafety = Math.trunc(this.crashsafety);
-        this.bomb_mass = Math.trunc(this.bomb_mass);
-        this.fuel = Math.trunc(this.fuel);
-        this.charge = Math.trunc(this.charge);
+        this.liftbleed = Math.trunc(1.0e-6 + this.liftbleed);
+        this.wetmass = Math.trunc(1.0e-6 + this.wetmass);
+        this.mass = Math.trunc(1.0e-6 + this.mass);
+        this.drag = Math.trunc(1.0e-6 + this.drag);
+        this.control = Math.trunc(1.0e-6 + this.control);
+        this.cost = Math.trunc(1.0e-6 + this.cost);
+        this.reqsections = Math.trunc(1.0e-6 + this.reqsections);
+        this.visibility = Math.trunc(1.0e-6 + this.visibility);
+        this.flightstress = Math.trunc(1.0e-6 + this.flightstress);
+        this.escape = Math.trunc(1.0e-6 + this.escape);
+        this.pitchstab = Math.trunc(1.0e-6 + this.pitchstab);
+        this.latstab = Math.trunc(1.0e-6 + this.latstab);
+        this.cooling = Math.trunc(1.0e-6 + this.cooling);
+        this.reliability = Math.trunc(1.0e-6 + this.reliability);
+        this.power = Math.trunc(1.0e-6 + this.power);
+        this.fuelconsumption = Math.trunc(1.0e-6 + this.fuelconsumption);
+        this.maxstrain = Math.trunc(1.0e-6 + this.maxstrain);
+        this.structure = Math.trunc(1.0e-6 + this.structure);
+        this.wingarea = Math.trunc(1.0e-6 + this.wingarea);
+        this.toughness = Math.trunc(1.0e-6 + this.toughness);
+        this.upkeep = Math.trunc(1.0e-6 + this.upkeep);
+        this.crashsafety = Math.trunc(1.0e-6 + this.crashsafety);
+        this.bomb_mass = Math.trunc(1.0e-6 + this.bomb_mass);
+        this.fuel = Math.trunc(1.0e-6 + this.fuel);
+        this.charge = Math.trunc(1.0e-6 + this.charge);
     }
 
     public Clone() {

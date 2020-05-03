@@ -382,10 +382,16 @@ class Engine_HTML extends Display {
     }
 
     public UpdateDisplay() {
-        var idx = this.engine.GetSelectedIndex();
-        if (idx < 0)
-            idx = engine_list.length;
-        this.e_select.selectedIndex = idx;
+        while (this.e_select.options.length > 0) {
+            this.e_select.options.remove(0);
+        }
+        for (let i = 0; i < engine_list.length; i++) {
+            let eng = engine_list.get(i);
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = eng.name;
+            this.e_select.add(opt);
+        }
+        this.e_select.selectedIndex = this.engine.GetSelectedIndex();
 
         if (this.e_select.selectedIndex == engine_list.length) {
             this.SetInputDisable(false);

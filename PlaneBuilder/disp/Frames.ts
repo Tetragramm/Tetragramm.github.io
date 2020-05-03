@@ -20,6 +20,20 @@ class Frames_HTML extends Display {
     private t_boom: HTMLInputElement;
     private t_fwing: HTMLInputElement;
 
+    private c_sec: {
+        fspan: HTMLSpanElement,
+        rem: HTMLButtonElement, add: HTMLButtonElement, fsel: HTMLSelectElement,
+        sspan: HTMLSpanElement, ssel: HTMLLabelElement,
+        ospan: HTMLSpanElement, geo: HTMLInputElement,
+        mono: HTMLInputElement, int: HTMLInputElement, lb: HTMLInputElement
+    }[];
+    private t_sec: {
+        fspan: HTMLSpanElement, fsel: HTMLSelectElement,
+        sspan: HTMLSpanElement, ssel: HTMLLabelElement,
+        ospan: HTMLSpanElement,
+        geo: HTMLInputElement, mono: HTMLInputElement, lb: HTMLInputElement
+    }[];
+
     //Display Stat Elements
     private d_mass: HTMLTableCellElement;
     private d_drag: HTMLTableCellElement;
@@ -35,6 +49,8 @@ class Frames_HTML extends Display {
 
     constructor(frames: Frames) {
         super();
+        this.c_sec = [];
+        this.t_sec = [];
         this.frames = frames;
         var table = document.getElementById("table_frames") as HTMLTableElement;
         var row = table.insertRow();
@@ -132,29 +148,30 @@ class Frames_HTML extends Display {
     }
 
     public UpdateDisplay() {
-        while (this.c_frame.children.length > 0)
-            this.c_frame.removeChild(this.c_frame.children[0]);
-        while (this.c_skin.children.length > 0)
-            this.c_skin.removeChild(this.c_skin.children[0]);
-        while (this.c_options.children.length > 0)
-            this.c_options.removeChild(this.c_options.children[0]);
-        while (this.t_frame.children.length > 0)
-            this.t_frame.removeChild(this.t_frame.children[0]);
-        while (this.t_skin.children.length > 0)
-            this.t_skin.removeChild(this.t_skin.children[0]);
-        while (this.t_options.children.length > 0)
-            this.t_options.removeChild(this.t_options.children[0]);
-
         var section_list = this.frames.GetSectionList();
         var tail_section_list = this.frames.GetTailSectionList();
+
+        while (section_list.length > this.c_sec.length) {
+            let i = this.c_sec.length;
+            this.CreateSection(i, section_list[i]);
+        }
+        while (section_list.length < this.c_sec.length) {
+            this.RemoveSection();
+        }
+
+        while (tail_section_list.length > this.t_sec.length) {
+            let i = this.t_sec.length;
+            this.CreateTailSection(i, tail_section_list[i]);
+        }
+        while (tail_section_list.length < this.t_sec.length) {
+            this.RemoveTailSection();
+        }
+
         var skin_list = this.frames.GetSkinList();
-        var is_flammable = false;
+        var is_flammable = skin_list[this.frames.GetSkin()].flammable;
         for (let i = 0; i < section_list.length; i++) {
             let sec = section_list[i];
             this.UpdateSection(i, sec);
-
-            //Flammable check
-            is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
 
         this.t_select.selectedIndex = this.frames.GetTailType();
@@ -170,9 +187,6 @@ class Frames_HTML extends Display {
         for (let i = 0; i < tail_section_list.length; i++) {
             let sec = tail_section_list[i];
             this.UpdateTailSection(i, sec);
-
-            //Flammable check
-            is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
 
         if (is_flammable)
@@ -193,144 +207,190 @@ class Frames_HTML extends Display {
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
     }
 
-    private UpdateSection(i: number, sec: {
-        frame: number; skin: number; geodesic: boolean;
-        monocoque: boolean; lifting_body: boolean; internal_bracing: boolean;
+    private CreateSection(i: number, sec: {
+        frame: number, geodesic: boolean,
+        monocoque: boolean, lifting_body: boolean, internal_bracing: boolean,
     }) {
+        var fsec = {
+            fspan: document.createElement("SPAN") as HTMLSpanElement,
+            rem: document.createElement("BUTTON") as HTMLButtonElement,
+            add: document.createElement("BUTTON") as HTMLButtonElement,
+            fsel: document.createElement("SELECT") as HTMLSelectElement,
+            sspan: document.createElement("SPAN") as HTMLSpanElement,
+            ssel: document.createElement("LABEL") as HTMLLabelElement,
+            ospan: document.createElement("SPAN") as HTMLSpanElement,
+            geo: document.createElement("INPUT") as HTMLInputElement,
+            mono: document.createElement("INPUT") as HTMLInputElement,
+            int: document.createElement("INPUT") as HTMLInputElement,
+            lb: document.createElement("INPUT") as HTMLInputElement,
+        };
+        fsec.rem.textContent = "-";
+        fsec.rem.onclick = () => { this.frames.DeleteSection(i); };
+        fsec.add.textContent = "+";
+        fsec.add.onclick = () => { this.frames.DuplicateSection(i); };
+
         var frame_list = this.frames.GetFrameList();
-        var skin_list = this.frames.GetSkinList();
-
-        var type_span = document.createElement("SPAN") as HTMLSpanElement;
-        var rem_button = document.createElement("BUTTON") as HTMLButtonElement;
-        rem_button.textContent = "-";
-        rem_button.onclick = () => { this.frames.DeleteSection(i); };
-        rem_button.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
-        var add_button = document.createElement("BUTTON") as HTMLButtonElement;
-        add_button.textContent = "+";
-        add_button.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
-        add_button.onclick = () => { this.frames.DuplicateSection(i); };
-
-        var frame_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = ft.name;
+            fsec.fsel.add(opt);
+        }
+        fsec.fsel.onchange = () => { this.frames.SetFrame(i, fsec.fsel.selectedIndex); };
+
+        fsec.fspan.appendChild(fsec.rem);
+        fsec.fspan.appendChild(fsec.add);
+        fsec.fspan.appendChild(fsec.fsel);
+        fsec.fspan.appendChild(document.createElement("BR"));
+        this.c_frame.appendChild(fsec.fspan);
+
+        fsec.sspan.appendChild(fsec.ssel);
+        fsec.sspan.appendChild(document.createElement("BR"));
+        this.c_skin.appendChild(fsec.sspan);
+
+        CreateCheckbox("Geodesic", fsec.geo, fsec.ospan, false);
+        fsec.geo.onchange = () => { this.frames.SetGeodesic(i, fsec.geo.checked); };
+        CreateCheckbox("Monocoque", fsec.mono, fsec.ospan, false);
+        fsec.mono.onchange = () => { this.frames.SetMonocoque(i, fsec.mono.checked); };
+        CreateCheckbox("Internal Bracing", fsec.int, fsec.ospan, false);
+        fsec.int.onchange = () => { this.frames.SetInternalBracing(i, fsec.int.checked); };
+        CreateCheckbox("Lifting Body", fsec.lb, fsec.ospan, true);
+        fsec.lb.onchange = () => { this.frames.SetLiftingBody(i, fsec.lb.checked); };
+        this.c_options.appendChild(fsec.ospan);
+
+        this.c_sec.push(fsec);
+        this.UpdateSection(i, sec);
+    }
+
+    private RemoveSection() {
+        var sec = this.c_sec.pop();
+        this.c_frame.removeChild(sec.fspan);
+        this.c_skin.removeChild(sec.sspan);
+        this.c_options.removeChild(sec.ospan);
+    }
+
+    private UpdateSection(i: number, sec: {
+        frame: number, geodesic: boolean,
+        monocoque: boolean, lifting_body: boolean, internal_bracing: boolean,
+    }) {
+        var fsec = this.c_sec[i];
+
+        fsec.rem.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
+        fsec.add.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
+
+        var frame_list = this.frames.GetFrameList();
+        for (let j = 0; j < frame_list.length; j++) {
+            let ft = frame_list[j];
+            let opt = fsec.fsel.options[j];
+            opt.text = ft.name;
+            opt.disabled = false;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
             if (!sec.internal_bracing && ft.basestruct == 0)
                 opt.disabled = true;
-            frame_select.add(opt);
         }
-        frame_select.onchange = () => { this.frames.SetFrame(i, frame_select.selectedIndex); };
-        frame_select.selectedIndex = sec.frame;
-        type_span.appendChild(rem_button);
-        type_span.appendChild(add_button);
-        type_span.appendChild(frame_select);
-        this.c_frame.appendChild(type_span);
-        this.c_frame.appendChild(document.createElement("BR"));
 
-        var skin_select = document.createElement("SELECT") as HTMLSelectElement;
-        for (let st of skin_list) {
-            let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = st.name;
-            if (sec.monocoque && !st.monocoque)
-                opt.disabled = true;
-            skin_select.add(opt);
-        }
-        if (sec.internal_bracing)
-            skin_select.disabled = true;
-        skin_select.onchange = () => { this.frames.SetSkin(i, skin_select.selectedIndex); };
-        skin_select.selectedIndex = sec.skin;
-        if (sec.internal_bracing)
-            skin_select.selectedIndex = -1;
-        this.c_skin.appendChild(skin_select);
-        this.c_skin.appendChild(document.createElement("BR"));
+        fsec.fsel.selectedIndex = sec.frame;
 
-        var opt_span = document.createElement("SPAN") as HTMLSpanElement;
-        var geo_input = document.createElement("INPUT") as HTMLInputElement;
-        CreateCheckbox("Geodesic", geo_input, opt_span, false);
-        geo_input.checked = sec.geodesic;
-        geo_input.disabled = !this.frames.PossibleGeodesic(i);
-        geo_input.onchange = () => { this.frames.SetGeodesic(i, geo_input.checked); };
+        var skin_list = this.frames.GetSkinList();
+        fsec.ssel.innerText = skin_list[this.frames.GetSkin()].name;
 
-        var mono_input = document.createElement("INPUT") as HTMLInputElement;
-        CreateCheckbox("Monocoque", mono_input, opt_span, false);
-        mono_input.checked = sec.monocoque;
-        mono_input.disabled = !this.frames.PossibleMonocoque(i);
-        mono_input.onchange = () => { this.frames.SetMonocoque(i, mono_input.checked); };
+        fsec.geo.checked = sec.geodesic;
+        fsec.geo.disabled = !this.frames.PossibleGeodesic(i);
 
-        var int_input = document.createElement("INPUT") as HTMLInputElement;
-        CreateCheckbox("Internal Bracing", int_input, opt_span, false);
-        int_input.checked = sec.internal_bracing;
+        fsec.mono.checked = sec.monocoque;
+        fsec.mono.disabled = !this.frames.PossibleMonocoque(i);
+
+        fsec.int.checked = sec.internal_bracing;
         if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing(true) || !this.frames.PossibleRemoveSections()))
-            int_input.disabled = true;
-        int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
+            fsec.int.disabled = true;
 
-        var lb_input = document.createElement("INPUT") as HTMLInputElement;
-        CreateCheckbox("Lifting Body", lb_input, opt_span, false);
-        lb_input.checked = sec.lifting_body;
-        lb_input.disabled = !this.frames.PossibleMonocoque(i);
-        lb_input.onchange = () => { this.frames.SetLiftingBody(i, lb_input.checked); };
-        this.c_options.appendChild(opt_span);
-        this.c_options.appendChild(document.createElement("BR"));
+        fsec.lb.checked = sec.lifting_body;
+        fsec.lb.disabled = !this.frames.PossibleMonocoque(i);
     }
 
-    private UpdateTailSection(i: number, sec: {
-        frame: number; skin: number; geodesic: boolean;
-        monocoque: boolean; lifting_body: boolean; internal_bracing: boolean;
+    private CreateTailSection(i: number, sec: {
+        frame: number, geodesic: boolean,
+        monocoque: boolean, lifting_body: boolean, internal_bracing: boolean,
     }) {
-        var frame_list = this.frames.GetFrameList();
-        var skin_list = this.frames.GetSkinList();
+        var tsec = {
+            fspan: document.createElement("SPAN") as HTMLSpanElement,
+            fsel: document.createElement("SELECT") as HTMLSelectElement,
+            sspan: document.createElement("SPAN") as HTMLSpanElement,
+            ssel: document.createElement("LABEL") as HTMLLabelElement,
+            ospan: document.createElement("SPAN") as HTMLSpanElement,
+            geo: document.createElement("INPUT") as HTMLInputElement,
+            mono: document.createElement("INPUT") as HTMLInputElement,
+            lb: document.createElement("INPUT") as HTMLInputElement,
+        };
 
-        var frame_select = document.createElement("SELECT") as HTMLSelectElement;
+        var frame_list = this.frames.GetFrameList();
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = ft.name;
+            tsec.fsel.add(opt);
+        }
+        tsec.fsel.onchange = () => { this.frames.SetTailFrame(i, tsec.fsel.selectedIndex); };
+
+        tsec.fspan.appendChild(tsec.fsel);
+        tsec.fspan.appendChild(document.createElement("BR"));
+        this.t_frame.appendChild(tsec.fspan);
+
+        tsec.sspan.appendChild(tsec.ssel);
+        tsec.sspan.appendChild(document.createElement("BR"));
+        this.t_skin.appendChild(tsec.sspan);
+
+        CreateCheckbox("Geodesic", tsec.geo, tsec.ospan, false);
+        tsec.geo.onchange = () => { this.frames.SetTailGeodesic(i, tsec.geo.checked); };
+        CreateCheckbox("Monocoque", tsec.mono, tsec.ospan, false);
+        tsec.mono.onchange = () => { this.frames.SetTailMonocoque(i, tsec.mono.checked); };
+        CreateCheckbox("Lifting Body", tsec.lb, tsec.ospan, true);
+        tsec.lb.onchange = () => { this.frames.SetTailLiftingBody(i, tsec.lb.checked); };
+        this.t_options.appendChild(tsec.ospan);
+
+        this.t_sec.push(tsec);
+        this.UpdateTailSection(i, sec);
+    }
+
+    private RemoveTailSection() {
+        var sec = this.t_sec.pop();
+        this.t_frame.removeChild(sec.fspan);
+        this.t_skin.removeChild(sec.sspan);
+        this.t_options.removeChild(sec.ospan);
+    }
+
+    private UpdateTailSection(i: number, sec: {
+        frame: number, geodesic: boolean,
+        monocoque: boolean, lifting_body: boolean, internal_bracing: boolean,
+    }) {
+        var tsec = this.t_sec[i];
+
+        var frame_list = this.frames.GetFrameList();
+        for (let j = 0; j < frame_list.length; j++) {
+            let ft = frame_list[j];
+            let opt = tsec.fsel.options[j];
+            opt.text = ft.name;
+            opt.disabled = false;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
-            if (ft.basestruct == 0)
+            if (!sec.internal_bracing && ft.basestruct == 0)
                 opt.disabled = true;
-            frame_select.add(opt);
         }
-        frame_select.onchange = () => { this.frames.SetTailFrame(i, frame_select.selectedIndex); };
-        frame_select.selectedIndex = sec.frame;
-        this.t_frame.appendChild(frame_select);
-        this.t_frame.appendChild(document.createElement("BR"));
 
-        var skin_select = document.createElement("SELECT") as HTMLSelectElement;
-        for (let st of skin_list) {
-            let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = st.name;
-            if (sec.monocoque && !st.monocoque)
-                opt.disabled = true;
-            skin_select.add(opt);
-        }
-        if (this.frames.GetUseFarman()) {
-            skin_select.disabled = true;
-        }
-        skin_select.onchange = () => { this.frames.SetTailSkin(i, skin_select.selectedIndex); };
-        skin_select.selectedIndex = sec.skin;
-        this.t_skin.appendChild(skin_select);
-        this.t_skin.appendChild(document.createElement("BR"));
+        tsec.fsel.selectedIndex = sec.frame;
 
-        var opt_span = document.createElement("SPAN") as HTMLSpanElement;
-        var geo_input = document.createElement("INPUT") as HTMLInputElement;
-        CreateCheckbox("Geodesic", geo_input, opt_span, false);
-        geo_input.checked = sec.geodesic;
-        geo_input.disabled = !this.frames.PossibleTailGeodesic(i);
-        geo_input.onchange = () => { this.frames.SetTailGeodesic(i, geo_input.checked); };
+        var skin_list = this.frames.GetSkinList();
+        var idx = this.frames.GetSkin();
+        if (this.frames.GetUseFarman())
+            idx = 0;
+        tsec.ssel.innerText = skin_list[idx].name;
 
-        var mono_input = document.createElement("INPUT") as HTMLInputElement;
-        CreateCheckbox("Monocoque", mono_input, opt_span, false);
-        mono_input.checked = sec.monocoque;
-        mono_input.disabled = !this.frames.PossibleTailMonocoque(i);
-        mono_input.onchange = () => { this.frames.SetTailMonocoque(i, mono_input.checked); };
+        tsec.geo.checked = sec.geodesic;
+        tsec.geo.disabled = !this.frames.PossibleTailGeodesic(i);
 
-        var lb_input = document.createElement("INPUT") as HTMLInputElement;
-        CreateCheckbox("Lifting Body", lb_input, opt_span, false);
-        lb_input.checked = sec.lifting_body;
-        lb_input.disabled = !this.frames.PossibleTailMonocoque(i);
-        lb_input.onchange = () => { this.frames.SetTailLiftingBody(i, lb_input.checked); };
-        this.t_options.appendChild(opt_span);
-        this.t_options.appendChild(document.createElement("BR"));
+        tsec.mono.checked = sec.monocoque;
+        tsec.mono.disabled = !this.frames.PossibleTailMonocoque(i);
+
+        tsec.lb.checked = sec.lifting_body;
+        tsec.lb.disabled = !this.frames.PossibleTailMonocoque(i);
     }
 }

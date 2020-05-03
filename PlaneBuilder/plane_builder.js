@@ -290,31 +290,31 @@ class Stats {
             && this.charge == other.charge;
     }
     Round() {
-        this.liftbleed = Math.trunc(this.liftbleed);
-        this.wetmass = Math.trunc(this.wetmass);
-        this.mass = Math.trunc(this.mass);
-        this.drag = Math.trunc(this.drag);
-        this.control = Math.trunc(this.control);
-        this.cost = Math.trunc(this.cost);
-        this.reqsections = Math.trunc(this.reqsections);
-        this.visibility = Math.trunc(this.visibility);
-        this.flightstress = Math.trunc(this.flightstress);
-        this.escape = Math.trunc(this.escape);
-        this.pitchstab = Math.trunc(this.pitchstab);
-        this.latstab = Math.trunc(this.latstab);
-        this.cooling = Math.trunc(this.cooling);
-        this.reliability = Math.trunc(this.reliability);
-        this.power = Math.trunc(this.power);
-        this.fuelconsumption = Math.trunc(this.fuelconsumption);
-        this.maxstrain = Math.trunc(this.maxstrain);
-        this.structure = Math.trunc(this.structure);
-        this.wingarea = Math.trunc(this.wingarea);
-        this.toughness = Math.trunc(this.toughness);
-        this.upkeep = Math.trunc(this.upkeep);
-        this.crashsafety = Math.trunc(this.crashsafety);
-        this.bomb_mass = Math.trunc(this.bomb_mass);
-        this.fuel = Math.trunc(this.fuel);
-        this.charge = Math.trunc(this.charge);
+        this.liftbleed = Math.trunc(1.0e-6 + this.liftbleed);
+        this.wetmass = Math.trunc(1.0e-6 + this.wetmass);
+        this.mass = Math.trunc(1.0e-6 + this.mass);
+        this.drag = Math.trunc(1.0e-6 + this.drag);
+        this.control = Math.trunc(1.0e-6 + this.control);
+        this.cost = Math.trunc(1.0e-6 + this.cost);
+        this.reqsections = Math.trunc(1.0e-6 + this.reqsections);
+        this.visibility = Math.trunc(1.0e-6 + this.visibility);
+        this.flightstress = Math.trunc(1.0e-6 + this.flightstress);
+        this.escape = Math.trunc(1.0e-6 + this.escape);
+        this.pitchstab = Math.trunc(1.0e-6 + this.pitchstab);
+        this.latstab = Math.trunc(1.0e-6 + this.latstab);
+        this.cooling = Math.trunc(1.0e-6 + this.cooling);
+        this.reliability = Math.trunc(1.0e-6 + this.reliability);
+        this.power = Math.trunc(1.0e-6 + this.power);
+        this.fuelconsumption = Math.trunc(1.0e-6 + this.fuelconsumption);
+        this.maxstrain = Math.trunc(1.0e-6 + this.maxstrain);
+        this.structure = Math.trunc(1.0e-6 + this.structure);
+        this.wingarea = Math.trunc(1.0e-6 + this.wingarea);
+        this.toughness = Math.trunc(1.0e-6 + this.toughness);
+        this.upkeep = Math.trunc(1.0e-6 + this.upkeep);
+        this.crashsafety = Math.trunc(1.0e-6 + this.crashsafety);
+        this.bomb_mass = Math.trunc(1.0e-6 + this.bomb_mass);
+        this.fuel = Math.trunc(1.0e-6 + this.fuel);
+        this.charge = Math.trunc(1.0e-6 + this.charge);
     }
     Clone() {
         return this.Add(new Stats());
@@ -1133,7 +1133,7 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetSelectedIndex() {
-        return this.selected_index;
+        return engine_list.find(this.etype_stats);
     }
     SetCustomStats(stats) {
         this.selected_index = -1;
@@ -1982,6 +1982,7 @@ class Frames extends Part {
                 geodesic: elem["geodesic"]
             });
         }
+        this.sel_skin = 0;
         this.skin_list = [];
         for (let elem of js["skin"]) {
             this.skin_list.push({
@@ -1989,7 +1990,9 @@ class Frames extends Part {
                 stats: new Stats(elem),
                 monocoque: elem["monocoque"],
                 monocoque_structure: elem["monocoque_structure"],
-                flammable: elem["flammable"]
+                flammable: elem["flammable"],
+                dragfactor: elem["dragfactor"],
+                massfactor: elem["massfactor"],
             });
         }
         this.farman = false;
@@ -2017,36 +2020,43 @@ class Frames extends Part {
             use_farman: this.farman,
             use_boom: this.boom,
             flying_wing: this.flying_wing,
+            sel_skin: this.sel_skin,
         };
     }
     fromJSON(js) {
         this.section_list = [];
         for (let elem of js["sections"]) {
             this.section_list.push({
-                frame: elem["frame"], skin: elem["skin"], geodesic: elem["geodesic"],
+                frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
+            if (elem["skin"])
+                this.sel_skin = elem["skin"];
         }
         this.tail_section_list = [];
         for (let elem of js["tail_sections"]) {
             this.tail_section_list.push({
-                frame: elem["frame"], skin: elem["skin"], geodesic: elem["geodesic"],
+                frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
+            if (elem["skin"])
+                this.sel_skin = elem["skin"];
         }
         this.farman = js["use_farman"];
         this.boom = js["use_boom"];
         this.sel_tail = js["tail_index"];
         this.flying_wing = js["flying_wing"];
+        if (js["sel_skin"])
+            this.sel_skin = js["sel_skin"];
     }
     serialize(s) {
         s.PushNum(this.section_list.length);
         for (let i = 0; i < this.section_list.length; i++) {
             var sec = this.section_list[i];
             s.PushNum(sec.frame);
-            s.PushNum(sec.skin);
+            s.PushNum(this.sel_skin);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
             s.PushBool(sec.lifting_body);
@@ -2056,7 +2066,7 @@ class Frames extends Part {
         for (let i = 0; i < this.tail_section_list.length; i++) {
             var sec = this.tail_section_list[i];
             s.PushNum(sec.frame);
-            s.PushNum(sec.skin);
+            s.PushNum(this.sel_skin);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
             s.PushBool(sec.lifting_body);
@@ -2076,7 +2086,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            sec.skin = d.GetNum();
+            this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
@@ -2091,7 +2101,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            sec.skin = d.GetNum();
+            this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
@@ -2106,7 +2116,7 @@ class Frames extends Part {
     DuplicateSection(num) {
         var sec = this.section_list[num];
         var new_section = {
-            frame: sec.frame, skin: sec.skin, geodesic: sec.geodesic, monocoque: sec.monocoque,
+            frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
         if (new_section.internal_bracing && this.CountSections() + this.tail_section_list.length == this.CountInternalBracing()) {
@@ -2118,7 +2128,7 @@ class Frames extends Part {
     DuplicateTailSection(num) {
         var sec = this.tail_section_list[num];
         var new_section = {
-            frame: sec.frame, skin: sec.skin, geodesic: sec.geodesic, monocoque: sec.monocoque,
+            frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
         if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
@@ -2147,7 +2157,7 @@ class Frames extends Part {
         if (this.required_sections > this.CountSections()) {
             if (this.section_list.length == 0) {
                 this.section_list.push({
-                    frame: 0, skin: 0, geodesic: false, monocoque: false,
+                    frame: 0, geodesic: false, monocoque: false,
                     lifting_body: false, internal_bracing: false
                 });
             }
@@ -2165,7 +2175,7 @@ class Frames extends Part {
         if (num > this.tail_section_list.length) {
             if (this.tail_section_list.length == 0) {
                 this.tail_section_list.push({
-                    frame: 0, skin: 0, geodesic: false, monocoque: false,
+                    frame: 0, geodesic: false, monocoque: false,
                     lifting_body: false, internal_bracing: false
                 });
             }
@@ -2240,16 +2250,16 @@ class Frames extends Part {
             this.section_list[num].geodesic = false;
         this.CalculateStats();
     }
-    SetSkin(num, type) {
-        this.section_list[num].skin = type;
-        if (type != 0)
-            this.section_list[num].internal_bracing = false;
-        if (!this.skin_list[type].monocoque) {
-            this.section_list[num].monocoque = false;
-            this.section_list[num].lifting_body = false;
-        }
-        this.CalculateStats();
-    }
+    // public SetSkin(num: number, type: number) {
+    //     this.section_list[num].skin = type;
+    //     if (type != 0)
+    //         this.section_list[num].internal_bracing = false;
+    //     if (!this.skin_list[type].monocoque) {
+    //         this.section_list[num].monocoque = false;
+    //         this.section_list[num].lifting_body = false;
+    //     }
+    //     this.CalculateStats();
+    // }
     SetGeodesic(num, use) {
         if (this.frame_list[this.section_list[num].frame].geodesic) {
             this.section_list[num].geodesic = use;
@@ -2257,13 +2267,13 @@ class Frames extends Part {
         }
     }
     SetMonocoque(num, use) {
-        if (this.skin_list[this.section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque) {
             this.section_list[num].monocoque = use;
             this.CalculateStats();
         }
     }
     SetLiftingBody(num, use) {
-        if (this.skin_list[this.section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque) {
             this.section_list[num].lifting_body = use;
             this.CalculateStats();
         }
@@ -2274,7 +2284,6 @@ class Frames extends Part {
             && this.PossibleInternalBracing(true)
             && this.CountSections() > this.required_sections) {
             this.section_list[num].internal_bracing = true;
-            this.section_list[num].skin = 0;
             this.section_list[num].monocoque = false;
             this.section_list[num].lifting_body = false;
             this.CalculateStats();
@@ -2294,13 +2303,13 @@ class Frames extends Part {
         return this.frame_list[this.section_list[num].frame].geodesic && !this.section_list[num].monocoque;
     }
     PossibleMonocoque(num) {
-        return this.skin_list[this.section_list[num].skin].monocoque;
+        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing;
     }
     PossibleTailGeodesic(num) {
         return this.frame_list[this.tail_section_list[num].frame].geodesic && !this.tail_section_list[num].monocoque;
     }
     PossibleTailMonocoque(num) {
-        return this.skin_list[this.tail_section_list[num].skin].monocoque;
+        return this.skin_list[this.sel_skin].monocoque && !this.farman;
     }
     PossibleRemoveSections() {
         return this.CountSections() > this.required_sections;
@@ -2316,17 +2325,39 @@ class Frames extends Part {
             stats.cost *= 2;
         }
         if (sec.lifting_body) {
-            stats.drag += 1;
             stats.wingarea += 3;
         }
         //If it's internal, no skin.
         if (!sec.internal_bracing) {
+            stats.drag += 4;
             if (sec.monocoque) {
                 stats.mass = 0;
                 stats.cost += 1;
-                stats.structure = this.skin_list[sec.skin].monocoque_structure;
+                stats.structure = this.skin_list[this.sel_skin].monocoque_structure;
             }
-            stats = stats.Add(this.skin_list[sec.skin].stats);
+            stats = stats.Add(this.skin_list[this.sel_skin].stats);
+        }
+        return stats;
+    }
+    TailSectionStats(sec) {
+        var stats = new Stats();
+        stats = stats.Add(this.frame_list[sec.frame].stats);
+        if (sec.geodesic) {
+            stats.structure *= 1.5;
+            stats.cost *= 2;
+        }
+        if (sec.lifting_body) {
+            stats.wingarea += 3;
+        }
+        stats.drag += 4;
+        //If it's farman, no skin.
+        if (!this.farman) {
+            if (sec.monocoque) {
+                stats.mass = 0;
+                stats.cost += 1;
+                stats.structure = this.skin_list[this.sel_skin].monocoque_structure;
+            }
+            stats = stats.Add(this.skin_list[this.sel_skin].stats);
         }
         return stats;
     }
@@ -2369,7 +2400,6 @@ class Frames extends Part {
             this.boom = false;
         if (this.farman) {
             for (let sec of this.tail_section_list) {
-                sec.skin = 0;
                 sec.monocoque = false;
                 sec.lifting_body = false;
             }
@@ -2394,16 +2424,16 @@ class Frames extends Part {
             this.section_list[num].geodesic = false;
         this.CalculateStats();
     }
-    SetTailSkin(num, type) {
-        this.tail_section_list[num].skin = type;
-        if (type != 0)
-            this.tail_section_list[num].internal_bracing = false;
-        if (!this.skin_list[type].monocoque) {
-            this.tail_section_list[num].monocoque = false;
-            this.tail_section_list[num].lifting_body = false;
-        }
-        this.CalculateStats();
-    }
+    // public SetTailSkin(num: number, type: number) {
+    //     this.tail_section_list[num].skin = type;
+    //     if (type != 0)
+    //         this.tail_section_list[num].internal_bracing = false;
+    //     if (!this.skin_list[type].monocoque) {
+    //         this.tail_section_list[num].monocoque = false;
+    //         this.tail_section_list[num].lifting_body = false;
+    //     }
+    //     this.CalculateStats();
+    // }
     SetTailGeodesic(num, use) {
         if (this.frame_list[this.tail_section_list[num].frame].geodesic) {
             this.tail_section_list[num].geodesic = use;
@@ -2411,13 +2441,13 @@ class Frames extends Part {
         }
     }
     SetTailMonocoque(num, use) {
-        if (this.skin_list[this.tail_section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque && !this.farman) {
             this.tail_section_list[num].monocoque = use;
             this.CalculateStats();
         }
     }
     SetTailLiftingBody(num, use) {
-        if (this.skin_list[this.tail_section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque && !this.farman) {
             this.tail_section_list[num].lifting_body = use;
             this.CalculateStats();
         }
@@ -2468,9 +2498,9 @@ class Frames extends Part {
         this.CalculateStats();
     }
     SetAllSkin(num) {
+        this.sel_skin = num;
         for (let s of this.section_list) {
             if (!s.internal_bracing) {
-                s.skin = num;
                 if (!this.skin_list[num].monocoque) {
                     s.monocoque = false;
                     s.lifting_body = false;
@@ -2479,7 +2509,6 @@ class Frames extends Part {
         }
         for (let s of this.tail_section_list) {
             if (!s.internal_bracing) {
-                s.skin = num;
                 if (!this.skin_list[num].monocoque) {
                     s.monocoque = false;
                     s.lifting_body = false;
@@ -2489,27 +2518,17 @@ class Frames extends Part {
         this.CalculateStats();
     }
     GetArmor() {
-        var count = 0;
-        for (let s of this.section_list) {
-            if (this.skin_list[s.skin].name == "Dragon Skin")
-                count++;
-        }
-        for (let s of this.tail_section_list) {
-            if (this.skin_list[s.skin].name == "Dragon Skin")
-                count++;
-        }
-        return count;
+        if (this.skin_list[this.sel_skin].name == "Dragon Skin")
+            return 5;
+        return 0;
     }
     GetIsFlammable() {
-        for (let s of this.section_list) {
-            if (this.skin_list[s.skin].flammable)
-                return true;
-        }
-        for (let s of this.tail_section_list) {
-            if (this.skin_list[s.skin].flammable)
-                return true;
-        }
+        if (this.skin_list[this.sel_skin].flammable)
+            return true;
         return false;
+    }
+    GetSkin() {
+        return this.sel_skin;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -2521,32 +2540,43 @@ class Frames extends Part {
         var base_type = this.BaseType();
         stats.structure = this.frame_list[base_type].basestruct;
         stats.cost = this.frame_list[base_type].basecost;
-        var is_clinker = false;
+        var is_clinker = this.skin_list[this.sel_skin].monocoque_structure < 0;
         for (let sec of this.section_list) {
             stats = stats.Add(this.SectionStats(sec));
-            var clinker = this.skin_list[sec.skin].monocoque_structure < 0 && sec.monocoque;
-            is_clinker = is_clinker || clinker;
         }
         var tail_stats = new Stats();
         for (let sec of this.tail_section_list) {
-            tail_stats = tail_stats.Add(this.SectionStats(sec));
-            var clinker = this.skin_list[sec.skin].monocoque_structure < 0 && sec.monocoque;
-            is_clinker = is_clinker || clinker;
+            tail_stats = tail_stats.Add(this.TailSectionStats(sec));
         }
         if (is_clinker)
             stats.structure += 30;
-        if (this.flying_wing) {
-            stats.liftbleed += 5;
-            stats.drag -= this.CountLiftingBody();
-            ;
-        }
         stats = stats.Add(this.tail_list[this.sel_tail].stats);
         if (this.boom) {
             tail_stats.maxstrain -= tail_stats.mass;
             if (this.has_tractor_nacelles)
                 tail_stats.drag = Math.floor(1.0e-6 + 1.5 * tail_stats.drag);
         }
-        stats = stats.Add(tail_stats);
+        if (this.farman) {
+            //Skin factors
+            stats.drag *= this.skin_list[this.sel_skin].dragfactor;
+            stats.mass *= this.skin_list[this.sel_skin].massfactor;
+            //Apply factors before tail_stats
+            stats = stats.Add(tail_stats);
+        }
+        else {
+            //Apply factors after tail_stats
+            stats = stats.Add(tail_stats);
+            //Skin factors
+            stats.drag *= this.skin_list[this.sel_skin].dragfactor;
+            stats.mass *= this.skin_list[this.sel_skin].massfactor;
+        }
+        //Lifting Body and Flying Wing
+        if (this.flying_wing) {
+            stats.liftbleed += 5;
+        }
+        else {
+            stats.drag += this.CountLiftingBody();
+        }
         stats.structure = Math.floor(1.0e-6 + stats.structure);
         stats.cost = Math.floor(1.0e-6 + stats.cost);
         stats.visibility = Math.min(stats.visibility, 3);
@@ -5561,7 +5591,6 @@ class Aircraft {
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
         stats = stats.Add(this.gear.PartStats());
-        stats.toughness += Math.floor(1.0e-6 + Math.max(0, (stats.structure - stats.maxstrain) / 2) + stats.maxstrain / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
         stats = stats.Add(this.alter.PartStats());
@@ -5662,6 +5691,7 @@ class Aircraft {
         if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         var Toughness = this.stats.toughness;
+        Toughness += Math.floor(1.0e-6 + this.stats.structure / 5);
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
@@ -6590,10 +6620,16 @@ class Engine_HTML extends Display {
         this.e_pulsejet.disabled = b;
     }
     UpdateDisplay() {
-        var idx = this.engine.GetSelectedIndex();
-        if (idx < 0)
-            idx = engine_list.length;
-        this.e_select.selectedIndex = idx;
+        while (this.e_select.options.length > 0) {
+            this.e_select.options.remove(0);
+        }
+        for (let i = 0; i < engine_list.length; i++) {
+            let eng = engine_list.get(i);
+            let opt = document.createElement("OPTION");
+            opt.text = eng.name;
+            this.e_select.add(opt);
+        }
+        this.e_select.selectedIndex = this.engine.GetSelectedIndex();
         if (this.e_select.selectedIndex == engine_list.length) {
             this.SetInputDisable(false);
         }
@@ -6990,6 +7026,8 @@ class Propeller_HTML extends Display {
 class Frames_HTML extends Display {
     constructor(frames) {
         super();
+        this.c_sec = [];
+        this.t_sec = [];
         this.frames = frames;
         var table = document.getElementById("table_frames");
         var row = table.insertRow();
@@ -7076,27 +7114,27 @@ class Frames_HTML extends Display {
         this.t_fwing.onchange = () => { this.frames.SetFlyingWing(this.t_fwing.checked); };
     }
     UpdateDisplay() {
-        while (this.c_frame.children.length > 0)
-            this.c_frame.removeChild(this.c_frame.children[0]);
-        while (this.c_skin.children.length > 0)
-            this.c_skin.removeChild(this.c_skin.children[0]);
-        while (this.c_options.children.length > 0)
-            this.c_options.removeChild(this.c_options.children[0]);
-        while (this.t_frame.children.length > 0)
-            this.t_frame.removeChild(this.t_frame.children[0]);
-        while (this.t_skin.children.length > 0)
-            this.t_skin.removeChild(this.t_skin.children[0]);
-        while (this.t_options.children.length > 0)
-            this.t_options.removeChild(this.t_options.children[0]);
         var section_list = this.frames.GetSectionList();
         var tail_section_list = this.frames.GetTailSectionList();
+        while (section_list.length > this.c_sec.length) {
+            let i = this.c_sec.length;
+            this.CreateSection(i, section_list[i]);
+        }
+        while (section_list.length < this.c_sec.length) {
+            this.RemoveSection();
+        }
+        while (tail_section_list.length > this.t_sec.length) {
+            let i = this.t_sec.length;
+            this.CreateTailSection(i, tail_section_list[i]);
+        }
+        while (tail_section_list.length < this.t_sec.length) {
+            this.RemoveTailSection();
+        }
         var skin_list = this.frames.GetSkinList();
-        var is_flammable = false;
+        var is_flammable = skin_list[this.frames.GetSkin()].flammable;
         for (let i = 0; i < section_list.length; i++) {
             let sec = section_list[i];
             this.UpdateSection(i, sec);
-            //Flammable check
-            is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
         this.t_select.selectedIndex = this.frames.GetTailType();
         this.t_farman.disabled = this.frames.GetUseBoom() || this.frames.GetIsTailless();
@@ -7110,8 +7148,6 @@ class Frames_HTML extends Display {
         for (let i = 0; i < tail_section_list.length; i++) {
             let sec = tail_section_list[i];
             this.UpdateTailSection(i, sec);
-            //Flammable check
-            is_flammable = is_flammable || skin_list[sec.skin].flammable;
         }
         if (is_flammable)
             BlinkIfChanged(this.d_flammable, "Yes");
@@ -7129,126 +7165,150 @@ class Frames_HTML extends Display {
         BlinkIfChanged(this.d_strn, stats.maxstrain.toString());
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
     }
-    UpdateSection(i, sec) {
+    CreateSection(i, sec) {
+        var fsec = {
+            fspan: document.createElement("SPAN"),
+            rem: document.createElement("BUTTON"),
+            add: document.createElement("BUTTON"),
+            fsel: document.createElement("SELECT"),
+            sspan: document.createElement("SPAN"),
+            ssel: document.createElement("LABEL"),
+            ospan: document.createElement("SPAN"),
+            geo: document.createElement("INPUT"),
+            mono: document.createElement("INPUT"),
+            int: document.createElement("INPUT"),
+            lb: document.createElement("INPUT"),
+        };
+        fsec.rem.textContent = "-";
+        fsec.rem.onclick = () => { this.frames.DeleteSection(i); };
+        fsec.add.textContent = "+";
+        fsec.add.onclick = () => { this.frames.DuplicateSection(i); };
         var frame_list = this.frames.GetFrameList();
-        var skin_list = this.frames.GetSkinList();
-        var type_span = document.createElement("SPAN");
-        var rem_button = document.createElement("BUTTON");
-        rem_button.textContent = "-";
-        rem_button.onclick = () => { this.frames.DeleteSection(i); };
-        rem_button.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
-        var add_button = document.createElement("BUTTON");
-        add_button.textContent = "+";
-        add_button.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
-        add_button.onclick = () => { this.frames.DuplicateSection(i); };
-        var frame_select = document.createElement("SELECT");
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION");
             opt.text = ft.name;
+            fsec.fsel.add(opt);
+        }
+        fsec.fsel.onchange = () => { this.frames.SetFrame(i, fsec.fsel.selectedIndex); };
+        fsec.fspan.appendChild(fsec.rem);
+        fsec.fspan.appendChild(fsec.add);
+        fsec.fspan.appendChild(fsec.fsel);
+        fsec.fspan.appendChild(document.createElement("BR"));
+        this.c_frame.appendChild(fsec.fspan);
+        fsec.sspan.appendChild(fsec.ssel);
+        fsec.sspan.appendChild(document.createElement("BR"));
+        this.c_skin.appendChild(fsec.sspan);
+        CreateCheckbox("Geodesic", fsec.geo, fsec.ospan, false);
+        fsec.geo.onchange = () => { this.frames.SetGeodesic(i, fsec.geo.checked); };
+        CreateCheckbox("Monocoque", fsec.mono, fsec.ospan, false);
+        fsec.mono.onchange = () => { this.frames.SetMonocoque(i, fsec.mono.checked); };
+        CreateCheckbox("Internal Bracing", fsec.int, fsec.ospan, false);
+        fsec.int.onchange = () => { this.frames.SetInternalBracing(i, fsec.int.checked); };
+        CreateCheckbox("Lifting Body", fsec.lb, fsec.ospan, true);
+        fsec.lb.onchange = () => { this.frames.SetLiftingBody(i, fsec.lb.checked); };
+        this.c_options.appendChild(fsec.ospan);
+        this.c_sec.push(fsec);
+        this.UpdateSection(i, sec);
+    }
+    RemoveSection() {
+        var sec = this.c_sec.pop();
+        this.c_frame.removeChild(sec.fspan);
+        this.c_skin.removeChild(sec.sspan);
+        this.c_options.removeChild(sec.ospan);
+    }
+    UpdateSection(i, sec) {
+        var fsec = this.c_sec[i];
+        fsec.rem.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
+        fsec.add.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
+        var frame_list = this.frames.GetFrameList();
+        for (let j = 0; j < frame_list.length; j++) {
+            let ft = frame_list[j];
+            let opt = fsec.fsel.options[j];
+            opt.text = ft.name;
+            opt.disabled = false;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
             if (!sec.internal_bracing && ft.basestruct == 0)
                 opt.disabled = true;
-            frame_select.add(opt);
         }
-        frame_select.onchange = () => { this.frames.SetFrame(i, frame_select.selectedIndex); };
-        frame_select.selectedIndex = sec.frame;
-        type_span.appendChild(rem_button);
-        type_span.appendChild(add_button);
-        type_span.appendChild(frame_select);
-        this.c_frame.appendChild(type_span);
-        this.c_frame.appendChild(document.createElement("BR"));
-        var skin_select = document.createElement("SELECT");
-        for (let st of skin_list) {
-            let opt = document.createElement("OPTION");
-            opt.text = st.name;
-            if (sec.monocoque && !st.monocoque)
-                opt.disabled = true;
-            skin_select.add(opt);
-        }
-        if (sec.internal_bracing)
-            skin_select.disabled = true;
-        skin_select.onchange = () => { this.frames.SetSkin(i, skin_select.selectedIndex); };
-        skin_select.selectedIndex = sec.skin;
-        if (sec.internal_bracing)
-            skin_select.selectedIndex = -1;
-        this.c_skin.appendChild(skin_select);
-        this.c_skin.appendChild(document.createElement("BR"));
-        var opt_span = document.createElement("SPAN");
-        var geo_input = document.createElement("INPUT");
-        CreateCheckbox("Geodesic", geo_input, opt_span, false);
-        geo_input.checked = sec.geodesic;
-        geo_input.disabled = !this.frames.PossibleGeodesic(i);
-        geo_input.onchange = () => { this.frames.SetGeodesic(i, geo_input.checked); };
-        var mono_input = document.createElement("INPUT");
-        CreateCheckbox("Monocoque", mono_input, opt_span, false);
-        mono_input.checked = sec.monocoque;
-        mono_input.disabled = !this.frames.PossibleMonocoque(i);
-        mono_input.onchange = () => { this.frames.SetMonocoque(i, mono_input.checked); };
-        var int_input = document.createElement("INPUT");
-        CreateCheckbox("Internal Bracing", int_input, opt_span, false);
-        int_input.checked = sec.internal_bracing;
-        if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing(true) || !this.frames.PossibleRemoveSections()))
-            int_input.disabled = true;
-        int_input.onchange = () => { this.frames.SetInternalBracing(i, int_input.checked); };
-        var lb_input = document.createElement("INPUT");
-        CreateCheckbox("Lifting Body", lb_input, opt_span, false);
-        lb_input.checked = sec.lifting_body;
-        lb_input.disabled = !this.frames.PossibleMonocoque(i);
-        lb_input.onchange = () => { this.frames.SetLiftingBody(i, lb_input.checked); };
-        this.c_options.appendChild(opt_span);
-        this.c_options.appendChild(document.createElement("BR"));
-    }
-    UpdateTailSection(i, sec) {
-        var frame_list = this.frames.GetFrameList();
+        fsec.fsel.selectedIndex = sec.frame;
         var skin_list = this.frames.GetSkinList();
-        var frame_select = document.createElement("SELECT");
+        fsec.ssel.innerText = skin_list[this.frames.GetSkin()].name;
+        fsec.geo.checked = sec.geodesic;
+        fsec.geo.disabled = !this.frames.PossibleGeodesic(i);
+        fsec.mono.checked = sec.monocoque;
+        fsec.mono.disabled = !this.frames.PossibleMonocoque(i);
+        fsec.int.checked = sec.internal_bracing;
+        if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing(true) || !this.frames.PossibleRemoveSections()))
+            fsec.int.disabled = true;
+        fsec.lb.checked = sec.lifting_body;
+        fsec.lb.disabled = !this.frames.PossibleMonocoque(i);
+    }
+    CreateTailSection(i, sec) {
+        var tsec = {
+            fspan: document.createElement("SPAN"),
+            fsel: document.createElement("SELECT"),
+            sspan: document.createElement("SPAN"),
+            ssel: document.createElement("LABEL"),
+            ospan: document.createElement("SPAN"),
+            geo: document.createElement("INPUT"),
+            mono: document.createElement("INPUT"),
+            lb: document.createElement("INPUT"),
+        };
+        var frame_list = this.frames.GetFrameList();
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION");
             opt.text = ft.name;
+            tsec.fsel.add(opt);
+        }
+        tsec.fsel.onchange = () => { this.frames.SetTailFrame(i, tsec.fsel.selectedIndex); };
+        tsec.fspan.appendChild(tsec.fsel);
+        tsec.fspan.appendChild(document.createElement("BR"));
+        this.t_frame.appendChild(tsec.fspan);
+        tsec.sspan.appendChild(tsec.ssel);
+        tsec.sspan.appendChild(document.createElement("BR"));
+        this.t_skin.appendChild(tsec.sspan);
+        CreateCheckbox("Geodesic", tsec.geo, tsec.ospan, false);
+        tsec.geo.onchange = () => { this.frames.SetTailGeodesic(i, tsec.geo.checked); };
+        CreateCheckbox("Monocoque", tsec.mono, tsec.ospan, false);
+        tsec.mono.onchange = () => { this.frames.SetTailMonocoque(i, tsec.mono.checked); };
+        CreateCheckbox("Lifting Body", tsec.lb, tsec.ospan, true);
+        tsec.lb.onchange = () => { this.frames.SetTailLiftingBody(i, tsec.lb.checked); };
+        this.t_options.appendChild(tsec.ospan);
+        this.t_sec.push(tsec);
+        this.UpdateTailSection(i, sec);
+    }
+    RemoveTailSection() {
+        var sec = this.t_sec.pop();
+        this.t_frame.removeChild(sec.fspan);
+        this.t_skin.removeChild(sec.sspan);
+        this.t_options.removeChild(sec.ospan);
+    }
+    UpdateTailSection(i, sec) {
+        var tsec = this.t_sec[i];
+        var frame_list = this.frames.GetFrameList();
+        for (let j = 0; j < frame_list.length; j++) {
+            let ft = frame_list[j];
+            let opt = tsec.fsel.options[j];
+            opt.text = ft.name;
+            opt.disabled = false;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
-            if (ft.basestruct == 0)
+            if (!sec.internal_bracing && ft.basestruct == 0)
                 opt.disabled = true;
-            frame_select.add(opt);
         }
-        frame_select.onchange = () => { this.frames.SetTailFrame(i, frame_select.selectedIndex); };
-        frame_select.selectedIndex = sec.frame;
-        this.t_frame.appendChild(frame_select);
-        this.t_frame.appendChild(document.createElement("BR"));
-        var skin_select = document.createElement("SELECT");
-        for (let st of skin_list) {
-            let opt = document.createElement("OPTION");
-            opt.text = st.name;
-            if (sec.monocoque && !st.monocoque)
-                opt.disabled = true;
-            skin_select.add(opt);
-        }
-        if (this.frames.GetUseFarman()) {
-            skin_select.disabled = true;
-        }
-        skin_select.onchange = () => { this.frames.SetTailSkin(i, skin_select.selectedIndex); };
-        skin_select.selectedIndex = sec.skin;
-        this.t_skin.appendChild(skin_select);
-        this.t_skin.appendChild(document.createElement("BR"));
-        var opt_span = document.createElement("SPAN");
-        var geo_input = document.createElement("INPUT");
-        CreateCheckbox("Geodesic", geo_input, opt_span, false);
-        geo_input.checked = sec.geodesic;
-        geo_input.disabled = !this.frames.PossibleTailGeodesic(i);
-        geo_input.onchange = () => { this.frames.SetTailGeodesic(i, geo_input.checked); };
-        var mono_input = document.createElement("INPUT");
-        CreateCheckbox("Monocoque", mono_input, opt_span, false);
-        mono_input.checked = sec.monocoque;
-        mono_input.disabled = !this.frames.PossibleTailMonocoque(i);
-        mono_input.onchange = () => { this.frames.SetTailMonocoque(i, mono_input.checked); };
-        var lb_input = document.createElement("INPUT");
-        CreateCheckbox("Lifting Body", lb_input, opt_span, false);
-        lb_input.checked = sec.lifting_body;
-        lb_input.disabled = !this.frames.PossibleTailMonocoque(i);
-        lb_input.onchange = () => { this.frames.SetTailLiftingBody(i, lb_input.checked); };
-        this.t_options.appendChild(opt_span);
-        this.t_options.appendChild(document.createElement("BR"));
+        tsec.fsel.selectedIndex = sec.frame;
+        var skin_list = this.frames.GetSkinList();
+        var idx = this.frames.GetSkin();
+        if (this.frames.GetUseFarman())
+            idx = 0;
+        tsec.ssel.innerText = skin_list[idx].name;
+        tsec.geo.checked = sec.geodesic;
+        tsec.geo.disabled = !this.frames.PossibleTailGeodesic(i);
+        tsec.mono.checked = sec.monocoque;
+        tsec.mono.disabled = !this.frames.PossibleTailMonocoque(i);
+        tsec.lb.checked = sec.lifting_body;
+        tsec.lb.disabled = !this.frames.PossibleTailMonocoque(i);
     }
 }
 /// <reference path="./Display.ts" />

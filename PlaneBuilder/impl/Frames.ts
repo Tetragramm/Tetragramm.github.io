@@ -10,21 +10,22 @@ class Frames extends Part {
     private skin_list: {
         name: string, stats: Stats,
         monocoque: boolean, monocoque_structure: number,
-        flammable: boolean;
+        flammable: boolean, dragfactor: number, massfactor: number,
     }[];
     private section_list: {
-        frame: number, skin: number, geodesic: boolean, monocoque: boolean,
+        frame: number, geodesic: boolean, monocoque: boolean,
         lifting_body: boolean, internal_bracing: boolean
     }[];
     private required_sections: number;
 
+    private sel_skin: number;
     private tail_list: { name: string, stats: Stats }[];
     private sel_tail: number;
     private farman: boolean;
     private boom: boolean;
     private has_tractor_nacelles: boolean;
     private tail_section_list: {
-        frame: number, skin: number, geodesic: boolean, monocoque: boolean,
+        frame: number, geodesic: boolean, monocoque: boolean,
         lifting_body: boolean, internal_bracing: boolean
     }[];
 
@@ -44,6 +45,7 @@ class Frames extends Part {
             });
         }
 
+        this.sel_skin = 0;
         this.skin_list = [];
         for (let elem of js["skin"]) {
             this.skin_list.push({
@@ -51,7 +53,9 @@ class Frames extends Part {
                 stats: new Stats(elem),
                 monocoque: elem["monocoque"],
                 monocoque_structure: elem["monocoque_structure"],
-                flammable: elem["flammable"]
+                flammable: elem["flammable"],
+                dragfactor: elem["dragfactor"],
+                massfactor: elem["massfactor"],
             });
         }
 
@@ -83,6 +87,7 @@ class Frames extends Part {
             use_farman: this.farman,
             use_boom: this.boom,
             flying_wing: this.flying_wing,
+            sel_skin: this.sel_skin,
         };
     }
 
@@ -90,24 +95,30 @@ class Frames extends Part {
         this.section_list = [];
         for (let elem of js["sections"]) {
             this.section_list.push({
-                frame: elem["frame"], skin: elem["skin"], geodesic: elem["geodesic"],
+                frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
+            if (elem["skin"])
+                this.sel_skin = elem["skin"];
         }
         this.tail_section_list = [];
         for (let elem of js["tail_sections"]) {
             this.tail_section_list.push({
-                frame: elem["frame"], skin: elem["skin"], geodesic: elem["geodesic"],
+                frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
+            if (elem["skin"])
+                this.sel_skin = elem["skin"];
         }
 
         this.farman = js["use_farman"];
         this.boom = js["use_boom"];
         this.sel_tail = js["tail_index"];
         this.flying_wing = js["flying_wing"];
+        if (js["sel_skin"])
+            this.sel_skin = js["sel_skin"];
     }
 
     public serialize(s: Serialize) {
@@ -115,7 +126,7 @@ class Frames extends Part {
         for (let i = 0; i < this.section_list.length; i++) {
             var sec = this.section_list[i];
             s.PushNum(sec.frame);
-            s.PushNum(sec.skin);
+            s.PushNum(this.sel_skin);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
             s.PushBool(sec.lifting_body);
@@ -125,7 +136,7 @@ class Frames extends Part {
         for (let i = 0; i < this.tail_section_list.length; i++) {
             var sec = this.tail_section_list[i];
             s.PushNum(sec.frame);
-            s.PushNum(sec.skin);
+            s.PushNum(this.sel_skin);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
             s.PushBool(sec.lifting_body);
@@ -146,7 +157,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            sec.skin = d.GetNum();
+            this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
@@ -161,7 +172,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            sec.skin = d.GetNum();
+            this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
@@ -177,7 +188,7 @@ class Frames extends Part {
     public DuplicateSection(num: number) {
         var sec = this.section_list[num];
         var new_section = {
-            frame: sec.frame, skin: sec.skin, geodesic: sec.geodesic, monocoque: sec.monocoque,
+            frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
         if (new_section.internal_bracing && this.CountSections() + this.tail_section_list.length == this.CountInternalBracing()) {
@@ -190,7 +201,7 @@ class Frames extends Part {
     private DuplicateTailSection(num: number) {
         var sec = this.tail_section_list[num];
         var new_section = {
-            frame: sec.frame, skin: sec.skin, geodesic: sec.geodesic, monocoque: sec.monocoque,
+            frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
         if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
@@ -221,7 +232,7 @@ class Frames extends Part {
         if (this.required_sections > this.CountSections()) {
             if (this.section_list.length == 0) {
                 this.section_list.push({
-                    frame: 0, skin: 0, geodesic: false, monocoque: false,
+                    frame: 0, geodesic: false, monocoque: false,
                     lifting_body: false, internal_bracing: false
                 });
             }
@@ -240,7 +251,7 @@ class Frames extends Part {
         if (num > this.tail_section_list.length) {
             if (this.tail_section_list.length == 0) {
                 this.tail_section_list.push({
-                    frame: 0, skin: 0, geodesic: false, monocoque: false,
+                    frame: 0, geodesic: false, monocoque: false,
                     lifting_body: false, internal_bracing: false
                 });
             }
@@ -326,16 +337,16 @@ class Frames extends Part {
         this.CalculateStats();
     }
 
-    public SetSkin(num: number, type: number) {
-        this.section_list[num].skin = type;
-        if (type != 0)
-            this.section_list[num].internal_bracing = false;
-        if (!this.skin_list[type].monocoque) {
-            this.section_list[num].monocoque = false;
-            this.section_list[num].lifting_body = false;
-        }
-        this.CalculateStats();
-    }
+    // public SetSkin(num: number, type: number) {
+    //     this.section_list[num].skin = type;
+    //     if (type != 0)
+    //         this.section_list[num].internal_bracing = false;
+    //     if (!this.skin_list[type].monocoque) {
+    //         this.section_list[num].monocoque = false;
+    //         this.section_list[num].lifting_body = false;
+    //     }
+    //     this.CalculateStats();
+    // }
 
     public SetGeodesic(num: number, use: boolean) {
         if (this.frame_list[this.section_list[num].frame].geodesic) {
@@ -345,14 +356,14 @@ class Frames extends Part {
     }
 
     public SetMonocoque(num: number, use: boolean) {
-        if (this.skin_list[this.section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque) {
             this.section_list[num].monocoque = use;
             this.CalculateStats();
         }
     }
 
     public SetLiftingBody(num: number, use: boolean) {
-        if (this.skin_list[this.section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque) {
             this.section_list[num].lifting_body = use;
             this.CalculateStats();
         }
@@ -364,7 +375,6 @@ class Frames extends Part {
             && this.PossibleInternalBracing(true)
             && this.CountSections() > this.required_sections) {
             this.section_list[num].internal_bracing = true;
-            this.section_list[num].skin = 0;
             this.section_list[num].monocoque = false;
             this.section_list[num].lifting_body = false;
             this.CalculateStats();
@@ -386,7 +396,7 @@ class Frames extends Part {
     }
 
     public PossibleMonocoque(num: number) {
-        return this.skin_list[this.section_list[num].skin].monocoque;
+        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing;
     }
 
     public PossibleTailGeodesic(num: number) {
@@ -394,7 +404,7 @@ class Frames extends Part {
     }
 
     public PossibleTailMonocoque(num: number) {
-        return this.skin_list[this.tail_section_list[num].skin].monocoque;
+        return this.skin_list[this.sel_skin].monocoque && !this.farman;
     }
 
     public PossibleRemoveSections() {
@@ -406,7 +416,7 @@ class Frames extends Part {
     }
 
     private SectionStats(sec: {
-        frame: number, skin: number, geodesic: boolean, monocoque: boolean,
+        frame: number, geodesic: boolean, monocoque: boolean,
         lifting_body: boolean, internal_bracing: boolean
     }): Stats {
         var stats = new Stats();
@@ -416,17 +426,43 @@ class Frames extends Part {
             stats.cost *= 2;
         }
         if (sec.lifting_body) {
-            stats.drag += 1;
             stats.wingarea += 3;
         }
         //If it's internal, no skin.
         if (!sec.internal_bracing) {
+            stats.drag += 4;
             if (sec.monocoque) {
                 stats.mass = 0;
                 stats.cost += 1;
-                stats.structure = this.skin_list[sec.skin].monocoque_structure;
+                stats.structure = this.skin_list[this.sel_skin].monocoque_structure;
             }
-            stats = stats.Add(this.skin_list[sec.skin].stats);
+            stats = stats.Add(this.skin_list[this.sel_skin].stats);
+        }
+        return stats;
+    }
+
+    private TailSectionStats(sec: {
+        frame: number, geodesic: boolean, monocoque: boolean,
+        lifting_body: boolean, internal_bracing: boolean
+    }): Stats {
+        var stats = new Stats();
+        stats = stats.Add(this.frame_list[sec.frame].stats);
+        if (sec.geodesic) {
+            stats.structure *= 1.5;
+            stats.cost *= 2;
+        }
+        if (sec.lifting_body) {
+            stats.wingarea += 3;
+        }
+        stats.drag += 4;
+        //If it's farman, no skin.
+        if (!this.farman) {
+            if (sec.monocoque) {
+                stats.mass = 0;
+                stats.cost += 1;
+                stats.structure = this.skin_list[this.sel_skin].monocoque_structure;
+            }
+            stats = stats.Add(this.skin_list[this.sel_skin].stats);
         }
         return stats;
     }
@@ -476,7 +512,6 @@ class Frames extends Part {
             this.boom = false;
         if (this.farman) {
             for (let sec of this.tail_section_list) {
-                sec.skin = 0;
                 sec.monocoque = false;
                 sec.lifting_body = false;
             }
@@ -506,16 +541,16 @@ class Frames extends Part {
         this.CalculateStats();
     }
 
-    public SetTailSkin(num: number, type: number) {
-        this.tail_section_list[num].skin = type;
-        if (type != 0)
-            this.tail_section_list[num].internal_bracing = false;
-        if (!this.skin_list[type].monocoque) {
-            this.tail_section_list[num].monocoque = false;
-            this.tail_section_list[num].lifting_body = false;
-        }
-        this.CalculateStats();
-    }
+    // public SetTailSkin(num: number, type: number) {
+    //     this.tail_section_list[num].skin = type;
+    //     if (type != 0)
+    //         this.tail_section_list[num].internal_bracing = false;
+    //     if (!this.skin_list[type].monocoque) {
+    //         this.tail_section_list[num].monocoque = false;
+    //         this.tail_section_list[num].lifting_body = false;
+    //     }
+    //     this.CalculateStats();
+    // }
 
     public SetTailGeodesic(num: number, use: boolean) {
         if (this.frame_list[this.tail_section_list[num].frame].geodesic) {
@@ -525,14 +560,14 @@ class Frames extends Part {
     }
 
     public SetTailMonocoque(num: number, use: boolean) {
-        if (this.skin_list[this.tail_section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque && !this.farman) {
             this.tail_section_list[num].monocoque = use;
             this.CalculateStats();
         }
     }
 
     public SetTailLiftingBody(num: number, use: boolean) {
-        if (this.skin_list[this.tail_section_list[num].skin].monocoque) {
+        if (this.skin_list[this.sel_skin].monocoque && !this.farman) {
             this.tail_section_list[num].lifting_body = use;
             this.CalculateStats();
         }
@@ -590,9 +625,9 @@ class Frames extends Part {
     }
 
     public SetAllSkin(num: number) {
+        this.sel_skin = num;
         for (let s of this.section_list) {
             if (!s.internal_bracing) {
-                s.skin = num;
                 if (!this.skin_list[num].monocoque) {
                     s.monocoque = false;
                     s.lifting_body = false;
@@ -601,7 +636,6 @@ class Frames extends Part {
         }
         for (let s of this.tail_section_list) {
             if (!s.internal_bracing) {
-                s.skin = num;
                 if (!this.skin_list[num].monocoque) {
                     s.monocoque = false;
                     s.lifting_body = false;
@@ -612,28 +646,19 @@ class Frames extends Part {
     }
 
     public GetArmor() {
-        var count = 0;
-        for (let s of this.section_list) {
-            if (this.skin_list[s.skin].name == "Dragon Skin")
-                count++;
-        }
-        for (let s of this.tail_section_list) {
-            if (this.skin_list[s.skin].name == "Dragon Skin")
-                count++;
-        }
-        return count;
+        if (this.skin_list[this.sel_skin].name == "Dragon Skin")
+            return 5;
+        return 0;
     }
 
     public GetIsFlammable() {
-        for (let s of this.section_list) {
-            if (this.skin_list[s.skin].flammable)
-                return true;
-        }
-        for (let s of this.tail_section_list) {
-            if (this.skin_list[s.skin].flammable)
-                return true;
-        }
+        if (this.skin_list[this.sel_skin].flammable)
+            return true;
         return false;
+    }
+
+    public GetSkin() {
+        return this.sel_skin;
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -649,28 +674,19 @@ class Frames extends Part {
         stats.structure = this.frame_list[base_type].basestruct;
         stats.cost = this.frame_list[base_type].basecost;
 
-        var is_clinker = false;
+        var is_clinker = this.skin_list[this.sel_skin].monocoque_structure < 0;
 
         for (let sec of this.section_list) {
             stats = stats.Add(this.SectionStats(sec));
-            var clinker = this.skin_list[sec.skin].monocoque_structure < 0 && sec.monocoque;
-            is_clinker = is_clinker || clinker;
         }
 
         var tail_stats = new Stats();
         for (let sec of this.tail_section_list) {
-            tail_stats = tail_stats.Add(this.SectionStats(sec));
-            var clinker = this.skin_list[sec.skin].monocoque_structure < 0 && sec.monocoque;
-            is_clinker = is_clinker || clinker;
+            tail_stats = tail_stats.Add(this.TailSectionStats(sec));
         }
 
         if (is_clinker)
             stats.structure += 30;
-
-        if (this.flying_wing) {
-            stats.liftbleed += 5;
-            stats.drag -= this.CountLiftingBody();;
-        }
 
         stats = stats.Add(this.tail_list[this.sel_tail].stats);
 
@@ -680,7 +696,27 @@ class Frames extends Part {
                 tail_stats.drag = Math.floor(1.0e-6 + 1.5 * tail_stats.drag);
         }
 
-        stats = stats.Add(tail_stats);
+        if (this.farman) {
+            //Skin factors
+            stats.drag *= this.skin_list[this.sel_skin].dragfactor;
+            stats.mass *= this.skin_list[this.sel_skin].massfactor;
+            //Apply factors before tail_stats
+            stats = stats.Add(tail_stats);
+        } else {
+            //Apply factors after tail_stats
+            stats = stats.Add(tail_stats);
+            //Skin factors
+            stats.drag *= this.skin_list[this.sel_skin].dragfactor;
+            stats.mass *= this.skin_list[this.sel_skin].massfactor;
+        }
+
+        //Lifting Body and Flying Wing
+        if (this.flying_wing) {
+            stats.liftbleed += 5;
+        }
+        else {
+            stats.drag += this.CountLiftingBody();
+        }
 
         stats.structure = Math.floor(1.0e-6 + stats.structure);
         stats.cost = Math.floor(1.0e-6 + stats.cost);
