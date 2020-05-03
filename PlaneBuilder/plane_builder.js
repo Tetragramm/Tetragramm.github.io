@@ -688,6 +688,8 @@ class Cockpit extends Part {
         this.selected_upgrades = js["upgrades"];
         this.selected_safety = js["safety"];
         this.selected_gunsights = js["sights"];
+        if (this.is_primary)
+            this.selected_upgrades[0] = false;
     }
     serialize(s) {
         s.PushNum(this.selected_type);
@@ -700,6 +702,8 @@ class Cockpit extends Part {
         this.selected_upgrades = d.GetBoolArr();
         this.selected_safety = d.GetBoolArr();
         this.selected_gunsights = d.GetBoolArr();
+        if (this.is_primary)
+            this.selected_upgrades[0] = false;
     }
     GetTypeList() {
         return this.types;
@@ -778,23 +782,23 @@ class Cockpit extends Part {
         return can;
     }
     PartStats() {
-        this.stats = new Stats();
-        this.stats.reqsections = 1;
-        this.stats = this.stats.Add(this.types[this.selected_type].stats);
+        var stats = new Stats();
+        stats.reqsections = 1;
+        stats = stats.Add(this.types[this.selected_type].stats);
         for (let i = 0; i < this.selected_upgrades.length; i++) {
             if (this.selected_upgrades[i])
-                this.stats = this.stats.Add(this.upgrades[i].stats);
+                stats = stats.Add(this.upgrades[i].stats);
         }
+        console.log(stats);
         for (let i = 0; i < this.selected_safety.length; i++) {
             if (this.selected_safety[i])
-                this.stats = this.stats.Add(this.safety[i].stats);
+                stats = stats.Add(this.safety[i].stats);
         }
         for (let i = 0; i < this.selected_gunsights.length; i++) {
             if (this.selected_gunsights[i])
-                this.stats = this.stats.Add(this.gunsights[i].stats);
+                stats = stats.Add(this.gunsights[i].stats);
         }
-        var stats = new Stats();
-        stats = stats.Add(this.stats);
+        this.stats = stats.Clone();
         return stats;
     }
     CrewUpdate(escape, flightstress, visibility) {
@@ -826,6 +830,7 @@ class Cockpits extends Part {
             let upg = { name: elem["name"], stats: new Stats(elem) };
             this.upgrades.push(upg);
         }
+        console.log(this.upgrades);
         this.safety = [];
         //Add all the safety
         for (let elem of js["safety"]) {
@@ -4972,13 +4977,21 @@ class Weapon extends Part {
                 out[0]++;
                 out[1]++;
             }
+            if (this.repeating) {
+                out[0]++;
+                out[1]++;
+            }
             return out;
         }
         else {
+            var ret = parseInt(this.weapon_type.jam);
             if (this.synchronization == SynchronizationType.INTERRUPT) {
-                return parseInt(this.weapon_type.jam) + 1;
+                ret += 1;
             }
-            return parseInt(this.weapon_type.jam);
+            if (this.repeating) {
+                ret += 1;
+            }
+            return ret;
         }
     }
     SetCalculateStats(callback) {
@@ -5704,7 +5717,7 @@ class Aircraft {
         var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
-        var FlightStress = this.stats.flightstress;
+        var FlightStress = 1 + this.stats.flightstress;
         if (Stabiilty > 3 || Stabiilty < -3)
             FlightStress++;
         FlightStress += Math.floor(1.0e-6 + DryMP / 10);
@@ -6166,19 +6179,16 @@ class Cockpit_HTML extends Display {
         option.appendChild(this.sel_type);
         var fs = CreateFlexSection(upgrades);
         //Add all the upgrades as checkboxes
-        var upg_index = 0;
         var upglst = cp.GetUpgradeList();
         var can = cp.CanUpgrades();
         for (let i = 0; i < upglst.length; i++) {
+            let upg = document.createElement("INPUT");
             if (can[i]) {
                 let elem = upglst[i];
-                let upg = document.createElement("INPUT");
                 FlexCheckbox(elem.name, upg, fs);
-                let local_index = upg_index;
-                upg_index += 1;
-                upg.onchange = () => { this.cockpit.SetUpgrade(local_index, upg.checked); };
-                this.upg_chbxs.push(upg);
+                upg.onchange = () => { this.cockpit.SetUpgrade(i, upg.checked); };
             }
+            this.upg_chbxs.push(upg);
         }
         var fs = CreateFlexSection(safety);
         //Add all the safties as checkboxes

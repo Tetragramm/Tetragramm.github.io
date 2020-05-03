@@ -301,13 +301,21 @@ class Weapon extends Part {
                 out[0]++;
                 out[1]++;
             }
+            if (this.repeating) {
+                out[0]++;
+                out[1]++;
+            }
             return out;
         }
         else {
+            var ret = parseInt(this.weapon_type.jam)
             if (this.synchronization == SynchronizationType.INTERRUPT) {
-                return parseInt(this.weapon_type.jam) + 1;
+                ret += 1;
             }
-            return parseInt(this.weapon_type.jam);
+            if (this.repeating) {
+                ret += 1;
+            }
+            return ret;
         }
     }
 

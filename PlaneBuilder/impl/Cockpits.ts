@@ -25,6 +25,7 @@ class Cockpits extends Part {
             let upg = { name: elem["name"], stats: new Stats(elem) };
             this.upgrades.push(upg);
         }
+        console.log(this.upgrades);
         this.safety = [];
         //Add all the safety
         for (let elem of js["safety"]) {

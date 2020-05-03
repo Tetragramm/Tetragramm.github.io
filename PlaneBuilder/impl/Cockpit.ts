@@ -51,6 +51,8 @@ class Cockpit extends Part {
         this.selected_upgrades = js["upgrades"];
         this.selected_safety = js["safety"];
         this.selected_gunsights = js["sights"];
+        if (this.is_primary)
+            this.selected_upgrades[0] = false;
     }
 
     public serialize(s: Serialize) {
@@ -65,6 +67,8 @@ class Cockpit extends Part {
         this.selected_upgrades = d.GetBoolArr();
         this.selected_safety = d.GetBoolArr();
         this.selected_gunsights = d.GetBoolArr();
+        if (this.is_primary)
+            this.selected_upgrades[0] = false;
     }
 
     public GetTypeList() {
@@ -162,28 +166,28 @@ class Cockpit extends Part {
     }
 
     public PartStats(): Stats {
-        this.stats = new Stats();
-        this.stats.reqsections = 1;
+        var stats = new Stats();
+        stats.reqsections = 1;
 
-        this.stats = this.stats.Add(this.types[this.selected_type].stats);
+        stats = stats.Add(this.types[this.selected_type].stats);
 
         for (let i = 0; i < this.selected_upgrades.length; i++) {
             if (this.selected_upgrades[i])
-                this.stats = this.stats.Add(this.upgrades[i].stats);
+                stats = stats.Add(this.upgrades[i].stats);
         }
 
+        console.log(stats);
         for (let i = 0; i < this.selected_safety.length; i++) {
             if (this.selected_safety[i])
-                this.stats = this.stats.Add(this.safety[i].stats);
+                stats = stats.Add(this.safety[i].stats);
         }
 
         for (let i = 0; i < this.selected_gunsights.length; i++) {
             if (this.selected_gunsights[i])
-                this.stats = this.stats.Add(this.gunsights[i].stats);
+                stats = stats.Add(this.gunsights[i].stats);
         }
 
-        var stats = new Stats();
-        stats = stats.Add(this.stats);
+        this.stats = stats.Clone();
         return stats;
     }
 

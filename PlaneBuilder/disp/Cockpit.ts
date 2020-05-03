@@ -82,19 +82,16 @@ class Cockpit_HTML extends Display {
 
         var fs = CreateFlexSection(upgrades);
         //Add all the upgrades as checkboxes
-        var upg_index = 0;
         var upglst = cp.GetUpgradeList();
         var can = cp.CanUpgrades();
         for (let i = 0; i < upglst.length; i++) {
+            let upg = document.createElement("INPUT") as HTMLInputElement;
             if (can[i]) {
                 let elem = upglst[i];
-                let upg = document.createElement("INPUT") as HTMLInputElement;
                 FlexCheckbox(elem.name, upg, fs);
-                let local_index = upg_index;
-                upg_index += 1;
-                upg.onchange = () => { this.cockpit.SetUpgrade(local_index, upg.checked); };
-                this.upg_chbxs.push(upg);
+                upg.onchange = () => { this.cockpit.SetUpgrade(i, upg.checked); };
             }
+            this.upg_chbxs.push(upg);
         }
 
         var fs = CreateFlexSection(safety);

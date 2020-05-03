@@ -397,7 +397,7 @@ class Aircraft {
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
 
-        var FlightStress = this.stats.flightstress;
+        var FlightStress = 1 + this.stats.flightstress;
         if (Stabiilty > 3 || Stabiilty < -3)
             FlightStress++;
         FlightStress += Math.floor(1.0e-6 + DryMP / 10);
