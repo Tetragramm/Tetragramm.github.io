@@ -7144,7 +7144,7 @@ class Frames_HTML extends Display {
         this.t_fwing.disabled = !this.frames.CanFlyingWing();
         this.t_fwing.checked = this.frames.GetFlyingWing();
         this.all_frame.selectedIndex = -1;
-        this.all_skin.selectedIndex = -1;
+        this.all_skin.selectedIndex = this.frames.GetSkin();
         for (let i = 0; i < tail_section_list.length; i++) {
             let sec = tail_section_list[i];
             this.UpdateTailSection(i, sec);
