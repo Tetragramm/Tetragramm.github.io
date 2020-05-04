@@ -5602,6 +5602,8 @@ class Aircraft {
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
         stats = stats.Add(this.gear.PartStats());
+        //Add toughness here so it gets optimized properly.
+        stats.toughness += Math.floor(1.0e-6 + stats.structure / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
         stats = stats.Add(this.alter.PartStats());
@@ -5641,7 +5643,6 @@ class Aircraft {
         WetMP = Math.max(WetMP, 1);
         var WetMPwBombs = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
         WetMPwBombs = Math.max(WetMPwBombs, 1);
-        var span = Math.max(1, this.wings.GetSpan());
         var DPEmpty = Math.floor(1.0e-6 + (this.stats.drag + DryMP) / 5);
         DPEmpty = Math.max(DPEmpty, 1);
         var DPFull = Math.floor(1.0e-6 + (this.stats.drag + WetMP) / 5);
@@ -5702,7 +5703,6 @@ class Aircraft {
         if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         var Toughness = this.stats.toughness;
-        Toughness += Math.floor(1.0e-6 + this.stats.structure / 5);
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
