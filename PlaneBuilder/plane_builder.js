@@ -2546,10 +2546,12 @@ class Frames extends Part {
         var is_clinker = this.skin_list[this.sel_skin].monocoque_structure < 0;
         for (let sec of this.section_list) {
             stats = stats.Add(this.SectionStats(sec));
+            is_clinker = is_clinker && (sec.internal_bracing || sec.monocoque);
         }
         var tail_stats = new Stats();
         for (let sec of this.tail_section_list) {
             tail_stats = tail_stats.Add(this.TailSectionStats(sec));
+            is_clinker = is_clinker && (sec.internal_bracing || sec.monocoque);
         }
         if (is_clinker)
             stats.structure += 30;
