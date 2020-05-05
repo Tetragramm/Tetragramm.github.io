@@ -299,7 +299,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, "Pitch Stability");
         CreateTH(row, "Lateral Stability");
         CreateTH(row, "Wing Area");
-        CreateTH(row, "Max Strain");
+        CreateTH(row, "Raw Strain");
         CreateTH(row, "Structure");
         CreateTH(row, "Toughness");
         row = tbl.insertRow();
@@ -406,7 +406,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, "Pitch Stability");
         CreateTH(row, "Lateral Stability");
         CreateTH(row, "Wing Area");
-        CreateTH(row, "Max Strain");
+        CreateTH(row, "Raw Strain");
         CreateTH(row, "Structure");
         CreateTH(row, "Toughness");
         row = tbl.insertRow();

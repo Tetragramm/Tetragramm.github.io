@@ -94,7 +94,7 @@ class Wings_HTML extends Display {
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Max Strain");
+        CreateTH(h3_row, "Raw Strain");
         CreateTH(h3_row, "Crash Safety");
         CreateTH(h3_row, "Lift Bleed");
         var c3_row = tbl_stat.insertRow();

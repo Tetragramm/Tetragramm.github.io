@@ -380,8 +380,12 @@ class Aircraft {
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
 
         var MaxStrain = 1 / 0;
-        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)
+        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0) {
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+            //And store the results so they can be displayed
+            this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
+            MaxStrain += this.optimization.final_ms;
+        }
 
         var Toughness = this.stats.toughness;
         var Structure = this.stats.structure;

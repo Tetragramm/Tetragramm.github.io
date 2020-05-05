@@ -13,6 +13,8 @@ class Optimization extends Part {
     private drag: number;
     private acft_stats: Stats;
 
+    public final_ms: number;
+
     constructor() {
         super();
 
@@ -273,7 +275,8 @@ class Optimization extends Part {
         stats.visibility = this.escape;
         stats.mass = Math.floor(1.0e-6 + -(this.mass * this.acft_stats.mass / 10));
         stats.toughness = Math.floor(1.0e-6 + this.toughness * this.acft_stats.toughness / 4);
-        stats.maxstrain = Math.floor(1.0e-6 + this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
+        //This Gets applied later, in derived stats.
+        // stats.maxstrain = Math.floor(1.0e-6 + this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
         stats.drag = Math.floor(1.0e-6 + -(this.drag * this.acft_stats.drag / 10));
 

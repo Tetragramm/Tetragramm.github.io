@@ -4720,7 +4720,8 @@ class Optimization extends Part {
         stats.visibility = this.escape;
         stats.mass = Math.floor(1.0e-6 + -(this.mass * this.acft_stats.mass / 10));
         stats.toughness = Math.floor(1.0e-6 + this.toughness * this.acft_stats.toughness / 4);
-        stats.maxstrain = Math.floor(1.0e-6 + this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
+        //This Gets applied later, in derived stats.
+        // stats.maxstrain = Math.floor(1.0e-6 + this.maxstrain * 1.5 * this.acft_stats.maxstrain / 10);
         stats.reliability = this.reliability * 2;
         stats.drag = Math.floor(1.0e-6 + -(this.drag * this.acft_stats.drag / 10));
         return stats;
@@ -5035,11 +5036,11 @@ class Weapon extends Part {
             stats.drag += 1;
         //Arty size weapon turrets need a section
         //Arty weapons in the fuselage need a section
-        if ((!this.fixed && size > 8) || (!this.wing && this.weapon_type.size == 16))
+        if ((!this.fixed && size > 8) || this.weapon_type.size == 16)
             stats.reqsections += 1;
         //Accessible Cost
         if (this.accessible) {
-            stats.cost += Math.max(1, Math.floor(1.0e-6 + stats.cost / 2));
+            stats.cost += Math.max(1, Math.floor(1.0e-6 + this.w_count / 2));
         }
         //Turret size cost
         if (!this.fixed) {
@@ -5700,8 +5701,12 @@ class Aircraft {
         var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
         var MaxStrain = 1 / 0;
-        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)
+        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0) {
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+            //And store the results so they can be displayed
+            this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
+            MaxStrain += this.optimization.final_ms;
+        }
         var Toughness = this.stats.toughness;
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
@@ -6511,7 +6516,7 @@ class Engine_HTML extends Display {
         var h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, "Pitch Stab");
         CreateTH(h4_row, "Lateral Stab");
-        CreateTH(h4_row, "Max Strain");
+        CreateTH(h4_row, "Raw Strain");
         var c4_row = tbl_stat.insertRow();
         this.d_pstb = c4_row.insertCell();
         this.d_lstb = c4_row.insertCell();
@@ -7072,7 +7077,7 @@ class Frames_HTML extends Display {
         this.d_flammable = c3_row.insertCell();
         this.d_pstb = c3_row.insertCell();
         var h4_row = tbl.insertRow();
-        CreateTH(h4_row, "Max Strain");
+        CreateTH(h4_row, "Raw Strain");
         CreateTH(h4_row, "Lift Bleed");
         CreateTH(h4_row, "");
         var c4_row = tbl.insertRow();
@@ -7375,7 +7380,7 @@ class Wings_HTML extends Display {
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Max Strain");
+        CreateTH(h3_row, "Raw Strain");
         CreateTH(h3_row, "Crash Safety");
         CreateTH(h3_row, "Lift Bleed");
         var c3_row = tbl_stat.insertRow();
@@ -7943,7 +7948,7 @@ class Reinforcement_HTML extends Display {
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Max Strain");
+        CreateTH(h2_row, "Raw Strain");
         CreateTH(h2_row, "Aircraft Max Strain");
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
@@ -8491,7 +8496,7 @@ class Optimization_HTML extends Display {
         BlinkIfChanged(this.d_visi, stats.visibility.toString());
         BlinkIfChanged(this.d_mass, stats.mass.toString());
         BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_mstr, this.opt.final_ms.toString());
         BlinkIfChanged(this.d_reli, stats.reliability.toString());
         BlinkIfChanged(this.d_drag, stats.drag.toString());
     }
@@ -8855,7 +8860,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, "Pitch Stability");
         CreateTH(row, "Lateral Stability");
         CreateTH(row, "Wing Area");
-        CreateTH(row, "Max Strain");
+        CreateTH(row, "Raw Strain");
         CreateTH(row, "Structure");
         CreateTH(row, "Toughness");
         row = tbl.insertRow();
@@ -8961,7 +8966,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, "Pitch Stability");
         CreateTH(row, "Lateral Stability");
         CreateTH(row, "Wing Area");
-        CreateTH(row, "Max Strain");
+        CreateTH(row, "Raw Strain");
         CreateTH(row, "Structure");
         CreateTH(row, "Toughness");
         row = tbl.insertRow();

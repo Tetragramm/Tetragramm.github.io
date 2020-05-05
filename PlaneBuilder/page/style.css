@@ -109,6 +109,13 @@ span {
 	white-space: nowrap;
 }
 
+label {
+	display:inline-block;
+	padding-top:0.12em;
+	padding-bottom: 0.12em;
+	font-size: 1em;
+}
+
 select, input {
 	background-color: #383838;
 	color: #c7c7c7;

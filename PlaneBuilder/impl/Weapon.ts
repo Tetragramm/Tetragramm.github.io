@@ -366,12 +366,12 @@ class Weapon extends Part {
 
         //Arty size weapon turrets need a section
         //Arty weapons in the fuselage need a section
-        if ((!this.fixed && size > 8) || (!this.wing && this.weapon_type.size == 16))
+        if ((!this.fixed && size > 8) || this.weapon_type.size == 16)
             stats.reqsections += 1;
 
         //Accessible Cost
         if (this.accessible) {
-            stats.cost += Math.max(1, Math.floor(1.0e-6 + stats.cost / 2));
+            stats.cost += Math.max(1, Math.floor(1.0e-6 + this.w_count / 2));
         }
 
         //Turret size cost

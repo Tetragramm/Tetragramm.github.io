@@ -166,7 +166,7 @@ class Optimization_HTML extends Display {
         BlinkIfChanged(this.d_visi, stats.visibility.toString());
         BlinkIfChanged(this.d_mass, stats.mass.toString());
         BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_mstr, this.opt.final_ms.toString());
         BlinkIfChanged(this.d_reli, stats.reliability.toString());
         BlinkIfChanged(this.d_drag, stats.drag.toString());
     }

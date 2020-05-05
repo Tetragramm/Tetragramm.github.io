@@ -88,7 +88,7 @@ class Frames_HTML extends Display {
         this.d_flammable = c3_row.insertCell();
         this.d_pstb = c3_row.insertCell();
         var h4_row = tbl.insertRow();
-        CreateTH(h4_row, "Max Strain");
+        CreateTH(h4_row, "Raw Strain");
         CreateTH(h4_row, "Lift Bleed");
         CreateTH(h4_row, "");
         var c4_row = tbl.insertRow();

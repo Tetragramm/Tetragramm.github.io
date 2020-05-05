@@ -259,7 +259,7 @@ class Engine_HTML extends Display {
         var h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, "Pitch Stab");
         CreateTH(h4_row, "Lateral Stab");
-        CreateTH(h4_row, "Max Strain");
+        CreateTH(h4_row, "Raw Strain");
         var c4_row = tbl_stat.insertRow();
         this.d_pstb = c4_row.insertCell();
         this.d_lstb = c4_row.insertCell();
