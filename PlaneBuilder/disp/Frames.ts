@@ -291,8 +291,12 @@ class Frames_HTML extends Display {
 
         fsec.fsel.selectedIndex = sec.frame;
 
-        var skin_list = this.frames.GetSkinList();
-        fsec.ssel.innerText = skin_list[this.frames.GetSkin()].name;
+        if (sec.internal_bracing) {
+            fsec.ssel.innerText = "N/A";
+        } else {
+            var skin_list = this.frames.GetSkinList();
+            fsec.ssel.innerText = skin_list[this.frames.GetSkin()].name;
+        }
 
         fsec.geo.checked = sec.geodesic;
         fsec.geo.disabled = !this.frames.PossibleGeodesic(i);
