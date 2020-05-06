@@ -6373,8 +6373,6 @@ class Engine_HTML extends Display {
         this.e_torq = document.createElement("INPUT");
         this.e_rumb = document.createElement("INPUT");
         this.e_cost = document.createElement("INPUT");
-        this.e_oil = document.createElement("INPUT");
-        this.e_pulsejet = document.createElement("INPUT");
         this.cool_count = document.createElement("INPUT");
         this.cool_count.setAttribute("type", "number");
         var tcell = row.insertCell(0);
@@ -6406,8 +6404,6 @@ class Engine_HTML extends Display {
         FlexInput("Torque", this.e_torq, fs);
         FlexInput("Rumble", this.e_rumb, fs);
         FlexInput("Cost", this.e_cost, fs);
-        FlexCheckbox("Oil Tank", this.e_oil, fs);
-        FlexCheckbox("Pulsejet", this.e_pulsejet, fs);
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
             if (this.e_select.selectedIndex == engine_list.length) {
@@ -6430,8 +6426,6 @@ class Engine_HTML extends Display {
         this.e_torq.onchange = trigger;
         this.e_rumb.onchange = trigger;
         this.e_cost.onchange = trigger;
-        this.e_oil.onchange = trigger;
-        this.e_pulsejet.onchange = trigger;
     }
     UpdateEngine(en) {
         this.engine = en;
@@ -6555,7 +6549,7 @@ class Engine_HTML extends Display {
     InitCoolingSelect() {
         while (this.cool_cell.children.length > 0)
             this.cool_cell.removeChild(this.cool_cell.children[0]);
-        if (this.e_oil.checked) {
+        if (this.engine.IsRotary()) {
             this.e_cool.valueAsNumber = 0;
             var txtSpan = document.createElement("SPAN");
             txtSpan.innerHTML = "Rotary Engines use Oil Tanks.<br/>+1 Mass, Oil Tank is a Vital Component.";
@@ -6615,8 +6609,6 @@ class Engine_HTML extends Display {
         e_stats.torque = this.e_torq.valueAsNumber;
         e_stats.rumble = this.e_rumb.valueAsNumber;
         e_stats.stats.cost = this.e_cost.valueAsNumber;
-        e_stats.oiltank = this.e_oil.checked;
-        e_stats.pulsejet = this.e_pulsejet.checked;
         this.engine.SetCustomStats(e_stats);
     }
     SetInputDisable(b) {
@@ -6631,8 +6623,6 @@ class Engine_HTML extends Display {
         this.e_torq.disabled = b;
         this.e_rumb.disabled = b;
         this.e_cost.disabled = b;
-        this.e_oil.disabled = b;
-        this.e_pulsejet.disabled = b;
     }
     UpdateDisplay() {
         while (this.e_select.options.length > 0) {
@@ -6663,8 +6653,6 @@ class Engine_HTML extends Display {
         this.e_torq.valueAsNumber = e_stats.torque;
         this.e_rumb.valueAsNumber = e_stats.rumble;
         this.e_cost.valueAsNumber = e_stats.stats.cost;
-        this.e_oil.checked = e_stats.oiltank;
-        this.e_pulsejet.checked = e_stats.pulsejet;
         this.InitCoolingSelect();
         this.intake_fan.checked = this.engine.GetIntakeFan();
         if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {

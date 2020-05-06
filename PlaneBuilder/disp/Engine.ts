@@ -15,8 +15,6 @@ class Engine_HTML extends Display {
     private e_torq: HTMLInputElement;
     private e_rumb: HTMLInputElement;
     private e_cost: HTMLInputElement;
-    private e_oil: HTMLInputElement;
-    private e_pulsejet: HTMLInputElement;
     //Cooling Elements
     private cool_cell: HTMLTableDataCellElement;
     private cool_select: HTMLSelectElement;
@@ -105,8 +103,6 @@ class Engine_HTML extends Display {
         this.e_torq = document.createElement("INPUT") as HTMLInputElement;
         this.e_rumb = document.createElement("INPUT") as HTMLInputElement;
         this.e_cost = document.createElement("INPUT") as HTMLInputElement;
-        this.e_oil = document.createElement("INPUT") as HTMLInputElement;
-        this.e_pulsejet = document.createElement("INPUT") as HTMLInputElement;
         this.cool_count = document.createElement("INPUT") as HTMLInputElement;
         this.cool_count.setAttribute("type", "number");
 
@@ -139,8 +135,6 @@ class Engine_HTML extends Display {
         FlexInput("Torque", this.e_torq, fs);
         FlexInput("Rumble", this.e_rumb, fs);
         FlexInput("Cost", this.e_cost, fs);
-        FlexCheckbox("Oil Tank", this.e_oil, fs);
-        FlexCheckbox("Pulsejet", this.e_pulsejet, fs);
 
         //Event Listeners for engine stats
         this.e_select.onchange = () => {
@@ -164,8 +158,6 @@ class Engine_HTML extends Display {
         this.e_torq.onchange = trigger;
         this.e_rumb.onchange = trigger;
         this.e_cost.onchange = trigger;
-        this.e_oil.onchange = trigger;
-        this.e_pulsejet.onchange = trigger;
     }
 
     public UpdateEngine(en: Engine) {
@@ -299,7 +291,7 @@ class Engine_HTML extends Display {
         while (this.cool_cell.children.length > 0)
             this.cool_cell.removeChild(this.cool_cell.children[0]);
 
-        if (this.e_oil.checked) {
+        if (this.engine.IsRotary()) {
             this.e_cool.valueAsNumber = 0;
             var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
             txtSpan.innerHTML = "Rotary Engines use Oil Tanks.<br/>+1 Mass, Oil Tank is a Vital Component.";
@@ -360,8 +352,6 @@ class Engine_HTML extends Display {
         e_stats.torque = this.e_torq.valueAsNumber;
         e_stats.rumble = this.e_rumb.valueAsNumber;
         e_stats.stats.cost = this.e_cost.valueAsNumber;
-        e_stats.oiltank = this.e_oil.checked;
-        e_stats.pulsejet = this.e_pulsejet.checked;
         this.engine.SetCustomStats(e_stats);
     }
 
@@ -377,8 +367,6 @@ class Engine_HTML extends Display {
         this.e_torq.disabled = b;
         this.e_rumb.disabled = b;
         this.e_cost.disabled = b;
-        this.e_oil.disabled = b;
-        this.e_pulsejet.disabled = b;
     }
 
     public UpdateDisplay() {
@@ -411,8 +399,6 @@ class Engine_HTML extends Display {
         this.e_torq.valueAsNumber = e_stats.torque;
         this.e_rumb.valueAsNumber = e_stats.rumble;
         this.e_cost.valueAsNumber = e_stats.stats.cost;
-        this.e_oil.checked = e_stats.oiltank;
-        this.e_pulsejet.checked = e_stats.pulsejet;
         this.InitCoolingSelect();
         this.intake_fan.checked = this.engine.GetIntakeFan();
 

@@ -381,15 +381,15 @@ class Engine extends Part {
         return false;
     }
 
-    private IsLiquidCooled() {
+    public IsLiquidCooled() {
         return this.NeedCooling();
     }
 
-    private IsRotary() {
+    public IsRotary() {
         return this.etype_stats.oiltank;
     }
 
-    private IsAirCooled() {
+    public IsAirCooled() {
         return !this.GetIsPulsejet() && !this.IsLiquidCooled() && !this.IsRotary();
     }
 
