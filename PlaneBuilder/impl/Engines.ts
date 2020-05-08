@@ -356,7 +356,6 @@ class Engines extends Part {
             }
             ecost += en.GetCurrentStats().stats.cost;
         }
-        stats.flightstress += this.GetMaxRumble();
 
         //Upkeep calc only uses engine costs
         stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.power / 10, ecost));

@@ -404,6 +404,10 @@ class Aircraft {
         var FlightStress = 1 + this.stats.flightstress;
         if (Stabiilty > 3 || Stabiilty < -3)
             FlightStress++;
+        //Flight Stress from Rumble. Excess structure can reduce stress.
+        if (this.engines.GetMaxRumble() > 0) {
+            FlightStress += Math.max(1, 2 * this.engines.GetMaxRumble() - this.stats.structure / 10);
+        }
         FlightStress += Math.floor(1.0e-6 + DryMP / 10);
 
         return {
