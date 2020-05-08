@@ -2719,6 +2719,17 @@ class Wings extends Part {
         }
         return count;
     }
+    CanStagger() {
+        var can = [...Array(this.stagger_list.length).fill(false)];
+        if (this.wing_list.length > 1) {
+            for (let i = 1; i < this.stagger_list.length; i++)
+                can[i] = true;
+        }
+        if (this.wing_list.length == 1) {
+            can[0] = true;
+        }
+        return can;
+    }
     SetStagger(index) {
         this.wing_stagger = index;
         while (this.stagger_list[index].wing_count < this.wing_list.length) {
@@ -2737,13 +2748,18 @@ class Wings extends Part {
         this.CalculateStats();
     }
     GetStagger() {
-        return this.wing_stagger;
+        if (this.wing_list.length > 0) {
+            return this.wing_stagger;
+        }
+        else {
+            return -1;
+        }
     }
     CanAddFullWing(deck) {
         if (deck >= this.deck_list.length)
             console.log("Deck out of Bounds");
-        if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
-            return false;
+        // if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
+        //     return false;
         var full_count = this.DeckCountFull();
         if (!this.stagger_list[this.wing_stagger].inline && full_count[deck] == 1 && this.deck_list[deck].limited)
             return false;
@@ -2806,7 +2822,7 @@ class Wings extends Part {
         return this.is_swept;
     }
     GetTandem() {
-        return this.stagger_list[this.wing_stagger].inline;
+        return this.stagger_list[this.wing_stagger].inline && this.wing_list.length > 1;
     }
     GetMonoplane() {
         return this.wing_list.length == 1;
@@ -2815,8 +2831,9 @@ class Wings extends Part {
         return this.stagger_list[this.wing_stagger].stats.liftbleed != 0;
     }
     SetFullWing(idx, w) {
-        if (this.wing_list.length != idx)
+        if (this.wing_list.length != idx) {
             this.wing_list.splice(idx, 1);
+        }
         if (w.area != w.area)
             w.area = 3;
         w.area = Math.floor(1.0e-6 + w.area);
@@ -2843,6 +2860,10 @@ class Wings extends Part {
             if (this.CanAddFullWing(w.deck))
                 this.wing_list.splice(idx, 0, w);
         }
+        if (this.wing_list.length > 1 && this.wing_stagger == 0)
+            this.wing_stagger = 4;
+        else if (this.wing_list.length <= 1)
+            this.wing_stagger = 0;
         this.CalculateStats();
     }
     SetMiniWing(idx, w) {
@@ -7395,6 +7416,10 @@ class Wings_HTML extends Display {
         this.d_flam = c4_row.insertCell();
     }
     UpdateDisplay() {
+        var cans = this.wings.CanStagger();
+        for (let i = 0; i < cans.length; i++) {
+            this.stagger.options[i].disabled = !cans[i];
+        }
         this.stagger.selectedIndex = this.wings.GetStagger();
         this.closed.checked = this.wings.GetClosed();
         this.closed.disabled = !this.wings.CanClosed();

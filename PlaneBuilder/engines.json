@@ -222,7 +222,26 @@
             "cost": 7,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 7.36,
+                "compression": 4.7,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 1.2,
+                "quality_fudge": 1.3,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Allison V-1710-85 1200hp",
@@ -238,7 +257,26 @@
             "cost": 72,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 28,
+                "compression": 6.65,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 0.9,
+                "era_sel": 3,
+                "material_fudge": 1,
+                "quality_fudge": 1.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Anzani 10 Cylinder 110hp",
@@ -254,7 +292,26 @@
             "cost": 4,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 12,
+                "compression": 4.85,
+                "type": 1,
+                "cyl_per_row": 5,
+                "rows": 2,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1.1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Anzani 10 Cylinder 110hp",
@@ -270,7 +327,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 12,
+                "compression": 4.85,
+                "type": 1,
+                "cyl_per_row": 5,
+                "rows": 2,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.75,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Anzani 10 Cylinder 80hp",
@@ -286,7 +362,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 8.27,
+                "compression": 4.85,
+                "type": 1,
+                "cyl_per_row": 5,
+                "rows": 2,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1.1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Anzani 10 Cylinder 80hp",
@@ -302,7 +397,26 @@
             "cost": 1,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 8.27,
+                "compression": 4.85,
+                "type": 1,
+                "cyl_per_row": 5,
+                "rows": 2,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.65,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Anzani 6 cylinder 60hp",
@@ -318,7 +432,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 6.23,
+                "compression": 4.5,
+                "type": 1,
+                "cyl_per_row": 3,
+                "rows": 2,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1.5,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Argus As 5 1500hp",
@@ -334,7 +467,26 @@
             "cost": 200,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 94.1,
+                "compression": 5.6,
+                "type": 0,
+                "cyl_per_row": 6,
+                "rows": 4,
+                "RPM_boost": 0.638,
+                "era_sel": 2,
+                "material_fudge": 0.4,
+                "quality_fudge": 3.4,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Argus As II 120hp",
@@ -350,7 +502,26 @@
             "cost": 9,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 10.353,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Argus As III 190hp",
@@ -366,7 +537,26 @@
             "cost": 19,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 15.9,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.6,
+                "quality_fudge": 1.4,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Austro-Daimler 6 120hp",
@@ -382,7 +572,26 @@
             "cost": 5,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 13.8,
+                "compression": 4.85,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.65,
+                "era_sel": 1,
+                "material_fudge": 1.05,
+                "quality_fudge": 0.5,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Austro-Daimler 6 200hp",
@@ -398,7 +607,26 @@
             "cost": 13,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 15,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 0.95,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Beardmore 160hp",
@@ -414,7 +642,26 @@
             "cost": 13,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 16.635,
+                "compression": 4.5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Bentley BR.1 150hp",
@@ -430,7 +677,26 @@
             "cost": 5,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 17.1,
+                "compression": 4.9,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Bentley BR.2 230hp",
@@ -446,7 +712,26 @@
             "cost": 10,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 24.93,
+                "compression": 5.2,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.7,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Benz Bz.III 150hp",
@@ -462,23 +747,26 @@
             "cost": 12,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
-        },
-        {
-            "name": "Benz Bz.III 150hp",
-            "power": 15,
-            "mass": 11,
-            "drag": 3,
-            "reliability": 0,
-            "cooling": 7,
-            "overspeed": 25,
-            "fuelconsumption": 20,
-            "altitude": 3,
-            "torque": 0,
-            "cost": 12,
-            "rumble": 0,
-            "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 15.4,
+                "compression": 4.7,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.75,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Bréguet Quadrimoteur Type B H-32 970hp",
@@ -494,7 +782,26 @@
             "cost": 52,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 48.64,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 4,
+                "rows": 8,
+                "RPM_boost": 1,
+                "era_sel": 2,
+                "material_fudge": 0.75,
+                "quality_fudge": 2,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Bristol Pegasus XVIII 835hp",
@@ -510,7 +817,26 @@
             "cost": 106,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 28.7,
+                "compression": 6.25,
+                "type": 1,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.95,
+                "era_sel": 2,
+                "material_fudge": 1.2,
+                "quality_fudge": 2,
+                "upgrades": [
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Bz.IV 200hp",
@@ -526,7 +852,26 @@
             "cost": 16,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 18.6,
+                "compression": 4.9,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.75,
+                "era_sel": 1,
+                "material_fudge": 0.9,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Clerget 11EB 200hp",
@@ -542,7 +887,26 @@
             "cost": 12,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 21.49,
+                "compression": 5.1,
+                "type": 2,
+                "cyl_per_row": 11,
+                "rows": 1,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Clerget 16X 420hp",
@@ -558,7 +922,26 @@
             "cost": 26,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 32.53333333,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 4,
+                "rows": 4,
+                "RPM_boost": 0.87,
+                "era_sel": 1,
+                "material_fudge": 0.6,
+                "quality_fudge": 2.4,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Clerget 7Z 95hp",
@@ -574,7 +957,26 @@
             "cost": 6,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 11.88,
+                "compression": 4.3,
+                "type": 2,
+                "cyl_per_row": 7,
+                "rows": 1,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Clerget 9B 130hp",
@@ -590,7 +992,26 @@
             "cost": 5,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 16.2,
+                "compression": 4.85,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Clerget 9Bf 140hp",
@@ -606,7 +1027,59 @@
             "cost": 5,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 17.46,
+                "compression": 4.85,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
+        },
+        {
+            "name": "Cosmos Mercury",
+            "overspeed": 28,
+            "altitude": 3,
+            "torque": 1,
+            "oiltank": false,
+            "pulsejet": false,
+            "mass": 10,
+            "drag": 6,
+            "cost": 14,
+            "reliability": -5,
+            "power": 30,
+            "fuelconsumption": 29,
+            "inputs": {
+                "displacement": 19.6,
+                "compression": 5.3,
+                "type": 1,
+                "cyl_per_row": 7,
+                "rows": 2,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 2,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Curtiss K-12 375hp",
@@ -622,7 +1095,26 @@
             "cost": 16,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 18.77,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 1.33,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 1.8,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Curtiss OXX-6",
@@ -638,7 +1130,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 9.3,
+                "compression": 4.92,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.7,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Daimler-Benz 601ARJ 1775hp",
@@ -654,7 +1165,26 @@
             "cost": 116,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 33.93,
+                "compression": 6.9,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 0.84,
+                "era_sel": 3,
+                "material_fudge": 0.57,
+                "quality_fudge": 1.5,
+                "upgrades": [
+                    true,
+                    false,
+                    false,
+                    false,
+                    true,
+                    false
+                ]
+            }
         },
         {
             "name": "Fiat A.12 200hp",
@@ -670,7 +1200,26 @@
             "cost": 18,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 21.6,
+                "compression": 4.5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.85,
+                "quality_fudge": 1.1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Gnome 14 Double Lambda 160hp",
@@ -686,7 +1235,26 @@
             "cost": 8,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 23.8,
+                "compression": 3.87,
+                "type": 2,
+                "cyl_per_row": 7,
+                "rows": 2,
+                "RPM_boost": 1.2,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 1.4,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Gnome 7 Lambda 70hp",
@@ -702,7 +1270,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 11.9,
+                "compression": 3.75,
+                "type": 2,
+                "cyl_per_row": 7,
+                "rows": 1,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Gnome 7 Lambda 80hp",
@@ -718,7 +1305,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 11.9,
+                "compression": 3.87,
+                "type": 2,
+                "cyl_per_row": 7,
+                "rows": 1,
+                "RPM_boost": 1.2,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Gnome 7 Omega 50hp",
@@ -734,7 +1340,26 @@
             "cost": 1,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 7.7,
+                "compression": 4,
+                "type": 2,
+                "cyl_per_row": 7,
+                "rows": 1,
+                "RPM_boost": 1.49,
+                "era_sel": 0,
+                "material_fudge": 1,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Gnome 9B Monosoupape 110hp",
@@ -750,7 +1375,26 @@
             "cost": 5,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 15.84,
+                "compression": 4.85,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Gnome 9N Monosoupape 160hp",
@@ -766,10 +1410,29 @@
             "cost": 6,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 15.84,
+                "compression": 5.1,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 1.05,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.7,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
-            "name": "Gnome Delta/U.I 100hp",
+            "name": "Gnome monosoupape 9B 100hp",
             "power": 10,
             "mass": 5,
             "drag": 8,
@@ -782,23 +1445,26 @@
             "cost": 8,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
-        },
-        {
-            "name": "Gnome monosoupape 9 100hp",
-            "power": 10,
-            "mass": 5,
-            "drag": 8,
-            "reliability": 3,
-            "cooling": 0,
-            "overspeed": 18,
-            "fuelconsumption": 15,
-            "altitude": 3,
-            "torque": 2,
-            "cost": 8,
-            "rumble": 0,
-            "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 16.28,
+                "compression": 4.5,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Hispano-Suiza 8Aa 150hp",
@@ -814,7 +1480,26 @@
             "cost": 5,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 11.2,
+                "compression": 4.8,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.9,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Hispano-Suiza 8Ab 180hp",
@@ -830,7 +1515,26 @@
             "cost": 6,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 11.2,
+                "compression": 5.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Hispano-Suiza 8B 200hp",
@@ -846,7 +1550,26 @@
             "cost": 8,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 11.2,
+                "compression": 5.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1.3,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Hispano-Suiza 8Bc 220hp",
@@ -862,7 +1585,26 @@
             "cost": 8,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 11.2,
+                "compression": 5.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 1.2,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1.4,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Hispano-Suiza 8F 300hp",
@@ -878,7 +1620,26 @@
             "cost": 16,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 18.4,
+                "compression": 5.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 0.98,
+                "era_sel": 1,
+                "material_fudge": 0.75,
+                "quality_fudge": 1.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Klimov M-105PF 1230hp",
@@ -894,7 +1655,26 @@
             "cost": 139,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 35.101,
+                "compression": 7,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 0.55,
+                "era_sel": 3,
+                "material_fudge": 0.55,
+                "quality_fudge": 1.86,
+                "upgrades": [
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Le Rhone 9C 90hp",
@@ -910,7 +1690,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 10.89,
+                "compression": 4.8,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1.1,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Le Rhone 9Ja 110hp",
@@ -926,7 +1725,26 @@
             "cost": 4,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 14.4,
+                "compression": 5,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Le Rhone 9Jb 130hp",
@@ -942,7 +1760,26 @@
             "cost": 4,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 14.4,
+                "compression": 5,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Liberty L-12 400hp",
@@ -958,7 +1795,26 @@
             "cost": 27,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 27,
+                "compression": 5.4,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 0.64,
+                "era_sel": 2,
+                "material_fudge": 0.63,
+                "quality_fudge": 0.97,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Lorraine 12Da 400hp",
@@ -974,7 +1830,26 @@
             "cost": 26,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 24.4,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 0.7,
+                "quality_fudge": 2.2,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Mercedes D.II 120hp",
@@ -990,7 +1865,26 @@
             "cost": 7,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 9.4,
+                "compression": 4.5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Mercedes D.III 150hp",
@@ -1006,7 +1900,26 @@
             "cost": 11,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 15,
+                "compression": 4.3,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.95,
+                "era_sel": 1,
+                "material_fudge": 0.9,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Mercedes D.IIIa 170hp",
@@ -1022,7 +1935,26 @@
             "cost": 11,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 15,
+                "compression": 4.5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.95,
+                "era_sel": 1,
+                "material_fudge": 0.9,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Mercedes D.IIIaü 180hp",
@@ -1038,7 +1970,26 @@
             "cost": 12,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 15,
+                "compression": 4.64,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.95,
+                "era_sel": 1,
+                "material_fudge": 0.9,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Mercedes D.IIIav 200hp",
@@ -1054,7 +2005,26 @@
             "cost": 12,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 15,
+                "compression": 4.64,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 1.05,
+                "era_sel": 1,
+                "material_fudge": 0.9,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Mercedes D.IVa 250hp",
@@ -1070,7 +2040,26 @@
             "cost": 18,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 21.6,
+                "compression": 4.94,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Mercedes E4F 70hp",
@@ -1086,7 +2075,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 6.3,
+                "compression": 4,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 4,
+                "RPM_boost": 1.2,
+                "era_sel": 1,
+                "material_fudge": 1.3,
+                "quality_fudge": 0.8,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Napier Lion II 480hp '18",
@@ -1102,7 +2110,26 @@
             "cost": 28,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 24,
+                "compression": 5.8,
+                "type": 0,
+                "cyl_per_row": 3,
+                "rows": 4,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 0.96,
+                "quality_fudge": 2.5,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Napier Lion II 480hp '20",
@@ -1118,7 +2145,59 @@
             "cost": 25,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 24,
+                "compression": 5.8,
+                "type": 0,
+                "cyl_per_row": 3,
+                "rows": 4,
+                "RPM_boost": 0.75,
+                "era_sel": 2,
+                "material_fudge": 0.96,
+                "quality_fudge": 1.1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
+        },
+        {
+            "name": "Napier Lion XI 580hp",
+            "overspeed": 36,
+            "altitude": 3,
+            "torque": 1,
+            "oiltank": false,
+            "pulsejet": false,
+            "mass": 18,
+            "drag": 5,
+            "cost": 65,
+            "cooling": 3,
+            "power": 69,
+            "fuelconsumption": 34,
+            "inputs": {
+                "displacement": 24,
+                "compression": 6,
+                "type": 0,
+                "cyl_per_row": 4,
+                "rows": 3,
+                "RPM_boost": 1,
+                "era_sel": 2,
+                "material_fudge": 1.1,
+                "quality_fudge": 2.9,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "RAF 1a 90hp",
@@ -1134,7 +2213,26 @@
             "cost": 4,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 9.88,
+                "compression": 4.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 1.3,
+                "quality_fudge": 0.9,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Renault V8 70hp",
@@ -1150,7 +2248,26 @@
             "cost": 2,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 7,
+                "compression": 4,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 1.4,
+                "quality_fudge": 0.7,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Rolls-Royce Eagle III 250hp",
@@ -1166,7 +2283,26 @@
             "cost": 13,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 24,
+                "compression": 4.9,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 0.75,
+                "era_sel": 1,
+                "material_fudge": 0.7,
+                "quality_fudge": 1.2,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Rolls-Royce Eagle VIII 360hp",
@@ -1182,7 +2318,59 @@
             "cost": 19,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 20,
+                "compression": 6,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 0.85,
+                "era_sel": 1,
+                "material_fudge": 0.7,
+                "quality_fudge": 1.7,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
+        },
+        {
+            "name": "Rolls Royce Merlin 46 930hp",
+            "overspeed": 29,
+            "altitude": 6,
+            "oiltank": false,
+            "pulsejet": false,
+            "mass": 31,
+            "drag": 7,
+            "cost": 28,
+            "cooling": 16,
+            "reliability": -10,
+            "power": 71,
+            "fuelconsumption": 62,
+            "inputs": {
+                "displacement": 32.4,
+                "compression": 55.5,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 1,
+                "era_sel": 3,
+                "material_fudge": 0.8,
+                "quality_fudge": 1.2,
+                "upgrades": [
+                    true,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Rolls-Royce Falcon III 290hp",
@@ -1198,7 +2386,26 @@
             "cost": 11,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 14.4,
+                "compression": 5.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 1.2,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 1.5,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Rolls-Royce Hawk 110hp",
@@ -1214,7 +2421,26 @@
             "cost": 4,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 7.41,
+                "compression": 5.1,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 1,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.7,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Rolls-Royce Hawk 80hp",
@@ -1230,7 +2456,26 @@
             "cost": 3,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 7.41,
+                "compression": 5.1,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.75,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.5,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Sunbeam Arab 208hp",
@@ -1246,7 +2491,26 @@
             "cost": 8,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 11.76,
+                "compression": 5.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 4,
+                "RPM_boost": 1.1,
+                "era_sel": 1,
+                "material_fudge": 1.2,
+                "quality_fudge": 1.3,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Sunbeam Dyak 100hp",
@@ -1262,7 +2526,26 @@
             "cost": 8,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 8.800000002,
+                "compression": 5,
+                "type": 0,
+                "cyl_per_row": 1,
+                "rows": 6,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.9,
+                "quality_fudge": 1.1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Sunbeam Maori II 260hp",
@@ -1278,7 +2561,26 @@
             "cost": 6,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": false
+            "oiltank": false,
+            "inputs": {
+                "displacement": 12.27,
+                "compression": 5.3,
+                "type": 0,
+                "cyl_per_row": 2,
+                "rows": 6,
+                "RPM_boost": 1.3,
+                "era_sel": 1,
+                "material_fudge": 1.7,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "U.0 80hp",
@@ -1310,7 +2612,26 @@
             "cost": 8,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 16.28,
+                "compression": 4.5,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 1,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "U.I 110hp",
@@ -1326,7 +2647,26 @@
             "cost": 5,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 15.84,
+                "compression": 4.85,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 0.8,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         },
         {
             "name": "Ur.I 90hp",
@@ -1358,7 +2698,59 @@
             "cost": 4,
             "rumble": 0,
             "pulsejet": false,
-            "oiltank": true
+            "oiltank": true,
+            "inputs": {
+                "displacement": 14.4,
+                "compression": 5,
+                "type": 2,
+                "cyl_per_row": 9,
+                "rows": 1,
+                "RPM_boost": 0.8,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
+        },
+        {
+            "name": "Ur.III 150hp",
+            "overspeed": 20,
+            "altitude": 3,
+            "torque": 4,
+            "oiltank": true,
+            "pulsejet": false,
+            "mass": 7,
+            "drag": 10,
+            "cost": 5,
+            "reliability": 2,
+            "power": 15,
+            "fuelconsumption": 19,
+            "inputs": {
+                "displacement": 17.6,
+                "compression": 5,
+                "type": 2,
+                "cyl_per_row": 11,
+                "rows": 1,
+                "RPM_boost": 0.9,
+                "era_sel": 1,
+                "material_fudge": 1,
+                "quality_fudge": 0.6,
+                "upgrades": [
+                    false,
+                    false,
+                    false,
+                    false,
+                    false,
+                    false
+                ]
+            }
         }
     ]
 }

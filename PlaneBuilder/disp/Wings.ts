@@ -112,6 +112,10 @@ class Wings_HTML extends Display {
     }
 
     public UpdateDisplay() {
+        var cans = this.wings.CanStagger();
+        for (let i = 0; i < cans.length; i++) {
+            this.stagger.options[i].disabled = !cans[i];
+        }
         this.stagger.selectedIndex = this.wings.GetStagger();
         this.closed.checked = this.wings.GetClosed();
         this.closed.disabled = !this.wings.CanClosed();

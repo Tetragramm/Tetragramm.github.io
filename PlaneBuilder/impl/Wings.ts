@@ -173,6 +173,18 @@ class Wings extends Part {
         return count;
     }
 
+    public CanStagger() {
+        var can = [...Array(this.stagger_list.length).fill(false)];
+        if (this.wing_list.length > 1) {
+            for (let i = 1; i < this.stagger_list.length; i++)
+                can[i] = true;
+        }
+        if (this.wing_list.length == 1) {
+            can[0] = true;
+        }
+        return can;
+    }
+
     public SetStagger(index: number) {
         this.wing_stagger = index;
         while (this.stagger_list[index].wing_count < this.wing_list.length) {
@@ -193,14 +205,18 @@ class Wings extends Part {
     }
 
     public GetStagger() {
-        return this.wing_stagger;
+        if (this.wing_list.length > 0) {
+            return this.wing_stagger;
+        } else {
+            return -1;
+        }
     }
 
     public CanAddFullWing(deck: number) {
         if (deck >= this.deck_list.length)
             console.log("Deck out of Bounds");
-        if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
-            return false;
+        // if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
+        //     return false;
 
         var full_count = this.DeckCountFull();
         if (!this.stagger_list[this.wing_stagger].inline && full_count[deck] == 1 && this.deck_list[deck].limited)
@@ -279,7 +295,7 @@ class Wings extends Part {
     }
 
     public GetTandem() {
-        return this.stagger_list[this.wing_stagger].inline;
+        return this.stagger_list[this.wing_stagger].inline && this.wing_list.length > 1;
     }
 
     public GetMonoplane() {
@@ -291,8 +307,9 @@ class Wings extends Part {
     }
 
     public SetFullWing(idx: number, w: WingType) {
-        if (this.wing_list.length != idx)
+        if (this.wing_list.length != idx) {
             this.wing_list.splice(idx, 1);
+        }
 
         if (w.area != w.area)
             w.area = 3;
@@ -321,6 +338,11 @@ class Wings extends Part {
             if (this.CanAddFullWing(w.deck))
                 this.wing_list.splice(idx, 0, w);
         }
+
+        if (this.wing_list.length > 1 && this.wing_stagger == 0)
+            this.wing_stagger = 4;
+        else if (this.wing_list.length <= 1)
+            this.wing_stagger = 0;
 
         this.CalculateStats();
     }
