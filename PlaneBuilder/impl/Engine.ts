@@ -329,6 +329,7 @@ class Engine extends Part {
     public UpdateReliability(num: number) {
         this.total_reliability = this.etype_stats.stats.reliability;
         this.total_reliability -= (this.gp_count - this.gpr_count);
+        this.total_reliability += this.cowl_list[this.cowl_sel].stats.reliability;
         if (this.NeedCooling()) {
             this.total_reliability -= (this.GetMaxCooling() - this.cooling_count);
         }
