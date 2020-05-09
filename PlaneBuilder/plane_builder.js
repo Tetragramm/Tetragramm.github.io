@@ -3068,7 +3068,7 @@ class Wings extends Part {
         //Longest wing effects
         stats.control += 8 - longest_span;
         stats.latstab += Math.min(0, longest_span - 8);
-        stats.latstab += Math.max(0, Math.floor(1.0e-6 + longest_span / this.num_frames) - 1);
+        //stats.latstab += Math.max(0, Math.floor(1.0e-6 + longest_span / this.num_frames) - 1);
         //Wing Sweep effects
         if (this.is_swept) {
             stats.liftbleed += 5;
