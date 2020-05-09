@@ -8,7 +8,8 @@ class Weapons extends Part {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean
+        rapid: boolean, synched: boolean, shells: boolean,
+        can_convert: boolean
     }[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
     private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
@@ -41,6 +42,7 @@ class Weapons extends Part {
                 rapid: elem["rapid"],
                 synched: elem["synched"],
                 shells: elem["shells"],
+                can_convert: elem["can_convert"],
             };
             this.weapon_list.push(weap);
         }

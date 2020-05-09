@@ -1005,7 +1005,7 @@
         ],
         "vstab": [
             {
-                "name": "Tailplane",
+                "name": "Tailfin",
                 "dragfactor": 1,
                 "increment": 1,
                 "is_vtail": false,

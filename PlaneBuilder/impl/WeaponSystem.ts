@@ -19,14 +19,16 @@ class WeaponSystem extends Part {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean
+        rapid: boolean, synched: boolean, shells: boolean,
+        can_convert: boolean
     }[];
 
     constructor(weapon_list: {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean
+        rapid: boolean, synched: boolean, shells: boolean,
+        can_convert: boolean
     }[]) {
         super();
         this.weapon_list = weapon_list;

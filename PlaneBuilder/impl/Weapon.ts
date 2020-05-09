@@ -14,7 +14,8 @@ class Weapon extends Part {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean
+        rapid: boolean, synched: boolean, shells: boolean,
+        can_convert: boolean
     };
     private fixed: boolean;
     private wing: boolean;
@@ -36,7 +37,8 @@ class Weapon extends Part {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean
+        rapid: boolean, synched: boolean, shells: boolean,
+        can_convert: boolean
     }, fixed: boolean = false) {
         super();
         this.weapon_type = weapon_type;
@@ -104,7 +106,8 @@ class Weapon extends Part {
         name: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean
+        rapid: boolean, synched: boolean, shells: boolean,
+        can_convert: boolean
     }) {
         this.weapon_type = weapon_type;
         if (this.weapon_type.size == 16) {
