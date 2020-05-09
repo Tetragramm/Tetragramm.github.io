@@ -151,10 +151,11 @@ class Munitions extends Part {
         stats.reqsections += this.internal_bay_count;
 
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+            var count = stats.reqsections;
             if (this.internal_bay_1) {
-                stats.reqsections++;
+                stats.reqsections += count;
                 if (this.internal_bay_2) {
-                    stats.reqsections++;
+                    stats.reqsections += count;
                 }
             }
         }

@@ -1635,7 +1635,7 @@
             {
                 "name": "Intercom System",
                 "charge": -1,
-                "cost": -1
+                "cost": 1
             },
             {
                 "name": "Radio Receiver",

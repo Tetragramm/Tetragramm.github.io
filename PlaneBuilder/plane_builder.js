@@ -2564,6 +2564,7 @@ class Frames extends Part {
             //Skin factors
             stats.drag *= this.skin_list[this.sel_skin].dragfactor;
             stats.mass *= this.skin_list[this.sel_skin].massfactor;
+            stats.visibility += this.tail_section_list.length;
             //Apply factors before tail_stats
             stats = stats.Add(tail_stats);
         }
@@ -4052,10 +4053,11 @@ class Munitions extends Part {
         ext_bomb_count = Math.max(0, ext_bomb_count);
         stats.reqsections += this.internal_bay_count;
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+            var count = stats.reqsections;
             if (this.internal_bay_1) {
-                stats.reqsections++;
+                stats.reqsections += count;
                 if (this.internal_bay_2) {
-                    stats.reqsections++;
+                    stats.reqsections += count;
                 }
             }
         }
@@ -9910,6 +9912,9 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
+//TODO: Gast and Mechanical weapons
+//TODO: Heatray, Pneumatic, and Gyrojet weapons
+//TODO: HTMLCanvasElement to make cards for planes.
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
