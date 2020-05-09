@@ -915,14 +915,14 @@ class Cockpits extends Part {
         }
         var js = null;
         if (this.positions.length > 0) {
-            js = JSON.parse(JSON.stringify(this.positions[this.positions.length - 1].toJSON()));
+            js = JSON.stringify(this.positions[this.positions.length - 1].toJSON());
         }
         while (this.positions.length < num) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
             if (this.positions.length == 0)
                 cp.SetPrimary();
             if (js)
-                cp.fromJSON(js);
+                cp.fromJSON(JSON.parse(js));
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
@@ -1673,13 +1673,13 @@ class Engines extends Part {
         }
         var js = null;
         if (this.engines.length > 0) {
-            js = JSON.parse(JSON.stringify(this.engines[this.engines.length - 1].toJSON()));
+            js = JSON.stringify(this.engines[this.engines.length - 1].toJSON());
         }
         while (this.engines.length < num) {
             let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
-                en.fromJSON(js);
+                en.fromJSON(JSON.parse(js));
             this.engines.push(en);
             en.SetNumRadiators(this.GetNumberOfRadiators());
         }

@@ -173,13 +173,13 @@ class Engines extends Part {
         }
         var js = null;
         if (this.engines.length > 0) {
-            js = JSON.parse(JSON.stringify(this.engines[this.engines.length - 1].toJSON()));
+            js = JSON.stringify(this.engines[this.engines.length - 1].toJSON());
         }
         while (this.engines.length < num) {
             let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
-                en.fromJSON(js);
+                en.fromJSON(JSON.parse(js));
             this.engines.push(en);
             en.SetNumRadiators(this.GetNumberOfRadiators());
         }

@@ -8,6 +8,8 @@ class WeaponSystem extends Part {
     private directions: boolean[];
     private weapons: Weapon[];
     private ammo: number;
+    private action_sel: number;
+    private projectile_sel: number;
 
     private tractor: boolean;
     private pusher: boolean;
