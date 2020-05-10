@@ -8,6 +8,7 @@ class Reinforcement_HTML extends Display {
     private wires: HTMLInputElement;
     private cabane: HTMLSelectElement;
     private cant_inp: HTMLInputElement[];
+    private wing_blades: HTMLInputElement;
 
     //Display Stat Elements
     private d_drag: HTMLTableCellElement;
@@ -77,6 +78,9 @@ class Reinforcement_HTML extends Display {
             inp.onchange = () => { this.rf.SetCantileverCount(i, inp.valueAsNumber); };
             this.cant_inp.push(inp);
         }
+        this.wing_blades = document.createElement("INPUT") as HTMLInputElement;
+        FlexCheckbox("Wing Blades", this.wing_blades, fs);
+        this.wing_blades.onchange = () => { this.rf.SetWingBlade(this.wing_blades.checked); };
     }
 
     private InitStatDisplay(stat_cell: HTMLTableCellElement) {
@@ -121,6 +125,9 @@ class Reinforcement_HTML extends Display {
         for (let i = 0; i < c_count.length; i++) {
             this.cant_inp[i].valueAsNumber = c_count[i];
         }
+
+        this.wing_blades.disabled = !this.rf.CanWingBlade();
+        this.wing_blades.checked = this.rf.GetWingBlade();
 
         var stats = this.rf.PartStats();
         BlinkIfChanged(this.d_drag, stats.drag.toString());

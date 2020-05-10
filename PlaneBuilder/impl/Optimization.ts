@@ -44,7 +44,7 @@ class Optimization extends Part {
         }
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.free_dots = js["free_dots"];
         this.cost = js["cost"];
         this.bleed = js["bleed"];

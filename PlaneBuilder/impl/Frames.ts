@@ -91,7 +91,7 @@ class Frames extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.section_list = [];
         for (let elem of js["sections"]) {
             this.section_list.push({
@@ -99,7 +99,7 @@ class Frames extends Part {
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
-            if (elem["skin"])
+            if (json_version == "10.2")
                 this.sel_skin = elem["skin"];
         }
         this.tail_section_list = [];
@@ -109,7 +109,7 @@ class Frames extends Part {
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
-            if (elem["skin"])
+            if (json_version == "10.2")
                 this.sel_skin = elem["skin"];
         }
 
@@ -117,7 +117,7 @@ class Frames extends Part {
         this.boom = js["use_boom"];
         this.sel_tail = js["tail_index"];
         this.flying_wing = js["flying_wing"];
-        if (js["sel_skin"])
+        if (json_version != "10.2")
             this.sel_skin = js["sel_skin"];
     }
 
@@ -126,7 +126,6 @@ class Frames extends Part {
         for (let i = 0; i < this.section_list.length; i++) {
             var sec = this.section_list[i];
             s.PushNum(sec.frame);
-            s.PushNum(this.sel_skin);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
             s.PushBool(sec.lifting_body);
@@ -136,7 +135,6 @@ class Frames extends Part {
         for (let i = 0; i < this.tail_section_list.length; i++) {
             var sec = this.tail_section_list[i];
             s.PushNum(sec.frame);
-            s.PushNum(this.sel_skin);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
             s.PushBool(sec.lifting_body);
@@ -146,6 +144,7 @@ class Frames extends Part {
         s.PushBool(this.farman);
         s.PushBool(this.boom);
         s.PushBool(this.flying_wing);
+        s.PushNum(this.sel_skin);
     }
 
     public deserialize(d: Deserialize) {
@@ -157,7 +156,8 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            this.sel_skin = d.GetNum();
+            if (d.version == "10.2")
+                this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
@@ -172,7 +172,8 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            this.sel_skin = d.GetNum();
+            if (d.version == "10.2")
+                this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
@@ -183,6 +184,8 @@ class Frames extends Part {
         this.farman = d.GetBool();
         this.boom = d.GetBool();
         this.flying_wing = d.GetBool();
+        if (d.version != "10.2")
+            this.sel_skin = d.GetNum();
     }
 
     public DuplicateSection(num: number) {

@@ -11,6 +11,7 @@ class Reinforcement extends Part {
     private cant_count: number[];
     private wires: boolean;
     private cabane_sel: number;
+    private wing_blades: boolean;
 
     //Set by Calculate Stats
     private is_staggered: boolean;
@@ -47,6 +48,7 @@ class Reinforcement extends Part {
         this.cant_count = [...Array(this.cant_list.length).fill(0)];
 
         this.wires = false;
+        this.wing_blades = false;
 
         this.is_staggered = false;
         this.is_tandem = false;
@@ -62,15 +64,22 @@ class Reinforcement extends Part {
             cant_count: this.cant_count,
             wires: this.wires,
             cabane_sel: this.cabane_sel,
+            wing_blades: this.wing_blades,
         }
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.ext_wood_count = js["ext_wood_count"];
         this.ext_steel_count = js["ext_steel_count"];
         this.cant_count = js["cant_count"];
         this.wires = js["wires"];
         this.cabane_sel = js["cabane_sel"];
+        if (json_version != "10.2") {
+            this.wing_blades = js["wing_blades"];
+        }
+        else {
+            this.wing_blades = false;
+        }
     }
 
     public serialize(s: Serialize) {
@@ -79,6 +88,7 @@ class Reinforcement extends Part {
         s.PushNumArr(this.cant_count);
         s.PushBool(this.wires);
         s.PushNum(this.cabane_sel);
+        s.PushBool(this.wing_blades);
     }
 
     public deserialize(d: Deserialize) {
@@ -87,6 +97,12 @@ class Reinforcement extends Part {
         this.cant_count = d.GetNumArr();
         this.wires = d.GetBool();
         this.cabane_sel = d.GetNum();
+        if (d.version != "10.2") {
+            this.wing_blades = d.GetBool();
+        }
+        else {
+            this.wing_blades = false;
+        }
     }
 
     public GetExternalList() {
@@ -226,6 +242,19 @@ class Reinforcement extends Part {
         this.cant_lift = use;
     }
 
+    public CanWingBlade() {
+        return this.cant_count[2] > 0;
+    }
+
+    public GetWingBlade() {
+        return this.wing_blades;
+    }
+
+    public SetWingBlade(use: boolean) {
+        this.wing_blades = use;
+        this.CalculateStats();
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -298,6 +327,14 @@ class Reinforcement extends Part {
                 ts = ts.Multiply(this.cant_count[i]);
                 stats = stats.Add(ts);
             }
+        }
+        //Wing Blades need Steel Cantilevers
+        if (this.cant_count[2] == 0) {
+            this.wing_blades = false;
+        } //So if we have them and are bladed...
+        else if (this.wing_blades) {
+            stats.mass += this.cant_list[2].stats.mass * this.cant_count[2];
+            stats.warnings.push({ source: "Wing Blades", warning: "No actual rules yet. Glorious Nippon Steel Folded Over 1000 Times" });
         }
 
         if (use_cant)

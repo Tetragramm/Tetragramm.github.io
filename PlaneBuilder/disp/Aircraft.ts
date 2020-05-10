@@ -787,6 +787,8 @@ class Aircraft_HTML extends Display {
 
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
+        var alist = aircraft_model.GetWeapons().GetActionList();
+        var plist = aircraft_model.GetWeapons().GetProjectileList();
         this.weapon_cell.innerHTML = "";
         if (aircraft_model.GetMunitions().GetBombCount() > 0) {
             var weaphtml = aircraft_model.GetMunitions().GetBombCount().toString() + " Mass of bombs or rockets.";
@@ -812,6 +814,20 @@ class Aircraft_HTML extends Display {
             else
                 weaphtml += "Turreted ";
 
+            if (w.GetAction() == 1) {
+                weaphtml += "Mechanical Action ";
+            } else if (w.GetAction() == 2) {
+                weaphtml += "Gast Principle ";
+            }
+
+            if (w.GetProjectile() == 1) {
+                weaphtml += "Heat Ray ";
+            } else if (w.GetProjectile() == 2) {
+                weaphtml += "Gyrojet ";
+            } else if (w.GetProjectile() == 3) {
+                weaphtml += "Pneumatic ";
+            }
+
             weaphtml += wlist[w.GetWeaponSelected()].name;
             if (w.IsPlural()) {
                 weaphtml += "s";
@@ -832,21 +848,21 @@ class Aircraft_HTML extends Display {
                 + h[1].toString() + "\\"
                 + h[2].toString() + "\\"
                 + h[3].toString() + " hits with "
-                + wlist[w.GetWeaponSelected()].ammo * w.GetAmmo() + " ammunition. ";//TODO
-            if (wlist[w.GetWeaponSelected()].rapid || wlist[w.GetWeaponSelected()].shells || wlist[w.GetWeaponSelected()].ap > 0) {
+                + w.GetFinalWeapon().ammo * w.GetAmmo() + " ammunition. ";//TODO
+            if (w.GetFinalWeapon().rapid || w.GetFinalWeapon().shells || w.GetFinalWeapon().ap > 0) {
                 weaphtml += "["
                 weaphtml += " Jam " + w.GetJam();
-                if (wlist[w.GetWeaponSelected()].rapid) {
+                if (w.GetFinalWeapon().rapid) {
                     weaphtml += ", ";
                     weaphtml += "Rapid Fire";
                 }
-                if (wlist[w.GetWeaponSelected()].shells) {
+                if (w.GetFinalWeapon().shells) {
                     weaphtml += ", ";
                     weaphtml += "Shells";
                 }
-                if (wlist[w.GetWeaponSelected()].ap > 0) {
+                if (w.GetFinalWeapon().ap > 0) {
                     weaphtml += ", ";
-                    weaphtml += "AP " + wlist[w.GetWeaponSelected()].ap.toString();
+                    weaphtml += "AP " + w.GetFinalWeapon().ap.toString();
                 }
                 weaphtml += " ]";
             }

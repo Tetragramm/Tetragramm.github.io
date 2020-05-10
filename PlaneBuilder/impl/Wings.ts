@@ -73,7 +73,7 @@ class Wings extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.wing_list = js["wing_list"];
         this.mini_wing_list = js["mini_wing_list"];
         this.wing_stagger = js["wing_stagger"];

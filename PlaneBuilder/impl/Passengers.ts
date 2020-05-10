@@ -21,7 +21,7 @@ class Passengers extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.seats = js["seats"];
         this.beds = js["beds"];
         this.connected = js["connected"];

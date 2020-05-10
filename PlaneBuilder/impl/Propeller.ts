@@ -29,7 +29,7 @@ class Propeller extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.idx_prop = js["type"];
         this.use_variable = js["use_variable"];
     }

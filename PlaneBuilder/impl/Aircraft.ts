@@ -129,29 +129,27 @@ class Aircraft {
             console.log(js);
             console.log(js["version"]);
         }
-        if (this.version == js["version"]) {
-            this.name = js["name"];
-            this.era.fromJSON(js["era"]);
-            this.cockpits.fromJSON(js["cockpits"]);
-            this.passengers.fromJSON(js["passengers"]);
-            this.engines.fromJSON(js["engines"]);
-            this.propeller.fromJSON(js["propeller"]);
-            this.frames.fromJSON(js["frames"]);
-            this.wings.fromJSON(js["wings"]);
-            this.stabilizers.fromJSON(js["stabilizers"]);
-            this.controlsurfaces.fromJSON(js["controlsurfaces"]);
-            this.reinforcements.fromJSON(js["reinforcements"]);
-            this.fuel.fromJSON(js["fuel"]);
-            this.munitions.fromJSON(js["munitions"]);
-            this.cargo.fromJSON(js["cargo"]);
-            this.gear.fromJSON(js["gear"]);
-            this.accessories.fromJSON(js["accessories"]);
-            this.optimization.fromJSON(js["optimization"]);
-            this.weapons.fromJSON(js["weapons"]);
-            this.CalculateStats();
-            return true;
-        }
-        return false;
+        var json_version = js["version"];
+        this.name = js["name"];
+        this.era.fromJSON(js["era"], json_version);
+        this.cockpits.fromJSON(js["cockpits"], json_version);
+        this.passengers.fromJSON(js["passengers"], json_version);
+        this.engines.fromJSON(js["engines"], json_version);
+        this.propeller.fromJSON(js["propeller"], json_version);
+        this.frames.fromJSON(js["frames"], json_version);
+        this.wings.fromJSON(js["wings"], json_version);
+        this.stabilizers.fromJSON(js["stabilizers"], json_version);
+        this.controlsurfaces.fromJSON(js["controlsurfaces"], json_version);
+        this.reinforcements.fromJSON(js["reinforcements"], json_version);
+        this.fuel.fromJSON(js["fuel"], json_version);
+        this.munitions.fromJSON(js["munitions"], json_version);
+        this.cargo.fromJSON(js["cargo"], json_version);
+        this.gear.fromJSON(js["gear"], json_version);
+        this.accessories.fromJSON(js["accessories"], json_version);
+        this.optimization.fromJSON(js["optimization"], json_version);
+        this.weapons.fromJSON(js["weapons"], json_version);
+        this.CalculateStats();
+        return true;
     }
 
     public serialize(s: Serialize) {
@@ -177,7 +175,8 @@ class Aircraft {
     }
 
     public deserialize(d: Deserialize) {
-        this.version = d.GetString();
+        d.version = d.GetString();
+        console.log(d.version);
         this.name = d.GetString();
         this.era.deserialize(d);
         this.cockpits.deserialize(d);

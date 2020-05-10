@@ -13,6 +13,17 @@ class Weapons extends Part {
     }[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
     private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
+    private action_list = [
+        { name: "Standard Action" },
+        { name: "Mechanical Action" },
+        { name: "Gast Principle" },
+    ];
+    private projectile_list = [
+        { name: "Bullets" },
+        { name: "Heat Ray" },
+        { name: "Gyrojets" },
+        { name: "Pneumatic" },
+    ];
 
     public cockpit_count: number;
     public has_tractor: boolean;
@@ -60,13 +71,13 @@ class Weapons extends Part {
         }
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.weapon_sets = [];
         var lst = js["weapon_systems"];
         for (let wsj of lst) {
             var ws = new WeaponSystem(this.weapon_list);
             ws.SetCalculateStats(this.CalculateStats);
-            ws.fromJSON(wsj);
+            ws.fromJSON(wsj, json_version);
             this.weapon_sets.push(ws);
         }
     }
@@ -282,6 +293,14 @@ class Weapons extends Part {
         this.has_pusher = info.have;
         this.pusher_spinner_count = info.spin_count;
         this.pusher_arty_spinner_count = info.arty_spin_count;
+    }
+
+    public GetActionList() {
+        return this.action_list;
+    }
+
+    public GetProjectileList() {
+        return this.projectile_list;
     }
 
     public SetCalculateStats(callback: () => void) {

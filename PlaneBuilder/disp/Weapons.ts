@@ -3,7 +3,7 @@
 
 type WType = { span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement, accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement, count: HTMLInputElement, repeating: HTMLInputElement };
 type WStatType = { mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement, sect: HTMLTableCellElement, hits: HTMLTableCellElement, damg: HTMLTableCellElement };
-type WSetType = { type: HTMLSelectElement, dirs: HTMLInputElement[], count: HTMLInputElement, fixed: HTMLInputElement, wcell: HTMLTableCellElement, ammo: HTMLInputElement, weaps: WType[], stats: WStatType };
+type WSetType = { type: HTMLSelectElement, dirs: HTMLInputElement[], count: HTMLInputElement, action: HTMLSelectElement, projectile: HTMLSelectElement, fixed: HTMLInputElement, wcell: HTMLTableCellElement, ammo: HTMLInputElement, weaps: WType[], stats: WStatType };
 class Weapons_HTML extends Display {
     private weap: Weapons;
 
@@ -31,6 +31,8 @@ class Weapons_HTML extends Display {
             type: document.createElement("SELECT") as HTMLSelectElement,
             dirs: [],
             count: document.createElement("INPUT") as HTMLInputElement,
+            action: document.createElement("SELECT") as HTMLSelectElement,
+            projectile: document.createElement("SELECT") as HTMLSelectElement,
             fixed: document.createElement("INPUT") as HTMLInputElement,
             wcell: null,
             weaps: [],
@@ -46,12 +48,30 @@ class Weapons_HTML extends Display {
         }
         type.type.required = true;
 
+        var alist = this.weap.GetActionList();
+        for (let a of alist) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = a.name;
+            type.action.add(opt);
+        }
+        type.action.required = true;
+
+        var plist = this.weap.GetProjectileList();
+        for (let p of plist) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = p.name;
+            type.projectile.add(opt);
+        }
+        type.projectile.required = true;
+
         FlexSelect("Type", type.type, fs);
 
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
         FlexInput("Number of Mounts", type.count, lfs);
         FlexInput("Ammunition", type.ammo, rfs);
+        FlexSelect("Action", type.action, lfs);
+        FlexSelect("Projectile", type.projectile, rfs);
         FlexCheckbox("Fixed", type.fixed, lfs);
         FlexSpace(rfs);
 
@@ -131,6 +151,12 @@ class Weapons_HTML extends Display {
         disp.count.valueAsNumber = set.GetWeaponCount();
         disp.count.onchange = () => { set.SetWeaponCount(disp.count.valueAsNumber); };
 
+        disp.action.selectedIndex = set.GetAction();
+        disp.action.onchange = () => { set.SetAction(disp.action.selectedIndex); };
+
+        disp.projectile.selectedIndex = set.GetProjectile();
+        disp.projectile.onchange = () => { set.SetProjectile(disp.projectile.selectedIndex); };
+
         disp.fixed.checked = set.GetFixed();
         disp.fixed.onchange = () => { set.SetFixed(disp.fixed.checked); };
 
@@ -177,7 +203,6 @@ class Weapons_HTML extends Display {
                 disp.weaps[i].synch.options[j].disabled = !can[j];
             }
         }
-
 
         var stats = set.PartStats();
         BlinkIfChanged(disp.stats.mass, stats.mass.toString());

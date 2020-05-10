@@ -47,13 +47,13 @@ class Cockpits extends Part {
         return { positions: lst };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.positions = [];
         for (let elem of js["positions"]) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
             if (this.positions.length == 0)
                 cp.SetPrimary();
-            cp.fromJSON(elem);
+            cp.fromJSON(elem, json_version);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
 
@@ -128,7 +128,7 @@ class Cockpits extends Part {
             if (this.positions.length == 0)
                 cp.SetPrimary();
             if (js)
-                cp.fromJSON(JSON.parse(js));
+                cp.fromJSON(JSON.parse(js), "");
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }

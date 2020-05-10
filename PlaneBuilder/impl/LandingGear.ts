@@ -45,7 +45,7 @@ class LandingGear extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.gear_sel = js["gear_sel"];
         this.retract = js["retract"];
         this.extra_sel = js["extra_sel"];

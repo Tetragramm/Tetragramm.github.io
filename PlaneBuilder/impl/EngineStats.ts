@@ -12,7 +12,7 @@ class EngineStats {
     public stats: Stats = new Stats();
     constructor(js?: JSON) {
         if (js) {
-            this.fromJSON(js);
+            this.fromJSON(js, "");
         }
     }
 
@@ -29,7 +29,7 @@ class EngineStats {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.name = js["name"];
         this.overspeed = js["overspeed"];
         this.altitude = js["altitude"];

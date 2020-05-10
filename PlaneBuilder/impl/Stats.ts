@@ -30,7 +30,7 @@ class Stats {
 
     constructor(js?: JSON) {
         if (js) {
-            this.fromJSON(js);
+            this.fromJSON(js, "");
         }
     }
 
@@ -66,7 +66,7 @@ class Stats {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         if (js["liftbleed"])
             this.liftbleed = js["liftbleed"];
         if (js["wetmass"])

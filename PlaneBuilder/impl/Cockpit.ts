@@ -46,7 +46,7 @@ class Cockpit extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.selected_type = js["type"];
         this.selected_upgrades = js["upgrades"];
         this.selected_safety = js["safety"];

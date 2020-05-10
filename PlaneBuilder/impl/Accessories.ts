@@ -98,7 +98,7 @@ class Accessories extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         if (js["v"] == 2) {
             this.armour_coverage = js["armour_coverage"];
         }

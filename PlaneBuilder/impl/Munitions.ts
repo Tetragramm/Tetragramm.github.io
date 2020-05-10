@@ -27,7 +27,7 @@ class Munitions extends Part {
         }
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.bomb_count = js["bomb_count"];
         this.internal_bay_count = js["bay_count"];
         this.internal_bay_1 = js["bay1"];

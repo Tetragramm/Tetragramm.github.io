@@ -23,7 +23,7 @@ class Era extends Part {
         };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.selected = js["selected"];
     }
 

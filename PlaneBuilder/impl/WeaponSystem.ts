@@ -3,6 +3,13 @@
 /// <reference path="./Weapon.ts" />
 
 class WeaponSystem extends Part {
+    private final_weapon: {
+        name: string, era: string, size: number, stats: Stats,
+        damage: number, hits: number, ammo: number,
+        ap: number, jam: string, reload: number,
+        rapid: boolean, synched: boolean, shells: boolean,
+        can_convert: boolean
+    };
     private weapon_type: number;
     private fixed: boolean;
     private directions: boolean[];
@@ -40,6 +47,16 @@ class WeaponSystem extends Part {
         this.ammo = 1;
         this.weapon_type = 0;
         this.weapons = [];
+        this.action_sel = 0;
+        this.projectile_sel = 0;
+        this.final_weapon = {
+            name: "", era: "", size: 0, stats: new Stats(),
+            damage: 0, hits: 0, ammo: 0,
+            ap: 0, jam: "", reload: 0,
+            rapid: false, synched: false, shells: false,
+            can_convert: false
+        };
+        this.MakeFinalWeapon();
         this.SWC(1);
     }
 
@@ -54,23 +71,34 @@ class WeaponSystem extends Part {
             directions: this.directions,
             weapons: wlist,
             ammo: this.ammo,
+            action: this.action_sel,
+            projectile: this.projectile_sel,
         }
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.weapon_type = js["weapon_type"];
         this.fixed = js["fixed"];
         this.directions = js["directions"];
         this.weapons = [];
+        this.MakeFinalWeapon();
         for (let elem of js["weapons"]) {
-            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            var w = new Weapon(this.final_weapon, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
-            w.fromJSON(elem);
+            w.fromJSON(elem, json_version);
             this.weapons.push(w);
         }
         this.ammo = js["ammo"];
         if (this.ammo == null)
             this.ammo = 1;
+        if (json_version == "10.2") {
+            this.action_sel = 0;
+            this.projectile_sel = 0;
+        }
+        else {
+            this.action_sel = js["action"];
+            this.projectile_sel = js["projectile"];
+        }
     }
 
     public serialize(s: Serialize) {
@@ -82,6 +110,8 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.serialize(s);
         }
+        s.PushNum(this.action_sel);
+        s.PushNum(this.projectile_sel);
     }
 
     public deserialize(d: Deserialize) {
@@ -91,16 +121,84 @@ class WeaponSystem extends Part {
         this.ammo = d.GetNum();
         var wlen = d.GetNum();
         this.weapons = [];
+        this.MakeFinalWeapon();
         for (let i = 0; i < wlen; i++) {
-            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            var w = new Weapon(this.final_weapon, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             w.deserialize(d);
             this.weapons.push(w);
+        }
+        if (d.version == "10.2") {
+            this.action_sel = 0;
+            this.projectile_sel = 0;
+        }
+        else {
+            this.action_sel = d.GetNum();
+            this.projectile_sel = d.GetNum();
         }
     }
 
     public GetWeaponSelected() {
         return this.weapon_type;
+    }
+
+    private MakeFinalWeapon() {
+        var num = this.weapon_type;
+        this.final_weapon.can_convert = this.weapon_list[num].can_convert;
+        this.final_weapon.ammo = this.weapon_list[num].ammo;
+        this.final_weapon.ap = this.weapon_list[num].ap;
+        this.final_weapon.damage = this.weapon_list[num].damage;
+        this.final_weapon.era = this.weapon_list[num].era;
+        this.final_weapon.name = this.weapon_list[num].name;
+        this.final_weapon.reload = this.weapon_list[num].reload;
+        this.final_weapon.shells = this.weapon_list[num].shells;
+        this.final_weapon.size = this.weapon_list[num].size;
+        this.final_weapon.stats = this.weapon_list[num].stats.Clone();
+        if (this.action_sel == 0) {
+            this.final_weapon.hits = this.weapon_list[num].hits;
+            this.final_weapon.jam = this.weapon_list[num].jam;
+            this.final_weapon.rapid = this.weapon_list[num].rapid;
+            this.final_weapon.synched = this.weapon_list[num].synched;
+        } else if (this.action_sel == 1) {
+            this.final_weapon.hits = 1 + this.weapon_list[num].hits;
+            this.final_weapon.jam = "0/0";
+            this.final_weapon.rapid = true;
+            this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
+            this.final_weapon.synched = true;
+        } else if (this.action_sel == 2) {
+            this.final_weapon.hits = 2 * this.weapon_list[num].hits;
+            this.final_weapon.ammo = Math.floor(this.weapon_list[num].ammo / 2);
+            this.final_weapon.jam = this.weapon_list[num].jam;
+            this.final_weapon.rapid = this.weapon_list[num].rapid;
+            this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
+            this.final_weapon.synched = this.weapon_list[num].synched;
+        }
+
+        if (this.projectile_sel == 1) {
+            this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
+            this.final_weapon.shells = false;
+            this.final_weapon.ammo = 0;
+            var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
+            if (this.action_sel == 2) {
+                ammo *= 2;
+            }
+            var warn = "Uses Charges as ammo " + ammo.toString() + "/" + Math.floor(1.5 * ammo).toString() + ".";
+            this.final_weapon.stats.warnings = [{ source: this.final_weapon.name + " Heat Ray", warning: warn }];
+            this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Incendiary shots. Take -2 forward to Eyeball after firing." })
+        } else if (this.projectile_sel == 2) {
+            this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
+            this.final_weapon.shells = false;
+            this.final_weapon.damage -= 1;
+            this.final_weapon.stats.warnings.push({ source: "Gyrojets", warning: "+1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife." });
+        } else if (this.projectile_sel == 3) {
+            this.final_weapon.ammo *= 2;
+            this.final_weapon.shells = false;
+            if (this.final_weapon.rapid) {
+                this.final_weapon.jam = this.final_weapon.jam.substr(0, 2) + "9999";
+                this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
+            }
+            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "AP or Wirecutter rounds only (free, your choice)." });
+        }
     }
 
     public SetWeaponSelected(num: number) {
@@ -110,8 +208,14 @@ class WeaponSystem extends Part {
                 this.weapons.pop();
             }
         }
+        if (!this.weapon_list[num].can_convert) {
+            this.action_sel = 0;
+            this.projectile_sel = 0;
+        }
+        this.MakeFinalWeapon();
+
         for (let w of this.weapons) {
-            w.SetWeaponType(this.weapon_list[num]);
+            w.SetWeaponType(this.final_weapon);
         }
         this.CalculateStats();
     }
@@ -181,7 +285,7 @@ class WeaponSystem extends Part {
             num = 1;
         num = Math.floor(1.0e-6 + num);
         while (num > this.weapons.length) {
-            var w = new Weapon(this.weapon_list[this.weapon_type], this.fixed);
+            var w = new Weapon(this.final_weapon, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             this.weapons.push(w);
         }
@@ -191,7 +295,7 @@ class WeaponSystem extends Part {
     }
 
     public SetWeaponCount(num: number) {
-        if (this.weapon_list[this.weapon_type].size == 16)
+        if (this.final_weapon.size == 16)
             num = 1;
         this.SWC(num);
         this.CalculateStats();
@@ -251,7 +355,7 @@ class WeaponSystem extends Part {
     }
 
     public GetHits() {
-        var hits = this.weapon_list[this.weapon_type].hits;
+        var hits = this.final_weapon.hits;
         var centerline = 0;
         var wings = 0;
         for (let w of this.weapons) {
@@ -270,7 +374,7 @@ class WeaponSystem extends Part {
     }
 
     public GetDamage() {
-        return this.weapon_list[this.weapon_type].damage;
+        return this.final_weapon.damage;
     }
 
     public GetAmmo() {
@@ -278,7 +382,7 @@ class WeaponSystem extends Part {
     }
 
     public GetJam() {
-        if (this.weapon_list[this.weapon_type].rapid) {
+        if (this.final_weapon.rapid) {
             var jams = [0, 0];
             for (let w of this.weapons) {
                 var t = w.GetJam();
@@ -308,6 +412,47 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
 
+    public GetAction() {
+        return this.action_sel;
+    }
+
+    public SetAction(num: number) {
+        if (this.weapon_list[this.weapon_type].can_convert) {
+            this.action_sel = num;
+
+            this.MakeFinalWeapon()
+            for (let w of this.weapons) {
+                w.SetWeaponType(this.final_weapon);
+            }
+
+        } else {
+            this.action_sel = 0;
+        }
+        this.CalculateStats();
+    }
+
+    public GetProjectile() {
+        return this.projectile_sel;
+    }
+
+    public SetProjectile(num: number) {
+        if (this.weapon_list[this.weapon_type].can_convert) {
+            this.projectile_sel = num;
+
+            this.MakeFinalWeapon()
+            for (let w of this.weapons) {
+                w.SetWeaponType(this.final_weapon);
+            }
+        } else {
+            this.projectile_sel = 0;
+        }
+        this.CalculateStats();
+    }
+
+    public GetFinalWeapon() {
+        return this.final_weapon;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -323,10 +468,12 @@ class WeaponSystem extends Part {
             if (d)
                 dircount++;
 
+        var count = 0;
         for (let w of this.weapons) {
             w.has_cantilever = this.has_cantilever;
             stats = stats.Add(w.PartStats());
 
+            count += w.GetCount();
             if (!this.fixed) {
                 //Turret direction costs
                 if (dircount == 2)
@@ -342,7 +489,7 @@ class WeaponSystem extends Part {
         }
 
         //Ammunition Cost
-        stats.mass += (this.ammo - 1) * this.weapons.length;
+        stats.mass += (this.ammo - 1) * count;
 
         return stats;
     }

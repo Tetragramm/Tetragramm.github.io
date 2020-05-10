@@ -69,7 +69,7 @@ class Weapon extends Part {
         }
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, json_version: string) {
         this.fixed = js["fixed"];
         this.wing = js["wing"];
         this.covered = js["covered"];
@@ -239,6 +239,7 @@ class Weapon extends Part {
     }
 
     public SetCount(use: number) {
+        use = Math.max(1, use);
         if (this.synchronization == SynchronizationType.SPINNER)
             use = 1;
         while (use * this.weapon_type.size > 16) {
@@ -333,8 +334,8 @@ class Weapon extends Part {
 
         if (!this.CanCovered() && this.covered)
             this.covered = false;
-        if (this.weapon_type.size == 16 && this.fixed)
-            this.covered = true;
+        if (this.weapon_type.size == 16)
+            this.covered = this.fixed;
 
         var size = 0;
         for (let i = 0; i < this.w_count; i++) {
@@ -346,19 +347,21 @@ class Weapon extends Part {
         //Covered Cost
         if (this.covered) {
             var cost = 0;
-            if (size <= 1) {
+            if (this.weapon_type.size <= 1) {
                 cost = 0;
-            } else if (size <= 2) {
+            } else if (this.weapon_type.size <= 2) {
                 cost = 1;
-            } else if (size <= 4) {
+            } else if (this.weapon_type.size <= 4) {
                 cost = 2;
-            } else if (size <= 8) {
-                cost == 5;
-            } else if (size <= 16) {
+            } else if (this.weapon_type.size <= 8) {
+                cost = 5;
+            } else if (this.weapon_type.size <= 16) {
                 cost = 0;
             }
+            cost *= this.w_count;
             if (!this.fixed)
                 cost *= 2;
+
             stats.cost += cost;
             stats.drag *= 0;
         }
