@@ -10003,8 +10003,7 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
-//TODO: Gast and Mechanical weapons
-//TODO: Heatray, Pneumatic, and Gyrojet weapons
+//TODO: Update Rules.htm
 //TODO: HTMLCanvasElement to make cards for planes.
 const init = () => {
     const sp = new URLSearchParams(location.search);
