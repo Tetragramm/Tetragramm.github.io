@@ -55,7 +55,7 @@ class EngineList {
         }
         this.list.push(es.Clone());
         window.localStorage.engines = JSON.stringify(this.toJSON());
-        this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
         return this.find(es);
     }
 

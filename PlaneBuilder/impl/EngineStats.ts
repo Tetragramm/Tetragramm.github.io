@@ -2,7 +2,7 @@
 /// <reference path="./Serialize.ts"/>
 
 class EngineStats {
-    public name: string = "";
+    public name: string = "Default";
     public overspeed: number = 0;
     public altitude: number = 0;
     public torque: number = 0;
@@ -30,13 +30,20 @@ class EngineStats {
     }
 
     public fromJSON(js: JSON, json_version: string) {
-        this.name = js["name"];
-        this.overspeed = js["overspeed"];
-        this.altitude = js["altitude"];
-        this.torque = js["torque"];
-        this.rumble = js["rumble"];
-        this.oiltank = js["oiltank"];
-        this.pulsejet = js["pulsejet"];
+        if (js["name"])
+            this.name = js["name"];
+        if (js["overspeed"])
+            this.overspeed = js["overspeed"];
+        if (js["altitude"])
+            this.altitude = js["altitude"];
+        if (js["torque"])
+            this.torque = js["torque"];
+        if (js["rumble"])
+            this.rumble = js["rumble"];
+        if (js["oiltank"])
+            this.oiltank = js["oiltank"];
+        if (js["pulsejet"])
+            this.pulsejet = js["pulsejet"];
         this.stats = new Stats(js);
     }
 

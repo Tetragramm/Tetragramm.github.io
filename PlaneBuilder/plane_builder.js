@@ -439,7 +439,7 @@ class Deserialize {
 /// <reference path="./Serialize.ts"/>
 class EngineStats {
     constructor(js) {
-        this.name = "";
+        this.name = "Default";
         this.overspeed = 0;
         this.altitude = 0;
         this.torque = 0;
@@ -455,13 +455,20 @@ class EngineStats {
         return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
     }
     fromJSON(js, json_version) {
-        this.name = js["name"];
-        this.overspeed = js["overspeed"];
-        this.altitude = js["altitude"];
-        this.torque = js["torque"];
-        this.rumble = js["rumble"];
-        this.oiltank = js["oiltank"];
-        this.pulsejet = js["pulsejet"];
+        if (js["name"])
+            this.name = js["name"];
+        if (js["overspeed"])
+            this.overspeed = js["overspeed"];
+        if (js["altitude"])
+            this.altitude = js["altitude"];
+        if (js["torque"])
+            this.torque = js["torque"];
+        if (js["rumble"])
+            this.rumble = js["rumble"];
+        if (js["oiltank"])
+            this.oiltank = js["oiltank"];
+        if (js["pulsejet"])
+            this.pulsejet = js["pulsejet"];
         this.stats = new Stats(js);
     }
     serialize(s) {
@@ -574,7 +581,7 @@ class EngineList {
         }
         this.list.push(es.Clone());
         window.localStorage.engines = JSON.stringify(this.toJSON());
-        this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
         return this.find(es);
     }
     get(i) {
