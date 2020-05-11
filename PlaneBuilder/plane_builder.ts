@@ -3,9 +3,8 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: Weapons are vital components
-//TODO: Used Plane Table
 //TODO: HTMLCanvasElement to make cards for planes.
+//TODO: Used Plane Table
 
 const init = () => {
     const sp = new URLSearchParams(location.search);

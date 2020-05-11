@@ -8787,6 +8787,183 @@ class Weapons_HTML extends Display {
         this.UpdateWSets();
     }
 }
+class Cards {
+    constructor() {
+        this.dash_canvas = document.createElement("CANVAS");
+        this.dash_canvas.width = 1122;
+        this.dash_canvas.height = 786;
+        this.dash_image = document.getElementById("dash_img");
+        this.dash_image.width = 1122;
+        this.dash_image.height = 786;
+        this.dash_image.src = './Cards/Dashboard.png';
+        this.weap_canvas = document.createElement("CANVAS");
+        this.weap_canvas.width = 483;
+        this.weap_canvas.height = 291;
+        this.weap_image = document.getElementById("weap_img");
+        this.weap_image.width = 483;
+        this.weap_image.height = 291;
+        this.weap_image.src = './Cards/Weapon.png';
+        this.acft_data = {
+            full_bomb_boost: 0,
+            half_bomb_boost: 0,
+            full_boost: 0,
+            half_boost: 0,
+            empty_boost: 0,
+            full_bomb_hand: 0,
+            half_bomb_hand: 0,
+            full_hand: 0,
+            half_hand: 0,
+            empty_hand: 0,
+            full_bomb_stall: 0,
+            half_bomb_stall: 0,
+            full_stall: 0,
+            half_stall: 0,
+            empty_stall: 0,
+            fuel: 0,
+            max_speed: 0,
+            dropoff: 0,
+            ordinance: [""],
+            escape: 0,
+            crash: 0,
+            visibility: 0,
+            energy_loss: 0,
+            turn_bleed: 0,
+            stability: 0,
+            stress: 0,
+            toughness: 0,
+            max_strain: 0,
+            vital_parts: [""],
+            armour: [],
+        };
+        this.weap_data = {
+            type: "",
+            ammo_mult: 0,
+            ammo_base: 0,
+            ap: 0,
+            jam: "",
+            hits: [],
+            damage: 0,
+            tags: [],
+            reload: 0,
+        };
+    }
+    SaveDash() {
+        var context = this.dash_canvas.getContext("2d");
+        context.clearRect(0, 0, this.dash_canvas.width, this.dash_canvas.height);
+        context.textAlign = "center";
+        context.drawImage(this.dash_image, 0, 0);
+        context.font = "35px Balthazar";
+        context.fillText(this.acft_data.full_bomb_boost.toString(), 548, 92, 80);
+        context.fillText(this.acft_data.full_bomb_hand.toString(), 548 + 80, 92, 80);
+        context.fillText(this.acft_data.full_bomb_stall.toString(), 548 + 160, 92, 80);
+        context.fillText(this.acft_data.half_bomb_boost.toString(), 548, 92 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_hand.toString(), 548 + 80, 92 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_stall.toString(), 548 + 160, 92 + 40, 80);
+        context.fillText(this.acft_data.full_boost.toString(), 548, 92 + 80, 80);
+        context.fillText(this.acft_data.full_hand.toString(), 548 + 80, 92 + 80, 80);
+        context.fillText(this.acft_data.full_stall.toString(), 548 + 160, 92 + 80, 80);
+        context.fillText(this.acft_data.half_boost.toString(), 548, 92 + 120, 80);
+        context.fillText(this.acft_data.half_hand.toString(), 548 + 80, 92 + 120, 80);
+        context.fillText(this.acft_data.half_stall.toString(), 548 + 160, 92 + 120, 80);
+        context.fillText(this.acft_data.empty_boost.toString(), 548, 92 + 160, 80);
+        context.fillText(this.acft_data.empty_hand.toString(), 548 + 80, 92 + 160, 80);
+        context.fillText(this.acft_data.empty_stall.toString(), 548 + 160, 92 + 160, 80);
+        context.fillText(Math.floor(this.acft_data.fuel).toString(), 414, 305, 35);
+        context.fillText(Math.floor(this.acft_data.max_speed).toString(), 1044, 370, 35);
+        context.fillText(this.acft_data.dropoff.toString(), 1044, 440, 35);
+        context.fillText(this.acft_data.escape.toString(), 280, 450, 35);
+        context.fillText(this.acft_data.crash.toString(), 280, 530, 35);
+        context.fillText(this.acft_data.visibility.toString(), 135, 460, 35);
+        context.fillText(this.acft_data.stability.toString(), 135, 550, 35);
+        context.fillText(this.acft_data.energy_loss.toString(), 70, 505, 35);
+        context.fillText(this.acft_data.turn_bleed.toString(), 195, 505, 35);
+        context.fillText(this.acft_data.stress.toString(), 85, 675, 35);
+        context.fillText(this.acft_data.toughness.toString(), 250, 645, 35);
+        context.fillText(this.acft_data.max_strain.toString(), 250, 720, 35);
+        context.font = "20px Balthazar";
+        context.textAlign = "left";
+        for (let i = 0; i < this.acft_data.ordinance.length; i++) {
+            context.fillText(this.acft_data.ordinance[i], 480, 398 + i * 26, 220);
+        }
+        var rows = Math.min(this.acft_data.vital_parts.length, 7);
+        var cols = Math.ceil(this.acft_data.vital_parts.length / rows);
+        var idx = 0;
+        for (let r = 0; r < rows; r++) {
+            let ypx = 575 + 26 * r;
+            let str = "";
+            for (let c = 0; c < cols; c++) {
+                if (idx < this.acft_data.vital_parts.length) {
+                    if (c != 0) {
+                        str += ", ";
+                    }
+                    str += this.acft_data.vital_parts[idx];
+                }
+                idx++;
+            }
+            context.fillText(str, 335, ypx, 180);
+        }
+        var idx = 0;
+        for (let r = 0; r < this.acft_data.armour.length; ++r) {
+            let AP = r + 1;
+            if (this.acft_data.armour[r] > 0) {
+                let str = this.acft_data.armour[r].toString() + " Coverage AP " + AP.toString();
+                context.fillText(str, 525, 575 + 26 * idx, 180);
+                idx++;
+            }
+        }
+        this.download(this.name + "_Dashboard", this.dash_canvas);
+    }
+    SaveWeapon(i) {
+        var context = this.weap_canvas.getContext("2d");
+        context.clearRect(0, 0, this.weap_canvas.width, this.weap_canvas.height);
+        context.textAlign = "center";
+        context.drawImage(this.weap_image, 0, 0);
+        context.font = "25px Balthazar";
+        context.fillText(this.weap_data.type, 150, 112, 215);
+        context.font = "15px Balthazar";
+        var ammo = "";
+        if (this.weap_data.reload > 0) {
+            var clips = this.weap_data.ammo_base / this.weap_data.reload;
+            ammo += (clips * this.weap_data.ammo_mult).toString() + " loads of ";
+            ammo += this.weap_data.reload.toString() + " shots";
+        }
+        else {
+            ammo += (this.weap_data.ammo_base * this.weap_data.ammo_mult).toString() + " shots";
+        }
+        context.fillText(ammo, 95, 158, 105);
+        context.fillText(this.weap_data.ap.toString(), 172, 158, 23);
+        context.fillText(this.weap_data.jam, 230, 158, 65);
+        context.fillText(this.weap_data.hits[0].toString(), 157, 208, 80);
+        context.fillText(this.weap_data.hits[1].toString(), 157 + 80, 208, 80);
+        context.fillText(this.weap_data.hits[2].toString(), 157 + 160, 208, 80);
+        context.fillText(this.weap_data.hits[3].toString(), 157 + 240, 208, 80);
+        context.fillText((this.weap_data.damage * this.weap_data.hits[0]).toString(), 157, 208 + 23, 80);
+        context.fillText((this.weap_data.damage * this.weap_data.hits[1]).toString(), 157 + 80, 208 + 23, 80);
+        context.fillText((this.weap_data.damage * this.weap_data.hits[2]).toString(), 157 + 160, 208 + 23, 80);
+        context.fillText((this.weap_data.damage * this.weap_data.hits[3]).toString(), 157 + 240, 208 + 23, 80);
+        context.textAlign = "left";
+        context.fillText(this.weap_data.tags[0], 90, 256, 350);
+        var tags = "";
+        for (let i = 1; i < this.weap_data.tags.length; i++) {
+            if (i != 1)
+                tags += ", ";
+            tags += this.weap_data.tags[i];
+        }
+        context.fillText(tags, 90, 276, 350);
+        this.download(this.name + "_Weapon_" + i.toString(), this.weap_canvas);
+    }
+    download(filename, canvas) {
+        var lnk = document.createElement('a');
+        lnk.download = filename + ".png";
+        lnk.href = canvas.toDataURL();
+        if (document.createEvent) {
+            var e = document.createEvent("MouseEvents");
+            e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+            /// send event            
+            lnk.dispatchEvent(e);
+        }
+    }
+}
 /// <reference path="./Display.ts" />
 /// <reference path="./Era.ts" />
 /// <reference path="./Cockpits.ts" />
@@ -8804,6 +8981,7 @@ class Weapons_HTML extends Display {
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="../impl/Aircraft.ts" />
+/// <reference path="./Cards.ts"/>
 class Aircraft_HTML extends Display {
     constructor(js, aircraft) {
         super();
@@ -8852,7 +9030,9 @@ class Aircraft_HTML extends Display {
                         this.acft.CalculateStats();
                     }
                 }
-                catch (_a) { }
+                catch (e) {
+                    console.error(e, e.stack);
+                }
             };
             reader.readAsText(file);
             load_button.value = "";
@@ -8907,8 +9087,179 @@ class Aircraft_HTML extends Display {
             var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt2);
             copyStringToClipboard(link);
         };
+        this.cards = new Cards();
+        var dash_button = document.getElementById("acft_save_dash");
+        dash_button.onclick = () => {
+            this.UpdateCard();
+            this.cards.SaveDash();
+            var wsetlist = this.acft.GetWeapons().GetWeaponSets();
+            for (let i = 0; i < wsetlist.length; i++) {
+                this.UpdateWeaponCard(wsetlist[i]);
+                this.cards.SaveWeapon(i);
+            }
+        };
         var reset_button = document.getElementById("acft_reset");
         reset_button.onclick = () => { aircraft_model.Reset(); };
+    }
+    UpdateCard() {
+        var stats = this.acft.GetStats();
+        var derived = this.acft.GetDerivedStats();
+        this.cards.name = this.acft.name;
+        this.cards.acft_data.armour = this.acft.GetAccessories().GetArmourCoverage();
+        this.cards.acft_data.crash = stats.crashsafety;
+        this.cards.acft_data.dropoff = derived.Dropoff;
+        this.cards.acft_data.empty_boost = derived.BoostEmpty;
+        this.cards.acft_data.empty_hand = derived.HandlingEmpty;
+        this.cards.acft_data.empty_stall = derived.StallSpeedEmpty;
+        this.cards.acft_data.energy_loss = derived.EnergyLoss;
+        this.cards.acft_data.escape = this.acft.GetCockpits().GetEscapeList()[0];
+        this.cards.acft_data.fuel = derived.FuelUses;
+        this.cards.acft_data.full_bomb_boost = derived.BoostFullwBombs;
+        this.cards.acft_data.full_bomb_hand = derived.HandlingFullwBombs;
+        this.cards.acft_data.full_bomb_stall = derived.StallSpeedFullwBombs;
+        this.cards.acft_data.full_boost = derived.BoostFull;
+        this.cards.acft_data.full_hand = derived.HandlingFull;
+        this.cards.acft_data.full_stall = derived.StallSpeedFull;
+        this.cards.acft_data.half_bomb_boost = Math.floor((derived.BoostFullwBombs + derived.BoostEmpty) / 2);
+        this.cards.acft_data.half_bomb_hand = Math.floor((derived.HandlingFullwBombs + derived.HandlingEmpty) / 2);
+        this.cards.acft_data.half_bomb_stall = Math.floor((derived.StallSpeedFullwBombs + derived.StallSpeedEmpty) / 2);
+        this.cards.acft_data.half_boost = Math.floor((derived.BoostFull + derived.BoostEmpty) / 2);
+        this.cards.acft_data.half_hand = Math.floor((derived.HandlingFull + derived.HandlingEmpty) / 2);
+        this.cards.acft_data.half_stall = Math.floor((derived.StallSpeedFull + derived.StallSpeedEmpty) / 2);
+        this.cards.acft_data.max_speed = derived.MaxSpeedEmpty;
+        this.cards.acft_data.max_strain = derived.MaxStrain;
+        var ordinance = [];
+        if (aircraft_model.GetMunitions().GetBombCount() > 0) {
+            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), 10 * aircraft_model.GetMunitions().GetBayCount());
+            var external = aircraft_model.GetMunitions().GetBombCount() - internal;
+            if (internal > 0)
+                ordinance.push(internal.toString() + " Mass Internally");
+            if (external > 0)
+                ordinance.push(external.toString() + " Mass Externally");
+            if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
+                ordinance.push("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass");
+            }
+        }
+        this.cards.acft_data.ordinance = ordinance;
+        this.cards.acft_data.stability = derived.Stabiilty;
+        this.cards.acft_data.stress = this.acft.GetCockpits().GetStressList()[0];
+        this.cards.acft_data.toughness = derived.Toughness;
+        this.cards.acft_data.turn_bleed = derived.TurnBleed;
+        this.cards.acft_data.visibility = this.acft.GetCockpits().GetVisibilityList()[0];
+        this.cards.acft_data.vital_parts = this.VitalComponentList();
+    }
+    UpdateWeaponCard(w) {
+        var dlist = aircraft_model.GetWeapons().GetDirectionList();
+        var name = this.WeaponName(w);
+        if (w.IsPlural()) {
+            name += "s";
+        }
+        var ds = w.GetDirection();
+        var dtag = "";
+        dtag += "[";
+        for (let i = 0; i < dlist.length; i++) {
+            if (ds[i])
+                dtag += dlist[i] + " ";
+        }
+        dtag = dtag.substr(0, dtag.length - 1);
+        dtag += "] ";
+        var fweap = w.GetFinalWeapon();
+        this.cards.weap_data.ammo_base = fweap.ammo;
+        this.cards.weap_data.ammo_mult = w.GetAmmo();
+        this.cards.weap_data.ap = fweap.ap;
+        this.cards.weap_data.damage = fweap.damage;
+        this.cards.weap_data.hits = w.GetHits();
+        this.cards.weap_data.jam = w.GetJam();
+        this.cards.weap_data.tags = [dtag];
+        this.cards.weap_data.type = name;
+        this.cards.weap_data.reload = fweap.reload;
+        if (fweap.rapid) {
+            this.cards.weap_data.tags.push("Rapid Fire");
+        }
+        if (fweap.shells) {
+            this.cards.weap_data.tags.push("Shells");
+        }
+    }
+    VitalComponentList() {
+        var derived = this.acft.GetDerivedStats();
+        var vital = [];
+        vital.push("Controls");
+        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
+            vital.push("Aircrew #" + (i + 1).toString());
+        }
+        if (derived.FuelUses > 0) {
+            vital.push("Fuel Tanks");
+        }
+        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+            if (this.acft.GetEngines().GetEngine(i).GetUsePushPull()) {
+                vital.push("Engine #" + (i + 1).toString() + " Pusher");
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital.push("Oil Tank #" + (i + 1).toString() + " Pusher");
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital.push("Oil Cooler #" + (i + 1).toString() + " Pusher");
+                }
+                vital.push("Engine #" + (i + 1).toString() + " Puller");
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital.push("Oil Tank #" + (i + 1).toString() + " Puller");
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital.push("Oil Cooler #" + (i + 1).toString() + " Puller");
+                }
+            }
+            else {
+                vital.push("Engine #" + (i + 1).toString());
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital.push("Oil Tank #" + (i + 1).toString());
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital.push("Oil Cooler #" + (i + 1).toString());
+                }
+            }
+        }
+        for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
+            vital.push("Radiator #" + (i + 1).toString());
+        }
+        if (this.acft.IsElectrics()) {
+            vital.push("Electrics");
+        }
+        for (let i = 0; i < aircraft_model.GetWeapons().GetWeaponSets().length; i++) {
+            vital.push("Weapon Set #" + (i + 1).toString());
+        }
+        return vital;
+    }
+    WeaponName(w) {
+        var wlist = aircraft_model.GetWeapons().GetWeaponList();
+        var ds = w.GetDirection();
+        var dircount = 0;
+        for (let d of ds) {
+            if (d)
+                dircount++;
+        }
+        var name = "";
+        if (dircount == 1 && w.GetFixed())
+            name += "Fixed ";
+        else if (dircount <= 2)
+            name += "Flexible ";
+        else
+            name += "Turreted ";
+        if (w.GetAction() == 1) {
+            name += "Mechanical Action ";
+        }
+        else if (w.GetAction() == 2) {
+            name += "Gast Principle ";
+        }
+        if (w.GetProjectile() == 1) {
+            name += "Heat Ray ";
+        }
+        else if (w.GetProjectile() == 2) {
+            name += "Gyrojet ";
+        }
+        else if (w.GetProjectile() == 3) {
+            name += "Pneumatic ";
+        }
+        name += wlist[w.GetWeaponSelected()].name;
+        return name;
     }
     // private InitAlter(tbl: HTMLTableElement) {
     //     var row = tbl.insertRow();
@@ -9361,57 +9712,10 @@ class Aircraft_HTML extends Display {
         this.copy_text += "\n";
         var vital = "Controls";
         this.copy_text += "Vital Components\n\tControls\n\t";
-        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital += "<br/>Aircrew #" + (i + 1).toString();
-            this.copy_text += "Aircrew #" + (i + 1).toString() + "\n\t";
-        }
-        if (derived.FuelUses > 0) {
-            vital += "<br/>Fuel Tanks";
-            this.copy_text += "Fuel Tanks\n\t";
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            if (this.acft.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital += "<br/>Engine #" + (i + 1).toString() + " Pusher";
-                this.copy_text += "Engine #" + (i + 1).toString() + " Pusher\n\t";
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Pusher";
-                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Pusher\n\t";
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Pusher";
-                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Pusher\n\t";
-                }
-                vital += "<br/>Engine #" + (i + 1).toString() + " Puller";
-                this.copy_text += "Engine #" + (i + 1).toString() + " Puller\n\t";
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Puller";
-                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Puller\n\t";
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Puller";
-                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Puller\n\t";
-                }
-            }
-            else {
-                vital += "<br/>Engine #" + (i + 1).toString();
-                this.copy_text += "Engine #" + (i + 1).toString() + "\n\t";
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital += "<br/>Oil Tank #" + (i + 1).toString();
-                    this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital += "<br/>Oil Cooler #" + (i + 1).toString();
-                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
-                }
-            }
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
-            vital += "<br/>Radiator #" + (i + 1).toString();
-            this.copy_text += "Radiator #" + (i + 1).toString() + "\n\t";
-        }
-        if (this.acft.IsElectrics()) {
-            vital += "<br/>Electrics";
-            this.copy_text += "Electrics\n\t";
+        var vlist = this.VitalComponentList();
+        for (let v of vlist) {
+            vital += "<br/>" + v;
+            this.copy_text += v + "\n\t";
         }
         this.vital_components.innerHTML = vital;
         this.copy_text += "\n";
@@ -9439,28 +9743,7 @@ class Aircraft_HTML extends Display {
                     dircount++;
             }
             var weaphtml = "";
-            if (dircount == 1 && w.GetFixed())
-                weaphtml += "Fixed ";
-            else if (dircount <= 2)
-                weaphtml += "Flexible ";
-            else
-                weaphtml += "Turreted ";
-            if (w.GetAction() == 1) {
-                weaphtml += "Mechanical Action ";
-            }
-            else if (w.GetAction() == 2) {
-                weaphtml += "Gast Principle ";
-            }
-            if (w.GetProjectile() == 1) {
-                weaphtml += "Heat Ray ";
-            }
-            else if (w.GetProjectile() == 2) {
-                weaphtml += "Gyrojet ";
-            }
-            else if (w.GetProjectile() == 3) {
-                weaphtml += "Pneumatic ";
-            }
-            weaphtml += wlist[w.GetWeaponSelected()].name;
+            weaphtml += this.WeaponName(w);
             if (w.IsPlural()) {
                 weaphtml += "s";
                 weaphtml += " fire ";
@@ -10003,8 +10286,8 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
-//TODO: Update Rules.htm
 //TODO: HTMLCanvasElement to make cards for planes.
+//TODO: Used Plane Table
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");

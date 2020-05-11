@@ -15,6 +15,7 @@
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="../impl/Aircraft.ts" />
+/// <reference path="./Cards.ts"/>
 
 class Aircraft_HTML extends Display {
     private acft: Aircraft;
@@ -135,6 +136,8 @@ class Aircraft_HTML extends Display {
 
     private copy_text: string;
 
+    private cards: Cards;
+
 
     constructor(js: JSON, aircraft: Aircraft) {
         super();
@@ -189,7 +192,9 @@ class Aircraft_HTML extends Display {
                         this.acft.CalculateStats();
                     }
 
-                } catch { }
+                } catch (e) {
+                    console.error(e, e.stack);
+                }
             };
             reader.readAsText(file);
             load_button.value = "";
@@ -245,8 +250,190 @@ class Aircraft_HTML extends Display {
             copyStringToClipboard(link);
         };
 
+
+        this.cards = new Cards();
+        var dash_button = document.getElementById("acft_save_dash") as HTMLButtonElement;
+        dash_button.onclick = () => {
+            this.UpdateCard();
+            this.cards.SaveDash();
+            var wsetlist = this.acft.GetWeapons().GetWeaponSets();
+            for (let i = 0; i < wsetlist.length; i++) {
+                this.UpdateWeaponCard(wsetlist[i]);
+                this.cards.SaveWeapon(i)
+            }
+        };
+
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
         reset_button.onclick = () => { aircraft_model.Reset(); };
+    }
+
+    private UpdateCard() {
+        var stats = this.acft.GetStats();
+        var derived = this.acft.GetDerivedStats();
+        this.cards.name = this.acft.name;
+        this.cards.acft_data.armour = this.acft.GetAccessories().GetArmourCoverage();
+        this.cards.acft_data.crash = stats.crashsafety;
+        this.cards.acft_data.dropoff = derived.Dropoff;
+        this.cards.acft_data.empty_boost = derived.BoostEmpty;
+        this.cards.acft_data.empty_hand = derived.HandlingEmpty;
+        this.cards.acft_data.empty_stall = derived.StallSpeedEmpty;
+        this.cards.acft_data.energy_loss = derived.EnergyLoss;
+        this.cards.acft_data.escape = this.acft.GetCockpits().GetEscapeList()[0];
+        this.cards.acft_data.fuel = derived.FuelUses;
+        this.cards.acft_data.full_bomb_boost = derived.BoostFullwBombs;
+        this.cards.acft_data.full_bomb_hand = derived.HandlingFullwBombs;
+        this.cards.acft_data.full_bomb_stall = derived.StallSpeedFullwBombs;
+        this.cards.acft_data.full_boost = derived.BoostFull;
+        this.cards.acft_data.full_hand = derived.HandlingFull;
+        this.cards.acft_data.full_stall = derived.StallSpeedFull;
+        this.cards.acft_data.half_bomb_boost = Math.floor((derived.BoostFullwBombs + derived.BoostEmpty) / 2);
+        this.cards.acft_data.half_bomb_hand = Math.floor((derived.HandlingFullwBombs + derived.HandlingEmpty) / 2);
+        this.cards.acft_data.half_bomb_stall = Math.floor((derived.StallSpeedFullwBombs + derived.StallSpeedEmpty) / 2);
+        this.cards.acft_data.half_boost = Math.floor((derived.BoostFull + derived.BoostEmpty) / 2);
+        this.cards.acft_data.half_hand = Math.floor((derived.HandlingFull + derived.HandlingEmpty) / 2);
+        this.cards.acft_data.half_stall = Math.floor((derived.StallSpeedFull + derived.StallSpeedEmpty) / 2);
+        this.cards.acft_data.max_speed = derived.MaxSpeedEmpty;
+        this.cards.acft_data.max_strain = derived.MaxStrain;
+        var ordinance = [];
+        if (aircraft_model.GetMunitions().GetBombCount() > 0) {
+            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), 10 * aircraft_model.GetMunitions().GetBayCount());
+            var external = aircraft_model.GetMunitions().GetBombCount() - internal;
+            if (internal > 0)
+                ordinance.push(internal.toString() + " Mass Internally");
+            if (external > 0)
+                ordinance.push(external.toString() + " Mass Externally");
+            if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
+                ordinance.push("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass");
+            }
+        }
+        this.cards.acft_data.ordinance = ordinance;
+        this.cards.acft_data.stability = derived.Stabiilty;
+        this.cards.acft_data.stress = this.acft.GetCockpits().GetStressList()[0];
+        this.cards.acft_data.toughness = derived.Toughness;
+        this.cards.acft_data.turn_bleed = derived.TurnBleed;
+        this.cards.acft_data.visibility = this.acft.GetCockpits().GetVisibilityList()[0];
+        this.cards.acft_data.vital_parts = this.VitalComponentList();
+    }
+
+    private UpdateWeaponCard(w: WeaponSystem) {
+        var dlist = aircraft_model.GetWeapons().GetDirectionList();
+
+        var name = this.WeaponName(w);
+        if (w.IsPlural()) {
+            name += "s";
+        }
+
+        var ds = w.GetDirection();
+        var dtag = "";
+        dtag += "[";
+        for (let i = 0; i < dlist.length; i++) {
+            if (ds[i])
+                dtag += dlist[i] + " ";
+        }
+        dtag = dtag.substr(0, dtag.length - 1);
+        dtag += "] ";
+
+        var fweap = w.GetFinalWeapon();
+
+        this.cards.weap_data.ammo_base = fweap.ammo;
+        this.cards.weap_data.ammo_mult = w.GetAmmo();
+        this.cards.weap_data.ap = fweap.ap;
+        this.cards.weap_data.damage = fweap.damage;
+        this.cards.weap_data.hits = w.GetHits();
+        this.cards.weap_data.jam = w.GetJam();
+        this.cards.weap_data.tags = [dtag];
+        this.cards.weap_data.type = name;
+        this.cards.weap_data.reload = fweap.reload;
+
+        if (fweap.rapid) {
+            this.cards.weap_data.tags.push("Rapid Fire");
+        }
+        if (fweap.shells) {
+            this.cards.weap_data.tags.push("Shells");
+        }
+    }
+
+    private VitalComponentList(): string[] {
+        var derived = this.acft.GetDerivedStats();
+        var vital = [];
+        vital.push("Controls");
+        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
+            vital.push("Aircrew #" + (i + 1).toString());
+        }
+        if (derived.FuelUses > 0) {
+            vital.push("Fuel Tanks");
+        }
+        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+            if (this.acft.GetEngines().GetEngine(i).GetUsePushPull()) {
+                vital.push("Engine #" + (i + 1).toString() + " Pusher");
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital.push("Oil Tank #" + (i + 1).toString() + " Pusher");
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital.push("Oil Cooler #" + (i + 1).toString() + " Pusher");
+                }
+                vital.push("Engine #" + (i + 1).toString() + " Puller");
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital.push("Oil Tank #" + (i + 1).toString() + " Puller");
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital.push("Oil Cooler #" + (i + 1).toString() + " Puller");
+                }
+            }
+            else {
+                vital.push("Engine #" + (i + 1).toString());
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
+                    vital.push("Oil Tank #" + (i + 1).toString());
+                }
+                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
+                    vital.push("Oil Cooler #" + (i + 1).toString());
+                }
+            }
+        }
+        for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
+            vital.push("Radiator #" + (i + 1).toString());
+        }
+        if (this.acft.IsElectrics()) {
+            vital.push("Electrics");
+        }
+        for (let i = 0; i < aircraft_model.GetWeapons().GetWeaponSets().length; i++) {
+            vital.push("Weapon Set #" + (i + 1).toString());
+        }
+        return vital;
+    }
+
+    private WeaponName(w: WeaponSystem): string {
+        var wlist = aircraft_model.GetWeapons().GetWeaponList();
+        var ds = w.GetDirection();
+        var dircount = 0;
+        for (let d of ds) {
+            if (d)
+                dircount++;
+        }
+        var name = "";
+        if (dircount == 1 && w.GetFixed())
+            name += "Fixed ";
+        else if (dircount <= 2)
+            name += "Flexible ";
+        else
+            name += "Turreted ";
+
+        if (w.GetAction() == 1) {
+            name += "Mechanical Action ";
+        } else if (w.GetAction() == 2) {
+            name += "Gast Principle ";
+        }
+
+        if (w.GetProjectile() == 1) {
+            name += "Heat Ray ";
+        } else if (w.GetProjectile() == 2) {
+            name += "Gyrojet ";
+        } else if (w.GetProjectile() == 3) {
+            name += "Pneumatic ";
+        }
+
+        name += wlist[w.GetWeaponSelected()].name;
+        return name;
     }
 
     // private InitAlter(tbl: HTMLTableElement) {
@@ -726,57 +913,10 @@ class Aircraft_HTML extends Display {
 
         var vital = "Controls";
         this.copy_text += "Vital Components\n\tControls\n\t";
-        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital += "<br/>Aircrew #" + (i + 1).toString();
-            this.copy_text += "Aircrew #" + (i + 1).toString() + "\n\t";
-        }
-        if (derived.FuelUses > 0) {
-            vital += "<br/>Fuel Tanks";
-            this.copy_text += "Fuel Tanks\n\t";
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            if (this.acft.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital += "<br/>Engine #" + (i + 1).toString() + " Pusher";
-                this.copy_text += "Engine #" + (i + 1).toString() + " Pusher\n\t";
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Pusher";
-                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Pusher\n\t";
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Pusher";
-                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Pusher\n\t";
-                }
-                vital += "<br/>Engine #" + (i + 1).toString() + " Puller";
-                this.copy_text += "Engine #" + (i + 1).toString() + " Puller\n\t";
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital += "<br/>Oil Tank #" + (i + 1).toString() + " Puller";
-                    this.copy_text += "Oil Tank #" + (i + 1).toString() + " Puller\n\t";
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital += "<br/>Oil Cooler #" + (i + 1).toString() + " Puller";
-                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + " Puller\n\t";
-                }
-            }
-            else {
-                vital += "<br/>Engine #" + (i + 1).toString();
-                this.copy_text += "Engine #" + (i + 1).toString() + "\n\t";
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital += "<br/>Oil Tank #" + (i + 1).toString();
-                    this.copy_text += "Oil Tank #" + (i + 1).toString() + "\n\t";
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital += "<br/>Oil Cooler #" + (i + 1).toString();
-                    this.copy_text += "Oil Cooler #" + (i + 1).toString() + "\n\t";
-                }
-            }
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
-            vital += "<br/>Radiator #" + (i + 1).toString();
-            this.copy_text += "Radiator #" + (i + 1).toString() + "\n\t";
-        }
-        if (this.acft.IsElectrics()) {
-            vital += "<br/>Electrics";
-            this.copy_text += "Electrics\n\t";
+        var vlist = this.VitalComponentList();
+        for (let v of vlist) {
+            vital += "<br/>" + v;
+            this.copy_text += v + "\n\t";
         }
         this.vital_components.innerHTML = vital;
         this.copy_text += "\n";
@@ -807,28 +947,7 @@ class Aircraft_HTML extends Display {
                     dircount++;
             }
             var weaphtml = "";
-            if (dircount == 1 && w.GetFixed())
-                weaphtml += "Fixed ";
-            else if (dircount <= 2)
-                weaphtml += "Flexible ";
-            else
-                weaphtml += "Turreted ";
-
-            if (w.GetAction() == 1) {
-                weaphtml += "Mechanical Action ";
-            } else if (w.GetAction() == 2) {
-                weaphtml += "Gast Principle ";
-            }
-
-            if (w.GetProjectile() == 1) {
-                weaphtml += "Heat Ray ";
-            } else if (w.GetProjectile() == 2) {
-                weaphtml += "Gyrojet ";
-            } else if (w.GetProjectile() == 3) {
-                weaphtml += "Pneumatic ";
-            }
-
-            weaphtml += wlist[w.GetWeaponSelected()].name;
+            weaphtml += this.WeaponName(w);
             if (w.IsPlural()) {
                 weaphtml += "s";
                 weaphtml += " fire ";
