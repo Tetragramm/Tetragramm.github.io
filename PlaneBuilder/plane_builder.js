@@ -10286,7 +10286,11 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
-//TODO: HTMLCanvasElement to make cards for planes.
+//TODO: Remove Boat Hull special rule, it's checked.
+//TODO: Weapon card, note deflector plates
+//TODO: Weapon card, gyrojet effects?
+//TODO: Weapon card, List Special Rules
+//TODO: Dashboard, List Special Rules, but only some?
 //TODO: Used Plane Table
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -10520,13 +10524,6 @@ class WeaponSystem extends Part {
         this.fixed = js["fixed"];
         this.directions = js["directions"];
         this.weapons = [];
-        this.MakeFinalWeapon();
-        for (let elem of js["weapons"]) {
-            var w = new Weapon(this.final_weapon, this.fixed);
-            w.SetCalculateStats(this.CalculateStats);
-            w.fromJSON(elem, json_version);
-            this.weapons.push(w);
-        }
         this.ammo = js["ammo"];
         if (this.ammo == null)
             this.ammo = 1;
@@ -10537,6 +10534,13 @@ class WeaponSystem extends Part {
         else {
             this.action_sel = js["action"];
             this.projectile_sel = js["projectile"];
+        }
+        this.MakeFinalWeapon();
+        for (let elem of js["weapons"]) {
+            var w = new Weapon(this.final_weapon, this.fixed);
+            w.SetCalculateStats(this.CalculateStats);
+            w.fromJSON(elem, json_version);
+            this.weapons.push(w);
         }
     }
     serialize(s) {
@@ -10572,6 +10576,10 @@ class WeaponSystem extends Part {
         else {
             this.action_sel = d.GetNum();
             this.projectile_sel = d.GetNum();
+        }
+        this.MakeFinalWeapon();
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.final_weapon);
         }
     }
     GetWeaponSelected() {

@@ -3,7 +3,11 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: HTMLCanvasElement to make cards for planes.
+//TODO: Remove Boat Hull special rule, it's checked.
+//TODO: Weapon card, note deflector plates
+//TODO: Weapon card, gyrojet effects?
+//TODO: Weapon card, List Special Rules
+//TODO: Dashboard, List Special Rules, but only some?
 //TODO: Used Plane Table
 
 const init = () => {
