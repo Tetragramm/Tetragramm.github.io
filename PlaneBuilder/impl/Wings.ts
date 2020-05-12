@@ -567,6 +567,7 @@ class Wings extends Part {
 
             //Actual stats
             var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats.wingarea = w.area;
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span

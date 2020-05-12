@@ -1574,8 +1574,7 @@
                 "mass": 5,
                 "DpLMP": 1,
                 "SpLMP": 1,
-                "can_retract": false,
-                "warning": "The engines must be in a pod, above a mid wing in nacelles, or mounted to a high or parasol wing in nacelles."
+                "can_retract": false
             },
             {
                 "name": "Landing Skid",
