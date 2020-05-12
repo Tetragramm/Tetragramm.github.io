@@ -165,6 +165,10 @@ class Cockpit extends Part {
         return can;
     }
 
+    public IsOpen() {
+        return this.types[this.selected_type].name == "Open";
+    }
+
     public PartStats(): Stats {
         var stats = new Stats();
         stats.reqsections = 1;

@@ -343,6 +343,14 @@ class Engines extends Part {
         return min;
     }
 
+    public HasTractorRotary() {
+        for (let e of this.engines) {
+            if (e.IsTractorRotary())
+                return true;
+        }
+        return false;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = [...Array(this.GetNumberOfRadiators()).fill({ cool: 0, count: 0 })];

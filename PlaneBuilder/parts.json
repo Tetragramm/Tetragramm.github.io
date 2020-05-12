@@ -188,6 +188,7 @@
             {
                 "name": "Telescopic Gunsight",
                 "visibility": -1,
+                "attack": 0,
                 "cost": 3,
                 "warning": "+2 to attack if you Drew a Bead"
             },

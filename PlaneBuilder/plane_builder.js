@@ -788,6 +788,9 @@ class Cockpit extends Part {
         }
         return can;
     }
+    IsOpen() {
+        return this.types[this.selected_type].name == "Open";
+    }
     PartStats() {
         var stats = new Stats();
         stats.reqsections = 1;
@@ -940,6 +943,13 @@ class Cockpits extends Part {
     }
     GetCockpit(index) {
         return this.positions[index];
+    }
+    HasOpen() {
+        for (let c of this.positions) {
+            if (c.IsOpen())
+                return true;
+        }
+        return false;
     }
     PartStats() {
         var s = new Stats();
@@ -1456,6 +1466,9 @@ class Engine extends Part {
             return 0;
         return -1;
     }
+    IsTractorRotary() {
+        return this.IsRotary() && this.mount_list[this.selected_mount].name == "Tractor";
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -1828,6 +1841,13 @@ class Engines extends Part {
         for (let e of this.engines)
             min = Math.min(min, e.GetEngineHeight());
         return min;
+    }
+    HasTractorRotary() {
+        for (let e of this.engines) {
+            if (e.IsTractorRotary())
+                return true;
+        }
+        return false;
     }
     PartStats() {
         var stats = new Stats;
@@ -5695,6 +5715,9 @@ class Aircraft {
         stats.toughness += Math.floor(1.0e-6 + stats.structure / 5);
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
+        //Has flight stress from open cockpit + tractor rotary.
+        if (this.cockpits.HasOpen() && this.engines.HasTractorRotary())
+            stats.flightstress++;
         // stats = stats.Add(this.alter.PartStats());
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();

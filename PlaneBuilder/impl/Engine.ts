@@ -527,6 +527,10 @@ class Engine extends Part {
         return -1;
     }
 
+    public IsTractorRotary() {
+        return this.IsRotary() && this.mount_list[this.selected_mount].name == "Tractor";
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

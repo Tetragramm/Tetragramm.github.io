@@ -143,6 +143,14 @@ class Cockpits extends Part {
         return this.positions[index];
     }
 
+    public HasOpen() {
+        for (let c of this.positions) {
+            if (c.IsOpen())
+                return true;
+        }
+        return false;
+    }
+
     public PartStats(): Stats {
         var s = new Stats();
         for (let cp of this.positions) {

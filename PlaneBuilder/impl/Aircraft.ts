@@ -267,6 +267,10 @@ class Aircraft {
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
 
+        //Has flight stress from open cockpit + tractor rotary.
+        if (this.cockpits.HasOpen() && this.engines.HasTractorRotary())
+            stats.flightstress++;
+
         // stats = stats.Add(this.alter.PartStats());
 
         //Have to round after optimizations, because otherwise it's wrong.
