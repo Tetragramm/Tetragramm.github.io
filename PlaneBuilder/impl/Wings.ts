@@ -557,11 +557,11 @@ class Wings extends Part {
             let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
 
+            stats.control += 1;
             if (!have_mini_wing) { //Is first miniature wing
                 have_mini_wing = true;
             }
             else {//Is not first miniature wing
-                stats.control += 1;
                 stats.liftbleed += 1;
             }
 
