@@ -839,6 +839,7 @@ class Cockpit extends Part {
         }
         if (this.bombsight > 0) {
             stats.cost += Math.floor(1.0e-6 + 2 + (this.bombsight - 4) / 3);
+            stats.warnings.push({ source: "Bombsight", warning: "Subtract " + this.bombsight.toString() + " from your Altitude when rolling for bombing." });
         }
         this.stats = stats.Clone();
         return stats;
@@ -10451,6 +10452,8 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
+//TODO: Revisit Bomb bay expansion
+//TODO: List bombsight in special rules
 //TODO: New Armour Limits
 //TODO: Update rules page again
 //TODO: Weapon card, List Special Rules

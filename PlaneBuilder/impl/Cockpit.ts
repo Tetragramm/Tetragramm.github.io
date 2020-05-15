@@ -222,6 +222,7 @@ class Cockpit extends Part {
 
         if (this.bombsight > 0) {
             stats.cost += Math.floor(1.0e-6 + 2 + (this.bombsight - 4) / 3);
+            stats.warnings.push({ source: "Bombsight", warning: "Subtract " + this.bombsight.toString() + " from your Altitude when rolling for bombing." });
         }
 
         this.stats = stats.Clone();
