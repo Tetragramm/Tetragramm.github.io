@@ -220,6 +220,10 @@ class Cockpit extends Part {
                 stats = stats.Add(this.gunsights[i].stats);
         }
 
+        if (this.bombsight > 0) {
+            stats.cost += Math.floor(1.0e-6 + 2 + (this.bombsight - 4) / 3);
+        }
+
         this.stats = stats.Clone();
         return stats;
     }
