@@ -29,7 +29,7 @@ class Stats {
         this.charge = 0;
         this.warnings = [];
         if (js) {
-            this.fromJSON(js, "");
+            this.fromJSON(js, 0);
         }
     }
     toJSON() {
@@ -448,7 +448,7 @@ class EngineStats {
         this.pulsejet = false;
         this.stats = new Stats();
         if (js) {
-            this.fromJSON(js, "");
+            this.fromJSON(js, 0);
         }
     }
     toJSON() {
@@ -615,8 +615,8 @@ class Era extends Part {
         this.vals = [];
         for (let elem of js["options"]) {
             var opt = {
-                name: elem["name"], value: elem["liftbleed"],
-                maxbomb: elem["maxbomb"], cant_lift: elem["cant_lift"]
+                name: elem["name"], maxbomb: elem["maxbomb"],
+                cant_lift: elem["cant_lift"], stats: new Stats(elem),
             };
             this.vals.push(opt);
         }
@@ -628,6 +628,11 @@ class Era extends Part {
     }
     fromJSON(js, json_version) {
         this.selected = js["selected"];
+        if (json_version < 10.35) {
+            if (this.selected > 2) {
+                this.selected++;
+            }
+        }
     }
     serialize(s) {
         s.PushNum(this.selected);
@@ -646,7 +651,7 @@ class Era extends Part {
         return this.vals;
     }
     GetLiftBleed() {
-        return this.vals[this.selected].value;
+        return this.vals[this.selected].stats.liftbleed;
     }
     GetMaxBomb() {
         return this.vals[this.selected].maxbomb;
@@ -656,7 +661,7 @@ class Era extends Part {
     }
     PartStats() {
         var s = new Stats();
-        s.liftbleed = this.GetLiftBleed();
+        s = s.Add(this.vals[this.selected].stats);
         return s;
     }
     SetCalculateStats(callback) {
@@ -681,6 +686,7 @@ class Cockpit extends Part {
         this.total_escape = 0;
         this.total_visibility = 0;
         this.is_primary = false;
+        this.bombsight = 0;
     }
     toJSON() {
         return {
@@ -688,6 +694,7 @@ class Cockpit extends Part {
             upgrades: this.selected_upgrades,
             safety: this.selected_safety,
             sights: this.selected_gunsights,
+            bombsight: this.bombsight,
         };
     }
     fromJSON(js, json_version) {
@@ -697,12 +704,15 @@ class Cockpit extends Part {
         this.selected_gunsights = js["sights"];
         if (this.is_primary)
             this.selected_upgrades[0] = false;
+        if (json_version > 10.35)
+            this.bombsight = js["bombsight"];
     }
     serialize(s) {
         s.PushNum(this.selected_type);
         s.PushBoolArr(this.selected_upgrades);
         s.PushBoolArr(this.selected_safety);
         s.PushBoolArr(this.selected_gunsights);
+        s.PushNum(this.bombsight);
     }
     deserialize(d) {
         this.selected_type = d.GetNum();
@@ -711,6 +721,8 @@ class Cockpit extends Part {
         this.selected_gunsights = d.GetBoolArr();
         if (this.is_primary)
             this.selected_upgrades[0] = false;
+        if (d.version > 10.35)
+            this.bombsight = d.GetNum();
     }
     GetTypeList() {
         return this.types;
@@ -769,6 +781,9 @@ class Cockpit extends Part {
     GetEscape() {
         return this.total_escape;
     }
+    GetCrash() {
+        return this.total_crash;
+    }
     GetAttack() {
         var mx = 0;
         for (let i = 0; i < this.gunsights.length; i++) {
@@ -791,6 +806,21 @@ class Cockpit extends Part {
     IsOpen() {
         return this.types[this.selected_type].name == "Open";
     }
+    GetBombsightQuality() {
+        return this.bombsight;
+    }
+    SetBombsightQuality(num) {
+        if (num == this.bombsight - 1)
+            num = this.bombsight - 3;
+        if (num == this.bombsight + 1)
+            num = this.bombsight + 3;
+        if (num < 2)
+            num = 0;
+        if (num > 0)
+            num = num - (num % 3) + 1;
+        this.bombsight = num;
+        this.CalculateStats();
+    }
     PartStats() {
         var stats = new Stats();
         stats.reqsections = 1;
@@ -810,11 +840,12 @@ class Cockpit extends Part {
         this.stats = stats.Clone();
         return stats;
     }
-    CrewUpdate(escape, flightstress, visibility) {
+    CrewUpdate(escape, flightstress, visibility, crash) {
         this.total_escape = this.stats.escape + escape;
         this.total_stress = this.stats.flightstress + flightstress;
         this.total_stress = Math.max(0, this.total_stress);
         this.total_visibility = this.stats.visibility + visibility;
+        this.total_crash = this.stats.crashsafety + crash;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -916,6 +947,13 @@ class Cockpits extends Part {
         }
         return lst;
     }
+    GetCrashList() {
+        var lst = [];
+        for (let p of this.positions) {
+            lst.push(p.GetCrash());
+        }
+        return lst;
+    }
     SetNumberOfCockpits(num) {
         if (num != num || num < 1)
             num = 1;
@@ -932,7 +970,7 @@ class Cockpits extends Part {
             if (this.positions.length == 0)
                 cp.SetPrimary();
             if (js)
-                cp.fromJSON(JSON.parse(js), "");
+                cp.fromJSON(JSON.parse(js), 0);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
@@ -960,11 +998,12 @@ class Cockpits extends Part {
         s.escape = 0;
         s.flightstress = 0;
         s.visibility = 0;
+        s.crashsafety = 0;
         return s;
     }
-    UpdateCrewStats(escape, flightstress, visibility) {
+    UpdateCrewStats(escape, flightstress, visibility, crash) {
         for (let cp of this.positions) {
-            cp.CrewUpdate(escape, flightstress, visibility);
+            cp.CrewUpdate(escape, flightstress, visibility, crash);
         }
     }
     SetCalculateStats(callback) {
@@ -1700,7 +1739,7 @@ class Engines extends Part {
             let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
-                en.fromJSON(JSON.parse(js), "");
+                en.fromJSON(JSON.parse(js), 0);
             this.engines.push(en);
             en.SetNumRadiators(this.GetNumberOfRadiators());
         }
@@ -2061,7 +2100,7 @@ class Frames extends Part {
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
-            if (json_version == "10.2")
+            if (json_version < 10.25)
                 this.sel_skin = elem["skin"];
         }
         this.tail_section_list = [];
@@ -2071,14 +2110,14 @@ class Frames extends Part {
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
-            if (json_version == "10.2")
+            if (json_version < 10.25)
                 this.sel_skin = elem["skin"];
         }
         this.farman = js["use_farman"];
         this.boom = js["use_boom"];
         this.sel_tail = js["tail_index"];
         this.flying_wing = js["flying_wing"];
-        if (json_version != "10.2")
+        if (json_version > 10.25)
             this.sel_skin = js["sel_skin"];
     }
     serialize(s) {
@@ -2115,7 +2154,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            if (d.version == "10.2")
+            if (d.version < 10.25)
                 this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
@@ -2131,7 +2170,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            if (d.version == "10.2")
+            if (d.version < 10.25)
                 this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
@@ -2143,7 +2182,7 @@ class Frames extends Part {
         this.farman = d.GetBool();
         this.boom = d.GetBool();
         this.flying_wing = d.GetBool();
-        if (d.version != "10.2")
+        if (d.version > 10.25)
             this.sel_skin = d.GetNum();
     }
     DuplicateSection(num) {
@@ -3586,7 +3625,7 @@ class Reinforcement extends Part {
         this.is_tandem = false;
         this.is_monoplane = false;
         this.acft_structure = 0;
-        this.cant_lift = false;
+        this.cant_lift = 0;
     }
     toJSON() {
         return {
@@ -3604,7 +3643,7 @@ class Reinforcement extends Part {
         this.cant_count = js["cant_count"];
         this.wires = js["wires"];
         this.cabane_sel = js["cabane_sel"];
-        if (json_version != "10.2") {
+        if (json_version > 10.25) {
             this.wing_blades = js["wing_blades"];
         }
         else {
@@ -3625,7 +3664,7 @@ class Reinforcement extends Part {
         this.cant_count = d.GetNumArr();
         this.wires = d.GetBool();
         this.cabane_sel = d.GetNum();
-        if (d.version != "10.2") {
+        if (d.version > 10.25) {
             this.wing_blades = d.GetBool();
         }
         else {
@@ -3831,8 +3870,8 @@ class Reinforcement extends Part {
         }
         if (use_cant)
             stats.cost += 5;
-        if (use_cant && this.cant_lift)
-            stats.liftbleed -= 4;
+        if (use_cant)
+            stats.liftbleed -= this.cant_lift;
         return stats;
     }
 }
@@ -4033,19 +4072,34 @@ class Munitions extends Part {
     GetBombCount() {
         return this.bomb_count;
     }
+    GetInternalBombCount() {
+        var ibc = 10 * this.internal_bay_count;
+        if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+            if (this.internal_bay_1) {
+                //Double Internal Count
+                ibc *= 2;
+                if (this.internal_bay_2) {
+                    //Double Internal Count Again
+                    ibc *= 2;
+                }
+            }
+        }
+        return ibc;
+    }
     GetMaxBombSize() {
         var sz = 0;
+        var ibc = this.GetInternalBombCount();
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
             if (this.internal_bay_1) {
                 if (this.internal_bay_2) {
-                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count);
+                    sz = Math.floor(1.0e-6 + ibc);
                 }
                 else {
-                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 2);
+                    sz = Math.floor(1.0e-6 + ibc / 2);
                 }
             }
             else {
-                sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 4);
+                sz = Math.floor(1.0e-6 + ibc / 4);
             }
         }
         return sz;
@@ -4085,7 +4139,7 @@ class Munitions extends Part {
     }
     LimitMass(bomb) {
         var reduce = false;
-        while (this.bomb_count > this.acft_struct * this.maxbomb) {
+        while (this.bomb_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
             reduce = true;
             this.bomb_count--;
         }
@@ -4114,7 +4168,7 @@ class Munitions extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        var ext_bomb_count = this.bomb_count - 10 * this.internal_bay_count;
+        var ext_bomb_count = this.bomb_count - this.GetInternalBombCount();
         ext_bomb_count = Math.max(0, ext_bomb_count);
         stats.reqsections += this.internal_bay_count;
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
@@ -4128,6 +4182,7 @@ class Munitions extends Part {
         }
         var rack_mass = Math.ceil(ext_bomb_count / 5);
         stats.mass += rack_mass;
+        stats.drag += rack_mass;
         stats.bomb_mass = this.bomb_count;
         stats.reqsections = Math.ceil(stats.reqsections);
         //Because it is load, it rounds up to the nearest 5 mass.
@@ -4312,7 +4367,7 @@ class LandingGear extends Part {
         for (let i = 0; i < this.extra_list.length; i++) {
             if (this.extra_sel[i]) {
                 stats = stats.Add(this.extra_list[i].stats);
-                stats.mass += this.extra_list[i].MpLMP * this.loadedMP;
+                stats.mass += Math.floor(1.0e-6 + this.extra_list[i].MpLMP * this.loadedMP);
             }
         }
         return stats;
@@ -4544,7 +4599,7 @@ class Accessories extends Part {
             }
             stats.mass += count * AP;
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
-            stats.toughness += this.armour_coverage[i] * AP;
+            stats.toughness += count * AP;
         }
         //Electrical
         for (let i = 0; i < this.electrical_count.length; i++) {
@@ -4829,6 +4884,14 @@ var SynchronizationType;
     SynchronizationType[SynchronizationType["DEFLECT"] = 3] = "DEFLECT";
     SynchronizationType[SynchronizationType["ENUM_MAX"] = 4] = "ENUM_MAX";
 })(SynchronizationType || (SynchronizationType = {}));
+var ProjectileType;
+(function (ProjectileType) {
+    ProjectileType[ProjectileType["BULLETS"] = 0] = "BULLETS";
+    ProjectileType[ProjectileType["HEATRAY"] = 1] = "HEATRAY";
+    ProjectileType[ProjectileType["GYROJETS"] = 2] = "GYROJETS";
+    ProjectileType[ProjectileType["PNEUMATIC"] = 3] = "PNEUMATIC";
+    ProjectileType[ProjectileType["ENUM_MAX"] = 4] = "ENUM_MAX";
+})(ProjectileType || (ProjectileType = {}));
 class Weapon extends Part {
     constructor(weapon_type, fixed = false) {
         super();
@@ -5217,6 +5280,7 @@ class Weapons extends Part {
             this.weapon_list.push(weap);
         }
         this.weapon_sets = [];
+        this.brace_count = 0;
     }
     toJSON() {
         var lst = [];
@@ -5225,6 +5289,7 @@ class Weapons extends Part {
         }
         return {
             weapon_systems: lst,
+            brace_count: this.brace_count,
         };
     }
     fromJSON(js, json_version) {
@@ -5236,12 +5301,16 @@ class Weapons extends Part {
             ws.fromJSON(wsj, json_version);
             this.weapon_sets.push(ws);
         }
+        if (json_version > 10.35) {
+            this.brace_count = js["brace_count"];
+        }
     }
     serialize(s) {
         s.PushNum(this.weapon_sets.length);
         for (let ws of this.weapon_sets) {
             ws.serialize(s);
         }
+        s.PushNum(this.brace_count);
     }
     deserialize(d) {
         this.weapon_sets = [];
@@ -5252,6 +5321,8 @@ class Weapons extends Part {
             ws.deserialize(d);
             this.weapon_sets.push(ws);
         }
+        if (d.version > 10.35)
+            this.brace_count = d.GetNum();
     }
     GetWeaponList() {
         return this.weapon_list;
@@ -5433,6 +5504,16 @@ class Weapons extends Part {
     GetProjectileList() {
         return this.projectile_list;
     }
+    GetBraceCount() {
+        return this.brace_count;
+    }
+    SetBraceCount(num) {
+        if (num < 0)
+            num = 0;
+        num -= num % 3;
+        this.brace_count = num;
+        this.CalculateStats();
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)
@@ -5457,13 +5538,13 @@ class Weapons extends Part {
             this.RemoveOnePusherSpinner();
         }
         //Wing reinforcement. Do this so it gets included in parts display.
-        var wing_size = 0;
+        var wing_size = [0, 0];
         if (this.cant_type == 0)
-            wing_size = 4;
+            wing_size = [2, 2];
         else if (this.cant_type == 1)
-            wing_size = 8;
+            wing_size = [4, 4];
         else
-            wing_size = 16;
+            wing_size = [8, 8];
         //Create list of every weapon size and a ref to the weapon
         var slist = [];
         for (let ws of this.weapon_sets) {
@@ -5479,9 +5560,21 @@ class Weapons extends Part {
         //Sort by size to we reinforce as few weapons as possible
         slist.sort(function (a, b) { return a.s - b.s; });
         for (let s of slist) {
-            wing_size -= s.s;
-            if (wing_size < 0)
-                s.w.wing_reinforcement = true;
+            if (wing_size[0] > 0) {
+                wing_size[0] -= s.s;
+                if (wing_size[0] < 0) {
+                    wing_size[1] -= s.s;
+                    if (wing_size[1] < 0) {
+                        s.w.wing_reinforcement = true;
+                    }
+                }
+            }
+            else {
+                wing_size[1] -= s.s;
+                if (wing_size[1] < 0) {
+                    s.w.wing_reinforcement = true;
+                }
+            }
         }
         for (let ws of this.weapon_sets) {
             ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
@@ -5489,6 +5582,8 @@ class Weapons extends Part {
             ws.has_cantilever = this.cant_type > 0;
             stats = stats.Add(ws.PartStats());
         }
+        //Weapon braces cost 1/3.  Should always be multiple of 3
+        stats.cost += this.brace_count / 3;
         return stats;
     }
 }
@@ -5590,7 +5685,7 @@ class Aircraft {
             console.log(js);
             console.log(js["version"]);
         }
-        var json_version = js["version"];
+        var json_version = parseFloat(js["version"]);
         this.name = js["name"];
         this.era.fromJSON(js["era"], json_version);
         this.cockpits.fromJSON(js["cockpits"], json_version);
@@ -5634,7 +5729,7 @@ class Aircraft {
         this.weapons.serialize(s);
     }
     deserialize(d) {
-        d.version = d.GetString();
+        d.version = parseFloat(d.GetString());
         console.log(d.version);
         this.name = d.GetString();
         this.era.deserialize(d);
@@ -5728,7 +5823,7 @@ class Aircraft {
             //Because flaps have cost per MP
             this.stats.cost += this.controlsurfaces.GetFlapCost(derived.DryMP);
             //Update Part Local stuff
-            this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility);
+            this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility, this.stats.crashsafety);
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
@@ -5895,6 +5990,9 @@ class Aircraft {
     }
     GetEscapeList() {
         return this.cockpits.GetEscapeList();
+    }
+    GetCrashList() {
+        return this.cockpits.GetCrashList();
     }
     GetReliabilityList() {
         return this.engines.GetReliabilityList();
@@ -6280,6 +6378,7 @@ class Cockpit_HTML extends Display {
         this.d_strs.className = "part_local";
         this.d_visi.className = "part_local";
         this.d_escp.className = "part_local";
+        this.d_crsh.className = "part_local";
         //Add all the cockpit types to the select box
         for (let elem of cp.GetTypeList()) {
             let opt = document.createElement("OPTION");
@@ -6322,6 +6421,12 @@ class Cockpit_HTML extends Display {
             gun.onchange = () => { this.cockpit.SetGunsight(local_index, gun.checked); };
             this.gun_chbxs.push(gun);
         }
+        this.bombsight = document.createElement("INPUT");
+        FlexInput("Bombsight", this.bombsight, fs);
+        this.bombsight.onchange = () => { this.cockpit.SetBombsightQuality(this.bombsight.valueAsNumber); };
+        this.bombsight.min = "0";
+        this.bombsight.max = "301";
+        this.bombsight.step = "1";
         //Set the change event, add the box, and execute it.
         this.sel_type.onchange = () => { this.cockpit.SetType(this.sel_type.selectedIndex); };
     }
@@ -6352,6 +6457,7 @@ class Cockpit_HTML extends Display {
         for (let i = 0; i < this.gun_chbxs.length; i++) {
             this.gun_chbxs[i].checked = guns[i];
         }
+        this.bombsight.valueAsNumber = this.cockpit.GetBombsightQuality();
     }
 }
 /// <reference path="./Display.ts" />
@@ -7354,6 +7460,8 @@ class Frames_HTML extends Display {
         fsec.int.checked = sec.internal_bracing;
         if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing(true) || !this.frames.PossibleRemoveSections()))
             fsec.int.disabled = true;
+        else
+            fsec.int.disabled = false;
         fsec.lb.checked = sec.lifting_body;
         fsec.lb.disabled = !this.frames.PossibleMonocoque(i);
     }
@@ -8618,6 +8726,8 @@ class Weapons_HTML extends Display {
         this.weap = weap;
         this.inp_w_count = document.getElementById("num_wsets");
         this.inp_w_count.onchange = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
+        this.inp_w_brace = document.getElementById("num_wbraces");
+        this.inp_w_brace.onchange = () => { this.weap.SetBraceCount(this.inp_w_brace.valueAsNumber); };
         this.tbl = document.getElementById("table_weapons");
         this.wrow = [];
     }
@@ -8635,7 +8745,7 @@ class Weapons_HTML extends Display {
             wcell: null,
             weaps: [],
             ammo: document.createElement("INPUT"),
-            stats: { mass: null, drag: null, cost: null, sect: null, hits: null, damg: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, none: null, jams: null, hits: null, damg: null, shots: null },
         };
         var wlist = this.weap.GetWeaponList();
         for (let w of wlist) {
@@ -8694,12 +8804,20 @@ class Weapons_HTML extends Display {
         type.stats.cost = c1_row.insertCell();
         var h2_row = stable.insertRow();
         CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Hits");
-        CreateTH(h2_row, "Damage");
+        CreateTH(h2_row, "");
+        CreateTH(h2_row, "Jam");
         var c2_row = stable.insertRow();
         type.stats.sect = c2_row.insertCell();
-        type.stats.hits = c2_row.insertCell();
-        type.stats.damg = c2_row.insertCell();
+        type.stats.none = c2_row.insertCell();
+        type.stats.jams = c2_row.insertCell();
+        var h3_row = stable.insertRow();
+        CreateTH(h3_row, "Hits");
+        CreateTH(h3_row, "Damage");
+        CreateTH(h3_row, "Shots");
+        var c3_row = stable.insertRow();
+        type.stats.hits = c3_row.insertCell();
+        type.stats.damg = c3_row.insertCell();
+        type.stats.shots = c3_row.insertCell();
         return type;
     }
     CreateWRow(wcell) {
@@ -8793,8 +8911,10 @@ class Weapons_HTML extends Display {
             + h[1].toString() + "\\"
             + h[2].toString() + "\\"
             + h[3].toString();
+        BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
+        BlinkIfChanged(disp.stats.shots, (set.GetFinalWeapon().ammo * set.GetAmmo()).toString());
     }
     UpdateWSets() {
         var wsets = this.weap.GetWeaponSets();
@@ -8816,6 +8936,8 @@ class Weapons_HTML extends Display {
     }
     UpdateDisplay() {
         this.UpdateWSets();
+        this.inp_w_count.valueAsNumber = this.weap.GetWeaponSets().length;
+        this.inp_w_brace.valueAsNumber = this.weap.GetBraceCount();
     }
 }
 class Cards {
@@ -8876,6 +8998,7 @@ class Cards {
             damage: 0,
             tags: [],
             reload: 0,
+            gyrojet: false,
         };
     }
     SaveDash() {
@@ -9161,7 +9284,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.max_strain = derived.MaxStrain;
         var ordinance = [];
         if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), 10 * aircraft_model.GetMunitions().GetBayCount());
+            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
             var external = aircraft_model.GetMunitions().GetBombCount() - internal;
             if (internal > 0)
                 ordinance.push(internal.toString() + " Mass Internally");
@@ -9209,6 +9332,14 @@ class Aircraft_HTML extends Display {
         }
         if (fweap.shells) {
             this.cards.weap_data.tags.push("Shells");
+        }
+        var deflector = false;
+        for (let iw of w.GetWeapons()) {
+            if (iw.GetSynchronization() == SynchronizationType.DEFLECT)
+                deflector = true;
+        }
+        if (deflector) {
+            this.cards.weap_data.tags.push("Deflector Plate");
         }
     }
     VitalComponentList() {
@@ -9720,7 +9851,7 @@ class Aircraft_HTML extends Display {
         this.toughness_cell.innerText = derived.Toughness.toString();
         this.mxstrain_cell.innerText = derived.MaxStrain.toString();
         this.escape_cell.innerText = this.acft.GetEscapeList().toString();
-        this.crashsafety_cell.innerText = stats.crashsafety.toString();
+        this.crashsafety_cell.innerText = this.acft.GetCrashList().toString();
         this.copy_text += "Survivability\n\t"
             + "Reliability\t" + this.reliability_cell.innerText + "\n\t"
             + "Toughness\t" + this.toughness_cell.innerText + "\n\t"
@@ -10317,8 +10448,8 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
-//TODO: Weapon card, note deflector plates
-//TODO: Weapon card, gyrojet effects?
+//TODO: New Armour Limits
+//TODO: Update rules page again
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
 //TODO: Used Plane Table
@@ -10523,7 +10654,7 @@ class WeaponSystem extends Part {
         this.weapon_type = 0;
         this.weapons = [];
         this.action_sel = 0;
-        this.projectile_sel = 0;
+        this.projectile_sel = ProjectileType.BULLETS;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -10557,9 +10688,9 @@ class WeaponSystem extends Part {
         this.ammo = js["ammo"];
         if (this.ammo == null)
             this.ammo = 1;
-        if (json_version == "10.2") {
+        if (json_version < 10.25) {
             this.action_sel = 0;
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
             this.action_sel = js["action"];
@@ -10599,9 +10730,9 @@ class WeaponSystem extends Part {
             w.deserialize(d);
             this.weapons.push(w);
         }
-        if (d.version == "10.2") {
+        if (d.version < 10.25) {
             this.action_sel = 0;
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
             this.action_sel = d.GetNum();
@@ -10648,7 +10779,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
-        if (this.projectile_sel == 1) {
+        if (this.projectile_sel == ProjectileType.HEATRAY) {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
@@ -10660,13 +10791,13 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings = [{ source: this.final_weapon.name + " Heat Ray", warning: warn }];
             this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Incendiary shots. Take -2 forward to Eyeball after firing." });
         }
-        else if (this.projectile_sel == 2) {
+        else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
             this.final_weapon.damage -= 1;
             this.final_weapon.stats.warnings.push({ source: "Gyrojets", warning: "+1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife." });
         }
-        else if (this.projectile_sel == 3) {
+        else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.final_weapon.ammo *= 2;
             this.final_weapon.shells = false;
             if (this.final_weapon.rapid) {
@@ -10685,7 +10816,7 @@ class WeaponSystem extends Part {
         }
         if (!this.weapon_list[num].can_convert) {
             this.action_sel = 0;
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
@@ -10898,7 +11029,7 @@ class WeaponSystem extends Part {
             }
         }
         else {
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         this.CalculateStats();
     }

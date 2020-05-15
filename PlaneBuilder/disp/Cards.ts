@@ -47,6 +47,7 @@ class Cards {
         damage: number,
         tags: string[],
         reload: number,
+        gyrojet: boolean,
     }
 
     constructor() {
@@ -109,6 +110,7 @@ class Cards {
             damage: 0,
             tags: [],
             reload: 0,
+            gyrojet: false,
         }
     }
 

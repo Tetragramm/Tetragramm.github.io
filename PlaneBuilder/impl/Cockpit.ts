@@ -14,7 +14,9 @@ class Cockpit extends Part {
     private total_stress: number;
     private total_escape: number;
     private total_visibility: number;
+    private total_crash: number;
     private is_primary: boolean;
+    private bombsight: number;
 
     constructor(tl: { name: string, stats: Stats }[],
         ul: { name: string, stats: Stats }[],
@@ -35,6 +37,7 @@ class Cockpit extends Part {
         this.total_escape = 0;
         this.total_visibility = 0;
         this.is_primary = false;
+        this.bombsight = 0;
     }
 
     public toJSON() {
@@ -43,16 +46,19 @@ class Cockpit extends Part {
             upgrades: this.selected_upgrades,
             safety: this.selected_safety,
             sights: this.selected_gunsights,
+            bombsight: this.bombsight,
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.selected_type = js["type"];
         this.selected_upgrades = js["upgrades"];
         this.selected_safety = js["safety"];
         this.selected_gunsights = js["sights"];
         if (this.is_primary)
             this.selected_upgrades[0] = false;
+        if (json_version > 10.35)
+            this.bombsight = js["bombsight"];
     }
 
     public serialize(s: Serialize) {
@@ -60,6 +66,7 @@ class Cockpit extends Part {
         s.PushBoolArr(this.selected_upgrades);
         s.PushBoolArr(this.selected_safety);
         s.PushBoolArr(this.selected_gunsights);
+        s.PushNum(this.bombsight);
     }
 
     public deserialize(d: Deserialize) {
@@ -69,6 +76,8 @@ class Cockpit extends Part {
         this.selected_gunsights = d.GetBoolArr();
         if (this.is_primary)
             this.selected_upgrades[0] = false;
+        if (d.version > 10.35)
+            this.bombsight = d.GetNum();
     }
 
     public GetTypeList() {
@@ -143,6 +152,10 @@ class Cockpit extends Part {
         return this.total_escape;
     }
 
+    public GetCrash() {
+        return this.total_crash;
+    }
+
     public GetAttack() {
         var mx = 0;
         for (let i = 0; i < this.gunsights.length; i++) {
@@ -167,6 +180,23 @@ class Cockpit extends Part {
 
     public IsOpen() {
         return this.types[this.selected_type].name == "Open";
+    }
+
+    public GetBombsightQuality() {
+        return this.bombsight;
+    }
+
+    public SetBombsightQuality(num: number) {
+        if (num == this.bombsight - 1)
+            num = this.bombsight - 3;
+        if (num == this.bombsight + 1)
+            num = this.bombsight + 3;
+        if (num < 2)
+            num = 0;
+        if (num > 0)
+            num = num - (num % 3) + 1;
+        this.bombsight = num;
+        this.CalculateStats();
     }
 
     public PartStats(): Stats {
@@ -194,11 +224,12 @@ class Cockpit extends Part {
         return stats;
     }
 
-    public CrewUpdate(escape: number, flightstress: number, visibility: number) {
+    public CrewUpdate(escape: number, flightstress: number, visibility: number, crash: number) {
         this.total_escape = this.stats.escape + escape;
         this.total_stress = this.stats.flightstress + flightstress;
         this.total_stress = Math.max(0, this.total_stress);
         this.total_visibility = this.stats.visibility + visibility;
+        this.total_crash = this.stats.crashsafety + crash;
     }
 
     public SetCalculateStats(callback: () => void) {

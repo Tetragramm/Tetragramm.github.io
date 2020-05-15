@@ -11,6 +11,7 @@ class Cockpit_HTML extends Display {
     private sft_chbxs: HTMLInputElement[];
     //Gunsight list
     private gun_chbxs: HTMLInputElement[];
+    private bombsight: HTMLInputElement;
     //Display Stat Elements
     private d_mass: HTMLTableCellElement;
     private d_drag: HTMLTableCellElement;
@@ -71,6 +72,7 @@ class Cockpit_HTML extends Display {
         this.d_strs.className = "part_local";
         this.d_visi.className = "part_local";
         this.d_escp.className = "part_local";
+        this.d_crsh.className = "part_local";
 
         //Add all the cockpit types to the select box
         for (let elem of cp.GetTypeList()) {
@@ -117,6 +119,12 @@ class Cockpit_HTML extends Display {
             gun.onchange = () => { this.cockpit.SetGunsight(local_index, gun.checked); };
             this.gun_chbxs.push(gun);
         }
+        this.bombsight = document.createElement("INPUT") as HTMLInputElement;
+        FlexInput("Bombsight", this.bombsight, fs);
+        this.bombsight.onchange = () => { this.cockpit.SetBombsightQuality(this.bombsight.valueAsNumber); };
+        this.bombsight.min = "0";
+        this.bombsight.max = "301";
+        this.bombsight.step = "1";
 
         //Set the change event, add the box, and execute it.
         this.sel_type.onchange = () => { this.cockpit.SetType(this.sel_type.selectedIndex); };
@@ -154,5 +162,6 @@ class Cockpit_HTML extends Display {
         for (let i = 0; i < this.gun_chbxs.length; i++) {
             this.gun_chbxs[i].checked = guns[i];
         }
+        this.bombsight.valueAsNumber = this.cockpit.GetBombsightQuality();
     }
 }

@@ -79,7 +79,7 @@ class Engines extends Part {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.radiators = [];
         for (let elem of js["radiators"]) {
             let rad = new Radiator(this.r_type_list, this.r_mount_list, this.r_coolant_list);
@@ -179,7 +179,7 @@ class Engines extends Part {
             let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
-                en.fromJSON(JSON.parse(js), "");
+                en.fromJSON(JSON.parse(js), 0);
             this.engines.push(en);
             en.SetNumRadiators(this.GetNumberOfRadiators());
         }

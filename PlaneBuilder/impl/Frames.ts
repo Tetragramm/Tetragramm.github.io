@@ -91,7 +91,7 @@ class Frames extends Part {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.section_list = [];
         for (let elem of js["sections"]) {
             this.section_list.push({
@@ -99,7 +99,7 @@ class Frames extends Part {
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
-            if (json_version == "10.2")
+            if (json_version < 10.25)
                 this.sel_skin = elem["skin"];
         }
         this.tail_section_list = [];
@@ -109,7 +109,7 @@ class Frames extends Part {
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
             });
-            if (json_version == "10.2")
+            if (json_version < 10.25)
                 this.sel_skin = elem["skin"];
         }
 
@@ -117,7 +117,7 @@ class Frames extends Part {
         this.boom = js["use_boom"];
         this.sel_tail = js["tail_index"];
         this.flying_wing = js["flying_wing"];
-        if (json_version != "10.2")
+        if (json_version > 10.25)
             this.sel_skin = js["sel_skin"];
     }
 
@@ -156,7 +156,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            if (d.version == "10.2")
+            if (d.version < 10.25)
                 this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
@@ -172,7 +172,7 @@ class Frames extends Part {
                 monocoque: false, lifting_body: false, internal_bracing: false
             };
             sec.frame = d.GetNum();
-            if (d.version == "10.2")
+            if (d.version < 10.25)
                 this.sel_skin = d.GetNum();
             sec.geodesic = d.GetBool();
             sec.monocoque = d.GetBool();
@@ -184,7 +184,7 @@ class Frames extends Part {
         this.farman = d.GetBool();
         this.boom = d.GetBool();
         this.flying_wing = d.GetBool();
-        if (d.version != "10.2")
+        if (d.version > 10.25)
             this.sel_skin = d.GetNum();
     }
 

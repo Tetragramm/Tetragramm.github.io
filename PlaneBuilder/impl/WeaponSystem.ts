@@ -48,7 +48,7 @@ class WeaponSystem extends Part {
         this.weapon_type = 0;
         this.weapons = [];
         this.action_sel = 0;
-        this.projectile_sel = 0;
+        this.projectile_sel = ProjectileType.BULLETS;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -76,7 +76,7 @@ class WeaponSystem extends Part {
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.weapon_type = js["weapon_type"];
         this.fixed = js["fixed"];
         this.directions = js["directions"];
@@ -84,9 +84,9 @@ class WeaponSystem extends Part {
         this.ammo = js["ammo"];
         if (this.ammo == null)
             this.ammo = 1;
-        if (json_version == "10.2") {
+        if (json_version < 10.25) {
             this.action_sel = 0;
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
             this.action_sel = js["action"];
@@ -128,9 +128,9 @@ class WeaponSystem extends Part {
             w.deserialize(d);
             this.weapons.push(w);
         }
-        if (d.version == "10.2") {
+        if (d.version < 10.25) {
             this.action_sel = 0;
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
             this.action_sel = d.GetNum();
@@ -178,7 +178,7 @@ class WeaponSystem extends Part {
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
 
-        if (this.projectile_sel == 1) {
+        if (this.projectile_sel == ProjectileType.HEATRAY) {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
@@ -189,12 +189,12 @@ class WeaponSystem extends Part {
             var warn = "Uses Charges as ammo " + ammo.toString() + "/" + Math.floor(1.5 * ammo).toString() + ".";
             this.final_weapon.stats.warnings = [{ source: this.final_weapon.name + " Heat Ray", warning: warn }];
             this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Incendiary shots. Take -2 forward to Eyeball after firing." })
-        } else if (this.projectile_sel == 2) {
+        } else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
             this.final_weapon.damage -= 1;
             this.final_weapon.stats.warnings.push({ source: "Gyrojets", warning: "+1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife." });
-        } else if (this.projectile_sel == 3) {
+        } else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.final_weapon.ammo *= 2;
             this.final_weapon.shells = false;
             if (this.final_weapon.rapid) {
@@ -214,7 +214,7 @@ class WeaponSystem extends Part {
         }
         if (!this.weapon_list[num].can_convert) {
             this.action_sel = 0;
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         this.MakeFinalWeapon();
 
@@ -448,7 +448,7 @@ class WeaponSystem extends Part {
                 w.SetWeaponType(this.final_weapon);
             }
         } else {
-            this.projectile_sel = 0;
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         this.CalculateStats();
     }

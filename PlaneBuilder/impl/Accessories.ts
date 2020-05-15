@@ -98,7 +98,7 @@ class Accessories extends Part {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         if (js["v"] == 2) {
             this.armour_coverage = js["armour_coverage"];
         }
@@ -298,7 +298,7 @@ class Accessories extends Part {
 
             stats.mass += count * AP;
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
-            stats.toughness += this.armour_coverage[i] * AP;
+            stats.toughness += count * AP;
         }
 
         //Electrical

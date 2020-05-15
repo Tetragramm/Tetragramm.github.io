@@ -12,7 +12,7 @@ class EngineStats {
     public stats: Stats = new Stats();
     constructor(js?: JSON) {
         if (js) {
-            this.fromJSON(js, "");
+            this.fromJSON(js, 0);
         }
     }
 
@@ -29,7 +29,7 @@ class EngineStats {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         if (js["name"])
             this.name = js["name"];
         if (js["overspeed"])

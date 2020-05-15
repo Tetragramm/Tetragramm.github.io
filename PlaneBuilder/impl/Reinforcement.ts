@@ -18,7 +18,7 @@ class Reinforcement extends Part {
     private is_tandem: boolean;
     private is_monoplane: boolean;
     private acft_structure: number;
-    private cant_lift: boolean;
+    private cant_lift: number;
 
     constructor(js: JSON) {
         super();
@@ -54,7 +54,7 @@ class Reinforcement extends Part {
         this.is_tandem = false;
         this.is_monoplane = false;
         this.acft_structure = 0;
-        this.cant_lift = false;
+        this.cant_lift = 0;
     }
 
     public toJSON() {
@@ -68,13 +68,13 @@ class Reinforcement extends Part {
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.ext_wood_count = js["ext_wood_count"];
         this.ext_steel_count = js["ext_steel_count"];
         this.cant_count = js["cant_count"];
         this.wires = js["wires"];
         this.cabane_sel = js["cabane_sel"];
-        if (json_version != "10.2") {
+        if (json_version > 10.25) {
             this.wing_blades = js["wing_blades"];
         }
         else {
@@ -97,7 +97,7 @@ class Reinforcement extends Part {
         this.cant_count = d.GetNumArr();
         this.wires = d.GetBool();
         this.cabane_sel = d.GetNum();
-        if (d.version != "10.2") {
+        if (d.version > 10.25) {
             this.wing_blades = d.GetBool();
         }
         else {
@@ -238,7 +238,7 @@ class Reinforcement extends Part {
         this.CalculateStats();
     }
 
-    public SetCantLift(use: boolean) {
+    public SetCantLift(use: number) {
         this.cant_lift = use;
     }
 
@@ -340,8 +340,8 @@ class Reinforcement extends Part {
         if (use_cant)
             stats.cost += 5;
 
-        if (use_cant && this.cant_lift)
-            stats.liftbleed -= 4;
+        if (use_cant)
+            stats.liftbleed -= this.cant_lift;
 
         return stats;
     }

@@ -295,6 +295,8 @@ class EngineBuilder {
         estats.stats.cost = this.CalcCost();
         estats.pulsejet = false;
         estats.rumble = 0;
+        if (this.upg_sel[1])
+            estats.stats.reqsections = 1;
         return estats;
     }
 }

@@ -296,7 +296,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.max_strain = derived.MaxStrain;
         var ordinance = [];
         if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), 10 * aircraft_model.GetMunitions().GetBayCount());
+            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
             var external = aircraft_model.GetMunitions().GetBombCount() - internal;
             if (internal > 0)
                 ordinance.push(internal.toString() + " Mass Internally");
@@ -350,6 +350,14 @@ class Aircraft_HTML extends Display {
         }
         if (fweap.shells) {
             this.cards.weap_data.tags.push("Shells");
+        }
+        var deflector = false;
+        for (let iw of w.GetWeapons()) {
+            if (iw.GetSynchronization() == SynchronizationType.DEFLECT)
+                deflector = true;
+        }
+        if (deflector) {
+            this.cards.weap_data.tags.push("Deflector Plate");
         }
     }
 
@@ -888,7 +896,7 @@ class Aircraft_HTML extends Display {
         this.toughness_cell.innerText = derived.Toughness.toString();
         this.mxstrain_cell.innerText = derived.MaxStrain.toString();
         this.escape_cell.innerText = this.acft.GetEscapeList().toString();
-        this.crashsafety_cell.innerText = stats.crashsafety.toString();
+        this.crashsafety_cell.innerText = this.acft.GetCrashList().toString();
         this.copy_text += "Survivability\n\t"
             + "Reliability\t" + this.reliability_cell.innerText + "\n\t"
             + "Toughness\t" + this.toughness_cell.innerText + "\n\t"

@@ -24,6 +24,7 @@ class Weapons extends Part {
         { name: "Gyrojets" },
         { name: "Pneumatic" },
     ];
+    private brace_count: number;
 
     public cockpit_count: number;
     public has_tractor: boolean;
@@ -59,6 +60,7 @@ class Weapons extends Part {
         }
 
         this.weapon_sets = [];
+        this.brace_count = 0;
     }
 
     public toJSON() {
@@ -68,10 +70,11 @@ class Weapons extends Part {
         }
         return {
             weapon_systems: lst,
+            brace_count: this.brace_count,
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.weapon_sets = [];
         var lst = js["weapon_systems"];
         for (let wsj of lst) {
@@ -80,6 +83,9 @@ class Weapons extends Part {
             ws.fromJSON(wsj, json_version);
             this.weapon_sets.push(ws);
         }
+        if (json_version > 10.35) {
+            this.brace_count = js["brace_count"];
+        }
     }
 
     public serialize(s: Serialize) {
@@ -87,6 +93,7 @@ class Weapons extends Part {
         for (let ws of this.weapon_sets) {
             ws.serialize(s);
         }
+        s.PushNum(this.brace_count);
     }
 
     public deserialize(d: Deserialize) {
@@ -98,6 +105,8 @@ class Weapons extends Part {
             ws.deserialize(d);
             this.weapon_sets.push(ws);
         }
+        if (d.version > 10.35)
+            this.brace_count = d.GetNum();
     }
 
     public GetWeaponList() {
@@ -303,6 +312,18 @@ class Weapons extends Part {
         return this.projectile_list;
     }
 
+    public GetBraceCount() {
+        return this.brace_count;
+    }
+
+    public SetBraceCount(num: number) {
+        if (num < 0)
+            num = 0;
+        num -= num % 3;
+        this.brace_count = num;
+        this.CalculateStats();
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)
@@ -330,13 +351,13 @@ class Weapons extends Part {
         }
 
         //Wing reinforcement. Do this so it gets included in parts display.
-        var wing_size = 0;
+        var wing_size = [0, 0];
         if (this.cant_type == 0)
-            wing_size = 4;
+            wing_size = [2, 2];
         else if (this.cant_type == 1)
-            wing_size = 8;
+            wing_size = [4, 4];
         else
-            wing_size = 16;
+            wing_size = [8, 8];
 
         //Create list of every weapon size and a ref to the weapon
         var slist = [];
@@ -354,9 +375,20 @@ class Weapons extends Part {
         //Sort by size to we reinforce as few weapons as possible
         slist.sort(function (a, b) { return a.s - b.s; });
         for (let s of slist) {
-            wing_size -= s.s;
-            if (wing_size < 0)
-                s.w.wing_reinforcement = true;
+            if (wing_size[0] > 0) {
+                wing_size[0] -= s.s;
+                if (wing_size[0] < 0) {
+                    wing_size[1] -= s.s;
+                    if (wing_size[1] < 0) {
+                        s.w.wing_reinforcement = true;
+                    }
+                }
+            } else {
+                wing_size[1] -= s.s;
+                if (wing_size[1] < 0) {
+                    s.w.wing_reinforcement = true;
+                }
+            }
         }
 
         for (let ws of this.weapon_sets) {
@@ -366,6 +398,9 @@ class Weapons extends Part {
             ws.has_cantilever = this.cant_type > 0;
             stats = stats.Add(ws.PartStats());
         }
+
+        //Weapon braces cost 1/3.  Should always be multiple of 3
+        stats.cost += this.brace_count / 3;
         return stats;
     }
 }

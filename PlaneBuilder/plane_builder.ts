@@ -3,8 +3,8 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: Weapon card, note deflector plates
-//TODO: Weapon card, gyrojet effects?
+//TODO: New Armour Limits
+//TODO: Update rules page again
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
 //TODO: Used Plane Table

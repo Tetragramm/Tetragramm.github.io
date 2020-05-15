@@ -69,7 +69,7 @@ class Deserialize {
     private array: ArrayBuffer;
     private view: DataView;
     private offset: number;
-    public version: string;
+    public version: number;
 
     public constructor(arr: ArrayBuffer) {
         this.array = arr;

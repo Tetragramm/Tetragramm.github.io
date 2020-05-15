@@ -20,7 +20,7 @@ class CargoAndPassengers extends Part {
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.cargo_sel = js["space_sel"];
     }
 

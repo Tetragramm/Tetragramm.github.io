@@ -1,15 +1,30 @@
 /// <reference path="./Display.ts" />
 /// <reference path="../impl/Weapons.ts" />
 
-type WType = { span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement, accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement, count: HTMLInputElement, repeating: HTMLInputElement };
-type WStatType = { mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement, sect: HTMLTableCellElement, hits: HTMLTableCellElement, damg: HTMLTableCellElement };
-type WSetType = { type: HTMLSelectElement, dirs: HTMLInputElement[], count: HTMLInputElement, action: HTMLSelectElement, projectile: HTMLSelectElement, fixed: HTMLInputElement, wcell: HTMLTableCellElement, ammo: HTMLInputElement, weaps: WType[], stats: WStatType };
+type WType = {
+    span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement,
+    accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement,
+    count: HTMLInputElement, repeating: HTMLInputElement
+};
+type WStatType = {
+    mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement,
+    sect: HTMLTableCellElement, none: HTMLTableCellElement, jams: HTMLTableCellElement,
+    hits: HTMLTableCellElement, damg: HTMLTableCellElement, shots: HTMLTableCellElement,
+};
+type WSetType = {
+    type: HTMLSelectElement, dirs: HTMLInputElement[],
+    count: HTMLInputElement, action: HTMLSelectElement,
+    projectile: HTMLSelectElement, fixed: HTMLInputElement,
+    wcell: HTMLTableCellElement, ammo: HTMLInputElement,
+    weaps: WType[], stats: WStatType
+};
 class Weapons_HTML extends Display {
     private weap: Weapons;
 
     private tbl: HTMLTableElement;
     private inp_w_count: HTMLInputElement;
     private wrow: WSetType[];
+    private inp_w_brace: HTMLInputElement;
 
     constructor(weap: Weapons) {
         super();
@@ -17,6 +32,9 @@ class Weapons_HTML extends Display {
 
         this.inp_w_count = document.getElementById("num_wsets") as HTMLInputElement;
         this.inp_w_count.onchange = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
+
+        this.inp_w_brace = document.getElementById("num_wbraces") as HTMLInputElement;
+        this.inp_w_brace.onchange = () => { this.weap.SetBraceCount(this.inp_w_brace.valueAsNumber); };
 
         this.tbl = document.getElementById("table_weapons") as HTMLTableElement;
         this.wrow = [];
@@ -37,7 +55,7 @@ class Weapons_HTML extends Display {
             wcell: null,
             weaps: [],
             ammo: document.createElement("INPUT") as HTMLInputElement,
-            stats: { mass: null, drag: null, cost: null, sect: null, hits: null, damg: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, none: null, jams: null, hits: null, damg: null, shots: null },
         };
 
         var wlist = this.weap.GetWeaponList();
@@ -103,12 +121,20 @@ class Weapons_HTML extends Display {
         type.stats.cost = c1_row.insertCell();
         var h2_row = stable.insertRow();
         CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Hits");
-        CreateTH(h2_row, "Damage");
+        CreateTH(h2_row, "");
+        CreateTH(h2_row, "Jam");
         var c2_row = stable.insertRow();
         type.stats.sect = c2_row.insertCell();
-        type.stats.hits = c2_row.insertCell();
-        type.stats.damg = c2_row.insertCell();
+        type.stats.none = c2_row.insertCell();
+        type.stats.jams = c2_row.insertCell();
+        var h3_row = stable.insertRow();
+        CreateTH(h3_row, "Hits");
+        CreateTH(h3_row, "Damage");
+        CreateTH(h3_row, "Shots");
+        var c3_row = stable.insertRow();
+        type.stats.hits = c3_row.insertCell();
+        type.stats.damg = c3_row.insertCell();
+        type.stats.shots = c3_row.insertCell();
 
         return type;
     }
@@ -216,8 +242,10 @@ class Weapons_HTML extends Display {
             + h[2].toString() + "\\"
             + h[3].toString();
 
+        BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
+        BlinkIfChanged(disp.stats.shots, (set.GetFinalWeapon().ammo * set.GetAmmo()).toString());
     }
 
     private UpdateWSets() {
@@ -242,5 +270,7 @@ class Weapons_HTML extends Display {
 
     public UpdateDisplay() {
         this.UpdateWSets();
+        this.inp_w_count.valueAsNumber = this.weap.GetWeaponSets().length;
+        this.inp_w_brace.valueAsNumber = this.weap.GetBraceCount();
     }
 }

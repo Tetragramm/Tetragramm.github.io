@@ -47,7 +47,7 @@ class Cockpits extends Part {
         return { positions: lst };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.positions = [];
         for (let elem of js["positions"]) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
@@ -112,6 +112,14 @@ class Cockpits extends Part {
         return lst;
     }
 
+    public GetCrashList() {
+        var lst = [];
+        for (let p of this.positions) {
+            lst.push(p.GetCrash());
+        }
+        return lst;
+    }
+
     public SetNumberOfCockpits(num: number) {
         if (num != num || num < 1)
             num = 1;
@@ -128,7 +136,7 @@ class Cockpits extends Part {
             if (this.positions.length == 0)
                 cp.SetPrimary();
             if (js)
-                cp.fromJSON(JSON.parse(js), "");
+                cp.fromJSON(JSON.parse(js), 0);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }
@@ -160,12 +168,13 @@ class Cockpits extends Part {
         s.escape = 0;
         s.flightstress = 0;
         s.visibility = 0;
+        s.crashsafety = 0;
         return s;
     }
 
-    public UpdateCrewStats(escape: number, flightstress: number, visibility: number) {
+    public UpdateCrewStats(escape: number, flightstress: number, visibility: number, crash: number) {
         for (let cp of this.positions) {
-            cp.CrewUpdate(escape, flightstress, visibility);
+            cp.CrewUpdate(escape, flightstress, visibility, crash);
         }
     }
 

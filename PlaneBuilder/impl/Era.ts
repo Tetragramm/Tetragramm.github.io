@@ -2,7 +2,7 @@
 /// <reference path="./Stats.ts" />
 
 class Era extends Part {
-    private vals: { name: string, value: number, maxbomb: number, cant_lift: boolean }[];
+    private vals: { name: string, maxbomb: number, cant_lift: number, stats: Stats }[];
     private selected: number;
     constructor(js: JSON) {
         super();
@@ -10,8 +10,8 @@ class Era extends Part {
         this.vals = [];
         for (let elem of js["options"]) {
             var opt = {
-                name: elem["name"], value: elem["liftbleed"],
-                maxbomb: elem["maxbomb"], cant_lift: elem["cant_lift"]
+                name: elem["name"], maxbomb: elem["maxbomb"],
+                cant_lift: elem["cant_lift"], stats: new Stats(elem),
             };
             this.vals.push(opt);
         }
@@ -23,8 +23,13 @@ class Era extends Part {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.selected = js["selected"];
+        if (json_version < 10.35) {
+            if (this.selected > 2) {
+                this.selected++;
+            }
+        }
     }
 
     public serialize(s: Serialize) {
@@ -44,25 +49,25 @@ class Era extends Part {
         this.CalculateStats();
     }
 
-    public GetEraOptions(): { name: string, value: number }[] {
+    public GetEraOptions(): { name: string }[] {
         return this.vals;
     }
 
     public GetLiftBleed(): number {
-        return this.vals[this.selected].value;
+        return this.vals[this.selected].stats.liftbleed;
     }
 
     public GetMaxBomb(): number {
         return this.vals[this.selected].maxbomb;
     }
 
-    public GetCantLift(): boolean {
+    public GetCantLift(): number {
         return this.vals[this.selected].cant_lift;
     }
 
     public PartStats(): Stats {
         var s = new Stats();
-        s.liftbleed = this.GetLiftBleed();
+        s = s.Add(this.vals[this.selected].stats);
         return s;
     }
 

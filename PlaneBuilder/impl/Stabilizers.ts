@@ -68,7 +68,7 @@ class Stabilizers extends Part {
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.hstab_sel = js["hstab_sel"];
         this.hstab_count = js["hstab_count"];
         this.vstab_sel = js["vstab_sel"];

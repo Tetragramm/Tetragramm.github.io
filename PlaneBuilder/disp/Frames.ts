@@ -307,6 +307,8 @@ class Frames_HTML extends Display {
         fsec.int.checked = sec.internal_bracing;
         if (!sec.internal_bracing && (!this.frames.PossibleInternalBracing(true) || !this.frames.PossibleRemoveSections()))
             fsec.int.disabled = true;
+        else
+            fsec.int.disabled = false;
 
         fsec.lb.checked = sec.lifting_body;
         fsec.lb.disabled = !this.frames.PossibleMonocoque(i);

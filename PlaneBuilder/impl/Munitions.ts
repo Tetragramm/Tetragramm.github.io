@@ -27,7 +27,7 @@ class Munitions extends Part {
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.bomb_count = js["bomb_count"];
         this.internal_bay_count = js["bay_count"];
         this.internal_bay_1 = js["bay1"];
@@ -52,19 +52,35 @@ class Munitions extends Part {
         return this.bomb_count;
     }
 
+    public GetInternalBombCount() {
+        var ibc = 10 * this.internal_bay_count;
+        if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+            if (this.internal_bay_1) {
+                //Double Internal Count
+                ibc *= 2;
+                if (this.internal_bay_2) {
+                    //Double Internal Count Again
+                    ibc *= 2;
+                }
+            }
+        }
+        return ibc;
+    }
+
     public GetMaxBombSize() {
         var sz = 0;
+        var ibc = this.GetInternalBombCount();
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
             if (this.internal_bay_1) {
                 if (this.internal_bay_2) {
-                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count);
+                    sz = Math.floor(1.0e-6 + ibc);
                 }
                 else {
-                    sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 2);
+                    sz = Math.floor(1.0e-6 + ibc / 2);
                 }
             }
             else {
-                sz = Math.floor(1.0e-6 + 10 * this.internal_bay_count / 4);
+                sz = Math.floor(1.0e-6 + ibc / 4);
             }
         }
         return sz;
@@ -111,7 +127,7 @@ class Munitions extends Part {
 
     private LimitMass(bomb: boolean) {
         var reduce = false;
-        while (this.bomb_count > this.acft_struct * this.maxbomb) {
+        while (this.bomb_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
             reduce = true;
             this.bomb_count--;
         }
@@ -146,7 +162,7 @@ class Munitions extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        var ext_bomb_count = this.bomb_count - 10 * this.internal_bay_count;
+        var ext_bomb_count = this.bomb_count - this.GetInternalBombCount();
         ext_bomb_count = Math.max(0, ext_bomb_count);
         stats.reqsections += this.internal_bay_count;
 
@@ -160,8 +176,10 @@ class Munitions extends Part {
             }
         }
 
+
         var rack_mass = Math.ceil(ext_bomb_count / 5);
         stats.mass += rack_mass;
+        stats.drag += rack_mass;
         stats.bomb_mass = this.bomb_count;
 
         stats.reqsections = Math.ceil(stats.reqsections);

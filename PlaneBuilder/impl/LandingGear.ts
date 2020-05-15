@@ -45,7 +45,7 @@ class LandingGear extends Part {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.gear_sel = js["gear_sel"];
         this.retract = js["retract"];
         this.extra_sel = js["extra_sel"];
@@ -157,7 +157,7 @@ class LandingGear extends Part {
         for (let i = 0; i < this.extra_list.length; i++) {
             if (this.extra_sel[i]) {
                 stats = stats.Add(this.extra_list[i].stats);
-                stats.mass += this.extra_list[i].MpLMP * this.loadedMP;
+                stats.mass += Math.floor(1.0e-6 + this.extra_list[i].MpLMP * this.loadedMP);
             }
         }
 

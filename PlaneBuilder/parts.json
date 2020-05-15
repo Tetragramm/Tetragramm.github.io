@@ -1,36 +1,47 @@
 {
-    "version": "10.3",
+    "version": "10.4",
     "era": {
         "options": [
             {
                 "name": "Pioneer",
                 "liftbleed": 30,
                 "maxbomb": 0.166666666666,
-                "cant_lift": true
+                "cost": -2,
+                "cant_lift": 4
             },
             {
                 "name": "WWI",
                 "liftbleed": 25,
                 "maxbomb": 0.2,
-                "cant_lift": true
+                "cant_lift": 3
             },
             {
-                "name": "Interbellum",
+                "name": "Roaring 20s",
                 "liftbleed": 22,
                 "maxbomb": 0.25,
-                "cant_lift": false
+                "cost": 5,
+                "cant_lift": 1
+            },
+            {
+                "name": "Coming Storm",
+                "liftbleed": 22,
+                "maxbomb": 0.333333333333,
+                "cost": 10,
+                "cant_lift": 0
             },
             {
                 "name": "WWII",
                 "liftbleed": 20,
                 "maxbomb": 0.333333333333,
-                "cant_lift": false
+                "cost": 15,
+                "cant_lift": 0
             },
             {
                 "name": "Last Hurrah",
                 "liftbleed": 18,
                 "maxbomb": 0.5,
-                "cant_lift": false
+                "cost": 20,
+                "cant_lift": 0
             }
         ]
     },

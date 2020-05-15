@@ -126,7 +126,7 @@ class Aircraft {
             console.log(js);
             console.log(js["version"]);
         }
-        var json_version = js["version"];
+        var json_version = parseFloat(js["version"]);
         this.name = js["name"];
         this.era.fromJSON(js["era"], json_version);
         this.cockpits.fromJSON(js["cockpits"], json_version);
@@ -172,7 +172,7 @@ class Aircraft {
     }
 
     public deserialize(d: Deserialize) {
-        d.version = d.GetString();
+        d.version = parseFloat(d.GetString());
         console.log(d.version);
         this.name = d.GetString();
         this.era.deserialize(d);
@@ -285,7 +285,7 @@ class Aircraft {
             this.stats.cost += this.controlsurfaces.GetFlapCost(derived.DryMP);
 
             //Update Part Local stuff
-            this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility);
+            this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility, this.stats.crashsafety);
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
@@ -473,6 +473,10 @@ class Aircraft {
 
     public GetEscapeList() {
         return this.cockpits.GetEscapeList();
+    }
+
+    public GetCrashList() {
+        return this.cockpits.GetCrashList();
     }
 
     public GetReliabilityList() {

@@ -70,7 +70,7 @@ class ControlSurfaces extends Part {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.aileron_sel = js["aileron_sel"];
         this.rudder_sel = js["rudder_sel"];
         this.elevator_sel = js["elevator_sel"];

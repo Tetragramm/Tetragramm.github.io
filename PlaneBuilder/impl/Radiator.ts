@@ -35,7 +35,7 @@ class Radiator extends Part {
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.idx_type = js["type"];
         this.idx_mount = js["mount"];
         this.idx_coolant = js["coolant"];

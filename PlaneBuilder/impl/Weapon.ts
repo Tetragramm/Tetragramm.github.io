@@ -7,7 +7,14 @@ enum SynchronizationType {
     SYNCH,
     SPINNER,
     DEFLECT,
-    ENUM_MAX,
+    ENUM_MAX
+}
+enum ProjectileType {
+    BULLETS,
+    HEATRAY,
+    GYROJETS,
+    PNEUMATIC,
+    ENUM_MAX
 }
 class Weapon extends Part {
     private weapon_type: {
@@ -69,7 +76,7 @@ class Weapon extends Part {
         }
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.fixed = js["fixed"];
         this.wing = js["wing"];
         this.covered = js["covered"];

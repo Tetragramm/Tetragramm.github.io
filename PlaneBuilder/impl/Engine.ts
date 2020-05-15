@@ -86,7 +86,7 @@ class Engine extends Part {
         };
     }
 
-    public fromJSON(js: JSON, json_version: string) {
+    public fromJSON(js: JSON, json_version: number) {
         this.etype_stats.fromJSON(js["selected_stats"], json_version);
         engine_list.push(this.etype_stats);
         this.cooling_count = js["cooling_count"];
