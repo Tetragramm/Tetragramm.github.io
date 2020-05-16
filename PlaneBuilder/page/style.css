@@ -135,6 +135,11 @@ select, input {
 	vertical-align: bottom;
 }
 
+select {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+
 input[type=number] {
 	width:4em;
 }
