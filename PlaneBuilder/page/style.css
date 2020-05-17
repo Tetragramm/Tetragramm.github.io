@@ -1,3 +1,4 @@
+@import "w3.css";
 @import "reset.css";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
@@ -37,12 +38,17 @@ html {
 	color: #ffffff;
 }
 
+h4 {
+	font-size: 1em;
+}
+
 h3 {
+	font-size: 1.5em;
 	margin-bottom: 0.25rem;
 }
 
 h2 {
-	font-size: 2rem;
+	font-size: 2em;
 	font-weight: 700;
 	border-bottom: .0625rem solid #606060;
 }
@@ -132,7 +138,7 @@ select, input {
 	border-style: solid;
 	line-height: 1.5em;
 	font-size: 1em;
-	vertical-align: bottom;
+	vertical-align: center;
 }
 
 select {
@@ -152,7 +158,6 @@ input[disabled] {
 input[type='checkbox'][disabled]{
 	width: 1em !important;
 	height: 1em !important;
-	/* padding: 0.285em; */
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
@@ -165,11 +170,12 @@ input[type='checkbox'][disabled]{
 	font-size: 0.75em;
 	text-align: left;
 	line-height: 0.75em;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
 }
 input[type='checkbox']{
 	width: 1em !important;
 	height: 1em !important;
-	/* padding: 0.285em; */
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
@@ -182,6 +188,8 @@ input[type='checkbox']{
 	font-size: 1em;
 	text-align: left;
 	line-height: 0.75em;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
 }
 
 input[type='checkbox']:not(checked):after {
@@ -206,18 +214,21 @@ select[disabled] {
 	/* color: #000000; */
 }
 
-button {
+button{
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	font-family: inherit;
+	font-size: 100%;
+	outline: none;
 	background-color: #383838;
 	color: #c7c7c7;
-	border-color: #555555;
 	text-align: center;
+	text-decoration: none;
 	box-sizing: border-box;
 	height: 1.5em !important;
 	font-size: 1em;
-	border-bottom:1px solid;
-	border-top:1px solid;
-	border-left:1px solid;
-	border-right:1px solid;
+	border:1px solid #555555;
 }
 
 button[disabled] {

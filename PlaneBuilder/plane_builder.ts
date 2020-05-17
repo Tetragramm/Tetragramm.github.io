@@ -3,8 +3,8 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
+//TODO: Co-pilot stress benefits for everyone.
 //TODO: Revisit Bomb bay expansion
-//TODO: List bombsight in special rules
 //TODO: New Armour Limits
 //TODO: Update rules page again
 //TODO: Weapon card, List Special Rules

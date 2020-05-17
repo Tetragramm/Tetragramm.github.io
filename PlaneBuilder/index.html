@@ -53,7 +53,9 @@
 				<br />
 				<div id="Era">
 					<h3>Era
-						<span>(<a href="./Rules/Rules.htm#_yosnw6cvungd"><u>Rules</u></a>)</span>
+						<h4>
+							<span>(<a href="./Rules/Rules.htm#_yosnw6cvungd"><u>Rules</u></a>)</span>
+						</h4>
 					</h3>
 					<table style="width:100%" id="table_era">
 						<tr>
@@ -71,10 +73,12 @@
 				<br />
 				<div id="Cockpit">
 					<h3>Cockpits
-						<span>(<a href="./Rules/Rules.htm#_39ltuebx0622"><u>Rules</u></a>)</span>
-						<br />
-						<span> <label for="num_cockpits">Number of Cockpits:</label> <input type="number"
-								id="num_cockpits" min="1" max="20" value="1" /></span>
+						<h4>
+							<span>(<a href="./Rules/Rules.htm#_39ltuebx0622"><u>Rules</u></a>)</span>
+							<br />
+							<span> <label for="num_cockpits">Number of Cockpits:</label> <input type="number"
+									id="num_cockpits" min="1" max="20" value="1" /></span>
+						</h4>
 					</h3>
 					<table style="width:100%" id="table_cockpit">
 						<tr>
@@ -89,7 +93,7 @@
 				<br />
 				<div id="Passengers">
 					<h3>Passengers
-						<span>(<a href="./Rules/Rules.htm#_xtnklorouzp2"><u>Rules</u></a>)</span>
+						<h4><span>(<a href="./Rules/Rules.htm#_xtnklorouzp2"><u>Rules</u></a>)</span></h4>
 					</h3>
 					<table style="width:100%" id="table_passengers">
 						<tr>
@@ -111,18 +115,20 @@
 				<br />
 				<div id="Engines">
 					<h3>Engines
-						<span>(<a href="./Rules/Rules.htm#_7z3qybtdwc8"><u>Engine Rules</u></a>)</span>
-						<span>(<a href="./Rules/Rules.htm#_q8c5kcydj4u"><u>Upgrade Rules</u></a>)</span>
-						<span>(<a href="./Rules/Rules.htm#_oba9a3riaklv"><u>Cooling Rules</u></a>)</span>
-						<span><a href="./engine.html"><b>Engine Builder</b></a></span>
-						<br />
-						<span> <label for="num_engines">Number of Engines:</label> <input type="number" id="num_engines"
-								min="0" max="20" value="1" /></span>
-						<span> <label for="num_radiators">Number of Radiators:</label> <input type="number"
-								id="num_radiators" min="1" max="20" value="0" /></span>
-						<span><label for="asymmetric">Asymmetric Plane:</label> <input type="checkbox"
-								id="asymmetric" /></span>
+						<h4>
+							<span>(<a href="./Rules/Rules.htm#_7z3qybtdwc8"><u>Engine Rules</u></a>)</span>
+							<span>(<a href="./Rules/Rules.htm#_q8c5kcydj4u"><u>Upgrade Rules</u></a>)</span>
+							<span>(<a href="./Rules/Rules.htm#_oba9a3riaklv"><u>Cooling Rules</u></a>)</span>
+							<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
+							<span> <label for="num_engines">Number of Engines:</label> <input type="number"
+									id="num_engines" min="0" max="20" value="1" /></span>
+							<span> <label for="num_radiators">Number of Radiators:</label> <input type="number"
+									id="num_radiators" min="1" max="20" value="0" /></span>
+							<span><label for="asymmetric">Asymmetric Plane:</label> <input type="checkbox"
+									id="asymmetric" /></span>
+						</h4>
 					</h3>
+
 					<table style="width:100%" id="table_engine">
 						<tr>
 							<th>Engine Type</th>
@@ -143,50 +149,48 @@
 				</div>
 			</div>
 			<br />
-			<div id="Propeller">
-				<h3>Propeller
-					<span>(<a href="./Rules/Rules.htm#_fuzb5rpxyxfm"><u>Rules</u></a>)</span> <br />
-					<span> <label for="propeller_pitch">Propeller Pitch:</label> <select
-							id="propeller_pitch"></select></span>
-					<span><label for="propeller_variable">Manually Variable Propeller:</label> <input type="checkbox"
-							id="propeller_variable" /></span>
-				</h3>
-			</div>
-			<br />
 			<div id="Frames">
 				<h3>Frames and Covering
-					<span>(<a href="./Rules/Rules.htm#_d5qmsg575qhr"><u>Rules</u></a>)</span>
-					<span><label for="flying_wing">Flying Wing:</label> <input type="checkbox"
-							id="flying_wing" /></span>
-					<table id="table_frames">
-						<tr>
-							<th>Frame Type<br /><select id="all_frame"></select></th>
-							<th>Skin Type<br /><select id="all_skin"></select></th>
-							<th>Frame Options</th>
-							<th>Frame Stats</th>
-						</tr>
-					</table>
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_d5qmsg575qhr"><u>Rules</u></a>)</span>
+						<span><label for="flying_wing">Flying Wing:</label> <input type="checkbox"
+								id="flying_wing" /></span>
+					</h4>
 				</h3>
+				<table id="table_frames">
+					<tr>
+						<th>Frame Type<br /><select id="all_frame"></select></th>
+						<th>Skin Type<br /><select id="all_skin"></select></th>
+						<th>Frame Options</th>
+						<th>Frame Stats</th>
+					</tr>
+				</table>
 			</div>
 			<br />
 			<div id="Tail">
 				<h3>Tail
-					<span>(<a href="./Rules/Rules.htm#_acy0fm3uj2ja"><u>Rules</u></a>)</span><br />
-					<span> <label for="tail_type">Tail Length:</label> <select id="tail_type"></select></span>
-					<span> <label for="tail_farman">Farman Tail:</label> <input type="checkbox"
-							id="tail_farman" /></span>
-					<span> <label for="tail_boom">Boom Tail:</label> <input type="checkbox" id="tail_boom" /></span>
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_acy0fm3uj2ja"><u>Rules</u></a>)</span><br />
+						<span> <label for="tail_type">Tail Length:</label> <select id="tail_type"></select></span>
+						<span> <label for="tail_farman">Farman Tail:</label> <input type="checkbox"
+								id="tail_farman" /></span>
+						<span> <label for="tail_boom">Boom Tail:</label> <input type="checkbox" id="tail_boom" /></span>
+					</h4>
 				</h3>
 			</div>
 			<br />
 			<div id="Wings">
 				<h3>Wings
-					<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
-					<br />
-					<span> <label for="wing_stagger">Wing Stagger:</label> <select id="wing_stagger"></select></span>
-					<span> <label for="wing_closed">Closed Wing:</label> <input type="checkbox"
-							id="wing_closed" /></span>
-					<span> <label for="wing_swept">Swept Wings:</label> <input type="checkbox" id="wing_swept" /></span>
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
+						<br />
+						<span> <label for="wing_stagger">Wing Stagger:</label> <select
+								id="wing_stagger"></select></span>
+						<span> <label for="wing_closed">Closed Wing:</label> <input type="checkbox"
+								id="wing_closed" /></span>
+						<span> <label for="wing_swept">Swept Wings:</label> <input type="checkbox"
+								id="wing_swept" /></span>
+					</h4>
 				</h3>
 				<table id="wing_table">
 					<tr>
@@ -199,8 +203,9 @@
 			<br />
 			<div id="Stabilizers">
 				<h3>Stabilizers
-					<span>(<a href="./Rules/Rules.htm#_yu8eo6k9uu3s"><u>Rules</u></a>)</span>
-					<br />
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_yu8eo6k9uu3s"><u>Rules</u></a>)</span>
+					</h4>
 				</h3>
 				<table id="stab_table">
 					<tr>
@@ -213,8 +218,9 @@
 			<br />
 			<div id="ControlSurfaces">
 				<h3>Control Surfaces
-					<span>(<a href="./Rules/Rules.htm#_d531g9ayebhk"><u>Rules</u></a>)</span>
-					<br />
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_d531g9ayebhk"><u>Rules</u></a>)</span>
+					</h4>
 				</h3>
 				<table id="tbl_control_surfaces">
 					<tr>
@@ -227,8 +233,9 @@
 			<br />
 			<div id="Reinforcements">
 				<h3>Reinforcements
-					<span>(<a href="./Rules/Rules.htm#_3utlenwdo4m2"><u>Rules</u></a>)</span>
-					<br />
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_3utlenwdo4m2"><u>Rules</u></a>)</span>
+					</h4>
 				</h3>
 				<table id="tbl_reinforcements">
 					<tr>
@@ -241,11 +248,13 @@
 			<br />
 			<div id="Weapons">
 				<h3>Weapons
-					<span>(<a href="./Rules/Rules.htm#_jjg8jcon1xb4"><u>Rules</u></a>)</span> <br />
-					<span> <label for="num_wsets">Number of Weapon Sets:</label> <input type="number" id="num_wsets"
-							min="0" max="20" value="1" /></span>
-					<span> <label for="num_wbraces">Number of Weapon Braces:</label> <input type="number"
-							id="num_wbraces" min="0" max="99" step="3" value="1" /></span>
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_jjg8jcon1xb4"><u>Rules</u></a>)</span> <br />
+						<span> <label for="num_wsets">Number of Weapon Sets:</label> <input type="number" id="num_wsets"
+								min="0" max="20" value="1" /></span>
+						<span> <label for="num_wbraces">Number of Weapon Braces:</label> <input type="number"
+								id="num_wbraces" min="0" max="99" step="3" value="1" /></span>
+					</h4>
 				</h3>
 				<table style="width:100%" id="table_weapons">
 					<tr>
@@ -259,8 +268,9 @@
 			<br />
 			<div id="Load">
 				<h3>Load
-					<span>(<a href="./Rules/Rules.htm#_t1lb2awb6fka"><u>Rules</u></a>)</span>
-					<br />
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_t1lb2awb6fka"><u>Rules</u></a>)</span>
+					</h4>
 				</h3>
 				<table id="tbl_load">
 					<tr>
@@ -274,8 +284,9 @@
 			<br />
 			<div id="Landing_Gear">
 				<h3>Landing Gear
-					<span>(<a href="./Rules/Rules.htm#_b9y175l7zqcl"><u>Rules</u></a>)</span>
-					<br />
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_b9y175l7zqcl"><u>Rules</u></a>)</span>
+					</h4>
 				</h3>
 				<table id="tbl_gear">
 					<tr>
@@ -288,8 +299,9 @@
 			<br />
 			<div id="Accessories">
 				<h3>Additional Parts
-					<span>(<a href="./Rules/Rules.htm#_8zv4bba6tuwb"><u>Rules</u></a>)</span>
-					<br />
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_8zv4bba6tuwb"><u>Rules</u></a>)</span>
+					</h4>
 				</h3>
 				<table id="tbl_accessories">
 					<tr>
@@ -304,6 +316,18 @@
 						<th>Control</th>
 					</tr>
 				</table>
+			</div>
+			<br />
+			<div id="Propeller">
+				<h3>Propeller
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_fuzb5rpxyxfm"><u>Rules</u></a>)</span> <br />
+						<span> <label for="propeller_pitch">Propeller Pitch:</label> <select
+								id="propeller_pitch"></select></span>
+						<span><label for="propeller_variable">Manually Variable Propeller:</label> <input
+								type="checkbox" id="propeller_variable" /></span>
+					</h4>
+				</h3>
 			</div>
 			<br />
 			<div id="Optimization">
