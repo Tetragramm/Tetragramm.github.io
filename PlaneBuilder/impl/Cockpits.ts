@@ -166,7 +166,8 @@ class Cockpits extends Part {
         }
         //Local only stats don't get rolled up into the aircraft as a whole.
         s.escape = 0;
-        s.flightstress = 0;
+        //This needs special work for co-pilot controls
+        //s.flightstress = 0;
         s.visibility = 0;
         s.crashsafety = 0;
         return s;

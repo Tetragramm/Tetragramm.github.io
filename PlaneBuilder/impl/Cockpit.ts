@@ -226,6 +226,17 @@ class Cockpit extends Part {
         }
 
         this.stats = stats.Clone();
+
+
+        //Special stuff for co-pilot controls
+        if (this.selected_upgrades[0]) {
+            stats.flightstress = this.upgrades[0].stats.flightstress;
+            this.stats.flightstress -= stats.flightstress;
+        }
+        else {
+            stats.flightstress = 0;
+        }
+
         return stats;
     }
 

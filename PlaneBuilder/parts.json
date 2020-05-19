@@ -106,7 +106,7 @@
                 "control": 3,
                 "escape": 0,
                 "cost": 1,
-                "flightstress": -1,
+                "flightstress": -2,
                 "visibility": 0
             },
             {
@@ -146,6 +146,7 @@
                 "drag": 0,
                 "control": 0,
                 "escape": 0,
+                "charge": 1,
                 "cost": 2,
                 "flightstress": 0,
                 "visibility": 0
@@ -1641,7 +1642,7 @@
         ],
         "radios": [
             {
-                "name": "No Radio"
+                "name": "Loud Yelling"
             },
             {
                 "name": "Intercom System",

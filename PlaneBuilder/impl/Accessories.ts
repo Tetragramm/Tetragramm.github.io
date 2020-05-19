@@ -29,6 +29,7 @@ class Accessories extends Part {
     private acft_power: number;
     private acft_rad: boolean;
     private skin_armour: number;
+    private vital_parts: number;
 
     constructor(js: JSON) {
         super();
@@ -146,7 +147,19 @@ class Accessories extends Part {
             num = 0;
         num = Math.floor(1.0e-6 + num);
         this.armour_coverage[idx] = num;
+        this.NormalizeCoverage();
         this.CalculateStats();
+    }
+
+    private NormalizeCoverage() {
+        var coverage = -8 + Math.min(0, -Math.floor((this.vital_parts - 8) / 2));
+        for (let i = this.armour_coverage.length - 1; i >= 0; i--) {
+            if (i == 1) {
+                coverage += this.skin_armour;
+            }
+            this.armour_coverage[i] = Math.max(0, Math.min(Math.abs(coverage), this.armour_coverage[i]));
+            coverage += this.armour_coverage[i];
+        }
     }
 
     public GetElectricalList() {
@@ -278,6 +291,11 @@ class Accessories extends Part {
             this.armour_coverage[1] += num - this.skin_armour;
         this.skin_armour = num;
         this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
+    }
+
+    public SetVitalParts(num: number) {
+        this.vital_parts = num;
+        this.NormalizeCoverage();
     }
 
     public SetCalculateStats(callback: () => void) {

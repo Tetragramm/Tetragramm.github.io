@@ -3,13 +3,12 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: Co-pilot stress benefits for everyone.
-//TODO: Revisit Bomb bay expansion
-//TODO: New Armour Limits
+//TODO: Used Plane Table
 //TODO: Update rules page again
+//TODO: "Adjusted Drag" ect.
+//TODO: Revisit Bomb bay expansion
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
-//TODO: Used Plane Table
 
 const init = () => {
     const sp = new URLSearchParams(location.search);

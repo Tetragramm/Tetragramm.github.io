@@ -64,6 +64,9 @@ class LandingGear extends Part {
     }
 
     public GetGearName() {
+        if (this.retract && this.gear_list[this.gear_sel].name == "Boat Hull") {
+            return "Retractable Gear + Boat Hull";
+        }
         if (this.retract)
             return "Retractable " + this.gear_list[this.gear_sel].name;
         else
@@ -95,7 +98,8 @@ class LandingGear extends Part {
     }
 
     public CanRetract() {
-        return this.gear_list[this.gear_sel].can_retract;
+        return this.gear_list[this.gear_sel].can_retract
+            || this.gear_list[this.gear_sel].name == "Boat Hull";
     }
 
     public GetRetract() {
@@ -146,6 +150,14 @@ class LandingGear extends Part {
 
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
         var pdrag = this.gear_list[this.gear_sel].DpLMP * this.loadedMP;
+
+        //Retractable gear with Boat Hull adds normal hull drag,
+        // plus the mass and cost of normal retrctable gear
+        if (this.gear_list[this.gear_sel].name == "Boat Hull" && this.retract) {
+            stats.drag += pdrag;
+            pdrag = this.gear_list[0].DpLMP * this.loadedMP;
+        }
+
         if (this.retract) {
             stats.mass += Math.floor(1.0e-6 + pdrag / 2);
             stats.cost += Math.floor(1.0e-6 + pdrag / 2);

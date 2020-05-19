@@ -92,22 +92,27 @@ class Aircraft_HTML extends Display {
     private ss_empty: HTMLTableCellElement;
     private hand_empty: HTMLTableCellElement;
     private boost_empty: HTMLTableCellElement;
+    private roc_empty: HTMLTableCellElement;
     private ts_half: HTMLTableCellElement;
     private ss_half: HTMLTableCellElement;
     private hand_half: HTMLTableCellElement;
     private boost_half: HTMLTableCellElement;
+    private roc_half: HTMLTableCellElement;
     private ts_full: HTMLTableCellElement;
     private ss_full: HTMLTableCellElement;
     private hand_full: HTMLTableCellElement;
     private boost_full: HTMLTableCellElement;
+    private roc_full: HTMLTableCellElement;
     private ts_halfwB: HTMLTableCellElement;
     private ss_halfwB: HTMLTableCellElement;
     private hand_halfwB: HTMLTableCellElement;
     private boost_halfwB: HTMLTableCellElement;
+    private roc_halfwB: HTMLTableCellElement;
     private ts_fullwB: HTMLTableCellElement;
     private ss_fullwB: HTMLTableCellElement;
     private hand_fullwB: HTMLTableCellElement;
     private boost_fullwB: HTMLTableCellElement;
+    private roc_fullwB: HTMLTableCellElement;
     private vital_components: HTMLTableCellElement;
     private dropoff_cell: HTMLTableCellElement;
     private stability_cell: HTMLTableCellElement;
@@ -312,7 +317,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.toughness = derived.Toughness;
         this.cards.acft_data.turn_bleed = derived.TurnBleed;
         this.cards.acft_data.visibility = this.acft.GetCockpits().GetVisibilityList()[0];
-        this.cards.acft_data.vital_parts = this.VitalComponentList();
+        this.cards.acft_data.vital_parts = this.acft.VitalComponentList();
     }
 
     private UpdateWeaponCard(w: WeaponSystem) {
@@ -359,55 +364,6 @@ class Aircraft_HTML extends Display {
         if (deflector) {
             this.cards.weap_data.tags.push("Deflector Plate");
         }
-    }
-
-    private VitalComponentList(): string[] {
-        var derived = this.acft.GetDerivedStats();
-        var vital = [];
-        vital.push("Controls");
-        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push("Aircrew #" + (i + 1).toString());
-        }
-        if (derived.FuelUses > 0) {
-            vital.push("Fuel Tanks");
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            if (this.acft.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital.push("Engine #" + (i + 1).toString() + " Pusher");
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString() + " Pusher");
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString() + " Pusher");
-                }
-                vital.push("Engine #" + (i + 1).toString() + " Puller");
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString() + " Puller");
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString() + " Puller");
-                }
-            }
-            else {
-                vital.push("Engine #" + (i + 1).toString());
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString());
-                }
-                if (this.acft.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString());
-                }
-            }
-        }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
-            vital.push("Radiator #" + (i + 1).toString());
-        }
-        if (this.acft.IsElectrics()) {
-            vital.push("Electrics");
-        }
-        for (let i = 0; i < aircraft_model.GetWeapons().GetWeaponSets().length; i++) {
-            vital.push("Weapon Set #" + (i + 1).toString());
-        }
-        return vital;
     }
 
     private WeaponName(w: WeaponSystem): string {
@@ -656,7 +612,8 @@ class Aircraft_HTML extends Display {
         CreateTH(row1, "Stall Speed");
         CreateTH(row1, "Handling");
         CreateTH(row1, "Boost");
-        CreateTH(row1, "Vital Components").colSpan = 3;
+        CreateTH(row1, "Rate of Climb");
+        CreateTH(row1, "Vital Components").colSpan = 2;
 
         var full = tbl.insertRow();
         CreateTH(full, "Full Mass");
@@ -664,6 +621,7 @@ class Aircraft_HTML extends Display {
         this.ss_full = full.insertCell();
         this.hand_full = full.insertCell();
         this.boost_full = full.insertCell();
+        this.roc_full = full.insertCell();
         this.vital_components = full.insertCell();
         this.vital_components.rowSpan = 3;
         this.vital_components.colSpan = 3;
@@ -674,6 +632,7 @@ class Aircraft_HTML extends Display {
         this.ss_half = half.insertCell();
         this.hand_half = half.insertCell();
         this.boost_half = half.insertCell();
+        this.roc_half = half.insertCell();
 
         var empty = tbl.insertRow();
         CreateTH(empty, "Empty Mass");
@@ -681,6 +640,7 @@ class Aircraft_HTML extends Display {
         this.ss_empty = empty.insertCell();
         this.hand_empty = empty.insertCell();
         this.boost_empty = empty.insertCell();
+        this.roc_empty = empty.insertCell();
 
         this.bomb_row2 = tbl.insertRow();
         CreateTH(this.bomb_row2, "Full Mass with Bombs");
@@ -688,6 +648,7 @@ class Aircraft_HTML extends Display {
         this.ss_fullwB = this.bomb_row2.insertCell();
         this.hand_fullwB = this.bomb_row2.insertCell();
         this.boost_fullwB = this.bomb_row2.insertCell();
+        this.roc_fullwB = this.bomb_row2.insertCell();
 
         this.bomb_row1 = tbl.insertRow();
         CreateTH(this.bomb_row1, "Half Mass with Bombs");
@@ -695,6 +656,7 @@ class Aircraft_HTML extends Display {
         this.ss_halfwB = this.bomb_row1.insertCell();
         this.hand_halfwB = this.bomb_row1.insertCell();
         this.boost_halfwB = this.bomb_row1.insertCell();
+        this.roc_halfwB = this.bomb_row1.insertCell();
 
         var row7 = tbl.insertRow();
         CreateTH(row7, "Propulsion").colSpan = 2;
@@ -806,6 +768,7 @@ class Aircraft_HTML extends Display {
         this.ss_empty.innerText = derived.StallSpeedEmpty.toString();
         this.hand_empty.innerText = derived.HandlingEmpty.toString();
         this.boost_empty.innerText = derived.BoostEmpty.toString();
+        this.roc_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         this.copy_text += "Empty Mass\t\t"
             + this.ts_empty.innerText + "\t\t"
             + this.ss_empty.innerText + "\t\t"
@@ -816,6 +779,7 @@ class Aircraft_HTML extends Display {
         this.ss_half.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
         this.hand_half.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
         this.boost_half.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
+        this.roc_half.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         this.copy_text += "Half Mass\t\t"
             + this.ts_half.innerText + "\t\t"
             + this.ss_half.innerText + "\t\t"
@@ -826,6 +790,7 @@ class Aircraft_HTML extends Display {
         this.ss_full.innerText = derived.StallSpeedFull.toString();
         this.hand_full.innerText = derived.HandlingFull.toString();
         this.boost_full.innerText = derived.BoostFull.toString();
+        this.roc_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         this.copy_text += "Full Mass\t\t"
             + this.ts_full.innerText + "\t\t"
             + this.ss_full.innerText + "\t\t"
@@ -842,6 +807,7 @@ class Aircraft_HTML extends Display {
             this.ss_halfwB.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
             this.hand_halfwB.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
             this.boost_halfwB.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
+            this.roc_halfwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
             this.copy_text += "Half Mass with Bombs\t"
                 + this.ts_halfwB.innerText + "\t\t"
                 + this.ss_halfwB.innerText + "\t\t"
@@ -852,6 +818,7 @@ class Aircraft_HTML extends Display {
             this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
             this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
+            this.roc_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
             this.copy_text += "Full Mass with Bombs\t"
                 + this.ts_fullwB.innerText + "\t\t"
                 + this.ss_fullwB.innerText + "\t\t"
@@ -919,11 +886,11 @@ class Aircraft_HTML extends Display {
             + "Electrics\t" + this.electric_cell.innerText + "\n";
         this.copy_text += "\n";
 
-        var vital = "Controls";
-        this.copy_text += "Vital Components\n\tControls\n\t";
-        var vlist = this.VitalComponentList();
+        var vital = "";
+        this.copy_text += "Vital Components\n\t";
+        var vlist = this.acft.VitalComponentList();
         for (let v of vlist) {
-            vital += "<br/>" + v;
+            vital += v + "<br/>";
             this.copy_text += v + "\n\t";
         }
         this.vital_components.innerHTML = vital;
