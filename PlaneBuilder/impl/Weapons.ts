@@ -9,7 +9,7 @@ class Weapons extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_convert: boolean
+        can_action: boolean, can_projectile: boolean
     }[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
     private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
@@ -54,7 +54,8 @@ class Weapons extends Part {
                 rapid: elem["rapid"],
                 synched: elem["synched"],
                 shells: elem["shells"],
-                can_convert: elem["can_convert"],
+                can_action: elem["can_action"],
+                can_projectile: elem["can_projectile"],
             };
             this.weapon_list.push(weap);
         }

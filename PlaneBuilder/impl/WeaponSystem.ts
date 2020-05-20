@@ -8,7 +8,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_convert: boolean
+        can_action: boolean, can_projectile: boolean
     };
     private weapon_type: number;
     private fixed: boolean;
@@ -29,7 +29,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_convert: boolean
+        can_action: boolean, can_projectile: boolean
     }[];
 
     constructor(weapon_list: {
@@ -37,7 +37,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_convert: boolean
+        can_action: boolean, can_projectile: boolean
     }[]) {
         super();
         this.weapon_list = weapon_list;
@@ -54,7 +54,7 @@ class WeaponSystem extends Part {
             damage: 0, hits: 0, ammo: 0,
             ap: 0, jam: "", reload: 0,
             rapid: false, synched: false, shells: false,
-            can_convert: false
+            can_action: false, can_projectile: false,
         };
         this.MakeFinalWeapon();
         this.SWC(1);
@@ -148,7 +148,8 @@ class WeaponSystem extends Part {
 
     private MakeFinalWeapon() {
         var num = this.weapon_type;
-        this.final_weapon.can_convert = this.weapon_list[num].can_convert;
+        this.final_weapon.can_action = this.weapon_list[num].can_action;
+        this.final_weapon.can_projectile = this.weapon_list[num].can_projectile;
         this.final_weapon.ammo = this.weapon_list[num].ammo;
         this.final_weapon.ap = this.weapon_list[num].ap;
         this.final_weapon.damage = this.weapon_list[num].damage;
@@ -212,8 +213,10 @@ class WeaponSystem extends Part {
                 this.weapons.pop();
             }
         }
-        if (!this.weapon_list[num].can_convert) {
+        if (!this.weapon_list[num].can_action) {
             this.action_sel = 0;
+        }
+        if (!this.weapon_list[num].can_projectile) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
         this.MakeFinalWeapon();
@@ -299,7 +302,7 @@ class WeaponSystem extends Part {
     }
 
     public SetWeaponCount(num: number) {
-        if (this.final_weapon.size == 16)
+        if (this.final_weapon.size == 16 || this.final_weapon.name == "Precision Rifle")
             num = 1;
         this.SWC(num);
         this.CalculateStats();
@@ -420,8 +423,12 @@ class WeaponSystem extends Part {
         return this.action_sel;
     }
 
+    public GetCanAction() {
+        return this.final_weapon.can_action;
+    }
+
     public SetAction(num: number) {
-        if (this.weapon_list[this.weapon_type].can_convert) {
+        if (this.final_weapon.can_action) {
             this.action_sel = num;
 
             this.MakeFinalWeapon()
@@ -435,12 +442,16 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
 
+    public GetCanProjectile() {
+        return this.final_weapon.can_projectile;
+    }
+
     public GetProjectile() {
         return this.projectile_sel;
     }
 
     public SetProjectile(num: number) {
-        if (this.weapon_list[this.weapon_type].can_convert) {
+        if (this.final_weapon.can_projectile) {
             this.projectile_sel = num;
 
             this.MakeFinalWeapon()

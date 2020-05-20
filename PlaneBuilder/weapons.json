@@ -16,7 +16,8 @@
             "jam": "0/1",
             "reload": 2,
             "size": 1,
-            "can_convert": false
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Scattergun",
@@ -35,7 +36,8 @@
             "reload": 0,
             "warning": "Hits are actually Hits*d5.",
             "size": 2,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Light Machine Gun",
@@ -53,7 +55,8 @@
             "jam": "1/2",
             "reload": 2,
             "size": 2,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Machine Gun",
@@ -71,7 +74,8 @@
             "jam": "1/2",
             "reload": 0,
             "size": 4,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Balloon Gun",
@@ -89,7 +93,8 @@
             "jam": "2/3",
             "reload": 0,
             "size": 4,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Enhanced Machine Gun",
@@ -107,7 +112,8 @@
             "jam": "0/0",
             "reload": 0,
             "size": 2,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Heavy Machine Gun",
@@ -125,7 +131,8 @@
             "jam": "0/0",
             "reload": 0,
             "size": 4,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Punt Gun",
@@ -144,7 +151,8 @@
             "reload": 0,
             "warning": "Hits are actually Hits*d10.",
             "size": 8,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Light Cannon (Low Velocity)",
@@ -163,7 +171,8 @@
             "reload": 2,
             "warning": "-3 to attack fixed-winged aircraft.",
             "size": 8,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Heavy Cannon (Low Velocity)",
@@ -182,7 +191,8 @@
             "reload": 1,
             "warning": "-3 to attack fixed-winged aircraft.",
             "size": 8,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Light Machine Cannon",
@@ -201,7 +211,8 @@
             "reload": 0,
             "warning": "Costs x2 to Sync. Not included in cost.",
             "size": 8,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Heavy Machine Cannon",
@@ -219,7 +230,8 @@
             "jam": "0/0",
             "reload": 0,
             "size": 8,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Fliergerflammerwerfer",
@@ -238,7 +250,8 @@
             "reload": 0,
             "warning": "Uses Fuel uses as Ammo. Incendiary. Max range is Knife. Crits start fires but do not destroy parts.",
             "size": 8,
-            "can_convert": false
+            "can_action": false,
+            "can_projectile": false
         },
         {
             "name": "Recoilless Cannon",
@@ -257,7 +270,8 @@
             "reload": 1,
             "warning": "-5 to attack fixed-winged aircraft.",
             "size": 16,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Autocannon",
@@ -275,7 +289,8 @@
             "jam": "0/0",
             "reload": 0,
             "size": 16,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
         },
         {
             "name": "Battle Cannon",
@@ -293,7 +308,28 @@
             "jam": "0",
             "reload": 1,
             "size": 16,
-            "can_convert": true
+            "can_action": true,
+            "can_projectile": true
+        },
+        {
+            "name": "Precision Rifle",
+            "era": "WWI",
+            "mass": 1,
+            "drag": 1,
+            "cost": 2,
+            "damage": 5,
+            "hits": 10,
+            "ap": 2,
+            "ammo": 8,
+            "rapid": false,
+            "synched": false,
+            "shells": true,
+            "jam": "0",
+            "reload": 1,
+            "size": 2,
+            "can_action": false,
+            "can_projectile": true,
+            "warning": "Must be fired alone. Must Draw a Beat to fire, gain +1 Results. Never does more than 1 Hit worth of damage, but rolls Crits normally."
         }
     ]
 }

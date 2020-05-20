@@ -178,9 +178,11 @@ class Weapons_HTML extends Display {
         disp.count.onchange = () => { set.SetWeaponCount(disp.count.valueAsNumber); };
 
         disp.action.selectedIndex = set.GetAction();
+        disp.action.disabled = !set.GetCanAction();
         disp.action.onchange = () => { set.SetAction(disp.action.selectedIndex); };
 
         disp.projectile.selectedIndex = set.GetProjectile();
+        disp.projectile.disabled = !set.GetCanProjectile();
         disp.projectile.onchange = () => { set.SetProjectile(disp.projectile.selectedIndex); };
 
         disp.fixed.checked = set.GetFixed();

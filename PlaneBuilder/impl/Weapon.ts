@@ -22,7 +22,7 @@ class Weapon extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_convert: boolean
+        can_action: boolean, can_projectile: boolean
     };
     private fixed: boolean;
     private wing: boolean;
@@ -45,7 +45,7 @@ class Weapon extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_convert: boolean
+        can_action: boolean, can_projectile: boolean
     }, fixed: boolean = false) {
         super();
         this.weapon_type = weapon_type;
@@ -114,7 +114,7 @@ class Weapon extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_convert: boolean
+        can_action: boolean, can_projectile: boolean
     }) {
         this.weapon_type = weapon_type;
         if (this.weapon_type.size == 16) {
@@ -248,6 +248,8 @@ class Weapon extends Part {
     public SetCount(use: number) {
         use = Math.max(1, use);
         if (this.synchronization == SynchronizationType.SPINNER)
+            use = 1;
+        if (this.weapon_type.name == "Precision Rifle")
             use = 1;
         while (use * this.weapon_type.size > 16) {
             use -= 1;
