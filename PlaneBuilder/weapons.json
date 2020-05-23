@@ -329,7 +329,7 @@
             "size": 2,
             "can_action": false,
             "can_projectile": true,
-            "warning": "Must be fired alone. Must Draw a Beat to fire, gain +1 Results. Never does more than 1 Hit worth of damage, but rolls Crits normally."
+            "warning": "Must be fired alone. Must Draw a Beat to fire, gain +1 Results. Never does more than 1 Hit worth of damage, but rolls Crits normally. Special Ammo: 1 Round per belt. Hits ammo adds or subtracts 5 Hits. Crit Ammo replaces normal Crits outright with the special effect."
         }
     ]
 }

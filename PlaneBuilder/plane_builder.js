@@ -448,11 +448,11 @@ class EngineStats {
         this.pulsejet = false;
         this.stats = new Stats();
         if (js) {
-            this.fromJSON(js, 0);
+            this.fromJSON(js, 10.5);
         }
     }
     toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet, input_eb: this.input_eb, input_pj: this.input_pj }, this.stats.toJSON());
     }
     fromJSON(js, json_version) {
         if (js["name"])
@@ -469,6 +469,28 @@ class EngineStats {
             this.oiltank = js["oiltank"];
         if (js["pulsejet"])
             this.pulsejet = js["pulsejet"];
+        if (this.pulsejet && js["input_pj"]) {
+            var ipj = js["input_pj"];
+            this.input_pj.power = ipj["power"];
+            this.input_pj.type = ipj["type"];
+            this.input_pj.era_sel = ipj["era_sel"];
+            this.input_pj.quality_cost = ipj["quality_cost"];
+            this.input_pj.quality_rely = ipj["quality_rely"];
+            this.input_pj.starter = ipj["starter"];
+        }
+        else if (js["input_eb"]) {
+            var ieb = js["input_eb"];
+            this.input_eb.displacement = ieb["displacement"];
+            this.input_eb.compression = ieb["compression"];
+            this.input_eb.type = ieb["type"];
+            this.input_eb.cyl_per_row = ieb["cyl_per_row"];
+            this.input_eb.rows = ieb["rows"];
+            this.input_eb.RPM_boost = ieb["RPM_boost"];
+            this.input_eb.era_sel = ieb["era_sel"];
+            this.input_eb.material_fudge = ieb["material_fudge"];
+            this.input_eb.quality_fudge = ieb["quality_fudge"];
+            this.input_eb.upgrades = ieb["upgrades"];
+        }
         this.stats = new Stats(js);
     }
     serialize(s) {
@@ -479,6 +501,26 @@ class EngineStats {
         s.PushNum(this.rumble);
         s.PushBool(this.oiltank);
         s.PushBool(this.pulsejet);
+        if (this.pulsejet) {
+            s.PushNum(this.input_pj.power);
+            s.PushNum(this.input_pj.type);
+            s.PushNum(this.input_pj.era_sel);
+            s.PushNum(this.input_pj.quality_cost);
+            s.PushNum(this.input_pj.quality_rely);
+            s.PushBool(this.input_pj.starter);
+        }
+        else {
+            s.PushNum(this.input_eb.displacement);
+            s.PushNum(this.input_eb.compression);
+            s.PushNum(this.input_eb.type);
+            s.PushNum(this.input_eb.cyl_per_row);
+            s.PushNum(this.input_eb.rows);
+            s.PushNum(this.input_eb.RPM_boost);
+            s.PushNum(this.input_eb.era_sel);
+            s.PushNum(this.input_eb.material_fudge);
+            s.PushNum(this.input_eb.quality_fudge);
+            s.PushBoolArr(this.input_eb.upgrades);
+        }
         this.stats.serialize(s);
     }
     deserialize(d) {
@@ -489,6 +531,28 @@ class EngineStats {
         this.rumble = d.GetNum();
         this.oiltank = d.GetBool();
         this.pulsejet = d.GetBool();
+        if (d.version > 10.45) {
+            if (this.pulsejet) {
+                this.input_pj.power = d.GetNum();
+                this.input_pj.type = d.GetNum();
+                this.input_pj.era_sel = d.GetNum();
+                this.input_pj.quality_cost = d.GetNum();
+                this.input_pj.quality_rely = d.GetNum();
+                this.input_pj.starter = d.GetBool();
+            }
+            else {
+                this.input_eb.displacement = d.GetNum();
+                this.input_eb.compression = d.GetNum();
+                this.input_eb.type = d.GetNum();
+                this.input_eb.cyl_per_row = d.GetNum();
+                this.input_eb.rows = d.GetNum();
+                this.input_eb.RPM_boost = d.GetNum();
+                this.input_eb.era_sel = d.GetNum();
+                this.input_eb.material_fudge = d.GetNum();
+                this.input_eb.quality_fudge = d.GetNum();
+                this.input_eb.upgrades = d.GetBoolArr();
+            }
+        }
         this.stats.deserialize(d);
     }
     Add(other) {
@@ -2659,11 +2723,13 @@ class Frames extends Part {
             stats.mass *= this.skin_list[this.sel_skin].massfactor;
         }
         //Lifting Body and Flying Wing
+        var lb_count = this.CountLiftingBody();
+        stats.cost += lb_count;
         if (this.flying_wing) {
             stats.liftbleed += 5;
         }
         else {
-            stats.drag += this.CountLiftingBody();
+            stats.drag += lb_count;
         }
         stats.structure = Math.floor(1.0e-6 + stats.structure);
         stats.cost = Math.floor(1.0e-6 + stats.cost);
@@ -3614,12 +3680,12 @@ class Reinforcement extends Part {
         super();
         this.ext_wood_list = [];
         for (let elem of js["external_wood"]) {
-            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
         }
         this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
         this.ext_steel_list = [];
         for (let elem of js["external_steel"]) {
-            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
         }
         this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
         this.ext_cabane_list = [];
@@ -3662,6 +3728,12 @@ class Reinforcement extends Part {
         else {
             this.wing_blades = false;
         }
+        while (this.ext_wood_list.length > this.ext_wood_count.length) {
+            this.ext_wood_count.push(0);
+        }
+        while (this.ext_steel_list.length > this.ext_steel_count.length) {
+            this.ext_steel_count.push(0);
+        }
     }
     serialize(s) {
         s.PushNumArr(this.ext_wood_count);
@@ -3682,6 +3754,9 @@ class Reinforcement extends Part {
         }
         else {
             this.wing_blades = false;
+        }
+        if (d.version < 10.45) {
+            this.ext_wood_count.push(0);
         }
     }
     GetExternalList() {
@@ -3822,10 +3897,12 @@ class Reinforcement extends Part {
             tension_multiple = 0.9;
         var tension = 0;
         var strut_count = 0;
+        var has_valid_first = false;
         //Wood Struts
         for (let i = 0; i < this.ext_wood_list.length; i++) {
             strut_count += this.ext_wood_count[i];
             if (this.ext_wood_count[i] > 0) {
+                has_valid_first = has_valid_first || this.ext_wood_list[i].first;
                 let ts = this.ext_wood_list[i].stats;
                 ts = ts.Multiply(this.ext_wood_count[i]);
                 stats = stats.Add(ts);
@@ -3839,6 +3916,7 @@ class Reinforcement extends Part {
         for (let i = 0; i < this.ext_steel_list.length; i++) {
             strut_count += this.ext_steel_count[i];
             if (this.ext_steel_count[i] > 0) {
+                has_valid_first = has_valid_first || this.ext_wood_list[i].first;
                 let ts = this.ext_steel_list[i].stats.Clone();
                 ts = ts.Multiply(this.ext_steel_count[i]);
                 stats = stats.Add(ts);
@@ -3849,7 +3927,7 @@ class Reinforcement extends Part {
             }
         }
         //First Strut Bonus
-        if (strut_count > 0) {
+        if (has_valid_first) {
             stats.structure += 5;
             stats.maxstrain += 10;
             tension += 10;
@@ -4441,7 +4519,7 @@ class Accessories extends Part {
         this.cont_list = [];
         this.cont_sel = 0;
         for (let elem of js["control"]) {
-            this.cont_list.push({ name: elem["name"], stats: new Stats(elem) });
+            this.cont_list.push({ name: elem["name"], max_mass_stress: elem["max_mass_stress"], max_total_stress: elem["max_total_stress"], stats: new Stats(elem) });
         }
     }
     toJSON() {
@@ -4621,6 +4699,12 @@ class Accessories extends Part {
     SetVitalParts(num) {
         this.vital_parts = num;
         this.NormalizeCoverage();
+    }
+    GetMaxMassStress() {
+        return this.cont_list[this.cont_sel].max_mass_stress;
+    }
+    GetMaxTotalStress() {
+        return this.cont_list[this.cont_sel].max_total_stress;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -4930,8 +5014,15 @@ var ProjectileType;
     ProjectileType[ProjectileType["PNEUMATIC"] = 3] = "PNEUMATIC";
     ProjectileType[ProjectileType["ENUM_MAX"] = 4] = "ENUM_MAX";
 })(ProjectileType || (ProjectileType = {}));
+var ActionType;
+(function (ActionType) {
+    ActionType[ActionType["STANDARD"] = 0] = "STANDARD";
+    ActionType[ActionType["MECHANICAL"] = 1] = "MECHANICAL";
+    ActionType[ActionType["GAST"] = 2] = "GAST";
+    ActionType[ActionType["ENUM_MAX"] = 3] = "ENUM_MAX";
+})(ActionType || (ActionType = {}));
 class Weapon extends Part {
-    constructor(weapon_type, fixed = false) {
+    constructor(weapon_type, action, projectile, fixed = false) {
         super();
         this.weapon_type = weapon_type;
         this.fixed = fixed;
@@ -4989,8 +5080,10 @@ class Weapon extends Part {
         this.w_count = d.GetNum();
         this.repeating = d.GetBool();
     }
-    SetWeaponType(weapon_type) {
+    SetWeaponType(weapon_type, action, projectile) {
         this.weapon_type = weapon_type;
+        this.action = action;
+        this.projectile = projectile;
         if (this.weapon_type.size == 16) {
             this.w_count = 1;
         }
@@ -5077,6 +5170,8 @@ class Weapon extends Part {
         else if (!this.can_synchronize && num != SynchronizationType.NONE) {
             return false;
         }
+        if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH))
+            return false;
         if ((num == SynchronizationType.INTERRUPT || num == SynchronizationType.SYNCH)
             && !this.weapon_type.synched) {
             return false;
@@ -5146,9 +5241,14 @@ class Weapon extends Part {
                 this.SetWing(true);
             }
         }
+        else if (this.action == ActionType.MECHANICAL) {
+            this.synchronization = SynchronizationType.SYNCH;
+        }
         else {
             this.synchronization = use;
         }
+        if (this.wing)
+            this.synchronization = SynchronizationType.NONE;
         if (this.synchronization == SynchronizationType.SPINNER)
             this.w_count = 1;
     }
@@ -5260,7 +5360,7 @@ class Weapon extends Part {
         if (this.synchronization == SynchronizationType.INTERRUPT) {
             stats.cost += this.w_count * 2;
         }
-        else if (this.synchronization == SynchronizationType.SYNCH) {
+        else if (this.synchronization == SynchronizationType.SYNCH && this.action != ActionType.MECHANICAL) {
             stats.cost += this.w_count * 3;
             //synchronization == 2 is spinner and costs nothing.
         }
@@ -5968,7 +6068,8 @@ class Aircraft {
         if (this.engines.GetMaxRumble() > 0) {
             FlightStress += Math.max(1, 2 * this.engines.GetMaxRumble() - this.stats.structure / 10);
         }
-        FlightStress += Math.floor(1.0e-6 + DryMP / 10);
+        FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
+        FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
         return {
             DryMP: DryMP,
             WetMP: WetMP,
@@ -9943,9 +10044,17 @@ class Aircraft_HTML extends Display {
         var plist = aircraft_model.GetWeapons().GetProjectileList();
         this.weapon_cell.innerHTML = "";
         if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-            var weaphtml = aircraft_model.GetMunitions().GetBombCount().toString() + " Mass of bombs or rockets.";
-            if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
-                weaphtml += " Largest internal bomb allowed is " + aircraft_model.GetMunitions().GetMaxBombSize() + " Mass.";
+            var weaphtml = "";
+            if (aircraft_model.GetMunitions().GetBombCount() > 0) {
+                var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
+                var external = aircraft_model.GetMunitions().GetBombCount() - internal;
+                if (internal > 0)
+                    weaphtml += (internal.toString() + " Bomb Mass Internally. ");
+                if (external > 0)
+                    weaphtml += (external.toString() + " Bomb Mass Externally. ");
+                if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
+                    weaphtml += ("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass.");
+                }
             }
             this.weapon_cell.innerHTML = weaphtml + "<br/>";
             this.copy_text += weaphtml + "\n\t";
@@ -10707,7 +10816,7 @@ class WeaponSystem extends Part {
         this.ammo = 1;
         this.weapon_type = 0;
         this.weapons = [];
-        this.action_sel = 0;
+        this.action_sel = ActionType.STANDARD;
         this.projectile_sel = ProjectileType.BULLETS;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
@@ -10743,7 +10852,7 @@ class WeaponSystem extends Part {
         if (this.ammo == null)
             this.ammo = 1;
         if (json_version < 10.25) {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
             this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
@@ -10752,10 +10861,14 @@ class WeaponSystem extends Part {
         }
         this.MakeFinalWeapon();
         for (let elem of js["weapons"]) {
-            var w = new Weapon(this.final_weapon, this.fixed);
+            var w = new Weapon(this.final_weapon, this.action_sel, this.projectile_sel, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             w.fromJSON(elem, json_version);
             this.weapons.push(w);
+        }
+        this.MakeFinalWeapon();
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
     }
     serialize(s) {
@@ -10779,13 +10892,13 @@ class WeaponSystem extends Part {
         this.weapons = [];
         this.MakeFinalWeapon();
         for (let i = 0; i < wlen; i++) {
-            var w = new Weapon(this.final_weapon, this.fixed);
+            var w = new Weapon(this.final_weapon, this.action_sel, this.projectile_sel, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             w.deserialize(d);
             this.weapons.push(w);
         }
         if (d.version < 10.25) {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
             this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
@@ -10794,7 +10907,7 @@ class WeaponSystem extends Part {
         }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
-            w.SetWeaponType(this.final_weapon);
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
     }
     GetWeaponSelected() {
@@ -10813,20 +10926,20 @@ class WeaponSystem extends Part {
         this.final_weapon.shells = this.weapon_list[num].shells;
         this.final_weapon.size = this.weapon_list[num].size;
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
-        if (this.action_sel == 0) {
+        if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
-        else if (this.action_sel == 1) {
+        else if (this.action_sel == ActionType.MECHANICAL) {
             this.final_weapon.hits = 1 + this.weapon_list[num].hits;
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
             this.final_weapon.synched = true;
         }
-        else if (this.action_sel == 2) {
+        else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
             this.final_weapon.ammo = Math.floor(this.weapon_list[num].ammo / 2);
             this.final_weapon.jam = this.weapon_list[num].jam;
@@ -10839,7 +10952,7 @@ class WeaponSystem extends Part {
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
             var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
-            if (this.action_sel == 2) {
+            if (this.action_sel == ActionType.GAST) {
                 ammo *= 2;
             }
             var warn = "Uses Charges as ammo " + ammo.toString() + "/" + Math.floor(1.5 * ammo).toString() + ".";
@@ -10870,14 +10983,14 @@ class WeaponSystem extends Part {
             }
         }
         if (!this.weapon_list[num].can_action) {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
         }
         if (!this.weapon_list[num].can_projectile) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
-            w.SetWeaponType(this.final_weapon);
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
         this.CalculateStats();
     }
@@ -10939,7 +11052,7 @@ class WeaponSystem extends Part {
             num = 1;
         num = Math.floor(1.0e-6 + num);
         while (num > this.weapons.length) {
-            var w = new Weapon(this.final_weapon, this.fixed);
+            var w = new Weapon(this.final_weapon, this.action_sel, this.projectile_sel, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             this.weapons.push(w);
         }
@@ -11069,11 +11182,11 @@ class WeaponSystem extends Part {
             this.action_sel = num;
             this.MakeFinalWeapon();
             for (let w of this.weapons) {
-                w.SetWeaponType(this.final_weapon);
+                w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
             }
         }
         else {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
         }
         this.CalculateStats();
     }
@@ -11088,7 +11201,7 @@ class WeaponSystem extends Part {
             this.projectile_sel = num;
             this.MakeFinalWeapon();
             for (let w of this.weapons) {
-                w.SetWeaponType(this.final_weapon);
+                w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
             }
         }
         else {

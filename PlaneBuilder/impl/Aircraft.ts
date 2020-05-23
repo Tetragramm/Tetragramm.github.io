@@ -401,7 +401,8 @@ class Aircraft {
         if (this.engines.GetMaxRumble() > 0) {
             FlightStress += Math.max(1, 2 * this.engines.GetMaxRumble() - this.stats.structure / 10);
         }
-        FlightStress += Math.floor(1.0e-6 + DryMP / 10);
+        FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
+        FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
 
         return {
             DryMP: DryMP,

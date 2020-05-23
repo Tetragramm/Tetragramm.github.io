@@ -16,6 +16,12 @@ enum ProjectileType {
     PNEUMATIC,
     ENUM_MAX
 }
+enum ActionType {
+    STANDARD,
+    MECHANICAL,
+    GAST,
+    ENUM_MAX
+}
 class Weapon extends Part {
     private weapon_type: {
         name: string, era: string, size: number, stats: Stats,
@@ -29,7 +35,7 @@ class Weapon extends Part {
     private covered: boolean;
     private accessible: boolean;
     private free_accessible: boolean;
-    private synchronization: number;
+    private synchronization: SynchronizationType;
     private w_count: number;
     private repeating: boolean;
 
@@ -39,6 +45,8 @@ class Weapon extends Part {
     public can_arty_spinner: boolean;
     public wing_reinforcement: boolean;
     public has_cantilever: boolean;
+    private action: ActionType;
+    private projectile: ProjectileType;
 
     constructor(weapon_type: {
         name: string, era: string, size: number, stats: Stats,
@@ -46,7 +54,7 @@ class Weapon extends Part {
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
         can_action: boolean, can_projectile: boolean
-    }, fixed: boolean = false) {
+    }, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
         super();
         this.weapon_type = weapon_type;
         this.fixed = fixed;
@@ -115,8 +123,10 @@ class Weapon extends Part {
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
         can_action: boolean, can_projectile: boolean
-    }) {
+    }, action: ActionType, projectile: ProjectileType) {
         this.weapon_type = weapon_type;
+        this.action = action;
+        this.projectile = projectile;
         if (this.weapon_type.size == 16) {
             this.w_count = 1;
         }
@@ -214,6 +224,9 @@ class Weapon extends Part {
             return false;
         }
 
+        if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH))
+            return false;
+
         if ((num == SynchronizationType.INTERRUPT || num == SynchronizationType.SYNCH)
             && !this.weapon_type.synched) {
             return false;
@@ -288,9 +301,13 @@ class Weapon extends Part {
                 //No valid synchronizations
                 this.SetWing(true);
             }
+        } else if (this.action == ActionType.MECHANICAL) {
+            this.synchronization = SynchronizationType.SYNCH;
         } else {
             this.synchronization = use;
         }
+        if (this.wing)
+            this.synchronization = SynchronizationType.NONE;
         if (this.synchronization == SynchronizationType.SPINNER)
             this.w_count = 1;
     }
@@ -409,7 +426,7 @@ class Weapon extends Part {
         //Synchronization == -1 is no synch.
         if (this.synchronization == SynchronizationType.INTERRUPT) {
             stats.cost += this.w_count * 2;
-        } else if (this.synchronization == SynchronizationType.SYNCH) {
+        } else if (this.synchronization == SynchronizationType.SYNCH && this.action != ActionType.MECHANICAL) {
             stats.cost += this.w_count * 3;
             //synchronization == 2 is spinner and costs nothing.
         } else if (this.synchronization == SynchronizationType.DEFLECT) {

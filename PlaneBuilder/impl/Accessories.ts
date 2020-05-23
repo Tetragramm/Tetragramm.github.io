@@ -23,7 +23,7 @@ class Accessories extends Part {
     //Control
     private auto_list: { name: string, stats: Stats }[];
     private auto_sel: number;
-    private cont_list: { name: string, stats: Stats }[];
+    private cont_list: { name: string, max_mass_stress: number, max_total_stress: number, stats: Stats }[];
     private cont_sel: number;
 
     private acft_power: number;
@@ -81,7 +81,7 @@ class Accessories extends Part {
         this.cont_list = [];
         this.cont_sel = 0;
         for (let elem of js["control"]) {
-            this.cont_list.push({ name: elem["name"], stats: new Stats(elem) });
+            this.cont_list.push({ name: elem["name"], max_mass_stress: elem["max_mass_stress"], max_total_stress: elem["max_total_stress"], stats: new Stats(elem) });
         }
     }
 
@@ -296,6 +296,14 @@ class Accessories extends Part {
     public SetVitalParts(num: number) {
         this.vital_parts = num;
         this.NormalizeCoverage();
+    }
+
+    public GetMaxMassStress() {
+        return this.cont_list[this.cont_sel].max_mass_stress;
+    }
+
+    public GetMaxTotalStress() {
+        return this.cont_list[this.cont_sel].max_total_stress;
     }
 
     public SetCalculateStats(callback: () => void) {

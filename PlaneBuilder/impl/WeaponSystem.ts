@@ -47,7 +47,7 @@ class WeaponSystem extends Part {
         this.ammo = 1;
         this.weapon_type = 0;
         this.weapons = [];
-        this.action_sel = 0;
+        this.action_sel = ActionType.STANDARD;
         this.projectile_sel = ProjectileType.BULLETS;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
@@ -85,7 +85,7 @@ class WeaponSystem extends Part {
         if (this.ammo == null)
             this.ammo = 1;
         if (json_version < 10.25) {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
             this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
@@ -94,10 +94,14 @@ class WeaponSystem extends Part {
         }
         this.MakeFinalWeapon();
         for (let elem of js["weapons"]) {
-            var w = new Weapon(this.final_weapon, this.fixed);
+            var w = new Weapon(this.final_weapon, this.action_sel, this.projectile_sel, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             w.fromJSON(elem, json_version);
             this.weapons.push(w);
+        }
+        this.MakeFinalWeapon();
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
     }
 
@@ -123,13 +127,13 @@ class WeaponSystem extends Part {
         this.weapons = [];
         this.MakeFinalWeapon();
         for (let i = 0; i < wlen; i++) {
-            var w = new Weapon(this.final_weapon, this.fixed);
+            var w = new Weapon(this.final_weapon, this.action_sel, this.projectile_sel, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             w.deserialize(d);
             this.weapons.push(w);
         }
         if (d.version < 10.25) {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
             this.projectile_sel = ProjectileType.BULLETS;
         }
         else {
@@ -138,7 +142,7 @@ class WeaponSystem extends Part {
         }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
-            w.SetWeaponType(this.final_weapon);
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
     }
 
@@ -159,18 +163,18 @@ class WeaponSystem extends Part {
         this.final_weapon.shells = this.weapon_list[num].shells;
         this.final_weapon.size = this.weapon_list[num].size;
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
-        if (this.action_sel == 0) {
+        if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.synched = this.weapon_list[num].synched;
-        } else if (this.action_sel == 1) {
+        } else if (this.action_sel == ActionType.MECHANICAL) {
             this.final_weapon.hits = 1 + this.weapon_list[num].hits;
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
             this.final_weapon.synched = true;
-        } else if (this.action_sel == 2) {
+        } else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
             this.final_weapon.ammo = Math.floor(this.weapon_list[num].ammo / 2);
             this.final_weapon.jam = this.weapon_list[num].jam;
@@ -184,7 +188,7 @@ class WeaponSystem extends Part {
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
             var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
-            if (this.action_sel == 2) {
+            if (this.action_sel == ActionType.GAST) {
                 ammo *= 2;
             }
             var warn = "Uses Charges as ammo " + ammo.toString() + "/" + Math.floor(1.5 * ammo).toString() + ".";
@@ -214,7 +218,7 @@ class WeaponSystem extends Part {
             }
         }
         if (!this.weapon_list[num].can_action) {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
         }
         if (!this.weapon_list[num].can_projectile) {
             this.projectile_sel = ProjectileType.BULLETS;
@@ -222,7 +226,7 @@ class WeaponSystem extends Part {
         this.MakeFinalWeapon();
 
         for (let w of this.weapons) {
-            w.SetWeaponType(this.final_weapon);
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
         this.CalculateStats();
     }
@@ -292,7 +296,7 @@ class WeaponSystem extends Part {
             num = 1;
         num = Math.floor(1.0e-6 + num);
         while (num > this.weapons.length) {
-            var w = new Weapon(this.final_weapon, this.fixed);
+            var w = new Weapon(this.final_weapon, this.action_sel, this.projectile_sel, this.fixed);
             w.SetCalculateStats(this.CalculateStats);
             this.weapons.push(w);
         }
@@ -433,11 +437,11 @@ class WeaponSystem extends Part {
 
             this.MakeFinalWeapon()
             for (let w of this.weapons) {
-                w.SetWeaponType(this.final_weapon);
+                w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
             }
 
         } else {
-            this.action_sel = 0;
+            this.action_sel = ActionType.STANDARD;
         }
         this.CalculateStats();
     }
@@ -456,7 +460,7 @@ class WeaponSystem extends Part {
 
             this.MakeFinalWeapon()
             for (let w of this.weapons) {
-                w.SetWeaponType(this.final_weapon);
+                w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
             }
         } else {
             this.projectile_sel = ProjectileType.BULLETS;

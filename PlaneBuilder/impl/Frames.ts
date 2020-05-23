@@ -717,11 +717,13 @@ class Frames extends Part {
         }
 
         //Lifting Body and Flying Wing
+        var lb_count = this.CountLiftingBody();
+        stats.cost += lb_count;
         if (this.flying_wing) {
             stats.liftbleed += 5;
         }
         else {
-            stats.drag += this.CountLiftingBody();
+            stats.drag += lb_count;
         }
 
         stats.structure = Math.floor(1.0e-6 + stats.structure);

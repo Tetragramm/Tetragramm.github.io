@@ -2,8 +2,8 @@
 /// <reference path="./Stats.ts" />
 
 class Reinforcement extends Part {
-    private ext_wood_list: { name: string, tension: number, config: boolean, stats: Stats }[];
-    private ext_steel_list: { name: string, tension: number, config: boolean, stats: Stats }[];
+    private ext_wood_list: { name: string, tension: number, config: boolean, first: boolean, stats: Stats }[];
+    private ext_steel_list: { name: string, tension: number, config: boolean, first: boolean, stats: Stats }[];
     private ext_cabane_list: { name: string, tension: number, stats: Stats }[];
     private ext_wood_count: number[];
     private ext_steel_count: number[];
@@ -25,13 +25,13 @@ class Reinforcement extends Part {
 
         this.ext_wood_list = [];
         for (let elem of js["external_wood"]) {
-            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
         }
         this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
 
         this.ext_steel_list = [];
         for (let elem of js["external_steel"]) {
-            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], stats: new Stats(elem) });
+            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
         }
         this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
 
@@ -80,6 +80,12 @@ class Reinforcement extends Part {
         else {
             this.wing_blades = false;
         }
+        while (this.ext_wood_list.length > this.ext_wood_count.length) {
+            this.ext_wood_count.push(0);
+        }
+        while (this.ext_steel_list.length > this.ext_steel_count.length) {
+            this.ext_steel_count.push(0);
+        }
     }
 
     public serialize(s: Serialize) {
@@ -102,6 +108,9 @@ class Reinforcement extends Part {
         }
         else {
             this.wing_blades = false;
+        }
+        if (d.version < 10.45) {
+            this.ext_wood_count.push(0);
         }
     }
 
@@ -272,10 +281,12 @@ class Reinforcement extends Part {
 
         var tension = 0;
         var strut_count = 0;
+        var has_valid_first = false;
         //Wood Struts
         for (let i = 0; i < this.ext_wood_list.length; i++) {
             strut_count += this.ext_wood_count[i];
             if (this.ext_wood_count[i] > 0) {
+                has_valid_first = has_valid_first || this.ext_wood_list[i].first;
                 let ts = this.ext_wood_list[i].stats;
                 ts = ts.Multiply(this.ext_wood_count[i]);
                 stats = stats.Add(ts);
@@ -289,6 +300,7 @@ class Reinforcement extends Part {
         for (let i = 0; i < this.ext_steel_list.length; i++) {
             strut_count += this.ext_steel_count[i];
             if (this.ext_steel_count[i] > 0) {
+                has_valid_first = has_valid_first || this.ext_wood_list[i].first;
                 let ts = this.ext_steel_list[i].stats.Clone();
                 ts = ts.Multiply(this.ext_steel_count[i]);
                 stats = stats.Add(ts);
@@ -300,7 +312,7 @@ class Reinforcement extends Part {
         }
 
         //First Strut Bonus
-        if (strut_count > 0) {
+        if (has_valid_first) {
             stats.structure += 5;
             stats.maxstrain += 10;
             tension += 10;

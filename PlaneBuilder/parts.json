@@ -1,5 +1,5 @@
 {
-    "version": "10.4",
+    "version": "10.5",
     "era": {
         "options": [
             {
@@ -677,8 +677,7 @@
             {
                 "name": "Treated Paper",
                 "dragfactor": 0.5,
-                "massfactor": 1,
-                "mass": -1,
+                "massfactor": 0.75,
                 "flammable": true,
                 "monocoque": false,
                 "monocoque_structure": 0
@@ -752,7 +751,7 @@
             {
                 "name": "Aluminum Sheet",
                 "dragfactor": 0.35,
-                "massfactor": 1,
+                "massfactor": 0.75,
                 "cost": 2,
                 "toughness": 2,
                 "flammable": false,
@@ -1163,7 +1162,8 @@
                 "maxstrain": 5,
                 "tension": 30,
                 "cost": 1,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "N-Strut",
@@ -1173,7 +1173,8 @@
                 "maxstrain": 8,
                 "tension": 20,
                 "cost": 1,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "V-Strut",
@@ -1183,7 +1184,8 @@
                 "maxstrain": 5,
                 "tension": 30,
                 "cost": 1,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "I-Strut",
@@ -1192,7 +1194,8 @@
                 "maxstrain": 20,
                 "tension": 15,
                 "cost": 2,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "W-Strut",
@@ -1201,7 +1204,8 @@
                 "maxstrain": 35,
                 "tension": 0,
                 "cost": 2,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Single Strut",
@@ -1210,7 +1214,8 @@
                 "maxstrain": 10,
                 "tension": 0,
                 "cost": 1,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Star Strut",
@@ -1220,14 +1225,22 @@
                 "maxstrain": 30,
                 "tension": 0,
                 "cost": 2,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Wing Truss",
                 "drag": 4,
                 "tension": 40,
                 "cost": 1,
-                "config": false
+                "config": false,
+                "first": true
+            },
+            {
+                "name": "Wire Root",
+                "tension": 10,
+                "config": true,
+                "first": false
             }
         ],
         "external_steel": [
@@ -1239,7 +1252,8 @@
                 "maxstrain": 10,
                 "tension": 15,
                 "cost": 2,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Steel N-Strut",
@@ -1249,7 +1263,8 @@
                 "maxstrain": 13,
                 "tension": 10,
                 "cost": 2,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Steel V-Strut",
@@ -1259,7 +1274,8 @@
                 "maxstrain": 10,
                 "tension": 15,
                 "cost": 2,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Steel I-Strut",
@@ -1268,7 +1284,8 @@
                 "maxstrain": 25,
                 "tension": 7,
                 "cost": 4,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Steel W-Strut",
@@ -1277,7 +1294,8 @@
                 "maxstrain": 40,
                 "tension": 0,
                 "cost": 4,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Steel Single Strut",
@@ -1286,7 +1304,8 @@
                 "maxstrain": 15,
                 "tension": 0,
                 "cost": 2,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Steel Star Strut",
@@ -1296,14 +1315,22 @@
                 "maxstrain": 35,
                 "tension": 0,
                 "cost": 4,
-                "config": true
+                "config": true,
+                "first": true
             },
             {
                 "name": "Steel Wing Truss",
                 "drag": 4,
                 "tension": 20,
                 "cost": 2,
-                "config": false
+                "config": false,
+                "first": true
+            },
+            {
+                "name": "Steel Wire Root",
+                "tension": 10,
+                "config": true,
+                "first": false
             }
         ],
         "cabane": [
@@ -1449,38 +1476,43 @@
         "cantilever": [
             {
                 "name": "Birch",
-                "mass": 2,
-                "maxstrain": 20,
+                "mass": 1,
+                "maxstrain": 10,
+                "toughness": 2,
                 "cost": 1,
                 "limited": true
             },
             {
                 "name": "Duralumin",
-                "mass": 2,
-                "maxstrain": 30,
+                "mass": 1,
+                "maxstrain": 15,
+                "toughness": 3,
                 "cost": 2,
                 "limited": true
             },
             {
                 "name": "Steel",
-                "mass": 3,
-                "maxstrain": 60,
+                "mass": 1,
+                "maxstrain": 20,
+                "toughness": 5,
                 "cost": 3,
                 "limited": true
             },
             {
                 "name": "Aluminium",
-                "mass": 2,
-                "maxstrain": 40,
+                "mass": 1,
+                "maxstrain": 25,
+                "toughness": 3,
                 "cost": 4,
                 "limited": true
             },
             {
                 "name": "Whalebone",
-                "mass": -10,
-                "maxstrain": 15,
+                "mass": 1,
+                "liftbleed": -3,
+                "maxstrain": 5,
                 "cost": 8,
-                "limited": false
+                "limited": true
             }
         ]
     },
@@ -1599,7 +1631,7 @@
         ],
         "extras": [
             {
-                "name": "Zepplin Hook",
+                "name": "Zeppelin Hook",
                 "mass": 1,
                 "MpLMP": 0,
                 "warning": "Allows landing inside airships or large planes."
@@ -1768,25 +1800,30 @@
         ],
         "control": [
             {
-                "name": "No Aids"
+                "name": "No Aids",
+                "max_mass_stress": 1000,
+                "max_total_stress": 1000
             },
             {
                 "name": "Control Rods",
                 "mass": 1,
                 "cost": 2,
-                "flightstress": -1
+                "max_mass_stress": 1,
+                "max_total_stress": 1000
             },
             {
                 "name": "Hydraulic-Assisted",
                 "mass": 3,
                 "cost": 5,
-                "flightstress": -3
+                "max_mass_stress": 0,
+                "max_total_stress": 1000
             },
             {
                 "name": "Fly by Wire",
                 "mass": 3,
                 "cost": 10,
-                "flightstress": -9999
+                "max_mass_stress": 0,
+                "max_total_stress": 0
             }
         ]
     }

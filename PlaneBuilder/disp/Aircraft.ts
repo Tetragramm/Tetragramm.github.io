@@ -906,9 +906,17 @@ class Aircraft_HTML extends Display {
         var plist = aircraft_model.GetWeapons().GetProjectileList();
         this.weapon_cell.innerHTML = "";
         if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-            var weaphtml = aircraft_model.GetMunitions().GetBombCount().toString() + " Mass of bombs or rockets.";
-            if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
-                weaphtml += " Largest internal bomb allowed is " + aircraft_model.GetMunitions().GetMaxBombSize() + " Mass.";
+            var weaphtml = "";
+            if (aircraft_model.GetMunitions().GetBombCount() > 0) {
+                var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
+                var external = aircraft_model.GetMunitions().GetBombCount() - internal;
+                if (internal > 0)
+                    weaphtml += (internal.toString() + " Bomb Mass Internally. ");
+                if (external > 0)
+                    weaphtml += (external.toString() + " Bomb Mass Externally. ");
+                if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
+                    weaphtml += ("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass.");
+                }
             }
             this.weapon_cell.innerHTML = weaphtml + "<br/>";
             this.copy_text += weaphtml + "\n\t";
