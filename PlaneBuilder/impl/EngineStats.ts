@@ -31,6 +31,17 @@ class EngineStats {
         starter: boolean,
     };
     constructor(js?: JSON) {
+        this.input_pj = {
+            power: 0, type: 0, era_sel: 0,
+            quality_cost: 0, quality_rely: 0, starter: false
+        };
+        this.input_eb = {
+            displacement: 0, compression: 0, type: 0,
+            cyl_per_row: 0, rows: 0, RPM_boost: 0,
+            era_sel: 0, material_fudge: 0, quality_fudge: 0,
+            upgrades: []
+        };
+
         if (js) {
             this.fromJSON(js, 10.5);
         }
@@ -66,6 +77,7 @@ class EngineStats {
             this.oiltank = js["oiltank"];
         if (js["pulsejet"])
             this.pulsejet = js["pulsejet"];
+
         if (this.pulsejet && js["input_pj"]) {
             var ipj = js["input_pj"];
             this.input_pj.power = ipj["power"];
