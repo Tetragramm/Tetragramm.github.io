@@ -193,6 +193,8 @@ class Aircraft_HTML extends Display {
                     var str = JSON.parse(reader.result as string);
                     var acft = new Aircraft(parts_JSON, weapon_json, false);
                     if (acft.fromJSON(str)) {
+                        str = JSON.parse(reader.result as string);
+                        console.log(str);
                         this.acft.fromJSON(str);
                         this.acft.CalculateStats();
                     }

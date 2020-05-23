@@ -86,6 +86,12 @@ class Reinforcement extends Part {
         while (this.ext_steel_list.length > this.ext_steel_count.length) {
             this.ext_steel_count.push(0);
         }
+        if (json_version < 10.45) {
+            this.cant_count[0] *= 2;
+            this.cant_count[1] *= 2;
+            this.cant_count[2] *= 3;
+            this.cant_count[3] *= 2;
+        }
     }
 
     public serialize(s: Serialize) {
@@ -109,8 +115,17 @@ class Reinforcement extends Part {
         else {
             this.wing_blades = false;
         }
-        if (d.version < 10.45) {
+        while (this.ext_wood_list.length > this.ext_wood_count.length) {
             this.ext_wood_count.push(0);
+        }
+        while (this.ext_steel_list.length > this.ext_steel_count.length) {
+            this.ext_steel_count.push(0);
+        }
+        if (d.version < 10.45) {
+            this.cant_count[0] *= 2;
+            this.cant_count[1] *= 2;
+            this.cant_count[2] *= 3;
+            this.cant_count[3] *= 2;
         }
     }
 
