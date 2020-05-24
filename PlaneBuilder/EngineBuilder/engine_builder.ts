@@ -66,7 +66,6 @@ class EngineBuilder_HTML {
     private p_type: HTMLSelectElement;
     private p_sera: HTMLSelectElement;
     private p_bqul: HTMLInputElement;
-    private p_oqul: HTMLInputElement;
     private p_strt: HTMLInputElement;
     //Pulsejet Outputs
     private pd_name: HTMLLabelElement;
@@ -273,7 +272,6 @@ class EngineBuilder_HTML {
         this.p_type = document.createElement("SELECT") as HTMLSelectElement;
         this.p_sera = document.createElement("SELECT") as HTMLSelectElement;
         this.p_bqul = document.createElement("INPUT") as HTMLInputElement;
-        this.p_oqul = document.createElement("INPUT") as HTMLInputElement;
         this.p_strt = document.createElement("INPUT") as HTMLInputElement;
         for (let v of this.pulsejetbuilder.ValveTable) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -290,20 +288,16 @@ class EngineBuilder_HTML {
         FlexInput("Desired Power", this.p_powr, fs);
         FlexSelect("Engine Type", this.p_type, fs);
         FlexSelect("Era", this.p_sera, fs);
-        FlexInput("Quality (Cost)", this.p_bqul, fs);
-        FlexInput("Quality (Reliability)", this.p_oqul, fs);
+        FlexInput("Quality", this.p_bqul, fs);
         FlexCheckbox("Starter", this.p_strt, fs);
 
-        this.p_bqul.step = "1";
+        this.p_bqul.step = "0.1";
         this.p_bqul.min = "0";
-        this.p_oqul.step = "0.1";
-        this.p_oqul.min = "0.1";
 
         this.p_powr.onchange = () => { this.pulsejetbuilder.desired_power = this.p_powr.valueAsNumber; this.UpdatePulsejet(); };
         this.p_type.onchange = () => { this.pulsejetbuilder.valve_sel = this.p_type.selectedIndex; this.UpdatePulsejet(); };
         this.p_sera.onchange = () => { this.pulsejetbuilder.era_sel = this.p_sera.selectedIndex; this.UpdatePulsejet(); };
-        this.p_bqul.onchange = () => { this.pulsejetbuilder.build_quality = this.p_bqul.valueAsNumber; this.UpdatePulsejet(); };
-        this.p_oqul.onchange = () => { this.pulsejetbuilder.overall_quality = this.p_oqul.valueAsNumber; this.UpdatePulsejet(); };
+        this.p_bqul.onchange = () => { this.pulsejetbuilder.build_quality = this.p_bqul.valueAsNumber; this.pulsejetbuilder.overall_quality = this.p_bqul.valueAsNumber; this.UpdatePulsejet(); };
         this.p_strt.onchange = () => { this.pulsejetbuilder.starter = this.p_strt.checked; this.UpdatePulsejet(); };
     }
 
@@ -336,7 +330,6 @@ class EngineBuilder_HTML {
         this.p_type.selectedIndex = this.pulsejetbuilder.valve_sel;
         this.p_sera.selectedIndex = this.pulsejetbuilder.era_sel;
         this.p_bqul.valueAsNumber = this.pulsejetbuilder.build_quality;
-        this.p_oqul.valueAsNumber = this.pulsejetbuilder.overall_quality;
         this.p_strt.checked = this.pulsejetbuilder.starter;
 
         var estats = this.pulsejetbuilder.EngineStats();
@@ -518,6 +511,30 @@ class EngineBuilder_HTML {
         this.m_oil.checked = e_stats.oiltank;
         this.m_pulsejet.checked = e_stats.pulsejet;
         this.m_turbo.checked = e_stats.stats.reqsections > 0;
+        if (e_stats.pulsejet) {
+            this.pulsejetbuilder.era_sel = e_stats.input_pj.era_sel;
+            this.pulsejetbuilder.valve_sel = e_stats.input_pj.type;
+            this.pulsejetbuilder.desired_power = e_stats.input_pj.power;
+            this.pulsejetbuilder.build_quality = e_stats.input_pj.quality_cost;
+            this.pulsejetbuilder.overall_quality = e_stats.input_pj.quality_rely;
+            this.pulsejetbuilder.starter = e_stats.input_pj.starter;
+            this.UpdatePulsejet();
+        } else {
+            this.enginebuilder.name = e_stats.name;
+            this.enginebuilder.era_sel = e_stats.input_eb.era_sel;
+            this.enginebuilder.cool_sel = e_stats.input_eb.type;
+            this.enginebuilder.engine_displacement = e_stats.input_eb.displacement;
+            this.enginebuilder.compression_ratio = e_stats.input_eb.compression;
+            this.enginebuilder.num_cyl_per_row = e_stats.input_eb.cyl_per_row;
+            this.enginebuilder.num_rows = e_stats.input_eb.rows;
+            this.enginebuilder.rpm_boost = e_stats.input_eb.RPM_boost;
+            this.enginebuilder.material_fudge = e_stats.input_eb.material_fudge;
+            this.enginebuilder.quality_fudge = e_stats.input_eb.quality_fudge;
+            for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
+                this.enginebuilder.upg_sel[i] = e_stats.input_eb.upgrades[i];
+            }
+            this.UpdateEngine();
+        }
     }
 
     public SelectEngine(num: number) {

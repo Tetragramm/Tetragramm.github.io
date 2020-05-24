@@ -43,7 +43,7 @@ class EngineStats {
         };
 
         if (js) {
-            this.fromJSON(js, 10.5);
+            this.fromJSON(js);
         }
     }
 
@@ -62,7 +62,7 @@ class EngineStats {
         };
     }
 
-    public fromJSON(js: JSON, json_version: number) {
+    public fromJSON(js: JSON, json_version: number = 9999) {
         if (js["name"])
             this.name = js["name"];
         if (js["overspeed"])
@@ -164,20 +164,10 @@ class EngineStats {
         this.stats.deserialize(d);
     }
 
-    public Add(other: EngineStats): EngineStats {
-        let res = new EngineStats();
-        res.stats = this.stats.Add(other.stats);
-        res.name = this.name;
-        res.overspeed = this.overspeed + other.overspeed;
-        res.altitude = this.altitude + other.altitude;
-        res.torque = this.torque + other.torque;
-        res.rumble = this.rumble + other.rumble;
-        res.oiltank = this.oiltank || other.oiltank;
-        res.pulsejet = this.pulsejet || other.pulsejet;
-        return res;
-    }
     public Clone(): EngineStats {
-        return this.Add(new EngineStats());
+        var c = new EngineStats();
+        c.fromJSON(JSON.parse(JSON.stringify(this.toJSON())));
+        return c;
     }
     public Equal(other: EngineStats) {
         return this.stats.Equal(other.stats)

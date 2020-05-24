@@ -87,6 +87,8 @@ class PulsejetBuilder {
         this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
         this.build_quality = Math.max(0.01, this.build_quality);
         this.overall_quality = Math.max(0.01, this.overall_quality);
+        this.build_quality = Math.max(this.build_quality, this.overall_quality);
+        this.overall_quality = this.build_quality;
     }
 
     public DesignCost() {
@@ -121,6 +123,14 @@ class PulsejetBuilder {
         estats.overspeed = 100;
         estats.altitude = 3;
         estats.pulsejet = true;
+
+        estats.input_pj.era_sel = this.era_sel;
+        estats.input_pj.type = this.valve_sel;
+        estats.input_pj.power = this.desired_power;
+        estats.input_pj.quality_cost = this.build_quality;
+        estats.input_pj.quality_rely = this.overall_quality;
+        estats.input_pj.starter = this.starter;
+
         return estats;
     }
 }

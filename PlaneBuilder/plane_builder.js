@@ -458,13 +458,13 @@ class EngineStats {
             upgrades: []
         };
         if (js) {
-            this.fromJSON(js, 10.5);
+            this.fromJSON(js);
         }
     }
     toJSON() {
         return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet, input_eb: this.input_eb, input_pj: this.input_pj }, this.stats.toJSON());
     }
-    fromJSON(js, json_version) {
+    fromJSON(js, json_version = 9999) {
         if (js["name"])
             this.name = js["name"];
         if (js["overspeed"])
@@ -565,20 +565,10 @@ class EngineStats {
         }
         this.stats.deserialize(d);
     }
-    Add(other) {
-        let res = new EngineStats();
-        res.stats = this.stats.Add(other.stats);
-        res.name = this.name;
-        res.overspeed = this.overspeed + other.overspeed;
-        res.altitude = this.altitude + other.altitude;
-        res.torque = this.torque + other.torque;
-        res.rumble = this.rumble + other.rumble;
-        res.oiltank = this.oiltank || other.oiltank;
-        res.pulsejet = this.pulsejet || other.pulsejet;
-        return res;
-    }
     Clone() {
-        return this.Add(new EngineStats());
+        var c = new EngineStats();
+        c.fromJSON(JSON.parse(JSON.stringify(this.toJSON())));
+        return c;
     }
     Equal(other) {
         return this.stats.Equal(other.stats)
@@ -650,12 +640,20 @@ class EngineList {
     push(es) {
         for (let i = 0; i < this.length; i++) {
             let li = this.list[i];
-            if (li.Equal(es))
-                return i;
+            if (li.Equal(es)) {
+                if ((li.pulsejet && li.input_pj.power == 0 && es.input_pj.power != 0)
+                    || (!li.pulsejet && li.input_eb.displacement == 0 && es.input_eb.displacement != 0)) {
+                    this.list.splice(i, 1);
+                    break;
+                }
+                else {
+                    return i;
+                }
+            }
         }
         this.list.push(es.Clone());
-        window.localStorage.engines = JSON.stringify(this.toJSON());
         this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        window.localStorage.engines = JSON.stringify(this.toJSON());
         return this.find(es);
     }
     get(i) {
@@ -675,6 +673,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
+        window.localStorage.engines = JSON.stringify(this.toJSON());
     }
     get length() {
         return this.list.length;
@@ -1291,9 +1290,7 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetCurrentStats() {
-        let stats = new EngineStats();
-        stats = stats.Add(this.etype_stats);
-        return stats;
+        return this.etype_stats.Clone();
     }
     NeedCooling() {
         return this.cooling_count > 0;

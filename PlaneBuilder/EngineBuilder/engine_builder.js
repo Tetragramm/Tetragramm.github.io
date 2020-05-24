@@ -29,7 +29,7 @@ class Stats {
         this.charge = 0;
         this.warnings = [];
         if (js) {
-            this.fromJSON(js, "");
+            this.fromJSON(js, 0);
         }
     }
     toJSON() {
@@ -444,14 +444,24 @@ class EngineStats {
         this.oiltank = false;
         this.pulsejet = false;
         this.stats = new Stats();
+        this.input_pj = {
+            power: 0, type: 0, era_sel: 0,
+            quality_cost: 0, quality_rely: 0, starter: false
+        };
+        this.input_eb = {
+            displacement: 0, compression: 0, type: 0,
+            cyl_per_row: 0, rows: 0, RPM_boost: 0,
+            era_sel: 0, material_fudge: 0, quality_fudge: 0,
+            upgrades: []
+        };
         if (js) {
-            this.fromJSON(js, "");
+            this.fromJSON(js);
         }
     }
     toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet, input_eb: this.input_eb, input_pj: this.input_pj }, this.stats.toJSON());
     }
-    fromJSON(js, json_version) {
+    fromJSON(js, json_version = 9999) {
         if (js["name"])
             this.name = js["name"];
         if (js["overspeed"])
@@ -466,6 +476,28 @@ class EngineStats {
             this.oiltank = js["oiltank"];
         if (js["pulsejet"])
             this.pulsejet = js["pulsejet"];
+        if (this.pulsejet && js["input_pj"]) {
+            var ipj = js["input_pj"];
+            this.input_pj.power = ipj["power"];
+            this.input_pj.type = ipj["type"];
+            this.input_pj.era_sel = ipj["era_sel"];
+            this.input_pj.quality_cost = ipj["quality_cost"];
+            this.input_pj.quality_rely = ipj["quality_rely"];
+            this.input_pj.starter = ipj["starter"];
+        }
+        else if (js["input_eb"]) {
+            var ieb = js["input_eb"];
+            this.input_eb.displacement = ieb["displacement"];
+            this.input_eb.compression = ieb["compression"];
+            this.input_eb.type = ieb["type"];
+            this.input_eb.cyl_per_row = ieb["cyl_per_row"];
+            this.input_eb.rows = ieb["rows"];
+            this.input_eb.RPM_boost = ieb["RPM_boost"];
+            this.input_eb.era_sel = ieb["era_sel"];
+            this.input_eb.material_fudge = ieb["material_fudge"];
+            this.input_eb.quality_fudge = ieb["quality_fudge"];
+            this.input_eb.upgrades = ieb["upgrades"];
+        }
         this.stats = new Stats(js);
     }
     serialize(s) {
@@ -476,6 +508,26 @@ class EngineStats {
         s.PushNum(this.rumble);
         s.PushBool(this.oiltank);
         s.PushBool(this.pulsejet);
+        if (this.pulsejet) {
+            s.PushNum(this.input_pj.power);
+            s.PushNum(this.input_pj.type);
+            s.PushNum(this.input_pj.era_sel);
+            s.PushNum(this.input_pj.quality_cost);
+            s.PushNum(this.input_pj.quality_rely);
+            s.PushBool(this.input_pj.starter);
+        }
+        else {
+            s.PushNum(this.input_eb.displacement);
+            s.PushNum(this.input_eb.compression);
+            s.PushNum(this.input_eb.type);
+            s.PushNum(this.input_eb.cyl_per_row);
+            s.PushNum(this.input_eb.rows);
+            s.PushNum(this.input_eb.RPM_boost);
+            s.PushNum(this.input_eb.era_sel);
+            s.PushNum(this.input_eb.material_fudge);
+            s.PushNum(this.input_eb.quality_fudge);
+            s.PushBoolArr(this.input_eb.upgrades);
+        }
         this.stats.serialize(s);
     }
     deserialize(d) {
@@ -486,22 +538,34 @@ class EngineStats {
         this.rumble = d.GetNum();
         this.oiltank = d.GetBool();
         this.pulsejet = d.GetBool();
+        if (d.version > 10.45) {
+            if (this.pulsejet) {
+                this.input_pj.power = d.GetNum();
+                this.input_pj.type = d.GetNum();
+                this.input_pj.era_sel = d.GetNum();
+                this.input_pj.quality_cost = d.GetNum();
+                this.input_pj.quality_rely = d.GetNum();
+                this.input_pj.starter = d.GetBool();
+            }
+            else {
+                this.input_eb.displacement = d.GetNum();
+                this.input_eb.compression = d.GetNum();
+                this.input_eb.type = d.GetNum();
+                this.input_eb.cyl_per_row = d.GetNum();
+                this.input_eb.rows = d.GetNum();
+                this.input_eb.RPM_boost = d.GetNum();
+                this.input_eb.era_sel = d.GetNum();
+                this.input_eb.material_fudge = d.GetNum();
+                this.input_eb.quality_fudge = d.GetNum();
+                this.input_eb.upgrades = d.GetBoolArr();
+            }
+        }
         this.stats.deserialize(d);
     }
-    Add(other) {
-        let res = new EngineStats();
-        res.stats = this.stats.Add(other.stats);
-        res.name = this.name;
-        res.overspeed = this.overspeed + other.overspeed;
-        res.altitude = this.altitude + other.altitude;
-        res.torque = this.torque + other.torque;
-        res.rumble = this.rumble + other.rumble;
-        res.oiltank = this.oiltank || other.oiltank;
-        res.pulsejet = this.pulsejet || other.pulsejet;
-        return res;
-    }
     Clone() {
-        return this.Add(new EngineStats());
+        var c = new EngineStats();
+        c.fromJSON(JSON.parse(JSON.stringify(this.toJSON())));
+        return c;
     }
     Equal(other) {
         return this.stats.Equal(other.stats)
@@ -573,12 +637,20 @@ class EngineList {
     push(es) {
         for (let i = 0; i < this.length; i++) {
             let li = this.list[i];
-            if (li.Equal(es))
-                return i;
+            if (li.Equal(es)) {
+                if ((li.pulsejet && li.input_pj.power == 0 && es.input_pj.power != 0)
+                    || (!li.pulsejet && li.input_eb.displacement == 0 && es.input_eb.displacement != 0)) {
+                    this.list.splice(i, 1);
+                    break;
+                }
+                else {
+                    return i;
+                }
+            }
         }
         this.list.push(es.Clone());
-        window.localStorage.engines = JSON.stringify(this.toJSON());
         this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        window.localStorage.engines = JSON.stringify(this.toJSON());
         return this.find(es);
     }
     get(i) {
@@ -598,6 +670,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
+        window.localStorage.engines = JSON.stringify(this.toJSON());
     }
     get length() {
         return this.list.length;
@@ -851,6 +924,8 @@ class EngineBuilder {
         estats.stats.cost = this.CalcCost();
         estats.pulsejet = false;
         estats.rumble = 0;
+        if (this.upg_sel[1])
+            estats.stats.reqsections = 1;
         return estats;
     }
 }
@@ -919,6 +994,8 @@ class PulsejetBuilder {
         this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
         this.build_quality = Math.max(0.01, this.build_quality);
         this.overall_quality = Math.max(0.01, this.overall_quality);
+        this.build_quality = Math.max(this.build_quality, this.overall_quality);
+        this.overall_quality = this.build_quality;
     }
     DesignCost() {
         var Era = this.EraTable[this.era_sel];
@@ -946,6 +1023,12 @@ class PulsejetBuilder {
         estats.overspeed = 100;
         estats.altitude = 3;
         estats.pulsejet = true;
+        estats.input_pj.era_sel = this.era_sel;
+        estats.input_pj.type = this.valve_sel;
+        estats.input_pj.power = this.desired_power;
+        estats.input_pj.quality_cost = this.build_quality;
+        estats.input_pj.quality_rely = this.overall_quality;
+        estats.input_pj.starter = this.starter;
         return estats;
     }
 }
@@ -1834,7 +1917,6 @@ class EngineBuilder_HTML {
         this.p_type = document.createElement("SELECT");
         this.p_sera = document.createElement("SELECT");
         this.p_bqul = document.createElement("INPUT");
-        this.p_oqul = document.createElement("INPUT");
         this.p_strt = document.createElement("INPUT");
         for (let v of this.pulsejetbuilder.ValveTable) {
             let opt = document.createElement("OPTION");
@@ -1850,18 +1932,14 @@ class EngineBuilder_HTML {
         FlexInput("Desired Power", this.p_powr, fs);
         FlexSelect("Engine Type", this.p_type, fs);
         FlexSelect("Era", this.p_sera, fs);
-        FlexInput("Quality (Cost)", this.p_bqul, fs);
-        FlexInput("Quality (Reliability)", this.p_oqul, fs);
+        FlexInput("Quality", this.p_bqul, fs);
         FlexCheckbox("Starter", this.p_strt, fs);
-        this.p_bqul.step = "1";
+        this.p_bqul.step = "0.1";
         this.p_bqul.min = "0";
-        this.p_oqul.step = "0.1";
-        this.p_oqul.min = "0.1";
         this.p_powr.onchange = () => { this.pulsejetbuilder.desired_power = this.p_powr.valueAsNumber; this.UpdatePulsejet(); };
         this.p_type.onchange = () => { this.pulsejetbuilder.valve_sel = this.p_type.selectedIndex; this.UpdatePulsejet(); };
         this.p_sera.onchange = () => { this.pulsejetbuilder.era_sel = this.p_sera.selectedIndex; this.UpdatePulsejet(); };
-        this.p_bqul.onchange = () => { this.pulsejetbuilder.build_quality = this.p_bqul.valueAsNumber; this.UpdatePulsejet(); };
-        this.p_oqul.onchange = () => { this.pulsejetbuilder.overall_quality = this.p_oqul.valueAsNumber; this.UpdatePulsejet(); };
+        this.p_bqul.onchange = () => { this.pulsejetbuilder.build_quality = this.p_bqul.valueAsNumber; this.pulsejetbuilder.overall_quality = this.p_bqul.valueAsNumber; this.UpdatePulsejet(); };
         this.p_strt.onchange = () => { this.pulsejetbuilder.starter = this.p_strt.checked; this.UpdatePulsejet(); };
     }
     InitPulsejetOutputs(cell) {
@@ -1892,7 +1970,6 @@ class EngineBuilder_HTML {
         this.p_type.selectedIndex = this.pulsejetbuilder.valve_sel;
         this.p_sera.selectedIndex = this.pulsejetbuilder.era_sel;
         this.p_bqul.valueAsNumber = this.pulsejetbuilder.build_quality;
-        this.p_oqul.valueAsNumber = this.pulsejetbuilder.overall_quality;
         this.p_strt.checked = this.pulsejetbuilder.starter;
         var estats = this.pulsejetbuilder.EngineStats();
         BlinkIfChanged(this.pd_name, estats.name);
@@ -2064,6 +2141,31 @@ class EngineBuilder_HTML {
         this.m_oil.checked = e_stats.oiltank;
         this.m_pulsejet.checked = e_stats.pulsejet;
         this.m_turbo.checked = e_stats.stats.reqsections > 0;
+        if (e_stats.pulsejet) {
+            this.pulsejetbuilder.era_sel = e_stats.input_pj.era_sel;
+            this.pulsejetbuilder.valve_sel = e_stats.input_pj.type;
+            this.pulsejetbuilder.desired_power = e_stats.input_pj.power;
+            this.pulsejetbuilder.build_quality = e_stats.input_pj.quality_cost;
+            this.pulsejetbuilder.overall_quality = e_stats.input_pj.quality_rely;
+            this.pulsejetbuilder.starter = e_stats.input_pj.starter;
+            this.UpdatePulsejet();
+        }
+        else {
+            this.enginebuilder.name = e_stats.name;
+            this.enginebuilder.era_sel = e_stats.input_eb.era_sel;
+            this.enginebuilder.cool_sel = e_stats.input_eb.type;
+            this.enginebuilder.engine_displacement = e_stats.input_eb.displacement;
+            this.enginebuilder.compression_ratio = e_stats.input_eb.compression;
+            this.enginebuilder.num_cyl_per_row = e_stats.input_eb.cyl_per_row;
+            this.enginebuilder.num_rows = e_stats.input_eb.rows;
+            this.enginebuilder.rpm_boost = e_stats.input_eb.RPM_boost;
+            this.enginebuilder.material_fudge = e_stats.input_eb.material_fudge;
+            this.enginebuilder.quality_fudge = e_stats.input_eb.quality_fudge;
+            for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
+                this.enginebuilder.upg_sel[i] = e_stats.input_eb.upgrades[i];
+            }
+            this.UpdateEngine();
+        }
     }
     SelectEngine(num) {
         this.SetValues(elist.get(num));

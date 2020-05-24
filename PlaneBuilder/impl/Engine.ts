@@ -168,9 +168,7 @@ class Engine extends Part {
     }
 
     public GetCurrentStats(): EngineStats {
-        let stats = new EngineStats();
-        stats = stats.Add(this.etype_stats);
-        return stats;
+        return this.etype_stats.Clone();
     }
 
     public NeedCooling(): boolean {

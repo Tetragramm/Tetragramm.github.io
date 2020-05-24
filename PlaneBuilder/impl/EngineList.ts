@@ -50,12 +50,19 @@ class EngineList {
     public push(es: EngineStats) {
         for (let i = 0; i < this.length; i++) {
             let li = this.list[i];
-            if (li.Equal(es))
-                return i;
+            if (li.Equal(es)) {
+                if ((li.pulsejet && li.input_pj.power == 0 && es.input_pj.power != 0)
+                    || (!li.pulsejet && li.input_eb.displacement == 0 && es.input_eb.displacement != 0)) {
+                    this.list.splice(i, 1);
+                    break;
+                } else {
+                    return i;
+                }
+            }
         }
         this.list.push(es.Clone());
-        window.localStorage.engines = JSON.stringify(this.toJSON());
         this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        window.localStorage.engines = JSON.stringify(this.toJSON());
         return this.find(es);
     }
 
@@ -78,6 +85,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
+        window.localStorage.engines = JSON.stringify(this.toJSON());
     }
 
     get length(): number {

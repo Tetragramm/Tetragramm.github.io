@@ -2,14 +2,25 @@
 @import "reset.css";
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
+:root{
+	--bkg_color: rgb(20,20,60);
+	--ftr_bkg_color: #00308F;
+	--inp_bkg_color:#383838;
+	--inp_txt_color:#c7c7c7;
+	--inp_bdr_color: #555555;
+	--lnk_color:#01b9d1;
+	--lnk_act_color:#72a0c1;
+	--prt_lcl_color:#004f98;
+}
+
 html {
-	background-color: rgb(20, 20, 60);
+	background-color: var(--bkg_color);
 }
 
 .html_body {
 	font-family: Open Sans, Helvetica, Arial, sans-serif;
 	line-height: 1.3333;
-	color: #b1b1b1;
+	color: var(--inp_txt_color);
 	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
@@ -27,12 +38,12 @@ html {
 }
 
 .html_content {
-	background-color: rgb(20, 20, 60);
+	background-color: var(--bkg_color);
 	flex: auto;
 }
 
 .html_footer {
-	background-color: rgb(0, 50, 150);
+	background-color: var(--ftr_bkg_color);
 	display: flex;
 	font-size: .8rem;
 	color: #ffffff;
@@ -50,11 +61,11 @@ h3 {
 h2 {
 	font-size: 2em;
 	font-weight: 700;
-	border-bottom: .0625rem solid #606060;
+	border-bottom: .0625rem solid var(--inp_bdr_color);
 }
 
 a {
-	color: #008ba3; /* blue */
+	color: var(--lnk_color); /* blue */
 	text-decoration: none;
 	cursor: pointer;
 }
@@ -62,7 +73,7 @@ a {
 a:hover,
 a:active,
 a:focus {
-	color: #00d9ff; /* sky blue */
+	color: var(--lnk_act_color); /* sky blue */
 }
 
 table {
@@ -75,9 +86,9 @@ table {
 }
 
 th {
-	border: 1px solid #555555;
+	border: 1px solid var(--inp_bdr_color);
 	font-weight: bold;
-	color: rgb(77, 181, 215);
+	color: var(--lnk_color);
 	padding: .25rem;
 	text-align: center;
 	margin-top:0;
@@ -87,14 +98,14 @@ th {
 .lbl_action:hover,
 .lbl_action:active,
 .lbl_action:focus {
-	color: #00d9ff; /* sky blue */
+	color: var(--lnk_act_color); /* sky blue */
 }
 
 .lbl_action:active {
 	color: #ffffff;
 }
 .lbl_action{
-	color: #008ba3; /* blue */
+	color: var(--lnk_color); /* blue */
 }
 
 .btn_th {
@@ -104,7 +115,7 @@ th {
 }
 
 td {
-	border: 1px solid #555555;
+	border: 1px solid var(--inp_bdr_color);
 	padding: .25rem;
 	margin-top:0;
 	margin-bottom:0;
@@ -131,9 +142,9 @@ select, input {
 	-o-appearance: none;
 	box-sizing: border-box;
 	height: 1.5em !important;
-	background-color: #383838;
-	color: #c7c7c7;
-	border-color: #555555;
+	background-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
+	border-color: var(--inp_bdr_color);
 	text-align: center;
 	border-style: solid;
 	line-height: 1.5em;
@@ -147,7 +158,7 @@ select {
 
 	background:
 		url("./Arrow.png"),
-		#383838;
+		var(--inp_bkg_color);
 	background-position:
 		calc(100% - 0.25em) calc(0.5em),
 		0,0;
@@ -193,10 +204,10 @@ input[type='checkbox']{
 	-moz-appearance: none;
 	-o-appearance: none;
 	appearance:none;
-	background-color: #383838;
-	border-color: #383838;
-	color: #c7c7c7;
-	outline: 1px solid #555555;
+	background-color: var(--inp_bkg_color);
+	border-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
+	outline: 1px solid var(--inp_bdr_color);
 	box-shadow: none;
 	font-size: 1em;
 	text-align: left;
@@ -217,11 +228,6 @@ input[type='checkbox']:checked:after {
 	content: '\2713\0020';
 }
 
-/* hover style just for information */
-span:hover:before {
-  border: 2px solid #4778d9!important;
-}
-
 select[disabled] {
 	background-color: #000000;
 	border-color: #000000;
@@ -235,14 +241,14 @@ button{
 	font-family: inherit;
 	font-size: 100%;
 	outline: none;
-	background-color: #383838;
-	color: #c7c7c7;
+	background-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
 	text-align: center;
 	text-decoration: none;
 	box-sizing: border-box;
 	height: 1.5em !important;
 	font-size: 1em;
-	border:1px solid #555555;
+	border:1px solid var(--inp_bdr_color);
 }
 
 button[disabled] {
@@ -253,56 +259,56 @@ button[disabled] {
 
 /* Use for marking stats as local to a part. */
 .part_local {
-	background-color: rgb(11, 48, 133);
+	background-color: var(--prt_lcl_color);
 	color: #ffffff;
 }
 
 .inner_table {
 	padding: 0px;
 	margin: 0px;
-	border: 1px solid #555555;
+	border: 1px solid var(--inp_bdr_color);
 	vertical-align: top;
 }
 
 /* Change Animations */
 @-webkit-keyframes changed {
 	from {background-color: #FF0000;}
-	to {background-color: inherit;}
+	to {background-color: var(--bkg_color);}
 }
 
 @-moz-keyframes changed {
 	from {background-color: #FF0000;}
-	to {background-color: inherit;}
+	to {background-color: var(--bkg_color);}
 }
 
 @-o-keyframes changed {
 	from {background-color: #FF0000;}
-	to {background-color: inherit;}
+	to {background-color: var(--bkg_color);}
 }
 
 @keyframes changed {
 	from {background-color: #FF0000;}
-	to {background-color: inherit;}
+	to {background-color: var(--bkg_color);}
 }
 
 @-webkit-keyframes changedpl {
 	from {background-color: #FF0000;}
-	to {background-color: rgb(11, 48, 133);}
+	to {background-color: var(--prt_lcl_color);}
 }
 
 @-moz-keyframes changedpl {
 	from {background-color: #FF0000;}
-	to {background-color: rgb(11, 48, 133);}
+	to {background-color: var(--prt_lcl_color);}
 }
 
 @-o-keyframes changedpl {
 	from {background-color: #FF0000;}
-	to {background-color: rgb(11, 48, 133);}
+	to {background-color: var(--prt_lcl_color);}
 }
 
 @keyframes changedpl {
 	from {background-color: #FF0000;}
-	to {background-color: rgb(11, 48, 133);}
+	to {background-color: var(--prt_lcl_color);}
 }
 
 .changed {
