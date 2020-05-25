@@ -1,13 +1,19 @@
 /// <reference path="../impl/EngineStats.ts" />
 /// <reference path="../impl/EngineList.ts" />
 
+enum CompressorEnum {
+    NONE,
+    ALTITUDE_THROTTLE,
+    SUPERCHARGER,
+    TURBOCHARGER,
+}
 class EngineBuilder {
-    readonly EraTable: { name: string, materials: number, cost: number, maxRPM: number, powerdiv: number, fuelfactor: number }[] = [
-        { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
-        { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
-        { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6 },
-        { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4 },
-        { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2 },
+    readonly EraTable: { name: string, materials: number, cost: number, maxRPM: number, powerdiv: number, fuelfactor: number, IAF: number }[] = [
+        { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10, IAF: 29 },
+        { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8, IAF: 39 },
+        { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6, IAF: 49 },
+        { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4, IAF: 49 },
+        { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2, IAF: 49 },
     ];
     readonly CoolingTable: { name: string, forcefactor: number, RPMoff: number, thrustfactor: number, radiator: number, massfactor: number }[] = [
         { name: "Liquid Cooled", forcefactor: 1.2, RPMoff: 0, thrustfactor: 1, radiator: 1, massfactor: 1 },
@@ -17,9 +23,15 @@ class EngineBuilder {
         { name: "Semi-Radial", forcefactor: 0.8, RPMoff: 0, thrustfactor: 1, radiator: 0, massfactor: 1 },
         { name: "Liquid Radial", forcefactor: 1, RPMoff: 0, thrustfactor: 1, radiator: 2.5, massfactor: 1.3 },
     ];
+    readonly CompressorTable: { name: string }[] = [
+        { name: "None" },
+        { name: "Altitude Throttle" },
+        { name: "Supercharger" },
+        { name: "Turbocharger" },
+    ]
     readonly Upgrades: { name: string, powerfactor: number, fuelfactor: number, massfactor: number, dragfactor: number, idealalt: number, costfactor: number, reqsection: boolean }[] = [
-        { name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
-        { name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
+        //{ name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
+        //{ name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
         { name: "Asperator Boost", powerfactor: 0.11, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: -1, costfactor: 3, reqsection: false },
         { name: "War Emergency Power", powerfactor: 0, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 5, reqsection: false },
         { name: "Fuel Injector", powerfactor: 0, fuelfactor: -0.1, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 2, reqsection: false },
@@ -30,6 +42,9 @@ class EngineBuilder {
     public name: string;
     public era_sel: number;
     public cool_sel: number;
+    public compressor_type: CompressorEnum;
+    public compressor_count: number;
+    public min_IAF: number;
     public upg_sel: boolean[];
     public engine_displacement: number;
     public num_cyl_per_row: number;
@@ -52,6 +67,20 @@ class EngineBuilder {
         this.rpm_boost = 1;
         this.material_fudge = 1;
         this.quality_fudge = 1;
+
+        this.compressor_type = CompressorEnum.NONE;
+        this.compressor_count = 0;
+        this.min_IAF = 0;
+    }
+
+    public CanUpgrade() {
+        var can_upg = [...Array(this.Upgrades.length).fill(true)];
+        if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE) {
+            can_upg[0] = false;
+            can_upg[1] = false;
+            can_upg[2] = false;
+        }
+        return can_upg;
     }
 
     private UpgradePower() {
@@ -274,6 +303,24 @@ class EngineBuilder {
         this.rpm_boost = Math.max(0.01, this.rpm_boost);
         this.material_fudge = Math.max(0.5, this.material_fudge);
         this.quality_fudge = Math.max(0.5, this.quality_fudge);
+
+
+        this.min_IAF = 10 * Math.round(1.0e-6 + this.min_IAF / 10);
+        this.compressor_count = Math.floor(1.0e-6 + this.compressor_count);
+
+        if (this.compressor_type == CompressorEnum.NONE) {
+            this.compressor_count = 0;
+            this.min_IAF = 0;
+        } else if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE) {
+            this.compressor_count = 1;
+            this.min_IAF = 0;
+            this.upg_sel[0] = false;
+            this.upg_sel[1] = false;
+            this.upg_sel[2] = false;
+        } else {
+            this.min_IAF = Math.max(0, this.min_IAF);
+            this.compressor_count = Math.max(1, this.compressor_count);
+        }
     }
 
     public EngineStats() {
@@ -295,8 +342,64 @@ class EngineBuilder {
         estats.stats.cost = this.CalcCost();
         estats.pulsejet = false;
         estats.rumble = 0;
-        if (this.upg_sel[1])
-            estats.stats.reqsections = 1;
+
+        switch (this.compressor_type) {
+            case CompressorEnum.NONE: {
+                break;
+            }
+            case CompressorEnum.ALTITUDE_THROTTLE: {
+                estats.stats.cost += 3;
+                estats.altitude = 49;
+                estats.stats.warnings.push({
+                    source: "Altitude Throttle",
+                    warning: "This engine has the WEP upgrade at Altitudes 0-10."
+                });
+                break;
+            }
+            case CompressorEnum.SUPERCHARGER: {
+                estats.stats.power = Math.floor(1.0e-6 + 1.25 * estats.stats.power);
+                estats.stats.fuelconsumption = Math.floor(1.0e-6 + 1.25 * estats.stats.fuelconsumption);
+                estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
+                estats.stats.drag += this.min_IAF / 10;
+                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                var extra = this.compressor_count - 1;
+                estats.altitude = 29 + 10 * 2 * extra;
+                estats.stats.reliability -= extra;
+                estats.stats.mass += extra;
+                estats.stats.drag += extra;
+                estats.stats.cost += 2 * extra;
+                break;
+            }
+            case CompressorEnum.TURBOCHARGER: {
+                estats.stats.power = Math.floor(1.0e-6 + 1.25 * estats.stats.power);
+                estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
+                estats.stats.drag += 2 * (this.min_IAF / 10);
+                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                var extra = this.compressor_count - 1;
+                estats.altitude = 49 + 10 * 2 * extra;
+                estats.stats.reliability -= extra;
+                estats.stats.mass += extra;
+                estats.stats.drag += extra;
+                estats.stats.cost += 2 * extra;
+                estats.stats.reqsections += 1;
+                break;
+            }
+        }
+
+        estats.input_eb.RPM_boost = this.rpm_boost;
+        estats.input_eb.compression = this.compression_ratio;
+        estats.input_eb.compressor_count = this.compressor_count;
+        estats.input_eb.compressor_type = this.compressor_type;
+        estats.input_eb.cyl_per_row = this.num_cyl_per_row;
+        estats.input_eb.rows = this.num_rows;
+        estats.input_eb.displacement = this.engine_displacement;
+        estats.input_eb.era_sel = this.era_sel;
+        estats.input_eb.material_fudge = this.material_fudge;
+        estats.input_eb.min_IAF = this.min_IAF;
+        estats.input_eb.quality_fudge = this.quality_fudge;
+        estats.input_eb.type = this.cool_sel;
+        estats.input_eb.upgrades = this.upg_sel;
+
         return estats;
     }
 }

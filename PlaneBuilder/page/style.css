@@ -218,13 +218,17 @@ input[type='checkbox']{
 }
 
 input[type='checkbox']:not(checked):after {
+	vertical-align: center;
 	content: '';
+	line-height: 0.75em;
 }
 
 input[type='checkbox']:checked:after {
+	vertical-align: center;
 	position: relative;
 	top:-2px;
 	font-size: 0.75em;
+	line-height: 0.75em;
 	content: '\2713\0020';
 }
 

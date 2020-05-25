@@ -3,6 +3,7 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
+//TODO: Ammo doubling
 //TODO: Used Plane Table
 //TODO: Update rules page again
 //TODO: "Adjusted Drag" ect.

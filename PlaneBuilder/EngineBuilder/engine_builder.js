@@ -452,6 +452,7 @@ class EngineStats {
             displacement: 0, compression: 0, type: 0,
             cyl_per_row: 0, rows: 0, RPM_boost: 0,
             era_sel: 0, material_fudge: 0, quality_fudge: 0,
+            compressor_type: 0, compressor_count: 0, min_IAF: 0,
             upgrades: []
         };
         if (js) {
@@ -497,6 +498,23 @@ class EngineStats {
             this.input_eb.material_fudge = ieb["material_fudge"];
             this.input_eb.quality_fudge = ieb["quality_fudge"];
             this.input_eb.upgrades = ieb["upgrades"];
+            if (this.input_eb.upgrades.length == 6) {
+                console.log(this.name);
+                if (this.input_eb.upgrades[0]) {
+                    this.input_eb.compressor_type = 2;
+                    this.input_eb.compressor_count = 1;
+                }
+                if (this.input_eb.upgrades[1]) {
+                    this.input_eb.compressor_type = 3;
+                    this.input_eb.compressor_count = 1;
+                }
+                this.input_eb.upgrades.splice(0, 2);
+            }
+            else {
+                this.input_eb.compressor_type = ieb["compressor_type"];
+                this.input_eb.compressor_count = ieb["compressor_count"];
+                this.input_eb.min_IAF = ieb["min_IAF"];
+            }
         }
         this.stats = new Stats(js);
     }
@@ -527,6 +545,9 @@ class EngineStats {
             s.PushNum(this.input_eb.material_fudge);
             s.PushNum(this.input_eb.quality_fudge);
             s.PushBoolArr(this.input_eb.upgrades);
+            s.PushNum(this.input_eb.compressor_type);
+            s.PushNum(this.input_eb.compressor_count);
+            s.PushNum(this.input_eb.min_IAF);
         }
         this.stats.serialize(s);
     }
@@ -558,6 +579,22 @@ class EngineStats {
                 this.input_eb.material_fudge = d.GetNum();
                 this.input_eb.quality_fudge = d.GetNum();
                 this.input_eb.upgrades = d.GetBoolArr();
+                if (this.input_eb.upgrades.length == 6) {
+                    if (this.input_eb.upgrades[0]) {
+                        this.input_eb.compressor_type = 2;
+                        this.input_eb.compressor_count = 1;
+                    }
+                    if (this.input_eb.upgrades[1]) {
+                        this.input_eb.compressor_type = 3;
+                        this.input_eb.compressor_count = 1;
+                    }
+                    this.input_eb.upgrades.splice(0, 2);
+                }
+                else {
+                    this.input_eb.compressor_type = d.GetNum();
+                    this.input_eb.compressor_count = d.GetNum();
+                    this.input_eb.min_IAF = d.GetNum();
+                }
             }
         }
         this.stats.deserialize(d);
@@ -678,14 +715,23 @@ class EngineList {
 }
 /// <reference path="../impl/EngineStats.ts" />
 /// <reference path="../impl/EngineList.ts" />
+var CompressorEnum;
+/// <reference path="../impl/EngineStats.ts" />
+/// <reference path="../impl/EngineList.ts" />
+(function (CompressorEnum) {
+    CompressorEnum[CompressorEnum["NONE"] = 0] = "NONE";
+    CompressorEnum[CompressorEnum["ALTITUDE_THROTTLE"] = 1] = "ALTITUDE_THROTTLE";
+    CompressorEnum[CompressorEnum["SUPERCHARGER"] = 2] = "SUPERCHARGER";
+    CompressorEnum[CompressorEnum["TURBOCHARGER"] = 3] = "TURBOCHARGER";
+})(CompressorEnum || (CompressorEnum = {}));
 class EngineBuilder {
     constructor() {
         this.EraTable = [
-            { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
-            { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
-            { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6 },
-            { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4 },
-            { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2 },
+            { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10, IAF: 29 },
+            { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8, IAF: 39 },
+            { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6, IAF: 49 },
+            { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4, IAF: 49 },
+            { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2, IAF: 49 },
         ];
         this.CoolingTable = [
             { name: "Liquid Cooled", forcefactor: 1.2, RPMoff: 0, thrustfactor: 1, radiator: 1, massfactor: 1 },
@@ -695,9 +741,15 @@ class EngineBuilder {
             { name: "Semi-Radial", forcefactor: 0.8, RPMoff: 0, thrustfactor: 1, radiator: 0, massfactor: 1 },
             { name: "Liquid Radial", forcefactor: 1, RPMoff: 0, thrustfactor: 1, radiator: 2.5, massfactor: 1.3 },
         ];
+        this.CompressorTable = [
+            { name: "None" },
+            { name: "Altitude Throttle" },
+            { name: "Supercharger" },
+            { name: "Turbocharger" },
+        ];
         this.Upgrades = [
-            { name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
-            { name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
+            //{ name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
+            //{ name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
             { name: "Asperator Boost", powerfactor: 0.11, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: -1, costfactor: 3, reqsection: false },
             { name: "War Emergency Power", powerfactor: 0, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 5, reqsection: false },
             { name: "Fuel Injector", powerfactor: 0, fuelfactor: -0.1, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 2, reqsection: false },
@@ -714,6 +766,18 @@ class EngineBuilder {
         this.rpm_boost = 1;
         this.material_fudge = 1;
         this.quality_fudge = 1;
+        this.compressor_type = CompressorEnum.NONE;
+        this.compressor_count = 0;
+        this.min_IAF = 0;
+    }
+    CanUpgrade() {
+        var can_upg = [...Array(this.Upgrades.length).fill(true)];
+        if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE) {
+            can_upg[0] = false;
+            can_upg[1] = false;
+            can_upg[2] = false;
+        }
+        return can_upg;
     }
     UpgradePower() {
         var power = 1;
@@ -906,6 +970,23 @@ class EngineBuilder {
         this.rpm_boost = Math.max(0.01, this.rpm_boost);
         this.material_fudge = Math.max(0.5, this.material_fudge);
         this.quality_fudge = Math.max(0.5, this.quality_fudge);
+        this.min_IAF = 10 * Math.round(1.0e-6 + this.min_IAF / 10);
+        this.compressor_count = Math.floor(1.0e-6 + this.compressor_count);
+        if (this.compressor_type == CompressorEnum.NONE) {
+            this.compressor_count = 0;
+            this.min_IAF = 0;
+        }
+        else if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE) {
+            this.compressor_count = 1;
+            this.min_IAF = 0;
+            this.upg_sel[0] = false;
+            this.upg_sel[1] = false;
+            this.upg_sel[2] = false;
+        }
+        else {
+            this.min_IAF = Math.max(0, this.min_IAF);
+            this.compressor_count = Math.max(1, this.compressor_count);
+        }
     }
     EngineStats() {
         var estats = new EngineStats();
@@ -924,8 +1005,61 @@ class EngineBuilder {
         estats.stats.cost = this.CalcCost();
         estats.pulsejet = false;
         estats.rumble = 0;
-        if (this.upg_sel[1])
-            estats.stats.reqsections = 1;
+        switch (this.compressor_type) {
+            case CompressorEnum.NONE: {
+                break;
+            }
+            case CompressorEnum.ALTITUDE_THROTTLE: {
+                estats.stats.cost += 3;
+                estats.altitude = 49;
+                estats.stats.warnings.push({
+                    source: "Altitude Throttle",
+                    warning: "This engine has the WEP upgrade at Altitudes 0-10."
+                });
+                break;
+            }
+            case CompressorEnum.SUPERCHARGER: {
+                estats.stats.power = Math.floor(1.0e-6 + 1.25 * estats.stats.power);
+                estats.stats.fuelconsumption = Math.floor(1.0e-6 + 1.25 * estats.stats.fuelconsumption);
+                estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
+                estats.stats.drag += this.min_IAF / 10;
+                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                var extra = this.compressor_count - 1;
+                estats.altitude = 29 + 10 * 2 * extra;
+                estats.stats.reliability -= extra;
+                estats.stats.mass += extra;
+                estats.stats.drag += extra;
+                estats.stats.cost += 2 * extra;
+                break;
+            }
+            case CompressorEnum.TURBOCHARGER: {
+                estats.stats.power = Math.floor(1.0e-6 + 1.25 * estats.stats.power);
+                estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
+                estats.stats.drag += 2 * (this.min_IAF / 10);
+                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                var extra = this.compressor_count - 1;
+                estats.altitude = 49 + 10 * 2 * extra;
+                estats.stats.reliability -= extra;
+                estats.stats.mass += extra;
+                estats.stats.drag += extra;
+                estats.stats.cost += 2 * extra;
+                estats.stats.reqsections += 1;
+                break;
+            }
+        }
+        estats.input_eb.RPM_boost = this.rpm_boost;
+        estats.input_eb.compression = this.compression_ratio;
+        estats.input_eb.compressor_count = this.compressor_count;
+        estats.input_eb.compressor_type = this.compressor_type;
+        estats.input_eb.cyl_per_row = this.num_cyl_per_row;
+        estats.input_eb.rows = this.num_rows;
+        estats.input_eb.displacement = this.engine_displacement;
+        estats.input_eb.era_sel = this.era_sel;
+        estats.input_eb.material_fudge = this.material_fudge;
+        estats.input_eb.min_IAF = this.min_IAF;
+        estats.input_eb.quality_fudge = this.quality_fudge;
+        estats.input_eb.type = this.cool_sel;
+        estats.input_eb.upgrades = this.upg_sel;
         return estats;
     }
 }
@@ -1745,6 +1879,7 @@ const init = () => {
     loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
         var engine_json = JSON.parse(engine_resp);
         elist.fromJSON(engine_json);
+        ebuild.UpdateList();
     });
     if (ep != null) {
         try {
@@ -1842,6 +1977,24 @@ class EngineBuilder_HTML {
     }
     InitEngineUpgrades(cell) {
         var fs = CreateFlexSection(cell);
+        this.e_ctyp = document.createElement("SELECT");
+        for (let e of this.enginebuilder.CompressorTable) {
+            let opt = document.createElement("OPTION");
+            opt.text = e.name;
+            this.e_ctyp.add(opt);
+        }
+        this.e_ccnt = document.createElement("INPUT");
+        this.e_mIAF = document.createElement("INPUT");
+        this.e_ctyp.onchange = () => { this.enginebuilder.compressor_type = this.e_ctyp.selectedIndex; this.UpdateEngine(); };
+        this.e_ccnt.onchange = () => { this.enginebuilder.compressor_count = this.e_ccnt.valueAsNumber; this.UpdateEngine(); };
+        this.e_mIAF.onchange = () => { this.enginebuilder.min_IAF = this.e_mIAF.valueAsNumber; this.UpdateEngine(); };
+        FlexSelect("Compressor Type", this.e_ctyp, fs);
+        FlexInput("Compressor Count", this.e_ccnt, fs);
+        FlexInput("Minimum IAF", this.e_mIAF, fs);
+        this.e_ccnt.min = "0";
+        this.e_ccnt.step = "1";
+        this.e_mIAF.min = "0";
+        this.e_mIAF.step = "10";
         this.e_upgs = [];
         for (let i = 0; i < this.enginebuilder.Upgrades.length; i++) {
             let u = this.enginebuilder.Upgrades[i];
@@ -1881,6 +2034,8 @@ class EngineBuilder_HTML {
         FlexDisplay("Geared RPM", this.ed_grpm, fs);
     }
     UpdateEngine() {
+        //Update and enfoce values before updating displayed values.
+        var estats = this.enginebuilder.EngineStats();
         this.e_name.value = this.enginebuilder.name;
         this.e_sera.selectedIndex = this.enginebuilder.era_sel;
         this.e_cool.selectedIndex = this.enginebuilder.cool_sel;
@@ -1894,7 +2049,13 @@ class EngineBuilder_HTML {
         for (let i = 0; i < this.e_upgs.length; i++) {
             this.e_upgs[i].checked = this.enginebuilder.upg_sel[i];
         }
-        var estats = this.enginebuilder.EngineStats();
+        this.e_ctyp.selectedIndex = this.enginebuilder.compressor_type;
+        this.e_ccnt.valueAsNumber = this.enginebuilder.compressor_count;
+        this.e_mIAF.valueAsNumber = this.enginebuilder.min_IAF;
+        var can_upg = this.enginebuilder.CanUpgrade();
+        for (let i = 0; i < this.e_upgs.length; i++) {
+            this.e_upgs[i].disabled = !can_upg[i];
+        }
         BlinkIfChanged(this.ed_name, estats.name);
         BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
         BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
@@ -2164,7 +2325,11 @@ class EngineBuilder_HTML {
             for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
                 this.enginebuilder.upg_sel[i] = e_stats.input_eb.upgrades[i];
             }
+            this.enginebuilder.compressor_type = e_stats.input_eb.compressor_type;
+            this.enginebuilder.compressor_count = e_stats.input_eb.compressor_count;
+            this.enginebuilder.min_IAF = e_stats.input_eb.min_IAF;
             this.UpdateEngine();
+            console.log(e_stats.toJSON());
         }
     }
     SelectEngine(num) {

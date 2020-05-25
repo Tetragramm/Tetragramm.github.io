@@ -13,6 +13,7 @@ const init = () => {
     loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
         var engine_json = JSON.parse(engine_resp);
         elist.fromJSON(engine_json);
+        ebuild.UpdateList();
     });
 
     if (ep != null) {
@@ -45,6 +46,9 @@ class EngineBuilder_HTML {
     private e_rpmb: HTMLInputElement;
     private e_mfdg: HTMLInputElement;
     private e_qfdg: HTMLInputElement;
+    private e_ctyp: HTMLSelectElement;
+    private e_ccnt: HTMLInputElement;
+    private e_mIAF: HTMLInputElement;
     private e_upgs: HTMLInputElement[];
     //Engine Outputs
     private ed_name: HTMLLabelElement;
@@ -193,6 +197,28 @@ class EngineBuilder_HTML {
 
     private InitEngineUpgrades(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
+
+        this.e_ctyp = document.createElement("SELECT") as HTMLSelectElement;
+        for (let e of this.enginebuilder.CompressorTable) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = e.name;
+            this.e_ctyp.add(opt);
+        }
+        this.e_ccnt = document.createElement("INPUT") as HTMLInputElement;
+        this.e_mIAF = document.createElement("INPUT") as HTMLInputElement;
+
+        this.e_ctyp.onchange = () => { this.enginebuilder.compressor_type = this.e_ctyp.selectedIndex; this.UpdateEngine(); };
+        this.e_ccnt.onchange = () => { this.enginebuilder.compressor_count = this.e_ccnt.valueAsNumber; this.UpdateEngine(); };
+        this.e_mIAF.onchange = () => { this.enginebuilder.min_IAF = this.e_mIAF.valueAsNumber; this.UpdateEngine(); };
+
+        FlexSelect("Compressor Type", this.e_ctyp, fs);
+        FlexInput("Compressor Count", this.e_ccnt, fs);
+        FlexInput("Minimum IAF", this.e_mIAF, fs);
+        this.e_ccnt.min = "0";
+        this.e_ccnt.step = "1";
+        this.e_mIAF.min = "0";
+        this.e_mIAF.step = "10";
+
         this.e_upgs = [];
         for (let i = 0; i < this.enginebuilder.Upgrades.length; i++) {
             let u = this.enginebuilder.Upgrades[i];
@@ -234,6 +260,9 @@ class EngineBuilder_HTML {
     }
 
     private UpdateEngine() {
+        //Update and enfoce values before updating displayed values.
+        var estats = this.enginebuilder.EngineStats();
+
         this.e_name.value = this.enginebuilder.name;
         this.e_sera.selectedIndex = this.enginebuilder.era_sel;
         this.e_cool.selectedIndex = this.enginebuilder.cool_sel;
@@ -247,8 +276,15 @@ class EngineBuilder_HTML {
         for (let i = 0; i < this.e_upgs.length; i++) {
             this.e_upgs[i].checked = this.enginebuilder.upg_sel[i];
         }
+        this.e_ctyp.selectedIndex = this.enginebuilder.compressor_type;
+        this.e_ccnt.valueAsNumber = this.enginebuilder.compressor_count;
+        this.e_mIAF.valueAsNumber = this.enginebuilder.min_IAF;
 
-        var estats = this.enginebuilder.EngineStats();
+        var can_upg = this.enginebuilder.CanUpgrade();
+        for (let i = 0; i < this.e_upgs.length; i++) {
+            this.e_upgs[i].disabled = !can_upg[i];
+        }
+
         BlinkIfChanged(this.ed_name, estats.name);
         BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
         BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
@@ -455,7 +491,7 @@ class EngineBuilder_HTML {
         this.UpdateList();
     }
 
-    private UpdateList() {
+    public UpdateList() {
         var idx = this.m_select.selectedIndex;
         while (this.m_select.options.length > 0) {
             this.m_select.options.remove(0);
@@ -533,7 +569,11 @@ class EngineBuilder_HTML {
             for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
                 this.enginebuilder.upg_sel[i] = e_stats.input_eb.upgrades[i];
             }
+            this.enginebuilder.compressor_type = e_stats.input_eb.compressor_type;
+            this.enginebuilder.compressor_count = e_stats.input_eb.compressor_count;
+            this.enginebuilder.min_IAF = e_stats.input_eb.min_IAF;
             this.UpdateEngine();
+            console.log(e_stats.toJSON());
         }
     }
 

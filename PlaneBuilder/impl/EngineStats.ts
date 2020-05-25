@@ -20,6 +20,9 @@ class EngineStats {
         era_sel: number,
         material_fudge: number,
         quality_fudge: number,
+        compressor_type: number,
+        compressor_count: number,
+        min_IAF: number,
         upgrades: boolean[],
     };
     public input_pj: {
@@ -39,6 +42,7 @@ class EngineStats {
             displacement: 0, compression: 0, type: 0,
             cyl_per_row: 0, rows: 0, RPM_boost: 0,
             era_sel: 0, material_fudge: 0, quality_fudge: 0,
+            compressor_type: 0, compressor_count: 0, min_IAF: 0,
             upgrades: []
         };
 
@@ -98,7 +102,24 @@ class EngineStats {
             this.input_eb.material_fudge = ieb["material_fudge"];
             this.input_eb.quality_fudge = ieb["quality_fudge"];
             this.input_eb.upgrades = ieb["upgrades"];
+            if (this.input_eb.upgrades.length == 6) {
+                console.log(this.name);
+                if (this.input_eb.upgrades[0]) {
+                    this.input_eb.compressor_type = 2;
+                    this.input_eb.compressor_count = 1;
+                }
+                if (this.input_eb.upgrades[1]) {
+                    this.input_eb.compressor_type = 3;
+                    this.input_eb.compressor_count = 1;
+                }
+                this.input_eb.upgrades.splice(0, 2);
+            } else {
+                this.input_eb.compressor_type = ieb["compressor_type"];
+                this.input_eb.compressor_count = ieb["compressor_count"];
+                this.input_eb.min_IAF = ieb["min_IAF"];
+            }
         }
+
         this.stats = new Stats(js);
     }
 
@@ -128,6 +149,9 @@ class EngineStats {
             s.PushNum(this.input_eb.material_fudge);
             s.PushNum(this.input_eb.quality_fudge);
             s.PushBoolArr(this.input_eb.upgrades);
+            s.PushNum(this.input_eb.compressor_type);
+            s.PushNum(this.input_eb.compressor_count);
+            s.PushNum(this.input_eb.min_IAF);
         }
         this.stats.serialize(s);
     }
@@ -159,6 +183,21 @@ class EngineStats {
                 this.input_eb.material_fudge = d.GetNum();
                 this.input_eb.quality_fudge = d.GetNum();
                 this.input_eb.upgrades = d.GetBoolArr();
+                if (this.input_eb.upgrades.length == 6) {
+                    if (this.input_eb.upgrades[0]) {
+                        this.input_eb.compressor_type = 2;
+                        this.input_eb.compressor_count = 1;
+                    }
+                    if (this.input_eb.upgrades[1]) {
+                        this.input_eb.compressor_type = 3;
+                        this.input_eb.compressor_count = 1;
+                    }
+                    this.input_eb.upgrades.splice(0, 2);
+                } else {
+                    this.input_eb.compressor_type = d.GetNum();
+                    this.input_eb.compressor_count = d.GetNum();
+                    this.input_eb.min_IAF = d.GetNum();
+                }
             }
         }
         this.stats.deserialize(d);
