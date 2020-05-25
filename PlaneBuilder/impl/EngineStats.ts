@@ -103,7 +103,7 @@ class EngineStats {
             this.input_eb.quality_fudge = ieb["quality_fudge"];
             this.input_eb.upgrades = ieb["upgrades"];
             if (this.input_eb.upgrades.length == 6) {
-                console.log(this.name);
+                this.altitude = this.altitude * 10 - 1;
                 if (this.input_eb.upgrades[0]) {
                     this.input_eb.compressor_type = 2;
                     this.input_eb.compressor_count = 1;
@@ -184,6 +184,7 @@ class EngineStats {
                 this.input_eb.quality_fudge = d.GetNum();
                 this.input_eb.upgrades = d.GetBoolArr();
                 if (this.input_eb.upgrades.length == 6) {
+                    this.altitude = this.altitude * 10 - 1;
                     if (this.input_eb.upgrades[0]) {
                         this.input_eb.compressor_type = 2;
                         this.input_eb.compressor_count = 1;
