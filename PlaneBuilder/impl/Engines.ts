@@ -388,6 +388,21 @@ class Engines extends Part {
             stats.warnings.push({ source: "Pulsejets", warning: "Pulsejets halve Boost when below dropoff speed, instead of above dropoff." });
         }
 
+        var rotationT = 0;
+        for (let e of this.engines) {
+            if (e.IsRotary()) {
+                if (e.IsTractor())
+                    rotationT++;
+                else if (e.IsPusher())
+                    rotationT--;
+            }
+        }
+        if (rotationT > 0) {
+            stats.warnings.push({ source: "Rotary", warning: "+1 to Dogfight! when turning right." });
+        } else if (rotationT < 0) {
+            stats.warnings.push({ source: "Rotary", warning: "+1 to Dogfight! when turning left." });
+        }
+
         //Part local, gets handled in UpdateReliability
         stats.reliability = 0;
 

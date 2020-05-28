@@ -268,6 +268,14 @@ class Aircraft_HTML extends Display {
                 this.UpdateWeaponCard(wsetlist[i]);
                 this.cards.SaveWeapon(i)
             }
+            for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+                this.UpdateEngineCard(this.acft.GetEngines().GetEngine(i));
+                this.cards.SaveEngine(i);
+            }
+            for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
+                this.UpdateRadiatorCard(this.acft.GetEngines().GetRadiator(i));
+                this.cards.SaveRadiator(i);
+            }
         };
 
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
@@ -366,6 +374,53 @@ class Aircraft_HTML extends Display {
         if (deflector) {
             this.cards.weap_data.tags.push("Deflector Plate");
         }
+    }
+
+    private UpdateEngineCard(e: Engine) {
+        var estats = e.GetCurrentStats();
+        this.cards.eng_data.reliability = e.GetReliability();
+        this.cards.eng_data.overspeed = e.GetOverspeed();
+        this.cards.eng_data.altitude = estats.altitude;
+        if (e.NeedCooling()) {
+            this.cards.eng_data.radiator = e.GetRadiator();
+        } else {
+            this.cards.eng_data.radiator = -1;
+        }
+        this.cards.eng_data.notes = [];
+
+        if (estats.pulsejet) {
+            this.cards.eng_data.notes.push("Pulsejet");
+            if (estats.input_pj.power > 0 && estats.input_pj.starter) {
+                this.cards.eng_data.notes.push("Starter");
+            }
+        }
+        else {
+
+            if (e.IsRotary() && e.IsTractor()) {
+                this.cards.eng_data.notes.push("Turns Right");
+            } else if (e.IsRotary() && e.IsPusher()) {
+                this.cards.eng_data.notes.push("Turns Left");
+            }
+
+            //Correct old engines still in the system
+            if (e.GetCurrentStats().input_eb.displacement == 0) {
+                this.cards.eng_data.altitude = 10 * (this.cards.eng_data.altitude) - 1;
+                this.cards.eng_data.min_IAF = 0;
+            } else {
+                this.cards.eng_data.min_IAF = estats.input_eb.min_IAF;
+                if (estats.input_eb.upgrades[1]) {
+                    this.cards.eng_data.notes.push("WEP");
+                } else if (estats.input_eb.compressor_count > 0 && estats.input_eb.compressor_type == 1) {
+                    this.cards.eng_data.notes.push("WEP from altitudes 0-10");
+                }
+            }
+        }
+
+    }
+
+    private UpdateRadiatorCard(r: Radiator) {
+        this.cards.rad_data.mount_type = r.GetMountList()[r.GetMountIndex()].name;
+        this.cards.rad_data.coolant_type = r.GetCoolantList()[r.GetCoolantIndex()].name;
     }
 
     private WeaponName(w: WeaponSystem): string {

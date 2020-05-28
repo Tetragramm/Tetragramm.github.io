@@ -3,7 +3,12 @@ class Cards {
     private dash_image: HTMLImageElement;
     private weap_canvas: HTMLCanvasElement;
     private weap_image: HTMLImageElement;
+    private eng_canvas: HTMLCanvasElement;
+    private eng_image: HTMLImageElement;
+    private rad_canvas: HTMLCanvasElement;
+    private rad_image: HTMLImageElement;
     public name: string;
+
     public acft_data: {
         full_bomb_boost: number,
         half_bomb_boost: number,
@@ -50,6 +55,20 @@ class Cards {
         gyrojet: boolean,
     }
 
+    public eng_data: {
+        reliability: number,
+        min_IAF: number,
+        altitude: number,
+        overspeed: number,
+        radiator: number,
+        notes: string[],
+    }
+
+    public rad_data: {
+        mount_type: string,
+        coolant_type: string,
+    }
+
     constructor() {
         this.dash_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
         this.dash_canvas.width = 1122;
@@ -66,6 +85,22 @@ class Cards {
         this.weap_image.width = 483;
         this.weap_image.height = 291;
         this.weap_image.src = './Cards/Weapon.png';
+
+        this.eng_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
+        this.eng_canvas.width = 483;
+        this.eng_canvas.height = 289;
+        this.eng_image = document.getElementById("eng_img") as HTMLImageElement;
+        this.eng_image.width = 483;
+        this.eng_image.height = 289;
+        this.eng_image.src = './Cards/Engine.png';
+
+        this.rad_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
+        this.rad_canvas.width = 479;
+        this.rad_canvas.height = 290;
+        this.rad_image = document.getElementById("eng_img") as HTMLImageElement;
+        this.rad_image.width = 479;
+        this.rad_image.height = 290;
+        this.rad_image.src = './Cards/Radiator.png';
 
         this.acft_data = {
             full_bomb_boost: 0,
@@ -111,6 +146,20 @@ class Cards {
             tags: [],
             reload: 0,
             gyrojet: false,
+        }
+
+        this.eng_data = {
+            reliability: 0,
+            min_IAF: 0,
+            altitude: 0,
+            overspeed: 0,
+            radiator: 0,
+            notes: [],
+        };
+
+        this.rad_data = {
+            mount_type: "",
+            coolant_type: "",
         }
     }
 
@@ -196,7 +245,8 @@ class Cards {
         this.download(this.name + "_Dashboard", this.dash_canvas);
     }
 
-    public SaveWeapon(i: number) {
+    public SaveWeapon(weapon_num: number) {
+        weapon_num++;
         var context = this.weap_canvas.getContext("2d");
 
         context.clearRect(0, 0, this.weap_canvas.width, this.weap_canvas.height);
@@ -240,7 +290,68 @@ class Cards {
         }
         context.fillText(tags, 90, 276, 350);
 
-        this.download(this.name + "_Weapon_" + i.toString(), this.weap_canvas);
+        this.download(this.name + "_Weapon_" + weapon_num.toString(), this.weap_canvas);
+    }
+
+    public SaveEngine(engine_num: number) {
+        engine_num++;
+        var context = this.eng_canvas.getContext("2d");
+
+        context.clearRect(0, 0, this.eng_canvas.width, this.eng_canvas.height);
+        context.drawImage(this.eng_image, 0, 0);
+
+
+        context.textAlign = "center";
+        context.font = "18px Balthazar";
+        context.fillStyle = "#000";
+        context.strokeStyle = "#000";
+        context.fillText(this.eng_data.reliability.toString(), 190, 62, 90);
+        var alt_string = this.eng_data.min_IAF.toString() + "-" + (this.eng_data.min_IAF + this.eng_data.altitude).toString();
+        context.fillText(alt_string, 280, 62, 90);
+        context.fillText(this.eng_data.overspeed.toString(), 370, 62, 90);
+
+        var note_str = "";
+        for (let i = 0; i < this.eng_data.notes.length; i++) {
+            if (i != 0)
+                note_str += ", ";
+            note_str += this.eng_data.notes[i];
+        }
+        context.fillText(note_str, 280, 84, 270);
+
+        if (this.eng_data.radiator >= 0) {
+            context.fillText("Uses Radiator #" + (this.eng_data.radiator + 1).toString(), 109, 280, 270);
+        }
+
+        context.textAlign = "right";
+        context.font = "25px Balthazar";
+        context.fillStyle = "#fff";
+        context.strokeStyle = "#fff";
+        context.fillText("#" + engine_num.toString(), 37, 56, 35);
+
+        this.download(this.name + "_Engine_" + engine_num.toString(), this.eng_canvas);
+    }
+
+    public SaveRadiator(radiator_num: number) {
+        radiator_num++;
+        var context = this.rad_canvas.getContext("2d");
+
+        context.clearRect(0, 0, this.rad_canvas.width, this.rad_canvas.height);
+        context.drawImage(this.rad_image, 0, 0);
+
+        context.textAlign = "center";
+        context.font = "25px Balthazar";
+        context.fillStyle = "#000";
+        context.strokeStyle = "#000";
+        context.fillText(this.rad_data.mount_type, 162, 141, 230);
+        context.fillText(this.rad_data.coolant_type, 162, 217, 230);
+
+        context.textAlign = "right";
+        context.font = "25px Balthazar";
+        context.fillStyle = "#fff";
+        context.strokeStyle = "#fff";
+        context.fillText("#" + radiator_num.toString(), 37, 56, 35);
+
+        this.download(this.name + "_Radiator_" + radiator_num.toString(), this.rad_canvas);
     }
 
     private download(filename: string, canvas: HTMLCanvasElement) {

@@ -3,11 +3,10 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: Ammo doubling
 //TODO: Used Plane Table
+//TODO: Autopilot for no cockpits
 //TODO: Update rules page again
 //TODO: "Adjusted Drag" ect.
-//TODO: Revisit Bomb bay expansion
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
 

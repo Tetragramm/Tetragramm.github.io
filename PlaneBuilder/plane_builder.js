@@ -455,6 +455,7 @@ class EngineStats {
             displacement: 0, compression: 0, type: 0,
             cyl_per_row: 0, rows: 0, RPM_boost: 0,
             era_sel: 0, material_fudge: 0, quality_fudge: 0,
+            compressor_type: 0, compressor_count: 0, min_IAF: 0,
             upgrades: []
         };
         if (js) {
@@ -500,6 +501,23 @@ class EngineStats {
             this.input_eb.material_fudge = ieb["material_fudge"];
             this.input_eb.quality_fudge = ieb["quality_fudge"];
             this.input_eb.upgrades = ieb["upgrades"];
+            if (this.input_eb.upgrades.length == 6) {
+                this.altitude = this.altitude * 10 - 1;
+                if (this.input_eb.upgrades[0]) {
+                    this.input_eb.compressor_type = 2;
+                    this.input_eb.compressor_count = 1;
+                }
+                if (this.input_eb.upgrades[1]) {
+                    this.input_eb.compressor_type = 3;
+                    this.input_eb.compressor_count = 1;
+                }
+                this.input_eb.upgrades.splice(0, 2);
+            }
+            else {
+                this.input_eb.compressor_type = ieb["compressor_type"];
+                this.input_eb.compressor_count = ieb["compressor_count"];
+                this.input_eb.min_IAF = ieb["min_IAF"];
+            }
         }
         this.stats = new Stats(js);
     }
@@ -530,6 +548,9 @@ class EngineStats {
             s.PushNum(this.input_eb.material_fudge);
             s.PushNum(this.input_eb.quality_fudge);
             s.PushBoolArr(this.input_eb.upgrades);
+            s.PushNum(this.input_eb.compressor_type);
+            s.PushNum(this.input_eb.compressor_count);
+            s.PushNum(this.input_eb.min_IAF);
         }
         this.stats.serialize(s);
     }
@@ -561,6 +582,23 @@ class EngineStats {
                 this.input_eb.material_fudge = d.GetNum();
                 this.input_eb.quality_fudge = d.GetNum();
                 this.input_eb.upgrades = d.GetBoolArr();
+                if (this.input_eb.upgrades.length == 6) {
+                    this.altitude = this.altitude * 10 - 1;
+                    if (this.input_eb.upgrades[0]) {
+                        this.input_eb.compressor_type = 2;
+                        this.input_eb.compressor_count = 1;
+                    }
+                    if (this.input_eb.upgrades[1]) {
+                        this.input_eb.compressor_type = 3;
+                        this.input_eb.compressor_count = 1;
+                    }
+                    this.input_eb.upgrades.splice(0, 2);
+                }
+                else {
+                    this.input_eb.compressor_type = d.GetNum();
+                    this.input_eb.compressor_count = d.GetNum();
+                    this.input_eb.min_IAF = d.GetNum();
+                }
             }
         }
         this.stats.deserialize(d);
@@ -1471,6 +1509,14 @@ class Engine extends Part {
     IsRotary() {
         return this.etype_stats.oiltank;
     }
+    IsContraRotary() {
+        if (!this.GetIsPulsejet()) {
+            if (this.etype_stats.input_eb.type == 3) {
+                return true;
+            }
+        }
+        return false;
+    }
     IsAirCooled() {
         return !this.GetIsPulsejet() && !this.IsLiquidCooled() && !this.IsRotary();
     }
@@ -1548,17 +1594,23 @@ class Engine extends Part {
     GetRumble() {
         return this.etype_stats.rumble;
     }
+    IsTractor() {
+        return this.mount_list[this.selected_mount].name == "Tractor"
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
+    }
     GetTractor() {
         return {
-            has: this.mount_list[this.selected_mount].name == "Tractor"
-                || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor",
+            has: this.IsTractor(),
             spinner: this.GetSpinner()
         };
     }
+    IsPusher() {
+        return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
+    }
     GetPusher() {
         return {
-            has: this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
-                || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher",
+            has: this.IsPusher(),
             spinner: this.GetSpinner()
         };
     }
@@ -1656,6 +1708,10 @@ class Engine extends Part {
         //Upgrades
         if (this.use_ds) {
             stats.mass += 1;
+        }
+        //ContraRotary Engines need geared propellers to function.
+        if (this.IsContraRotary()) {
+            this.gp_count = Math.max(1, this.gp_count);
         }
         stats.cost += this.gp_count + this.gpr_count;
         if (this.is_generator) {
@@ -2003,6 +2059,21 @@ class Engines extends Part {
         }
         if (is_pulsejet) {
             stats.warnings.push({ source: "Pulsejets", warning: "Pulsejets halve Boost when below dropoff speed, instead of above dropoff." });
+        }
+        var rotationT = 0;
+        for (let e of this.engines) {
+            if (e.IsRotary()) {
+                if (e.IsTractor())
+                    rotationT++;
+                else if (e.IsPusher())
+                    rotationT--;
+            }
+        }
+        if (rotationT > 0) {
+            stats.warnings.push({ source: "Rotary", warning: "+1 to Dogfight! when turning right." });
+        }
+        else if (rotationT < 0) {
+            stats.warnings.push({ source: "Rotary", warning: "+1 to Dogfight! when turning left." });
         }
         //Part local, gets handled in UpdateReliability
         stats.reliability = 0;
@@ -9169,6 +9240,20 @@ class Cards {
         this.weap_image.width = 483;
         this.weap_image.height = 291;
         this.weap_image.src = './Cards/Weapon.png';
+        this.eng_canvas = document.createElement("CANVAS");
+        this.eng_canvas.width = 483;
+        this.eng_canvas.height = 289;
+        this.eng_image = document.getElementById("eng_img");
+        this.eng_image.width = 483;
+        this.eng_image.height = 289;
+        this.eng_image.src = './Cards/Engine.png';
+        this.rad_canvas = document.createElement("CANVAS");
+        this.rad_canvas.width = 479;
+        this.rad_canvas.height = 290;
+        this.rad_image = document.getElementById("eng_img");
+        this.rad_image.width = 479;
+        this.rad_image.height = 290;
+        this.rad_image.src = './Cards/Radiator.png';
         this.acft_data = {
             full_bomb_boost: 0,
             half_bomb_boost: 0,
@@ -9212,6 +9297,18 @@ class Cards {
             tags: [],
             reload: 0,
             gyrojet: false,
+        };
+        this.eng_data = {
+            reliability: 0,
+            min_IAF: 0,
+            altitude: 0,
+            overspeed: 0,
+            radiator: 0,
+            notes: [],
+        };
+        this.rad_data = {
+            mount_type: "",
+            coolant_type: "",
         };
     }
     SaveDash() {
@@ -9280,7 +9377,8 @@ class Cards {
         }
         this.download(this.name + "_Dashboard", this.dash_canvas);
     }
-    SaveWeapon(i) {
+    SaveWeapon(weapon_num) {
+        weapon_num++;
         var context = this.weap_canvas.getContext("2d");
         context.clearRect(0, 0, this.weap_canvas.width, this.weap_canvas.height);
         context.textAlign = "center";
@@ -9317,7 +9415,55 @@ class Cards {
             tags += this.weap_data.tags[i];
         }
         context.fillText(tags, 90, 276, 350);
-        this.download(this.name + "_Weapon_" + i.toString(), this.weap_canvas);
+        this.download(this.name + "_Weapon_" + weapon_num.toString(), this.weap_canvas);
+    }
+    SaveEngine(engine_num) {
+        engine_num++;
+        var context = this.eng_canvas.getContext("2d");
+        context.clearRect(0, 0, this.eng_canvas.width, this.eng_canvas.height);
+        context.drawImage(this.eng_image, 0, 0);
+        context.textAlign = "center";
+        context.font = "18px Balthazar";
+        context.fillStyle = "#000";
+        context.strokeStyle = "#000";
+        context.fillText(this.eng_data.reliability.toString(), 190, 62, 90);
+        var alt_string = this.eng_data.min_IAF.toString() + "-" + (this.eng_data.min_IAF + this.eng_data.altitude).toString();
+        context.fillText(alt_string, 280, 62, 90);
+        context.fillText(this.eng_data.overspeed.toString(), 370, 62, 90);
+        var note_str = "";
+        for (let i = 0; i < this.eng_data.notes.length; i++) {
+            if (i != 0)
+                note_str += ", ";
+            note_str += this.eng_data.notes[i];
+        }
+        context.fillText(note_str, 280, 84, 270);
+        if (this.eng_data.radiator >= 0) {
+            context.fillText("Uses Radiator #" + (this.eng_data.radiator + 1).toString(), 109, 280, 270);
+        }
+        context.textAlign = "right";
+        context.font = "25px Balthazar";
+        context.fillStyle = "#fff";
+        context.strokeStyle = "#fff";
+        context.fillText("#" + engine_num.toString(), 37, 56, 35);
+        this.download(this.name + "_Engine_" + engine_num.toString(), this.eng_canvas);
+    }
+    SaveRadiator(radiator_num) {
+        radiator_num++;
+        var context = this.rad_canvas.getContext("2d");
+        context.clearRect(0, 0, this.rad_canvas.width, this.rad_canvas.height);
+        context.drawImage(this.rad_image, 0, 0);
+        context.textAlign = "center";
+        context.font = "25px Balthazar";
+        context.fillStyle = "#000";
+        context.strokeStyle = "#000";
+        context.fillText(this.rad_data.mount_type, 162, 141, 230);
+        context.fillText(this.rad_data.coolant_type, 162, 217, 230);
+        context.textAlign = "right";
+        context.font = "25px Balthazar";
+        context.fillStyle = "#fff";
+        context.strokeStyle = "#fff";
+        context.fillText("#" + radiator_num.toString(), 37, 56, 35);
+        this.download(this.name + "_Radiator_" + radiator_num.toString(), this.rad_canvas);
     }
     download(filename, canvas) {
         var lnk = document.createElement('a');
@@ -9466,6 +9612,14 @@ class Aircraft_HTML extends Display {
                 this.UpdateWeaponCard(wsetlist[i]);
                 this.cards.SaveWeapon(i);
             }
+            for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+                this.UpdateEngineCard(this.acft.GetEngines().GetEngine(i));
+                this.cards.SaveEngine(i);
+            }
+            for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
+                this.UpdateRadiatorCard(this.acft.GetEngines().GetRadiator(i));
+                this.cards.SaveRadiator(i);
+            }
         };
         var reset_button = document.getElementById("acft_reset");
         reset_button.onclick = () => { aircraft_model.Reset(); };
@@ -9556,6 +9710,51 @@ class Aircraft_HTML extends Display {
         if (deflector) {
             this.cards.weap_data.tags.push("Deflector Plate");
         }
+    }
+    UpdateEngineCard(e) {
+        var estats = e.GetCurrentStats();
+        this.cards.eng_data.reliability = e.GetReliability();
+        this.cards.eng_data.overspeed = e.GetOverspeed();
+        this.cards.eng_data.altitude = estats.altitude;
+        if (e.NeedCooling()) {
+            this.cards.eng_data.radiator = e.GetRadiator();
+        }
+        else {
+            this.cards.eng_data.radiator = -1;
+        }
+        this.cards.eng_data.notes = [];
+        if (estats.pulsejet) {
+            this.cards.eng_data.notes.push("Pulsejet");
+            if (estats.input_pj.power > 0 && estats.input_pj.starter) {
+                this.cards.eng_data.notes.push("Starter");
+            }
+        }
+        else {
+            if (e.IsRotary() && e.IsTractor()) {
+                this.cards.eng_data.notes.push("Turns Right");
+            }
+            else if (e.IsRotary() && e.IsPusher()) {
+                this.cards.eng_data.notes.push("Turns Left");
+            }
+            //Correct old engines still in the system
+            if (e.GetCurrentStats().input_eb.displacement == 0) {
+                this.cards.eng_data.altitude = 10 * (this.cards.eng_data.altitude) - 1;
+                this.cards.eng_data.min_IAF = 0;
+            }
+            else {
+                this.cards.eng_data.min_IAF = estats.input_eb.min_IAF;
+                if (estats.input_eb.upgrades[1]) {
+                    this.cards.eng_data.notes.push("WEP");
+                }
+                else if (estats.input_eb.compressor_count > 0 && estats.input_eb.compressor_type == 1) {
+                    this.cards.eng_data.notes.push("WEP from altitudes 0-10");
+                }
+            }
+        }
+    }
+    UpdateRadiatorCard(r) {
+        this.cards.rad_data.mount_type = r.GetMountList()[r.GetMountIndex()].name;
+        this.cards.rad_data.coolant_type = r.GetCoolantList()[r.GetCoolantIndex()].name;
     }
     WeaponName(w) {
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
@@ -10635,9 +10834,9 @@ var LZString = (function () {
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 //TODO: Used Plane Table
+//TODO: Autopilot for no cockpits
 //TODO: Update rules page again
 //TODO: "Adjusted Drag" ect.
-//TODO: Revisit Bomb bay expansion
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
 const init = () => {
@@ -11267,7 +11466,7 @@ class WeaponSystem extends Part {
             }
         }
         //Ammunition Cost
-        stats.mass += (this.ammo - 1) * count;
+        stats.mass += (this.ammo - 1);
         return stats;
     }
 }

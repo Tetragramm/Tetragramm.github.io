@@ -259,7 +259,7 @@ class EngineBuilder {
             if (this.upg_sel[i])
                 alt += this.Upgrades[i].idealalt;
         }
-        return 3 + alt;
+        return (3 + alt) * 10 - 1;
     }
 
     private CoolTorque() {

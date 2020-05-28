@@ -388,6 +388,15 @@ class Engine extends Part {
         return this.etype_stats.oiltank;
     }
 
+    public IsContraRotary() {
+        if (!this.GetIsPulsejet()) {
+            if (this.etype_stats.input_eb.type == 3) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public IsAirCooled() {
         return !this.GetIsPulsejet() && !this.IsLiquidCooled() && !this.IsRotary();
     }
@@ -478,18 +487,26 @@ class Engine extends Part {
         return this.etype_stats.rumble;
     }
 
+    public IsTractor() {
+        return this.mount_list[this.selected_mount].name == "Tractor"
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
+    }
+
     public GetTractor() {
         return {
-            has: this.mount_list[this.selected_mount].name == "Tractor"
-                || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor",
+            has: this.IsTractor(),
             spinner: this.GetSpinner()
         };
     }
 
+    public IsPusher() {
+        return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
+    }
+
     public GetPusher() {
         return {
-            has: this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
-                || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher",
+            has: this.IsPusher(),
             spinner: this.GetSpinner()
         };
     }
@@ -602,6 +619,11 @@ class Engine extends Part {
         //Upgrades
         if (this.use_ds) {
             stats.mass += 1;
+        }
+
+        //ContraRotary Engines need geared propellers to function.
+        if (this.IsContraRotary()) {
+            this.gp_count = Math.max(1, this.gp_count);
         }
         stats.cost += this.gp_count + this.gpr_count;
 
