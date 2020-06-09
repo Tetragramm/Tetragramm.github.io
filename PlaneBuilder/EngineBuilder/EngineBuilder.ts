@@ -8,12 +8,13 @@ enum CompressorEnum {
     TURBOCHARGER,
 }
 class EngineBuilder {
-    readonly EraTable: { name: string, materials: number, cost: number, maxRPM: number, powerdiv: number, fuelfactor: number, IAF: number }[] = [
-        { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10, IAF: 29 },
-        { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8, IAF: 39 },
-        { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6, IAF: 49 },
-        { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4, IAF: 49 },
-        { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2, IAF: 49 },
+    readonly EraTable: { name: string, materials: number, cost: number, maxRPM: number, powerdiv: number, fuelfactor: number }[] = [
+        { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
+        { name: "Great War", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
+        { name: "Roaring 20s", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6.8, fuelfactor: 6 },
+        { name: "Coming Storm", materials: 1.35, cost: 2.25, maxRPM: 45, powerdiv: 6.6, fuelfactor: 5 },
+        { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 50, powerdiv: 6.5, fuelfactor: 4 },
+        { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 6.2, fuelfactor: 2 },
     ];
     readonly CoolingTable: { name: string, forcefactor: number, RPMoff: number, thrustfactor: number, radiator: number, massfactor: number }[] = [
         { name: "Liquid Cooled", forcefactor: 1.2, RPMoff: 0, thrustfactor: 1, radiator: 1, massfactor: 1 },
@@ -30,8 +31,6 @@ class EngineBuilder {
         { name: "Turbocharger" },
     ]
     readonly Upgrades: { name: string, powerfactor: number, fuelfactor: number, massfactor: number, dragfactor: number, idealalt: number, costfactor: number, reqsection: boolean }[] = [
-        //{ name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
-        //{ name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
         { name: "Asperator Boost", powerfactor: 0.11, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: -1, costfactor: 3, reqsection: false },
         { name: "War Emergency Power", powerfactor: 0, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 5, reqsection: false },
         { name: "Fuel Injector", powerfactor: 0, fuelfactor: -0.1, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 2, reqsection: false },
@@ -386,20 +385,48 @@ class EngineBuilder {
             }
         }
 
-        estats.input_eb.RPM_boost = this.rpm_boost;
-        estats.input_eb.compression = this.compression_ratio;
-        estats.input_eb.compressor_count = this.compressor_count;
-        estats.input_eb.compressor_type = this.compressor_type;
-        estats.input_eb.cyl_per_row = this.num_cyl_per_row;
-        estats.input_eb.rows = this.num_rows;
-        estats.input_eb.displacement = this.engine_displacement;
-        estats.input_eb.era_sel = this.era_sel;
-        estats.input_eb.material_fudge = this.material_fudge;
-        estats.input_eb.min_IAF = this.min_IAF;
-        estats.input_eb.quality_fudge = this.quality_fudge;
-        estats.input_eb.type = this.cool_sel;
-        estats.input_eb.upgrades = this.upg_sel;
-
         return estats;
+    }
+
+    public EngineInputs() {
+        var ei = new EngineInputs();
+        ei.engine_type = ENGINE_TYPE.PROPELLER;
+        ei.RPM_boost = this.rpm_boost;
+        ei.compression = this.compression_ratio;
+        ei.compressor_count = this.compressor_count;
+        ei.compressor_type = this.compressor_type;
+        ei.cyl_per_row = this.num_cyl_per_row;
+        ei.displacement = this.engine_displacement;
+        ei.era_sel = this.era_sel;
+        ei.material_fudge = this.material_fudge;
+        ei.min_IAF = this.min_IAF;
+        ei.name = this.name;
+        ei.quality_fudge = this.quality_fudge;
+        ei.rows = this.num_rows;
+        ei.type = this.cool_sel;
+        for (let i = 0; i < ei.upgrades.length; i++)
+            ei.upgrades[i] = this.upg_sel[i];
+
+        return ei;
+    }
+
+    public fromJSON(js: JSON) {
+        this.engine_displacement = js["displacement"];
+        this.compression_ratio = js["compression"];
+        this.cool_sel = js["type"];
+        this.num_cyl_per_row = js["cyl_per_row"];
+        this.num_rows = js["rows"];
+        this.rpm_boost = js["RPM_boost"];
+        this.era_sel = js["era_sel"];
+        this.material_fudge = js["material_fudge"];
+        this.quality_fudge = js["quality_fudge"];
+        this.compressor_type = js["compressor_type"];
+        this.compressor_count = js["compressor_count"];
+        this.min_IAF = js["min_IAF"];
+        var upgs = js["upgrades"];
+        for (let i = 0; i < upgs.length; i++) {
+            this.upg_sel[i] = upgs[i];
+        }
+        return this.EngineStats();
     }
 }

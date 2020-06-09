@@ -3,6 +3,7 @@
 
 class Engine_HTML extends Display {
     private engine: Engine;
+    private e_list_select: HTMLSelectElement;
     private e_select: HTMLSelectElement;
     private e_pwr: HTMLInputElement;
     private e_mass: HTMLInputElement;
@@ -107,13 +108,24 @@ class Engine_HTML extends Display {
         this.cool_count.setAttribute("type", "number");
 
         var tcell = row.insertCell(0);
+        //Set up the engine list select box.
+        this.e_list_select = document.createElement("SELECT") as HTMLSelectElement;
+        this.e_list_select.required = true;
+        tcell.appendChild(this.e_list_select);
+        tcell.appendChild(document.createElement("BR"));
+        for (let key in engine_list) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = key;
+            this.e_list_select.add(opt);
+        }
+
         //Set up the engine select box.
         this.e_select = document.createElement("SELECT") as HTMLSelectElement;
         this.e_select.required = true;
         tcell.appendChild(this.e_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let i = 0; i < engine_list.length; i++) {
-            let eng = engine_list.get(i);
+        for (let i = 0; i < engine_list["Custom"].length; i++) {
+            let eng = engine_list["Custom"].get(i);
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = eng.name;
             this.e_select.add(opt);
@@ -137,8 +149,12 @@ class Engine_HTML extends Display {
         FlexInput("Cost", this.e_cost, fs);
 
         //Event Listeners for engine stats
+        this.e_list_select.onchange = () => {
+            this.engine.SetSelectedList(
+                this.e_list_select.options[this.e_list_select.selectedIndex].text);
+        }
         this.e_select.onchange = () => {
-            if (this.e_select.selectedIndex == engine_list.length) {
+            if (this.e_select.selectedIndex == this.e_select.options.length - 1) {
                 window.location.href = "engine.html";
             }
             else {
@@ -146,7 +162,7 @@ class Engine_HTML extends Display {
                 this.engine.SetSelectedIndex(this.e_select.selectedIndex);
             }
         };
-        var trigger = () => { this.SendCustomStats(); };
+        var trigger = () => { };
         this.e_pwr.onchange = trigger;
         this.e_mass.onchange = trigger;
         this.e_drag.onchange = trigger;
@@ -339,21 +355,21 @@ class Engine_HTML extends Display {
         }
     }
 
-    private SendCustomStats() {
-        var e_stats = new EngineStats();
-        e_stats.stats.power = this.e_pwr.valueAsNumber;
-        e_stats.stats.mass = this.e_mass.valueAsNumber;
-        e_stats.stats.drag = this.e_drag.valueAsNumber;
-        e_stats.stats.reliability = this.e_rely.valueAsNumber;
-        e_stats.stats.cooling = this.e_cool.valueAsNumber;
-        e_stats.overspeed = this.e_over.valueAsNumber;
-        e_stats.stats.fuelconsumption = this.e_fuel.valueAsNumber;
-        e_stats.altitude = this.e_alti.valueAsNumber;
-        e_stats.torque = this.e_torq.valueAsNumber;
-        e_stats.rumble = this.e_rumb.valueAsNumber;
-        e_stats.stats.cost = this.e_cost.valueAsNumber;
-        this.engine.SetCustomStats(e_stats);
-    }
+    // private SendCustomStats() {
+    //     var e_stats = new EngineStats();
+    //     e_stats.stats.power = this.e_pwr.valueAsNumber;
+    //     e_stats.stats.mass = this.e_mass.valueAsNumber;
+    //     e_stats.stats.drag = this.e_drag.valueAsNumber;
+    //     e_stats.stats.reliability = this.e_rely.valueAsNumber;
+    //     e_stats.stats.cooling = this.e_cool.valueAsNumber;
+    //     e_stats.overspeed = this.e_over.valueAsNumber;
+    //     e_stats.stats.fuelconsumption = this.e_fuel.valueAsNumber;
+    //     e_stats.altitude = this.e_alti.valueAsNumber;
+    //     e_stats.torque = this.e_torq.valueAsNumber;
+    //     e_stats.rumble = this.e_rumb.valueAsNumber;
+    //     e_stats.stats.cost = this.e_cost.valueAsNumber;
+    //     this.engine.SetCustomStats(e_stats);
+    // }
 
     private SetInputDisable(b: boolean) {
         this.e_pwr.disabled = b;
@@ -370,21 +386,56 @@ class Engine_HTML extends Display {
     }
 
     public UpdateDisplay() {
+        while (this.e_list_select.options.length > 0) {
+            this.e_list_select.options.remove(0);
+        }
         while (this.e_select.options.length > 0) {
             this.e_select.options.remove(0);
         }
-        for (let i = 0; i < engine_list.length; i++) {
-            let eng = engine_list.get(i);
+        var list_idx = this.engine.GetSelectedList();
+        if (list_idx != "") {
+
+            var found_list = false;
+            var sel_list = 0;
+            for (let key in engine_list) {
+                let opt = document.createElement("OPTION") as HTMLOptionElement;
+                opt.text = key;
+                this.e_list_select.add(opt);
+                if (key != list_idx && !found_list) {
+                    sel_list -= 1;
+                } else {
+                    sel_list = Math.abs(sel_list);
+                    found_list = true;
+                }
+            }
+            this.e_list_select.selectedIndex = sel_list;
+
+            for (let i = 0; i < engine_list[list_idx].length; i++) {
+                let eng = engine_list[list_idx].get(i);
+                let opt = document.createElement("OPTION") as HTMLOptionElement;
+                opt.text = eng.name;
+                this.e_select.add(opt);
+            }
+            this.e_select.selectedIndex = this.engine.GetSelectedIndex();
+
+            if (this.e_select.selectedIndex == engine_list[list_idx].length) {
+                this.SetInputDisable(false);
+            }
+            else {
+                this.SetInputDisable(true);
+            }
+        } else {
+            for (let key in engine_list) {
+                let opt = document.createElement("OPTION") as HTMLOptionElement;
+                opt.text = key;
+                this.e_list_select.add(opt);
+            }
+            this.e_list_select.selectedIndex = -1;
+            let eng = this.engine.GetCurrentStats();
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = eng.name;
             this.e_select.add(opt);
-        }
-        this.e_select.selectedIndex = this.engine.GetSelectedIndex();
-
-        if (this.e_select.selectedIndex == engine_list.length) {
-            this.SetInputDisable(false);
-        }
-        else {
+            this.e_select.selectedIndex = 0;
             this.SetInputDisable(true);
         }
         var e_stats = this.engine.GetCurrentStats();

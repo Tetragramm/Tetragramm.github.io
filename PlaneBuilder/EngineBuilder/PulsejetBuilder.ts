@@ -103,6 +103,23 @@ class PulsejetBuilder {
         return Math.floor(1.0e-6 + 1 + this.build_quality * (Cost + StarterCost));
     }
 
+    public EngineInputs() {
+        var ei = new EngineInputs();
+
+        var valved = "";
+        if (this.valve_sel == 0)
+            valved = "V";
+        ei.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
+        ei.engine_type = ENGINE_TYPE.PULSEJET;
+        ei.era_sel = this.era_sel;
+        ei.type = this.valve_sel;
+        ei.power = this.desired_power;
+        ei.starter = this.starter;
+        ei.quality_cost = this.build_quality;
+        ei.quality_rely = this.overall_quality;
+        return ei;
+    }
+
     public EngineStats() {
         var estats = new EngineStats();
 
@@ -123,13 +140,6 @@ class PulsejetBuilder {
         estats.overspeed = 100;
         estats.altitude = 3;
         estats.pulsejet = true;
-
-        estats.input_pj.era_sel = this.era_sel;
-        estats.input_pj.type = this.valve_sel;
-        estats.input_pj.power = this.desired_power;
-        estats.input_pj.quality_cost = this.build_quality;
-        estats.input_pj.quality_rely = this.overall_quality;
-        estats.input_pj.starter = this.starter;
 
         return estats;
     }

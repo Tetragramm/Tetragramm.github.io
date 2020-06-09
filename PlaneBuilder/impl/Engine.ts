@@ -3,8 +3,9 @@
 /// <reference path="./EngineStats.ts" />
 
 class Engine extends Part {
-    private selected_index: number;
+    private elist_idx: string;
     private etype_stats: EngineStats;
+    private etype_inputs: EngineInputs;
 
     private cooling_count: number;
     private radiator_index: number;
@@ -36,8 +37,9 @@ class Engine extends Part {
         cl: { name: string, stats: Stats, ed: number, mpd: number, air: boolean, liquid: boolean, rotary: boolean }[]) {
 
         super();
-        this.selected_index = 0;
-        this.etype_stats = engine_list.get(0).Clone();
+        this.elist_idx = "Custom";
+        this.etype_stats = engine_list[this.elist_idx].get_stats(0);
+        this.etype_inputs = engine_list[this.elist_idx].get(0);
 
         this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
@@ -64,13 +66,14 @@ class Engine extends Part {
         this.is_generator = false;
         this.has_alternator = false;
 
-        if (engine_list.length <= 0)
+        if (engine_list[this.elist_idx].length <= 0)
             throw "No Engine Stats Found.  Should be at least one.";
     }
 
     public toJSON() {
         return {
             selected_stats: this.etype_stats.toJSON(),
+            selected_inputs: this.etype_inputs.toJSON(),
             cooling_count: this.cooling_count,
             radiator_index: this.radiator_index,
             selected_mount: this.selected_mount,
@@ -86,9 +89,92 @@ class Engine extends Part {
         };
     }
 
+    private oldJSON(js: JSON, json_version: number): EngineInputs {
+        var stats = js["selected_stats"];
+        this.etype_stats.fromJSON(stats, json_version);
+        var einput = null;
+        if (this.etype_stats.pulsejet && stats["input_pj"]) {
+            this.etype_inputs = new EngineInputs();
+            this.etype_inputs.name = this.etype_stats.name;
+            this.etype_inputs.engine_type = ENGINE_TYPE.PULSEJET;
+
+            var ipj = stats["input_pj"];
+            this.etype_inputs.type = ipj["type"];
+            this.etype_inputs.power = ipj["power"];
+            this.etype_inputs.era_sel = ipj["era_sel"];
+            this.etype_inputs.quality_cost = ipj["quality_cost"];
+            this.etype_inputs.quality_rely = ipj["quality_rely"];
+            this.etype_inputs.starter = ipj["starter"];
+        } else if (stats["input_eb"]) {
+            this.etype_inputs = new EngineInputs();
+            this.etype_inputs.name = this.etype_stats.name;
+            this.etype_inputs.engine_type = ENGINE_TYPE.PROPELLER;
+
+            var ieb = stats["input_eb"];
+            this.etype_inputs.displacement = ieb["displacement"];
+            this.etype_inputs.compression = ieb["compression"];
+            this.etype_inputs.type = ieb["type"];
+            this.etype_inputs.cyl_per_row = ieb["cyl_per_row"];
+            this.etype_inputs.rows = ieb["rows"];
+            this.etype_inputs.RPM_boost = ieb["RPM_boost"];
+            this.etype_inputs.era_sel = ieb["era_sel"];
+            this.etype_inputs.material_fudge = ieb["material_fudge"];
+            this.etype_inputs.quality_fudge = ieb["quality_fudge"];
+            this.etype_inputs.upgrades = ieb["upgrades"];
+            if (this.etype_inputs.upgrades.length == 6) {
+                this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
+                if (this.etype_inputs.upgrades[0]) {
+                    this.etype_inputs.compressor_type = 2;
+                    this.etype_inputs.compressor_count = 1;
+                }
+                if (this.etype_inputs.upgrades[1]) {
+                    this.etype_inputs.compressor_type = 3;
+                    this.etype_inputs.compressor_count = 1;
+                }
+                this.etype_inputs.upgrades.splice(0, 2);
+            } else {
+                this.etype_inputs.compressor_type = ieb["compressor_type"];
+                this.etype_inputs.compressor_count = ieb["compressor_count"];
+                this.etype_inputs.min_IAF = ieb["min_IAF"];
+            }
+        } else {
+            this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
+        }
+
+        return einput;
+    }
+
     public fromJSON(js: JSON, json_version: number) {
-        this.etype_stats.fromJSON(js["selected_stats"], json_version);
-        engine_list.push(this.etype_stats);
+        var elist_idx = "";
+        if (json_version > 10.55) {
+            this.etype_stats.fromJSON(js["selected_stats"], json_version);
+            var e_inputs = new EngineInputs(js["selected_inputs"]);
+            elist_idx = SearchAllEngineLists(this.etype_stats.name);
+            if (elist_idx == "") {
+                elist_idx = "Custom";
+                if (e_inputs.name != "Default") {
+                    engine_list[elist_idx].push(e_inputs);
+                }
+            }
+            this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
+            this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+        } else {
+            var e_inputs = this.oldJSON(js, json_version);
+            if (e_inputs) {
+                elist_idx = SearchAllEngineLists(this.etype_stats.name);
+                console.log("Found engine in: " + elist_idx);
+                if (elist_idx == "") {
+                    elist_idx = "Custom";
+                    if (e_inputs.name != "Default") {
+                        engine_list[elist_idx].push(e_inputs);
+                    }
+                }
+                this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
+                this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+            }
+        }
+        this.elist_idx = elist_idx;
+
         this.cooling_count = js["cooling_count"];
         this.radiator_index = js["radiator_index"];
         this.selected_mount = js["selected_mount"];
@@ -101,11 +187,11 @@ class Engine extends Part {
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
         this.intake_fan = js["intake_fan"];
-        this.selected_index = engine_list.find(this.etype_stats);
     }
 
     public serialize(s: Serialize) {
         this.etype_stats.serialize(s);
+        this.etype_inputs.serialize(s);
         s.PushNum(this.cooling_count);
         s.PushNum(this.radiator_index);
         s.PushNum(this.selected_mount);
@@ -120,9 +206,92 @@ class Engine extends Part {
         s.PushBool(this.intake_fan);
     }
 
+    private oldDeserialize(d: Deserialize): EngineInputs {
+        this.etype_stats.name = d.GetString();
+        this.etype_stats.overspeed = d.GetNum();
+        this.etype_stats.altitude = d.GetNum();
+        this.etype_stats.torque = d.GetNum();
+        this.etype_stats.rumble = d.GetNum();
+        this.etype_stats.oiltank = d.GetBool();
+        this.etype_stats.pulsejet = d.GetBool();
+        if (d.version > 10.45) {
+            this.etype_inputs = new EngineInputs();
+            this.etype_inputs.name = this.etype_stats.name;
+            if (this.etype_stats.pulsejet) {
+                this.etype_inputs.engine_type = ENGINE_TYPE.PULSEJET;
+                this.etype_inputs.power = d.GetNum();
+                this.etype_inputs.type = d.GetNum();
+                this.etype_inputs.era_sel = d.GetNum();
+                this.etype_inputs.quality_cost = d.GetNum();
+                this.etype_inputs.quality_rely = d.GetNum();
+                this.etype_inputs.starter = d.GetBool();
+            } else {
+                this.etype_inputs.displacement = d.GetNum();
+                this.etype_inputs.compression = d.GetNum();
+                this.etype_inputs.type = d.GetNum();
+                this.etype_inputs.cyl_per_row = d.GetNum();
+                this.etype_inputs.rows = d.GetNum();
+                this.etype_inputs.RPM_boost = d.GetNum();
+                this.etype_inputs.era_sel = d.GetNum();
+                this.etype_inputs.material_fudge = d.GetNum();
+                this.etype_inputs.quality_fudge = d.GetNum();
+                this.etype_inputs.upgrades = d.GetBoolArr();
+                if (this.etype_inputs.upgrades.length == 6) {
+                    this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
+                    if (this.etype_inputs.upgrades[0]) {
+                        this.etype_inputs.compressor_type = 2;
+                        this.etype_inputs.compressor_count = 1;
+                    }
+                    if (this.etype_inputs.upgrades[1]) {
+                        this.etype_inputs.compressor_type = 3;
+                        this.etype_inputs.compressor_count = 1;
+                    }
+                    this.etype_inputs.upgrades.splice(0, 2);
+                } else {
+                    this.etype_inputs.compressor_type = d.GetNum();
+                    this.etype_inputs.compressor_count = d.GetNum();
+                    this.etype_inputs.min_IAF = d.GetNum();
+                }
+            }
+        } else {
+            this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
+        }
+
+        this.etype_stats.stats.deserialize(d);
+
+        return this.etype_inputs;
+    }
+
     public deserialize(d: Deserialize) {
-        this.etype_stats.deserialize(d);
-        engine_list.push(this.etype_stats);
+        var elist_idx = "";
+        if (d.version > 10.55) {
+            this.etype_stats.deserialize(d);
+            var e_inputs = new EngineInputs();
+            e_inputs.deserialize(d);
+            elist_idx = SearchAllEngineLists(this.etype_stats.name);
+            if (elist_idx == "") {
+                elist_idx = "Custom";
+                if (e_inputs.name != "Default") {
+                    engine_list[elist_idx].push(e_inputs);
+                }
+            }
+            this.etype_stats = engine_list[this.elist_idx].get_stats_name(this.etype_stats.name);
+            this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+        } else {
+            var e_inputs = this.oldDeserialize(d);
+            if (e_inputs) {
+                elist_idx = SearchAllEngineLists(this.etype_stats.name);
+                if (elist_idx == "") {
+                    elist_idx = "Custom";
+                    if (e_inputs.name != "Default") {
+                        engine_list[elist_idx].push(e_inputs);
+                    }
+                }
+                this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
+                this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+            }
+        }
+
         this.cooling_count = d.GetNum();
         this.radiator_index = d.GetNum();
         this.selected_mount = d.GetNum();
@@ -135,7 +304,8 @@ class Engine extends Part {
         this.is_generator = d.GetBool();
         this.has_alternator = d.GetBool();
         this.intake_fan = d.GetBool();
-        this.selected_index = engine_list.find(this.etype_stats);
+
+        this.elist_idx = elist_idx;
     }
 
     public GetMaxAltitude() {
@@ -143,10 +313,8 @@ class Engine extends Part {
     }
 
     public SetSelectedIndex(num: number) {
-        this.selected_index = num;
-        this.etype_stats = engine_list.get(this.selected_index).Clone();
-        if (num >= engine_list.length)
-            throw "Index is out of range of engine_list.";
+        this.etype_stats = engine_list[this.elist_idx].get_stats(num);
+        this.etype_inputs = engine_list[this.elist_idx].get(num);
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
         this.cooling_count = this.etype_stats.stats.cooling;
@@ -154,17 +322,7 @@ class Engine extends Part {
     }
 
     public GetSelectedIndex(): number {
-        return engine_list.find(this.etype_stats);
-    }
-
-    public SetCustomStats(stats: EngineStats) {
-        this.selected_index = -1;
-        stats.Verify();
-        this.etype_stats = stats;
-        this.PulseJetCheck();
-        this.cooling_count = Math.min(this.cooling_count, this.etype_stats.stats.cooling);
-        this.VerifyCowl(this.cowl_sel);
-        this.CalculateStats();
+        return engine_list[this.elist_idx].find_name(this.etype_stats.name);
     }
 
     public GetCurrentStats(): EngineStats {
@@ -231,8 +389,22 @@ class Engine extends Part {
         return this.intake_fan;
     }
 
+    public SetSelectedList(n: string) {
+        if (n != this.elist_idx) {
+            this.etype_stats = engine_list[n].get_stats(0);
+            this.etype_inputs = engine_list[n].get(0);
+            this.cooling_count = this.etype_stats.stats.cooling;
+        }
+        this.elist_idx = n;
+        this.CalculateStats();
+    }
+
+    public GetSelectedList() {
+        return this.elist_idx;
+    }
+
     public GetListOfEngines(): EngineList {
-        return engine_list;
+        return engine_list[this.elist_idx];
     }
 
     public RequiresExtendedDriveshafts(): boolean {
@@ -390,7 +562,8 @@ class Engine extends Part {
 
     public IsContraRotary() {
         if (!this.GetIsPulsejet()) {
-            if (this.etype_stats.input_eb.type == 3) {
+            if (this.elist_idx != ""
+                && this.etype_inputs.type == 3) {
                 return true;
             }
         }
@@ -552,10 +725,7 @@ class Engine extends Part {
 
     public PartStats(): Stats {
         let stats = new Stats;
-        if (this.selected_index > 0)
-            stats = stats.Add(this.etype_stats.stats);
-        else
-            stats = stats.Add(this.etype_stats.stats);
+        stats = stats.Add(this.etype_stats.stats);
 
         if (this.etype_stats.oiltank)
             stats.mass += 1;

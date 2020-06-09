@@ -433,7 +433,490 @@ class Deserialize {
     }
 }
 /// <reference path="./Stats.ts" />
+/// <reference path="./EngineStats.ts" />
+class EngineList {
+    constructor(name) {
+        this.name = name;
+        this.list = [];
+        var ejson = window.localStorage.getItem("engines." + this.name);
+        if (ejson != null)
+            this.fromJSON(JSON.parse(ejson));
+        var nameliststr = window.localStorage.getItem("engines_names");
+        var namelist = [];
+        if (nameliststr) {
+            namelist = JSON.parse(nameliststr);
+        }
+        var hasname = false;
+        for (let e of namelist) {
+            if (e == name) {
+                hasname = true;
+                break;
+            }
+        }
+        if (!hasname)
+            namelist.push(name);
+        window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+    }
+    toJSON() {
+        var ret = [];
+        for (let li of this.list) {
+            ret.push(li.toJSON());
+        }
+        return { name: this.name, engines: ret };
+    }
+    fromJSON(js) {
+        if (js["name"])
+            this.name = js["name"];
+        for (let elem of js["engines"]) {
+            this.push(new EngineInputs(elem));
+        }
+    }
+    serialize(s) {
+        s.PushString(this.name);
+        s.PushNum(this.list.length);
+        for (let li of this.list) {
+            li.serialize(s);
+        }
+    }
+    deserialize(d) {
+        this.name = d.GetString();
+        var len = d.GetNum();
+        for (let i = 0; i < len; i++) {
+            let stats = new EngineInputs();
+            stats.deserialize(d);
+            this.push(stats);
+        }
+    }
+    deserializeEngine(d) {
+        let stats = new EngineInputs();
+        stats.deserialize(d);
+        return this.push(stats);
+    }
+    push(es) {
+        for (let i = 0; i < this.length; i++) {
+            let li = this.list[i];
+            if (li.Equal(es)) {
+                return i;
+            }
+        }
+        this.list.push(es.Clone());
+        this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
+        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        return this.find(es);
+    }
+    get(i) {
+        if (i < 0 || i >= this.length)
+            return new EngineInputs();
+        return this.list[i];
+    }
+    get_name(n) {
+        var i = this.find_name(n);
+        return this.get(i);
+    }
+    get_stats(i) {
+        if (i < 0 || i >= this.length)
+            return new EngineStats();
+        return this.list[i].PartStats();
+    }
+    get_stats_name(n) {
+        var i = this.find_name(n);
+        return this.get_stats(i);
+    }
+    find(es) {
+        for (let i = 0; i < this.length; i++) {
+            if (es.Equal(this.list[i]))
+                return i;
+        }
+        return -1;
+    }
+    find_name(n) {
+        for (let i = 0; i < this.length; i++) {
+            if (this.list[i].name == n)
+                return i;
+        }
+        return -1;
+    }
+    remove(es) {
+        var idx = this.find(es);
+        if (idx >= 0) {
+            this.list.splice(idx, 1);
+        }
+        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+    }
+    remove_name(name) {
+        var idx = this.find_name(name);
+        if (idx >= 0) {
+            this.list.splice(idx, 1);
+        }
+        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+    }
+    get length() {
+        return this.list.length;
+    }
+}
+function SearchAllEngineLists(n) {
+    for (let key in engine_list) {
+        if (key != "Custom") {
+            let elist = engine_list[key];
+            let idx = elist.find_name(n);
+            if (idx >= 0) {
+                return key;
+            }
+        }
+    }
+    let idx = engine_list["Custom"].find_name(n);
+    if (idx >= 0) {
+        return "Custom";
+    }
+    return "";
+}
+/// <reference path="../impl/EngineStats.ts" />
+/// <reference path="../impl/EngineList.ts" />
+class PulsejetBuilder {
+    constructor() {
+        this.EraTable = [
+            { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
+            { name: "WWI", cost: 0.75, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
+            { name: "Interbellum", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
+            { name: "WWII", cost: 0.25, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
+            { name: "Last Hurrah", cost: 0.1, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
+        ];
+        this.ValveTable = [
+            { name: "Valved", scale: 1, rumble: 1, designcost: 2, reliability: 1 },
+            { name: "Valveless", scale: 1.1, rumble: 0.9, designcost: 1, reliability: 3 },
+        ];
+        this.desired_power = 1;
+        this.valve_sel = 0;
+        this.era_sel = 0;
+        this.build_quality = 1;
+        this.overall_quality = 1;
+        this.starter = false;
+    }
+    TempMass() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var StarterMass = 0;
+        if (this.starter)
+            StarterMass = 1;
+        var Mass = (this.desired_power / Era.mass) * Valve.scale + StarterMass;
+        return Mass;
+    }
+    CalcMass() {
+        return Math.floor(1.0e-6 + this.TempMass()) + 1;
+    }
+    CalcDrag() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var Drag = (this.desired_power / Era.drag) * Valve.scale + 1;
+        return Math.floor(1.0e-6 + this.TempMass() + Drag + 1);
+    }
+    CalcReliability() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var Reliability = this.desired_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
+        return Math.trunc(-Reliability);
+    }
+    CalcFuelConsumption() {
+        var Era = this.EraTable[this.era_sel];
+        return Math.floor(1.0e-6 + this.desired_power * Era.fuel);
+    }
+    CalcRumble() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        return Math.floor(1.0e-6 + this.desired_power * Valve.rumble / (2 * Era.vibe));
+    }
+    CalcCost() {
+        var Era = this.EraTable[this.era_sel];
+        return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
+    }
+    VerifyValues() {
+        this.desired_power = Math.max(1, Math.floor(this.desired_power));
+        this.valve_sel = Math.max(0, Math.min(this.ValveTable.length - 1, this.valve_sel));
+        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
+        this.build_quality = Math.max(0.01, this.build_quality);
+        this.overall_quality = Math.max(0.01, this.overall_quality);
+        this.build_quality = Math.max(this.build_quality, this.overall_quality);
+        this.overall_quality = this.build_quality;
+    }
+    DesignCost() {
+        var Era = this.EraTable[this.era_sel];
+        var Valve = this.ValveTable[this.valve_sel];
+        var StarterCost = 0;
+        if (this.starter)
+            StarterCost = 3;
+        var Cost = this.desired_power * Era.cost / Valve.designcost;
+        return Math.floor(1.0e-6 + 1 + this.build_quality * (Cost + StarterCost));
+    }
+    EngineInputs() {
+        var ei = new EngineInputs();
+        var valved = "";
+        if (this.valve_sel == 0)
+            valved = "V";
+        ei.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
+        ei.engine_type = ENGINE_TYPE.PULSEJET;
+        ei.era_sel = this.era_sel;
+        ei.type = this.valve_sel;
+        ei.power = this.desired_power;
+        ei.starter = this.starter;
+        ei.quality_cost = this.build_quality;
+        ei.quality_rely = this.overall_quality;
+        return ei;
+    }
+    EngineStats() {
+        var estats = new EngineStats();
+        this.VerifyValues();
+        var valved = "";
+        if (this.valve_sel == 0)
+            valved = "V";
+        estats.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
+        estats.stats.power = this.desired_power;
+        estats.stats.mass = this.CalcMass();
+        estats.stats.drag = this.CalcDrag();
+        estats.stats.reliability = this.CalcReliability();
+        estats.stats.fuelconsumption = this.CalcFuelConsumption();
+        estats.rumble = this.CalcRumble();
+        estats.stats.cost = this.CalcCost();
+        estats.overspeed = 100;
+        estats.altitude = 3;
+        estats.pulsejet = true;
+        return estats;
+    }
+}
 /// <reference path="./Serialize.ts"/>
+/// <reference path="../EngineBuilder/EngineBuilder.ts"/>
+/// <reference path="../EngineBuilder/PulsejetBuilder.ts"/>
+var ENGINE_TYPE;
+/// <reference path="./Serialize.ts"/>
+/// <reference path="../EngineBuilder/EngineBuilder.ts"/>
+/// <reference path="../EngineBuilder/PulsejetBuilder.ts"/>
+(function (ENGINE_TYPE) {
+    ENGINE_TYPE[ENGINE_TYPE["PROPELLER"] = 0] = "PROPELLER";
+    ENGINE_TYPE[ENGINE_TYPE["PULSEJET"] = 1] = "PULSEJET";
+})(ENGINE_TYPE || (ENGINE_TYPE = {}));
+class EngineInputs {
+    constructor(js) {
+        this.name = "Default";
+        this.engine_type = ENGINE_TYPE.PROPELLER;
+        this.type = 0;
+        this.era_sel = 0;
+        this.displacement = 0;
+        this.compression = 0;
+        this.cyl_per_row = 0;
+        this.rows = 0;
+        this.RPM_boost = 0;
+        this.material_fudge = 0;
+        this.quality_fudge = 0;
+        this.compressor_type = 0;
+        this.compressor_count = 0;
+        this.min_IAF = 0;
+        this.upgrades = [...Array(4).fill(false)];
+        this.power = 0;
+        this.quality_cost = 0;
+        this.quality_rely = 0;
+        this.starter = false;
+        if (js) {
+            this.fromJSON(js);
+        }
+    }
+    toJSON() {
+        switch (this.engine_type) {
+            case ENGINE_TYPE.PROPELLER: {
+                return {
+                    name: this.name,
+                    engine_type: this.engine_type,
+                    type: this.type,
+                    era_sel: this.era_sel,
+                    displacement: this.displacement,
+                    compression: this.compression,
+                    cyl_per_row: this.cyl_per_row,
+                    rows: this.rows,
+                    RPM_boost: this.RPM_boost,
+                    material_fudge: this.material_fudge,
+                    quality_fudge: this.quality_fudge,
+                    compressor_type: this.compressor_type,
+                    compressor_count: this.compressor_count,
+                    min_IAF: this.min_IAF,
+                    upgrades: this.upgrades,
+                };
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                return {
+                    name: this.name,
+                    engine_type: this.engine_type,
+                    type: this.type,
+                    era_sel: this.era_sel,
+                    power: this.power,
+                    quality_cost: this.quality_cost,
+                    quality_rely: this.quality_rely,
+                    starter: this.starter,
+                };
+            }
+            default:
+                throw "EngineInputs.toJSON: Oh dear, you have a new engine type.";
+        }
+    }
+    fromJSON(js) {
+        this.name = js["name"];
+        this.engine_type = js["engine_type"];
+        this.type = js["type"];
+        this.era_sel = js["era_sel"];
+        switch (this.engine_type) {
+            case ENGINE_TYPE.PROPELLER: {
+                this.displacement = js["displacement"];
+                this.compression = js["compression"];
+                this.cyl_per_row = js["cyl_per_row"];
+                this.rows = js["rows"];
+                this.RPM_boost = js["RPM_boost"];
+                this.material_fudge = js["material_fudge"];
+                this.quality_fudge = js["quality_fudge"];
+                this.compressor_type = js["compressor_type"];
+                this.compressor_count = js["compressor_count"];
+                this.min_IAF = js["min_IAF"];
+                this.upgrades = js["upgrades"];
+                break;
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                this.power = js["power"];
+                this.quality_cost = js["quality_cost"];
+                this.quality_rely = js["quality_rely"];
+                this.starter = js["starter"];
+                break;
+            }
+            default:
+                throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
+        }
+    }
+    serialize(s) {
+        s.PushString(this.name);
+        s.PushNum(this.engine_type);
+        s.PushNum(this.type);
+        s.PushNum(this.era_sel);
+        switch (this.engine_type) {
+            case ENGINE_TYPE.PROPELLER: {
+                s.PushFloat(this.displacement);
+                s.PushFloat(this.compression);
+                s.PushNum(this.cyl_per_row);
+                s.PushNum(this.rows);
+                s.PushFloat(this.RPM_boost);
+                s.PushFloat(this.material_fudge);
+                s.PushFloat(this.quality_fudge);
+                s.PushNum(this.compressor_type);
+                s.PushNum(this.compressor_count);
+                s.PushNum(this.min_IAF);
+                s.PushBoolArr(this.upgrades);
+                break;
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                s.PushNum(this.power);
+                s.PushFloat(this.quality_cost);
+                s.PushFloat(this.quality_rely);
+                s.PushBool(this.starter);
+                break;
+            }
+            default:
+                throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
+        }
+    }
+    deserialize(d) {
+        this.name = d.GetString();
+        this.engine_type = d.GetNum();
+        this.type = d.GetNum();
+        this.era_sel = d.GetNum();
+        switch (this.engine_type) {
+            case ENGINE_TYPE.PROPELLER: {
+                this.displacement = d.GetFloat();
+                this.compression = d.GetFloat();
+                this.cyl_per_row = d.GetNum();
+                this.rows = d.GetNum();
+                this.RPM_boost = d.GetFloat();
+                this.material_fudge = d.GetFloat();
+                this.quality_fudge = d.GetFloat();
+                this.compressor_type = d.GetNum();
+                this.compressor_count = d.GetNum();
+                this.min_IAF = d.GetNum();
+                this.upgrades = d.GetBoolArr();
+                break;
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                this.power = d.GetNum();
+                this.quality_cost = d.GetFloat();
+                this.quality_rely = d.GetFloat();
+                this.starter = d.GetBool();
+                break;
+            }
+            default:
+                throw "EngineInputs.deserialize: Oh dear, you have a new engine type.";
+        }
+    }
+    PartStats() {
+        switch (this.engine_type) {
+            case ENGINE_TYPE.PROPELLER: {
+                var eb = new EngineBuilder();
+                eb.name = this.name;
+                eb.cool_sel = this.type;
+                eb.era_sel = this.era_sel;
+                eb.engine_displacement = this.displacement;
+                eb.compression_ratio = this.compression;
+                eb.num_cyl_per_row = this.cyl_per_row;
+                eb.num_rows = this.rows;
+                eb.rpm_boost = this.RPM_boost;
+                eb.material_fudge = this.material_fudge;
+                eb.quality_fudge = this.quality_fudge;
+                eb.compressor_type = this.compressor_type;
+                eb.compressor_count = this.compressor_count;
+                eb.min_IAF = this.min_IAF;
+                eb.upg_sel = this.upgrades;
+                return eb.EngineStats();
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                var pb = new PulsejetBuilder();
+                pb.valve_sel = this.type;
+                pb.era_sel = this.era_sel;
+                pb.desired_power = this.power;
+                pb.build_quality = this.quality_cost;
+                pb.overall_quality = this.quality_rely;
+                pb.starter = this.starter;
+                return pb.EngineStats();
+            }
+            default:
+                throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
+        }
+    }
+    AE(a, b) {
+        return Math.abs(a - b) < 1.0e-6;
+    }
+    Equal(other) {
+        return this.name == other.name;
+    }
+    Clone() {
+        var n = new EngineInputs();
+        n.name = this.name;
+        n.engine_type = this.engine_type;
+        n.type = this.type;
+        n.era_sel = this.era_sel;
+        n.displacement = this.displacement;
+        n.compression = this.compression;
+        n.cyl_per_row = this.cyl_per_row;
+        n.rows = this.rows;
+        n.RPM_boost = this.RPM_boost;
+        n.material_fudge = this.material_fudge;
+        n.quality_fudge = this.quality_fudge;
+        n.compressor_type = this.compressor_type;
+        n.compressor_count = this.compressor_count;
+        n.min_IAF = this.min_IAF;
+        n.power = this.power;
+        n.quality_cost = this.quality_cost;
+        n.quality_rely = this.quality_rely;
+        n.starter = this.starter;
+        for (let i = 0; i < this.upgrades.length; i++) {
+            n.upgrades[i] = this.upgrades[i];
+        }
+        return n;
+    }
+}
+/// <reference path="./Stats.ts" />
+/// <reference path="./Serialize.ts"/>
+/// <reference path="./EngineInputs.ts"/>
 class EngineStats {
     constructor(js) {
         this.name = "Default";
@@ -444,23 +927,12 @@ class EngineStats {
         this.oiltank = false;
         this.pulsejet = false;
         this.stats = new Stats();
-        this.input_pj = {
-            power: 0, type: 0, era_sel: 0,
-            quality_cost: 0, quality_rely: 0, starter: false
-        };
-        this.input_eb = {
-            displacement: 0, compression: 0, type: 0,
-            cyl_per_row: 0, rows: 0, RPM_boost: 0,
-            era_sel: 0, material_fudge: 0, quality_fudge: 0,
-            compressor_type: 0, compressor_count: 0, min_IAF: 0,
-            upgrades: []
-        };
         if (js) {
             this.fromJSON(js);
         }
     }
     toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet, input_eb: this.input_eb, input_pj: this.input_pj }, this.stats.toJSON());
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
     }
     fromJSON(js, json_version = 9999) {
         if (js["name"])
@@ -477,45 +949,6 @@ class EngineStats {
             this.oiltank = js["oiltank"];
         if (js["pulsejet"])
             this.pulsejet = js["pulsejet"];
-        if (this.pulsejet && js["input_pj"]) {
-            var ipj = js["input_pj"];
-            this.input_pj.power = ipj["power"];
-            this.input_pj.type = ipj["type"];
-            this.input_pj.era_sel = ipj["era_sel"];
-            this.input_pj.quality_cost = ipj["quality_cost"];
-            this.input_pj.quality_rely = ipj["quality_rely"];
-            this.input_pj.starter = ipj["starter"];
-        }
-        else if (js["input_eb"]) {
-            var ieb = js["input_eb"];
-            this.input_eb.displacement = ieb["displacement"];
-            this.input_eb.compression = ieb["compression"];
-            this.input_eb.type = ieb["type"];
-            this.input_eb.cyl_per_row = ieb["cyl_per_row"];
-            this.input_eb.rows = ieb["rows"];
-            this.input_eb.RPM_boost = ieb["RPM_boost"];
-            this.input_eb.era_sel = ieb["era_sel"];
-            this.input_eb.material_fudge = ieb["material_fudge"];
-            this.input_eb.quality_fudge = ieb["quality_fudge"];
-            this.input_eb.upgrades = ieb["upgrades"];
-            if (this.input_eb.upgrades.length == 6) {
-                this.altitude = this.altitude * 10 - 1;
-                if (this.input_eb.upgrades[0]) {
-                    this.input_eb.compressor_type = 2;
-                    this.input_eb.compressor_count = 1;
-                }
-                if (this.input_eb.upgrades[1]) {
-                    this.input_eb.compressor_type = 3;
-                    this.input_eb.compressor_count = 1;
-                }
-                this.input_eb.upgrades.splice(0, 2);
-            }
-            else {
-                this.input_eb.compressor_type = ieb["compressor_type"];
-                this.input_eb.compressor_count = ieb["compressor_count"];
-                this.input_eb.min_IAF = ieb["min_IAF"];
-            }
-        }
         this.stats = new Stats(js);
     }
     serialize(s) {
@@ -526,29 +959,6 @@ class EngineStats {
         s.PushNum(this.rumble);
         s.PushBool(this.oiltank);
         s.PushBool(this.pulsejet);
-        if (this.pulsejet) {
-            s.PushNum(this.input_pj.power);
-            s.PushNum(this.input_pj.type);
-            s.PushNum(this.input_pj.era_sel);
-            s.PushNum(this.input_pj.quality_cost);
-            s.PushNum(this.input_pj.quality_rely);
-            s.PushBool(this.input_pj.starter);
-        }
-        else {
-            s.PushNum(this.input_eb.displacement);
-            s.PushNum(this.input_eb.compression);
-            s.PushNum(this.input_eb.type);
-            s.PushNum(this.input_eb.cyl_per_row);
-            s.PushNum(this.input_eb.rows);
-            s.PushNum(this.input_eb.RPM_boost);
-            s.PushNum(this.input_eb.era_sel);
-            s.PushNum(this.input_eb.material_fudge);
-            s.PushNum(this.input_eb.quality_fudge);
-            s.PushBoolArr(this.input_eb.upgrades);
-            s.PushNum(this.input_eb.compressor_type);
-            s.PushNum(this.input_eb.compressor_count);
-            s.PushNum(this.input_eb.min_IAF);
-        }
         this.stats.serialize(s);
     }
     deserialize(d) {
@@ -559,45 +969,6 @@ class EngineStats {
         this.rumble = d.GetNum();
         this.oiltank = d.GetBool();
         this.pulsejet = d.GetBool();
-        if (d.version > 10.45) {
-            if (this.pulsejet) {
-                this.input_pj.power = d.GetNum();
-                this.input_pj.type = d.GetNum();
-                this.input_pj.era_sel = d.GetNum();
-                this.input_pj.quality_cost = d.GetNum();
-                this.input_pj.quality_rely = d.GetNum();
-                this.input_pj.starter = d.GetBool();
-            }
-            else {
-                this.input_eb.displacement = d.GetNum();
-                this.input_eb.compression = d.GetNum();
-                this.input_eb.type = d.GetNum();
-                this.input_eb.cyl_per_row = d.GetNum();
-                this.input_eb.rows = d.GetNum();
-                this.input_eb.RPM_boost = d.GetNum();
-                this.input_eb.era_sel = d.GetNum();
-                this.input_eb.material_fudge = d.GetNum();
-                this.input_eb.quality_fudge = d.GetNum();
-                this.input_eb.upgrades = d.GetBoolArr();
-                if (this.input_eb.upgrades.length == 6) {
-                    this.altitude = this.altitude * 10 - 1;
-                    if (this.input_eb.upgrades[0]) {
-                        this.input_eb.compressor_type = 2;
-                        this.input_eb.compressor_count = 1;
-                    }
-                    if (this.input_eb.upgrades[1]) {
-                        this.input_eb.compressor_type = 3;
-                        this.input_eb.compressor_count = 1;
-                    }
-                    this.input_eb.upgrades.splice(0, 2);
-                }
-                else {
-                    this.input_eb.compressor_type = d.GetNum();
-                    this.input_eb.compressor_count = d.GetNum();
-                    this.input_eb.min_IAF = d.GetNum();
-                }
-            }
-        }
         this.stats.deserialize(d);
     }
     Clone() {
@@ -632,88 +1003,6 @@ class EngineStats {
         }
     }
 }
-/// <reference path="./Stats.ts" />
-/// <reference path="./EngineStats.ts" />
-class EngineList {
-    constructor() {
-        this.list = [];
-        var ejson = window.localStorage.engines;
-        if (ejson != null)
-            this.fromJSON(JSON.parse(ejson));
-    }
-    toJSON() {
-        var ret = [];
-        for (let li of this.list) {
-            ret.push(li.toJSON());
-        }
-        return { engines: ret };
-    }
-    fromJSON(js) {
-        for (let elem of js["engines"]) {
-            this.push(new EngineStats(elem));
-        }
-    }
-    serialize(s) {
-        s.PushNum(this.list.length);
-        for (let li of this.list) {
-            li.serialize(s);
-        }
-    }
-    deserialize(d) {
-        var len = d.GetNum();
-        for (let i = 0; i < len; i++) {
-            let stats = new EngineStats();
-            stats.deserialize(d);
-            this.push(stats);
-        }
-    }
-    deserializeEngine(d) {
-        let stats = new EngineStats();
-        stats.deserialize(d);
-        return this.push(stats);
-    }
-    push(es) {
-        for (let i = 0; i < this.length; i++) {
-            let li = this.list[i];
-            if (li.Equal(es)) {
-                if ((li.pulsejet && li.input_pj.power == 0 && es.input_pj.power != 0)
-                    || (!li.pulsejet && li.input_eb.displacement == 0 && es.input_eb.displacement != 0)) {
-                    this.list.splice(i, 1);
-                    break;
-                }
-                else {
-                    return i;
-                }
-            }
-        }
-        this.list.push(es.Clone());
-        this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
-        window.localStorage.engines = JSON.stringify(this.toJSON());
-        return this.find(es);
-    }
-    get(i) {
-        if (i < 0 || i >= this.length)
-            return new EngineStats();
-        return this.list[i];
-    }
-    find(es) {
-        for (let i = 0; i < this.length; i++) {
-            if (es.Equal(this.list[i]))
-                return i;
-        }
-        return -1;
-    }
-    remove(es) {
-        var idx = this.find(es);
-        if (idx >= 0) {
-            this.list.splice(idx, 1);
-        }
-        window.localStorage.engines = JSON.stringify(this.toJSON());
-    }
-    get length() {
-        return this.list.length;
-    }
-}
 /// <reference path="../impl/EngineStats.ts" />
 /// <reference path="../impl/EngineList.ts" />
 var CompressorEnum;
@@ -728,11 +1017,12 @@ var CompressorEnum;
 class EngineBuilder {
     constructor() {
         this.EraTable = [
-            { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10, IAF: 29 },
-            { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8, IAF: 39 },
-            { name: "Interbellum", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6, fuelfactor: 6, IAF: 49 },
-            { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 45, powerdiv: 5, fuelfactor: 4, IAF: 49 },
-            { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 4, fuelfactor: 2, IAF: 49 },
+            { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
+            { name: "Great War", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
+            { name: "Roaring 20s", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6.8, fuelfactor: 6 },
+            { name: "Coming Storm", materials: 1.35, cost: 2.25, maxRPM: 45, powerdiv: 6.6, fuelfactor: 5 },
+            { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 50, powerdiv: 6.5, fuelfactor: 4 },
+            { name: "Last Hurrah", materials: 1, cost: 3, maxRPM: 50, powerdiv: 6.2, fuelfactor: 2 },
         ];
         this.CoolingTable = [
             { name: "Liquid Cooled", forcefactor: 1.2, RPMoff: 0, thrustfactor: 1, radiator: 1, massfactor: 1 },
@@ -749,8 +1039,6 @@ class EngineBuilder {
             { name: "Turbocharger" },
         ];
         this.Upgrades = [
-            //{ name: "Supercharger", powerfactor: 0.1, fuelfactor: 0.25, massfactor: 0.2, dragfactor: 0.5, idealalt: 3, costfactor: 6, reqsection: false },
-            //{ name: "Turbocharger", powerfactor: 0.25, fuelfactor: 0, massfactor: 0.5, dragfactor: 0.5, idealalt: 4, costfactor: 8, reqsection: true },
             { name: "Asperator Boost", powerfactor: 0.11, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: -1, costfactor: 3, reqsection: false },
             { name: "War Emergency Power", powerfactor: 0, fuelfactor: 0, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 5, reqsection: false },
             { name: "Fuel Injector", powerfactor: 0, fuelfactor: -0.1, massfactor: 0, dragfactor: 0, idealalt: 0, costfactor: 2, reqsection: false },
@@ -934,7 +1222,7 @@ class EngineBuilder {
             if (this.upg_sel[i])
                 alt += this.Upgrades[i].idealalt;
         }
-        return 3 + alt;
+        return (3 + alt) * 10 - 1;
     }
     CoolTorque() {
         if (this.IsRotary()) {
@@ -1048,123 +1336,46 @@ class EngineBuilder {
                 break;
             }
         }
-        estats.input_eb.RPM_boost = this.rpm_boost;
-        estats.input_eb.compression = this.compression_ratio;
-        estats.input_eb.compressor_count = this.compressor_count;
-        estats.input_eb.compressor_type = this.compressor_type;
-        estats.input_eb.cyl_per_row = this.num_cyl_per_row;
-        estats.input_eb.rows = this.num_rows;
-        estats.input_eb.displacement = this.engine_displacement;
-        estats.input_eb.era_sel = this.era_sel;
-        estats.input_eb.material_fudge = this.material_fudge;
-        estats.input_eb.min_IAF = this.min_IAF;
-        estats.input_eb.quality_fudge = this.quality_fudge;
-        estats.input_eb.type = this.cool_sel;
-        estats.input_eb.upgrades = this.upg_sel;
         return estats;
     }
-}
-/// <reference path="../impl/EngineStats.ts" />
-/// <reference path="../impl/EngineList.ts" />
-class PulsejetBuilder {
-    constructor() {
-        this.EraTable = [
-            { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
-            { name: "WWI", cost: 0.75, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
-            { name: "Interbellum", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
-            { name: "WWII", cost: 0.25, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
-            { name: "Last Hurrah", cost: 0.1, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
-        ];
-        this.ValveTable = [
-            { name: "Valved", scale: 1, rumble: 1, designcost: 2, reliability: 1 },
-            { name: "Valveless", scale: 1.1, rumble: 0.9, designcost: 1, reliability: 3 },
-        ];
-        this.desired_power = 1;
-        this.valve_sel = 0;
-        this.era_sel = 0;
-        this.build_quality = 1;
-        this.overall_quality = 1;
-        this.starter = false;
+    EngineInputs() {
+        var ei = new EngineInputs();
+        ei.engine_type = ENGINE_TYPE.PROPELLER;
+        ei.RPM_boost = this.rpm_boost;
+        ei.compression = this.compression_ratio;
+        ei.compressor_count = this.compressor_count;
+        ei.compressor_type = this.compressor_type;
+        ei.cyl_per_row = this.num_cyl_per_row;
+        ei.displacement = this.engine_displacement;
+        ei.era_sel = this.era_sel;
+        ei.material_fudge = this.material_fudge;
+        ei.min_IAF = this.min_IAF;
+        ei.name = this.name;
+        ei.quality_fudge = this.quality_fudge;
+        ei.rows = this.num_rows;
+        ei.type = this.cool_sel;
+        for (let i = 0; i < ei.upgrades.length; i++)
+            ei.upgrades[i] = this.upg_sel[i];
+        return ei;
     }
-    TempMass() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var StarterMass = 0;
-        if (this.starter)
-            StarterMass = 1;
-        var Mass = (this.desired_power / Era.mass) * Valve.scale + StarterMass;
-        return Mass;
-    }
-    CalcMass() {
-        return Math.floor(1.0e-6 + this.TempMass()) + 1;
-    }
-    CalcDrag() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var Drag = (this.desired_power / Era.drag) * Valve.scale + 1;
-        return Math.floor(1.0e-6 + this.TempMass() + Drag + 1);
-    }
-    CalcReliability() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var Reliability = this.desired_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
-        return Math.trunc(-Reliability);
-    }
-    CalcFuelConsumption() {
-        var Era = this.EraTable[this.era_sel];
-        return Math.floor(1.0e-6 + this.desired_power * Era.fuel);
-    }
-    CalcRumble() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        return Math.floor(1.0e-6 + this.desired_power * Valve.rumble / (2 * Era.vibe));
-    }
-    CalcCost() {
-        var Era = this.EraTable[this.era_sel];
-        return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
-    }
-    VerifyValues() {
-        this.desired_power = Math.max(1, Math.floor(this.desired_power));
-        this.valve_sel = Math.max(0, Math.min(this.ValveTable.length - 1, this.valve_sel));
-        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
-        this.build_quality = Math.max(0.01, this.build_quality);
-        this.overall_quality = Math.max(0.01, this.overall_quality);
-        this.build_quality = Math.max(this.build_quality, this.overall_quality);
-        this.overall_quality = this.build_quality;
-    }
-    DesignCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
-        var StarterCost = 0;
-        if (this.starter)
-            StarterCost = 3;
-        var Cost = this.desired_power * Era.cost / Valve.designcost;
-        return Math.floor(1.0e-6 + 1 + this.build_quality * (Cost + StarterCost));
-    }
-    EngineStats() {
-        var estats = new EngineStats();
-        this.VerifyValues();
-        var valved = "";
-        if (this.valve_sel == 0)
-            valved = "V";
-        estats.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
-        estats.stats.power = this.desired_power;
-        estats.stats.mass = this.CalcMass();
-        estats.stats.drag = this.CalcDrag();
-        estats.stats.reliability = this.CalcReliability();
-        estats.stats.fuelconsumption = this.CalcFuelConsumption();
-        estats.rumble = this.CalcRumble();
-        estats.stats.cost = this.CalcCost();
-        estats.overspeed = 100;
-        estats.altitude = 3;
-        estats.pulsejet = true;
-        estats.input_pj.era_sel = this.era_sel;
-        estats.input_pj.type = this.valve_sel;
-        estats.input_pj.power = this.desired_power;
-        estats.input_pj.quality_cost = this.build_quality;
-        estats.input_pj.quality_rely = this.overall_quality;
-        estats.input_pj.starter = this.starter;
-        return estats;
+    fromJSON(js) {
+        this.engine_displacement = js["displacement"];
+        this.compression_ratio = js["compression"];
+        this.cool_sel = js["type"];
+        this.num_cyl_per_row = js["cyl_per_row"];
+        this.num_rows = js["rows"];
+        this.rpm_boost = js["RPM_boost"];
+        this.era_sel = js["era_sel"];
+        this.material_fudge = js["material_fudge"];
+        this.quality_fudge = js["quality_fudge"];
+        this.compressor_type = js["compressor_type"];
+        this.compressor_count = js["compressor_count"];
+        this.min_IAF = js["min_IAF"];
+        var upgs = js["upgrades"];
+        for (let i = 0; i < upgs.length; i++) {
+            this.upg_sel[i] = upgs[i];
+        }
+        return this.EngineStats();
     }
 }
 var internal_id = 0;
@@ -1875,11 +2086,22 @@ var LZString = (function () {
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var ep = sp.get("engine");
-    elist = new EngineList();
     ebuild = new EngineBuilder_HTML();
     loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
         var engine_json = JSON.parse(engine_resp);
-        elist.fromJSON(engine_json);
+        var nameliststr = window.localStorage.getItem("engines_names");
+        var namelist = [];
+        if (nameliststr) {
+            namelist = JSON.parse(nameliststr);
+            for (let n of namelist) {
+                engine_list[n] = new EngineList(n);
+            }
+        }
+        for (let el of engine_json["lists"]) {
+            if (!engine_list[el["name"]])
+                engine_list[el["name"]] = new EngineList(el["name"]);
+            engine_list[el["name"]].fromJSON(el);
+        }
         ebuild.UpdateList();
     });
     if (ep != null) {
@@ -1887,7 +2109,7 @@ const init = () => {
             var str = LZString.decompressFromEncodedURIComponent(ep);
             var arr = _stringToArrayBuffer(str);
             var des = new Deserialize(arr);
-            var num = elist.deserializeEngine(des);
+            var num = engine_list["Custom"].deserializeEngine(des);
             ebuild.SelectEngine(num);
         }
         catch (_a) {
@@ -1897,7 +2119,7 @@ const init = () => {
 };
 window.onload = init;
 var ebuild;
-var elist;
+var engine_list = { "Custom": new EngineList("Custom") };
 class EngineBuilder_HTML {
     constructor() {
         this.enginebuilder = new EngineBuilder();
@@ -2196,20 +2418,20 @@ class EngineBuilder_HTML {
         this.m_turbo.onchange = trigger;
     }
     InitListManagement(cell) {
+        this.list_idx = "Custom";
+        this.m_list_select = document.createElement("SELECT");
         this.m_select = document.createElement("SELECT");
-        this.m_add = document.createElement("BUTTON");
         this.m_delete = document.createElement("BUTTON");
         this.m_add_eb = document.createElement("BUTTON");
         this.m_add_pj = document.createElement("BUTTON");
-        this.m_copy = document.createElement("BUTTON");
         this.m_save = document.createElement("BUTTON");
         this.m_load = document.createElement("INPUT");
-        this.m_select.onchange = () => { this.SetValues(elist.get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
-        this.m_delete.onclick = () => { elist.remove(this.UpdateManual()); this.UpdateList(); };
-        this.m_add.onclick = () => { elist.push(this.UpdateManual()); this.UpdateList(); };
-        this.m_add_eb.onclick = () => { elist.push(this.enginebuilder.EngineStats()); this.UpdateList(); };
-        this.m_add_pj.onclick = () => { elist.push(this.pulsejetbuilder.EngineStats()); this.UpdateList(); };
-        this.m_save.onclick = () => { download(JSON.stringify(elist.toJSON()), "EngineList.json", "json"); };
+        this.m_list_select.onchange = () => { this.list_idx = this.m_list_select.options[this.m_list_select.selectedIndex].text; this.UpdateList(); };
+        this.m_select.onchange = () => { this.SetValues(engine_list[this.list_idx].get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
+        this.m_delete.onclick = () => { engine_list[this.list_idx].remove_name(this.UpdateManual().name); this.UpdateList(); };
+        this.m_add_eb.onclick = () => { engine_list[this.list_idx].push(this.enginebuilder.EngineInputs()); this.UpdateList(); };
+        this.m_add_pj.onclick = () => { engine_list[this.list_idx].push(this.pulsejetbuilder.EngineInputs()); this.UpdateList(); };
+        this.m_save.onclick = () => { download(JSON.stringify(engine_list[this.list_idx].toJSON()), this.list_idx + ".json", "json"); };
         this.m_load.setAttribute("type", "file");
         this.m_load.multiple = false;
         this.m_load.accept = "application/JSON";
@@ -2221,7 +2443,10 @@ class EngineBuilder_HTML {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result);
-                    elist.fromJSON(str);
+                    var newelist = new EngineList("");
+                    newelist.fromJSON(str);
+                    engine_list[newelist.name] = newelist;
+                    ;
                     this.UpdateList();
                 }
                 catch (_a) { }
@@ -2229,38 +2454,38 @@ class EngineBuilder_HTML {
             reader.readAsText(file);
             this.m_load.value = "";
         };
-        this.m_copy.onclick = () => {
-            var ser = new Serialize();
-            this.UpdateManual().serialize(ser);
-            var arr = ser.FinalArray();
-            var str2 = _arrayBufferToString(arr);
-            var txt2 = LZString.compressToEncodedURIComponent(str2);
-            var link = (location.origin + "/PlaneBuilder/index.html?engine=" + txt2);
-            copyStringToClipboard(link);
-        };
+        CreateSelect("Lists", this.m_list_select, cell);
         CreateSelect("Engines", this.m_select, cell);
         cell.appendChild(document.createElement("BR"));
-        CreateButton("Copy Single Engine", this.m_copy, cell);
         CreateButton("Save Engine List", this.m_save, cell);
         CreateButton("Load Engine List", this.m_load, cell);
         CreateButton("Add From Engine Builder", this.m_add_eb, cell);
         CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
-        CreateButton("Add From Manual Input", this.m_add, cell);
         CreateButton("Delete Engine", this.m_delete, cell);
         this.UpdateList();
     }
     UpdateList() {
+        var l_idx = this.m_list_select.selectedIndex;
+        while (this.m_list_select.options.length > 0) {
+            this.m_list_select.options.remove(0);
+        }
+        for (let key in engine_list) {
+            let opt = document.createElement("OPTION");
+            opt.text = key;
+            this.m_list_select.add(opt);
+        }
+        this.m_list_select.selectedIndex = l_idx;
         var idx = this.m_select.selectedIndex;
         while (this.m_select.options.length > 0) {
             this.m_select.options.remove(0);
         }
-        for (let i = 0; i < elist.length; i++) {
+        for (let i = 0; i < engine_list[this.list_idx].length; i++) {
             let opt = document.createElement("OPTION");
-            opt.text = elist.get(i).name;
+            opt.text = engine_list[this.list_idx].get(i).name;
             this.m_select.add(opt);
         }
-        if (idx >= elist.length) {
-            idx = elist.length - 1;
+        if (idx >= engine_list[this.list_idx].length) {
+            idx = engine_list[this.list_idx].length - 1;
         }
         this.m_select.selectedIndex = idx;
     }
@@ -2283,11 +2508,44 @@ class EngineBuilder_HTML {
         if (this.m_turbo.checked)
             e_stats.stats.reqsections = 1;
         e_stats.Verify();
-        this.SetValues(e_stats);
         return e_stats;
     }
-    SetValues(e_stats) {
-        e_stats.Verify();
+    SetValues(e_input) {
+        var e_stats = e_input.PartStats();
+        switch (e_input.engine_type) {
+            case ENGINE_TYPE.PROPELLER: {
+                this.enginebuilder.name = e_input.name;
+                this.enginebuilder.era_sel = e_input.era_sel;
+                this.enginebuilder.cool_sel = e_input.type;
+                this.enginebuilder.engine_displacement = e_input.displacement;
+                this.enginebuilder.compression_ratio = e_input.compression;
+                this.enginebuilder.num_cyl_per_row = e_input.cyl_per_row;
+                this.enginebuilder.num_rows = e_input.rows;
+                this.enginebuilder.rpm_boost = e_input.RPM_boost;
+                this.enginebuilder.material_fudge = e_input.material_fudge;
+                this.enginebuilder.quality_fudge = e_input.quality_fudge;
+                for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
+                    this.enginebuilder.upg_sel[i] = e_input.upgrades[i];
+                }
+                this.enginebuilder.compressor_type = e_input.compressor_type;
+                this.enginebuilder.compressor_count = e_input.compressor_count;
+                this.enginebuilder.min_IAF = e_input.min_IAF;
+                this.UpdateEngine();
+                break;
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                this.pulsejetbuilder.era_sel = e_input.era_sel;
+                this.pulsejetbuilder.valve_sel = e_input.type;
+                this.pulsejetbuilder.desired_power = e_input.power;
+                this.pulsejetbuilder.build_quality = e_input.quality_cost;
+                this.pulsejetbuilder.overall_quality = e_input.quality_rely;
+                this.pulsejetbuilder.starter = e_input.starter;
+                this.UpdatePulsejet();
+                break;
+            }
+            default:
+                throw "engine_builder.SetValues New Engine Type";
+        }
         this.m_name.value = e_stats.name;
         this.m_pwr.valueAsNumber = e_stats.stats.power;
         this.m_mass.valueAsNumber = e_stats.stats.mass;
@@ -2303,37 +2561,8 @@ class EngineBuilder_HTML {
         this.m_oil.checked = e_stats.oiltank;
         this.m_pulsejet.checked = e_stats.pulsejet;
         this.m_turbo.checked = e_stats.stats.reqsections > 0;
-        if (e_stats.pulsejet) {
-            this.pulsejetbuilder.era_sel = e_stats.input_pj.era_sel;
-            this.pulsejetbuilder.valve_sel = e_stats.input_pj.type;
-            this.pulsejetbuilder.desired_power = e_stats.input_pj.power;
-            this.pulsejetbuilder.build_quality = e_stats.input_pj.quality_cost;
-            this.pulsejetbuilder.overall_quality = e_stats.input_pj.quality_rely;
-            this.pulsejetbuilder.starter = e_stats.input_pj.starter;
-            this.UpdatePulsejet();
-        }
-        else {
-            this.enginebuilder.name = e_stats.name;
-            this.enginebuilder.era_sel = e_stats.input_eb.era_sel;
-            this.enginebuilder.cool_sel = e_stats.input_eb.type;
-            this.enginebuilder.engine_displacement = e_stats.input_eb.displacement;
-            this.enginebuilder.compression_ratio = e_stats.input_eb.compression;
-            this.enginebuilder.num_cyl_per_row = e_stats.input_eb.cyl_per_row;
-            this.enginebuilder.num_rows = e_stats.input_eb.rows;
-            this.enginebuilder.rpm_boost = e_stats.input_eb.RPM_boost;
-            this.enginebuilder.material_fudge = e_stats.input_eb.material_fudge;
-            this.enginebuilder.quality_fudge = e_stats.input_eb.quality_fudge;
-            for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
-                this.enginebuilder.upg_sel[i] = e_stats.input_eb.upgrades[i];
-            }
-            this.enginebuilder.compressor_type = e_stats.input_eb.compressor_type;
-            this.enginebuilder.compressor_count = e_stats.input_eb.compressor_count;
-            this.enginebuilder.min_IAF = e_stats.input_eb.min_IAF;
-            this.UpdateEngine();
-            console.log(e_stats.toJSON());
-        }
     }
     SelectEngine(num) {
-        this.SetValues(elist.get(num));
+        this.SetValues(engine_list[this.list_idx].get(num));
     }
 }

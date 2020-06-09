@@ -7,12 +7,26 @@ const init = () => {
     const sp = new URLSearchParams(location.search);
     var ep = sp.get("engine");
 
-    elist = new EngineList();
     ebuild = new EngineBuilder_HTML();
 
     loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
         var engine_json = JSON.parse(engine_resp);
-        elist.fromJSON(engine_json);
+
+        var nameliststr = window.localStorage.getItem("engines_names");
+        var namelist = [];
+        if (nameliststr) {
+            namelist = JSON.parse(nameliststr);
+            for (let n of namelist) {
+                engine_list[n] = new EngineList(n);
+            }
+        }
+
+        for (let el of engine_json["lists"]) {
+            if (!engine_list[el["name"]])
+                engine_list[el["name"]] = new EngineList(el["name"]);
+            engine_list[el["name"]].fromJSON(el);
+        }
+
         ebuild.UpdateList();
     });
 
@@ -21,7 +35,7 @@ const init = () => {
             var str = LZString.decompressFromEncodedURIComponent(ep);
             var arr = _stringToArrayBuffer(str);
             var des = new Deserialize(arr);
-            var num = elist.deserializeEngine(des);
+            var num = engine_list["Custom"].deserializeEngine(des);
             ebuild.SelectEngine(num);
         } catch { console.log("Compressed Engine Parameter Failed."); }
     }
@@ -29,7 +43,8 @@ const init = () => {
 window.onload = init;
 
 var ebuild: EngineBuilder_HTML;
-var elist: EngineList;
+
+var engine_list: { [id: string]: EngineList } = { "Custom": new EngineList("Custom") };
 
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
@@ -101,14 +116,14 @@ class EngineBuilder_HTML {
     private m_turbo: HTMLInputElement;
 
     //List Modification
+    private list_idx: string;
+    private m_list_select: HTMLSelectElement;
     private m_select: HTMLSelectElement;
-    private m_add: HTMLButtonElement;
     private m_delete: HTMLButtonElement;
     private m_add_eb: HTMLButtonElement;
     private m_add_pj: HTMLButtonElement;
     private m_save: HTMLButtonElement;
     private m_load: HTMLInputElement;
-    private m_copy: HTMLButtonElement;
 
     constructor() {
         this.enginebuilder = new EngineBuilder();
@@ -435,21 +450,21 @@ class EngineBuilder_HTML {
     }
 
     private InitListManagement(cell: HTMLTableCellElement) {
+        this.list_idx = "Custom";
+        this.m_list_select = document.createElement("SELECT") as HTMLSelectElement;
         this.m_select = document.createElement("SELECT") as HTMLSelectElement;
-        this.m_add = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_delete = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_eb = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_pj = document.createElement("BUTTON") as HTMLButtonElement;
-        this.m_copy = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_save = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_load = document.createElement("INPUT") as HTMLInputElement;
 
-        this.m_select.onchange = () => { this.SetValues(elist.get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
-        this.m_delete.onclick = () => { elist.remove(this.UpdateManual()); this.UpdateList(); }
-        this.m_add.onclick = () => { elist.push(this.UpdateManual()); this.UpdateList(); }
-        this.m_add_eb.onclick = () => { elist.push(this.enginebuilder.EngineStats()); this.UpdateList(); }
-        this.m_add_pj.onclick = () => { elist.push(this.pulsejetbuilder.EngineStats()); this.UpdateList(); }
-        this.m_save.onclick = () => { download(JSON.stringify(elist.toJSON()), "EngineList.json", "json"); }
+        this.m_list_select.onchange = () => { this.list_idx = this.m_list_select.options[this.m_list_select.selectedIndex].text; this.UpdateList(); };
+        this.m_select.onchange = () => { this.SetValues(engine_list[this.list_idx].get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
+        this.m_delete.onclick = () => { engine_list[this.list_idx].remove_name(this.UpdateManual().name); this.UpdateList(); }
+        this.m_add_eb.onclick = () => { engine_list[this.list_idx].push(this.enginebuilder.EngineInputs()); this.UpdateList(); }
+        this.m_add_pj.onclick = () => { engine_list[this.list_idx].push(this.pulsejetbuilder.EngineInputs()); this.UpdateList(); }
+        this.m_save.onclick = () => { download(JSON.stringify(engine_list[this.list_idx].toJSON()), this.list_idx + ".json", "json"); }
         this.m_load.setAttribute("type", "file");
         this.m_load.multiple = false;
         this.m_load.accept = "application/JSON";
@@ -461,7 +476,9 @@ class EngineBuilder_HTML {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result as string);
-                    elist.fromJSON(str);
+                    var newelist = new EngineList("");
+                    newelist.fromJSON(str);
+                    engine_list[newelist.name] = newelist;;
                     this.UpdateList();
                 } catch { }
             };
@@ -469,40 +486,40 @@ class EngineBuilder_HTML {
             this.m_load.value = "";
         };
 
-        this.m_copy.onclick = () => {
-            var ser = new Serialize();
-            this.UpdateManual().serialize(ser);
-            var arr = ser.FinalArray();
-            var str2 = _arrayBufferToString(arr);
-            var txt2 = LZString.compressToEncodedURIComponent(str2);
-            var link = (location.origin + "/PlaneBuilder/index.html?engine=" + txt2);
-            copyStringToClipboard(link);
-        };
-
+        CreateSelect("Lists", this.m_list_select, cell);
         CreateSelect("Engines", this.m_select, cell);
         cell.appendChild(document.createElement("BR"));
-        CreateButton("Copy Single Engine", this.m_copy, cell);
         CreateButton("Save Engine List", this.m_save, cell);
         CreateButton("Load Engine List", this.m_load, cell);
         CreateButton("Add From Engine Builder", this.m_add_eb, cell);
         CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
-        CreateButton("Add From Manual Input", this.m_add, cell);
         CreateButton("Delete Engine", this.m_delete, cell);
         this.UpdateList();
     }
 
     public UpdateList() {
+        var l_idx = this.m_list_select.selectedIndex;
+        while (this.m_list_select.options.length > 0) {
+            this.m_list_select.options.remove(0);
+        }
+        for (let key in engine_list) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = key;
+            this.m_list_select.add(opt);
+        }
+        this.m_list_select.selectedIndex = l_idx;
+
         var idx = this.m_select.selectedIndex;
         while (this.m_select.options.length > 0) {
             this.m_select.options.remove(0);
         }
-        for (let i = 0; i < elist.length; i++) {
+        for (let i = 0; i < engine_list[this.list_idx].length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = elist.get(i).name;
+            opt.text = engine_list[this.list_idx].get(i).name;
             this.m_select.add(opt);
         }
-        if (idx >= elist.length) {
-            idx = elist.length - 1;
+        if (idx >= engine_list[this.list_idx].length) {
+            idx = engine_list[this.list_idx].length - 1;
         }
         this.m_select.selectedIndex = idx;
     }
@@ -526,12 +543,45 @@ class EngineBuilder_HTML {
         if (this.m_turbo.checked)
             e_stats.stats.reqsections = 1;
         e_stats.Verify();
-        this.SetValues(e_stats);
         return e_stats;
     }
 
-    private SetValues(e_stats: EngineStats) {
-        e_stats.Verify();
+    private SetValues(e_input: EngineInputs) {
+        var e_stats = e_input.PartStats();
+        switch (e_input.engine_type) {
+            case ENGINE_TYPE.PROPELLER: {
+                this.enginebuilder.name = e_input.name;
+                this.enginebuilder.era_sel = e_input.era_sel;
+                this.enginebuilder.cool_sel = e_input.type;
+                this.enginebuilder.engine_displacement = e_input.displacement;
+                this.enginebuilder.compression_ratio = e_input.compression;
+                this.enginebuilder.num_cyl_per_row = e_input.cyl_per_row;
+                this.enginebuilder.num_rows = e_input.rows;
+                this.enginebuilder.rpm_boost = e_input.RPM_boost;
+                this.enginebuilder.material_fudge = e_input.material_fudge;
+                this.enginebuilder.quality_fudge = e_input.quality_fudge;
+                for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
+                    this.enginebuilder.upg_sel[i] = e_input.upgrades[i];
+                }
+                this.enginebuilder.compressor_type = e_input.compressor_type;
+                this.enginebuilder.compressor_count = e_input.compressor_count;
+                this.enginebuilder.min_IAF = e_input.min_IAF;
+                this.UpdateEngine();
+                break;
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                this.pulsejetbuilder.era_sel = e_input.era_sel;
+                this.pulsejetbuilder.valve_sel = e_input.type;
+                this.pulsejetbuilder.desired_power = e_input.power;
+                this.pulsejetbuilder.build_quality = e_input.quality_cost;
+                this.pulsejetbuilder.overall_quality = e_input.quality_rely;
+                this.pulsejetbuilder.starter = e_input.starter;
+                this.UpdatePulsejet();
+                break;
+            }
+            default:
+                throw "engine_builder.SetValues New Engine Type";
+        }
         this.m_name.value = e_stats.name;
         this.m_pwr.valueAsNumber = e_stats.stats.power;
         this.m_mass.valueAsNumber = e_stats.stats.mass;
@@ -547,37 +597,9 @@ class EngineBuilder_HTML {
         this.m_oil.checked = e_stats.oiltank;
         this.m_pulsejet.checked = e_stats.pulsejet;
         this.m_turbo.checked = e_stats.stats.reqsections > 0;
-        if (e_stats.pulsejet) {
-            this.pulsejetbuilder.era_sel = e_stats.input_pj.era_sel;
-            this.pulsejetbuilder.valve_sel = e_stats.input_pj.type;
-            this.pulsejetbuilder.desired_power = e_stats.input_pj.power;
-            this.pulsejetbuilder.build_quality = e_stats.input_pj.quality_cost;
-            this.pulsejetbuilder.overall_quality = e_stats.input_pj.quality_rely;
-            this.pulsejetbuilder.starter = e_stats.input_pj.starter;
-            this.UpdatePulsejet();
-        } else {
-            this.enginebuilder.name = e_stats.name;
-            this.enginebuilder.era_sel = e_stats.input_eb.era_sel;
-            this.enginebuilder.cool_sel = e_stats.input_eb.type;
-            this.enginebuilder.engine_displacement = e_stats.input_eb.displacement;
-            this.enginebuilder.compression_ratio = e_stats.input_eb.compression;
-            this.enginebuilder.num_cyl_per_row = e_stats.input_eb.cyl_per_row;
-            this.enginebuilder.num_rows = e_stats.input_eb.rows;
-            this.enginebuilder.rpm_boost = e_stats.input_eb.RPM_boost;
-            this.enginebuilder.material_fudge = e_stats.input_eb.material_fudge;
-            this.enginebuilder.quality_fudge = e_stats.input_eb.quality_fudge;
-            for (let i = 0; i < this.enginebuilder.upg_sel.length; i++) {
-                this.enginebuilder.upg_sel[i] = e_stats.input_eb.upgrades[i];
-            }
-            this.enginebuilder.compressor_type = e_stats.input_eb.compressor_type;
-            this.enginebuilder.compressor_count = e_stats.input_eb.compressor_count;
-            this.enginebuilder.min_IAF = e_stats.input_eb.min_IAF;
-            this.UpdateEngine();
-            console.log(e_stats.toJSON());
-        }
     }
 
     public SelectEngine(num: number) {
-        this.SetValues(elist.get(num));
+        this.SetValues(engine_list[this.list_idx].get(num));
     }
 }

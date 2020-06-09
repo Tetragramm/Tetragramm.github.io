@@ -390,8 +390,11 @@ class Aircraft_HTML extends Display {
 
         if (estats.pulsejet) {
             this.cards.eng_data.notes.push("Pulsejet");
-            if (estats.input_pj.power > 0 && estats.input_pj.starter) {
-                this.cards.eng_data.notes.push("Starter");
+            if (e.GetSelectedList() != "") {
+                var inputs = engine_list[e.GetSelectedList()].get_name(estats.name);
+                if (inputs.power > 0 && inputs.starter) {
+                    this.cards.eng_data.notes.push("Starter");
+                }
             }
         }
         else {
@@ -402,15 +405,13 @@ class Aircraft_HTML extends Display {
                 this.cards.eng_data.notes.push("Turns Left");
             }
 
-            //Correct old engines still in the system
-            if (e.GetCurrentStats().input_eb.displacement == 0) {
-                this.cards.eng_data.altitude = 10 * (this.cards.eng_data.altitude) - 1;
-                this.cards.eng_data.min_IAF = 0;
-            } else {
-                this.cards.eng_data.min_IAF = estats.input_eb.min_IAF;
-                if (estats.input_eb.upgrades[1]) {
+            if (e.GetSelectedList() != "") {
+                var inputs = engine_list[e.GetSelectedList()].get_name(estats.name);
+
+                this.cards.eng_data.min_IAF = inputs.min_IAF;
+                if (inputs.upgrades[1]) {
                     this.cards.eng_data.notes.push("WEP");
-                } else if (estats.input_eb.compressor_count > 0 && estats.input_eb.compressor_type == 1) {
+                } else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {
                     this.cards.eng_data.notes.push("WEP from altitudes 0-10");
                 }
             }

@@ -3,6 +3,9 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
+//TODO: Add Create List button.
+//TODO: Armor in Special Rules
+//TODO: Mechanical action + Pulsejet is silly.
 //TODO: Used Plane Table
 //TODO: Autopilot for no cockpits
 //TODO: Update rules page again
@@ -24,14 +27,20 @@ const init = () => {
 
         loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
-            engine_list.fromJSON(engine_json);
-            if (ep != null) {
-                try {
-                    var str = LZString.decompressFromEncodedURIComponent(ep);
-                    var arr = _stringToArrayBuffer(str);
-                    var des = new Deserialize(arr);
-                    engine_list.deserializeEngine(des);
-                } catch { console.log("Compressed Engine Parameter Failed."); }
+
+            var nameliststr = window.localStorage.getItem("engines_names");
+            var namelist = [];
+            if (nameliststr) {
+                namelist = JSON.parse(nameliststr);
+                for (let n of namelist) {
+                    engine_list[n] = new EngineList(n);
+                }
+            }
+
+            for (let el of engine_json["lists"]) {
+                if (!engine_list[el["name"]])
+                    engine_list[el["name"]] = new EngineList(el["name"]);
+                engine_list[el["name"]].fromJSON(el);
             }
 
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
@@ -49,7 +58,7 @@ const init = () => {
                         aircraft_model.deserialize(des);
                         aircraft_model.CalculateStats();
                         loaded = true;
-                    } catch { console.log("Compressed Query Parameter Failed."); aircraft_model.Reset(); }
+                    } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); aircraft_model.Reset(); }
                 }
                 if (acft_data && !loaded) {
                     console.log("Used Saved Data");
@@ -135,4 +144,4 @@ var engine_json: JSON;
 var weapon_json: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
-var engine_list: EngineList = new EngineList();
+var engine_list: { [id: string]: EngineList } = { "Custom": new EngineList("Custom") };

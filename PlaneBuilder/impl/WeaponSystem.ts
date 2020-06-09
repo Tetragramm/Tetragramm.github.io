@@ -508,7 +508,7 @@ class WeaponSystem extends Part {
         }
 
         //Ammunition Cost
-        stats.mass += (this.ammo - 1);
+        stats.mass += (this.ammo - 1) * count;
 
         return stats;
     }
