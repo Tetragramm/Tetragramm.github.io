@@ -92,7 +92,7 @@ class Engine extends Part {
     private oldJSON(js: JSON, json_version: number): EngineInputs {
         var stats = js["selected_stats"];
         this.etype_stats.fromJSON(stats, json_version);
-        var einput = null;
+        this.etype_inputs = new EngineInputs();
         if (this.etype_stats.pulsejet && stats["input_pj"]) {
             this.etype_inputs = new EngineInputs();
             this.etype_inputs.name = this.etype_stats.name;
@@ -106,7 +106,6 @@ class Engine extends Part {
             this.etype_inputs.quality_rely = ipj["quality_rely"];
             this.etype_inputs.starter = ipj["starter"];
         } else if (stats["input_eb"]) {
-            this.etype_inputs = new EngineInputs();
             this.etype_inputs.name = this.etype_stats.name;
             this.etype_inputs.engine_type = ENGINE_TYPE.PROPELLER;
 
@@ -141,7 +140,7 @@ class Engine extends Part {
             this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
         }
 
-        return einput;
+        return this.etype_inputs;
     }
 
     public fromJSON(js: JSON, json_version: number) {
@@ -160,14 +159,12 @@ class Engine extends Part {
             this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
         } else {
             var e_inputs = this.oldJSON(js, json_version);
-            if (e_inputs) {
+            if (e_inputs.name != "Default") {
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
                 console.log("Found engine in: " + elist_idx);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
-                    if (e_inputs.name != "Default") {
-                        engine_list[elist_idx].push(e_inputs);
-                    }
+                    engine_list[elist_idx].push(e_inputs);
                 }
                 this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
                 this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
@@ -214,8 +211,8 @@ class Engine extends Part {
         this.etype_stats.rumble = d.GetNum();
         this.etype_stats.oiltank = d.GetBool();
         this.etype_stats.pulsejet = d.GetBool();
+        this.etype_inputs = new EngineInputs();
         if (d.version > 10.45) {
-            this.etype_inputs = new EngineInputs();
             this.etype_inputs.name = this.etype_stats.name;
             if (this.etype_stats.pulsejet) {
                 this.etype_inputs.engine_type = ENGINE_TYPE.PULSEJET;
@@ -264,6 +261,7 @@ class Engine extends Part {
 
     public deserialize(d: Deserialize) {
         var elist_idx = "";
+        console.log(d.version.toString());
         if (d.version > 10.55) {
             this.etype_stats.deserialize(d);
             var e_inputs = new EngineInputs();
@@ -279,13 +277,12 @@ class Engine extends Part {
             this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
         } else {
             var e_inputs = this.oldDeserialize(d);
-            if (e_inputs) {
+            if (e_inputs.name != "Default") {
+                console.log(JSON.stringify(e_inputs.toJSON()));
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
-                    if (e_inputs.name != "Default") {
-                        engine_list[elist_idx].push(e_inputs);
-                    }
+                    engine_list[elist_idx].push(e_inputs);
                 }
                 this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
                 this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);

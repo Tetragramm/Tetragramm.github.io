@@ -462,8 +462,20 @@ class EngineBuilder_HTML {
         this.m_list_select.onchange = () => { this.list_idx = this.m_list_select.options[this.m_list_select.selectedIndex].text; this.UpdateList(); };
         this.m_select.onchange = () => { this.SetValues(engine_list[this.list_idx].get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
         this.m_delete.onclick = () => { engine_list[this.list_idx].remove_name(this.UpdateManual().name); this.UpdateList(); }
-        this.m_add_eb.onclick = () => { engine_list[this.list_idx].push(this.enginebuilder.EngineInputs()); this.UpdateList(); }
-        this.m_add_pj.onclick = () => { engine_list[this.list_idx].push(this.pulsejetbuilder.EngineInputs()); this.UpdateList(); }
+        this.m_add_eb.onclick = () => {
+            var inputs = this.enginebuilder.EngineInputs();
+            if (inputs.name != "Default") {
+                engine_list[this.list_idx].push(inputs);
+                this.UpdateList();
+            }
+        }
+        this.m_add_pj.onclick = () => {
+            var inputs = this.pulsejetbuilder.EngineInputs();
+            if (inputs.name != "Default") {
+                engine_list[this.list_idx].push(inputs);
+                this.UpdateList();
+            }
+        }
         this.m_save.onclick = () => { download(JSON.stringify(engine_list[this.list_idx].toJSON()), this.list_idx + ".json", "json"); }
         this.m_load.setAttribute("type", "file");
         this.m_load.multiple = false;
