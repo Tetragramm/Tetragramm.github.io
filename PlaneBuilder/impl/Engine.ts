@@ -38,8 +38,8 @@ class Engine extends Part {
 
         super();
         this.elist_idx = "Custom";
-        this.etype_stats = engine_list[this.elist_idx].get_stats(0);
-        this.etype_inputs = engine_list[this.elist_idx].get(0);
+        this.etype_stats = engine_list.get(this.elist_idx).get_stats(0);
+        this.etype_inputs = engine_list.get(this.elist_idx).get(0);
 
         this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
@@ -66,7 +66,7 @@ class Engine extends Part {
         this.is_generator = false;
         this.has_alternator = false;
 
-        if (engine_list[this.elist_idx].length <= 0)
+        if (engine_list.get(this.elist_idx).length <= 0)
             throw "No Engine Stats Found.  Should be at least one.";
     }
 
@@ -152,11 +152,11 @@ class Engine extends Part {
             if (elist_idx == "") {
                 elist_idx = "Custom";
                 if (e_inputs.name != "Default") {
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
             }
-            this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
-            this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+            this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+            this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
         } else {
             var e_inputs = this.oldJSON(js, json_version);
             if (e_inputs.name != "Default") {
@@ -164,10 +164,10 @@ class Engine extends Part {
                 console.log("Found engine in: " + elist_idx);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
-                this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
-                this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+                this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+                this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
             }
         }
         this.elist_idx = elist_idx;
@@ -270,11 +270,11 @@ class Engine extends Part {
             if (elist_idx == "") {
                 elist_idx = "Custom";
                 if (e_inputs.name != "Default") {
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
             }
-            this.etype_stats = engine_list[this.elist_idx].get_stats_name(this.etype_stats.name);
-            this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+            this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+            this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
         } else {
             var e_inputs = this.oldDeserialize(d);
             if (e_inputs.name != "Default") {
@@ -282,10 +282,10 @@ class Engine extends Part {
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
-                this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
-                this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+                this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+                this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
             }
         }
 
@@ -310,8 +310,8 @@ class Engine extends Part {
     }
 
     public SetSelectedIndex(num: number) {
-        this.etype_stats = engine_list[this.elist_idx].get_stats(num);
-        this.etype_inputs = engine_list[this.elist_idx].get(num);
+        this.etype_stats = engine_list.get(this.elist_idx).get_stats(num);
+        this.etype_inputs = engine_list.get(this.elist_idx).get(num);
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
         this.cooling_count = this.etype_stats.stats.cooling;
@@ -319,7 +319,7 @@ class Engine extends Part {
     }
 
     public GetSelectedIndex(): number {
-        return engine_list[this.elist_idx].find_name(this.etype_stats.name);
+        return engine_list.get(this.elist_idx).find_name(this.etype_stats.name);
     }
 
     public GetCurrentStats(): EngineStats {
@@ -388,8 +388,8 @@ class Engine extends Part {
 
     public SetSelectedList(n: string) {
         if (n != this.elist_idx) {
-            this.etype_stats = engine_list[n].get_stats(0);
-            this.etype_inputs = engine_list[n].get(0);
+            this.etype_stats = engine_list.get(n).get_stats(0);
+            this.etype_inputs = engine_list.get(n).get(0);
             this.cooling_count = this.etype_stats.stats.cooling;
         }
         this.elist_idx = n;
@@ -401,7 +401,7 @@ class Engine extends Part {
     }
 
     public GetListOfEngines(): EngineList {
-        return engine_list[this.elist_idx];
+        return engine_list.get(this.elist_idx);
     }
 
     public RequiresExtendedDriveshafts(): boolean {

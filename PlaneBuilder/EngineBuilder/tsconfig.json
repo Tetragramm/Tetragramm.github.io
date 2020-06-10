@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "system",
+        "outFile": "engine_builder.js"
+    },
+    "include": [
+        ".",
+        "../impl"
+    ]
+}

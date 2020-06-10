@@ -143,16 +143,16 @@ class EngineList {
 }
 
 function SearchAllEngineLists(n: string) {
-    for (let key in engine_list) {
+    for (let key of engine_list.keys()) {
         if (key != "Custom") {
-            let elist = engine_list[key];
+            let elist = engine_list.get(key);
             let idx = elist.find_name(n);
             if (idx >= 0) {
                 return key;
             }
         }
     }
-    let idx = engine_list["Custom"].find_name(n);
+    let idx = engine_list.get("Custom").find_name(n);
     if (idx >= 0) {
         return "Custom";
     }

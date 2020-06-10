@@ -33,14 +33,14 @@ const init = () => {
             if (nameliststr) {
                 namelist = JSON.parse(nameliststr);
                 for (let n of namelist) {
-                    engine_list[n] = new EngineList(n);
+                    engine_list.set(n, new EngineList(n));
                 }
             }
 
             for (let el of engine_json["lists"]) {
-                if (!engine_list[el["name"]])
-                    engine_list[el["name"]] = new EngineList(el["name"]);
-                engine_list[el["name"]].fromJSON(el);
+                if (!engine_list.has(el["name"]))
+                    engine_list.set(el["name"], new EngineList(el["name"]));
+                engine_list.get(el["name"]).fromJSON(el);
             }
 
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
@@ -144,4 +144,4 @@ var engine_json: JSON;
 var weapon_json: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
-var engine_list: { [id: string]: EngineList } = { "Custom": new EngineList("Custom") };
+var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);

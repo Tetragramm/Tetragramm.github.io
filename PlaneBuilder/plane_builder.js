@@ -1366,16 +1366,16 @@ class EngineList {
     }
 }
 function SearchAllEngineLists(n) {
-    for (let key in engine_list) {
+    for (let key of engine_list.keys()) {
         if (key != "Custom") {
-            let elist = engine_list[key];
+            let elist = engine_list.get(key);
             let idx = elist.find_name(n);
             if (idx >= 0) {
                 return key;
             }
         }
     }
-    let idx = engine_list["Custom"].find_name(n);
+    let idx = engine_list.get("Custom").find_name(n);
     if (idx >= 0) {
         return "Custom";
     }
@@ -1878,8 +1878,8 @@ class Engine extends Part {
     constructor(ml, ppl, cl) {
         super();
         this.elist_idx = "Custom";
-        this.etype_stats = engine_list[this.elist_idx].get_stats(0);
-        this.etype_inputs = engine_list[this.elist_idx].get(0);
+        this.etype_stats = engine_list.get(this.elist_idx).get_stats(0);
+        this.etype_inputs = engine_list.get(this.elist_idx).get(0);
         this.cooling_count = this.etype_stats.stats.cooling;
         this.radiator_index = -1;
         if (this.cooling_count > 0)
@@ -1898,7 +1898,7 @@ class Engine extends Part {
         this.total_reliability = 0;
         this.is_generator = false;
         this.has_alternator = false;
-        if (engine_list[this.elist_idx].length <= 0)
+        if (engine_list.get(this.elist_idx).length <= 0)
             throw "No Engine Stats Found.  Should be at least one.";
     }
     toJSON() {
@@ -1981,11 +1981,11 @@ class Engine extends Part {
             if (elist_idx == "") {
                 elist_idx = "Custom";
                 if (e_inputs.name != "Default") {
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
             }
-            this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
-            this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+            this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+            this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
         }
         else {
             var e_inputs = this.oldJSON(js, json_version);
@@ -1994,10 +1994,10 @@ class Engine extends Part {
                 console.log("Found engine in: " + elist_idx);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
-                this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
-                this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+                this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+                this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
             }
         }
         this.elist_idx = elist_idx;
@@ -2097,11 +2097,11 @@ class Engine extends Part {
             if (elist_idx == "") {
                 elist_idx = "Custom";
                 if (e_inputs.name != "Default") {
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
             }
-            this.etype_stats = engine_list[this.elist_idx].get_stats_name(this.etype_stats.name);
-            this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+            this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+            this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
         }
         else {
             var e_inputs = this.oldDeserialize(d);
@@ -2110,10 +2110,10 @@ class Engine extends Part {
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
-                    engine_list[elist_idx].push(e_inputs);
+                    engine_list.get(elist_idx).push(e_inputs);
                 }
-                this.etype_stats = engine_list[elist_idx].get_stats_name(this.etype_stats.name);
-                this.etype_inputs = engine_list[elist_idx].get_name(this.etype_stats.name);
+                this.etype_stats = engine_list.get(elist_idx).get_stats_name(this.etype_stats.name);
+                this.etype_inputs = engine_list.get(elist_idx).get_name(this.etype_stats.name);
             }
         }
         this.cooling_count = d.GetNum();
@@ -2134,15 +2134,15 @@ class Engine extends Part {
         return this.etype_stats.altitude;
     }
     SetSelectedIndex(num) {
-        this.etype_stats = engine_list[this.elist_idx].get_stats(num);
-        this.etype_inputs = engine_list[this.elist_idx].get(num);
+        this.etype_stats = engine_list.get(this.elist_idx).get_stats(num);
+        this.etype_inputs = engine_list.get(this.elist_idx).get(num);
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
         this.cooling_count = this.etype_stats.stats.cooling;
         this.CalculateStats();
     }
     GetSelectedIndex() {
-        return engine_list[this.elist_idx].find_name(this.etype_stats.name);
+        return engine_list.get(this.elist_idx).find_name(this.etype_stats.name);
     }
     GetCurrentStats() {
         return this.etype_stats.Clone();
@@ -2197,8 +2197,8 @@ class Engine extends Part {
     }
     SetSelectedList(n) {
         if (n != this.elist_idx) {
-            this.etype_stats = engine_list[n].get_stats(0);
-            this.etype_inputs = engine_list[n].get(0);
+            this.etype_stats = engine_list.get(n).get_stats(0);
+            this.etype_inputs = engine_list.get(n).get(0);
             this.cooling_count = this.etype_stats.stats.cooling;
         }
         this.elist_idx = n;
@@ -2208,7 +2208,7 @@ class Engine extends Part {
         return this.elist_idx;
     }
     GetListOfEngines() {
-        return engine_list[this.elist_idx];
+        return engine_list.get(this.elist_idx);
     }
     RequiresExtendedDriveshafts() {
         return this.mount_list[this.selected_mount].reqED;
@@ -7706,7 +7706,7 @@ class Engine_HTML extends Display {
         this.e_list_select.required = true;
         tcell.appendChild(this.e_list_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let key in engine_list) {
+        for (let key of engine_list.keys()) {
             let opt = document.createElement("OPTION");
             opt.text = key;
             this.e_list_select.add(opt);
@@ -7716,8 +7716,8 @@ class Engine_HTML extends Display {
         this.e_select.required = true;
         tcell.appendChild(this.e_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let i = 0; i < engine_list["Custom"].length; i++) {
-            let eng = engine_list["Custom"].get(i);
+        for (let i = 0; i < engine_list.get("Custom").length; i++) {
+            let eng = engine_list.get("Custom").get(i);
             let opt = document.createElement("OPTION");
             opt.text = eng.name;
             this.e_select.add(opt);
@@ -7973,7 +7973,7 @@ class Engine_HTML extends Display {
         if (list_idx != "") {
             var found_list = false;
             var sel_list = 0;
-            for (let key in engine_list) {
+            for (let key of engine_list.keys()) {
                 let opt = document.createElement("OPTION");
                 opt.text = key;
                 this.e_list_select.add(opt);
@@ -7986,14 +7986,14 @@ class Engine_HTML extends Display {
                 }
             }
             this.e_list_select.selectedIndex = sel_list;
-            for (let i = 0; i < engine_list[list_idx].length; i++) {
-                let eng = engine_list[list_idx].get(i);
+            for (let i = 0; i < engine_list.get(list_idx).length; i++) {
+                let eng = engine_list.get(list_idx).get(i);
                 let opt = document.createElement("OPTION");
                 opt.text = eng.name;
                 this.e_select.add(opt);
             }
             this.e_select.selectedIndex = this.engine.GetSelectedIndex();
-            if (this.e_select.selectedIndex == engine_list[list_idx].length) {
+            if (this.e_select.selectedIndex == engine_list.get(list_idx).length) {
                 this.SetInputDisable(false);
             }
             else {
@@ -8001,7 +8001,7 @@ class Engine_HTML extends Display {
             }
         }
         else {
-            for (let key in engine_list) {
+            for (let key of engine_list.keys()) {
                 let opt = document.createElement("OPTION");
                 opt.text = key;
                 this.e_list_select.add(opt);
@@ -10606,7 +10606,7 @@ class Aircraft_HTML extends Display {
         if (estats.pulsejet) {
             this.cards.eng_data.notes.push("Pulsejet");
             if (e.GetSelectedList() != "") {
-                var inputs = engine_list[e.GetSelectedList()].get_name(estats.name);
+                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
                 if (inputs.power > 0 && inputs.starter) {
                     this.cards.eng_data.notes.push("Starter");
                 }
@@ -10620,7 +10620,7 @@ class Aircraft_HTML extends Display {
                 this.cards.eng_data.notes.push("Turns Left");
             }
             if (e.GetSelectedList() != "") {
-                var inputs = engine_list[e.GetSelectedList()].get_name(estats.name);
+                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
                 this.cards.eng_data.min_IAF = inputs.min_IAF;
                 if (inputs.upgrades[1]) {
                     this.cards.eng_data.notes.push("WEP");
@@ -11738,13 +11738,13 @@ const init = () => {
             if (nameliststr) {
                 namelist = JSON.parse(nameliststr);
                 for (let n of namelist) {
-                    engine_list[n] = new EngineList(n);
+                    engine_list.set(n, new EngineList(n));
                 }
             }
             for (let el of engine_json["lists"]) {
-                if (!engine_list[el["name"]])
-                    engine_list[el["name"]] = new EngineList(el["name"]);
-                engine_list[el["name"]].fromJSON(el);
+                if (!engine_list.has(el["name"]))
+                    engine_list.set(el["name"], new EngineList(el["name"]));
+                engine_list.get(el["name"]).fromJSON(el);
             }
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
@@ -11851,7 +11851,7 @@ var engine_json;
 var weapon_json;
 var aircraft_model;
 var aircraft_display;
-var engine_list = { "Custom": new EngineList("Custom") };
+var engine_list = new Map([["Custom", new EngineList("Custom")]]);
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 class AlterStats extends Part {

@@ -113,7 +113,7 @@ class Engine_HTML extends Display {
         this.e_list_select.required = true;
         tcell.appendChild(this.e_list_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let key in engine_list) {
+        for (let key of engine_list.keys()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = key;
             this.e_list_select.add(opt);
@@ -124,8 +124,8 @@ class Engine_HTML extends Display {
         this.e_select.required = true;
         tcell.appendChild(this.e_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let i = 0; i < engine_list["Custom"].length; i++) {
-            let eng = engine_list["Custom"].get(i);
+        for (let i = 0; i < engine_list.get("Custom").length; i++) {
+            let eng = engine_list.get("Custom").get(i);
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = eng.name;
             this.e_select.add(opt);
@@ -397,7 +397,7 @@ class Engine_HTML extends Display {
 
             var found_list = false;
             var sel_list = 0;
-            for (let key in engine_list) {
+            for (let key of engine_list.keys()) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = key;
                 this.e_list_select.add(opt);
@@ -410,22 +410,22 @@ class Engine_HTML extends Display {
             }
             this.e_list_select.selectedIndex = sel_list;
 
-            for (let i = 0; i < engine_list[list_idx].length; i++) {
-                let eng = engine_list[list_idx].get(i);
+            for (let i = 0; i < engine_list.get(list_idx).length; i++) {
+                let eng = engine_list.get(list_idx).get(i);
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = eng.name;
                 this.e_select.add(opt);
             }
             this.e_select.selectedIndex = this.engine.GetSelectedIndex();
 
-            if (this.e_select.selectedIndex == engine_list[list_idx].length) {
+            if (this.e_select.selectedIndex == engine_list.get(list_idx).length) {
                 this.SetInputDisable(false);
             }
             else {
                 this.SetInputDisable(true);
             }
         } else {
-            for (let key in engine_list) {
+            for (let key of engine_list.keys()) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = key;
                 this.e_list_select.add(opt);

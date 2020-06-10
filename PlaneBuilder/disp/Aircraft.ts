@@ -391,7 +391,7 @@ class Aircraft_HTML extends Display {
         if (estats.pulsejet) {
             this.cards.eng_data.notes.push("Pulsejet");
             if (e.GetSelectedList() != "") {
-                var inputs = engine_list[e.GetSelectedList()].get_name(estats.name);
+                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
                 if (inputs.power > 0 && inputs.starter) {
                     this.cards.eng_data.notes.push("Starter");
                 }
@@ -406,7 +406,7 @@ class Aircraft_HTML extends Display {
             }
 
             if (e.GetSelectedList() != "") {
-                var inputs = engine_list[e.GetSelectedList()].get_name(estats.name);
+                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
 
                 this.cards.eng_data.min_IAF = inputs.min_IAF;
                 if (inputs.upgrades[1]) {

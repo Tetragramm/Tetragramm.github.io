@@ -17,14 +17,14 @@ const init = () => {
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
             for (let n of namelist) {
-                engine_list[n] = new EngineList(n);
+                engine_list.set(n, new EngineList(n));
             }
         }
 
         for (let el of engine_json["lists"]) {
-            if (!engine_list[el["name"]])
-                engine_list[el["name"]] = new EngineList(el["name"]);
-            engine_list[el["name"]].fromJSON(el);
+            if (!engine_list.has(el["name"]))
+                engine_list.set(el["name"], new EngineList(el["name"]));
+            engine_list.get(el["name"]).fromJSON(el);
         }
 
         ebuild.UpdateList();
@@ -35,7 +35,7 @@ const init = () => {
             var str = LZString.decompressFromEncodedURIComponent(ep);
             var arr = _stringToArrayBuffer(str);
             var des = new Deserialize(arr);
-            var num = engine_list["Custom"].deserializeEngine(des);
+            var num = engine_list.get("Custom").deserializeEngine(des);
             ebuild.SelectEngine(num);
         } catch { console.log("Compressed Engine Parameter Failed."); }
     }
@@ -44,7 +44,7 @@ window.onload = init;
 
 var ebuild: EngineBuilder_HTML;
 
-var engine_list: { [id: string]: EngineList } = { "Custom": new EngineList("Custom") };
+var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
 
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
@@ -124,6 +124,9 @@ class EngineBuilder_HTML {
     private m_add_pj: HTMLButtonElement;
     private m_save: HTMLButtonElement;
     private m_load: HTMLInputElement;
+    private m_list_create: HTMLButtonElement;
+    private m_list_delete: HTMLButtonElement;
+    private m_list_input: HTMLInputElement;
 
     constructor() {
         this.enginebuilder = new EngineBuilder();
@@ -458,25 +461,28 @@ class EngineBuilder_HTML {
         this.m_add_pj = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_save = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_load = document.createElement("INPUT") as HTMLInputElement;
+        this.m_list_create = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_list_input = document.createElement("INPUT") as HTMLInputElement;
+        this.m_list_delete = document.createElement("BUTTON") as HTMLButtonElement;
 
         this.m_list_select.onchange = () => { this.list_idx = this.m_list_select.options[this.m_list_select.selectedIndex].text; this.UpdateList(); };
-        this.m_select.onchange = () => { this.SetValues(engine_list[this.list_idx].get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
-        this.m_delete.onclick = () => { engine_list[this.list_idx].remove_name(this.UpdateManual().name); this.UpdateList(); }
+        this.m_select.onchange = () => { this.SetValues(engine_list.get(this.list_idx).get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
+        this.m_delete.onclick = () => { engine_list.get(this.list_idx).remove_name(this.UpdateManual().name); this.UpdateList(); }
         this.m_add_eb.onclick = () => {
             var inputs = this.enginebuilder.EngineInputs();
             if (inputs.name != "Default") {
-                engine_list[this.list_idx].push(inputs);
+                engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
             }
         }
         this.m_add_pj.onclick = () => {
             var inputs = this.pulsejetbuilder.EngineInputs();
             if (inputs.name != "Default") {
-                engine_list[this.list_idx].push(inputs);
+                engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
             }
         }
-        this.m_save.onclick = () => { download(JSON.stringify(engine_list[this.list_idx].toJSON()), this.list_idx + ".json", "json"); }
+        this.m_save.onclick = () => { download(JSON.stringify(engine_list.get(this.list_idx).toJSON()), this.list_idx + ".json", "json"); }
         this.m_load.setAttribute("type", "file");
         this.m_load.multiple = false;
         this.m_load.accept = "application/JSON";
@@ -490,12 +496,35 @@ class EngineBuilder_HTML {
                     var str = JSON.parse(reader.result as string);
                     var newelist = new EngineList("");
                     newelist.fromJSON(str);
-                    engine_list[newelist.name] = newelist;;
+                    engine_list.set(newelist.name, newelist);
                     this.UpdateList();
                 } catch { }
             };
             reader.readAsText(file);
             this.m_load.value = "";
+        };
+        this.m_list_create.onclick = () => {
+            if (this.m_list_input.value != "") {
+                engine_list.set(this.m_list_input.value, new EngineList(this.m_list_input.value));
+                this.UpdateList();
+            }
+        };
+        this.m_list_delete.onclick = () => {
+            if (this.list_idx != "" && this.list_idx != "Custom") {
+                engine_list.delete(this.list_idx);
+                window.localStorage.removeItem("engines." + this.list_idx);
+                let namelist = JSON.parse(window.localStorage.getItem("engines_names"));
+                var idx = -1;
+                for (let i = 0; i < namelist.length; i++) {
+                    if (namelist[i] == this.list_idx)
+                        idx = i;
+                }
+                if (idx != -1)
+                    namelist.splice(idx, 1);
+                window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+                this.list_idx = "Custom";
+                this.UpdateList();
+            }
         };
 
         CreateSelect("Lists", this.m_list_select, cell);
@@ -506,6 +535,23 @@ class EngineBuilder_HTML {
         CreateButton("Add From Engine Builder", this.m_add_eb, cell);
         CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
         CreateButton("Delete Engine", this.m_delete, cell);
+
+        var span = document.createElement("SPAN") as HTMLSpanElement;
+        var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
+        this.m_list_create.hidden = true;
+        this.m_list_create.id = GenerateID();
+        txtSpan.htmlFor = this.m_list_create.id;
+        txtSpan.innerHTML = "<b>&nbsp;" + "Create List" + "&nbsp;&nbsp;</b>";
+        txtSpan.classList.add("lbl_action");
+        txtSpan.classList.add("btn_th");
+        span.appendChild(txtSpan);
+        span.appendChild(this.m_list_create);
+        span.appendChild(this.m_list_input);
+        cell.appendChild(span);
+        cell.appendChild(document.createElement("BR"));
+        cell.appendChild(document.createElement("BR"));
+        CreateButton("Delete List", this.m_list_delete, cell);
+
         this.UpdateList();
     }
 
@@ -514,10 +560,12 @@ class EngineBuilder_HTML {
         while (this.m_list_select.options.length > 0) {
             this.m_list_select.options.remove(0);
         }
-        for (let key in engine_list) {
+        for (let key of engine_list.keys()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = key;
             this.m_list_select.add(opt);
+            if (key == this.list_idx)
+                l_idx = this.m_list_select.options.length - 1;
         }
         this.m_list_select.selectedIndex = l_idx;
 
@@ -525,13 +573,13 @@ class EngineBuilder_HTML {
         while (this.m_select.options.length > 0) {
             this.m_select.options.remove(0);
         }
-        for (let i = 0; i < engine_list[this.list_idx].length; i++) {
+        for (let i = 0; i < engine_list.get(this.list_idx).length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = engine_list[this.list_idx].get(i).name;
+            opt.text = engine_list.get(this.list_idx).get(i).name;
             this.m_select.add(opt);
         }
-        if (idx >= engine_list[this.list_idx].length) {
-            idx = engine_list[this.list_idx].length - 1;
+        if (idx >= engine_list.get(this.list_idx).length) {
+            idx = engine_list.get(this.list_idx).length - 1;
         }
         this.m_select.selectedIndex = idx;
     }
@@ -612,6 +660,6 @@ class EngineBuilder_HTML {
     }
 
     public SelectEngine(num: number) {
-        this.SetValues(engine_list[this.list_idx].get(num));
+        this.SetValues(engine_list.get(this.list_idx).get(num));
     }
 }
