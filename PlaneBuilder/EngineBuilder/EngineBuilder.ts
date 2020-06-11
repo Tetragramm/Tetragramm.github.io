@@ -285,14 +285,6 @@ class EngineBuilder {
         var Era = this.EraTable[this.era_sel];
         var Cool = this.CoolingTable[this.cool_sel];
 
-        var OldCost = 0;
-        {
-            var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
-            var CylinderForce = EngineForce / (this.num_rows * this.num_cyl_per_row);
-            var Cost = this.UpgradeCost() + (CylinderForce / 10 * (this.num_cyl_per_row + (this.num_rows * 1.3)));
-            OldCost = Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
-        }
-
         var EngineForce = this.engine_displacement * this.compression_ratio / 10;
         var Cost = (this.UpgradeCost() + EngineForce);
         var PlusBSandEra = this.quality_fudge * Era.cost * Cost;
@@ -300,7 +292,6 @@ class EngineBuilder {
             PlusBSandEra *= 1.4;
         }
 
-        console.log("Old:" + OldCost.toString() + "  New:" + Math.floor(1.0e-6 + PlusBSandEra).toString());
         return Math.floor(1.0e-6 + PlusBSandEra);
     }
 

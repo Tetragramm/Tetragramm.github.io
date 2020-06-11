@@ -35,7 +35,6 @@ const init = () => {
             }
 
             for (let el of engine_json["lists"]) {
-                console.log(el["name"]);
                 if (!engine_list.has(el["name"]))
                     engine_list.set(el["name"], new EngineList(el["name"]));
                 engine_list.get(el["name"]).fromJSON(el);

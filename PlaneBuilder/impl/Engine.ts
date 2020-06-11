@@ -161,7 +161,6 @@ class Engine extends Part {
             var e_inputs = this.oldJSON(js, json_version);
             if (e_inputs.name != "Default") {
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
-                console.log("Found engine in: " + elist_idx);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
                     engine_list.get(elist_idx).push(e_inputs);
@@ -261,7 +260,6 @@ class Engine extends Part {
 
     public deserialize(d: Deserialize) {
         var elist_idx = "";
-        console.log(d.version.toString());
         if (d.version > 10.55) {
             this.etype_stats.deserialize(d);
             var e_inputs = new EngineInputs();
@@ -278,7 +276,6 @@ class Engine extends Part {
         } else {
             var e_inputs = this.oldDeserialize(d);
             if (e_inputs.name != "Default") {
-                console.log(JSON.stringify(e_inputs.toJSON()));
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
                 if (elist_idx == "") {
                     elist_idx = "Custom";

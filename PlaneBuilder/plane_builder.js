@@ -676,20 +676,12 @@ class EngineBuilder {
     CalcCost() {
         var Era = this.EraTable[this.era_sel];
         var Cool = this.CoolingTable[this.cool_sel];
-        var OldCost = 0;
-        {
-            var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
-            var CylinderForce = EngineForce / (this.num_rows * this.num_cyl_per_row);
-            var Cost = this.UpgradeCost() + (CylinderForce / 10 * (this.num_cyl_per_row + (this.num_rows * 1.3)));
-            OldCost = Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
-        }
         var EngineForce = this.engine_displacement * this.compression_ratio / 10;
         var Cost = (this.UpgradeCost() + EngineForce);
         var PlusBSandEra = this.quality_fudge * Era.cost * Cost;
         if (Cool.radiator > 0) {
             PlusBSandEra *= 1.4;
         }
-        console.log("Old:" + OldCost.toString() + "  New:" + Math.floor(1.0e-6 + PlusBSandEra).toString());
         return Math.floor(1.0e-6 + PlusBSandEra);
     }
     VerifyValues() {
@@ -2008,7 +2000,6 @@ class Engine extends Part {
             var e_inputs = this.oldJSON(js, json_version);
             if (e_inputs.name != "Default") {
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
-                console.log("Found engine in: " + elist_idx);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
                     engine_list.get(elist_idx).push(e_inputs);
@@ -2105,7 +2096,6 @@ class Engine extends Part {
     }
     deserialize(d) {
         var elist_idx = "";
-        console.log(d.version.toString());
         if (d.version > 10.55) {
             this.etype_stats.deserialize(d);
             var e_inputs = new EngineInputs();
@@ -2123,7 +2113,6 @@ class Engine extends Part {
         else {
             var e_inputs = this.oldDeserialize(d);
             if (e_inputs.name != "Default") {
-                console.log(JSON.stringify(e_inputs.toJSON()));
                 elist_idx = SearchAllEngineLists(this.etype_stats.name);
                 if (elist_idx == "") {
                     elist_idx = "Custom";
@@ -11770,7 +11759,6 @@ const init = () => {
                 }
             }
             for (let el of engine_json["lists"]) {
-                console.log(el["name"]);
                 if (!engine_list.has(el["name"]))
                     engine_list.set(el["name"], new EngineList(el["name"]));
                 engine_list.get(el["name"]).fromJSON(el);
@@ -11882,6 +11870,64 @@ var aircraft_model;
 var aircraft_display;
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);
 /// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+class AlterStats extends Part {
+    constructor() {
+        super();
+        this.stats = new Stats();
+    }
+    PartStats() {
+        var stats = new Stats();
+        if (!this.stats.liftbleed)
+            this.stats.liftbleed = 0;
+        if (!this.stats.drag)
+            this.stats.drag = 0;
+        if (!this.stats.mass)
+            this.stats.mass = 0;
+        if (!this.stats.wetmass)
+            this.stats.wetmass = 0;
+        if (!this.stats.bomb_mass)
+            this.stats.bomb_mass = 0;
+        if (!this.stats.cost)
+            this.stats.cost = 0;
+        if (!this.stats.upkeep)
+            this.stats.upkeep = 0;
+        if (!this.stats.control)
+            this.stats.control = 0;
+        if (!this.stats.pitchstab)
+            this.stats.pitchstab = 0;
+        if (!this.stats.latstab)
+            this.stats.latstab = 0;
+        if (!this.stats.wingarea)
+            this.stats.wingarea = 0;
+        if (!this.stats.maxstrain)
+            this.stats.maxstrain = 0;
+        if (!this.stats.structure)
+            this.stats.structure = 0;
+        if (!this.stats.toughness)
+            this.stats.toughness = 0;
+        if (!this.stats.power)
+            this.stats.power = 0;
+        if (!this.stats.fuelconsumption)
+            this.stats.fuelconsumption = 0;
+        if (!this.stats.fuel)
+            this.stats.fuel = 0;
+        if (!this.stats.pitchspeed)
+            this.stats.pitchspeed = 0;
+        if (!this.stats.pitchboost)
+            this.stats.pitchboost = 0;
+        if (!this.stats.charge)
+            this.stats.charge = 0;
+        if (!this.stats.crashsafety)
+            this.stats.crashsafety = 0;
+        stats = stats.Add(this.stats);
+        return stats;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+}
+/// <reference path="./Part.ts" />
 class Used extends Part {
     constructor() {
         super();
@@ -11965,626 +12011,6 @@ class Used extends Part {
         this.leaky = Math.floor(1.0e-6 + this.leaky);
         this.sluggish = Math.floor(1.0e-6 + this.sluggish);
         return new Stats();
-    }
-    SetCalculateStats(callback) {
-        this.CalculateStats = callback;
-    }
-}
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
-/// <reference path="./EngineList.ts"/>
-/// <reference path="./Era.ts" />
-/// <reference path="./Cockpits.ts" />
-/// <reference path="./Passengers.ts" />
-/// <reference path="./Engines.ts" />
-/// <reference path="./Propeller.ts" />
-/// <reference path="./Frames.ts" />
-/// <reference path="./Wings.ts" />
-/// <reference path="./Stabilizers.ts" />
-/// <reference path="./ControlSurfaces.ts" />
-/// <reference path="./Reinforcement.ts" />
-/// <reference path="./Fuel.ts" />
-/// <reference path="./Munitions.ts" />
-/// <reference path="./CargoAndPassengers.ts" />
-/// <reference path="./LandingGear.ts" />
-/// <reference path="./Accessories.ts" />
-/// <reference path="./Optimization.ts" />
-/// <reference path="./Weapons.ts" />
-/// <reference path="./Used.ts" />
-class Aircraft {
-    constructor(js, weapon_json, storage) {
-        this.use_storage = false;
-        // private alter: AlterStats;
-        this.reset_json = String.raw `{"version":"10.6","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R-3 Boxer 6-Cylinder","overspeed":26,"altitude":29,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Hornet R-3 Boxer 6-Cylinder","engine_type":0,"type":0,"era_sel":1,"displacement":10,"compression":5,"cyl_per_row":2,"rows":3,"RPM_boost":1,"material_fudge":1,"quality_fudge":1.04,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":0},"wings":{"wing_list":[{"surface":0,"area":10,"span":10,"dihedral":0,"anhedral":0,"deck":1},{"surface":0,"area":10,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":3,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[2,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[],"brace_count":0}}`;
-        this.stats = new Stats();
-        this.name = "Prototype Aircraft";
-        this.version = js['version'];
-        this.era = new Era(js["era"]);
-        this.cockpits = new Cockpits(js["cockpit"]);
-        this.passengers = new Passengers(js["passengers"]);
-        this.engines = new Engines(js["engines"]);
-        this.propeller = new Propeller(js["propellers"]);
-        this.frames = new Frames(js["frames"]);
-        this.wings = new Wings(js["wings"]);
-        this.stabilizers = new Stabilizers(js["stabilizers"]);
-        this.controlsurfaces = new ControlSurfaces(js["controls"]);
-        this.reinforcements = new Reinforcement(js["reinforcement"]);
-        this.fuel = new Fuel(js["fuel"]);
-        this.munitions = new Munitions();
-        this.cargo = new CargoAndPassengers(js["cargo"]);
-        this.gear = new LandingGear(js["landing_gear"]);
-        this.accessories = new Accessories(js["accessories"]);
-        this.optimization = new Optimization();
-        this.weapons = new Weapons(weapon_json);
-        this.used = new Used();
-        // this.alter = new AlterStats();
-        this.era.SetCalculateStats(() => { this.CalculateStats(); });
-        this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
-        this.passengers.SetCalculateStats(() => { this.CalculateStats(); });
-        this.engines.SetCalculateStats(() => { this.CalculateStats(); });
-        this.propeller.SetCalculateStats(() => { this.CalculateStats(); });
-        this.frames.SetCalculateStats(() => { this.CalculateStats(); });
-        this.wings.SetCalculateStats(() => { this.CalculateStats(); });
-        this.stabilizers.SetCalculateStats(() => { this.CalculateStats(); });
-        this.controlsurfaces.SetCalculateStats(() => { this.CalculateStats(); });
-        this.reinforcements.SetCalculateStats(() => { this.CalculateStats(); });
-        this.fuel.SetCalculateStats(() => { this.CalculateStats(); });
-        this.munitions.SetCalculateStats(() => { this.CalculateStats(); });
-        this.cargo.SetCalculateStats(() => { this.CalculateStats(); });
-        this.gear.SetCalculateStats(() => { this.CalculateStats(); });
-        this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
-        this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
-        this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
-        this.used.SetCalculateStats(() => { this.CalculateStats(); });
-        // this.alter.SetCalculateStats(() => { this.CalculateStats(); });
-        this.cockpits.SetNumberOfCockpits(1);
-        this.engines.SetNumberOfEngines(1);
-        this.frames.SetTailType(1);
-        this.use_storage = storage;
-        this.Reset();
-    }
-    toJSON() {
-        return {
-            version: this.version,
-            name: this.name,
-            era: this.era.toJSON(),
-            cockpits: this.cockpits.toJSON(),
-            passengers: this.passengers.toJSON(),
-            engines: this.engines.toJSON(),
-            propeller: this.propeller.toJSON(),
-            frames: this.frames.toJSON(),
-            wings: this.wings.toJSON(),
-            stabilizers: this.stabilizers.toJSON(),
-            controlsurfaces: this.controlsurfaces.toJSON(),
-            reinforcements: this.reinforcements.toJSON(),
-            fuel: this.fuel.toJSON(),
-            munitions: this.munitions.toJSON(),
-            cargo: this.cargo.toJSON(),
-            gear: this.gear.toJSON(),
-            accessories: this.accessories.toJSON(),
-            optimization: this.optimization.toJSON(),
-            weapons: this.weapons.toJSON(),
-            used: this.used.toJSON(),
-        };
-    }
-    fromJSON(js, disp = true) {
-        if (disp) {
-            console.log(js);
-            console.log(js["version"]);
-        }
-        var json_version = parseFloat(js["version"]);
-        this.name = js["name"];
-        this.era.fromJSON(js["era"], json_version);
-        this.cockpits.fromJSON(js["cockpits"], json_version);
-        this.passengers.fromJSON(js["passengers"], json_version);
-        this.engines.fromJSON(js["engines"], json_version);
-        this.propeller.fromJSON(js["propeller"], json_version);
-        this.frames.fromJSON(js["frames"], json_version);
-        this.wings.fromJSON(js["wings"], json_version);
-        this.stabilizers.fromJSON(js["stabilizers"], json_version);
-        this.controlsurfaces.fromJSON(js["controlsurfaces"], json_version);
-        this.reinforcements.fromJSON(js["reinforcements"], json_version);
-        this.fuel.fromJSON(js["fuel"], json_version);
-        this.munitions.fromJSON(js["munitions"], json_version);
-        this.cargo.fromJSON(js["cargo"], json_version);
-        this.gear.fromJSON(js["gear"], json_version);
-        this.accessories.fromJSON(js["accessories"], json_version);
-        this.optimization.fromJSON(js["optimization"], json_version);
-        this.weapons.fromJSON(js["weapons"], json_version);
-        if (json_version > 10.65) {
-            this.used.fromJSON(js["used"], json_version);
-        }
-        this.CalculateStats();
-        return true;
-    }
-    serialize(s) {
-        s.PushString(this.version);
-        s.PushString(this.name);
-        this.era.serialize(s);
-        this.cockpits.serialize(s);
-        this.passengers.serialize(s);
-        this.engines.serialize(s);
-        this.propeller.serialize(s);
-        this.frames.serialize(s);
-        this.wings.serialize(s);
-        this.stabilizers.serialize(s);
-        this.controlsurfaces.serialize(s);
-        this.reinforcements.serialize(s);
-        this.fuel.serialize(s);
-        this.munitions.serialize(s);
-        this.cargo.serialize(s);
-        this.gear.serialize(s);
-        this.accessories.serialize(s);
-        this.optimization.serialize(s);
-        this.weapons.serialize(s);
-        this.used.serialize(s);
-    }
-    deserialize(d) {
-        d.version = parseFloat(d.GetString());
-        console.log(d.version);
-        this.name = d.GetString();
-        this.era.deserialize(d);
-        this.cockpits.deserialize(d);
-        this.passengers.deserialize(d);
-        this.engines.deserialize(d);
-        this.propeller.deserialize(d);
-        this.frames.deserialize(d);
-        this.wings.deserialize(d);
-        this.stabilizers.deserialize(d);
-        this.controlsurfaces.deserialize(d);
-        this.reinforcements.deserialize(d);
-        this.fuel.deserialize(d);
-        this.munitions.deserialize(d);
-        this.cargo.deserialize(d);
-        this.gear.deserialize(d);
-        this.accessories.deserialize(d);
-        this.optimization.deserialize(d);
-        this.weapons.deserialize(d);
-        if (d.version > 10.65) {
-            this.used.deserialize(d);
-        }
-    }
-    SetDisplayCallback(callback) {
-        this.DisplayCallback = callback;
-    }
-    CalculateStats() {
-        this.updated_stats = false;
-        var stats = new Stats();
-        stats = stats.Add(this.era.PartStats());
-        stats = stats.Add(this.cockpits.PartStats());
-        stats = stats.Add(this.passengers.PartStats());
-        this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard());
-        this.engines.SetMetalArea(this.wings.GetMetalArea());
-        this.engines.HaveParasol(this.wings.GetParasol());
-        stats = stats.Add(this.engines.PartStats());
-        this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
-        stats = stats.Add(this.propeller.PartStats());
-        //Fuel goes here, because it makes sections.
-        stats = stats.Add(this.fuel.PartStats());
-        //Munitions goes here, because it makes sections.
-        stats = stats.Add(this.munitions.PartStats());
-        //Weapons go here, because they make sections.
-        this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
-        this.weapons.SetTractorInfo(this.engines.GetTractor());
-        this.weapons.SetPusherInfo(this.engines.GetPusher());
-        this.weapons.cant_type = this.reinforcements.GetCantileverType();
-        this.weapons.SetHavePropeller(this.engines.GetHavePropeller());
-        stats = stats.Add(this.weapons.PartStats());
-        //Cargo makes sections
-        stats = stats.Add(this.cargo.PartStats());
-        this.frames.SetRequiredSections(stats.reqsections);
-        this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
-        this.frames.SetIsTandem(this.wings.GetTandem());
-        stats = stats.Add(this.frames.PartStats());
-        this.wings.SetNumFrames(this.frames.GetNumFrames());
-        stats = stats.Add(this.wings.PartStats());
-        this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
-        this.stabilizers.SetIsTandem(this.wings.GetTandem());
-        this.stabilizers.SetIsSwept(this.wings.GetSwept());
-        this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
-        this.stabilizers.SetWingArea(stats.wingarea);
-        this.stabilizers.wing_drag = this.wings.GetWingDrag();
-        stats = stats.Add(this.stabilizers.PartStats());
-        this.controlsurfaces.SetWingArea(stats.wingarea);
-        this.controlsurfaces.SetSpan(this.wings.GetSpan());
-        stats = stats.Add(this.controlsurfaces.PartStats());
-        this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
-        this.reinforcements.SetTandem(this.wings.GetTandem());
-        this.reinforcements.SetStaggered(this.wings.GetStaggered());
-        this.reinforcements.SetCantLift(this.era.GetCantLift());
-        stats = stats.Add(this.reinforcements.PartStats());
-        this.accessories.SetAcftPower(stats.power);
-        this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
-        this.accessories.SetSkinArmor(this.frames.GetArmor());
-        this.accessories.SetVitalParts(this.VitalComponentList().length);
-        stats = stats.Add(this.accessories.PartStats());
-        //Gear go last, because they need total mass.
-        this.gear.SetLoadedMass(stats.mass + stats.wetmass);
-        this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
-        stats = stats.Add(this.gear.PartStats());
-        //Add toughness here so it gets optimized properly.
-        stats.toughness += Math.floor(1.0e-6 + stats.structure / 5);
-        this.optimization.SetAcftStats(stats);
-        stats = stats.Add(this.optimization.PartStats());
-        //Has flight stress from open cockpit + tractor rotary.
-        if (this.cockpits.HasOpen() && this.engines.HasTractorRotary())
-            stats.flightstress++;
-        // stats = stats.Add(this.alter.PartStats());
-        //Have to round after optimizations, because otherwise it's wrong.
-        stats.Round();
-        if (!this.updated_stats) {
-            this.updated_stats = true;
-            this.stats = stats;
-            var derived = this.GetDerivedStats();
-            //Because flaps have cost per MP
-            this.stats.cost += this.controlsurfaces.GetFlapCost(derived.DryMP);
-            //First element of "used"
-            stats.reliability -= this.used.burnt_out;
-            //Update Part Local stuff
-            this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility, this.stats.crashsafety);
-            this.engines.UpdateReliability(stats);
-            //Not really part local, but only affects number limits.
-            this.reinforcements.SetAcftStructure(stats.structure);
-            this.fuel.SetArea(this.wings.GetArea());
-            this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
-            this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
-            //Airplanes always cost 1
-            this.stats.cost = Math.max(1, this.stats.cost);
-            if (this.engines.GetRumble() * 10 > stats.structure) {
-                this.stats.power = 0;
-                this.stats.warnings.push({
-                    source: "Rumble",
-                    warning: "Rumble requires a minimum structure of Rumble*10 to fly."
-                });
-            }
-            if (this.DisplayCallback)
-                this.DisplayCallback();
-            if (this.use_storage)
-                window.localStorage.aircraft = JSON.stringify(this);
-        }
-    }
-    GetDerivedStats() {
-        var DryMP = Math.floor(1.0e-6 + this.stats.mass / 5);
-        DryMP = Math.max(DryMP, 1);
-        var WetMP = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass) / 5);
-        WetMP = Math.max(WetMP, 1);
-        var WetMPwBombs = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass + this.stats.bomb_mass) / 5);
-        WetMPwBombs = Math.max(WetMPwBombs, 1);
-        var DPEmpty = Math.floor(1.0e-6 + (this.stats.drag + DryMP) / 5);
-        DPEmpty = Math.max(DPEmpty, 1);
-        var DPFull = DPEmpty; //Based on advice from Discord.
-        var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
-        DPwBombs = Math.max(DPwBombs, 1);
-        var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
-        var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
-        var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
-        //Used: Ragged
-        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * (1 - 0.1 * this.used.ragged));
-        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * (1 - 0.1 * this.used.ragged));
-        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * (1 - 0.1 * this.used.ragged));
-        var StallSpeedEmpty = Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
-        var StallSpeedFull = Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
-        var StallSpeedFullwBombs = Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
-        //Used: Hefty
-        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * (1 + 0.2 * this.used.hefty));
-        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * (1 + 0.2 * this.used.hefty));
-        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * (1 + 0.2 * this.used.hefty));
-        var Overspeed = this.engines.GetOverspeed();
-        var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
-        var BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
-        var BoostFullwBombs = Math.floor(1.0e-6 + this.stats.power / WetMPwBombs);
-        var Dropoff = Math.floor(1.0e-6 + this.stats.pitchboost * MaxSpeedEmpty);
-        var Stabiilty = this.stats.pitchstab + this.stats.latstab;
-        if (this.stats.pitchstab > 0 && this.stats.latstab > 0)
-            Stabiilty += 2;
-        else if (this.stats.pitchstab < 0 && this.stats.latstab < 0)
-            Stabiilty -= 2;
-        var HandlingEmpty = 100 + this.stats.control - DryMP;
-        if (Stabiilty > 10)
-            HandlingEmpty = -99999;
-        else if (Stabiilty == 10)
-            HandlingEmpty -= 4;
-        else if (Stabiilty > 6)
-            HandlingEmpty -= 3;
-        else if (Stabiilty > 3)
-            HandlingEmpty -= 2;
-        else if (Stabiilty > 0)
-            HandlingEmpty -= 1;
-        else if (Stabiilty == 0)
-            HandlingEmpty += 0;
-        else if (Stabiilty > -4)
-            HandlingEmpty += 1;
-        else if (Stabiilty > -7)
-            HandlingEmpty += 2;
-        else if (Stabiilty > -10)
-            HandlingEmpty += 3;
-        else if (Stabiilty == -10)
-            HandlingEmpty += 4;
-        else
-            HandlingEmpty = -99999;
-        var HandlingFull = HandlingEmpty + DryMP - WetMP;
-        var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
-        //Used: Sluggish
-        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty - Math.abs(HandlingEmpty) * (1 - 0.5 * this.used.sluggish));
-        HandlingFull = Math.floor(1.0e-6 + HandlingFull - Math.abs(HandlingFull) * (1 - 0.5 * this.used.sluggish));
-        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - Math.abs(HandlingFullwBombs) * (1 - 0.5 * this.used.sluggish));
-        var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
-        var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
-        var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
-        var MaxStrain = 1 / 0;
-        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0) {
-            MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
-        }
-        else {
-            MaxStrain = Math.min(this.stats.structure + this.stats.maxstrain, this.stats.structure);
-        }
-        //And store the results so they can be displayed
-        this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
-        MaxStrain += this.optimization.final_ms;
-        //Used: Fragile
-        MaxStrain = Math.floor(1.0e-6 + MaxStrain * (1 - 0.2 * this.used.fragile));
-        var Toughness = this.stats.toughness;
-        //Used: Weak
-        Toughness = Toughness * Math.pow(0.5, this.used.weak);
-        var Structure = this.stats.structure;
-        var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
-        var EnergyLosswBombs = EnergyLoss + 1;
-        EnergyLoss = Math.min(EnergyLoss, 10);
-        EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
-        var TurnBleed = Math.ceil(((StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
-        var TurnBleedwBombs = TurnBleed + 1;
-        TurnBleed = Math.max(TurnBleed, 1);
-        TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
-        var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
-        //Used: Leaky
-        FuelUses = FuelUses * (1 - 0.2 * this.used.leaky);
-        var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
-        var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
-        var FlightStress = 1 + this.stats.flightstress;
-        if (Stabiilty > 3 || Stabiilty < -3)
-            FlightStress++;
-        //Flight Stress from Rumble. Excess structure can reduce stress.
-        if (this.engines.GetMaxRumble() > 0) {
-            FlightStress += Math.max(1, 2 * this.engines.GetMaxRumble() - this.stats.structure / 10);
-        }
-        FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
-        FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
-        return {
-            DryMP: DryMP,
-            WetMP: WetMP,
-            WetMPwBombs: WetMPwBombs,
-            DPEmpty: DPEmpty,
-            DPFull: DPFull,
-            DPwBombs: DPwBombs,
-            MaxSpeedEmpty: MaxSpeedEmpty,
-            MaxSpeedFull: MaxSpeedFull,
-            MaxSpeedwBombs: MaxSpeedwBombs,
-            StallSpeedEmpty: StallSpeedEmpty,
-            StallSpeedFull: StallSpeedFull,
-            StallSpeedFullwBombs: StallSpeedFullwBombs,
-            Overspeed: Overspeed,
-            BoostEmpty: BoostEmpty,
-            BoostFull: BoostFull,
-            BoostFullwBombs: BoostFullwBombs,
-            Dropoff: Dropoff,
-            Stabiilty: Stabiilty,
-            HandlingEmpty: HandlingEmpty,
-            HandlingFull: HandlingFull,
-            HandlingFullwBombs: HandlingFullwBombs,
-            ElevatorsEmpty: ElevatorsEmpty,
-            ElevatorsFull: ElevatorsFull,
-            ElevatorsFullwBombs: ElevatorsFullwBombs,
-            MaxStrain: MaxStrain,
-            Toughness: Toughness,
-            Structure: Structure,
-            EnergyLoss: EnergyLoss,
-            EnergyLosswBombs: EnergyLosswBombs,
-            TurnBleed: TurnBleed,
-            TurnBleedwBombs: TurnBleedwBombs,
-            FuelUses: FuelUses,
-            CruiseRange: CruiseRange,
-            CruiseRangewBombs: CruiseRangewBombs,
-            FlightStress: FlightStress,
-        };
-    }
-    VitalComponentList() {
-        var derived = this.GetDerivedStats();
-        var vital = [];
-        vital.push("Controls");
-        for (let i = 0; i < this.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push("Aircrew #" + (i + 1).toString());
-        }
-        if (derived.FuelUses > 0) {
-            vital.push("Fuel Tanks");
-        }
-        for (let i = 0; i < this.GetEngines().GetNumberOfEngines(); i++) {
-            if (this.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital.push("Engine #" + (i + 1).toString() + " Pusher");
-                if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString() + " Pusher");
-                }
-                if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString() + " Pusher");
-                }
-                vital.push("Engine #" + (i + 1).toString() + " Puller");
-                if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString() + " Puller");
-                }
-                if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString() + " Puller");
-                }
-            }
-            else {
-                vital.push("Engine #" + (i + 1).toString());
-                if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString());
-                }
-                if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString());
-                }
-            }
-        }
-        for (let i = 0; i < this.GetEngines().GetNumberOfRadiators(); i++) {
-            vital.push("Radiator #" + (i + 1).toString());
-        }
-        if (this.IsElectrics()) {
-            vital.push("Electrics");
-        }
-        for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
-            vital.push("Weapon Set #" + (i + 1).toString());
-        }
-        return vital;
-    }
-    SetStorage(use) {
-        this.use_storage = use;
-    }
-    Reset() {
-        this.fromJSON(JSON.parse(this.reset_json), false);
-    }
-    GetVersion() {
-        return this.version;
-    }
-    GetCommunicationName() {
-        return this.accessories.GetCommunicationName();
-    }
-    GetAttackList() {
-        return this.cockpits.GetAttackList();
-    }
-    GetVisibilityList() {
-        return this.cockpits.GetVisibilityList();
-    }
-    GetStressList() {
-        return this.cockpits.GetStressList();
-    }
-    GetEscapeList() {
-        return this.cockpits.GetEscapeList();
-    }
-    GetCrashList() {
-        return this.cockpits.GetCrashList();
-    }
-    GetReliabilityList() {
-        return this.engines.GetReliabilityList();
-    }
-    GetMaxAltitude() {
-        return this.engines.GetMaxAltitude();
-    }
-    GetGearName() {
-        return this.gear.GetGearName();
-    }
-    GetIsFlammable() {
-        return this.frames.GetIsFlammable() || this.wings.GetIsFlammable();
-    }
-    GetEra() {
-        return this.era;
-    }
-    GetCockpits() {
-        return this.cockpits;
-    }
-    GetPassengers() {
-        return this.passengers;
-    }
-    GetEngines() {
-        return this.engines;
-    }
-    GetPropeller() {
-        return this.propeller;
-    }
-    GetFrames() {
-        return this.frames;
-    }
-    GetWings() {
-        return this.wings;
-    }
-    GetStabilizers() {
-        return this.stabilizers;
-    }
-    GetControlSurfaces() {
-        return this.controlsurfaces;
-    }
-    GetReinforcements() {
-        return this.reinforcements;
-    }
-    GetFuel() {
-        return this.fuel;
-    }
-    GetMunitions() {
-        return this.munitions;
-    }
-    GetCargoAndPassengers() {
-        return this.cargo;
-    }
-    GetLandingGear() {
-        return this.gear;
-    }
-    GetAccessories() {
-        return this.accessories;
-    }
-    GetOptimization() {
-        return this.optimization;
-    }
-    GetStats() {
-        return this.stats;
-    }
-    GetWeapons() {
-        return this.weapons;
-    }
-    IsElectrics() {
-        return this.engines.IsElectrics() || this.accessories.IsElectrics();
-    }
-}
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
-class AlterStats extends Part {
-    constructor() {
-        super();
-        this.stats = new Stats();
-    }
-    PartStats() {
-        var stats = new Stats();
-        if (!this.stats.liftbleed)
-            this.stats.liftbleed = 0;
-        if (!this.stats.drag)
-            this.stats.drag = 0;
-        if (!this.stats.mass)
-            this.stats.mass = 0;
-        if (!this.stats.wetmass)
-            this.stats.wetmass = 0;
-        if (!this.stats.bomb_mass)
-            this.stats.bomb_mass = 0;
-        if (!this.stats.cost)
-            this.stats.cost = 0;
-        if (!this.stats.upkeep)
-            this.stats.upkeep = 0;
-        if (!this.stats.control)
-            this.stats.control = 0;
-        if (!this.stats.pitchstab)
-            this.stats.pitchstab = 0;
-        if (!this.stats.latstab)
-            this.stats.latstab = 0;
-        if (!this.stats.wingarea)
-            this.stats.wingarea = 0;
-        if (!this.stats.maxstrain)
-            this.stats.maxstrain = 0;
-        if (!this.stats.structure)
-            this.stats.structure = 0;
-        if (!this.stats.toughness)
-            this.stats.toughness = 0;
-        if (!this.stats.power)
-            this.stats.power = 0;
-        if (!this.stats.fuelconsumption)
-            this.stats.fuelconsumption = 0;
-        if (!this.stats.fuel)
-            this.stats.fuel = 0;
-        if (!this.stats.pitchspeed)
-            this.stats.pitchspeed = 0;
-        if (!this.stats.pitchboost)
-            this.stats.pitchboost = 0;
-        if (!this.stats.charge)
-            this.stats.charge = 0;
-        if (!this.stats.crashsafety)
-            this.stats.crashsafety = 0;
-        stats = stats.Add(this.stats);
-        return stats;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
