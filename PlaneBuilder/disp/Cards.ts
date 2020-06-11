@@ -237,7 +237,7 @@ class Cards {
         for (let r = 0; r < this.acft_data.armour.length; ++r) {
             let AP = r + 1;
             if (this.acft_data.armour[r] > 0) {
-                let str = this.acft_data.armour[r].toString() + " Coverage AP " + AP.toString();
+                let str = this.acft_data.armour[r].toString() + "x AP " + AP.toString();
                 context.fillText(str, 525, 575 + 26 * idx, 180);
                 idx++;
             }

@@ -23,6 +23,7 @@ class WeaponSystem extends Part {
     private spinner_t: boolean;
     private spinner_p: boolean;
     public has_cantilever: boolean;
+    private has_propeller: boolean;
 
     private weapon_list: {
         name: string, era: string, size: number, stats: Stats,
@@ -49,6 +50,7 @@ class WeaponSystem extends Part {
         this.weapons = [];
         this.action_sel = ActionType.STANDARD;
         this.projectile_sel = ProjectileType.BULLETS;
+        this.has_propeller = true;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -423,12 +425,20 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
 
+    public SetHavePropeller(have: boolean) {
+        if (this.has_propeller && !have) {
+            this.has_propeller = have;
+            this.SetAction(ActionType.STANDARD);
+        }
+        this.has_propeller = have;
+    }
+
     public GetAction() {
         return this.action_sel;
     }
 
     public GetCanAction() {
-        return this.final_weapon.can_action;
+        return this.has_propeller && this.final_weapon.can_action;
     }
 
     public SetAction(num: number) {

@@ -325,6 +325,12 @@ class Weapons extends Part {
         this.CalculateStats();
     }
 
+    public SetHavePropeller(have: boolean) {
+        for (let ws of this.weapon_sets) {
+            ws.SetHavePropeller(have);
+        }
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)

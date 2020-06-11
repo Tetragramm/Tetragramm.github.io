@@ -3,9 +3,6 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: Add Create List button.
-//TODO: Armor in Special Rules
-//TODO: Mechanical action + Pulsejet is silly.
 //TODO: Used Plane Table
 //TODO: Autopilot for no cockpits
 //TODO: Update rules page again
@@ -38,6 +35,7 @@ const init = () => {
             }
 
             for (let el of engine_json["lists"]) {
+                console.log(el["name"]);
                 if (!engine_list.has(el["name"]))
                     engine_list.set(el["name"], new EngineList(el["name"]));
                 engine_list.get(el["name"]).fromJSON(el);

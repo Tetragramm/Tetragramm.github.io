@@ -194,12 +194,12 @@ class EngineBuilder_HTML {
         this.e_rpmb.min = "0.01";
         this.e_rpmb.step = "0.01";
         this.e_rpmb.max = "2000";
-        this.e_mfdg.min = "0.01";
-        this.e_mfdg.step = "0.01";
-        this.e_mfdg.max = "99999";
-        this.e_qfdg.step = "0.01";
-        this.e_qfdg.min = "0.01";
-        this.e_qfdg.max = "99999";
+        this.e_mfdg.min = "0.1";
+        this.e_mfdg.step = "0.1";
+        this.e_mfdg.max = "1.9";
+        this.e_qfdg.step = "0.1";
+        this.e_qfdg.min = "0.1";
+        this.e_qfdg.max = "1.9";
 
         this.e_name.onchange = () => { this.enginebuilder.name = this.e_name.value; this.UpdateEngine(); };
         this.e_sera.onchange = () => { this.enginebuilder.era_sel = this.e_sera.selectedIndex; this.UpdateEngine(); };

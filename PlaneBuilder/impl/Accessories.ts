@@ -314,6 +314,7 @@ class Accessories extends Part {
         var stats = new Stats();
 
         this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
+        var armour_str = "";
         //Armour
         for (let i = 0; i < this.armour_coverage.length; i++) {
             let AP = i + 1;
@@ -324,7 +325,15 @@ class Accessories extends Part {
 
             stats.mass += count * AP;
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
-            stats.toughness += count * AP;
+            stats.toughness += this.armour_coverage[i] * AP;
+            if (this.armour_coverage[i] > 0) {
+                if (armour_str != "")
+                    armour_str += ", ";
+                armour_str += this.armour_coverage[i].toString() + " x AP" + AP.toString();
+            }
+        }
+        if (armour_str != "") {
+            stats.warnings.push({ source: "Armour", warning: armour_str });
         }
 
         //Electrical

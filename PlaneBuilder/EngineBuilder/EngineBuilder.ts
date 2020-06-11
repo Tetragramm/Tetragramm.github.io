@@ -170,23 +170,23 @@ class EngineBuilder {
         return Math.floor(1.0e-6 + RawDrag * this.CoolDrag() * this.UpgradeDrag());
     }
 
-    private CoolReliability() {
-        switch (this.CoolingTable[this.cool_sel].name) {
-            case "Liquid Cooled":
-                return (this.num_rows / 2 + 5 * this.num_cyl_per_row) / 10;
-            case "Air Cooled":
-                return 1;
-            case "Rotary":
-                return 1;
-            case "Contrarotary":
-                return 1.1;
-            case "Semi-Radial":
-                return 0.8;
-            case "Liquid Radial":
-                return 1;
-        }
-        throw "Error in CoolReliability, no valid switch case.";
-    }
+    // private CoolReliability() {
+    //     switch (this.CoolingTable[this.cool_sel].name) {
+    //         case "Liquid Cooled":
+    //             return (this.num_rows / 2 + 5 * this.num_cyl_per_row) / 10;
+    //         case "Air Cooled":
+    //             return 1;
+    //         case "Rotary":
+    //             return 1;
+    //         case "Contrarotary":
+    //             return 1.1;
+    //         case "Semi-Radial":
+    //             return 0.8;
+    //         case "Liquid Radial":
+    //             return 1;
+    //     }
+    //     throw "Error in CoolReliability, no valid switch case.";
+    // }
 
     private CoolBurnout() {
         var EraBurnout = this.EraTable[this.era_sel].materials / 2;
@@ -212,13 +212,13 @@ class EngineBuilder {
         var num_cyl = this.num_cyl_per_row * this.num_rows;
         var CylinderBurnout = this.engine_displacement / num_cyl * (this.compression_ratio ** 2) * EraBurnout;
         var GearingBurnout = this.rpm_boost * CylinderBurnout * this.CoolBurnout();
-        return GearingBurnout * this.rpm_boost / (this.material_fudge + this.quality_fudge - 1);
+        return GearingBurnout * this.rpm_boost;
     }
 
-    private CalcReliability() {
-        var Reliability = 6 - this.MaterialModifier() * this.CoolReliability() / 25;
-        return Math.trunc(Reliability);
-    }
+    // private CalcReliability() {
+    //     var Reliability = 6 - this.MaterialModifier() * this.CoolReliability() / 25;
+    //     return Math.trunc(Reliability);
+    // }
 
     private IsRotary() {
         if (this.CoolingTable[this.cool_sel].name == "Rotary"
@@ -285,11 +285,23 @@ class EngineBuilder {
         var Era = this.EraTable[this.era_sel];
         var Cool = this.CoolingTable[this.cool_sel];
 
-        var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
-        var CylinderForce = EngineForce / (this.num_rows * this.num_cyl_per_row);
-        var Cost = this.UpgradeCost() + (CylinderForce / 10 * (this.num_cyl_per_row + (this.num_rows * 1.3)));
+        var OldCost = 0;
+        {
+            var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
+            var CylinderForce = EngineForce / (this.num_rows * this.num_cyl_per_row);
+            var Cost = this.UpgradeCost() + (CylinderForce / 10 * (this.num_cyl_per_row + (this.num_rows * 1.3)));
+            OldCost = Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
+        }
 
-        return Math.floor(1.0e-6 + this.quality_fudge * Era.cost * Cost);
+        var EngineForce = this.engine_displacement * this.compression_ratio / 10;
+        var Cost = (this.UpgradeCost() + EngineForce);
+        var PlusBSandEra = this.quality_fudge * Era.cost * Cost;
+        if (Cool.radiator > 0) {
+            PlusBSandEra *= 1.4;
+        }
+
+        console.log("Old:" + OldCost.toString() + "  New:" + Math.floor(1.0e-6 + PlusBSandEra).toString());
+        return Math.floor(1.0e-6 + PlusBSandEra);
     }
 
     private VerifyValues() {
@@ -300,8 +312,15 @@ class EngineBuilder {
         this.num_rows = Math.floor(Math.max(1, this.num_rows));
         this.compression_ratio = Math.max(0.01, this.compression_ratio);
         this.rpm_boost = Math.max(0.01, this.rpm_boost);
-        this.material_fudge = Math.max(0.5, this.material_fudge);
-        this.quality_fudge = Math.max(0.5, this.quality_fudge);
+        this.material_fudge = Math.max(0.1, this.material_fudge);
+        this.material_fudge = Math.min(2.0, this.material_fudge);
+        this.quality_fudge = Math.max(0.1, this.quality_fudge);
+        this.quality_fudge = Math.min(2.0, this.quality_fudge);
+
+        while ((this.material_fudge - 1) + (this.quality_fudge - 1) < -0.9) {
+            this.material_fudge += 0.1;
+            this.quality_fudge += 0.1;
+        }
 
 
         this.min_IAF = 10 * Math.round(1.0e-6 + this.min_IAF / 10);
@@ -331,7 +350,7 @@ class EngineBuilder {
         estats.stats.power = this.CalcPower();
         estats.stats.mass = this.CalcMass();
         estats.stats.drag = this.CalcDrag();
-        estats.stats.reliability = this.CalcReliability();
+        estats.stats.reliability = Math.floor(1.0e-6 - 2 + this.era_sel + (this.quality_fudge + this.material_fudge - 2) * 10);
         estats.stats.cooling = this.CalcCooling();
         estats.oiltank = this.IsRotary();
         estats.overspeed = this.CalcOverspeed();
