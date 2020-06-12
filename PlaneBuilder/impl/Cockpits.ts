@@ -136,7 +136,7 @@ class Cockpits extends Part {
             if (this.positions.length == 0)
                 cp.SetPrimary();
             if (js)
-                cp.fromJSON(JSON.parse(js), 0);
+                cp.fromJSON(JSON.parse(js), 1000);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
         }

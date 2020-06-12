@@ -508,6 +508,8 @@ class Engine extends Part {
     }
 
     public GetOverspeed(): number {
+        if (this.is_generator)
+            return 100;
         return this.etype_stats.overspeed + Math.floor(1.0e-6 + this.gp_count * this.etype_stats.overspeed / 2);
     }
 

@@ -179,7 +179,7 @@ class Engines extends Part {
             let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
-                en.fromJSON(JSON.parse(js), 0);
+                en.fromJSON(JSON.parse(js), 1000);
             this.engines.push(en);
             en.SetNumRadiators(this.GetNumberOfRadiators());
         }

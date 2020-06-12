@@ -24,6 +24,7 @@ class WeaponSystem extends Part {
     private spinner_p: boolean;
     public has_cantilever: boolean;
     private has_propeller: boolean;
+    private sticky_guns: number;
 
     private weapon_list: {
         name: string, era: string, size: number, stats: Stats,
@@ -51,6 +52,7 @@ class WeaponSystem extends Part {
         this.action_sel = ActionType.STANDARD;
         this.projectile_sel = ProjectileType.BULLETS;
         this.has_propeller = true;
+        this.sticky_guns = 0;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -399,15 +401,15 @@ class WeaponSystem extends Part {
             var jams = [0, 0];
             for (let w of this.weapons) {
                 var t = w.GetJam();
-                jams[0] = Math.max(jams[0], t[0]);
-                jams[1] = Math.max(jams[1], t[1]);
+                jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
+                jams[1] = Math.max(jams[1], t[1] + this.sticky_guns);
             }
             return jams[0].toString() + "/" + jams[1].toString();
         }
         else {
             var jam = 0;
             for (let w of this.weapons) {
-                jam = Math.max(jam, w.GetJam() as number);
+                jam = Math.max(jam, (w.GetJam() as number) + this.sticky_guns);
             }
             return jam.toString();
         }
@@ -438,7 +440,7 @@ class WeaponSystem extends Part {
     }
 
     public GetCanAction() {
-        return this.has_propeller && this.final_weapon.can_action;
+        return [true, this.has_propeller && this.final_weapon.can_action, this.final_weapon.can_action];
     }
 
     public SetAction(num: number) {
@@ -480,6 +482,10 @@ class WeaponSystem extends Part {
 
     public GetFinalWeapon() {
         return this.final_weapon;
+    }
+
+    public SetStickyGuns(num: number) {
+        this.sticky_guns = num;
     }
 
     public SetCalculateStats(callback: () => void) {

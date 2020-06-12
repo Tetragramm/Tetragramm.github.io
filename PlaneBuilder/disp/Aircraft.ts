@@ -34,6 +34,7 @@ class Aircraft_HTML extends Display {
     private accessories: Accessories_HTML;
     private optimization: Optimization_HTML;
     private weapons: Weapons_HTML;
+    private used: Used_HTML;
 
     //Alter Stats
     // private a_lift: HTMLInputElement;
@@ -162,6 +163,7 @@ class Aircraft_HTML extends Display {
         this.accessories = new Accessories_HTML(aircraft.GetAccessories());
         this.optimization = new Optimization_HTML(aircraft.GetOptimization());
         this.weapons = new Weapons_HTML(aircraft.GetWeapons());
+        this.used = new Used_HTML(aircraft.GetUsed());
 
         // var tbla = document.getElementById("tbl_alter") as HTMLTableElement;
         // this.InitAlter(tbla);
@@ -815,8 +817,12 @@ class Aircraft_HTML extends Display {
         this.copy_text = this.acft.name + "\n";
         this.version_cell.innerText = this.acft.GetVersion();
         this.copy_text += "Version " + this.acft.GetVersion() + "\n";
-        this.cost_cell.innerText = stats.cost.toString() + "þ";
+        this.cost_cell.innerText = stats.cost.toString() + "þ ";
         this.copy_text += "Cost " + stats.cost.toString() + "þ\n";
+        if (this.acft.GetUsed().GetEnabled()) {
+            this.cost_cell.innerText += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
+            this.copy_text += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
+        }
         this.upkeep_cell.innerText = stats.upkeep.toString() + "þ";
         this.copy_text += "Upkeep " + stats.upkeep.toString() + "þ\n";
         this.copy_text += "\n";
@@ -908,7 +914,7 @@ class Aircraft_HTML extends Display {
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
         this.turnbleed_cell.innerText = derived.TurnBleed.toString();
         this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = (Math.floor(1.0e-6 + this.acft.GetMaxAltitude() * 10 - 1 + derived.MaxSpeedEmpty - derived.StallSpeedEmpty)).toString();
+        this.maxalt_cell.innerText = (Math.floor(1.0e-6 + this.acft.GetMaxAltitude() + derived.MaxSpeedEmpty - derived.StallSpeedEmpty)).toString();
 
         this.copy_text += "Aerodynamics\n\t"
             + "Stability\t" + this.stability_cell.innerText + "\n\t"
@@ -1059,6 +1065,7 @@ class Aircraft_HTML extends Display {
         this.accessories.UpdateDisplay();
         this.optimization.UpdateDisplay();
         this.weapons.UpdateDisplay();
+        this.used.UpdateDisplay();
 
         this.UpdateStats();
         this.UpdateDerived();

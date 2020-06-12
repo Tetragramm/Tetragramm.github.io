@@ -331,6 +331,12 @@ class Weapons extends Part {
         }
     }
 
+    public SetStickyGuns(num: number) {
+        for (let ws of this.weapon_sets) {
+            ws.SetStickyGuns(num);
+        }
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)

@@ -18,6 +18,7 @@
 /// <reference path="./Accessories.ts" />
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
+/// <reference path="./Used.ts" />
 
 class Aircraft {
     private use_storage: boolean = false;
@@ -43,9 +44,10 @@ class Aircraft {
     private accessories: Accessories;
     private optimization: Optimization;
     private weapons: Weapons;
+    private used: Used;
     // private alter: AlterStats;
 
-    private reset_json = String.raw`{"version":"10.6","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R-3 Boxer 6-Cylinder","overspeed":26,"altitude":29,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Hornet R-3 Boxer 6-Cylinder","engine_type":0,"type":0,"era_sel":1,"displacement":10,"compression":5,"cyl_per_row":2,"rows":3,"RPM_boost":1,"material_fudge":1,"quality_fudge":1.04,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":8,"radiator_index":0,"selected_mount":4,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":0},"wings":{"wing_list":[{"surface":0,"area":10,"span":10,"dihedral":0,"anhedral":0,"deck":1},{"surface":0,"area":10,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":3,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[2,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[],"brace_count":0}}`;
+    private reset_json = String.raw`{"version":"10.6","name":"Beginner","era":{"selected":0},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Hornet R-3 Boxer 6-Cylinder","overspeed":26,"altitude":29,"torque":0,"rumble":0,"oiltank":false,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":6,"drag":4,"control":0,"cost":6,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":8,"reliability":-1,"power":15,"fuelconsumption":14,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Hornet R-3 Boxer 6-Cylinder","engine_type":0,"type":0,"era_sel":1,"displacement":10,"compression":5,"cyl_per_row":2,"rows":3,"RPM_boost":1,"material_fudge":1,"quality_fudge":1.04,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":8,"radiator_index":0,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":0,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[{"type":0,"mount":0,"coolant":0}],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":0},"wings":{"wing_list":[{"surface":0,"area":10,"span":10,"dihedral":0,"anhedral":0,"deck":1},{"surface":0,"area":10,"span":10,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":3,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[2,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[],"brace_count":0}}`;
 
     constructor(js: JSON, weapon_json: JSON, storage: boolean) {
         this.stats = new Stats();
@@ -68,6 +70,7 @@ class Aircraft {
         this.accessories = new Accessories(js["accessories"]);
         this.optimization = new Optimization();
         this.weapons = new Weapons(weapon_json);
+        this.used = new Used();
         // this.alter = new AlterStats();
 
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
@@ -87,6 +90,7 @@ class Aircraft {
         this.accessories.SetCalculateStats(() => { this.CalculateStats(); });
         this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
         this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
+        this.used.SetCalculateStats(() => { this.CalculateStats(); });
         // this.alter.SetCalculateStats(() => { this.CalculateStats(); });
 
         this.cockpits.SetNumberOfCockpits(1);
@@ -118,6 +122,7 @@ class Aircraft {
             accessories: this.accessories.toJSON(),
             optimization: this.optimization.toJSON(),
             weapons: this.weapons.toJSON(),
+            used: this.used.toJSON(),
         };
     }
 
@@ -145,6 +150,9 @@ class Aircraft {
         this.accessories.fromJSON(js["accessories"], json_version);
         this.optimization.fromJSON(js["optimization"], json_version);
         this.weapons.fromJSON(js["weapons"], json_version);
+        if (json_version > 10.65) {
+            this.used.fromJSON(js["used"], json_version);
+        }
         this.CalculateStats();
         return true;
     }
@@ -169,6 +177,7 @@ class Aircraft {
         this.accessories.serialize(s);
         this.optimization.serialize(s);
         this.weapons.serialize(s);
+        this.used.serialize(s);
     }
 
     public deserialize(d: Deserialize) {
@@ -192,6 +201,9 @@ class Aircraft {
         this.accessories.deserialize(d);
         this.optimization.deserialize(d);
         this.weapons.deserialize(d);
+        if (d.version > 10.65) {
+            this.used.deserialize(d);
+        }
     }
 
     public SetDisplayCallback(callback: () => void) {
@@ -222,6 +234,7 @@ class Aircraft {
         this.weapons.SetTractorInfo(this.engines.GetTractor());
         this.weapons.SetPusherInfo(this.engines.GetPusher());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
+        this.weapons.SetHavePropeller(this.engines.GetHavePropeller());
         stats = stats.Add(this.weapons.PartStats());
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());
@@ -285,6 +298,12 @@ class Aircraft {
             //Because flaps have cost per MP
             this.stats.cost += this.controlsurfaces.GetFlapCost(derived.DryMP);
 
+            //Used: burnt_out
+            stats.reliability -= this.used.burnt_out;
+
+            //Used: sticky_guns  (Just needs to happen before display)
+            this.weapons.SetStickyGuns(this.used.sticky_guns);
+
             //Update Part Local stuff
             this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility, this.stats.crashsafety);
             this.engines.UpdateReliability(stats);
@@ -328,9 +347,20 @@ class Aircraft {
         var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
         var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
         var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
+
+        //Used: Ragged
+        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * Math.pow(0.9, this.used.ragged));
+        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * Math.pow(0.9, this.used.ragged));
+        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * Math.pow(0.9, this.used.ragged));
+
         var StallSpeedEmpty = Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFull = Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea));
         var StallSpeedFullwBombs = Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea));
+
+        //Used: Hefty
+        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * Math.pow(1.2, this.used.hefty));
+        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * Math.pow(1.2, this.used.hefty));
+        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * Math.pow(1.2, this.used.hefty));
 
         var Overspeed = this.engines.GetOverspeed();
         var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
@@ -371,6 +401,11 @@ class Aircraft {
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
 
+        //Used: Sluggish
+        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty * Math.pow(0.95, this.used.sluggish));
+        HandlingFull = Math.floor(1.0e-6 + HandlingFull * Math.pow(0.95, this.used.sluggish));
+        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs * Math.pow(0.95, this.used.sluggish));
+
         var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
         var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
@@ -384,8 +419,12 @@ class Aircraft {
         //And store the results so they can be displayed
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;
+        //Used: Fragile
+        MaxStrain = Math.floor(1.0e-6 + MaxStrain * Math.pow(0.8, this.used.fragile));
 
         var Toughness = this.stats.toughness;
+        //Used: Weak
+        Toughness = Toughness * Math.pow(0.5, this.used.weak);
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
@@ -396,6 +435,8 @@ class Aircraft {
         TurnBleed = Math.max(TurnBleed, 1);
         TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
         var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
+        //Used: Leaky
+        FuelUses = FuelUses * Math.pow(0.8, this.used.leaky);
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
 
@@ -605,6 +646,9 @@ class Aircraft {
     }
     public IsElectrics() {
         return this.engines.IsElectrics() || this.accessories.IsElectrics();
+    }
+    public GetUsed() {
+        return this.used;
     }
     // public GetAlter() {
     //     return this.alter;
