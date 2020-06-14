@@ -1016,28 +1016,6 @@
                     ]
                 },
                 {
-                    "name": "U.I 100hp",
-                    "engine_type": 0,
-                    "type": 2,
-                    "era_sel": 1,
-                    "displacement": 16.28,
-                    "compression": 4.5,
-                    "cyl_per_row": 9,
-                    "rows": 1,
-                    "RPM_boost": 0.8,
-                    "material_fudge": 0.8,
-                    "quality_fudge": 1.6,
-                    "compressor_type": 0,
-                    "compressor_count": 0,
-                    "min_IAF": 0,
-                    "upgrades": [
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
-                },
-                {
                     "name": "U.I 110hp",
                     "engine_type": 0,
                     "type": 2,
@@ -1108,6 +1086,28 @@
         {
             "name": "Early-WWI",
             "engines": [
+                {
+                    "name": "U.I 100hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 16.28,
+                    "compression": 4.5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
                 {
                     "name": "Anzani 10 Cylinder 110hp",
                     "engine_type": 0,
