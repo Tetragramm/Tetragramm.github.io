@@ -3,9 +3,9 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: Used Plane Table
+//Wing Warping with no wings
+//Reinforcements with no wings
 //TODO: Autopilot for no cockpits
-//TODO: Update rules page again
 //TODO: "Adjusted Drag" ect.
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?

@@ -998,7 +998,7 @@
                 "latstab": 2,
                 "pitchstab": 2,
                 "cost": 5,
-                "dragfactor": 1,
+                "dragfactor": 0.8,
                 "is_canard": false,
                 "increment": 1,
                 "is_vtail": true,

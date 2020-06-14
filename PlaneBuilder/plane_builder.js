@@ -11880,9 +11880,7 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
-//TODO: Used Plane Table
 //TODO: Autopilot for no cockpits
-//TODO: Update rules page again
 //TODO: "Adjusted Drag" ect.
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
