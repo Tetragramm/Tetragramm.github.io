@@ -141,6 +141,8 @@ select, input {
 	-moz-appearance: none;
 	-o-appearance: none;
 	box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
 	height: 1.5em !important;
 	background-color: var(--inp_bkg_color);
 	color: var(--inp_txt_color);
