@@ -10307,13 +10307,22 @@ class Cards {
             full_hand: 0,
             half_hand: 0,
             empty_hand: 0,
+            full_bomb_climb: 0,
+            half_bomb_climb: 0,
+            full_climb: 0,
+            half_climb: 0,
+            empty_climb: 0,
             full_bomb_stall: 0,
             half_bomb_stall: 0,
             full_stall: 0,
             half_stall: 0,
             empty_stall: 0,
+            full_bomb_speed: 0,
+            half_bomb_speed: 0,
+            full_speed: 0,
+            half_speed: 0,
+            empty_speed: 0,
             fuel: 0,
-            max_speed: 0,
             dropoff: 0,
             ordinance: [""],
             escape: 0,
@@ -10327,6 +10336,7 @@ class Cards {
             max_strain: 0,
             vital_parts: [""],
             armour: [],
+            warnings: [{ source: "", warning: "" }],
         };
         this.weap_data = {
             type: "",
@@ -10359,43 +10369,66 @@ class Cards {
         context.textAlign = "center";
         context.drawImage(this.dash_image, 0, 0);
         context.font = "35px Balthazar";
-        context.fillText(this.acft_data.full_bomb_boost.toString(), 548, 92, 80);
-        context.fillText(this.acft_data.full_bomb_hand.toString(), 548 + 80, 92, 80);
-        context.fillText(this.acft_data.full_bomb_stall.toString(), 548 + 160, 92, 80);
-        context.fillText(this.acft_data.half_bomb_boost.toString(), 548, 92 + 40, 80);
-        context.fillText(this.acft_data.half_bomb_hand.toString(), 548 + 80, 92 + 40, 80);
-        context.fillText(this.acft_data.half_bomb_stall.toString(), 548 + 160, 92 + 40, 80);
-        context.fillText(this.acft_data.full_boost.toString(), 548, 92 + 80, 80);
-        context.fillText(this.acft_data.full_hand.toString(), 548 + 80, 92 + 80, 80);
-        context.fillText(this.acft_data.full_stall.toString(), 548 + 160, 92 + 80, 80);
-        context.fillText(this.acft_data.half_boost.toString(), 548, 92 + 120, 80);
-        context.fillText(this.acft_data.half_hand.toString(), 548 + 80, 92 + 120, 80);
-        context.fillText(this.acft_data.half_stall.toString(), 548 + 160, 92 + 120, 80);
-        context.fillText(this.acft_data.empty_boost.toString(), 548, 92 + 160, 80);
-        context.fillText(this.acft_data.empty_hand.toString(), 548 + 80, 92 + 160, 80);
-        context.fillText(this.acft_data.empty_stall.toString(), 548 + 160, 92 + 160, 80);
-        context.fillText(Math.floor(this.acft_data.fuel).toString(), 414, 305, 35);
-        context.fillText(Math.floor(this.acft_data.max_speed).toString(), 1044, 370, 35);
-        context.fillText(this.acft_data.dropoff.toString(), 1044, 440, 35);
-        context.fillText(this.acft_data.escape.toString(), 280, 450, 35);
-        context.fillText(this.acft_data.crash.toString(), 280, 530, 35);
+        context.fillText(this.acft_data.full_bomb_boost.toString(), 493, 94, 80);
+        context.fillText(this.acft_data.full_bomb_hand.toString(), 493 + 1 * 62, 94, 80);
+        context.fillText(this.acft_data.full_bomb_climb.toString(), 493 + 2 * 62, 94, 80);
+        context.fillText(this.acft_data.full_bomb_stall.toString(), 493 + 3 * 62, 94, 80);
+        context.fillText(this.acft_data.full_bomb_speed.toString(), 493 + 4 * 62, 94, 80);
+        context.fillText(this.acft_data.half_bomb_boost.toString(), 493, 94 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_hand.toString(), 493 + 1 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.full_bomb_climb.toString(), 493 + 2 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_stall.toString(), 493 + 3 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_speed.toString(), 493 + 4 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.full_boost.toString(), 493, 94 + 80, 80);
+        context.fillText(this.acft_data.full_hand.toString(), 493 + 1 * 62, 94 + 80, 80);
+        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 80, 80);
+        context.fillText(this.acft_data.full_stall.toString(), 493 + 3 * 62, 94 + 80, 80);
+        context.fillText(this.acft_data.full_speed.toString(), 493 + 4 * 62, 94 + 80, 80);
+        context.fillText(this.acft_data.half_boost.toString(), 493, 94 + 120, 80);
+        context.fillText(this.acft_data.half_hand.toString(), 493 + 1 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.half_stall.toString(), 493 + 3 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.half_speed.toString(), 493 + 4 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.empty_boost.toString(), 493, 94 + 160, 80);
+        context.fillText(this.acft_data.empty_hand.toString(), 493 + 1 * 62, 94 + 160, 80);
+        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 160, 80);
+        context.fillText(this.acft_data.empty_stall.toString(), 493 + 3 * 62, 94 + 160, 80);
+        context.fillText(this.acft_data.empty_speed.toString(), 493 + 4 * 62, 94 + 160, 80);
+        context.fillText(Math.floor(this.acft_data.fuel).toString(), 417, 310, 35);
+        context.fillText(this.acft_data.dropoff.toString(), 1048, 375, 35);
+        context.fillText(this.acft_data.escape.toString(), 85, 640, 35);
+        context.fillText(this.acft_data.crash.toString(), 85, 720, 35);
         context.fillText(this.acft_data.visibility.toString(), 135, 460, 35);
         context.fillText(this.acft_data.stability.toString(), 135, 550, 35);
         context.fillText(this.acft_data.energy_loss.toString(), 70, 505, 35);
         context.fillText(this.acft_data.turn_bleed.toString(), 195, 505, 35);
-        context.fillText(this.acft_data.stress.toString(), 85, 675, 35);
+        context.fillText(this.acft_data.stress.toString(), 285, 495, 35);
         context.fillText(this.acft_data.toughness.toString(), 250, 645, 35);
         context.fillText(this.acft_data.max_strain.toString(), 250, 720, 35);
         context.font = "20px Balthazar";
         context.textAlign = "left";
-        for (let i = 0; i < this.acft_data.ordinance.length; i++) {
-            context.fillText(this.acft_data.ordinance[i], 480, 398 + i * 26, 220);
+        var rows = Math.min(this.acft_data.ordinance.length, 2);
+        var cols = Math.ceil(this.acft_data.ordinance.length / rows);
+        var idx = 0;
+        for (let r = 0; r < rows; r++) {
+            let ypx = 612 + 27 * r;
+            let str = "";
+            for (let c = 0; c < cols; c++) {
+                if (idx < this.acft_data.ordinance.length) {
+                    if (c != 0) {
+                        str += ", ";
+                    }
+                    str += this.acft_data.ordinance[idx];
+                }
+                idx++;
+            }
+            context.fillText(str, 335, ypx, 370);
         }
-        var rows = Math.min(this.acft_data.vital_parts.length, 7);
+        var rows = Math.min(this.acft_data.vital_parts.length, 5);
         var cols = Math.ceil(this.acft_data.vital_parts.length / rows);
         var idx = 0;
         for (let r = 0; r < rows; r++) {
-            let ypx = 575 + 26 * r;
+            let ypx = 392 + 27 * r;
             let str = "";
             for (let c = 0; c < cols; c++) {
                 if (idx < this.acft_data.vital_parts.length) {
@@ -10406,16 +10439,31 @@ class Cards {
                 }
                 idx++;
             }
-            context.fillText(str, 335, ypx, 180);
+            context.fillText(str, 335, ypx, 370);
         }
-        var idx = 0;
+        var str = "";
         for (let r = 0; r < this.acft_data.armour.length; ++r) {
             let AP = r + 1;
             if (this.acft_data.armour[r] > 0) {
-                let str = this.acft_data.armour[r].toString() + "x AP " + AP.toString();
-                context.fillText(str, 525, 575 + 26 * idx, 180);
-                idx++;
+                str += this.acft_data.armour[r].toString() + "x AP " + AP.toString() + "  ";
             }
+        }
+        context.fillText(str, 335, 558, 375);
+        context.font = "8px Balthazar";
+        var idx = 1;
+        for (let r = 0; r < this.acft_data.warnings.length; ++r) {
+            if (this.acft_data.warnings[r].source == "Armour")
+                continue;
+            let str = this.acft_data.warnings[r].source + ": " + this.acft_data.warnings[r].warning;
+            if (idx == 9 && this.acft_data.warnings.length > r + 1) {
+                context.fillText("And More!  See the Plane Builder for details.", 335, 673 + idx * 9, 375);
+            }
+            else if (idx > 9) {
+            }
+            else {
+                context.fillText(str, 335, 673 + idx * 9, 375);
+            }
+            idx++;
         }
         this.download(this.name + "_Dashboard", this.dash_canvas);
     }
@@ -10677,22 +10725,28 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.empty_boost = derived.BoostEmpty;
         this.cards.acft_data.empty_hand = derived.HandlingEmpty;
         this.cards.acft_data.empty_stall = derived.StallSpeedEmpty;
+        this.cards.acft_data.empty_speed = Math.floor(1.0e-6 + derived.MaxSpeedEmpty);
         this.cards.acft_data.energy_loss = derived.EnergyLoss;
         this.cards.acft_data.escape = this.acft.GetCockpits().GetEscapeList()[0];
         this.cards.acft_data.fuel = derived.FuelUses;
         this.cards.acft_data.full_bomb_boost = derived.BoostFullwBombs;
         this.cards.acft_data.full_bomb_hand = derived.HandlingFullwBombs;
+        this.cards.acft_data.full_bomb_climb = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs);
         this.cards.acft_data.full_bomb_stall = derived.StallSpeedFullwBombs;
+        this.cards.acft_data.full_bomb_speed = derived.MaxSpeedwBombs;
         this.cards.acft_data.full_boost = derived.BoostFull;
         this.cards.acft_data.full_hand = derived.HandlingFull;
+        this.cards.acft_data.full_climb = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull);
         this.cards.acft_data.full_stall = derived.StallSpeedFull;
+        this.cards.acft_data.full_speed = Math.floor(1.0e-6 + derived.MaxSpeedFull);
         this.cards.acft_data.half_bomb_boost = Math.floor((derived.BoostFullwBombs + derived.BoostEmpty) / 2);
         this.cards.acft_data.half_bomb_hand = Math.floor((derived.HandlingFullwBombs + derived.HandlingEmpty) / 2);
         this.cards.acft_data.half_bomb_stall = Math.floor((derived.StallSpeedFullwBombs + derived.StallSpeedEmpty) / 2);
+        this.cards.acft_data.half_bomb_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2);
         this.cards.acft_data.half_boost = Math.floor((derived.BoostFull + derived.BoostEmpty) / 2);
         this.cards.acft_data.half_hand = Math.floor((derived.HandlingFull + derived.HandlingEmpty) / 2);
         this.cards.acft_data.half_stall = Math.floor((derived.StallSpeedFull + derived.StallSpeedEmpty) / 2);
-        this.cards.acft_data.max_speed = derived.MaxSpeedEmpty;
+        this.cards.acft_data.half_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
         this.cards.acft_data.max_strain = derived.MaxStrain;
         var ordinance = [];
         if (aircraft_model.GetMunitions().GetBombCount() > 0) {
@@ -10713,6 +10767,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.turn_bleed = derived.TurnBleed;
         this.cards.acft_data.visibility = this.acft.GetCockpits().GetVisibilityList()[0];
         this.cards.acft_data.vital_parts = this.acft.VitalComponentList();
+        this.cards.acft_data.warnings = stats.warnings;
     }
     UpdateWeaponCard(w) {
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
@@ -11035,50 +11090,50 @@ class Aircraft_HTML extends Display {
         this.version_cell = row0.insertCell();
         var row1 = tbl.insertRow();
         CreateTH(row1, "Mass Variations");
-        CreateTH(row1, "Top Speed");
-        CreateTH(row1, "Stall Speed");
-        CreateTH(row1, "Handling");
         CreateTH(row1, "Boost");
+        CreateTH(row1, "Handling");
         CreateTH(row1, "Rate of Climb");
+        CreateTH(row1, "Stall Speed");
+        CreateTH(row1, "Top Speed");
         CreateTH(row1, "Vital Components").colSpan = 2;
-        var full = tbl.insertRow();
-        CreateTH(full, "Full Mass");
-        this.ts_full = full.insertCell();
-        this.ss_full = full.insertCell();
-        this.hand_full = full.insertCell();
-        this.boost_full = full.insertCell();
-        this.roc_full = full.insertCell();
-        this.vital_components = full.insertCell();
+        this.bomb_row2 = tbl.insertRow();
+        CreateTH(this.bomb_row2, "Full Fuel with Bombs");
+        this.boost_fullwB = this.bomb_row2.insertCell();
+        this.hand_fullwB = this.bomb_row2.insertCell();
+        this.roc_fullwB = this.bomb_row2.insertCell();
+        this.ss_fullwB = this.bomb_row2.insertCell();
+        this.ts_fullwB = this.bomb_row2.insertCell();
+        this.vital_components = this.bomb_row2.insertCell();
         this.vital_components.rowSpan = 3;
         this.vital_components.colSpan = 3;
-        var half = tbl.insertRow();
-        CreateTH(half, "Half Mass");
-        this.ts_half = half.insertCell();
-        this.ss_half = half.insertCell();
-        this.hand_half = half.insertCell();
-        this.boost_half = half.insertCell();
-        this.roc_half = half.insertCell();
-        var empty = tbl.insertRow();
-        CreateTH(empty, "Empty Mass");
-        this.ts_empty = empty.insertCell();
-        this.ss_empty = empty.insertCell();
-        this.hand_empty = empty.insertCell();
-        this.boost_empty = empty.insertCell();
-        this.roc_empty = empty.insertCell();
-        this.bomb_row2 = tbl.insertRow();
-        CreateTH(this.bomb_row2, "Full Mass with Bombs");
-        this.ts_fullwB = this.bomb_row2.insertCell();
-        this.ss_fullwB = this.bomb_row2.insertCell();
-        this.hand_fullwB = this.bomb_row2.insertCell();
-        this.boost_fullwB = this.bomb_row2.insertCell();
-        this.roc_fullwB = this.bomb_row2.insertCell();
         this.bomb_row1 = tbl.insertRow();
-        CreateTH(this.bomb_row1, "Half Mass with Bombs");
-        this.ts_halfwB = this.bomb_row1.insertCell();
-        this.ss_halfwB = this.bomb_row1.insertCell();
-        this.hand_halfwB = this.bomb_row1.insertCell();
+        CreateTH(this.bomb_row1, "Half Fuel with Bombs");
         this.boost_halfwB = this.bomb_row1.insertCell();
+        this.hand_halfwB = this.bomb_row1.insertCell();
         this.roc_halfwB = this.bomb_row1.insertCell();
+        this.ss_halfwB = this.bomb_row1.insertCell();
+        this.ts_halfwB = this.bomb_row1.insertCell();
+        this.full_row = tbl.insertRow();
+        CreateTH(this.full_row, "Full Fuel");
+        this.boost_full = this.full_row.insertCell();
+        this.hand_full = this.full_row.insertCell();
+        this.roc_full = this.full_row.insertCell();
+        this.ss_full = this.full_row.insertCell();
+        this.ts_full = this.full_row.insertCell();
+        var half = tbl.insertRow();
+        CreateTH(half, "Half Fuel");
+        this.boost_half = half.insertCell();
+        this.hand_half = half.insertCell();
+        this.roc_half = half.insertCell();
+        this.ss_half = half.insertCell();
+        this.ts_half = half.insertCell();
+        var empty = tbl.insertRow();
+        CreateTH(empty, "Empty Fuel");
+        this.boost_empty = empty.insertCell();
+        this.hand_empty = empty.insertCell();
+        this.roc_empty = empty.insertCell();
+        this.ss_empty = empty.insertCell();
+        this.ts_empty = empty.insertCell();
         var row7 = tbl.insertRow();
         CreateTH(row7, "Propulsion").colSpan = 2;
         CreateTH(row7, "Aerodynamics").colSpan = 2;
@@ -11216,6 +11271,7 @@ class Aircraft_HTML extends Display {
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
             this.bomb_row2.hidden = false;
+            this.bomb_row2.appendChild(this.vital_components);
             this.vital_components.rowSpan = 5;
             //Half
             this.ts_halfwB.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
@@ -11244,6 +11300,7 @@ class Aircraft_HTML extends Display {
         else {
             this.bomb_row1.hidden = true;
             this.bomb_row2.hidden = true;
+            this.full_row.appendChild(this.vital_components);
             this.vital_components.rowSpan = 3;
         }
         this.dropoff_cell.innerText = derived.Dropoff.toString();
@@ -12344,7 +12401,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.jam = this.final_weapon.jam.substr(0, 2) + "9999";
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
             }
-            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "AP or Wirecutter rounds only (free, your choice)." });
+            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "AP or Fragmentation rounds only (free, your choice)." });
         }
     }
     SetWeaponSelected(num) {

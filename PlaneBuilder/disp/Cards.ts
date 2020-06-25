@@ -20,13 +20,22 @@ class Cards {
         full_hand: number,
         half_hand: number,
         empty_hand: number,
+        full_bomb_climb: number,
+        half_bomb_climb: number,
+        full_climb: number,
+        half_climb: number,
+        empty_climb: number,
         full_bomb_stall: number,
         half_bomb_stall: number,
         full_stall: number,
         half_stall: number,
         empty_stall: number,
+        full_bomb_speed: number,
+        half_bomb_speed: number,
+        full_speed: number,
+        half_speed: number,
+        empty_speed: number,
         fuel: number,
-        max_speed: number,
         dropoff: number,
         ordinance: string[],
         escape: number,
@@ -40,6 +49,7 @@ class Cards {
         max_strain: number,
         vital_parts: string[],
         armour: number[],
+        warnings: { source: string, warning: string }[],
     }
 
     public weap_data: {
@@ -113,13 +123,22 @@ class Cards {
             full_hand: 0,
             half_hand: 0,
             empty_hand: 0,
+            full_bomb_climb: 0,
+            half_bomb_climb: 0,
+            full_climb: 0,
+            half_climb: 0,
+            empty_climb: 0,
             full_bomb_stall: 0,
             half_bomb_stall: 0,
             full_stall: 0,
             half_stall: 0,
             empty_stall: 0,
+            full_bomb_speed: 0,
+            half_bomb_speed: 0,
+            full_speed: 0,
+            half_speed: 0,
+            empty_speed: 0,
             fuel: 0,
-            max_speed: 0,
             dropoff: 0,
             ordinance: [""],
             escape: 0,
@@ -133,6 +152,7 @@ class Cards {
             max_strain: 0,
             vital_parts: [""],
             armour: [],
+            warnings: [{ source: "", warning: "" }],
         }
 
         this.weap_data = {
@@ -171,55 +191,79 @@ class Cards {
 
         context.drawImage(this.dash_image, 0, 0);
         context.font = "35px Balthazar";
-        context.fillText(this.acft_data.full_bomb_boost.toString(), 548, 92, 80);
-        context.fillText(this.acft_data.full_bomb_hand.toString(), 548 + 80, 92, 80);
-        context.fillText(this.acft_data.full_bomb_stall.toString(), 548 + 160, 92, 80);
+        context.fillText(this.acft_data.full_bomb_boost.toString(), 493, 94, 80);
+        context.fillText(this.acft_data.full_bomb_hand.toString(), 493 + 1 * 62, 94, 80);
+        context.fillText(this.acft_data.full_bomb_climb.toString(), 493 + 2 * 62, 94, 80);
+        context.fillText(this.acft_data.full_bomb_stall.toString(), 493 + 3 * 62, 94, 80);
+        context.fillText(this.acft_data.full_bomb_speed.toString(), 493 + 4 * 62, 94, 80);
 
-        context.fillText(this.acft_data.half_bomb_boost.toString(), 548, 92 + 40, 80);
-        context.fillText(this.acft_data.half_bomb_hand.toString(), 548 + 80, 92 + 40, 80);
-        context.fillText(this.acft_data.half_bomb_stall.toString(), 548 + 160, 92 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_boost.toString(), 493, 94 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_hand.toString(), 493 + 1 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.full_bomb_climb.toString(), 493 + 2 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_stall.toString(), 493 + 3 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_speed.toString(), 493 + 4 * 62, 94 + 40, 80);
 
-        context.fillText(this.acft_data.full_boost.toString(), 548, 92 + 80, 80);
-        context.fillText(this.acft_data.full_hand.toString(), 548 + 80, 92 + 80, 80);
-        context.fillText(this.acft_data.full_stall.toString(), 548 + 160, 92 + 80, 80);
+        context.fillText(this.acft_data.full_boost.toString(), 493, 94 + 80, 80);
+        context.fillText(this.acft_data.full_hand.toString(), 493 + 1 * 62, 94 + 80, 80);
+        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 80, 80);
+        context.fillText(this.acft_data.full_stall.toString(), 493 + 3 * 62, 94 + 80, 80);
+        context.fillText(this.acft_data.full_speed.toString(), 493 + 4 * 62, 94 + 80, 80);
 
-        context.fillText(this.acft_data.half_boost.toString(), 548, 92 + 120, 80);
-        context.fillText(this.acft_data.half_hand.toString(), 548 + 80, 92 + 120, 80);
-        context.fillText(this.acft_data.half_stall.toString(), 548 + 160, 92 + 120, 80);
+        context.fillText(this.acft_data.half_boost.toString(), 493, 94 + 120, 80);
+        context.fillText(this.acft_data.half_hand.toString(), 493 + 1 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.half_stall.toString(), 493 + 3 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.half_speed.toString(), 493 + 4 * 62, 94 + 120, 80);
 
-        context.fillText(this.acft_data.empty_boost.toString(), 548, 92 + 160, 80);
-        context.fillText(this.acft_data.empty_hand.toString(), 548 + 80, 92 + 160, 80);
-        context.fillText(this.acft_data.empty_stall.toString(), 548 + 160, 92 + 160, 80);
+        context.fillText(this.acft_data.empty_boost.toString(), 493, 94 + 160, 80);
+        context.fillText(this.acft_data.empty_hand.toString(), 493 + 1 * 62, 94 + 160, 80);
+        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 160, 80);
+        context.fillText(this.acft_data.empty_stall.toString(), 493 + 3 * 62, 94 + 160, 80);
+        context.fillText(this.acft_data.empty_speed.toString(), 493 + 4 * 62, 94 + 160, 80);
 
-        context.fillText(Math.floor(this.acft_data.fuel).toString(), 414, 305, 35);
+        context.fillText(Math.floor(this.acft_data.fuel).toString(), 417, 310, 35);
 
-        context.fillText(Math.floor(this.acft_data.max_speed).toString(), 1044, 370, 35);
-        context.fillText(this.acft_data.dropoff.toString(), 1044, 440, 35);
+        context.fillText(this.acft_data.dropoff.toString(), 1048, 375, 35);
 
-        context.fillText(this.acft_data.escape.toString(), 280, 450, 35);
-        context.fillText(this.acft_data.crash.toString(), 280, 530, 35);
+        context.fillText(this.acft_data.escape.toString(), 85, 640, 35);
+        context.fillText(this.acft_data.crash.toString(), 85, 720, 35);
 
         context.fillText(this.acft_data.visibility.toString(), 135, 460, 35);
         context.fillText(this.acft_data.stability.toString(), 135, 550, 35);
         context.fillText(this.acft_data.energy_loss.toString(), 70, 505, 35);
         context.fillText(this.acft_data.turn_bleed.toString(), 195, 505, 35);
 
-        context.fillText(this.acft_data.stress.toString(), 85, 675, 35);
+        context.fillText(this.acft_data.stress.toString(), 285, 495, 35);
 
         context.fillText(this.acft_data.toughness.toString(), 250, 645, 35);
         context.fillText(this.acft_data.max_strain.toString(), 250, 720, 35);
 
         context.font = "20px Balthazar";
         context.textAlign = "left";
-        for (let i = 0; i < this.acft_data.ordinance.length; i++) {
-            context.fillText(this.acft_data.ordinance[i], 480, 398 + i * 26, 220);
+
+        var rows = Math.min(this.acft_data.ordinance.length, 2);
+        var cols = Math.ceil(this.acft_data.ordinance.length / rows);
+        var idx = 0;
+        for (let r = 0; r < rows; r++) {
+            let ypx = 612 + 27 * r;
+            let str = "";
+            for (let c = 0; c < cols; c++) {
+                if (idx < this.acft_data.ordinance.length) {
+                    if (c != 0) {
+                        str += ", ";
+                    }
+                    str += this.acft_data.ordinance[idx];
+                }
+                idx++;
+            }
+            context.fillText(str, 335, ypx, 370);
         }
 
-        var rows = Math.min(this.acft_data.vital_parts.length, 7);
+        var rows = Math.min(this.acft_data.vital_parts.length, 5);
         var cols = Math.ceil(this.acft_data.vital_parts.length / rows);
         var idx = 0;
         for (let r = 0; r < rows; r++) {
-            let ypx = 575 + 26 * r;
+            let ypx = 392 + 27 * r;
             let str = "";
             for (let c = 0; c < cols; c++) {
                 if (idx < this.acft_data.vital_parts.length) {
@@ -230,17 +274,33 @@ class Cards {
                 }
                 idx++;
             }
-            context.fillText(str, 335, ypx, 180);
+            context.fillText(str, 335, ypx, 370);
         }
 
-        var idx = 0;
+        var str = "";
         for (let r = 0; r < this.acft_data.armour.length; ++r) {
             let AP = r + 1;
             if (this.acft_data.armour[r] > 0) {
-                let str = this.acft_data.armour[r].toString() + "x AP " + AP.toString();
-                context.fillText(str, 525, 575 + 26 * idx, 180);
-                idx++;
+                str += this.acft_data.armour[r].toString() + "x AP " + AP.toString() + "  ";
             }
+        }
+        context.fillText(str, 335, 558, 375);
+
+
+        context.font = "8px Balthazar";
+        var idx = 1;
+        for (let r = 0; r < this.acft_data.warnings.length; ++r) {
+            if (this.acft_data.warnings[r].source == "Armour")
+                continue;
+            let str = this.acft_data.warnings[r].source + ": " + this.acft_data.warnings[r].warning;
+            if (idx == 9 && this.acft_data.warnings.length > r + 1) {
+                context.fillText("And More!  See the Plane Builder for details.", 335, 673 + idx * 9, 375);
+            } else if (idx > 9) {
+
+            } else {
+                context.fillText(str, 335, 673 + idx * 9, 375);
+            }
+            idx++;
         }
         this.download(this.name + "_Dashboard", this.dash_canvas);
     }

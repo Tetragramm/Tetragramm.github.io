@@ -87,6 +87,7 @@ class Aircraft_HTML extends Display {
     private cost_cell: HTMLTableCellElement;
     private upkeep_cell: HTMLTableCellElement;
     private version_cell: HTMLTableCellElement;
+    private full_row: HTMLTableRowElement;
     private bomb_row1: HTMLTableRowElement;
     private bomb_row2: HTMLTableRowElement;
     private ts_empty: HTMLTableCellElement;
@@ -294,22 +295,28 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.empty_boost = derived.BoostEmpty;
         this.cards.acft_data.empty_hand = derived.HandlingEmpty;
         this.cards.acft_data.empty_stall = derived.StallSpeedEmpty;
+        this.cards.acft_data.empty_speed = Math.floor(1.0e-6 + derived.MaxSpeedEmpty);
         this.cards.acft_data.energy_loss = derived.EnergyLoss;
         this.cards.acft_data.escape = this.acft.GetCockpits().GetEscapeList()[0];
         this.cards.acft_data.fuel = derived.FuelUses;
         this.cards.acft_data.full_bomb_boost = derived.BoostFullwBombs;
         this.cards.acft_data.full_bomb_hand = derived.HandlingFullwBombs;
+        this.cards.acft_data.full_bomb_climb = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs);
         this.cards.acft_data.full_bomb_stall = derived.StallSpeedFullwBombs;
+        this.cards.acft_data.full_bomb_speed = derived.MaxSpeedwBombs;
         this.cards.acft_data.full_boost = derived.BoostFull;
         this.cards.acft_data.full_hand = derived.HandlingFull;
+        this.cards.acft_data.full_climb = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull);
         this.cards.acft_data.full_stall = derived.StallSpeedFull;
+        this.cards.acft_data.full_speed = Math.floor(1.0e-6 + derived.MaxSpeedFull);
         this.cards.acft_data.half_bomb_boost = Math.floor((derived.BoostFullwBombs + derived.BoostEmpty) / 2);
         this.cards.acft_data.half_bomb_hand = Math.floor((derived.HandlingFullwBombs + derived.HandlingEmpty) / 2);
         this.cards.acft_data.half_bomb_stall = Math.floor((derived.StallSpeedFullwBombs + derived.StallSpeedEmpty) / 2);
+        this.cards.acft_data.half_bomb_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2);
         this.cards.acft_data.half_boost = Math.floor((derived.BoostFull + derived.BoostEmpty) / 2);
         this.cards.acft_data.half_hand = Math.floor((derived.HandlingFull + derived.HandlingEmpty) / 2);
         this.cards.acft_data.half_stall = Math.floor((derived.StallSpeedFull + derived.StallSpeedEmpty) / 2);
-        this.cards.acft_data.max_speed = derived.MaxSpeedEmpty;
+        this.cards.acft_data.half_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
         this.cards.acft_data.max_strain = derived.MaxStrain;
         var ordinance = [];
         if (aircraft_model.GetMunitions().GetBombCount() > 0) {
@@ -330,6 +337,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.turn_bleed = derived.TurnBleed;
         this.cards.acft_data.visibility = this.acft.GetCockpits().GetVisibilityList()[0];
         this.cards.acft_data.vital_parts = this.acft.VitalComponentList();
+        this.cards.acft_data.warnings = stats.warnings;
     }
 
     private UpdateWeaponCard(w: WeaponSystem) {
@@ -668,55 +676,56 @@ class Aircraft_HTML extends Display {
 
         var row1 = tbl.insertRow();
         CreateTH(row1, "Mass Variations");
-        CreateTH(row1, "Top Speed");
-        CreateTH(row1, "Stall Speed");
-        CreateTH(row1, "Handling");
         CreateTH(row1, "Boost");
+        CreateTH(row1, "Handling");
         CreateTH(row1, "Rate of Climb");
+        CreateTH(row1, "Stall Speed");
+        CreateTH(row1, "Top Speed");
         CreateTH(row1, "Vital Components").colSpan = 2;
 
-        var full = tbl.insertRow();
-        CreateTH(full, "Full Mass");
-        this.ts_full = full.insertCell();
-        this.ss_full = full.insertCell();
-        this.hand_full = full.insertCell();
-        this.boost_full = full.insertCell();
-        this.roc_full = full.insertCell();
-        this.vital_components = full.insertCell();
+
+        this.bomb_row2 = tbl.insertRow();
+        CreateTH(this.bomb_row2, "Full Fuel with Bombs");
+        this.boost_fullwB = this.bomb_row2.insertCell();
+        this.hand_fullwB = this.bomb_row2.insertCell();
+        this.roc_fullwB = this.bomb_row2.insertCell();
+        this.ss_fullwB = this.bomb_row2.insertCell();
+        this.ts_fullwB = this.bomb_row2.insertCell();
+        this.vital_components = this.bomb_row2.insertCell();
         this.vital_components.rowSpan = 3;
         this.vital_components.colSpan = 3;
 
+        this.bomb_row1 = tbl.insertRow();
+        CreateTH(this.bomb_row1, "Half Fuel with Bombs");
+        this.boost_halfwB = this.bomb_row1.insertCell();
+        this.hand_halfwB = this.bomb_row1.insertCell();
+        this.roc_halfwB = this.bomb_row1.insertCell();
+        this.ss_halfwB = this.bomb_row1.insertCell();
+        this.ts_halfwB = this.bomb_row1.insertCell();
+
+        this.full_row = tbl.insertRow();
+        CreateTH(this.full_row, "Full Fuel");
+        this.boost_full = this.full_row.insertCell();
+        this.hand_full = this.full_row.insertCell();
+        this.roc_full = this.full_row.insertCell();
+        this.ss_full = this.full_row.insertCell();
+        this.ts_full = this.full_row.insertCell();
+
         var half = tbl.insertRow();
-        CreateTH(half, "Half Mass");
-        this.ts_half = half.insertCell();
-        this.ss_half = half.insertCell();
-        this.hand_half = half.insertCell();
+        CreateTH(half, "Half Fuel");
         this.boost_half = half.insertCell();
+        this.hand_half = half.insertCell();
         this.roc_half = half.insertCell();
+        this.ss_half = half.insertCell();
+        this.ts_half = half.insertCell();
 
         var empty = tbl.insertRow();
-        CreateTH(empty, "Empty Mass");
-        this.ts_empty = empty.insertCell();
-        this.ss_empty = empty.insertCell();
-        this.hand_empty = empty.insertCell();
+        CreateTH(empty, "Empty Fuel");
         this.boost_empty = empty.insertCell();
+        this.hand_empty = empty.insertCell();
         this.roc_empty = empty.insertCell();
-
-        this.bomb_row2 = tbl.insertRow();
-        CreateTH(this.bomb_row2, "Full Mass with Bombs");
-        this.ts_fullwB = this.bomb_row2.insertCell();
-        this.ss_fullwB = this.bomb_row2.insertCell();
-        this.hand_fullwB = this.bomb_row2.insertCell();
-        this.boost_fullwB = this.bomb_row2.insertCell();
-        this.roc_fullwB = this.bomb_row2.insertCell();
-
-        this.bomb_row1 = tbl.insertRow();
-        CreateTH(this.bomb_row1, "Half Mass with Bombs");
-        this.ts_halfwB = this.bomb_row1.insertCell();
-        this.ss_halfwB = this.bomb_row1.insertCell();
-        this.hand_halfwB = this.bomb_row1.insertCell();
-        this.boost_halfwB = this.bomb_row1.insertCell();
-        this.roc_halfwB = this.bomb_row1.insertCell();
+        this.ss_empty = empty.insertCell();
+        this.ts_empty = empty.insertCell();
 
         var row7 = tbl.insertRow();
         CreateTH(row7, "Propulsion").colSpan = 2;
@@ -865,6 +874,7 @@ class Aircraft_HTML extends Display {
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
             this.bomb_row2.hidden = false;
+            this.bomb_row2.appendChild(this.vital_components);
             this.vital_components.rowSpan = 5;
             //Half
             this.ts_halfwB.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
@@ -893,6 +903,7 @@ class Aircraft_HTML extends Display {
         } else {
             this.bomb_row1.hidden = true;
             this.bomb_row2.hidden = true;
+            this.full_row.appendChild(this.vital_components);
             this.vital_components.rowSpan = 3;
         }
 

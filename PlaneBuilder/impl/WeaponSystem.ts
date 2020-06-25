@@ -210,7 +210,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.jam = this.final_weapon.jam.substr(0, 2) + "9999";
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
             }
-            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "AP or Wirecutter rounds only (free, your choice)." });
+            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "AP or Fragmentation rounds only (free, your choice)." });
         }
     }
 
