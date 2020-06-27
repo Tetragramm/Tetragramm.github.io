@@ -103,7 +103,7 @@
                 "name": "Co-Pilot Controls",
                 "mass": 0,
                 "drag": 0,
-                "control": 3,
+                "control": 0,
                 "escape": 0,
                 "cost": 1,
                 "flightstress": -2,
