@@ -317,11 +317,12 @@ class Stabilizers extends Part {
         //Pairs of stabilizers
         var pairs = 0;
         if (this.vstab_list[this.vstab_sel].is_vtail) //V-Tail
-            pairs = this.hstab_count;
+            pairs = this.hstab_count - 1;
         else
-            pairs = Math.min(this.hstab_count, this.vstab_count);
-        var leftovers = Math.max(this.hstab_count, this.vstab_count) - pairs;
-        var es_pairs = Math.min(this.engine_count, pairs);
+            pairs = Math.min(this.hstab_count, this.vstab_count) - 1;
+        pairs = Math.max(0, pairs);
+        var leftovers = Math.max(this.hstab_count - 1, this.vstab_count - 1) - pairs;
+        var es_pairs = Math.min(this.engine_count - 1, pairs);
         leftovers += 2 * (pairs - es_pairs);
 
         stats.control += 3 * es_pairs + leftovers;
