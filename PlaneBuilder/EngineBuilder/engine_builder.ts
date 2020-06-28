@@ -24,7 +24,7 @@ const init = () => {
         for (let el of engine_json["lists"]) {
             if (!engine_list.has(el["name"]))
                 engine_list.set(el["name"], new EngineList(el["name"]));
-            engine_list.get(el["name"]).fromJSON(el);
+            engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
         }
 
         ebuild.UpdateList();
@@ -311,7 +311,9 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString());
         BlinkIfChanged(this.ed_ospd, estats.overspeed.toString());
         BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString());
-        BlinkIfChanged(this.ed_malt, estats.altitude.toString());
+        var b = this.enginebuilder.min_IAF;
+        var t = this.enginebuilder.min_IAF + estats.altitude;
+        BlinkIfChanged(this.ed_malt, b.toString() + "-" + t.toString());
         BlinkIfChanged(this.ed_torq, estats.torque.toString());
         BlinkIfChanged(this.ed_cost, estats.stats.cost.toString());
         if (estats.oiltank)

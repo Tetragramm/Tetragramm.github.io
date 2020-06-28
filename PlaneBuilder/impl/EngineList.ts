@@ -37,12 +37,12 @@ class EngineList {
         return { name: this.name, engines: ret };
     }
 
-    public fromJSON(js: JSON) {
+    public fromJSON(js: JSON, force = false) {
         if (js["name"])
             this.name = js["name"];
 
         for (let elem of js["engines"]) {
-            this.push(new EngineInputs(elem));
+            this.push(new EngineInputs(elem), force);
         }
     }
 
@@ -70,11 +70,15 @@ class EngineList {
         return this.push(stats);
     }
 
-    public push(es: EngineInputs) {
-        for (let i = 0; i < this.length; i++) {
-            let li = this.list[i];
-            if (li.Equal(es)) {
-                return i;
+    public push(es: EngineInputs, force = false) {
+        if (force) {
+            this.remove(es);
+        } else {
+            for (let i = 0; i < this.length; i++) {
+                let li = this.list[i];
+                if (li.Equal(es)) {
+                    return i;
+                }
             }
         }
         this.list.push(es.Clone());

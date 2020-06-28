@@ -303,7 +303,11 @@ class Engine extends Part {
     }
 
     public GetMaxAltitude() {
-        return this.etype_stats.altitude;
+        return this.GetMinIAF() + this.etype_stats.altitude;
+    }
+
+    public GetMinIAF() {
+        return this.etype_inputs.min_IAF;
     }
 
     public SetSelectedIndex(num: number) {

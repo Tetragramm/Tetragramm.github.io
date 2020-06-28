@@ -1284,11 +1284,11 @@ class EngineList {
         }
         return { name: this.name, engines: ret };
     }
-    fromJSON(js) {
+    fromJSON(js, force = false) {
         if (js["name"])
             this.name = js["name"];
         for (let elem of js["engines"]) {
-            this.push(new EngineInputs(elem));
+            this.push(new EngineInputs(elem), force);
         }
     }
     serialize(s) {
@@ -1312,11 +1312,16 @@ class EngineList {
         stats.deserialize(d);
         return this.push(stats);
     }
-    push(es) {
-        for (let i = 0; i < this.length; i++) {
-            let li = this.list[i];
-            if (li.Equal(es)) {
-                return i;
+    push(es, force = false) {
+        if (force) {
+            this.remove(es);
+        }
+        else {
+            for (let i = 0; i < this.length; i++) {
+                let li = this.list[i];
+                if (li.Equal(es)) {
+                    return i;
+                }
             }
         }
         this.list.push(es.Clone());
@@ -2137,7 +2142,10 @@ class Engine extends Part {
         this.elist_idx = elist_idx;
     }
     GetMaxAltitude() {
-        return this.etype_stats.altitude;
+        return this.GetMinIAF() + this.etype_stats.altitude;
+    }
+    GetMinIAF() {
+        return this.etype_inputs.min_IAF;
     }
     SetSelectedIndex(num) {
         this.etype_stats = engine_list.get(this.elist_idx).get_stats(num);
@@ -2690,6 +2698,13 @@ class Engines extends Part {
             lst.push(e.GetReliability());
         }
         return lst;
+    }
+    GetMinIAF() {
+        var m = 0;
+        for (let e of this.engines) {
+            m = Math.max(m, e.GetMinIAF());
+        }
+        return m;
     }
     GetMaxAltitude() {
         var m = 100;
@@ -4494,6 +4509,16 @@ class ControlSurfaces extends Part {
     GetAileronList() {
         return this.aileron_list;
     }
+    CanAileron() {
+        var can = [];
+        for (let a of this.aileron_list) {
+            if (a.warping && this.wing_area == 0)
+                can.push(false);
+            else
+                can.push(true);
+        }
+        return can;
+    }
     GetAileron() {
         return this.aileron_sel;
     }
@@ -4570,6 +4595,9 @@ class ControlSurfaces extends Part {
     }
     PartStats() {
         var stats = new Stats();
+        if (this.aileron_list[this.aileron_sel].warping && this.wing_area == 0) {
+            this.aileron_sel = 0;
+        }
         stats = stats.Add(this.aileron_list[this.aileron_sel].stats);
         if (this.aileron_list[this.aileron_sel].warping) {
             stats.maxstrain -= this.span;
@@ -5503,6 +5531,14 @@ class Accessories extends Part {
     GetArmourCoverage() {
         return this.armour_coverage;
     }
+    GetEffectiveCoverage() {
+        var arr = [];
+        var vital_adj = Math.max(0, Math.floor((this.vital_parts - 8) / 2));
+        for (let i = 0; i < this.armour_coverage.length; i++) {
+            arr.push(Math.max(0, this.armour_coverage[i] - vital_adj));
+        }
+        return arr;
+    }
     SetArmourCoverage(idx, num) {
         if (num != num || num < 0)
             num = 0;
@@ -5644,6 +5680,7 @@ class Accessories extends Part {
         this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
         var armour_str = "";
         //Armour
+        var eff_armour = this.GetEffectiveCoverage();
         for (let i = 0; i < this.armour_coverage.length; i++) {
             let AP = i + 1;
             var count = this.armour_coverage[i];
@@ -5653,10 +5690,10 @@ class Accessories extends Part {
             stats.mass += count * AP;
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
-            if (this.armour_coverage[i] > 0) {
+            if (eff_armour[i] > 0) {
                 if (armour_str != "")
                     armour_str += ", ";
-                armour_str += this.armour_coverage[i].toString() + " x AP" + AP.toString();
+                armour_str += eff_armour[i].toString() + " x AP" + AP.toString();
             }
         }
         if (armour_str != "") {
@@ -5919,7 +5956,7 @@ class Optimization extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        stats.cost = Math.floor(1.0e-6 + -(this.cost * 2 * this.acft_stats.cost / 10));
+        stats.cost = Math.floor(1.0e-6 + -(this.cost * this.acft_stats.cost / 10));
         stats.liftbleed = Math.floor(1.0e-6 + -this.bleed * 3);
         stats.escape = this.escape;
         stats.visibility = this.escape;
@@ -7269,6 +7306,9 @@ class Aircraft {
     GetReliabilityList() {
         return this.engines.GetReliabilityList();
     }
+    GetMinIAF() {
+        return this.engines.GetMinIAF();
+    }
     GetMaxAltitude() {
         return this.engines.GetMaxAltitude();
     }
@@ -7848,17 +7888,17 @@ class Engine_HTML extends Display {
         this.intake_fan.onchange = () => { this.engine.SetIntakeFan(this.intake_fan.checked); };
     }
     InitTypeSelect(row) {
-        this.e_pwr = document.createElement("INPUT");
-        this.e_mass = document.createElement("INPUT");
-        this.e_drag = document.createElement("INPUT");
-        this.e_rely = document.createElement("INPUT");
-        this.e_cool = document.createElement("INPUT");
-        this.e_over = document.createElement("INPUT");
-        this.e_fuel = document.createElement("INPUT");
-        this.e_alti = document.createElement("INPUT");
-        this.e_torq = document.createElement("INPUT");
-        this.e_rumb = document.createElement("INPUT");
-        this.e_cost = document.createElement("INPUT");
+        this.e_pwr = document.createElement("LABEL");
+        this.e_mass = document.createElement("LABEL");
+        this.e_drag = document.createElement("LABEL");
+        this.e_rely = document.createElement("LABEL");
+        this.e_cool = document.createElement("LABEL");
+        this.e_over = document.createElement("LABEL");
+        this.e_fuel = document.createElement("LABEL");
+        this.e_alti = document.createElement("LABEL");
+        this.e_torq = document.createElement("LABEL");
+        this.e_rumb = document.createElement("LABEL");
+        this.e_cost = document.createElement("LABEL");
         this.cool_count = document.createElement("INPUT");
         this.cool_count.setAttribute("type", "number");
         var tcell = row.insertCell(0);
@@ -7883,48 +7923,26 @@ class Engine_HTML extends Display {
             opt.text = eng.name;
             this.e_select.add(opt);
         }
-        let opt = document.createElement("OPTION");
-        opt.text = "Custom";
-        opt.value = (-1).toString();
-        this.e_select.add(opt);
         var fs = CreateFlexSection(tcell);
         //Set up the individual stat input boxes
-        FlexInput("Power", this.e_pwr, fs);
-        FlexInput("Mass", this.e_mass, fs);
-        FlexInput("Drag", this.e_drag, fs);
-        FlexInput("Reliability", this.e_rely, fs);
-        FlexInput("Cooling", this.e_cool, fs);
-        FlexInput("Overspeed", this.e_over, fs);
-        FlexInput("Fuel Consumption", this.e_fuel, fs);
-        FlexInput("Altitude", this.e_alti, fs);
-        FlexInput("Torque", this.e_torq, fs);
-        FlexInput("Rumble", this.e_rumb, fs);
-        FlexInput("Cost", this.e_cost, fs);
+        FlexDisplay("Power", this.e_pwr, fs);
+        FlexDisplay("Mass", this.e_mass, fs);
+        FlexDisplay("Drag", this.e_drag, fs);
+        FlexDisplay("Reliability", this.e_rely, fs);
+        FlexDisplay("Cooling", this.e_cool, fs);
+        FlexDisplay("Overspeed", this.e_over, fs);
+        FlexDisplay("Fuel Consumption", this.e_fuel, fs);
+        FlexDisplay("Altitude", this.e_alti, fs);
+        FlexDisplay("Torque", this.e_torq, fs);
+        FlexDisplay("Rumble", this.e_rumb, fs);
+        FlexDisplay("Cost", this.e_cost, fs);
         //Event Listeners for engine stats
         this.e_list_select.onchange = () => {
             this.engine.SetSelectedList(this.e_list_select.options[this.e_list_select.selectedIndex].text);
         };
         this.e_select.onchange = () => {
-            if (this.e_select.selectedIndex == this.e_select.options.length - 1) {
-                window.location.href = "engine.html";
-            }
-            else {
-                this.SetInputDisable(true);
-                this.engine.SetSelectedIndex(this.e_select.selectedIndex);
-            }
+            this.engine.SetSelectedIndex(this.e_select.selectedIndex);
         };
-        var trigger = () => { };
-        this.e_pwr.onchange = trigger;
-        this.e_mass.onchange = trigger;
-        this.e_drag.onchange = trigger;
-        this.e_rely.onchange = trigger;
-        this.e_cool.onchange = trigger;
-        this.e_over.onchange = trigger;
-        this.e_fuel.onchange = trigger;
-        this.e_alti.onchange = trigger;
-        this.e_torq.onchange = trigger;
-        this.e_rumb.onchange = trigger;
-        this.e_cost.onchange = trigger;
     }
     UpdateEngine(en) {
         this.engine = en;
@@ -8049,12 +8067,12 @@ class Engine_HTML extends Display {
         while (this.cool_cell.children.length > 0)
             this.cool_cell.removeChild(this.cool_cell.children[0]);
         if (this.engine.IsRotary()) {
-            this.e_cool.valueAsNumber = 0;
+            this.e_cool.innerText = "0";
             var txtSpan = document.createElement("SPAN");
             txtSpan.innerHTML = "Rotary Engines use Oil Tanks.<br/>+1 Mass, Oil Tank is a Vital Component.";
             this.cool_cell.appendChild(txtSpan);
         }
-        else if (this.e_cool.valueAsNumber == 0) {
+        else if (this.e_cool.innerText == "0") {
             var txtSpan = document.createElement("SPAN");
             txtSpan.innerHTML = "Air-Cooled Engine.<br/>";
             this.cool_cell.appendChild(txtSpan);
@@ -8095,34 +8113,6 @@ class Engine_HTML extends Display {
             this.cool_cell.appendChild(txtSpan2);
         }
     }
-    // private SendCustomStats() {
-    //     var e_stats = new EngineStats();
-    //     e_stats.stats.power = this.e_pwr.valueAsNumber;
-    //     e_stats.stats.mass = this.e_mass.valueAsNumber;
-    //     e_stats.stats.drag = this.e_drag.valueAsNumber;
-    //     e_stats.stats.reliability = this.e_rely.valueAsNumber;
-    //     e_stats.stats.cooling = this.e_cool.valueAsNumber;
-    //     e_stats.overspeed = this.e_over.valueAsNumber;
-    //     e_stats.stats.fuelconsumption = this.e_fuel.valueAsNumber;
-    //     e_stats.altitude = this.e_alti.valueAsNumber;
-    //     e_stats.torque = this.e_torq.valueAsNumber;
-    //     e_stats.rumble = this.e_rumb.valueAsNumber;
-    //     e_stats.stats.cost = this.e_cost.valueAsNumber;
-    //     this.engine.SetCustomStats(e_stats);
-    // }
-    SetInputDisable(b) {
-        this.e_pwr.disabled = b;
-        this.e_mass.disabled = b;
-        this.e_drag.disabled = b;
-        this.e_rely.disabled = b;
-        this.e_cool.disabled = b;
-        this.e_over.disabled = b;
-        this.e_fuel.disabled = b;
-        this.e_alti.disabled = b;
-        this.e_torq.disabled = b;
-        this.e_rumb.disabled = b;
-        this.e_cost.disabled = b;
-    }
     UpdateDisplay() {
         while (this.e_list_select.options.length > 0) {
             this.e_list_select.options.remove(0);
@@ -8154,12 +8144,6 @@ class Engine_HTML extends Display {
                 this.e_select.add(opt);
             }
             this.e_select.selectedIndex = this.engine.GetSelectedIndex();
-            if (this.e_select.selectedIndex == engine_list.get(list_idx).length) {
-                this.SetInputDisable(false);
-            }
-            else {
-                this.SetInputDisable(true);
-            }
         }
         else {
             for (let key of engine_list.keys()) {
@@ -8173,20 +8157,22 @@ class Engine_HTML extends Display {
             opt.text = eng.name;
             this.e_select.add(opt);
             this.e_select.selectedIndex = 0;
-            this.SetInputDisable(true);
         }
         var e_stats = this.engine.GetCurrentStats();
-        this.e_pwr.valueAsNumber = e_stats.stats.power;
-        this.e_mass.valueAsNumber = e_stats.stats.mass;
-        this.e_drag.valueAsNumber = e_stats.stats.drag;
-        this.e_rely.valueAsNumber = e_stats.stats.reliability;
-        this.e_cool.valueAsNumber = e_stats.stats.cooling;
-        this.e_over.valueAsNumber = e_stats.overspeed;
-        this.e_fuel.valueAsNumber = e_stats.stats.fuelconsumption;
-        this.e_alti.valueAsNumber = e_stats.altitude;
-        this.e_torq.valueAsNumber = e_stats.torque;
-        this.e_rumb.valueAsNumber = e_stats.rumble;
-        this.e_cost.valueAsNumber = e_stats.stats.cost;
+        var b = this.engine.GetMinIAF();
+        var t = b + e_stats.altitude;
+        this.e_pwr.innerText = e_stats.stats.power.toString();
+        this.e_mass.innerText = e_stats.stats.mass.toString();
+        this.e_drag.innerText = e_stats.stats.drag.toString();
+        this.e_rely.innerText = e_stats.stats.reliability.toString();
+        this.e_cool.innerText = e_stats.stats.cooling.toString();
+        this.e_over.innerText = e_stats.overspeed.toString();
+        this.e_fuel.innerText = e_stats.stats.fuelconsumption.toString();
+        this.e_alti.innerText = b.toString() + "-" + t.toString();
+        ;
+        this.e_torq.innerText = e_stats.torque.toString();
+        this.e_rumb.innerText = e_stats.rumble.toString();
+        this.e_cost.innerText = e_stats.stats.cost.toString();
         this.InitCoolingSelect();
         this.intake_fan.checked = this.engine.GetIntakeFan();
         if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {
@@ -9387,6 +9373,10 @@ class ControlSurfaces_HTML extends Display {
         this.d_none = c3_row.insertCell();
     }
     UpdateDisplay() {
+        var can_aileron = this.cs.CanAileron();
+        for (let i = 0; i < can_aileron.length; i++) {
+            this.aileron_select.options[i].disabled = !can_aileron[i];
+        }
         this.aileron_select.selectedIndex = this.cs.GetAileron();
         this.rudder_select.selectedIndex = this.cs.GetRudder();
         this.elevator_select.selectedIndex = this.cs.GetElevator();
@@ -9906,7 +9896,7 @@ class Optimization_HTML extends Display {
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
         var tbl = document.getElementById("tbl_optimization");
         var row1 = tbl.insertRow();
-        this.cost_cbx = this.InitRow(row1, "Expense: +/- 20% Cost", (num) => this.opt.SetCost(num));
+        this.cost_cbx = this.InitRow(row1, "Expense: +/- 10% Cost", (num) => this.opt.SetCost(num));
         this.bleed_cbx = this.InitRow(tbl.insertRow(), "Lift Efficienty: +/- 3 Lift Bleed", (num) => this.opt.SetBleed(num));
         this.escape_cbx = this.InitRow(tbl.insertRow(), "Leg Room: +/- 1 Escape, Visibility", (num) => this.opt.SetEscape(num));
         this.mass_cbx = this.InitRow(tbl.insertRow(), "Mass: +/- 10% Mass", (num) => this.opt.SetMass(num));
@@ -10721,7 +10711,7 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.cards.name = this.acft.name;
-        this.cards.acft_data.armour = this.acft.GetAccessories().GetArmourCoverage();
+        this.cards.acft_data.armour = this.acft.GetAccessories().GetEffectiveCoverage();
         this.cards.acft_data.crash = stats.crashsafety;
         this.cards.acft_data.dropoff = derived.Dropoff;
         this.cards.acft_data.empty_boost = derived.BoostEmpty;
@@ -11178,7 +11168,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row11, "Escape");
         this.escape_cell = row11.insertCell();
         var row12 = tbl.insertRow();
-        CreateTH(row12, "Flight Ceiling");
+        CreateTH(row12, "Ideal Altitude");
         this.maxalt_cell = row12.insertCell();
         CreateTH(row12, "Flammable?");
         this.flammable_cell = row12.insertCell();
@@ -11322,7 +11312,7 @@ class Aircraft_HTML extends Display {
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
         this.turnbleed_cell.innerText = derived.TurnBleed.toString();
         this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = (Math.floor(1.0e-6 + this.acft.GetMaxAltitude() + derived.MaxSpeedEmpty - derived.StallSpeedEmpty)).toString();
+        this.maxalt_cell.innerText = this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString();
         this.copy_text += "Aerodynamics\n\t"
             + "Stability\t" + this.stability_cell.innerText + "\n\t"
             + "Energy Loss\t" + this.eloss_cell.innerText + "\n\t"
@@ -11939,10 +11929,11 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
+//TODO: Overwrite defaults
 //Wing Warping with no wings
 //Reinforcements with no wings
-//TODO: Autopilot for no cockpits
 //TODO: "Adjusted Drag" ect.
+//TODO: Autopilot for no cockpits
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
 const init = () => {
@@ -11968,7 +11959,7 @@ const init = () => {
             for (let el of engine_json["lists"]) {
                 if (!engine_list.has(el["name"]))
                     engine_list.set(el["name"], new EngineList(el["name"]));
-                engine_list.get(el["name"]).fromJSON(el);
+                engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
             }
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);

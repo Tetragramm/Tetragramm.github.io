@@ -142,6 +142,15 @@ class Accessories extends Part {
         return this.armour_coverage;
     }
 
+    public GetEffectiveCoverage() {
+        var arr = [];
+        var vital_adj = Math.max(0, Math.floor((this.vital_parts - 8) / 2));
+        for (let i = 0; i < this.armour_coverage.length; i++) {
+            arr.push(Math.max(0, this.armour_coverage[i] - vital_adj));
+        }
+        return arr;
+    }
+
     public SetArmourCoverage(idx: number, num: number) {
         if (num != num || num < 0)
             num = 0;
@@ -316,6 +325,7 @@ class Accessories extends Part {
         this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
         var armour_str = "";
         //Armour
+        var eff_armour = this.GetEffectiveCoverage();
         for (let i = 0; i < this.armour_coverage.length; i++) {
             let AP = i + 1;
             var count = this.armour_coverage[i];
@@ -326,10 +336,10 @@ class Accessories extends Part {
             stats.mass += count * AP;
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
-            if (this.armour_coverage[i] > 0) {
+            if (eff_armour[i] > 0) {
                 if (armour_str != "")
                     armour_str += ", ";
-                armour_str += this.armour_coverage[i].toString() + " x AP" + AP.toString();
+                armour_str += eff_armour[i].toString() + " x AP" + AP.toString();
             }
         }
         if (armour_str != "") {

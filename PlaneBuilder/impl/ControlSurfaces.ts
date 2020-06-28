@@ -101,6 +101,17 @@ class ControlSurfaces extends Part {
         return this.aileron_list;
     }
 
+    public CanAileron() {
+        var can = [];
+        for (let a of this.aileron_list) {
+            if (a.warping && this.wing_area == 0)
+                can.push(false)
+            else
+                can.push(true);
+        }
+        return can;
+    }
+
     public GetAileron() {
         return this.aileron_sel;
     }
@@ -199,6 +210,9 @@ class ControlSurfaces extends Part {
 
     public PartStats() {
         var stats = new Stats();
+        if (this.aileron_list[this.aileron_sel].warping && this.wing_area == 0) {
+            this.aileron_sel = 0;
+        }
         stats = stats.Add(this.aileron_list[this.aileron_sel].stats);
 
         if (this.aileron_list[this.aileron_sel].warping) {

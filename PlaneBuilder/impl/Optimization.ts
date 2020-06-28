@@ -269,7 +269,7 @@ class Optimization extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        stats.cost = Math.floor(1.0e-6 + -(this.cost * 2 * this.acft_stats.cost / 10));
+        stats.cost = Math.floor(1.0e-6 + -(this.cost * this.acft_stats.cost / 10));
         stats.liftbleed = Math.floor(1.0e-6 + - this.bleed * 3);
         stats.escape = this.escape;
         stats.visibility = this.escape;

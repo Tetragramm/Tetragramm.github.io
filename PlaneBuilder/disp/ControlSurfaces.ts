@@ -122,6 +122,10 @@ class ControlSurfaces_HTML extends Display {
     }
 
     public UpdateDisplay() {
+        var can_aileron = this.cs.CanAileron();
+        for (let i = 0; i < can_aileron.length; i++) {
+            this.aileron_select.options[i].disabled = !can_aileron[i];
+        }
         this.aileron_select.selectedIndex = this.cs.GetAileron();
         this.rudder_select.selectedIndex = this.cs.GetRudder();
         this.elevator_select.selectedIndex = this.cs.GetElevator();

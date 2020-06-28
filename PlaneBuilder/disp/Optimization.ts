@@ -32,7 +32,7 @@ class Optimization_HTML extends Display {
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
         var tbl = document.getElementById("tbl_optimization") as HTMLTableElement;
         var row1 = tbl.insertRow();
-        this.cost_cbx = this.InitRow(row1, "Expense: +/- 20% Cost", (num: number) => this.opt.SetCost(num));
+        this.cost_cbx = this.InitRow(row1, "Expense: +/- 10% Cost", (num: number) => this.opt.SetCost(num));
         this.bleed_cbx = this.InitRow(tbl.insertRow(), "Lift Efficienty: +/- 3 Lift Bleed", (num: number) => this.opt.SetBleed(num));
         this.escape_cbx = this.InitRow(tbl.insertRow(), "Leg Room: +/- 1 Escape, Visibility", (num: number) => this.opt.SetEscape(num));
         this.mass_cbx = this.InitRow(tbl.insertRow(), "Mass: +/- 10% Mass", (num: number) => this.opt.SetMass(num));

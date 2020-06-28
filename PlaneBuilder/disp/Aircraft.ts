@@ -289,7 +289,7 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.cards.name = this.acft.name;
-        this.cards.acft_data.armour = this.acft.GetAccessories().GetArmourCoverage();
+        this.cards.acft_data.armour = this.acft.GetAccessories().GetEffectiveCoverage();
         this.cards.acft_data.crash = stats.crashsafety;
         this.cards.acft_data.dropoff = derived.Dropoff;
         this.cards.acft_data.empty_boost = derived.BoostEmpty;
@@ -774,7 +774,7 @@ class Aircraft_HTML extends Display {
         this.escape_cell = row11.insertCell();
 
         var row12 = tbl.insertRow();
-        CreateTH(row12, "Flight Ceiling");
+        CreateTH(row12, "Ideal Altitude");
         this.maxalt_cell = row12.insertCell();
         CreateTH(row12, "Flammable?");
         this.flammable_cell = row12.insertCell();
@@ -925,7 +925,7 @@ class Aircraft_HTML extends Display {
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
         this.turnbleed_cell.innerText = derived.TurnBleed.toString();
         this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = (Math.floor(1.0e-6 + this.acft.GetMaxAltitude() + derived.MaxSpeedEmpty - derived.StallSpeedEmpty)).toString();
+        this.maxalt_cell.innerText = this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString();
 
         this.copy_text += "Aerodynamics\n\t"
             + "Stability\t" + this.stability_cell.innerText + "\n\t"

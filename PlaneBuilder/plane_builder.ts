@@ -3,10 +3,11 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
+//TODO: Overwrite defaults
 //Wing Warping with no wings
 //Reinforcements with no wings
-//TODO: Autopilot for no cockpits
 //TODO: "Adjusted Drag" ect.
+//TODO: Autopilot for no cockpits
 //TODO: Weapon card, List Special Rules
 //TODO: Dashboard, List Special Rules, but only some?
 
@@ -37,7 +38,7 @@ const init = () => {
             for (let el of engine_json["lists"]) {
                 if (!engine_list.has(el["name"]))
                     engine_list.set(el["name"], new EngineList(el["name"]));
-                engine_list.get(el["name"]).fromJSON(el);
+                engine_list.get(el["name"]).fromJSON(el, false);//TODO: Overwrite defaults
             }
 
             loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {

@@ -578,6 +578,10 @@ class Aircraft {
         return this.engines.GetReliabilityList();
     }
 
+    public GetMinIAF() {
+        return this.engines.GetMinIAF();
+    }
+
     public GetMaxAltitude() {
         return this.engines.GetMaxAltitude();
     }
