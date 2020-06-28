@@ -396,7 +396,7 @@ class Aircraft {
         else if (Stabiilty == -10)
             HandlingEmpty += 4;
         else
-            HandlingEmpty = -99999;
+            HandlingEmpty = -1 / 0;
 
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;

@@ -682,7 +682,7 @@ class PulsejetBuilder {
         estats.rumble = this.CalcRumble();
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
-        estats.altitude = 3;
+        estats.altitude = 29;
         estats.pulsejet = true;
         return estats;
     }
@@ -8386,7 +8386,7 @@ class Aircraft {
         else if (Stabiilty == -10)
             HandlingEmpty += 4;
         else
-            HandlingEmpty = -99999;
+            HandlingEmpty = -1 / 0;
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
         //Used: Sluggish

@@ -138,7 +138,7 @@ class PulsejetBuilder {
         estats.rumble = this.CalcRumble();
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
-        estats.altitude = 3;
+        estats.altitude = 29;
         estats.pulsejet = true;
 
         return estats;
