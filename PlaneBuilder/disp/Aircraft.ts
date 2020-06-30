@@ -319,16 +319,29 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.half_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
         this.cards.acft_data.max_strain = derived.MaxStrain;
         var ordinance = [];
-        if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
-            var external = aircraft_model.GetMunitions().GetBombCount() - internal;
-            if (internal > 0)
-                ordinance.push(internal.toString() + " Mass Internally");
-            if (external > 0)
-                ordinance.push(external.toString() + " Mass Externally");
-            if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
-                ordinance.push("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass");
+        var bombs = aircraft_model.GetMunitions().GetBombCount();
+        var rockets = aircraft_model.GetMunitions().GetRocketCount();
+        var internal = aircraft_model.GetMunitions().GetInternalBombCount();
+        if (bombs > 0) {
+            var int_bomb = Math.min(bombs, internal);
+            var ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                ordinance.push(int_bomb.toString() + " Bomb Mass Internally.");
+            if (ext_bomb > 0)
+                ordinance.push(ext_bomb.toString() + " Bomb Mass Externally.");
+            if (int_bomb > 0) {
+                var mib = Math.min(int_bomb, aircraft_model.GetMunitions().GetMaxBombSize());
+                ordinance.push("Largest internal bomb is " + mib.toString() + " Mass.");
             }
+            internal -= int_bomb;
+        }
+        if (rockets > 0) {
+            var int_rock = Math.min(rockets, internal);
+            var ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                ordinance.push(int_rock.toString() + " Rocket Mass Internally.");
+            if (ext_rock > 0)
+                ordinance.push(ext_rock.toString() + " Rocket Mass Externally.");
         }
         this.cards.acft_data.ordinance = ordinance;
         this.cards.acft_data.stability = derived.Stabiilty;
@@ -980,20 +993,34 @@ class Aircraft_HTML extends Display {
         var alist = aircraft_model.GetWeapons().GetActionList();
         var plist = aircraft_model.GetWeapons().GetProjectileList();
         this.weapon_cell.innerHTML = "";
-        if (aircraft_model.GetMunitions().GetBombCount() > 0) {
+        var bombs = aircraft_model.GetMunitions().GetBombCount();
+        var rockets = aircraft_model.GetMunitions().GetRocketCount();
+        var internal = aircraft_model.GetMunitions().GetInternalBombCount();
+        if (bombs > 0) {
             var weaphtml = "";
-            if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-                var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
-                var external = aircraft_model.GetMunitions().GetBombCount() - internal;
-                if (internal > 0)
-                    weaphtml += (internal.toString() + " Bomb Mass Internally. ");
-                if (external > 0)
-                    weaphtml += (external.toString() + " Bomb Mass Externally. ");
-                if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
-                    weaphtml += ("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass.");
-                }
+            var int_bomb = Math.min(bombs, internal);
+            var ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                weaphtml += (int_bomb.toString() + " Bomb Mass Internally. ");
+            if (ext_bomb > 0)
+                weaphtml += (ext_bomb.toString() + " Bomb Mass Externally. ");
+            if (int_bomb > 0) {
+                var mib = Math.min(int_bomb, aircraft_model.GetMunitions().GetMaxBombSize());
+                weaphtml += ("Largest internal bomb is " + mib.toString() + " Mass.");
             }
-            this.weapon_cell.innerHTML = weaphtml + "<br/>";
+            internal -= int_bomb;
+            this.weapon_cell.innerHTML += weaphtml + "<br/>";
+            this.copy_text += weaphtml + "\n\t";
+        }
+        if (rockets > 0) {
+            var weaphtml = "";
+            var int_rock = Math.min(rockets, internal);
+            var ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                weaphtml += (int_rock.toString() + " Rocket Mass Internally. ");
+            if (ext_rock > 0)
+                weaphtml += (ext_rock.toString() + " Rocket Mass Externally. ");
+            this.weapon_cell.innerHTML += weaphtml + "<br/>";
             this.copy_text += weaphtml + "\n\t";
         }
 

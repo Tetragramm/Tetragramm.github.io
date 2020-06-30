@@ -5087,6 +5087,7 @@ class Munitions extends Part {
     constructor() {
         super();
         this.bomb_count = 0;
+        this.rocket_count = 0;
         this.internal_bay_count = 0;
         this.internal_bay_1 = false;
         this.internal_bay_2 = false;
@@ -5094,6 +5095,7 @@ class Munitions extends Part {
     toJSON() {
         return {
             bomb_count: this.bomb_count,
+            rocket_count: this.rocket_count,
             bay_count: this.internal_bay_count,
             bay1: this.internal_bay_1,
             bay2: this.internal_bay_2,
@@ -5104,18 +5106,28 @@ class Munitions extends Part {
         this.internal_bay_count = js["bay_count"];
         this.internal_bay_1 = js["bay1"];
         this.internal_bay_2 = js["bay2"];
+        if (json_version > 10.75) {
+            this.rocket_count = js["rocket_count"];
+        }
     }
     serialize(s) {
         s.PushNum(this.bomb_count);
         s.PushNum(this.internal_bay_count);
         s.PushBool(this.internal_bay_1);
         s.PushBool(this.internal_bay_2);
+        s.PushNum(this.rocket_count);
     }
     deserialize(d) {
         this.bomb_count = d.GetNum();
         this.internal_bay_count = d.GetNum();
         this.internal_bay_1 = d.GetBool();
         this.internal_bay_2 = d.GetBool();
+        if (d.version > 10.75) {
+            this.rocket_count = d.GetNum();
+        }
+    }
+    GetRocketCount() {
+        return this.rocket_count;
     }
     GetBombCount() {
         return this.bomb_count;
@@ -5152,6 +5164,14 @@ class Munitions extends Part {
         }
         return sz;
     }
+    SetRocketCount(count) {
+        if (count != count || count < 0)
+            count = 0;
+        count = Math.floor(1.0e-6 + count);
+        this.rocket_count = count;
+        this.LimitMass(true);
+        this.CalculateStats();
+    }
     SetBombCount(count) {
         if (count != count || count < 0)
             count = 0;
@@ -5187,22 +5207,20 @@ class Munitions extends Part {
     }
     LimitMass(bomb) {
         var reduce = false;
-        while (this.bomb_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
+        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
             reduce = true;
-            this.bomb_count--;
+            if (this.rocket_count > 0) {
+                this.rocket_count--;
+            }
+            else {
+                this.bomb_count--;
+            }
         }
         return reduce;
     }
     GetExternalMass() {
-        var ext_bomb_count = this.bomb_count;
-        if (this.internal_bay_1) {
-            ext_bomb_count = Math.floor(1.0e-6 + ext_bomb_count / 2);
-            if (this.internal_bay_2) {
-                ext_bomb_count = 0;
-            }
-        }
-        var ext_mass = ext_bomb_count;
-        return ext_mass;
+        var ext_bomb_count = this.bomb_count + this.rocket_count;
+        return Math.max(0, ext_bomb_count - this.GetInternalBombCount());
     }
     SetAcftStructure(num, maxbomb) {
         this.acft_struct = num;
@@ -5216,8 +5234,7 @@ class Munitions extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        var ext_bomb_count = this.bomb_count - this.GetInternalBombCount();
-        ext_bomb_count = Math.max(0, ext_bomb_count);
+        var ext_bomb_count = this.GetExternalMass();
         stats.reqsections += this.internal_bay_count;
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
             var count = stats.reqsections;
@@ -5231,7 +5248,7 @@ class Munitions extends Part {
         var rack_mass = Math.ceil(ext_bomb_count / 5);
         stats.mass += rack_mass;
         stats.drag += rack_mass;
-        stats.bomb_mass = this.bomb_count;
+        stats.bomb_mass = this.bomb_count + this.rocket_count;
         stats.reqsections = Math.ceil(stats.reqsections);
         //Because it is load, it rounds up to the nearest 5 mass.
         if ((stats.bomb_mass % 5) > 0)
@@ -9547,8 +9564,11 @@ class Load_HTML extends Display {
     InitMunitions(cell) {
         var fs = CreateFlexSection(cell);
         this.bombs = document.createElement("INPUT");
-        FlexInput("Bombs and Rockets", this.bombs, fs);
+        FlexInput("Bombs ", this.bombs, fs);
         this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
+        this.rockets = document.createElement("INPUT");
+        FlexInput("Rockets", this.rockets, fs);
+        this.rockets.onchange = () => { this.boom.SetRocketCount(this.rockets.valueAsNumber); };
         this.bay_count = document.createElement("INPUT");
         FlexInput("Internal Bay Count", this.bay_count, fs);
         this.bay_count.onchange = () => { this.boom.SetBayCount(this.bay_count.valueAsNumber); };
@@ -9604,6 +9624,7 @@ class Load_HTML extends Display {
         this.seal.disabled = !this.fuel.GetSealingEnabled();
         this.extinguish.checked = this.fuel.GetExtinguisher();
         this.bombs.valueAsNumber = this.boom.GetBombCount();
+        this.rockets.valueAsNumber = this.boom.GetRocketCount();
         this.bay_count.valueAsNumber = this.boom.GetBayCount();
         this.bay1.checked = this.boom.GetBay1();
         this.bay2.checked = this.boom.GetBay2();
@@ -10741,16 +10762,29 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.half_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
         this.cards.acft_data.max_strain = derived.MaxStrain;
         var ordinance = [];
-        if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-            var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
-            var external = aircraft_model.GetMunitions().GetBombCount() - internal;
-            if (internal > 0)
-                ordinance.push(internal.toString() + " Mass Internally");
-            if (external > 0)
-                ordinance.push(external.toString() + " Mass Externally");
-            if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
-                ordinance.push("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass");
+        var bombs = aircraft_model.GetMunitions().GetBombCount();
+        var rockets = aircraft_model.GetMunitions().GetRocketCount();
+        var internal = aircraft_model.GetMunitions().GetInternalBombCount();
+        if (bombs > 0) {
+            var int_bomb = Math.min(bombs, internal);
+            var ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                ordinance.push(int_bomb.toString() + " Bomb Mass Internally.");
+            if (ext_bomb > 0)
+                ordinance.push(ext_bomb.toString() + " Bomb Mass Externally.");
+            if (int_bomb > 0) {
+                var mib = Math.min(int_bomb, aircraft_model.GetMunitions().GetMaxBombSize());
+                ordinance.push("Largest internal bomb is " + mib.toString() + " Mass.");
             }
+            internal -= int_bomb;
+        }
+        if (rockets > 0) {
+            var int_rock = Math.min(rockets, internal);
+            var ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                ordinance.push(int_rock.toString() + " Rocket Mass Internally.");
+            if (ext_rock > 0)
+                ordinance.push(ext_rock.toString() + " Rocket Mass Externally.");
         }
         this.cards.acft_data.ordinance = ordinance;
         this.cards.acft_data.stability = derived.Stabiilty;
@@ -11361,20 +11395,34 @@ class Aircraft_HTML extends Display {
         var alist = aircraft_model.GetWeapons().GetActionList();
         var plist = aircraft_model.GetWeapons().GetProjectileList();
         this.weapon_cell.innerHTML = "";
-        if (aircraft_model.GetMunitions().GetBombCount() > 0) {
+        var bombs = aircraft_model.GetMunitions().GetBombCount();
+        var rockets = aircraft_model.GetMunitions().GetRocketCount();
+        var internal = aircraft_model.GetMunitions().GetInternalBombCount();
+        if (bombs > 0) {
             var weaphtml = "";
-            if (aircraft_model.GetMunitions().GetBombCount() > 0) {
-                var internal = Math.min(aircraft_model.GetMunitions().GetBombCount(), aircraft_model.GetMunitions().GetInternalBombCount());
-                var external = aircraft_model.GetMunitions().GetBombCount() - internal;
-                if (internal > 0)
-                    weaphtml += (internal.toString() + " Bomb Mass Internally. ");
-                if (external > 0)
-                    weaphtml += (external.toString() + " Bomb Mass Externally. ");
-                if (aircraft_model.GetMunitions().GetMaxBombSize() > 0) {
-                    weaphtml += ("Largest internal bomb is " + aircraft_model.GetMunitions().GetMaxBombSize().toString() + " Mass.");
-                }
+            var int_bomb = Math.min(bombs, internal);
+            var ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                weaphtml += (int_bomb.toString() + " Bomb Mass Internally. ");
+            if (ext_bomb > 0)
+                weaphtml += (ext_bomb.toString() + " Bomb Mass Externally. ");
+            if (int_bomb > 0) {
+                var mib = Math.min(int_bomb, aircraft_model.GetMunitions().GetMaxBombSize());
+                weaphtml += ("Largest internal bomb is " + mib.toString() + " Mass.");
             }
-            this.weapon_cell.innerHTML = weaphtml + "<br/>";
+            internal -= int_bomb;
+            this.weapon_cell.innerHTML += weaphtml + "<br/>";
+            this.copy_text += weaphtml + "\n\t";
+        }
+        if (rockets > 0) {
+            var weaphtml = "";
+            var int_rock = Math.min(rockets, internal);
+            var ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                weaphtml += (int_rock.toString() + " Rocket Mass Internally. ");
+            if (ext_rock > 0)
+                weaphtml += (ext_rock.toString() + " Rocket Mass Externally. ");
+            this.weapon_cell.innerHTML += weaphtml + "<br/>";
             this.copy_text += weaphtml + "\n\t";
         }
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {

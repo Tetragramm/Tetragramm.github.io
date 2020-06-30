@@ -3,6 +3,7 @@
 
 class Munitions extends Part {
     private bomb_count: number;
+    private rocket_count: number;
     private internal_bay_count: number;
     private internal_bay_1: boolean;
     private internal_bay_2: boolean;
@@ -13,6 +14,7 @@ class Munitions extends Part {
         super();
 
         this.bomb_count = 0;
+        this.rocket_count = 0;
         this.internal_bay_count = 0;
         this.internal_bay_1 = false;
         this.internal_bay_2 = false;
@@ -21,6 +23,7 @@ class Munitions extends Part {
     public toJSON() {
         return {
             bomb_count: this.bomb_count,
+            rocket_count: this.rocket_count,
             bay_count: this.internal_bay_count,
             bay1: this.internal_bay_1,
             bay2: this.internal_bay_2,
@@ -32,6 +35,9 @@ class Munitions extends Part {
         this.internal_bay_count = js["bay_count"];
         this.internal_bay_1 = js["bay1"];
         this.internal_bay_2 = js["bay2"];
+        if (json_version > 10.75) {
+            this.rocket_count = js["rocket_count"];
+        }
     }
 
     public serialize(s: Serialize) {
@@ -39,6 +45,7 @@ class Munitions extends Part {
         s.PushNum(this.internal_bay_count);
         s.PushBool(this.internal_bay_1);
         s.PushBool(this.internal_bay_2);
+        s.PushNum(this.rocket_count);
     }
 
     public deserialize(d: Deserialize) {
@@ -46,6 +53,13 @@ class Munitions extends Part {
         this.internal_bay_count = d.GetNum();
         this.internal_bay_1 = d.GetBool();
         this.internal_bay_2 = d.GetBool();
+        if (d.version > 10.75) {
+            this.rocket_count = d.GetNum();
+        }
+    }
+
+    public GetRocketCount() {
+        return this.rocket_count;
     }
 
     public GetBombCount() {
@@ -84,6 +98,15 @@ class Munitions extends Part {
             }
         }
         return sz;
+    }
+
+    public SetRocketCount(count: number) {
+        if (count != count || count < 0)
+            count = 0;
+        count = Math.floor(1.0e-6 + count);
+        this.rocket_count = count;
+        this.LimitMass(true);
+        this.CalculateStats();
     }
 
     public SetBombCount(count: number) {
@@ -127,24 +150,20 @@ class Munitions extends Part {
 
     private LimitMass(bomb: boolean) {
         var reduce = false;
-        while (this.bomb_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
+        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
             reduce = true;
-            this.bomb_count--;
+            if (this.rocket_count > 0) {
+                this.rocket_count--;
+            } else {
+                this.bomb_count--;
+            }
         }
         return reduce;
     }
 
     public GetExternalMass() {
-        var ext_bomb_count = this.bomb_count;
-        if (this.internal_bay_1) {
-            ext_bomb_count = Math.floor(1.0e-6 + ext_bomb_count / 2);
-            if (this.internal_bay_2) {
-                ext_bomb_count = 0;
-            }
-        }
-
-        var ext_mass = ext_bomb_count;
-        return ext_mass;
+        var ext_bomb_count = this.bomb_count + this.rocket_count;
+        return Math.max(0, ext_bomb_count - this.GetInternalBombCount());
     }
 
     public SetAcftStructure(num: number, maxbomb: number) {
@@ -162,8 +181,7 @@ class Munitions extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        var ext_bomb_count = this.bomb_count - this.GetInternalBombCount();
-        ext_bomb_count = Math.max(0, ext_bomb_count);
+        var ext_bomb_count = this.GetExternalMass();
         stats.reqsections += this.internal_bay_count;
 
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
@@ -180,7 +198,7 @@ class Munitions extends Part {
         var rack_mass = Math.ceil(ext_bomb_count / 5);
         stats.mass += rack_mass;
         stats.drag += rack_mass;
-        stats.bomb_mass = this.bomb_count;
+        stats.bomb_mass = this.bomb_count + this.rocket_count;
 
         stats.reqsections = Math.ceil(stats.reqsections);
 

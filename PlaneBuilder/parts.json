@@ -1,5 +1,5 @@
 {
-    "version": "10.7",
+    "version": "10.8",
     "era": {
         "options": [
             {
@@ -513,7 +513,7 @@
     "propellers": {
         "props": [
             {
-                "name": "Very Coarse",
+                "name": "High Power",
                 "pitchspeed": 0.8,
                 "pitchboost": 0.9,
                 "cost": 0,
@@ -522,7 +522,7 @@
                 "automatic": false
             },
             {
-                "name": "Coarse",
+                "name": "Power",
                 "pitchspeed": 0.9,
                 "pitchboost": 0.8,
                 "cost": 0,
@@ -540,7 +540,7 @@
                 "automatic": false
             },
             {
-                "name": "Fine",
+                "name": "Speed",
                 "pitchspeed": 1.1,
                 "pitchboost": 0.4,
                 "cost": 0,
@@ -549,7 +549,7 @@
                 "automatic": false
             },
             {
-                "name": "Very Fine",
+                "name": "High Speed",
                 "pitchspeed": 1.2,
                 "pitchboost": 0.3,
                 "cost": 0,

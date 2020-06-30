@@ -1571,20 +1571,20 @@
                     "engine_type": 0,
                     "type": 0,
                     "era_sel": 3,
-                    "displacement": 32.4,
-                    "compression": 55.5,
+                    "displacement": 27,
+                    "compression": 5.55,
                     "cyl_per_row": 2,
                     "rows": 6,
-                    "RPM_boost": 1,
+                    "RPM_boost": 0.98,
                     "material_fudge": 0.8,
-                    "quality_fudge": 0.6,
+                    "quality_fudge": 1,
                     "compressor_type": 2,
                     "compressor_count": 1,
-                    "min_IAF": 0,
+                    "min_IAF": 30,
                     "upgrades": [
                         false,
-                        false,
-                        false,
+                        true,
+                        true,
                         false
                     ]
                 }

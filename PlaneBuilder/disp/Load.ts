@@ -14,6 +14,7 @@ class Load_HTML extends Display {
     private extinguish: HTMLInputElement;
     //Munitions
     private bombs: HTMLInputElement;
+    private rockets: HTMLInputElement;
     private bay_count: HTMLInputElement;
     private bay1: HTMLInputElement;
     private bay2: HTMLInputElement;
@@ -66,8 +67,11 @@ class Load_HTML extends Display {
     private InitMunitions(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
         this.bombs = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Bombs and Rockets", this.bombs, fs);
+        FlexInput("Bombs ", this.bombs, fs);
         this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
+        this.rockets = document.createElement("INPUT") as HTMLInputElement;
+        FlexInput("Rockets", this.rockets, fs);
+        this.rockets.onchange = () => { this.boom.SetRocketCount(this.rockets.valueAsNumber); };
 
         this.bay_count = document.createElement("INPUT") as HTMLInputElement;
         FlexInput("Internal Bay Count", this.bay_count, fs);
@@ -130,6 +134,7 @@ class Load_HTML extends Display {
         this.extinguish.checked = this.fuel.GetExtinguisher();
 
         this.bombs.valueAsNumber = this.boom.GetBombCount();
+        this.rockets.valueAsNumber = this.boom.GetRocketCount();
         this.bay_count.valueAsNumber = this.boom.GetBayCount();
         this.bay1.checked = this.boom.GetBay1();
         this.bay2.checked = this.boom.GetBay2();
