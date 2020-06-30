@@ -187,6 +187,8 @@ class Cockpit extends Part {
     }
 
     public SetBombsightQuality(num: number) {
+        if (num != num)
+            num = 0;
         if (num == this.bombsight - 1)
             num = this.bombsight - 3;
         if (num == this.bombsight + 1)

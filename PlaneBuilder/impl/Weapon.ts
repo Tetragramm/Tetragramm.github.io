@@ -259,6 +259,9 @@ class Weapon extends Part {
     }
 
     public SetCount(use: number) {
+        if (use != use) {
+            use = 1;
+        }
         use = Math.max(1, use);
         if (this.synchronization == SynchronizationType.SPINNER)
             use = 1;

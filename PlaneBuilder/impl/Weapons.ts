@@ -318,7 +318,7 @@ class Weapons extends Part {
     }
 
     public SetBraceCount(num: number) {
-        if (num < 0)
+        if (num < 0 || num != num)
             num = 0;
         num -= num % 3;
         this.brace_count = num;

@@ -110,6 +110,24 @@ class Used extends Part {
     }
 
     public TriggerCS() {
+
+        if (this.burnt_out != this.burnt_out)
+            this.burnt_out = 0;
+        if (this.ragged != this.ragged)
+            this.ragged = 0;
+        if (this.hefty != this.hefty)
+            this.hefty = 0;
+        if (this.sticky_guns != this.sticky_guns)
+            this.sticky_guns = 0;
+        if (this.weak != this.weak)
+            this.weak = 0;
+        if (this.fragile != this.fragile)
+            this.fragile = 0;
+        if (this.leaky != this.leaky)
+            this.leaky = 0;
+        if (this.sluggish != this.sluggish)
+            this.sluggish = 0;
+
         this.CalculateStats();
     }
 }
