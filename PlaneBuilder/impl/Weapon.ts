@@ -218,6 +218,15 @@ class Weapon extends Part {
     }
 
     private CanSynch(num: number) {
+
+        if (!this.fixed && !this.wing) {
+            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         if (this.can_synchronize && num == SynchronizationType.NONE) {
             return false;
         } else if (!this.can_synchronize && num != SynchronizationType.NONE) {

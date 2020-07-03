@@ -6159,6 +6159,14 @@ class Weapon extends Part {
         return lst;
     }
     CanSynch(num) {
+        if (!this.fixed && !this.wing) {
+            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
         if (this.can_synchronize && num == SynchronizationType.NONE) {
             return false;
         }
@@ -12580,6 +12588,11 @@ class WeaponSystem extends Part {
                     w.can_spinner = can_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
                     w.can_arty_spinner = can_arty_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
                 }
+                else if (!w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = false;
+                    w.can_arty_spinner = false;
+                }
                 else {
                     w.can_synchronize = false;
                     w.can_spinner = false;
@@ -12593,6 +12606,11 @@ class WeaponSystem extends Part {
                     w.can_synchronize = true;
                     w.can_spinner = can_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
                     w.can_arty_spinner = can_arty_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
+                }
+                else if (!w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = false;
+                    w.can_arty_spinner = false;
                 }
                 else {
                     w.can_synchronize = false;
