@@ -6931,6 +6931,8 @@ class Aircraft {
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
         this.use_storage = storage;
+        this.updated_stats = false;
+        this.freeze_display = false;
         this.Reset();
     }
     toJSON() {
@@ -6958,6 +6960,7 @@ class Aircraft {
         };
     }
     fromJSON(js, disp = true) {
+        this.freeze_display = true;
         if (disp) {
             console.log(js);
             console.log(js["version"]);
@@ -6984,7 +6987,7 @@ class Aircraft {
         if (json_version > 10.65) {
             this.used.fromJSON(js["used"], json_version);
         }
-        this.CalculateStats();
+        this.freeze_display = false;
         return true;
     }
     serialize(s) {
@@ -7010,6 +7013,7 @@ class Aircraft {
         this.used.serialize(s);
     }
     deserialize(d) {
+        this.freeze_display = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);
         this.name = d.GetString();
@@ -7033,6 +7037,7 @@ class Aircraft {
         if (d.version > 10.65) {
             this.used.deserialize(d);
         }
+        this.freeze_display = false;
     }
     SetDisplayCallback(callback) {
         this.DisplayCallback = callback;
@@ -7129,7 +7134,7 @@ class Aircraft {
                     warning: "Rumble requires a minimum structure of Rumble*10 to fly."
                 });
             }
-            if (this.DisplayCallback)
+            if (this.DisplayCallback && !this.freeze_display)
                 this.DisplayCallback();
             if (this.use_storage)
                 window.localStorage.aircraft = JSON.stringify(this);
@@ -10663,7 +10668,6 @@ class Aircraft_HTML extends Display {
         var tbl2 = document.getElementById("tbl_derived");
         this.InitDerived(tbl2);
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
-        this.UpdateDisplay();
         var save_button = document.getElementById("acft_save");
         save_button.onclick = () => {
             download(JSON.stringify(this.acft.toJSON()), this.acft.name + "_" + this.acft.GetVersion() + ".json", "json");
@@ -10760,7 +10764,7 @@ class Aircraft_HTML extends Display {
             }
         };
         var reset_button = document.getElementById("acft_reset");
-        reset_button.onclick = () => { aircraft_model.Reset(); };
+        reset_button.onclick = () => { aircraft_model.Reset(); aircraft_model.CalculateStats(); };
     }
     UpdateCard() {
         var stats = this.acft.GetStats();
@@ -11981,7 +11985,6 @@ const init = () => {
                         var arr = _stringToArrayBuffer(str);
                         var des = new Deserialize(arr);
                         aircraft_model.deserialize(des);
-                        aircraft_model.CalculateStats();
                         loaded = true;
                     }
                     catch (e) {
@@ -11994,7 +11997,6 @@ const init = () => {
                     console.log("Used Saved Data");
                     try {
                         loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
-                        aircraft_model.CalculateStats();
                     }
                     catch (_a) {
                         console.log("Saved Data Failed.");

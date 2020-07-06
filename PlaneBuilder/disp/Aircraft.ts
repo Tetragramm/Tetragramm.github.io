@@ -146,6 +146,7 @@ class Aircraft_HTML extends Display {
 
     constructor(js: JSON, aircraft: Aircraft) {
         super();
+
         this.acft = aircraft;
         this.era = new Era_HTML(this.acft.GetEra());
         this.cockpits = new Cockpits_HTML(aircraft.GetCockpits());
@@ -174,7 +175,6 @@ class Aircraft_HTML extends Display {
         this.InitDerived(tbl2);
 
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
-        this.UpdateDisplay();
 
         var save_button = document.getElementById("acft_save") as HTMLButtonElement;
         save_button.onclick = () => {
@@ -274,7 +274,7 @@ class Aircraft_HTML extends Display {
         };
 
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
-        reset_button.onclick = () => { aircraft_model.Reset(); };
+        reset_button.onclick = () => { aircraft_model.Reset(); aircraft_model.CalculateStats(); };
     }
 
     private UpdateCard() {
@@ -800,6 +800,7 @@ class Aircraft_HTML extends Display {
     }
 
     private UpdateStats() {
+
         var stats = this.acft.GetStats();
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
         BlinkIfChanged(this.d_drag, stats.drag.toString());

@@ -26,6 +26,7 @@ class Aircraft {
     public name: string;
     private stats: Stats;
     private updated_stats: boolean;
+    private freeze_display: boolean;
     private DisplayCallback: () => void;
     private era: Era;
     private cockpits: Cockpits;
@@ -98,6 +99,8 @@ class Aircraft {
         this.frames.SetTailType(1);
 
         this.use_storage = storage;
+        this.updated_stats = false;
+        this.freeze_display = false;
         this.Reset();
     }
 
@@ -127,6 +130,7 @@ class Aircraft {
     }
 
     public fromJSON(js: JSON, disp: boolean = true) {
+        this.freeze_display = true;
         if (disp) {
             console.log(js);
             console.log(js["version"]);
@@ -153,7 +157,7 @@ class Aircraft {
         if (json_version > 10.65) {
             this.used.fromJSON(js["used"], json_version);
         }
-        this.CalculateStats();
+        this.freeze_display = false;
         return true;
     }
 
@@ -181,6 +185,7 @@ class Aircraft {
     }
 
     public deserialize(d: Deserialize) {
+        this.freeze_display = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);
         this.name = d.GetString();
@@ -204,6 +209,7 @@ class Aircraft {
         if (d.version > 10.65) {
             this.used.deserialize(d);
         }
+        this.freeze_display = false;
     }
 
     public SetDisplayCallback(callback: () => void) {
@@ -324,7 +330,7 @@ class Aircraft {
                 });
             }
 
-            if (this.DisplayCallback)
+            if (this.DisplayCallback && !this.freeze_display)
                 this.DisplayCallback();
 
             if (this.use_storage)

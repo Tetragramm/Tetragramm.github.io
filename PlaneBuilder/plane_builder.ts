@@ -54,7 +54,6 @@ const init = () => {
                         var arr = _stringToArrayBuffer(str);
                         var des = new Deserialize(arr);
                         aircraft_model.deserialize(des);
-                        aircraft_model.CalculateStats();
                         loaded = true;
                     } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); aircraft_model.Reset(); }
                 }
@@ -62,7 +61,6 @@ const init = () => {
                     console.log("Used Saved Data");
                     try {
                         loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
-                        aircraft_model.CalculateStats();
                     } catch { console.log("Saved Data Failed."); aircraft_model.Reset(); }
                 }
 
