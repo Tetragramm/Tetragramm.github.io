@@ -281,7 +281,11 @@ class Cards {
         for (let r = 0; r < this.acft_data.armour.length; ++r) {
             let AP = r + 1;
             if (this.acft_data.armour[r] > 0) {
-                str += this.acft_data.armour[r].toString() + "x AP " + AP.toString() + "  ";
+                if (str != "")
+                    str += ", ";
+                else
+                    str += "Armour ";
+                str += AP.toString() + "/+" + (11 - this.acft_data.armour[r]).toString();
             }
         }
         context.fillText(str, 335, 558, 375);

@@ -53,11 +53,11 @@ class CargoAndPassengers extends Part {
         var stats = new Stats();
         stats = stats.Add(this.cargo_list[this.cargo_sel].stats);
 
-        stats.wetmass += stats.reqsections * 3;
+        stats.bomb_mass += stats.reqsections * 3;
 
         //Because it is load, it rounds up to the nearest 5 mass.
-        if ((stats.wetmass % 5) > 0)
-            stats.wetmass += 5 - (stats.wetmass % 5);
+        if ((stats.bomb_mass % 5) > 0)
+            stats.bomb_mass += 5 - (stats.bomb_mass % 5);
 
         return stats;
     }

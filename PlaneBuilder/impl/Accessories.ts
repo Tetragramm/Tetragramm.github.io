@@ -146,7 +146,12 @@ class Accessories extends Part {
         var arr = [];
         var vital_adj = Math.max(0, Math.floor((this.vital_parts - 8) / 2));
         for (let i = 0; i < this.armour_coverage.length; i++) {
-            arr.push(Math.max(0, this.armour_coverage[i] - vital_adj));
+            arr.push(Math.max(0, this.armour_coverage[i]));
+        }
+        var sum = 0;
+        for (let r = this.armour_coverage.length - 1; r >= 0; r--) {
+            sum += arr[r];
+            arr[r] = sum - vital_adj;
         }
         return arr;
     }
@@ -339,7 +344,7 @@ class Accessories extends Part {
             if (eff_armour[i] > 0) {
                 if (armour_str != "")
                     armour_str += ", ";
-                armour_str += eff_armour[i].toString() + " x AP" + AP.toString();
+                armour_str += AP.toString() + "/+" + (11 - eff_armour[i]).toString();
             }
         }
         if (armour_str != "") {

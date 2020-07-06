@@ -30,10 +30,7 @@
 							<th class="btn_th">
 								<label class="lbl_action" for="acft_load">Load</label>
 							</th>
-							<th class="btn_th">
-								<label class="lbl_action" for="acft_save_text">Copy As Text</label>
-							</th>
-							<th class="btn_th">
+							<th class="btn_th" hidden>
 								<label class="lbl_action" for="acft_load_text2">Load Text</label> <input type="text"
 									id="acft_load_text2" class="skinny" />
 							</th>
@@ -44,7 +41,7 @@
 								<label class="lbl_action" for="acft_save_dash">Save Dashboard</label>
 							</th>
 							<th class="btn_th">
-								<label class="lbl_action" for="acft_reset">Reset</label>
+								<label class="lbl_action" for="acft_reset">Default Aircraft</label>
 							</th>
 						</tr>
 					</table>
@@ -384,8 +381,6 @@
 					<span>(<a href="./Rules/Rules.htm#_x2j3wmcf82xy"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
-				<label class="lbl_action" for="stats_copy"><u>Copy Stats As Text</u></label><button hidden="true"
-					id="stats_copy"></button>
 				<table id="tbl_derived">
 				</table>
 			</div>
@@ -403,11 +398,7 @@
 						<label class="lbl_action" for="acft_load">Load</label> <input hidden="true" type="file"
 							id="acft_load" />
 					</th>
-					<th class="btn_th">
-						<label class="lbl_action" for="acft_save_text">Copy As Text</label><button hidden="true"
-							id="acft_save_text">Save</button>
-					</th>
-					<th class="btn_th">
+					<th class="btn_th" hidden>
 						<label class="lbl_action" for="acft_load_text">Load Text</label> <input type="text"
 							id="acft_load_text" class="skinny" />
 					</th>
@@ -420,8 +411,8 @@
 							id="acft_save_dash">Save</button>
 					</th>
 					<th class="btn_th">
-						<label class="lbl_action" for="acft_reset">Reset</label><button hidden="true"
-							id="acft_reset">Reset</button>
+						<label class="lbl_action" for="acft_reset">Default Aircraft</label><button hidden="true"
+							id="acft_reset">Default Aircraft</button>
 					</th>
 				</tr>
 			</table>

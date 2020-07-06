@@ -141,8 +141,6 @@ class Aircraft_HTML extends Display {
     private warning_head: HTMLTableHeaderCellElement;
     private warning_cell: HTMLTableCellElement;
 
-    private copy_text: string;
-
     private cards: Cards;
 
 
@@ -209,12 +207,6 @@ class Aircraft_HTML extends Display {
             reader.readAsText(file);
             load_button.value = "";
         };
-
-        var copy_button = document.getElementById("stats_copy") as HTMLButtonElement;
-        copy_button.onclick = () => { copyStringToClipboard(this.copy_text); };
-
-        var save_text_button = document.getElementById("acft_save_text") as HTMLButtonElement;
-        save_text_button.onclick = () => { copyStringToClipboard(JSON.stringify(this.acft.toJSON())); };
 
         var load_text_area = document.getElementById("acft_load_text") as HTMLInputElement;
         load_text_area.onchange = () => {
@@ -836,53 +828,30 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.name_inp.value = this.acft.name;
-        this.copy_text = this.acft.name + "\n";
         this.version_cell.innerText = this.acft.GetVersion();
-        this.copy_text += "Version " + this.acft.GetVersion() + "\n";
         this.cost_cell.innerText = stats.cost.toString() + "þ ";
-        this.copy_text += "Cost " + stats.cost.toString() + "þ\n";
         if (this.acft.GetUsed().GetEnabled()) {
             this.cost_cell.innerText += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
-            this.copy_text += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
         }
         this.upkeep_cell.innerText = stats.upkeep.toString() + "þ";
-        this.copy_text += "Upkeep " + stats.upkeep.toString() + "þ\n";
-        this.copy_text += "\n";
-        this.copy_text += "Mass\t\t\tTop Speed\tStall Speed\tHandling\tBoost\n";
         //Empty
         this.ts_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
         this.ss_empty.innerText = derived.StallSpeedEmpty.toString();
         this.hand_empty.innerText = derived.HandlingEmpty.toString();
         this.boost_empty.innerText = derived.BoostEmpty.toString();
         this.roc_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
-        this.copy_text += "Empty Mass\t\t"
-            + this.ts_empty.innerText + "\t\t"
-            + this.ss_empty.innerText + "\t\t"
-            + this.hand_empty.innerText + "\t\t"
-            + this.boost_empty.innerText + "\n";
         //Half
         this.ts_half.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
         this.ss_half.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
         this.hand_half.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
         this.boost_half.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
         this.roc_half.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
-        this.copy_text += "Half Mass\t\t"
-            + this.ts_half.innerText + "\t\t"
-            + this.ss_half.innerText + "\t\t"
-            + this.hand_half.innerText + "\t\t"
-            + this.boost_half.innerText + "\n";
         //Full
         this.ts_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
         this.ss_full.innerText = derived.StallSpeedFull.toString();
         this.hand_full.innerText = derived.HandlingFull.toString();
         this.boost_full.innerText = derived.BoostFull.toString();
         this.roc_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
-        this.copy_text += "Full Mass\t\t"
-            + this.ts_full.innerText + "\t\t"
-            + this.ss_full.innerText + "\t\t"
-            + this.hand_full.innerText + "\t\t"
-            + this.boost_full.innerText + "\n";
-        this.copy_text += "\n";
 
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
@@ -895,23 +864,12 @@ class Aircraft_HTML extends Display {
             this.hand_halfwB.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
             this.boost_halfwB.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
             this.roc_halfwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
-            this.copy_text += "Half Mass with Bombs\t"
-                + this.ts_halfwB.innerText + "\t\t"
-                + this.ss_halfwB.innerText + "\t\t"
-                + this.hand_halfwB.innerText + "\t\t"
-                + this.boost_halfwB.innerText + "\n";
             //Full
             this.ts_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
             this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
             this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
             this.roc_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
-            this.copy_text += "Full Mass with Bombs\t"
-                + this.ts_fullwB.innerText + "\t\t"
-                + this.ss_fullwB.innerText + "\t\t"
-                + this.hand_fullwB.innerText + "\t\t"
-                + this.boost_fullwB.innerText + "\n";
-            this.copy_text += "\n";
 
         } else {
             this.bomb_row1.hidden = true;
@@ -927,12 +885,6 @@ class Aircraft_HTML extends Display {
             this.flammable_cell.innerText = "Yes";
         else
             this.flammable_cell.innerText = "No";
-        this.copy_text += "Propulsion\n\t"
-            + "Dropoff\t" + this.dropoff_cell.innerText + "\n\t"
-            + "Overspeed\t" + this.overspeed_cell.innerText + "\n\t"
-            + "Fuel Uses\t" + this.maxfuel_cell.innerText + "\n\t"
-            + "Flight Ceiling\t" + this.maxalt_cell.innerText + "\n";
-        this.copy_text += "\n";
 
         this.stability_cell.innerText = derived.Stabiilty.toString();
         this.eloss_cell.innerText = derived.EnergyLoss.toString();
@@ -940,25 +892,11 @@ class Aircraft_HTML extends Display {
         this.landing_cell.innerText = this.acft.GetGearName();
         this.maxalt_cell.innerText = this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString();
 
-        this.copy_text += "Aerodynamics\n\t"
-            + "Stability\t" + this.stability_cell.innerText + "\n\t"
-            + "Energy Loss\t" + this.eloss_cell.innerText + "\n\t"
-            + "Turn Bleed\t" + this.turnbleed_cell.innerText + "\n\t"
-            + "Landing Gear\t" + this.landing_cell.innerText + "\n"
-        this.copy_text += "\n";
-
         this.reliability_cell.innerText = this.acft.GetReliabilityList().toString();
         this.toughness_cell.innerText = derived.Toughness.toString();
         this.mxstrain_cell.innerText = derived.MaxStrain.toString();
         this.escape_cell.innerText = this.acft.GetEscapeList().toString();
         this.crashsafety_cell.innerText = this.acft.GetCrashList().toString();
-        this.copy_text += "Survivability\n\t"
-            + "Reliability\t" + this.reliability_cell.innerText + "\n\t"
-            + "Toughness\t" + this.toughness_cell.innerText + "\n\t"
-            + "Max Strain\t" + this.mxstrain_cell.innerText + "\n\t"
-            + "Escape\t" + this.escape_cell.innerText + "\n\t"
-            + "Crash Safety\t" + this.crashsafety_cell.innerText + "\n";
-        this.copy_text += "\n";
 
         this.crew_cell.innerText = aircraft_model.GetCockpits().GetNumberOfCockpits().toString() + "/" + (aircraft_model.GetPassengers().GetSeats() + aircraft_model.GetPassengers().GetBeds()).toString();
         this.flightstress_cell.innerText = this.acft.GetStressList().toString();
@@ -966,27 +904,13 @@ class Aircraft_HTML extends Display {
         this.attack_cell.innerText = this.acft.GetAttackList().toString();
         this.communications_cell.innerText = this.acft.GetCommunicationName();
         this.electric_cell.innerText = stats.charge.toString(); //TODO Windmill
-        this.copy_text += "Ergonomics\n\t"
-            + "Flight Stress\t" + this.flightstress_cell.innerText + "\n\t"
-            + "Visibility\t" + this.visibility_cell.innerText + "\n\t"
-            + "Attack Modifier\t" + this.attack_cell.innerText + "\n\t"
-            + "Communications\t" + this.communications_cell.innerText + "\n\t"
-            + "Electrics\t" + this.electric_cell.innerText + "\n";
-        this.copy_text += "\n";
 
         var vital = "";
-        this.copy_text += "Vital Components\n\t";
         var vlist = this.acft.VitalComponentList();
         for (let v of vlist) {
             vital += v + "<br/>";
-            this.copy_text += v + "\n\t";
         }
         this.vital_components.innerHTML = vital;
-        this.copy_text += "\n";
-
-        if (aircraft_model.GetWeapons().GetWeaponSets().length > 0) {
-            this.copy_text += "Weapons\n\t";
-        }
 
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
@@ -1010,7 +934,6 @@ class Aircraft_HTML extends Display {
             }
             internal -= int_bomb;
             this.weapon_cell.innerHTML += weaphtml + "<br/>";
-            this.copy_text += weaphtml + "\n\t";
         }
         if (rockets > 0) {
             var weaphtml = "";
@@ -1021,7 +944,6 @@ class Aircraft_HTML extends Display {
             if (ext_rock > 0)
                 weaphtml += (ext_rock.toString() + " Rocket Mass Externally. ");
             this.weapon_cell.innerHTML += weaphtml + "<br/>";
-            this.copy_text += weaphtml + "\n\t";
         }
 
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
@@ -1070,19 +992,13 @@ class Aircraft_HTML extends Display {
                 }
                 weaphtml += " ]";
             }
-            this.copy_text += weaphtml + "\n\t";
             weaphtml += "<br\>";
             this.weapon_cell.innerHTML += weaphtml;
         }
-        this.copy_text += "\n";
 
-        if (stats.warnings.length > 0) {
-            this.copy_text += "Special Rules\n\t";
-        }
         var warnhtml = "";
         for (let w of stats.warnings) {
             warnhtml += w.source + ":  " + w.warning + "<br/>";
-            this.copy_text += w.source + ":  " + w.warning + "\n\t";
         }
         this.warning_cell.innerHTML = warnhtml;
     }
