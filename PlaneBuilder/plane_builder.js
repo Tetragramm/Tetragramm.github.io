@@ -7489,7 +7489,7 @@ function CreateFlexSection(elem) {
 }
 function CreateTH(row, content) {
     var th = document.createElement("TH");
-    th.innerHTML = content;
+    th.textContent = content;
     row.appendChild(th);
     return th;
 }
@@ -7498,7 +7498,9 @@ function CreateInput(txt, elem, table, br = true) {
     var txtSpan = document.createElement("LABEL");
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     elem.setAttribute("type", "number");
     elem.min = "0";
     elem.step = "1";
@@ -7513,7 +7515,9 @@ function FlexInput(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "number");
     inp.min = "0";
     inp.step = "1";
@@ -7527,7 +7531,9 @@ function FlexText(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "text");
     inp.value = "Default";
     lbl.classList.add("flex-item");
@@ -7539,7 +7545,9 @@ function FlexDisplay(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
@@ -7549,23 +7557,22 @@ function FlexSelect(txt, sel, fs) {
     var lbl = document.createElement("LABEL");
     sel.id = GenerateID();
     lbl.htmlFor = sel.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     lbl.classList.add("flex-item");
     sel.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     fs.div2.appendChild(sel);
-}
-function CreateSpace(elem) {
-    var span = document.createElement("SPAN");
-    span.innerHTML = "&nbsp;";
-    elem.appendChild(span);
 }
 function CreateCheckbox(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
     var txtSpan = document.createElement("LABEL");
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     elem.setAttribute("type", "checkbox");
     span.appendChild(txtSpan);
     span.appendChild(elem);
@@ -7578,7 +7585,9 @@ function CreateSelect(txt, elem, table, br = true) {
     var txtSpan = document.createElement("LABEL");
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     span.appendChild(txtSpan);
     span.appendChild(elem);
     table.appendChild(span);
@@ -7591,7 +7600,9 @@ function CreateButton(txt, elem, table, br = true) {
     elem.hidden = true;
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "<b>&nbsp;" + txt + "&nbsp;&nbsp;</b>";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     txtSpan.classList.add("lbl_action");
     txtSpan.classList.add("btn_th");
     span.appendChild(txtSpan);
@@ -7606,7 +7617,9 @@ function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "checkbox");
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
@@ -7615,17 +7628,19 @@ function FlexCheckbox(txt, inp, fs) {
 }
 function FlexLabel(txt, div1) {
     var lbl = document.createElement("LABEL");
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     lbl.classList.add("flex-item");
     div1.appendChild(lbl);
 }
 function FlexSpace(fs) {
     var lbl = document.createElement("LABEL");
-    lbl.innerHTML = "&nbsp;";
+    lbl.textContent = " ";
     lbl.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     var lbl2 = document.createElement("LABEL");
-    lbl2.innerHTML = "&nbsp;";
+    lbl2.textContent = " ";
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
 }
@@ -7635,10 +7650,10 @@ function Blink(elem) {
     elem.classList.toggle("changed");
 }
 function BlinkIfChanged(elem, str) {
-    if (elem.innerText != str) {
+    if (elem.textContent != str) {
         Blink(elem);
     }
-    elem.innerText = str;
+    elem.textContent = str;
 }
 function _arrayBufferToString(buffer) {
     var binary = '';
@@ -8005,7 +8020,7 @@ class Engine_HTML extends Display {
     }
     InitMountSelect(mount_cell) {
         var txtSpan = document.createElement("SPAN");
-        txtSpan.innerHTML = "Engine Mounting Location";
+        txtSpan.textContent = "Engine Mounting Location";
         mount_cell.appendChild(txtSpan);
         mount_cell.appendChild(document.createElement("BR"));
         this.mount_select = document.createElement("SELECT");
@@ -8123,14 +8138,14 @@ class Engine_HTML extends Display {
         while (this.cool_cell.children.length > 0)
             this.cool_cell.removeChild(this.cool_cell.children[0]);
         if (this.engine.IsRotary()) {
-            this.e_cool.innerText = "0";
+            this.e_cool.textContent = "0";
             var txtSpan = document.createElement("SPAN");
-            txtSpan.innerHTML = "Rotary Engines use Oil Tanks.<br/>+1 Mass, Oil Tank is a Vital Component.";
+            txtSpan.innerText = "Rotary Engines use Oil Tanks. \n +1 Mass, Oil Tank is a Vital Component.";
             this.cool_cell.appendChild(txtSpan);
         }
-        else if (this.e_cool.innerText == "0") {
+        else if (this.e_cool.textContent == "0") {
             var txtSpan = document.createElement("SPAN");
-            txtSpan.innerHTML = "Air-Cooled Engine.<br/>";
+            txtSpan.textContent = "Air-Cooled Engine.";
             this.cool_cell.appendChild(txtSpan);
             var fs = CreateFlexSection(this.cool_cell);
             FlexCheckbox("Air Cooling Fan", this.intake_fan, fs);
@@ -8138,7 +8153,7 @@ class Engine_HTML extends Display {
         }
         else {
             var txtSpan = document.createElement("SPAN");
-            txtSpan.innerHTML = "    Select Radiator";
+            txtSpan.textContent = "    Select Radiator";
             if (!this.cool_select) {
                 this.cool_select = document.createElement("SELECT");
                 this.cool_select.required = true;
@@ -8149,7 +8164,7 @@ class Engine_HTML extends Display {
             }
             for (let i = 1; i < numrad + 1; i++) {
                 let opt = document.createElement("OPTION");
-                opt.innerText = "Radiator #" + i.toString();
+                opt.textContent = "Radiator #" + i.toString();
                 this.cool_select.add(opt);
             }
             this.cool_select.onchange = () => {
@@ -8160,7 +8175,7 @@ class Engine_HTML extends Display {
             this.cool_cell.appendChild(txtSpan);
             this.cool_cell.appendChild(document.createElement("BR"));
             var txtSpan2 = document.createElement("SPAN");
-            txtSpan2.innerHTML = "    Cooling Amount";
+            txtSpan2.textContent = "    Cooling Amount";
             this.cool_count.min = "0";
             this.cool_count.valueAsNumber = this.engine.GetCooling();
             this.cool_count.max = this.engine.GetMaxCooling().toString();
@@ -8217,18 +8232,18 @@ class Engine_HTML extends Display {
         var e_stats = this.engine.GetCurrentStats();
         var b = this.engine.GetMinIAF();
         var t = b + e_stats.altitude;
-        this.e_pwr.innerText = e_stats.stats.power.toString();
-        this.e_mass.innerText = e_stats.stats.mass.toString();
-        this.e_drag.innerText = e_stats.stats.drag.toString();
-        this.e_rely.innerText = e_stats.stats.reliability.toString();
-        this.e_cool.innerText = e_stats.stats.cooling.toString();
-        this.e_over.innerText = e_stats.overspeed.toString();
-        this.e_fuel.innerText = e_stats.stats.fuelconsumption.toString();
-        this.e_alti.innerText = b.toString() + "-" + t.toString();
+        this.e_pwr.textContent = e_stats.stats.power.toString();
+        this.e_mass.textContent = e_stats.stats.mass.toString();
+        this.e_drag.textContent = e_stats.stats.drag.toString();
+        this.e_rely.textContent = e_stats.stats.reliability.toString();
+        this.e_cool.textContent = e_stats.stats.cooling.toString();
+        this.e_over.textContent = e_stats.overspeed.toString();
+        this.e_fuel.textContent = e_stats.stats.fuelconsumption.toString();
+        this.e_alti.textContent = b.toString() + "-" + t.toString();
         ;
-        this.e_torq.innerText = e_stats.torque.toString();
-        this.e_rumb.innerText = e_stats.rumble.toString();
-        this.e_cost.innerText = e_stats.stats.cost.toString();
+        this.e_torq.textContent = e_stats.torque.toString();
+        this.e_rumb.textContent = e_stats.rumble.toString();
+        this.e_cost.textContent = e_stats.stats.cost.toString();
         this.InitCoolingSelect();
         this.intake_fan.checked = this.engine.GetIntakeFan();
         if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {
@@ -8812,11 +8827,11 @@ class Frames_HTML extends Display {
         }
         fsec.fsel.selectedIndex = sec.frame;
         if (sec.internal_bracing) {
-            fsec.ssel.innerText = "N/A";
+            fsec.ssel.textContent = "N/A";
         }
         else {
             var skin_list = this.frames.GetSkinList();
-            fsec.ssel.innerText = skin_list[this.frames.GetSkin()].name;
+            fsec.ssel.textContent = skin_list[this.frames.GetSkin()].name;
         }
         fsec.geo.checked = sec.geodesic;
         fsec.geo.disabled = !this.frames.PossibleGeodesic(i);
@@ -8888,7 +8903,7 @@ class Frames_HTML extends Display {
         var idx = this.frames.GetSkin();
         if (this.frames.GetUseFarman())
             idx = 0;
-        tsec.ssel.innerText = skin_list[idx].name;
+        tsec.ssel.textContent = skin_list[idx].name;
         tsec.geo.checked = sec.geodesic;
         tsec.geo.disabled = !this.frames.PossibleTailGeodesic(i);
         tsec.mono.checked = sec.monocoque;
@@ -9032,7 +9047,6 @@ class Wings_HTML extends Display {
             br: document.createElement("BR")
         };
         wing.span.appendChild(wing.deck);
-        CreateSpace(wing.span);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
         none_opt.textContent = "None";
@@ -9044,7 +9058,6 @@ class Wings_HTML extends Display {
             wing.deck.append(opt);
         }
         wing.span.appendChild(wing.skin);
-        CreateSpace(wing.span);
         var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION");
@@ -9127,7 +9140,6 @@ class Wings_HTML extends Display {
             br: document.createElement("BR")
         };
         wing.span.appendChild(wing.deck);
-        CreateSpace(wing.span);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
         none_opt.textContent = "None";
@@ -9139,7 +9151,6 @@ class Wings_HTML extends Display {
             wing.deck.append(opt);
         }
         wing.span.appendChild(wing.skin);
-        CreateSpace(wing.span);
         var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION");
@@ -9992,7 +10003,7 @@ class Optimization_HTML extends Display {
         ncell.appendChild(cbxs[0]);
         ncell.appendChild(cbxs[1]);
         ncell.appendChild(cbxs[2]);
-        ecell.innerHTML = txt;
+        ecell.textContent = txt;
         pcell.appendChild(cbxs[3]);
         pcell.appendChild(cbxs[4]);
         pcell.appendChild(cbxs[5]);
@@ -11285,47 +11296,47 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.name_inp.value = this.acft.name;
-        this.version_cell.innerText = this.acft.GetVersion();
-        this.cost_cell.innerText = stats.cost.toString() + "þ ";
+        this.version_cell.textContent = this.acft.GetVersion();
+        this.cost_cell.textContent = stats.cost.toString() + "þ ";
         if (this.acft.GetUsed().GetEnabled()) {
-            this.cost_cell.innerText += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
+            this.cost_cell.textContent += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
         }
-        this.upkeep_cell.innerText = stats.upkeep.toString() + "þ";
+        this.upkeep_cell.textContent = stats.upkeep.toString() + "þ";
         //Empty
-        this.ts_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
-        this.ss_empty.innerText = derived.StallSpeedEmpty.toString();
-        this.hand_empty.innerText = derived.HandlingEmpty.toString();
-        this.boost_empty.innerText = derived.BoostEmpty.toString();
-        this.roc_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
+        this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
+        this.hand_empty.textContent = derived.HandlingEmpty.toString();
+        this.boost_empty.textContent = derived.BoostEmpty.toString();
+        this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         //Half
-        this.ts_half.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
-        this.ss_half.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
-        this.hand_half.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
-        this.boost_half.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
-        this.roc_half.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_half.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
+        this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
+        this.hand_half.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
+        this.boost_half.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
+        this.roc_half.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         //Full
-        this.ts_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
-        this.ss_full.innerText = derived.StallSpeedFull.toString();
-        this.hand_full.innerText = derived.HandlingFull.toString();
-        this.boost_full.innerText = derived.BoostFull.toString();
-        this.roc_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
+        this.ss_full.textContent = derived.StallSpeedFull.toString();
+        this.hand_full.textContent = derived.HandlingFull.toString();
+        this.boost_full.textContent = derived.BoostFull.toString();
+        this.roc_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
             this.bomb_row2.hidden = false;
             this.bomb_row2.appendChild(this.vital_components);
             this.vital_components.rowSpan = 5;
             //Half
-            this.ts_halfwB.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
-            this.ss_halfwB.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
-            this.hand_halfwB.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
-            this.boost_halfwB.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
-            this.roc_halfwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.ts_halfwB.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
+            this.ss_halfwB.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
+            this.hand_halfwB.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
+            this.boost_halfwB.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
+            this.roc_halfwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
             //Full
-            this.ts_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
-            this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
-            this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
-            this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
-            this.roc_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.ts_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
+            this.ss_fullwB.textContent = derived.StallSpeedFullwBombs.toString();
+            this.hand_fullwB.textContent = derived.HandlingFullwBombs.toString();
+            this.boost_fullwB.textContent = derived.BoostFullwBombs.toString();
+            this.roc_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
         }
         else {
             this.bomb_row1.hidden = true;
@@ -11333,29 +11344,29 @@ class Aircraft_HTML extends Display {
             this.full_row.appendChild(this.vital_components);
             this.vital_components.rowSpan = 3;
         }
-        this.dropoff_cell.innerText = derived.Dropoff.toString();
-        this.overspeed_cell.innerText = derived.Overspeed.toString();
-        this.maxfuel_cell.innerText = (Math.round(derived.FuelUses * 10) / 10).toString();
+        this.dropoff_cell.textContent = derived.Dropoff.toString();
+        this.overspeed_cell.textContent = derived.Overspeed.toString();
+        this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
         if (this.acft.GetIsFlammable())
-            this.flammable_cell.innerText = "Yes";
+            this.flammable_cell.textContent = "Yes";
         else
-            this.flammable_cell.innerText = "No";
-        this.stability_cell.innerText = derived.Stabiilty.toString();
-        this.eloss_cell.innerText = derived.EnergyLoss.toString();
-        this.turnbleed_cell.innerText = derived.TurnBleed.toString();
-        this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString();
-        this.reliability_cell.innerText = this.acft.GetReliabilityList().toString();
-        this.toughness_cell.innerText = derived.Toughness.toString();
-        this.mxstrain_cell.innerText = derived.MaxStrain.toString();
-        this.escape_cell.innerText = this.acft.GetEscapeList().toString();
-        this.crashsafety_cell.innerText = this.acft.GetCrashList().toString();
-        this.crew_cell.innerText = aircraft_model.GetCockpits().GetNumberOfCockpits().toString() + "/" + (aircraft_model.GetPassengers().GetSeats() + aircraft_model.GetPassengers().GetBeds()).toString();
-        this.flightstress_cell.innerText = this.acft.GetStressList().toString();
-        this.visibility_cell.innerText = this.acft.GetVisibilityList().toString();
-        this.attack_cell.innerText = this.acft.GetAttackList().toString();
-        this.communications_cell.innerText = this.acft.GetCommunicationName();
-        this.electric_cell.innerText = stats.charge.toString(); //TODO Windmill
+            this.flammable_cell.textContent = "No";
+        this.stability_cell.textContent = derived.Stabiilty.toString();
+        this.eloss_cell.textContent = derived.EnergyLoss.toString();
+        this.turnbleed_cell.textContent = derived.TurnBleed.toString();
+        this.landing_cell.textContent = this.acft.GetGearName();
+        this.maxalt_cell.textContent = this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString();
+        this.reliability_cell.textContent = this.acft.GetReliabilityList().toString();
+        this.toughness_cell.textContent = derived.Toughness.toString();
+        this.mxstrain_cell.textContent = derived.MaxStrain.toString();
+        this.escape_cell.textContent = this.acft.GetEscapeList().toString();
+        this.crashsafety_cell.textContent = this.acft.GetCrashList().toString();
+        this.crew_cell.textContent = aircraft_model.GetCockpits().GetNumberOfCockpits().toString() + "/" + (aircraft_model.GetPassengers().GetSeats() + aircraft_model.GetPassengers().GetBeds()).toString();
+        this.flightstress_cell.textContent = this.acft.GetStressList().toString();
+        this.visibility_cell.textContent = this.acft.GetVisibilityList().toString();
+        this.attack_cell.textContent = this.acft.GetAttackList().toString();
+        this.communications_cell.textContent = this.acft.GetCommunicationName();
+        this.electric_cell.textContent = stats.charge.toString(); //TODO Windmill
         var vital = "";
         var vlist = this.acft.VitalComponentList();
         for (let v of vlist) {
@@ -11364,14 +11375,11 @@ class Aircraft_HTML extends Display {
         this.vital_components.innerHTML = vital;
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
-        var alist = aircraft_model.GetWeapons().GetActionList();
-        var plist = aircraft_model.GetWeapons().GetProjectileList();
-        this.weapon_cell.innerHTML = "";
         var bombs = aircraft_model.GetMunitions().GetBombCount();
         var rockets = aircraft_model.GetMunitions().GetRocketCount();
         var internal = aircraft_model.GetMunitions().GetInternalBombCount();
+        var weaphtml = "";
         if (bombs > 0) {
-            var weaphtml = "";
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0)
@@ -11383,17 +11391,16 @@ class Aircraft_HTML extends Display {
                 weaphtml += ("Largest internal bomb is " + mib.toString() + " Mass.");
             }
             internal -= int_bomb;
-            this.weapon_cell.innerHTML += weaphtml + "<br/>";
+            weaphtml += "<br/>";
         }
         if (rockets > 0) {
-            var weaphtml = "";
             var int_rock = Math.min(rockets, internal);
             var ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0)
                 weaphtml += (int_rock.toString() + " Rocket Mass Internally. ");
             if (ext_rock > 0)
                 weaphtml += (ext_rock.toString() + " Rocket Mass Externally. ");
-            this.weapon_cell.innerHTML += weaphtml + "<br/>";
+            weaphtml += "<br/>";
         }
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
             var ds = w.GetDirection();
@@ -11402,7 +11409,6 @@ class Aircraft_HTML extends Display {
                 if (d)
                     dircount++;
             }
-            var weaphtml = "";
             weaphtml += this.WeaponName(w);
             if (w.IsPlural()) {
                 weaphtml += "s";
@@ -11442,8 +11448,8 @@ class Aircraft_HTML extends Display {
                 weaphtml += " ]";
             }
             weaphtml += "<br\>";
-            this.weapon_cell.innerHTML += weaphtml;
         }
+        this.weapon_cell.innerHTML = weaphtml;
         var warnhtml = "";
         for (let w of stats.warnings) {
             warnhtml += w.source + ":  " + w.warning + "<br/>";
@@ -12098,43 +12104,43 @@ class Used_HTML extends Display {
         this.leaky = document.createElement("INPUT");
         this.sluggish = document.createElement("INPUT");
         var row = tbl.insertRow();
-        row.insertCell().innerText = "Burnt Out";
-        row.insertCell().innerText = "Engines are at -1 Reliability";
+        row.insertCell().textContent = "Burnt Out";
+        row.insertCell().textContent = "Engines are at -1 Reliability";
         var cell = row.insertCell();
         CreateInput("", this.burnt_out, cell, false);
         row = tbl.insertRow();
-        row.insertCell().innerText = "Ragged";
-        row.insertCell().innerText = "Reduce your Max Speed by 10%";
+        row.insertCell().textContent = "Ragged";
+        row.insertCell().textContent = "Reduce your Max Speed by 10%";
         cell = row.insertCell();
         CreateInput("", this.ragged, cell, false);
         row = tbl.insertRow();
-        row.insertCell().innerText = "Hefty";
-        row.insertCell().innerText = "Increase your Stall Speeds by 20%";
+        row.insertCell().textContent = "Hefty";
+        row.insertCell().textContent = "Increase your Stall Speeds by 20%";
         cell = row.insertCell();
         CreateInput("", this.hefty, cell, false);
         row = tbl.insertRow();
-        row.insertCell().innerText = "Sticky Guns";
-        row.insertCell().innerText = "Increase the chance of guns jamming by 1";
+        row.insertCell().textContent = "Sticky Guns";
+        row.insertCell().textContent = "Increase the chance of guns jamming by 1";
         cell = row.insertCell();
         CreateInput("", this.sticky_guns, cell, false);
         row = tbl.insertRow();
-        row.insertCell().innerText = "Weak";
-        row.insertCell().innerText = "Cut the plane's Toughness in half";
+        row.insertCell().textContent = "Weak";
+        row.insertCell().textContent = "Cut the plane's Toughness in half";
         cell = row.insertCell();
         CreateInput("", this.weak, cell, false);
         row = tbl.insertRow();
-        row.insertCell().innerText = "Fragile";
-        row.insertCell().innerText = "Reduce your Max Strain by 20%";
+        row.insertCell().textContent = "Fragile";
+        row.insertCell().textContent = "Reduce your Max Strain by 20%";
         cell = row.insertCell();
         CreateInput("", this.fragile, cell, false);
         row = tbl.insertRow();
-        row.insertCell().innerText = "Leaky";
-        row.insertCell().innerText = "Reduce your Fuel by 20%";
+        row.insertCell().textContent = "Leaky";
+        row.insertCell().textContent = "Reduce your Fuel by 20%";
         cell = row.insertCell();
         CreateInput("", this.leaky, cell, false);
         row = tbl.insertRow();
-        row.insertCell().innerText = "Sluggish";
-        row.insertCell().innerText = "Reduce your Handling by 5%";
+        row.insertCell().textContent = "Sluggish";
+        row.insertCell().textContent = "Reduce your Handling by 5%";
         cell = row.insertCell();
         CreateInput("", this.sluggish, cell, false);
         this.burnt_out.onchange = () => { this.used.burnt_out = this.burnt_out.valueAsNumber; this.used.TriggerCS(); };

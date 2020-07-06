@@ -36,50 +36,50 @@ class Used_HTML extends Display {
         this.sluggish = document.createElement("INPUT") as HTMLInputElement;
 
         var row = tbl.insertRow();
-        row.insertCell().innerText = "Burnt Out";
-        row.insertCell().innerText = "Engines are at -1 Reliability";
+        row.insertCell().textContent = "Burnt Out";
+        row.insertCell().textContent = "Engines are at -1 Reliability";
         var cell = row.insertCell();
         CreateInput("", this.burnt_out, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().innerText = "Ragged";
-        row.insertCell().innerText = "Reduce your Max Speed by 10%";
+        row.insertCell().textContent = "Ragged";
+        row.insertCell().textContent = "Reduce your Max Speed by 10%";
         cell = row.insertCell();
         CreateInput("", this.ragged, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().innerText = "Hefty";
-        row.insertCell().innerText = "Increase your Stall Speeds by 20%";
+        row.insertCell().textContent = "Hefty";
+        row.insertCell().textContent = "Increase your Stall Speeds by 20%";
         cell = row.insertCell();
         CreateInput("", this.hefty, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().innerText = "Sticky Guns";
-        row.insertCell().innerText = "Increase the chance of guns jamming by 1";
+        row.insertCell().textContent = "Sticky Guns";
+        row.insertCell().textContent = "Increase the chance of guns jamming by 1";
         cell = row.insertCell();
         CreateInput("", this.sticky_guns, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().innerText = "Weak";
-        row.insertCell().innerText = "Cut the plane's Toughness in half";
+        row.insertCell().textContent = "Weak";
+        row.insertCell().textContent = "Cut the plane's Toughness in half";
         cell = row.insertCell();
         CreateInput("", this.weak, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().innerText = "Fragile";
-        row.insertCell().innerText = "Reduce your Max Strain by 20%";
+        row.insertCell().textContent = "Fragile";
+        row.insertCell().textContent = "Reduce your Max Strain by 20%";
         cell = row.insertCell();
         CreateInput("", this.fragile, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().innerText = "Leaky";
-        row.insertCell().innerText = "Reduce your Fuel by 20%";
+        row.insertCell().textContent = "Leaky";
+        row.insertCell().textContent = "Reduce your Fuel by 20%";
         cell = row.insertCell();
         CreateInput("", this.leaky, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().innerText = "Sluggish";
-        row.insertCell().innerText = "Reduce your Handling by 5%";
+        row.insertCell().textContent = "Sluggish";
+        row.insertCell().textContent = "Reduce your Handling by 5%";
         cell = row.insertCell();
         CreateInput("", this.sluggish, cell, false);
 

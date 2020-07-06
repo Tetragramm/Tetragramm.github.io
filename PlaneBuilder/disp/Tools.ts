@@ -59,7 +59,7 @@ function CreateFlexSection(elem: HTMLElement): FlexSection {
 
 function CreateTH(row: HTMLElement, content: string) {
     var th = document.createElement("TH") as HTMLTableHeaderCellElement;
-    th.innerHTML = content;
+    th.textContent = content;
     row.appendChild(th);
     return th;
 }
@@ -69,7 +69,9 @@ function CreateInput(txt: string, elem: HTMLInputElement, table: HTMLElement, br
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     elem.setAttribute("type", "number");
     elem.min = "0";
     elem.step = "1";
@@ -85,7 +87,9 @@ function FlexInput(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "number");
     inp.min = "0";
     inp.step = "1";
@@ -101,7 +105,9 @@ function FlexText(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "text");
     inp.value = "Default";
 
@@ -115,7 +121,9 @@ function FlexDisplay(txt: string, inp: HTMLLabelElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
 
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
@@ -127,7 +135,9 @@ function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     sel.id = GenerateID();
     lbl.htmlFor = sel.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
 
     lbl.classList.add("flex-item");
     sel.classList.add("flex-item");
@@ -135,18 +145,14 @@ function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection) {
     fs.div2.appendChild(sel);
 }
 
-function CreateSpace(elem: HTMLElement) {
-    var span = document.createElement("SPAN") as HTMLSpanElement;
-    span.innerHTML = "&nbsp;";
-    elem.appendChild(span);
-}
-
 function CreateCheckbox(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
     var span = document.createElement("SPAN") as HTMLSpanElement;
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     elem.setAttribute("type", "checkbox");
     span.appendChild(txtSpan);
     span.appendChild(elem);
@@ -160,7 +166,9 @@ function CreateSelect(txt: string, elem: HTMLSelectElement, table: HTMLElement, 
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     span.appendChild(txtSpan);
     span.appendChild(elem);
     table.appendChild(span);
@@ -174,7 +182,9 @@ function CreateButton(txt: string, elem: HTMLButtonElement, table: HTMLElement, 
     elem.hidden = true;
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "<b>&nbsp;" + txt + "&nbsp;&nbsp;</b>";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     txtSpan.classList.add("lbl_action");
     txtSpan.classList.add("btn_th");
     span.appendChild(txtSpan);
@@ -191,7 +201,9 @@ function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "checkbox");
 
     lbl.classList.add("flex-item");
@@ -202,18 +214,20 @@ function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
 
 function FlexLabel(txt: string, div1: HTMLDivElement) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     lbl.classList.add("flex-item");
     div1.appendChild(lbl);
 }
 
 function FlexSpace(fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
-    lbl.innerHTML = "&nbsp;";
+    lbl.textContent = " ";
     lbl.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     var lbl2 = document.createElement("LABEL") as HTMLLabelElement;
-    lbl2.innerHTML = "&nbsp;";
+    lbl2.textContent = " ";
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
 }
@@ -225,10 +239,10 @@ function Blink(elem: HTMLElement) {
 }
 
 function BlinkIfChanged(elem: HTMLElement, str: string) {
-    if (elem.innerText != str) {
+    if (elem.textContent != str) {
         Blink(elem);
     }
-    elem.innerText = str;
+    elem.textContent = str;
 }
 
 function _arrayBufferToString(buffer: ArrayBuffer) {

@@ -180,7 +180,6 @@ class Wings_HTML extends Display {
             br: document.createElement("BR") as HTMLBRElement
         }
         wing.span.appendChild(wing.deck);
-        CreateSpace(wing.span);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION") as HTMLOptionElement;
         none_opt.textContent = "None";
@@ -193,7 +192,6 @@ class Wings_HTML extends Display {
         }
 
         wing.span.appendChild(wing.skin);
-        CreateSpace(wing.span);
         var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -289,7 +287,6 @@ class Wings_HTML extends Display {
             br: document.createElement("BR") as HTMLBRElement
         }
         wing.span.appendChild(wing.deck);
-        CreateSpace(wing.span);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION") as HTMLOptionElement;
         none_opt.textContent = "None";
@@ -302,7 +299,6 @@ class Wings_HTML extends Display {
         }
 
         wing.span.appendChild(wing.skin);
-        CreateSpace(wing.span);
         var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;

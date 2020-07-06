@@ -1446,7 +1446,7 @@ function CreateFlexSection(elem) {
 }
 function CreateTH(row, content) {
     var th = document.createElement("TH");
-    th.innerHTML = content;
+    th.textContent = content;
     row.appendChild(th);
     return th;
 }
@@ -1455,7 +1455,9 @@ function CreateInput(txt, elem, table, br = true) {
     var txtSpan = document.createElement("LABEL");
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     elem.setAttribute("type", "number");
     elem.min = "0";
     elem.step = "1";
@@ -1470,7 +1472,9 @@ function FlexInput(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "number");
     inp.min = "0";
     inp.step = "1";
@@ -1484,7 +1488,9 @@ function FlexText(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "text");
     inp.value = "Default";
     lbl.classList.add("flex-item");
@@ -1496,7 +1502,9 @@ function FlexDisplay(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
@@ -1506,23 +1514,22 @@ function FlexSelect(txt, sel, fs) {
     var lbl = document.createElement("LABEL");
     sel.id = GenerateID();
     lbl.htmlFor = sel.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     lbl.classList.add("flex-item");
     sel.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     fs.div2.appendChild(sel);
-}
-function CreateSpace(elem) {
-    var span = document.createElement("SPAN");
-    span.innerHTML = "&nbsp;";
-    elem.appendChild(span);
 }
 function CreateCheckbox(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
     var txtSpan = document.createElement("LABEL");
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     elem.setAttribute("type", "checkbox");
     span.appendChild(txtSpan);
     span.appendChild(elem);
@@ -1535,7 +1542,9 @@ function CreateSelect(txt, elem, table, br = true) {
     var txtSpan = document.createElement("LABEL");
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     span.appendChild(txtSpan);
     span.appendChild(elem);
     table.appendChild(span);
@@ -1548,7 +1557,9 @@ function CreateButton(txt, elem, table, br = true) {
     elem.hidden = true;
     elem.id = GenerateID();
     txtSpan.htmlFor = elem.id;
-    txtSpan.innerHTML = "<b>&nbsp;" + txt + "&nbsp;&nbsp;</b>";
+    txtSpan.style.marginLeft = "0.25em";
+    txtSpan.style.marginRight = "0.5em";
+    txtSpan.textContent = txt;
     txtSpan.classList.add("lbl_action");
     txtSpan.classList.add("btn_th");
     span.appendChild(txtSpan);
@@ -1563,7 +1574,9 @@ function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     inp.setAttribute("type", "checkbox");
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
@@ -1572,17 +1585,19 @@ function FlexCheckbox(txt, inp, fs) {
 }
 function FlexLabel(txt, div1) {
     var lbl = document.createElement("LABEL");
-    lbl.innerHTML = "&nbsp;" + txt + "&nbsp;&nbsp;";
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
     lbl.classList.add("flex-item");
     div1.appendChild(lbl);
 }
 function FlexSpace(fs) {
     var lbl = document.createElement("LABEL");
-    lbl.innerHTML = "&nbsp;";
+    lbl.textContent = " ";
     lbl.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     var lbl2 = document.createElement("LABEL");
-    lbl2.innerHTML = "&nbsp;";
+    lbl2.textContent = " ";
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
 }
@@ -1592,10 +1607,10 @@ function Blink(elem) {
     elem.classList.toggle("changed");
 }
 function BlinkIfChanged(elem, str) {
-    if (elem.innerText != str) {
+    if (elem.textContent != str) {
         Blink(elem);
     }
-    elem.innerText = str;
+    elem.textContent = str;
 }
 function _arrayBufferToString(buffer) {
     var binary = '';
@@ -2742,7 +2757,12 @@ class Accessories extends Part {
         var arr = [];
         var vital_adj = Math.max(0, Math.floor((this.vital_parts - 8) / 2));
         for (let i = 0; i < this.armour_coverage.length; i++) {
-            arr.push(Math.max(0, this.armour_coverage[i] - vital_adj));
+            arr.push(Math.max(0, this.armour_coverage[i]));
+        }
+        var sum = 0;
+        for (let r = this.armour_coverage.length - 1; r >= 0; r--) {
+            sum += arr[r];
+            arr[r] = sum - vital_adj;
         }
         return arr;
     }
@@ -2900,7 +2920,7 @@ class Accessories extends Part {
             if (eff_armour[i] > 0) {
                 if (armour_str != "")
                     armour_str += ", ";
-                armour_str += eff_armour[i].toString() + " x AP" + AP.toString();
+                armour_str += AP.toString() + "/+" + (11 - eff_armour[i]).toString();
             }
         }
         if (armour_str != "") {
@@ -3139,6 +3159,8 @@ class Cockpit extends Part {
         return this.bombsight;
     }
     SetBombsightQuality(num) {
+        if (num != num)
+            num = 0;
         if (num == this.bombsight - 1)
             num = this.bombsight - 3;
         if (num == this.bombsight + 1)
@@ -6627,6 +6649,7 @@ class Munitions extends Part {
     constructor() {
         super();
         this.bomb_count = 0;
+        this.rocket_count = 0;
         this.internal_bay_count = 0;
         this.internal_bay_1 = false;
         this.internal_bay_2 = false;
@@ -6634,6 +6657,7 @@ class Munitions extends Part {
     toJSON() {
         return {
             bomb_count: this.bomb_count,
+            rocket_count: this.rocket_count,
             bay_count: this.internal_bay_count,
             bay1: this.internal_bay_1,
             bay2: this.internal_bay_2,
@@ -6644,18 +6668,28 @@ class Munitions extends Part {
         this.internal_bay_count = js["bay_count"];
         this.internal_bay_1 = js["bay1"];
         this.internal_bay_2 = js["bay2"];
+        if (json_version > 10.75) {
+            this.rocket_count = js["rocket_count"];
+        }
     }
     serialize(s) {
         s.PushNum(this.bomb_count);
         s.PushNum(this.internal_bay_count);
         s.PushBool(this.internal_bay_1);
         s.PushBool(this.internal_bay_2);
+        s.PushNum(this.rocket_count);
     }
     deserialize(d) {
         this.bomb_count = d.GetNum();
         this.internal_bay_count = d.GetNum();
         this.internal_bay_1 = d.GetBool();
         this.internal_bay_2 = d.GetBool();
+        if (d.version > 10.75) {
+            this.rocket_count = d.GetNum();
+        }
+    }
+    GetRocketCount() {
+        return this.rocket_count;
     }
     GetBombCount() {
         return this.bomb_count;
@@ -6692,6 +6726,14 @@ class Munitions extends Part {
         }
         return sz;
     }
+    SetRocketCount(count) {
+        if (count != count || count < 0)
+            count = 0;
+        count = Math.floor(1.0e-6 + count);
+        this.rocket_count = count;
+        this.LimitMass(true);
+        this.CalculateStats();
+    }
     SetBombCount(count) {
         if (count != count || count < 0)
             count = 0;
@@ -6727,22 +6769,20 @@ class Munitions extends Part {
     }
     LimitMass(bomb) {
         var reduce = false;
-        while (this.bomb_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
+        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
             reduce = true;
-            this.bomb_count--;
+            if (this.rocket_count > 0) {
+                this.rocket_count--;
+            }
+            else {
+                this.bomb_count--;
+            }
         }
         return reduce;
     }
     GetExternalMass() {
-        var ext_bomb_count = this.bomb_count;
-        if (this.internal_bay_1) {
-            ext_bomb_count = Math.floor(1.0e-6 + ext_bomb_count / 2);
-            if (this.internal_bay_2) {
-                ext_bomb_count = 0;
-            }
-        }
-        var ext_mass = ext_bomb_count;
-        return ext_mass;
+        var ext_bomb_count = this.bomb_count + this.rocket_count;
+        return Math.max(0, ext_bomb_count - this.GetInternalBombCount());
     }
     SetAcftStructure(num, maxbomb) {
         this.acft_struct = num;
@@ -6756,8 +6796,7 @@ class Munitions extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        var ext_bomb_count = this.bomb_count - this.GetInternalBombCount();
-        ext_bomb_count = Math.max(0, ext_bomb_count);
+        var ext_bomb_count = this.GetExternalMass();
         stats.reqsections += this.internal_bay_count;
         if (this.bomb_count > 0 && this.internal_bay_count > 0) {
             var count = stats.reqsections;
@@ -6771,7 +6810,7 @@ class Munitions extends Part {
         var rack_mass = Math.ceil(ext_bomb_count / 5);
         stats.mass += rack_mass;
         stats.drag += rack_mass;
-        stats.bomb_mass = this.bomb_count;
+        stats.bomb_mass = this.bomb_count + this.rocket_count;
         stats.reqsections = Math.ceil(stats.reqsections);
         //Because it is load, it rounds up to the nearest 5 mass.
         if ((stats.bomb_mass % 5) > 0)
@@ -6820,10 +6859,10 @@ class CargoAndPassengers extends Part {
     PartStats() {
         var stats = new Stats();
         stats = stats.Add(this.cargo_list[this.cargo_sel].stats);
-        stats.wetmass += stats.reqsections * 3;
+        stats.bomb_mass += stats.reqsections * 3;
         //Because it is load, it rounds up to the nearest 5 mass.
-        if ((stats.wetmass % 5) > 0)
-            stats.wetmass += 5 - (stats.wetmass % 5);
+        if ((stats.bomb_mass % 5) > 0)
+            stats.bomb_mass += 5 - (stats.bomb_mass % 5);
         return stats;
     }
 }
@@ -7384,6 +7423,14 @@ class Weapon extends Part {
         return lst;
     }
     CanSynch(num) {
+        if (!this.fixed && !this.wing) {
+            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
         if (this.can_synchronize && num == SynchronizationType.NONE) {
             return false;
         }
@@ -7422,6 +7469,9 @@ class Weapon extends Part {
         return this.w_count;
     }
     SetCount(use) {
+        if (use != use) {
+            use = 1;
+        }
         use = Math.max(1, use);
         if (this.synchronization == SynchronizationType.SPINNER)
             use = 1;
@@ -7869,7 +7919,7 @@ class Weapons extends Part {
         return this.brace_count;
     }
     SetBraceCount(num) {
-        if (num < 0)
+        if (num < 0 || num != num)
             num = 0;
         num -= num % 3;
         this.brace_count = num;
@@ -8050,6 +8100,22 @@ class Used extends Part {
         this.CalculateStats = callback;
     }
     TriggerCS() {
+        if (this.burnt_out != this.burnt_out)
+            this.burnt_out = 0;
+        if (this.ragged != this.ragged)
+            this.ragged = 0;
+        if (this.hefty != this.hefty)
+            this.hefty = 0;
+        if (this.sticky_guns != this.sticky_guns)
+            this.sticky_guns = 0;
+        if (this.weak != this.weak)
+            this.weak = 0;
+        if (this.fragile != this.fragile)
+            this.fragile = 0;
+        if (this.leaky != this.leaky)
+            this.leaky = 0;
+        if (this.sluggish != this.sluggish)
+            this.sluggish = 0;
         this.CalculateStats();
     }
 }
@@ -8078,7 +8144,7 @@ class Aircraft {
     constructor(js, weapon_json, storage) {
         this.use_storage = false;
         // private alter: AlterStats;
-        this.reset_json = String.raw `{"version":"10.7","name":"Fokker Eindecker E.IV","era":{"selected":1},"cockpits":{"positions":[{"type":1,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"U.I 100hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":5,"drag":8,"control":0,"cost":11,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":3,"power":10,"fuelconsumption":15,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"U.I 100hp","engine_type":0,"type":2,"era_sel":1,"displacement":16.28,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":0.8,"material_fudge":0.8,"quality_fudge":1.6,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":16,"span":9,"dihedral":0,"anhedral":0,"deck":2}],"mini_wing_list":[],"wing_stagger":0,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":1,"rudder_sel":1,"elevator_sel":1,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[0,0,0,0,0,0,0,1,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":0,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1,"repeating":false}],"ammo":1,"action":0,"projectile":0}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0}}`;
+        this.reset_json = String.raw `{"version":"10.7","name":"Fokker Eindecker E.III","era":{"selected":1},"cockpits":{"positions":[{"type":1,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"U.I 100hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":5,"drag":8,"control":0,"cost":11,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":3,"power":10,"fuelconsumption":15,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"U.I 100hp","engine_type":0,"type":2,"era_sel":1,"displacement":16.28,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":0.8,"material_fudge":0.8,"quality_fudge":1.6,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":16,"span":9,"dihedral":0,"anhedral":0,"deck":2}],"mini_wing_list":[],"wing_stagger":0,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":1,"rudder_sel":1,"elevator_sel":1,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[0,0,0,0,0,0,0,1,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":0,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false},"munitions":{"bomb_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1,"repeating":false}],"ammo":1,"action":0,"projectile":0}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0}}`;
         this.stats = new Stats();
         this.name = "Prototype Aircraft";
         this.version = js['version'];
@@ -8124,6 +8190,8 @@ class Aircraft {
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
         this.use_storage = storage;
+        this.updated_stats = false;
+        this.freeze_display = false;
         this.Reset();
     }
     toJSON() {
@@ -8151,6 +8219,7 @@ class Aircraft {
         };
     }
     fromJSON(js, disp = true) {
+        this.freeze_display = true;
         if (disp) {
             console.log(js);
             console.log(js["version"]);
@@ -8177,7 +8246,7 @@ class Aircraft {
         if (json_version > 10.65) {
             this.used.fromJSON(js["used"], json_version);
         }
-        this.CalculateStats();
+        this.freeze_display = false;
         return true;
     }
     serialize(s) {
@@ -8203,6 +8272,7 @@ class Aircraft {
         this.used.serialize(s);
     }
     deserialize(d) {
+        this.freeze_display = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);
         this.name = d.GetString();
@@ -8226,6 +8296,7 @@ class Aircraft {
         if (d.version > 10.65) {
             this.used.deserialize(d);
         }
+        this.freeze_display = false;
     }
     SetDisplayCallback(callback) {
         this.DisplayCallback = callback;
@@ -8322,7 +8393,7 @@ class Aircraft {
                     warning: "Rumble requires a minimum structure of Rumble*10 to fly."
                 });
             }
-            if (this.DisplayCallback)
+            if (this.DisplayCallback && !this.freeze_display)
                 this.DisplayCallback();
             if (this.use_storage)
                 window.localStorage.aircraft = JSON.stringify(this);
@@ -9081,6 +9152,11 @@ class WeaponSystem extends Part {
                     w.can_spinner = can_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
                     w.can_arty_spinner = can_arty_spinnerT || w.GetSynchronization() == SynchronizationType.SPINNER;
                 }
+                else if (!w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = false;
+                    w.can_arty_spinner = false;
+                }
                 else {
                     w.can_synchronize = false;
                     w.can_spinner = false;
@@ -9094,6 +9170,11 @@ class WeaponSystem extends Part {
                     w.can_synchronize = true;
                     w.can_spinner = can_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
                     w.can_arty_spinner = can_arty_spinnerP || w.GetSynchronization() == SynchronizationType.SPINNER;
+                }
+                else if (!w.GetFixed() && !w.GetWing()) {
+                    w.can_synchronize = true;
+                    w.can_spinner = false;
+                    w.can_arty_spinner = false;
                 }
                 else {
                     w.can_synchronize = false;

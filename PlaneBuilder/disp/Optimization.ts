@@ -69,7 +69,7 @@ class Optimization_HTML extends Display {
         ncell.appendChild(cbxs[0]);
         ncell.appendChild(cbxs[1]);
         ncell.appendChild(cbxs[2]);
-        ecell.innerHTML = txt;
+        ecell.textContent = txt;
         pcell.appendChild(cbxs[3]);
         pcell.appendChild(cbxs[4]);
         pcell.appendChild(cbxs[5]);

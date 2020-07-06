@@ -829,30 +829,30 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
         this.name_inp.value = this.acft.name;
-        this.version_cell.innerText = this.acft.GetVersion();
-        this.cost_cell.innerText = stats.cost.toString() + "þ ";
+        this.version_cell.textContent = this.acft.GetVersion();
+        this.cost_cell.textContent = stats.cost.toString() + "þ ";
         if (this.acft.GetUsed().GetEnabled()) {
-            this.cost_cell.innerText += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
+            this.cost_cell.textContent += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ Used)";
         }
-        this.upkeep_cell.innerText = stats.upkeep.toString() + "þ";
+        this.upkeep_cell.textContent = stats.upkeep.toString() + "þ";
         //Empty
-        this.ts_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
-        this.ss_empty.innerText = derived.StallSpeedEmpty.toString();
-        this.hand_empty.innerText = derived.HandlingEmpty.toString();
-        this.boost_empty.innerText = derived.BoostEmpty.toString();
-        this.roc_empty.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
+        this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
+        this.hand_empty.textContent = derived.HandlingEmpty.toString();
+        this.boost_empty.textContent = derived.BoostEmpty.toString();
+        this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         //Half
-        this.ts_half.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
-        this.ss_half.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
-        this.hand_half.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
-        this.boost_half.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
-        this.roc_half.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_half.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
+        this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
+        this.hand_half.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
+        this.boost_half.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
+        this.roc_half.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
         //Full
-        this.ts_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
-        this.ss_full.innerText = derived.StallSpeedFull.toString();
-        this.hand_full.innerText = derived.HandlingFull.toString();
-        this.boost_full.innerText = derived.BoostFull.toString();
-        this.roc_full.innerText = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
+        this.ss_full.textContent = derived.StallSpeedFull.toString();
+        this.hand_full.textContent = derived.HandlingFull.toString();
+        this.boost_full.textContent = derived.BoostFull.toString();
+        this.roc_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
 
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
@@ -860,17 +860,17 @@ class Aircraft_HTML extends Display {
             this.bomb_row2.appendChild(this.vital_components);
             this.vital_components.rowSpan = 5;
             //Half
-            this.ts_halfwB.innerText = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
-            this.ss_halfwB.innerText = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
-            this.hand_halfwB.innerText = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
-            this.boost_halfwB.innerText = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
-            this.roc_halfwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.ts_halfwB.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
+            this.ss_halfwB.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
+            this.hand_halfwB.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
+            this.boost_halfwB.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
+            this.roc_halfwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
             //Full
-            this.ts_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
-            this.ss_fullwB.innerText = derived.StallSpeedFullwBombs.toString();
-            this.hand_fullwB.innerText = derived.HandlingFullwBombs.toString();
-            this.boost_fullwB.innerText = derived.BoostFullwBombs.toString();
-            this.roc_fullwB.innerText = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.ts_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
+            this.ss_fullwB.textContent = derived.StallSpeedFullwBombs.toString();
+            this.hand_fullwB.textContent = derived.HandlingFullwBombs.toString();
+            this.boost_fullwB.textContent = derived.BoostFullwBombs.toString();
+            this.roc_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
 
         } else {
             this.bomb_row1.hidden = true;
@@ -879,32 +879,32 @@ class Aircraft_HTML extends Display {
             this.vital_components.rowSpan = 3;
         }
 
-        this.dropoff_cell.innerText = derived.Dropoff.toString();
-        this.overspeed_cell.innerText = derived.Overspeed.toString();
-        this.maxfuel_cell.innerText = (Math.round(derived.FuelUses * 10) / 10).toString();
+        this.dropoff_cell.textContent = derived.Dropoff.toString();
+        this.overspeed_cell.textContent = derived.Overspeed.toString();
+        this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
         if (this.acft.GetIsFlammable())
-            this.flammable_cell.innerText = "Yes";
+            this.flammable_cell.textContent = "Yes";
         else
-            this.flammable_cell.innerText = "No";
+            this.flammable_cell.textContent = "No";
 
-        this.stability_cell.innerText = derived.Stabiilty.toString();
-        this.eloss_cell.innerText = derived.EnergyLoss.toString();
-        this.turnbleed_cell.innerText = derived.TurnBleed.toString();
-        this.landing_cell.innerText = this.acft.GetGearName();
-        this.maxalt_cell.innerText = this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString();
+        this.stability_cell.textContent = derived.Stabiilty.toString();
+        this.eloss_cell.textContent = derived.EnergyLoss.toString();
+        this.turnbleed_cell.textContent = derived.TurnBleed.toString();
+        this.landing_cell.textContent = this.acft.GetGearName();
+        this.maxalt_cell.textContent = this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString();
 
-        this.reliability_cell.innerText = this.acft.GetReliabilityList().toString();
-        this.toughness_cell.innerText = derived.Toughness.toString();
-        this.mxstrain_cell.innerText = derived.MaxStrain.toString();
-        this.escape_cell.innerText = this.acft.GetEscapeList().toString();
-        this.crashsafety_cell.innerText = this.acft.GetCrashList().toString();
+        this.reliability_cell.textContent = this.acft.GetReliabilityList().toString();
+        this.toughness_cell.textContent = derived.Toughness.toString();
+        this.mxstrain_cell.textContent = derived.MaxStrain.toString();
+        this.escape_cell.textContent = this.acft.GetEscapeList().toString();
+        this.crashsafety_cell.textContent = this.acft.GetCrashList().toString();
 
-        this.crew_cell.innerText = aircraft_model.GetCockpits().GetNumberOfCockpits().toString() + "/" + (aircraft_model.GetPassengers().GetSeats() + aircraft_model.GetPassengers().GetBeds()).toString();
-        this.flightstress_cell.innerText = this.acft.GetStressList().toString();
-        this.visibility_cell.innerText = this.acft.GetVisibilityList().toString();
-        this.attack_cell.innerText = this.acft.GetAttackList().toString();
-        this.communications_cell.innerText = this.acft.GetCommunicationName();
-        this.electric_cell.innerText = stats.charge.toString(); //TODO Windmill
+        this.crew_cell.textContent = aircraft_model.GetCockpits().GetNumberOfCockpits().toString() + "/" + (aircraft_model.GetPassengers().GetSeats() + aircraft_model.GetPassengers().GetBeds()).toString();
+        this.flightstress_cell.textContent = this.acft.GetStressList().toString();
+        this.visibility_cell.textContent = this.acft.GetVisibilityList().toString();
+        this.attack_cell.textContent = this.acft.GetAttackList().toString();
+        this.communications_cell.textContent = this.acft.GetCommunicationName();
+        this.electric_cell.textContent = stats.charge.toString(); //TODO Windmill
 
         var vital = "";
         var vlist = this.acft.VitalComponentList();
@@ -915,14 +915,11 @@ class Aircraft_HTML extends Display {
 
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
-        var alist = aircraft_model.GetWeapons().GetActionList();
-        var plist = aircraft_model.GetWeapons().GetProjectileList();
-        this.weapon_cell.innerHTML = "";
         var bombs = aircraft_model.GetMunitions().GetBombCount();
         var rockets = aircraft_model.GetMunitions().GetRocketCount();
         var internal = aircraft_model.GetMunitions().GetInternalBombCount();
+        var weaphtml = "";
         if (bombs > 0) {
-            var weaphtml = "";
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0)
@@ -934,17 +931,16 @@ class Aircraft_HTML extends Display {
                 weaphtml += ("Largest internal bomb is " + mib.toString() + " Mass.");
             }
             internal -= int_bomb;
-            this.weapon_cell.innerHTML += weaphtml + "<br/>";
+            weaphtml += "<br/>";
         }
         if (rockets > 0) {
-            var weaphtml = "";
             var int_rock = Math.min(rockets, internal);
             var ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0)
                 weaphtml += (int_rock.toString() + " Rocket Mass Internally. ");
             if (ext_rock > 0)
                 weaphtml += (ext_rock.toString() + " Rocket Mass Externally. ");
-            this.weapon_cell.innerHTML += weaphtml + "<br/>";
+            weaphtml += "<br/>";
         }
 
         for (let w of aircraft_model.GetWeapons().GetWeaponSets()) {
@@ -954,7 +950,6 @@ class Aircraft_HTML extends Display {
                 if (d)
                     dircount++;
             }
-            var weaphtml = "";
             weaphtml += this.WeaponName(w);
             if (w.IsPlural()) {
                 weaphtml += "s";
@@ -994,8 +989,8 @@ class Aircraft_HTML extends Display {
                 weaphtml += " ]";
             }
             weaphtml += "<br\>";
-            this.weapon_cell.innerHTML += weaphtml;
         }
+        this.weapon_cell.innerHTML = weaphtml;
 
         var warnhtml = "";
         for (let w of stats.warnings) {

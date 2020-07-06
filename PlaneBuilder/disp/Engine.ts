@@ -160,7 +160,7 @@ class Engine_HTML extends Display {
 
     private InitMountSelect(mount_cell: HTMLTableCellElement) {
         var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
-        txtSpan.innerHTML = "Engine Mounting Location";
+        txtSpan.textContent = "Engine Mounting Location";
         mount_cell.appendChild(txtSpan);
         mount_cell.appendChild(document.createElement("BR"));
         this.mount_select = document.createElement("SELECT") as HTMLSelectElement;
@@ -286,14 +286,14 @@ class Engine_HTML extends Display {
             this.cool_cell.removeChild(this.cool_cell.children[0]);
 
         if (this.engine.IsRotary()) {
-            this.e_cool.innerText = "0";
+            this.e_cool.textContent = "0";
             var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
-            txtSpan.innerHTML = "Rotary Engines use Oil Tanks.<br/>+1 Mass, Oil Tank is a Vital Component.";
+            txtSpan.innerText = "Rotary Engines use Oil Tanks. \n +1 Mass, Oil Tank is a Vital Component.";
             this.cool_cell.appendChild(txtSpan);
         }
-        else if (this.e_cool.innerText == "0") {
+        else if (this.e_cool.textContent == "0") {
             var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
-            txtSpan.innerHTML = "Air-Cooled Engine.<br/>";
+            txtSpan.textContent = "Air-Cooled Engine.";
             this.cool_cell.appendChild(txtSpan);
             var fs = CreateFlexSection(this.cool_cell);
             FlexCheckbox("Air Cooling Fan", this.intake_fan, fs);
@@ -301,7 +301,7 @@ class Engine_HTML extends Display {
         }
         else {
             var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
-            txtSpan.innerHTML = "    Select Radiator";
+            txtSpan.textContent = "    Select Radiator";
             if (!this.cool_select) {
                 this.cool_select = document.createElement("SELECT") as HTMLSelectElement;
                 this.cool_select.required = true;
@@ -312,7 +312,7 @@ class Engine_HTML extends Display {
             }
             for (let i = 1; i < numrad + 1; i++) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
-                opt.innerText = "Radiator #" + i.toString();
+                opt.textContent = "Radiator #" + i.toString();
                 this.cool_select.add(opt);
             }
             this.cool_select.onchange = () => {
@@ -323,7 +323,7 @@ class Engine_HTML extends Display {
             this.cool_cell.appendChild(txtSpan);
             this.cool_cell.appendChild(document.createElement("BR"));
             var txtSpan2 = document.createElement("SPAN") as HTMLSpanElement;
-            txtSpan2.innerHTML = "    Cooling Amount";
+            txtSpan2.textContent = "    Cooling Amount";
             this.cool_count.min = "0";
             this.cool_count.valueAsNumber = this.engine.GetCooling();
             this.cool_count.max = this.engine.GetMaxCooling().toString();
@@ -381,17 +381,17 @@ class Engine_HTML extends Display {
         var e_stats = this.engine.GetCurrentStats();
         var b = this.engine.GetMinIAF();
         var t = b + e_stats.altitude;
-        this.e_pwr.innerText = e_stats.stats.power.toString();
-        this.e_mass.innerText = e_stats.stats.mass.toString();
-        this.e_drag.innerText = e_stats.stats.drag.toString();
-        this.e_rely.innerText = e_stats.stats.reliability.toString();
-        this.e_cool.innerText = e_stats.stats.cooling.toString();
-        this.e_over.innerText = e_stats.overspeed.toString();
-        this.e_fuel.innerText = e_stats.stats.fuelconsumption.toString();
-        this.e_alti.innerText = b.toString() + "-" + t.toString();;
-        this.e_torq.innerText = e_stats.torque.toString();
-        this.e_rumb.innerText = e_stats.rumble.toString();
-        this.e_cost.innerText = e_stats.stats.cost.toString();
+        this.e_pwr.textContent = e_stats.stats.power.toString();
+        this.e_mass.textContent = e_stats.stats.mass.toString();
+        this.e_drag.textContent = e_stats.stats.drag.toString();
+        this.e_rely.textContent = e_stats.stats.reliability.toString();
+        this.e_cool.textContent = e_stats.stats.cooling.toString();
+        this.e_over.textContent = e_stats.overspeed.toString();
+        this.e_fuel.textContent = e_stats.stats.fuelconsumption.toString();
+        this.e_alti.textContent = b.toString() + "-" + t.toString();;
+        this.e_torq.textContent = e_stats.torque.toString();
+        this.e_rumb.textContent = e_stats.rumble.toString();
+        this.e_cost.textContent = e_stats.stats.cost.toString();
         this.InitCoolingSelect();
         this.intake_fan.checked = this.engine.GetIntakeFan();
 

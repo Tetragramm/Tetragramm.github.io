@@ -292,10 +292,10 @@ class Frames_HTML extends Display {
         fsec.fsel.selectedIndex = sec.frame;
 
         if (sec.internal_bracing) {
-            fsec.ssel.innerText = "N/A";
+            fsec.ssel.textContent = "N/A";
         } else {
             var skin_list = this.frames.GetSkinList();
-            fsec.ssel.innerText = skin_list[this.frames.GetSkin()].name;
+            fsec.ssel.textContent = skin_list[this.frames.GetSkin()].name;
         }
 
         fsec.geo.checked = sec.geodesic;
@@ -388,7 +388,7 @@ class Frames_HTML extends Display {
         var idx = this.frames.GetSkin();
         if (this.frames.GetUseFarman())
             idx = 0;
-        tsec.ssel.innerText = skin_list[idx].name;
+        tsec.ssel.textContent = skin_list[idx].name;
 
         tsec.geo.checked = sec.geodesic;
         tsec.geo.disabled = !this.frames.PossibleTailGeodesic(i);
