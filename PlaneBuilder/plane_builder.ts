@@ -3,8 +3,7 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: Overwrite defaults
-//Wing Warping with no wings
+//TODO: can i have a checkbox for 2 thaler to harden a radiator to accept unusual liquids, rather than tying the cost directly to the coolant in the builder?
 //Reinforcements with no wings
 //TODO: "Adjusted Drag" ect.
 //TODO: Autopilot for no cockpits

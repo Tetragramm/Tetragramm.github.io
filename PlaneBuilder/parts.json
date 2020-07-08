@@ -1,5 +1,5 @@
 {
-    "version": "10.8",
+    "version": "10.9",
     "era": {
         "options": [
             {
@@ -398,17 +398,22 @@
             {
                 "name": "Water",
                 "cost": 0,
-                "reliability": 0
+                "harden": false,
+                "reliability": 0,
+                "flammable": false
             },
             {
                 "name": "Salt Water",
-                "cost": 3,
-                "reliability": 1
+                "cost": 1,
+                "harden": true,
+                "reliability": 1,
+                "flammable": false
             },
             {
                 "name": "Mineral Oil",
                 "warning": "Absorbs 1 Miss to Cool Down.",
-                "cost": 3,
+                "cost": 1,
+                "harden": true,
                 "reliability": 0,
                 "flammable": true
             },
@@ -416,25 +421,32 @@
                 "name": "Castor Oil",
                 "warning": "Absorbs 1 Miss to Cool Down. +2 Stress if leaking.",
                 "cost": 0,
+                "harden": false,
                 "reliability": 0,
                 "flammable": true
             },
             {
                 "name": "Glycol",
                 "reliability": 2,
-                "cost": 2
+                "harden": false,
+                "cost": 2,
+                "flammable": false
             },
             {
                 "name": "Freon",
                 "warning": "Caps RPM to 3.",
                 "reliability": 1,
-                "cost": 3
+                "harden": false,
+                "cost": 3,
+                "flammable": false
             },
             {
                 "name": "Ammonia",
                 "warning": "Caps RPM to 3. Causes 2 Injury when leaking.",
                 "reliability": 1,
-                "cost": 2
+                "harden": false,
+                "cost": 2,
+                "flammable": false
             }
         ],
         "cowling": [

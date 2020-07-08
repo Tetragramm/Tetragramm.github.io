@@ -6,15 +6,16 @@ class Radiator extends Part {
     private idx_type: number;
     private mount_list: { name: string, stats: Stats }[];
     private idx_mount: number;
-    private coolant_list: { name: string, stats: Stats }[];
+    private coolant_list: { name: string, harden: boolean, flammable: boolean, stats: Stats }[];
     private idx_coolant: number;
     private need_cool: number;
     private engine_count: number;
     private has_parasol: boolean;
     private metal_area: number;
+    private harden_cool: boolean;
 
     constructor(tl: { name: string, stats: Stats, dragpercool: number }[],
-        ml: { name: string, stats: Stats }[], cl: { name: string, stats: Stats }[]) {
+        ml: { name: string, stats: Stats }[], cl: { name: string, harden: boolean, flammable: boolean, stats: Stats }[]) {
         super();
         this.need_cool = 0;
         this.idx_type = 0;
@@ -25,13 +26,15 @@ class Radiator extends Part {
         this.type_list = tl;
         this.mount_list = ml;
         this.coolant_list = cl;
+        this.harden_cool = false;
     }
 
     public toJSON() {
         return {
             type: this.idx_type,
             mount: this.idx_mount,
-            coolant: this.idx_coolant
+            coolant: this.idx_coolant,
+            harden_cool: this.harden_cool,
         }
     }
 
@@ -39,18 +42,25 @@ class Radiator extends Part {
         this.idx_type = js["type"];
         this.idx_mount = js["mount"];
         this.idx_coolant = js["coolant"];
+        if (json_version > 10.85) {
+            this.harden_cool = js["harden_cool"];
+        }
     }
 
     public serialize(s: Serialize) {
         s.PushNum(this.idx_type);
         s.PushNum(this.idx_mount);
         s.PushNum(this.idx_coolant);
+        s.PushBool(this.harden_cool);
     }
 
     public derserialize(d: Deserialize) {
         this.idx_type = d.GetNum();
         this.idx_mount = d.GetNum();
         this.idx_coolant = d.GetNum();
+        if (d.version > 10.85) {
+            this.harden_cool = d.GetBool();
+        }
     }
 
     public GetTypeList() {
@@ -129,7 +139,24 @@ class Radiator extends Part {
             this.idx_type = 0;
     }
 
+    public GetHarden() {
+        return this.harden_cool;
+    }
+
+    public SetHarden(use: boolean) {
+        this.harden_cool = use;
+        this.CalculateStats();
+    }
+
+    private VerifyHarden() {
+        if (this.coolant_list[this.idx_coolant].harden) {
+            this.harden_cool = true;
+        }
+    }
+
     public PartStats(): Stats {
+        this.VerifyHarden();
+
         var stats = new Stats();
         stats.mass = 3;
         stats = stats.Add(this.type_list[this.idx_type].stats);
@@ -137,6 +164,14 @@ class Radiator extends Part {
         stats = stats.Add(this.coolant_list[this.idx_coolant].stats);
 
         stats.drag += Math.ceil(this.type_list[this.idx_type].dragpercool * (this.need_cool - stats.cooling));
+
+        if (this.harden_cool) {
+            stats.cost += 2;
+        }
+
+        if (this.coolant_list[this.idx_coolant].flammable) {
+            stats.warnings.push({ source: "Radiator Fluid", warning: "Radiator Fluid is Flammable." });
+        }
 
         return stats;
     }

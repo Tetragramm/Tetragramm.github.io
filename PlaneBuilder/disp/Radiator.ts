@@ -6,6 +6,7 @@ class Radiator_HTML extends Display {
     private type_select: HTMLSelectElement;
     private mount_select: HTMLSelectElement;
     private coolant_select: HTMLSelectElement;
+    private harden_input: HTMLInputElement;
     private c_mass: HTMLTableCellElement;
     private c_drag: HTMLTableCellElement;
     private c_cost: HTMLTableCellElement;
@@ -40,6 +41,7 @@ class Radiator_HTML extends Display {
 
         var cool_cell = row.insertCell();
         //Special Coolant
+
         this.coolant_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let elem of this.radiator.GetCoolantList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -48,6 +50,11 @@ class Radiator_HTML extends Display {
         }
         this.coolant_select.onchange = () => { this.radiator.SetCoolantIndex(this.coolant_select.selectedIndex) };
         cool_cell.appendChild(this.coolant_select);
+        cool_cell.appendChild(document.createElement("BR"));
+        this.harden_input = document.createElement("INPUT") as HTMLInputElement;
+        var fs = CreateFlexSection(cool_cell);
+        FlexCheckbox("Harden Radiator", this.harden_input, fs);
+        this.harden_input.onchange = () => { this.radiator.SetHarden(this.harden_input.checked); };
 
         var stats_cell = row.insertCell();
         var tbl = document.createElement("TABLE") as HTMLTableElement;
@@ -84,6 +91,7 @@ class Radiator_HTML extends Display {
             this.mount_select.options[i].disabled = !mcan[i];
         }
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
+        this.harden_input.checked = this.radiator.GetHarden();
         var stats = this.radiator.PartStats();
         BlinkIfChanged(this.c_mass, stats.mass.toString());
         BlinkIfChanged(this.c_cost, stats.cost.toString());

@@ -11,7 +11,7 @@ class Engines extends Part {
     private is_asymmetric: boolean;
     private r_type_list: { name: string, stats: Stats, dragpercool: number }[];
     private r_mount_list: { name: string, stats: Stats }[];
-    private r_coolant_list: { name: string, stats: Stats }[];
+    private r_coolant_list: { name: string, harden: boolean, flammable: boolean, stats: Stats }[];
     private cowl_list: { name: string, stats: Stats, ed: number, mpd: number, air: boolean, liquid: boolean, rotary: boolean }[]
 
     constructor(js: JSON) {
@@ -46,7 +46,7 @@ class Engines extends Part {
         }
         this.r_coolant_list = [];
         for (let elem of js["radiator-coolant"]) {
-            this.r_coolant_list.push({ name: elem["name"], stats: new Stats(elem) });
+            this.r_coolant_list.push({ name: elem["name"], harden: elem["harden"], flammable: elem["flammable"], stats: new Stats(elem) });
         }
         this.cowl_list = [];
         for (let elem of js["cowling"]) {

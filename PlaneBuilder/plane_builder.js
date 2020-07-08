@@ -2606,7 +2606,7 @@ class Engines extends Part {
         }
         this.r_coolant_list = [];
         for (let elem of js["radiator-coolant"]) {
-            this.r_coolant_list.push({ name: elem["name"], stats: new Stats(elem) });
+            this.r_coolant_list.push({ name: elem["name"], harden: elem["harden"], flammable: elem["flammable"], stats: new Stats(elem) });
         }
         this.cowl_list = [];
         for (let elem of js["cowling"]) {
@@ -8341,28 +8341,37 @@ class Radiator extends Part {
         this.type_list = tl;
         this.mount_list = ml;
         this.coolant_list = cl;
+        this.harden_cool = false;
     }
     toJSON() {
         return {
             type: this.idx_type,
             mount: this.idx_mount,
-            coolant: this.idx_coolant
+            coolant: this.idx_coolant,
+            harden_cool: this.harden_cool,
         };
     }
     fromJSON(js, json_version) {
         this.idx_type = js["type"];
         this.idx_mount = js["mount"];
         this.idx_coolant = js["coolant"];
+        if (json_version > 10.85) {
+            this.harden_cool = js["harden_cool"];
+        }
     }
     serialize(s) {
         s.PushNum(this.idx_type);
         s.PushNum(this.idx_mount);
         s.PushNum(this.idx_coolant);
+        s.PushBool(this.harden_cool);
     }
     derserialize(d) {
         this.idx_type = d.GetNum();
         this.idx_mount = d.GetNum();
         this.idx_coolant = d.GetNum();
+        if (d.version > 10.85) {
+            this.harden_cool = d.GetBool();
+        }
     }
     GetTypeList() {
         return this.type_list;
@@ -8426,13 +8435,32 @@ class Radiator extends Part {
         if (!this.CanType()[this.idx_type])
             this.idx_type = 0;
     }
+    GetHarden() {
+        return this.harden_cool;
+    }
+    SetHarden(use) {
+        this.harden_cool = use;
+        this.CalculateStats();
+    }
+    VerifyHarden() {
+        if (this.coolant_list[this.idx_coolant].harden) {
+            this.harden_cool = true;
+        }
+    }
     PartStats() {
+        this.VerifyHarden();
         var stats = new Stats();
         stats.mass = 3;
         stats = stats.Add(this.type_list[this.idx_type].stats);
         stats = stats.Add(this.mount_list[this.idx_mount].stats);
         stats = stats.Add(this.coolant_list[this.idx_coolant].stats);
         stats.drag += Math.ceil(this.type_list[this.idx_type].dragpercool * (this.need_cool - stats.cooling));
+        if (this.harden_cool) {
+            stats.cost += 2;
+        }
+        if (this.coolant_list[this.idx_coolant].flammable) {
+            stats.warnings.push({ source: "Radiator Fluid", warning: "Radiator Fluid is Flammable." });
+        }
         return stats;
     }
     SetCalculateStats(callback) {
@@ -8475,6 +8503,11 @@ class Radiator_HTML extends Display {
         }
         this.coolant_select.onchange = () => { this.radiator.SetCoolantIndex(this.coolant_select.selectedIndex); };
         cool_cell.appendChild(this.coolant_select);
+        cool_cell.appendChild(document.createElement("BR"));
+        this.harden_input = document.createElement("INPUT");
+        var fs = CreateFlexSection(cool_cell);
+        FlexCheckbox("Harden Radiator", this.harden_input, fs);
+        this.harden_input.onchange = () => { this.radiator.SetHarden(this.harden_input.checked); };
         var stats_cell = row.insertCell();
         var tbl = document.createElement("TABLE");
         stats_cell.className = "inner_table";
@@ -8508,6 +8541,7 @@ class Radiator_HTML extends Display {
             this.mount_select.options[i].disabled = !mcan[i];
         }
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
+        this.harden_input.checked = this.radiator.GetHarden();
         var stats = this.radiator.PartStats();
         BlinkIfChanged(this.c_mass, stats.mass.toString());
         BlinkIfChanged(this.c_cost, stats.cost.toString());
@@ -11947,8 +11981,7 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
-//TODO: Overwrite defaults
-//Wing Warping with no wings
+//TODO: can i have a checkbox for 2 thaler to harden a radiator to accept unusual liquids, rather than tying the cost directly to the coolant in the builder?
 //Reinforcements with no wings
 //TODO: "Adjusted Drag" ect.
 //TODO: Autopilot for no cockpits
