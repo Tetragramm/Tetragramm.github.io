@@ -836,11 +836,16 @@ class Aircraft_HTML extends Display {
         }
         this.upkeep_cell.textContent = stats.upkeep.toString() + "þ";
         //Empty
-        this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
+        // this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
+        // this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
+        // this.hand_empty.textContent = derived.HandlingEmpty.toString();
+        // this.boost_empty.textContent = derived.BoostEmpty.toString();
+        // this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_empty.textContent = (0).toString();
         this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
         this.hand_empty.textContent = derived.HandlingEmpty.toString();
-        this.boost_empty.textContent = derived.BoostEmpty.toString();
-        this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.boost_empty.textContent = (0).toString();
+        this.roc_empty.textContent = (0).toString();
         //Half
         this.ts_half.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
         this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();

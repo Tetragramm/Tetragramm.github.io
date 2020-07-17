@@ -389,9 +389,9 @@ class WeaponSystem extends Part {
             }
         }
         return [
-            centerline + Math.floor(1.0e-6 + wings * 0.8),
-            wings + Math.floor(1.0e-6 + centerline * 0.75),
-            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.3),
+            centerline + wings,
+            Math.floor(1.0e-6 + centerline * 0.75) + Math.floor(1.0e-6 + wings * 0.75),
+            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.25),
             Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
         ];
     }

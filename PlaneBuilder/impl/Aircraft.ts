@@ -269,6 +269,7 @@ class Aircraft {
         this.reinforcements.SetTandem(this.wings.GetTandem());
         this.reinforcements.SetStaggered(this.wings.GetStaggered());
         this.reinforcements.SetCantLift(this.era.GetCantLift());
+        this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
         stats = stats.Add(this.reinforcements.PartStats());
 
         this.accessories.SetAcftPower(stats.power);

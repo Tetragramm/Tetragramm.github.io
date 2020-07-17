@@ -4647,6 +4647,7 @@ class Reinforcement extends Part {
         this.is_staggered = false;
         this.is_tandem = false;
         this.is_monoplane = false;
+        this.has_wing = true;
         this.acft_structure = 0;
         this.cant_lift = 0;
     }
@@ -4790,6 +4791,9 @@ class Reinforcement extends Part {
     SetMonoplane(is) {
         this.is_monoplane = is;
     }
+    SetHasWing(has) {
+        this.has_wing = has;
+    }
     SetAcftStructure(struct) {
         var oldstruct = this.acft_structure;
         this.acft_structure = struct;
@@ -4854,6 +4858,16 @@ class Reinforcement extends Part {
             tension_multiple = 0.8;
         else if (this.is_staggered)
             tension_multiple = 0.9;
+        if (!this.has_wing) {
+            for (let i = 0; i < this.ext_wood_count.length; i++) {
+                this.ext_wood_count[i] = 0;
+            }
+            for (let i = 0; i < this.ext_steel_count.length; i++) {
+                this.ext_steel_count[i] = 0;
+            }
+            this.cabane_sel = 0;
+            this.wires = false;
+        }
         var tension = 0;
         var strut_count = 0;
         var has_valid_first = false;
@@ -6260,8 +6274,10 @@ class Weapon extends Part {
         }
         if (this.wing)
             this.synchronization = SynchronizationType.NONE;
-        if (this.synchronization == SynchronizationType.SPINNER)
+        if (this.synchronization == SynchronizationType.SPINNER) {
             this.w_count = 1;
+            this.covered = true;
+        }
     }
     GetArty() {
         return this.weapon_type.size == 16;
@@ -6333,7 +6349,9 @@ class Weapon extends Part {
             cost *= this.w_count;
             if (!this.fixed)
                 cost *= 2;
-            stats.cost += cost;
+            if (this.synchronization != SynchronizationType.SPINNER) {
+                stats.cost += cost;
+            }
             stats.drag *= 0;
         }
         //If on the wing and uncovered add 1, if covered, drag is min 1.
@@ -7087,6 +7105,7 @@ class Aircraft {
         this.reinforcements.SetTandem(this.wings.GetTandem());
         this.reinforcements.SetStaggered(this.wings.GetStaggered());
         this.reinforcements.SetCantLift(this.era.GetCantLift());
+        this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
         stats = stats.Add(this.reinforcements.PartStats());
         this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
@@ -11337,11 +11356,16 @@ class Aircraft_HTML extends Display {
         }
         this.upkeep_cell.textContent = stats.upkeep.toString() + "þ";
         //Empty
-        this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
+        // this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
+        // this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
+        // this.hand_empty.textContent = derived.HandlingEmpty.toString();
+        // this.boost_empty.textContent = derived.BoostEmpty.toString();
+        // this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_empty.textContent = (0).toString();
         this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
         this.hand_empty.textContent = derived.HandlingEmpty.toString();
-        this.boost_empty.textContent = derived.BoostEmpty.toString();
-        this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.boost_empty.textContent = (0).toString();
+        this.roc_empty.textContent = (0).toString();
         //Half
         this.ts_half.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
         this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
@@ -11981,8 +12005,6 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
-//TODO: can i have a checkbox for 2 thaler to harden a radiator to accept unusual liquids, rather than tying the cost directly to the coolant in the builder?
-//Reinforcements with no wings
 //TODO: "Adjusted Drag" ect.
 //TODO: Autopilot for no cockpits
 //TODO: Weapon card, List Special Rules
@@ -12612,9 +12634,9 @@ class WeaponSystem extends Part {
             }
         }
         return [
-            centerline + Math.floor(1.0e-6 + wings * 0.8),
-            wings + Math.floor(1.0e-6 + centerline * 0.75),
-            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.3),
+            centerline + wings,
+            Math.floor(1.0e-6 + centerline * 0.75) + Math.floor(1.0e-6 + wings * 0.75),
+            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.25),
             Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
         ];
     }

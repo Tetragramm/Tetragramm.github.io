@@ -17,6 +17,7 @@ class Reinforcement extends Part {
     private is_staggered: boolean;
     private is_tandem: boolean;
     private is_monoplane: boolean;
+    private has_wing: boolean;
     private acft_structure: number;
     private cant_lift: number;
 
@@ -53,6 +54,7 @@ class Reinforcement extends Part {
         this.is_staggered = false;
         this.is_tandem = false;
         this.is_monoplane = false;
+        this.has_wing = true;
         this.acft_structure = 0;
         this.cant_lift = 0;
     }
@@ -216,6 +218,10 @@ class Reinforcement extends Part {
         this.is_monoplane = is;
     }
 
+    public SetHasWing(has: boolean) {
+        this.has_wing = has;
+    }
+
     public SetAcftStructure(struct: number) {
         var oldstruct = this.acft_structure;
         this.acft_structure = struct;
@@ -293,6 +299,17 @@ class Reinforcement extends Part {
             tension_multiple = 0.8;
         else if (this.is_staggered)
             tension_multiple = 0.9;
+
+        if (!this.has_wing) {
+            for (let i = 0; i < this.ext_wood_count.length; i++) {
+                this.ext_wood_count[i] = 0;
+            }
+            for (let i = 0; i < this.ext_steel_count.length; i++) {
+                this.ext_steel_count[i] = 0;
+            }
+            this.cabane_sel = 0;
+            this.wires = false;
+        }
 
         var tension = 0;
         var strut_count = 0;

@@ -320,8 +320,10 @@ class Weapon extends Part {
         }
         if (this.wing)
             this.synchronization = SynchronizationType.NONE;
-        if (this.synchronization == SynchronizationType.SPINNER)
+        if (this.synchronization == SynchronizationType.SPINNER) {
             this.w_count = 1;
+            this.covered = true;
+        }
     }
 
     public GetArty() {
@@ -400,7 +402,9 @@ class Weapon extends Part {
             if (!this.fixed)
                 cost *= 2;
 
-            stats.cost += cost;
+            if (this.synchronization != SynchronizationType.SPINNER) {
+                stats.cost += cost;
+            }
             stats.drag *= 0;
         }
 
