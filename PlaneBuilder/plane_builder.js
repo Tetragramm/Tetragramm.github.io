@@ -11323,9 +11323,15 @@ class Aircraft_HTML extends Display {
     }
     UpdateStats() {
         var stats = this.acft.GetStats();
+        var dragbreak = stats.drag.toString() + " ("
+            + ((stats.drag + Math.floor(1.0e-6 + stats.mass / 5)) % 5)
+            + "/5)";
+        var massbreak = stats.mass.toString() + " ("
+            + (stats.mass % 5).toString()
+            + "/5)";
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
+        BlinkIfChanged(this.d_drag, dragbreak);
+        BlinkIfChanged(this.d_mass, massbreak);
         BlinkIfChanged(this.d_wmas, stats.wetmass.toString());
         BlinkIfChanged(this.d_bmas, stats.bomb_mass.toString());
         BlinkIfChanged(this.d_cost, stats.cost.toString());
