@@ -1667,20 +1667,20 @@
                 "name": "Windmill",
                 "drag": 1,
                 "cost": 1,
-                "cp10p": 0,
+                "cp10s": 1,
                 "warning": "Generates 1 charge per 10 speed."
             },
             {
                 "name": "Ram Air Scoop",
                 "charge": 1,
                 "cost": 3,
-                "cp10p": 0
+                "cp10s": 0
             },
             {
                 "name": "Battery",
                 "mass": 1,
                 "cost": 2,
-                "cp10p": 0,
+                "cp10s": 0,
                 "warning": "Stores 5 charge"
             }
         ],

@@ -191,12 +191,6 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
-            var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
-            if (this.action_sel == ActionType.GAST) {
-                ammo *= 2;
-            }
-            var warn = "Uses Charges as ammo " + ammo.toString() + "/" + Math.floor(1.5 * ammo).toString() + ".";
-            this.final_weapon.stats.warnings = [{ source: this.final_weapon.name + " Heat Ray", warning: warn }];
             this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Incendiary shots. Take -2 forward to Eyeball after firing." })
         } else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
@@ -496,6 +490,22 @@ class WeaponSystem extends Part {
         this.sticky_guns = num;
     }
 
+    public GetHRCharges() {
+        var count = 0;
+        for (let w of this.weapons) {
+            count += w.GetCount();
+        }
+        //Calc charges / shot.
+        var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
+        if (this.action_sel == ActionType.GAST) {
+            ammo *= 2;
+        }
+        if (this.final_weapon.rapid)
+            return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
+        else
+            return [count * ammo];
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -529,6 +539,11 @@ class WeaponSystem extends Part {
                     stats.cost += 4;
                 //Turret Size costs handled in Weapon.ts
             }
+        }
+
+        if (this.projectile_sel == ProjectileType.HEATRAY) {
+            //Cant have extra ammo for heatray.
+            this.ammo = 1;
         }
 
         //Ammunition Cost

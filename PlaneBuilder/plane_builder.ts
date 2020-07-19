@@ -3,11 +3,6 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 
-//TODO: "Adjusted Drag" ect.
-//TODO: Autopilot for no cockpits
-//TODO: Weapon card, List Special Rules
-//TODO: Dashboard, List Special Rules, but only some?
-
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");

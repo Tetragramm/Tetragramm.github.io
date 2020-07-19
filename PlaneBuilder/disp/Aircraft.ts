@@ -916,7 +916,14 @@ class Aircraft_HTML extends Display {
         this.visibility_cell.textContent = this.acft.GetVisibilityList().toString();
         this.attack_cell.textContent = this.acft.GetAttackList().toString();
         this.communications_cell.textContent = this.acft.GetCommunicationName();
-        this.electric_cell.textContent = stats.charge.toString(); //TODO Windmill
+        var wm = this.acft.GetAccessories().GetWindmill();
+        var bat = this.acft.GetAccessories().GetStorage();
+        var electric_str = stats.charge.toString();
+        if (wm > 0)
+            electric_str += " + " + wm.toString() + "/10 speed";
+        if (bat > 0)
+            electric_str += " + " + bat + " storage";
+        this.electric_cell.textContent = electric_str;
 
         var vital = "";
         var vlist = this.acft.VitalComponentList();
@@ -981,8 +988,16 @@ class Aircraft_HTML extends Display {
             weaphtml += "for " + wlist[w.GetWeaponSelected()].damage + " damage with " + h[0].toString() + "\\"
                 + h[1].toString() + "\\"
                 + h[2].toString() + "\\"
-                + h[3].toString() + " hits with "
-                + w.GetFinalWeapon().ammo * w.GetAmmo() + " ammunition. ";//TODO
+                + h[3].toString() + " hits with ";
+            if (w.GetProjectile() == ProjectileType.HEATRAY) {
+                let chgs = w.GetHRCharges();
+                if (chgs.length == 1)
+                    weaphtml += chgs[0].toString() + " charges. ";
+                else
+                    weaphtml += chgs[0].toString() + "/" + chgs[1].toString() + " charges. ";
+            } else {
+                weaphtml += w.GetFinalWeapon().ammo * w.GetAmmo() + " ammunition. ";
+            }
             if (w.GetFinalWeapon().rapid || w.GetFinalWeapon().shells || w.GetFinalWeapon().ap > 0) {
                 weaphtml += "["
                 weaphtml += " Jam " + w.GetJam();

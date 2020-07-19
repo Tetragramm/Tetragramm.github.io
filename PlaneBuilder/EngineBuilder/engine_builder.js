@@ -289,32 +289,38 @@ class Stats {
             && this.fuel == other.fuel
             && this.charge == other.charge;
     }
+    rtz(num) {
+        if (num > 0) {
+            return Math.floor(1.0e-6 + num);
+        }
+        return Math.ceil(-1.0e-6 + num);
+    }
     Round() {
-        this.liftbleed = Math.floor(1.0e-6 + this.liftbleed);
-        this.wetmass = Math.floor(1.0e-6 + this.wetmass);
-        this.mass = Math.floor(1.0e-6 + this.mass);
-        this.drag = Math.floor(1.0e-6 + this.drag);
-        this.control = Math.floor(1.0e-6 + this.control);
-        this.cost = Math.floor(1.0e-6 + this.cost);
-        this.reqsections = Math.floor(1.0e-6 + this.reqsections);
-        this.visibility = Math.floor(1.0e-6 + this.visibility);
-        this.flightstress = Math.floor(1.0e-6 + this.flightstress);
-        this.escape = Math.floor(1.0e-6 + this.escape);
-        this.pitchstab = Math.floor(1.0e-6 + this.pitchstab);
-        this.latstab = Math.floor(1.0e-6 + this.latstab);
-        this.cooling = Math.floor(1.0e-6 + this.cooling);
-        this.reliability = Math.floor(1.0e-6 + this.reliability);
-        this.power = Math.floor(1.0e-6 + this.power);
-        this.fuelconsumption = Math.floor(1.0e-6 + this.fuelconsumption);
-        this.maxstrain = Math.floor(1.0e-6 + this.maxstrain);
-        this.structure = Math.floor(1.0e-6 + this.structure);
-        this.wingarea = Math.floor(1.0e-6 + this.wingarea);
-        this.toughness = Math.floor(1.0e-6 + this.toughness);
-        this.upkeep = Math.floor(1.0e-6 + this.upkeep);
-        this.crashsafety = Math.floor(1.0e-6 + this.crashsafety);
-        this.bomb_mass = Math.floor(1.0e-6 + this.bomb_mass);
-        this.fuel = Math.floor(1.0e-6 + this.fuel);
-        this.charge = Math.floor(1.0e-6 + this.charge);
+        this.liftbleed = this.rtz(this.liftbleed);
+        this.wetmass = this.rtz(this.wetmass);
+        this.mass = this.rtz(this.mass);
+        this.drag = this.rtz(this.drag);
+        this.control = this.rtz(this.control);
+        this.cost = this.rtz(this.cost);
+        this.reqsections = this.rtz(this.reqsections);
+        this.visibility = this.rtz(this.visibility);
+        this.flightstress = this.rtz(this.flightstress);
+        this.escape = this.rtz(this.escape);
+        this.pitchstab = this.rtz(this.pitchstab);
+        this.latstab = this.rtz(this.latstab);
+        this.cooling = this.rtz(this.cooling);
+        this.reliability = this.rtz(this.reliability);
+        this.power = this.rtz(this.power);
+        this.fuelconsumption = this.rtz(this.fuelconsumption);
+        this.maxstrain = this.rtz(this.maxstrain);
+        this.structure = this.rtz(this.structure);
+        this.wingarea = this.rtz(this.wingarea);
+        this.toughness = this.rtz(this.toughness);
+        this.upkeep = this.rtz(this.upkeep);
+        this.crashsafety = this.rtz(this.crashsafety);
+        this.bomb_mass = this.rtz(this.bomb_mass);
+        this.fuel = this.rtz(this.fuel);
+        this.charge = this.rtz(this.charge);
     }
     Clone() {
         return this.Add(new Stats());
@@ -2667,7 +2673,7 @@ class Accessories extends Part {
         for (let elem of js["electrical"]) {
             this.electric_list.push({
                 name: elem["name"], stats: new Stats(elem),
-                cp10p: elem["cp10p"]
+                cp10s: elem["cp10s"]
             });
         }
         this.electrical_count = [...Array(this.electric_list.length).fill(0)];
@@ -2902,6 +2908,16 @@ class Accessories extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    GetStorage() {
+        return 5 * this.electrical_count[2];
+    }
+    GetWindmill() {
+        var production = 0;
+        for (let i = 0; i < this.electrical_count.length; i++) {
+            production += this.electric_list[i].cp10s * this.electrical_count[i];
+        }
+        return production;
+    }
     PartStats() {
         var stats = new Stats();
         this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
@@ -2931,7 +2947,7 @@ class Accessories extends Part {
             let ts = this.electric_list[i].stats.Clone();
             ts = ts.Multiply(this.electrical_count[i]);
             stats = stats.Add(ts);
-            stats.charge += Math.floor(1.0e-6 + this.electrical_count[i] * this.electric_list[i].cp10p * this.acft_power / 10);
+            stats.charge += Math.floor(1.0e-6 + this.electrical_count[i] * this.electric_list[i].cp10s * this.acft_power / 10);
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
         //Information
@@ -2952,6 +2968,7 @@ class Accessories extends Part {
         //Control
         stats = stats.Add(this.auto_list[this.auto_sel].stats);
         stats = stats.Add(this.cont_list[this.cont_sel].stats);
+        stats.Round();
         return stats;
     }
 }
@@ -9061,12 +9078,6 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
-            var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
-            if (this.action_sel == ActionType.GAST) {
-                ammo *= 2;
-            }
-            var warn = "Uses Charges as ammo " + ammo.toString() + "/" + Math.floor(1.5 * ammo).toString() + ".";
-            this.final_weapon.stats.warnings = [{ source: this.final_weapon.name + " Heat Ray", warning: warn }];
             this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Incendiary shots. Take -2 forward to Eyeball after firing." });
         }
         else if (this.projectile_sel == ProjectileType.GYROJETS) {
@@ -9342,6 +9353,21 @@ class WeaponSystem extends Part {
     SetStickyGuns(num) {
         this.sticky_guns = num;
     }
+    GetHRCharges() {
+        var count = 0;
+        for (let w of this.weapons) {
+            count += w.GetCount();
+        }
+        //Calc charges / shot.
+        var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
+        if (this.action_sel == ActionType.GAST) {
+            ammo *= 2;
+        }
+        if (this.final_weapon.rapid)
+            return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
+        else
+            return [count * ammo];
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -9371,6 +9397,10 @@ class WeaponSystem extends Part {
                     stats.cost += 4;
                 //Turret Size costs handled in Weapon.ts
             }
+        }
+        if (this.projectile_sel == ProjectileType.HEATRAY) {
+            //Cant have extra ammo for heatray.
+            this.ammo = 1;
         }
         //Ammunition Cost
         stats.mass += (this.ammo - 1) * count;

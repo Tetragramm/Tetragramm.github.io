@@ -300,33 +300,39 @@ class Stats {
             && this.charge == other.charge;
 
     }
+    private rtz(num: number) {
+        if (num > 0) {
+            return Math.floor(1.0e-6 + num);
+        }
+        return Math.ceil(-1.0e-6 + num);
+    }
 
     public Round() {
-        this.liftbleed = Math.floor(1.0e-6 + this.liftbleed);
-        this.wetmass = Math.floor(1.0e-6 + this.wetmass);
-        this.mass = Math.floor(1.0e-6 + this.mass);
-        this.drag = Math.floor(1.0e-6 + this.drag);
-        this.control = Math.floor(1.0e-6 + this.control);
-        this.cost = Math.floor(1.0e-6 + this.cost);
-        this.reqsections = Math.floor(1.0e-6 + this.reqsections);
-        this.visibility = Math.floor(1.0e-6 + this.visibility);
-        this.flightstress = Math.floor(1.0e-6 + this.flightstress);
-        this.escape = Math.floor(1.0e-6 + this.escape);
-        this.pitchstab = Math.floor(1.0e-6 + this.pitchstab);
-        this.latstab = Math.floor(1.0e-6 + this.latstab);
-        this.cooling = Math.floor(1.0e-6 + this.cooling);
-        this.reliability = Math.floor(1.0e-6 + this.reliability);
-        this.power = Math.floor(1.0e-6 + this.power);
-        this.fuelconsumption = Math.floor(1.0e-6 + this.fuelconsumption);
-        this.maxstrain = Math.floor(1.0e-6 + this.maxstrain);
-        this.structure = Math.floor(1.0e-6 + this.structure);
-        this.wingarea = Math.floor(1.0e-6 + this.wingarea);
-        this.toughness = Math.floor(1.0e-6 + this.toughness);
-        this.upkeep = Math.floor(1.0e-6 + this.upkeep);
-        this.crashsafety = Math.floor(1.0e-6 + this.crashsafety);
-        this.bomb_mass = Math.floor(1.0e-6 + this.bomb_mass);
-        this.fuel = Math.floor(1.0e-6 + this.fuel);
-        this.charge = Math.floor(1.0e-6 + this.charge);
+        this.liftbleed = this.rtz(this.liftbleed);
+        this.wetmass = this.rtz(this.wetmass);
+        this.mass = this.rtz(this.mass);
+        this.drag = this.rtz(this.drag);
+        this.control = this.rtz(this.control);
+        this.cost = this.rtz(this.cost);
+        this.reqsections = this.rtz(this.reqsections);
+        this.visibility = this.rtz(this.visibility);
+        this.flightstress = this.rtz(this.flightstress);
+        this.escape = this.rtz(this.escape);
+        this.pitchstab = this.rtz(this.pitchstab);
+        this.latstab = this.rtz(this.latstab);
+        this.cooling = this.rtz(this.cooling);
+        this.reliability = this.rtz(this.reliability);
+        this.power = this.rtz(this.power);
+        this.fuelconsumption = this.rtz(this.fuelconsumption);
+        this.maxstrain = this.rtz(this.maxstrain);
+        this.structure = this.rtz(this.structure);
+        this.wingarea = this.rtz(this.wingarea);
+        this.toughness = this.rtz(this.toughness);
+        this.upkeep = this.rtz(this.upkeep);
+        this.crashsafety = this.rtz(this.crashsafety);
+        this.bomb_mass = this.rtz(this.bomb_mass);
+        this.fuel = this.rtz(this.fuel);
+        this.charge = this.rtz(this.charge);
     }
 
     public Clone() {

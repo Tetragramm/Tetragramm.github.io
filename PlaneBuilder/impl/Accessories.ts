@@ -6,7 +6,7 @@ class Accessories extends Part {
     //Electrical
     private electric_list: {
         name: string, stats: Stats,
-        cp10p: number
+        cp10s: number
     }[];
     private electrical_count: number[];
     private radio_list: { name: string, stats: Stats }[];
@@ -43,7 +43,7 @@ class Accessories extends Part {
         for (let elem of js["electrical"]) {
             this.electric_list.push({
                 name: elem["name"], stats: new Stats(elem),
-                cp10p: elem["cp10p"]
+                cp10s: elem["cp10s"]
             });
         }
         this.electrical_count = [...Array(this.electric_list.length).fill(0)];
@@ -324,6 +324,18 @@ class Accessories extends Part {
         this.CalculateStats = callback;
     }
 
+    public GetStorage() {
+        return 5 * this.electrical_count[2];
+    }
+
+    public GetWindmill() {
+        var production = 0;
+        for (let i = 0; i < this.electrical_count.length; i++) {
+            production += this.electric_list[i].cp10s * this.electrical_count[i];
+        }
+        return production;
+    }
+
     public PartStats() {
         var stats = new Stats();
 
@@ -356,7 +368,7 @@ class Accessories extends Part {
             let ts = this.electric_list[i].stats.Clone();
             ts = ts.Multiply(this.electrical_count[i]);
             stats = stats.Add(ts);
-            stats.charge += Math.floor(1.0e-6 + this.electrical_count[i] * this.electric_list[i].cp10p * this.acft_power / 10);
+            stats.charge += Math.floor(1.0e-6 + this.electrical_count[i] * this.electric_list[i].cp10s * this.acft_power / 10);
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
 
@@ -386,7 +398,7 @@ class Accessories extends Part {
         stats = stats.Add(this.auto_list[this.auto_sel].stats);
         stats = stats.Add(this.cont_list[this.cont_sel].stats);
 
-
+        stats.Round();
         return stats;
     }
 }
