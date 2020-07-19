@@ -10373,7 +10373,7 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
-        BlinkIfChanged(disp.stats.shots, (set.GetFinalWeapon().ammo * set.GetAmmo()).toString());
+        BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
     }
     UpdateWSets() {
         var wsets = this.weap.GetWeaponSets();
@@ -11525,7 +11525,7 @@ class Aircraft_HTML extends Display {
                     weaphtml += chgs[0].toString() + "/" + chgs[1].toString() + " charges. ";
             }
             else {
-                weaphtml += w.GetFinalWeapon().ammo * w.GetAmmo() + " ammunition. ";
+                weaphtml += w.GetShots() + " ammunition. ";
             }
             if (w.GetFinalWeapon().rapid || w.GetFinalWeapon().shells || w.GetFinalWeapon().ap > 0) {
                 weaphtml += "[";
@@ -12469,7 +12469,7 @@ class WeaponSystem extends Part {
         }
         else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
-            this.final_weapon.ammo = Math.floor(this.weapon_list[num].ammo / 2);
+            this.final_weapon.ammo = this.weapon_list[num].ammo / 2;
             this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
@@ -12768,6 +12768,9 @@ class WeaponSystem extends Part {
             return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
         else
             return [count * ammo];
+    }
+    GetShots() {
+        return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;

@@ -250,7 +250,7 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
-        BlinkIfChanged(disp.stats.shots, (set.GetFinalWeapon().ammo * set.GetAmmo()).toString());
+        BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
     }
 
     private UpdateWSets() {

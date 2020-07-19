@@ -180,7 +180,7 @@ class WeaponSystem extends Part {
             this.final_weapon.synched = true;
         } else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
-            this.final_weapon.ammo = Math.floor(this.weapon_list[num].ammo / 2);
+            this.final_weapon.ammo = this.weapon_list[num].ammo / 2;
             this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
@@ -504,6 +504,10 @@ class WeaponSystem extends Part {
             return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
         else
             return [count * ammo];
+    }
+
+    public GetShots() {
+        return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
     }
 
     public SetCalculateStats(callback: () => void) {

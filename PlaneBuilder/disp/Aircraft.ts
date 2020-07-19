@@ -996,7 +996,7 @@ class Aircraft_HTML extends Display {
                 else
                     weaphtml += chgs[0].toString() + "/" + chgs[1].toString() + " charges. ";
             } else {
-                weaphtml += w.GetFinalWeapon().ammo * w.GetAmmo() + " ammunition. ";
+                weaphtml += w.GetShots() + " ammunition. ";
             }
             if (w.GetFinalWeapon().rapid || w.GetFinalWeapon().shells || w.GetFinalWeapon().ap > 0) {
                 weaphtml += "["
