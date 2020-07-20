@@ -19,7 +19,7 @@ class Radiator extends Part {
         super();
         this.need_cool = 0;
         this.idx_type = 0;
-        this.idx_mount = 0;
+        this.idx_mount = 1;
         this.idx_coolant = 0;
         this.metal_area = 0;
         this.engine_count = 0;
