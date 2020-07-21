@@ -1897,7 +1897,7 @@ class Passengers extends Part {
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
 class Engine extends Part {
-    constructor(ml, ppl, cl) {
+    constructor(ml, cl) {
         super();
         this.elist_idx = "Custom";
         this.etype_stats = engine_list.get(this.elist_idx).get_stats(0);
@@ -1910,7 +1910,6 @@ class Engine extends Part {
         this.mount_list = ml;
         this.selected_mount = 0;
         this.intake_fan = false;
-        this.pp_list = ppl;
         this.use_pp = false;
         this.torque_to_struct = false;
         this.cowl_list = cl;
@@ -2303,7 +2302,7 @@ class Engine extends Part {
         return this.torque_to_struct;
     }
     CanTorqueToStruct() {
-        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].pp_type == "wing";
+        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].mount_type == "wing";
     }
     UpdateReliability(num) {
         this.total_reliability = this.etype_stats.stats.reliability;
@@ -2337,10 +2336,10 @@ class Engine extends Part {
             this.cooling_count = 0;
             this.has_alternator = false;
             this.is_generator = false;
-            if (this.mount_list[this.selected_mount].pp_type == "fuselage") {
+            if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
                 for (let i = 0; i < this.mount_list.length; i++) {
                     this.selected_mount = i;
-                    if (this.mount_list[this.selected_mount].pp_type != "fuselage")
+                    if (this.mount_list[this.selected_mount].mount_type != "fuselage")
                         break;
                 }
             }
@@ -2352,7 +2351,7 @@ class Engine extends Part {
     GetIsTractorNacelle() {
         if (!this.GetIsPulsejet()
             && !this.GetUsePushPull()
-            && this.mount_list[this.selected_mount].pp_type == "wing")
+            && this.mount_list[this.selected_mount].powerfactor == 0.8)
             return true;
         return false;
     }
@@ -2506,9 +2505,9 @@ class Engine extends Part {
         stats = stats.Add(this.etype_stats.stats);
         if (this.etype_stats.oiltank)
             stats.mass += 1;
-        if (this.mount_list[this.selected_mount].pp_type == "fuselage")
+        if (this.mount_list[this.selected_mount].mount_type == "fuselage")
             stats.latstab -= this.etype_stats.torque;
-        else if (this.mount_list[this.selected_mount].pp_type == "wing") {
+        else if (this.mount_list[this.selected_mount].mount_type == "wing") {
             if (this.torque_to_struct)
                 stats.structure -= this.etype_stats.torque;
             else
@@ -2516,7 +2515,6 @@ class Engine extends Part {
         }
         //Push-pull
         if (this.use_pp) {
-            var pp_type = this.mount_list[this.selected_mount].pp_type;
             stats.power *= 2;
             stats.mass *= 2;
             stats.cooling *= 2;
@@ -2525,7 +2523,7 @@ class Engine extends Part {
             stats.latstab *= 2;
             stats.structure *= 2;
             stats.maxstrain *= 2;
-            stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
+            stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
         //Air Cooling Fan
         if (this.IsAirCooled() && this.intake_fan) {
@@ -2590,16 +2588,12 @@ class Engines extends Part {
         this.radiators = [];
         this.mount_list = [];
         for (let elem of js["mounts"]) {
-            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], pp_type: elem["push-pull"], reqED: false, reqTail: false };
+            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false };
             if (elem["reqED"])
                 mount.reqED = true;
             if (elem["reqTail"])
                 mount.reqTail = true;
             this.mount_list.push(mount);
-        }
-        this.pp_list = [];
-        for (let elem of js["push-pull"]) {
-            this.pp_list[elem["type"]] = { name: elem["name"], powerfactor: elem["powerfactor"] };
         }
         this.is_asymmetric = false;
         this.r_type_list = [];
@@ -2652,7 +2646,7 @@ class Engines extends Part {
         }
         this.engines = [];
         for (let elem of js["engines"]) {
-            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.cowl_list);
             eng.fromJSON(elem, json_version);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -2675,7 +2669,7 @@ class Engines extends Part {
         var elen = d.GetNum();
         this.engines = [];
         for (let i = 0; i < elen; i++) {
-            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.cowl_list);
             eng.deserialize(d);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -2734,7 +2728,7 @@ class Engines extends Part {
             js = JSON.stringify(this.engines[this.engines.length - 1].toJSON());
         }
         while (this.engines.length < num) {
-            let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let en = new Engine(this.mount_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
                 en.fromJSON(JSON.parse(js), 1000);
@@ -8063,7 +8057,6 @@ class Engine_HTML extends Display {
         for (let elem of this.engine.GetMountList()) {
             let opt = document.createElement("OPTION");
             opt.text = elem.name;
-            opt.value = elem.pp_type;
             this.mount_select.add(opt);
         }
         this.mount_select.required = true;

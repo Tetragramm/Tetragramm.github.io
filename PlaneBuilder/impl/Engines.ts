@@ -5,8 +5,7 @@
 
 class Engines extends Part {
     private engines: Engine[];
-    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, pp_type: string, reqED: boolean, reqTail: boolean }[];
-    private pp_list: Array<{ name: string, powerfactor: number }>;
+    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean }[];
     private radiators: Radiator[];
     private is_asymmetric: boolean;
     private r_type_list: { name: string, stats: Stats, dragpercool: number }[];
@@ -21,17 +20,12 @@ class Engines extends Part {
 
         this.mount_list = [];
         for (let elem of js["mounts"]) {
-            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], pp_type: elem["push-pull"], reqED: false, reqTail: false };
+            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false };
             if (elem["reqED"])
                 mount.reqED = true;
             if (elem["reqTail"])
                 mount.reqTail = true;
             this.mount_list.push(mount);
-        }
-
-        this.pp_list = [];
-        for (let elem of js["push-pull"]) {
-            this.pp_list[elem["type"]] = { name: elem["name"], powerfactor: elem["powerfactor"] };
         }
 
         this.is_asymmetric = false;
@@ -90,7 +84,7 @@ class Engines extends Part {
 
         this.engines = [];
         for (let elem of js["engines"]) {
-            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.cowl_list);
             eng.fromJSON(elem, json_version);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -117,7 +111,7 @@ class Engines extends Part {
         var elen = d.GetNum();
         this.engines = [];
         for (let i = 0; i < elen; i++) {
-            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.cowl_list);
             eng.deserialize(d);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -184,7 +178,7 @@ class Engines extends Part {
             js = JSON.stringify(this.engines[this.engines.length - 1].toJSON());
         }
         while (this.engines.length < num) {
-            let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let en = new Engine(this.mount_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
                 en.fromJSON(JSON.parse(js), 1000);

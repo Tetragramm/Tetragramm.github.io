@@ -231,7 +231,8 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 0,
-                "push-pull": "fuselage"
+                "location": "fuselage",
+                "powerfactor": 0.9
             },
             {
                 "name": "Center-Mounted Tractor",
@@ -242,8 +243,9 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 0,
-                "push-pull": "fuselage",
-                "reqED": true
+                "location": "fuselage",
+                "reqED": true,
+                "powerfactor": 0.9
             },
             {
                 "name": "Rear-Mounted Pusher",
@@ -254,7 +256,8 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 0,
-                "push-pull": "fuselage"
+                "location": "fuselage",
+                "powerfactor": 0.9
             },
             {
                 "name": "Center-Mounted Pusher",
@@ -265,8 +268,9 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 0,
-                "push-pull": "fuselage",
-                "reqTail": true
+                "location": "fuselage",
+                "reqTail": true,
+                "powerfactor": 0.9
             },
             {
                 "name": "Pod",
@@ -277,7 +281,8 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 0,
-                "push-pull": "pod"
+                "location": "pod",
+                "powerfactor": 0.9
             },
             {
                 "name": "Nacelle (Inside)",
@@ -288,7 +293,8 @@
                 "liftbleed": 1,
                 "strainfactor": 0.5,
                 "dragfactor": 0,
-                "push-pull": "wing"
+                "location": "wing",
+                "powerfactor": 0.8
             },
             {
                 "name": "Nacelle (Offset)",
@@ -299,7 +305,8 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 1,
-                "push-pull": "wing"
+                "location": "wing",
+                "powerfactor": 0.8
             },
             {
                 "name": "Channel Tractor",
@@ -310,23 +317,7 @@
                 "liftbleed": -1,
                 "strainfactor": 1,
                 "dragfactor": 0,
-                "push-pull": "fuselage"
-            }
-        ],
-        "push-pull": [
-            {
-                "type": "fuselage",
-                "name": "Tractor + Pusher/Rearward",
-                "powerfactor": 0.9
-            },
-            {
-                "type": "wing",
-                "name": "Nacelle/Nacelle",
-                "powerfactor": 0.8
-            },
-            {
-                "type": "pod",
-                "name": "Tandem Pod",
+                "location": "wing",
                 "powerfactor": 0.9
             }
         ],

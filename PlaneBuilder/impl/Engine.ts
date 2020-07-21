@@ -11,10 +11,9 @@ class Engine extends Part {
     private radiator_index: number;
     private num_radiators: number;
 
-    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, pp_type: string, reqED: boolean, reqTail: boolean }[];
+    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean }[];
     private selected_mount: number;
 
-    private pp_list: { name: string, powerfactor: number }[];
     private use_pp: boolean;
     private torque_to_struct: boolean;
 
@@ -32,8 +31,7 @@ class Engine extends Part {
     private total_reliability: number;
 
     constructor(
-        ml: { name: string, stats: Stats, strainfactor: number, dragfactor: number, pp_type: string, reqED: boolean, reqTail: boolean }[],
-        ppl: { name: string, powerfactor: number }[],
+        ml: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean }[],
         cl: { name: string, stats: Stats, ed: number, mpd: number, air: boolean, liquid: boolean, rotary: boolean }[]) {
 
         super();
@@ -51,7 +49,6 @@ class Engine extends Part {
         this.selected_mount = 0;
 
         this.intake_fan = false;
-        this.pp_list = ppl;
         this.use_pp = false;
         this.torque_to_struct = false;
 
@@ -442,7 +439,7 @@ class Engine extends Part {
         return this.use_pp;
     }
 
-    public GetMountList(): { name: string, stats: Stats, strainfactor: number, dragfactor: number, pp_type: string, reqED: boolean, reqTail: boolean }[] {
+    public GetMountList() {
         return this.mount_list;
     }
 
@@ -491,7 +488,7 @@ class Engine extends Part {
     }
 
     public CanTorqueToStruct() {
-        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].pp_type == "wing";
+        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].mount_type == "wing";
     }
 
     public UpdateReliability(num: number) {
@@ -530,10 +527,10 @@ class Engine extends Part {
             this.cooling_count = 0;
             this.has_alternator = false;
             this.is_generator = false;
-            if (this.mount_list[this.selected_mount].pp_type == "fuselage") {
+            if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
                 for (let i = 0; i < this.mount_list.length; i++) {
                     this.selected_mount = i;
-                    if (this.mount_list[this.selected_mount].pp_type != "fuselage")
+                    if (this.mount_list[this.selected_mount].mount_type != "fuselage")
                         break;
                 }
             }
@@ -547,7 +544,7 @@ class Engine extends Part {
     public GetIsTractorNacelle() {
         if (!this.GetIsPulsejet()
             && !this.GetUsePushPull()
-            && this.mount_list[this.selected_mount].pp_type == "wing")
+            && this.mount_list[this.selected_mount].powerfactor == 0.8)
             return true;
         return false;
     }
@@ -730,9 +727,9 @@ class Engine extends Part {
         if (this.etype_stats.oiltank)
             stats.mass += 1;
 
-        if (this.mount_list[this.selected_mount].pp_type == "fuselage")
+        if (this.mount_list[this.selected_mount].mount_type == "fuselage")
             stats.latstab -= this.etype_stats.torque;
-        else if (this.mount_list[this.selected_mount].pp_type == "wing") {
+        else if (this.mount_list[this.selected_mount].mount_type == "wing") {
             if (this.torque_to_struct)
                 stats.structure -= this.etype_stats.torque;
             else
@@ -741,7 +738,6 @@ class Engine extends Part {
 
         //Push-pull
         if (this.use_pp) {
-            var pp_type = this.mount_list[this.selected_mount].pp_type;
             stats.power *= 2;
             stats.mass *= 2;
             stats.cooling *= 2;
@@ -750,7 +746,7 @@ class Engine extends Part {
             stats.latstab *= 2;
             stats.structure *= 2;
             stats.maxstrain *= 2;
-            stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
+            stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
 
         //Air Cooling Fan

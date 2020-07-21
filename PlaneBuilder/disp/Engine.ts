@@ -167,7 +167,6 @@ class Engine_HTML extends Display {
         for (let elem of this.engine.GetMountList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = elem.name;
-            opt.value = elem.pp_type;
             this.mount_select.add(opt);
         }
         this.mount_select.required = true;
