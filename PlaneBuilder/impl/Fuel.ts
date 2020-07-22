@@ -126,6 +126,12 @@ class Fuel extends Part {
                 }
             }
         }
+        //Limit microtanks to 4
+        for (let i = 0; i < this.tank_count.length; i++) {
+            if (this.tank_stats[i].stats.wetmass == 0) {
+                this.tank_count[i] = Math.min(4, this.tank_count[i]);
+            }
+        }
         return mod;
     }
 
