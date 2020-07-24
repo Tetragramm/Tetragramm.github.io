@@ -755,7 +755,7 @@ class Aircraft_HTML extends Display {
         this.eloss_cell = row9.insertCell();
         CreateTH(row9, "Toughness");
         this.toughness_cell = row9.insertCell();
-        CreateTH(row9, "Visibiilty");
+        CreateTH(row9, "Visibilty");
         this.visibility_cell = row9.insertCell();
 
         var row10 = tbl.insertRow();
