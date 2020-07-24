@@ -130,12 +130,12 @@ class Reinforcement_HTML extends Display {
         this.wing_blades.checked = this.rf.GetWingBlade();
 
         var stats = this.rf.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
         var derivedMS = aircraft_model.GetDerivedStats().MaxStrain;
-        BlinkIfChanged(this.d_amax, derivedMS.toString());
+        BlinkIfChanged(this.d_amax, derivedMS.toString(), true);
     }
 }

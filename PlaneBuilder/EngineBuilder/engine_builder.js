@@ -1607,14 +1607,41 @@ function FlexSpace(fs) {
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
 }
-function Blink(elem) {
-    elem.classList.toggle("changed", false);
+function BlinkBad(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
     elem.offsetHeight;
-    elem.classList.toggle("changed");
+    elem.classList.toggle("changed_b");
 }
-function BlinkIfChanged(elem, str) {
+function BlinkGood(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_g");
+}
+function BlinkNeutral(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_n");
+}
+function BlinkIfChanged(elem, str, positive_good = null) {
     if (elem.textContent != str) {
-        Blink(elem);
+        if (positive_good == null) {
+            BlinkNeutral(elem);
+        }
+        else {
+            var positive = parseInt(elem.textContent) < parseInt(str);
+            if (positive_good && positive || (!positive_good && !positive)) {
+                BlinkGood(elem);
+            }
+            else {
+                BlinkBad(elem);
+            }
+        }
     }
     elem.textContent = str;
 }
@@ -2315,18 +2342,18 @@ class EngineBuilder_HTML {
             this.e_upgs[i].disabled = !can_upg[i];
         }
         BlinkIfChanged(this.ed_name, estats.name);
-        BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
-        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
-        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString());
-        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString());
-        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString());
-        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString());
-        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString());
+        BlinkIfChanged(this.ed_powr, estats.stats.power.toString(), true);
+        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString(), false);
+        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString(), false);
+        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString(), true);
+        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString(), false);
+        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString(), true);
+        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString(), false);
         var b = this.enginebuilder.min_IAF;
         var t = this.enginebuilder.min_IAF + estats.altitude;
         BlinkIfChanged(this.ed_malt, b.toString() + "-" + t.toString());
-        BlinkIfChanged(this.ed_torq, estats.torque.toString());
-        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString());
+        BlinkIfChanged(this.ed_torq, estats.torque.toString(), false);
+        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString(), false);
         if (estats.oiltank)
             BlinkIfChanged(this.ed_oilt, "Yes");
         else
@@ -3468,7 +3495,7 @@ class Passengers extends Part {
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
 class Engine extends Part {
-    constructor(ml, ppl, cl) {
+    constructor(ml, cl) {
         super();
         this.elist_idx = "Custom";
         this.etype_stats = engine_list.get(this.elist_idx).get_stats(0);
@@ -3481,7 +3508,6 @@ class Engine extends Part {
         this.mount_list = ml;
         this.selected_mount = 0;
         this.intake_fan = false;
-        this.pp_list = ppl;
         this.use_pp = false;
         this.torque_to_struct = false;
         this.cowl_list = cl;
@@ -3874,7 +3900,7 @@ class Engine extends Part {
         return this.torque_to_struct;
     }
     CanTorqueToStruct() {
-        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].pp_type == "wing";
+        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].mount_type == "wing";
     }
     UpdateReliability(num) {
         this.total_reliability = this.etype_stats.stats.reliability;
@@ -3908,10 +3934,10 @@ class Engine extends Part {
             this.cooling_count = 0;
             this.has_alternator = false;
             this.is_generator = false;
-            if (this.mount_list[this.selected_mount].pp_type == "fuselage") {
+            if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
                 for (let i = 0; i < this.mount_list.length; i++) {
                     this.selected_mount = i;
-                    if (this.mount_list[this.selected_mount].pp_type != "fuselage")
+                    if (this.mount_list[this.selected_mount].mount_type != "fuselage")
                         break;
                 }
             }
@@ -3923,7 +3949,7 @@ class Engine extends Part {
     GetIsTractorNacelle() {
         if (!this.GetIsPulsejet()
             && !this.GetUsePushPull()
-            && this.mount_list[this.selected_mount].pp_type == "wing")
+            && this.mount_list[this.selected_mount].powerfactor == 0.8)
             return true;
         return false;
     }
@@ -4075,11 +4101,12 @@ class Engine extends Part {
     PartStats() {
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
+        stats.upkeep = stats.power / 10;
         if (this.etype_stats.oiltank)
             stats.mass += 1;
-        if (this.mount_list[this.selected_mount].pp_type == "fuselage")
+        if (this.mount_list[this.selected_mount].mount_type == "fuselage")
             stats.latstab -= this.etype_stats.torque;
-        else if (this.mount_list[this.selected_mount].pp_type == "wing") {
+        else if (this.mount_list[this.selected_mount].mount_type == "wing") {
             if (this.torque_to_struct)
                 stats.structure -= this.etype_stats.torque;
             else
@@ -4087,7 +4114,6 @@ class Engine extends Part {
         }
         //Push-pull
         if (this.use_pp) {
-            var pp_type = this.mount_list[this.selected_mount].pp_type;
             stats.power *= 2;
             stats.mass *= 2;
             stats.cooling *= 2;
@@ -4096,7 +4122,8 @@ class Engine extends Part {
             stats.latstab *= 2;
             stats.structure *= 2;
             stats.maxstrain *= 2;
-            stats.power = Math.floor(1.0e-6 + this.pp_list[pp_type].powerfactor * stats.power);
+            stats.upkeep *= 2;
+            stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
         //Air Cooling Fan
         if (this.IsAirCooled() && this.intake_fan) {
@@ -4161,16 +4188,12 @@ class Engines extends Part {
         this.radiators = [];
         this.mount_list = [];
         for (let elem of js["mounts"]) {
-            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], pp_type: elem["push-pull"], reqED: false, reqTail: false };
+            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false };
             if (elem["reqED"])
                 mount.reqED = true;
             if (elem["reqTail"])
                 mount.reqTail = true;
             this.mount_list.push(mount);
-        }
-        this.pp_list = [];
-        for (let elem of js["push-pull"]) {
-            this.pp_list[elem["type"]] = { name: elem["name"], powerfactor: elem["powerfactor"] };
         }
         this.is_asymmetric = false;
         this.r_type_list = [];
@@ -4223,7 +4246,7 @@ class Engines extends Part {
         }
         this.engines = [];
         for (let elem of js["engines"]) {
-            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.cowl_list);
             eng.fromJSON(elem, json_version);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -4246,7 +4269,7 @@ class Engines extends Part {
         var elen = d.GetNum();
         this.engines = [];
         for (let i = 0; i < elen; i++) {
-            let eng = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let eng = new Engine(this.mount_list, this.cowl_list);
             eng.deserialize(d);
             eng.SetCalculateStats(this.CalculateStats);
             this.engines.push(eng);
@@ -4305,7 +4328,7 @@ class Engines extends Part {
             js = JSON.stringify(this.engines[this.engines.length - 1].toJSON());
         }
         while (this.engines.length < num) {
-            let en = new Engine(this.mount_list, this.pp_list, this.cowl_list);
+            let en = new Engine(this.mount_list, this.cowl_list);
             en.SetCalculateStats(this.CalculateStats);
             if (js)
                 en.fromJSON(JSON.parse(js), 1000);
@@ -4471,7 +4494,7 @@ class Engines extends Part {
             ecost += en.GetCurrentStats().stats.cost;
         }
         //Upkeep calc only uses engine costs
-        stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.power / 10, ecost));
+        stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
@@ -6620,6 +6643,12 @@ class Fuel extends Part {
                 }
             }
         }
+        //Limit microtanks to 4
+        for (let i = 0; i < this.tank_count.length; i++) {
+            if (this.tank_stats[i].stats.wetmass == 0) {
+                this.tank_count[i] = Math.min(4, this.tank_count[i]);
+            }
+        }
         return mod;
     }
     GetSealingEnabled() {
@@ -8538,6 +8567,7 @@ class Aircraft {
         //Flight Stress from Rumble. Excess structure can reduce stress.
         if (this.engines.GetMaxRumble() > 0) {
             FlightStress += Math.max(1, 2 * this.engines.GetMaxRumble() - this.stats.structure / 10);
+            FlightStress = Math.floor(1.0e-6 + FlightStress);
         }
         FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
         FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
@@ -8795,7 +8825,7 @@ class Radiator extends Part {
         super();
         this.need_cool = 0;
         this.idx_type = 0;
-        this.idx_mount = 0;
+        this.idx_mount = 1;
         this.idx_coolant = 0;
         this.metal_area = 0;
         this.engine_count = 0;
@@ -9068,7 +9098,7 @@ class WeaponSystem extends Part {
         }
         else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
-            this.final_weapon.ammo = Math.floor(this.weapon_list[num].ammo / 2);
+            this.final_weapon.ammo = this.weapon_list[num].ammo / 2;
             this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
@@ -9367,6 +9397,9 @@ class WeaponSystem extends Part {
             return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
         else
             return [count * ammo];
+    }
+    GetShots() {
+        return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;

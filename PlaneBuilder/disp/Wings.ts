@@ -151,17 +151,17 @@ class Wings_HTML extends Display {
         this.CreateMWAdd(mwl.length);
 
         var stats = this.wings.PartStats();
-        BlinkIfChanged(this.d_area, stats.wingarea.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_chrg, "0");//stats.charge.toString(); //TODO: Charge
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_area, stats.wingarea.toString(), true);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_chrg, "0", true);//stats.charge.toString(); //TODO: Charge
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         if (this.wings.IsFlammable())
             BlinkIfChanged(this.d_flam, "Yes");
         else

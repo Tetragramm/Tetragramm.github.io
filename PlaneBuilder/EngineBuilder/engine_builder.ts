@@ -304,18 +304,18 @@ class EngineBuilder_HTML {
         }
 
         BlinkIfChanged(this.ed_name, estats.name);
-        BlinkIfChanged(this.ed_powr, estats.stats.power.toString());
-        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString());
-        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString());
-        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString());
-        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString());
-        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString());
-        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString());
+        BlinkIfChanged(this.ed_powr, estats.stats.power.toString(), true);
+        BlinkIfChanged(this.ed_mass, estats.stats.mass.toString(), false);
+        BlinkIfChanged(this.ed_drag, estats.stats.drag.toString(), false);
+        BlinkIfChanged(this.ed_rely, estats.stats.reliability.toString(), true);
+        BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString(), false);
+        BlinkIfChanged(this.ed_ospd, estats.overspeed.toString(), true);
+        BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString(), false);
         var b = this.enginebuilder.min_IAF;
         var t = this.enginebuilder.min_IAF + estats.altitude;
         BlinkIfChanged(this.ed_malt, b.toString() + "-" + t.toString());
-        BlinkIfChanged(this.ed_torq, estats.torque.toString());
-        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString());
+        BlinkIfChanged(this.ed_torq, estats.torque.toString(), false);
+        BlinkIfChanged(this.ed_cost, estats.stats.cost.toString(), false);
         if (estats.oiltank)
             BlinkIfChanged(this.ed_oilt, "Yes");
         else

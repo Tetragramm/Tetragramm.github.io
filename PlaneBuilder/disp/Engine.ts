@@ -461,21 +461,21 @@ class Engine_HTML extends Display {
         this.alternator_input.disabled = !this.engine.GetAlternatorEnabled();
 
         var full_stats = this.engine.PartStats();
-        BlinkIfChanged(this.d_powr, full_stats.power.toString());
-        BlinkIfChanged(this.d_mass, full_stats.mass.toString());
-        BlinkIfChanged(this.d_drag, full_stats.drag.toString());
-        BlinkIfChanged(this.d_rely, this.engine.GetReliability().toString());
-        BlinkIfChanged(this.d_visi, full_stats.visibility.toString());
-        BlinkIfChanged(this.d_over, this.engine.GetOverspeed().toString());
-        BlinkIfChanged(this.d_cost, full_stats.cost.toString());
-        BlinkIfChanged(this.d_alti, e_stats.altitude.toString());
-        BlinkIfChanged(this.d_fuel, full_stats.fuelconsumption.toString());
-        BlinkIfChanged(this.d_pstb, full_stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, full_stats.latstab.toString());
-        BlinkIfChanged(this.d_maxs, full_stats.maxstrain.toString());
-        BlinkIfChanged(this.d_strc, full_stats.structure.toString());
-        BlinkIfChanged(this.d_fstr, full_stats.flightstress.toString());
-        BlinkIfChanged(this.d_sect, full_stats.reqsections.toString());
-        BlinkIfChanged(this.d_chrg, full_stats.charge.toString());
+        BlinkIfChanged(this.d_powr, full_stats.power.toString(), true);
+        BlinkIfChanged(this.d_mass, full_stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, full_stats.drag.toString(), false);
+        BlinkIfChanged(this.d_rely, this.engine.GetReliability().toString(), true);
+        BlinkIfChanged(this.d_visi, full_stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_over, this.engine.GetOverspeed().toString(), true);
+        BlinkIfChanged(this.d_cost, full_stats.cost.toString(), false);
+        BlinkIfChanged(this.d_alti, e_stats.altitude.toString(), true);
+        BlinkIfChanged(this.d_fuel, full_stats.fuelconsumption.toString(), false);
+        BlinkIfChanged(this.d_pstb, full_stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, full_stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_maxs, full_stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_strc, full_stats.structure.toString(), true);
+        BlinkIfChanged(this.d_fstr, full_stats.flightstress.toString(), false);
+        BlinkIfChanged(this.d_sect, full_stats.reqsections.toString(), false);
+        BlinkIfChanged(this.d_chrg, full_stats.charge.toString(), true);
     }
 }

@@ -195,16 +195,16 @@ class Frames_HTML extends Display {
             BlinkIfChanged(this.d_flammable, "No");
 
         var stats = this.frames.PartStats();
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_visi, stats.visibility.toString());
-        BlinkIfChanged(this.d_area, stats.wingarea.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_strn, stats.maxstrain.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString(), true);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_area, stats.wingarea.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_strn, stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
     }
 
     private CreateSection(i: number, sec: {

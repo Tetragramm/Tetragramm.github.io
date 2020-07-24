@@ -218,7 +218,7 @@ class Aircraft_HTML extends Display {
                     this.acft.CalculateStats();
                 }
             } catch {
-                Blink(load_text_area.parentElement);
+                BlinkBad(load_text_area.parentElement);
             } finally {
                 load_text_area.value = "";
             }
@@ -233,7 +233,7 @@ class Aircraft_HTML extends Display {
                     this.acft.CalculateStats();
                 }
             } catch {
-                Blink(load_text_area2.parentElement);
+                BlinkBad(load_text_area2.parentElement);
             } finally {
                 load_text_area2.value = "";
             }
@@ -809,27 +809,27 @@ class Aircraft_HTML extends Display {
             + (stats.mass % 5).toString()
             + "/5)";
 
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.d_drag, dragbreak);
         BlinkIfChanged(this.d_mass, massbreak);
-        BlinkIfChanged(this.d_wmas, stats.wetmass.toString());
-        BlinkIfChanged(this.d_bmas, stats.bomb_mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_upkp, stats.upkeep.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_powr, stats.power.toString());
-        BlinkIfChanged(this.d_fcom, stats.fuelconsumption.toString());
-        BlinkIfChanged(this.d_fuel, stats.fuel.toString());
-        BlinkIfChanged(this.d_pspd, stats.pitchspeed.toString());
-        BlinkIfChanged(this.d_pbst, stats.pitchboost.toString());
-        BlinkIfChanged(this.d_wara, stats.wingarea.toString());
-        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_chrg, stats.charge.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+        BlinkIfChanged(this.d_wmas, stats.wetmass.toString(), false);
+        BlinkIfChanged(this.d_bmas, stats.bomb_mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_upkp, stats.upkeep.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_powr, stats.power.toString(), true);
+        BlinkIfChanged(this.d_fcom, stats.fuelconsumption.toString(), false);
+        BlinkIfChanged(this.d_fuel, stats.fuel.toString(), true);
+        BlinkIfChanged(this.d_pspd, stats.pitchspeed.toString(), true);
+        BlinkIfChanged(this.d_pbst, stats.pitchboost.toString(), true);
+        BlinkIfChanged(this.d_wara, stats.wingarea.toString(), true);
+        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString(), true);
+        BlinkIfChanged(this.d_chrg, stats.charge.toString(), true);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
     }
 
     private UpdateDerived() {

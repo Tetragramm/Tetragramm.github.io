@@ -155,11 +155,11 @@ class Load_HTML extends Display {
         stats = stats.Add(this.boom.PartStats());
         stats = stats.Add(this.cargo.PartStats());
 
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_wmas, stats.wetmass.toString());
-        BlinkIfChanged(this.d_rsec, stats.reqsections.toString());
-        BlinkIfChanged(this.d_fuel, stats.fuel.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_wmas, stats.wetmass.toString(), false);
+        BlinkIfChanged(this.d_rsec, stats.reqsections.toString(), false);
+        BlinkIfChanged(this.d_fuel, stats.fuel.toString(), true);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
     }
 }

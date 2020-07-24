@@ -317,18 +317,126 @@ button[disabled] {
 	to {background-color: var(--prt_lcl_color);}
 }
 
-.changed {
+.changed_b {
 	-webkit-animation: changed 1s 1;
 	-moz-animation: changed 1s 1;
 	-o-animation: changed 1s 1;
 	animation: changed 1s 1;
 }
 
-.changed.part_local {
+.changed_b.part_local {
 	-webkit-animation: changedpl 1s 1;
 	-moz-animation: changedpl 1s 1;
 	-o-animation: changedpl 1s 1;
 	animation: changedpl 1s 1;
+}
+
+@-webkit-keyframes changed_g {
+	from {background-color: #009900;}
+	to {background-color: var(--bkg_color);}
+}
+
+@-moz-keyframes changed_g {
+	from {background-color: #009900;}
+	to {background-color: var(--bkg_color);}
+}
+
+@-o-keyframes changed_g {
+	from {background-color: #009900;}
+	to {background-color: var(--bkg_color);}
+}
+
+@keyframes changed_g {
+	from {background-color: #009900;}
+	to {background-color: var(--bkg_color);}
+}
+
+@-webkit-keyframes changed_g_pl {
+	from {background-color: #009900;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+@-moz-keyframes changed_g_pl {
+	from {background-color: #009900;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+@-o-keyframes changed_g_pl {
+	from {background-color: #009900;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+@keyframes changed_g_pl {
+	from {background-color: #009900;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+.changed_g {
+	-webkit-animation: changed_g 1s 1;
+	-moz-animation: changed_g 1s 1;
+	-o-animation: changed_g 1s 1;
+	animation: changed_g 1s 1;
+}
+
+.changed_g.part_local {
+	-webkit-animation: changed_g_pl 1s 1;
+	-moz-animation: changed_g_pl 1s 1;
+	-o-animation: changed_g_pl 1s 1;
+	animation: changed_g_pl 1s 1;
+}
+
+@-webkit-keyframes changed_n {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--bkg_color);}
+}
+
+@-moz-keyframes changed_n {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--bkg_color);}
+}
+
+@-o-keyframes changed_n {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--bkg_color);}
+}
+
+@keyframes changed_n {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--bkg_color);}
+}
+
+@-webkit-keyframes changed_n_pl {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+@-moz-keyframes changed_n_pl {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+@-o-keyframes changed_n_pl {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+@keyframes changed_n_pl {
+	from {background-color: #FFFFFF;}
+	to {background-color: var(--prt_lcl_color);}
+}
+
+.changed_n {
+	-webkit-animation: changed_n 1s 1;
+	-moz-animation: changed_n 1s 1;
+	-o-animation: changed_n 1s 1;
+	animation: changed_n 1s 1;
+}
+
+.changed_n.part_local {
+	-webkit-animation: changed_n_pl 1s 1;
+	-moz-animation: changed_n_pl 1s 1;
+	-o-animation: changed_n_pl 1s 1;
+	animation: changed_n_pl 1s 1;
 }
 
 .flex-container-o {

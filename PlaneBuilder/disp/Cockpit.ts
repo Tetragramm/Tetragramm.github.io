@@ -136,15 +136,15 @@ class Cockpit_HTML extends Display {
 
     public UpdateDisplay() {
         let stats = this.cockpit.PartStats();
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_rseq, stats.reqsections.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
-        BlinkIfChanged(this.d_strs, this.cockpit.GetFlightStress().toString());
-        BlinkIfChanged(this.d_escp, this.cockpit.GetEscape().toString());
-        BlinkIfChanged(this.d_visi, this.cockpit.GetVisibility().toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_rseq, stats.reqsections.toString(), false);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
+        BlinkIfChanged(this.d_strs, this.cockpit.GetFlightStress().toString(), true);
+        BlinkIfChanged(this.d_escp, this.cockpit.GetEscape().toString(), true);
+        BlinkIfChanged(this.d_visi, this.cockpit.GetVisibility().toString(), true);
 
         this.sel_type.selectedIndex = this.cockpit.GetType();
 

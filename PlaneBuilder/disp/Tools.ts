@@ -232,15 +232,42 @@ function FlexSpace(fs: FlexSection) {
     fs.div2.appendChild(lbl2);
 }
 
-function Blink(elem: HTMLElement) {
-    elem.classList.toggle("changed", false);
+function BlinkBad(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
     elem.offsetHeight;
-    elem.classList.toggle("changed");
+    elem.classList.toggle("changed_b");
 }
 
-function BlinkIfChanged(elem: HTMLElement, str: string) {
+function BlinkGood(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_g");
+}
+
+function BlinkNeutral(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_n");
+}
+
+function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
     if (elem.textContent != str) {
-        Blink(elem);
+        if (positive_good == null) {
+            BlinkNeutral(elem);
+        } else {
+            var positive = parseInt(elem.textContent) < parseInt(str);
+            if (positive_good && positive || (!positive_good && !positive)) {
+                BlinkGood(elem);
+            } else {
+                BlinkBad(elem);
+            }
+        }
     }
     elem.textContent = str;
 }

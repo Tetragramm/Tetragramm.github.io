@@ -138,13 +138,13 @@ class ControlSurfaces_HTML extends Display {
 
         var stats = this.cs.PartStats();
         var cost = stats.cost + this.cs.GetFlapCost();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, cost.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, cost.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
     }
 }

@@ -236,10 +236,10 @@ class Weapons_HTML extends Display {
         }
 
         var stats = set.PartStats();
-        BlinkIfChanged(disp.stats.mass, stats.mass.toString());
-        BlinkIfChanged(disp.stats.drag, stats.drag.toString());
-        BlinkIfChanged(disp.stats.cost, stats.cost.toString());
-        BlinkIfChanged(disp.stats.sect, stats.reqsections.toString());
+        BlinkIfChanged(disp.stats.mass, stats.mass.toString(), false);
+        BlinkIfChanged(disp.stats.drag, stats.drag.toString(), false);
+        BlinkIfChanged(disp.stats.cost, stats.cost.toString(), false);
+        BlinkIfChanged(disp.stats.sect, stats.reqsections.toString(), false);
 
         var h = set.GetHits();
         var hits = h[0].toString() + "\\"

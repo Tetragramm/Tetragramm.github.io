@@ -92,10 +92,10 @@ class LandingGear_HTML extends Display {
         }
 
         var stats = this.gear.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
     }
 }

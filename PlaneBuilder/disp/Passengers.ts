@@ -42,7 +42,7 @@ class Passengers_HTML extends Display {
         this.nbeds.valueAsNumber = this.pass.GetBeds();
         this.connect.checked = this.pass.GetConnected();
         this.connect.disabled = !this.pass.PossibleConnection();
-        BlinkIfChanged(this.mass, stats.mass.toString());
-        BlinkIfChanged(this.reqseq, stats.reqsections.toString());
+        BlinkIfChanged(this.mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.reqseq, stats.reqsections.toString(), false);
     }
 }

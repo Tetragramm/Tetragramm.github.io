@@ -212,13 +212,13 @@ class Accessories_HTML extends Display {
         this.cont.selectedIndex = this.acc.GetControlSel();
 
         var stats = this.acc.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_chgh, stats.charge.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_visi, stats.visibility.toString());
-        BlinkIfChanged(this.d_strs, stats.flightstress.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_chgh, stats.charge.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_strs, stats.flightstress.toString(), false);
     }
 }

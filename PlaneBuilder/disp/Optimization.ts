@@ -160,14 +160,14 @@ class Optimization_HTML extends Display {
         this.UpdateEnabled(can_dot, this.drag_cbx);
         //Update Stats
         var stats = this.opt.PartStats();
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_escp, stats.escape.toString());
-        BlinkIfChanged(this.d_visi, stats.visibility.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_mstr, this.opt.final_ms.toString());
-        BlinkIfChanged(this.d_reli, stats.reliability.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_escp, stats.escape.toString(), true);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString(), true);
+        BlinkIfChanged(this.d_mstr, this.opt.final_ms.toString(), true);
+        BlinkIfChanged(this.d_reli, stats.reliability.toString(), true);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
     }
 }

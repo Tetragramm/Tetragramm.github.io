@@ -93,10 +93,10 @@ class Radiator_HTML extends Display {
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         this.harden_input.checked = this.radiator.GetHarden();
         var stats = this.radiator.PartStats();
-        BlinkIfChanged(this.c_mass, stats.mass.toString());
-        BlinkIfChanged(this.c_cost, stats.cost.toString());
-        BlinkIfChanged(this.c_drag, stats.drag.toString());
-        BlinkIfChanged(this.c_rely, stats.reliability.toString());
-        BlinkIfChanged(this.c_lstb, stats.latstab.toString());
+        BlinkIfChanged(this.c_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.c_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.c_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.c_rely, stats.reliability.toString(), true);
+        BlinkIfChanged(this.c_lstb, stats.latstab.toString(), true);
     }
 }

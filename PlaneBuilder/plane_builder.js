@@ -7281,6 +7281,7 @@ class Aircraft {
         //Flight Stress from Rumble. Excess structure can reduce stress.
         if (this.engines.GetMaxRumble() > 0) {
             FlightStress += Math.max(1, 2 * this.engines.GetMaxRumble() - this.stats.structure / 10);
+            FlightStress = Math.floor(1.0e-6 + FlightStress);
         }
         FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
         FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
@@ -7682,14 +7683,41 @@ function FlexSpace(fs) {
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
 }
-function Blink(elem) {
-    elem.classList.toggle("changed", false);
+function BlinkBad(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
     elem.offsetHeight;
-    elem.classList.toggle("changed");
+    elem.classList.toggle("changed_b");
 }
-function BlinkIfChanged(elem, str) {
+function BlinkGood(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_g");
+}
+function BlinkNeutral(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_n");
+}
+function BlinkIfChanged(elem, str, positive_good = null) {
     if (elem.textContent != str) {
-        Blink(elem);
+        if (positive_good == null) {
+            BlinkNeutral(elem);
+        }
+        else {
+            var positive = parseInt(elem.textContent) < parseInt(str);
+            if (positive_good && positive || (!positive_good && !positive)) {
+                BlinkGood(elem);
+            }
+            else {
+                BlinkBad(elem);
+            }
+        }
     }
     elem.textContent = str;
 }
@@ -7750,7 +7778,7 @@ class Era_HTML extends Display {
     }
     UpdateDisplay() {
         this.select.selectedIndex = this.model.GetSelected();
-        BlinkIfChanged(this.bleed, this.model.GetLiftBleed().toString());
+        BlinkIfChanged(this.bleed, this.model.GetLiftBleed().toString(), false);
     }
 }
 /// <reference path="./Display.ts" />
@@ -7859,15 +7887,15 @@ class Cockpit_HTML extends Display {
     }
     UpdateDisplay() {
         let stats = this.cockpit.PartStats();
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_rseq, stats.reqsections.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
-        BlinkIfChanged(this.d_strs, this.cockpit.GetFlightStress().toString());
-        BlinkIfChanged(this.d_escp, this.cockpit.GetEscape().toString());
-        BlinkIfChanged(this.d_visi, this.cockpit.GetVisibility().toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_rseq, stats.reqsections.toString(), false);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
+        BlinkIfChanged(this.d_strs, this.cockpit.GetFlightStress().toString(), true);
+        BlinkIfChanged(this.d_escp, this.cockpit.GetEscape().toString(), true);
+        BlinkIfChanged(this.d_visi, this.cockpit.GetVisibility().toString(), true);
         this.sel_type.selectedIndex = this.cockpit.GetType();
         var upgs = this.cockpit.GetSelectedUpgrades();
         for (let i = 0; i < this.upg_chbxs.length; i++) {
@@ -7956,8 +7984,8 @@ class Passengers_HTML extends Display {
         this.nbeds.valueAsNumber = this.pass.GetBeds();
         this.connect.checked = this.pass.GetConnected();
         this.connect.disabled = !this.pass.PossibleConnection();
-        BlinkIfChanged(this.mass, stats.mass.toString());
-        BlinkIfChanged(this.reqseq, stats.reqsections.toString());
+        BlinkIfChanged(this.mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.reqseq, stats.reqsections.toString(), false);
     }
 }
 /// <reference path="./Display.ts" />
@@ -8346,22 +8374,22 @@ class Engine_HTML extends Display {
         this.alternator_input.checked = this.engine.GetAlternator();
         this.alternator_input.disabled = !this.engine.GetAlternatorEnabled();
         var full_stats = this.engine.PartStats();
-        BlinkIfChanged(this.d_powr, full_stats.power.toString());
-        BlinkIfChanged(this.d_mass, full_stats.mass.toString());
-        BlinkIfChanged(this.d_drag, full_stats.drag.toString());
-        BlinkIfChanged(this.d_rely, this.engine.GetReliability().toString());
-        BlinkIfChanged(this.d_visi, full_stats.visibility.toString());
-        BlinkIfChanged(this.d_over, this.engine.GetOverspeed().toString());
-        BlinkIfChanged(this.d_cost, full_stats.cost.toString());
-        BlinkIfChanged(this.d_alti, e_stats.altitude.toString());
-        BlinkIfChanged(this.d_fuel, full_stats.fuelconsumption.toString());
-        BlinkIfChanged(this.d_pstb, full_stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, full_stats.latstab.toString());
-        BlinkIfChanged(this.d_maxs, full_stats.maxstrain.toString());
-        BlinkIfChanged(this.d_strc, full_stats.structure.toString());
-        BlinkIfChanged(this.d_fstr, full_stats.flightstress.toString());
-        BlinkIfChanged(this.d_sect, full_stats.reqsections.toString());
-        BlinkIfChanged(this.d_chrg, full_stats.charge.toString());
+        BlinkIfChanged(this.d_powr, full_stats.power.toString(), true);
+        BlinkIfChanged(this.d_mass, full_stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, full_stats.drag.toString(), false);
+        BlinkIfChanged(this.d_rely, this.engine.GetReliability().toString(), true);
+        BlinkIfChanged(this.d_visi, full_stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_over, this.engine.GetOverspeed().toString(), true);
+        BlinkIfChanged(this.d_cost, full_stats.cost.toString(), false);
+        BlinkIfChanged(this.d_alti, e_stats.altitude.toString(), true);
+        BlinkIfChanged(this.d_fuel, full_stats.fuelconsumption.toString(), false);
+        BlinkIfChanged(this.d_pstb, full_stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, full_stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_maxs, full_stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_strc, full_stats.structure.toString(), true);
+        BlinkIfChanged(this.d_fstr, full_stats.flightstress.toString(), false);
+        BlinkIfChanged(this.d_sect, full_stats.reqsections.toString(), false);
+        BlinkIfChanged(this.d_chrg, full_stats.charge.toString(), true);
     }
 }
 /// <reference path="./Part.ts" />
@@ -8580,11 +8608,11 @@ class Radiator_HTML extends Display {
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         this.harden_input.checked = this.radiator.GetHarden();
         var stats = this.radiator.PartStats();
-        BlinkIfChanged(this.c_mass, stats.mass.toString());
-        BlinkIfChanged(this.c_cost, stats.cost.toString());
-        BlinkIfChanged(this.c_drag, stats.drag.toString());
-        BlinkIfChanged(this.c_rely, stats.reliability.toString());
-        BlinkIfChanged(this.c_lstb, stats.latstab.toString());
+        BlinkIfChanged(this.c_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.c_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.c_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.c_rely, stats.reliability.toString(), true);
+        BlinkIfChanged(this.c_lstb, stats.latstab.toString(), true);
     }
 }
 /// <reference path="./Display.ts" />
@@ -8819,16 +8847,16 @@ class Frames_HTML extends Display {
         else
             BlinkIfChanged(this.d_flammable, "No");
         var stats = this.frames.PartStats();
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_visi, stats.visibility.toString());
-        BlinkIfChanged(this.d_area, stats.wingarea.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_strn, stats.maxstrain.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString(), true);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_area, stats.wingarea.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_strn, stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
     }
     CreateSection(i, sec) {
         var fsec = {
@@ -9090,17 +9118,17 @@ class Wings_HTML extends Display {
         this.CreateFWAdd(wl.length);
         this.CreateMWAdd(mwl.length);
         var stats = this.wings.PartStats();
-        BlinkIfChanged(this.d_area, stats.wingarea.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_chrg, "0"); //stats.charge.toString(); //TODO: Charge
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_area, stats.wingarea.toString(), true);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_chrg, "0", true); //stats.charge.toString(); //TODO: Charge
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         if (this.wings.IsFlammable())
             BlinkIfChanged(this.d_flam, "Yes");
         else
@@ -9410,12 +9438,12 @@ class Stabilizers_HTML extends Display {
         this.v_count.valueAsNumber = this.stab.GetVStabCount();
         this.v_count.step = this.stab.GetVStabIncrement().toString();
         var stats = this.stab.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
     }
 }
 /// <reference path="./Display.ts" />
@@ -9526,14 +9554,14 @@ class ControlSurfaces_HTML extends Display {
         }
         var stats = this.cs.PartStats();
         var cost = stats.cost + this.cs.GetFlapCost();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, cost.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, cost.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
     }
 }
 /// <reference path="./Display.ts" />
@@ -9639,13 +9667,13 @@ class Reinforcement_HTML extends Display {
         this.wing_blades.disabled = !this.rf.CanWingBlade();
         this.wing_blades.checked = this.rf.GetWingBlade();
         var stats = this.rf.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
         var derivedMS = aircraft_model.GetDerivedStats().MaxStrain;
-        BlinkIfChanged(this.d_amax, derivedMS.toString());
+        BlinkIfChanged(this.d_amax, derivedMS.toString(), true);
     }
 }
 /// <reference path="./Display.ts" />
@@ -9764,12 +9792,12 @@ class Load_HTML extends Display {
         var stats = this.fuel.PartStats();
         stats = stats.Add(this.boom.PartStats());
         stats = stats.Add(this.cargo.PartStats());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_wmas, stats.wetmass.toString());
-        BlinkIfChanged(this.d_rsec, stats.reqsections.toString());
-        BlinkIfChanged(this.d_fuel, stats.fuel.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_wmas, stats.wetmass.toString(), false);
+        BlinkIfChanged(this.d_rsec, stats.reqsections.toString(), false);
+        BlinkIfChanged(this.d_fuel, stats.fuel.toString(), true);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
     }
 }
 /// <reference path="./Display.ts" />
@@ -9844,11 +9872,11 @@ class LandingGear_HTML extends Display {
             this.extras[i].checked = lst[i];
         }
         var stats = this.gear.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
     }
 }
 /// <reference path="./Display.ts" />
@@ -10018,14 +10046,14 @@ class Accessories_HTML extends Display {
         this.auto.selectedIndex = this.acc.GetAutopilotSel();
         this.cont.selectedIndex = this.acc.GetControlSel();
         var stats = this.acc.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_chgh, stats.charge.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_visi, stats.visibility.toString());
-        BlinkIfChanged(this.d_strs, stats.flightstress.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_chgh, stats.charge.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_strs, stats.flightstress.toString(), false);
     }
 }
 /// <reference path="./Display.ts" />
@@ -10162,15 +10190,15 @@ class Optimization_HTML extends Display {
         this.UpdateEnabled(can_dot, this.drag_cbx);
         //Update Stats
         var stats = this.opt.PartStats();
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
-        BlinkIfChanged(this.d_escp, stats.escape.toString());
-        BlinkIfChanged(this.d_visi, stats.visibility.toString());
-        BlinkIfChanged(this.d_mass, stats.mass.toString());
-        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_mstr, this.opt.final_ms.toString());
-        BlinkIfChanged(this.d_reli, stats.reliability.toString());
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_escp, stats.escape.toString(), true);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString(), true);
+        BlinkIfChanged(this.d_mstr, this.opt.final_ms.toString(), true);
+        BlinkIfChanged(this.d_reli, stats.reliability.toString(), true);
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
     }
 }
 /// <reference path="./Display.ts" />
@@ -10362,10 +10390,10 @@ class Weapons_HTML extends Display {
             }
         }
         var stats = set.PartStats();
-        BlinkIfChanged(disp.stats.mass, stats.mass.toString());
-        BlinkIfChanged(disp.stats.drag, stats.drag.toString());
-        BlinkIfChanged(disp.stats.cost, stats.cost.toString());
-        BlinkIfChanged(disp.stats.sect, stats.reqsections.toString());
+        BlinkIfChanged(disp.stats.mass, stats.mass.toString(), false);
+        BlinkIfChanged(disp.stats.drag, stats.drag.toString(), false);
+        BlinkIfChanged(disp.stats.cost, stats.cost.toString(), false);
+        BlinkIfChanged(disp.stats.sect, stats.reqsections.toString(), false);
         var h = set.GetHits();
         var hits = h[0].toString() + "\\"
             + h[1].toString() + "\\"
@@ -10791,7 +10819,7 @@ class Aircraft_HTML extends Display {
                 }
             }
             catch (_a) {
-                Blink(load_text_area.parentElement);
+                BlinkBad(load_text_area.parentElement);
             }
             finally {
                 load_text_area.value = "";
@@ -10808,7 +10836,7 @@ class Aircraft_HTML extends Display {
                 }
             }
             catch (_a) {
-                Blink(load_text_area2.parentElement);
+                BlinkBad(load_text_area2.parentElement);
             }
             finally {
                 load_text_area2.value = "";
@@ -11347,27 +11375,27 @@ class Aircraft_HTML extends Display {
         var massbreak = stats.mass.toString() + " ("
             + (stats.mass % 5).toString()
             + "/5)";
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.d_drag, dragbreak);
         BlinkIfChanged(this.d_mass, massbreak);
-        BlinkIfChanged(this.d_wmas, stats.wetmass.toString());
-        BlinkIfChanged(this.d_bmas, stats.bomb_mass.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_upkp, stats.upkeep.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_powr, stats.power.toString());
-        BlinkIfChanged(this.d_fcom, stats.fuelconsumption.toString());
-        BlinkIfChanged(this.d_fuel, stats.fuel.toString());
-        BlinkIfChanged(this.d_pspd, stats.pitchspeed.toString());
-        BlinkIfChanged(this.d_pbst, stats.pitchboost.toString());
-        BlinkIfChanged(this.d_wara, stats.wingarea.toString());
-        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString());
-        BlinkIfChanged(this.d_strc, stats.structure.toString());
-        BlinkIfChanged(this.d_tugh, stats.toughness.toString());
-        BlinkIfChanged(this.d_chrg, stats.charge.toString());
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString());
+        BlinkIfChanged(this.d_wmas, stats.wetmass.toString(), false);
+        BlinkIfChanged(this.d_bmas, stats.bomb_mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_upkp, stats.upkeep.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_powr, stats.power.toString(), true);
+        BlinkIfChanged(this.d_fcom, stats.fuelconsumption.toString(), false);
+        BlinkIfChanged(this.d_fuel, stats.fuel.toString(), true);
+        BlinkIfChanged(this.d_pspd, stats.pitchspeed.toString(), true);
+        BlinkIfChanged(this.d_pbst, stats.pitchboost.toString(), true);
+        BlinkIfChanged(this.d_wara, stats.wingarea.toString(), true);
+        BlinkIfChanged(this.d_mstr, stats.maxstrain.toString(), true);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_tugh, stats.toughness.toString(), true);
+        BlinkIfChanged(this.d_chrg, stats.charge.toString(), true);
+        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
     }
     UpdateDerived() {
         var stats = this.acft.GetStats();

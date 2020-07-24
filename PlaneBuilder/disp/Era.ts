@@ -28,6 +28,6 @@ class Era_HTML extends Display {
 
     public UpdateDisplay() {
         this.select.selectedIndex = this.model.GetSelected();
-        BlinkIfChanged(this.bleed, this.model.GetLiftBleed().toString());
+        BlinkIfChanged(this.bleed, this.model.GetLiftBleed().toString(), false);
     }
 }

@@ -106,11 +106,11 @@ class Stabilizers_HTML extends Display {
         this.v_count.step = this.stab.GetVStabIncrement().toString();
 
         var stats = this.stab.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString());
-        BlinkIfChanged(this.d_cont, stats.control.toString());
-        BlinkIfChanged(this.d_cost, stats.cost.toString());
-        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString());
-        BlinkIfChanged(this.d_lstb, stats.latstab.toString());
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString());
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_cont, stats.control.toString(), true);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
+        BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
     }
 }
