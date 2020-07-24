@@ -2503,6 +2503,7 @@ class Engine extends Part {
     PartStats() {
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
+        stats.upkeep = stats.power / 10;
         if (this.etype_stats.oiltank)
             stats.mass += 1;
         if (this.mount_list[this.selected_mount].mount_type == "fuselage")
@@ -2523,6 +2524,7 @@ class Engine extends Part {
             stats.latstab *= 2;
             stats.structure *= 2;
             stats.maxstrain *= 2;
+            stats.upkeep *= 2;
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
         //Air Cooling Fan
@@ -2894,7 +2896,9 @@ class Engines extends Part {
             ecost += en.GetCurrentStats().stats.cost;
         }
         //Upkeep calc only uses engine costs
-        stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.power / 10, ecost));
+        console.log([stats.upkeep.toString(), ecost.toString()]);
+        stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
+        console.log([stats.upkeep.toString()]);
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];

@@ -724,6 +724,8 @@ class Engine extends Part {
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
 
+        stats.upkeep = stats.power / 10;
+
         if (this.etype_stats.oiltank)
             stats.mass += 1;
 
@@ -746,6 +748,7 @@ class Engine extends Part {
             stats.latstab *= 2;
             stats.structure *= 2;
             stats.maxstrain *= 2;
+            stats.upkeep *= 2;
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
 
