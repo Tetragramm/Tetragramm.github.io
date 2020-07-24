@@ -368,9 +368,7 @@ class Engines extends Part {
         }
 
         //Upkeep calc only uses engine costs
-        console.log([stats.upkeep.toString(), ecost.toString()]);
         stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
-        console.log([stats.upkeep.toString()]);
 
         //Include radiaators
         for (let i = 0; i < this.radiators.length; i++) {
