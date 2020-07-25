@@ -159,7 +159,8 @@
                 "escape": 0,
                 "cost": 1,
                 "flightstress": 0,
-                "visibility": 0
+                "visibility": 0,
+                "crashsafety": -3
             }
         ],
         "safety": [
