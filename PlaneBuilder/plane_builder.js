@@ -3015,7 +3015,7 @@ class Propeller extends Part {
         if (this.have_propellers)
             return this.prop_list[this.idx_prop].energy;
         else
-            return 5;
+            return 2;
     }
     GetTurn() {
         if (this.have_propellers)
@@ -5760,7 +5760,6 @@ class Accessories extends Part {
             let ts = this.electric_list[i].stats.Clone();
             ts = ts.Multiply(this.electrical_count[i]);
             stats = stats.Add(ts);
-            stats.charge += Math.floor(1.0e-6 + this.electrical_count[i] * this.electric_list[i].cp10s * this.acft_power / 10);
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
         //Information
