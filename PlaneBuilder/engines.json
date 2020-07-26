@@ -1844,6 +1844,750 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "Himmilgard Pulsejet",
+            "engines": [
+                {
+                    "name": "Pulsejet PV-15 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 15,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Liquid Radial",
+            "engines": [
+                {
+                    "name": "Gernsback Motor 0005",
+                    "engine_type": 0,
+                    "type": 5,
+                    "era_sel": 1,
+                    "displacement": 12,
+                    "compression": 6,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Liquid Cooled",
+            "engines": [
+                {
+                    "name": "Bertha F1166 120hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 9.4,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bertha F1466 170hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.64,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bertha F1466 Über 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.64,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 0.9,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bertha F2000 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.6,
+                    "compression": 4.94,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Brandt Krieger I 370hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 18.77,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Brandt Kurier XVI 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Fleischmann F10 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.71,
+                    "compression": 4.3,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Fleischmann F10ü 300hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.71,
+                    "compression": 4.75,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Fokker Fungizidherstellung Typ 247 160hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 14.3,
+                    "compression": 4.8,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.85,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Meier Ochs 2 160hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 16.6,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.84,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Meier Windhund 70hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 6.3,
+                    "compression": 4,
+                    "cyl_per_row": 1,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1.3,
+                    "quality_fudge": 0.8,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro Arbeiter XVII 170hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.7,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-1140 220hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.4,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-760 150hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7.6,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-760tgl 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7.6,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.4,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-840 160hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 8.4,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro Kurier XXI 210hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.7,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Kurier XII 150hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 4.8,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Kurier XX 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Transporter I 300hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 22.08,
+                    "compression": 4.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.15,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Transporter III 320hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 22.08,
+                    "compression": 4.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Transporter V 350hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 22.08,
+                    "compression": 4.75,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schrankhut RD.300V 230hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 19.1,
+                    "compression": 6.4,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.51,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 1,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Wollsteinkraft Verteidiger C 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 24,
+                    "compression": 4.9,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.75,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Wollsteinkraft Verteidiger H 360hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 20,
+                    "compression": 6,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.85,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Wollsteinkraft Wagenhals C 290hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 14.4,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Contrarotary",
+            "engines": [
+                {
+                    "name": "Nationales Motorbüro R-1860 160hp",
+                    "engine_type": 0,
+                    "type": 3,
+                    "era_sel": 1,
+                    "displacement": 18.6,
+                    "compression": 6,
+                    "cyl_per_row": 11,
+                    "rows": 1,
+                    "RPM_boost": 0.65,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 1,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Air Cooled",
+            "engines": [
+                {
+                    "name": "Braun UL 90hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 8.8,
+                    "compression": 4.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1.3,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Braun ULK 110hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 8.8,
+                    "compression": 4.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1.2,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Scholz Luchs X 110hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 12.1,
+                    "compression": 4.85,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Semi-Radial",
+            "engines": [
+                {
+                    "name": "SLW Sigvird 180hp",
+                    "engine_type": 0,
+                    "type": 4,
+                    "era_sel": 1,
+                    "displacement": 11,
+                    "compression": 6,
+                    "cyl_per_row": 4,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 2,
+                    "compressor_count": 2,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
         }
     ]
 }
