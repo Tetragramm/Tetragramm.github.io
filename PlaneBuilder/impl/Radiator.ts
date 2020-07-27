@@ -18,7 +18,7 @@ class Radiator extends Part {
         ml: { name: string, stats: Stats }[], cl: { name: string, harden: boolean, flammable: boolean, stats: Stats }[]) {
         super();
         this.need_cool = 0;
-        this.idx_type = 0;
+        this.idx_type = 1;
         this.idx_mount = 1;
         this.idx_coolant = 0;
         this.metal_area = 0;
