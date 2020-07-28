@@ -1151,7 +1151,6 @@
             {
                 "name": "Drogue Chute",
                 "cost": 3,
-                "crashsafety": 3,
                 "warning": "Activate once per flight to: Give +3 to Go Down or take down a close pursuer."
             }
         ]
