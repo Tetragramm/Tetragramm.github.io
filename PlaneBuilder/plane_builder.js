@@ -1757,11 +1757,7 @@ class Cockpits extends Part {
         return lst;
     }
     GetCrashList() {
-        var lst = [];
-        for (let p of this.positions) {
-            lst.push(p.GetCrash());
-        }
-        return lst;
+        return [this.positions[0].GetCrash()];
     }
     SetNumberOfCockpits(num) {
         if (num != num || num < 1)
@@ -8397,7 +8393,7 @@ class Radiator extends Part {
     constructor(tl, ml, cl) {
         super();
         this.need_cool = 0;
-        this.idx_type = 0;
+        this.idx_type = 1;
         this.idx_mount = 1;
         this.idx_coolant = 0;
         this.metal_area = 0;

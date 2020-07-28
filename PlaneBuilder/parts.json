@@ -160,20 +160,20 @@
                 "cost": 1,
                 "flightstress": 0,
                 "visibility": 0,
-                "crashsafety": -3
+                "warning": "Position takes double Injury when you Go Down."
             }
         ],
         "safety": [
             {
                 "name": "Padding",
-                "crashsafety": 1,
-                "cost": 1
+                "cost": 1,
+                "warning": "Negates 1 Injury for this position when you Go Down"
             },
             {
                 "name": "Harness",
-                "crashsafety": 2,
                 "escape": -1,
-                "cost": 1
+                "cost": 1,
+                "warning": "Negates 1 Injury for this position when you Go Down"
             },
             {
                 "name": "Fast Release System",
@@ -183,7 +183,7 @@
             {
                 "name": "Roll Bar",
                 "mass": 2,
-                "crashsafety": 3
+                "warning": "Negates 1 Injury for this position when you Go Down"
             },
             {
                 "name": "Flare Slot",
@@ -1152,7 +1152,7 @@
                 "name": "Drogue Chute",
                 "cost": 3,
                 "crashsafety": 3,
-                "warning": "Can be activated as a weapon or a one-use Air-Brake."
+                "warning": "Activate once per flight to: Give +3 to Go Down or take down a close pursuer."
             }
         ]
     },
