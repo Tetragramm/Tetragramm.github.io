@@ -2510,6 +2510,19 @@ class Engine extends Part {
             else
                 stats.maxstrain -= this.etype_stats.torque;
         }
+        //ContraRotary Engines need geared propellers to function.
+        if (this.IsContraRotary()) {
+            this.gp_count = Math.max(1, this.gp_count);
+        }
+        stats.cost += this.gp_count + this.gpr_count;
+        //Extended Driveshafts
+        if (this.use_ds) {
+            stats.mass += 1;
+        }
+        //Cowls modify engine stats directly, not mounting or upgrade.
+        stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
+        stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
+        stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
         //Push-pull
         if (this.use_pp) {
             stats.power *= 2;
@@ -2523,7 +2536,10 @@ class Engine extends Part {
             stats.upkeep *= 2;
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
-        //Air Cooling Fan
+        //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
+        if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail || this.use_pp)
+            stats.cost += 2;
+        //Air Cooling Fan (only 1 / push-pull)
         if (this.IsAirCooled() && this.intake_fan) {
             stats.mass += 3;
             //Double Effect of Torque
@@ -2535,12 +2551,6 @@ class Engine extends Part {
         else {
             this.intake_fan = false;
         }
-        //Cowls modify engine stats directly, not mounting or upgrade.
-        stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
-        stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
-        stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
-        if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail)
-            stats.cost += 2;
         //Move here so it doesn't get affected by cowl.
         if (this.GetHasOilCooler()) {
             stats.drag += Math.floor(stats.power / 15);
@@ -2552,15 +2562,7 @@ class Engine extends Part {
             stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(1.0e-6 + this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
-        //Upgrades
-        if (this.use_ds) {
-            stats.mass += 1;
-        }
-        //ContraRotary Engines need geared propellers to function.
-        if (this.IsContraRotary()) {
-            this.gp_count = Math.max(1, this.gp_count);
-        }
-        stats.cost += this.gp_count + this.gpr_count;
+        // Power Generation
         if (this.is_generator) {
             stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
             stats.power = 0;
@@ -10449,7 +10451,7 @@ class Cards {
         this.rad_canvas = document.createElement("CANVAS");
         this.rad_canvas.width = 479;
         this.rad_canvas.height = 290;
-        this.rad_image = document.getElementById("eng_img");
+        this.rad_image = document.getElementById("rad_img");
         this.rad_image.width = 479;
         this.rad_image.height = 290;
         this.rad_image.src = './Cards/Radiator.png';

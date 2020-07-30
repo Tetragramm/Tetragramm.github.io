@@ -107,7 +107,7 @@ class Cards {
         this.rad_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
         this.rad_canvas.width = 479;
         this.rad_canvas.height = 290;
-        this.rad_image = document.getElementById("eng_img") as HTMLImageElement;
+        this.rad_image = document.getElementById("rad_img") as HTMLImageElement;
         this.rad_image.width = 479;
         this.rad_image.height = 290;
         this.rad_image.src = './Cards/Radiator.png';
