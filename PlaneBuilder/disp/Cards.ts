@@ -54,8 +54,7 @@ class Cards {
 
     public weap_data: {
         type: string,
-        ammo_mult: number,
-        ammo_base: number,
+        ammo: number,
         ap: number,
         jam: string,
         hits: number[],
@@ -157,8 +156,7 @@ class Cards {
 
         this.weap_data = {
             type: "",
-            ammo_mult: 0,
-            ammo_base: 0,
+            ammo: 0,
             ap: 0,
             jam: "",
             hits: [],
@@ -324,11 +322,11 @@ class Cards {
         context.font = "15px Balthazar";
         var ammo = "";
         if (this.weap_data.reload > 0) {
-            var clips = this.weap_data.ammo_base / this.weap_data.reload;
-            ammo += (clips * this.weap_data.ammo_mult).toString() + " loads of ";
+            ammo += (this.weap_data.ammo / this.weap_data.reload).toString() + " loads of ";
             ammo += this.weap_data.reload.toString() + " shots";
+            this.weap_data.tags.push("Reload " + this.weap_data.reload.toString());
         } else {
-            ammo += (this.weap_data.ammo_base * this.weap_data.ammo_mult).toString() + " shots";
+            ammo += this.weap_data.ammo.toString() + " shots";
         }
         context.fillText(ammo, 95, 158, 105);
         context.fillText(this.weap_data.ap.toString(), 172, 158, 23);

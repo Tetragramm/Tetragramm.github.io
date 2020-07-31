@@ -365,8 +365,7 @@ class Aircraft_HTML extends Display {
 
         var fweap = w.GetFinalWeapon();
 
-        this.cards.weap_data.ammo_base = fweap.ammo;
-        this.cards.weap_data.ammo_mult = w.GetAmmo();
+        this.cards.weap_data.ammo = w.GetShots();
         this.cards.weap_data.ap = fweap.ap;
         this.cards.weap_data.damage = fweap.damage;
         this.cards.weap_data.hits = w.GetHits();
@@ -1001,6 +1000,10 @@ class Aircraft_HTML extends Display {
             if (w.GetFinalWeapon().rapid || w.GetFinalWeapon().shells || w.GetFinalWeapon().ap > 0) {
                 weaphtml += "["
                 weaphtml += " Jam " + w.GetJam();
+                if (w.GetReload() > 0) {
+                    weaphtml += ", ";
+                    weaphtml += "Reload " + w.GetReload().toString();
+                }
                 if (w.GetFinalWeapon().rapid) {
                     weaphtml += ", ";
                     weaphtml += "Rapid Fire";

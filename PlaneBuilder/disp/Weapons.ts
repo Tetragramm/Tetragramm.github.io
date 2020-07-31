@@ -4,7 +4,7 @@
 type WType = {
     span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement,
     accessible: HTMLInputElement, free_access: HTMLInputElement, synch: HTMLSelectElement,
-    count: HTMLInputElement, repeating: HTMLInputElement
+    count: HTMLInputElement,
 };
 type WStatType = {
     mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement,
@@ -16,7 +16,7 @@ type WSetType = {
     count: HTMLInputElement, action: HTMLSelectElement,
     projectile: HTMLSelectElement, fixed: HTMLInputElement,
     wcell: HTMLTableCellElement, ammo: HTMLInputElement,
-    weaps: WType[], stats: WStatType
+    weaps: WType[], stats: WStatType, repeating: HTMLInputElement
 };
 class Weapons_HTML extends Display {
     private weap: Weapons;
@@ -56,6 +56,7 @@ class Weapons_HTML extends Display {
             weaps: [],
             ammo: document.createElement("INPUT") as HTMLInputElement,
             stats: { mass: null, drag: null, cost: null, sect: null, none: null, jams: null, hits: null, damg: null, shots: null },
+            repeating: document.createElement("INPUT") as HTMLInputElement,
         };
 
         var wlist = this.weap.GetWeaponList();
@@ -90,6 +91,8 @@ class Weapons_HTML extends Display {
         FlexInput("Ammunition", type.ammo, rfs);
         FlexSelect("Action", type.action, lfs);
         FlexSelect("Projectile", type.projectile, rfs);
+        FlexCheckbox("Autoloader", type.repeating, lfs);
+        FlexSpace(rfs);
         FlexCheckbox("Fixed", type.fixed, lfs);
         FlexSpace(rfs);
 
@@ -148,14 +151,12 @@ class Weapons_HTML extends Display {
             free_access: document.createElement("INPUT") as HTMLInputElement,
             synch: document.createElement("SELECT") as HTMLSelectElement,
             count: document.createElement("INPUT") as HTMLInputElement,
-            repeating: document.createElement("INPUT") as HTMLInputElement,
         };
         CreateCheckbox("Wing Mount", w.wing, w.span, false);
         CreateCheckbox("Accessible", w.accessible, w.span, false);
-        CreateCheckbox("Free Accessible", w.free_access, w.span, true);
+        CreateCheckbox("Free Accessible", w.free_access, w.span, false);
+        CreateCheckbox("Covered", w.covered, w.span, true);
         CreateInput("Weapons at Mount", w.count, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, false);
-        CreateCheckbox("Autoloader", w.repeating, w.span, true);
         CreateSelect("Synchronization", w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
 
@@ -187,6 +188,10 @@ class Weapons_HTML extends Display {
         disp.projectile.selectedIndex = set.GetProjectile();
         disp.projectile.disabled = !set.GetCanProjectile();
         disp.projectile.onchange = () => { set.SetProjectile(disp.projectile.selectedIndex); };
+
+        disp.repeating.checked = set.GetRepeating();
+        disp.repeating.onchange = () => { set.SetRepeating(disp.repeating.checked); };
+        disp.repeating.disabled = !set.CanRepeating();
 
         disp.fixed.checked = set.GetFixed();
         disp.fixed.onchange = () => { set.SetFixed(disp.fixed.checked); };
@@ -223,9 +228,6 @@ class Weapons_HTML extends Display {
             disp.weaps[i].free_access.disabled = !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible());
             disp.weaps[i].count.valueAsNumber = wlist[i].GetCount();
             disp.weaps[i].count.onchange = () => { wlist[i].SetCount(disp.weaps[i].count.valueAsNumber); };
-            disp.weaps[i].repeating.checked = wlist[i].GetRepeating();
-            disp.weaps[i].repeating.onchange = () => { wlist[i].SetRepeating(disp.weaps[i].repeating.checked); };
-            disp.weaps[i].repeating.disabled = !wlist[i].CanRepeating();
             disp.weaps[i].synch.selectedIndex = wlist[i].GetSynchronization() + 1;
             disp.weaps[i].synch.onchange = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
             disp.weaps[i].synch.disabled = !wlist[i].can_synchronize;

@@ -3354,11 +3354,7 @@ class Cockpits extends Part {
         return lst;
     }
     GetCrashList() {
-        var lst = [];
-        for (let p of this.positions) {
-            lst.push(p.GetCrash());
-        }
-        return lst;
+        return [this.positions[0].GetCrash()];
     }
     SetNumberOfCockpits(num) {
         if (num != num || num < 1)
@@ -4111,6 +4107,19 @@ class Engine extends Part {
             else
                 stats.maxstrain -= this.etype_stats.torque;
         }
+        //ContraRotary Engines need geared propellers to function.
+        if (this.IsContraRotary()) {
+            this.gp_count = Math.max(1, this.gp_count);
+        }
+        stats.cost += this.gp_count + this.gpr_count;
+        //Extended Driveshafts
+        if (this.use_ds) {
+            stats.mass += 1;
+        }
+        //Cowls modify engine stats directly, not mounting or upgrade.
+        stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
+        stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
+        stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
         //Push-pull
         if (this.use_pp) {
             stats.power *= 2;
@@ -4124,7 +4133,10 @@ class Engine extends Part {
             stats.upkeep *= 2;
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
-        //Air Cooling Fan
+        //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
+        if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail || this.use_pp)
+            stats.cost += 2;
+        //Air Cooling Fan (only 1 / push-pull)
         if (this.IsAirCooled() && this.intake_fan) {
             stats.mass += 3;
             //Double Effect of Torque
@@ -4136,12 +4148,6 @@ class Engine extends Part {
         else {
             this.intake_fan = false;
         }
-        //Cowls modify engine stats directly, not mounting or upgrade.
-        stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
-        stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
-        stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
-        if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail)
-            stats.cost += 2;
         //Move here so it doesn't get affected by cowl.
         if (this.GetHasOilCooler()) {
             stats.drag += Math.floor(stats.power / 15);
@@ -4153,15 +4159,7 @@ class Engine extends Part {
             stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(1.0e-6 + this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
-        //Upgrades
-        if (this.use_ds) {
-            stats.mass += 1;
-        }
-        //ContraRotary Engines need geared propellers to function.
-        if (this.IsContraRotary()) {
-            this.gp_count = Math.max(1, this.gp_count);
-        }
-        stats.cost += this.gp_count + this.gpr_count;
+        // Power Generation
         if (this.is_generator) {
             stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
             stats.power = 0;
@@ -6529,7 +6527,7 @@ class Reinforcement extends Part {
         } //So if we have them and are bladed...
         else if (this.wing_blades) {
             stats.mass += this.cant_list[2].stats.mass * this.cant_count[2];
-            stats.warnings.push({ source: "Wing Blades", warning: "No actual rules yet. Glorious Nippon Steel Folded Over 1000 Times" });
+            stats.warnings.push({ source: "Wing Blades", warning: "Dogfight +Hard. On hit, collide and user unharmed.  11-15, user takes 1d10 damage. Miss, collide. When used vs. a PC, roll -Keen." });
         }
         if (use_cant)
             stats.cost += 5;
@@ -7365,7 +7363,6 @@ class Weapon extends Part {
             free_accessible: this.free_accessible,
             synchronization: this.synchronization,
             w_count: this.w_count,
-            repeating: this.repeating,
         };
     }
     fromJSON(js, json_version) {
@@ -7376,7 +7373,8 @@ class Weapon extends Part {
         this.free_accessible = js["free_accessible"];
         this.synchronization = js["synchronization"];
         this.w_count = js["w_count"];
-        this.repeating = js["repeating"];
+        if (json_version < 10.95)
+            this.repeating = js["repeating"];
     }
     serialize(s) {
         s.PushBool(this.fixed);
@@ -7386,7 +7384,6 @@ class Weapon extends Part {
         s.PushBool(this.free_accessible);
         s.PushNum(this.synchronization);
         s.PushNum(this.w_count);
-        s.PushBool(this.repeating);
     }
     deserialize(d) {
         this.fixed = d.GetBool();
@@ -7396,7 +7393,8 @@ class Weapon extends Part {
         this.free_accessible = d.GetBool();
         this.synchronization = d.GetNum();
         this.w_count = d.GetNum();
-        this.repeating = d.GetBool();
+        if (d.version < 10.95)
+            this.repeating = d.GetBool();
     }
     SetWeaponType(weapon_type, action, projectile) {
         this.weapon_type = weapon_type;
@@ -7704,9 +7702,6 @@ class Weapon extends Part {
                 warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
             });
         }
-        //If it's repeating
-        if (this.repeating)
-            stats.cost += this.w_count * 2;
         if (this.wing_reinforcement)
             stats.mass += 2;
         stats.Round();
@@ -8563,9 +8558,9 @@ class Aircraft {
         var FlightStress = 1 + this.stats.flightstress;
         if (Stabiilty > 3 || Stabiilty < -3)
             FlightStress++;
-        //Flight Stress from Rumble. Excess structure can reduce stress.
+        //Flight Stress from Rumble.
         if (this.engines.GetMaxRumble() > 0) {
-            FlightStress += Math.max(1, 2 * this.engines.GetMaxRumble() - this.stats.structure / 10);
+            FlightStress += Math.max(1, this.engines.GetMaxRumble());
             FlightStress = Math.floor(1.0e-6 + FlightStress);
         }
         FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
@@ -8823,7 +8818,7 @@ class Radiator extends Part {
     constructor(tl, ml, cl) {
         super();
         this.need_cool = 0;
-        this.idx_type = 0;
+        this.idx_type = 1;
         this.idx_mount = 1;
         this.idx_coolant = 0;
         this.metal_area = 0;
@@ -8974,6 +8969,7 @@ class WeaponSystem extends Part {
         this.projectile_sel = ProjectileType.BULLETS;
         this.has_propeller = true;
         this.sticky_guns = 0;
+        this.repeating = false;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -8997,6 +8993,7 @@ class WeaponSystem extends Part {
             ammo: this.ammo,
             action: this.action_sel,
             projectile: this.projectile_sel,
+            repeating: this.repeating,
         };
     }
     fromJSON(js, json_version) {
@@ -9022,6 +9019,16 @@ class WeaponSystem extends Part {
             w.fromJSON(elem, json_version);
             this.weapons.push(w);
         }
+        //Repeating has been moved from Weapon to WeaponSystem
+        if (json_version < 10.95) {
+            this.repeating = false;
+            for (let w of this.weapons) {
+                this.repeating = this.repeating || w.GetRepeating();
+            }
+        }
+        else {
+            this.repeating = js["repeating"];
+        }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -9038,6 +9045,7 @@ class WeaponSystem extends Part {
         }
         s.PushNum(this.action_sel);
         s.PushNum(this.projectile_sel);
+        s.PushBool(this.repeating);
     }
     deserialize(d) {
         this.weapon_type = d.GetNum();
@@ -9060,6 +9068,16 @@ class WeaponSystem extends Part {
         else {
             this.action_sel = d.GetNum();
             this.projectile_sel = d.GetNum();
+        }
+        //Repeating has been moved from Weapon to WeaponSystem
+        if (d.version < 10.95) {
+            this.repeating = false;
+            for (let w of this.weapons) {
+                this.repeating = this.repeating || w.GetRepeating();
+            }
+        }
+        else {
+            this.repeating = d.GetBool();
         }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
@@ -9103,6 +9121,26 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
+        if (this.repeating) {
+            this.final_weapon.reload = 0;
+            //Update Jam values, stupid string parsing.
+            if (this.final_weapon.rapid) {
+                var jams = this.final_weapon.jam.split('/');
+                var out = [parseInt(jams[0]), parseInt(jams[1])];
+                if (this.repeating) {
+                    out[0]++;
+                    out[1]++;
+                }
+                this.final_weapon.jam = out[0].toString() + "/" + out[1].toString();
+            }
+            else {
+                var ret = parseInt(this.final_weapon.jam);
+                if (this.repeating) {
+                    ret += 1;
+                }
+                this.final_weapon.jam = ret.toString();
+            }
+        }
         if (this.projectile_sel == ProjectileType.HEATRAY) {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
@@ -9138,6 +9176,23 @@ class WeaponSystem extends Part {
         if (!this.weapon_list[num].can_projectile) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
+        this.MakeFinalWeapon();
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
+        }
+        this.CalculateStats();
+    }
+    CanRepeating() {
+        return !this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0;
+    }
+    GetRepeating() {
+        return this.repeating;
+    }
+    SetRepeating(use) {
+        if (use && this.CanRepeating())
+            this.repeating = true;
+        else
+            this.repeating = false;
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -9400,6 +9455,9 @@ class WeaponSystem extends Part {
     GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
     }
+    GetReload() {
+        return this.final_weapon.reload;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -9434,6 +9492,9 @@ class WeaponSystem extends Part {
             //Cant have extra ammo for heatray.
             this.ammo = 1;
         }
+        //If it's repeating
+        if (this.repeating)
+            stats.cost += count * 2;
         //Ammunition Cost
         stats.mass += (this.ammo - 1) * count;
         return stats;

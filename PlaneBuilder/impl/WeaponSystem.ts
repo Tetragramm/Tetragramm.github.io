@@ -25,6 +25,7 @@ class WeaponSystem extends Part {
     public has_cantilever: boolean;
     private has_propeller: boolean;
     private sticky_guns: number;
+    private repeating: boolean;
 
     private weapon_list: {
         name: string, era: string, size: number, stats: Stats,
@@ -53,6 +54,7 @@ class WeaponSystem extends Part {
         this.projectile_sel = ProjectileType.BULLETS;
         this.has_propeller = true;
         this.sticky_guns = 0;
+        this.repeating = false;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -77,6 +79,7 @@ class WeaponSystem extends Part {
             ammo: this.ammo,
             action: this.action_sel,
             projectile: this.projectile_sel,
+            repeating: this.repeating,
         }
     }
 
@@ -103,6 +106,17 @@ class WeaponSystem extends Part {
             w.fromJSON(elem, json_version);
             this.weapons.push(w);
         }
+
+        //Repeating has been moved from Weapon to WeaponSystem
+        if (json_version < 10.95) {
+            this.repeating = false;
+            for (let w of this.weapons) {
+                this.repeating = this.repeating || w.GetRepeating();
+            }
+        } else {
+            this.repeating = js["repeating"];
+        }
+
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -120,6 +134,7 @@ class WeaponSystem extends Part {
         }
         s.PushNum(this.action_sel);
         s.PushNum(this.projectile_sel);
+        s.PushBool(this.repeating);
     }
 
     public deserialize(d: Deserialize) {
@@ -144,6 +159,17 @@ class WeaponSystem extends Part {
             this.action_sel = d.GetNum();
             this.projectile_sel = d.GetNum();
         }
+
+        //Repeating has been moved from Weapon to WeaponSystem
+        if (d.version < 10.95) {
+            this.repeating = false;
+            for (let w of this.weapons) {
+                this.repeating = this.repeating || w.GetRepeating();
+            }
+        } else {
+            this.repeating = d.GetBool();
+        }
+
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -187,6 +213,27 @@ class WeaponSystem extends Part {
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
 
+        if (this.repeating) {
+            this.final_weapon.reload = 0;
+            //Update Jam values, stupid string parsing.
+            if (this.final_weapon.rapid) {
+                var jams = this.final_weapon.jam.split('/');
+                var out = [parseInt(jams[0]), parseInt(jams[1])];
+                if (this.repeating) {
+                    out[0]++;
+                    out[1]++;
+                }
+                this.final_weapon.jam = out[0].toString() + "/" + out[1].toString();
+            }
+            else {
+                var ret = parseInt(this.final_weapon.jam)
+                if (this.repeating) {
+                    ret += 1;
+                }
+                this.final_weapon.jam = ret.toString();
+            }
+        }
+
         if (this.projectile_sel == ProjectileType.HEATRAY) {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
@@ -223,6 +270,26 @@ class WeaponSystem extends Part {
         }
         this.MakeFinalWeapon();
 
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
+        }
+        this.CalculateStats();
+    }
+
+    public CanRepeating() {
+        return !this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0;
+    }
+
+    public GetRepeating() {
+        return this.repeating;
+    }
+
+    public SetRepeating(use: boolean) {
+        if (use && this.CanRepeating())
+            this.repeating = true;
+        else
+            this.repeating = false;
+        this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
@@ -510,6 +577,10 @@ class WeaponSystem extends Part {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
     }
 
+    public GetReload() {
+        return this.final_weapon.reload;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -549,6 +620,10 @@ class WeaponSystem extends Part {
             //Cant have extra ammo for heatray.
             this.ammo = 1;
         }
+
+        //If it's repeating
+        if (this.repeating)
+            stats.cost += count * 2;
 
         //Ammunition Cost
         stats.mass += (this.ammo - 1) * count;

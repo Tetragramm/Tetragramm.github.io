@@ -80,7 +80,6 @@ class Weapon extends Part {
             free_accessible: this.free_accessible,
             synchronization: this.synchronization,
             w_count: this.w_count,
-            repeating: this.repeating,
         }
     }
 
@@ -92,7 +91,8 @@ class Weapon extends Part {
         this.free_accessible = js["free_accessible"];
         this.synchronization = js["synchronization"];
         this.w_count = js["w_count"];
-        this.repeating = js["repeating"];
+        if (json_version < 10.95)
+            this.repeating = js["repeating"];
     }
 
     public serialize(s: Serialize) {
@@ -103,7 +103,6 @@ class Weapon extends Part {
         s.PushBool(this.free_accessible);
         s.PushNum(this.synchronization);
         s.PushNum(this.w_count);
-        s.PushBool(this.repeating);
     }
 
     public deserialize(d: Deserialize) {
@@ -114,7 +113,8 @@ class Weapon extends Part {
         this.free_accessible = d.GetBool();
         this.synchronization = d.GetNum();
         this.w_count = d.GetNum();
-        this.repeating = d.GetBool();
+        if (d.version < 10.95)
+            this.repeating = d.GetBool();
     }
 
     public SetWeaponType(weapon_type: {
@@ -452,10 +452,6 @@ class Weapon extends Part {
                 warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
             });
         }
-
-        //If it's repeating
-        if (this.repeating)
-            stats.cost += this.w_count * 2;
 
         if (this.wing_reinforcement)
             stats.mass += 2;

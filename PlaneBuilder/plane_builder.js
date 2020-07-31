@@ -6077,7 +6077,6 @@ class Weapon extends Part {
             free_accessible: this.free_accessible,
             synchronization: this.synchronization,
             w_count: this.w_count,
-            repeating: this.repeating,
         };
     }
     fromJSON(js, json_version) {
@@ -6088,7 +6087,8 @@ class Weapon extends Part {
         this.free_accessible = js["free_accessible"];
         this.synchronization = js["synchronization"];
         this.w_count = js["w_count"];
-        this.repeating = js["repeating"];
+        if (json_version < 10.95)
+            this.repeating = js["repeating"];
     }
     serialize(s) {
         s.PushBool(this.fixed);
@@ -6098,7 +6098,6 @@ class Weapon extends Part {
         s.PushBool(this.free_accessible);
         s.PushNum(this.synchronization);
         s.PushNum(this.w_count);
-        s.PushBool(this.repeating);
     }
     deserialize(d) {
         this.fixed = d.GetBool();
@@ -6108,7 +6107,8 @@ class Weapon extends Part {
         this.free_accessible = d.GetBool();
         this.synchronization = d.GetNum();
         this.w_count = d.GetNum();
-        this.repeating = d.GetBool();
+        if (d.version < 10.95)
+            this.repeating = d.GetBool();
     }
     SetWeaponType(weapon_type, action, projectile) {
         this.weapon_type = weapon_type;
@@ -6416,9 +6416,6 @@ class Weapon extends Part {
                 warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
             });
         }
-        //If it's repeating
-        if (this.repeating)
-            stats.cost += this.w_count * 2;
         if (this.wing_reinforcement)
             stats.mass += 2;
         stats.Round();
@@ -10226,6 +10223,7 @@ class Weapons_HTML extends Display {
             weaps: [],
             ammo: document.createElement("INPUT"),
             stats: { mass: null, drag: null, cost: null, sect: null, none: null, jams: null, hits: null, damg: null, shots: null },
+            repeating: document.createElement("INPUT"),
         };
         var wlist = this.weap.GetWeaponList();
         for (let w of wlist) {
@@ -10255,6 +10253,8 @@ class Weapons_HTML extends Display {
         FlexInput("Ammunition", type.ammo, rfs);
         FlexSelect("Action", type.action, lfs);
         FlexSelect("Projectile", type.projectile, rfs);
+        FlexCheckbox("Autoloader", type.repeating, lfs);
+        FlexSpace(rfs);
         FlexCheckbox("Fixed", type.fixed, lfs);
         FlexSpace(rfs);
         var dirlist = this.weap.GetDirectionList();
@@ -10309,14 +10309,12 @@ class Weapons_HTML extends Display {
             free_access: document.createElement("INPUT"),
             synch: document.createElement("SELECT"),
             count: document.createElement("INPUT"),
-            repeating: document.createElement("INPUT"),
         };
         CreateCheckbox("Wing Mount", w.wing, w.span, false);
         CreateCheckbox("Accessible", w.accessible, w.span, false);
-        CreateCheckbox("Free Accessible", w.free_access, w.span, true);
+        CreateCheckbox("Free Accessible", w.free_access, w.span, false);
+        CreateCheckbox("Covered", w.covered, w.span, true);
         CreateInput("Weapons at Mount", w.count, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, false);
-        CreateCheckbox("Autoloader", w.repeating, w.span, true);
         CreateSelect("Synchronization", w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
         var slist = this.weap.GetSynchronizationList();
@@ -10342,6 +10340,9 @@ class Weapons_HTML extends Display {
         disp.projectile.selectedIndex = set.GetProjectile();
         disp.projectile.disabled = !set.GetCanProjectile();
         disp.projectile.onchange = () => { set.SetProjectile(disp.projectile.selectedIndex); };
+        disp.repeating.checked = set.GetRepeating();
+        disp.repeating.onchange = () => { set.SetRepeating(disp.repeating.checked); };
+        disp.repeating.disabled = !set.CanRepeating();
         disp.fixed.checked = set.GetFixed();
         disp.fixed.onchange = () => { set.SetFixed(disp.fixed.checked); };
         var dirlist = set.GetDirection();
@@ -10375,9 +10376,6 @@ class Weapons_HTML extends Display {
             disp.weaps[i].free_access.disabled = !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible());
             disp.weaps[i].count.valueAsNumber = wlist[i].GetCount();
             disp.weaps[i].count.onchange = () => { wlist[i].SetCount(disp.weaps[i].count.valueAsNumber); };
-            disp.weaps[i].repeating.checked = wlist[i].GetRepeating();
-            disp.weaps[i].repeating.onchange = () => { wlist[i].SetRepeating(disp.weaps[i].repeating.checked); };
-            disp.weaps[i].repeating.disabled = !wlist[i].CanRepeating();
             disp.weaps[i].synch.selectedIndex = wlist[i].GetSynchronization() + 1;
             disp.weaps[i].synch.onchange = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
             disp.weaps[i].synch.disabled = !wlist[i].can_synchronize;
@@ -10499,8 +10497,7 @@ class Cards {
         };
         this.weap_data = {
             type: "",
-            ammo_mult: 0,
-            ammo_base: 0,
+            ammo: 0,
             ap: 0,
             jam: "",
             hits: [],
@@ -10641,12 +10638,12 @@ class Cards {
         context.font = "15px Balthazar";
         var ammo = "";
         if (this.weap_data.reload > 0) {
-            var clips = this.weap_data.ammo_base / this.weap_data.reload;
-            ammo += (clips * this.weap_data.ammo_mult).toString() + " loads of ";
+            ammo += (this.weap_data.ammo / this.weap_data.reload).toString() + " loads of ";
             ammo += this.weap_data.reload.toString() + " shots";
+            this.weap_data.tags.push("Reload " + this.weap_data.reload.toString());
         }
         else {
-            ammo += (this.weap_data.ammo_base * this.weap_data.ammo_mult).toString() + " shots";
+            ammo += this.weap_data.ammo.toString() + " shots";
         }
         context.fillText(ammo, 95, 158, 105);
         context.fillText(this.weap_data.ap.toString(), 172, 158, 23);
@@ -10956,8 +10953,7 @@ class Aircraft_HTML extends Display {
         dtag = dtag.substr(0, dtag.length - 1);
         dtag += "] ";
         var fweap = w.GetFinalWeapon();
-        this.cards.weap_data.ammo_base = fweap.ammo;
-        this.cards.weap_data.ammo_mult = w.GetAmmo();
+        this.cards.weap_data.ammo = w.GetShots();
         this.cards.weap_data.ap = fweap.ap;
         this.cards.weap_data.damage = fweap.damage;
         this.cards.weap_data.hits = w.GetHits();
@@ -11556,6 +11552,10 @@ class Aircraft_HTML extends Display {
             if (w.GetFinalWeapon().rapid || w.GetFinalWeapon().shells || w.GetFinalWeapon().ap > 0) {
                 weaphtml += "[";
                 weaphtml += " Jam " + w.GetJam();
+                if (w.GetReload() > 0) {
+                    weaphtml += ", ";
+                    weaphtml += "Reload " + w.GetReload().toString();
+                }
                 if (w.GetFinalWeapon().rapid) {
                     weaphtml += ", ";
                     weaphtml += "Rapid Fire";
@@ -12372,6 +12372,7 @@ class WeaponSystem extends Part {
         this.projectile_sel = ProjectileType.BULLETS;
         this.has_propeller = true;
         this.sticky_guns = 0;
+        this.repeating = false;
         this.final_weapon = {
             name: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -12395,6 +12396,7 @@ class WeaponSystem extends Part {
             ammo: this.ammo,
             action: this.action_sel,
             projectile: this.projectile_sel,
+            repeating: this.repeating,
         };
     }
     fromJSON(js, json_version) {
@@ -12420,6 +12422,16 @@ class WeaponSystem extends Part {
             w.fromJSON(elem, json_version);
             this.weapons.push(w);
         }
+        //Repeating has been moved from Weapon to WeaponSystem
+        if (json_version < 10.95) {
+            this.repeating = false;
+            for (let w of this.weapons) {
+                this.repeating = this.repeating || w.GetRepeating();
+            }
+        }
+        else {
+            this.repeating = js["repeating"];
+        }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -12436,6 +12448,7 @@ class WeaponSystem extends Part {
         }
         s.PushNum(this.action_sel);
         s.PushNum(this.projectile_sel);
+        s.PushBool(this.repeating);
     }
     deserialize(d) {
         this.weapon_type = d.GetNum();
@@ -12458,6 +12471,16 @@ class WeaponSystem extends Part {
         else {
             this.action_sel = d.GetNum();
             this.projectile_sel = d.GetNum();
+        }
+        //Repeating has been moved from Weapon to WeaponSystem
+        if (d.version < 10.95) {
+            this.repeating = false;
+            for (let w of this.weapons) {
+                this.repeating = this.repeating || w.GetRepeating();
+            }
+        }
+        else {
+            this.repeating = d.GetBool();
         }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
@@ -12501,6 +12524,26 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
+        if (this.repeating) {
+            this.final_weapon.reload = 0;
+            //Update Jam values, stupid string parsing.
+            if (this.final_weapon.rapid) {
+                var jams = this.final_weapon.jam.split('/');
+                var out = [parseInt(jams[0]), parseInt(jams[1])];
+                if (this.repeating) {
+                    out[0]++;
+                    out[1]++;
+                }
+                this.final_weapon.jam = out[0].toString() + "/" + out[1].toString();
+            }
+            else {
+                var ret = parseInt(this.final_weapon.jam);
+                if (this.repeating) {
+                    ret += 1;
+                }
+                this.final_weapon.jam = ret.toString();
+            }
+        }
         if (this.projectile_sel == ProjectileType.HEATRAY) {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
@@ -12536,6 +12579,23 @@ class WeaponSystem extends Part {
         if (!this.weapon_list[num].can_projectile) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
+        this.MakeFinalWeapon();
+        for (let w of this.weapons) {
+            w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
+        }
+        this.CalculateStats();
+    }
+    CanRepeating() {
+        return !this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0;
+    }
+    GetRepeating() {
+        return this.repeating;
+    }
+    SetRepeating(use) {
+        if (use && this.CanRepeating())
+            this.repeating = true;
+        else
+            this.repeating = false;
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -12798,6 +12858,9 @@ class WeaponSystem extends Part {
     GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
     }
+    GetReload() {
+        return this.final_weapon.reload;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -12832,6 +12895,9 @@ class WeaponSystem extends Part {
             //Cant have extra ammo for heatray.
             this.ammo = 1;
         }
+        //If it's repeating
+        if (this.repeating)
+            stats.cost += count * 2;
         //Ammunition Cost
         stats.mass += (this.ammo - 1) * count;
         return stats;
