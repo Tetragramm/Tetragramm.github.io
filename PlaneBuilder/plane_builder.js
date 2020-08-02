@@ -6445,6 +6445,7 @@ class Weapons extends Part {
         for (let elem of js["weapons"]) {
             var weap = {
                 name: elem["name"],
+				abrv: elem["abrv"],
                 era: elem["era"],
                 size: elem["size"],
                 stats: new Stats(elem),
@@ -10452,7 +10453,15 @@ class Cards {
         this.rad_image = document.getElementById("rad_img");
         this.rad_image.width = 479;
         this.rad_image.height = 290;
-        this.rad_image.src = './Cards/Radiator.png';
+        this.rad_image.src = './Cards/Radiator.png';	
+		this.npc_canvas = document.createElement("CANVAS");
+        this.npc_canvas.width = 482;
+        this.npc_canvas.height = 290;
+        this.npc_image = document.getElementById("npc_img");
+        this.npc_image.width = 482;
+        this.npc_image.height = 290;
+        this.npc_image.src = './Cards/NPC.png';
+		
         this.acft_data = {
             full_bomb_boost: 0,
             half_bomb_boost: 0,
@@ -10715,6 +10724,52 @@ class Cards {
         context.fillText("#" + radiator_num.toString(), 37, 56, 35);
         this.download(this.name + "_Radiator_" + radiator_num.toString(), this.rad_canvas);
     }
+	SaveNPC( parent ) {
+		console.debug(this);
+		console.debug(this.acft_data); 
+		var context = this.npc_canvas.getContext("2d");
+        context.clearRect(0, 0, this.npc_canvas.width, this.npc_canvas.height);
+        context.drawImage(this.npc_image, 0, 0);
+        context.font = "20px Balthazar";
+		context.textAlign = "center";
+		context.fillStyle = "#000";
+        context.strokeStyle = "#000";
+		context.fillText(this.name, 100, 100, 145);
+		context.fillText(this.lowest_overspeed, 70, 158, 40);
+		context.fillText(this.acft_data.full_speed, 126, 158, 40);
+		var combat_speed = this.acft_data.full_speed - (this.acft_data.full_speed % 10) - this.acft_data.turn_bleed;
+		context.fillText(combat_speed, 187, 158, 40);
+		context.fillText(this.acft_data.full_stall, 245, 158, 40);
+		
+		var structure = this.acft_data.toughness + this.acft_data.max_strain;		
+		context.fillText(structure, 70, 236, 40);
+		context.fillText(this.acft_data.full_hand, 123, 236, 40);
+		
+		var wep; 
+		if (this.all_weapons[0]) {			
+			wep = this.all_weapons[0]; 
+			context.font = "14px Avenir";			
+			context.fillText(wep.type, 232, 71, 91);
+			context.font = "20px Balthazar";
+			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
+			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+			context.fillText(hits, 320, 71, 91);			
+			context.fillText(dam, 401, 71, 91);
+		}
+		
+		if (this.all_weapons[1]) {			
+			wep = this.all_weapons[1]; 
+			context.font = "14px Avenir";
+			context.fillText(wep.type, 232, 103, 91);
+			context.font = "20px Balthazar";
+			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
+			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+			context.fillText(hits, 320, 103, 91);			
+			context.fillText(dam, 401, 103, 91);
+		}
+		
+		this.download(this.name + "_NPC", this.npc_canvas);
+	}
     download(filename, canvas) {
         var lnk = document.createElement('a');
         lnk.download = filename + ".png";
@@ -10867,6 +10922,32 @@ class Aircraft_HTML extends Display {
                 this.cards.SaveRadiator(i);
             }
         };
+		var npc_button = document.getElementById("acft_save_npc"); 
+		npc_button.onclick = () => {
+			//update all the aircraft data we need.
+			this.UpdateCard();
+			
+			//pick the lowest overspeed among all engines, treat that as the overspeed for the plane. 
+			this.cards.lowest_overspeed = -1;
+			for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+                var engine = this.acft.GetEngines().GetEngine(i); 
+				if (engine.GetOverspeed() < this.cards.lowest_overspeed || this.cards.lowest_overspeed < 0) {
+					this.cards.lowest_overspeed = engine.GetOverspeed();
+				}
+            }
+			
+			//append weapon data to card so we can use it. 
+			this.cards.all_weapons = [];
+			var wsetlist = this.acft.GetWeapons().GetWeaponSets();
+            for (let i = 0; i < wsetlist.length; i++) {
+                this.UpdateWeaponCard(wsetlist[i]);
+                this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data)); 
+            }
+			
+			console.log(this);
+			this.cards.SaveNPC();
+		};
+		
         var reset_button = document.getElementById("acft_reset");
         reset_button.onclick = () => { aircraft_model.Reset(); aircraft_model.CalculateStats(); };
     }
@@ -10937,7 +11018,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.vital_parts = this.acft.VitalComponentList();
         this.cards.acft_data.warnings = stats.warnings;
     }
-    UpdateWeaponCard(w) {
+    UpdateWeaponCard(w) {		
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
         var name = this.WeaponName(w);
         if (w.IsPlural()) {
@@ -10953,6 +11034,7 @@ class Aircraft_HTML extends Display {
         dtag = dtag.substr(0, dtag.length - 1);
         dtag += "] ";
         var fweap = w.GetFinalWeapon();
+		console.log(fweap);		
         this.cards.weap_data.ammo = w.GetShots();
         this.cards.weap_data.ap = fweap.ap;
         this.cards.weap_data.damage = fweap.damage;
@@ -10961,6 +11043,7 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.tags = [dtag];
         this.cards.weap_data.type = name;
         this.cards.weap_data.reload = fweap.reload;
+		this.cards.weap_data.abrv = fweap.abrv; 
         if (fweap.rapid) {
             this.cards.weap_data.tags.push("Rapid Fire");
         }
@@ -12490,8 +12573,9 @@ class WeaponSystem extends Part {
     GetWeaponSelected() {
         return this.weapon_type;
     }
-    MakeFinalWeapon() {
+    MakeFinalWeapon() {				
         var num = this.weapon_type;
+		console.log("In make final weapon: ", num, this.weapon_list);
         this.final_weapon.can_action = this.weapon_list[num].can_action;
         this.final_weapon.can_projectile = this.weapon_list[num].can_projectile;
         this.final_weapon.ammo = this.weapon_list[num].ammo;
@@ -12499,6 +12583,7 @@ class WeaponSystem extends Part {
         this.final_weapon.damage = this.weapon_list[num].damage;
         this.final_weapon.era = this.weapon_list[num].era;
         this.final_weapon.name = this.weapon_list[num].name;
+		this.final_weapon.abrv = this.weapon_list[num].abrv; 
         this.final_weapon.reload = this.weapon_list[num].reload;
         this.final_weapon.shells = this.weapon_list[num].shells;
         this.final_weapon.size = this.weapon_list[num].size;
