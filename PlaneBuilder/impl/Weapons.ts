@@ -5,7 +5,7 @@
 class Weapons extends Part {
     private weapon_sets: WeaponSystem[];
     private weapon_list: {
-        name: string, era: string, size: number, stats: Stats,
+        name: string, abrv: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
@@ -42,6 +42,7 @@ class Weapons extends Part {
         for (let elem of js["weapons"]) {
             var weap = {
                 name: elem["name"],
+				abrv: elem["abrv"],
                 era: elem["era"],
                 size: elem["size"],
                 stats: new Stats(elem),

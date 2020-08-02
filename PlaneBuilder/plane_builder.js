@@ -6445,7 +6445,7 @@ class Weapons extends Part {
         for (let elem of js["weapons"]) {
             var weap = {
                 name: elem["name"],
-				abrv: elem["abrv"],
+                abrv: elem["abrv"],
                 era: elem["era"],
                 size: elem["size"],
                 stats: new Stats(elem),
@@ -10453,15 +10453,14 @@ class Cards {
         this.rad_image = document.getElementById("rad_img");
         this.rad_image.width = 479;
         this.rad_image.height = 290;
-        this.rad_image.src = './Cards/Radiator.png';	
-		this.npc_canvas = document.createElement("CANVAS");
+        this.rad_image.src = './Cards/Radiator.png';
+        this.npc_canvas = document.createElement("CANVAS");
         this.npc_canvas.width = 482;
         this.npc_canvas.height = 290;
         this.npc_image = document.getElementById("npc_img");
         this.npc_image.width = 482;
         this.npc_image.height = 290;
         this.npc_image.src = './Cards/NPC.png';
-		
         this.acft_data = {
             full_bomb_boost: 0,
             half_bomb_boost: 0,
@@ -10506,6 +10505,7 @@ class Cards {
         };
         this.weap_data = {
             type: "",
+            abrv: "",
             ammo: 0,
             ap: 0,
             jam: "",
@@ -10724,52 +10724,46 @@ class Cards {
         context.fillText("#" + radiator_num.toString(), 37, 56, 35);
         this.download(this.name + "_Radiator_" + radiator_num.toString(), this.rad_canvas);
     }
-	SaveNPC( parent ) {
-		console.debug(this);
-		console.debug(this.acft_data); 
-		var context = this.npc_canvas.getContext("2d");
+    SaveNPC() {
+        var context = this.npc_canvas.getContext("2d");
         context.clearRect(0, 0, this.npc_canvas.width, this.npc_canvas.height);
         context.drawImage(this.npc_image, 0, 0);
         context.font = "20px Balthazar";
-		context.textAlign = "center";
-		context.fillStyle = "#000";
+        context.textAlign = "center";
+        context.fillStyle = "#000";
         context.strokeStyle = "#000";
-		context.fillText(this.name, 100, 100, 145);
-		context.fillText(this.lowest_overspeed, 70, 158, 40);
-		context.fillText(this.acft_data.full_speed, 126, 158, 40);
-		var combat_speed = this.acft_data.full_speed - (this.acft_data.full_speed % 10) - this.acft_data.turn_bleed;
-		context.fillText(combat_speed, 187, 158, 40);
-		context.fillText(this.acft_data.full_stall, 245, 158, 40);
-		
-		var structure = this.acft_data.toughness + this.acft_data.max_strain;		
-		context.fillText(structure, 70, 236, 40);
-		context.fillText(this.acft_data.full_hand, 123, 236, 40);
-		
-		var wep; 
-		if (this.all_weapons[0]) {			
-			wep = this.all_weapons[0]; 
-			context.font = "12px Avenir";	
-			context.fillText(wep.abrv, 232, 71, 91);
-			context.font = "20px Balthazar";
-			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
-			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
-			context.fillText(hits, 320, 71, 80);			
-			context.fillText(dam, 401, 71, 80);
-		}
-		
-		if (this.all_weapons[1]) {			
-			wep = this.all_weapons[1]; 
-			context.font = "14px Avenir";
-			context.fillText(wep.abrv, 232, 103, 91);
-			context.font = "20px Balthazar";
-			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
-			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
-			context.fillText(hits, 320, 103, 80);			
-			context.fillText(dam, 401, 103, 80);
-		}
-		
-		this.download(this.name + "_NPC", this.npc_canvas);
-	}
+        context.fillText(this.name, 100, 100, 145);
+        context.fillText("" + this.lowest_overspeed, 70, 158, 40);
+        context.fillText("" + this.acft_data.full_speed, 126, 158, 40);
+        var combat_speed = this.acft_data.full_speed - (this.acft_data.full_speed % 10) - this.acft_data.turn_bleed;
+        context.fillText("" + combat_speed, 187, 158, 40);
+        context.fillText("" + this.acft_data.full_stall, 245, 158, 40);
+        var structure = this.acft_data.toughness + this.acft_data.max_strain;
+        context.fillText("" + structure, 70, 236, 40);
+        context.fillText("" + this.acft_data.full_hand, 123, 236, 40);
+        var wep;
+        if (this.all_weapons[0]) {
+            wep = this.all_weapons[0];
+            context.font = "12px Avenir";
+            context.fillText(wep.abrv, 232, 71, 91);
+            context.font = "20px Balthazar";
+            var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
+            var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+            context.fillText(hits, 320, 71, 80);
+            context.fillText(dam, 401, 71, 80);
+        }
+        if (this.all_weapons[1]) {
+            wep = this.all_weapons[1];
+            context.font = "12px Avenir";
+            context.fillText(wep.abrv, 232, 103, 91);
+            context.font = "20px Balthazar";
+            var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
+            var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+            context.fillText(hits, 320, 103, 80);
+            context.fillText(dam, 401, 103, 80);
+        }
+        this.download(this.name + "_NPC", this.npc_canvas);
+    }
     download(filename, canvas) {
         var lnk = document.createElement('a');
         lnk.download = filename + ".png";
@@ -10922,31 +10916,27 @@ class Aircraft_HTML extends Display {
                 this.cards.SaveRadiator(i);
             }
         };
-		var npc_button = document.getElementById("acft_save_npc"); 
-		npc_button.onclick = () => {
-			//update all the aircraft data we need.
-			this.UpdateCard();
-			
-			//pick the lowest overspeed among all engines, treat that as the overspeed for the plane. 
-			this.cards.lowest_overspeed = -1;
-			for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-                var engine = this.acft.GetEngines().GetEngine(i); 
-				if (engine.GetOverspeed() < this.cards.lowest_overspeed || this.cards.lowest_overspeed < 0) {
-					this.cards.lowest_overspeed = engine.GetOverspeed();
-				}
+        var npc_button = document.getElementById("acft_save_npc");
+        npc_button.onclick = () => {
+            //update all the aircraft data we need.
+            this.UpdateCard();
+            //pick the lowest overspeed among all engines, treat that as the overspeed for the plane. 
+            this.cards.lowest_overspeed = -1;
+            for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+                var engine = this.acft.GetEngines().GetEngine(i);
+                if (engine.GetOverspeed() < this.cards.lowest_overspeed || this.cards.lowest_overspeed < 0) {
+                    this.cards.lowest_overspeed = engine.GetOverspeed();
+                }
             }
-			
-			//append weapon data to card so we can use it. 
-			this.cards.all_weapons = [];
-			var wsetlist = this.acft.GetWeapons().GetWeaponSets();
+            //append weapon data to card so we can use it. 
+            this.cards.all_weapons = [];
+            var wsetlist = this.acft.GetWeapons().GetWeaponSets();
             for (let i = 0; i < wsetlist.length; i++) {
                 this.UpdateWeaponCard(wsetlist[i]);
-                this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data)); 
+                this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data));
             }
-			
-			this.cards.SaveNPC();
-		};
-		
+            this.cards.SaveNPC();
+        };
         var reset_button = document.getElementById("acft_reset");
         reset_button.onclick = () => { aircraft_model.Reset(); aircraft_model.CalculateStats(); };
     }
@@ -11017,7 +11007,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.vital_parts = this.acft.VitalComponentList();
         this.cards.acft_data.warnings = stats.warnings;
     }
-    UpdateWeaponCard(w) {		
+    UpdateWeaponCard(w) {
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
         var name = this.WeaponName(w);
         if (w.IsPlural()) {
@@ -11040,8 +11030,8 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.jam = w.GetJam();
         this.cards.weap_data.tags = [dtag];
         this.cards.weap_data.type = name;
+        this.cards.weap_data.abrv = fweap.abrv;
         this.cards.weap_data.reload = fweap.reload;
-		this.cards.weap_data.abrv = this.WeaponAbrv(w);
         if (fweap.rapid) {
             this.cards.weap_data.tags.push("Rapid Fire");
         }
@@ -11101,48 +11091,6 @@ class Aircraft_HTML extends Display {
         this.cards.rad_data.mount_type = r.GetMountList()[r.GetMountIndex()].name;
         this.cards.rad_data.coolant_type = r.GetCoolantList()[r.GetCoolantIndex()].name;
     }
-	WeaponAbrv(w) {
-		var wlist = aircraft_model.GetWeapons().GetWeaponList();
-        var ds = w.GetDirection();
-        var dircount = 0;
-        for (let d of ds) {
-            if (d)
-                dircount++;
-        }
-        var abrv = "";
-        if (dircount == 1 && w.GetFixed())
-            abrv += "Fix ";
-        else if (dircount <= 2)
-            abrv += "Flex ";
-        else
-            abrv += "Tur ";
-		
-		if (ds[0]) abrv += "F";
-		if (ds[1]) abrv += "R";
-		if (ds[2]) abrv += "U";
-		if (ds[3]) abrv += "D";
-		if (ds[4]) abrv += "L";
-		if (ds[5]) abrv += "R";
-		if (dircount > 0) abrv += " "; 
-		
-        if (w.GetAction() == 1) {
-            abrv += "Mech ";
-        }
-        else if (w.GetAction() == 2) {
-            abrv += "Gast ";
-        }
-        if (w.GetProjectile() == 1) {
-            abrv += "HRay ";
-        }
-        else if (w.GetProjectile() == 2) {
-            abrv += "Gyrojet ";
-        }
-        else if (w.GetProjectile() == 3) {
-            abrv += "Pneum ";
-        }
-        abrv += wlist[w.GetWeaponSelected()].abrv;
-        return abrv;
-	}
     WeaponName(w) {
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
         var ds = w.GetDirection();
@@ -12497,7 +12445,7 @@ class WeaponSystem extends Part {
         this.sticky_guns = 0;
         this.repeating = false;
         this.final_weapon = {
-            name: "", era: "", size: 0, stats: new Stats(),
+            name: "", abrv: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
             ap: 0, jam: "", reload: 0,
             rapid: false, synched: false, shells: false,
@@ -12613,7 +12561,7 @@ class WeaponSystem extends Part {
     GetWeaponSelected() {
         return this.weapon_type;
     }
-    MakeFinalWeapon() {				
+    MakeFinalWeapon() {
         var num = this.weapon_type;
         this.final_weapon.can_action = this.weapon_list[num].can_action;
         this.final_weapon.can_projectile = this.weapon_list[num].can_projectile;
@@ -12622,7 +12570,7 @@ class WeaponSystem extends Part {
         this.final_weapon.damage = this.weapon_list[num].damage;
         this.final_weapon.era = this.weapon_list[num].era;
         this.final_weapon.name = this.weapon_list[num].name;
-		this.final_weapon.abrv = this.weapon_list[num].abrv; 
+        this.final_weapon.abrv = this.weapon_list[num].abrv;
         this.final_weapon.reload = this.weapon_list[num].reload;
         this.final_weapon.shells = this.weapon_list[num].shells;
         this.final_weapon.size = this.weapon_list[num].size;

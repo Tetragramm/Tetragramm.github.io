@@ -4,7 +4,7 @@
 
 class WeaponSystem extends Part {
     private final_weapon: {
-        name: string, era: string, size: number, stats: Stats,
+        name: string, abrv: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
@@ -28,7 +28,7 @@ class WeaponSystem extends Part {
     private repeating: boolean;
 
     private weapon_list: {
-        name: string, era: string, size: number, stats: Stats,
+        name: string, abrv: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
@@ -36,7 +36,7 @@ class WeaponSystem extends Part {
     }[];
 
     constructor(weapon_list: {
-        name: string, era: string, size: number, stats: Stats,
+        name: string, abrv: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
@@ -56,7 +56,7 @@ class WeaponSystem extends Part {
         this.sticky_guns = 0;
         this.repeating = false;
         this.final_weapon = {
-            name: "", era: "", size: 0, stats: new Stats(),
+            name: "", abrv: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
             ap: 0, jam: "", reload: 0,
             rapid: false, synched: false, shells: false,
@@ -189,6 +189,7 @@ class WeaponSystem extends Part {
         this.final_weapon.damage = this.weapon_list[num].damage;
         this.final_weapon.era = this.weapon_list[num].era;
         this.final_weapon.name = this.weapon_list[num].name;
+        this.final_weapon.abrv = this.weapon_list[num].abrv; 
         this.final_weapon.reload = this.weapon_list[num].reload;
         this.final_weapon.shells = this.weapon_list[num].shells;
         this.final_weapon.size = this.weapon_list[num].size;
