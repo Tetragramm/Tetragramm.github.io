@@ -10748,24 +10748,24 @@ class Cards {
 		var wep; 
 		if (this.all_weapons[0]) {			
 			wep = this.all_weapons[0]; 
-			context.font = "14px Avenir";			
-			context.fillText(wep.type, 232, 71, 91);
+			context.font = "12px Avenir";	
+			context.fillText(wep.abrv, 232, 71, 91);
 			context.font = "20px Balthazar";
 			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
 			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
-			context.fillText(hits, 320, 71, 91);			
-			context.fillText(dam, 401, 71, 91);
+			context.fillText(hits, 320, 71, 80);			
+			context.fillText(dam, 401, 71, 80);
 		}
 		
 		if (this.all_weapons[1]) {			
 			wep = this.all_weapons[1]; 
 			context.font = "14px Avenir";
-			context.fillText(wep.type, 232, 103, 91);
+			context.fillText(wep.abrv, 232, 103, 91);
 			context.font = "20px Balthazar";
 			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
 			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
-			context.fillText(hits, 320, 103, 91);			
-			context.fillText(dam, 401, 103, 91);
+			context.fillText(hits, 320, 103, 80);			
+			context.fillText(dam, 401, 103, 80);
 		}
 		
 		this.download(this.name + "_NPC", this.npc_canvas);
@@ -10944,7 +10944,6 @@ class Aircraft_HTML extends Display {
                 this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data)); 
             }
 			
-			console.log(this);
 			this.cards.SaveNPC();
 		};
 		
@@ -11034,7 +11033,6 @@ class Aircraft_HTML extends Display {
         dtag = dtag.substr(0, dtag.length - 1);
         dtag += "] ";
         var fweap = w.GetFinalWeapon();
-		console.log(fweap);		
         this.cards.weap_data.ammo = w.GetShots();
         this.cards.weap_data.ap = fweap.ap;
         this.cards.weap_data.damage = fweap.damage;
@@ -11043,7 +11041,7 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.tags = [dtag];
         this.cards.weap_data.type = name;
         this.cards.weap_data.reload = fweap.reload;
-		this.cards.weap_data.abrv = fweap.abrv; 
+		this.cards.weap_data.abrv = this.WeaponAbrv(w);
         if (fweap.rapid) {
             this.cards.weap_data.tags.push("Rapid Fire");
         }
@@ -11103,6 +11101,48 @@ class Aircraft_HTML extends Display {
         this.cards.rad_data.mount_type = r.GetMountList()[r.GetMountIndex()].name;
         this.cards.rad_data.coolant_type = r.GetCoolantList()[r.GetCoolantIndex()].name;
     }
+	WeaponAbrv(w) {
+		var wlist = aircraft_model.GetWeapons().GetWeaponList();
+        var ds = w.GetDirection();
+        var dircount = 0;
+        for (let d of ds) {
+            if (d)
+                dircount++;
+        }
+        var abrv = "";
+        if (dircount == 1 && w.GetFixed())
+            abrv += "Fix ";
+        else if (dircount <= 2)
+            abrv += "Flex ";
+        else
+            abrv += "Tur ";
+		
+		if (ds[0]) abrv += "F";
+		if (ds[1]) abrv += "R";
+		if (ds[2]) abrv += "U";
+		if (ds[3]) abrv += "D";
+		if (ds[4]) abrv += "L";
+		if (ds[5]) abrv += "R";
+		if (dircount > 0) abrv += " "; 
+		
+        if (w.GetAction() == 1) {
+            abrv += "Mech ";
+        }
+        else if (w.GetAction() == 2) {
+            abrv += "Gast ";
+        }
+        if (w.GetProjectile() == 1) {
+            abrv += "HRay ";
+        }
+        else if (w.GetProjectile() == 2) {
+            abrv += "Gyrojet ";
+        }
+        else if (w.GetProjectile() == 3) {
+            abrv += "Pneum ";
+        }
+        abrv += wlist[w.GetWeaponSelected()].abrv;
+        return abrv;
+	}
     WeaponName(w) {
         var wlist = aircraft_model.GetWeapons().GetWeaponList();
         var ds = w.GetDirection();
@@ -12575,7 +12615,6 @@ class WeaponSystem extends Part {
     }
     MakeFinalWeapon() {				
         var num = this.weapon_type;
-		console.log("In make final weapon: ", num, this.weapon_list);
         this.final_weapon.can_action = this.weapon_list[num].can_action;
         this.final_weapon.can_projectile = this.weapon_list[num].can_projectile;
         this.final_weapon.ammo = this.weapon_list[num].ammo;
