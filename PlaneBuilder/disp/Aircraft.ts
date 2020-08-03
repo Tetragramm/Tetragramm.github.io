@@ -272,32 +272,32 @@ class Aircraft_HTML extends Display {
                 this.cards.SaveRadiator(i);
             }
         };
-		
-		var npc_button = document.getElementById("acft_save_npc"); 
-		npc_button.onclick = () => {
-			//update all the aircraft data we need.
-			this.UpdateCard();
-			
-			//pick the lowest overspeed among all engines, treat that as the overspeed for the plane. 
-			this.cards.lowest_overspeed = -1;
-			for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-                var engine = this.acft.GetEngines().GetEngine(i); 
-				if (engine.GetOverspeed() < this.cards.lowest_overspeed || this.cards.lowest_overspeed < 0) {
-					this.cards.lowest_overspeed = engine.GetOverspeed();
-				}
+
+        var npc_button = document.getElementById("acft_save_npc");
+        npc_button.onclick = () => {
+            //update all the aircraft data we need.
+            this.UpdateCard();
+
+            //pick the lowest overspeed among all engines, treat that as the overspeed for the plane. 
+            this.cards.lowest_overspeed = -1;
+            for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+                var engine = this.acft.GetEngines().GetEngine(i);
+                if (engine.GetOverspeed() < this.cards.lowest_overspeed || this.cards.lowest_overspeed < 0) {
+                    this.cards.lowest_overspeed = engine.GetOverspeed();
+                }
             }
-			
-			//append weapon data to card so we can use it. 
-			this.cards.all_weapons = [];
-			var wsetlist = this.acft.GetWeapons().GetWeaponSets();
+
+            //append weapon data to card so we can use it. 
+            this.cards.all_weapons = [];
+            var wsetlist = this.acft.GetWeapons().GetWeaponSets();
             for (let i = 0; i < wsetlist.length; i++) {
                 this.UpdateWeaponCard(wsetlist[i]);
-                this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data)); 
+                this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data));
             }
-			
-			this.cards.SaveNPC();
-		}
-		
+
+            this.cards.SaveNPC();
+        }
+
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
         reset_button.onclick = () => { aircraft_model.Reset(); aircraft_model.CalculateStats(); };
     }
@@ -397,7 +397,7 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.jam = w.GetJam();
         this.cards.weap_data.tags = [dtag];
         this.cards.weap_data.type = name;
-		this.cards.weap_data.abrv = fweap.abrv; 
+        this.cards.weap_data.abrv = fweap.abrv;
         this.cards.weap_data.reload = fweap.reload;
 
         if (fweap.rapid) {
@@ -494,7 +494,7 @@ class Aircraft_HTML extends Display {
             name += "Pneumatic ";
         }
 
-        name += wlist[w.GetWeaponSelected()].name;
+        name += wlist[w.GetWeaponSelected()].abrv;
         return name;
     }
 

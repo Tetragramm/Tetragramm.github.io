@@ -11121,7 +11121,7 @@ class Aircraft_HTML extends Display {
         else if (w.GetProjectile() == 3) {
             name += "Pneumatic ";
         }
-        name += wlist[w.GetWeaponSelected()].name;
+        name += wlist[w.GetWeaponSelected()].abrv;
         return name;
     }
     // private InitAlter(tbl: HTMLTableElement) {
