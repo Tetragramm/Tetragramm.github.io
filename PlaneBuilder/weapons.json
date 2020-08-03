@@ -2,6 +2,7 @@
     "weapons": [
         {
             "name": "Submachine Gun",
+			"abrv": "SMG",
             "era": "WWI",
             "cost": 1,
             "mass": 0.5,
@@ -21,6 +22,7 @@
         },
         {
             "name": "Scattergun",
+			"abrv": "SG",
             "era": "Pioneer",
             "cost": 2,
             "mass": 2,
@@ -41,7 +43,8 @@
         },
         {
             "name": "Light Machine Gun",
-            "era": "WWI",
+			"abrv": "LMG",
+            "era": "WWI",			
             "cost": 2,
             "mass": 2,
             "drag": 1,
@@ -60,6 +63,7 @@
         },
         {
             "name": "Machine Gun",
+			"abrv": "MG",
             "era": "WWI",
             "cost": 2,
             "mass": 3,
@@ -79,6 +83,7 @@
         },
         {
             "name": "Balloon Gun",
+			"abrv": "BMG",
             "era": "WWI",
             "cost": 3,
             "mass": 3,
@@ -92,12 +97,14 @@
             "shells": true,
             "jam": "2/3",
             "reload": 0,
+			"warning": "-2 to attack on a deflection shot.",
             "size": 4,
             "can_action": true,
             "can_projectile": true
         },
         {
             "name": "Enhanced Machine Gun",
+			"abrv": "EMG",
             "era": "Interwar",
             "cost": 2,
             "mass": 2,
@@ -117,6 +124,7 @@
         },
         {
             "name": "Heavy Machine Gun",
+			"abrv": "HMG",
             "era": "Interwar",
             "cost": 4,
             "mass": 3,
@@ -136,6 +144,7 @@
         },
         {
             "name": "Punt Gun",
+			"abrv": "PG",
             "era": "Pioneer",
             "cost": 4,
             "mass": 4,
@@ -155,27 +164,29 @@
             "can_projectile": true
         },
         {
-            "name": "Light Cannon (Low Velocity)",
+            "name": "Light Repeating Cannon",
+			"abrv": "LRC",
             "era": "WWI",
             "cost": 4,
             "mass": 4,
             "drag": 3,
             "damage": 8,
-            "hits": 2,
+            "hits": 3,
             "ap": 2,
             "ammo": 4,
             "rapid": true,
             "synched": false,
             "shells": true,
-            "jam": "2/4",
+            "jam": "2/5",
             "reload": 2,
-            "warning": "-3 to attack fixed-winged aircraft.",
+            "warning": "-3 to attack on a deflection shot.",
             "size": 8,
             "can_action": true,
             "can_projectile": true
         },
         {
-            "name": "Heavy Cannon (Low Velocity)",
+            "name": "Heavy Cannon",
+			"abrv": "HC",
             "era": "WWI",
             "cost": 6,
             "mass": 5,
@@ -189,13 +200,14 @@
             "shells": true,
             "jam": "0",
             "reload": 1,
-            "warning": "-3 to attack fixed-winged aircraft.",
+            "warning": "-3 to attack on a deflection shot.",
             "size": 8,
             "can_action": true,
             "can_projectile": true
         },
         {
             "name": "Light Machine Cannon",
+			"abrv": "LMC",
             "era": "Interwar",
             "cost": 8,
             "mass": 4,
@@ -216,6 +228,7 @@
         },
         {
             "name": "Heavy Machine Cannon",
+			"abrv": "HMC",
             "era": "WWII",
             "cost": 12,
             "mass": 5,
@@ -235,6 +248,7 @@
         },
         {
             "name": "Fliergerflammerwerfer",
+			"abrv": "FFW",
             "era": "WWII",
             "cost": 4,
             "mass": 1,
@@ -255,6 +269,7 @@
         },
         {
             "name": "Recoilless Cannon",
+			"abrv": "RC",
             "era": "WWI",
             "cost": 5,
             "mass": 8,
@@ -268,13 +283,14 @@
             "shells": true,
             "jam": "0",
             "reload": 1,
-            "warning": "-5 to attack fixed-winged aircraft.",
+            "warning": "-5 to attack on a deflection shot.",
             "size": 16,
             "can_action": true,
             "can_projectile": true
         },
         {
             "name": "Autocannon",
+			"abrv": "AC",
             "era": "WWII",
             "cost": 15,
             "mass": 8,
@@ -294,6 +310,7 @@
         },
         {
             "name": "Battle Cannon",
+			"abrv": "BC",
             "era": "WWII",
             "cost": 15,
             "mass": 40,
@@ -313,6 +330,7 @@
         },
         {
             "name": "Precision Rifle",
+			"abrv": "PR",
             "era": "WWI",
             "mass": 1,
             "drag": 1,
