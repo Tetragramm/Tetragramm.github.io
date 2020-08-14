@@ -2,7 +2,7 @@
     "weapons": [
         {
             "name": "Submachine Gun",
-			"abrv": "SMG",
+            "abrv": "SMG",
             "era": "WWI",
             "cost": 1,
             "mass": 0.5,
@@ -22,13 +22,13 @@
         },
         {
             "name": "Scattergun",
-			"abrv": "SG",
+            "abrv": "SG",
             "era": "Pioneer",
             "cost": 2,
             "mass": 2,
             "drag": 2,
             "damage": 1,
-            "hits": 1,
+            "hits": 0,
             "ap": 0,
             "ammo": 8,
             "rapid": false,
@@ -36,15 +36,15 @@
             "shells": false,
             "jam": "0",
             "reload": 1,
-            "warning": "Rather than roll Open Fire, you roll 3d5 at Knife range, 2d5 at Close Range, and 1d5 at Long Range. You do an equal number of Hits and Damage to the roll results, and roll Crit dice like normal.",
+            "warning": "Rather than roll Open Fire, you roll 4d5 at Knife range, 2d5 at Close Range, and 1d5 at Long Range. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal.",
             "size": 2,
             "can_action": true,
             "can_projectile": true
         },
         {
             "name": "Light Machine Gun",
-			"abrv": "LMG",
-            "era": "WWI",			
+            "abrv": "LMG",
+            "era": "WWI",
             "cost": 2,
             "mass": 2,
             "drag": 1,
@@ -63,7 +63,7 @@
         },
         {
             "name": "Machine Gun",
-			"abrv": "MG",
+            "abrv": "MG",
             "era": "WWI",
             "cost": 2,
             "mass": 3,
@@ -83,7 +83,7 @@
         },
         {
             "name": "Balloon Gun",
-			"abrv": "BMG",
+            "abrv": "BMG",
             "era": "WWI",
             "cost": 3,
             "mass": 3,
@@ -97,14 +97,14 @@
             "shells": true,
             "jam": "2/3",
             "reload": 0,
-			"warning": "-2 to attack on a deflection shot.",
+            "warning": "-2 to attack on a deflection shot.",
             "size": 4,
             "can_action": true,
             "can_projectile": true
         },
         {
             "name": "Enhanced Machine Gun",
-			"abrv": "EMG",
+            "abrv": "EMG",
             "era": "Interwar",
             "cost": 2,
             "mass": 2,
@@ -124,7 +124,7 @@
         },
         {
             "name": "Heavy Machine Gun",
-			"abrv": "HMG",
+            "abrv": "HMG",
             "era": "Interwar",
             "cost": 4,
             "mass": 3,
@@ -144,7 +144,7 @@
         },
         {
             "name": "Punt Gun",
-			"abrv": "PG",
+            "abrv": "PG",
             "era": "Pioneer",
             "cost": 4,
             "mass": 4,
@@ -158,14 +158,14 @@
             "shells": false,
             "jam": "0",
             "reload": 1,
-            "warning": "Rather than roll Open Fire, you roll 3d10 at Knife range, 2d10 at Close Range, and 1d10 at Long Range. You do an equal number of Hits and Damage to the roll results, and roll Crit dice like normal.",
+            "warning": "Rather than roll Open Fire, you roll 4d10 at Knife range, 2d10 at Close Range, and 1d10 at Long Range. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal.",
             "size": 8,
             "can_action": true,
             "can_projectile": true
         },
         {
             "name": "Light Repeating Cannon",
-			"abrv": "LRC",
+            "abrv": "LRC",
             "era": "WWI",
             "cost": 4,
             "mass": 4,
@@ -186,7 +186,7 @@
         },
         {
             "name": "Heavy Cannon",
-			"abrv": "HC",
+            "abrv": "HC",
             "era": "WWI",
             "cost": 6,
             "mass": 5,
@@ -207,7 +207,7 @@
         },
         {
             "name": "Light Machine Cannon",
-			"abrv": "LMC",
+            "abrv": "LMC",
             "era": "Interwar",
             "cost": 8,
             "mass": 4,
@@ -228,7 +228,7 @@
         },
         {
             "name": "Heavy Machine Cannon",
-			"abrv": "HMC",
+            "abrv": "HMC",
             "era": "WWII",
             "cost": 12,
             "mass": 5,
@@ -248,7 +248,7 @@
         },
         {
             "name": "Fliergerflammerwerfer",
-			"abrv": "FFW",
+            "abrv": "FFW",
             "era": "WWII",
             "cost": 4,
             "mass": 1,
@@ -269,7 +269,7 @@
         },
         {
             "name": "Recoilless Cannon",
-			"abrv": "RC",
+            "abrv": "RC",
             "era": "WWI",
             "cost": 5,
             "mass": 8,
@@ -290,7 +290,7 @@
         },
         {
             "name": "Autocannon",
-			"abrv": "AC",
+            "abrv": "AC",
             "era": "WWII",
             "cost": 15,
             "mass": 8,
@@ -310,7 +310,7 @@
         },
         {
             "name": "Battle Cannon",
-			"abrv": "BC",
+            "abrv": "BC",
             "era": "WWII",
             "cost": 15,
             "mass": 40,
@@ -330,7 +330,7 @@
         },
         {
             "name": "Precision Rifle",
-			"abrv": "PR",
+            "abrv": "PR",
             "era": "WWI",
             "mass": 1,
             "drag": 1,
