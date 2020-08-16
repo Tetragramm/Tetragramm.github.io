@@ -10554,11 +10554,11 @@ class Cards {
         context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 120, 80);
         context.fillText(this.acft_data.half_stall.toString(), 493 + 3 * 62, 94 + 120, 80);
         context.fillText(this.acft_data.half_speed.toString(), 493 + 4 * 62, 94 + 120, 80);
-        context.fillText(this.acft_data.empty_boost.toString(), 493, 94 + 160, 80);
+        context.fillText("0", 493, 94 + 160, 80);
         context.fillText(this.acft_data.empty_hand.toString(), 493 + 1 * 62, 94 + 160, 80);
-        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 160, 80);
+        context.fillText("0", 493 + 2 * 62, 94 + 160, 80);
         context.fillText(this.acft_data.empty_stall.toString(), 493 + 3 * 62, 94 + 160, 80);
-        context.fillText(this.acft_data.empty_speed.toString(), 493 + 4 * 62, 94 + 160, 80);
+        context.fillText("0", 493 + 4 * 62, 94 + 160, 80);
         context.fillText(Math.floor(this.acft_data.fuel).toString(), 417, 310, 35);
         context.fillText(this.acft_data.dropoff.toString(), 1048, 375, 35);
         context.fillText(this.acft_data.escape.toString(), 85, 640, 35);

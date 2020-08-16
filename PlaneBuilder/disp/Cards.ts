@@ -8,8 +8,8 @@ class Cards {
     private rad_canvas: HTMLCanvasElement;
     private rad_image: HTMLImageElement;
     private npc_canvas: HTMLCanvasElement;
-    private npc_image: HTMLImageElement; 
-	
+    private npc_image: HTMLImageElement;
+
     public name: string;
 
     public acft_data: {
@@ -57,7 +57,7 @@ class Cards {
 
     public weap_data: {
         type: string,
-		abrv: string, 
+        abrv: string,
         ammo: number,
         ap: number,
         jam: string,
@@ -81,9 +81,9 @@ class Cards {
         mount_type: string,
         coolant_type: string,
     }
-	
-	public lowest_overspeed : number; 
-	public all_weapons : any[]; 
+
+    public lowest_overspeed: number;
+    public all_weapons: any[];
 
     constructor() {
         this.dash_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
@@ -117,7 +117,7 @@ class Cards {
         this.rad_image.width = 479;
         this.rad_image.height = 290;
         this.rad_image.src = './Cards/Radiator.png';
-		
+
         this.npc_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
         this.npc_canvas.width = 482;
         this.npc_canvas.height = 290;
@@ -171,7 +171,7 @@ class Cards {
 
         this.weap_data = {
             type: "",
-			abrv: "",
+            abrv: "",
             ammo: 0,
             ap: 0,
             jam: "",
@@ -229,11 +229,11 @@ class Cards {
         context.fillText(this.acft_data.half_stall.toString(), 493 + 3 * 62, 94 + 120, 80);
         context.fillText(this.acft_data.half_speed.toString(), 493 + 4 * 62, 94 + 120, 80);
 
-        context.fillText(this.acft_data.empty_boost.toString(), 493, 94 + 160, 80);
+        context.fillText("0", 493, 94 + 160, 80);
         context.fillText(this.acft_data.empty_hand.toString(), 493 + 1 * 62, 94 + 160, 80);
-        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 160, 80);
+        context.fillText("0", 493 + 2 * 62, 94 + 160, 80);
         context.fillText(this.acft_data.empty_stall.toString(), 493 + 3 * 62, 94 + 160, 80);
-        context.fillText(this.acft_data.empty_speed.toString(), 493 + 4 * 62, 94 + 160, 80);
+        context.fillText("0", 493 + 4 * 62, 94 + 160, 80);
 
         context.fillText(Math.floor(this.acft_data.fuel).toString(), 417, 310, 35);
 
@@ -431,51 +431,51 @@ class Cards {
 
         this.download(this.name + "_Radiator_" + radiator_num.toString(), this.rad_canvas);
     }
-	
-	public SaveNPC() {
-		var context = this.npc_canvas.getContext("2d");
+
+    public SaveNPC() {
+        var context = this.npc_canvas.getContext("2d");
         context.clearRect(0, 0, this.npc_canvas.width, this.npc_canvas.height);
         context.drawImage(this.npc_image, 0, 0);
         context.font = "20px Balthazar";
-		context.textAlign = "center";
-		context.fillStyle = "#000";
+        context.textAlign = "center";
+        context.fillStyle = "#000";
         context.strokeStyle = "#000";
-		context.fillText(this.name, 100, 100, 145);
-		context.fillText("" + this.lowest_overspeed, 70, 158, 40);
-		context.fillText("" + this.acft_data.full_speed, 126, 158, 40);
-		var combat_speed = this.acft_data.full_speed - (this.acft_data.full_speed % 10) - this.acft_data.turn_bleed;
-		context.fillText("" + combat_speed, 187, 158, 40);
-		context.fillText("" + this.acft_data.full_stall, 245, 158, 40);
-		
-		var structure = this.acft_data.toughness + this.acft_data.max_strain;		
-		context.fillText("" + structure, 70, 236, 40);
-		context.fillText("" + this.acft_data.full_hand, 123, 236, 40);
-		
-		var wep; 
-		if (this.all_weapons[0]) {			
-			wep = this.all_weapons[0]; 
-			context.font = "12px Avenir";	
-			context.fillText(wep.abrv, 232, 71, 91);
-			context.font = "20px Balthazar";
-			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
-			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
-			context.fillText(hits, 320, 71, 80);			
-			context.fillText(dam, 401, 71, 80);
-		}
-		
-		if (this.all_weapons[1]) {			
-			wep = this.all_weapons[1]; 
-			context.font = "12px Avenir";
-			context.fillText(wep.abrv, 232, 103, 91);
-			context.font = "20px Balthazar";
-			var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
-			var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
-			context.fillText(hits, 320, 103, 80);			
-			context.fillText(dam, 401, 103, 80);
-		}
-		
-		this.download(this.name + "_NPC", this.npc_canvas);
-	}
+        context.fillText(this.name, 100, 100, 145);
+        context.fillText("" + this.lowest_overspeed, 70, 158, 40);
+        context.fillText("" + this.acft_data.full_speed, 126, 158, 40);
+        var combat_speed = this.acft_data.full_speed - (this.acft_data.full_speed % 10) - this.acft_data.turn_bleed;
+        context.fillText("" + combat_speed, 187, 158, 40);
+        context.fillText("" + this.acft_data.full_stall, 245, 158, 40);
+
+        var structure = this.acft_data.toughness + this.acft_data.max_strain;
+        context.fillText("" + structure, 70, 236, 40);
+        context.fillText("" + this.acft_data.full_hand, 123, 236, 40);
+
+        var wep;
+        if (this.all_weapons[0]) {
+            wep = this.all_weapons[0];
+            context.font = "12px Avenir";
+            context.fillText(wep.abrv, 232, 71, 91);
+            context.font = "20px Balthazar";
+            var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
+            var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+            context.fillText(hits, 320, 71, 80);
+            context.fillText(dam, 401, 71, 80);
+        }
+
+        if (this.all_weapons[1]) {
+            wep = this.all_weapons[1];
+            context.font = "12px Avenir";
+            context.fillText(wep.abrv, 232, 103, 91);
+            context.font = "20px Balthazar";
+            var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
+            var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+            context.fillText(hits, 320, 103, 80);
+            context.fillText(dam, 401, 103, 80);
+        }
+
+        this.download(this.name + "_NPC", this.npc_canvas);
+    }
 
     private download(filename: string, canvas: HTMLCanvasElement) {
 
