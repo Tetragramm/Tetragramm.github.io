@@ -883,13 +883,13 @@ class Aircraft_HTML extends Display {
         this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
         this.hand_half.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
         this.boost_half.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
-        this.roc_half.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.roc_half.textContent = derived.RateOfClimb.toString();
         //Full
         this.ts_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
         this.ss_full.textContent = derived.StallSpeedFull.toString();
         this.hand_full.textContent = derived.HandlingFull.toString();
         this.boost_full.textContent = derived.BoostFull.toString();
-        this.roc_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.roc_full.textContent = derived.RateOfClimb.toString();
 
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
@@ -901,13 +901,13 @@ class Aircraft_HTML extends Display {
             this.ss_halfwB.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
             this.hand_halfwB.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
             this.boost_halfwB.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
-            this.roc_halfwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.roc_halfwB.textContent = derived.RateOfClimbwBombs.toString();
             //Full
             this.ts_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
             this.ss_fullwB.textContent = derived.StallSpeedFullwBombs.toString();
             this.hand_fullwB.textContent = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.textContent = derived.BoostFullwBombs.toString();
-            this.roc_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.roc_fullwB.textContent = derived.RateOfClimbwBombs.toString();
 
         } else {
             this.bomb_row1.hidden = true;

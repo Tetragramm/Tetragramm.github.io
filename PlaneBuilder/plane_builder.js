@@ -7280,6 +7280,8 @@ class Aircraft {
         }
         FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
         FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
+        var RateOfClimb = Math.floor(1.0e-6 + (this.stats.power / DryMP) * (7.0 / this.stats.pitchspeed) - StallSpeedEmpty);
+        var RateOfClimbwBombs = Math.floor(1.0e-6 + (this.stats.power / DryMP) * (7.0 / this.stats.pitchspeed) - StallSpeedFullwBombs);
         return {
             DryMP: DryMP,
             WetMP: WetMP,
@@ -7316,6 +7318,8 @@ class Aircraft {
             CruiseRange: CruiseRange,
             CruiseRangewBombs: CruiseRangewBombs,
             FlightStress: FlightStress,
+            RateOfClimb: RateOfClimb,
+            RateOfClimbwBombs: RateOfClimbwBombs,
         };
     }
     VitalComponentList() {
@@ -11487,13 +11491,13 @@ class Aircraft_HTML extends Display {
         this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
         this.hand_half.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
         this.boost_half.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
-        this.roc_half.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.roc_half.textContent = derived.RateOfClimb.toString();
         //Full
         this.ts_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
         this.ss_full.textContent = derived.StallSpeedFull.toString();
         this.hand_full.textContent = derived.HandlingFull.toString();
         this.boost_full.textContent = derived.BoostFull.toString();
-        this.roc_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.roc_full.textContent = derived.RateOfClimb.toString();
         if (stats.bomb_mass > 0) {
             this.bomb_row1.hidden = false;
             this.bomb_row2.hidden = false;
@@ -11504,13 +11508,13 @@ class Aircraft_HTML extends Display {
             this.ss_halfwB.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
             this.hand_halfwB.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
             this.boost_halfwB.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
-            this.roc_halfwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.roc_halfwB.textContent = derived.RateOfClimbwBombs.toString();
             //Full
             this.ts_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
             this.ss_fullwB.textContent = derived.StallSpeedFullwBombs.toString();
             this.hand_fullwB.textContent = derived.HandlingFullwBombs.toString();
             this.boost_fullwB.textContent = derived.BoostFullwBombs.toString();
-            this.roc_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs - derived.StallSpeedFullwBombs + derived.BoostFullwBombs).toString();
+            this.roc_fullwB.textContent = derived.RateOfClimbwBombs.toString();
         }
         else {
             this.bomb_row1.hidden = true;
@@ -12141,6 +12145,9 @@ var LZString = (function () {
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
+//Fix Rules.htm
+//  Climb
+//  Pneumatic
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
@@ -12635,7 +12642,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.jam = this.final_weapon.jam.substr(0, 2) + "9999";
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
             }
-            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "AP or Fragmentation rounds only (free, your choice)." });
+            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
         }
     }
     SetWeaponSelected(num) {
