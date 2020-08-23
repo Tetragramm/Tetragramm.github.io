@@ -213,7 +213,7 @@ class Cards {
 
         context.fillText(this.acft_data.half_bomb_boost.toString(), 493, 94 + 40, 80);
         context.fillText(this.acft_data.half_bomb_hand.toString(), 493 + 1 * 62, 94 + 40, 80);
-        context.fillText(this.acft_data.full_bomb_climb.toString(), 493 + 2 * 62, 94 + 40, 80);
+        context.fillText(this.acft_data.half_bomb_climb.toString(), 493 + 2 * 62, 94 + 40, 80);
         context.fillText(this.acft_data.half_bomb_stall.toString(), 493 + 3 * 62, 94 + 40, 80);
         context.fillText(this.acft_data.half_bomb_speed.toString(), 493 + 4 * 62, 94 + 40, 80);
 
@@ -225,7 +225,7 @@ class Cards {
 
         context.fillText(this.acft_data.half_boost.toString(), 493, 94 + 120, 80);
         context.fillText(this.acft_data.half_hand.toString(), 493 + 1 * 62, 94 + 120, 80);
-        context.fillText(this.acft_data.full_climb.toString(), 493 + 2 * 62, 94 + 120, 80);
+        context.fillText(this.acft_data.half_climb.toString(), 493 + 2 * 62, 94 + 120, 80);
         context.fillText(this.acft_data.half_stall.toString(), 493 + 3 * 62, 94 + 120, 80);
         context.fillText(this.acft_data.half_speed.toString(), 493 + 4 * 62, 94 + 120, 80);
 
