@@ -458,8 +458,9 @@ class Aircraft {
         FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
         FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
 
-        var RateOfClimb = Math.floor(1.0e-6 + (this.stats.power / WetMP) * (7.0 / this.stats.pitchspeed) - StallSpeedEmpty);
-        var RateOfClimbwBombs = Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (7.0 / this.stats.pitchspeed) - StallSpeedFullwBombs);
+        var RateOfClimbFull = Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull);
+        var RateOfClimbEmpty = Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty);
+        var RateOfClimbwBombs = Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (23.0 / this.stats.pitchspeed) / DPwBombs);
 
         return {
             DryMP: DryMP,
@@ -497,7 +498,8 @@ class Aircraft {
             CruiseRange: CruiseRange,
             CruiseRangewBombs: CruiseRangewBombs,
             FlightStress: FlightStress,
-            RateOfClimb: RateOfClimb,
+            RateOfClimbFull: RateOfClimbFull,
+            RateOfClimbEmpty: RateOfClimbEmpty,
             RateOfClimbwBombs: RateOfClimbwBombs,
         }
     }
