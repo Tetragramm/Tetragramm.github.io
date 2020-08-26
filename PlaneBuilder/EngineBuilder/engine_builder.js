@@ -1029,7 +1029,7 @@ class EngineBuilder {
     constructor() {
         this.EraTable = [
             { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
-            { name: "Great War", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
+            { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
             { name: "Roaring 20s", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6.8, fuelfactor: 6 },
             { name: "Coming Storm", materials: 1.35, cost: 2.25, maxRPM: 45, powerdiv: 6.6, fuelfactor: 5 },
             { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 50, powerdiv: 6.5, fuelfactor: 4 },
@@ -7731,6 +7731,7 @@ class Weapons extends Part {
         for (let elem of js["weapons"]) {
             var weap = {
                 name: elem["name"],
+                abrv: elem["abrv"],
                 era: elem["era"],
                 size: elem["size"],
                 stats: new Stats(elem),
@@ -8565,6 +8566,9 @@ class Aircraft {
         }
         FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
         FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
+        var RateOfClimbFull = Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull);
+        var RateOfClimbEmpty = Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty);
+        var RateOfClimbwBombs = Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (23.0 / this.stats.pitchspeed) / DPwBombs);
         return {
             DryMP: DryMP,
             WetMP: WetMP,
@@ -8601,6 +8605,9 @@ class Aircraft {
             CruiseRange: CruiseRange,
             CruiseRangewBombs: CruiseRangewBombs,
             FlightStress: FlightStress,
+            RateOfClimbFull: RateOfClimbFull,
+            RateOfClimbEmpty: RateOfClimbEmpty,
+            RateOfClimbwBombs: RateOfClimbwBombs,
         };
     }
     VitalComponentList() {
@@ -8971,7 +8978,7 @@ class WeaponSystem extends Part {
         this.sticky_guns = 0;
         this.repeating = false;
         this.final_weapon = {
-            name: "", era: "", size: 0, stats: new Stats(),
+            name: "", abrv: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
             ap: 0, jam: "", reload: 0,
             rapid: false, synched: false, shells: false,
@@ -9096,6 +9103,7 @@ class WeaponSystem extends Part {
         this.final_weapon.damage = this.weapon_list[num].damage;
         this.final_weapon.era = this.weapon_list[num].era;
         this.final_weapon.name = this.weapon_list[num].name;
+        this.final_weapon.abrv = this.weapon_list[num].abrv;
         this.final_weapon.reload = this.weapon_list[num].reload;
         this.final_weapon.shells = this.weapon_list[num].shells;
         this.final_weapon.size = this.weapon_list[num].size;
@@ -9160,7 +9168,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.jam = this.final_weapon.jam.substr(0, 2) + "9999";
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
             }
-            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "AP or Fragmentation rounds only (free, your choice)." });
+            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
         }
     }
     SetWeaponSelected(num) {
