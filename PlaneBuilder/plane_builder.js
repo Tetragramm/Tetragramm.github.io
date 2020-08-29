@@ -456,7 +456,7 @@ class EngineBuilder {
     constructor() {
         this.EraTable = [
             { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
-            { name: "Great War", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
+            { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
             { name: "Roaring 20s", materials: 1.5, cost: 2, maxRPM: 40, powerdiv: 6.8, fuelfactor: 6 },
             { name: "Coming Storm", materials: 1.35, cost: 2.25, maxRPM: 45, powerdiv: 6.6, fuelfactor: 5 },
             { name: "WWII", materials: 1.25, cost: 2.5, maxRPM: 50, powerdiv: 6.5, fuelfactor: 4 },
@@ -5441,6 +5441,9 @@ class LandingGear extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    IsVital() {
+        return this.gear_list[this.gear_sel].can_retract;
+    }
     PartStats() {
         var stats = new Stats();
         if (!this.CanGear()[this.gear_sel])
@@ -7369,6 +7372,9 @@ class Aircraft {
         }
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
             vital.push("Weapon Set #" + (i + 1).toString());
+        }
+        if (this.GetLandingGear().IsVital()) {
+            vital.push("Landing Gear");
         }
         return vital;
     }

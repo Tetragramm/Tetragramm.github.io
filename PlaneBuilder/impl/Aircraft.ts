@@ -550,6 +550,9 @@ class Aircraft {
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
             vital.push("Weapon Set #" + (i + 1).toString());
         }
+        if (this.GetLandingGear().IsVital()) {
+            vital.push("Landing Gear");
+        }
         return vital;
     }
 

@@ -143,6 +143,10 @@ class LandingGear extends Part {
         this.CalculateStats = callback;
     }
 
+    public IsVital() {
+        return this.gear_list[this.gear_sel].can_retract;
+    }
+
     public PartStats() {
         var stats = new Stats();
         if (!this.CanGear()[this.gear_sel])
