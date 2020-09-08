@@ -235,6 +235,10 @@ class WeaponSystem extends Part {
             }
         }
 
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL) && this.projectile_sel == ProjectileType.HEATRAY) {
+            this.projectile_sel = ProjectileType.BULLETS;
+        }
+
         if (this.projectile_sel == ProjectileType.HEATRAY) {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
