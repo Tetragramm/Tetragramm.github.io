@@ -2332,6 +2332,7 @@ class Engine extends Part {
             this.cooling_count = 0;
             this.has_alternator = false;
             this.is_generator = false;
+            this.cowl_sel = 0;
             if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
                 for (let i = 0; i < this.mount_list.length; i++) {
                     this.selected_mount = i;
@@ -2497,6 +2498,9 @@ class Engine extends Part {
         this.CalculateStats = callback;
     }
     PartStats() {
+        console.log(this.cowl_sel);
+        this.PulseJetCheck();
+        console.log(this.cowl_sel);
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
         stats.upkeep = stats.power / 10;

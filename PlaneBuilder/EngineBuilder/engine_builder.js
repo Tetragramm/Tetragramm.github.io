@@ -3929,6 +3929,7 @@ class Engine extends Part {
             this.cooling_count = 0;
             this.has_alternator = false;
             this.is_generator = false;
+            this.cowl_sel = 0;
             if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
                 for (let i = 0; i < this.mount_list.length; i++) {
                     this.selected_mount = i;
@@ -4094,6 +4095,9 @@ class Engine extends Part {
         this.CalculateStats = callback;
     }
     PartStats() {
+        console.log(this.cowl_sel);
+        this.PulseJetCheck();
+        console.log(this.cowl_sel);
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
         stats.upkeep = stats.power / 10;
@@ -7038,6 +7042,9 @@ class LandingGear extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    IsVital() {
+        return this.gear_list[this.gear_sel].can_retract;
+    }
     PartStats() {
         var stats = new Stats();
         if (!this.CanGear()[this.gear_sel])
@@ -8656,6 +8663,9 @@ class Aircraft {
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
             vital.push("Weapon Set #" + (i + 1).toString());
         }
+        if (this.GetLandingGear().IsVital()) {
+            vital.push("Landing Gear");
+        }
         return vital;
     }
     SetStorage(use) {
@@ -9148,6 +9158,9 @@ class WeaponSystem extends Part {
                 }
                 this.final_weapon.jam = ret.toString();
             }
+        }
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL) && this.projectile_sel == ProjectileType.HEATRAY) {
+            this.projectile_sel = ProjectileType.BULLETS;
         }
         if (this.projectile_sel == ProjectileType.HEATRAY) {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
