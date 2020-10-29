@@ -722,9 +722,7 @@ class Engine extends Part {
     }
 
     public PartStats(): Stats {
-        console.log(this.cowl_sel);
         this.PulseJetCheck();
-        console.log(this.cowl_sel);
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
 

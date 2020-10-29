@@ -184,7 +184,7 @@ class Reinforcement extends Part {
 
     private ImplSCC(idx: number, count: number) {
         var diff = count - this.cant_count[idx];
-        if (this.cant_list[idx].limited && this.cant_count[idx] > 0) {
+        if (this.cant_list[idx].limited && count > 0) {
             var total_structure = this.TotalStructure();
             for (let i = 0; i < this.cant_list.length; i++) {
                 if (this.cant_list[i].limited) {
@@ -192,7 +192,10 @@ class Reinforcement extends Part {
                 }
             }
             diff = Math.min(diff, Math.floor(1.0e-6 + total_structure / (5 * this.cant_list[idx].stats.mass)));
+            console.log(total_structure);
+            console.log((5 * this.cant_list[idx].stats.mass));
         }
+        console.log(this.cant_count[idx] + "  " + diff);
         this.cant_count[idx] += diff;
         return diff != 0;
     }
