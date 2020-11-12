@@ -12681,10 +12681,14 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
+        //Special Case for Lightning Arc
+        if (this.weapon_list[num].ammo == 0) {
+            this.SetFixed(true);
+        }
         this.CalculateStats();
     }
     CanRepeating() {
-        return !this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0;
+        return (!this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0) && this.weapon_list[this.weapon_type].ammo > 0;
     }
     GetRepeating() {
         return this.repeating;
@@ -12704,6 +12708,10 @@ class WeaponSystem extends Part {
         return this.fixed;
     }
     SetFixed(use) {
+        //Special Case for Lightning Arc
+        if (this.weapon_list[this.weapon_type].ammo == 0) {
+            use = true;
+        }
         if (this.fixed != use) {
             this.fixed = use;
             for (let w of this.weapons) {

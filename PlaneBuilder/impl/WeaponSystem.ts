@@ -278,11 +278,17 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
+
+        //Special Case for Lightning Arc
+        if (this.weapon_list[num].ammo == 0) {
+            this.SetFixed(true);
+        }
+
         this.CalculateStats();
     }
 
     public CanRepeating() {
-        return !this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0;
+        return (!this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0) && this.weapon_list[this.weapon_type].ammo > 0;
     }
 
     public GetRepeating() {
@@ -306,6 +312,12 @@ class WeaponSystem extends Part {
     }
 
     public SetFixed(use: boolean) {
+
+        //Special Case for Lightning Arc
+        if (this.weapon_list[this.weapon_type].ammo == 0) {
+            use = true;
+        }
+
         if (this.fixed != use) {
             this.fixed = use;
             for (let w of this.weapons) {
