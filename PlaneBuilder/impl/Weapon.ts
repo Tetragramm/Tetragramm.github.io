@@ -28,7 +28,7 @@ class Weapon extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean
+        can_action: boolean, can_projectile: boolean, deflection: number,
     };
     private fixed: boolean;
     private wing: boolean;
@@ -53,7 +53,7 @@ class Weapon extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean
+        can_action: boolean, can_projectile: boolean, deflection: number,
     }, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
         super();
         this.weapon_type = weapon_type;
@@ -122,7 +122,7 @@ class Weapon extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean
+        can_action: boolean, can_projectile: boolean, deflection: number,
     }, action: ActionType, projectile: ProjectileType) {
         this.weapon_type = weapon_type;
         this.action = action;
@@ -442,8 +442,17 @@ class Weapon extends Part {
         //Synchronization == -1 is no synch.
         if (this.synchronization == SynchronizationType.INTERRUPT) {
             stats.cost += this.w_count * 2;
+
+            if (this.weapon_type.name == "Light Machine Cannon") {
+                stats.cost += this.w_count * 2;
+            }
+
         } else if (this.synchronization == SynchronizationType.SYNCH && this.action != ActionType.MECHANICAL) {
             stats.cost += this.w_count * 3;
+
+            if (this.weapon_type.name == "Light Machine Cannon") {
+                stats.cost += this.w_count * 3;
+            }
             //synchronization == 2 is spinner and costs nothing.
         } else if (this.synchronization == SynchronizationType.DEFLECT) {
             stats.cost += 1;

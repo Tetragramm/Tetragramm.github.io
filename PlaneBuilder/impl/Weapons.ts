@@ -9,7 +9,7 @@ class Weapons extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean
+        can_action: boolean, can_projectile: boolean, deflection: number,
     }[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
     private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
@@ -42,7 +42,7 @@ class Weapons extends Part {
         for (let elem of js["weapons"]) {
             var weap = {
                 name: elem["name"],
-				abrv: elem["abrv"],
+                abrv: elem["abrv"],
                 era: elem["era"],
                 size: elem["size"],
                 stats: new Stats(elem),
@@ -57,10 +57,12 @@ class Weapons extends Part {
                 shells: elem["shells"],
                 can_action: elem["can_action"],
                 can_projectile: elem["can_projectile"],
+                deflection: elem["deflection"],
             };
             this.weapon_list.push(weap);
         }
 
+        console.log(this.weapon_list);
         this.weapon_sets = [];
         this.brace_count = 0;
     }

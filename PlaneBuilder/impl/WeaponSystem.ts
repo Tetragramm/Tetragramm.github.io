@@ -8,7 +8,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean
+        can_action: boolean, can_projectile: boolean, deflection: number
     };
     private weapon_type: number;
     private fixed: boolean;
@@ -32,7 +32,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean
+        can_action: boolean, can_projectile: boolean, deflection: number,
     }[];
 
     constructor(weapon_list: {
@@ -40,7 +40,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean
+        can_action: boolean, can_projectile: boolean, deflection: number,
     }[]) {
         super();
         this.weapon_list = weapon_list;
@@ -60,7 +60,7 @@ class WeaponSystem extends Part {
             damage: 0, hits: 0, ammo: 0,
             ap: 0, jam: "", reload: 0,
             rapid: false, synched: false, shells: false,
-            can_action: false, can_projectile: false,
+            can_action: false, can_projectile: false, deflection: 0,
         };
         this.MakeFinalWeapon();
         this.SWC(1);
@@ -194,6 +194,7 @@ class WeaponSystem extends Part {
         this.final_weapon.shells = this.weapon_list[num].shells;
         this.final_weapon.size = this.weapon_list[num].size;
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
+        this.final_weapon.deflection = this.weapon_list[num].deflection;
         if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.jam = this.weapon_list[num].jam;
@@ -243,7 +244,8 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
-            this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Incendiary shots. Take -2 forward to Eyeball after firing." })
+            this.final_weapon.deflection = 0;
+            this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Roll Crits +Damage done. On Crit, choose one: start a fire, destroy a radiator/oil component and push Cool Down, or injure crew. Take -2 forward to Eyeball after firing." })
         } else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
             this.final_weapon.shells = false;
@@ -257,6 +259,11 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
             }
             this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
+        }
+
+        console.log(this.final_weapon.deflection);
+        if (this.final_weapon.deflection != 0) {
+            this.final_weapon.stats.warnings.push({ source: this.final_weapon.name, warning: "Take " + this.final_weapon.deflection + " to attack on a deflection shot." });
         }
     }
 
