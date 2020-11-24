@@ -11,7 +11,7 @@ class Engine extends Part {
     private radiator_index: number;
     private num_radiators: number;
 
-    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean }[];
+    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean, helicopter: boolean }[];
     private selected_mount: number;
 
     private use_pp: boolean;
@@ -27,11 +27,12 @@ class Engine extends Part {
 
     private is_generator: boolean;
     private has_alternator: boolean;
+    private is_helicopter: boolean;
 
     private total_reliability: number;
 
     constructor(
-        ml: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean }[],
+        ml: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean, helicopter: boolean }[],
         cl: { name: string, stats: Stats, ed: number, mpd: number, air: boolean, liquid: boolean, rotary: boolean }[]) {
 
         super();
@@ -307,6 +308,18 @@ class Engine extends Part {
         return this.etype_inputs.min_IAF;
     }
 
+    public CanSelectIndex() {
+        var elist_temp = engine_list.get(this.elist_idx);
+        var can = [...Array(elist_temp.length).fill(true)];
+        if (this.is_helicopter) {
+            for (let i = 0; i < elist_temp.length; i++) {
+                if (elist_temp.get(i).type == ENGINE_TYPE.PULSEJET)
+                    can[i] = false;
+            }
+        }
+        return can;
+    }
+
     public SetSelectedIndex(num: number) {
         this.etype_stats = engine_list.get(this.elist_idx).get_stats(num);
         this.etype_inputs = engine_list.get(this.elist_idx).get(num);
@@ -403,12 +416,25 @@ class Engine extends Part {
     }
 
     public RequiresExtendedDriveshafts(): boolean {
+        if (this.is_helicopter)
+            return false;
         return this.mount_list[this.selected_mount].reqED;
     }
 
     public SetTailMods(forb: boolean, swr: boolean) {
         if (this.mount_list[this.selected_mount].reqTail && !(forb || swr))
             this.use_ds = true;
+    }
+
+    public CanMountIndex() {
+        var can = [...Array(this.mount_list.length).fill(false)];
+        if (this.is_helicopter) {
+            for (let i = 0; i < can.length; ++i) {
+                if (!this.mount_list[i].helicopter)
+                    can[i] = false;
+            }
+        }
+        return can;
     }
 
     public SetMountIndex(num: number) {
@@ -545,7 +571,8 @@ class Engine extends Part {
     public GetIsTractorNacelle() {
         if (!this.GetIsPulsejet()
             && !this.GetUsePushPull()
-            && this.mount_list[this.selected_mount].powerfactor == 0.8)
+            && this.mount_list[this.selected_mount].powerfactor == 0.8
+            && !this.is_helicopter)
             return true;
         return false;
     }
@@ -659,6 +686,8 @@ class Engine extends Part {
     }
 
     public IsTractor() {
+        if (this.is_helicopter)
+            return false;
         return this.mount_list[this.selected_mount].name == "Tractor"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
     }
@@ -671,6 +700,8 @@ class Engine extends Part {
     }
 
     public IsPusher() {
+        if (this.is_helicopter)
+            return false;
         return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
     }
@@ -703,7 +734,7 @@ class Engine extends Part {
     }
 
     public GetEngineHeight() {
-        if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet)
+        if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_helicopter)
             return 2;
         else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
             return 1;
@@ -719,6 +750,14 @@ class Engine extends Part {
 
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
+    }
+
+    public IsHelicopter(is: boolean) {
+        this.is_helicopter = is;
+        if (is) {
+            this.use_ds = false;
+
+        }
     }
 
     public PartStats(): Stats {

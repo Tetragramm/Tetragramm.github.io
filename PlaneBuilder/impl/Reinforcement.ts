@@ -20,6 +20,7 @@ class Reinforcement extends Part {
     private has_wing: boolean;
     private acft_structure: number;
     private cant_lift: number;
+    private rotor_strain: number;
 
     constructor(js: JSON) {
         super();
@@ -192,10 +193,7 @@ class Reinforcement extends Part {
                 }
             }
             diff = Math.min(diff, Math.floor(1.0e-6 + total_structure / (5 * this.cant_list[idx].stats.mass)));
-            console.log(total_structure);
-            console.log((5 * this.cant_list[idx].stats.mass));
         }
-        console.log(this.cant_count[idx] + "  " + diff);
         this.cant_count[idx] += diff;
         return diff != 0;
     }
@@ -288,6 +286,23 @@ class Reinforcement extends Part {
         this.CalculateStats();
     }
 
+    public GetCantileverStrain() {
+        var strain = 0;
+        for (let i = 0; i < this.cant_list.length; i++) {
+            if (this.cant_count[i] > 0) {
+
+                let ts = this.cant_list[i].stats;
+                ts = ts.Multiply(this.cant_count[i]);
+                strain += ts.maxstrain;
+            }
+        }
+        return strain;
+    }
+
+    public SetRotorStrain(num: number) {
+        this.rotor_strain = num;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -366,15 +381,23 @@ class Reinforcement extends Part {
         }
 
         var use_cant = false;
+        var cant_strain = 0;
         for (let i = 0; i < this.cant_list.length; i++) {
             if (this.cant_count[i] > 0) {
                 use_cant = true;
 
                 let ts = this.cant_list[i].stats;
                 ts = ts.Multiply(this.cant_count[i]);
+                cant_strain += ts.maxstrain;
                 stats = stats.Add(ts);
             }
         }
+
+        if (cant_strain < this.rotor_strain) {
+            stats.warnings.push({ source: "Cantilevers", warning: "Rotors require at least " + this.rotor_strain + " strain in cantilevers to function." });
+            stats.maxstrain = -9999;
+        }
+
         //Wing Blades need Steel Cantilevers
         if (this.cant_count[2] == 0) {
             this.wing_blades = false;

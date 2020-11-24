@@ -19,6 +19,7 @@
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="./Used.ts" />
+/// <reference path="./Rotor.ts" />
 
 class Aircraft {
     private use_storage: boolean = false;
@@ -28,6 +29,7 @@ class Aircraft {
     private updated_stats: boolean;
     private freeze_display: boolean;
     private DisplayCallback: () => void;
+    private aircraft_type: AIRCRAFT_TYPE;
     private era: Era;
     private cockpits: Cockpits;
     private passengers: Passengers;
@@ -46,6 +48,7 @@ class Aircraft {
     private optimization: Optimization;
     private weapons: Weapons;
     private used: Used;
+    private rotor: Rotor;
     // private alter: AlterStats;
 
     private reset_json = String.raw`{"version":"10.8","name":"Basic Biplane","era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.890000343322754,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":8,"span":8,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1,"repeating":false}],"ammo":1,"action":0,"projectile":0}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0}}`;
@@ -72,6 +75,7 @@ class Aircraft {
         this.optimization = new Optimization();
         this.weapons = new Weapons(weapon_json);
         this.used = new Used();
+        this.rotor = new Rotor();
         // this.alter = new AlterStats();
 
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
@@ -92,6 +96,7 @@ class Aircraft {
         this.optimization.SetCalculateStats(() => { this.CalculateStats(); });
         this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
         this.used.SetCalculateStats(() => { this.CalculateStats(); });
+        this.rotor.SetCalculateStats(() => { this.CalculateStats(); });
         // this.alter.SetCalculateStats(() => { this.CalculateStats(); });
 
         this.cockpits.SetNumberOfCockpits(1);
@@ -101,6 +106,7 @@ class Aircraft {
         this.use_storage = storage;
         this.updated_stats = false;
         this.freeze_display = false;
+        this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
         this.Reset();
     }
 
@@ -108,6 +114,7 @@ class Aircraft {
         return {
             version: this.version,
             name: this.name,
+            aircraft_type: this.aircraft_type,
             era: this.era.toJSON(),
             cockpits: this.cockpits.toJSON(),
             passengers: this.passengers.toJSON(),
@@ -126,6 +133,7 @@ class Aircraft {
             optimization: this.optimization.toJSON(),
             weapons: this.weapons.toJSON(),
             used: this.used.toJSON(),
+            rotor: this.rotor.toJSON(),
         };
     }
 
@@ -137,6 +145,9 @@ class Aircraft {
         }
         var json_version = parseFloat(js["version"]);
         this.name = js["name"];
+        if (json_version > 11.05) {
+            this.aircraft_type = js["aircraft_type"];
+        }
         this.era.fromJSON(js["era"], json_version);
         this.cockpits.fromJSON(js["cockpits"], json_version);
         this.passengers.fromJSON(js["passengers"], json_version);
@@ -156,6 +167,9 @@ class Aircraft {
         this.weapons.fromJSON(js["weapons"], json_version);
         if (json_version > 10.65) {
             this.used.fromJSON(js["used"], json_version);
+        }
+        if (json_version > 11.05) {
+            this.rotor.fromJSON(js["rotor"], json_version);
         }
         this.freeze_display = false;
         return true;
@@ -182,6 +196,8 @@ class Aircraft {
         this.optimization.serialize(s);
         this.weapons.serialize(s);
         this.used.serialize(s);
+        this.rotor.serialize(s);
+        s.PushNum(this.aircraft_type);
     }
 
     public deserialize(d: Deserialize) {
@@ -209,6 +225,10 @@ class Aircraft {
         if (d.version > 10.65) {
             this.used.deserialize(d);
         }
+        if (d.version > 11.05) {
+            this.rotor.deserialise(d);
+            this.aircraft_type = d.GetNum();
+        }
         this.freeze_display = false;
     }
 
@@ -224,8 +244,14 @@ class Aircraft {
         stats = stats.Add(this.passengers.PartStats());
 
         this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard());
-        this.engines.SetMetalArea(this.wings.GetMetalArea());
-        this.engines.HaveParasol(this.wings.GetParasol());
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.engines.SetMetalArea(this.wings.GetMetalArea());
+            this.engines.HaveParasol(this.wings.GetParasol());
+        } else {
+            this.engines.SetMetalArea(0);
+            this.engines.HaveParasol(false);
+        }
+        this.engines.IsHelicopter(this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER);
         stats = stats.Add(this.engines.PartStats());
 
         this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
@@ -247,29 +273,62 @@ class Aircraft {
 
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
-        this.frames.SetIsTandem(this.wings.GetTandem());
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.frames.SetIsTandem(this.wings.GetTandem());
+        } else {
+            this.frames.SetIsTandem(false);
+        }
         stats = stats.Add(this.frames.PartStats());
 
-        this.wings.SetNumFrames(this.frames.GetNumFrames());
-        stats = stats.Add(this.wings.PartStats());
+        //If there are wings...
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.wings.SetNumFrames(this.frames.GetNumFrames());
+            stats = stats.Add(this.wings.PartStats());
+            this.rotor.SetWingArea(stats.wingarea);
+        }
+        //If there is a rotor...
+        if (this.aircraft_type != AIRCRAFT_TYPE.AIRPLANE) {
+            this.rotor.SetPitch(this.propeller.GetPropIndex());
+            stats = stats.Add(this.rotor.PartStats());
+        }
 
-        this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
-        this.stabilizers.SetIsTandem(this.wings.GetTandem());
-        this.stabilizers.SetIsSwept(this.wings.GetSwept());
-        this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
+        //Stabilizer is different for helicopters
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
+            this.stabilizers.SetIsTandem(this.wings.GetTandem());
+            this.stabilizers.SetIsSwept(this.wings.GetSwept());
+            this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
+        } else {
+            this.stabilizers.SetEngineCount(0);
+            this.stabilizers.SetIsTandem(false);
+            this.stabilizers.SetIsSwept(false);
+            this.stabilizers.SetHaveTail(true);
+        }
         this.stabilizers.SetWingArea(stats.wingarea);
-        this.stabilizers.wing_drag = this.wings.GetWingDrag();
+        this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
         stats = stats.Add(this.stabilizers.PartStats());
 
         this.controlsurfaces.SetWingArea(stats.wingarea);
-        this.controlsurfaces.SetSpan(this.wings.GetSpan());
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.controlsurfaces.SetSpan(this.wings.GetSpan());
+        } else {
+            this.controlsurfaces.SetSpan(0);
+        }
         stats = stats.Add(this.controlsurfaces.PartStats());
 
-        this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
-        this.reinforcements.SetTandem(this.wings.GetTandem());
-        this.reinforcements.SetStaggered(this.wings.GetStaggered());
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
+            this.reinforcements.SetTandem(this.wings.GetTandem());
+            this.reinforcements.SetStaggered(this.wings.GetStaggered());
+            this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
+        } else {
+            this.reinforcements.SetMonoplane(false);
+            this.reinforcements.SetTandem(false);
+            this.reinforcements.SetStaggered(false);
+            this.reinforcements.SetHasWing(false);
+        }
         this.reinforcements.SetCantLift(this.era.GetCantLift());
-        this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
+        this.reinforcements.SetRotorStrain(this.rotor.GetCantileverStrain());
         stats = stats.Add(this.reinforcements.PartStats());
 
         this.accessories.SetAcftPower(stats.power);
@@ -280,7 +339,11 @@ class Aircraft {
 
         //Gear go last, because they need total mass.
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
-        this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
+        } else {
+            this.gear.CanBoat(this.engines.GetEngineHeight(), 5);
+        }
         stats = stats.Add(this.gear.PartStats());
 
         //Add toughness here so it gets optimized properly.
@@ -302,6 +365,14 @@ class Aircraft {
             this.stats = stats;
 
             var derived = this.GetDerivedStats();
+
+            //Can only do this last, but might trigger a recalc.
+            //So freeze display while it happens.
+            var freeze = this.freeze_display;
+            this.freeze_display = true;
+            this.rotor.SetMP(derived.DryMP);
+            this.freeze_display = freeze;
+
             //Because flaps have cost per MP
             this.stats.cost += this.controlsurfaces.GetFlapCost(derived.DryMP);
 
@@ -316,7 +387,11 @@ class Aircraft {
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
-            this.fuel.SetArea(this.wings.GetArea());
+            if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+                this.fuel.SetArea(this.wings.GetArea());
+            } else {
+                this.fuel.SetArea(0);
+            }
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
             this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
 
@@ -553,6 +628,9 @@ class Aircraft {
         if (this.GetLandingGear().IsVital()) {
             vital.push("Landing Gear");
         }
+        if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
+            vital.push("Tail Rotor");
+        }
         return vital;
     }
 
@@ -610,6 +688,10 @@ class Aircraft {
 
     public GetIsFlammable() {
         return this.frames.GetIsFlammable() || this.wings.GetIsFlammable();
+    }
+
+    public GetAircraftType() {
+        return this.aircraft_type;
     }
 
     public GetEra(): Era {
@@ -671,6 +753,9 @@ class Aircraft {
     }
     public GetUsed() {
         return this.used;
+    }
+    public GetRotor() {
+        return this.rotor;
     }
     // public GetAlter() {
     //     return this.alter;

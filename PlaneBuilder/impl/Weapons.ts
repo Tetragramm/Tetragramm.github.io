@@ -61,8 +61,6 @@ class Weapons extends Part {
             };
             this.weapon_list.push(weap);
         }
-
-        console.log(this.weapon_list);
         this.weapon_sets = [];
         this.brace_count = 0;
     }

@@ -261,7 +261,6 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
         }
 
-        console.log(this.final_weapon.deflection);
         if (this.final_weapon.deflection != 0) {
             this.final_weapon.stats.warnings.push({ source: this.final_weapon.name, warning: "Take " + this.final_weapon.deflection + " to attack on a deflection shot." });
         }

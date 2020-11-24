@@ -5,7 +5,7 @@
 
 class Engines extends Part {
     private engines: Engine[];
-    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean }[];
+    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean, helicopter: boolean }[];
     private radiators: Radiator[];
     private is_asymmetric: boolean;
     private r_type_list: { name: string, stats: Stats, dragpercool: number }[];
@@ -20,7 +20,7 @@ class Engines extends Part {
 
         this.mount_list = [];
         for (let elem of js["mounts"]) {
-            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false };
+            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false, helicopter: elem["helicopter"] };
             if (elem["reqED"])
                 mount.reqED = true;
             if (elem["reqTail"])
@@ -351,6 +351,12 @@ class Engines extends Part {
                 return true;
         }
         return false;
+    }
+
+    public IsHelicopter(is: boolean) {
+        for (let e of this.engines) {
+            e.IsHelicopter(is);
+        }
     }
 
     public PartStats(): Stats {

@@ -1,5 +1,5 @@
 {
-    "version": "11.0",
+    "version": "11.1",
     "era": {
         "options": [
             {
@@ -146,7 +146,7 @@
                 "drag": 0,
                 "control": 0,
                 "escape": 0,
-                "charge": 1,
+                "charge": -1,
                 "cost": 2,
                 "flightstress": 0,
                 "visibility": 0
@@ -233,7 +233,8 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "fuselage",
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": false
             },
             {
                 "name": "Center-Mounted Tractor",
@@ -246,7 +247,8 @@
                 "dragfactor": 0,
                 "location": "fuselage",
                 "reqED": true,
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": true
             },
             {
                 "name": "Rear-Mounted Pusher",
@@ -258,7 +260,8 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "fuselage",
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": false
             },
             {
                 "name": "Center-Mounted Pusher",
@@ -271,7 +274,8 @@
                 "dragfactor": 0,
                 "location": "fuselage",
                 "reqTail": true,
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": false
             },
             {
                 "name": "Pod",
@@ -283,7 +287,8 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "pod",
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": true
             },
             {
                 "name": "Nacelle (Inside)",
@@ -295,7 +300,8 @@
                 "strainfactor": 0.5,
                 "dragfactor": 0,
                 "location": "wing",
-                "powerfactor": 0.8
+                "powerfactor": 0.8,
+                "helicopter": false
             },
             {
                 "name": "Nacelle (Offset)",
@@ -307,7 +313,8 @@
                 "strainfactor": 0,
                 "dragfactor": 1,
                 "location": "wing",
-                "powerfactor": 0.8
+                "powerfactor": 0.8,
+                "helicopter": false
             },
             {
                 "name": "Channel Tractor",
@@ -319,7 +326,8 @@
                 "strainfactor": 1,
                 "dragfactor": 0,
                 "location": "wing",
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": false
             }
         ],
         "radiator-type": [

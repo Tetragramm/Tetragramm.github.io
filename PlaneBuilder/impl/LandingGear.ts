@@ -128,7 +128,7 @@ class LandingGear extends Part {
         this.loadedMP = Math.floor(1.0e-6 + mass / 5);
     }
 
-    public CanBoat(engine_height: number, wing_height) {
+    public CanBoat(engine_height: number, wing_height: number) {
         if (engine_height == 2)
             this.can_boat = true;
         else if (engine_height == 1 && wing_height >= 3)
