@@ -146,7 +146,7 @@
                 "drag": 0,
                 "control": 0,
                 "escape": 0,
-                "charge": 1,
+                "charge": -1,
                 "cost": 2,
                 "flightstress": 0,
                 "visibility": 0
