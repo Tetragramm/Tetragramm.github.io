@@ -87,7 +87,7 @@ class Propeller extends Part {
         if (this.have_propellers)
             return this.prop_list[this.idx_prop].energy;
         else
-            return 2;
+            return 5;
     }
 
     public GetTurn() {
