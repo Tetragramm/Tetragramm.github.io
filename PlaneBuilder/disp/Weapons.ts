@@ -91,7 +91,7 @@ class Weapons_HTML extends Display {
         FlexInput("Ammunition", type.ammo, rfs);
         FlexSelect("Action", type.action, lfs);
         FlexSelect("Projectile", type.projectile, rfs);
-        FlexCheckbox("Autoloader", type.repeating, lfs);
+        FlexCheckbox("Belt Fed", type.repeating, lfs);
         FlexSpace(rfs);
         FlexCheckbox("Fixed", type.fixed, lfs);
         FlexSpace(rfs);

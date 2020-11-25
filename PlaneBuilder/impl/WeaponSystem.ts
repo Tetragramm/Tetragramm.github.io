@@ -204,7 +204,7 @@ class WeaponSystem extends Part {
             this.final_weapon.hits = 1 + this.weapon_list[num].hits;
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
-            this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
+            this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
             this.final_weapon.synched = true;
         } else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
@@ -212,7 +212,7 @@ class WeaponSystem extends Part {
             this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
-            this.final_weapon.synched = this.weapon_list[num].synched;
+            this.final_weapon.synched = false;
         }
 
         if (this.repeating) {
@@ -234,6 +234,7 @@ class WeaponSystem extends Part {
                 }
                 this.final_weapon.jam = ret.toString();
             }
+            this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
         }
 
         if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL) && this.projectile_sel == ProjectileType.HEATRAY) {
@@ -247,7 +248,7 @@ class WeaponSystem extends Part {
             this.final_weapon.deflection = 0;
             this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Roll Crits +Damage done. On Crit, choose one: start a fire, destroy a radiator/oil component and push Cool Down, or injure crew. Take -2 forward to Eyeball after firing." })
         } else if (this.projectile_sel == ProjectileType.GYROJETS) {
-            this.final_weapon.stats.cost += 0.5 * this.weapon_list[num].stats.cost;
+            this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
             this.final_weapon.shells = false;
             this.final_weapon.damage -= 1;
             this.final_weapon.stats.warnings.push({ source: "Gyrojets", warning: "+1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife." });
@@ -643,10 +644,6 @@ class WeaponSystem extends Part {
             //Cant have extra ammo for heatray.
             this.ammo = 1;
         }
-
-        //If it's repeating
-        if (this.repeating)
-            stats.cost += count * 2;
 
         //Ammunition Cost
         stats.mass += (this.ammo - 1) * count;
