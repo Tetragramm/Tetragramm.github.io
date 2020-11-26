@@ -357,10 +357,12 @@ class Engine_HTML extends Display {
             }
             this.e_list_select.selectedIndex = sel_list;
 
+            var can_idx = this.engine.CanSelectIndex();
             for (let i = 0; i < engine_list.get(list_idx).length; i++) {
                 let eng = engine_list.get(list_idx).get(i);
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = eng.name;
+                opt.disabled = !can_idx[i];
                 this.e_select.add(opt);
             }
             this.e_select.selectedIndex = this.engine.GetSelectedIndex();
