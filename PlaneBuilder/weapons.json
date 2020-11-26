@@ -9,7 +9,7 @@
             "drag": 0,
             "damage": 1,
             "hits": 4,
-            "ap": 1,
+            "ap": 0,
             "ammo": 12,
             "rapid": true,
             "synched": false,
