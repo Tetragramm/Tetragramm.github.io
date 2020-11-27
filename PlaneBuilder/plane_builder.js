@@ -2539,8 +2539,12 @@ class Engine extends Part {
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
         //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
-        if (this.cowl_sel != 0 && this.mount_list[this.selected_mount].reqTail || this.use_pp)
+        if (this.cowl_sel != 0 &&
+            (this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher" ||
+                this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")
+            || (this.use_pp && this.mount_list[this.selected_mount].mount_type == "fuselage")) {
             stats.cost += 2;
+        }
         //Air Cooling Fan (only 1 / push-pull)
         if (this.IsAirCooled() && this.intake_fan) {
             stats.mass += 3;
