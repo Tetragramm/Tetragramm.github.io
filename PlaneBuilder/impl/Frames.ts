@@ -577,7 +577,7 @@ class Frames extends Part {
     }
 
     public SetHasTractorNacelles(use: boolean) {
-        this.has_tractor_nacelles = true;
+        this.has_tractor_nacelles = use;
     }
 
     public GetHasTractorNacelles() {
