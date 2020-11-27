@@ -186,7 +186,10 @@ class Weapons_HTML extends Display {
         disp.action.onchange = () => { set.SetAction(disp.action.selectedIndex); };
 
         disp.projectile.selectedIndex = set.GetProjectile();
-        disp.projectile.disabled = !set.GetCanProjectile();
+        var can_proj = set.GetCanProjectile();
+        for (let i = 0; i < can_proj.length; i++) {
+            disp.projectile.options[i].disabled = !can_proj[i];
+        }
         disp.projectile.onchange = () => { set.SetProjectile(disp.projectile.selectedIndex); };
 
         disp.repeating.checked = set.GetRepeating();

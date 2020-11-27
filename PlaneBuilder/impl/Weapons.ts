@@ -19,7 +19,7 @@ class Weapons extends Part {
         { name: "Gast Principle" },
     ];
     private projectile_list = [
-        { name: "Bullets" },
+        { name: "Standard" },
         { name: "Heat Ray" },
         { name: "Gyrojets" },
         { name: "Pneumatic" },

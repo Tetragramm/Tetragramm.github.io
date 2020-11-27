@@ -6,6 +6,7 @@
     },
     "exclude": [
         "./EngineBuilder",
+        "./WeaponDisplay",
         "./Standalone"
     ],
     "include": [

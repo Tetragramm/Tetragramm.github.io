@@ -4936,7 +4936,9 @@ class Reinforcement extends Part {
         } //So if we have them and are bladed...
         else if (this.wing_blades) {
             stats.mass += this.cant_list[2].stats.mass * this.cant_count[2];
-            stats.warnings.push({ source: "Wing Blades", warning: "Dogfight +Hard. On hit, collide and user unharmed.  11-15, user takes 1d10 damage. Miss, collide. When used vs. a PC, roll -Keen." });
+            stats.warnings.push({
+                source: "Wing Blades", warning: "Roll Dogfight! to use. 16+, enemy takes damage as per collision, user takes 1d10. 20+, user takes no damage.When used on a PC, use Evade Danger and Collision instead."
+            });
         }
         if (use_cant)
             stats.cost += 5;
@@ -6451,7 +6453,7 @@ class Weapons extends Part {
             { name: "Gast Principle" },
         ];
         this.projectile_list = [
-            { name: "Bullets" },
+            { name: "Standard" },
             { name: "Heat Ray" },
             { name: "Gyrojets" },
             { name: "Pneumatic" },
@@ -7555,6 +7557,12 @@ function CreateFlexSection(elem) {
 }
 function CreateTH(row, content) {
     var th = document.createElement("TH");
+    th.textContent = content;
+    row.appendChild(th);
+    return th;
+}
+function CreateTD(row, content) {
+    var th = document.createElement("TD");
     th.textContent = content;
     row.appendChild(th);
     return th;
@@ -10371,7 +10379,10 @@ class Weapons_HTML extends Display {
         }
         disp.action.onchange = () => { set.SetAction(disp.action.selectedIndex); };
         disp.projectile.selectedIndex = set.GetProjectile();
-        disp.projectile.disabled = !set.GetCanProjectile();
+        var can_proj = set.GetCanProjectile();
+        for (let i = 0; i < can_proj.length; i++) {
+            disp.projectile.options[i].disabled = !can_proj[i];
+        }
         disp.projectile.onchange = () => { set.SetProjectile(disp.projectile.selectedIndex); };
         disp.repeating.checked = set.GetRepeating();
         disp.repeating.onchange = () => { set.SetRepeating(disp.repeating.checked); };
@@ -12621,7 +12632,10 @@ class WeaponSystem extends Part {
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
         else if (this.action_sel == ActionType.MECHANICAL) {
-            this.final_weapon.hits = 1 + this.weapon_list[num].hits;
+            if (this.weapon_list[num].hits > 0)
+                this.final_weapon.hits = 1 + this.weapon_list[num].hits;
+            else
+                this.final_weapon.stats.warnings.push({ source: "Mechanical Action", warning: "Rapid-Firing Scatterguns roll +1 Shot Dice." });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
@@ -12681,6 +12695,12 @@ class WeaponSystem extends Part {
         if (!this.weapon_list[num].can_projectile) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
+        if (this.weapon_list[num].rapid) {
+            this.repeating = false;
+        }
+        else if (!this.repeating && this.action_sel == ActionType.GAST) {
+            this.action_sel = ActionType.STANDARD;
+        }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -12700,8 +12720,11 @@ class WeaponSystem extends Part {
     SetRepeating(use) {
         if (use && this.CanRepeating())
             this.repeating = true;
-        else
+        else {
             this.repeating = false;
+            if (!this.weapon_list[this.weapon_type].rapid && this.action_sel == ActionType.GAST)
+                this.action_sel = ActionType.STANDARD;
+        }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -12910,7 +12933,7 @@ class WeaponSystem extends Part {
         return this.action_sel;
     }
     GetCanAction() {
-        return [true, this.has_propeller && this.final_weapon.can_action, this.final_weapon.can_action];
+        return [true, this.has_propeller && this.final_weapon.can_action, this.final_weapon.can_action && (this.final_weapon.rapid || this.repeating)];
     }
     SetAction(num) {
         if (this.final_weapon.can_action) {
@@ -12926,7 +12949,7 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
     GetCanProjectile() {
-        return this.final_weapon.can_projectile;
+        return [true, this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL, this.final_weapon.can_projectile, this.final_weapon.can_projectile];
     }
     GetProjectile() {
         return this.projectile_sel;
@@ -12955,15 +12978,33 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             count += w.GetCount();
         }
-        //Calc charges / shot.
-        var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
-        if (this.action_sel == ActionType.GAST) {
-            ammo *= 2;
+        if (this.final_weapon.hits > 0) {
+            //Calc charges / shot.
+            var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
+            if (this.action_sel == ActionType.GAST) {
+                ammo *= 2;
+            }
+            if (this.final_weapon.rapid)
+                return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
+            else
+                return [count * ammo];
         }
-        if (this.final_weapon.rapid)
-            return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
-        else
-            return [count * ammo];
+        else {
+            if (this.final_weapon.name == "Scattergun") {
+                //4 shot dice, d5, half damage
+                if (!this.final_weapon.rapid)
+                    return [Math.floor(1.0e-6 + 4 * 5 * 0.5 / 4)];
+                else
+                    return [Math.floor(1.0e-6 + 4 * 5 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 5 * 0.5 / 4)];
+            }
+            else if (this.final_weapon.name == "Punt Gun") {
+                //4 shot dice, d10, half damage
+                if (!this.final_weapon.rapid)
+                    return [Math.floor(1.0e-6 + 4 * 10 * 0.5 / 4)];
+                else
+                    return [Math.floor(1.0e-6 + 4 * 10 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 10 * 0.5 / 4)];
+            }
+        }
     }
     GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
