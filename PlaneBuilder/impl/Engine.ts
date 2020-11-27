@@ -774,7 +774,7 @@ class Engine extends Part {
         if (this.cowl_sel != 0 &&
             (this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher" ||
                 this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")
-            || (this.use_pp && this.mount_list[this.selected_mount].mount_type == "fuselage") {
+            || (this.use_pp && this.mount_list[this.selected_mount].mount_type == "fuselage")) {
             stats.cost += 2;
         }
 
