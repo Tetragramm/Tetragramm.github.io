@@ -375,35 +375,36 @@ class Aircraft {
         var BoostFullwBombs = Math.floor(1.0e-6 + this.stats.power / WetMPwBombs);
         var Dropoff = Math.floor(1.0e-6 + this.stats.pitchboost * MaxSpeedEmpty);
 
-        var Stabiilty = this.stats.pitchstab + this.stats.latstab;
+        var Stability = this.stats.pitchstab + this.stats.latstab;
         if (this.stats.pitchstab > 0 && this.stats.latstab > 0)
-            Stabiilty += 2;
+            Stability += 2;
         else if (this.stats.pitchstab < 0 && this.stats.latstab < 0)
-            Stabiilty -= 2;
+            Stability -= 2;
 
         var HandlingEmpty = 100 + this.stats.control - DryMP;
-        if (Stabiilty > 10)
-            HandlingEmpty = -99999;
-        else if (Stabiilty == 10)
-            HandlingEmpty -= 4;
-        else if (Stabiilty > 6)
-            HandlingEmpty -= 3;
-        else if (Stabiilty > 3)
-            HandlingEmpty -= 2;
-        else if (Stabiilty > 0)
-            HandlingEmpty -= 1;
-        else if (Stabiilty == 0)
-            HandlingEmpty += 0;
-        else if (Stabiilty > -4)
-            HandlingEmpty += 1;
-        else if (Stabiilty > -7)
-            HandlingEmpty += 2;
-        else if (Stabiilty > -10)
-            HandlingEmpty += 3;
-        else if (Stabiilty == -10)
-            HandlingEmpty += 4;
-        else
+        if (Stability > 10 || Stability < -10) {
             HandlingEmpty = -1 / 0;
+            if (this.stats.warnings.findIndex((value) => { return value.source == "Stability" }) == -1) {
+                this.stats.warnings.push({ source: "Stability", warning: "Stability must be between -10 and +10 to be flyable by a human." });
+            }
+        } else if (Stability == 10)
+            HandlingEmpty -= 4;
+        else if (Stability > 6)
+            HandlingEmpty -= 3;
+        else if (Stability > 3)
+            HandlingEmpty -= 2;
+        else if (Stability > 0)
+            HandlingEmpty -= 1;
+        else if (Stability == 0)
+            HandlingEmpty += 0;
+        else if (Stability > -4)
+            HandlingEmpty += 1;
+        else if (Stability > -7)
+            HandlingEmpty += 2;
+        else if (Stability > -10)
+            HandlingEmpty += 3;
+        else if (Stability == -10)
+            HandlingEmpty += 4;
 
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
@@ -428,6 +429,9 @@ class Aircraft {
         MaxStrain += this.optimization.final_ms;
         //Used: Fragile
         MaxStrain = Math.floor(1.0e-6 + MaxStrain * Math.pow(0.8, this.used.fragile));
+        if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == "Max Strain" }) == -1) {
+            this.stats.warnings.push({ source: "Max Strain", warning: "A Max Strain of less than 10 means the plane falls apart on the ground." });
+        }
 
         var Toughness = this.stats.toughness;
         //Used: Weak
@@ -448,7 +452,7 @@ class Aircraft {
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
 
         var FlightStress = 1 + this.stats.flightstress;
-        if (Stabiilty > 3 || Stabiilty < -3)
+        if (Stability > 3 || Stability < -3)
             FlightStress++;
         //Flight Stress from Rumble.
         if (this.engines.GetMaxRumble() > 0) {
@@ -480,7 +484,7 @@ class Aircraft {
             BoostFull: BoostFull,
             BoostFullwBombs: BoostFullwBombs,
             Dropoff: Dropoff,
-            Stabiilty: Stabiilty,
+            Stabiilty: Stability,
             HandlingEmpty: HandlingEmpty,
             HandlingFull: HandlingFull,
             HandlingFullwBombs: HandlingFullwBombs,
