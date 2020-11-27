@@ -697,7 +697,7 @@ class Frames extends Part {
 
         if (this.boom) {
             tail_stats.maxstrain -= tail_stats.mass;
-            if (this.has_tractor_nacelles)
+            if (!this.has_tractor_nacelles)
                 tail_stats.drag = Math.floor(1.0e-6 + 1.5 * tail_stats.drag);
         }
 
