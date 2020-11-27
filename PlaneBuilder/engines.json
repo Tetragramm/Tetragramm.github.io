@@ -2461,7 +2461,7 @@
                         false,
                         false
                     ]
-                }
+                },
             ]
         },
         {
@@ -2478,6 +2478,28 @@
                     "rows": 1,
                     "RPM_boost": 0.65,
                     "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 1,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro R-1190 110hp",
+                    "engine_type": 0,
+                    "type": 3,
+                    "era_sel": 1,
+                    "displacement": 11.9,
+                    "compression": 6,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.67,
+                    "material_fudge": 1.2,
                     "quality_fudge": 1,
                     "compressor_type": 1,
                     "compressor_count": 1,
@@ -2615,6 +2637,28 @@
                     ]
                 },
                 {
+                    "name": "Robur Herausforderer 180hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 18,
+                    "compression": 5.5,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 40,
+                    "upgrades": [
+                        false,
+                        false,
+                        true,
+                        true
+                    ]
+                },
+                {
                     "name": "Rhona Motorbau Z11 80hp",
                     "engine_type": 0,
                     "type": 2,
@@ -2629,6 +2673,28 @@
                     "compressor_type": 0,
                     "compressor_count": 0,
                     "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rhona Motorbau Z11tgl 100hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 10.9,
+                    "compression": 4.5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 20,
                     "upgrades": [
                         false,
                         false,
@@ -2703,6 +2769,28 @@
                     ]
                 },
                 {
+                    "name": "Schreiber O.VII 50hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 8,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
                     "name": "Schreiber L.VII 80hp",
                     "engine_type": 0,
                     "type": 2,
@@ -2717,6 +2805,50 @@
                     "compressor_type": 0,
                     "compressor_count": 0,
                     "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber TG.IX 130hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15.84,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 20,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber T.IX 160hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 16.2,
+                    "compression": 4.8,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 30,
                     "upgrades": [
                         false,
                         false,

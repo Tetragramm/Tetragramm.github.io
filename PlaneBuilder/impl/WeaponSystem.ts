@@ -217,23 +217,6 @@ class WeaponSystem extends Part {
 
         if (this.repeating) {
             this.final_weapon.reload = 0;
-            //Update Jam values, stupid string parsing.
-            if (this.final_weapon.rapid) {
-                var jams = this.final_weapon.jam.split('/');
-                var out = [parseInt(jams[0]), parseInt(jams[1])];
-                if (this.repeating) {
-                    out[0]++;
-                    out[1]++;
-                }
-                this.final_weapon.jam = out[0].toString() + "/" + out[1].toString();
-            }
-            else {
-                var ret = parseInt(this.final_weapon.jam)
-                if (this.repeating) {
-                    ret += 1;
-                }
-                this.final_weapon.jam = ret.toString();
-            }
             this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
         }
 

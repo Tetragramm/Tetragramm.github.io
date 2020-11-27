@@ -7298,7 +7298,7 @@ class Aircraft {
         FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
         var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbEmpty = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty));
-        var RateOfClimbwBombs = Math.max(Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (23.0 / this.stats.pitchspeed) / DPwBombs));
+        var RateOfClimbwBombs = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (23.0 / this.stats.pitchspeed) / DPwBombs));
         return {
             DryMP: DryMP,
             WetMP: WetMP,
@@ -12630,23 +12630,6 @@ class WeaponSystem extends Part {
         }
         if (this.repeating) {
             this.final_weapon.reload = 0;
-            //Update Jam values, stupid string parsing.
-            if (this.final_weapon.rapid) {
-                var jams = this.final_weapon.jam.split('/');
-                var out = [parseInt(jams[0]), parseInt(jams[1])];
-                if (this.repeating) {
-                    out[0]++;
-                    out[1]++;
-                }
-                this.final_weapon.jam = out[0].toString() + "/" + out[1].toString();
-            }
-            else {
-                var ret = parseInt(this.final_weapon.jam);
-                if (this.repeating) {
-                    ret += 1;
-                }
-                this.final_weapon.jam = ret.toString();
-            }
             this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
         }
         if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL) && this.projectile_sel == ProjectileType.HEATRAY) {
