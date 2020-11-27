@@ -4777,10 +4777,7 @@ class Reinforcement extends Part {
                 }
             }
             diff = Math.min(diff, Math.floor(1.0e-6 + total_structure / (5 * this.cant_list[idx].stats.mass)));
-            console.log(total_structure);
-            console.log((5 * this.cant_list[idx].stats.mass));
         }
-        console.log(this.cant_count[idx] + "  " + diff);
         this.cant_count[idx] += diff;
         return diff != 0;
     }
@@ -6482,7 +6479,6 @@ class Weapons extends Part {
             };
             this.weapon_list.push(weap);
         }
-        console.log(this.weapon_list);
         this.weapon_sets = [];
         this.brace_count = 0;
     }
@@ -12668,7 +12664,6 @@ class WeaponSystem extends Part {
             }
             this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
         }
-        console.log(this.final_weapon.name + " " + this.final_weapon.synched);
         if (this.final_weapon.deflection != 0) {
             this.final_weapon.stats.warnings.push({ source: this.final_weapon.name, warning: "Take " + this.final_weapon.deflection + " to attack on a deflection shot." });
         }
