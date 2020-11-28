@@ -195,12 +195,12 @@ class Munitions extends Part {
         }
 
 
-        var rack_mass = Math.ceil(ext_bomb_count / 5);
+        var rack_mass = Math.ceil(-1.0e-6 + ext_bomb_count / 5);
         stats.mass += rack_mass;
         stats.drag += rack_mass;
         stats.bomb_mass = this.bomb_count + this.rocket_count;
 
-        stats.reqsections = Math.ceil(stats.reqsections);
+        stats.reqsections = Math.ceil(-1.0e-6 + stats.reqsections);
 
         //Because it is load, it rounds up to the nearest 5 mass.
         if ((stats.bomb_mass % 5) > 0)

@@ -78,7 +78,7 @@ class Passengers extends Part {
 
     public PartStats(): Stats {
         var s = new Stats();
-        s.reqsections = 2 * Math.ceil((this.seats + 2 * this.beds) / 5);
+        s.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
         if (this.seats + this.beds > 0 && this.connected) {
             s.mass = 1;
         }

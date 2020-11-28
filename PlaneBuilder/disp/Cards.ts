@@ -256,7 +256,7 @@ class Cards {
         context.textAlign = "left";
 
         var rows = Math.min(this.acft_data.ordinance.length, 2);
-        var cols = Math.ceil(this.acft_data.ordinance.length / rows);
+        var cols = Math.ceil(-1.0e-6 + this.acft_data.ordinance.length / rows);
         var idx = 0;
         for (let r = 0; r < rows; r++) {
             let ypx = 612 + 27 * r;
@@ -274,7 +274,7 @@ class Cards {
         }
 
         var rows = Math.min(this.acft_data.vital_parts.length, 5);
-        var cols = Math.ceil(this.acft_data.vital_parts.length / rows);
+        var cols = Math.ceil(-1.0e-6 + this.acft_data.vital_parts.length / rows);
         var idx = 0;
         for (let r = 0; r < rows; r++) {
             let ypx = 392 + 27 * r;

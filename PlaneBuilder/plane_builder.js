@@ -1879,7 +1879,7 @@ class Passengers extends Part {
     }
     PartStats() {
         var s = new Stats();
-        s.reqsections = 2 * Math.ceil((this.seats + 2 * this.beds) / 5);
+        s.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
         if (this.seats + this.beds > 0 && this.connected) {
             s.mass = 1;
         }
@@ -4002,12 +4002,12 @@ class Wings extends Part {
         var longest_span = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
         }
         return longest_span;
@@ -4097,7 +4097,7 @@ class Wings extends Part {
         var longest_span = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
             if (!have_wing) { //Is first wing
                 have_wing = true;
@@ -4132,7 +4132,7 @@ class Wings extends Part {
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
             stats.control += 1;
             if (!have_mini_wing) { //Is first miniature wing
@@ -5094,7 +5094,7 @@ class Fuel extends Part {
             if (this.tank_stats[i].internal)
                 internal_count += this.tank_count[i];
         }
-        stats.reqsections = Math.ceil(stats.reqsections);
+        stats.reqsections = Math.ceil(-1.0e-6 + stats.reqsections);
         if (this.self_sealing) {
             stats.mass += internal_count;
             stats.cost += 2 * internal_count;
@@ -5275,11 +5275,11 @@ class Munitions extends Part {
                 }
             }
         }
-        var rack_mass = Math.ceil(ext_bomb_count / 5);
+        var rack_mass = Math.ceil(-1.0e-6 + ext_bomb_count / 5);
         stats.mass += rack_mass;
         stats.drag += rack_mass;
         stats.bomb_mass = this.bomb_count + this.rocket_count;
-        stats.reqsections = Math.ceil(stats.reqsections);
+        stats.reqsections = Math.ceil(-1.0e-6 + stats.reqsections);
         //Because it is load, it rounds up to the nearest 5 mass.
         if ((stats.bomb_mass % 5) > 0)
             stats.bomb_mass += 5 - (stats.bomb_mass % 5);
@@ -7282,11 +7282,11 @@ class Aircraft {
         //Used: Weak
         Toughness = Toughness * Math.pow(0.5, this.used.weak);
         var Structure = this.stats.structure;
-        var EnergyLoss = Math.ceil(DPEmpty / this.propeller.GetEnergy());
+        var EnergyLoss = Math.ceil(-1.0e-6 + DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
-        var TurnBleed = Math.ceil(((StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
+        var TurnBleed = Math.ceil(-1.0e-6 + ((StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
         var TurnBleedwBombs = TurnBleed + 1;
         TurnBleed = Math.max(TurnBleed, 1);
         TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
@@ -8554,7 +8554,7 @@ class Radiator extends Part {
         stats = stats.Add(this.type_list[this.idx_type].stats);
         stats = stats.Add(this.mount_list[this.idx_mount].stats);
         stats = stats.Add(this.coolant_list[this.idx_coolant].stats);
-        stats.drag += Math.ceil(this.type_list[this.idx_type].dragpercool * (this.need_cool - stats.cooling));
+        stats.drag += Math.ceil(-1.0e-6 + this.type_list[this.idx_type].dragpercool * (this.need_cool - stats.cooling));
         if (this.harden_cool) {
             stats.cost += 2;
         }
@@ -10616,7 +10616,7 @@ class Cards {
         context.font = "20px Balthazar";
         context.textAlign = "left";
         var rows = Math.min(this.acft_data.ordinance.length, 2);
-        var cols = Math.ceil(this.acft_data.ordinance.length / rows);
+        var cols = Math.ceil(-1.0e-6 + this.acft_data.ordinance.length / rows);
         var idx = 0;
         for (let r = 0; r < rows; r++) {
             let ypx = 612 + 27 * r;
@@ -10633,7 +10633,7 @@ class Cards {
             context.fillText(str, 335, ypx, 370);
         }
         var rows = Math.min(this.acft_data.vital_parts.length, 5);
-        var cols = Math.ceil(this.acft_data.vital_parts.length / rows);
+        var cols = Math.ceil(-1.0e-6 + this.acft_data.vital_parts.length / rows);
         var idx = 0;
         for (let r = 0; r < rows; r++) {
             let ypx = 392 + 27 * r;

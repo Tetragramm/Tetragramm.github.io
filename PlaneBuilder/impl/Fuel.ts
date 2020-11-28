@@ -176,7 +176,7 @@ class Fuel extends Part {
             if (this.tank_stats[i].internal)
                 internal_count += this.tank_count[i];
         }
-        stats.reqsections = Math.ceil(stats.reqsections);
+        stats.reqsections = Math.ceil(-1.0e-6 + stats.reqsections);
 
         if (this.self_sealing) {
             stats.mass += internal_count;
