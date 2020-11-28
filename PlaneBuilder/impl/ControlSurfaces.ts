@@ -215,7 +215,6 @@ class ControlSurfaces extends Part {
         this.span = 0;
         this.is_cantilever = false;
         this.wing_area = 0;
-        console.log("SetHelicopter");
     }
 
     public SetCalculateStats(callback: () => void) {

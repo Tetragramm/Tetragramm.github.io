@@ -413,9 +413,8 @@ class Engine_HTML extends Display {
             this.mount_select.selectedIndex = -1;
             this.pushpull_input.disabled = true;
             for (let i = 0; i < this.mount_select.options.length; i++) {
-                let opt = this.mount_select.options[i];
-                if (opt.value == "fuselage") {
-                    opt.disabled = true;
+                if (this.mount_select.options[i].value == "fuselage") {
+                    this.mount_select.options[i].disabled = true;
                 }
             }
             this.cowl_select.disabled = true;
@@ -427,8 +426,7 @@ class Engine_HTML extends Display {
             this.pushpull_input.disabled = false;
             var can_mount = this.engine.CanMountIndex();
             for (let i = 0; i < this.mount_select.options.length; i++) {
-                let opt = this.mount_select.options[i];
-                opt.disabled = !can_mount[i];
+                this.mount_select.options[i].disabled = !can_mount[i];
             }
             this.cowl_select.disabled = false;
             this.alternator_input.disabled = false;

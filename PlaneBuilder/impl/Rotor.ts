@@ -253,6 +253,7 @@ class Rotor extends Part {
             } else {
                 this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.PitchSizing());
             }
+            this.sizing_span = Math.min(100, this.sizing_span);
         }
     }
 
@@ -265,13 +266,15 @@ class Rotor extends Part {
         stats.drag = this.GetRotorDrag();
 
         var strain = this.GetRotorStrain();
-        while (strain > 0) {
-            let ts = this.cant_list[this.cant_idx].stats.Clone();
-            strain -= ts.maxstrain;
-            ts.maxstrain = 0;
-            ts.toughness = 0;
-            stats = stats.Add(ts);
-        }
+        var ts = this.cant_list[this.cant_idx].stats.Clone();
+        var count = Math.ceil(-1.0e-6 + strain / ts.maxstrain);
+        ts = ts.Multiply(count);
+        ts.maxstrain = 0;
+        ts.toughness = 0;
+        stats = stats.Add(ts);
+
+        if (this.rotor_count > 2)
+            this.is_tandem = true;
 
         if (this.is_tandem) {
             stats.pitchstab = 4;
@@ -288,6 +291,19 @@ class Rotor extends Part {
             } else if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
                 stats.mass += this.rotor_count * this.engine_count;
             }
+        }
+
+        //Warnings
+        if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
+            stats.warnings.push({ source: "Helicopter Flight", warning: "A helicopter must have Boost 2 to to take off vertically. " });
+            stats.warnings.push({ source: "Helicopter Landing", warning: "A deliberately landed helicopter travelling at 0 speed never has to roll Go Down regardless of how rough the terrain is." });
+            stats.warnings.push({ source: "Helicopter Descent", warning: "A helicopter can descend up to 5 altitude bands in one maneuver without gaining speed." });
+            stats.warnings.push({ source: "Helicopter Stall", warning: "Travelling faster than 37 speed immediately suffers a Retreating Wing Stall." });
+            if (stats.reliability < 0) {
+                stats.warnings.push({ source: "Rotor Span", warning: "Undersized rotors cause the engine to work harder and reduce reliability." });
+            }
+        } else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
+            stats.warnings.push({ source: "Autogyro Stall", warning: "An Autogyro cannot stall, it automatically trades Altitude for speed 1-1.  If it runs out of altitude before regaining control, it lands gently.  If the autogyro exceeds Max Speed or sustains negative Gs it suffers a more traditional stall." });
         }
 
         return stats;

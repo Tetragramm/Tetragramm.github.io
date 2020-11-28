@@ -768,7 +768,8 @@ class Engine extends Part {
         this.is_helicopter = is;
         if (is) {
             this.use_ds = false;
-            this.selected_mount = 1;
+            if (!this.CanMountIndex()[this.selected_mount])
+                this.selected_mount = 1;
         }
     }
 
