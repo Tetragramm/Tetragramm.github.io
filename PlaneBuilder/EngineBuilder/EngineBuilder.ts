@@ -262,7 +262,9 @@ class EngineBuilder {
     }
 
     private CoolTorque() {
-        if (this.IsRotary()) {
+        if (this.CoolingTable[this.cool_sel].name == "Contrarotary") {
+            return Math.floor(1.0e-6 + this.CalcMass() / 2);
+        } else if (this.IsRotary()) {
             return this.CalcMass();
         }
         return 1;

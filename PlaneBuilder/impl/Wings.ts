@@ -406,12 +406,12 @@ class Wings extends Part {
         var longest_span = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
         }
         return longest_span;
@@ -512,7 +512,7 @@ class Wings extends Part {
 
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
 
             if (!have_wing) { //Is first wing
@@ -554,7 +554,7 @@ class Wings extends Part {
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil((w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             longest_span = Math.max(longest_span, wspan);
 
             stats.control += 1;

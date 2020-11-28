@@ -469,6 +469,10 @@ class Engine extends Part {
         return this.mount_list;
     }
 
+    public CanUseExtendedDriveshaft() {
+        return !(this.GetIsPulsejet() || this.is_helicopter || this.is_generator);
+    }
+
     public SetUseExtendedDriveshaft(use: boolean) {
         this.use_ds = use || this.RequiresExtendedDriveshafts();
         this.CalculateStats();
@@ -752,11 +756,10 @@ class Engine extends Part {
         this.CalculateStats = callback;
     }
 
-    public IsHelicopter(is: boolean) {
+    public SetHelicopter(is: boolean) {
         this.is_helicopter = is;
         if (is) {
             this.use_ds = false;
-
         }
     }
 

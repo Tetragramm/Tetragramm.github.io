@@ -163,7 +163,7 @@ class Radiator extends Part {
         stats = stats.Add(this.mount_list[this.idx_mount].stats);
         stats = stats.Add(this.coolant_list[this.idx_coolant].stats);
 
-        stats.drag += Math.ceil(this.type_list[this.idx_type].dragpercool * (this.need_cool - stats.cooling));
+        stats.drag += Math.ceil(-1.0e-6 + this.type_list[this.idx_type].dragpercool * (this.need_cool - stats.cooling));
 
         if (this.harden_cool) {
             stats.cost += 2;

@@ -358,9 +358,15 @@ class Engines extends Part {
         return false;
     }
 
-    public IsHelicopter(is: boolean) {
+    public SetHelicopter(is: boolean) {
         for (let e of this.engines) {
-            e.IsHelicopter(is);
+            e.SetHelicopter(is);
+        }
+        if (is) {
+            for (let r of this.radiators) {
+                r.SetMetalArea(0);
+                r.SetParasol(false);
+            }
         }
     }
 

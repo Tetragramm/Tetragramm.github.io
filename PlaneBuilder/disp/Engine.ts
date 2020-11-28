@@ -412,6 +412,7 @@ class Engine_HTML extends Display {
         if (this.ds_input.checked != this.engine.GetUseExtendedDriveshaft()) {
             this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
         }
+        this.ds_input.disabled = !this.engine.CanUseExtendedDriveshaft();
         if (this.gp_input.valueAsNumber != this.engine.GetGearCount()) {
             this.gp_input.valueAsNumber = this.engine.GetGearCount();
         }
