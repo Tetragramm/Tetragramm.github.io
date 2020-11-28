@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "system",
+        "outFile": "plane_builder.js"
+    },
+    "exclude": [
+        "./EngineBuilder",
+        "./WeaponDisplay",
+        "./Standalone"
+    ],
+    "include": [
+        ".",
+        "./disp",
+        "./impl"
+    ]
+}

@@ -1,0 +1,1841 @@
+{
+    "version": "11.1",
+    "era": {
+        "options": [
+            {
+                "name": "Pioneer",
+                "liftbleed": 30,
+                "maxbomb": 0.166666666666,
+                "cost": -2,
+                "cant_lift": 4
+            },
+            {
+                "name": "WWI",
+                "liftbleed": 25,
+                "maxbomb": 0.2,
+                "cant_lift": 3
+            },
+            {
+                "name": "Roaring 20s",
+                "liftbleed": 22,
+                "maxbomb": 0.25,
+                "cost": 5,
+                "cant_lift": 1
+            },
+            {
+                "name": "Coming Storm",
+                "liftbleed": 22,
+                "maxbomb": 0.333333333333,
+                "cost": 10,
+                "cant_lift": 0
+            },
+            {
+                "name": "WWII",
+                "liftbleed": 20,
+                "maxbomb": 0.333333333333,
+                "cost": 15,
+                "cant_lift": 0
+            },
+            {
+                "name": "Last Hurrah",
+                "liftbleed": 18,
+                "maxbomb": 0.5,
+                "cost": 20,
+                "cant_lift": 0
+            }
+        ]
+    },
+    "cockpit": {
+        "options": [
+            {
+                "name": "Open",
+                "mass": 1,
+                "drag": 3,
+                "control": 0,
+                "escape": 2,
+                "cost": 0,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Windscreen",
+                "mass": 2,
+                "drag": 1,
+                "control": 0,
+                "escape": 2,
+                "cost": 1,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Sealed",
+                "mass": 2,
+                "drag": 0,
+                "control": 0,
+                "escape": -3,
+                "cost": 1,
+                "flightstress": -1,
+                "visibility": 0
+            },
+            {
+                "name": "Narrow Canopy",
+                "mass": 3,
+                "drag": 0,
+                "control": 0,
+                "escape": 0,
+                "cost": 3,
+                "flightstress": -1,
+                "visibility": -1
+            },
+            {
+                "name": "Bubble Canopy",
+                "mass": 3,
+                "drag": -3,
+                "control": 0,
+                "escape": 0,
+                "cost": 8,
+                "flightstress": -1,
+                "visibility": 0
+            }
+        ],
+        "upgrades": [
+            {
+                "name": "Co-Pilot Controls",
+                "mass": 0,
+                "drag": 0,
+                "control": 0,
+                "escape": 0,
+                "cost": 1,
+                "flightstress": -2,
+                "visibility": 0
+            },
+            {
+                "name": "Escape Hatch",
+                "mass": 1,
+                "drag": 0,
+                "control": 0,
+                "escape": 3,
+                "cost": 2,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Ejection Seat",
+                "mass": 2,
+                "drag": 0,
+                "control": 0,
+                "escape": 5,
+                "cost": 4,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Connectivity",
+                "mass": 1,
+                "drag": 0,
+                "control": 0,
+                "escape": 0,
+                "cost": 0,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Oxygen Mask",
+                "warning": "The pilot ignores the effects of high altitude and negates up to 2 G-Penalty.",
+                "mass": 0,
+                "drag": 0,
+                "control": 0,
+                "escape": 0,
+                "charge": -1,
+                "cost": 2,
+                "flightstress": 0,
+                "visibility": 0
+            },
+            {
+                "name": "Isolated",
+                "mass": 1,
+                "drag": 5,
+                "control": 0,
+                "escape": 0,
+                "cost": 1,
+                "flightstress": 0,
+                "visibility": 0,
+                "warning": "Position takes double Injury when you Go Down."
+            }
+        ],
+        "safety": [
+            {
+                "name": "Padding",
+                "cost": 1,
+                "warning": "Negates 1 Injury for this position when you Go Down"
+            },
+            {
+                "name": "Harness",
+                "escape": -1,
+                "cost": 1,
+                "warning": "Negates 1 Injury for this position when you Go Down"
+            },
+            {
+                "name": "Fast Release System",
+                "escape": 2,
+                "cost": 1
+            },
+            {
+                "name": "Roll Bar",
+                "mass": 2,
+                "warning": "Negates 1 Injury for this position when you Go Down"
+            },
+            {
+                "name": "Flare Slot",
+                "cost": 1,
+                "warning": "Allows flares to be fired out of a closed cockpit without opening the cockpit."
+            }
+        ],
+        "gunsights": [
+            {
+                "name": "X1 Collimated Gunsight",
+                "visibility": -1,
+                "attack": 1,
+                "cost": 2
+            },
+            {
+                "name": "Telescopic Gunsight",
+                "visibility": -1,
+                "attack": 0,
+                "cost": 3,
+                "warning": "+2 to attack if you Drew a Bead"
+            },
+            {
+                "name": "Illuminated Reflex Sight",
+                "visibility": -1,
+                "attack": 2,
+                "cost": 6
+            },
+            {
+                "name": "Gyro Gunsight",
+                "visibility": -1,
+                "attack": 2,
+                "cost": 12,
+                "warning": "+2 to attack if you Drew a Bead"
+            }
+        ]
+    },
+    "passengers": {},
+    "engines": {
+        "mounts": [
+            {
+                "name": "Tractor",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "fuselage",
+                "powerfactor": 0.9,
+                "helicopter": false
+            },
+            {
+                "name": "Center-Mounted Tractor",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": -2,
+                "visibility": 1,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "fuselage",
+                "reqED": true,
+                "powerfactor": 0.9,
+                "helicopter": true
+            },
+            {
+                "name": "Rear-Mounted Pusher",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": -4,
+                "visibility": 2,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "fuselage",
+                "powerfactor": 0.9,
+                "helicopter": false
+            },
+            {
+                "name": "Center-Mounted Pusher",
+                "drag": 0,
+                "reqsections": 1,
+                "pitchstab": -2,
+                "visibility": 2,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "fuselage",
+                "reqTail": true,
+                "powerfactor": 0.9,
+                "helicopter": false
+            },
+            {
+                "name": "Pod",
+                "drag": 5,
+                "reqsections": 1,
+                "pitchstab": 0,
+                "visibility": -2,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "pod",
+                "powerfactor": 0.9,
+                "helicopter": true
+            },
+            {
+                "name": "Nacelle (Inside)",
+                "drag": 0,
+                "reqsections": 0,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": 1,
+                "strainfactor": 0.5,
+                "dragfactor": 0,
+                "location": "wing",
+                "powerfactor": 0.8,
+                "helicopter": false
+            },
+            {
+                "name": "Nacelle (Offset)",
+                "drag": 0,
+                "reqsections": 0,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": 0,
+                "strainfactor": 0,
+                "dragfactor": 1,
+                "location": "wing",
+                "powerfactor": 0.8,
+                "helicopter": false
+            },
+            {
+                "name": "Channel Tractor",
+                "drag": 0,
+                "reqsections": 0,
+                "pitchstab": 0,
+                "visibility": 0,
+                "liftbleed": -1,
+                "strainfactor": 1,
+                "dragfactor": 0,
+                "location": "wing",
+                "powerfactor": 0.9,
+                "helicopter": false
+            }
+        ],
+        "radiator-type": [
+            {
+                "name": "Panel",
+                "drag": 0,
+                "mass": 0,
+                "cost": 0,
+                "cooling": 0,
+                "dragpercool": 0.5
+            },
+            {
+                "name": "Box",
+                "drag": 2,
+                "mass": -1,
+                "cost": 0,
+                "cooling": 0,
+                "dragpercool": 0.5
+            },
+            {
+                "name": "Intake",
+                "drag": 0,
+                "mass": 0,
+                "cost": 3,
+                "cooling": 2,
+                "dragpercool": 0.5
+            },
+            {
+                "name": "Evaporation",
+                "warning": "Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.",
+                "drag": 0,
+                "mass": 0,
+                "cost": 0,
+                "cooling": 0,
+                "dragpercool": 0
+            }
+        ],
+        "radiator-mount": [
+            {
+                "name": "Low",
+                "warning": "Force Cool Down when shot.",
+                "reliability": 1,
+                "drag": 0,
+                "latstab": 0
+            },
+            {
+                "name": "Inline",
+                "reliability": 0,
+                "drag": 0,
+                "latstab": 0
+            },
+            {
+                "name": "High",
+                "warning": "Bonus persists for 1 Cool Down after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!",
+                "reliability": 0,
+                "drag": 1,
+                "latstab": 0
+            },
+            {
+                "name": "High Offset",
+                "warning": "Bonus persists for 1 Cool Down after being shot.",
+                "reliability": 0,
+                "drag": 1,
+                "latstab": -1
+            }
+        ],
+        "radiator-coolant": [
+            {
+                "name": "Water",
+                "cost": 0,
+                "harden": false,
+                "reliability": 0,
+                "flammable": false
+            },
+            {
+                "name": "Salt Water",
+                "cost": 1,
+                "harden": true,
+                "reliability": 1,
+                "flammable": false
+            },
+            {
+                "name": "Mineral Oil",
+                "warning": "Absorbs 1 Miss to Cool Down.",
+                "cost": 1,
+                "harden": true,
+                "reliability": 0,
+                "flammable": true
+            },
+            {
+                "name": "Castor Oil",
+                "warning": "Absorbs 1 Miss to Cool Down. +2 Stress if leaking.",
+                "cost": 0,
+                "harden": false,
+                "reliability": 0,
+                "flammable": true
+            },
+            {
+                "name": "Glycol",
+                "reliability": 2,
+                "harden": false,
+                "cost": 2,
+                "flammable": false
+            },
+            {
+                "name": "Freon",
+                "warning": "Caps RPM to 3.",
+                "reliability": 1,
+                "harden": false,
+                "cost": 3,
+                "flammable": false
+            },
+            {
+                "name": "Ammonia",
+                "warning": "Caps RPM to 3. Causes 2 Injury when leaking.",
+                "reliability": 1,
+                "harden": false,
+                "cost": 2,
+                "flammable": false
+            }
+        ],
+        "cowling": [
+            {
+                "name": "No Cowling",
+                "ed": 1,
+                "mpd": 0,
+                "air": true,
+                "liquid": true,
+                "rotary": true
+            },
+            {
+                "name": "Basic Cowl",
+                "mass": 1,
+                "cost": 1,
+                "ed": 0.8,
+                "mpd": 0,
+                "air": true,
+                "liquid": false,
+                "rotary": false
+            },
+            {
+                "name": "Rotary Basic Cowl",
+                "mass": 1,
+                "cost": 1,
+                "ed": 0.4,
+                "mpd": 0,
+                "air": false,
+                "liquid": false,
+                "rotary": true
+            },
+            {
+                "name": "Closed Cowl",
+                "mass": 1,
+                "cost": 1,
+                "reliability": -1,
+                "ed": 0.3,
+                "mpd": 0,
+                "air": false,
+                "liquid": false,
+                "rotary": true
+            },
+            {
+                "name": "Adjustable Slat Cowl",
+                "mass": 2,
+                "reliability": 2,
+                "cost": 2,
+                "ed": 0.5,
+                "mpd": 0,
+                "air": true,
+                "liquid": false,
+                "rotary": true
+            },
+            {
+                "name": "Foil Cowl",
+                "mass": 2,
+                "reliability": 3,
+                "cost": 3,
+                "ed": 0.4,
+                "mpd": 0,
+                "air": true,
+                "liquid": false,
+                "rotary": true
+            },
+            {
+                "name": "Sealed Cowl",
+                "cost": 1,
+                "ed": 0.5,
+                "mpd": 0.333333333333,
+                "air": false,
+                "liquid": true,
+                "rotary": false
+            }
+        ]
+    },
+    "propellers": {
+        "props": [
+            {
+                "name": "High Power",
+                "pitchspeed": 0.8,
+                "pitchboost": 0.9,
+                "cost": 0,
+                "energy": 1.5,
+                "turn": 8,
+                "automatic": false
+            },
+            {
+                "name": "Power",
+                "pitchspeed": 0.9,
+                "pitchboost": 0.8,
+                "cost": 0,
+                "energy": 2,
+                "turn": 7,
+                "automatic": false
+            },
+            {
+                "name": "Default",
+                "pitchspeed": 1.0,
+                "pitchboost": 0.6,
+                "cost": 0,
+                "energy": 3,
+                "turn": 6,
+                "automatic": false
+            },
+            {
+                "name": "Speed",
+                "pitchspeed": 1.1,
+                "pitchboost": 0.4,
+                "cost": 0,
+                "energy": 4,
+                "turn": 5,
+                "automatic": false
+            },
+            {
+                "name": "High Speed",
+                "pitchspeed": 1.2,
+                "pitchboost": 0.3,
+                "cost": 0,
+                "energy": 4.5,
+                "turn": 4,
+                "automatic": false
+            },
+            {
+                "name": "Automatic",
+                "pitchspeed": 1.1,
+                "pitchboost": 0.7,
+                "mass": 1,
+                "cost": 8,
+                "energy": 2,
+                "turn": 5,
+                "automatic": true
+            }
+        ],
+        "MVP_Warning": "Allows blad pitch to be adjusted on the ground without replacing it."
+    },
+    "frames": {
+        "frames": [
+            {
+                "name": "Wooden Spars",
+                "basestructure": 15,
+                "basecost": 0,
+                "mass": 1,
+                "structure": 2,
+                "cost": 0,
+                "geodesic": false
+            },
+            {
+                "name": "Steel Spars",
+                "basestructure": 25,
+                "basecost": 1,
+                "mass": 1,
+                "structure": 5,
+                "cost": 1,
+                "geodesic": false
+            },
+            {
+                "name": "Aluminum Spars",
+                "basestructure": 20,
+                "basecost": 2,
+                "mass": 0.5,
+                "structure": 4,
+                "cost": 2,
+                "geodesic": false
+            },
+            {
+                "name": "Wooden Ribs",
+                "basestructure": 30,
+                "basecost": 1,
+                "mass": 2,
+                "structure": 5,
+                "cost": 0.5,
+                "geodesic": true
+            },
+            {
+                "name": "Steel Ribs",
+                "basestructure": 60,
+                "basecost": 2,
+                "mass": 3,
+                "structure": 12,
+                "cost": 2,
+                "geodesic": true
+            },
+            {
+                "name": "Aluminum Ribs",
+                "basestructure": 50,
+                "basecost": 3,
+                "mass": 2,
+                "structure": 8,
+                "cost": 3,
+                "geodesic": true
+            },
+            {
+                "name": "Titanium",
+                "basestructure": 0,
+                "basecost": 0,
+                "mass": 1,
+                "structure": 10,
+                "cost": 8,
+                "geodesic": false
+            },
+            {
+                "name": "Living Grove",
+                "basestructure": 30,
+                "basecost": 8,
+                "mass": 2,
+                "structure": 4,
+                "cost": 0,
+                "geodesic": true,
+                "warning": "Free Repairs for Living Grove sections."
+            }
+        ],
+        "skin": [
+            {
+                "name": "Naked",
+                "dragfactor": 1,
+                "massfactor": 0.6,
+                "visibility": 1,
+                "flammable": false,
+                "monocoque": false,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Cloth Canvas",
+                "dragfactor": 0.5,
+                "massfactor": 1,
+                "flammable": false,
+                "monocoque": false,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Transparent Celluloid",
+                "dragfactor": 0.6,
+                "massfactor": 1,
+                "visibility": 1,
+                "cost": 1,
+                "flammable": true,
+                "monocoque": false,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Treated Paper",
+                "dragfactor": 0.5,
+                "massfactor": 0.75,
+                "flammable": true,
+                "monocoque": false,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Tense Silk",
+                "dragfactor": 0.5,
+                "massfactor": 1,
+                "toughness": 1,
+                "cost": 1,
+                "flammable": false,
+                "monocoque": false,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Dragon Skin",
+                "dragfactor": 0.5,
+                "massfactor": 1,
+                "cost": 4,
+                "flammable": false,
+                "monocoque": false,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Molded Plywood",
+                "dragfactor": 0.4,
+                "massfactor": 1,
+                "cost": 0.5,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 3
+            },
+            {
+                "name": "Clinker Build",
+                "dragfactor": 0.5,
+                "massfactor": 1,
+                "cost": 0,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": -3
+            },
+            {
+                "name": "Glass Reinforced Plastic",
+                "dragfactor": 0.3,
+                "massfactor": 1,
+                "cost": 1,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 0
+            },
+            {
+                "name": "Corrugated Duralumin",
+                "dragfactor": 0.5,
+                "massfactor": 1,
+                "toughness": 3,
+                "cost": 1,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 10
+            },
+            {
+                "name": "Steel Sheet",
+                "dragfactor": 0.35,
+                "massfactor": 1,
+                "cost": 1.5,
+                "toughness": 3,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 8
+            },
+            {
+                "name": "Aluminum Sheet",
+                "dragfactor": 0.35,
+                "massfactor": 0.75,
+                "cost": 2,
+                "toughness": 2,
+                "flammable": false,
+                "monocoque": true,
+                "monocoque_structure": 6
+            }
+        ],
+        "tail": [
+            {
+                "name": "Tailless",
+                "reqsections": 0,
+                "pitchstab": -4
+            },
+            {
+                "name": "Stubby",
+                "reqsections": 1,
+                "pitchstab": -3
+            },
+            {
+                "name": "Standard",
+                "reqsections": 2,
+                "pitchstab": 0
+            },
+            {
+                "name": "Long",
+                "reqsections": 3,
+                "pitchstab": 3
+            }
+        ]
+    },
+    "wings": {
+        "decks": [
+            {
+                "name": "Parasol",
+                "pitchstab": 3,
+                "maxstrain": -10,
+                "liftbleed": -2,
+                "limited": false
+            },
+            {
+                "name": "Shoulder",
+                "pitchstab": 2,
+                "liftbleed": -1,
+                "limited": true
+            },
+            {
+                "name": "Mid",
+                "limited": true
+            },
+            {
+                "name": "Low",
+                "pitchstab": -2,
+                "crashsafety": -1,
+                "liftbleed": -1,
+                "limited": true
+            },
+            {
+                "name": "Gear",
+                "pitchstab": -3,
+                "maxstrain": -10,
+                "crashsafety": -1,
+                "liftbleed": -2,
+                "limited": false
+            }
+        ],
+        "surface": [
+            {
+                "name": "Cloth Canvas",
+                "flammable": false,
+                "strainfactor": 1.0,
+                "dragfactor": 1.0,
+                "metal": false
+            },
+            {
+                "name": "Treated Paper",
+                "flammable": true,
+                "strainfactor": 1.0,
+                "dragfactor": 1.0,
+                "mass": -0.25,
+                "metal": false
+            },
+            {
+                "name": "Tense Silk Layers",
+                "flammable": false,
+                "strainfactor": 0.9,
+                "dragfactor": 1.0,
+                "cost": 0.2,
+                "metal": false
+            },
+            {
+                "name": "Plywood",
+                "flammable": false,
+                "strainfactor": 0.9,
+                "dragfactor": 1.0,
+                "mass": 0.2,
+                "cost": 0.1,
+                "metal": false
+            },
+            {
+                "name": "Aluminum Sheet",
+                "flammable": false,
+                "strainfactor": 1.0,
+                "dragfactor": 0.8,
+                "cost": 0.3,
+                "metal": true
+            },
+            {
+                "name": "Corrugated Steel",
+                "flammable": false,
+                "strainfactor": 0.6,
+                "dragfactor": 1.0,
+                "mass": 0.25,
+                "cost": 0.2,
+                "metal": true
+            },
+            {
+                "name": "Thin Sheet Steel",
+                "flammable": false,
+                "strainfactor": 0.6,
+                "dragfactor": 0.9,
+                "mass": 0.2,
+                "cost": 0.3,
+                "metal": true
+            },
+            {
+                "name": "Grand Eagle Feather",
+                "flammable": false,
+                "strainfactor": 1.0,
+                "dragfactor": 1.0,
+                "control": 0.2,
+                "cost": 0.6,
+                "metal": false
+            },
+            {
+                "name": "Solar Fiber",
+                "flammable": false,
+                "strainfactor": 1.0,
+                "dragfactor": 1.0,
+                "charge": 0.2,
+                "cost": 0.4,
+                "metal": false
+            },
+            {
+                "name": "Dragon Skin",
+                "flammable": false,
+                "strainfactor": 0.4,
+                "dragfactor": 1.0,
+                "cost": 0.8,
+                "metal": true
+            }
+        ],
+        "stagger": [
+            {
+                "name": "Monoplane",
+                "inline": false,
+                "wing_count": 1,
+                "hstab": true
+            },
+            {
+                "name": "Tandem",
+                "inline": true,
+                "wing_count": 20,
+                "hstab": false,
+                "pitchstab": 4
+            },
+            {
+                "name": "Extreme Positive",
+                "inline": false,
+                "wing_count": 20,
+                "hstab": true,
+                "pitchstab": 2,
+                "liftbleed": -2
+            },
+            {
+                "name": "Positive",
+                "inline": false,
+                "wing_count": 20,
+                "hstab": true,
+                "pitchstab": 1,
+                "liftbleed": -1
+            },
+            {
+                "name": "Unstaggered",
+                "inline": false,
+                "wing_count": 20,
+                "hstab": true
+            },
+            {
+                "name": "Negative",
+                "inline": false,
+                "wing_count": 20,
+                "hstab": true,
+                "pitchstab": -1,
+                "liftbleed": -1
+            },
+            {
+                "name": "Extreme Negative",
+                "inline": false,
+                "wing_count": 20,
+                "hstab": true,
+                "pitchstab": -2,
+                "liftbleed": -2
+            }
+        ]
+    },
+    "stabilizers": {
+        "hstab": [
+            {
+                "name": "Tailplane",
+                "dragfactor": 1,
+                "is_canard": false,
+                "increment": 1,
+                "is_vtail": false,
+                "is_tail": true
+            },
+            {
+                "name": "The Wings",
+                "dragfactor": 0,
+                "is_canard": false,
+                "increment": 0,
+                "is_vtail": false,
+                "is_tail": false
+            },
+            {
+                "name": "Canards",
+                "pitchstab": -3,
+                "dragfactor": 0.5,
+                "is_canard": true,
+                "increment": 1,
+                "is_vtail": false,
+                "is_tail": false
+            },
+            {
+                "name": "Outboard",
+                "latstab": 1,
+                "dragfactor": 1,
+                "is_canard": false,
+                "increment": 2,
+                "is_vtail": false,
+                "is_tail": false
+            },
+            {
+                "name": "V-Tail",
+                "latstab": 2,
+                "pitchstab": 2,
+                "cost": 5,
+                "dragfactor": 0.8,
+                "is_canard": false,
+                "increment": 1,
+                "is_vtail": true,
+                "is_tail": true
+            },
+            {
+                "name": "T-Tail",
+                "liftbleed": -2,
+                "dragfactor": 0.5,
+                "is_canard": false,
+                "increment": 1,
+                "is_vtail": false,
+                "is_tail": true,
+                "warning": "In the event of a spin/stall while above stall speed and under power, you are at a Disadvantage to recover."
+            }
+        ],
+        "vstab": [
+            {
+                "name": "Tailfin",
+                "dragfactor": 1,
+                "increment": 1,
+                "is_vtail": false,
+                "is_tail": true
+            },
+            {
+                "name": "Outboard",
+                "dragfactor": 1,
+                "control": 1,
+                "increment": 2,
+                "is_vtail": false,
+                "is_tail": false
+            },
+            {
+                "name": "V-Tail",
+                "dragfactor": 0,
+                "increment": 0,
+                "is_vtail": true,
+                "is_tail": true
+            }
+        ]
+    },
+    "controls": {
+        "ailerons": [
+            {
+                "name": "Flap Ailerons",
+                "warping": false
+            },
+            {
+                "name": "Wing Warping",
+                "drag": -1,
+                "warping": true,
+                "warning": "Get +1 to Dogfight! at 15 speed and below."
+            },
+            {
+                "name": "Spoilerons",
+                "cost": 2,
+                "warping": false,
+                "warning": "When you Dogfight!, spend double speed but take +1"
+            },
+            {
+                "name": "None",
+                "warping": false,
+                "control": -15,
+                "crashsafety": -1,
+                "cost": -2
+            }
+        ],
+        "rudders": [
+            {
+                "name": "Flap Rudder"
+            },
+            {
+                "name": "Flying Rudder",
+                "latstab": -2,
+                "control": 3
+            }
+        ],
+        "elevators": [
+            {
+                "name": "Flap Elevator"
+            },
+            {
+                "name": "Flying Elevator",
+                "pitchstab": -2,
+                "control": 2
+            }
+        ],
+        "flaps": [
+            {
+                "name": "None",
+                "costfactor": 0
+            },
+            {
+                "name": "Basic Flaps",
+                "liftbleed": -3,
+                "costfactor": 0.333333333333
+            },
+            {
+                "name": "Advanced Flaps",
+                "liftbleed": -5,
+                "costfactor": 0.666666666666
+            },
+            {
+                "name": "Control Flaps",
+                "liftbleed": -5,
+                "control": 3,
+                "costfactor": 1
+            },
+            {
+                "name": "Lift Dumpers",
+                "crashsafety": 2,
+                "costfactor": 1,
+                "warning": "Activate for +1 to Dogfight!, then immediately induce a stall."
+            }
+        ],
+        "slats": [
+            {
+                "name": "None"
+            },
+            {
+                "name": "Fixed Slots",
+                "drag": 5,
+                "liftbleed": -3,
+                "cost": 1
+            },
+            {
+                "name": "Automatic Slats",
+                "liftbleed": -1,
+                "control": 3,
+                "cost": 4
+            }
+        ],
+        "drag_inducers": [
+            {
+                "name": "Air Brake",
+                "mass": 1,
+                "cost": 3,
+                "warning": "When deployed, immediately bleed of speed equal to Speed Factor and gain +1 to Dogfight!."
+            },
+            {
+                "name": "Dive Brake",
+                "mass": 2,
+                "cost": 4,
+                "warning": "When deployed, steep dives trade altitude for speed at 1-2 instead of 1-3."
+            },
+            {
+                "name": "Drogue Chute",
+                "cost": 3,
+                "warning": "Activate once per flight to: Give +3 to Go Down or take down a close pursuer."
+            }
+        ]
+    },
+    "reinforcement": {
+        "external_wood": [
+            {
+                "name": "Parallel Struts",
+                "drag": 2,
+                "mass": 1,
+                "structure": 5,
+                "maxstrain": 5,
+                "tension": 30,
+                "cost": 1,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "N-Strut",
+                "drag": 2,
+                "mass": 1,
+                "structure": 6,
+                "maxstrain": 8,
+                "tension": 20,
+                "cost": 1,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "V-Strut",
+                "drag": 1,
+                "mass": 1,
+                "structure": -5,
+                "maxstrain": 5,
+                "tension": 30,
+                "cost": 1,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "I-Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 20,
+                "tension": 15,
+                "cost": 2,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "W-Strut",
+                "drag": 3,
+                "mass": 1,
+                "maxstrain": 35,
+                "tension": 0,
+                "cost": 2,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Single Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 10,
+                "tension": 0,
+                "cost": 1,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Star Strut",
+                "drag": 8,
+                "mass": 2,
+                "structure": 10,
+                "maxstrain": 30,
+                "tension": 0,
+                "cost": 2,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Wing Truss",
+                "drag": 4,
+                "tension": 40,
+                "cost": 1,
+                "config": false,
+                "first": true
+            },
+            {
+                "name": "Wire Root",
+                "tension": 10,
+                "config": true,
+                "first": false
+            }
+        ],
+        "external_steel": [
+            {
+                "name": "Steel Parallel Struts",
+                "drag": 2,
+                "mass": 1,
+                "structure": 10,
+                "maxstrain": 10,
+                "tension": 15,
+                "cost": 2,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Steel N-Strut",
+                "drag": 2,
+                "mass": 1,
+                "structure": 12,
+                "maxstrain": 13,
+                "tension": 10,
+                "cost": 2,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Steel V-Strut",
+                "drag": 1,
+                "mass": 1,
+                "structure": 0,
+                "maxstrain": 10,
+                "tension": 15,
+                "cost": 2,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Steel I-Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 25,
+                "tension": 7,
+                "cost": 4,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Steel W-Strut",
+                "drag": 3,
+                "mass": 1,
+                "maxstrain": 40,
+                "tension": 0,
+                "cost": 4,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Steel Single Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 15,
+                "tension": 0,
+                "cost": 2,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Steel Star Strut",
+                "drag": 6,
+                "mass": 2,
+                "structure": 20,
+                "maxstrain": 35,
+                "tension": 0,
+                "cost": 4,
+                "config": true,
+                "first": true
+            },
+            {
+                "name": "Steel Wing Truss",
+                "drag": 4,
+                "tension": 20,
+                "cost": 2,
+                "config": false,
+                "first": true
+            },
+            {
+                "name": "Steel Wire Root",
+                "tension": 10,
+                "config": true,
+                "first": false
+            }
+        ],
+        "cabane": [
+            {
+                "name": "None",
+                "tension": 0
+            },
+            {
+                "name": "Parallel Struts",
+                "drag": 0,
+                "mass": 1,
+                "structure": 5,
+                "maxstrain": 5,
+                "tension": 15,
+                "cost": 1,
+                "config": true
+            },
+            {
+                "name": "Steel Parallel Struts",
+                "drag": 0,
+                "mass": 1,
+                "structure": 10,
+                "maxstrain": 10,
+                "tension": 7,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "N-Strut",
+                "drag": 0,
+                "mass": 1,
+                "structure": 6,
+                "maxstrain": 8,
+                "tension": 10,
+                "cost": 1,
+                "config": true
+            },
+            {
+                "name": "Steel N-Strut",
+                "drag": 0,
+                "mass": 1,
+                "structure": 12,
+                "maxstrain": 13,
+                "tension": 5,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "V-Strut",
+                "drag": 0,
+                "mass": 1,
+                "structure": -5,
+                "maxstrain": 5,
+                "tension": 15,
+                "cost": 1,
+                "config": true
+            },
+            {
+                "name": "Steel V-Strut",
+                "drag": 0,
+                "mass": 1,
+                "structure": 0,
+                "maxstrain": 10,
+                "tension": 7,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "I-Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 20,
+                "tension": 7,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "Steel I-Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 25,
+                "tension": 3,
+                "cost": 4,
+                "config": true
+            },
+            {
+                "name": "W-Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 35,
+                "tension": 0,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "Steel W-Strut",
+                "drag": 1,
+                "mass": 1,
+                "maxstrain": 40,
+                "tension": 0,
+                "cost": 4,
+                "config": true
+            },
+            {
+                "name": "Single Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 10,
+                "tension": 0,
+                "cost": 1,
+                "config": true
+            },
+            {
+                "name": "Steel Single Strut",
+                "drag": 0,
+                "mass": 1,
+                "maxstrain": 15,
+                "tension": 0,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "Star Strut",
+                "drag": 6,
+                "mass": 2,
+                "structure": 10,
+                "maxstrain": 30,
+                "tension": 0,
+                "cost": 2,
+                "config": true
+            },
+            {
+                "name": "Steel Star Strut",
+                "drag": 4,
+                "mass": 2,
+                "structure": 20,
+                "maxstrain": 35,
+                "tension": 0,
+                "cost": 4,
+                "config": true
+            }
+        ],
+        "cantilever": [
+            {
+                "name": "Birch",
+                "mass": 1,
+                "maxstrain": 10,
+                "toughness": 2,
+                "cost": 1,
+                "limited": true
+            },
+            {
+                "name": "Duralumin",
+                "mass": 1,
+                "maxstrain": 15,
+                "toughness": 3,
+                "cost": 2,
+                "limited": true
+            },
+            {
+                "name": "Steel",
+                "mass": 1,
+                "maxstrain": 20,
+                "toughness": 5,
+                "cost": 3,
+                "limited": true
+            },
+            {
+                "name": "Aluminium",
+                "mass": 1,
+                "maxstrain": 25,
+                "toughness": 3,
+                "cost": 4,
+                "limited": true
+            },
+            {
+                "name": "Whalebone",
+                "mass": 1,
+                "liftbleed": -3,
+                "maxstrain": 5,
+                "cost": 8,
+                "limited": true
+            }
+        ]
+    },
+    "fuel": {
+        "tanks": [
+            {
+                "name": "Internal Fuselage Tank",
+                "mass": 1,
+                "wetmass": 5,
+                "fuel": 125,
+                "reqsections": 0.5,
+                "internal": true,
+                "cantilever": false
+            },
+            {
+                "name": "External Wing Tank",
+                "mass": 1,
+                "wetmass": 5,
+                "fuel": 125,
+                "drag": 3,
+                "internal": false,
+                "cantilever": false
+            },
+            {
+                "name": "Internal Wing Tank",
+                "mass": 1,
+                "wetmass": 5,
+                "fuel": 125,
+                "internal": true,
+                "cantilever": true
+            },
+            {
+                "name": "Microtank",
+                "mass": 1,
+                "wetmass": 0,
+                "fuel": 25,
+                "internal": true,
+                "cantilever": false
+            }
+        ],
+        "safety": [
+            {
+                "name": "Remote Fire Extinguisher",
+                "mass": 2,
+                "cost": 3,
+                "warning": "Spend to put out a fire."
+            },
+            {
+                "name": "Self-Sealing Gas Tank",
+                "mass": 1,
+                "cost": 2
+            }
+        ]
+    },
+    "cargo": {
+        "spaces": [
+            {
+                "name": "None"
+            },
+            {
+                "name": "Tiny",
+                "mass": 1
+            },
+            {
+                "name": "Small",
+                "reqsections": 1
+            },
+            {
+                "name": "Medium",
+                "reqsections": 3
+            },
+            {
+                "name": "Large",
+                "reqsections": 5
+            },
+            {
+                "name": "Huge",
+                "reqsections": 10
+            }
+        ]
+    },
+    "landing_gear": {
+        "gear": [
+            {
+                "name": "Landing Gear",
+                "DpLMP": 1,
+                "SpLMP": 0,
+                "can_retract": true
+            },
+            {
+                "name": "Floats",
+                "DpLMP": 1.5,
+                "SpLMP": 0,
+                "can_retract": true
+            },
+            {
+                "name": "Hybrid Floats",
+                "DpLMP": 2,
+                "SpLMP": 0,
+                "can_retract": true
+            },
+            {
+                "name": "Boat Hull",
+                "mass": 5,
+                "DpLMP": 1,
+                "SpLMP": 1,
+                "can_retract": false
+            },
+            {
+                "name": "Landing Skid",
+                "DpLMP": 0,
+                "SpLMP": 0,
+                "can_retract": false,
+                "warning": "All landings are crash landings."
+            }
+        ],
+        "extras": [
+            {
+                "name": "Zeppelin Hook",
+                "mass": 1,
+                "MpLMP": 0,
+                "warning": "Allows landing inside airships or large planes."
+            },
+            {
+                "name": "Carrier Hook",
+                "MpLMP": 0.5,
+                "warning": "Allows landing on carriers."
+            },
+            {
+                "name": "Underwing Skid",
+                "MpLMP": 0,
+                "drag": 3,
+                "crashsafety": 2
+            }
+        ]
+    },
+    "accessories": {
+        "electrical": [
+            {
+                "name": "Windmill",
+                "drag": 1,
+                "cost": 1,
+                "cp10s": 1,
+                "warning": "Generates 1 charge per 10 speed."
+            },
+            {
+                "name": "Ram Air Scoop",
+                "charge": 1,
+                "cost": 3,
+                "cp10s": 0
+            },
+            {
+                "name": "Battery",
+                "mass": 1,
+                "cost": 2,
+                "cp10s": 0,
+                "warning": "Stores 5 charge"
+            }
+        ],
+        "radios": [
+            {
+                "name": "Loud Yelling"
+            },
+            {
+                "name": "Intercom System",
+                "charge": -1,
+                "cost": 1
+            },
+            {
+                "name": "Radio Receiver",
+                "mass": 2,
+                "drag": 2,
+                "charge": -1,
+                "cost": 3
+            },
+            {
+                "name": "Radio Transmitter",
+                "mass": 3,
+                "drag": 3,
+                "charge": -2,
+                "cost": 3
+            },
+            {
+                "name": "Radio Transceiver",
+                "mass": 5,
+                "drag": 3,
+                "charge": -2,
+                "cost": 3
+            },
+            {
+                "name": "Whalebone Radio Receiver",
+                "charge": -1,
+                "cost": 5
+            },
+            {
+                "name": "Whalebone Radio Node",
+                "mass": 6,
+                "drag": 1,
+                "charge": -4,
+                "cost": 12
+            }
+        ],
+        "information": [
+            {
+                "name": "Reconnaissance Camera",
+                "cost": 2,
+                "warning": "Can take pictures downward. Capabilities scale with era."
+            },
+            {
+                "name": "Guncam",
+                "cost": 1,
+                "warning": "Confirms your kills for you."
+            }
+        ],
+        "visibility": [
+            {
+                "name": "Wing Cutouts",
+                "visibility": 1,
+                "liftbleed": 1
+            },
+            {
+                "name": "Hull Cutouts",
+                "visibility": 1,
+                "structure": -5
+            },
+            {
+                "name": "Searchlight",
+                "charge": -2,
+                "cost": 1
+            }
+        ],
+        "climate": [
+            {
+                "name": "Electric Heating",
+                "charge": -1,
+                "cost": 1,
+                "req_radiator": false
+            },
+            {
+                "name": "Radiator Loop",
+                "cost": 1,
+                "req_radiator": true
+            },
+            {
+                "name": "Basic Fan",
+                "charge": -1,
+                "req_radiator": false
+            },
+            {
+                "name": "Air Conditioning",
+                "charge": -2,
+                "cost": 4,
+                "req_radiator": false
+            }
+        ],
+        "autopilots": [
+            {
+                "name": "No Autopilot"
+            },
+            {
+                "name": "Gyroscopic",
+                "cost": 3,
+                "warning": "Gives +4 to Empty Seat rolls."
+            },
+            {
+                "name": "Altitude Holding",
+                "mass": 1,
+                "cost": 5,
+                "warning": "Allows the Empty Seat rule to be ignored."
+            },
+            {
+                "name": "Programmable",
+                "mass": 1,
+                "charge": -2,
+                "cost": 6,
+                "warning": "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings."
+            },
+            {
+                "name": "\"Rattegehirn\"",
+                "mass": 3,
+                "charge": -3,
+                "cost": 25,
+                "warning": "Fully automated. For robo-planes."
+            }
+        ],
+        "control": [
+            {
+                "name": "No Aids",
+                "max_mass_stress": 1000,
+                "max_total_stress": 1000
+            },
+            {
+                "name": "Control Rods",
+                "mass": 1,
+                "cost": 2,
+                "max_mass_stress": 1,
+                "max_total_stress": 1000
+            },
+            {
+                "name": "Hydraulic-Assisted",
+                "mass": 3,
+                "cost": 5,
+                "max_mass_stress": 0,
+                "max_total_stress": 1000
+            },
+            {
+                "name": "Fly by Wire",
+                "mass": 3,
+                "cost": 10,
+                "max_mass_stress": 0,
+                "max_total_stress": 0
+            }
+        ]
+    }
+}
