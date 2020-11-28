@@ -16,6 +16,7 @@ class Rotor extends Part {
     private dryMP: number;
     private sizing_span: number;
     private accessory: boolean;
+    private engine_count: number;
 
     private cant_idx: number;
     private cant_list: { name: string, limited: boolean, stats: Stats }[];
@@ -82,6 +83,7 @@ class Rotor extends Part {
 
     public SetCantilever(num: number) {
         this.cant_idx = num;
+        this.CalculateStats();
     }
 
     public GetCantilever() {
@@ -94,9 +96,10 @@ class Rotor extends Part {
             this.cant_idx = 0;
             this.is_tandem = false;
             this.rotor_count = 1;
+            this.type = new_type;
+            this.VerifySizes();
+            this.rotor_span = this.sizing_span;
         }
-        this.type = new_type;
-        this.VerifySizes();
     }
 
     public CanRotorCount() {
@@ -116,6 +119,8 @@ class Rotor extends Part {
             }
         }
         this.rotor_count = num;
+        if (this.rotor_count < 2)
+            this.is_tandem = false;
         this.CalculateStats();
     }
 
@@ -128,6 +133,8 @@ class Rotor extends Part {
     }
 
     public SetRotorSpan(num: number) {
+        if (num < 2)
+            num = 2;
         this.rotor_span = num;
         this.CalculateStats();
     }
@@ -201,17 +208,25 @@ class Rotor extends Part {
         this.CalculateStats();
     }
 
+    public SetEngineCount(num: number) {
+        this.engine_count = num;
+    }
+
+    public GetTailRotor() {
+        return this.type == AIRCRAFT_TYPE.HELICOPTER && !this.is_tandem;
+    }
+
     private PitchSizing() {
         switch (this.rotor_pitch) {
-            case 1:
+            case 0:
                 return 1.1;
-            case 2:
+            case 1:
                 return 1.05;
-            case 3:
+            case 2:
                 return 1;
-            case 4:
+            case 3:
                 return 0.95;
-            case 5:
+            case 4:
                 return 0.9;
             default:
                 return 1000;
@@ -246,7 +261,7 @@ class Rotor extends Part {
 
         var stats = new Stats();
         var area = (Math.PI / 8) * this.rotor_span * this.rotor_span;
-        stats.wingarea += area;
+        stats.wingarea += Math.floor(1.0e-6 + area);
         stats.drag = this.GetRotorDrag();
 
         var strain = this.GetRotorStrain();
@@ -263,7 +278,16 @@ class Rotor extends Part {
         }
 
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
-            stats.reliability = Math.min(0, this.sizing_span - this.rotor_span);
+            stats.reliability = Math.min(0, this.rotor_span - this.sizing_span);
+        }
+
+        if (this.accessory) {
+            if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
+                stats.cost += 2;
+                stats.mass += 2;
+            } else if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
+                stats.mass += this.rotor_count * this.engine_count;
+            }
         }
 
         return stats;

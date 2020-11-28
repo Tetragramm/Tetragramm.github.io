@@ -105,14 +105,6 @@ class Reinforcement_HTML extends Display {
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
         this.d_amax = c2_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Raw Strain");
-        CreateTH(h2_row, "Aircraft Max Strain");
-        var c2_row = tbl_stat.insertRow();
-        this.d_strc = c2_row.insertCell();
-        this.d_maxs = c2_row.insertCell();
-        this.d_amax = c2_row.insertCell();
     }
 
     public UpdateDisplay() {

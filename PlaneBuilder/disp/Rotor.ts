@@ -5,6 +5,9 @@ class Rotor_HTML extends Display {
     private rotor: Rotor;
 
     private div: HTMLDivElement;
+    private wing_div: HTMLDivElement;
+    private reinforce_div: HTMLDivElement;
+    private control_div: HTMLDivElement;
 
     private auto_header: HTMLTableRowElement;
     private auto_row: HTMLTableRowElement;
@@ -40,6 +43,9 @@ class Rotor_HTML extends Display {
         this.rotor = r;
 
         this.div = document.getElementById("Rotors") as HTMLDivElement;
+        this.wing_div = document.getElementById("Wings") as HTMLDivElement;
+        this.reinforce_div = document.getElementById("Reinforcements") as HTMLDivElement;
+        this.control_div = document.getElementById("ControlSurfaces") as HTMLDivElement;
         var tbl = document.getElementById("rotor_table") as HTMLTableElement;
 
         this.InitAutogyro(tbl);
@@ -150,7 +156,7 @@ class Rotor_HTML extends Display {
         let opt2 = document.createElement("OPTION") as HTMLOptionElement;
         opt2.text = "Tandem";
         this.heli_stagger.add(opt2);
-        this.heli_mat.onchange = () => { this.rotor.SetTandem(this.heli_stagger.selectedIndex == 1); };
+        this.heli_stagger.onchange = () => { this.rotor.SetTandem(this.heli_stagger.selectedIndex == 1); };
 
         var mat_cell = this.heli_row.insertCell();
         var mat_fs = CreateFlexSection(mat_cell);
@@ -166,7 +172,7 @@ class Rotor_HTML extends Display {
         var acc_cell = this.heli_row.insertCell();
         var acc_fs = CreateFlexSection(acc_cell);
         this.heli_shafts = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Clutched Rotor", this.heli_shafts, acc_fs);
+        FlexCheckbox("Motor Cross-link", this.heli_shafts, acc_fs);
         this.heli_shafts.onchange = () => { this.rotor.SetAccessory(this.heli_shafts.checked); };
 
         this.InitHelicopterStats(this.heli_row.insertCell());
@@ -231,9 +237,15 @@ class Rotor_HTML extends Display {
         switch (this.rotor.GetType()) {
             case AIRCRAFT_TYPE.AIRPLANE:
                 this.div.hidden = true;
+                this.wing_div.hidden = false;
+                this.reinforce_div.hidden = false;
+                this.control_div.hidden = false;
                 break;
             case AIRCRAFT_TYPE.AUTOGYRO:
                 this.div.hidden = false;
+                this.wing_div.hidden = false;
+                this.reinforce_div.hidden = false;
+                this.control_div.hidden = false;
                 this.heli_header.hidden = true;
                 this.heli_row.hidden = true;
                 this.auto_header.hidden = false;
@@ -242,6 +254,9 @@ class Rotor_HTML extends Display {
                 break;
             case AIRCRAFT_TYPE.HELICOPTER:
                 this.div.hidden = false;
+                this.wing_div.hidden = true;
+                this.reinforce_div.hidden = true;
+                this.control_div.hidden = true;
                 this.auto_header.hidden = true;
                 this.auto_row.hidden = true;
                 this.heli_header.hidden = false;

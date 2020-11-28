@@ -210,11 +210,12 @@ class ControlSurfaces extends Part {
         this.elevator_sel = 0;
         this.flaps_sel = 0;
         this.slats_sel = 0;
-        for (let d of this.drag_sel)
-            d = false;
+        for (let i = 0; i < this.drag_sel.length; i++)
+            this.drag_sel[i] = false;
         this.span = 0;
         this.is_cantilever = false;
         this.wing_area = 0;
+        console.log("SetHelicopter");
     }
 
     public SetCalculateStats(callback: () => void) {

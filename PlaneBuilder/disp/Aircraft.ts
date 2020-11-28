@@ -35,6 +35,9 @@ class Aircraft_HTML extends Display {
     private optimization: Optimization_HTML;
     private weapons: Weapons_HTML;
     private used: Used_HTML;
+    private rotor: Rotor_HTML;
+
+    private acft_type: HTMLSelectElement;
 
     //Alter Stats
     // private a_lift: HTMLInputElement;
@@ -164,9 +167,20 @@ class Aircraft_HTML extends Display {
         this.optimization = new Optimization_HTML(aircraft.GetOptimization());
         this.weapons = new Weapons_HTML(aircraft.GetWeapons());
         this.used = new Used_HTML(aircraft.GetUsed());
+        this.rotor = new Rotor_HTML(aircraft.GetRotor());
 
         // var tbla = document.getElementById("tbl_alter") as HTMLTableElement;
         // this.InitAlter(tbla);
+
+        this.acft_type = document.getElementById("acft_type") as HTMLSelectElement;
+        for (let type in AIRCRAFT_TYPE) {
+            if (isNaN(Number(type))) {
+                let opt = document.createElement("OPTION") as HTMLOptionElement;
+                opt.text = type;
+                this.acft_type.add(opt);
+            }
+        }
+        this.acft_type.onchange = () => { this.acft.SetType(this.acft_type.selectedIndex); };
 
         var tbl = document.getElementById("tbl_stats") as HTMLTableElement;
         this.InitStats(tbl);
@@ -1075,6 +1089,9 @@ class Aircraft_HTML extends Display {
         this.optimization.UpdateDisplay();
         this.weapons.UpdateDisplay();
         this.used.UpdateDisplay();
+        this.rotor.UpdateDisplay();
+
+        this.acft_type.selectedIndex = this.acft.GetAircraftType();
 
         this.UpdateStats();
         this.UpdateDerived();

@@ -313,7 +313,7 @@ class Engine extends Part {
         var can = [...Array(elist_temp.length).fill(true)];
         if (this.is_helicopter) {
             for (let i = 0; i < elist_temp.length; i++) {
-                if (elist_temp.get(i).type == ENGINE_TYPE.PULSEJET)
+                if (elist_temp.get(i).engine_type == ENGINE_TYPE.PULSEJET)
                     can[i] = false;
             }
         }
@@ -427,11 +427,10 @@ class Engine extends Part {
     }
 
     public CanMountIndex() {
-        var can = [...Array(this.mount_list.length).fill(false)];
+        var can = [...Array(this.mount_list.length).fill(true)];
         if (this.is_helicopter) {
             for (let i = 0; i < can.length; ++i) {
-                if (!this.mount_list[i].helicopter)
-                    can[i] = false;
+                can[i] = this.mount_list[i].helicopter;
             }
         }
         return can;
@@ -480,6 +479,10 @@ class Engine extends Part {
 
     public GetUseExtendedDriveshaft(): boolean {
         return this.use_ds;
+    }
+
+    public CanUseGears() {
+        return !(this.GetIsPulsejet() || this.is_generator);
     }
 
     public SetGearCount(num: number) {
@@ -665,6 +668,11 @@ class Engine extends Part {
         } else {
             this.is_generator = false;
         }
+        if (this.is_generator) {
+            this.gp_count = 0;
+            this.gpr_count = 0;
+            this.use_ds = false;
+        }
         this.CalculateStats();
     }
 
@@ -760,6 +768,7 @@ class Engine extends Part {
         this.is_helicopter = is;
         if (is) {
             this.use_ds = false;
+            this.selected_mount = 1;
         }
     }
 

@@ -197,6 +197,10 @@ class Engines extends Part {
         return count;
     }
 
+    public GetNumberOfItems(): number {
+        return this.engines.length;
+    }
+
     public GetEngine(num: number): Engine {
         return this.engines[num];
     }
@@ -368,6 +372,14 @@ class Engines extends Part {
                 r.SetParasol(false);
             }
         }
+    }
+
+    public HasPulsejet() {
+        for (let e of this.engines) {
+            if (e.GetIsPulsejet())
+                return true;
+        }
+        return false;
     }
 
     public PartStats(): Stats {

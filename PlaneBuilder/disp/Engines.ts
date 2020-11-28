@@ -23,7 +23,7 @@ class Engines_HTML extends Display {
 
         this.num_engines = document.getElementById("num_engines") as HTMLInputElement;
         this.num_engines.onchange = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };
-        this.num_engines.valueAsNumber = this.eng.GetNumberOfEngines();
+        this.num_engines.valueAsNumber = this.eng.GetNumberOfItems();
 
         this.num_radiators = document.getElementById("num_radiators") as HTMLInputElement;
         this.num_radiators.onchange = () => { this.eng.SetNumberOfRadiators(this.num_radiators.valueAsNumber); };
@@ -35,7 +35,7 @@ class Engines_HTML extends Display {
     }
 
     public UpdateDisplay() {
-        var num = this.eng.GetNumberOfEngines();
+        var num = this.eng.GetNumberOfItems();
         if (num == 0)
             this.tbl.style.display = "none";
         else

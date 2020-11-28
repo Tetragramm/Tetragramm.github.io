@@ -396,37 +396,22 @@ class Engine_HTML extends Display {
         this.InitCoolingSelect();
         this.intake_fan.checked = this.engine.GetIntakeFan();
 
-        if (this.mount_select.selectedIndex != this.engine.GetMountIndex()) {
-            this.mount_select.selectedIndex = this.engine.GetMountIndex();
-        }
-        if (this.pushpull_input.checked != this.engine.GetUsePushPull()) {
-            this.pushpull_input.checked = this.engine.GetUsePushPull();
-        }
-        if (this.torque_input.checked != this.engine.GetTorqueToStruct()) {
-            this.torque_input.checked = this.engine.GetTorqueToStruct();
-        }
-        if (this.torque_input.checked != this.engine.GetTorqueToStruct()) {
-            this.torque_input.checked = this.engine.GetTorqueToStruct();
-        }
+        this.mount_select.selectedIndex = this.engine.GetMountIndex();
+        this.pushpull_input.checked = this.engine.GetUsePushPull();
+        this.torque_input.checked = this.engine.GetTorqueToStruct();
+        this.torque_input.checked = this.engine.GetTorqueToStruct();
         this.torque_input.disabled = !this.engine.CanTorqueToStruct();
-        if (this.ds_input.checked != this.engine.GetUseExtendedDriveshaft()) {
-            this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
-        }
+        this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
         this.ds_input.disabled = !this.engine.CanUseExtendedDriveshaft();
-        if (this.gp_input.valueAsNumber != this.engine.GetGearCount()) {
-            this.gp_input.valueAsNumber = this.engine.GetGearCount();
-        }
-        if (this.gpr_input.valueAsNumber != this.engine.GetGearReliability()) {
-            this.gpr_input.valueAsNumber = this.engine.GetGearReliability();
-        }
+        this.gp_input.valueAsNumber = this.engine.GetGearCount();
+        this.gp_input.disabled = !this.engine.CanUseGears();
+        this.gpr_input.valueAsNumber = this.engine.GetGearReliability();
+        this.gpr_input.disabled = !this.engine.CanUseGears();
 
         if (e_stats.pulsejet) {
             this.mount_select.disabled = true;
             this.mount_select.selectedIndex = -1;
             this.pushpull_input.disabled = true;
-            this.ds_input.disabled = true;
-            this.gp_input.disabled = true;
-            this.gpr_input.disabled = true;
             for (let i = 0; i < this.mount_select.options.length; i++) {
                 let opt = this.mount_select.options[i];
                 if (opt.value == "fuselage") {
@@ -440,12 +425,10 @@ class Engine_HTML extends Display {
         else {
             this.mount_select.disabled = false;
             this.pushpull_input.disabled = false;
-            this.ds_input.disabled = false;
-            this.gp_input.disabled = false;
-            this.gpr_input.disabled = false;
+            var can_mount = this.engine.CanMountIndex();
             for (let i = 0; i < this.mount_select.options.length; i++) {
                 let opt = this.mount_select.options[i];
-                opt.disabled = false;
+                opt.disabled = !can_mount[i];
             }
             this.cowl_select.disabled = false;
             this.alternator_input.disabled = false;
