@@ -444,7 +444,7 @@ class Aircraft {
         var EnergyLosswBombs = EnergyLoss + 1;
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
-        var TurnBleed = Math.ceil(-1.0e-6 + ((StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
+        var TurnBleed = Math.ceil(-1.0e-6 + Math.floor(1.0e-6 + (StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
         var TurnBleedwBombs = TurnBleed + 1;
         TurnBleed = Math.max(TurnBleed, 1);
         TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
