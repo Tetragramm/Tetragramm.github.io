@@ -7180,6 +7180,8 @@ class Aircraft {
             this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
             //Airplanes always cost 1
             this.stats.cost = Math.max(1, this.stats.cost);
+            //Always have at least 1 liftbleed
+            this.stats.liftbleed = Math.max(1, this.stats.liftbleed);
             if (this.engines.GetRumble() * 10 > stats.structure) {
                 this.stats.power = 0;
                 this.stats.warnings.push({
