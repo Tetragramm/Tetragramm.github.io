@@ -2542,7 +2542,8 @@ class Engine extends Part {
         this.is_helicopter = is;
         if (is) {
             this.use_ds = false;
-            this.selected_mount = 1;
+            if (!this.CanMountIndex()[this.selected_mount])
+                this.selected_mount = 1;
         }
     }
     PartStats() {
@@ -4694,7 +4695,6 @@ class ControlSurfaces extends Part {
         this.span = 0;
         this.is_cantilever = false;
         this.wing_area = 0;
-        console.log("SetHelicopter");
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -7233,6 +7233,7 @@ class Rotor extends Part {
             else {
                 this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.PitchSizing());
             }
+            this.sizing_span = Math.min(100, this.sizing_span);
         }
     }
     PartStats() {
@@ -7242,13 +7243,14 @@ class Rotor extends Part {
         stats.wingarea += Math.floor(1.0e-6 + area);
         stats.drag = this.GetRotorDrag();
         var strain = this.GetRotorStrain();
-        while (strain > 0) {
-            let ts = this.cant_list[this.cant_idx].stats.Clone();
-            strain -= ts.maxstrain;
-            ts.maxstrain = 0;
-            ts.toughness = 0;
-            stats = stats.Add(ts);
-        }
+        var ts = this.cant_list[this.cant_idx].stats.Clone();
+        var count = Math.ceil(-1.0e-6 + strain / ts.maxstrain);
+        ts = ts.Multiply(count);
+        ts.maxstrain = 0;
+        ts.toughness = 0;
+        stats = stats.Add(ts);
+        if (this.rotor_count > 2)
+            this.is_tandem = true;
         if (this.is_tandem) {
             stats.pitchstab = 4;
         }
@@ -7263,6 +7265,19 @@ class Rotor extends Part {
             else if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
                 stats.mass += this.rotor_count * this.engine_count;
             }
+        }
+        //Warnings
+        if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
+            stats.warnings.push({ source: "Helicopter Flight", warning: "A helicopter must have Boost 2 to to take off vertically. " });
+            stats.warnings.push({ source: "Helicopter Landing", warning: "A deliberately landed helicopter travelling at 0 speed never has to roll Go Down regardless of how rough the terrain is." });
+            stats.warnings.push({ source: "Helicopter Descent", warning: "A helicopter can descend up to 5 altitude bands in one maneuver without gaining speed." });
+            stats.warnings.push({ source: "Helicopter Stall", warning: "Travelling faster than 37 speed immediately suffers a Retreating Wing Stall." });
+            if (stats.reliability < 0) {
+                stats.warnings.push({ source: "Rotor Span", warning: "Undersized rotors cause the engine to work harder and reduce reliability." });
+            }
+        }
+        else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
+            stats.warnings.push({ source: "Autogyro Stall", warning: "An Autogyro cannot stall, it automatically trades Altitude for speed 1-1.  If it runs out of altitude before regaining control, it lands gently.  If the autogyro exceeds Max Speed or sustains negative Gs it suffers a more traditional stall." });
         }
         return stats;
     }
@@ -7340,10 +7355,10 @@ class Aircraft {
         this.used.SetCalculateStats(() => { this.CalculateStats(); });
         this.rotor.SetCalculateStats(() => { this.CalculateStats(); });
         // this.alter.SetCalculateStats(() => { this.CalculateStats(); });
+        this.rotor.SetCantileverList(this.reinforcements.GetCantileverList());
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
-        this.rotor.SetCantileverList(this.reinforcements.GetCantileverList());
         this.use_storage = storage;
         this.updated_stats = false;
         this.freeze_display = false;
@@ -7631,6 +7646,8 @@ class Aircraft {
             this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
             //Airplanes always cost 1
             this.stats.cost = Math.max(1, this.stats.cost);
+            //Always have at least 1 liftbleed
+            this.stats.liftbleed = Math.max(1, this.stats.liftbleed);
             if (this.engines.GetRumble() * 10 > stats.structure) {
                 this.stats.power = 0;
                 this.stats.warnings.push({
@@ -7741,6 +7758,16 @@ class Aircraft {
         var TurnBleedwBombs = TurnBleed + 1;
         TurnBleed = Math.max(TurnBleed, 1);
         TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
+        if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
+            TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2));
+            EnergyLoss = Math.max(1, Math.floor(1.0e-6 + DPEmpty / 7));
+            StallSpeedEmpty = 0;
+            StallSpeedFull = 0;
+            StallSpeedFullwBombs = 0;
+            MaxSpeedEmpty = Math.min(37, MaxSpeedEmpty);
+            MaxSpeedFull = Math.min(37, MaxSpeedFull);
+            MaxSpeedwBombs = Math.min(37, MaxSpeedwBombs);
+        }
         var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
         //Used: Leaky
         FuelUses = FuelUses * Math.pow(0.8, this.used.leaky);
@@ -8824,9 +8851,8 @@ class Engine_HTML extends Display {
             this.mount_select.selectedIndex = -1;
             this.pushpull_input.disabled = true;
             for (let i = 0; i < this.mount_select.options.length; i++) {
-                let opt = this.mount_select.options[i];
-                if (opt.value == "fuselage") {
-                    opt.disabled = true;
+                if (this.mount_select.options[i].value == "fuselage") {
+                    this.mount_select.options[i].disabled = true;
                 }
             }
             this.cowl_select.disabled = true;
@@ -8838,8 +8864,7 @@ class Engine_HTML extends Display {
             this.pushpull_input.disabled = false;
             var can_mount = this.engine.CanMountIndex();
             for (let i = 0; i < this.mount_select.options.length; i++) {
-                let opt = this.mount_select.options[i];
-                opt.disabled = !can_mount[i];
+                this.mount_select.options[i].disabled = !can_mount[i];
             }
             this.cowl_select.disabled = false;
             this.alternator_input.disabled = false;
