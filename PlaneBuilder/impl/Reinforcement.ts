@@ -20,7 +20,6 @@ class Reinforcement extends Part {
     private has_wing: boolean;
     private acft_structure: number;
     private cant_lift: number;
-    private rotor_strain: number;
 
     constructor(js: JSON) {
         super();
@@ -286,21 +285,11 @@ class Reinforcement extends Part {
         this.CalculateStats();
     }
 
-    public GetCantileverStrain() {
-        var strain = 0;
-        for (let i = 0; i < this.cant_list.length; i++) {
-            if (this.cant_count[i] > 0) {
-
-                let ts = this.cant_list[i].stats;
-                ts = ts.Multiply(this.cant_count[i]);
-                strain += ts.maxstrain;
-            }
-        }
-        return strain;
-    }
-
-    public SetRotorStrain(num: number) {
-        this.rotor_strain = num;
+    public SetHelicopter() {
+        this.has_wing = false;
+        this.is_monoplane = false;
+        this.is_tandem = false;
+        this.is_staggered = false;
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -391,11 +380,6 @@ class Reinforcement extends Part {
                 cant_strain += ts.maxstrain;
                 stats = stats.Add(ts);
             }
-        }
-
-        if (cant_strain < this.rotor_strain) {
-            stats.warnings.push({ source: "Cantilevers", warning: "Rotors require at least " + this.rotor_strain + " strain in cantilevers to function." });
-            stats.maxstrain = -9999;
         }
 
         //Wing Blades need Steel Cantilevers

@@ -189,7 +189,12 @@ class Engines extends Part {
     }
 
     public GetNumberOfEngines(): number {
-        return this.engines.length;
+        var count = 0;
+        for (let e of this.engines) {
+            if (!e.GetGenerator())
+                count++;
+        }
+        return count;
     }
 
     public GetEngine(num: number): Engine {

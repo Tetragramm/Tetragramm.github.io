@@ -276,6 +276,18 @@ class Stabilizers extends Part {
         }
     }
 
+    public SetHelicopter() {
+        this.have_tail = true;
+        this.is_tandem = false;
+        this.is_swept = false;
+        this.wing_area = 0;
+        this.engine_count = 0;
+        this.hstab_sel = 0;
+        this.hstab_count = 1;
+        this.vstab_sel = 0;
+        this.vstab_count = 1;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

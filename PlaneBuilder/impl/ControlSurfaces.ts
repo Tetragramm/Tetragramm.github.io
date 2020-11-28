@@ -204,6 +204,19 @@ class ControlSurfaces extends Part {
         this.wing_area = wa;
     }
 
+    public SetHelicopter() {
+        this.aileron_sel = 0;
+        this.rudder_sel = 0;
+        this.elevator_sel = 0;
+        this.flaps_sel = 0;
+        this.slats_sel = 0;
+        for (let d of this.drag_sel)
+            d = false;
+        this.span = 0;
+        this.is_cantilever = false;
+        this.wing_area = 0;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

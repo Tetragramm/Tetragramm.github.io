@@ -16,6 +16,9 @@ class Rotor extends Part {
     private dryMP: number;
     private sizing_span: number;
 
+    private cant_idx: number;
+    private cant_list: { name: string, limited: boolean, stats: Stats }[];
+
     constructor() {
         super();
         this.type = AIRCRAFT_TYPE.AIRPLANE;
@@ -26,6 +29,7 @@ class Rotor extends Part {
         this.rotor_pitch = -1;
         this.dryMP = 0;
         this.sizing_span = 0;
+        this.cant_idx = 0;
     }
 
     public toJSON() {
@@ -56,6 +60,22 @@ class Rotor extends Part {
         this.rotor_count = d.GetNum();
         this.rotor_span = d.GetNum();
         this.is_tandem = d.GetBool();
+    }
+
+    public SetCantileverList(cant_list: { name: string, limited: boolean, stats: Stats }[]) {
+        this.cant_list = cant_list;
+    }
+
+    public GetCantileverList() {
+        return this.cant_list;
+    }
+
+    public SetCantilever(num: number) {
+        this.cant_idx = num;
+    }
+
+    public GetCantilever() {
+        return this.cant_idx;
     }
 
     public SetType(new_type: AIRCRAFT_TYPE) {
@@ -135,7 +155,7 @@ class Rotor extends Part {
         }
     }
 
-    public GetCantileverStrain() {
+    private GetRotorStrain() {
         var area = (Math.PI / 8) * this.rotor_span * this.rotor_span;
         return this.rotor_count * Math.max(1, 2 * this.rotor_span + area - 10);
     }
@@ -200,17 +220,22 @@ class Rotor extends Part {
         stats.wingarea += area;
         stats.drag = this.GetRotorDrag();
 
-        stats.maxstrain -= this.GetCantileverStrain();
+        var strain = this.GetRotorStrain();
+        while (strain > 0) {
+            let ts = this.cant_list[this.cant_idx].stats.Clone();
+            strain -= ts.maxstrain;
+            ts.maxstrain = 0;
+            stats = stats.Add(ts);
+        }
 
         if (this.is_tandem) {
             stats.pitchstab = 4;
         }
 
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
-            stats.reliability = Math.max(0, this.sizing_span - this.rotor_span);
+            stats.reliability = Math.min(0, this.sizing_span - this.rotor_span);
         }
 
-        console.log(this);
         return stats;
     }
 

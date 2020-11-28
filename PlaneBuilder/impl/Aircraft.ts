@@ -102,6 +102,7 @@ class Aircraft {
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
         this.frames.SetTailType(1);
+        this.rotor.SetCantileverList(this.reinforcements.GetCantileverList());
 
         this.use_storage = storage;
         this.updated_stats = false;
@@ -299,10 +300,7 @@ class Aircraft {
             this.stabilizers.SetIsSwept(this.wings.GetSwept());
             this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
         } else {
-            this.stabilizers.SetEngineCount(0);
-            this.stabilizers.SetIsTandem(false);
-            this.stabilizers.SetIsSwept(false);
-            this.stabilizers.SetHaveTail(true);
+            this.stabilizers.SetHelicopter();
         }
         this.stabilizers.SetWingArea(stats.wingarea);
         this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
@@ -312,7 +310,7 @@ class Aircraft {
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
             this.controlsurfaces.SetSpan(this.wings.GetSpan());
         } else {
-            this.controlsurfaces.SetSpan(0);
+            this.controlsurfaces.SetHelicopter();
         }
         stats = stats.Add(this.controlsurfaces.PartStats());
 
@@ -322,13 +320,9 @@ class Aircraft {
             this.reinforcements.SetStaggered(this.wings.GetStaggered());
             this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
         } else {
-            this.reinforcements.SetMonoplane(false);
-            this.reinforcements.SetTandem(false);
-            this.reinforcements.SetStaggered(false);
-            this.reinforcements.SetHasWing(false);
+            this.reinforcements.SetHelicopter();
         }
         this.reinforcements.SetCantLift(this.era.GetCantLift());
-        this.reinforcements.SetRotorStrain(this.rotor.GetCantileverStrain());
         stats = stats.Add(this.reinforcements.PartStats());
 
         this.accessories.SetAcftPower(stats.power);
