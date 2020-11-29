@@ -7614,7 +7614,7 @@ class Aircraft {
             stats.flightstress++;
         // stats = stats.Add(this.alter.PartStats());
         //Can only do this last, but might trigger a recalc.
-        this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + this.stats.mass / 5), 1));
+        this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + stats.mass / 5), 1));
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
         if (!this.updated_stats) {
