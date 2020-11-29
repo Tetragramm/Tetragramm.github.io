@@ -7488,6 +7488,7 @@ class Aircraft {
             this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
         }
         this.freeze_display = false;
+        console.log(this);
     }
     SetType(type) {
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER
@@ -12178,6 +12179,7 @@ class Aircraft_HTML extends Display {
         this.warning_cell.innerHTML = warnhtml;
     }
     UpdateDisplay() {
+        this.acft_type.selectedIndex = this.acft.GetAircraftType();
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
         this.passengers.UpdateDisplay();
@@ -12195,7 +12197,6 @@ class Aircraft_HTML extends Display {
         this.weapons.UpdateDisplay();
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
-        this.acft_type.selectedIndex = this.acft.GetAircraftType();
         this.UpdateStats();
         this.UpdateDerived();
     }

@@ -1073,6 +1073,7 @@ class Aircraft_HTML extends Display {
     }
 
     public UpdateDisplay() {
+        this.acft_type.selectedIndex = this.acft.GetAircraftType();
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
         this.passengers.UpdateDisplay();
@@ -1091,7 +1092,6 @@ class Aircraft_HTML extends Display {
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
 
-        this.acft_type.selectedIndex = this.acft.GetAircraftType();
 
         this.UpdateStats();
         this.UpdateDerived();
