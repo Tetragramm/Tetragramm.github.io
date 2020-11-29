@@ -374,6 +374,9 @@ class Aircraft {
 
         // stats = stats.Add(this.alter.PartStats());
 
+        //Can only do this last, but might trigger a recalc.
+        this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + this.stats.mass / 5), 1));
+
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
 
@@ -382,13 +385,6 @@ class Aircraft {
             this.stats = stats;
 
             var derived = this.GetDerivedStats();
-
-            //Can only do this last, but might trigger a recalc.
-            //So freeze display while it happens.
-            var freeze = this.freeze_display;
-            this.freeze_display = true;
-            this.rotor.SetMP(derived.DryMP);
-            this.freeze_display = freeze;
 
             //Because flaps have cost per MP
             this.stats.cost += this.controlsurfaces.GetFlapCost(derived.DryMP);
