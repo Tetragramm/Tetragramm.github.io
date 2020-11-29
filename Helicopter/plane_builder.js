@@ -7613,18 +7613,14 @@ class Aircraft {
         if (this.cockpits.HasOpen() && this.engines.HasTractorRotary())
             stats.flightstress++;
         // stats = stats.Add(this.alter.PartStats());
+        //Can only do this last, but might trigger a recalc.
+        this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + this.stats.mass / 5), 1));
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
         if (!this.updated_stats) {
             this.updated_stats = true;
             this.stats = stats;
             var derived = this.GetDerivedStats();
-            //Can only do this last, but might trigger a recalc.
-            //So freeze display while it happens.
-            var freeze = this.freeze_display;
-            this.freeze_display = true;
-            this.rotor.SetMP(derived.DryMP);
-            this.freeze_display = freeze;
             //Because flaps have cost per MP
             this.stats.cost += this.controlsurfaces.GetFlapCost(derived.DryMP);
             //Used: burnt_out
@@ -12178,6 +12174,7 @@ class Aircraft_HTML extends Display {
         this.warning_cell.innerHTML = warnhtml;
     }
     UpdateDisplay() {
+        this.acft_type.selectedIndex = this.acft.GetAircraftType();
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
         this.passengers.UpdateDisplay();
@@ -12195,7 +12192,6 @@ class Aircraft_HTML extends Display {
         this.weapons.UpdateDisplay();
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
-        this.acft_type.selectedIndex = this.acft.GetAircraftType();
         this.UpdateStats();
         this.UpdateDerived();
     }
