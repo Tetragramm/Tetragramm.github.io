@@ -663,11 +663,11 @@ class EngineBuilder {
         return (3 + alt) * 10 - 1;
     }
     CoolTorque() {
-        if (this.CoolingTable[this.cool_sel].name == "Contrarotary") {
-            return Math.floor(1.0e-6 + this.CalcMass() / 2);
-        }
-        else if (this.IsRotary()) {
+        if (this.CoolingTable[this.cool_sel].name == "Rotary") {
             return this.CalcMass();
+        }
+        else if (this.CoolingTable[this.cool_sel].name == "Contrarotary") {
+            return Math.floor(1.0e-6 + this.CalcMass() / 2);
         }
         return 1;
     }
@@ -3759,20 +3759,20 @@ class Wings extends Part {
             this.skin_list.push({
                 name: elem["name"], flammable: elem["flammable"],
                 stats: new Stats(elem), strainfactor: elem["strainfactor"],
-                dragfactor: elem["dragfactor"], metal: elem["metal"]
+                dragfactor: elem["dragfactor"], metal: elem["metal"],
             });
         }
         this.stagger_list = [];
         for (let elem of js["stagger"]) {
             this.stagger_list.push({
                 name: elem["name"], inline: elem["inline"],
-                wing_count: elem["wing_count"], hstab: elem["hstab"], stats: new Stats(elem)
+                wing_count: elem["wing_count"], hstab: elem["hstab"], stats: new Stats(elem),
             });
         }
         this.deck_list = [];
         for (let elem of js["decks"]) {
             this.deck_list.push({
-                name: elem["name"], limited: elem["limited"], stats: new Stats(elem)
+                name: elem["name"], limited: elem["limited"], stats: new Stats(elem), dragfactor: elem["dragfactor"],
             });
         }
         this.wing_list = [];
@@ -4170,9 +4170,19 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
+        var second_longest_span = 0;
+        var longest_deck = -1;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            if (wspan > longest_span) {
+                longest_deck = w.deck;
+                second_longest_span = longest_span;
+                longest_span = wspan;
+            }
+            else if (wspan == longest_span) {
+                second_longest_span = wspan;
+            }
             longest_span = Math.max(longest_span, wspan);
             if (!have_wing) { //Is first wing
                 have_wing = true;
@@ -11245,7 +11255,7 @@ class Cards {
         context.fillText(this.name, 100, 100, 145);
         context.fillText("" + this.lowest_overspeed, 70, 158, 40);
         context.fillText("" + this.acft_data.full_speed, 126, 158, 40);
-        var combat_speed = this.acft_data.full_speed - (this.acft_data.full_speed % 10) - this.acft_data.turn_bleed;
+        var combat_speed = Math.floor(1.0e-6 + 0.9 * this.acft_data.full_speed - this.acft_data.turn_bleed);
         context.fillText("" + combat_speed, 187, 158, 40);
         context.fillText("" + this.acft_data.full_stall, 245, 158, 40);
         var structure = this.acft_data.toughness + this.acft_data.max_strain;
@@ -12675,11 +12685,11 @@ const init = () => {
     var ep = sp.get("engine");
     var ihash = window.location.hash;
     location.hash = "";
-    loadJSON('/Helicopter/parts.json', (part_resp) => {
+    loadJSON('/PlaneBuilder/parts.json', (part_resp) => {
         // Parse JSON string into object
         let acft_data = window.localStorage.aircraft;
         parts_JSON = JSON.parse(part_resp);
-        loadJSON('/Helicopter/engines.json', (engine_resp) => {
+        loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
             var nameliststr = window.localStorage.getItem("engines_names");
             var namelist = [];
@@ -12694,7 +12704,7 @@ const init = () => {
                     engine_list.set(el["name"], new EngineList(el["name"]));
                 engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
             }
-            loadJSON('/Helicopter/weapons.json', (weapon_resp) => {
+            loadJSON('/PlaneBuilder/weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
                 aircraft_model = new Aircraft(parts_JSON, weapon_json, true);
                 aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
@@ -13319,7 +13329,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({ source: "Mechanical Action", warning: "Rapid-Firing Scatterguns roll +1 Shot Dice." });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
-            this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
+            this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
             this.final_weapon.synched = true;
         }
         else if (this.action_sel == ActionType.GAST) {
@@ -13332,7 +13342,7 @@ class WeaponSystem extends Part {
         }
         if (this.repeating) {
             this.final_weapon.reload = 0;
-            this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
+            this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
         if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL) && this.projectile_sel == ProjectileType.HEATRAY) {
             this.projectile_sel = ProjectileType.BULLETS;
@@ -13345,7 +13355,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Roll Crits +Damage done. On Crit, choose one: start a fire, destroy a radiator/oil component and push Cool Down, or injure crew. Take -2 forward to Eyeball after firing." });
         }
         else if (this.projectile_sel == ProjectileType.GYROJETS) {
-            this.final_weapon.stats.cost += Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost);
+            this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
             this.final_weapon.shells = false;
             this.final_weapon.damage -= 1;
             this.final_weapon.stats.warnings.push({ source: "Gyrojets", warning: "+1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife." });
