@@ -5,7 +5,7 @@
             "abrv": "SMG",
             "era": "WWI",
             "cost": 1,
-            "mass": 0.5,
+            "mass": 1,
             "drag": 0,
             "damage": 1,
             "hits": 4,
