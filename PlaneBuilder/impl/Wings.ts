@@ -11,16 +11,16 @@ class Wings extends Part {
     private mini_wing_list: WingType[];
     private stagger_list: {
         name: string, inline: boolean,
-        wing_count: number, hstab: boolean, stats: Stats
+        wing_count: number, hstab: boolean, stats: Stats,
     }[];
     private skin_list: {
         name: string, flammable: boolean,
         stats: Stats, strainfactor: number,
-        dragfactor: number, metal: boolean
+        dragfactor: number, metal: boolean,
     }[];
     private deck_list: {
         name: string, limited: boolean,
-        stats: Stats
+        stats: Stats, dragfactor: number,
     }[];
     //Actual selections
     private wing_stagger: number;
@@ -36,7 +36,7 @@ class Wings extends Part {
             this.skin_list.push({
                 name: elem["name"], flammable: elem["flammable"],
                 stats: new Stats(elem), strainfactor: elem["strainfactor"],
-                dragfactor: elem["dragfactor"], metal: elem["metal"]
+                dragfactor: elem["dragfactor"], metal: elem["metal"],
             });
         }
 
@@ -44,14 +44,14 @@ class Wings extends Part {
         for (let elem of js["stagger"]) {
             this.stagger_list.push({
                 name: elem["name"], inline: elem["inline"],
-                wing_count: elem["wing_count"], hstab: elem["hstab"], stats: new Stats(elem)
+                wing_count: elem["wing_count"], hstab: elem["hstab"], stats: new Stats(elem),
             });
         }
 
         this.deck_list = [];
         for (let elem of js["decks"]) {
             this.deck_list.push({
-                name: elem["name"], limited: elem["limited"], stats: new Stats(elem)
+                name: elem["name"], limited: elem["limited"], stats: new Stats(elem), dragfactor: elem["dragfactor"],
             });
         }
 
@@ -509,10 +509,19 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
+        var second_longest_span = 0;
+        var longest_deck = -1;
 
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            if (wspan > longest_span) {
+                longest_deck = w.deck;
+                second_longest_span = longest_span;
+                longest_span = wspan;
+            } else if (wspan == longest_span) {
+                second_longest_span = wspan;
+            }
             longest_span = Math.max(longest_span, wspan);
 
             if (!have_wing) { //Is first wing

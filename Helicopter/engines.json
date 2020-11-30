@@ -1,0 +1,2906 @@
+{
+    "lists": [
+        {
+            "name": "Custom",
+            "engines": [
+                {
+                    "name": "Bentley BR.1 150hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 17.1,
+                    "compression": 4.9,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Renault V8 70hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7,
+                    "compression": 4,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.4,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Early-WWI",
+            "engines": [
+                {
+                    "name": "Aeromarine K-6 100hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7.36,
+                    "compression": 4.7,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.2,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Anzani 10 Cylinder 110hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 12,
+                    "compression": 4.85,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Anzani 10 Cylinder 80hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 8.27,
+                    "compression": 4.85,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Anzani 6 cylinder 60hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 6.23,
+                    "compression": 4.5,
+                    "cyl_per_row": 3,
+                    "rows": 2,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Argus As II 120hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 10.353,
+                    "compression": 5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Austro-Daimler 6 120hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 13.8,
+                    "compression": 4.85,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.65,
+                    "material_fudge": 1.1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Benz Bz.III 150hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15.4,
+                    "compression": 4.7,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.75,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Clerget 7Z 95hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 11.88,
+                    "compression": 4.3,
+                    "cyl_per_row": 7,
+                    "rows": 1,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Clerget 9Bf 140hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 17.46,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Gnome 14 Double Lambda 160hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 23.8,
+                    "compression": 3.87,
+                    "cyl_per_row": 7,
+                    "rows": 2,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Gnome 7 Lambda 70hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 11.9,
+                    "compression": 3.75,
+                    "cyl_per_row": 7,
+                    "rows": 1,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Gnome 7 Lambda 80hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 11.9,
+                    "compression": 3.87,
+                    "cyl_per_row": 7,
+                    "rows": 1,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Gnome 7 Omega 50hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 0,
+                    "displacement": 7.7,
+                    "compression": 4,
+                    "cyl_per_row": 7,
+                    "rows": 1,
+                    "RPM_boost": 1.49,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Gnome monosoupape 9B 100hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 16.28,
+                    "compression": 4.5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Le Rhone 9C 90hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 10.89,
+                    "compression": 4.8,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1.1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Mercedes D.II 120hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 9.4,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Mercedes D.III 150hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.3,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "RAF 1a 90hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 9.88,
+                    "compression": 4.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 1.3,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "U.I 100hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 16.28,
+                    "compression": 4.5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "U.I 110hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15.84,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Late-WWI",
+            "engines": [
+                {
+                    "name": "Bentley BR.2 230hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 24.93,
+                    "compression": 5.2,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Clerget 11EB 200hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 21.49,
+                    "compression": 5.1,
+                    "cyl_per_row": 11,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Clerget 16X 420hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 32.53333333,
+                    "compression": 5,
+                    "cyl_per_row": 4,
+                    "rows": 4,
+                    "RPM_boost": 0.87,
+                    "material_fudge": 0.6,
+                    "quality_fudge": 1.5,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Hispano-Suiza 8F 300hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 18.4,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 0.98,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Mercedes D.IIIav 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.64,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Napier Lion II 480hp '18",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 24,
+                    "compression": 5.8,
+                    "cyl_per_row": 3,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Pulsejet PV-15 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 15,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false
+                },
+                {
+                    "name": "Rolls-Royce Eagle III 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 24,
+                    "compression": 4.9,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.75,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rolls-Royce Eagle VIII 360hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 20,
+                    "compression": 6,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.85,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rolls-Royce Hawk 110hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7.41,
+                    "compression": 5.1,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Sunbeam Dyak 100hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 8.800000002,
+                    "compression": 5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Ur.III 150hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 17.6,
+                    "compression": 5,
+                    "cyl_per_row": 11,
+                    "rows": 1,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Mid-WWI",
+            "engines": [
+                {
+                    "name": "Argus As III 190hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15.9,
+                    "compression": 5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.6,
+                    "quality_fudge": 1.5,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Austro-Daimler 6 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Beardmore 160hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 16.635,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bz.IV 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 18.6,
+                    "compression": 4.9,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.75,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Clerget 9B 130hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 16.2,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Cosmos Mercury",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 19.6,
+                    "compression": 5.3,
+                    "cyl_per_row": 7,
+                    "rows": 2,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Curtiss K-12 375hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 18.77,
+                    "compression": 5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.33,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Curtiss OXX-6",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 9.3,
+                    "compression": 4.92,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Fiat A.12 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.6,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Gnome 9B Monosoupape 110hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15.84,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Gnome 9N Monosoupape 160hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15.84,
+                    "compression": 5.1,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Hispano-Suiza 8Aa 150hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 4.8,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Hispano-Suiza 8Ab 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Hispano-Suiza 8B 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Hispano-Suiza 8Bc 220hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Le Rhone 9Ja 110hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 14.4,
+                    "compression": 5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Le Rhone 9Jb 130hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 14.4,
+                    "compression": 5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Liberty L-12 400hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 2,
+                    "displacement": 27,
+                    "compression": 5.4,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.64,
+                    "material_fudge": 0.6,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Lorraine 12Da 400hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 24.4,
+                    "compression": 5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Mercedes D.IIIa 170hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Mercedes D.IIIaü 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.64,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Mercedes D.IVa 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.6,
+                    "compression": 4.94,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rolls-Royce Falcon III 290hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 14.4,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rolls-Royce Hawk 80hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7.41,
+                    "compression": 5.1,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.75,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Sunbeam Arab 208hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.76,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.2,
+                    "quality_fudge": 0.9,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Sunbeam Maori II 260hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 12.27,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.3,
+                    "material_fudge": 1.7,
+                    "quality_fudge": 0.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Ur.II 110hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 14.4,
+                    "compression": 5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Pre-WWI",
+            "engines": [
+                {
+                    "name": "Mercedes E4F 70hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 6.3,
+                    "compression": 4,
+                    "cyl_per_row": 1,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1.3,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Coming Storm",
+            "engines": [
+                {
+                    "name": "Allison V-1710-85 1200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 3,
+                    "displacement": 28,
+                    "compression": 6.65,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 1,
+                    "quality_fudge": 0.8,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bristol Pegasus XVIII 835hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 2,
+                    "displacement": 28.7,
+                    "compression": 6.25,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 1.2,
+                    "quality_fudge": 0.8,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Daimler-Benz 601ARJ 1775hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 3,
+                    "displacement": 33.93,
+                    "compression": 6.9,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.84,
+                    "material_fudge": 0.6,
+                    "quality_fudge": 0.7,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        true,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Roaring 20s",
+            "engines": [
+                {
+                    "name": "Argus As 5 1500hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 2,
+                    "displacement": 94.1,
+                    "compression": 5.6,
+                    "cyl_per_row": 6,
+                    "rows": 4,
+                    "RPM_boost": 0.638,
+                    "material_fudge": 0.4,
+                    "quality_fudge": 1.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bréguet Quadrimoteur Type B H-32 970hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 2,
+                    "displacement": 48.64,
+                    "compression": 5,
+                    "cyl_per_row": 4,
+                    "rows": 8,
+                    "RPM_boost": 1,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Napier Lion II 480hp '20",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 2,
+                    "displacement": 24,
+                    "compression": 5.8,
+                    "cyl_per_row": 3,
+                    "rows": 4,
+                    "RPM_boost": 0.75,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Napier Lion XI 580hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 2,
+                    "displacement": 24,
+                    "compression": 6,
+                    "cyl_per_row": 4,
+                    "rows": 3,
+                    "RPM_boost": 1,
+                    "material_fudge": 1.1,
+                    "quality_fudge": 0.9,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "WWII",
+            "engines": [
+                {
+                    "name": "Klimov M-105PF 1230hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 3,
+                    "displacement": 35.101,
+                    "compression": 7,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.55,
+                    "material_fudge": 0.6,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rolls Royce Merlin 46 930hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 3,
+                    "displacement": 27,
+                    "compression": 5.55,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.98,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 30,
+                    "upgrades": [
+                        false,
+                        true,
+                        true,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "ACDQ",
+            "engines": [
+                {
+                    "name": "2A-Series 4-Cylinder Inline",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 0,
+                    "displacement": 16,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 2,
+                    "RPM_boost": 0.5,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "F-Series 6-Cylinder Inline",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 0,
+                    "displacement": 17,
+                    "compression": 4.3,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.07,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "G-Series 9-Cylinder Rotary Engine",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 0,
+                    "displacement": 16,
+                    "compression": 4.7,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1.04,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Hartmann H.IIc Straight-6 Engine",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 12,
+                    "compression": 4.7,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Hornet R-3 Boxer 6-Cylinder",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 10,
+                    "compression": 5,
+                    "cyl_per_row": 2,
+                    "rows": 3,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Maclean-King Tiger MK.1 V-12 Engine",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 17,
+                    "compression": 5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Ogre-Z Beta V-6",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 0,
+                    "displacement": 11,
+                    "compression": 5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 0.8,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Pulsejet PV-12 (Pioneer)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 0,
+                    "power": 12,
+                    "quality_cost": 1.1,
+                    "quality_rely": 1.1,
+                    "starter": false
+                },
+                {
+                    "name": "Pulsejet PV-20 (Pioneer)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 0,
+                    "power": 20,
+                    "quality_cost": 1.1,
+                    "quality_rely": 1.1,
+                    "starter": false
+                },
+                {
+                    "name": "Pulsejet PV-8 (Pioneer)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 0,
+                    "power": 8,
+                    "quality_cost": 1.1,
+                    "quality_rely": 1.1,
+                    "starter": false
+                },
+                {
+                    "name": "Seguin Σ110 Sigma 7-Cylinder Rotary Engine",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 14,
+                    "compression": 4.5,
+                    "cyl_per_row": 7,
+                    "rows": 1,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.5,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SuperPegasus 7-Cylinder Rotary Engine",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 0,
+                    "displacement": 13.5,
+                    "compression": 5,
+                    "cyl_per_row": 7,
+                    "rows": 1,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "TurboGoblin 8-Cylinder Semi-Radial",
+                    "engine_type": 0,
+                    "type": 4,
+                    "era_sel": 0,
+                    "displacement": 13,
+                    "compression": 5.5,
+                    "cyl_per_row": 8,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Pulsejet",
+            "engines": [
+                {
+                    "name": "Pulsejet PV-15 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 15,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Liquid Radial",
+            "engines": [
+                {
+                    "name": "Gernsback Motor 0005",
+                    "engine_type": 0,
+                    "type": 5,
+                    "era_sel": 1,
+                    "displacement": 12,
+                    "compression": 6,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Liquid Cooled",
+            "engines": [
+                {
+                    "name": "Bertha F1166 120hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 9.4,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bertha F1466 170hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.64,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bertha F1466 Über 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 4.64,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 0.9,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bertha F2000 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.6,
+                    "compression": 4.94,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Brandt Krieger I 370hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 18.77,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Brandt Kurier XVI 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Fleischmann F10 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.71,
+                    "compression": 4.3,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Fleischmann F10ü 300hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 21.71,
+                    "compression": 4.75,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Fokker Fungizidherstellung Typ 247 160hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 14.3,
+                    "compression": 4.8,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.85,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Meier Ochs 2 160hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 16.6,
+                    "compression": 4.5,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.84,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Meier Windhund 70hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 6.3,
+                    "compression": 4,
+                    "cyl_per_row": 1,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1.3,
+                    "quality_fudge": 0.8,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro Arbeiter XVII 170hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.7,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-1140 220hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.4,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-760 150hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7.6,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-760tgl 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 7.6,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.4,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro D-840 160hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 8.4,
+                    "compression": 5.5,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.05,
+                    "material_fudge": 1.5,
+                    "quality_fudge": 0.6,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro Kurier XXI 210hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.7,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Kurier XII 150hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 4.8,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Kurier XX 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Transporter I 300hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 22.08,
+                    "compression": 4.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.15,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Transporter III 320hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 22.08,
+                    "compression": 4.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Transporter V 350hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 22.08,
+                    "compression": 4.75,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schrankhut RD.300V 230hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 19.1,
+                    "compression": 6.4,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.51,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 1,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Wollsteinkraft Verteidiger C 250hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 24,
+                    "compression": 4.9,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.75,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Wollsteinkraft Verteidiger H 360hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 20,
+                    "compression": 6,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.85,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Wollsteinkraft Wagenhals C 290hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 14.4,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Contrarotary",
+            "engines": [
+                {
+                    "name": "Nationales Motorbüro R-1860 160hp",
+                    "engine_type": 0,
+                    "type": 3,
+                    "era_sel": 1,
+                    "displacement": 18.6,
+                    "compression": 6,
+                    "cyl_per_row": 11,
+                    "rows": 1,
+                    "RPM_boost": 0.65,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 1,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Nationales Motorbüro R-1190 110hp",
+                    "engine_type": 0,
+                    "type": 3,
+                    "era_sel": 1,
+                    "displacement": 11.9,
+                    "compression": 6,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.67,
+                    "material_fudge": 1.2,
+                    "quality_fudge": 1,
+                    "compressor_type": 1,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Air Cooled",
+            "engines": [
+                {
+                    "name": "Braun UL 90hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 8.8,
+                    "compression": 4.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1.3,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Braun ULK 110hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 8.8,
+                    "compression": 4.3,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1.2,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Scholz Luchs X 110hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 12.1,
+                    "compression": 4.85,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Semi-Radial",
+            "engines": [
+                {
+                    "name": "SLW Sigvird 180hp",
+                    "engine_type": 0,
+                    "type": 4,
+                    "era_sel": 1,
+                    "displacement": 11,
+                    "compression": 6,
+                    "cyl_per_row": 4,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.3,
+                    "compressor_type": 2,
+                    "compressor_count": 2,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Himmilgard Rotary",
+            "engines": [
+                {
+                    "name": "Modded Z12 110hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 1,
+                    "compressor_count": 1,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Robur Herausforderer 180hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 18,
+                    "compression": 5.5,
+                    "cyl_per_row": 5,
+                    "rows": 2,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 40,
+                    "upgrades": [
+                        false,
+                        false,
+                        true,
+                        true
+                    ]
+                },
+                {
+                    "name": "Rhona Motorbau Z11 80hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 10.9,
+                    "compression": 4.5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rhona Motorbau Z11tgl 100hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 10.9,
+                    "compression": 4.5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 20,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rhona Motorbau Z12 110hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15,
+                    "compression": 5,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber B.IX 130hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 16.2,
+                    "compression": 4.8,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber G.IX 110hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15.84,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber O.VII 50hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 8,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber L.VII 80hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 11.9,
+                    "compression": 3.87,
+                    "cyl_per_row": 7,
+                    "rows": 1,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber TG.IX 130hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 15.84,
+                    "compression": 4.85,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.8,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 20,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Schreiber T.IX 160hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 16.2,
+                    "compression": 4.8,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.95,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 30,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "W.O.1 150hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 17.1,
+                    "compression": 4.9,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "W.O.3 230hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 24.93,
+                    "compression": 5.2,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                }
+            ]
+        }
+    ]
+}

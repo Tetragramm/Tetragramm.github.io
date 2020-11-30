@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Flying Circus Plane Builder</title>
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="page/style.css" />
+	<script src="plane_builder.js" type="text/javascript"></script>
+</head>
+<!-- python -m http.server 8080 -->
+
+<body class="html_body" dir="ltr">
+	<div class="html_outer html_content">
+		<div>
+
+			<h2>
+				<a href="https://opensketch.itch.io/flying-circus">
+					Ohara Airworks</a>
+			</h2>
+
+			<div>
+				<span>
+					<table>
+						<tr>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_save">Save</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_load">Load</label>
+							</th>
+							<th class="btn_th" hidden>
+								<label class="lbl_action" for="acft_load_text2">Load Text</label> <input type="text"
+									id="acft_load_text2" class="skinny" />
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_save_link">Copy As Link</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_save_dash">Save Dashboard</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_save_npc">Save NPC</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" for="acft_reset">Default Aircraft</label>
+							</th>
+						</tr>
+					</table>
+				</span>
+				<br />
+				<br />
+				<div id="Type">
+					<h3>Aircraft Type
+						<h4>
+							<span> <select id="acft_type"></select></span>
+						</h4>
+					</h3>
+				</div>
+				<br />
+				<div id="Era">
+					<h3>Era
+						<h4>
+							<span>(<a href="./Rules/Rules.htm#_yosnw6cvungd"><u>Rules</u></a>)</span>
+						</h4>
+					</h3>
+					<table style="width:100%" id="table_era">
+						<tr>
+							<th>Option</th>
+							<th>Lift Bleed</th>
+						</tr>
+						<tr>
+							<td> <select id="select_era"> </select> </td>
+							<td id="liftbleed_era">
+							</td>
+						</tr>
+
+					</table>
+				</div>
+				<br />
+				<div id="Cockpit">
+					<h3>Cockpits
+						<h4>
+							<span>(<a href="./Rules/Rules.htm#_39ltuebx0622"><u>Rules</u></a>)</span>
+							<br />
+							<span> <label for="num_cockpits">Number of Cockpits:</label> <input type="number"
+									id="num_cockpits" min="1" max="20" value="1" /></span>
+						</h4>
+					</h3>
+					<table style="width:100%" id="table_cockpit">
+						<tr>
+							<th>Option</th>
+							<th>Upgrade</th>
+							<th>Safety Options</th>
+							<th>Gunsights</th>
+							<th>Cockpit Stats</th>
+						</tr>
+					</table>
+				</div>
+				<br />
+				<div id="Passengers">
+					<h3>Passengers
+						<h4><span>(<a href="./Rules/Rules.htm#_xtnklorouzp2"><u>Rules</u></a>)</span></h4>
+					</h3>
+					<table style="width:100%" id="table_passengers">
+						<tr>
+							<th>Number of Seats</th>
+							<th>Number of 1st Class, Beds, or Stretchers</th>
+							<th>Upgrade</th>
+							<th>Mass</th>
+							<th>Required Sections</th>
+						</tr>
+						<tr>
+							<td><input type="number" id="num_seats" min="0" value="0" /></td>
+							<td><input type="number" id="num_beds" min="0" value="0" /></td>
+							<td id="passenger_upg"></td>
+							<td id="passenger_mass"></td>
+							<td id="passenger_req_seq"></td>
+						</tr>
+					</table>
+				</div>
+				<br />
+				<div id="Engines">
+					<h3>Engines
+						<h4>
+							<span>(<a href="./Rules/Rules.htm#_7z3qybtdwc8"><u>Engine Rules</u></a>)</span>
+							<span>(<a href="./Rules/Rules.htm#_q8c5kcydj4u"><u>Upgrade Rules</u></a>)</span>
+							<span>(<a href="./Rules/Rules.htm#_oba9a3riaklv"><u>Cooling Rules</u></a>)</span>
+							<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
+							<span> <label for="num_engines">Number of Engines:</label> <input type="number"
+									id="num_engines" min="0" max="20" value="1" /></span>
+							<span> <label for="num_radiators">Number of Radiators:</label> <input type="number"
+									id="num_radiators" min="1" max="20" value="0" /></span>
+							<span><label for="asymmetric">Asymmetric Plane:</label> <input type="checkbox"
+									id="asymmetric" /></span>
+						</h4>
+					</h3>
+
+					<table style="width:100%" id="table_engine">
+						<tr>
+							<th>Engine Type</th>
+							<th>Options</th>
+							<th>Options 2</th>
+							<th>Engine Stats</th>
+						</tr>
+					</table>
+					<br />
+					<table style="width:100%" id="table_radiator">
+						<tr>
+							<th>Radiator Type</th>
+							<th>Mounting</th>
+							<th>Coolant</th>
+							<th>Radiator Stats</th>
+						</tr>
+					</table>
+				</div>
+			</div>
+			<br />
+			<div id="Frames">
+				<h3>Frames and Covering
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_d5qmsg575qhr"><u>Rules</u></a>)</span>
+						<span><label for="flying_wing">Flying Wing:</label> <input type="checkbox"
+								id="flying_wing" /></span>
+					</h4>
+				</h3>
+				<table id="table_frames">
+					<tr>
+						<th>Frame Type<br /><select id="all_frame"></select></th>
+						<th>Skin Type<br /><select id="all_skin"></select></th>
+						<th>Frame Options</th>
+						<th>Frame Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div id="Tail">
+				<h3>Tail
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_acy0fm3uj2ja"><u>Rules</u></a>)</span><br />
+						<span> <label for="tail_type">Tail Length:</label> <select id="tail_type"></select></span>
+						<span> <label for="tail_farman">Farman Tail:</label> <input type="checkbox"
+								id="tail_farman" /></span>
+						<span> <label for="tail_boom">Boom Tail:</label> <input type="checkbox" id="tail_boom" /></span>
+					</h4>
+				</h3>
+			</div>
+			<br />
+			<div id="Wings">
+				<h3>Wings
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
+						<br />
+						<span> <label for="wing_stagger">Wing Stagger:</label> <select
+								id="wing_stagger"></select></span>
+						<span> <label for="wing_closed">Closed Wing:</label> <input type="checkbox"
+								id="wing_closed" /></span>
+						<span> <label for="wing_swept">Swept Wings:</label> <input type="checkbox"
+								id="wing_swept" /></span>
+					</h4>
+				</h3>
+				<table id="wing_table">
+					<tr>
+						<th>Wing Type</th>
+						<th>Wing Options</th>
+						<th>Wing Stats</th>
+					</tr>
+				</table>
+			</div><br />
+			<div id="Rotors" hidden="true">
+				<h3>Rotors
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
+					</h4>
+				</h3>
+				<table id="rotor_table">
+				</table>
+			</div>
+			<br />
+			<div id="Stabilizers">
+				<h3>Stabilizers
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_yu8eo6k9uu3s"><u>Rules</u></a>)</span>
+					</h4>
+				</h3>
+				<table id="stab_table">
+					<tr>
+						<th>Horizontal Stabilizers</th>
+						<th>Vertical Stabilizers</th>
+						<th>Stabilizer Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div id="ControlSurfaces">
+				<h3>Control Surfaces
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_d531g9ayebhk"><u>Rules</u></a>)</span>
+					</h4>
+				</h3>
+				<table id="tbl_control_surfaces">
+					<tr>
+						<th>Control Surfaces</th>
+						<th>Drag Inducers</th>
+						<th>Control Surface Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div id="Reinforcements">
+				<h3>Reinforcements
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_3utlenwdo4m2"><u>Rules</u></a>)</span>
+					</h4>
+				</h3>
+				<table id="tbl_reinforcements">
+					<tr>
+						<th>External Reinforcements</th>
+						<th>Internal Reinforcements</th>
+						<th>Reinforcement Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div id="Weapons">
+				<h3>Weapons
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_jjg8jcon1xb4"><u>Rules</u></a>)</span> <br />
+						<span> <label for="num_wsets">Number of Weapon Sets:</label> <input type="number" id="num_wsets"
+								min="0" max="20" value="1" /></span>
+						<span> <label for="num_wbraces">Number of Weapon Braces:</label> <input type="number"
+								id="num_wbraces" min="0" max="99" step="3" value="1" /></span>
+					</h4>
+				</h3>
+				<table style="width:100%" id="table_weapons">
+					<tr>
+						<th>Weapon Set</th>
+						<th>Weapons</th>
+						<th>Weapon Stats</th>
+					</tr>
+				</table>
+				</h3>
+			</div>
+			<br />
+			<div id="Load">
+				<h3>Load
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_t1lb2awb6fka"><u>Rules</u></a>)</span>
+					</h4>
+				</h3>
+				<table id="tbl_load">
+					<tr>
+						<th>Fuel</th>
+						<th>Munitions</th>
+						<th>Cargo and Passengers</th>
+						<th>Load Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div id="Landing_Gear">
+				<h3>Landing Gear
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_b9y175l7zqcl"><u>Rules</u></a>)</span>
+					</h4>
+				</h3>
+				<table id="tbl_gear">
+					<tr>
+						<th>Landing Gear</th>
+						<th>Extras</th>
+						<th>Gear Stats</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div id="Accessories">
+				<h3>Additional Parts
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_8zv4bba6tuwb"><u>Rules</u></a>)</span>
+					</h4>
+				</h3>
+				<table id="tbl_accessories">
+					<tr>
+						<th>Armour Coverage</th>
+						<th>Climate</th>
+						<th>Visibility</th>
+						<th>Additional Part Stats</th>
+					</tr>
+					<tr>
+						<th>Information</th>
+						<th>Electrical</th>
+						<th>Control</th>
+					</tr>
+				</table>
+			</div>
+			<br />
+			<div id="Propeller">
+				<h3>Propeller
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_fuzb5rpxyxfm"><u>Rules</u></a>)</span> <br />
+						<span> <label for="propeller_pitch">Propeller Pitch:</label> <select
+								id="propeller_pitch"></select></span>
+						<span><label for="propeller_variable">Manually Variable Propeller:</label> <input
+								type="checkbox" id="propeller_variable" /></span>
+					</h4>
+				</h3>
+			</div>
+			<br />
+			<div id="Optimization">
+				<h3>Optimizations
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_9966tgispmti"><u>Rules</u></a>)</span>
+						<br /></h4>
+				</h3>
+				<span> <label for="num_opt">Number of Free Optimizations:</label> <input type="number" id="num_opt"
+						min="0" max="20" value="0" /></span><br />
+				<table id="tbl_optimization">
+					<tr>
+						<th>Negative</th>
+						<th>Effect</th>
+						<th>Positive</th>
+						<th>Optimization Stats</th>
+					</tr>
+				</table>
+			</div><br />
+			<div id="Used Planes">
+				<h3>Used Plane
+					<h4>
+						<span>(<a href="./Rules/Rules.htm#_used"><u>Rules</u></a>)</span>
+						<br /></h4>
+				</h3>
+				<span> <label for="is_used">Is Aircraft Used? </label> <input type="checkbox"
+						id="is_used" /></span><br />
+				<table hidden id="tbl_used">
+					<tr>
+						<th>Effect</th>
+						<th>Description</th>
+						<th>Penalties (+) <br /> Benefits (-)</th>
+					</tr>
+				</table>
+			</div><br />
+			<!-- <div id="Stats">
+				<h3>Manual Alteration
+					<br />
+				</h3>
+				<table id="tbl_alter">
+				</table>
+			</div>
+			<br /> -->
+			<div id="Stats">
+				<h3>Total Sum of Stats
+					<br />
+				</h3>
+				<table id="tbl_stats">
+				</table>
+			</div>
+			<br />
+			<div id="Flight">
+				<h3>Aircraft Derived Statistics
+					<span>(<a href="./Rules/Rules.htm#_x2j3wmcf82xy"><u>Rules</u></a>)</span>
+					<br />
+				</h3>
+				<table id="tbl_derived">
+				</table>
+			</div>
+		</div>
+		<br />
+		<br />
+		<span>
+			<table>
+				<tr>
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_save">Save</label><button hidden="true"
+							id="acft_save">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_load">Load</label> <input hidden="true" type="file"
+							id="acft_load" />
+					</th>
+					<th class="btn_th" hidden>
+						<label class="lbl_action" for="acft_load_text">Load Text</label> <input type="text"
+							id="acft_load_text" class="skinny" />
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_save_link">Copy As Link</label><button hidden="true"
+							id="acft_save_link">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_save_dash">Save Dashboard</label><button hidden="true"
+							id="acft_save_dash">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_save_npc">Save NPC</label><button hidden="true"
+							id="acft_save_npc">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" for="acft_reset">Default Aircraft</label><button hidden="true"
+							id="acft_reset">Default Aircraft</button>
+					</th>
+				</tr>
+			</table>
+		</span>
+		<img id="dash_img" hidden="true"></img>
+		<img id="weap_img" hidden="true"></img>
+		<img id="eng_img" hidden="true"></img>
+		<img id="rad_img" hidden="true"></img>
+		<img id="npc_img" hidden="true"></img>
+	</div>
+
+
+	<!-- python -m http.server 8080 -->
+	<footer class="html_outer html_footer" dir="ltr">
+		<div>
+			© Tetragramm
+		</div>
+	</footer>
+</body>
+
+</html>

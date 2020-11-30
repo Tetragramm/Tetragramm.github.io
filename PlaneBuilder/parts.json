@@ -55,7 +55,7 @@
                 "escape": 2,
                 "cost": 0,
                 "flightstress": 0,
-                "visibility": 0
+                "visibility": 1
             },
             {
                 "name": "Windscreen",
@@ -65,7 +65,7 @@
                 "escape": 2,
                 "cost": 1,
                 "flightstress": 0,
-                "visibility": 0
+                "visibility": 1
             },
             {
                 "name": "Sealed",
@@ -801,16 +801,21 @@
                 "pitchstab": 3,
                 "maxstrain": -10,
                 "liftbleed": -2,
+                "visibility": -1,
+                "dragfactor": 1,
                 "limited": false
             },
             {
                 "name": "Shoulder",
                 "pitchstab": 2,
                 "liftbleed": -1,
+                "visibility": -1,
+                "dragfactor": 1,
                 "limited": true
             },
             {
                 "name": "Mid",
+                "dragfactor": 0.9,
                 "limited": true
             },
             {
@@ -818,6 +823,7 @@
                 "pitchstab": -2,
                 "crashsafety": -1,
                 "liftbleed": -1,
+                "dragfactor": 1,
                 "limited": true
             },
             {
@@ -826,7 +832,32 @@
                 "maxstrain": -10,
                 "crashsafety": -1,
                 "liftbleed": -2,
+                "dragfactor": 1,
                 "limited": false
+            }
+        ],
+        "largest": [
+            {
+                "name": "Parasol",
+                "latstab": 1,
+                "control": -1
+            },
+            {
+                "name": "Shoulder",
+                "control": -1
+            },
+            {
+                "name": "Mid"
+            },
+            {
+                "name": "Low",
+                "latstab": -1,
+                "control": 2
+            },
+            {
+                "name": "Gear",
+                "latstab": -1,
+                "control": 3
             }
         ],
         "surface": [
