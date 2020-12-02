@@ -298,7 +298,6 @@ class Aircraft {
 
         //If there are wings...
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.wings.SetNumFrames(this.frames.GetNumFrames());
             stats = stats.Add(this.wings.PartStats());
             this.rotor.SetWingArea(stats.wingarea);
         }
@@ -351,6 +350,9 @@ class Aircraft {
         this.accessories.SetVitalParts(this.VitalComponentList().length);
         stats = stats.Add(this.accessories.PartStats());
 
+        //Treated Paper needs to apply near to last
+        this.wings.SetAircraftMass(stats.mass);
+        stats.mass += this.wings.GetPaperMass();
         //Because treated paper brings mass down.
         stats.mass = Math.max(1, stats.mass);
 

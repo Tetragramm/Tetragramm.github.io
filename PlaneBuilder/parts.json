@@ -1,5 +1,5 @@
 {
-    "version": "11.1",
+    "version": "11.0",
     "era": {
         "options": [
             {
@@ -55,7 +55,7 @@
                 "escape": 2,
                 "cost": 0,
                 "flightstress": 0,
-                "visibility": 1
+                "visibility": 0
             },
             {
                 "name": "Windscreen",
@@ -65,7 +65,7 @@
                 "escape": 2,
                 "cost": 1,
                 "flightstress": 0,
-                "visibility": 1
+                "visibility": 0
             },
             {
                 "name": "Sealed",
@@ -233,8 +233,7 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "fuselage",
-                "powerfactor": 0.9,
-                "helicopter": false
+                "powerfactor": 0.9
             },
             {
                 "name": "Center-Mounted Tractor",
@@ -247,8 +246,7 @@
                 "dragfactor": 0,
                 "location": "fuselage",
                 "reqED": true,
-                "powerfactor": 0.9,
-                "helicopter": true
+                "powerfactor": 0.9
             },
             {
                 "name": "Rear-Mounted Pusher",
@@ -260,8 +258,7 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "fuselage",
-                "powerfactor": 0.9,
-                "helicopter": false
+                "powerfactor": 0.9
             },
             {
                 "name": "Center-Mounted Pusher",
@@ -274,8 +271,7 @@
                 "dragfactor": 0,
                 "location": "fuselage",
                 "reqTail": true,
-                "powerfactor": 0.9,
-                "helicopter": false
+                "powerfactor": 0.9
             },
             {
                 "name": "Pod",
@@ -287,8 +283,7 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "pod",
-                "powerfactor": 0.9,
-                "helicopter": true
+                "powerfactor": 0.9
             },
             {
                 "name": "Nacelle (Inside)",
@@ -300,8 +295,7 @@
                 "strainfactor": 0.5,
                 "dragfactor": 0,
                 "location": "wing",
-                "powerfactor": 0.8,
-                "helicopter": false
+                "powerfactor": 0.8
             },
             {
                 "name": "Nacelle (Offset)",
@@ -313,8 +307,7 @@
                 "strainfactor": 0,
                 "dragfactor": 1,
                 "location": "wing",
-                "powerfactor": 0.8,
-                "helicopter": false
+                "powerfactor": 0.8
             },
             {
                 "name": "Channel Tractor",
@@ -326,8 +319,7 @@
                 "strainfactor": 1,
                 "dragfactor": 0,
                 "location": "wing",
-                "powerfactor": 0.9,
-                "helicopter": false
+                "powerfactor": 0.9
             }
         ],
         "radiator-type": [
@@ -801,21 +793,16 @@
                 "pitchstab": 3,
                 "maxstrain": -10,
                 "liftbleed": -2,
-                "visibility": -1,
-                "dragfactor": 1,
                 "limited": false
             },
             {
                 "name": "Shoulder",
                 "pitchstab": 2,
                 "liftbleed": -1,
-                "visibility": -1,
-                "dragfactor": 1,
                 "limited": true
             },
             {
                 "name": "Mid",
-                "dragfactor": 0.9,
                 "limited": true
             },
             {
@@ -823,7 +810,6 @@
                 "pitchstab": -2,
                 "crashsafety": -1,
                 "liftbleed": -1,
-                "dragfactor": 1,
                 "limited": true
             },
             {
@@ -832,32 +818,7 @@
                 "maxstrain": -10,
                 "crashsafety": -1,
                 "liftbleed": -2,
-                "dragfactor": 1,
                 "limited": false
-            }
-        ],
-        "largest": [
-            {
-                "name": "Parasol",
-                "latstab": 1,
-                "control": -1
-            },
-            {
-                "name": "Shoulder",
-                "control": -1
-            },
-            {
-                "name": "Mid"
-            },
-            {
-                "name": "Low",
-                "latstab": -1,
-                "control": 2
-            },
-            {
-                "name": "Gear",
-                "latstab": -1,
-                "control": 3
             }
         ],
         "surface": [

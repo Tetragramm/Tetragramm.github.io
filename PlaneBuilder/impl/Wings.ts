@@ -1,9 +1,14 @@
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 
-type WingType = {
+type WingType_OLD = {
     surface: number, area: number, span: number,
     dihedral: number, anhedral: number, deck: number
+};
+type WingType = {
+    surface: number, area: number, span: number,
+    dihedral: number, anhedral: number,
+    gull: boolean, deck: number
 };
 class Wings extends Part {
     //Possible selections
@@ -22,11 +27,12 @@ class Wings extends Part {
         name: string, limited: boolean,
         stats: Stats, dragfactor: number,
     }[];
+    private long_list: Stats[];
     //Actual selections
     private wing_stagger: number;
     private is_swept: boolean;
     private is_closed: boolean;
-    private num_frames: number;
+    private plane_mass: number;
 
     constructor(js: JSON) {
         super();
@@ -55,6 +61,11 @@ class Wings extends Part {
             });
         }
 
+        this.long_list = [];
+        for (let elem of js["largest"]) {
+            this.long_list.push(new Stats(elem));
+        }
+
         this.wing_list = [];
         this.mini_wing_list = [];
 
@@ -74,11 +85,29 @@ class Wings extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
-        this.wing_list = js["wing_list"];
-        this.mini_wing_list = js["mini_wing_list"];
+        if (json_version > 11.15) {
+            this.wing_list = js["wing_list"];
+            this.mini_wing_list = js["mini_wing_list"];
+        } else {
+            var wl = js["wing_list"];
+            this.wing_list = this.OldtoNew(wl);
+            var mwl = js["mini_wing_list"];
+            this.mini_wing_list = this.OldtoNew(mwl);
+        }
         this.wing_stagger = js["wing_stagger"];
         this.is_swept = js["is_swept"];
         this.is_closed = js["is_closed"];
+    }
+
+    private OldtoNew(wtl: WingType_OLD[]): WingType[] {
+        var list = [] as WingType[];
+        for (let wt of wtl) {
+            list.push({
+                surface: wt.surface, area: wt.area, span: wt.span, anhedral: wt.anhedral,
+                dihedral: wt.dihedral, gull: (wt.anhedral > 0 || wt.dihedral > 0), deck: wt.deck
+            });
+        }
+        return list;
     }
 
     public serialize(s: Serialize) {
@@ -90,6 +119,7 @@ class Wings extends Part {
             s.PushNum(w.span);
             s.PushNum(w.dihedral);
             s.PushNum(w.anhedral);
+            s.PushBool(w.gull);
             s.PushNum(w.deck);
         }
         s.PushNum(this.mini_wing_list.length);
@@ -100,6 +130,7 @@ class Wings extends Part {
             s.PushNum(w.span);
             s.PushNum(w.dihedral);
             s.PushNum(w.anhedral);
+            s.PushBool(w.gull);
             s.PushNum(w.deck);
         }
         s.PushNum(this.wing_stagger);
@@ -111,24 +142,34 @@ class Wings extends Part {
         var wlen = d.GetNum();
         this.wing_list = [];
         for (let i = 0; i < wlen; i++) {
-            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            let wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
             wing.surface = d.GetNum();
             wing.area = d.GetNum();
             wing.span = d.GetNum();
-            wing.dihedral = d.GetNum();
-            wing.anhedral = d.GetNum();
+            if (d.version > 11.15) {
+                wing.gull = d.GetBool();
+            } else {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
+                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+            }
             wing.deck = d.GetNum();
             this.wing_list.push(wing);
         }
         var mlen = d.GetNum();
         this.mini_wing_list = [];
         for (let i = 0; i < mlen; i++) {
-            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            let wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
             wing.surface = d.GetNum();
             wing.area = d.GetNum();
             wing.span = d.GetNum();
-            wing.dihedral = d.GetNum();
-            wing.anhedral = d.GetNum();
+            if (d.version > 11.15) {
+                wing.gull = d.GetBool();
+            } else {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
+                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+            }
             wing.deck = d.GetNum();
             this.mini_wing_list.push(wing);
         }
@@ -317,23 +358,10 @@ class Wings extends Part {
         if (w.span != w.span)
             w.span = 1;
         w.span = Math.floor(1.0e-6 + w.span);
-        if (w.dihedral != w.dihedral)
-            w.dihedral = 0;
-        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
-        if (w.anhedral != w.anhedral)
-            w.anhedral = 0;
-        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
 
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 3);
             w.span = Math.max(w.span, 1);
-            while (w.anhedral + w.dihedral > w.span - 1) {
-                if (w.anhedral > w.dihedral) {
-                    w.anhedral--;
-                } else {
-                    w.dihedral--;
-                }
-            }
 
             if (this.CanAddFullWing(w.deck))
                 this.wing_list.splice(idx, 0, w);
@@ -357,19 +385,11 @@ class Wings extends Part {
         if (w.span != w.span)
             w.span = 1;
         w.span = Math.floor(1.0e-6 + w.span);
-        if (w.dihedral != w.dihedral)
-            w.dihedral = 0;
-        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
-        if (w.anhedral != w.anhedral)
-            w.anhedral = 0;
-        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
 
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 1);
             w.area = Math.min(w.area, 2);
             w.span = Math.max(w.span, 1);
-            w.dihedral = 0;
-            w.anhedral = 0;
 
             if (this.CanAddMiniWing(w.deck))
                 this.mini_wing_list.splice(idx, 0, w);
@@ -390,10 +410,6 @@ class Wings extends Part {
         return false;
     }
 
-    public SetNumFrames(num: number) {
-        this.num_frames = num;
-    }
-
     public NeedHStab() {
         return this.stagger_list[this.wing_stagger].hstab;
     }
@@ -406,12 +422,12 @@ class Wings extends Part {
         var longest_span = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             longest_span = Math.max(longest_span, wspan);
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             longest_span = Math.max(longest_span, wspan);
         }
         return longest_span;
@@ -497,6 +513,60 @@ class Wings extends Part {
         return false;
     }
 
+    public SetAircraftMass(plane_mass: number) {
+        this.plane_mass = plane_mass;
+    }
+
+    public GetPaperMass() {
+        var paper = 0;
+        for (let w of this.wing_list) {
+            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats.Round();
+            if (wStats.mass < 0)
+                paper += wStats.mass;
+        }
+        for (let w of this.mini_wing_list) {
+            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats.Round();
+            if (wStats.mass < 0)
+                paper += wStats.mass;
+        }
+
+        return Math.max(-Math.floor(1.0e-6 + 0.25 * this.plane_mass), paper);
+    }
+
+    public GetIsSesquiplane(): { is: boolean, deck: number, super_small: boolean } {
+        if (this.GetMonoplane() || this.GetTandem()) {
+            return { is: false, deck: -1, super_small: false };
+        }
+
+        var biggest_area = 0;
+        var biggest_deck = -1;
+        var biggest_span = 0;
+        var smallest_area = 1e100;
+        var smallest_span = 0;
+
+        for (let w of this.wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            if (w.area > biggest_area) {
+                biggest_area = w.area;
+                biggest_deck = w.deck;
+                biggest_span = w.span;
+            }
+            if (smallest_area > w.area) {
+                smallest_area = w.area;
+                smallest_span = w.span;
+            }
+        }
+
+        var is = Math.floor(1.0e-6 + 0.5 * biggest_area) > smallest_area;
+        if (is) {
+            var ss = Math.floor(1.0e-6 + 0.75 * biggest_span) > smallest_span;
+            return { is: is, deck: biggest_deck, super_small: ss };
+        }
+        return { is: false, deck: -1, super_small: false };
+    }
+
     public PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -509,20 +579,18 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
-        var second_longest_span = 0;
-        var longest_deck = -1;
+        var biggest_area = 0;
+        var biggest_deck = -1;
+        var smallest_area = 1e100;
 
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
-            if (wspan > longest_span) {
-                longest_deck = w.deck;
-                second_longest_span = longest_span;
-                longest_span = wspan;
-            } else if (wspan == longest_span) {
-                second_longest_span = wspan;
+            if (w.area > biggest_area) {
+                biggest_area = w.area;
+                biggest_deck = w.deck;
             }
-            longest_span = Math.max(longest_span, wspan);
+            smallest_area = Math.min(smallest_area, w.area);
+            longest_span = Math.max(longest_span, w.span);
 
             if (!have_wing) { //Is first wing
                 have_wing = true;
@@ -542,12 +610,9 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
+            //TODO: GULL DRAG
             wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (w.span * w.span));
-            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
-
-            //stability from -hedral
-            wStats.latstab += w.dihedral - w.anhedral;
-            wStats.liftbleed += w.dihedral + w.anhedral;
+            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor * this.deck_list[w.deck].dragfactor);
 
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
@@ -559,12 +624,13 @@ class Wings extends Part {
             stats = stats.Add(this.deck_list[w.deck].stats);
 
             wStats.Round();
+            if (wStats.mass < 0) //Treated paper is applied later
+                wStats.mass = 0;
             stats = stats.Add(wStats);
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
-            longest_span = Math.max(longest_span, wspan);
+            longest_span = Math.max(longest_span, w.span);
 
             stats.control += 1;
             if (!have_mini_wing) { //Is first miniature wing
@@ -584,13 +650,33 @@ class Wings extends Part {
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
             wStats.Round();
+            if (wStats.mass < 0) //Treated paper is applied later
+                wStats.mass = 0;
             stats = stats.Add(wStats);
         }
 
         //Longest wing effects
         stats.control += 8 - longest_span;
         stats.latstab += Math.min(0, longest_span - 8);
-        //stats.latstab += Math.max(0, Math.floor(1.0e-6 + longest_span / this.num_frames) - 1);
+
+        //Sesquiplanes!
+        var sesp = this.GetIsSesquiplane();
+        if (sesp.is) {
+            stats = stats.Add(this.long_list[sesp.deck]);
+            stats.liftbleed -= 2;
+            stats.control += 2;
+        }
+
+        //Inline Wing Shadowing
+        if (this.stagger_list[this.wing_stagger].inline) {
+            for (let count of deck_count) {
+                if (count > 1) {
+                    stats.liftbleed += (count - 1) * 3;
+                }
+            }
+        }
+
+        //TODO: Gull resolution and effects
 
         //Wing Sweep effects
         if (this.is_swept) {

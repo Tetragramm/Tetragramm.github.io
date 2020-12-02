@@ -1,5 +1,5 @@
 {
-    "version": "11.1",
+    "version": "11.2",
     "era": {
         "options": [
             {
@@ -203,7 +203,7 @@
                 "visibility": -1,
                 "attack": 0,
                 "cost": 3,
-                "warning": "+2 to attack if you Drew a Bead"
+                "warning": "+2 to Open Fire if you Drew a Bead"
             },
             {
                 "name": "Illuminated Reflex Sight",
@@ -216,7 +216,7 @@
                 "visibility": -1,
                 "attack": 2,
                 "cost": 12,
-                "warning": "+2 to attack if you Drew a Bead"
+                "warning": "+2 to Open Fire if you Drew a Bead"
             }
         ]
     },
