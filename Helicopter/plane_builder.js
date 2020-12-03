@@ -3855,6 +3855,8 @@ class Wings extends Part {
             wing.area = d.GetNum();
             wing.span = d.GetNum();
             if (d.version > 11.15) {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
                 wing.gull = d.GetBool();
             }
             else {
@@ -3873,6 +3875,8 @@ class Wings extends Part {
             wing.area = d.GetNum();
             wing.span = d.GetNum();
             if (d.version > 11.15) {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
                 wing.gull = d.GetBool();
             }
             else {
@@ -12917,11 +12921,11 @@ const init = () => {
     var ep = sp.get("engine");
     var ihash = window.location.hash;
     location.hash = "";
-    loadJSON('/Helicopter/parts.json', (part_resp) => {
+    loadJSON(window.location.href + 'parts.json', (part_resp) => {
         // Parse JSON string into object
         let acft_data = window.localStorage.aircraft;
         parts_JSON = JSON.parse(part_resp);
-        loadJSON('/Helicopter/engines.json', (engine_resp) => {
+        loadJSON(window.location.href + 'engines.json', (engine_resp) => {
             engine_json = JSON.parse(engine_resp);
             var nameliststr = window.localStorage.getItem("engines_names");
             var namelist = [];
@@ -12936,7 +12940,7 @@ const init = () => {
                     engine_list.set(el["name"], new EngineList(el["name"]));
                 engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
             }
-            loadJSON('/Helicopter/weapons.json', (weapon_resp) => {
+            loadJSON(window.location.href + 'weapons.json', (weapon_resp) => {
                 weapon_json = JSON.parse(weapon_resp);
                 aircraft_model = new Aircraft(parts_JSON, weapon_json, true);
                 aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);

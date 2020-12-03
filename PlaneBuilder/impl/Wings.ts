@@ -147,6 +147,8 @@ class Wings extends Part {
             wing.area = d.GetNum();
             wing.span = d.GetNum();
             if (d.version > 11.15) {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
                 wing.gull = d.GetBool();
             } else {
                 wing.dihedral = d.GetNum();
@@ -164,6 +166,8 @@ class Wings extends Part {
             wing.area = d.GetNum();
             wing.span = d.GetNum();
             if (d.version > 11.15) {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
                 wing.gull = d.GetBool();
             } else {
                 wing.dihedral = d.GetNum();
