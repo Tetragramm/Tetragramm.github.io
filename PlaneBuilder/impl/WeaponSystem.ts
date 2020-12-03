@@ -616,6 +616,16 @@ class WeaponSystem extends Part {
         return this.final_weapon.reload;
     }
 
+    public GetWingWeight() {
+        var sum = 0;
+        for (let w of this.weapons) {
+            if (w.GetWing()) {
+                sum += w.PartStats().mass;
+            }
+        }
+        return sum;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {

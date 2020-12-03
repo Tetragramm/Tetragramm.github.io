@@ -339,6 +339,14 @@ class Weapons extends Part {
         }
     }
 
+    private GetWingWeight() {
+        var sum = 0;
+        for (let w of this.weapon_sets) {
+            sum += w.GetWingWeight();
+        }
+        return sum;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)
@@ -416,6 +424,10 @@ class Weapons extends Part {
 
         //Weapon braces cost 1/3.  Should always be multiple of 3
         stats.cost += this.brace_count / 3;
+
+        //Wing-tip weight: -1 control for every 5 mass
+        stats.control -= Math.floor(1.0e-6 + this.GetWingWeight() / 5);
+
         return stats;
     }
 }

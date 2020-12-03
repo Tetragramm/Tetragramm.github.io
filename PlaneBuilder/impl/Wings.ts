@@ -259,9 +259,16 @@ class Wings extends Part {
         // if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
         //     return false;
 
-        var full_count = this.DeckCountFull();
-        if (!this.stagger_list[this.wing_stagger].inline && full_count[deck] == 1 && this.deck_list[deck].limited)
-            return false
+        if (!this.stagger_list[this.wing_stagger].inline) {//If not tandem...
+            //No shoulder with gull parasol
+            if (deck == 1 && this.HasPolishWing())
+                return false;
+
+            //Limited numbers of each deck
+            var full_count = this.DeckCountFull();
+            if (full_count[deck] == 1 && this.deck_list[deck].limited)
+                return false
+        }
 
         var mini_count = this.DeckCountMini();
         if (mini_count[deck] != 0)
@@ -398,6 +405,22 @@ class Wings extends Part {
         this.CalculateStats();
     }
 
+    private HasShoulder() {
+        for (let w of this.wing_list) {
+            if (w.deck == 1)//If we have shoulder...
+                return true;
+        }
+        return false;
+    }
+
+    public CanGull(idx: number) {
+        if (this.wing_list[idx].deck == 0) {
+            if (this.HasShoulder())
+                return false;
+        }
+        return true;
+    }
+
     public IsFlammable() {
         for (let w of this.wing_list) {
             if (this.skin_list[w.surface].flammable)
@@ -477,8 +500,12 @@ class Wings extends Part {
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span;
+            let warea = w.area;
 
-            var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
+            if (w.gull)
+                warea = Math.floor(1.0e-6 + 1.1 * warea);
+
+            var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
@@ -501,7 +528,7 @@ class Wings extends Part {
         return drag;
     }
 
-    public GetIsFlammable() {
+    public GetIsFlammable(): boolean {
         for (let s of this.wing_list) {
             if (this.skin_list[s.surface].flammable)
                 return true;
@@ -517,7 +544,7 @@ class Wings extends Part {
         this.plane_mass = plane_mass;
     }
 
-    public GetPaperMass() {
+    public GetPaperMass(): number {
         var paper = 0;
         for (let w of this.wing_list) {
             var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
@@ -567,6 +594,25 @@ class Wings extends Part {
         return { is: false, deck: -1, super_small: false };
     }
 
+    private HasPolishWing(): boolean {
+        for (let w of this.wing_list) {
+            if (w.deck == 0 && w.gull == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public HasInvertedGull(): number {
+        var ret = -1;
+        for (let w of this.wing_list) {
+            if (w.gull) {
+                ret = Math.max(ret, w.deck);
+            }
+        }
+        return ret;
+    }
+
     public PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -610,8 +656,14 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            //TODO: GULL DRAG
-            wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (w.span * w.span));
+
+            //Gull Drag modifies wing area
+            let warea = w.area;
+            if (w.gull)
+                warea = Math.floor(1.0e-6 + 1.1 * warea);
+
+            var wdrag = Math.max(1, 6 * warea * warea / (w.span * w.span));
+            wStats.drag = wStats.drag + wdrag;
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor * this.deck_list[w.deck].dragfactor);
 
             //Inline wings
@@ -676,7 +728,27 @@ class Wings extends Part {
             }
         }
 
-        //TODO: Gull resolution and effects
+        //Gull wing effects (wing bits, drag is already applied)
+        if (this.HasPolishWing()) {
+            stats.visibility += 1;
+            stats.maxstrain += 10;
+        }
+        switch (this.HasInvertedGull()) {
+            case 1: //Shoulder Wing
+                //Only affects landing gear
+                break;
+            case 2: //Mid wing
+            case 3: //Low wing (same as Mid)
+                //Only affects landing gear and bomb capacity
+                break;
+            case 4: //Gear wing
+                stats.maxstrain += 10;
+                stats.crashsafety += 1;
+                //Also affects landing gear and bomb capacity
+                break;
+            default:
+            //NOTHING...
+        }
 
         //Wing Sweep effects
         if (this.is_swept) {

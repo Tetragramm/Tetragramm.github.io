@@ -1205,7 +1205,8 @@
                 "tension": 30,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "N-Strut",
@@ -1216,7 +1217,8 @@
                 "tension": 20,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "V-Strut",
@@ -1227,7 +1229,8 @@
                 "tension": 30,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "I-Strut",
@@ -1237,7 +1240,8 @@
                 "tension": 15,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "W-Strut",
@@ -1247,7 +1251,8 @@
                 "tension": 0,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Single Strut",
@@ -1257,7 +1262,8 @@
                 "tension": 0,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Star Strut",
@@ -1268,7 +1274,8 @@
                 "tension": 0,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Wing Truss",
@@ -1276,13 +1283,15 @@
                 "tension": 40,
                 "cost": 1,
                 "config": false,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Wire Root",
                 "tension": 10,
                 "config": true,
-                "first": false
+                "first": false,
+                "small_sqp": true
             }
         ],
         "external_steel": [
@@ -1295,7 +1304,8 @@
                 "tension": 15,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel N-Strut",
@@ -1306,7 +1316,8 @@
                 "tension": 10,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel V-Strut",
@@ -1317,7 +1328,8 @@
                 "tension": 15,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel I-Strut",
@@ -1327,7 +1339,8 @@
                 "tension": 7,
                 "cost": 4,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel W-Strut",
@@ -1337,7 +1350,8 @@
                 "tension": 0,
                 "cost": 4,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel Single Strut",
@@ -1347,7 +1361,8 @@
                 "tension": 0,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel Star Strut",
@@ -1358,7 +1373,8 @@
                 "tension": 0,
                 "cost": 4,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel Wing Truss",
@@ -1366,13 +1382,15 @@
                 "tension": 20,
                 "cost": 2,
                 "config": false,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel Wire Root",
                 "tension": 10,
                 "config": true,
-                "first": false
+                "first": false,
+                "small_sqp": true
             }
         ],
         "cabane": [
@@ -1575,6 +1593,7 @@
                 "wetmass": 5,
                 "fuel": 125,
                 "drag": 3,
+                "control": -1,
                 "internal": false,
                 "cantilever": false
             },
@@ -1583,6 +1602,7 @@
                 "mass": 1,
                 "wetmass": 5,
                 "fuel": 125,
+                "control": -1,
                 "internal": true,
                 "cantilever": true
             },

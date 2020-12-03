@@ -334,6 +334,7 @@ class Aircraft {
             this.reinforcements.SetTandem(this.wings.GetTandem());
             this.reinforcements.SetStaggered(this.wings.GetStaggered());
             this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
+            this.reinforcements.SetSesquiplane(this.wings.GetIsSesquiplane());
         } else {
             this.reinforcements.SetHelicopter();
         }
@@ -357,6 +358,7 @@ class Aircraft {
         stats.mass = Math.max(1, stats.mass);
 
         //Gear go last, because they need total mass.
+        this.gear.SetGull(this.wings.HasInvertedGull());
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
             this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
@@ -408,7 +410,7 @@ class Aircraft {
                 this.fuel.SetArea(0);
             }
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
-            this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
+            this.munitions.SetAcftParameters(stats.structure, this.era.GetMaxBomb(), this.wings.HasInvertedGull());
 
             //Airplanes always cost 1
             this.stats.cost = Math.max(1, this.stats.cost);

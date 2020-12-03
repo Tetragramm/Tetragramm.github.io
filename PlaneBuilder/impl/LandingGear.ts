@@ -9,6 +9,7 @@ class LandingGear extends Part {
     private extra_sel: boolean[];
     private loadedMP: number;
     public can_boat: boolean;
+    private gull_deck: number;
 
     constructor(js: JSON) {
         super();
@@ -139,6 +140,10 @@ class LandingGear extends Part {
             this.can_boat = false;
     }
 
+    public SetGull(deck: number) {
+        this.gull_deck = deck;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -160,6 +165,26 @@ class LandingGear extends Part {
         if (this.gear_list[this.gear_sel].name == "Boat Hull" && this.retract) {
             stats.drag += pdrag;
             pdrag = this.gear_list[0].DpLMP * this.loadedMP;
+        }
+
+        //Gull wings don't affect Boat Hulls, but do affect the normal gear you get
+        //if you put retract on your boat hull.  Since the hull is already applied,
+        //we can just modify here.
+        if (this.gear_list[this.gear_sel].name != "Boat Hull" || this.retract) {
+            switch (this.gull_deck) {
+                case 1: //Shoulder
+                    pdrag -= Math.floor(1.0e-6 + 0.1 * pdrag);
+                    break;
+                case 2: //Mid
+                case 3: //Low
+                    pdrag -= Math.floor(1.0e-6 + 0.15 * pdrag);
+                    break;
+                case 4: //Gear
+                    pdrag -= Math.floor(1.0e-6 + 0.25 * pdrag);
+                    break;
+                default:
+                //No change
+            }
         }
 
         if (this.retract) {

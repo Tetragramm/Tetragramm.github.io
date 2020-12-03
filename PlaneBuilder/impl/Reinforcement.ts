@@ -2,8 +2,8 @@
 /// <reference path="./Stats.ts" />
 
 class Reinforcement extends Part {
-    private ext_wood_list: { name: string, tension: number, config: boolean, first: boolean, stats: Stats }[];
-    private ext_steel_list: { name: string, tension: number, config: boolean, first: boolean, stats: Stats }[];
+    private ext_wood_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, stats: Stats }[];
+    private ext_steel_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, stats: Stats }[];
     private ext_cabane_list: { name: string, tension: number, stats: Stats }[];
     private ext_wood_count: number[];
     private ext_steel_count: number[];
@@ -20,19 +20,23 @@ class Reinforcement extends Part {
     private has_wing: boolean;
     private acft_structure: number;
     private cant_lift: number;
+    private tension_sqp: boolean;
+    private limited_sqp: boolean;
 
     constructor(js: JSON) {
         super();
 
         this.ext_wood_list = [];
         for (let elem of js["external_wood"]) {
-            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
+            this.ext_wood_list.push({
+                name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], stats: new Stats(elem)
+            });
         }
         this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
 
         this.ext_steel_list = [];
         for (let elem of js["external_steel"]) {
-            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
+            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], stats: new Stats(elem) });
         }
         this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
 
@@ -139,6 +143,16 @@ class Reinforcement extends Part {
         return this.cant_list;
     }
 
+    public CanExternalWood() {
+        var can = [...Array(this.ext_wood_list.length).fill(true)];
+        if (this.limited_sqp) {
+            for (let i = 0; i < this.ext_wood_list.length; i++) {
+                can[i] = this.ext_wood_list[i].small_sqp;
+            }
+        }
+        return can;
+    }
+
     public GetExternalWoodCount() {
         return this.ext_wood_count;
     }
@@ -149,6 +163,16 @@ class Reinforcement extends Part {
         count = Math.floor(1.0e-6 + count);
         this.ext_wood_count[idx] = count;
         this.CalculateStats();
+    }
+
+    public CanExternalSteel() {
+        var can = [...Array(this.ext_steel_list.length).fill(true)];
+        if (this.limited_sqp) {
+            for (let i = 0; i < this.ext_steel_list.length; i++) {
+                can[i] = this.ext_steel_list[i].small_sqp;
+            }
+        }
+        return can;
     }
 
     public GetExternalSteelCount() {
@@ -292,6 +316,21 @@ class Reinforcement extends Part {
         this.is_staggered = false;
     }
 
+    public SetSesquiplane(sqp: { is: boolean, deck: number, super_small: boolean }) {
+        this.tension_sqp = sqp.is && !sqp.super_small;
+        this.limited_sqp = sqp.is && sqp.super_small;
+        if (this.limited_sqp) {
+            for (let i = 0; i < this.ext_wood_list.length; i++) {
+                if (!this.ext_wood_list[i].small_sqp)
+                    this.ext_wood_count[i] = 0;
+            }
+            for (let i = 0; i < this.ext_steel_list.length; i++) {
+                if (!this.ext_steel_list[i].small_sqp)
+                    this.ext_steel_count[i] = 0;
+            }
+        }
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -306,6 +345,10 @@ class Reinforcement extends Part {
             tension_multiple = 0.8;
         else if (this.is_staggered)
             tension_multiple = 0.9;
+
+        if (this.tension_sqp) {
+            tension_multiple -= 0.15;
+        }
 
         if (!this.has_wing) {
             for (let i = 0; i < this.ext_wood_count.length; i++) {

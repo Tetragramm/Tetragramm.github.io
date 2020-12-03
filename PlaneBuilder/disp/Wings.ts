@@ -5,8 +5,8 @@ type WingHTMLType = {
     span: HTMLSpanElement,
     deck: HTMLSelectElement, skin: HTMLSelectElement,
     area: HTMLInputElement, wspan: HTMLInputElement,
-    dihedral: HTMLInputElement, anhedral: HTMLInputElement,
-    br: HTMLBRElement
+    gull: HTMLInputElement, dihedral: HTMLInputElement,
+    anhedral: HTMLInputElement, br: HTMLBRElement
 };
 class Wings_HTML extends Display {
     private wings: Wings;
@@ -175,6 +175,7 @@ class Wings_HTML extends Display {
             skin: document.createElement("SELECT") as HTMLSelectElement,
             area: document.createElement("INPUT") as HTMLInputElement,
             wspan: document.createElement("INPUT") as HTMLInputElement,
+            gull: document.createElement("INPUT") as HTMLInputElement,
             dihedral: document.createElement("INPUT") as HTMLInputElement,
             anhedral: document.createElement("INPUT") as HTMLInputElement,
             br: document.createElement("BR") as HTMLBRElement
@@ -204,6 +205,8 @@ class Wings_HTML extends Display {
 
         CreateInput(" Span ", wing.wspan, wing.span, false);
         wing.wspan.min = "1";
+
+        CreateCheckbox(" Gull ", wing.gull, wing.span, false);
 
         CreateInput(" Dihedral ", wing.dihedral, wing.span, false);
         wing.dihedral.min = "0";
@@ -258,6 +261,13 @@ class Wings_HTML extends Display {
         };
         ht.wspan.valueAsNumber = wing.span;
 
+        ht.gull.onchange = () => {
+            let w = { ...wing };
+            w.gull = ht.gull.checked;
+            this.wings.SetFullWing(idx, w);
+        };
+        ht.gull.checked = wing.gull;
+
         ht.dihedral.onchange = () => {
             let w = { ...wing };
             w.dihedral = ht.dihedral.valueAsNumber;
@@ -282,6 +292,7 @@ class Wings_HTML extends Display {
             skin: document.createElement("SELECT") as HTMLSelectElement,
             area: document.createElement("INPUT") as HTMLInputElement,
             wspan: document.createElement("INPUT") as HTMLInputElement,
+            gull: undefined,
             dihedral: undefined,
             anhedral: undefined,
             br: document.createElement("BR") as HTMLBRElement
@@ -380,7 +391,7 @@ class Wings_HTML extends Display {
             this.fw_add.append(opt);
         }
         this.fw_add.onchange = () => {
-            let w = { surface: 0, area: 10, span: 5, dihedral: 0, anhedral: 0, deck: this.fw_add.selectedIndex - 1 };
+            let w = { surface: 0, area: 10, span: 5, gull: false, dihedral: 0, anhedral: 0, deck: this.fw_add.selectedIndex - 1 };
             this.wings.SetFullWing(idx, w);
         };
         this.fw_add.selectedIndex = 0;
@@ -407,7 +418,7 @@ class Wings_HTML extends Display {
             this.mw_add.append(opt);
         }
         this.mw_add.onchange = () => {
-            let w = { surface: 0, area: 2, span: 2, dihedral: 0, anhedral: 0, deck: this.mw_add.selectedIndex - 1 };
+            let w = { surface: 0, area: 2, span: 2, gull: false, dihedral: 0, anhedral: 0, deck: this.mw_add.selectedIndex - 1 };
             this.wings.SetMiniWing(idx, w);
         };
         this.mw_add.selectedIndex = 0;

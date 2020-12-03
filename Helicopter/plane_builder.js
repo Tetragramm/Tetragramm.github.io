@@ -3775,6 +3775,10 @@ class Wings extends Part {
                 name: elem["name"], limited: elem["limited"], stats: new Stats(elem), dragfactor: elem["dragfactor"],
             });
         }
+        this.long_list = [];
+        for (let elem of js["largest"]) {
+            this.long_list.push(new Stats(elem));
+        }
         this.wing_list = [];
         this.mini_wing_list = [];
         this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
@@ -3791,11 +3795,29 @@ class Wings extends Part {
         };
     }
     fromJSON(js, json_version) {
-        this.wing_list = js["wing_list"];
-        this.mini_wing_list = js["mini_wing_list"];
+        if (json_version > 11.15) {
+            this.wing_list = js["wing_list"];
+            this.mini_wing_list = js["mini_wing_list"];
+        }
+        else {
+            var wl = js["wing_list"];
+            this.wing_list = this.OldtoNew(wl);
+            var mwl = js["mini_wing_list"];
+            this.mini_wing_list = this.OldtoNew(mwl);
+        }
         this.wing_stagger = js["wing_stagger"];
         this.is_swept = js["is_swept"];
         this.is_closed = js["is_closed"];
+    }
+    OldtoNew(wtl) {
+        var list = [];
+        for (let wt of wtl) {
+            list.push({
+                surface: wt.surface, area: wt.area, span: wt.span, anhedral: wt.anhedral,
+                dihedral: wt.dihedral, gull: (wt.anhedral > 0 || wt.dihedral > 0), deck: wt.deck
+            });
+        }
+        return list;
     }
     serialize(s) {
         s.PushNum(this.wing_list.length);
@@ -3806,6 +3828,7 @@ class Wings extends Part {
             s.PushNum(w.span);
             s.PushNum(w.dihedral);
             s.PushNum(w.anhedral);
+            s.PushBool(w.gull);
             s.PushNum(w.deck);
         }
         s.PushNum(this.mini_wing_list.length);
@@ -3816,6 +3839,7 @@ class Wings extends Part {
             s.PushNum(w.span);
             s.PushNum(w.dihedral);
             s.PushNum(w.anhedral);
+            s.PushBool(w.gull);
             s.PushNum(w.deck);
         }
         s.PushNum(this.wing_stagger);
@@ -3826,24 +3850,36 @@ class Wings extends Part {
         var wlen = d.GetNum();
         this.wing_list = [];
         for (let i = 0; i < wlen; i++) {
-            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            let wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
             wing.surface = d.GetNum();
             wing.area = d.GetNum();
             wing.span = d.GetNum();
-            wing.dihedral = d.GetNum();
-            wing.anhedral = d.GetNum();
+            if (d.version > 11.15) {
+                wing.gull = d.GetBool();
+            }
+            else {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
+                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+            }
             wing.deck = d.GetNum();
             this.wing_list.push(wing);
         }
         var mlen = d.GetNum();
         this.mini_wing_list = [];
         for (let i = 0; i < mlen; i++) {
-            let wing = { surface: 0, area: 0, span: 0, dihedral: 0, anhedral: 0, deck: 0 };
+            let wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
             wing.surface = d.GetNum();
             wing.area = d.GetNum();
             wing.span = d.GetNum();
-            wing.dihedral = d.GetNum();
-            wing.anhedral = d.GetNum();
+            if (d.version > 11.15) {
+                wing.gull = d.GetBool();
+            }
+            else {
+                wing.dihedral = d.GetNum();
+                wing.anhedral = d.GetNum();
+                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+            }
             wing.deck = d.GetNum();
             this.mini_wing_list.push(wing);
         }
@@ -3921,9 +3957,15 @@ class Wings extends Part {
             console.log("Deck out of Bounds");
         // if (this.wing_list.length >= this.stagger_list[this.wing_stagger].wing_count)
         //     return false;
-        var full_count = this.DeckCountFull();
-        if (!this.stagger_list[this.wing_stagger].inline && full_count[deck] == 1 && this.deck_list[deck].limited)
-            return false;
+        if (!this.stagger_list[this.wing_stagger].inline) { //If not tandem...
+            //No shoulder with gull parasol
+            if (deck == 1 && this.HasPolishWing())
+                return false;
+            //Limited numbers of each deck
+            var full_count = this.DeckCountFull();
+            if (full_count[deck] == 1 && this.deck_list[deck].limited)
+                return false;
+        }
         var mini_count = this.DeckCountMini();
         if (mini_count[deck] != 0)
             return false;
@@ -4001,23 +4043,9 @@ class Wings extends Part {
         if (w.span != w.span)
             w.span = 1;
         w.span = Math.floor(1.0e-6 + w.span);
-        if (w.dihedral != w.dihedral)
-            w.dihedral = 0;
-        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
-        if (w.anhedral != w.anhedral)
-            w.anhedral = 0;
-        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 3);
             w.span = Math.max(w.span, 1);
-            while (w.anhedral + w.dihedral > w.span - 1) {
-                if (w.anhedral > w.dihedral) {
-                    w.anhedral--;
-                }
-                else {
-                    w.dihedral--;
-                }
-            }
             if (this.CanAddFullWing(w.deck))
                 this.wing_list.splice(idx, 0, w);
         }
@@ -4036,22 +4064,28 @@ class Wings extends Part {
         if (w.span != w.span)
             w.span = 1;
         w.span = Math.floor(1.0e-6 + w.span);
-        if (w.dihedral != w.dihedral)
-            w.dihedral = 0;
-        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
-        if (w.anhedral != w.anhedral)
-            w.anhedral = 0;
-        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
         if (w.deck >= 0) {
             w.area = Math.max(w.area, 1);
             w.area = Math.min(w.area, 2);
             w.span = Math.max(w.span, 1);
-            w.dihedral = 0;
-            w.anhedral = 0;
             if (this.CanAddMiniWing(w.deck))
                 this.mini_wing_list.splice(idx, 0, w);
         }
         this.CalculateStats();
+    }
+    HasShoulder() {
+        for (let w of this.wing_list) {
+            if (w.deck == 1) //If we have shoulder...
+                return true;
+        }
+        return false;
+    }
+    CanGull(idx) {
+        if (this.wing_list[idx].deck == 0) {
+            if (this.HasShoulder())
+                return false;
+        }
+        return true;
     }
     IsFlammable() {
         for (let w of this.wing_list) {
@@ -4064,9 +4098,6 @@ class Wings extends Part {
         }
         return false;
     }
-    SetNumFrames(num) {
-        this.num_frames = num;
-    }
     NeedHStab() {
         return this.stagger_list[this.wing_stagger].hstab;
     }
@@ -4077,12 +4108,12 @@ class Wings extends Part {
         var longest_span = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             longest_span = Math.max(longest_span, wspan);
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             longest_span = Math.max(longest_span, wspan);
         }
         return longest_span;
@@ -4128,7 +4159,10 @@ class Wings extends Part {
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span;
-            var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
+            let warea = w.area;
+            if (w.gull)
+                warea = Math.floor(1.0e-6 + 1.1 * warea);
+            var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
@@ -4160,6 +4194,70 @@ class Wings extends Part {
         }
         return false;
     }
+    SetAircraftMass(plane_mass) {
+        this.plane_mass = plane_mass;
+    }
+    GetPaperMass() {
+        var paper = 0;
+        for (let w of this.wing_list) {
+            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats.Round();
+            if (wStats.mass < 0)
+                paper += wStats.mass;
+        }
+        for (let w of this.mini_wing_list) {
+            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            wStats.Round();
+            if (wStats.mass < 0)
+                paper += wStats.mass;
+        }
+        return Math.max(-Math.floor(1.0e-6 + 0.25 * this.plane_mass), paper);
+    }
+    GetIsSesquiplane() {
+        if (this.GetMonoplane() || this.GetTandem()) {
+            return { is: false, deck: -1, super_small: false };
+        }
+        var biggest_area = 0;
+        var biggest_deck = -1;
+        var biggest_span = 0;
+        var smallest_area = 1e100;
+        var smallest_span = 0;
+        for (let w of this.wing_list) {
+            //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
+            if (w.area > biggest_area) {
+                biggest_area = w.area;
+                biggest_deck = w.deck;
+                biggest_span = w.span;
+            }
+            if (smallest_area > w.area) {
+                smallest_area = w.area;
+                smallest_span = w.span;
+            }
+        }
+        var is = Math.floor(1.0e-6 + 0.5 * biggest_area) > smallest_area;
+        if (is) {
+            var ss = Math.floor(1.0e-6 + 0.75 * biggest_span) > smallest_span;
+            return { is: is, deck: biggest_deck, super_small: ss };
+        }
+        return { is: false, deck: -1, super_small: false };
+    }
+    HasPolishWing() {
+        for (let w of this.wing_list) {
+            if (w.deck == 0 && w.gull == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+    HasInvertedGull() {
+        var ret = -1;
+        for (let w of this.wing_list) {
+            if (w.gull) {
+                ret = Math.max(ret, w.deck);
+            }
+        }
+        return ret;
+    }
     PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -4170,20 +4268,17 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
-        var second_longest_span = 0;
-        var longest_deck = -1;
+        var biggest_area = 0;
+        var biggest_deck = -1;
+        var smallest_area = 1e100;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
-            if (wspan > longest_span) {
-                longest_deck = w.deck;
-                second_longest_span = longest_span;
-                longest_span = wspan;
+            if (w.area > biggest_area) {
+                biggest_area = w.area;
+                biggest_deck = w.deck;
             }
-            else if (wspan == longest_span) {
-                second_longest_span = wspan;
-            }
-            longest_span = Math.max(longest_span, wspan);
+            smallest_area = Math.min(smallest_area, w.area);
+            longest_span = Math.max(longest_span, w.span);
             if (!have_wing) { //Is first wing
                 have_wing = true;
             }
@@ -4200,11 +4295,13 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (w.span * w.span));
-            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
-            //stability from -hedral
-            wStats.latstab += w.dihedral - w.anhedral;
-            wStats.liftbleed += w.dihedral + w.anhedral;
+            //Gull Drag modifies wing area
+            let warea = w.area;
+            if (w.gull)
+                warea = Math.floor(1.0e-6 + 1.1 * warea);
+            var wdrag = Math.max(1, 6 * warea * warea / (w.span * w.span));
+            wStats.drag = wStats.drag + wdrag;
+            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor * this.deck_list[w.deck].dragfactor);
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
                 wStats.drag = Math.floor(1.0e-6 + 0.75 * wStats.drag);
@@ -4213,12 +4310,13 @@ class Wings extends Part {
             //Deck Effects
             stats = stats.Add(this.deck_list[w.deck].stats);
             wStats.Round();
+            if (wStats.mass < 0) //Treated paper is applied later
+                wStats.mass = 0;
             stats = stats.Add(wStats);
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
-            longest_span = Math.max(longest_span, wspan);
+            longest_span = Math.max(longest_span, w.span);
             stats.control += 1;
             if (!have_mini_wing) { //Is first miniature wing
                 have_mini_wing = true;
@@ -4235,12 +4333,49 @@ class Wings extends Part {
             wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (w.span * w.span));
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             wStats.Round();
+            if (wStats.mass < 0) //Treated paper is applied later
+                wStats.mass = 0;
             stats = stats.Add(wStats);
         }
         //Longest wing effects
         stats.control += 8 - longest_span;
         stats.latstab += Math.min(0, longest_span - 8);
-        //stats.latstab += Math.max(0, Math.floor(1.0e-6 + longest_span / this.num_frames) - 1);
+        //Sesquiplanes!
+        var sesp = this.GetIsSesquiplane();
+        if (sesp.is) {
+            stats = stats.Add(this.long_list[sesp.deck]);
+            stats.liftbleed -= 2;
+            stats.control += 2;
+        }
+        //Inline Wing Shadowing
+        if (this.stagger_list[this.wing_stagger].inline) {
+            for (let count of deck_count) {
+                if (count > 1) {
+                    stats.liftbleed += (count - 1) * 3;
+                }
+            }
+        }
+        //Gull wing effects (wing bits, drag is already applied)
+        if (this.HasPolishWing()) {
+            stats.visibility += 1;
+            stats.maxstrain += 10;
+        }
+        switch (this.HasInvertedGull()) {
+            case 1: //Shoulder Wing
+                //Only affects landing gear
+                break;
+            case 2: //Mid wing
+            case 3: //Low wing (same as Mid)
+                //Only affects landing gear and bomb capacity
+                break;
+            case 4: //Gear wing
+                stats.maxstrain += 10;
+                stats.crashsafety += 1;
+                //Also affects landing gear and bomb capacity
+                break;
+            default:
+            //NOTHING...
+        }
         //Wing Sweep effects
         if (this.is_swept) {
             stats.liftbleed += 5;
@@ -4738,12 +4873,14 @@ class Reinforcement extends Part {
         super();
         this.ext_wood_list = [];
         for (let elem of js["external_wood"]) {
-            this.ext_wood_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
+            this.ext_wood_list.push({
+                name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], stats: new Stats(elem)
+            });
         }
         this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
         this.ext_steel_list = [];
         for (let elem of js["external_steel"]) {
-            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], stats: new Stats(elem) });
+            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], stats: new Stats(elem) });
         }
         this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
         this.ext_cabane_list = [];
@@ -4839,6 +4976,15 @@ class Reinforcement extends Part {
     GetCantileverList() {
         return this.cant_list;
     }
+    CanExternalWood() {
+        var can = [...Array(this.ext_wood_list.length).fill(true)];
+        if (this.limited_sqp) {
+            for (let i = 0; i < this.ext_wood_list.length; i++) {
+                can[i] = this.ext_wood_list[i].small_sqp;
+            }
+        }
+        return can;
+    }
     GetExternalWoodCount() {
         return this.ext_wood_count;
     }
@@ -4848,6 +4994,15 @@ class Reinforcement extends Part {
         count = Math.floor(1.0e-6 + count);
         this.ext_wood_count[idx] = count;
         this.CalculateStats();
+    }
+    CanExternalSteel() {
+        var can = [...Array(this.ext_steel_list.length).fill(true)];
+        if (this.limited_sqp) {
+            for (let i = 0; i < this.ext_steel_list.length; i++) {
+                can[i] = this.ext_steel_list[i].small_sqp;
+            }
+        }
+        return can;
     }
     GetExternalSteelCount() {
         return this.ext_steel_count;
@@ -4966,6 +5121,20 @@ class Reinforcement extends Part {
         this.is_tandem = false;
         this.is_staggered = false;
     }
+    SetSesquiplane(sqp) {
+        this.tension_sqp = sqp.is && !sqp.super_small;
+        this.limited_sqp = sqp.is && sqp.super_small;
+        if (this.limited_sqp) {
+            for (let i = 0; i < this.ext_wood_list.length; i++) {
+                if (!this.ext_wood_list[i].small_sqp)
+                    this.ext_wood_count[i] = 0;
+            }
+            for (let i = 0; i < this.ext_steel_list.length; i++) {
+                if (!this.ext_steel_list[i].small_sqp)
+                    this.ext_steel_count[i] = 0;
+            }
+        }
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -4978,6 +5147,9 @@ class Reinforcement extends Part {
             tension_multiple = 0.8;
         else if (this.is_staggered)
             tension_multiple = 0.9;
+        if (this.tension_sqp) {
+            tension_multiple -= 0.15;
+        }
         if (!this.has_wing) {
             for (let i = 0; i < this.ext_wood_count.length; i++) {
                 this.ext_wood_count[i] = 0;
@@ -5353,7 +5525,7 @@ class Munitions extends Part {
     }
     LimitMass(bomb) {
         var reduce = false;
-        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
+        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb * this.gull_factor) {
             reduce = true;
             if (this.rocket_count > 0) {
                 this.rocket_count--;
@@ -5368,9 +5540,21 @@ class Munitions extends Part {
         var ext_bomb_count = this.bomb_count + this.rocket_count;
         return Math.max(0, ext_bomb_count - this.GetInternalBombCount());
     }
-    SetAcftStructure(num, maxbomb) {
-        this.acft_struct = num;
+    SetAcftParameters(struct, maxbomb, gull_deck) {
+        this.acft_struct = struct;
         this.maxbomb = maxbomb;
+        switch (gull_deck) {
+            //Parasol and Shoulder do nothing
+            case 2: //Mid
+            case 3: //Low
+                this.gull_factor = 1.1;
+                break;
+            case 4: //Gear
+                this.gull_factor = 1.2;
+                break;
+            default:
+                this.gull_factor = 1;
+        }
         if (this.LimitMass(false)) {
             this.CalculateStats();
         }
@@ -5562,6 +5746,9 @@ class LandingGear extends Part {
         else
             this.can_boat = false;
     }
+    SetGull(deck) {
+        this.gull_deck = deck;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -5579,6 +5766,25 @@ class LandingGear extends Part {
         if (this.gear_list[this.gear_sel].name == "Boat Hull" && this.retract) {
             stats.drag += pdrag;
             pdrag = this.gear_list[0].DpLMP * this.loadedMP;
+        }
+        //Gull wings don't affect Boat Hulls, but do affect the normal gear you get
+        //if you put retract on your boat hull.  Since the hull is already applied,
+        //we can just modify here.
+        if (this.gear_list[this.gear_sel].name != "Boat Hull" || this.retract) {
+            switch (this.gull_deck) {
+                case 1: //Shoulder
+                    pdrag -= Math.floor(1.0e-6 + 0.1 * pdrag);
+                    break;
+                case 2: //Mid
+                case 3: //Low
+                    pdrag -= Math.floor(1.0e-6 + 0.15 * pdrag);
+                    break;
+                case 4: //Gear
+                    pdrag -= Math.floor(1.0e-6 + 0.25 * pdrag);
+                    break;
+                default:
+                //No change
+            }
         }
         if (this.retract) {
             stats.mass += Math.floor(1.0e-6 + pdrag / 2);
@@ -6842,6 +7048,13 @@ class Weapons extends Part {
             ws.SetStickyGuns(num);
         }
     }
+    GetWingWeight() {
+        var sum = 0;
+        for (let w of this.weapon_sets) {
+            sum += w.GetWingWeight();
+        }
+        return sum;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)
@@ -6912,6 +7125,8 @@ class Weapons extends Part {
         }
         //Weapon braces cost 1/3.  Should always be multiple of 3
         stats.cost += this.brace_count / 3;
+        //Wing-tip weight: -1 control for every 5 mass
+        stats.control -= Math.floor(1.0e-6 + this.GetWingWeight() / 5);
         return stats;
     }
 }
@@ -7554,7 +7769,6 @@ class Aircraft {
         stats = stats.Add(this.frames.PartStats());
         //If there are wings...
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.wings.SetNumFrames(this.frames.GetNumFrames());
             stats = stats.Add(this.wings.PartStats());
             this.rotor.SetWingArea(stats.wingarea);
         }
@@ -7590,6 +7804,7 @@ class Aircraft {
             this.reinforcements.SetTandem(this.wings.GetTandem());
             this.reinforcements.SetStaggered(this.wings.GetStaggered());
             this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
+            this.reinforcements.SetSesquiplane(this.wings.GetIsSesquiplane());
         }
         else {
             this.reinforcements.SetHelicopter();
@@ -7604,9 +7819,13 @@ class Aircraft {
         this.accessories.SetSkinArmor(this.frames.GetArmor());
         this.accessories.SetVitalParts(this.VitalComponentList().length);
         stats = stats.Add(this.accessories.PartStats());
+        //Treated Paper needs to apply near to last
+        this.wings.SetAircraftMass(stats.mass);
+        stats.mass += this.wings.GetPaperMass();
         //Because treated paper brings mass down.
         stats.mass = Math.max(1, stats.mass);
         //Gear go last, because they need total mass.
+        this.gear.SetGull(this.wings.HasInvertedGull());
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
             this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
@@ -7649,7 +7868,7 @@ class Aircraft {
                 this.fuel.SetArea(0);
             }
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
-            this.munitions.SetAcftStructure(stats.structure, this.era.GetMaxBomb());
+            this.munitions.SetAcftParameters(stats.structure, this.era.GetMaxBomb(), this.wings.HasInvertedGull());
             //Airplanes always cost 1
             this.stats.cost = Math.max(1, this.stats.cost);
             //Always have at least 1 liftbleed
@@ -9653,6 +9872,7 @@ class Wings_HTML extends Display {
             skin: document.createElement("SELECT"),
             area: document.createElement("INPUT"),
             wspan: document.createElement("INPUT"),
+            gull: document.createElement("INPUT"),
             dihedral: document.createElement("INPUT"),
             anhedral: document.createElement("INPUT"),
             br: document.createElement("BR")
@@ -9679,6 +9899,7 @@ class Wings_HTML extends Display {
         wing.area.min = "3";
         CreateInput(" Span ", wing.wspan, wing.span, false);
         wing.wspan.min = "1";
+        CreateCheckbox(" Gull ", wing.gull, wing.span, false);
         CreateInput(" Dihedral ", wing.dihedral, wing.span, false);
         wing.dihedral.min = "0";
         CreateInput(" Anhedral ", wing.anhedral, wing.span, false);
@@ -9724,6 +9945,12 @@ class Wings_HTML extends Display {
             this.wings.SetFullWing(idx, w);
         };
         ht.wspan.valueAsNumber = wing.span;
+        ht.gull.onchange = () => {
+            let w = Object.assign({}, wing);
+            w.gull = ht.gull.checked;
+            this.wings.SetFullWing(idx, w);
+        };
+        ht.gull.checked = wing.gull;
         ht.dihedral.onchange = () => {
             let w = Object.assign({}, wing);
             w.dihedral = ht.dihedral.valueAsNumber;
@@ -9746,6 +9973,7 @@ class Wings_HTML extends Display {
             skin: document.createElement("SELECT"),
             area: document.createElement("INPUT"),
             wspan: document.createElement("INPUT"),
+            gull: undefined,
             dihedral: undefined,
             anhedral: undefined,
             br: document.createElement("BR")
@@ -9835,7 +10063,7 @@ class Wings_HTML extends Display {
             this.fw_add.append(opt);
         }
         this.fw_add.onchange = () => {
-            let w = { surface: 0, area: 10, span: 5, dihedral: 0, anhedral: 0, deck: this.fw_add.selectedIndex - 1 };
+            let w = { surface: 0, area: 10, span: 5, gull: false, dihedral: 0, anhedral: 0, deck: this.fw_add.selectedIndex - 1 };
             this.wings.SetFullWing(idx, w);
         };
         this.fw_add.selectedIndex = 0;
@@ -9862,7 +10090,7 @@ class Wings_HTML extends Display {
             this.mw_add.append(opt);
         }
         this.mw_add.onchange = () => {
-            let w = { surface: 0, area: 2, span: 2, dihedral: 0, anhedral: 0, deck: this.mw_add.selectedIndex - 1 };
+            let w = { surface: 0, area: 2, span: 2, gull: false, dihedral: 0, anhedral: 0, deck: this.mw_add.selectedIndex - 1 };
             this.wings.SetMiniWing(idx, w);
         };
         this.mw_add.selectedIndex = 0;
@@ -10165,12 +10393,16 @@ class Reinforcement_HTML extends Display {
         this.cabane.selectedIndex = this.rf.GetCabane();
         this.wires.checked = this.rf.GetWires();
         var w_count = this.rf.GetExternalWoodCount();
+        var w_can = this.rf.CanExternalWood();
         for (let i = 0; i < w_count.length; i++) {
             this.ext_wood_inp[i].valueAsNumber = w_count[i];
+            this.ext_wood_inp[i].disabled = !w_can[i];
         }
         var s_count = this.rf.GetExternalSteelCount();
+        var s_can = this.rf.CanExternalWood();
         for (let i = 0; i < s_count.length; i++) {
             this.ext_steel_inp[i].valueAsNumber = s_count[i];
+            this.ext_steel_inp[i].disabled = !s_can[i];
         }
         var c_count = this.rf.GetCantileverCount();
         for (let i = 0; i < c_count.length; i++) {
@@ -13702,6 +13934,15 @@ class WeaponSystem extends Part {
     }
     GetReload() {
         return this.final_weapon.reload;
+    }
+    GetWingWeight() {
+        var sum = 0;
+        for (let w of this.weapons) {
+            if (w.GetWing()) {
+                sum += w.PartStats().mass;
+            }
+        }
+        return sum;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;

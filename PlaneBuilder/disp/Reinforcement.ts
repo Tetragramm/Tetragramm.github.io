@@ -113,13 +113,17 @@ class Reinforcement_HTML extends Display {
         this.wires.checked = this.rf.GetWires();
 
         var w_count = this.rf.GetExternalWoodCount();
+        var w_can = this.rf.CanExternalWood();
         for (let i = 0; i < w_count.length; i++) {
             this.ext_wood_inp[i].valueAsNumber = w_count[i];
+            this.ext_wood_inp[i].disabled = !w_can[i];
         }
 
         var s_count = this.rf.GetExternalSteelCount();
+        var s_can = this.rf.CanExternalWood();
         for (let i = 0; i < s_count.length; i++) {
             this.ext_steel_inp[i].valueAsNumber = s_count[i];
+            this.ext_steel_inp[i].disabled = !s_can[i];
         }
 
         var c_count = this.rf.GetCantileverCount();

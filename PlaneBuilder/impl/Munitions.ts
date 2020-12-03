@@ -9,6 +9,7 @@ class Munitions extends Part {
     private internal_bay_2: boolean;
     private acft_struct: number;
     private maxbomb: number;
+    private gull_factor: number;
 
     constructor() {
         super();
@@ -150,7 +151,7 @@ class Munitions extends Part {
 
     private LimitMass(bomb: boolean) {
         var reduce = false;
-        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb) {
+        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb * this.gull_factor) {
             reduce = true;
             if (this.rocket_count > 0) {
                 this.rocket_count--;
@@ -166,9 +167,21 @@ class Munitions extends Part {
         return Math.max(0, ext_bomb_count - this.GetInternalBombCount());
     }
 
-    public SetAcftStructure(num: number, maxbomb: number) {
-        this.acft_struct = num;
+    public SetAcftParameters(struct: number, maxbomb: number, gull_deck: number) {
+        this.acft_struct = struct;
         this.maxbomb = maxbomb;
+        switch (gull_deck) {
+            //Parasol and Shoulder do nothing
+            case 2: //Mid
+            case 3: //Low
+                this.gull_factor = 1.1;
+                break;
+            case 4: //Gear
+                this.gull_factor = 1.2;
+                break;
+            default:
+                this.gull_factor = 1;
+        }
         if (this.LimitMass(false)) {
             this.CalculateStats();
         }
