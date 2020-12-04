@@ -2374,7 +2374,7 @@ class Engine extends Part {
         }
     }
     GetHavePropeller() {
-        return !this.GetIsPulsejet(); //TODO: Charge and Generators
+        return !(this.GetIsPulsejet() || this.GetGenerator());
     }
     GetIsTractorNacelle() {
         if (!this.GetIsPulsejet()
@@ -2482,7 +2482,7 @@ class Engine extends Part {
         return this.etype_stats.rumble;
     }
     IsTractor() {
-        if (this.is_helicopter)
+        if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Tractor"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
@@ -2494,7 +2494,7 @@ class Engine extends Part {
         };
     }
     IsPusher() {
-        if (this.is_helicopter)
+        if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
@@ -2506,7 +2506,7 @@ class Engine extends Part {
         };
     }
     GetSpinner() {
-        if (this.gp_count > 0) {
+        if (this.gp_count > 0 && !this.GetGenerator()) {
             if (this.use_ds &&
                 (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
                     || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")) { //Uses Extended Driveshafts, can be arty, and rotary engine
@@ -2520,19 +2520,23 @@ class Engine extends Part {
         return [false, false];
     }
     IsElectrics() {
-        return this.has_alternator || this.is_generator;
+        return this.has_alternator || this.GetGenerator();
     }
     GetEngineHeight() {
-        if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_helicopter)
-            return 2;
-        else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
-            return 1;
-        else if (this.mount_list[this.selected_mount].name == "Nacelle (Inside)"
-            || this.mount_list[this.selected_mount].name == "Channel Tractor")
-            return 0;
+        if (!this.GetGenerator()) {
+            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_helicopter)
+                return 2;
+            else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
+                return 1;
+            else if (this.mount_list[this.selected_mount].name == "Nacelle (Inside)"
+                || this.mount_list[this.selected_mount].name == "Channel Tractor")
+                return 0;
+        }
         return -1;
     }
     IsTractorRotary() {
+        if (this.GetGenerator())
+            return false;
         return this.IsRotary() && this.mount_list[this.selected_mount].name == "Tractor";
     }
     SetCalculateStats(callback) {
@@ -4162,7 +4166,7 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             let warea = w.area;
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
@@ -4178,7 +4182,7 @@ class Wings extends Part {
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             //Drag is modified by area, span
             var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
@@ -4297,11 +4301,12 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             //Gull Drag modifies wing area
             let warea = w.area;
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
-            var wdrag = Math.max(1, 6 * warea * warea / (w.span * w.span));
+            var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wStats.drag = wStats.drag + wdrag;
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor * this.deck_list[w.deck].dragfactor);
             //Inline wings
@@ -4311,6 +4316,9 @@ class Wings extends Part {
             }
             //Deck Effects
             stats = stats.Add(this.deck_list[w.deck].stats);
+            //stability from -hedral
+            wStats.latstab += w.dihedral - w.anhedral;
+            wStats.liftbleed += w.dihedral + w.anhedral;
             wStats.Round();
             if (wStats.mass < 0) //Treated paper is applied later
                 wStats.mass = 0;
@@ -4332,8 +4340,12 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span
-            wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (w.span * w.span));
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (wspan * wspan));
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
+            //stability from -hedral
+            wStats.latstab += w.dihedral - w.anhedral;
+            wStats.liftbleed += w.dihedral + w.anhedral;
             wStats.Round();
             if (wStats.mass < 0) //Treated paper is applied later
                 wStats.mass = 0;
@@ -9813,12 +9825,20 @@ class Wings_HTML extends Display {
         this.d_lift = c3_row.insertCell();
         var h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, "Cost");
-        CreateTH(h4_row, "Charge");
-        CreateTH(h4_row, "Flammable");
+        CreateTH(h4_row, "Visibility");
+        CreateTH(h4_row, "");
         var c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
-        this.d_chrg = c4_row.insertCell();
-        this.d_flam = c4_row.insertCell();
+        this.d_visi = c4_row.insertCell();
+        c4_row.insertCell();
+        var h5_row = tbl_stat.insertRow();
+        CreateTH(h5_row, "");
+        CreateTH(h5_row, "Sesquiplane");
+        CreateTH(h5_row, "Flammable");
+        var c5_row = tbl_stat.insertRow();
+        c5_row.insertCell();
+        this.d_sesq = c5_row.insertCell();
+        this.d_flam = c5_row.insertCell();
     }
     UpdateDisplay() {
         var cans = this.wings.CanStagger();
@@ -9863,9 +9883,13 @@ class Wings_HTML extends Display {
         BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
         BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
-        BlinkIfChanged(this.d_chrg, "0", true); //stats.charge.toString(); //TODO: Charge
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        if (this.wings.GetIsSesquiplane().is)
+            BlinkIfChanged(this.d_sesq, "Yes");
+        else
+            BlinkIfChanged(this.d_sesq, "No");
         if (this.wings.IsFlammable())
             BlinkIfChanged(this.d_flam, "Yes");
         else
