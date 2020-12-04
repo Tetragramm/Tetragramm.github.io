@@ -503,7 +503,7 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             let warea = w.area;
 
             if (w.gull)
@@ -521,7 +521,7 @@ class Wings extends Part {
         }
         for (let w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
 
             //Drag is modified by area, span
             var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
@@ -567,10 +567,6 @@ class Wings extends Part {
     }
 
     public GetIsSesquiplane(): { is: boolean, deck: number, super_small: boolean } {
-        if (this.GetMonoplane() || this.GetTandem()) {
-            return { is: false, deck: -1, super_small: false };
-        }
-
         var biggest_area = 0;
         var biggest_deck = -1;
         var biggest_span = 0;
@@ -590,12 +586,14 @@ class Wings extends Part {
             }
         }
 
-        var is = Math.floor(1.0e-6 + 0.5 * biggest_area) > smallest_area;
+        var is = biggest_area >= 2 * smallest_area;
+        is = is && !this.GetMonoplane() && !this.GetTandem();
+
         if (is) {
-            var ss = Math.floor(1.0e-6 + 0.75 * biggest_span) > smallest_span;
+            var ss = 0.75 * biggest_span >= smallest_span;
             return { is: is, deck: biggest_deck, super_small: ss };
         }
-        return { is: false, deck: -1, super_small: false };
+        return { is: false, deck: biggest_deck, super_small: false };
     }
 
     private HasPolishWing(): boolean {
@@ -659,14 +657,15 @@ class Wings extends Part {
             //Wings cannot generate positive max strain
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
-            //Drag is modified by area, span, and the leading wing
 
+            //Drag is modified by area, span, and the leading wing
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
             //Gull Drag modifies wing area
             let warea = w.area;
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
 
-            var wdrag = Math.max(1, 6 * warea * warea / (w.span * w.span));
+            var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wStats.drag = wStats.drag + wdrag;
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor * this.deck_list[w.deck].dragfactor);
 
@@ -678,6 +677,10 @@ class Wings extends Part {
 
             //Deck Effects
             stats = stats.Add(this.deck_list[w.deck].stats);
+
+            //stability from -hedral
+            wStats.latstab += w.dihedral - w.anhedral;
+            wStats.liftbleed += w.dihedral + w.anhedral;
 
             wStats.Round();
             if (wStats.mass < 0) //Treated paper is applied later
@@ -702,8 +705,13 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span
-            wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (w.span * w.span));
+            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (wspan * wspan));
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
+
+            //stability from -hedral
+            wStats.latstab += w.dihedral - w.anhedral;
+            wStats.liftbleed += w.dihedral + w.anhedral;
 
             wStats.Round();
             if (wStats.mass < 0) //Treated paper is applied later
@@ -717,8 +725,13 @@ class Wings extends Part {
 
         //Sesquiplanes!
         var sesp = this.GetIsSesquiplane();
-        if (sesp.is) {
+        if (sesp.is || this.GetMonoplane()) {
+            console.log(this.long_list);
+            console.log(sesp);
             stats = stats.Add(this.long_list[sesp.deck]);
+        }
+
+        if (sesp.is) {
             stats.liftbleed -= 2;
             stats.control += 2;
         }

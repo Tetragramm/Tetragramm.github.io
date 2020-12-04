@@ -17,6 +17,7 @@ class Cockpit extends Part {
     private total_crash: number;
     private is_primary: boolean;
     private bombsight: number;
+    private has_rotary: boolean;
 
     constructor(tl: { name: string, stats: Stats }[],
         ul: { name: string, stats: Stats }[],
@@ -201,6 +202,10 @@ class Cockpit extends Part {
         this.CalculateStats();
     }
 
+    public SetHasRotary(has: boolean) {
+        this.has_rotary = has;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats();
         stats.reqsections = 1;
@@ -245,6 +250,9 @@ class Cockpit extends Part {
     public CrewUpdate(escape: number, flightstress: number, visibility: number, crash: number) {
         this.total_escape = this.stats.escape + escape;
         this.total_stress = this.stats.flightstress + flightstress;
+        if (this.selected_type == 0 && this.has_rotary) { //Is open and has rotary
+            this.total_stress += 1;
+        }
         this.total_stress = Math.max(0, this.total_stress);
         this.total_visibility = this.stats.visibility + visibility;
         this.total_crash = this.stats.crashsafety + crash;

@@ -30,9 +30,10 @@ class Wings_HTML extends Display {
     private d_lstb: HTMLTableCellElement;
     private d_maxs: HTMLTableCellElement;
     private d_lift: HTMLTableCellElement;
-    private d_chrg: HTMLTableCellElement;
+    private d_sesq: HTMLTableCellElement;
     private d_crsh: HTMLTableCellElement;
     private d_cost: HTMLTableCellElement;
+    private d_visi: HTMLTableCellElement;
     private d_flam: HTMLTableCellElement;
 
     constructor(w: Wings) {
@@ -103,12 +104,20 @@ class Wings_HTML extends Display {
         this.d_lift = c3_row.insertCell();
         var h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, "Cost");
-        CreateTH(h4_row, "Charge");
-        CreateTH(h4_row, "Flammable");
+        CreateTH(h4_row, "Visibility");
+        CreateTH(h4_row, "");
         var c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
-        this.d_chrg = c4_row.insertCell();
-        this.d_flam = c4_row.insertCell();
+        this.d_visi = c4_row.insertCell();
+        c4_row.insertCell();
+        var h5_row = tbl_stat.insertRow();
+        CreateTH(h5_row, "");
+        CreateTH(h5_row, "Sesquiplane");
+        CreateTH(h5_row, "Flammable");
+        var c5_row = tbl_stat.insertRow();
+        c5_row.insertCell();
+        this.d_sesq = c5_row.insertCell();
+        this.d_flam = c5_row.insertCell();
     }
 
     public UpdateDisplay() {
@@ -159,9 +168,14 @@ class Wings_HTML extends Display {
         BlinkIfChanged(this.d_lstb, stats.latstab.toString(), true);
         BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
-        BlinkIfChanged(this.d_chrg, "0", true);//stats.charge.toString(); //TODO: Charge
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        if (this.wings.GetIsSesquiplane().is)
+            BlinkIfChanged(this.d_sesq, "Yes");
+        else
+            BlinkIfChanged(this.d_sesq, "No");
+
         if (this.wings.IsFlammable())
             BlinkIfChanged(this.d_flam, "Yes");
         else

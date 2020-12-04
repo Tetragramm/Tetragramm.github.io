@@ -8,7 +8,7 @@ type WType = {
 };
 type WStatType = {
     mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement,
-    sect: HTMLTableCellElement, none: HTMLTableCellElement, jams: HTMLTableCellElement,
+    sect: HTMLTableCellElement, mounting: HTMLTableCellElement, jams: HTMLTableCellElement,
     hits: HTMLTableCellElement, damg: HTMLTableCellElement, shots: HTMLTableCellElement,
 };
 type WSetType = {
@@ -55,7 +55,7 @@ class Weapons_HTML extends Display {
             wcell: null,
             weaps: [],
             ammo: document.createElement("INPUT") as HTMLInputElement,
-            stats: { mass: null, drag: null, cost: null, sect: null, none: null, jams: null, hits: null, damg: null, shots: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null },
             repeating: document.createElement("INPUT") as HTMLInputElement,
         };
 
@@ -124,11 +124,11 @@ class Weapons_HTML extends Display {
         type.stats.cost = c1_row.insertCell();
         var h2_row = stable.insertRow();
         CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "");
+        CreateTH(h2_row, "Mounting");
         CreateTH(h2_row, "Jam");
         var c2_row = stable.insertRow();
         type.stats.sect = c2_row.insertCell();
-        type.stats.none = c2_row.insertCell();
+        type.stats.mounting = c2_row.insertCell();
         type.stats.jams = c2_row.insertCell();
         var h3_row = stable.insertRow();
         CreateTH(h3_row, "Hits");
@@ -251,6 +251,13 @@ class Weapons_HTML extends Display {
             + h[1].toString() + "\\"
             + h[2].toString() + "\\"
             + h[3].toString();
+
+        if (set.GetFixed())
+            BlinkIfChanged(disp.stats.mounting, "Fixed");
+        else if (set.GetDirectionCount() <= 2)
+            BlinkIfChanged(disp.stats.mounting, "Flexible");
+        else
+            BlinkIfChanged(disp.stats.mounting, "Turret");
 
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);

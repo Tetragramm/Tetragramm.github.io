@@ -356,7 +356,7 @@ class Accessories extends Part {
             if (eff_armour[i] > 0) {
                 if (armour_str != "")
                     armour_str += ", ";
-                armour_str += AP.toString() + "/+" + (11 - eff_armour[i]).toString();
+                armour_str += AP.toString() + "/" + (11 - eff_armour[i]).toString() + "+";
             }
         }
         if (armour_str != "") {

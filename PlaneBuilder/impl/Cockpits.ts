@@ -155,6 +155,12 @@ class Cockpits extends Part {
         return false;
     }
 
+    public SetHasRotary(has: boolean) {
+        for (let c of this.positions) {
+            this.SetHasRotary(has);
+        }
+    }
+
     public PartStats(): Stats {
         var s = new Stats();
         for (let cp of this.positions) {

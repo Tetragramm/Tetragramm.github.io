@@ -373,8 +373,7 @@ class Aircraft {
         stats = stats.Add(this.optimization.PartStats());
 
         //Has flight stress from open cockpit + tractor rotary.
-        if (this.cockpits.HasOpen() && this.engines.HasTractorRotary())
-            stats.flightstress++;
+        this.cockpits.SetHasRotary(this.engines.HasTractorRotary());
 
         // stats = stats.Add(this.alter.PartStats());
 
@@ -529,7 +528,7 @@ class Aircraft {
 
         var Toughness = this.stats.toughness;
         //Used: Weak
-        Toughness = Toughness * Math.pow(0.5, this.used.weak);
+        Toughness = Math.floor(1.0e-6 + Toughness * Math.pow(0.5, this.used.weak));
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(-1.0e-6 + DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;

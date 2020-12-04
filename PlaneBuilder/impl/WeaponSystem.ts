@@ -459,21 +459,33 @@ class WeaponSystem extends Part {
 
     public GetHits() {
         var hits = this.final_weapon.hits;
-        var centerline = 0;
-        var wings = 0;
-        for (let w of this.weapons) {
-            if (w.GetWing() && w.GetFixed()) {
-                wings += w.GetCount() * hits;
+        if (hits != 0) {
+            var centerline = 0;
+            var wings = 0;
+            for (let w of this.weapons) {
+                if (w.GetWing() && (w.GetFixed() || this.GetDirectionCount() <= 2)) {
+                    wings += w.GetCount() * hits;
+                } else {
+                    centerline += w.GetCount() * hits;
+                }
+            }
+            return [
+                centerline + wings,
+                Math.floor(1.0e-6 + centerline * 0.75) + Math.floor(1.0e-6 + wings * 0.9),
+                Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.2),
+                Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
+            ];
+        } else {
+            if (this.final_weapon.ammo == 0) {
+                return [0, 0, 0, 0];
             } else {
-                centerline += w.GetCount() * hits;
+                var count = 0;
+                for (let w of this.weapons) {
+                    count += w.GetCount();
+                }
+                return [4 * count, 2 * count, 1 * count, 0];
             }
         }
-        return [
-            centerline + wings,
-            Math.floor(1.0e-6 + centerline * 0.75) + Math.floor(1.0e-6 + wings * 0.9),
-            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.2),
-            Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
-        ];
     }
 
     public GetDamage() {
@@ -624,6 +636,15 @@ class WeaponSystem extends Part {
             }
         }
         return sum;
+    }
+
+    public GetDirectionCount() {
+        var count = 0;
+        for (let d of this.directions) {
+            if (d)
+                count++;
+        }
+        return count;
     }
 
     public SetCalculateStats(callback: () => void) {

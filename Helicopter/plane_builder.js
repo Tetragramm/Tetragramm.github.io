@@ -1621,6 +1621,9 @@ class Cockpit extends Part {
         this.bombsight = num;
         this.CalculateStats();
     }
+    SetHasRotary(has) {
+        this.has_rotary = has;
+    }
     PartStats() {
         var stats = new Stats();
         stats.reqsections = 1;
@@ -1655,6 +1658,9 @@ class Cockpit extends Part {
     CrewUpdate(escape, flightstress, visibility, crash) {
         this.total_escape = this.stats.escape + escape;
         this.total_stress = this.stats.flightstress + flightstress;
+        if (this.selected_type == 0 && this.has_rotary) { //Is open and has rotary
+            this.total_stress += 1;
+        }
         this.total_stress = Math.max(0, this.total_stress);
         this.total_visibility = this.stats.visibility + visibility;
         this.total_crash = this.stats.crashsafety + crash;
@@ -1796,6 +1802,11 @@ class Cockpits extends Part {
                 return true;
         }
         return false;
+    }
+    SetHasRotary(has) {
+        for (let c of this.positions) {
+            this.SetHasRotary(has);
+        }
     }
     PartStats() {
         var s = new Stats();
@@ -2287,7 +2298,7 @@ class Engine extends Part {
         return this.mount_list;
     }
     CanUseExtendedDriveshaft() {
-        return !(this.GetIsPulsejet() || this.is_helicopter || this.is_generator);
+        return !(this.GetIsPulsejet() || this.is_helicopter || this.GetGenerator());
     }
     SetUseExtendedDriveshaft(use) {
         this.use_ds = use || this.RequiresExtendedDriveshafts();
@@ -2297,7 +2308,7 @@ class Engine extends Part {
         return this.use_ds;
     }
     CanUseGears() {
-        return !(this.GetIsPulsejet() || this.is_generator);
+        return !(this.GetIsPulsejet() || this.GetGenerator());
     }
     SetGearCount(num) {
         if (num != num || num < 0)
@@ -5248,7 +5259,7 @@ class Reinforcement extends Part {
         }
         if (use_cant)
             stats.cost += 5;
-        if (use_cant)
+        if (use_cant && this.has_wing)
             stats.liftbleed -= this.cant_lift;
         return stats;
     }
@@ -6098,7 +6109,7 @@ class Accessories extends Part {
             if (eff_armour[i] > 0) {
                 if (armour_str != "")
                     armour_str += ", ";
-                armour_str += AP.toString() + "/+" + (11 - eff_armour[i]).toString();
+                armour_str += AP.toString() + "/" + (11 - eff_armour[i]).toString() + "+";
             }
         }
         if (armour_str != "") {
@@ -7857,8 +7868,7 @@ class Aircraft {
         this.optimization.SetAcftStats(stats);
         stats = stats.Add(this.optimization.PartStats());
         //Has flight stress from open cockpit + tractor rotary.
-        if (this.cockpits.HasOpen() && this.engines.HasTractorRotary())
-            stats.flightstress++;
+        this.cockpits.SetHasRotary(this.engines.HasTractorRotary());
         // stats = stats.Add(this.alter.PartStats());
         //Can only do this last, but might trigger a recalc.
         this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + stats.mass / 5), 1));
@@ -7991,7 +8001,7 @@ class Aircraft {
         }
         var Toughness = this.stats.toughness;
         //Used: Weak
-        Toughness = Toughness * Math.pow(0.5, this.used.weak);
+        Toughness = Math.floor(1.0e-6 + Toughness * Math.pow(0.5, this.used.weak));
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(-1.0e-6 + DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
@@ -11002,7 +11012,7 @@ class Weapons_HTML extends Display {
             wcell: null,
             weaps: [],
             ammo: document.createElement("INPUT"),
-            stats: { mass: null, drag: null, cost: null, sect: null, none: null, jams: null, hits: null, damg: null, shots: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null },
             repeating: document.createElement("INPUT"),
         };
         var wlist = this.weap.GetWeaponList();
@@ -11064,11 +11074,11 @@ class Weapons_HTML extends Display {
         type.stats.cost = c1_row.insertCell();
         var h2_row = stable.insertRow();
         CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "");
+        CreateTH(h2_row, "Mounting");
         CreateTH(h2_row, "Jam");
         var c2_row = stable.insertRow();
         type.stats.sect = c2_row.insertCell();
-        type.stats.none = c2_row.insertCell();
+        type.stats.mounting = c2_row.insertCell();
         type.stats.jams = c2_row.insertCell();
         var h3_row = stable.insertRow();
         CreateTH(h3_row, "Hits");
@@ -11177,6 +11187,12 @@ class Weapons_HTML extends Display {
             + h[1].toString() + "\\"
             + h[2].toString() + "\\"
             + h[3].toString();
+        if (set.GetFixed())
+            BlinkIfChanged(disp.stats.mounting, "Fixed");
+        else if (set.GetDirectionCount() <= 2)
+            BlinkIfChanged(disp.stats.mounting, "Flexible");
+        else
+            BlinkIfChanged(disp.stats.mounting, "Turret");
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
@@ -13824,22 +13840,36 @@ class WeaponSystem extends Part {
     }
     GetHits() {
         var hits = this.final_weapon.hits;
-        var centerline = 0;
-        var wings = 0;
-        for (let w of this.weapons) {
-            if (w.GetWing() && w.GetFixed()) {
-                wings += w.GetCount() * hits;
+        if (hits != 0) {
+            var centerline = 0;
+            var wings = 0;
+            for (let w of this.weapons) {
+                if (w.GetWing() && (w.GetFixed() || this.GetDirectionCount() <= 2)) {
+                    wings += w.GetCount() * hits;
+                }
+                else {
+                    centerline += w.GetCount() * hits;
+                }
+            }
+            return [
+                centerline + wings,
+                Math.floor(1.0e-6 + centerline * 0.75) + Math.floor(1.0e-6 + wings * 0.9),
+                Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.2),
+                Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
+            ];
+        }
+        else {
+            if (this.final_weapon.ammo == 0) {
+                return [0, 0, 0, 0];
             }
             else {
-                centerline += w.GetCount() * hits;
+                var count = 0;
+                for (let w of this.weapons) {
+                    count += w.GetCount();
+                }
+                return [4 * count, 2 * count, 1 * count, 0];
             }
         }
-        return [
-            centerline + wings,
-            Math.floor(1.0e-6 + centerline * 0.75) + Math.floor(1.0e-6 + wings * 0.9),
-            Math.floor(1.0e-6 + centerline * 0.5) + Math.floor(1.0e-6 + wings * 0.2),
-            Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
-        ];
     }
     GetDamage() {
         return this.final_weapon.damage;
@@ -13973,6 +14003,14 @@ class WeaponSystem extends Part {
             }
         }
         return sum;
+    }
+    GetDirectionCount() {
+        var count = 0;
+        for (let d of this.directions) {
+            if (d)
+                count++;
+        }
+        return count;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;

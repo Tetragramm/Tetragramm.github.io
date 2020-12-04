@@ -317,8 +317,8 @@ class Reinforcement extends Part {
     }
 
     public SetSesquiplane(sqp: { is: boolean, deck: number, super_small: boolean }) {
-        this.tension_sqp = sqp.is && !sqp.super_small;
-        this.limited_sqp = sqp.is && sqp.super_small;
+        this.tension_sqp = sqp.is && sqp.super_small;
+        this.limited_sqp = sqp.is && !sqp.super_small;
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_wood_list.length; i++) {
                 if (!this.ext_wood_list[i].small_sqp)
@@ -439,7 +439,7 @@ class Reinforcement extends Part {
         if (use_cant)
             stats.cost += 5;
 
-        if (use_cant)
+        if (use_cant && this.has_wing)
             stats.liftbleed -= this.cant_lift;
 
         return stats;

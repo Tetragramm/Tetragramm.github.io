@@ -469,7 +469,7 @@ class Engine extends Part {
     }
 
     public CanUseExtendedDriveshaft() {
-        return !(this.GetIsPulsejet() || this.is_helicopter || this.is_generator);
+        return !(this.GetIsPulsejet() || this.is_helicopter || this.GetGenerator());
     }
 
     public SetUseExtendedDriveshaft(use: boolean) {
@@ -482,7 +482,7 @@ class Engine extends Part {
     }
 
     public CanUseGears() {
-        return !(this.GetIsPulsejet() || this.is_generator);
+        return !(this.GetIsPulsejet() || this.GetGenerator());
     }
 
     public SetGearCount(num: number) {
@@ -572,7 +572,7 @@ class Engine extends Part {
     }
 
     public GetHavePropeller() {
-        return !this.GetIsPulsejet(); //TODO: Charge and Generators
+        return !(this.GetIsPulsejet() || this.GetGenerator());
     }
 
     public GetIsTractorNacelle() {
@@ -698,7 +698,7 @@ class Engine extends Part {
     }
 
     public IsTractor() {
-        if (this.is_helicopter)
+        if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Tractor"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
@@ -712,7 +712,7 @@ class Engine extends Part {
     }
 
     public IsPusher() {
-        if (this.is_helicopter)
+        if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
@@ -726,7 +726,7 @@ class Engine extends Part {
     }
 
     private GetSpinner() {
-        if (this.gp_count > 0) {
+        if (this.gp_count > 0 && !this.GetGenerator()) {
             if (this.use_ds &&
                 (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
                     || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
@@ -742,21 +742,25 @@ class Engine extends Part {
     }
 
     public IsElectrics() {
-        return this.has_alternator || this.is_generator;
+        return this.has_alternator || this.GetGenerator();
     }
 
     public GetEngineHeight() {
-        if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_helicopter)
-            return 2;
-        else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
-            return 1;
-        else if (this.mount_list[this.selected_mount].name == "Nacelle (Inside)"
-            || this.mount_list[this.selected_mount].name == "Channel Tractor")
-            return 0;
+        if (!this.GetGenerator()) {
+            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_helicopter)
+                return 2;
+            else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
+                return 1;
+            else if (this.mount_list[this.selected_mount].name == "Nacelle (Inside)"
+                || this.mount_list[this.selected_mount].name == "Channel Tractor")
+                return 0;
+        }
         return -1;
     }
 
     public IsTractorRotary() {
+        if (this.GetGenerator())
+            return false;
         return this.IsRotary() && this.mount_list[this.selected_mount].name == "Tractor";
     }
 
