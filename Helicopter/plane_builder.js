@@ -4312,7 +4312,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span, and the leading wing
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             //Gull Drag modifies wing area
             let warea = w.area;
             if (w.gull)
@@ -4351,7 +4351,7 @@ class Wings extends Part {
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span
-            let wspan = w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0);
+            let wspan = w.span;
             wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (wspan * wspan));
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
             //stability from -hedral
