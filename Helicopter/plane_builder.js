@@ -4218,9 +4218,6 @@ class Wings extends Part {
         return Math.max(-Math.floor(1.0e-6 + 0.25 * this.plane_mass), paper);
     }
     GetIsSesquiplane() {
-        if (this.GetMonoplane() || this.GetTandem()) {
-            return { is: false, deck: -1, super_small: false };
-        }
         var biggest_area = 0;
         var biggest_deck = -1;
         var biggest_span = 0;
@@ -4238,12 +4235,13 @@ class Wings extends Part {
                 smallest_span = w.span;
             }
         }
-        var is = Math.floor(1.0e-6 + 0.5 * biggest_area) > smallest_area;
+        var is = biggest_area >= 2 * smallest_area;
+        is = is && !this.GetMonoplane() && !this.GetTandem();
         if (is) {
-            var ss = Math.floor(1.0e-6 + 0.75 * biggest_span) > smallest_span;
+            var ss = 0.75 * biggest_span >= smallest_span;
             return { is: is, deck: biggest_deck, super_small: ss };
         }
-        return { is: false, deck: -1, super_small: false };
+        return { is: false, deck: biggest_deck, super_small: false };
     }
     HasPolishWing() {
         for (let w of this.wing_list) {
@@ -4346,8 +4344,12 @@ class Wings extends Part {
         stats.latstab += Math.min(0, longest_span - 8);
         //Sesquiplanes!
         var sesp = this.GetIsSesquiplane();
-        if (sesp.is) {
+        if (sesp.is || this.GetMonoplane()) {
+            console.log(this.long_list);
+            console.log(sesp);
             stats = stats.Add(this.long_list[sesp.deck]);
+        }
+        if (sesp.is) {
             stats.liftbleed -= 2;
             stats.control += 2;
         }
@@ -5126,8 +5128,8 @@ class Reinforcement extends Part {
         this.is_staggered = false;
     }
     SetSesquiplane(sqp) {
-        this.tension_sqp = sqp.is && !sqp.super_small;
-        this.limited_sqp = sqp.is && sqp.super_small;
+        this.tension_sqp = sqp.is && sqp.super_small;
+        this.limited_sqp = sqp.is && !sqp.super_small;
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_wood_list.length; i++) {
                 if (!this.ext_wood_list[i].small_sqp)
