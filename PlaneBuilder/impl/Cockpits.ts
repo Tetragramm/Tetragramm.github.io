@@ -157,7 +157,7 @@ class Cockpits extends Part {
 
     public SetHasRotary(has: boolean) {
         for (let c of this.positions) {
-            this.SetHasRotary(has);
+            c.SetHasRotary(has);
         }
     }
 

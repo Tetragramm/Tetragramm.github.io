@@ -1805,7 +1805,7 @@ class Cockpits extends Part {
     }
     SetHasRotary(has) {
         for (let c of this.positions) {
-            this.SetHasRotary(has);
+            c.SetHasRotary(has);
         }
     }
     PartStats() {
