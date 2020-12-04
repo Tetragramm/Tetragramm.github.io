@@ -4295,7 +4295,7 @@ class Wings extends Part {
                 biggest_deck = w.deck;
             }
             smallest_area = Math.min(smallest_area, w.area);
-            longest_span = Math.max(longest_span, w.span);
+            longest_span = Math.max(longest_span, w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0));
             if (!have_wing) { //Is first wing
                 have_wing = true;
             }
