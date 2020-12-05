@@ -627,18 +627,10 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
-        var biggest_area = 0;
-        var biggest_deck = -1;
-        var smallest_area = 1e100;
 
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            if (w.area > biggest_area) {
-                biggest_area = w.area;
-                biggest_deck = w.deck;
-            }
-            smallest_area = Math.min(smallest_area, w.area);
-            longest_span = Math.max(longest_span, w.span - Math.ceil(-1.0e-6 + (w.anhedral + w.dihedral) / 2.0));
+            longest_span = Math.max(longest_span, w.span);
 
             if (!have_wing) { //Is first wing
                 have_wing = true;
