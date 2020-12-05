@@ -188,7 +188,7 @@ class Accessories extends Part {
         if (count != count || count < 0)
             count = 0;
         count = Math.floor(1.0e-6 + count);
-        count = Math.min(count, 5);
+        count = Math.min(count, 50);
         this.electrical_count[idx] = count;
         this.CalculateStats();
     }
