@@ -1732,6 +1732,13 @@
                 "cost": 2,
                 "cp10s": 0,
                 "warning": "Stores 5 charge"
+            },
+            {
+                "name": "Battery (High Quality)",
+                "mass": 0,
+                "cost": 4,
+                "cp10s": 0,
+                "warning": "Stores 5 charge"
             }
         ],
         "radios": [
@@ -1775,6 +1782,34 @@
                 "drag": 1,
                 "charge": -4,
                 "cost": 12
+            },
+            {
+                "name": "Radio Receiver (High Quality)",
+                "mass": 1,
+                "drag": 2,
+                "charge": -1,
+                "cost": 6
+            },
+            {
+                "name": "Radio Transmitter (High Quality)",
+                "mass": 2,
+                "drag": 3,
+                "charge": -2,
+                "cost": 6
+            },
+            {
+                "name": "Radio Transceiver (High Quality)",
+                "mass": 4,
+                "drag": 3,
+                "charge": -2,
+                "cost": 6
+            },
+            {
+                "name": "Whalebone Radio Node (High Quality)",
+                "mass": 5,
+                "drag": 1,
+                "charge": -4,
+                "cost": 24
             }
         ],
         "information": [
