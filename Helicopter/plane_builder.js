@@ -6565,6 +6565,8 @@ class Weapon extends Part {
         }
         if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH))
             return false;
+        if (this.action == ActionType.GAST && num == SynchronizationType.SPINNER)
+            return false;
         if ((num == SynchronizationType.INTERRUPT || num == SynchronizationType.SYNCH)
             && !this.weapon_type.synched) {
             return false;
@@ -13494,6 +13496,7 @@ class WeaponSystem extends Part {
         this.fixed = true;
         this.ammo = 1;
         this.weapon_type = 0;
+        this.raw_weapon_type = 0;
         this.weapons = [];
         this.action_sel = ActionType.STANDARD;
         this.projectile_sel = ProjectileType.BULLETS;
@@ -13516,7 +13519,7 @@ class WeaponSystem extends Part {
             wlist.push(w.toJSON());
         }
         return {
-            weapon_type: this.weapon_type,
+            weapon_type: this.raw_weapon_type,
             fixed: this.fixed,
             directions: this.directions,
             weapons: wlist,
@@ -13527,13 +13530,8 @@ class WeaponSystem extends Part {
         };
     }
     fromJSON(js, json_version) {
-        if (json_version < 11.25) {
-            this.weapon_type = js["weapon_type"];
-            this.weapon_type = this.wl_permute[this.weapon_type];
-        }
-        else {
-            this.weapon_type = js["weapon_type"];
-        }
+        this.raw_weapon_type = js["weapon_type"];
+        this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = js["fixed"];
         this.directions = js["directions"];
         this.weapons = [];
@@ -13571,7 +13569,7 @@ class WeaponSystem extends Part {
         }
     }
     serialize(s) {
-        s.PushNum(this.weapon_type);
+        s.PushNum(this.raw_weapon_type);
         s.PushBool(this.fixed);
         s.PushBoolArr(this.directions);
         s.PushNum(this.ammo);
@@ -13584,13 +13582,8 @@ class WeaponSystem extends Part {
         s.PushBool(this.repeating);
     }
     deserialize(d) {
-        if (d.version < 11.25) {
-            this.weapon_type = d.GetNum();
-            this.weapon_type = this.wl_permute[this.weapon_type];
-        }
-        else {
-            this.weapon_type = d.GetNum();
-        }
+        this.raw_weapon_type = d.GetNum();
+        this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
         this.directions = d.GetBoolArr();
         this.ammo = d.GetNum();
@@ -13718,6 +13711,7 @@ class WeaponSystem extends Part {
     }
     SetWeaponSelected(num) {
         this.weapon_type = num;
+        this.raw_weapon_type = this.wl_permute.findIndex((value) => { return value == num; });
         if (this.weapon_list[num].size == 16) {
             while (this.weapons.length > 1) {
                 this.weapons.pop();

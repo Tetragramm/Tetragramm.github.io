@@ -219,7 +219,6 @@ class Weapon extends Part {
     }
 
     private CanSynch(num: number) {
-
         if (!this.fixed && !this.wing) {
             if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) {
                 return true;
@@ -235,6 +234,9 @@ class Weapon extends Part {
         }
 
         if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH))
+            return false;
+
+        if (this.action == ActionType.GAST && num == SynchronizationType.SPINNER)
             return false;
 
         if ((num == SynchronizationType.INTERRUPT || num == SynchronizationType.SYNCH)

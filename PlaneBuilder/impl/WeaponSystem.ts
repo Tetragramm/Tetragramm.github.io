@@ -11,6 +11,7 @@ class WeaponSystem extends Part {
         can_action: boolean, can_projectile: boolean, deflection: number
     };
     private weapon_type: number;
+    private raw_weapon_type: number;
     private fixed: boolean;
     private directions: boolean[];
     private weapons: Weapon[];
@@ -51,6 +52,7 @@ class WeaponSystem extends Part {
         this.fixed = true;
         this.ammo = 1;
         this.weapon_type = 0;
+        this.raw_weapon_type = 0;
         this.weapons = [];
         this.action_sel = ActionType.STANDARD;
         this.projectile_sel = ProjectileType.BULLETS;
@@ -74,7 +76,7 @@ class WeaponSystem extends Part {
             wlist.push(w.toJSON());
         }
         return {
-            weapon_type: this.weapon_type,
+            weapon_type: this.raw_weapon_type,
             fixed: this.fixed,
             directions: this.directions,
             weapons: wlist,
@@ -86,12 +88,8 @@ class WeaponSystem extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
-        if (json_version < 11.25) {
-            this.weapon_type = js["weapon_type"];
-            this.weapon_type = this.wl_permute[this.weapon_type];
-        } else {
-            this.weapon_type = js["weapon_type"];
-        }
+        this.raw_weapon_type = js["weapon_type"];
+        this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = js["fixed"];
         this.directions = js["directions"];
         this.weapons = [];
@@ -131,7 +129,7 @@ class WeaponSystem extends Part {
     }
 
     public serialize(s: Serialize) {
-        s.PushNum(this.weapon_type);
+        s.PushNum(this.raw_weapon_type);
         s.PushBool(this.fixed);
         s.PushBoolArr(this.directions);
         s.PushNum(this.ammo);
@@ -145,12 +143,8 @@ class WeaponSystem extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        if (d.version < 11.25) {
-            this.weapon_type = d.GetNum();
-            this.weapon_type = this.wl_permute[this.weapon_type];
-        } else {
-            this.weapon_type = d.GetNum();
-        }
+        this.raw_weapon_type = d.GetNum();
+        this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
         this.directions = d.GetBoolArr();
         this.ammo = d.GetNum();
@@ -283,6 +277,7 @@ class WeaponSystem extends Part {
 
     public SetWeaponSelected(num: number) {
         this.weapon_type = num;
+        this.raw_weapon_type = this.wl_permute.findIndex((value) => { return value == num; });
         if (this.weapon_list[num].size == 16) {
             while (this.weapons.length > 1) {
                 this.weapons.pop();
