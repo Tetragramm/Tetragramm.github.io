@@ -20,6 +20,7 @@ enum ActionType {
     STANDARD,
     MECHANICAL,
     GAST,
+    ROTARY,
     ENUM_MAX
 }
 class Weapon extends Part {
@@ -410,7 +411,7 @@ class Weapon extends Part {
 
         //If on the wing and uncovered add 1, if covered, drag is min 1.
         if (this.wing && !this.covered)
-            stats.drag += 1;
+            stats.drag += this.w_count;
 
         //Arty size weapon turrets need a section
         //Arty weapons in the fuselage need a section
@@ -458,7 +459,7 @@ class Weapon extends Part {
             stats.cost += 1;
             stats.warnings.push({
                 source: this.weapon_type.name,
-                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
+                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less on the first Crit die."
             });
         }
 

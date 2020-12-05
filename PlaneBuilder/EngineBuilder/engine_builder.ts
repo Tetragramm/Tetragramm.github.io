@@ -417,6 +417,21 @@ class EngineBuilder_HTML {
         this.m_oil = document.createElement("INPUT") as HTMLInputElement;
         this.m_pulsejet = document.createElement("INPUT") as HTMLInputElement;
         this.m_turbo = document.createElement("INPUT") as HTMLInputElement;
+        this.m_name.disabled = true;
+        this.m_pwr.disabled = true;
+        this.m_mass.disabled = true;
+        this.m_drag.disabled = true;
+        this.m_rely.disabled = true;
+        this.m_cool.disabled = true;
+        this.m_over.disabled = true;
+        this.m_fuel.disabled = true;
+        this.m_alti.disabled = true;
+        this.m_torq.disabled = true;
+        this.m_rumb.disabled = true;
+        this.m_cost.disabled = true;
+        this.m_oil.disabled = true;
+        this.m_pulsejet.disabled = true;
+        this.m_turbo.disabled = true;
 
         var fs = CreateFlexSection(cell);
         //Set up the individual stat input boxes

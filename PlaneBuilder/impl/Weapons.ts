@@ -11,12 +11,14 @@ class Weapons extends Part {
         rapid: boolean, synched: boolean, shells: boolean,
         can_action: boolean, can_projectile: boolean, deflection: number,
     }[];
+    private wl_permute: number[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
     private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
     private action_list = [
         { name: "Standard Action" },
         { name: "Mechanical Action" },
         { name: "Gast Principle" },
+        { name: "Rotary" },
     ];
     private projectile_list = [
         { name: "Standard" },
@@ -62,6 +64,53 @@ class Weapons extends Part {
             this.weapon_list.push(weap);
         }
 
+
+
+        var era2num = (era: string): number => {
+            switch (era) {
+                case "Pioneer":
+                    return 0;
+                case "WWI":
+                    return 1;
+                case "Roaring 20s":
+                    return 2;
+                case "Coming Storm":
+                    return 3;
+                case "WWII":
+                    return 4;
+                case "Last Hurrah":
+                    return 5;
+                case "Himmelgard":
+                    return 6;
+            }
+        };
+        var pred = (a, b): number => {
+            var cvt2num = (l, r) => {
+                if (l < r)
+                    return -1;
+                if (r < l)
+                    return 1;
+                return 0;
+            };
+            if (a.size != b.size)
+                return cvt2num(a.size, b.size);
+            else if (a.era != b.era)
+                return cvt2num(era2num(a.era), era2num(b.era));
+            else if (a.damage != b.damage)
+                return cvt2num(a.damage, b.damage);
+            else
+                return cvt2num(a.name, b.name);
+        };
+
+        this.wl_permute = Array.from(Array(this.weapon_list.length).keys())
+            .sort((a, b) => { return pred(this.weapon_list[a], this.weapon_list[b]); });
+        var p2 = [];
+        for (let i = 0; i < this.wl_permute.length; i++) {
+            p2.push(this.wl_permute.findIndex((value) => { return value == i; }));
+        }
+        this.wl_permute = p2;
+        this.weapon_list = this.weapon_list.sort(pred);
+
         this.weapon_sets = [];
         this.brace_count = 0;
     }
@@ -81,7 +130,7 @@ class Weapons extends Part {
         this.weapon_sets = [];
         var lst = js["weapon_systems"];
         for (let wsj of lst) {
-            var ws = new WeaponSystem(this.weapon_list);
+            var ws = new WeaponSystem(this.weapon_list, this.wl_permute);
             ws.SetCalculateStats(this.CalculateStats);
             ws.fromJSON(wsj, json_version);
             this.weapon_sets.push(ws);
@@ -103,7 +152,7 @@ class Weapons extends Part {
         this.weapon_sets = [];
         var wlen = d.GetNum();
         for (let i = 0; i < wlen; i++) {
-            var ws = new WeaponSystem(this.weapon_list);
+            var ws = new WeaponSystem(this.weapon_list, this.wl_permute);
             ws.SetCalculateStats(this.CalculateStats);
             ws.deserialize(d);
             this.weapon_sets.push(ws);
@@ -129,7 +178,7 @@ class Weapons extends Part {
             num = 0;
         num = Math.floor(1.0e-6 + num);
         while (num > this.weapon_sets.length) {
-            var w = new WeaponSystem(this.weapon_list);
+            var w = new WeaponSystem(this.weapon_list, this.wl_permute);
             w.SetCalculateStats(this.CalculateStats);
             this.weapon_sets.push(w);
         }

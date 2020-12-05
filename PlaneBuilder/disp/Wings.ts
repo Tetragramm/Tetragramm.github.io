@@ -161,7 +161,7 @@ class Wings_HTML extends Display {
 
         var stats = this.wings.PartStats();
         BlinkIfChanged(this.d_area, stats.wingarea.toString(), true);
-        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_mass, (stats.mass + this.wings.GetPaperMass()).toString(), false);
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.d_cont, stats.control.toString(), true);
         BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);

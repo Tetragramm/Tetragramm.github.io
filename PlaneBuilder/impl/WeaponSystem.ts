@@ -34,6 +34,7 @@ class WeaponSystem extends Part {
         rapid: boolean, synched: boolean, shells: boolean,
         can_action: boolean, can_projectile: boolean, deflection: number,
     }[];
+    private wl_permute: number[];
 
     constructor(weapon_list: {
         name: string, abrv: string, era: string, size: number, stats: Stats,
@@ -41,9 +42,10 @@ class WeaponSystem extends Part {
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
         can_action: boolean, can_projectile: boolean, deflection: number,
-    }[]) {
+    }[], wl_permute: number[]) {
         super();
         this.weapon_list = weapon_list;
+        this.wl_permute = wl_permute;
         this.directions = [...Array(6).fill(false)];
         this.directions[0] = true;
         this.fixed = true;
@@ -84,7 +86,12 @@ class WeaponSystem extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
-        this.weapon_type = js["weapon_type"];
+        if (json_version < 11.25) {
+            this.weapon_type = js["weapon_type"];
+            this.weapon_type = this.wl_permute[this.weapon_type];
+        } else {
+            this.weapon_type = js["weapon_type"];
+        }
         this.fixed = js["fixed"];
         this.directions = js["directions"];
         this.weapons = [];
@@ -138,7 +145,12 @@ class WeaponSystem extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        this.weapon_type = d.GetNum();
+        if (d.version < 11.25) {
+            this.weapon_type = d.GetNum();
+            this.weapon_type = this.wl_permute[this.weapon_type];
+        } else {
+            this.weapon_type = d.GetNum();
+        }
         this.fixed = d.GetBool();
         this.directions = d.GetBoolArr();
         this.ammo = d.GetNum();
@@ -217,6 +229,19 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = false;
+        } else if (this.action_sel == ActionType.ROTARY) {
+            //rotary conversion
+            //3x hits, awkward + 1(don't know if that's easy to do? Otherwise I may reconsider), can only rapid fire, weapon becomes open bolt but can fire down the spinner, +1 jam, +100 % mass, +100 % cost
+            this.final_weapon.stats.mass += this.weapon_list[num].stats.mass;
+            this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
+            this.final_weapon.hits = 3 * this.weapon_list[num].hits;
+            this.final_weapon.deflection += 1;
+            this.final_weapon.synched = false;
+
+            var jams = this.weapon_list[num].jam.split('/');
+            jams[0] = "9999";
+            jams[1] = (parseInt(jams[1]) + 1).toString();
+            this.final_weapon.jam = jams.join('/');
         }
 
         if (this.repeating) {
@@ -243,7 +268,9 @@ class WeaponSystem extends Part {
             this.final_weapon.ammo *= 2;
             this.final_weapon.shells = false;
             if (this.final_weapon.rapid) {
-                this.final_weapon.jam = this.final_weapon.jam.substr(0, 2) + "9999";
+                var jams = this.weapon_list[num].jam.split('/');
+                jams[1] = "9999";
+                this.final_weapon.jam = jams.join('/');
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
             }
             this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
@@ -540,7 +567,11 @@ class WeaponSystem extends Part {
     }
 
     public GetCanAction() {
-        return [true, this.has_propeller && this.final_weapon.can_action, this.final_weapon.can_action && (this.final_weapon.rapid || this.repeating)];
+        return [true,
+            this.has_propeller && this.weapon_list[this.weapon_type].can_action,
+            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
+            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
+        ];
     }
 
     public SetAction(num: number) {

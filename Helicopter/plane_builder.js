@@ -6403,7 +6403,8 @@ var ActionType;
     ActionType[ActionType["STANDARD"] = 0] = "STANDARD";
     ActionType[ActionType["MECHANICAL"] = 1] = "MECHANICAL";
     ActionType[ActionType["GAST"] = 2] = "GAST";
-    ActionType[ActionType["ENUM_MAX"] = 3] = "ENUM_MAX";
+    ActionType[ActionType["ROTARY"] = 3] = "ROTARY";
+    ActionType[ActionType["ENUM_MAX"] = 4] = "ENUM_MAX";
 })(ActionType || (ActionType = {}));
 class Weapon extends Part {
     constructor(weapon_type, action, projectile, fixed = false) {
@@ -6726,7 +6727,7 @@ class Weapon extends Part {
         }
         //If on the wing and uncovered add 1, if covered, drag is min 1.
         if (this.wing && !this.covered)
-            stats.drag += 1;
+            stats.drag += this.w_count;
         //Arty size weapon turrets need a section
         //Arty weapons in the fuselage need a section
         if ((!this.fixed && size > 8) || this.weapon_type.size == 16)
@@ -6773,7 +6774,7 @@ class Weapon extends Part {
             stats.cost += 1;
             stats.warnings.push({
                 source: this.weapon_type.name,
-                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less."
+                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less on the first Crit die."
             });
         }
         if (this.wing_reinforcement)
@@ -6794,6 +6795,7 @@ class Weapons extends Part {
             { name: "Standard Action" },
             { name: "Mechanical Action" },
             { name: "Gast Principle" },
+            { name: "Rotary" },
         ];
         this.projectile_list = [
             { name: "Standard" },
@@ -6824,6 +6826,49 @@ class Weapons extends Part {
             };
             this.weapon_list.push(weap);
         }
+        var era2num = (era) => {
+            switch (era) {
+                case "Pioneer":
+                    return 0;
+                case "WWI":
+                    return 1;
+                case "Roaring 20s":
+                    return 2;
+                case "Coming Storm":
+                    return 3;
+                case "WWII":
+                    return 4;
+                case "Last Hurrah":
+                    return 5;
+                case "Himmelgard":
+                    return 6;
+            }
+        };
+        var pred = (a, b) => {
+            var cvt2num = (l, r) => {
+                if (l < r)
+                    return -1;
+                if (r < l)
+                    return 1;
+                return 0;
+            };
+            if (a.size != b.size)
+                return cvt2num(a.size, b.size);
+            else if (a.era != b.era)
+                return cvt2num(era2num(a.era), era2num(b.era));
+            else if (a.damage != b.damage)
+                return cvt2num(a.damage, b.damage);
+            else
+                return cvt2num(a.name, b.name);
+        };
+        this.wl_permute = Array.from(Array(this.weapon_list.length).keys())
+            .sort((a, b) => { return pred(this.weapon_list[a], this.weapon_list[b]); });
+        var p2 = [];
+        for (let i = 0; i < this.wl_permute.length; i++) {
+            p2.push(this.wl_permute.findIndex((value) => { return value == i; }));
+        }
+        this.wl_permute = p2;
+        this.weapon_list = this.weapon_list.sort(pred);
         this.weapon_sets = [];
         this.brace_count = 0;
     }
@@ -6841,7 +6886,7 @@ class Weapons extends Part {
         this.weapon_sets = [];
         var lst = js["weapon_systems"];
         for (let wsj of lst) {
-            var ws = new WeaponSystem(this.weapon_list);
+            var ws = new WeaponSystem(this.weapon_list, this.wl_permute);
             ws.SetCalculateStats(this.CalculateStats);
             ws.fromJSON(wsj, json_version);
             this.weapon_sets.push(ws);
@@ -6861,7 +6906,7 @@ class Weapons extends Part {
         this.weapon_sets = [];
         var wlen = d.GetNum();
         for (let i = 0; i < wlen; i++) {
-            var ws = new WeaponSystem(this.weapon_list);
+            var ws = new WeaponSystem(this.weapon_list, this.wl_permute);
             ws.SetCalculateStats(this.CalculateStats);
             ws.deserialize(d);
             this.weapon_sets.push(ws);
@@ -6883,7 +6928,7 @@ class Weapons extends Part {
             num = 0;
         num = Math.floor(1.0e-6 + num);
         while (num > this.weapon_sets.length) {
-            var w = new WeaponSystem(this.weapon_list);
+            var w = new WeaponSystem(this.weapon_list, this.wl_permute);
             w.SetCalculateStats(this.CalculateStats);
             this.weapon_sets.push(w);
         }
@@ -9878,7 +9923,7 @@ class Wings_HTML extends Display {
         this.CreateMWAdd(mwl.length);
         var stats = this.wings.PartStats();
         BlinkIfChanged(this.d_area, stats.wingarea.toString(), true);
-        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_mass, (stats.mass + this.wings.GetPaperMass()).toString(), false);
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.d_cont, stats.control.toString(), true);
         BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
@@ -13440,9 +13485,10 @@ class AlterStats extends Part {
 /// <reference path="./Stats.ts" />
 /// <reference path="./Weapon.ts" />
 class WeaponSystem extends Part {
-    constructor(weapon_list) {
+    constructor(weapon_list, wl_permute) {
         super();
         this.weapon_list = weapon_list;
+        this.wl_permute = wl_permute;
         this.directions = [...Array(6).fill(false)];
         this.directions[0] = true;
         this.fixed = true;
@@ -13481,7 +13527,13 @@ class WeaponSystem extends Part {
         };
     }
     fromJSON(js, json_version) {
-        this.weapon_type = js["weapon_type"];
+        if (json_version < 11.25) {
+            this.weapon_type = js["weapon_type"];
+            this.weapon_type = this.wl_permute[this.weapon_type];
+        }
+        else {
+            this.weapon_type = js["weapon_type"];
+        }
         this.fixed = js["fixed"];
         this.directions = js["directions"];
         this.weapons = [];
@@ -13532,7 +13584,13 @@ class WeaponSystem extends Part {
         s.PushBool(this.repeating);
     }
     deserialize(d) {
-        this.weapon_type = d.GetNum();
+        if (d.version < 11.25) {
+            this.weapon_type = d.GetNum();
+            this.weapon_type = this.wl_permute[this.weapon_type];
+        }
+        else {
+            this.weapon_type = d.GetNum();
+        }
         this.fixed = d.GetBool();
         this.directions = d.GetBoolArr();
         this.ammo = d.GetNum();
@@ -13610,6 +13668,19 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = false;
         }
+        else if (this.action_sel == ActionType.ROTARY) {
+            //rotary conversion
+            //3x hits, awkward + 1(don't know if that's easy to do? Otherwise I may reconsider), can only rapid fire, weapon becomes open bolt but can fire down the spinner, +1 jam, +100 % mass, +100 % cost
+            this.final_weapon.stats.mass += this.weapon_list[num].stats.mass;
+            this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
+            this.final_weapon.hits = 3 * this.weapon_list[num].hits;
+            this.final_weapon.deflection += 1;
+            this.final_weapon.synched = false;
+            var jams = this.weapon_list[num].jam.split('/');
+            jams[0] = "9999";
+            jams[1] = (parseInt(jams[1]) + 1).toString();
+            this.final_weapon.jam = jams.join('/');
+        }
         if (this.repeating) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
@@ -13634,7 +13705,9 @@ class WeaponSystem extends Part {
             this.final_weapon.ammo *= 2;
             this.final_weapon.shells = false;
             if (this.final_weapon.rapid) {
-                this.final_weapon.jam = this.final_weapon.jam.substr(0, 2) + "9999";
+                var jams = this.weapon_list[num].jam.split('/');
+                jams[1] = "9999";
+                this.final_weapon.jam = jams.join('/');
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
             }
             this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
@@ -13908,7 +13981,11 @@ class WeaponSystem extends Part {
         return this.action_sel;
     }
     GetCanAction() {
-        return [true, this.has_propeller && this.final_weapon.can_action, this.final_weapon.can_action && (this.final_weapon.rapid || this.repeating)];
+        return [true,
+            this.has_propeller && this.weapon_list[this.weapon_type].can_action,
+            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
+            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
+        ];
     }
     SetAction(num) {
         if (this.final_weapon.can_action) {
