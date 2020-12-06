@@ -13637,9 +13637,9 @@ class WeaponSystem extends Part {
         this.final_weapon.size = this.weapon_list[num].size;
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
+        this.final_weapon.jam = this.weapon_list[num].jam;
         if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
-            this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.synched = this.weapon_list[num].synched;
         }
@@ -13656,7 +13656,6 @@ class WeaponSystem extends Part {
         else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
             this.final_weapon.ammo = this.weapon_list[num].ammo / 2;
-            this.final_weapon.jam = this.weapon_list[num].jam;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = false;
@@ -13669,7 +13668,7 @@ class WeaponSystem extends Part {
             this.final_weapon.hits = 3 * this.weapon_list[num].hits;
             this.final_weapon.deflection += 1;
             this.final_weapon.synched = false;
-            var jams = this.weapon_list[num].jam.split('/');
+            var jams = this.final_weapon.jam.split('/');
             jams[0] = "9999";
             jams[1] = (parseInt(jams[1]) + 1).toString();
             this.final_weapon.jam = jams.join('/');
@@ -13678,7 +13677,12 @@ class WeaponSystem extends Part {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
-        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL) && this.projectile_sel == ProjectileType.HEATRAY) {
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL)
+            && this.projectile_sel == ProjectileType.HEATRAY) {
+            this.projectile_sel = ProjectileType.BULLETS;
+        }
+        if (this.action_sel == ActionType.ROTARY
+            && this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
         if (this.projectile_sel == ProjectileType.HEATRAY) {
@@ -13698,7 +13702,7 @@ class WeaponSystem extends Part {
             this.final_weapon.ammo *= 2;
             this.final_weapon.shells = false;
             if (this.final_weapon.rapid) {
-                var jams = this.weapon_list[num].jam.split('/');
+                var jams = this.final_weapon.jam.split('/');
                 jams[1] = "9999";
                 this.final_weapon.jam = jams.join('/');
                 this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
@@ -13995,7 +13999,10 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
     GetCanProjectile() {
-        return [true, this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL, this.final_weapon.can_projectile, this.final_weapon.can_projectile];
+        return [true,
+            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST,
+            this.final_weapon.can_projectile,
+            this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY];
     }
     GetProjectile() {
         return this.projectile_sel;
