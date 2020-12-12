@@ -7889,6 +7889,7 @@ class Aircraft {
         this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
         stats = stats.Add(this.stabilizers.PartStats());
         this.controlsurfaces.SetWingArea(stats.wingarea);
+        this.controlsurfaces.SetBoomTail(this.frames.GetUseBoom());
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
             this.controlsurfaces.SetSpan(this.wings.GetSpan());
         }
