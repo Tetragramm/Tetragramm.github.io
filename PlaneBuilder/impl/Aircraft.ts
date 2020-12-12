@@ -322,6 +322,7 @@ class Aircraft {
         stats = stats.Add(this.stabilizers.PartStats());
 
         this.controlsurfaces.SetWingArea(stats.wingarea);
+        this.controlsurfaces.SetBoomTail(this.frames.GetUseBoom());
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
             this.controlsurfaces.SetSpan(this.wings.GetSpan());
         } else {
@@ -513,8 +514,9 @@ class Aircraft {
 
         var MaxStrain = 1 / 0;
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER && (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)) {
-            MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+            MaxStrain = this.stats.maxstrain - DryMP;
             this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * this.reinforcements.PartStats().maxstrain / 10);
+            MaxStrain = Math.min(MaxStrain, this.stats.structure);
         } else {
             MaxStrain = Math.min(this.stats.structure + this.stats.maxstrain, this.stats.structure);
             this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * this.stats.structure / 10);

@@ -2441,7 +2441,7 @@
                     ]
                 },
                 {
-                    "name": "Wollsteinkraft Wagenhals C 290hp",
+                    "name": "Wollsteinkraft Wagehals C 290hp",
                     "engine_type": 0,
                     "type": 0,
                     "era_sel": 1,
@@ -2683,7 +2683,7 @@
                     ]
                 },
                 {
-                    "name": "Wollsteinkraft Wagenhals T 360hp",
+                    "name": "Wollsteinkraft Wagehals T 360hp",
                     "engine_type": 0,
                     "type": 0,
                     "era_sel": 1,
@@ -2830,7 +2830,7 @@
             "name": "Himmilgard Semi-Radial",
             "engines": [
                 {
-                    "name": "SLW Sigvird 180hp",
+                    "name": "SLW Sigvrid 180hp",
                     "engine_type": 0,
                     "type": 4,
                     "era_sel": 1,
