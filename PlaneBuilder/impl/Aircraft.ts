@@ -514,11 +514,12 @@ class Aircraft {
         var MaxStrain = 1 / 0;
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER && (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)) {
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+            this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * this.reinforcements.PartStats().maxstrain / 10);
         } else {
             MaxStrain = Math.min(this.stats.structure + this.stats.maxstrain, this.stats.structure);
+            this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * this.stats.structure / 10);
         }
         //And store the results so they can be displayed
-        this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;
         //Used: Fragile
         MaxStrain = Math.floor(1.0e-6 + MaxStrain * Math.pow(0.8, this.used.fragile));

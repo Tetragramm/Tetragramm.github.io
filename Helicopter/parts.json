@@ -7,41 +7,47 @@
                 "liftbleed": 30,
                 "maxbomb": 0.166666666666,
                 "cost": -2,
-                "cant_lift": 4
+                "cant_lift": 4,
+                "pitchstab": 0
             },
             {
                 "name": "WWI",
                 "liftbleed": 25,
                 "maxbomb": 0.2,
-                "cant_lift": 3
+                "cant_lift": 3,
+                "pitchstab": 0
             },
             {
                 "name": "Roaring 20s",
                 "liftbleed": 22,
                 "maxbomb": 0.25,
                 "cost": 5,
-                "cant_lift": 1
+                "cant_lift": 1,
+                "pitchstab": 0
             },
             {
                 "name": "Coming Storm",
                 "liftbleed": 22,
                 "maxbomb": 0.333333333333,
                 "cost": 10,
-                "cant_lift": 0
+                "cant_lift": 0,
+                "pitchstab": 2
             },
             {
                 "name": "WWII",
                 "liftbleed": 20,
                 "maxbomb": 0.333333333333,
                 "cost": 15,
-                "cant_lift": 0
+                "cant_lift": 0,
+                "pitchstab": 2
             },
             {
                 "name": "Last Hurrah",
                 "liftbleed": 18,
                 "maxbomb": 0.5,
                 "cost": 20,
-                "cant_lift": 0
+                "cant_lift": 0,
+                "pitchstab": 2
             }
         ]
     },
@@ -802,7 +808,6 @@
                 "maxstrain": -10,
                 "liftbleed": -2,
                 "visibility": -1,
-                "dragfactor": 1,
                 "limited": false
             },
             {
@@ -810,12 +815,10 @@
                 "pitchstab": 2,
                 "liftbleed": -1,
                 "visibility": -1,
-                "dragfactor": 1,
                 "limited": true
             },
             {
                 "name": "Mid",
-                "dragfactor": 0.9,
                 "limited": true
             },
             {
@@ -823,7 +826,6 @@
                 "pitchstab": -2,
                 "crashsafety": -1,
                 "liftbleed": -1,
-                "dragfactor": 1,
                 "limited": true
             },
             {
@@ -832,7 +834,6 @@
                 "maxstrain": -10,
                 "crashsafety": -1,
                 "liftbleed": -2,
-                "dragfactor": 1,
                 "limited": false
             }
         ],
@@ -840,24 +841,29 @@
             {
                 "name": "Parasol",
                 "latstab": 1,
-                "control": -1
+                "control": -1,
+                "dragfactor": 1
             },
             {
                 "name": "Shoulder",
-                "control": -1
+                "control": -1,
+                "dragfactor": 1
             },
             {
-                "name": "Mid"
+                "name": "Mid",
+                "dragfactor": 0.9
             },
             {
                 "name": "Low",
                 "latstab": -1,
-                "control": 2
+                "control": 2,
+                "dragfactor": 1
             },
             {
                 "name": "Gear",
                 "latstab": -1,
-                "control": 3
+                "control": 3,
+                "dragfactor": 1
             }
         ],
         "surface": [
@@ -1115,7 +1121,7 @@
             },
             {
                 "name": "Flying Rudder",
-                "latstab": -2,
+                "latstab": -1,
                 "control": 3
             }
         ],
@@ -1125,7 +1131,7 @@
             },
             {
                 "name": "Flying Elevator",
-                "pitchstab": -2,
+                "pitchstab": -1,
                 "control": 2
             }
         ],

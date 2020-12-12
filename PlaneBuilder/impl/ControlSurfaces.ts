@@ -19,6 +19,7 @@ class ControlSurfaces extends Part {
     private is_cantilever: boolean = false;
     private wing_area: number = 0;
     private mp: number = 0;
+    private is_boom: boolean = false;
 
     constructor(js: JSON) {
         super();
@@ -217,6 +218,10 @@ class ControlSurfaces extends Part {
         this.wing_area = 0;
     }
 
+    public SetBoomTail(has: boolean) {
+        this.is_boom = has;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -230,8 +235,14 @@ class ControlSurfaces extends Part {
 
         if (this.aileron_list[this.aileron_sel].warping) {
             stats.maxstrain -= this.span;
-            if (this.is_cantilever)
+            if (this.is_cantilever) {
                 stats.cost += 2 * this.wing_area;
+            }
+            if (this.is_boom) {
+                stats.pitchstab -= 1;
+                stats.latstab -= 1;
+                stats.warnings.push({ source: "Wing Warping", warning: "Wing Warping with a Boom Tail causes a stability penalty." });
+            }
         }
 
         stats = stats.Add(this.rudder_list[this.rudder_sel].stats);

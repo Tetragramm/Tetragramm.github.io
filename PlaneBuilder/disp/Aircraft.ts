@@ -423,6 +423,9 @@ class Aircraft_HTML extends Display {
         if (fweap.shells) {
             this.cards.weap_data.tags.push("Shells");
         }
+        if (fweap.deflection) {
+            this.cards.weap_data.tags.push("Awkward " + fweap.deflection);
+        }
         var deflector = false;
         for (let iw of w.GetWeapons()) {
             if (iw.GetSynchronization() == SynchronizationType.DEFLECT)

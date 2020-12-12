@@ -25,9 +25,11 @@ class Wings extends Part {
     }[];
     private deck_list: {
         name: string, limited: boolean,
-        stats: Stats, dragfactor: number,
+        stats: Stats,
     }[];
-    private long_list: Stats[];
+    private long_list: {
+        dragfactor: number, stats: Stats,
+    }[];
     //Actual selections
     private wing_stagger: number;
     private is_swept: boolean;
@@ -57,13 +59,13 @@ class Wings extends Part {
         this.deck_list = [];
         for (let elem of js["decks"]) {
             this.deck_list.push({
-                name: elem["name"], limited: elem["limited"], stats: new Stats(elem), dragfactor: elem["dragfactor"],
+                name: elem["name"], limited: elem["limited"], stats: new Stats(elem),
             });
         }
 
         this.long_list = [];
         for (let elem of js["largest"]) {
-            this.long_list.push(new Stats(elem));
+            this.long_list.push({ dragfactor: elem["dragfactor"], stats: new Stats(elem), });
         }
 
         this.wing_list = [];
@@ -501,22 +503,27 @@ class Wings extends Part {
     public GetWingDrag() {
         var drag = 0;
         var deck_count = this.DeckCountFull();
+        var longest_span = 0;
+        var longest_drag = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             let wspan = w.span;
             let warea = w.area;
+            longest_span = Math.max(longest_span, wspan);
 
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
 
             var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
-            wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor * this.deck_list[w.deck].dragfactor);
+            wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
                 wdrag = Math.floor(1.0e-6 + 0.75 * wdrag);
                 wdrag = Math.max(1, wdrag);
             }
             wdrag = Math.floor(1.0e-6 + wdrag);
+            if (longest_span == wspan)
+                longest_drag = longest_drag;
             drag += wdrag;
         }
         for (let w of this.mini_wing_list) {
@@ -528,6 +535,11 @@ class Wings extends Part {
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             wdrag = Math.floor(1.0e-6 + wdrag);
             drag += wdrag;
+        }
+        //Sesquiplanes!
+        var sesp = this.GetIsSesquiplane();
+        if (sesp.is || this.GetMonoplane()) {
+            drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
         }
         return drag;
     }
@@ -627,6 +639,7 @@ class Wings extends Part {
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
         var longest_span = 0;
+        var longest_drag = 0;
 
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
@@ -659,7 +672,7 @@ class Wings extends Part {
 
             var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wStats.drag = wStats.drag + wdrag;
-            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor * this.deck_list[w.deck].dragfactor);
+            wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
@@ -675,6 +688,12 @@ class Wings extends Part {
             wStats.liftbleed += w.dihedral + w.anhedral;
 
             wStats.Round();
+
+            //Save for Longest Wing Mid bonus later
+            if (longest_span == w.span) {
+                longest_drag = wStats.drag;
+            }
+
             if (wStats.mass < 0) //Treated paper is applied later
                 wStats.mass = 0;
             stats = stats.Add(wStats);
@@ -718,9 +737,8 @@ class Wings extends Part {
         //Sesquiplanes!
         var sesp = this.GetIsSesquiplane();
         if (sesp.is || this.GetMonoplane()) {
-            console.log(this.long_list);
-            console.log(sesp);
-            stats = stats.Add(this.long_list[sesp.deck]);
+            stats = stats.Add(this.long_list[sesp.deck].stats);
+            stats.drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
         }
 
         if (sesp.is) {

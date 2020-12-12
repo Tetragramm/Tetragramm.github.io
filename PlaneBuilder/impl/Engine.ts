@@ -422,7 +422,7 @@ class Engine extends Part {
     }
 
     public SetTailMods(forb: boolean, swr: boolean) {
-        if (this.mount_list[this.selected_mount].reqTail && !(forb || swr))
+        if (this.mount_list[this.selected_mount].reqTail && !(forb || swr) && !this.GetGenerator())
             this.use_ds = true;
     }
 
@@ -473,7 +473,11 @@ class Engine extends Part {
     }
 
     public SetUseExtendedDriveshaft(use: boolean) {
-        this.use_ds = use || this.RequiresExtendedDriveshafts();
+        if (!this.GetGenerator()) {
+            this.use_ds = use || this.RequiresExtendedDriveshafts();
+        } else {
+            this.use_ds = false;
+        }
         this.CalculateStats();
     }
 
