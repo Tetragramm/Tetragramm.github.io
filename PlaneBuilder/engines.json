@@ -2461,6 +2461,248 @@
                         false,
                         false
                     ]
+                },
+                {
+                    "name": "Bertha F1666 220hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 19.7,
+                    "compression": 4.7,
+                    "cyl_per_row": 1,
+                    "rows": 8,
+                    "RPM_boost": 0.85,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Bertha F4398 490hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 44.3,
+                    "compression": 4.7,
+                    "cyl_per_row": 3,
+                    "rows": 6,
+                    "RPM_boost": 0.85,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Brandt Patriot 210hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 17.5,
+                    "compression": 5.65,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.65,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Brandt Turbolader-Patriot 260hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 17.5,
+                    "compression": 5.65,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.65,
+                    "material_fudge": 0.7,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 30,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Meier Bär 400hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 27,
+                    "compression": 5.4,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.86,
+                    "material_fudge": 0.6,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Meier Eisbär 500hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 27,
+                    "compression": 5.4,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 0.86,
+                    "material_fudge": 0.6,
+                    "quality_fudge": 1.4,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 30,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Rhona Motorbau Stämmig 24L",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 24,
+                    "compression": 6,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.5,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        true,
+                        true
+                    ]
+                },
+                {
+                    "name": "SAM Kurier XIII 180hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 11.2,
+                    "compression": 4.8,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 10,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "SAM Transporter IV 320hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 22.08,
+                    "compression": 4.5,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 3,
+                    "compressor_count": 1,
+                    "min_IAF": 20,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Sonnenmotor EGH3 220hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 0,
+                    "displacement": 20,
+                    "compression": 5,
+                    "cyl_per_row": 2,
+                    "rows": 4,
+                    "RPM_boost": 1,
+                    "material_fudge": 0.9,
+                    "quality_fudge": 1,
+                    "compressor_type": 2,
+                    "compressor_count": 1,
+                    "min_IAF": 50,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        true
+                    ]
+                },
+                {
+                    "name": "Wollsteinkraft Wagenhals T 360hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 14.4,
+                    "compression": 5.3,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 1,
+                    "quality_fudge": 1.1,
+                    "compressor_type": 3,
+                    "compressor_count": 2,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
                 }
             ]
         },
