@@ -3728,7 +3728,9 @@ class Frames extends Part {
         var tail_stats = new Stats();
         for (let sec of this.tail_section_list) {
             tail_stats = tail_stats.Add(this.TailSectionStats(sec));
-            is_clinker = is_clinker && (sec.internal_bracing || sec.monocoque);
+            if (!this.farman) {
+                is_clinker = is_clinker && (sec.internal_bracing || sec.monocoque);
+            }
         }
         if (is_clinker)
             stats.structure += 30;
