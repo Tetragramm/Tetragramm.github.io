@@ -66,12 +66,12 @@ class LandingGear extends Part {
 
     public GetGearName() {
         if (this.retract && this.gear_list[this.gear_sel].name == "Boat Hull") {
-            return "Retractable Gear + Boat Hull";
+            return lu("Retractable Gear + Boat Hull");
         }
         if (this.retract)
-            return "Retractable " + this.gear_list[this.gear_sel].name;
+            return lu("Retractable ") + lu(this.gear_list[this.gear_sel].name);
         else
-            return this.gear_list[this.gear_sel].name;
+            return lu(this.gear_list[this.gear_sel].name);
     }
 
     public GetGearList() {

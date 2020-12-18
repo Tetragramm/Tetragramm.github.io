@@ -22,6 +22,7 @@ class Wings extends Part {
         name: string, flammable: boolean,
         stats: Stats, strainfactor: number,
         dragfactor: number, metal: boolean,
+        transparent: boolean,
     }[];
     private deck_list: {
         name: string, limited: boolean,
@@ -45,6 +46,7 @@ class Wings extends Part {
                 name: elem["name"], flammable: elem["flammable"],
                 stats: new Stats(elem), strainfactor: elem["strainfactor"],
                 dragfactor: elem["dragfactor"], metal: elem["metal"],
+                transparent: elem["transparent"],
             });
         }
 
@@ -662,6 +664,10 @@ class Wings extends Part {
             //Wings cannot generate positive max strain
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
+
+            if (this.skin_list[w.surface].transparent) {
+                wStats.visibility += 1;
+            }
 
             //Drag is modified by area, span, and the leading wing
             let wspan = w.span;

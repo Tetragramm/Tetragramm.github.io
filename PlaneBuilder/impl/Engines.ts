@@ -2,6 +2,7 @@
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
 /// <reference path="./Engine.ts" />
+/// <reference path="./Radiator.ts" />
 
 class Engines extends Part {
     private engines: Engine[];
@@ -416,7 +417,9 @@ class Engines extends Part {
                 is_pulsejet = true;
         }
         if (is_pulsejet) {
-            stats.warnings.push({ source: "Pulsejets", warning: "Pulsejets double Boost when above dropoff speed, instead of below dropoff." });
+            stats.warnings.push({
+                source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+            });
         }
 
         var rotationT = 0;
@@ -429,9 +432,13 @@ class Engines extends Part {
             }
         }
         if (rotationT > 0) {
-            stats.warnings.push({ source: "Rotary", warning: "+1 to Dogfight! when turning right." });
+            stats.warnings.push({
+                source: "Rotary", warning: lu("Rotary Right Warning")
+            });
         } else if (rotationT < 0) {
-            stats.warnings.push({ source: "Rotary", warning: "+1 to Dogfight! when turning left." });
+            stats.warnings.push({
+                source: "Rotary", warning: lu("Rotary Left Warning")
+            });
         }
 
         //Part local, gets handled in UpdateReliability

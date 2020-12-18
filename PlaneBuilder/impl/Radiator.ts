@@ -170,7 +170,9 @@ class Radiator extends Part {
         }
 
         if (this.coolant_list[this.idx_coolant].flammable) {
-            stats.warnings.push({ source: "Radiator Fluid", warning: "Radiator Fluid is Flammable." });
+            stats.warnings.push({
+                source: lu("Radiator Fluid"), warning: lu("Radiator Fluid Warning")
+            });
         }
 
         return stats;

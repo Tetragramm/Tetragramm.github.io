@@ -122,7 +122,10 @@ class Stats {
         if (js["charge"])
             this.charge = js["charge"];
         if (js["warning"])
-            this.warnings.push({ source: js["name"], warning: js["warning"] });
+            this.warnings.push({
+                source: lu(js["name"]),
+                warning: lu(js["warning"])
+            });
     }
 
     public serialize(s: Serialize) {

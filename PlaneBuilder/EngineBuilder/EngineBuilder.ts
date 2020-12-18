@@ -304,6 +304,7 @@ class EngineBuilder {
         this.num_cyl_per_row = Math.floor(Math.max(1, this.num_cyl_per_row));
         this.num_rows = Math.floor(Math.max(1, this.num_rows));
         this.compression_ratio = Math.max(0.01, this.compression_ratio);
+        this.compression_ratio = Math.min(25, this.compression_ratio);
         this.rpm_boost = Math.max(0.01, this.rpm_boost);
         this.material_fudge = Math.max(0.1, this.material_fudge);
         this.material_fudge = Math.min(2.0, this.material_fudge);

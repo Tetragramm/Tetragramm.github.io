@@ -135,7 +135,7 @@ class Accessories extends Part {
     }
 
     public GetCommunicationName() {
-        return this.radio_list[this.radio_sel].name;
+        return lu(this.radio_list[this.radio_sel].name);
     }
 
     public GetArmourCoverage() {
@@ -360,7 +360,9 @@ class Accessories extends Part {
             }
         }
         if (armour_str != "") {
-            stats.warnings.push({ source: "Armour", warning: armour_str });
+            stats.warnings.push({
+                source: lu("Armour"), warning: armour_str
+            });
         }
 
         //Electrical

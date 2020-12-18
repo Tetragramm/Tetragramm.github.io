@@ -758,8 +758,11 @@ class Engine extends Part {
             else if (this.mount_list[this.selected_mount].name == "Nacelle (Inside)"
                 || this.mount_list[this.selected_mount].name == "Channel Tractor")
                 return 0;
+            else
+                return -1;
+        } else {
+            return 5;
         }
-        return -1;
     }
 
     public IsTractorRotary() {

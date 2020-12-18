@@ -460,8 +460,8 @@ class Weapon extends Part {
         } else if (this.synchronization == SynchronizationType.DEFLECT) {
             stats.cost += 1;
             stats.warnings.push({
-                source: this.weapon_type.name,
-                warning: "Deflector Plates inflict 1 Wear every time you roll a natural 5 or less on the first Crit die."
+                source: lu(this.weapon_type.name),
+                warning: lu("Deflector Plate Warning"),
             });
         }
 

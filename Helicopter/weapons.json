@@ -39,7 +39,7 @@
             "shells": false,
             "jam": "0",
             "reload": 1,
-            "warning": "Rather than roll Open Fire, you roll a d5 per hit shown in the builder. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal.",
+            "warning": "Scattergun Warning",
             "size": 2,
             "can_action": true,
             "can_projectile": true,
@@ -172,7 +172,7 @@
             "shells": false,
             "jam": "0",
             "reload": 1,
-            "warning": "Rather than roll Open Fire, you roll a d10 per hit shown in the builder. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal.",
+            "warning": "Punt Gun Warning",
             "size": 8,
             "can_action": true,
             "can_projectile": true,
@@ -283,7 +283,7 @@
             "shells": false,
             "jam": "0/0",
             "reload": 0,
-            "warning": "Uses Fuel uses as Ammo. Incendiary. Max range is Knife. Crits start fires but do not destroy parts.",
+            "warning": "Fliergerflammerwerfer Warning",
             "size": 8,
             "can_action": false,
             "can_projectile": false,
@@ -375,7 +375,7 @@
             "size": 2,
             "can_action": false,
             "can_projectile": true,
-            "warning": "Must be fired alone. Must Draw a Beat to fire, gain +1 Results. Never does more than 1 Hit worth of damage, but rolls Crits normally. Special Ammo: 1 Round per belt. Hits ammo adds or subtracts 5 Hits. Crit Ammo replaces normal Crits outright with the special effect.",
+            "warning": "Precision Rifle Warning",
             "deflection": 0
         },
         {
@@ -398,7 +398,7 @@
             "size": 16,
             "can_action": false,
             "can_projectile": false,
-            "warning": "Uses 3 Charge to deal 1d10 damage to any aircraft within Close range.",
+            "warning": "Lightning Arc Warning",
             "deflection": 0
         },
         {
@@ -421,7 +421,7 @@
             "size": 4,
             "can_action": false,
             "can_projectile": false,
-            "warning": "Max Range Close. Ignores range bands: hits on 16+. Prevents escape until the line is cut. Harpoons can be used as ziplines by boarders.",
+            "warning": "Harpoon Launcher Warning",
             "deflection": 0
         },
         {

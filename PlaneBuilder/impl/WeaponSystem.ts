@@ -211,7 +211,10 @@ class WeaponSystem extends Part {
             if (this.weapon_list[num].hits > 0)
                 this.final_weapon.hits = 1 + this.weapon_list[num].hits;
             else
-                this.final_weapon.stats.warnings.push({ source: "Mechanical Action", warning: "Rapid-Firing Scatterguns roll +1 Shot Dice." });
+                this.final_weapon.stats.warnings.push({
+                    source: lu("Mechanical Action"),
+                    warning: lu("Mechanical Action Warning"),
+                });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
@@ -257,12 +260,18 @@ class WeaponSystem extends Part {
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
             this.final_weapon.deflection = 0;
-            this.final_weapon.stats.warnings.push({ source: "Heat Ray", warning: "Roll Crits +Damage done. On Crit, choose one: start a fire, destroy a radiator/oil component and push Cool Down, or injure crew. Take -2 forward to Eyeball after firing." })
+            this.final_weapon.stats.warnings.push({
+                source: lu("Heat Ray"),
+                warning: lu("Heat Ray Warning"),
+            })
         } else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
             this.final_weapon.shells = false;
             this.final_weapon.damage -= 1;
-            this.final_weapon.stats.warnings.push({ source: "Gyrojets", warning: "+1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife." });
+            this.final_weapon.stats.warnings.push({
+                source: lu("Gyrojets"),
+                warning: lu("Gyrojets Warning"),
+            });
         } else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.final_weapon.ammo *= 2;
             this.final_weapon.shells = false;
@@ -270,13 +279,22 @@ class WeaponSystem extends Part {
                 var jams = this.final_weapon.jam.split('/');
                 jams[1] = "9999";
                 this.final_weapon.jam = jams.join('/');
-                this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Weapon 'jams' after rapid fire as the compressor refills." });
+                this.final_weapon.stats.warnings.push({
+                    source: lu("Pneumatic"),
+                    warning: lu("Pneumatic Warning 1"),
+                });
             }
-            this.final_weapon.stats.warnings.push({ source: "Pneumatic", warning: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits." });
+            this.final_weapon.stats.warnings.push({
+                source: lu("Pneumatic"),
+                warning: lu("Pneumatic Warning 2"),
+            });
         }
 
         if (this.final_weapon.deflection != 0) {
-            this.final_weapon.stats.warnings.push({ source: this.final_weapon.name, warning: "Take " + this.final_weapon.deflection + " to attack on a deflection shot." });
+            this.final_weapon.stats.warnings.push({
+                source: lu(this.final_weapon.name),
+                warning: lu("Deflection Warning", this.final_weapon.deflection),
+            });
         }
     }
 

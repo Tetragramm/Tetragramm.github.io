@@ -1,5 +1,6 @@
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
+/// <reference path="./WeaponSystem.ts" />
 /// <reference path="./Weapon.ts" />
 
 class Weapons extends Part {
@@ -18,7 +19,7 @@ class Weapons extends Part {
         { name: "Standard Action" },
         { name: "Mechanical Action" },
         { name: "Gast Principle" },
-        { name: "Rotary" },
+        { name: "Rotary_Gun" },
     ];
     private projectile_list = [
         { name: "Standard" },

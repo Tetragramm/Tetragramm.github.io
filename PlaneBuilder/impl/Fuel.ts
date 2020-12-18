@@ -181,13 +181,19 @@ class Fuel extends Part {
         if (this.self_sealing) {
             stats.mass += internal_count;
             stats.cost += 2 * internal_count;
-            stats.warnings.push({ source: "Self-Sealing Gas Tank", warning: "Fuel leak penalty will apply only to the next Fuel Check." });
+            stats.warnings.push({
+                source: lu("Self-Sealing Gas Tank"),
+                warning: lu("Self-Sealing Gas Tank Warning")
+            });
         }
 
         if (this.fire_extinguisher) {
             stats.mass += 2;
             stats.cost += 3;
-            stats.warnings.push({ source: "Remote Fire Extinguisher", warning: "Spend to put out a fire." });
+            stats.warnings.push({
+                source: lu("Remote Fire Extinguisher"),
+                warning: lu("Remote Fire Extinguisher Warning")
+            });
         }
 
         //Because it is load, it rounds up to the nearest 5 mass.

@@ -432,7 +432,8 @@ class Reinforcement extends Part {
         else if (this.wing_blades) {
             stats.mass += this.cant_list[2].stats.mass * this.cant_count[2];
             stats.warnings.push({
-                source: "Wing Blades", warning: "Roll Dogfight! to use. 16+, enemy takes damage as per collision, user takes 1d10. 20+, user takes no damage.When used on a PC, use Evade Danger and Collision instead."
+                source: lu("Wing Blades"),
+                warning: lu("Wing Blades Warning"),
             });
         }
 

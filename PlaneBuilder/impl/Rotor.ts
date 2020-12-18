@@ -295,15 +295,33 @@ class Rotor extends Part {
 
         //Warnings
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
-            stats.warnings.push({ source: "Helicopter Flight", warning: "A helicopter must have Boost 2 to to take off vertically. " });
-            stats.warnings.push({ source: "Helicopter Landing", warning: "A deliberately landed helicopter travelling at 0 speed never has to roll Go Down regardless of how rough the terrain is." });
-            stats.warnings.push({ source: "Helicopter Descent", warning: "A helicopter can descend up to 5 altitude bands in one maneuver without gaining speed." });
-            stats.warnings.push({ source: "Helicopter Stall", warning: "Travelling faster than 37 speed immediately suffers a Retreating Wing Stall." });
+            stats.warnings.push({
+                source: lu("Helicopter Flight"),
+                warning: lu("Helicopter Flight Warning")
+            });
+            stats.warnings.push({
+                source: lu("Helicopter Landing"),
+                warning: lu("Helicopter Landing Warning")
+            });
+            stats.warnings.push({
+                source: lu("Helicopter Descent"),
+                warning: lu("Helicopter Descent Warning")
+            });
+            stats.warnings.push({
+                source: lu("Helicopter Stall"),
+                warning: lu("Helicopter Stall Warning")
+            });
             if (stats.reliability < 0) {
-                stats.warnings.push({ source: "Rotor Span", warning: "Undersized rotors cause the engine to work harder and reduce reliability." });
+                stats.warnings.push({
+                    source: lu("Rotor Span"),
+                    warning: lu("Rotor Span Warning"),
+                });
             }
         } else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
-            stats.warnings.push({ source: "Autogyro Stall", warning: "An Autogyro cannot stall, it automatically trades Altitude for speed 1-1.  If it runs out of altitude before regaining control, it lands gently.  If the autogyro exceeds Max Speed or sustains negative Gs it suffers a more traditional stall." });
+            stats.warnings.push({
+                source: lu("Autogyro Stall"),
+                warning: lu("Autogyro Stall Warning")
+            });
         }
 
         return stats;

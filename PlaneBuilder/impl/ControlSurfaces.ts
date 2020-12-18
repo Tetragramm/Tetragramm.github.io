@@ -164,7 +164,7 @@ class ControlSurfaces extends Part {
     public GetFlapCost(mp?: number) {
         if (mp)
             this.mp = mp;
-        return Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp);
+        return Math.max(1, Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp));
     }
 
     public GetSlatsList() {
@@ -241,7 +241,10 @@ class ControlSurfaces extends Part {
             if (this.is_boom) {
                 stats.pitchstab -= 1;
                 stats.latstab -= 1;
-                stats.warnings.push({ source: "Wing Warping", warning: "Wing Warping with a Boom Tail causes a stability penalty." });
+                stats.warnings.push({
+                    source: lu("Wing Warping"),
+                    warning: lu("Wing Warping Warning")
+                });
             }
         }
 

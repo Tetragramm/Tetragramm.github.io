@@ -1,4 +1,5 @@
 /// <reference path="./Part.ts" />
+/// <reference path="./Localization.ts" />
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineList.ts"/>
 /// <reference path="./Era.ts" />
@@ -51,7 +52,7 @@ class Aircraft {
     private rotor: Rotor;
     // private alter: AlterStats;
 
-    private reset_json = String.raw`{"version":"10.8","name":"Basic Biplane","era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.890000343322754,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"skin":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"dihedral":0,"anhedral":0,"deck":0},{"surface":0,"area":8,"span":8,"dihedral":0,"anhedral":0,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1,"repeating":false}],"ammo":1,"action":0,"projectile":0}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0}}`;
+    private reset_json = String.raw`{"version":"11.3","name":"Basic Biplane","aircraft_type":0,"era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.9,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":0},{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1}],"ammo":1,"action":0,"projectile":0,"repeating":false}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0},"rotor":{"type":0,"rotor_count":0,"rotor_span":0,"rotor_mat":0,"is_tandem":false,"accessory":false}}`;
 
     constructor(js: JSON, weapon_json: JSON, storage: boolean) {
         this.stats = new Stats();
@@ -148,8 +149,10 @@ class Aircraft {
         this.name = js["name"];
         if (json_version > 11.05) {
             this.aircraft_type = js["aircraft_type"];
+            this.rotor.SetType(js["aircraft_type"]);
         } else {
             this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
+            this.rotor.SetType(AIRCRAFT_TYPE.AIRPLANE);
         }
         this.era.fromJSON(js["era"], json_version);
         this.cockpits.fromJSON(js["cockpits"], json_version);
@@ -231,8 +234,10 @@ class Aircraft {
         if (d.version > 11.05) {
             this.rotor.deserialise(d);
             this.aircraft_type = d.GetNum();
+            this.rotor.SetType(this.aircraft_type);
         } else {
             this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
+            this.rotor.SetType(AIRCRAFT_TYPE.AIRPLANE);
         }
         this.freeze_display = false;
     }
@@ -420,8 +425,8 @@ class Aircraft {
             if (this.engines.GetRumble() * 10 > stats.structure) {
                 this.stats.power = 0;
                 this.stats.warnings.push({
-                    source: "Rumble",
-                    warning: "Rumble requires a minimum structure of Rumble*10 to fly."
+                    source: lu("Stat Rumble"),
+                    warning: lu("Rumble Warning")
                 });
             }
 
@@ -478,8 +483,10 @@ class Aircraft {
         var HandlingEmpty = 100 + this.stats.control - DryMP;
         if (Stability > 10 || Stability < -10) {
             HandlingEmpty = -1 / 0;
-            if (this.stats.warnings.findIndex((value) => { return value.source == "Stability" }) == -1) {
-                this.stats.warnings.push({ source: "Stability", warning: "Stability must be between -10 and +10 to be flyable by a human." });
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Stability") }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Derived Stability"), warning: lu("Stability Warning")
+                });
             }
         } else if (Stability == 10)
             HandlingEmpty -= 4;
@@ -523,8 +530,10 @@ class Aircraft {
         MaxStrain += this.optimization.final_ms;
         //Used: Fragile
         MaxStrain = Math.floor(1.0e-6 + MaxStrain * Math.pow(0.8, this.used.fragile));
-        if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == "Max Strain" }) == -1) {
-            this.stats.warnings.push({ source: "Max Strain", warning: "A Max Strain of less than 10 means the plane falls apart on the ground." });
+        if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Max Strain") }) == -1) {
+            this.stats.warnings.push({
+                source: lu("Stat Max Strain"), warning: lu("Max Strain Warning")
+            });
         }
 
         var Toughness = this.stats.toughness;
@@ -617,54 +626,54 @@ class Aircraft {
     public VitalComponentList(): string[] {
         var derived = this.GetDerivedStats();
         var vital = [];
-        vital.push("Controls");
+        vital.push(lu("Controls"));
         for (let i = 0; i < this.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push("Aircrew #" + (i + 1).toString());
+            vital.push(lu("Aircrew") + " #" + (i + 1).toString());
         }
         if (derived.FuelUses > 0) {
-            vital.push("Fuel Tanks");
+            vital.push(lu("Fuel Tanks"));
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfEngines(); i++) {
             if (this.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital.push("Engine #" + (i + 1).toString() + " Pusher");
+                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Pusher"));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString() + " Pusher");
+                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Pusher"));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString() + " Pusher");
+                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Pusher"));
                 }
-                vital.push("Engine #" + (i + 1).toString() + " Puller");
+                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Puller"));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString() + " Puller");
+                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Puller"));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString() + " Puller");
+                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Puller"));
                 }
             }
             else {
-                vital.push("Engine #" + (i + 1).toString());
+                vital.push(lu("Engine") + " #" + (i + 1).toString());
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push("Oil Tank #" + (i + 1).toString());
+                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString());
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push("Oil Cooler #" + (i + 1).toString());
+                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString());
                 }
             }
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfRadiators(); i++) {
-            vital.push("Radiator #" + (i + 1).toString());
+            vital.push(lu("Radiator") + " #" + (i + 1).toString());
         }
         if (this.IsElectrics()) {
-            vital.push("Electrics");
+            vital.push(lu("Electrics"));
         }
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
-            vital.push("Weapon Set #" + (i + 1).toString());
+            vital.push(lu("Weapon Set") + " #" + (i + 1).toString());
         }
         if (this.GetLandingGear().IsVital()) {
-            vital.push("Landing Gear");
+            vital.push(lu("Landing Gear"));
         }
         if (this.rotor.GetTailRotor()) {
-            vital.push("Tail Rotor");
+            vital.push(lu("Tail Rotor"));
         }
         return vital;
     }

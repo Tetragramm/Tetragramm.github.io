@@ -147,7 +147,7 @@
             },
             {
                 "name": "Oxygen Mask",
-                "warning": "The pilot ignores the effects of high altitude and negates up to 2 G-Penalty.",
+                "warning": "Oxygen Mask Warning",
                 "mass": 0,
                 "drag": 0,
                 "control": 0,
@@ -166,20 +166,20 @@
                 "cost": 1,
                 "flightstress": 0,
                 "visibility": 0,
-                "warning": "Position takes double Injury when you Go Down."
+                "warning": "Isolated Warning"
             }
         ],
         "safety": [
             {
                 "name": "Padding",
                 "cost": 1,
-                "warning": "Negates 1 Injury for this position when you Go Down"
+                "warning": "Injury Reduction Warning"
             },
             {
                 "name": "Harness",
                 "escape": -1,
                 "cost": 1,
-                "warning": "Negates 1 Injury for this position when you Go Down"
+                "warning": "Injury Reduction Warning"
             },
             {
                 "name": "Fast Release System",
@@ -189,12 +189,12 @@
             {
                 "name": "Roll Bar",
                 "mass": 2,
-                "warning": "Negates 1 Injury for this position when you Go Down"
+                "warning": "Injury Reduction Warning"
             },
             {
                 "name": "Flare Slot",
                 "cost": 1,
-                "warning": "Allows flares to be fired out of a closed cockpit without opening the cockpit."
+                "warning": "Flare Slot Warning"
             }
         ],
         "gunsights": [
@@ -209,7 +209,7 @@
                 "visibility": -1,
                 "attack": 0,
                 "cost": 3,
-                "warning": "+2 to Open Fire if you Drew a Bead"
+                "warning": "Gunsight Warning"
             },
             {
                 "name": "Illuminated Reflex Sight",
@@ -222,7 +222,7 @@
                 "visibility": -1,
                 "attack": 2,
                 "cost": 12,
-                "warning": "+2 to Open Fire if you Drew a Bead"
+                "warning": "Gunsight Warning"
             }
         ]
     },
@@ -363,7 +363,7 @@
             },
             {
                 "name": "Evaporation",
-                "warning": "Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.",
+                "warning": "Evaporation Warning",
                 "drag": 0,
                 "mass": 0,
                 "cost": 0,
@@ -387,14 +387,14 @@
             },
             {
                 "name": "High",
-                "warning": "Bonus persists for 1 Cool Down after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!",
+                "warning": "High Warning",
                 "reliability": 0,
                 "drag": 1,
                 "latstab": 0
             },
             {
                 "name": "High Offset",
-                "warning": "Bonus persists for 1 Cool Down after being shot.",
+                "warning": "High Offset Warning",
                 "reliability": 0,
                 "drag": 1,
                 "latstab": -1
@@ -417,7 +417,7 @@
             },
             {
                 "name": "Mineral Oil",
-                "warning": "Absorbs 1 Miss to Cool Down.",
+                "warning": "Mineral Oil Warning",
                 "cost": 1,
                 "harden": true,
                 "reliability": 0,
@@ -425,7 +425,7 @@
             },
             {
                 "name": "Castor Oil",
-                "warning": "Absorbs 1 Miss to Cool Down. +2 Stress if leaking.",
+                "warning": "Castor Oil Warning",
                 "cost": 0,
                 "harden": false,
                 "reliability": 0,
@@ -440,7 +440,7 @@
             },
             {
                 "name": "Freon",
-                "warning": "Caps RPM to 3.",
+                "warning": "Freon Warning",
                 "reliability": 1,
                 "harden": false,
                 "cost": 3,
@@ -448,7 +448,7 @@
             },
             {
                 "name": "Ammonia",
-                "warning": "Caps RPM to 3. Causes 2 Injury when leaking.",
+                "warning": "Ammonia Warning",
                 "reliability": 1,
                 "harden": false,
                 "cost": 2,
@@ -576,7 +576,7 @@
                 "automatic": false
             },
             {
-                "name": "Automatic",
+                "name": "Automatic Pitch",
                 "pitchspeed": 1.1,
                 "pitchboost": 0.7,
                 "mass": 1,
@@ -585,8 +585,7 @@
                 "turn": 5,
                 "automatic": true
             }
-        ],
-        "MVP_Warning": "Allows blad pitch to be adjusted on the ground without replacing it."
+        ]
     },
     "frames": {
         "frames": [
@@ -661,7 +660,7 @@
                 "structure": 4,
                 "cost": 0,
                 "geodesic": true,
-                "warning": "Free Repairs for Living Grove sections."
+                "warning": "Living Grove Warning"
             }
         ],
         "skin": [
@@ -872,7 +871,8 @@
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Treated Paper",
@@ -880,7 +880,8 @@
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
                 "mass": -0.25,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Tense Silk Layers",
@@ -888,7 +889,8 @@
                 "strainfactor": 0.9,
                 "dragfactor": 1.0,
                 "cost": 0.2,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Plywood",
@@ -897,7 +899,18 @@
                 "dragfactor": 1.0,
                 "mass": 0.2,
                 "cost": 0.1,
-                "metal": false
+                "metal": false,
+                "transparent": false
+            },
+            {
+                "name": "Transparent Celluloid",
+                "flammable": true,
+                "strainfactor": 0.9,
+                "dragfactor": 1.0,
+                "toughness": -0.1,
+                "cost": 0.1,
+                "metal": false,
+                "transparent": true
             },
             {
                 "name": "Aluminum Sheet",
@@ -905,7 +918,8 @@
                 "strainfactor": 1.0,
                 "dragfactor": 0.8,
                 "cost": 0.3,
-                "metal": true
+                "metal": true,
+                "transparent": false
             },
             {
                 "name": "Corrugated Steel",
@@ -914,7 +928,8 @@
                 "dragfactor": 1.0,
                 "mass": 0.25,
                 "cost": 0.2,
-                "metal": true
+                "metal": true,
+                "transparent": false
             },
             {
                 "name": "Thin Sheet Steel",
@@ -923,7 +938,8 @@
                 "dragfactor": 0.9,
                 "mass": 0.2,
                 "cost": 0.3,
-                "metal": true
+                "metal": true,
+                "transparent": false
             },
             {
                 "name": "Grand Eagle Feather",
@@ -932,7 +948,8 @@
                 "dragfactor": 1.0,
                 "control": 0.2,
                 "cost": 0.6,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Solar Fiber",
@@ -941,7 +958,8 @@
                 "dragfactor": 1.0,
                 "charge": 0.2,
                 "cost": 0.4,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Dragon Skin",
@@ -949,7 +967,8 @@
                 "strainfactor": 0.4,
                 "dragfactor": 1.0,
                 "cost": 0.8,
-                "metal": true
+                "metal": true,
+                "transparent": false
             }
         ],
         "stagger": [
@@ -1061,7 +1080,7 @@
                 "increment": 1,
                 "is_vtail": false,
                 "is_tail": true,
-                "warning": "In the event of a spin/stall while above stall speed and under power, you are at a Disadvantage to recover."
+                "warning": "T-Tail Warning"
             }
         ],
         "vstab": [
@@ -1099,13 +1118,13 @@
                 "name": "Wing Warping",
                 "drag": -1,
                 "warping": true,
-                "warning": "Get +1 to Dogfight! at 15 speed and below."
+                "warning": "Wing Warping Warning 2"
             },
             {
                 "name": "Spoilerons",
                 "cost": 2,
                 "warping": false,
-                "warning": "When you Dogfight!, spend double speed but take +1"
+                "warning": "Spoilerons Warning"
             },
             {
                 "name": "None",
@@ -1160,7 +1179,7 @@
                 "name": "Lift Dumpers",
                 "crashsafety": 2,
                 "costfactor": 1,
-                "warning": "Activate for +1 to Dogfight!, then immediately induce a stall."
+                "warning": "Lift Dumpers Warning"
             }
         ],
         "slats": [
@@ -1185,18 +1204,18 @@
                 "name": "Air Brake",
                 "mass": 1,
                 "cost": 3,
-                "warning": "When deployed, immediately bleed of speed equal to Speed Factor and gain +1 to Dogfight!."
+                "warning": "Air Brake Warning"
             },
             {
                 "name": "Dive Brake",
                 "mass": 2,
                 "cost": 4,
-                "warning": "When deployed, steep dives trade altitude for speed at 1-2 instead of 1-3."
+                "warning": "Dive Brake Warning"
             },
             {
                 "name": "Drogue Chute",
                 "cost": 3,
-                "warning": "Activate once per flight to: Give +3 to Go Down or take down a close pursuer."
+                "warning": "Drogue Chute Warning"
             }
         ]
     },
@@ -1620,19 +1639,6 @@
                 "internal": true,
                 "cantilever": false
             }
-        ],
-        "safety": [
-            {
-                "name": "Remote Fire Extinguisher",
-                "mass": 2,
-                "cost": 3,
-                "warning": "Spend to put out a fire."
-            },
-            {
-                "name": "Self-Sealing Gas Tank",
-                "mass": 1,
-                "cost": 2
-            }
         ]
     },
     "cargo": {
@@ -1694,7 +1700,7 @@
                 "DpLMP": 0,
                 "SpLMP": 0,
                 "can_retract": false,
-                "warning": "All landings are crash landings."
+                "warning": "Landing Skid Warning"
             }
         ],
         "extras": [
@@ -1702,12 +1708,12 @@
                 "name": "Zeppelin Hook",
                 "mass": 1,
                 "MpLMP": 0,
-                "warning": "Allows landing inside airships or large planes."
+                "warning": "Zeppelin Hook Warning"
             },
             {
                 "name": "Carrier Hook",
                 "MpLMP": 0.5,
-                "warning": "Allows landing on carriers."
+                "warning": "Carrier Hook Warning"
             },
             {
                 "name": "Underwing Skid",
@@ -1724,7 +1730,7 @@
                 "drag": 1,
                 "cost": 1,
                 "cp10s": 1,
-                "warning": "Generates 1 charge per 10 speed."
+                "warning": "Windmill Warning"
             },
             {
                 "name": "Ram Air Scoop",
@@ -1737,14 +1743,14 @@
                 "mass": 1,
                 "cost": 2,
                 "cp10s": 0,
-                "warning": "Stores 5 charge"
+                "warning": "Battery Warning"
             },
             {
                 "name": "Battery (High Quality)",
                 "mass": 0,
                 "cost": 4,
                 "cp10s": 0,
-                "warning": "Stores 5 charge"
+                "warning": "Battery Warning"
             }
         ],
         "radios": [
@@ -1783,7 +1789,7 @@
                 "cost": 5
             },
             {
-                "name": "Whalebone Radio Node",
+                "name": "Whalebone Radio Base Station",
                 "mass": 6,
                 "drag": 1,
                 "charge": -4,
@@ -1811,7 +1817,7 @@
                 "cost": 6
             },
             {
-                "name": "Whalebone Radio Node (High Quality)",
+                "name": "Whalebone Radio Base Station (High Quality)",
                 "mass": 5,
                 "drag": 1,
                 "charge": -4,
@@ -1822,12 +1828,12 @@
             {
                 "name": "Reconnaissance Camera",
                 "cost": 2,
-                "warning": "Can take pictures downward. Capabilities scale with era."
+                "warning": "Reconnaissance Camera Warning"
             },
             {
                 "name": "Guncam",
                 "cost": 1,
-                "warning": "Confirms your kills for you."
+                "warning": "Guncam Warning"
             }
         ],
         "visibility": [
@@ -1873,37 +1879,37 @@
         ],
         "autopilots": [
             {
-                "name": "No Autopilot"
+                "name": "None"
             },
             {
                 "name": "Gyroscopic",
                 "cost": 3,
-                "warning": "Gives +4 to Empty Seat rolls."
+                "warning": "Gyroscopic Warning"
             },
             {
                 "name": "Altitude Holding",
                 "mass": 1,
                 "cost": 5,
-                "warning": "Allows the Empty Seat rule to be ignored."
+                "warning": "Altitude Holding Warning"
             },
             {
                 "name": "Programmable",
                 "mass": 1,
                 "charge": -2,
                 "cost": 6,
-                "warning": "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings."
+                "warning": "Programmable Warning"
             },
             {
-                "name": "\"Rattegehirn\"",
+                "name": "Rattegehirn",
                 "mass": 3,
                 "charge": -3,
                 "cost": 25,
-                "warning": "Fully automated. For robo-planes."
+                "warning": "Rattegehirn Warning"
             }
         ],
         "control": [
             {
-                "name": "No Aids",
+                "name": "None",
                 "max_mass_stress": 1000,
                 "max_total_stress": 1000
             },

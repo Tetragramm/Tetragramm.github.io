@@ -104,8 +104,8 @@ class Propeller extends Part {
             if (this.use_variable) {
                 stats.cost += 2;
                 stats.warnings.push({
-                    source: "Manually Variable Propeller",
-                    "warning": "Allows blade pitch to be adjusted on the ground without replacing it."
+                    source: lu("Manually Variable Propeller"),
+                    warning: lu("MVP_Warning")
                 })
             }
         }
