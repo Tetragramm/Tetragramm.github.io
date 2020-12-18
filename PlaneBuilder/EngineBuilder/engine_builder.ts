@@ -2,6 +2,7 @@
 /// <reference path="./EngineBuilder.ts" />
 /// <reference path="./PulsejetBuilder.ts" />
 /// <reference path="../lz/lz-string.ts" />
+/// <reference path="../string/index.ts" />
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -45,6 +46,12 @@ window.onload = init;
 var ebuild: EngineBuilder_HTML;
 
 var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
+
+var local: Localization;
+
+function lu(s: string, ...args: any[]): string {
+    return StringFmt.Format(local.e(s), ...args);
+}
 
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
