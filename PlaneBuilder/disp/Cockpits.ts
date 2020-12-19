@@ -12,6 +12,12 @@ class Cockpits_HTML extends Display {
         super();
         this.cockpits = cockpits;
         this.tbl = document.getElementById("table_cockpit") as HTMLTableElement;
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Cockpit Option"));
+        CreateTH(row, lu("Cockpit Upgrade"));
+        CreateTH(row, lu("Cockpit Safety Options"));
+        CreateTH(row, lu("Cockpit Gunsights"));
+        CreateTH(row, lu("Cockpit Cockpit Stats"));
         this.counter = document.getElementById("num_cockpits") as HTMLInputElement;
         this.positions = [];
         this.counter.onchange = (e) => {

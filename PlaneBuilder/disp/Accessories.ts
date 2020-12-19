@@ -33,11 +33,20 @@ class Accessories_HTML extends Display {
         this.acc = acc;
 
         var tbl = document.getElementById("tbl_accessories") as HTMLTableElement;
-        var row = tbl.insertRow(1);
+        var row = tbl.insertRow();
+        CreateTH(row, lu("Accessories Armour Coverage"));
+        CreateTH(row, lu("Accessories Climate"));
+        CreateTH(row, lu("Accessories Visibility"));
+        CreateTH(row, lu("Accessories Additional Part Stats"));
+        row = tbl.insertRow();
         this.InitArmour(row.insertCell());
         this.InitClimate(row.insertCell());
         this.InitVisibility(row.insertCell());
         this.InitStats(row.insertCell());
+        row = tbl.insertRow();
+        CreateTH(row, lu("Accessories Information"));
+        CreateTH(row, lu("Accessories Electrical"));
+        CreateTH(row, lu("Accessories Control"));
         row = tbl.insertRow();
         this.InitInformation(row.insertCell());
         this.InitElectrical(row.insertCell());
@@ -67,11 +76,11 @@ class Accessories_HTML extends Display {
     private InitElectrical(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
         this.radio = document.createElement("SELECT") as HTMLSelectElement;
-        FlexSelect("Radio", this.radio, fs);
+        FlexSelect(lu("Accessories Radio"), this.radio, fs);
         var rlist = this.acc.GetRadioList();
         for (let i = 0; i < rlist.length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = rlist[i].name;
+            opt.text = lu(rlist[i].name);
             this.radio.add(opt);
         }
         this.radio.onchange = () => { this.acc.SetRadioSel(this.radio.selectedIndex); };
@@ -80,7 +89,7 @@ class Accessories_HTML extends Display {
         var elist = this.acc.GetElectricalList();
         for (let i = 0; i < elist.length; i++) {
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexInput(elist[i].name, inp, fs);
+            FlexInput(lu(elist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetElectricalCount(i, inp.valueAsNumber); };
             this.elect.push(inp);
         }
@@ -92,7 +101,7 @@ class Accessories_HTML extends Display {
         this.info = [];
         for (let i = 0; i < ilist.length; i++) {
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(ilist[i].name, inp, fs);
+            FlexCheckbox(lu(ilist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetInfoSel(i, inp.checked); };
             this.info.push(inp);
         }
@@ -104,7 +113,7 @@ class Accessories_HTML extends Display {
         this.visi = [];
         for (let i = 0; i < vlist.length; i++) {
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(vlist[i].name, inp, fs);
+            FlexCheckbox(lu(vlist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetVisibilitySel(i, inp.checked); };
             this.visi.push(inp);
         }
@@ -116,7 +125,7 @@ class Accessories_HTML extends Display {
         this.clim = [];
         for (let i = 0; i < clist.length; i++) {
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(clist[i].name, inp, fs);
+            FlexCheckbox(lu(clist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetClimateSel(i, inp.checked); };
             this.clim.push(inp);
         }
@@ -127,20 +136,20 @@ class Accessories_HTML extends Display {
 
         this.auto = document.createElement("SELECT") as HTMLSelectElement;
         var alist = this.acc.GetAutopilotList();
-        FlexSelect("Autopilot", this.auto, fs);
+        FlexSelect(lu("Accessories Autopilot"), this.auto, fs);
         for (let i = 0; i < alist.length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = alist[i].name;
+            opt.text = lu(alist[i].name);
             this.auto.add(opt);
         }
         this.auto.onchange = () => { this.acc.SetAutopilotSel(this.auto.selectedIndex); };
 
         var clist = this.acc.GetControlList();
         this.cont = document.createElement("SELECT") as HTMLSelectElement;
-        FlexSelect("Control Aids", this.cont, fs);
+        FlexSelect(lu("Accessories Control Aids"), this.cont, fs);
         for (let i = 0; i < clist.length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = clist[i].name;
+            opt.text = lu(clist[i].name);
             this.cont.add(opt);
         }
         this.cont.onchange = () => { this.acc.SetControlSel(this.cont.selectedIndex); };
@@ -153,24 +162,24 @@ class Accessories_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Charge");
-        CreateTH(h2_row, "Lift Bleed");
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Charge"));
+        CreateTH(h2_row, lu("Stat Lift Bleed"));
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_chgh = c2_row.insertCell();
         this.d_lift = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Visibility");
-        CreateTH(h3_row, "Flight Stress");
+        CreateTH(h3_row, lu("Stat Visibility"));
+        CreateTH(h3_row, lu("Stat Flight Stress"));
         CreateTH(h3_row, "");
         var c3_row = tbl_stat.insertRow();
         this.d_visi = c3_row.insertCell();

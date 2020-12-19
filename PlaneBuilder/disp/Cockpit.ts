@@ -38,25 +38,25 @@ class Cockpit_HTML extends Display {
         var stat_cell = this.row.insertCell();
         var tbl = document.createElement("TABLE") as HTMLTableElement;
         var h1_row = tbl.insertRow();
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl.insertRow();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl.insertRow();
-        CreateTH(h2_row, "Control");
-        CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Crash Safety");
+        CreateTH(h2_row, lu("Stat Control"));
+        CreateTH(h2_row, lu("Stat Required Sections"));
+        CreateTH(h2_row, lu("Stat Crash Safety"));
         var c2_row = tbl.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_rseq = c2_row.insertCell();
         this.d_crsh = c2_row.insertCell();
         var h3_row = tbl.insertRow();
-        CreateTH(h3_row, "Flight Stress");
-        CreateTH(h3_row, "Escape");
-        CreateTH(h3_row, "Visibility");
+        CreateTH(h3_row, lu("Stat Flight Stress"));
+        CreateTH(h3_row, lu("Stat Escape"));
+        CreateTH(h3_row, lu("Stat Visibility"));
         var c3_row = tbl.insertRow();
         this.d_strs = c3_row.insertCell();
         this.d_escp = c3_row.insertCell();
@@ -77,7 +77,7 @@ class Cockpit_HTML extends Display {
         //Add all the cockpit types to the select box
         for (let elem of cp.GetTypeList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.sel_type.add(opt);
         }
         option.appendChild(this.sel_type);
@@ -89,8 +89,7 @@ class Cockpit_HTML extends Display {
         for (let i = 0; i < upglst.length; i++) {
             let upg = document.createElement("INPUT") as HTMLInputElement;
             if (can[i]) {
-                let elem = upglst[i];
-                FlexCheckbox(elem.name, upg, fs);
+                FlexCheckbox(lu(upglst[i].name), upg, fs);
                 upg.onchange = () => { this.cockpit.SetUpgrade(i, upg.checked); };
             }
             this.upg_chbxs.push(upg);
@@ -101,7 +100,7 @@ class Cockpit_HTML extends Display {
         var sft_index = 0;
         for (let elem of cp.GetSafetyList()) {
             let sft = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(elem.name, sft, fs);
+            FlexCheckbox(lu(elem.name), sft, fs);
             let local_index = sft_index;
             sft_index += 1;
             sft.onchange = () => { this.cockpit.SetSafety(local_index, sft.checked); };
@@ -113,14 +112,14 @@ class Cockpit_HTML extends Display {
         var gun_index = 0;
         for (let elem of cp.GetGunsightList()) {
             let gun = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(elem.name, gun, fs);
+            FlexCheckbox(lu(elem.name), gun, fs);
             let local_index = gun_index;
             gun_index += 1;
             gun.onchange = () => { this.cockpit.SetGunsight(local_index, gun.checked); };
             this.gun_chbxs.push(gun);
         }
         this.bombsight = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Bombsight", this.bombsight, fs);
+        FlexInput(lu("Cockpit Bombsight"), this.bombsight, fs);
         this.bombsight.onchange = () => { this.cockpit.SetBombsightQuality(this.bombsight.valueAsNumber); };
         this.bombsight.min = "0";
         this.bombsight.max = "301";

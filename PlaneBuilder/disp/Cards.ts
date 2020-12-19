@@ -298,7 +298,7 @@ class Cards {
                 if (str != "")
                     str += ", ";
                 else
-                    str += "Armour ";
+                    str += lu("Armour") + " ";
                 str += AP.toString() + "/+" + (11 - this.acft_data.armour[r]).toString();
             }
         }
@@ -308,11 +308,11 @@ class Cards {
         context.font = "8px Balthazar";
         var idx = 1;
         for (let r = 0; r < this.acft_data.warnings.length; ++r) {
-            if (this.acft_data.warnings[r].source == "Armour")
+            if (this.acft_data.warnings[r].source == lu("Armour"))
                 continue;
             let str = this.acft_data.warnings[r].source + ": " + this.acft_data.warnings[r].warning;
             if (idx == 9 && this.acft_data.warnings.length > r + 1) {
-                context.fillText("And More!  See the Plane Builder for details.", 335, 673 + idx * 9, 375);
+                context.fillText(lu("Cards Too Many Warnings Warning"), 335, 673 + idx * 9, 375);
             } else if (idx > 9) {
 
             } else {
@@ -338,11 +338,12 @@ class Cards {
         context.font = "15px Balthazar";
         var ammo = "";
         if (this.weap_data.reload > 0) {
-            ammo += (this.weap_data.ammo / this.weap_data.reload).toString() + " loads of ";
-            ammo += this.weap_data.reload.toString() + " shots";
-            this.weap_data.tags.push("Reload " + this.weap_data.reload.toString());
+            ammo += lu("Cards Gun String",
+                (this.weap_data.ammo / this.weap_data.reload).toString(),
+                this.weap_data.reload.toString());
+            this.weap_data.tags.push(lu("Weapon Tag Reload", this.weap_data.reload.toString()));
         } else {
-            ammo += this.weap_data.ammo.toString() + " shots";
+            ammo += lu("Cards Gun String No Reload", this.weap_data.ammo);
         }
         context.fillText(ammo, 95, 158, 105);
         context.fillText(this.weap_data.ap.toString(), 172, 158, 23);
@@ -397,7 +398,7 @@ class Cards {
         context.fillText(note_str, 280, 84, 270);
 
         if (this.eng_data.radiator >= 0) {
-            context.fillText("Uses Radiator #" + (this.eng_data.radiator + 1).toString(), 109, 280, 270);
+            context.fillText(lu("Cards Uses Radiator", this.eng_data.radiator + 1), 109, 280, 270);
         }
 
         context.textAlign = "right";

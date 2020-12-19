@@ -626,54 +626,54 @@ class Aircraft {
     public VitalComponentList(): string[] {
         var derived = this.GetDerivedStats();
         var vital = [];
-        vital.push(lu("Controls"));
+        vital.push(lu("Vital Part Controls"));
         for (let i = 0; i < this.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push(lu("Aircrew") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Aircrew", i + 1));
         }
         if (derived.FuelUses > 0) {
-            vital.push(lu("Fuel Tanks"));
+            vital.push(lu("Vital Part Fuel Tanks"));
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfEngines(); i++) {
             if (this.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                vital.push(lu("Vital Part Engine Pusher", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                    vital.push(lu("Vital Part Oil Tank Pusher", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                    vital.push(lu("Vital Part Oil Cooler Pusher", i + 1));
                 }
-                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                vital.push(lu("Vital Part Engine Puller", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                    vital.push(lu("Vital Part Oil Tank Puller", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                    vital.push(lu("Vital Part Oil Cooler Puller", i + 1));
                 }
             }
             else {
-                vital.push(lu("Engine") + " #" + (i + 1).toString());
+                vital.push(lu("Vital Part Engine", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString());
+                    vital.push(lu("Vital Part Oil Tank", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString());
+                    vital.push(lu("Vital Part Oil Cooler", i + 1));
                 }
             }
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfRadiators(); i++) {
-            vital.push(lu("Radiator") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Radiator", i + 1));
         }
         if (this.IsElectrics()) {
-            vital.push(lu("Electrics"));
+            vital.push(lu("Vital Part Electrics"));
         }
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
-            vital.push(lu("Weapon Set") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Weapon Set", i + 1));
         }
         if (this.GetLandingGear().IsVital()) {
-            vital.push(lu("Landing Gear"));
+            vital.push(lu("Vital Part Landing Gear"));
         }
         if (this.rotor.GetTailRotor()) {
-            vital.push(lu("Tail Rotor"));
+            vital.push(lu("Vital Part Tail Rotor"));
         }
         return vital;
     }

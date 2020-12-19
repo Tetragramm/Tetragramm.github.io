@@ -19,7 +19,18 @@ class Engines_HTML extends Display {
         this.engines = [];
         this.radiators = [];
         this.tbl = document.getElementById("table_engine") as HTMLTableElement;
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Engines Engine Type"));
+        CreateTH(row, lu("Engines Options"));
+        CreateTH(row, lu("Engines Options 2"));
+        CreateTH(row, lu("Engines Engine Stats"));
+
         this.tblR = document.getElementById("table_radiator") as HTMLTableElement;
+        row = this.tblR.insertRow();
+        CreateTH(row, lu("Radiators Radiator Type"));
+        CreateTH(row, lu("Radiators Mounting"));
+        CreateTH(row, lu("Radiators Coolant"));
+        CreateTH(row, lu("Radiators Radiator Stats"));
 
         this.num_engines = document.getElementById("num_engines") as HTMLInputElement;
         this.num_engines.onchange = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };

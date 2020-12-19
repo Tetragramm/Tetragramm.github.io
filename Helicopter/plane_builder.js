@@ -7373,8 +7373,15 @@ class WeaponSystem extends Part {
         this.directions[num] = use;
         this.CalculateStats();
     }
-    GetWeaponCount() {
+    GetMountingCount() {
         return this.weapons.length;
+    }
+    GetWeaponCount() {
+        var count = 0;
+        for (let w of this.weapons) {
+            count += w.GetCount();
+        }
+        return count;
     }
     SWC(num) {
         if (num != num || num < 1)
@@ -7389,7 +7396,7 @@ class WeaponSystem extends Part {
             this.weapons.pop();
         }
     }
-    SetWeaponCount(num) {
+    SetMountingCount(num) {
         if (this.final_weapon.size == 16 || this.final_weapon.name == "Precision Rifle")
             num = 1;
         this.SWC(num);
@@ -9043,54 +9050,54 @@ class Aircraft {
     VitalComponentList() {
         var derived = this.GetDerivedStats();
         var vital = [];
-        vital.push(lu("Controls"));
+        vital.push(lu("Vital Part Controls"));
         for (let i = 0; i < this.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push(lu("Aircrew") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Aircrew", i + 1));
         }
         if (derived.FuelUses > 0) {
-            vital.push(lu("Fuel Tanks"));
+            vital.push(lu("Vital Part Fuel Tanks"));
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfEngines(); i++) {
             if (this.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                vital.push(lu("Vital Part Engine Pusher", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                    vital.push(lu("Vital Part Oil Tank Pusher", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                    vital.push(lu("Vital Part Oil Cooler Pusher", i + 1));
                 }
-                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                vital.push(lu("Vital Part Engine Puller", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                    vital.push(lu("Vital Part Oil Tank Puller", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                    vital.push(lu("Vital Part Oil Cooler Puller", i + 1));
                 }
             }
             else {
-                vital.push(lu("Engine") + " #" + (i + 1).toString());
+                vital.push(lu("Vital Part Engine", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString());
+                    vital.push(lu("Vital Part Oil Tank", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString());
+                    vital.push(lu("Vital Part Oil Cooler", i + 1));
                 }
             }
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfRadiators(); i++) {
-            vital.push(lu("Radiator") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Radiator", i + 1));
         }
         if (this.IsElectrics()) {
-            vital.push(lu("Electrics"));
+            vital.push(lu("Vital Part Electrics"));
         }
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
-            vital.push(lu("Weapon Set") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Weapon Set", i + 1));
         }
         if (this.GetLandingGear().IsVital()) {
-            vital.push(lu("Landing Gear"));
+            vital.push(lu("Vital Part Landing Gear"));
         }
         if (this.rotor.GetTailRotor()) {
-            vital.push(lu("Tail Rotor"));
+            vital.push(lu("Vital Part Tail Rotor"));
         }
         return vital;
     }
@@ -9495,9 +9502,20 @@ class Era_HTML extends Display {
     constructor(m) {
         super();
         this.model = m;
+        var tbl = document.getElementById("table_era");
+        var row = tbl.insertRow();
+        CreateTH(row, lu("Era Option"));
+        CreateTH(row, lu("Stat Lift Bleed"));
+        CreateTH(row, lu("Stat Cost"));
+        CreateTH(row, lu("Stat Pitch Stability"));
+        row = tbl.insertRow();
+        var selcell = row.insertCell();
         //Get used elements
-        this.select = document.getElementById("select_era");
-        this.bleed = document.getElementById("liftbleed_era");
+        this.select = document.createElement("SELECT");
+        selcell.append(this.select);
+        this.bleed = row.insertCell();
+        this.cost = row.insertCell();
+        this.pstab = row.insertCell();
         this.select.required = true;
         //When selection changes, change value and RecalculateTotals
         this.select.onchange = () => {
@@ -9507,13 +9525,16 @@ class Era_HTML extends Display {
         //    add it to the select
         for (let elem of this.model.GetEraOptions()) {
             var opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.select.add(opt);
         }
     }
     UpdateDisplay() {
         this.select.selectedIndex = this.model.GetSelected();
-        BlinkIfChanged(this.bleed, this.model.GetLiftBleed().toString(), false);
+        var stats = this.model.PartStats();
+        BlinkIfChanged(this.bleed, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.pstab, stats.pitchstab.toString(), false);
     }
 }
 /// <reference path="./Display.ts" />
@@ -9533,25 +9554,25 @@ class Cockpit_HTML extends Display {
         var stat_cell = this.row.insertCell();
         var tbl = document.createElement("TABLE");
         var h1_row = tbl.insertRow();
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl.insertRow();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl.insertRow();
-        CreateTH(h2_row, "Control");
-        CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Crash Safety");
+        CreateTH(h2_row, lu("Stat Control"));
+        CreateTH(h2_row, lu("Stat Required Sections"));
+        CreateTH(h2_row, lu("Stat Crash Safety"));
         var c2_row = tbl.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_rseq = c2_row.insertCell();
         this.d_crsh = c2_row.insertCell();
         var h3_row = tbl.insertRow();
-        CreateTH(h3_row, "Flight Stress");
-        CreateTH(h3_row, "Escape");
-        CreateTH(h3_row, "Visibility");
+        CreateTH(h3_row, lu("Stat Flight Stress"));
+        CreateTH(h3_row, lu("Stat Escape"));
+        CreateTH(h3_row, lu("Stat Visibility"));
         var c3_row = tbl.insertRow();
         this.d_strs = c3_row.insertCell();
         this.d_escp = c3_row.insertCell();
@@ -9569,7 +9590,7 @@ class Cockpit_HTML extends Display {
         //Add all the cockpit types to the select box
         for (let elem of cp.GetTypeList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.sel_type.add(opt);
         }
         option.appendChild(this.sel_type);
@@ -9580,8 +9601,7 @@ class Cockpit_HTML extends Display {
         for (let i = 0; i < upglst.length; i++) {
             let upg = document.createElement("INPUT");
             if (can[i]) {
-                let elem = upglst[i];
-                FlexCheckbox(elem.name, upg, fs);
+                FlexCheckbox(lu(upglst[i].name), upg, fs);
                 upg.onchange = () => { this.cockpit.SetUpgrade(i, upg.checked); };
             }
             this.upg_chbxs.push(upg);
@@ -9591,7 +9611,7 @@ class Cockpit_HTML extends Display {
         var sft_index = 0;
         for (let elem of cp.GetSafetyList()) {
             let sft = document.createElement("INPUT");
-            FlexCheckbox(elem.name, sft, fs);
+            FlexCheckbox(lu(elem.name), sft, fs);
             let local_index = sft_index;
             sft_index += 1;
             sft.onchange = () => { this.cockpit.SetSafety(local_index, sft.checked); };
@@ -9602,14 +9622,14 @@ class Cockpit_HTML extends Display {
         var gun_index = 0;
         for (let elem of cp.GetGunsightList()) {
             let gun = document.createElement("INPUT");
-            FlexCheckbox(elem.name, gun, fs);
+            FlexCheckbox(lu(elem.name), gun, fs);
             let local_index = gun_index;
             gun_index += 1;
             gun.onchange = () => { this.cockpit.SetGunsight(local_index, gun.checked); };
             this.gun_chbxs.push(gun);
         }
         this.bombsight = document.createElement("INPUT");
-        FlexInput("Bombsight", this.bombsight, fs);
+        FlexInput(lu("Cockpit Bombsight"), this.bombsight, fs);
         this.bombsight.onchange = () => { this.cockpit.SetBombsightQuality(this.bombsight.valueAsNumber); };
         this.bombsight.min = "0";
         this.bombsight.max = "301";
@@ -9655,6 +9675,12 @@ class Cockpits_HTML extends Display {
         super();
         this.cockpits = cockpits;
         this.tbl = document.getElementById("table_cockpit");
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Cockpit Option"));
+        CreateTH(row, lu("Cockpit Upgrade"));
+        CreateTH(row, lu("Cockpit Safety Options"));
+        CreateTH(row, lu("Cockpit Gunsights"));
+        CreateTH(row, lu("Cockpit Cockpit Stats"));
         this.counter = document.getElementById("num_cockpits");
         this.positions = [];
         this.counter.onchange = (e) => {
@@ -9735,21 +9761,21 @@ class Engine_HTML extends Display {
         option_cell.className = "inner_table";
         var opt_table = document.createElement("TABLE");
         opt_table.className = "inner_table";
-        CreateTH(opt_table.insertRow(), "Cooling");
+        CreateTH(opt_table.insertRow(), lu("Engine Cooling"));
         this.cool_cell = opt_table.insertRow().insertCell();
-        CreateTH(opt_table.insertRow(), "Mounting");
+        CreateTH(opt_table.insertRow(), lu("Engine Mounting"));
         var mount_cell = opt_table.insertRow().insertCell();
-        CreateTH(opt_table.insertRow(), "Upgrades");
+        CreateTH(opt_table.insertRow(), lu("Engine Upgrades"));
         var upg_cell = opt_table.insertRow().insertCell();
         option_cell.appendChild(opt_table);
         var option2_cell = row.insertCell();
         option2_cell.className = "inner_table";
         var opt2_table = document.createElement("TABLE");
         opt2_table.className = "inner_table";
-        CreateTH(opt2_table.insertRow(), "Cowls");
+        CreateTH(opt2_table.insertRow(), lu("Engine Cowls"));
         var cowl_cell = opt2_table.insertRow().insertCell();
         option2_cell.appendChild(opt2_table);
-        CreateTH(opt2_table.insertRow(), "Electrical");
+        CreateTH(opt2_table.insertRow(), lu("Engine Electrical"));
         var elec_cell = opt2_table.insertRow().insertCell();
         this.InitMountSelect(mount_cell);
         this.InitUpgradeSelect(upg_cell);
@@ -9797,17 +9823,17 @@ class Engine_HTML extends Display {
         }
         var fs = CreateFlexSection(tcell);
         //Set up the individual stat input boxes
-        FlexDisplay("Power", this.e_pwr, fs);
-        FlexDisplay("Mass", this.e_mass, fs);
-        FlexDisplay("Drag", this.e_drag, fs);
-        FlexDisplay("Reliability", this.e_rely, fs);
-        FlexDisplay("Cooling", this.e_cool, fs);
-        FlexDisplay("Overspeed", this.e_over, fs);
-        FlexDisplay("Fuel Consumption", this.e_fuel, fs);
-        FlexDisplay("Altitude", this.e_alti, fs);
-        FlexDisplay("Torque", this.e_torq, fs);
-        FlexDisplay("Rumble", this.e_rumb, fs);
-        FlexDisplay("Cost", this.e_cost, fs);
+        FlexDisplay(lu("Stat Power"), this.e_pwr, fs);
+        FlexDisplay(lu("Stat Mass"), this.e_mass, fs);
+        FlexDisplay(lu("Stat Drag"), this.e_drag, fs);
+        FlexDisplay(lu("Stat Reliability"), this.e_rely, fs);
+        FlexDisplay(lu("Stat Cooling"), this.e_cool, fs);
+        FlexDisplay(lu("Stat Overspeed"), this.e_over, fs);
+        FlexDisplay(lu("Stat Fuel Consumption"), this.e_fuel, fs);
+        FlexDisplay(lu("Stat Altitude"), this.e_alti, fs);
+        FlexDisplay(lu("Stat Torque"), this.e_torq, fs);
+        FlexDisplay(lu("Stat Rumble"), this.e_rumb, fs);
+        FlexDisplay(lu("Stat Cost"), this.e_cost, fs);
         //Event Listeners for engine stats
         this.e_list_select.onchange = () => {
             this.engine.SetSelectedList(this.e_list_select.options[this.e_list_select.selectedIndex].text);
@@ -9821,13 +9847,13 @@ class Engine_HTML extends Display {
     }
     InitMountSelect(mount_cell) {
         var txtSpan = document.createElement("SPAN");
-        txtSpan.textContent = "Engine Mounting Location";
+        txtSpan.textContent = lu("Engine Mounting Location");
         mount_cell.appendChild(txtSpan);
         mount_cell.appendChild(document.createElement("BR"));
         this.mount_select = document.createElement("SELECT");
         for (let elem of this.engine.GetMountList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.mount_select.add(opt);
         }
         this.mount_select.required = true;
@@ -9838,8 +9864,8 @@ class Engine_HTML extends Display {
         this.pushpull_input = document.createElement("INPUT");
         this.torque_input = document.createElement("INPUT");
         var fs = CreateFlexSection(mount_cell);
-        FlexCheckbox(" Push Pull", this.pushpull_input, fs);
-        FlexCheckbox(" Torque To Structure", this.torque_input, fs);
+        FlexCheckbox(" " + lu("Engine Push Pull"), this.pushpull_input, fs);
+        FlexCheckbox(" " + lu("Engine Torque To Structure"), this.torque_input, fs);
         this.pushpull_input.checked = this.engine.GetUsePushPull();
         this.torque_input.checked = this.engine.GetUsePushPull();
         this.pushpull_input.onchange = () => { this.engine.SetUsePushPull(this.pushpull_input.checked); };
@@ -9850,9 +9876,9 @@ class Engine_HTML extends Display {
         this.gp_input = document.createElement("INPUT");
         this.gpr_input = document.createElement("INPUT");
         var fs = CreateFlexSection(upg_cell);
-        FlexCheckbox("Extended Driveshafts", this.ds_input, fs);
-        FlexInput("Geared Propeller", this.gp_input, fs);
-        FlexInput("Negate Reliability Penalty", this.gpr_input, fs);
+        FlexCheckbox(lu("Engine Extended Driveshafts"), this.ds_input, fs);
+        FlexInput(lu("Engine Geared Propeller"), this.gp_input, fs);
+        FlexInput(lu("Engine Negate Reliability Penalty"), this.gpr_input, fs);
         this.gp_input.onchange = () => { this.engine.SetGearCount(this.gp_input.valueAsNumber); };
         this.gpr_input.onchange = () => { this.engine.SetGearReliability(this.gpr_input.valueAsNumber); };
         this.ds_input.onchange = () => { this.engine.SetUseExtendedDriveshaft(this.ds_input.checked); };
@@ -9861,8 +9887,8 @@ class Engine_HTML extends Display {
         var fs = CreateFlexSection(cell);
         this.alternator_input = document.createElement("INPUT");
         this.generator_input = document.createElement("INPUT");
-        FlexCheckbox("Alternator", this.alternator_input, fs);
-        FlexCheckbox("Generator", this.generator_input, fs);
+        FlexCheckbox(lu("Engine Alternator"), this.alternator_input, fs);
+        FlexCheckbox(lu("Engine Generator"), this.generator_input, fs);
         this.alternator_input.onchange = () => { this.engine.SetAlternator(this.alternator_input.checked); };
         this.generator_input.onchange = () => { this.engine.SetGenerator(this.generator_input.checked); };
     }
@@ -9873,48 +9899,48 @@ class Engine_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Power");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, lu("Stat Power"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
         var c1_row = tbl_stat.insertRow();
         this.d_powr = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Reliability");
-        CreateTH(h2_row, "Visibility");
-        CreateTH(h2_row, "Overspeed");
+        CreateTH(h2_row, lu("Stat Reliability"));
+        CreateTH(h2_row, lu("Stat Visibility"));
+        CreateTH(h2_row, lu("Stat Overspeed"));
         var c2_row = tbl_stat.insertRow();
         this.d_rely = c2_row.insertCell();
         this.d_rely.className = "part_local";
         this.d_visi = c2_row.insertCell();
         this.d_over = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Cost");
-        CreateTH(h3_row, "Altitude");
-        CreateTH(h3_row, "Fuel Consumption");
+        CreateTH(h3_row, lu("Stat Cost"));
+        CreateTH(h3_row, lu("Stat Altitude"));
+        CreateTH(h3_row, lu("Stat Fuel Consumption"));
         var c3_row = tbl_stat.insertRow();
         this.d_cost = c3_row.insertCell();
         this.d_alti = c3_row.insertCell();
         this.d_fuel = c3_row.insertCell();
         var h4_row = tbl_stat.insertRow();
-        CreateTH(h4_row, "Pitch Stab");
-        CreateTH(h4_row, "Lateral Stab");
-        CreateTH(h4_row, "Raw Strain");
+        CreateTH(h4_row, lu("Stat Pitch Stability"));
+        CreateTH(h4_row, lu("Stat Lateral Stability"));
+        CreateTH(h4_row, lu("Stat Raw Strain"));
         var c4_row = tbl_stat.insertRow();
         this.d_pstb = c4_row.insertCell();
         this.d_lstb = c4_row.insertCell();
         this.d_maxs = c4_row.insertCell();
         var h5_row = tbl_stat.insertRow();
-        CreateTH(h5_row, "Structure");
-        CreateTH(h5_row, "Flight Stress");
-        CreateTH(h5_row, "Frame Sections");
+        CreateTH(h5_row, lu("Stat Structure"));
+        CreateTH(h5_row, lu("Stat Flight Stress"));
+        CreateTH(h5_row, lu("Stat Required Sections"));
         var c5_row = tbl_stat.insertRow();
         this.d_strc = c5_row.insertCell();
         this.d_fstr = c5_row.insertCell();
         this.d_sect = c5_row.insertCell();
         var h6_row = tbl_stat.insertRow();
-        CreateTH(h6_row, "Charge");
+        CreateTH(h6_row, lu("Stat Charge"));
         CreateTH(h6_row, "");
         CreateTH(h6_row, "");
         var c6_row = tbl_stat.insertRow();
@@ -9926,7 +9952,7 @@ class Engine_HTML extends Display {
         this.cowl_select = document.createElement("SELECT");
         for (let elem of this.engine.GetCowlList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.cowl_select.add(opt);
         }
         this.cowl_select.required = true;
@@ -9940,20 +9966,18 @@ class Engine_HTML extends Display {
         if (this.engine.IsRotary()) {
             this.e_cool.textContent = "0";
             var txtSpan = document.createElement("SPAN");
-            txtSpan.innerText = "Rotary Engines use Oil Tanks. \n +1 Mass, Oil Tank is a Vital Component.";
+            txtSpan.innerText = lu("Engine Rotary Cooling");
             this.cool_cell.appendChild(txtSpan);
         }
         else if (this.e_cool.textContent == "0") {
             var txtSpan = document.createElement("SPAN");
-            txtSpan.textContent = "Air-Cooled Engine.";
+            txtSpan.textContent = lu("Engine Air-Cooled Engine.");
             this.cool_cell.appendChild(txtSpan);
             var fs = CreateFlexSection(this.cool_cell);
-            FlexCheckbox("Air Cooling Fan", this.intake_fan, fs);
+            FlexCheckbox(lu("Engine Air Cooling Fan"), this.intake_fan, fs);
             this.intake_fan.disabled = !this.engine.CanIntakeFan();
         }
         else {
-            var txtSpan = document.createElement("SPAN");
-            txtSpan.textContent = "    Select Radiator";
             if (!this.cool_select) {
                 this.cool_select = document.createElement("SELECT");
                 this.cool_select.required = true;
@@ -9964,24 +9988,20 @@ class Engine_HTML extends Display {
             }
             for (let i = 1; i < numrad + 1; i++) {
                 let opt = document.createElement("OPTION");
-                opt.textContent = "Radiator #" + i.toString();
+                opt.textContent = lu("Vital Part Radiator", i);
                 this.cool_select.add(opt);
             }
             this.cool_select.onchange = () => {
                 this.engine.SetRadiator(this.cool_select.selectedIndex);
             };
             this.cool_select.selectedIndex = this.engine.GetRadiator();
-            this.cool_cell.appendChild(this.cool_select);
-            this.cool_cell.appendChild(txtSpan);
-            this.cool_cell.appendChild(document.createElement("BR"));
-            var txtSpan2 = document.createElement("SPAN");
-            txtSpan2.textContent = "    Cooling Amount";
             this.cool_count.min = "0";
             this.cool_count.valueAsNumber = this.engine.GetCooling();
             this.cool_count.max = this.engine.GetMaxCooling().toString();
             this.cool_count.onchange = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
-            this.cool_cell.appendChild(this.cool_count);
-            this.cool_cell.appendChild(txtSpan2);
+            var fs = CreateFlexSection(this.cool_cell);
+            FlexSelect(lu("Engine Select Radiator"), this.cool_select, fs);
+            FlexInput(lu("Engine Cooling Amount"), this.cool_count, fs);
         }
     }
     UpdateDisplay() {
@@ -10205,7 +10225,17 @@ class Engines_HTML extends Display {
         this.engines = [];
         this.radiators = [];
         this.tbl = document.getElementById("table_engine");
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Engines Engine Type"));
+        CreateTH(row, lu("Engines Options"));
+        CreateTH(row, lu("Engines Options 2"));
+        CreateTH(row, lu("Engines Engine Stats"));
         this.tblR = document.getElementById("table_radiator");
+        row = this.tblR.insertRow();
+        CreateTH(row, lu("Radiators Radiator Type"));
+        CreateTH(row, lu("Radiators Mounting"));
+        CreateTH(row, lu("Radiators Coolant"));
+        CreateTH(row, lu("Radiators Radiator Stats"));
         this.num_engines = document.getElementById("num_engines");
         this.num_engines.onchange = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };
         this.num_engines.valueAsNumber = this.eng.GetNumberOfItems();
@@ -11054,55 +11084,59 @@ class ControlSurfaces_HTML extends Display {
         this.cs = cs;
         var tbl = document.getElementById("tbl_control_surfaces");
         var row = tbl.insertRow();
+        CreateTH(row, lu("Control Surfaces Control Surfaces"));
+        CreateTH(row, lu("Control Surfaces Drag Inducers"));
+        CreateTH(row, lu("Control Surfaces Stats"));
+        row = tbl.insertRow();
         var cs_cell = row.insertCell();
         this.aileron_select = document.createElement("SELECT");
         for (let a of cs.GetAileronList()) {
             let opt = document.createElement("OPTION");
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.aileron_select.add(opt);
         }
         this.aileron_select.onchange = () => { this.cs.SetAileron(this.aileron_select.selectedIndex); };
         this.rudder_select = document.createElement("SELECT");
         for (let a of cs.GetRudderList()) {
             let opt = document.createElement("OPTION");
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.rudder_select.add(opt);
         }
         this.rudder_select.onchange = () => { this.cs.SetRudder(this.rudder_select.selectedIndex); };
         this.elevator_select = document.createElement("SELECT");
         for (let a of cs.GetElevatorList()) {
             let opt = document.createElement("OPTION");
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.elevator_select.add(opt);
         }
         this.elevator_select.onchange = () => { this.cs.SetElevator(this.elevator_select.selectedIndex); };
         this.flaps_select = document.createElement("SELECT");
         for (let a of cs.GetFlapsList()) {
             let opt = document.createElement("OPTION");
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.flaps_select.add(opt);
         }
         this.flaps_select.onchange = () => { this.cs.SetFlaps(this.flaps_select.selectedIndex); };
         this.slats_select = document.createElement("SELECT");
         for (let a of cs.GetSlatsList()) {
             let opt = document.createElement("OPTION");
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.slats_select.add(opt);
         }
         this.slats_select.onchange = () => { this.cs.SetSlats(this.slats_select.selectedIndex); };
         var fs = CreateFlexSection(cs_cell);
-        FlexSelect("Ailerons", this.aileron_select, fs);
-        FlexSelect("Rudders", this.rudder_select, fs);
-        FlexSelect("Elevators", this.elevator_select, fs);
-        FlexSelect("Flaps", this.flaps_select, fs);
-        FlexSelect("Slats", this.slats_select, fs);
+        FlexSelect(lu("Control Surfaces Ailerons"), this.aileron_select, fs);
+        FlexSelect(lu("Control Surfaces Rudders"), this.rudder_select, fs);
+        FlexSelect(lu("Control Surfaces Elevators"), this.elevator_select, fs);
+        FlexSelect(lu("Control Surfaces Flaps"), this.flaps_select, fs);
+        FlexSelect(lu("Control Surfaces Slats"), this.slats_select, fs);
         var drag_cell = row.insertCell();
         var fs2 = CreateFlexSection(drag_cell);
         this.drag_chbx = [];
         var dlist = cs.GetDragList();
         for (let i = 0; i < dlist.length; i++) {
             let cbx = document.createElement("INPUT");
-            FlexCheckbox(dlist[i].name, cbx, fs2);
+            FlexCheckbox(lu(dlist[i].name), cbx, fs2);
             cbx.onchange = () => { this.cs.SetDrag(i, cbx.checked); };
             this.drag_chbx.push(cbx);
         }
@@ -11114,24 +11148,24 @@ class ControlSurfaces_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Control");
-        CreateTH(h2_row, "Pitch Stability");
-        CreateTH(h2_row, "Lateral Stability");
+        CreateTH(h2_row, lu("Stat Control"));
+        CreateTH(h2_row, lu("Stat Pitch Stability"));
+        CreateTH(h2_row, lu("Stat Lateral Stability"));
         var c2_row = tbl_stat.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Lift Bleed");
-        CreateTH(h3_row, "Crash Safety");
+        CreateTH(h3_row, lu("Stat Lift Bleed"));
+        CreateTH(h3_row, lu("Stat Crash Safety"));
         CreateTH(h3_row, " ");
         var c3_row = tbl_stat.insertRow();
         this.d_lift = c3_row.insertCell();
@@ -11490,11 +11524,20 @@ class Accessories_HTML extends Display {
         super();
         this.acc = acc;
         var tbl = document.getElementById("tbl_accessories");
-        var row = tbl.insertRow(1);
+        var row = tbl.insertRow();
+        CreateTH(row, lu("Accessories Armour Coverage"));
+        CreateTH(row, lu("Accessories Climate"));
+        CreateTH(row, lu("Accessories Visibility"));
+        CreateTH(row, lu("Accessories Additional Part Stats"));
+        row = tbl.insertRow();
         this.InitArmour(row.insertCell());
         this.InitClimate(row.insertCell());
         this.InitVisibility(row.insertCell());
         this.InitStats(row.insertCell());
+        row = tbl.insertRow();
+        CreateTH(row, lu("Accessories Information"));
+        CreateTH(row, lu("Accessories Electrical"));
+        CreateTH(row, lu("Accessories Control"));
         row = tbl.insertRow();
         this.InitInformation(row.insertCell());
         this.InitElectrical(row.insertCell());
@@ -11521,11 +11564,11 @@ class Accessories_HTML extends Display {
     InitElectrical(cell) {
         var fs = CreateFlexSection(cell);
         this.radio = document.createElement("SELECT");
-        FlexSelect("Radio", this.radio, fs);
+        FlexSelect(lu("Accessories Radio"), this.radio, fs);
         var rlist = this.acc.GetRadioList();
         for (let i = 0; i < rlist.length; i++) {
             let opt = document.createElement("OPTION");
-            opt.text = rlist[i].name;
+            opt.text = lu(rlist[i].name);
             this.radio.add(opt);
         }
         this.radio.onchange = () => { this.acc.SetRadioSel(this.radio.selectedIndex); };
@@ -11533,7 +11576,7 @@ class Accessories_HTML extends Display {
         var elist = this.acc.GetElectricalList();
         for (let i = 0; i < elist.length; i++) {
             let inp = document.createElement("INPUT");
-            FlexInput(elist[i].name, inp, fs);
+            FlexInput(lu(elist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetElectricalCount(i, inp.valueAsNumber); };
             this.elect.push(inp);
         }
@@ -11544,7 +11587,7 @@ class Accessories_HTML extends Display {
         this.info = [];
         for (let i = 0; i < ilist.length; i++) {
             let inp = document.createElement("INPUT");
-            FlexCheckbox(ilist[i].name, inp, fs);
+            FlexCheckbox(lu(ilist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetInfoSel(i, inp.checked); };
             this.info.push(inp);
         }
@@ -11555,7 +11598,7 @@ class Accessories_HTML extends Display {
         this.visi = [];
         for (let i = 0; i < vlist.length; i++) {
             let inp = document.createElement("INPUT");
-            FlexCheckbox(vlist[i].name, inp, fs);
+            FlexCheckbox(lu(vlist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetVisibilitySel(i, inp.checked); };
             this.visi.push(inp);
         }
@@ -11566,7 +11609,7 @@ class Accessories_HTML extends Display {
         this.clim = [];
         for (let i = 0; i < clist.length; i++) {
             let inp = document.createElement("INPUT");
-            FlexCheckbox(clist[i].name, inp, fs);
+            FlexCheckbox(lu(clist[i].name), inp, fs);
             inp.onchange = () => { this.acc.SetClimateSel(i, inp.checked); };
             this.clim.push(inp);
         }
@@ -11575,19 +11618,19 @@ class Accessories_HTML extends Display {
         var fs = CreateFlexSection(cell);
         this.auto = document.createElement("SELECT");
         var alist = this.acc.GetAutopilotList();
-        FlexSelect("Autopilot", this.auto, fs);
+        FlexSelect(lu("Accessories Autopilot"), this.auto, fs);
         for (let i = 0; i < alist.length; i++) {
             let opt = document.createElement("OPTION");
-            opt.text = alist[i].name;
+            opt.text = lu(alist[i].name);
             this.auto.add(opt);
         }
         this.auto.onchange = () => { this.acc.SetAutopilotSel(this.auto.selectedIndex); };
         var clist = this.acc.GetControlList();
         this.cont = document.createElement("SELECT");
-        FlexSelect("Control Aids", this.cont, fs);
+        FlexSelect(lu("Accessories Control Aids"), this.cont, fs);
         for (let i = 0; i < clist.length; i++) {
             let opt = document.createElement("OPTION");
-            opt.text = clist[i].name;
+            opt.text = lu(clist[i].name);
             this.cont.add(opt);
         }
         this.cont.onchange = () => { this.acc.SetControlSel(this.cont.selectedIndex); };
@@ -11599,24 +11642,24 @@ class Accessories_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Charge");
-        CreateTH(h2_row, "Lift Bleed");
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Charge"));
+        CreateTH(h2_row, lu("Stat Lift Bleed"));
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_chgh = c2_row.insertCell();
         this.d_lift = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Visibility");
-        CreateTH(h3_row, "Flight Stress");
+        CreateTH(h3_row, lu("Stat Visibility"));
+        CreateTH(h3_row, lu("Stat Flight Stress"));
         CreateTH(h3_row, "");
         var c3_row = tbl_stat.insertRow();
         this.d_visi = c3_row.insertCell();
@@ -11939,8 +11982,8 @@ class Weapons_HTML extends Display {
     UpdateWSet(set, disp) {
         disp.type.selectedIndex = set.GetWeaponSelected();
         disp.type.onchange = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
-        disp.count.valueAsNumber = set.GetWeaponCount();
-        disp.count.onchange = () => { set.SetWeaponCount(disp.count.valueAsNumber); };
+        disp.count.valueAsNumber = set.GetMountingCount();
+        disp.count.onchange = () => { set.SetMountingCount(disp.count.valueAsNumber); };
         disp.action.selectedIndex = set.GetAction();
         var can_act = set.GetCanAction();
         for (let i = 0; i < can_act.length; i++) {
@@ -12231,7 +12274,7 @@ class Cards {
                 if (str != "")
                     str += ", ";
                 else
-                    str += "Armour ";
+                    str += lu("Armour") + " ";
                 str += AP.toString() + "/+" + (11 - this.acft_data.armour[r]).toString();
             }
         }
@@ -12239,11 +12282,11 @@ class Cards {
         context.font = "8px Balthazar";
         var idx = 1;
         for (let r = 0; r < this.acft_data.warnings.length; ++r) {
-            if (this.acft_data.warnings[r].source == "Armour")
+            if (this.acft_data.warnings[r].source == lu("Armour"))
                 continue;
             let str = this.acft_data.warnings[r].source + ": " + this.acft_data.warnings[r].warning;
             if (idx == 9 && this.acft_data.warnings.length > r + 1) {
-                context.fillText("And More!  See the Plane Builder for details.", 335, 673 + idx * 9, 375);
+                context.fillText(lu("Cards Too Many Warnings Warning"), 335, 673 + idx * 9, 375);
             }
             else if (idx > 9) {
             }
@@ -12265,12 +12308,11 @@ class Cards {
         context.font = "15px Balthazar";
         var ammo = "";
         if (this.weap_data.reload > 0) {
-            ammo += (this.weap_data.ammo / this.weap_data.reload).toString() + " loads of ";
-            ammo += this.weap_data.reload.toString() + " shots";
-            this.weap_data.tags.push("Reload " + this.weap_data.reload.toString());
+            ammo += lu("Cards Gun String", (this.weap_data.ammo / this.weap_data.reload).toString(), this.weap_data.reload.toString());
+            this.weap_data.tags.push(lu("Weapon Tag Reload", this.weap_data.reload.toString()));
         }
         else {
-            ammo += this.weap_data.ammo.toString() + " shots";
+            ammo += lu("Cards Gun String No Reload", this.weap_data.ammo);
         }
         context.fillText(ammo, 95, 158, 105);
         context.fillText(this.weap_data.ap.toString(), 172, 158, 23);
@@ -12315,7 +12357,7 @@ class Cards {
         }
         context.fillText(note_str, 280, 84, 270);
         if (this.eng_data.radiator >= 0) {
-            context.fillText("Uses Radiator #" + (this.eng_data.radiator + 1).toString(), 109, 280, 270);
+            context.fillText(lu("Cards Uses Radiator", this.eng_data.radiator + 1), 109, 280, 270);
         }
         context.textAlign = "right";
         context.font = "25px Balthazar";
@@ -12664,13 +12706,13 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.abrv = fweap.abrv;
         this.cards.weap_data.reload = fweap.reload;
         if (fweap.rapid) {
-            this.cards.weap_data.tags.push(lu("Rapid Fire"));
+            this.cards.weap_data.tags.push(lu("Weapon Tag Rapid Fire"));
         }
         if (fweap.shells) {
-            this.cards.weap_data.tags.push(lu("Shells"));
+            this.cards.weap_data.tags.push(lu("Weapon Tag Shells"));
         }
         if (fweap.deflection) {
-            this.cards.weap_data.tags.push(lu("Awkward") + " " + fweap.deflection);
+            this.cards.weap_data.tags.push(lu("Weapon Tag Awkward", fweap.deflection));
         }
         var deflector = false;
         for (let iw of w.GetWeapons()) {

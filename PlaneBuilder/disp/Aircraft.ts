@@ -418,13 +418,13 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.reload = fweap.reload;
 
         if (fweap.rapid) {
-            this.cards.weap_data.tags.push(lu("Rapid Fire"));
+            this.cards.weap_data.tags.push(lu("Weapon Tag Rapid Fire"));
         }
         if (fweap.shells) {
-            this.cards.weap_data.tags.push(lu("Shells"));
+            this.cards.weap_data.tags.push(lu("Weapon Tag Shells"));
         }
         if (fweap.deflection) {
-            this.cards.weap_data.tags.push(lu("Awkward") + " " + fweap.deflection);
+            this.cards.weap_data.tags.push(lu("Weapon Tag Awkward", fweap.deflection));
         }
         var deflector = false;
         for (let iw of w.GetWeapons()) {

@@ -14,12 +14,10 @@
 <body class="html_body" dir="ltr">
 	<div class="html_outer html_content">
 		<div>
-
 			<h2>
 				<a href="https://opensketch.itch.io/flying-circus">
-					Ohara Experimental Airworks</a>
+					Ohara Airworks</a>
 			</h2>
-
 			<div>
 				<span>
 					<table>
@@ -51,7 +49,7 @@
 				</span>
 				<br />
 				<br />
-				<div id="Type">
+				<div id="Type" hidden="true">
 					<h3>Aircraft Type
 						<h4>
 							<span> <select id="acft_type"></select></span>
@@ -66,16 +64,6 @@
 						</h4>
 					</h3>
 					<table style="width:100%" id="table_era">
-						<tr>
-							<th>Option</th>
-							<th>Lift Bleed</th>
-						</tr>
-						<tr>
-							<td> <select id="select_era"> </select> </td>
-							<td id="liftbleed_era">
-							</td>
-						</tr>
-
 					</table>
 				</div>
 				<br />
@@ -89,13 +77,6 @@
 						</h4>
 					</h3>
 					<table style="width:100%" id="table_cockpit">
-						<tr>
-							<th>Option</th>
-							<th>Upgrade</th>
-							<th>Safety Options</th>
-							<th>Gunsights</th>
-							<th>Cockpit Stats</th>
-						</tr>
 					</table>
 				</div>
 				<br />
@@ -138,21 +119,9 @@
 					</h3>
 
 					<table style="width:100%" id="table_engine">
-						<tr>
-							<th>Engine Type</th>
-							<th>Options</th>
-							<th>Options 2</th>
-							<th>Engine Stats</th>
-						</tr>
 					</table>
 					<br />
 					<table style="width:100%" id="table_radiator">
-						<tr>
-							<th>Radiator Type</th>
-							<th>Mounting</th>
-							<th>Coolant</th>
-							<th>Radiator Stats</th>
-						</tr>
 					</table>
 				</div>
 			</div>
@@ -240,11 +209,6 @@
 					</h4>
 				</h3>
 				<table id="tbl_control_surfaces">
-					<tr>
-						<th>Control Surfaces</th>
-						<th>Drag Inducers</th>
-						<th>Control Surface Stats</th>
-					</tr>
 				</table>
 			</div>
 			<br />
@@ -321,17 +285,6 @@
 					</h4>
 				</h3>
 				<table id="tbl_accessories">
-					<tr>
-						<th>Armour Coverage</th>
-						<th>Climate</th>
-						<th>Visibility</th>
-						<th>Additional Part Stats</th>
-					</tr>
-					<tr>
-						<th>Information</th>
-						<th>Electrical</th>
-						<th>Control</th>
-					</tr>
 				</table>
 			</div>
 			<br />
@@ -351,7 +304,8 @@
 				<h3>Optimizations
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_9966tgispmti"><u>Rules</u></a>)</span>
-						<br /></h4>
+						<br />
+					</h4>
 				</h3>
 				<span> <label for="num_opt">Number of Free Optimizations:</label> <input type="number" id="num_opt"
 						min="0" max="20" value="0" /></span><br />
@@ -368,7 +322,8 @@
 				<h3>Used Plane
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_used"><u>Rules</u></a>)</span>
-						<br /></h4>
+						<br />
+					</h4>
 				</h3>
 				<span> <label for="is_used">Is Aircraft Used? </label> <input type="checkbox"
 						id="is_used" /></span><br />

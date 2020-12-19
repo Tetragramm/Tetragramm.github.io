@@ -416,8 +416,16 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
 
-    public GetWeaponCount() {
+    public GetMountingCount() {
         return this.weapons.length;
+    }
+
+    public GetWeaponCount() {
+        var count = 0;
+        for (let w of this.weapons) {
+            count += w.GetCount();
+        }
+        return count;
     }
 
     private SWC(num: number) {
@@ -434,7 +442,7 @@ class WeaponSystem extends Part {
         }
     }
 
-    public SetWeaponCount(num: number) {
+    public SetMountingCount(num: number) {
         if (this.final_weapon.size == 16 || this.final_weapon.name == "Precision Rifle")
             num = 1;
         this.SWC(num);

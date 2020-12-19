@@ -27,12 +27,17 @@ class ControlSurfaces_HTML extends Display {
         this.cs = cs;
         var tbl = document.getElementById("tbl_control_surfaces") as HTMLTableElement;
         var row = tbl.insertRow();
+        CreateTH(row, lu("Control Surfaces Control Surfaces"));
+        CreateTH(row, lu("Control Surfaces Drag Inducers"));
+        CreateTH(row, lu("Control Surfaces Stats"));
+
+        row = tbl.insertRow()
         var cs_cell = row.insertCell();
 
         this.aileron_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let a of cs.GetAileronList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.aileron_select.add(opt);
         }
         this.aileron_select.onchange = () => { this.cs.SetAileron(this.aileron_select.selectedIndex); };
@@ -40,7 +45,7 @@ class ControlSurfaces_HTML extends Display {
         this.rudder_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let a of cs.GetRudderList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.rudder_select.add(opt);
         }
         this.rudder_select.onchange = () => { this.cs.SetRudder(this.rudder_select.selectedIndex); };
@@ -48,7 +53,7 @@ class ControlSurfaces_HTML extends Display {
         this.elevator_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let a of cs.GetElevatorList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.elevator_select.add(opt);
         }
         this.elevator_select.onchange = () => { this.cs.SetElevator(this.elevator_select.selectedIndex); };
@@ -56,7 +61,7 @@ class ControlSurfaces_HTML extends Display {
         this.flaps_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let a of cs.GetFlapsList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.flaps_select.add(opt);
         }
         this.flaps_select.onchange = () => { this.cs.SetFlaps(this.flaps_select.selectedIndex); };
@@ -64,17 +69,17 @@ class ControlSurfaces_HTML extends Display {
         this.slats_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let a of cs.GetSlatsList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = a.name;
+            opt.text = lu(a.name);
             this.slats_select.add(opt);
         }
         this.slats_select.onchange = () => { this.cs.SetSlats(this.slats_select.selectedIndex); };
 
         var fs = CreateFlexSection(cs_cell);
-        FlexSelect("Ailerons", this.aileron_select, fs);
-        FlexSelect("Rudders", this.rudder_select, fs);
-        FlexSelect("Elevators", this.elevator_select, fs);
-        FlexSelect("Flaps", this.flaps_select, fs);
-        FlexSelect("Slats", this.slats_select, fs);
+        FlexSelect(lu("Control Surfaces Ailerons"), this.aileron_select, fs);
+        FlexSelect(lu("Control Surfaces Rudders"), this.rudder_select, fs);
+        FlexSelect(lu("Control Surfaces Elevators"), this.elevator_select, fs);
+        FlexSelect(lu("Control Surfaces Flaps"), this.flaps_select, fs);
+        FlexSelect(lu("Control Surfaces Slats"), this.slats_select, fs);
 
         var drag_cell = row.insertCell();
         var fs2 = CreateFlexSection(drag_cell);
@@ -82,7 +87,7 @@ class ControlSurfaces_HTML extends Display {
         var dlist = cs.GetDragList();
         for (let i = 0; i < dlist.length; i++) {
             let cbx = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(dlist[i].name, cbx, fs2);
+            FlexCheckbox(lu(dlist[i].name), cbx, fs2);
             cbx.onchange = () => { this.cs.SetDrag(i, cbx.checked); };
             this.drag_chbx.push(cbx);
         }
@@ -96,24 +101,24 @@ class ControlSurfaces_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Control");
-        CreateTH(h2_row, "Pitch Stability");
-        CreateTH(h2_row, "Lateral Stability");
+        CreateTH(h2_row, lu("Stat Control"));
+        CreateTH(h2_row, lu("Stat Pitch Stability"));
+        CreateTH(h2_row, lu("Stat Lateral Stability"));
         var c2_row = tbl_stat.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Lift Bleed");
-        CreateTH(h3_row, "Crash Safety");
+        CreateTH(h3_row, lu("Stat Lift Bleed"));
+        CreateTH(h3_row, lu("Stat Crash Safety"));
         CreateTH(h3_row, " ");
         var c3_row = tbl_stat.insertRow();
         this.d_lift = c3_row.insertCell();
