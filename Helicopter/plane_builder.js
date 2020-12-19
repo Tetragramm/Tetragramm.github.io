@@ -10010,6 +10010,9 @@ class Engine_HTML extends Display {
                 this.cool_select = document.createElement("SELECT");
                 this.cool_select.required = true;
             }
+            var fs = CreateFlexSection(this.cool_cell);
+            FlexSelect(lu("Engine Select Radiator"), this.cool_select, fs);
+            FlexInput(lu("Engine Cooling Amount"), this.cool_count, fs);
             var numrad = this.engine.GetNumRadiators();
             while (this.cool_select.options.length > 0) {
                 this.cool_select.options.remove(0);
@@ -10024,12 +10027,10 @@ class Engine_HTML extends Display {
             };
             this.cool_select.selectedIndex = this.engine.GetRadiator();
             this.cool_count.min = "0";
-            this.cool_count.valueAsNumber = this.engine.GetCooling();
             this.cool_count.max = this.engine.GetMaxCooling().toString();
+            this.cool_count.valueAsNumber = this.engine.GetCooling();
+            console.log(this.engine.GetMaxCooling());
             this.cool_count.onchange = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
-            var fs = CreateFlexSection(this.cool_cell);
-            FlexSelect(lu("Engine Select Radiator"), this.cool_select, fs);
-            FlexInput(lu("Engine Cooling Amount"), this.cool_count, fs);
         }
     }
     UpdateDisplay() {
