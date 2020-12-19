@@ -5034,7 +5034,10 @@ class ControlSurfaces extends Part {
     GetFlapCost(mp) {
         if (mp)
             this.mp = mp;
-        return Math.max(1, Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp));
+        if (this.flaps_list[this.flaps_sel].costfactor > 0)
+            return Math.max(1, Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp));
+        else
+            return 0;
     }
     GetSlatsList() {
         return this.slats_list;
@@ -9502,6 +9505,7 @@ class Era_HTML extends Display {
     constructor(m) {
         super();
         this.model = m;
+        document.getElementById("lbl_era").textContent = lu("Era Section Title");
         var tbl = document.getElementById("table_era");
         var row = tbl.insertRow();
         CreateTH(row, lu("Era Option"));
@@ -9674,6 +9678,8 @@ class Cockpits_HTML extends Display {
     constructor(cockpits) {
         super();
         this.cockpits = cockpits;
+        document.getElementById("lbl_cockpits").textContent = lu("Cockpit Section Title");
+        document.getElementById("lbl_num_cockpits").textContent = lu("Cockpit Num Cockpits");
         this.tbl = document.getElementById("table_cockpit");
         var row = this.tbl.insertRow();
         CreateTH(row, lu("Cockpit Option"));
@@ -10224,6 +10230,7 @@ class Engines_HTML extends Display {
         this.eng = eng;
         this.engines = [];
         this.radiators = [];
+        document.getElementById("lbl_engines").textContent = lu("Engines Section Title");
         this.tbl = document.getElementById("table_engine");
         var row = this.tbl.insertRow();
         CreateTH(row, lu("Engines Engine Type"));
@@ -10236,12 +10243,15 @@ class Engines_HTML extends Display {
         CreateTH(row, lu("Radiators Mounting"));
         CreateTH(row, lu("Radiators Coolant"));
         CreateTH(row, lu("Radiators Radiator Stats"));
+        document.getElementById("lbl_num_engines").textContent = lu("Engines Num Engines");
         this.num_engines = document.getElementById("num_engines");
         this.num_engines.onchange = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };
         this.num_engines.valueAsNumber = this.eng.GetNumberOfItems();
+        document.getElementById("lbl_num_radiators").textContent = lu("Engines Num Radiators");
         this.num_radiators = document.getElementById("num_radiators");
         this.num_radiators.onchange = () => { this.eng.SetNumberOfRadiators(this.num_radiators.valueAsNumber); };
         this.num_radiators.valueAsNumber = this.eng.GetNumberOfRadiators();
+        document.getElementById("lbl_asymmetric").textContent = lu("Engines Asymmetric Plane");
         this.is_asymmetric = document.getElementById("asymmetric");
         this.is_asymmetric.onchange = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
         this.is_asymmetric.checked = this.eng.GetAsymmetry();
@@ -10331,8 +10341,17 @@ class Frames_HTML extends Display {
         this.c_sec = [];
         this.t_sec = [];
         this.frames = frames;
+        //Translate Section title
+        document.getElementById("lbl_frames").textContent = lu("Frames Frames and Covering");
         var table = document.getElementById("table_frames");
         var row = table.insertRow();
+        this.all_frame = document.createElement("SELECT");
+        this.all_skin = document.createElement("SELECT");
+        CreateTH(row, lu("Frames Frame Type")).append(document.createElement("BR"), this.all_frame);
+        CreateTH(row, lu("Frames Skin Type")).append(document.createElement("BR"), this.all_skin);
+        CreateTH(row, lu("Frames Frame Options"));
+        CreateTH(row, lu("Frames Frame Stats"));
+        row = table.insertRow();
         this.c_frame = row.insertCell();
         this.c_skin = row.insertCell();
         this.c_options = row.insertCell();
@@ -10342,32 +10361,32 @@ class Frames_HTML extends Display {
         var tbl = document.createElement("TABLE");
         tbl.className = "inner_table";
         var h1_row = tbl.insertRow();
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl.insertRow();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Toughness");
-        CreateTH(h2_row, "Visibility");
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Toughness"));
+        CreateTH(h2_row, lu("Stat Visibility"));
         var c2_row = tbl.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_tugh = c2_row.insertCell();
         this.d_visi = c2_row.insertCell();
         var h3_row = tbl.insertRow();
-        CreateTH(h3_row, "Wing Area");
-        CreateTH(h3_row, "Flammable");
-        CreateTH(h3_row, "Pitch Stability");
+        CreateTH(h3_row, lu("Stat Wing Area"));
+        CreateTH(h3_row, lu("Derived Is Flammable Question"));
+        CreateTH(h3_row, lu("Stat Pitch Stability"));
         var c3_row = tbl.insertRow();
         this.d_area = c3_row.insertCell();
         this.d_flammable = c3_row.insertCell();
         this.d_pstb = c3_row.insertCell();
         var h4_row = tbl.insertRow();
-        CreateTH(h4_row, "Raw Strain");
-        CreateTH(h4_row, "Lift Bleed");
+        CreateTH(h4_row, lu("Stat Raw Strain"));
+        CreateTH(h4_row, lu("Stat Lift Bleed"));
         CreateTH(h4_row, "");
         var c4_row = tbl.insertRow();
         this.d_strn = c4_row.insertCell();
@@ -10375,9 +10394,9 @@ class Frames_HTML extends Display {
         c4_row.insertCell();
         this.c_stats.appendChild(tbl);
         var row3 = table.insertRow();
-        CreateTH(row3, "Tail Frame Type");
-        CreateTH(row3, "Tail Skin Type");
-        CreateTH(row3, "Tail Frame Options");
+        CreateTH(row3, lu("Frames Tail Frame Type"));
+        CreateTH(row3, lu("Frames Tail Skin Type"));
+        CreateTH(row3, lu("Frames Tail Frame Options"));
         var row4 = table.insertRow();
         this.t_frame = row4.insertCell();
         this.t_skin = row4.insertCell();
@@ -10385,13 +10404,12 @@ class Frames_HTML extends Display {
         this.t_select = document.getElementById("tail_type");
         this.t_farman = document.getElementById("tail_farman");
         this.t_boom = document.getElementById("tail_boom");
+        document.getElementById("lbl_flying_wing").textContent = lu("Frames Flying Wing");
         this.t_fwing = document.getElementById("flying_wing");
-        this.all_frame = document.getElementById("all_frame");
-        this.all_skin = document.getElementById("all_skin");
         var spar_list = this.frames.GetFrameList();
         for (let spar of spar_list) {
             let opt = document.createElement("OPTION");
-            opt.text = spar.name;
+            opt.text = lu(spar.name);
             if (spar.basestruct <= 0) {
                 opt.disabled = true;
             }
@@ -10401,13 +10419,13 @@ class Frames_HTML extends Display {
         var skin_list = this.frames.GetSkinList();
         for (let skin of skin_list) {
             let opt = document.createElement("OPTION");
-            opt.text = skin.name;
+            opt.text = lu(skin.name);
             this.all_skin.add(opt);
         }
         this.all_skin.onchange = () => { this.frames.SetAllSkin(this.all_skin.selectedIndex); };
         for (let elem of this.frames.GetTailList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.t_select.add(opt);
         }
         this.t_select.onchange = () => { this.frames.SetTailType(this.t_select.selectedIndex); };
@@ -10452,9 +10470,9 @@ class Frames_HTML extends Display {
             this.UpdateTailSection(i, sec);
         }
         if (is_flammable)
-            BlinkIfChanged(this.d_flammable, "Yes");
+            BlinkIfChanged(this.d_flammable, lu("Derived Is Flammable Yes"));
         else
-            BlinkIfChanged(this.d_flammable, "No");
+            BlinkIfChanged(this.d_flammable, lu("Derived Is Flammable No"));
         var stats = this.frames.PartStats();
         BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
@@ -10488,7 +10506,7 @@ class Frames_HTML extends Display {
         var frame_list = this.frames.GetFrameList();
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION");
-            opt.text = ft.name;
+            opt.text = lu(ft.name);
             fsec.fsel.add(opt);
         }
         fsec.fsel.onchange = () => { this.frames.SetFrame(i, fsec.fsel.selectedIndex); };
@@ -10500,13 +10518,13 @@ class Frames_HTML extends Display {
         fsec.sspan.appendChild(fsec.ssel);
         fsec.sspan.appendChild(document.createElement("BR"));
         this.c_skin.appendChild(fsec.sspan);
-        CreateCheckbox("Geodesic", fsec.geo, fsec.ospan, false);
+        CreateCheckbox(lu("Frames Geodesic"), fsec.geo, fsec.ospan, false);
         fsec.geo.onchange = () => { this.frames.SetGeodesic(i, fsec.geo.checked); };
-        CreateCheckbox("Monocoque", fsec.mono, fsec.ospan, false);
+        CreateCheckbox(lu("Frames Monocoque"), fsec.mono, fsec.ospan, false);
         fsec.mono.onchange = () => { this.frames.SetMonocoque(i, fsec.mono.checked); };
-        CreateCheckbox("Internal Bracing", fsec.int, fsec.ospan, false);
+        CreateCheckbox(lu("Frames Internal Bracing"), fsec.int, fsec.ospan, false);
         fsec.int.onchange = () => { this.frames.SetInternalBracing(i, fsec.int.checked); };
-        CreateCheckbox("Lifting Body", fsec.lb, fsec.ospan, true);
+        CreateCheckbox(lu("Frames Lifting Body"), fsec.lb, fsec.ospan, true);
         fsec.lb.onchange = () => { this.frames.SetLiftingBody(i, fsec.lb.checked); };
         this.c_options.appendChild(fsec.ospan);
         this.c_sec.push(fsec);
@@ -10526,7 +10544,7 @@ class Frames_HTML extends Display {
         for (let j = 0; j < frame_list.length; j++) {
             let ft = frame_list[j];
             let opt = fsec.fsel.options[j];
-            opt.text = ft.name;
+            opt.text = lu(ft.name);
             opt.disabled = false;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
@@ -10535,11 +10553,11 @@ class Frames_HTML extends Display {
         }
         fsec.fsel.selectedIndex = sec.frame;
         if (sec.internal_bracing) {
-            fsec.ssel.textContent = "N/A";
+            fsec.ssel.textContent = lu("Frames No Skin");
         }
         else {
             var skin_list = this.frames.GetSkinList();
-            fsec.ssel.textContent = skin_list[this.frames.GetSkin()].name;
+            fsec.ssel.textContent = lu(skin_list[this.frames.GetSkin()].name);
         }
         fsec.geo.checked = sec.geodesic;
         fsec.geo.disabled = !this.frames.PossibleGeodesic(i);
@@ -10567,7 +10585,7 @@ class Frames_HTML extends Display {
         var frame_list = this.frames.GetFrameList();
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION");
-            opt.text = ft.name;
+            opt.text = lu(ft.name);
             tsec.fsel.add(opt);
         }
         tsec.fsel.onchange = () => { this.frames.SetTailFrame(i, tsec.fsel.selectedIndex); };
@@ -10577,11 +10595,11 @@ class Frames_HTML extends Display {
         tsec.sspan.appendChild(tsec.ssel);
         tsec.sspan.appendChild(document.createElement("BR"));
         this.t_skin.appendChild(tsec.sspan);
-        CreateCheckbox("Geodesic", tsec.geo, tsec.ospan, false);
+        CreateCheckbox(lu("Frames Geodesic"), tsec.geo, tsec.ospan, false);
         tsec.geo.onchange = () => { this.frames.SetTailGeodesic(i, tsec.geo.checked); };
-        CreateCheckbox("Monocoque", tsec.mono, tsec.ospan, false);
+        CreateCheckbox(lu("Frames Monocoque"), tsec.mono, tsec.ospan, false);
         tsec.mono.onchange = () => { this.frames.SetTailMonocoque(i, tsec.mono.checked); };
-        CreateCheckbox("Lifting Body", tsec.lb, tsec.ospan, true);
+        CreateCheckbox(lu("Frames Lifting Body"), tsec.lb, tsec.ospan, true);
         tsec.lb.onchange = () => { this.frames.SetTailLiftingBody(i, tsec.lb.checked); };
         this.t_options.appendChild(tsec.ospan);
         this.t_sec.push(tsec);
@@ -10599,7 +10617,7 @@ class Frames_HTML extends Display {
         for (let j = 0; j < frame_list.length; j++) {
             let ft = frame_list[j];
             let opt = tsec.fsel.options[j];
-            opt.text = ft.name;
+            opt.text = lu(ft.name);
             opt.disabled = false;
             if (sec.geodesic && !ft.geodesic)
                 opt.disabled = true;
@@ -11082,6 +11100,7 @@ class ControlSurfaces_HTML extends Display {
     constructor(cs) {
         super();
         this.cs = cs;
+        document.getElementById("lbl_control_surfaces").textContent = lu("Control Surfaces Section Title");
         var tbl = document.getElementById("tbl_control_surfaces");
         var row = tbl.insertRow();
         CreateTH(row, lu("Control Surfaces Control Surfaces"));
@@ -11523,6 +11542,7 @@ class Accessories_HTML extends Display {
     constructor(acc) {
         super();
         this.acc = acc;
+        document.getElementById("lbl_accessories").textContent = lu("Accessories Section Title");
         var tbl = document.getElementById("tbl_accessories");
         var row = tbl.insertRow();
         CreateTH(row, lu("Accessories Armour Coverage"));

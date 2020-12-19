@@ -58,7 +58,7 @@
 				</div>
 				<br />
 				<div id="Era">
-					<h3>Era
+					<h3><label id="lbl_era">Era</label>
 						<h4>
 							<span>(<a href="./Rules/Rules.htm#_yosnw6cvungd"><u>Rules</u></a>)</span>
 						</h4>
@@ -68,12 +68,12 @@
 				</div>
 				<br />
 				<div id="Cockpit">
-					<h3>Cockpits
+					<h3><label id="lbl_cockpits">Cockpits</label>
 						<h4>
 							<span>(<a href="./Rules/Rules.htm#_39ltuebx0622"><u>Rules</u></a>)</span>
 							<br />
-							<span> <label for="num_cockpits">Number of Cockpits:</label> <input type="number"
-									id="num_cockpits" min="1" max="20" value="1" /></span>
+							<span> <label id="lbl_num_cockpits" for="num_cockpits">Number of Cockpits:</label> <input
+									type="number" id="num_cockpits" min="1" max="20" value="1" /></span>
 						</h4>
 					</h3>
 					<table style="width:100%" id="table_cockpit">
@@ -103,18 +103,18 @@
 				</div>
 				<br />
 				<div id="Engines">
-					<h3>Engines
+					<h3><label id="lbl_engines">Engines</label>
 						<h4>
 							<span>(<a href="./Rules/Rules.htm#_7z3qybtdwc8"><u>Engine Rules</u></a>)</span>
 							<span>(<a href="./Rules/Rules.htm#_q8c5kcydj4u"><u>Upgrade Rules</u></a>)</span>
 							<span>(<a href="./Rules/Rules.htm#_oba9a3riaklv"><u>Cooling Rules</u></a>)</span>
 							<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
-							<span> <label for="num_engines">Number of Engines:</label> <input type="number"
-									id="num_engines" min="0" max="20" value="1" /></span>
-							<span> <label for="num_radiators">Number of Radiators:</label> <input type="number"
-									id="num_radiators" min="1" max="20" value="0" /></span>
-							<span><label for="asymmetric">Asymmetric Plane:</label> <input type="checkbox"
-									id="asymmetric" /></span>
+							<span> <label id="lbl_num_engines" for="num_engines">Number of Engines:</label> <input
+									type="number" id="num_engines" min="0" max="20" value="1" /></span>
+							<span> <label id="lbl_num_radiators" for="num_radiators">Number of Radiators:</label> <input
+									type="number" id="num_radiators" min="1" max="20" value="0" /></span>
+							<span><label id="lbl_asymmetric" for="asymmetric">Asymmetric Plane:</label> <input
+									type="checkbox" id="asymmetric" /></span>
 						</h4>
 					</h3>
 
@@ -127,20 +127,14 @@
 			</div>
 			<br />
 			<div id="Frames">
-				<h3>Frames and Covering
+				<h3><label id="lbl_frames">Frames and Covering</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_d5qmsg575qhr"><u>Rules</u></a>)</span>
-						<span><label for="flying_wing">Flying Wing:</label> <input type="checkbox"
+						<span><label id="lbl_flying_wing" for="flying_wing">Flying Wing:</label> <input type="checkbox"
 								id="flying_wing" /></span>
 					</h4>
 				</h3>
 				<table id="table_frames">
-					<tr>
-						<th>Frame Type<br /><select id="all_frame"></select></th>
-						<th>Skin Type<br /><select id="all_skin"></select></th>
-						<th>Frame Options</th>
-						<th>Frame Stats</th>
-					</tr>
 				</table>
 			</div>
 			<br />
@@ -203,7 +197,7 @@
 			</div>
 			<br />
 			<div id="ControlSurfaces">
-				<h3>Control Surfaces
+				<h3><label id="lbl_control_surfaces">Control Surfaces</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_d531g9ayebhk"><u>Rules</u></a>)</span>
 					</h4>
@@ -279,7 +273,7 @@
 			</div>
 			<br />
 			<div id="Accessories">
-				<h3>Additional Parts
+				<h3><label id="lbl_accessories">Additional Parts</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_8zv4bba6tuwb"><u>Rules</u></a>)</span>
 					</h4>
