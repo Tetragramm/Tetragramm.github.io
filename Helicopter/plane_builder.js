@@ -6329,7 +6329,7 @@ class Accessories extends Part {
             if (AP == 2) {
                 count -= this.skin_armour;
             }
-            stats.mass += count * Math.pow(2, AP);
+            stats.mass += count * Math.pow(2, AP - 1);
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
             if (eff_armour[i] > 0) {
