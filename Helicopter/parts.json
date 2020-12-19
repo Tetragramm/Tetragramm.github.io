@@ -903,16 +903,6 @@
                 "transparent": false
             },
             {
-                "name": "Transparent Celluloid",
-                "flammable": true,
-                "strainfactor": 0.9,
-                "dragfactor": 1.0,
-                "toughness": -0.1,
-                "cost": 0.1,
-                "metal": false,
-                "transparent": true
-            },
-            {
                 "name": "Aluminum Sheet",
                 "flammable": false,
                 "strainfactor": 1.0,
@@ -969,6 +959,16 @@
                 "cost": 0.8,
                 "metal": true,
                 "transparent": false
+            },
+            {
+                "name": "Transparent Celluloid",
+                "flammable": true,
+                "strainfactor": 0.9,
+                "dragfactor": 1.0,
+                "toughness": -0.1,
+                "cost": 0.1,
+                "metal": false,
+                "transparent": true
             }
         ],
         "stagger": [
