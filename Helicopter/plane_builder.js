@@ -10210,7 +10210,7 @@ class Radiator_HTML extends Display {
         CreateTH(h1_row, lu("Stat Cost"));
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Reliability"));
-        CreateTH(h1_row, lu("Stat Lateral Stab"));
+        CreateTH(h1_row, lu("Stat Lateral Stability"));
         var c1_row = tbl.insertRow();
         this.c_mass = c1_row.insertCell();
         this.c_cost = c1_row.insertCell();

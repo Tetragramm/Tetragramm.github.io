@@ -374,7 +374,7 @@
         "radiator-mount": [
             {
                 "name": "Low",
-                "warning": "Force Cool Down when shot.",
+                "warning": "Low Warning",
                 "reliability": 1,
                 "drag": 0,
                 "latstab": 0

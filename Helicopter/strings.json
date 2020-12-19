@@ -57,6 +57,7 @@
         "Evaporation": "Evaporation",
         "Evaporation Warning": "Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.",
         "Low": "Low",
+        "Low Warning": "Force Cool Down when shot.",
         "Inline": "Inline",
         "High": "High",
         "High Warning": "Bonus persists for 1 Cool Down after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!",
