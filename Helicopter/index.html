@@ -23,34 +23,38 @@
 					<table>
 						<tr>
 							<th class="btn_th">
-								<label class="lbl_action" for="acft_save">Save</label>
+								<label class="lbl_action" id="lbl_acft_save_top" for="acft_save">Save</label>
 							</th>
 							<th class="btn_th">
-								<label class="lbl_action" for="acft_load">Load</label>
+								<label class="lbl_action" id="lbl_acft_load_top" for="acft_load">Load</label>
 							</th>
 							<th class="btn_th" hidden>
 								<label class="lbl_action" for="acft_load_text2">Load Text</label> <input type="text"
 									id="acft_load_text2" class="skinny" />
 							</th>
 							<th class="btn_th">
-								<label class="lbl_action" for="acft_save_link">Copy As Link</label>
+								<label class="lbl_action" id="lbl_acft_save_link_top" for="acft_save_link">Copy As
+									Link</label>
 							</th>
 							<th class="btn_th">
-								<label class="lbl_action" for="acft_save_dash">Save Dashboard</label>
+								<label class="lbl_action" id="lbl_acft_save_dash_top" for="acft_save_dash">Save
+									Dashboard</label>
 							</th>
 							<th class="btn_th">
-								<label class="lbl_action" for="acft_save_npc">Save NPC</label>
+								<label class="lbl_action" id="lbl_acft_save_npc_top" for="acft_save_npc">Save
+									NPC</label>
 							</th>
 							<th class="btn_th">
-								<label class="lbl_action" for="acft_reset">Default Aircraft</label>
+								<label class="lbl_action" id="lbl_acft_reset_top" for="acft_reset">Default
+									Aircraft</label>
 							</th>
 						</tr>
 					</table>
 				</span>
 				<br />
 				<br />
-				<div id="Type" hidden="true">
-					<h3>Aircraft Type
+				<div id="Type">
+					<h3><label id="lbl_acft_type">Aircraft Type</label>
 						<h4>
 							<span> <select id="acft_type"></select></span>
 						</h4>
@@ -81,24 +85,10 @@
 				</div>
 				<br />
 				<div id="Passengers">
-					<h3>Passengers
+					<h3><label id="lbl_passengers">Passengers</label>
 						<h4><span>(<a href="./Rules/Rules.htm#_xtnklorouzp2"><u>Rules</u></a>)</span></h4>
 					</h3>
 					<table style="width:100%" id="table_passengers">
-						<tr>
-							<th>Number of Seats</th>
-							<th>Number of 1st Class, Beds, or Stretchers</th>
-							<th>Upgrade</th>
-							<th>Mass</th>
-							<th>Required Sections</th>
-						</tr>
-						<tr>
-							<td><input type="number" id="num_seats" min="0" value="0" /></td>
-							<td><input type="number" id="num_beds" min="0" value="0" /></td>
-							<td id="passenger_upg"></td>
-							<td id="passenger_mass"></td>
-							<td id="passenger_req_seq"></td>
-						</tr>
 					</table>
 				</div>
 				<br />
@@ -139,40 +129,37 @@
 			</div>
 			<br />
 			<div id="Tail">
-				<h3>Tail
+				<h3><label id="lbl_tail">Tail</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_acy0fm3uj2ja"><u>Rules</u></a>)</span><br />
-						<span> <label for="tail_type">Tail Length:</label> <select id="tail_type"></select></span>
-						<span> <label for="tail_farman">Farman Tail:</label> <input type="checkbox"
+						<span> <label id="lbl_tail_type" for="tail_type">Tail Length:</label> <select
+								id="tail_type"></select></span>
+						<span> <label id="lbl_tail_farman" for="tail_farman">Farman Tail:</label> <input type="checkbox"
 								id="tail_farman" /></span>
-						<span> <label for="tail_boom">Boom Tail:</label> <input type="checkbox" id="tail_boom" /></span>
+						<span> <label id="lbl_tail_boom" for="tail_boom">Boom Tail:</label> <input type="checkbox"
+								id="tail_boom" /></span>
 					</h4>
 				</h3>
 			</div>
 			<br />
 			<div id="Wings">
-				<h3>Wings
+				<h3><label id="lbl_wings">Wings</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
 						<br />
-						<span> <label for="wing_stagger">Wing Stagger:</label> <select
+						<span> <label id="lbl_wing_stagger" for="wing_stagger">Wing Stagger:</label> <select
 								id="wing_stagger"></select></span>
-						<span> <label for="wing_closed">Closed Wing:</label> <input type="checkbox"
+						<span> <label id="lbl_wing_closed" for="wing_closed">Closed Wing:</label> <input type="checkbox"
 								id="wing_closed" /></span>
-						<span> <label for="wing_swept">Swept Wings:</label> <input type="checkbox"
+						<span> <label id="lbl_wing_swept" for="wing_swept">Swept Wings:</label> <input type="checkbox"
 								id="wing_swept" /></span>
 					</h4>
 				</h3>
 				<table id="wing_table">
-					<tr>
-						<th>Wing Type</th>
-						<th>Wing Options</th>
-						<th>Wing Stats</th>
-					</tr>
 				</table>
 			</div><br />
 			<div id="Rotors" hidden="true">
-				<h3>Rotors
+				<h3><label id="lbl_rotor">Rotors</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
 					</h4>
@@ -182,17 +169,12 @@
 			</div>
 			<br />
 			<div id="Stabilizers">
-				<h3>Stabilizers
+				<h3><label id="lbl_stab">Stabilizers</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_yu8eo6k9uu3s"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
 				<table id="stab_table">
-					<tr>
-						<th>Horizontal Stabilizers</th>
-						<th>Vertical Stabilizers</th>
-						<th>Stabilizer Stats</th>
-					</tr>
 				</table>
 			</div>
 			<br />
@@ -207,68 +189,47 @@
 			</div>
 			<br />
 			<div id="Reinforcements">
-				<h3>Reinforcements
+				<h3><label id="lbl_reinforcements">Reinforcements</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_3utlenwdo4m2"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
 				<table id="tbl_reinforcements">
-					<tr>
-						<th>External Reinforcements</th>
-						<th>Internal Reinforcements</th>
-						<th>Reinforcement Stats</th>
-					</tr>
 				</table>
 			</div>
 			<br />
 			<div id="Weapons">
-				<h3>Weapons
+				<h3><label id="lbl_weapons">Weapons</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_jjg8jcon1xb4"><u>Rules</u></a>)</span> <br />
-						<span> <label for="num_wsets">Number of Weapon Sets:</label> <input type="number" id="num_wsets"
-								min="0" max="20" value="1" /></span>
-						<span> <label for="num_wbraces">Number of Weapon Braces:</label> <input type="number"
-								id="num_wbraces" min="0" max="99" step="3" value="1" /></span>
+						<span> <label id="lbl_num_wsets" for="num_wsets">Number of Weapon Sets:</label> <input
+								type="number" id="num_wsets" min="0" max="20" value="1" /></span>
+						<span> <label id="lbl_num_wbraces" for="num_wbraces">Number of Weapon Braces:</label> <input
+								type="number" id="num_wbraces" min="0" max="99" step="3" value="1" /></span>
 					</h4>
 				</h3>
 				<table style="width:100%" id="table_weapons">
-					<tr>
-						<th>Weapon Set</th>
-						<th>Weapons</th>
-						<th>Weapon Stats</th>
-					</tr>
 				</table>
 				</h3>
 			</div>
 			<br />
 			<div id="Load">
-				<h3>Load
+				<h3><label id="lbl_load">Load</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_t1lb2awb6fka"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
 				<table id="tbl_load">
-					<tr>
-						<th>Fuel</th>
-						<th>Munitions</th>
-						<th>Cargo and Passengers</th>
-						<th>Load Stats</th>
-					</tr>
 				</table>
 			</div>
 			<br />
 			<div id="Landing_Gear">
-				<h3>Landing Gear
+				<h3><label id="lbl_landing_gear">Landing Gear</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_b9y175l7zqcl"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
 				<table id="tbl_gear">
-					<tr>
-						<th>Landing Gear</th>
-						<th>Extras</th>
-						<th>Gear Stats</th>
-					</tr>
 				</table>
 			</div>
 			<br />
@@ -283,50 +244,39 @@
 			</div>
 			<br />
 			<div id="Propeller">
-				<h3>Propeller
+				<h3><label id="lbl_propeller">Propeller</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_fuzb5rpxyxfm"><u>Rules</u></a>)</span> <br />
-						<span> <label for="propeller_pitch">Propeller Pitch:</label> <select
+						<span> <label id="lbl_propeller_pitch" for="propeller_pitch">Propeller Pitch:</label> <select
 								id="propeller_pitch"></select></span>
-						<span><label for="propeller_variable">Manually Variable Propeller:</label> <input
-								type="checkbox" id="propeller_variable" /></span>
+						<span><label id="lbl_propeller_variable" for="propeller_variable">Manually Variable
+								Propeller:</label> <input type="checkbox" id="propeller_variable" /></span>
 					</h4>
 				</h3>
 			</div>
 			<br />
 			<div id="Optimization">
-				<h3>Optimizations
+				<h3><label id="lbl_optimization">Optimizations</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_9966tgispmti"><u>Rules</u></a>)</span>
 						<br />
 					</h4>
 				</h3>
-				<span> <label for="num_opt">Number of Free Optimizations:</label> <input type="number" id="num_opt"
-						min="0" max="20" value="0" /></span><br />
+				<span> <label id="lbl_num_opt" for="num_opt">Number of Free Optimizations:</label> <input type="number"
+						id="num_opt" min="0" max="20" value="0" /></span><br />
 				<table id="tbl_optimization">
-					<tr>
-						<th>Negative</th>
-						<th>Effect</th>
-						<th>Positive</th>
-						<th>Optimization Stats</th>
-					</tr>
 				</table>
 			</div><br />
 			<div id="Used Planes">
-				<h3>Used Plane
+				<h3><label id="lbl_used">Used Plane</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_used"><u>Rules</u></a>)</span>
 						<br />
 					</h4>
 				</h3>
-				<span> <label for="is_used">Is Aircraft Used? </label> <input type="checkbox"
+				<span> <label id="lbl_is_used" for="is_used">Is Aircraft Used? </label> <input type="checkbox"
 						id="is_used" /></span><br />
 				<table hidden id="tbl_used">
-					<tr>
-						<th>Effect</th>
-						<th>Description</th>
-						<th>Penalties (+) <br /> Benefits (-)</th>
-					</tr>
 				</table>
 			</div><br />
 			<!-- <div id="Stats">
@@ -338,7 +288,7 @@
 			</div>
 			<br /> -->
 			<div id="Stats">
-				<h3>Total Sum of Stats
+				<h3><label id="lbl_stats">Total Sum of Stats</label>
 					<br />
 				</h3>
 				<table id="tbl_stats">
@@ -346,7 +296,7 @@
 			</div>
 			<br />
 			<div id="Flight">
-				<h3>Aircraft Derived Statistics
+				<h3><label id="lbl_derived">Aircraft Derived Statistics</label>
 					<span>(<a href="./Rules/Rules.htm#_x2j3wmcf82xy"><u>Rules</u></a>)</span>
 					<br />
 				</h3>
@@ -360,32 +310,32 @@
 			<table>
 				<tr>
 					<th class="btn_th">
-						<label class="lbl_action" for="acft_save">Save</label><button hidden="true"
-							id="acft_save">Save</button>
+						<label class="lbl_action" id="lbl_acft_save_bot" for="acft_save">Save</label><button
+							hidden="true" id="acft_save">Save</button>
 					</th>
 					<th class="btn_th">
-						<label class="lbl_action" for="acft_load">Load</label> <input hidden="true" type="file"
-							id="acft_load" />
+						<label class="lbl_action" id="lbl_acft_load_bot" for="acft_load">Load</label> <input
+							hidden="true" type="file" id="acft_load" />
 					</th>
 					<th class="btn_th" hidden>
 						<label class="lbl_action" for="acft_load_text">Load Text</label> <input type="text"
 							id="acft_load_text" class="skinny" />
 					</th>
 					<th class="btn_th">
-						<label class="lbl_action" for="acft_save_link">Copy As Link</label><button hidden="true"
-							id="acft_save_link">Save</button>
+						<label class="lbl_action" id="lbl_acft_save_link_bot" for="acft_save_link">Copy As
+							Link</label><button hidden="true" id="acft_save_link">Save</button>
 					</th>
 					<th class="btn_th">
-						<label class="lbl_action" for="acft_save_dash">Save Dashboard</label><button hidden="true"
-							id="acft_save_dash">Save</button>
+						<label class="lbl_action" id="lbl_acft_save_dash_bot" for="acft_save_dash">Save
+							Dashboard</label><button hidden="true" id="acft_save_dash">Save</button>
 					</th>
 					<th class="btn_th">
-						<label class="lbl_action" for="acft_save_npc">Save NPC</label><button hidden="true"
-							id="acft_save_npc">Save</button>
+						<label class="lbl_action" id="lbl_acft_save_npc_bot" for="acft_save_npc">Save NPC</label><button
+							hidden="true" id="acft_save_npc">Save</button>
 					</th>
 					<th class="btn_th">
-						<label class="lbl_action" for="acft_reset">Default Aircraft</label><button hidden="true"
-							id="acft_reset">Default Aircraft</button>
+						<label class="lbl_action" id="lbl_acft_reset_bot" for="acft_reset">Default
+							Aircraft</label><button hidden="true" id="acft_reset">Default Aircraft</button>
 					</th>
 				</tr>
 			</table>

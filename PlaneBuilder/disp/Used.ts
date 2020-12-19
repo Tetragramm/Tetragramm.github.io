@@ -18,10 +18,17 @@ class Used_HTML extends Display {
         super();
         this.used = used;
 
+        (document.getElementById("lbl_used") as HTMLLabelElement).textContent = lu("Used Section Title");
+
+        (document.getElementById("lbl_is_used") as HTMLLabelElement).textContent = lu("Used Is Aircraft Used?");
         this.enabled = document.getElementById("is_used") as HTMLInputElement;
         this.enabled.onchange = () => { this.used.SetEnabled(this.enabled.checked); };
 
         this.tbl = document.getElementById("tbl_used") as HTMLTableElement;
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Used Effect"));
+        CreateTH(row, lu("Used Description"));
+        CreateTH(row, lu("Used Penalties(+) < br /> Benefits(-)"));
         this.InitTable(this.tbl);
     }
 
@@ -36,50 +43,50 @@ class Used_HTML extends Display {
         this.sluggish = document.createElement("INPUT") as HTMLInputElement;
 
         var row = tbl.insertRow();
-        row.insertCell().textContent = "Burnt Out";
-        row.insertCell().textContent = "Engines are at -1 Reliability";
+        row.insertCell().textContent = lu("Used Burnt Out");
+        row.insertCell().textContent = lu("Used Burnt Out Description");
         var cell = row.insertCell();
         CreateInput("", this.burnt_out, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().textContent = "Ragged";
-        row.insertCell().textContent = "Reduce your Max Speed by 10%";
+        row.insertCell().textContent = lu("Used Ragged");
+        row.insertCell().textContent = lu("Used Ragged Description");
         cell = row.insertCell();
         CreateInput("", this.ragged, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().textContent = "Hefty";
-        row.insertCell().textContent = "Increase your Stall Speeds by 20%";
+        row.insertCell().textContent = lu("Used Hefty");
+        row.insertCell().textContent = lu("Used Hefty Description");
         cell = row.insertCell();
         CreateInput("", this.hefty, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().textContent = "Sticky Guns";
-        row.insertCell().textContent = "Increase the chance of guns jamming by 1";
+        row.insertCell().textContent = lu("Used Sticky Guns");
+        row.insertCell().textContent = lu("Used Sticky Guns Description");
         cell = row.insertCell();
         CreateInput("", this.sticky_guns, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().textContent = "Weak";
-        row.insertCell().textContent = "Cut the plane's Toughness in half";
+        row.insertCell().textContent = lu("Used Weak");
+        row.insertCell().textContent = lu("Used Weak Description");
         cell = row.insertCell();
         CreateInput("", this.weak, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().textContent = "Fragile";
-        row.insertCell().textContent = "Reduce your Max Strain by 20%";
+        row.insertCell().textContent = lu("Used Fragile");
+        row.insertCell().textContent = lu("Used Fragile Description");
         cell = row.insertCell();
         CreateInput("", this.fragile, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().textContent = "Leaky";
-        row.insertCell().textContent = "Reduce your Fuel by 20%";
+        row.insertCell().textContent = lu("Used Leaky");
+        row.insertCell().textContent = lu("Used Leaky Description");
         cell = row.insertCell();
         CreateInput("", this.leaky, cell, false);
 
         row = tbl.insertRow();
-        row.insertCell().textContent = "Sluggish";
-        row.insertCell().textContent = "Reduce your Handling by 5%";
+        row.insertCell().textContent = lu("Used Sluggish");
+        row.insertCell().textContent = lu("Used Sluggish Description");
         cell = row.insertCell();
         CreateInput("", this.sluggish, cell, false);
 

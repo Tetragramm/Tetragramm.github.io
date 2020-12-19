@@ -3209,12 +3209,12 @@ class Engines extends Part {
         }
         if (rotationT > 0) {
             stats.warnings.push({
-                source: "Rotary", warning: lu("Rotary Right Warning")
+                source: lu("Rotary"), warning: lu("Rotary Right Warning")
             });
         }
         else if (rotationT < 0) {
             stats.warnings.push({
-                source: "Rotary", warning: lu("Rotary Left Warning")
+                source: lu("Rotary"), warning: lu("Rotary Left Warning")
             });
         }
         //Part local, gets handled in UpdateReliability
@@ -9267,13 +9267,13 @@ function CreateFlexSection(elem) {
 }
 function CreateTH(row, content) {
     var th = document.createElement("TH");
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
 function CreateTD(row, content) {
     var th = document.createElement("TD");
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
@@ -9726,14 +9726,36 @@ class Passengers_HTML extends Display {
     constructor(pass) {
         super();
         this.pass = pass;
-        this.nseats = document.getElementById("num_seats");
-        this.nbeds = document.getElementById("num_beds");
-        this.mass = document.getElementById("passenger_mass");
-        this.reqseq = document.getElementById("passenger_req_seq");
-        var upg_cell = document.getElementById("passenger_upg");
+        document.getElementById("lbl_passengers").textContent = lu("Passengers Section Title");
+        var tbl = document.getElementById("table_passengers");
+        var row = tbl.insertRow();
+        CreateTH(row, lu("Passengers Number of Seats"));
+        CreateTH(row, lu("Passengers Number of Beds"));
+        CreateTH(row, lu("Passengers Upgrade"));
+        CreateTH(row, lu("Stat Mass"));
+        CreateTH(row, lu("Stat Required Sections"));
+        // < tr >
+        // <td><input type="number" id = "num_seats" min = "0" value = "0" /> </td>
+        // < td > <input type="number" id = "num_beds" min = "0" value = "0" /> </td>
+        // < td id = "passenger_upg" > </td>
+        // < td id = "passenger_mass" > </td>
+        // < td id = "passenger_req_seq" > </td>
+        // < /tr>
+        row = tbl.insertRow();
+        this.nseats = document.createElement("INPUT");
+        this.nseats.type = "number";
+        this.nseats.min = "0";
+        row.insertCell().append(this.nseats);
+        this.nbeds = document.createElement("INPUT");
+        this.nbeds.type = "number";
+        this.nbeds.min = "0";
+        row.insertCell().append(this.nbeds);
+        var upg_cell = row.insertCell();
         this.connect = document.createElement("INPUT");
         var fs = CreateFlexSection(upg_cell);
-        FlexCheckbox("Connectivity", this.connect, fs);
+        FlexCheckbox(lu("Passengers Connectivity"), this.connect, fs);
+        this.mass = row.insertCell();
+        this.reqseq = row.insertCell();
         this.connect.disabled = true;
         this.nseats.onchange = () => {
             this.pass.SetSeats(this.nseats.valueAsNumber);
@@ -10148,7 +10170,7 @@ class Radiator_HTML extends Display {
         this.type_select = document.createElement("SELECT");
         for (let elem of this.radiator.GetTypeList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.type_select.add(opt);
         }
         this.type_select.onchange = () => { this.radiator.SetTypeIndex(this.type_select.selectedIndex); };
@@ -10158,7 +10180,7 @@ class Radiator_HTML extends Display {
         this.mount_select = document.createElement("SELECT");
         for (let elem of this.radiator.GetMountList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.mount_select.add(opt);
         }
         this.mount_select.onchange = () => { this.radiator.SetMountIndex(this.mount_select.selectedIndex); };
@@ -10168,7 +10190,7 @@ class Radiator_HTML extends Display {
         this.coolant_select = document.createElement("SELECT");
         for (let elem of this.radiator.GetCoolantList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.coolant_select.add(opt);
         }
         this.coolant_select.onchange = () => { this.radiator.SetCoolantIndex(this.coolant_select.selectedIndex); };
@@ -10176,18 +10198,18 @@ class Radiator_HTML extends Display {
         cool_cell.appendChild(document.createElement("BR"));
         this.harden_input = document.createElement("INPUT");
         var fs = CreateFlexSection(cool_cell);
-        FlexCheckbox("Harden Radiator", this.harden_input, fs);
+        FlexCheckbox(lu("Radiators Harden Radiator"), this.harden_input, fs);
         this.harden_input.onchange = () => { this.radiator.SetHarden(this.harden_input.checked); };
         var stats_cell = row.insertCell();
         var tbl = document.createElement("TABLE");
         stats_cell.className = "inner_table";
         tbl.className = "inner_table";
         var h1_row = tbl.insertRow();
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Reliability");
-        CreateTH(h1_row, "Lateral Stab");
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Reliability"));
+        CreateTH(h1_row, lu("Stat Lateral Stab"));
         var c1_row = tbl.insertRow();
         this.c_mass = c1_row.insertCell();
         this.c_cost = c1_row.insertCell();
@@ -10311,13 +10333,16 @@ class Propeller_HTML extends Display {
     constructor(prop) {
         super();
         this.prop = prop;
+        document.getElementById("lbl_propeller").textContent = lu("Propeller Section Title");
+        document.getElementById("lbl_propeller_pitch").textContent = lu("Propeller Propeller Pitch");
         this.select_prop = document.getElementById("propeller_pitch");
         for (let elem of prop.GetPropList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.select_prop.add(opt);
         }
         this.select_prop.onchange = () => { this.prop.SetPropIndex(this.select_prop.selectedIndex); };
+        document.getElementById("lbl_propeller_variable").textContent = lu("Propeller Manually Variable Propeller");
         this.input_variable = document.getElementById("propeller_variable");
         this.input_variable.onchange = () => { this.prop.SetVariable(this.input_variable.checked); };
     }
@@ -10401,8 +10426,12 @@ class Frames_HTML extends Display {
         this.t_frame = row4.insertCell();
         this.t_skin = row4.insertCell();
         this.t_options = row4.insertCell();
+        document.getElementById("lbl_tail").textContent = lu("Frames Tail Section Title");
+        document.getElementById("lbl_tail_type").textContent = lu("Frames Tail Type");
         this.t_select = document.getElementById("tail_type");
+        document.getElementById("lbl_tail_farman").textContent = lu("Frames Tail Farman");
         this.t_farman = document.getElementById("tail_farman");
+        document.getElementById("lbl_tail_boom").textContent = lu("Frames Tail Boom");
         this.t_boom = document.getElementById("tail_boom");
         document.getElementById("lbl_flying_wing").textContent = lu("Frames Flying Wing");
         this.t_fwing = document.getElementById("flying_wing");
@@ -10470,9 +10499,9 @@ class Frames_HTML extends Display {
             this.UpdateTailSection(i, sec);
         }
         if (is_flammable)
-            BlinkIfChanged(this.d_flammable, lu("Derived Is Flammable Yes"));
+            BlinkIfChanged(this.d_flammable, lu("Yes"));
         else
-            BlinkIfChanged(this.d_flammable, lu("Derived Is Flammable No"));
+            BlinkIfChanged(this.d_flammable, lu("No"));
         var stats = this.frames.PartStats();
         BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
@@ -10629,7 +10658,7 @@ class Frames_HTML extends Display {
         var idx = this.frames.GetSkin();
         if (this.frames.GetUseFarman())
             idx = 0;
-        tsec.ssel.textContent = skin_list[idx].name;
+        tsec.ssel.textContent = lu(skin_list[idx].name);
         tsec.geo.checked = sec.geodesic;
         tsec.geo.disabled = !this.frames.PossibleTailGeodesic(i);
         tsec.mono.checked = sec.monocoque;
@@ -10646,26 +10675,30 @@ class Wings_HTML extends Display {
         this.wings = w;
         this.fw_list = [];
         this.mw_list = [];
+        document.getElementById("lbl_wings").textContent = lu("Wings Section Title");
+        document.getElementById("lbl_wing_stagger").textContent = lu("Wings Wing Stagger");
         this.stagger = document.getElementById("wing_stagger");
+        document.getElementById("lbl_wing_closed").textContent = lu("Wings Closed Wing");
         this.closed = document.getElementById("wing_closed");
+        document.getElementById("lbl_wing_swept").textContent = lu("Wings Swept Wing");
         this.swept = document.getElementById("wing_swept");
         for (let s of w.GetStaggerList()) {
             let opt = document.createElement("OPTION");
-            opt.textContent = s.name;
+            opt.textContent = lu(s.name);
             this.stagger.append(opt);
         }
         this.stagger.onchange = () => { this.wings.SetStagger(this.stagger.selectedIndex); };
         this.closed.onchange = () => { this.wings.SetClosed(this.closed.checked); };
         this.swept.onchange = () => { this.wings.SetSwept(this.swept.checked); };
         var tbl = document.getElementById("wing_table");
+        var row = tbl.insertRow();
+        CreateTH(row, lu("Wings Wing Type"));
+        CreateTH(row, lu("Wings Wing Options"));
+        CreateTH(row, lu("Wings Wing Stats"));
         var full_row = tbl.insertRow();
+        CreateTH(full_row, lu("Wings Full Wings"));
         var mini_row = tbl.insertRow();
-        var full_type = document.createElement("TH");
-        full_type.textContent = "Full Wings";
-        full_row.appendChild(full_type);
-        var mini_type = document.createElement("TH");
-        mini_type.textContent = "Miniature Wings";
-        mini_row.appendChild(mini_type);
+        CreateTH(mini_row, lu("Wings Miniature Wings"));
         this.full_cell = full_row.insertCell();
         this.mini_cell = mini_row.insertCell();
         var stat_cell = full_row.insertCell();
@@ -10678,32 +10711,32 @@ class Wings_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Wing Area");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, lu("Stat Wing Area"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
         var c1_row = tbl_stat.insertRow();
         this.d_area = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Control");
-        CreateTH(h2_row, "Pitch Stability");
-        CreateTH(h2_row, "Lateral Stability");
+        CreateTH(h2_row, lu("Stat Control"));
+        CreateTH(h2_row, lu("Stat Pitch Stability"));
+        CreateTH(h2_row, lu("Stat Lateral Stability"));
         var c2_row = tbl_stat.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Raw Strain");
-        CreateTH(h3_row, "Crash Safety");
-        CreateTH(h3_row, "Lift Bleed");
+        CreateTH(h3_row, lu("Stat Raw Strain"));
+        CreateTH(h3_row, lu("Stat Crash Safety"));
+        CreateTH(h3_row, lu("Stat Lift Bleed"));
         var c3_row = tbl_stat.insertRow();
         this.d_maxs = c3_row.insertCell();
         this.d_crsh = c3_row.insertCell();
         this.d_lift = c3_row.insertCell();
         var h4_row = tbl_stat.insertRow();
-        CreateTH(h4_row, "Cost");
-        CreateTH(h4_row, "Visibility");
+        CreateTH(h4_row, lu("Stat Cost"));
+        CreateTH(h4_row, lu("Stat Visibility"));
         CreateTH(h4_row, "");
         var c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
@@ -10711,8 +10744,8 @@ class Wings_HTML extends Display {
         c4_row.insertCell();
         var h5_row = tbl_stat.insertRow();
         CreateTH(h5_row, "");
-        CreateTH(h5_row, "Sesquiplane");
-        CreateTH(h5_row, "Flammable");
+        CreateTH(h5_row, lu("Wings Sesquiplane"));
+        CreateTH(h5_row, lu("Derived Is Flammable Question"));
         var c5_row = tbl_stat.insertRow();
         c5_row.insertCell();
         this.d_sesq = c5_row.insertCell();
@@ -10765,13 +10798,13 @@ class Wings_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
         if (this.wings.GetIsSesquiplane().is)
-            BlinkIfChanged(this.d_sesq, "Yes");
+            BlinkIfChanged(this.d_sesq, lu("Yes"));
         else
-            BlinkIfChanged(this.d_sesq, "No");
+            BlinkIfChanged(this.d_sesq, lu("No"));
         if (this.wings.IsFlammable())
-            BlinkIfChanged(this.d_flam, "Yes");
+            BlinkIfChanged(this.d_flam, lu("Yes"));
         else
-            BlinkIfChanged(this.d_flam, "No");
+            BlinkIfChanged(this.d_flam, lu("No"));
     }
     AddFullWing() {
         var wing = {
@@ -10788,29 +10821,28 @@ class Wings_HTML extends Display {
         wing.span.appendChild(wing.deck);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION");
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             wing.deck.append(opt);
         }
         wing.span.appendChild(wing.skin);
-        var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION");
-            opt.textContent = s.name;
+            opt.textContent = lu(s.name);
             wing.skin.append(opt);
         }
-        CreateInput(" Area ", wing.area, wing.span, false);
+        CreateInput(lu("Wings Area"), wing.area, wing.span, false);
         wing.area.min = "3";
-        CreateInput(" Span ", wing.wspan, wing.span, false);
+        CreateInput(lu("Wings Span"), wing.wspan, wing.span, false);
         wing.wspan.min = "1";
-        CreateCheckbox(" Gull ", wing.gull, wing.span, false);
-        CreateInput(" Dihedral ", wing.dihedral, wing.span, false);
+        CreateCheckbox(lu("Wings Gull"), wing.gull, wing.span, false);
+        CreateInput(lu("Wings Dihedral"), wing.dihedral, wing.span, false);
         wing.dihedral.min = "0";
-        CreateInput(" Anhedral ", wing.anhedral, wing.span, false);
+        CreateInput(lu("Wings Anhedral"), wing.anhedral, wing.span, false);
         wing.anhedral.min = "0";
         this.full_cell.appendChild(wing.span);
         this.full_cell.appendChild(wing.br);
@@ -10889,25 +10921,24 @@ class Wings_HTML extends Display {
         wing.span.appendChild(wing.deck);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION");
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             wing.deck.append(opt);
         }
         wing.span.appendChild(wing.skin);
-        var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION");
-            opt.textContent = s.name;
+            opt.textContent = lu(s.name);
             wing.skin.append(opt);
         }
-        CreateInput(" Area ", wing.area, wing.span, false);
+        CreateInput(lu("Wings Area"), wing.area, wing.span, false);
         wing.area.min = "1";
         wing.area.max = "2";
-        CreateInput(" Span ", wing.wspan, wing.span, false);
+        CreateInput(lu("Wings Span"), wing.wspan, wing.span, false);
         wing.wspan.min = "1";
         this.mini_cell.appendChild(wing.span);
         this.mini_cell.appendChild(wing.br);
@@ -10955,13 +10986,13 @@ class Wings_HTML extends Display {
         this.fw_add = document.createElement("SELECT");
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         this.fw_add.append(none_opt);
         var can = false;
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION");
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             if (!this.wings.CanAddFullWing(i)) {
                 opt.disabled = true;
             }
@@ -10982,13 +11013,13 @@ class Wings_HTML extends Display {
         this.mw_add = document.createElement("SELECT");
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION");
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         this.mw_add.append(none_opt);
         var can = false;
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION");
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             if (!this.wings.CanAddMiniWing(i)) {
                 opt.disabled = true;
             }
@@ -11012,36 +11043,41 @@ class Stabilizers_HTML extends Display {
     constructor(s) {
         super();
         this.stab = s;
+        document.getElementById("lbl_stab").textContent = lu("Stabilizers Section Title");
         var tbl = document.getElementById("stab_table");
         var row = tbl.insertRow();
+        CreateTH(row, lu("Stabilizers Horizontal Stabilizers"));
+        CreateTH(row, lu("Stabilizers Vertical Stabilizers"));
+        CreateTH(row, lu("Stabilizers Stabilizer Stats"));
+        row = tbl.insertRow();
         var hcell = row.insertCell();
         var vcell = row.insertCell();
         this.h_type = document.createElement("SELECT");
         this.h_count = document.createElement("INPUT");
         hcell.appendChild(this.h_type);
         hcell.append(document.createElement("BR"));
-        CreateInput(" Stabilizers", this.h_count, hcell);
+        CreateInput(lu("Stabilizers # of Stabilizers"), this.h_count, hcell);
         this.h_count.min = "0";
         this.h_count.max = "20";
         this.h_count.onchange = () => { this.stab.SetHStabCount(this.h_count.valueAsNumber); };
         this.h_type.onchange = () => { this.stab.SetHStabType(this.h_type.selectedIndex); };
         for (let elem of s.GetHStabList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.h_type.add(opt);
         }
         this.v_type = document.createElement("SELECT");
         this.v_count = document.createElement("INPUT");
         vcell.appendChild(this.v_type);
         vcell.appendChild(document.createElement("BR"));
-        CreateInput(" Stabilizers", this.v_count, vcell);
+        CreateInput(lu("Stabilizers # of Stabilizers"), this.v_count, vcell);
         this.v_count.min = "0";
         this.v_count.max = "20";
         this.v_count.onchange = () => { this.stab.SetVStabCount(this.v_count.valueAsNumber); };
         this.v_type.onchange = () => { this.stab.SetVStabType(this.v_type.selectedIndex); };
         for (let elem of s.GetVStabList()) {
             let opt = document.createElement("OPTION");
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.v_type.add(opt);
         }
         var stat_cell = row.insertCell();
@@ -11054,17 +11090,17 @@ class Stabilizers_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Control");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Control"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_cont = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Pitch Stability");
-        CreateTH(h2_row, "Lateral Stability");
-        CreateTH(h2_row, "Lift Bleed");
+        CreateTH(h2_row, lu("Stat Pitch Stability"));
+        CreateTH(h2_row, lu("Stat Lateral Stability"));
+        CreateTH(h2_row, lu("Stat Lift Bleed"));
         var c2_row = tbl_stat.insertRow();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
@@ -11226,8 +11262,13 @@ class Reinforcement_HTML extends Display {
         this.ext_wood_inp = [];
         this.ext_steel_inp = [];
         this.cant_inp = [];
+        document.getElementById("lbl_reinforcements").textContent = lu("Reinforcement Section Title");
         var tbl = document.getElementById("tbl_reinforcements");
         var row = tbl.insertRow();
+        CreateTH(row, lu("Reinforcement External Reinforcements"));
+        CreateTH(row, lu("Reinforcement Internal Reinforcements"));
+        CreateTH(row, lu("Reinforcement Reinforcement Stats"));
+        row = tbl.insertRow();
         this.InitExternal(row.insertCell());
         this.InitInternal(row.insertCell());
         this.InitStatDisplay(row.insertCell());
@@ -11242,9 +11283,9 @@ class Reinforcement_HTML extends Display {
             let elem = lst[i];
             let w_inp = document.createElement("INPUT");
             let s_inp = document.createElement("INPUT");
-            FlexLabel(elem.name, fs.div1);
-            FlexInput("Wood", w_inp, fs_wood);
-            FlexInput("Steel", s_inp, fs_steel);
+            FlexLabel(lu(elem.name), fs.div1);
+            FlexInput(lu("Reinforcement Wood"), w_inp, fs_wood);
+            FlexInput(lu("Reinforcement Steel"), s_inp, fs_steel);
             w_inp.min = "0";
             s_inp.min = "0";
             w_inp.onchange = () => { this.rf.SetExternalWoodCount(i, w_inp.valueAsNumber); };
@@ -11253,16 +11294,16 @@ class Reinforcement_HTML extends Display {
             this.ext_steel_inp.push(s_inp);
         }
         this.cabane = document.createElement("SELECT");
-        FlexSelect("Cabane", this.cabane, fs);
+        FlexSelect(lu("Reinforcement Cabane"), this.cabane, fs);
         for (let o of this.rf.GetCabaneList()) {
             let opt = document.createElement("OPTION");
-            opt.text = o.name;
+            opt.text = lu(o.name);
             this.cabane.add(opt);
         }
         this.cabane.onchange = () => { this.rf.SetCabane(this.cabane.selectedIndex); };
         this.cabane.selectedIndex = 0;
         this.wires = document.createElement("INPUT");
-        FlexCheckbox("Wires", this.wires, fs);
+        FlexCheckbox(lu("Reinforcement Wires"), this.wires, fs);
         this.wires.onchange = () => { this.rf.SetWires(this.wires.checked); };
     }
     InitInternal(cell) {
@@ -11271,13 +11312,13 @@ class Reinforcement_HTML extends Display {
         for (let i = 0; i < lst.length; i++) {
             let elem = lst[i];
             let inp = document.createElement("INPUT");
-            FlexInput(elem.name, inp, fs);
+            FlexInput(lu(elem.name), inp, fs);
             inp.min = "0";
             inp.onchange = () => { this.rf.SetCantileverCount(i, inp.valueAsNumber); };
             this.cant_inp.push(inp);
         }
         this.wing_blades = document.createElement("INPUT");
-        FlexCheckbox("Wing Blades", this.wing_blades, fs);
+        FlexCheckbox(lu("Reinforcement Wing Blades"), this.wing_blades, fs);
         this.wing_blades.onchange = () => { this.rf.SetWingBlade(this.wing_blades.checked); };
     }
     InitStatDisplay(stat_cell) {
@@ -11286,17 +11327,17 @@ class Reinforcement_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Raw Strain");
-        CreateTH(h2_row, "Aircraft Max Strain");
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Raw Strain"));
+        CreateTH(h2_row, lu("Reinforcement Aircraft Max Strain"));
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
@@ -11344,8 +11385,14 @@ class Load_HTML extends Display {
         this.boom = boom;
         this.cargo = cargo;
         this.fuel_list = [];
+        document.getElementById("lbl_load").textContent = lu("Load Section Title");
         var tbl = document.getElementById("tbl_load");
         var row = tbl.insertRow();
+        CreateTH(row, lu("Load Fuel"));
+        CreateTH(row, lu("Load Munitions"));
+        CreateTH(row, lu("Load Cargo and Passengers"));
+        CreateTH(row, lu("Load Load Stats"));
+        row = tbl.insertRow();
         this.InitFuel(row.insertCell());
         this.InitMunitions(row.insertCell());
         this.InitCargoAndPassengers(row.insertCell());
@@ -11356,43 +11403,43 @@ class Load_HTML extends Display {
         var fs = CreateFlexSection(cell);
         for (let i = 0; i < lst.length; i++) {
             let inp = document.createElement("INPUT");
-            FlexInput(lst[i].name, inp, fs);
+            FlexInput(lu(lst[i].name), inp, fs);
             inp.onchange = () => { this.fuel.SetTankCount(i, inp.valueAsNumber); };
             this.fuel_list.push(inp);
         }
         this.seal = document.createElement("INPUT");
-        FlexCheckbox("Self-Sealing Gas Tank", this.seal, fs);
+        FlexCheckbox(lu("Load Self-Sealing Gas Tank"), this.seal, fs);
         this.seal.onchange = () => { this.fuel.SetSelfSealing(this.seal.checked); };
         this.extinguish = document.createElement("INPUT");
-        FlexCheckbox("Remote Fire Extinguisher", this.extinguish, fs);
+        FlexCheckbox(lu("Load Remote Fire Extinguisher"), this.extinguish, fs);
         this.extinguish.onchange = () => { this.fuel.SetExtinguisher(this.extinguish.checked); };
     }
     InitMunitions(cell) {
         var fs = CreateFlexSection(cell);
         this.bombs = document.createElement("INPUT");
-        FlexInput("Bombs ", this.bombs, fs);
+        FlexInput(lu("Load Bombs"), this.bombs, fs);
         this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
         this.rockets = document.createElement("INPUT");
-        FlexInput("Rockets", this.rockets, fs);
+        FlexInput(lu("Load Rockets"), this.rockets, fs);
         this.rockets.onchange = () => { this.boom.SetRocketCount(this.rockets.valueAsNumber); };
         this.bay_count = document.createElement("INPUT");
-        FlexInput("Internal Bay Count", this.bay_count, fs);
+        FlexInput(lu("Load Internal Bay Count"), this.bay_count, fs);
         this.bay_count.onchange = () => { this.boom.SetBayCount(this.bay_count.valueAsNumber); };
         this.bay1 = document.createElement("INPUT");
-        FlexCheckbox("Widen Internal Bay 1", this.bay1, fs);
+        FlexCheckbox(lu("Load Widen Internal Bay 1"), this.bay1, fs);
         this.bay1.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
         this.bay2 = document.createElement("INPUT");
-        FlexCheckbox("Widen Internal Bay 2", this.bay2, fs);
+        FlexCheckbox(lu("Load Widen Internal Bay 2"), this.bay2, fs);
         this.bay2.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
     }
     InitCargoAndPassengers(cell) {
         var fs = CreateFlexSection(cell);
         this.carg = document.createElement("SELECT");
-        FlexSelect("Cargo", this.carg, fs);
+        FlexSelect(lu("Load Cargo"), this.carg, fs);
         var lst = this.cargo.GetSpaceList();
         for (let l of lst) {
             let opt = document.createElement("OPTION");
-            opt.text = l.name;
+            opt.text = lu(l.name);
             this.carg.add(opt);
         }
         this.carg.onchange = () => { this.cargo.SetSpace(this.carg.selectedIndex); };
@@ -11403,17 +11450,17 @@ class Load_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Wet Mass");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Wet Mass"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_wmas = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Fuel");
-        CreateTH(h2_row, "Cost");
+        CreateTH(h2_row, lu("Stat Required Sections"));
+        CreateTH(h2_row, lu("Stat Fuel"));
+        CreateTH(h2_row, lu("Stat Cost"));
         var c2_row = tbl_stat.insertRow();
         this.d_rsec = c2_row.insertCell();
         this.d_fuel = c2_row.insertCell();
@@ -11463,8 +11510,13 @@ class LandingGear_HTML extends Display {
     constructor(gear) {
         super();
         this.gear = gear;
+        document.getElementById("lbl_landing_gear").textContent = lu("Landing Gear Section Title");
         var tbl = document.getElementById("tbl_gear");
         var row = tbl.insertRow();
+        CreateTH(row, lu("Landing Gear Landing Gear"));
+        CreateTH(row, lu("Landing Gear Extras"));
+        CreateTH(row, lu("Landing Gear Gear Stats"));
+        row = tbl.insertRow();
         this.InitGear(row.insertCell());
         this.InitExtras(row.insertCell());
         this.InitStats(row.insertCell());
@@ -11476,12 +11528,12 @@ class LandingGear_HTML extends Display {
         FlexSelect("Type", this.sel, fs);
         for (let i = 0; i < lst.length; i++) {
             let opt = document.createElement("OPTION");
-            opt.text = lst[i].name;
+            opt.text = lu(lst[i].name);
             this.sel.add(opt);
         }
         this.sel.onchange = () => { this.gear.SetGear(this.sel.selectedIndex); };
         this.retract = document.createElement("INPUT");
-        FlexCheckbox("Retractable", this.retract, fs);
+        FlexCheckbox(lu("Landing Gear Retractable"), this.retract, fs);
         this.retract.onchange = () => { this.gear.SetRetract(this.retract.checked); };
     }
     InitExtras(cell) {
@@ -11490,7 +11542,7 @@ class LandingGear_HTML extends Display {
         var fs = CreateFlexSection(cell);
         for (let i = 0; i < lst.length; i++) {
             let cbx = document.createElement("INPUT");
-            FlexCheckbox(lst[i].name, cbx, fs);
+            FlexCheckbox(lu(lst[i].name), cbx, fs);
             cbx.onchange = () => { this.gear.SetExtraSelected(i, cbx.checked); };
             this.extras.push(cbx);
         }
@@ -11501,16 +11553,16 @@ class LandingGear_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Crash Safety");
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Crash Safety"));
         CreateTH(h2_row, "");
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
@@ -11729,18 +11781,29 @@ class Optimization_HTML extends Display {
     constructor(opt) {
         super();
         this.opt = opt;
+        document.getElementById("lbl_optimization").textContent = lu("Optimization Section Title");
+        document.getElementById("lbl_num_opt").textContent = lu("Optimization Num Free Optimizations");
         this.free_inp = document.getElementById("num_opt");
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
         var tbl = document.getElementById("tbl_optimization");
+        var row0 = tbl.insertRow();
+        CreateTH(row0, lu("Optimization Negative"));
+        CreateTH(row0, lu("Optimization Effect"));
+        CreateTH(row0, lu("Optimization Positive"));
+        CreateTH(row0, lu("Optimization Optimization Stats"));
+        // <th>Negative < /th>
+        // < th > Effect < /th>
+        // < th > Positive < /th>
+        // < th > Optimization Stats < /th>
         var row1 = tbl.insertRow();
-        this.cost_cbx = this.InitRow(row1, "Expense: +/- 10% Cost", (num) => this.opt.SetCost(num));
-        this.bleed_cbx = this.InitRow(tbl.insertRow(), "Lift Efficienty: +/- 3 Lift Bleed", (num) => this.opt.SetBleed(num));
-        this.escape_cbx = this.InitRow(tbl.insertRow(), "Leg Room: +/- 1 Escape, Visibility", (num) => this.opt.SetEscape(num));
-        this.mass_cbx = this.InitRow(tbl.insertRow(), "Mass: +/- 10% Mass", (num) => this.opt.SetMass(num));
-        this.toughness_cbx = this.InitRow(tbl.insertRow(), "Redundancy: +/- 25% Toughness ", (num) => this.opt.SetToughness(num));
-        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), "Support: +/- 15% Max Strain", (num) => this.opt.SetMaxStrain(num));
-        this.reliability_cbx = this.InitRow(tbl.insertRow(), "Reliability: +/- 2 Reliability", (num) => this.opt.SetReliability(num));
-        this.drag_cbx = this.InitRow(tbl.insertRow(), "Streamlining: +/- 10% Drag", (num) => this.opt.SetDrag(num));
+        this.cost_cbx = this.InitRow(row1, lu("Optimization Cost"), (num) => this.opt.SetCost(num));
+        this.bleed_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Lift Bleed"), (num) => this.opt.SetBleed(num));
+        this.escape_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Leg Room"), (num) => this.opt.SetEscape(num));
+        this.mass_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Mass"), (num) => this.opt.SetMass(num));
+        this.toughness_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Toughness"), (num) => this.opt.SetToughness(num));
+        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Max Strain"), (num) => this.opt.SetMaxStrain(num));
+        this.reliability_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Reliability"), (num) => this.opt.SetReliability(num));
+        this.drag_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Drag"), (num) => this.opt.SetDrag(num));
         this.InitStatDisplay(row1.insertCell());
     }
     InitRow(row, txt, call) {
@@ -11782,25 +11845,25 @@ class Optimization_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Cost");
-        CreateTH(h1_row, "Lift Bleed");
-        CreateTH(h1_row, "Escape");
+        CreateTH(h1_row, lu("Stat Cost"));
+        CreateTH(h1_row, lu("Stat Lift Bleed"));
+        CreateTH(h1_row, lu("Stat Escape"));
         var c1_row = tbl_stat.insertRow();
         this.d_cost = c1_row.insertCell();
         this.d_lift = c1_row.insertCell();
         this.d_escp = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Visibility");
-        CreateTH(h2_row, "Mass");
-        CreateTH(h2_row, "Toughness");
+        CreateTH(h2_row, lu("Stat Visibility"));
+        CreateTH(h2_row, lu("Stat Mass"));
+        CreateTH(h2_row, lu("Stat Toughness"));
         var c2_row = tbl_stat.insertRow();
         this.d_visi = c2_row.insertCell();
         this.d_mass = c2_row.insertCell();
         this.d_tugh = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Max Strain");
-        CreateTH(h3_row, "Reliability");
-        CreateTH(h3_row, "Drag");
+        CreateTH(h3_row, lu("Stat Max Strain"));
+        CreateTH(h3_row, lu("Stat Reliability"));
+        CreateTH(h3_row, lu("Stat Drag"));
         var c3_row = tbl_stat.insertRow();
         this.d_mstr = c3_row.insertCell();
         this.d_reli = c3_row.insertCell();
@@ -11874,11 +11937,18 @@ class Weapons_HTML extends Display {
     constructor(weap) {
         super();
         this.weap = weap;
+        document.getElementById("lbl_weapons").textContent = lu("Weapons Section Title");
+        document.getElementById("lbl_num_wsets").textContent = lu("Weapons Number of Weapon Sets");
         this.inp_w_count = document.getElementById("num_wsets");
         this.inp_w_count.onchange = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
+        document.getElementById("lbl_num_wbraces").textContent = lu("Weapons Number of Weapon Braces");
         this.inp_w_brace = document.getElementById("num_wbraces");
         this.inp_w_brace.onchange = () => { this.weap.SetBraceCount(this.inp_w_brace.valueAsNumber); };
         this.tbl = document.getElementById("table_weapons");
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Weapons Weapon Set"));
+        CreateTH(row, lu("Weapons Weapons"));
+        CreateTH(row, lu("Weapons Weapon Stats"));
         this.wrow = [];
     }
     CreateWSetRow() {
@@ -11901,42 +11971,42 @@ class Weapons_HTML extends Display {
         var wlist = this.weap.GetWeaponList();
         for (let w of wlist) {
             let opt = document.createElement("OPTION");
-            opt.text = w.name + " (" + w.era + ")";
+            opt.text = lu(w.name) + " (" + lu(w.era) + ")";
             type.type.add(opt);
         }
         type.type.required = true;
         var alist = this.weap.GetActionList();
         for (let a of alist) {
             let opt = document.createElement("OPTION");
-            opt.text = a.name;
+            opt.text = lu(a.name);
             type.action.add(opt);
         }
         type.action.required = true;
         var plist = this.weap.GetProjectileList();
         for (let p of plist) {
             let opt = document.createElement("OPTION");
-            opt.text = p.name;
+            opt.text = lu(p.name);
             type.projectile.add(opt);
         }
         type.projectile.required = true;
-        FlexSelect("Type", type.type, fs);
+        FlexSelect(lu("Weapons Type"), type.type, fs);
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
-        FlexInput("Number of Mounts", type.count, lfs);
-        FlexInput("Ammunition", type.ammo, rfs);
-        FlexSelect("Action", type.action, lfs);
-        FlexSelect("Projectile", type.projectile, rfs);
-        FlexCheckbox("Belt Fed", type.repeating, lfs);
+        FlexInput(lu("Weapons Number of Mounts"), type.count, lfs);
+        FlexInput(lu("Weapons Ammunition"), type.ammo, rfs);
+        FlexSelect(lu("Weapons Action"), type.action, lfs);
+        FlexSelect(lu("Weapons Projectile"), type.projectile, rfs);
+        FlexCheckbox(lu("Weapons Belt Fed"), type.repeating, lfs);
         FlexSpace(rfs);
-        FlexCheckbox("Fixed", type.fixed, lfs);
+        FlexCheckbox(lu("Fixed"), type.fixed, lfs);
         FlexSpace(rfs);
         var dirlist = this.weap.GetDirectionList();
         for (let i = 0; i < dirlist.length; i += 2) {
-            var dl = dirlist[i];
+            var dl = lu(dirlist[i]);
             var cbx = document.createElement("INPUT");
             FlexCheckbox(dl, cbx, lfs);
             type.dirs.push(cbx);
-            var dr = dirlist[i + 1];
+            var dr = lu(dirlist[i + 1]);
             cbx = document.createElement("INPUT");
             FlexCheckbox(dr, cbx, rfs);
             type.dirs.push(cbx);
@@ -11948,25 +12018,25 @@ class Weapons_HTML extends Display {
         stable.classList.toggle("inner_table");
         statcell.appendChild(stable);
         var h1_row = stable.insertRow();
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = stable.insertRow();
         type.stats.mass = c1_row.insertCell();
         type.stats.drag = c1_row.insertCell();
         type.stats.cost = c1_row.insertCell();
         var h2_row = stable.insertRow();
-        CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Mounting");
-        CreateTH(h2_row, "Jam");
+        CreateTH(h2_row, lu("Stat Required Sections"));
+        CreateTH(h2_row, lu("Weapons Stat Mounting"));
+        CreateTH(h2_row, lu("Weapons Stat Jam"));
         var c2_row = stable.insertRow();
         type.stats.sect = c2_row.insertCell();
         type.stats.mounting = c2_row.insertCell();
         type.stats.jams = c2_row.insertCell();
         var h3_row = stable.insertRow();
-        CreateTH(h3_row, "Hits");
-        CreateTH(h3_row, "Damage");
-        CreateTH(h3_row, "Shots");
+        CreateTH(h3_row, lu("Weapons Stat Hits"));
+        CreateTH(h3_row, lu("Weapons Stat Damage"));
+        CreateTH(h3_row, lu("Weapons Stat Shots"));
         var c3_row = stable.insertRow();
         type.stats.hits = c3_row.insertCell();
         type.stats.damg = c3_row.insertCell();
@@ -11983,17 +12053,17 @@ class Weapons_HTML extends Display {
             synch: document.createElement("SELECT"),
             count: document.createElement("INPUT"),
         };
-        CreateCheckbox("Wing Mount", w.wing, w.span, false);
-        CreateCheckbox("Accessible", w.accessible, w.span, false);
-        CreateCheckbox("Free Accessible", w.free_access, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, true);
-        CreateInput("Weapons at Mount", w.count, w.span, false);
-        CreateSelect("Synchronization", w.synch, w.span, false);
+        CreateCheckbox(lu("Weapons Wing Mount"), w.wing, w.span, false);
+        CreateCheckbox(lu("Weapons Accessible"), w.accessible, w.span, false);
+        CreateCheckbox(lu("Weapons Free Accessible"), w.free_access, w.span, false);
+        CreateCheckbox(lu("Weapons Covered"), w.covered, w.span, true);
+        CreateInput(lu("Weapons # Weapons at Mount"), w.count, w.span, false);
+        CreateSelect(lu("Weapons Synchronization"), w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
         var slist = this.weap.GetSynchronizationList();
         for (let s of slist) {
             var opt = document.createElement("OPTION");
-            opt.text = s;
+            opt.text = lu(s);
             w.synch.add(opt);
         }
         wcell.appendChild(w.span);
@@ -12071,11 +12141,11 @@ class Weapons_HTML extends Display {
             + h[2].toString() + "\\"
             + h[3].toString();
         if (set.GetFixed())
-            BlinkIfChanged(disp.stats.mounting, "Fixed");
+            BlinkIfChanged(disp.stats.mounting, lu("Fixed"));
         else if (set.GetDirectionCount() <= 2)
-            BlinkIfChanged(disp.stats.mounting, "Flexible");
+            BlinkIfChanged(disp.stats.mounting, lu("Flexible"));
         else
-            BlinkIfChanged(disp.stats.mounting, "Turret");
+            BlinkIfChanged(disp.stats.mounting, lu("Turret"));
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
@@ -12497,24 +12567,31 @@ class Aircraft_HTML extends Display {
         this.rotor = new Rotor_HTML(aircraft.GetRotor());
         // var tbla = document.getElementById("tbl_alter") as HTMLTableElement;
         // this.InitAlter(tbla);
+        document.getElementById("lbl_acft_type").textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type");
         for (let type in AIRCRAFT_TYPE) {
             if (isNaN(Number(type))) {
                 let opt = document.createElement("OPTION");
-                opt.text = type;
+                opt.text = lu(type);
                 this.acft_type.add(opt);
             }
         }
         this.acft_type.onchange = () => { this.acft.SetType(this.acft_type.selectedIndex); };
+        document.getElementById("lbl_stats").textContent = lu("Aircraft Stats Section Title");
         var tbl = document.getElementById("tbl_stats");
         this.InitStats(tbl);
+        document.getElementById("lbl_derived").textContent = lu("Aircraft Derived Section Title");
         var tbl2 = document.getElementById("tbl_derived");
         this.InitDerived(tbl2);
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
+        document.getElementById("lbl_acft_save_top").textContent = lu("Aircraft Button Save");
+        document.getElementById("lbl_acft_save_bot").textContent = lu("Aircraft Button Save");
         var save_button = document.getElementById("acft_save");
         save_button.onclick = () => {
             download(JSON.stringify(this.acft.toJSON()), this.acft.name + "_" + this.acft.GetVersion() + ".json", "json");
         };
+        document.getElementById("lbl_acft_load_top").textContent = lu("Aircraft Button Load");
+        document.getElementById("lbl_acft_load_bot").textContent = lu("Aircraft Button Load");
         var load_button = document.getElementById("acft_load");
         load_button.multiple = false;
         load_button.accept = "application/JSON";
@@ -12575,6 +12652,8 @@ class Aircraft_HTML extends Display {
                 load_text_area2.value = "";
             }
         };
+        document.getElementById("lbl_acft_save_link_top").textContent = lu("Aircraft Button Copy As Link");
+        document.getElementById("lbl_acft_save_link_bot").textContent = lu("Aircraft Button Copy As Link");
         var link_button = document.getElementById("acft_save_link");
         link_button.onclick = () => {
             // var str = JSON.stringify(this.acft.toJSON());
@@ -12588,6 +12667,8 @@ class Aircraft_HTML extends Display {
             copyStringToClipboard(link);
         };
         this.cards = new Cards();
+        document.getElementById("lbl_acft_save_dash_top").textContent = lu("Aircraft Button Save Dashboard");
+        document.getElementById("lbl_acft_save_dash_bot").textContent = lu("Aircraft Button Save Dashboard");
         var dash_button = document.getElementById("acft_save_dash");
         dash_button.onclick = () => {
             this.UpdateCard();
@@ -12606,6 +12687,8 @@ class Aircraft_HTML extends Display {
                 this.cards.SaveRadiator(i);
             }
         };
+        document.getElementById("lbl_acft_save_npc_top").textContent = lu("Aircraft Button Save NPC");
+        document.getElementById("lbl_acft_save_npc_bot").textContent = lu("Aircraft Button Save NPC");
         var npc_button = document.getElementById("acft_save_npc");
         npc_button.onclick = () => {
             //update all the aircraft data we need.
@@ -12627,6 +12710,8 @@ class Aircraft_HTML extends Display {
             }
             this.cards.SaveNPC();
         };
+        document.getElementById("lbl_acft_reset_top").textContent = lu("Aircraft Button Default Aircraft");
+        document.getElementById("lbl_acft_reset_bot").textContent = lu("Aircraft Button Default Aircraft");
         var reset_button = document.getElementById("acft_reset");
         reset_button.onclick = () => { aircraft_model.Reset(); aircraft_model.CalculateStats(); };
     }
@@ -13221,9 +13306,9 @@ class Aircraft_HTML extends Display {
         this.overspeed_cell.textContent = derived.Overspeed.toString();
         this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
         if (this.acft.GetIsFlammable())
-            this.flammable_cell.textContent = lu("Derived Is Flammable Yes");
+            this.flammable_cell.textContent = lu("Yes");
         else
-            this.flammable_cell.textContent = lu("Derived Is Flammable No");
+            this.flammable_cell.textContent = lu("No");
         this.stability_cell.textContent = derived.Stabiilty.toString();
         this.eloss_cell.textContent = derived.EnergyLoss.toString();
         this.turnbleed_cell.textContent = derived.TurnBleed.toString();
@@ -14214,6 +14299,7 @@ class Rotor_HTML extends Display {
     constructor(r) {
         super();
         this.rotor = r;
+        document.getElementById("lbl_rotor").textContent = lu("Rotor Section Title");
         this.div = document.getElementById("Rotors");
         this.wing_div = document.getElementById("Wings");
         this.reinforce_div = document.getElementById("Reinforcements");
@@ -14225,32 +14311,32 @@ class Rotor_HTML extends Display {
     }
     InitAutogyro(tbl) {
         this.auto_header = tbl.insertRow();
-        CreateTH(this.auto_header, "Rotor");
-        CreateTH(this.auto_header, "Material");
-        CreateTH(this.auto_header, "Accessories");
-        CreateTH(this.auto_header, "Stats");
+        CreateTH(this.auto_header, lu("Rotor Rotor"));
+        CreateTH(this.auto_header, lu("Rotor Material"));
+        CreateTH(this.auto_header, lu("Rotor Accessories"));
+        CreateTH(this.auto_header, lu("Rotor Stats"));
         this.auto_row = tbl.insertRow();
         var rotor_cell = this.auto_row.insertCell();
         var rotor_fs = CreateFlexSection(rotor_cell);
         this.auto_min = document.createElement("LABEL");
-        FlexDisplay("Minimum Rotor Span", this.auto_min, rotor_fs);
+        FlexDisplay(lu("Rotor Minimum Span"), this.auto_min, rotor_fs);
         this.auto_span = document.createElement("INPUT");
-        FlexInput("Rotor Span", this.auto_span, rotor_fs);
+        FlexInput(lu("Rotor Span"), this.auto_span, rotor_fs);
         this.auto_span.onchange = () => { this.rotor.SetRotorSpan(this.auto_span.valueAsNumber); };
         var mat_cell = this.auto_row.insertCell();
         var mat_fs = CreateFlexSection(mat_cell);
         this.auto_mat = document.createElement("SELECT");
-        FlexSelect("Rotor Material", this.auto_mat, mat_fs);
+        FlexSelect(lu("Rotor Material"), this.auto_mat, mat_fs);
         for (let ctype of this.rotor.GetCantileverList()) {
             let opt = document.createElement("OPTION");
-            opt.text = ctype.name;
+            opt.text = lu(ctype.name);
             this.auto_mat.add(opt);
         }
         this.auto_mat.onchange = () => { this.rotor.SetCantilever(this.auto_mat.selectedIndex); };
         var acc_cell = this.auto_row.insertCell();
         var acc_fs = CreateFlexSection(acc_cell);
         this.auto_clutch = document.createElement("INPUT");
-        FlexCheckbox("Clutched Rotor", this.auto_clutch, acc_fs);
+        FlexCheckbox(lu("Rotor Clutched Rotor"), this.auto_clutch, acc_fs);
         this.auto_clutch.onchange = () => { this.rotor.SetAccessory(this.auto_clutch.checked); };
         this.InitAutogyroStats(this.auto_row.insertCell());
     }
@@ -14260,15 +14346,15 @@ class Rotor_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.a_drag = c1_row.insertCell();
         this.a_mass = c1_row.insertCell();
         this.a_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Rotor Area");
+        CreateTH(h2_row, lu("Rotor Area"));
         CreateTH(h2_row, "");
         CreateTH(h2_row, "");
         var c2_row = tbl_stat.insertRow();
@@ -14289,44 +14375,44 @@ class Rotor_HTML extends Display {
     }
     InitHelicopter(tbl) {
         this.heli_header = tbl.insertRow();
-        CreateTH(this.heli_header, "Rotor");
-        CreateTH(this.heli_header, "Material");
-        CreateTH(this.heli_header, "Accessories");
-        CreateTH(this.heli_header, "Stats");
+        CreateTH(this.heli_header, lu("Rotor Rotor"));
+        CreateTH(this.heli_header, lu("Rotor Material"));
+        CreateTH(this.heli_header, lu("Rotor Accessories"));
+        CreateTH(this.heli_header, lu("Rotor Stats"));
         this.heli_row = tbl.insertRow();
         var rotor_cell = this.heli_row.insertCell();
         var rotor_fs = CreateFlexSection(rotor_cell);
         this.heli_count = document.createElement("INPUT");
-        FlexInput("Number of Rotors", this.heli_count, rotor_fs);
+        FlexInput(lu("Rotor Number of Rotors"), this.heli_count, rotor_fs);
         this.heli_count.onchange = () => { this.rotor.SetRotorCount(this.heli_count.valueAsNumber); };
         this.heli_min = document.createElement("LABEL");
-        FlexDisplay("Ideal Rotor Span", this.heli_min, rotor_fs);
+        FlexDisplay(lu("Rotor Ideal Rotor Span"), this.heli_min, rotor_fs);
         this.heli_span = document.createElement("INPUT");
-        FlexInput("Rotor Span", this.heli_span, rotor_fs);
+        FlexInput(lu("Rotor Span"), this.heli_span, rotor_fs);
         this.heli_span.onchange = () => { this.rotor.SetRotorSpan(this.heli_span.valueAsNumber); };
         this.heli_stagger = document.createElement("SELECT");
-        FlexSelect("Rotor Stagger", this.heli_stagger, rotor_fs);
+        FlexSelect(lu("Rotor Stagger"), this.heli_stagger, rotor_fs);
         let opt1 = document.createElement("OPTION");
-        opt1.text = "Unstaggered";
+        opt1.text = lu("Unstaggered");
         this.heli_stagger.add(opt1);
         let opt2 = document.createElement("OPTION");
-        opt2.text = "Tandem";
+        opt2.text = lu("Tandem");
         this.heli_stagger.add(opt2);
         this.heli_stagger.onchange = () => { this.rotor.SetTandem(this.heli_stagger.selectedIndex == 1); };
         var mat_cell = this.heli_row.insertCell();
         var mat_fs = CreateFlexSection(mat_cell);
         this.heli_mat = document.createElement("SELECT");
-        FlexSelect("Rotor Material", this.heli_mat, mat_fs);
+        FlexSelect(lu("Rotor Rotor Material"), this.heli_mat, mat_fs);
         for (let ctype of this.rotor.GetCantileverList()) {
             let opt = document.createElement("OPTION");
-            opt.text = ctype.name;
+            opt.text = lu(ctype.name);
             this.heli_mat.add(opt);
         }
         this.heli_mat.onchange = () => { this.rotor.SetCantilever(this.heli_mat.selectedIndex); };
         var acc_cell = this.heli_row.insertCell();
         var acc_fs = CreateFlexSection(acc_cell);
         this.heli_shafts = document.createElement("INPUT");
-        FlexCheckbox("Motor Cross-link", this.heli_shafts, acc_fs);
+        FlexCheckbox(lu("Rotor Motor Cross-link"), this.heli_shafts, acc_fs);
         this.heli_shafts.onchange = () => { this.rotor.SetAccessory(this.heli_shafts.checked); };
         this.InitHelicopterStats(this.heli_row.insertCell());
     }
@@ -14336,16 +14422,16 @@ class Rotor_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.h_drag = c1_row.insertCell();
         this.h_mass = c1_row.insertCell();
         this.h_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Rotor Area");
-        CreateTH(h2_row, "Reliability");
+        CreateTH(h2_row, lu("Rotor Area"));
+        CreateTH(h2_row, lu("Stat Reliability"));
         CreateTH(h2_row, "");
         var c2_row = tbl_stat.insertRow();
         this.h_area = c2_row.insertCell();
@@ -14416,9 +14502,15 @@ class Used_HTML extends Display {
     constructor(used) {
         super();
         this.used = used;
+        document.getElementById("lbl_used").textContent = lu("Used Section Title");
+        document.getElementById("lbl_is_used").textContent = lu("Used Is Aircraft Used?");
         this.enabled = document.getElementById("is_used");
         this.enabled.onchange = () => { this.used.SetEnabled(this.enabled.checked); };
         this.tbl = document.getElementById("tbl_used");
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Used Effect"));
+        CreateTH(row, lu("Used Description"));
+        CreateTH(row, lu("Used Penalties(+) < br /> Benefits(-)"));
         this.InitTable(this.tbl);
     }
     InitTable(tbl) {
@@ -14431,43 +14523,43 @@ class Used_HTML extends Display {
         this.leaky = document.createElement("INPUT");
         this.sluggish = document.createElement("INPUT");
         var row = tbl.insertRow();
-        row.insertCell().textContent = "Burnt Out";
-        row.insertCell().textContent = "Engines are at -1 Reliability";
+        row.insertCell().textContent = lu("Used Burnt Out");
+        row.insertCell().textContent = lu("Used Burnt Out Description");
         var cell = row.insertCell();
         CreateInput("", this.burnt_out, cell, false);
         row = tbl.insertRow();
-        row.insertCell().textContent = "Ragged";
-        row.insertCell().textContent = "Reduce your Max Speed by 10%";
+        row.insertCell().textContent = lu("Used Ragged");
+        row.insertCell().textContent = lu("Used Ragged Description");
         cell = row.insertCell();
         CreateInput("", this.ragged, cell, false);
         row = tbl.insertRow();
-        row.insertCell().textContent = "Hefty";
-        row.insertCell().textContent = "Increase your Stall Speeds by 20%";
+        row.insertCell().textContent = lu("Used Hefty");
+        row.insertCell().textContent = lu("Used Hefty Description");
         cell = row.insertCell();
         CreateInput("", this.hefty, cell, false);
         row = tbl.insertRow();
-        row.insertCell().textContent = "Sticky Guns";
-        row.insertCell().textContent = "Increase the chance of guns jamming by 1";
+        row.insertCell().textContent = lu("Used Sticky Guns");
+        row.insertCell().textContent = lu("Used Sticky Guns Description");
         cell = row.insertCell();
         CreateInput("", this.sticky_guns, cell, false);
         row = tbl.insertRow();
-        row.insertCell().textContent = "Weak";
-        row.insertCell().textContent = "Cut the plane's Toughness in half";
+        row.insertCell().textContent = lu("Used Weak");
+        row.insertCell().textContent = lu("Used Weak Description");
         cell = row.insertCell();
         CreateInput("", this.weak, cell, false);
         row = tbl.insertRow();
-        row.insertCell().textContent = "Fragile";
-        row.insertCell().textContent = "Reduce your Max Strain by 20%";
+        row.insertCell().textContent = lu("Used Fragile");
+        row.insertCell().textContent = lu("Used Fragile Description");
         cell = row.insertCell();
         CreateInput("", this.fragile, cell, false);
         row = tbl.insertRow();
-        row.insertCell().textContent = "Leaky";
-        row.insertCell().textContent = "Reduce your Fuel by 20%";
+        row.insertCell().textContent = lu("Used Leaky");
+        row.insertCell().textContent = lu("Used Leaky Description");
         cell = row.insertCell();
         CreateInput("", this.leaky, cell, false);
         row = tbl.insertRow();
-        row.insertCell().textContent = "Sluggish";
-        row.insertCell().textContent = "Reduce your Handling by 5%";
+        row.insertCell().textContent = lu("Used Sluggish");
+        row.insertCell().textContent = lu("Used Sluggish Description");
         cell = row.insertCell();
         CreateInput("", this.sluggish, cell, false);
         this.burnt_out.onchange = () => { this.used.burnt_out = this.burnt_out.valueAsNumber; this.used.TriggerCS(); };

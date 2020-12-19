@@ -59,14 +59,14 @@ function CreateFlexSection(elem: HTMLElement): FlexSection {
 
 function CreateTH(row: HTMLElement, content: string) {
     var th = document.createElement("TH") as HTMLTableHeaderCellElement;
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
 
 function CreateTD(row: HTMLElement, content: string) {
     var th = document.createElement("TD") as HTMLTableCellElement;
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }

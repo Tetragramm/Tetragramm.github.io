@@ -20,8 +20,15 @@ class Stabilizers_HTML extends Display {
         super();
         this.stab = s;
 
+        (document.getElementById("lbl_stab") as HTMLLabelElement).textContent = lu("Stabilizers Section Title");
+
         var tbl = document.getElementById("stab_table") as HTMLTableElement;
         var row = tbl.insertRow();
+        CreateTH(row, lu("Stabilizers Horizontal Stabilizers"));
+        CreateTH(row, lu("Stabilizers Vertical Stabilizers"));
+        CreateTH(row, lu("Stabilizers Stabilizer Stats"));
+
+        row = tbl.insertRow();
         var hcell = row.insertCell();
         var vcell = row.insertCell();
 
@@ -29,7 +36,7 @@ class Stabilizers_HTML extends Display {
         this.h_count = document.createElement("INPUT") as HTMLInputElement;
         hcell.appendChild(this.h_type);
         hcell.append(document.createElement("BR"));
-        CreateInput(" Stabilizers", this.h_count, hcell);
+        CreateInput(lu("Stabilizers # of Stabilizers"), this.h_count, hcell);
 
         this.h_count.min = "0";
         this.h_count.max = "20";
@@ -38,7 +45,7 @@ class Stabilizers_HTML extends Display {
 
         for (let elem of s.GetHStabList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.h_type.add(opt);
         }
 
@@ -46,7 +53,7 @@ class Stabilizers_HTML extends Display {
         this.v_count = document.createElement("INPUT") as HTMLInputElement;
         vcell.appendChild(this.v_type);
         vcell.appendChild(document.createElement("BR"));
-        CreateInput(" Stabilizers", this.v_count, vcell);
+        CreateInput(lu("Stabilizers # of Stabilizers"), this.v_count, vcell);
 
         this.v_count.min = "0";
         this.v_count.max = "20";
@@ -55,7 +62,7 @@ class Stabilizers_HTML extends Display {
 
         for (let elem of s.GetVStabList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.v_type.add(opt);
         }
 
@@ -70,17 +77,17 @@ class Stabilizers_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Control");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Control"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_cont = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Pitch Stability");
-        CreateTH(h2_row, "Lateral Stability");
-        CreateTH(h2_row, "Lift Bleed");
+        CreateTH(h2_row, lu("Stat Pitch Stability"));
+        CreateTH(h2_row, lu("Stat Lateral Stability"));
+        CreateTH(h2_row, lu("Stat Lift Bleed"));
         var c2_row = tbl_stat.insertRow();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();

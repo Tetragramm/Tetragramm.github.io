@@ -433,11 +433,11 @@ class Engines extends Part {
         }
         if (rotationT > 0) {
             stats.warnings.push({
-                source: "Rotary", warning: lu("Rotary Right Warning")
+                source: lu("Rotary"), warning: lu("Rotary Right Warning")
             });
         } else if (rotationT < 0) {
             stats.warnings.push({
-                source: "Rotary", warning: lu("Rotary Left Warning")
+                source: lu("Rotary"), warning: lu("Rotary Left Warning")
             });
         }
 

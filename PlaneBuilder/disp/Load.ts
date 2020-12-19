@@ -37,8 +37,16 @@ class Load_HTML extends Display {
         this.cargo = cargo;
         this.fuel_list = [];
 
+        (document.getElementById("lbl_load") as HTMLLabelElement).textContent = lu("Load Section Title");
+
         var tbl = document.getElementById("tbl_load") as HTMLTableElement;
         var row = tbl.insertRow();
+        CreateTH(row, lu("Load Fuel"));
+        CreateTH(row, lu("Load Munitions"));
+        CreateTH(row, lu("Load Cargo and Passengers"));
+        CreateTH(row, lu("Load Load Stats"));
+
+        row = tbl.insertRow();
         this.InitFuel(row.insertCell());
         this.InitMunitions(row.insertCell());
         this.InitCargoAndPassengers(row.insertCell());
@@ -50,50 +58,50 @@ class Load_HTML extends Display {
         var fs = CreateFlexSection(cell);
         for (let i = 0; i < lst.length; i++) {
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexInput(lst[i].name, inp, fs);
+            FlexInput(lu(lst[i].name), inp, fs);
             inp.onchange = () => { this.fuel.SetTankCount(i, inp.valueAsNumber); };
             this.fuel_list.push(inp);
         }
 
         this.seal = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Self-Sealing Gas Tank", this.seal, fs);
+        FlexCheckbox(lu("Load Self-Sealing Gas Tank"), this.seal, fs);
         this.seal.onchange = () => { this.fuel.SetSelfSealing(this.seal.checked); };
 
         this.extinguish = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Remote Fire Extinguisher", this.extinguish, fs);
+        FlexCheckbox(lu("Load Remote Fire Extinguisher"), this.extinguish, fs);
         this.extinguish.onchange = () => { this.fuel.SetExtinguisher(this.extinguish.checked); };
     }
 
     private InitMunitions(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
         this.bombs = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Bombs ", this.bombs, fs);
+        FlexInput(lu("Load Bombs"), this.bombs, fs);
         this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
         this.rockets = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Rockets", this.rockets, fs);
+        FlexInput(lu("Load Rockets"), this.rockets, fs);
         this.rockets.onchange = () => { this.boom.SetRocketCount(this.rockets.valueAsNumber); };
 
         this.bay_count = document.createElement("INPUT") as HTMLInputElement;
-        FlexInput("Internal Bay Count", this.bay_count, fs);
+        FlexInput(lu("Load Internal Bay Count"), this.bay_count, fs);
         this.bay_count.onchange = () => { this.boom.SetBayCount(this.bay_count.valueAsNumber); };
 
         this.bay1 = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Widen Internal Bay 1", this.bay1, fs);
+        FlexCheckbox(lu("Load Widen Internal Bay 1"), this.bay1, fs);
         this.bay1.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
 
         this.bay2 = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Widen Internal Bay 2", this.bay2, fs);
+        FlexCheckbox(lu("Load Widen Internal Bay 2"), this.bay2, fs);
         this.bay2.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
     }
 
     private InitCargoAndPassengers(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
         this.carg = document.createElement("SELECT") as HTMLSelectElement;
-        FlexSelect("Cargo", this.carg, fs);
+        FlexSelect(lu("Load Cargo"), this.carg, fs);
         var lst = this.cargo.GetSpaceList();
         for (let l of lst) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = l.name;
+            opt.text = lu(l.name);
             this.carg.add(opt);
         }
         this.carg.onchange = () => { this.cargo.SetSpace(this.carg.selectedIndex); };
@@ -105,17 +113,17 @@ class Load_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Wet Mass");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Wet Mass"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_wmas = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Fuel");
-        CreateTH(h2_row, "Cost");
+        CreateTH(h2_row, lu("Stat Required Sections"));
+        CreateTH(h2_row, lu("Stat Fuel"));
+        CreateTH(h2_row, lu("Stat Cost"));
         var c2_row = tbl_stat.insertRow();
         this.d_rsec = c2_row.insertCell();
         this.d_fuel = c2_row.insertCell();

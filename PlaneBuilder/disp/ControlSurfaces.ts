@@ -25,6 +25,9 @@ class ControlSurfaces_HTML extends Display {
     constructor(cs: ControlSurfaces) {
         super();
         this.cs = cs;
+
+        (document.getElementById("lbl_control_surfaces") as HTMLLabelElement).textContent = lu("Control Surfaces Section Title");
+
         var tbl = document.getElementById("tbl_control_surfaces") as HTMLTableElement;
         var row = tbl.insertRow();
         CreateTH(row, lu("Control Surfaces Control Surfaces"));

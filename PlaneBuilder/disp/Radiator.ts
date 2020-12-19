@@ -22,7 +22,7 @@ class Radiator_HTML extends Display {
         this.type_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let elem of this.radiator.GetTypeList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.type_select.add(opt);
         }
         this.type_select.onchange = () => { this.radiator.SetTypeIndex(this.type_select.selectedIndex); };
@@ -33,7 +33,7 @@ class Radiator_HTML extends Display {
         this.mount_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let elem of this.radiator.GetMountList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.mount_select.add(opt);
         }
         this.mount_select.onchange = () => { this.radiator.SetMountIndex(this.mount_select.selectedIndex); };
@@ -45,7 +45,7 @@ class Radiator_HTML extends Display {
         this.coolant_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let elem of this.radiator.GetCoolantList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = elem.name;
+            opt.text = lu(elem.name);
             this.coolant_select.add(opt);
         }
         this.coolant_select.onchange = () => { this.radiator.SetCoolantIndex(this.coolant_select.selectedIndex) };
@@ -53,7 +53,7 @@ class Radiator_HTML extends Display {
         cool_cell.appendChild(document.createElement("BR"));
         this.harden_input = document.createElement("INPUT") as HTMLInputElement;
         var fs = CreateFlexSection(cool_cell);
-        FlexCheckbox("Harden Radiator", this.harden_input, fs);
+        FlexCheckbox(lu("Radiators Harden Radiator"), this.harden_input, fs);
         this.harden_input.onchange = () => { this.radiator.SetHarden(this.harden_input.checked); };
 
         var stats_cell = row.insertCell();
@@ -61,11 +61,11 @@ class Radiator_HTML extends Display {
         stats_cell.className = "inner_table";
         tbl.className = "inner_table";
         var h1_row = tbl.insertRow();
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Reliability");
-        CreateTH(h1_row, "Lateral Stab");
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Reliability"));
+        CreateTH(h1_row, lu("Stat Lateral Stab"));
         var c1_row = tbl.insertRow();
         this.c_mass = c1_row.insertCell();
         this.c_cost = c1_row.insertCell();

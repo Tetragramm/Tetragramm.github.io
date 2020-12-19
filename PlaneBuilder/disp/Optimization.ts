@@ -28,18 +28,32 @@ class Optimization_HTML extends Display {
         super();
         this.opt = opt;
 
+        (document.getElementById("lbl_optimization") as HTMLLabelElement).textContent = lu("Optimization Section Title");
+
+        (document.getElementById("lbl_num_opt") as HTMLLabelElement).textContent = lu("Optimization Num Free Optimizations");
         this.free_inp = document.getElementById("num_opt") as HTMLInputElement;
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
+
         var tbl = document.getElementById("tbl_optimization") as HTMLTableElement;
+        var row0 = tbl.insertRow();
+        CreateTH(row0, lu("Optimization Negative"));
+        CreateTH(row0, lu("Optimization Effect"));
+        CreateTH(row0, lu("Optimization Positive"));
+        CreateTH(row0, lu("Optimization Optimization Stats"));
+        // <th>Negative < /th>
+        // < th > Effect < /th>
+        // < th > Positive < /th>
+        // < th > Optimization Stats < /th>
+
         var row1 = tbl.insertRow();
-        this.cost_cbx = this.InitRow(row1, "Expense: +/- 10% Cost", (num: number) => this.opt.SetCost(num));
-        this.bleed_cbx = this.InitRow(tbl.insertRow(), "Lift Efficienty: +/- 3 Lift Bleed", (num: number) => this.opt.SetBleed(num));
-        this.escape_cbx = this.InitRow(tbl.insertRow(), "Leg Room: +/- 1 Escape, Visibility", (num: number) => this.opt.SetEscape(num));
-        this.mass_cbx = this.InitRow(tbl.insertRow(), "Mass: +/- 10% Mass", (num: number) => this.opt.SetMass(num));
-        this.toughness_cbx = this.InitRow(tbl.insertRow(), "Redundancy: +/- 25% Toughness ", (num: number) => this.opt.SetToughness(num));
-        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), "Support: +/- 15% Max Strain", (num: number) => this.opt.SetMaxStrain(num));
-        this.reliability_cbx = this.InitRow(tbl.insertRow(), "Reliability: +/- 2 Reliability", (num: number) => this.opt.SetReliability(num));
-        this.drag_cbx = this.InitRow(tbl.insertRow(), "Streamlining: +/- 10% Drag", (num: number) => this.opt.SetDrag(num));
+        this.cost_cbx = this.InitRow(row1, lu("Optimization Cost"), (num: number) => this.opt.SetCost(num));
+        this.bleed_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Lift Bleed"), (num: number) => this.opt.SetBleed(num));
+        this.escape_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Leg Room"), (num: number) => this.opt.SetEscape(num));
+        this.mass_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Mass"), (num: number) => this.opt.SetMass(num));
+        this.toughness_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Toughness"), (num: number) => this.opt.SetToughness(num));
+        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Max Strain"), (num: number) => this.opt.SetMaxStrain(num));
+        this.reliability_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Reliability"), (num: number) => this.opt.SetReliability(num));
+        this.drag_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Drag"), (num: number) => this.opt.SetDrag(num));
         this.InitStatDisplay(row1.insertCell());
     }
 
@@ -83,25 +97,25 @@ class Optimization_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Cost");
-        CreateTH(h1_row, "Lift Bleed");
-        CreateTH(h1_row, "Escape");
+        CreateTH(h1_row, lu("Stat Cost"));
+        CreateTH(h1_row, lu("Stat Lift Bleed"));
+        CreateTH(h1_row, lu("Stat Escape"));
         var c1_row = tbl_stat.insertRow();
         this.d_cost = c1_row.insertCell();
         this.d_lift = c1_row.insertCell();
         this.d_escp = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Visibility");
-        CreateTH(h2_row, "Mass");
-        CreateTH(h2_row, "Toughness");
+        CreateTH(h2_row, lu("Stat Visibility"));
+        CreateTH(h2_row, lu("Stat Mass"));
+        CreateTH(h2_row, lu("Stat Toughness"));
         var c2_row = tbl_stat.insertRow();
         this.d_visi = c2_row.insertCell();
         this.d_mass = c2_row.insertCell();
         this.d_tugh = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Max Strain");
-        CreateTH(h3_row, "Reliability");
-        CreateTH(h3_row, "Drag");
+        CreateTH(h3_row, lu("Stat Max Strain"));
+        CreateTH(h3_row, lu("Stat Reliability"));
+        CreateTH(h3_row, lu("Stat Drag"));
         var c3_row = tbl_stat.insertRow();
         this.d_mstr = c3_row.insertCell();
         this.d_reli = c3_row.insertCell();

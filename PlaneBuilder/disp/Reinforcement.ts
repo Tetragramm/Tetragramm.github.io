@@ -26,8 +26,15 @@ class Reinforcement_HTML extends Display {
         this.ext_steel_inp = [];
         this.cant_inp = [];
 
+        (document.getElementById("lbl_reinforcements") as HTMLLabelElement).textContent = lu("Reinforcement Section Title");
+
         var tbl = document.getElementById("tbl_reinforcements") as HTMLTableElement;
         var row = tbl.insertRow();
+        CreateTH(row, lu("Reinforcement External Reinforcements"));
+        CreateTH(row, lu("Reinforcement Internal Reinforcements"));
+        CreateTH(row, lu("Reinforcement Reinforcement Stats"));
+
+        row = tbl.insertRow();
         this.InitExternal(row.insertCell());
         this.InitInternal(row.insertCell());
         this.InitStatDisplay(row.insertCell());
@@ -43,9 +50,9 @@ class Reinforcement_HTML extends Display {
             let elem = lst[i];
             let w_inp = document.createElement("INPUT") as HTMLInputElement;
             let s_inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexLabel(elem.name, fs.div1);
-            FlexInput("Wood", w_inp, fs_wood);
-            FlexInput("Steel", s_inp, fs_steel);
+            FlexLabel(lu(elem.name), fs.div1);
+            FlexInput(lu("Reinforcement Wood"), w_inp, fs_wood);
+            FlexInput(lu("Reinforcement Steel"), s_inp, fs_steel);
             w_inp.min = "0";
             s_inp.min = "0";
             w_inp.onchange = () => { this.rf.SetExternalWoodCount(i, w_inp.valueAsNumber); };
@@ -54,17 +61,17 @@ class Reinforcement_HTML extends Display {
             this.ext_steel_inp.push(s_inp);
         }
         this.cabane = document.createElement("SELECT") as HTMLSelectElement;
-        FlexSelect("Cabane", this.cabane, fs)
+        FlexSelect(lu("Reinforcement Cabane"), this.cabane, fs)
         for (let o of this.rf.GetCabaneList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = o.name;
+            opt.text = lu(o.name);
             this.cabane.add(opt);
         }
         this.cabane.onchange = () => { this.rf.SetCabane(this.cabane.selectedIndex); };
         this.cabane.selectedIndex = 0;
 
         this.wires = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Wires", this.wires, fs);
+        FlexCheckbox(lu("Reinforcement Wires"), this.wires, fs);
         this.wires.onchange = () => { this.rf.SetWires(this.wires.checked); };
     }
 
@@ -74,13 +81,13 @@ class Reinforcement_HTML extends Display {
         for (let i = 0; i < lst.length; i++) {
             let elem = lst[i];
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexInput(elem.name, inp, fs);
+            FlexInput(lu(elem.name), inp, fs);
             inp.min = "0";
             inp.onchange = () => { this.rf.SetCantileverCount(i, inp.valueAsNumber); };
             this.cant_inp.push(inp);
         }
         this.wing_blades = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Wing Blades", this.wing_blades, fs);
+        FlexCheckbox(lu("Reinforcement Wing Blades"), this.wing_blades, fs);
         this.wing_blades.onchange = () => { this.rf.SetWingBlade(this.wing_blades.checked); };
     }
 
@@ -90,17 +97,17 @@ class Reinforcement_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Raw Strain");
-        CreateTH(h2_row, "Aircraft Max Strain");
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Raw Strain"));
+        CreateTH(h2_row, lu("Reinforcement Aircraft Max Strain"));
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();

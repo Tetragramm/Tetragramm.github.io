@@ -11,6 +11,8 @@ class Era_HTML extends Display {
         super();
         this.model = m;
 
+        (document.getElementById("lbl_era") as HTMLLabelElement).textContent = lu("Era Section Title");
+
         var tbl = document.getElementById("table_era") as HTMLTableElement;
         var row = tbl.insertRow();
         CreateTH(row, lu("Era Option"));

@@ -18,8 +18,14 @@ class LandingGear_HTML extends Display {
         super();
         this.gear = gear;
 
+        (document.getElementById("lbl_landing_gear") as HTMLLabelElement).textContent = lu("Landing Gear Section Title");
         var tbl = document.getElementById("tbl_gear") as HTMLTableElement;
         var row = tbl.insertRow();
+        CreateTH(row, lu("Landing Gear Landing Gear"));
+        CreateTH(row, lu("Landing Gear Extras"));
+        CreateTH(row, lu("Landing Gear Gear Stats"));
+
+        row = tbl.insertRow();
         this.InitGear(row.insertCell());
         this.InitExtras(row.insertCell());
         this.InitStats(row.insertCell());
@@ -32,13 +38,13 @@ class LandingGear_HTML extends Display {
         FlexSelect("Type", this.sel, fs);
         for (let i = 0; i < lst.length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = lst[i].name;
+            opt.text = lu(lst[i].name);
             this.sel.add(opt);
         }
         this.sel.onchange = () => { this.gear.SetGear(this.sel.selectedIndex); };
 
         this.retract = document.createElement("INPUT") as HTMLInputElement;
-        FlexCheckbox("Retractable", this.retract, fs);
+        FlexCheckbox(lu("Landing Gear Retractable"), this.retract, fs);
         this.retract.onchange = () => { this.gear.SetRetract(this.retract.checked); };
     }
 
@@ -48,7 +54,7 @@ class LandingGear_HTML extends Display {
         var fs = CreateFlexSection(cell);
         for (let i = 0; i < lst.length; i++) {
             let cbx = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(lst[i].name, cbx, fs);
+            FlexCheckbox(lu(lst[i].name), cbx, fs);
             cbx.onchange = () => { this.gear.SetExtraSelected(i, cbx.checked); };
             this.extras.push(cbx);
         }
@@ -60,16 +66,16 @@ class LandingGear_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Structure");
-        CreateTH(h2_row, "Crash Safety");
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Crash Safety"));
         CreateTH(h2_row, "");
         var c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();

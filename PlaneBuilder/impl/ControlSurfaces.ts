@@ -164,7 +164,10 @@ class ControlSurfaces extends Part {
     public GetFlapCost(mp?: number) {
         if (mp)
             this.mp = mp;
-        return Math.max(1, Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp));
+        if (this.flaps_list[this.flaps_sel].costfactor > 0)
+            return Math.max(1, Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp));
+        else
+            return 0;
     }
 
     public GetSlatsList() {

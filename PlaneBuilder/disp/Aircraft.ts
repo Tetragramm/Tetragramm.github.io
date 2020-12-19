@@ -172,29 +172,37 @@ class Aircraft_HTML extends Display {
         // var tbla = document.getElementById("tbl_alter") as HTMLTableElement;
         // this.InitAlter(tbla);
 
+        (document.getElementById("lbl_acft_type") as HTMLLabelElement).textContent = lu("Aircraft Type Section Title");
+
         this.acft_type = document.getElementById("acft_type") as HTMLSelectElement;
         for (let type in AIRCRAFT_TYPE) {
             if (isNaN(Number(type))) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
-                opt.text = type;
+                opt.text = lu(type);
                 this.acft_type.add(opt);
             }
         }
         this.acft_type.onchange = () => { this.acft.SetType(this.acft_type.selectedIndex); };
 
+        (document.getElementById("lbl_stats") as HTMLLabelElement).textContent = lu("Aircraft Stats Section Title");
         var tbl = document.getElementById("tbl_stats") as HTMLTableElement;
         this.InitStats(tbl);
 
+        (document.getElementById("lbl_derived") as HTMLLabelElement).textContent = lu("Aircraft Derived Section Title");
         var tbl2 = document.getElementById("tbl_derived") as HTMLTableElement;
         this.InitDerived(tbl2);
 
         this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
 
+        (document.getElementById("lbl_acft_save_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save");
+        (document.getElementById("lbl_acft_save_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save");
         var save_button = document.getElementById("acft_save") as HTMLButtonElement;
         save_button.onclick = () => {
             download(JSON.stringify(this.acft.toJSON()), this.acft.name + "_" + this.acft.GetVersion() + ".json", "json");
         };
 
+        (document.getElementById("lbl_acft_load_top") as HTMLLabelElement).textContent = lu("Aircraft Button Load");
+        (document.getElementById("lbl_acft_load_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Load");
         var load_button = document.getElementById("acft_load") as HTMLInputElement;
         load_button.multiple = false;
         load_button.accept = "application/JSON";
@@ -253,6 +261,8 @@ class Aircraft_HTML extends Display {
             }
         };
 
+        (document.getElementById("lbl_acft_save_link_top") as HTMLLabelElement).textContent = lu("Aircraft Button Copy As Link");
+        (document.getElementById("lbl_acft_save_link_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Copy As Link");
         var link_button = document.getElementById("acft_save_link") as HTMLButtonElement;
         link_button.onclick = () => {
             // var str = JSON.stringify(this.acft.toJSON());
@@ -268,6 +278,8 @@ class Aircraft_HTML extends Display {
 
 
         this.cards = new Cards();
+        (document.getElementById("lbl_acft_save_dash_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save Dashboard");
+        (document.getElementById("lbl_acft_save_dash_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save Dashboard");
         var dash_button = document.getElementById("acft_save_dash") as HTMLButtonElement;
         dash_button.onclick = () => {
             this.UpdateCard();
@@ -287,6 +299,8 @@ class Aircraft_HTML extends Display {
             }
         };
 
+        (document.getElementById("lbl_acft_save_npc_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save NPC");
+        (document.getElementById("lbl_acft_save_npc_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save NPC");
         var npc_button = document.getElementById("acft_save_npc");
         npc_button.onclick = () => {
             //update all the aircraft data we need.
@@ -312,6 +326,8 @@ class Aircraft_HTML extends Display {
             this.cards.SaveNPC();
         }
 
+        (document.getElementById("lbl_acft_reset_top") as HTMLLabelElement).textContent = lu("Aircraft Button Default Aircraft");
+        (document.getElementById("lbl_acft_reset_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Default Aircraft");
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
         reset_button.onclick = () => { aircraft_model.Reset(); aircraft_model.CalculateStats(); };
     }
@@ -942,9 +958,9 @@ class Aircraft_HTML extends Display {
         this.overspeed_cell.textContent = derived.Overspeed.toString();
         this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
         if (this.acft.GetIsFlammable())
-            this.flammable_cell.textContent = lu("Derived Is Flammable Yes");
+            this.flammable_cell.textContent = lu("Yes");
         else
-            this.flammable_cell.textContent = lu("Derived Is Flammable No");
+            this.flammable_cell.textContent = lu("No");
 
         this.stability_cell.textContent = derived.Stabiilty.toString();
         this.eloss_cell.textContent = derived.EnergyLoss.toString();

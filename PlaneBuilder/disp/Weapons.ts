@@ -30,13 +30,21 @@ class Weapons_HTML extends Display {
         super();
         this.weap = weap;
 
+        (document.getElementById("lbl_weapons") as HTMLLabelElement).textContent = lu("Weapons Section Title");
+
+        (document.getElementById("lbl_num_wsets") as HTMLLabelElement).textContent = lu("Weapons Number of Weapon Sets");
         this.inp_w_count = document.getElementById("num_wsets") as HTMLInputElement;
         this.inp_w_count.onchange = () => { this.weap.SetWeaponSetCount(this.inp_w_count.valueAsNumber); };
 
+        (document.getElementById("lbl_num_wbraces") as HTMLLabelElement).textContent = lu("Weapons Number of Weapon Braces");
         this.inp_w_brace = document.getElementById("num_wbraces") as HTMLInputElement;
         this.inp_w_brace.onchange = () => { this.weap.SetBraceCount(this.inp_w_brace.valueAsNumber); };
 
         this.tbl = document.getElementById("table_weapons") as HTMLTableElement;
+        var row = this.tbl.insertRow();
+        CreateTH(row, lu("Weapons Weapon Set"));
+        CreateTH(row, lu("Weapons Weapons"));
+        CreateTH(row, lu("Weapons Weapon Stats"));
         this.wrow = [];
     }
 
@@ -62,7 +70,7 @@ class Weapons_HTML extends Display {
         var wlist = this.weap.GetWeaponList();
         for (let w of wlist) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = w.name + " (" + w.era + ")";
+            opt.text = lu(w.name) + " (" + lu(w.era) + ")";
             type.type.add(opt);
         }
         type.type.required = true;
@@ -70,7 +78,7 @@ class Weapons_HTML extends Display {
         var alist = this.weap.GetActionList();
         for (let a of alist) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = a.name;
+            opt.text = lu(a.name);
             type.action.add(opt);
         }
         type.action.required = true;
@@ -78,31 +86,31 @@ class Weapons_HTML extends Display {
         var plist = this.weap.GetProjectileList();
         for (let p of plist) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = p.name;
+            opt.text = lu(p.name);
             type.projectile.add(opt);
         }
         type.projectile.required = true;
 
-        FlexSelect("Type", type.type, fs);
+        FlexSelect(lu("Weapons Type"), type.type, fs);
 
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
-        FlexInput("Number of Mounts", type.count, lfs);
-        FlexInput("Ammunition", type.ammo, rfs);
-        FlexSelect("Action", type.action, lfs);
-        FlexSelect("Projectile", type.projectile, rfs);
-        FlexCheckbox("Belt Fed", type.repeating, lfs);
+        FlexInput(lu("Weapons Number of Mounts"), type.count, lfs);
+        FlexInput(lu("Weapons Ammunition"), type.ammo, rfs);
+        FlexSelect(lu("Weapons Action"), type.action, lfs);
+        FlexSelect(lu("Weapons Projectile"), type.projectile, rfs);
+        FlexCheckbox(lu("Weapons Belt Fed"), type.repeating, lfs);
         FlexSpace(rfs);
-        FlexCheckbox("Fixed", type.fixed, lfs);
+        FlexCheckbox(lu("Fixed"), type.fixed, lfs);
         FlexSpace(rfs);
 
         var dirlist = this.weap.GetDirectionList();
         for (let i = 0; i < dirlist.length; i += 2) {
-            var dl = dirlist[i];
+            var dl = lu(dirlist[i]);
             var cbx = document.createElement("INPUT") as HTMLInputElement;
             FlexCheckbox(dl, cbx, lfs);
             type.dirs.push(cbx);
-            var dr = dirlist[i + 1];
+            var dr = lu(dirlist[i + 1]);
             cbx = document.createElement("INPUT") as HTMLInputElement;
             FlexCheckbox(dr, cbx, rfs);
             type.dirs.push(cbx);
@@ -115,25 +123,25 @@ class Weapons_HTML extends Display {
         stable.classList.toggle("inner_table");
         statcell.appendChild(stable);
         var h1_row = stable.insertRow();
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
-        CreateTH(h1_row, "Cost");
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Cost"));
         var c1_row = stable.insertRow();
         type.stats.mass = c1_row.insertCell();
         type.stats.drag = c1_row.insertCell();
         type.stats.cost = c1_row.insertCell();
         var h2_row = stable.insertRow();
-        CreateTH(h2_row, "Required Sections");
-        CreateTH(h2_row, "Mounting");
-        CreateTH(h2_row, "Jam");
+        CreateTH(h2_row, lu("Stat Required Sections"));
+        CreateTH(h2_row, lu("Weapons Stat Mounting"));
+        CreateTH(h2_row, lu("Weapons Stat Jam"));
         var c2_row = stable.insertRow();
         type.stats.sect = c2_row.insertCell();
         type.stats.mounting = c2_row.insertCell();
         type.stats.jams = c2_row.insertCell();
         var h3_row = stable.insertRow();
-        CreateTH(h3_row, "Hits");
-        CreateTH(h3_row, "Damage");
-        CreateTH(h3_row, "Shots");
+        CreateTH(h3_row, lu("Weapons Stat Hits"));
+        CreateTH(h3_row, lu("Weapons Stat Damage"));
+        CreateTH(h3_row, lu("Weapons Stat Shots"));
         var c3_row = stable.insertRow();
         type.stats.hits = c3_row.insertCell();
         type.stats.damg = c3_row.insertCell();
@@ -152,18 +160,18 @@ class Weapons_HTML extends Display {
             synch: document.createElement("SELECT") as HTMLSelectElement,
             count: document.createElement("INPUT") as HTMLInputElement,
         };
-        CreateCheckbox("Wing Mount", w.wing, w.span, false);
-        CreateCheckbox("Accessible", w.accessible, w.span, false);
-        CreateCheckbox("Free Accessible", w.free_access, w.span, false);
-        CreateCheckbox("Covered", w.covered, w.span, true);
-        CreateInput("Weapons at Mount", w.count, w.span, false);
-        CreateSelect("Synchronization", w.synch, w.span, false);
+        CreateCheckbox(lu("Weapons Wing Mount"), w.wing, w.span, false);
+        CreateCheckbox(lu("Weapons Accessible"), w.accessible, w.span, false);
+        CreateCheckbox(lu("Weapons Free Accessible"), w.free_access, w.span, false);
+        CreateCheckbox(lu("Weapons Covered"), w.covered, w.span, true);
+        CreateInput(lu("Weapons # Weapons at Mount"), w.count, w.span, false);
+        CreateSelect(lu("Weapons Synchronization"), w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
 
         var slist = this.weap.GetSynchronizationList();
         for (let s of slist) {
             var opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.text = s;
+            opt.text = lu(s);
             w.synch.add(opt);
         }
 
@@ -253,11 +261,11 @@ class Weapons_HTML extends Display {
             + h[3].toString();
 
         if (set.GetFixed())
-            BlinkIfChanged(disp.stats.mounting, "Fixed");
+            BlinkIfChanged(disp.stats.mounting, lu("Fixed"));
         else if (set.GetDirectionCount() <= 2)
-            BlinkIfChanged(disp.stats.mounting, "Flexible");
+            BlinkIfChanged(disp.stats.mounting, lu("Flexible"));
         else
-            BlinkIfChanged(disp.stats.mounting, "Turret");
+            BlinkIfChanged(disp.stats.mounting, lu("Turret"));
 
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);

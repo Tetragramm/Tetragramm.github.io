@@ -18,6 +18,9 @@ class Engines_HTML extends Display {
         this.eng = eng;
         this.engines = [];
         this.radiators = [];
+
+        (document.getElementById("lbl_engines") as HTMLLabelElement).textContent = lu("Engines Section Title");
+
         this.tbl = document.getElementById("table_engine") as HTMLTableElement;
         var row = this.tbl.insertRow();
         CreateTH(row, lu("Engines Engine Type"));
@@ -32,14 +35,18 @@ class Engines_HTML extends Display {
         CreateTH(row, lu("Radiators Coolant"));
         CreateTH(row, lu("Radiators Radiator Stats"));
 
+
+        (document.getElementById("lbl_num_engines") as HTMLLabelElement).textContent = lu("Engines Num Engines");
         this.num_engines = document.getElementById("num_engines") as HTMLInputElement;
         this.num_engines.onchange = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };
         this.num_engines.valueAsNumber = this.eng.GetNumberOfItems();
 
+        (document.getElementById("lbl_num_radiators") as HTMLLabelElement).textContent = lu("Engines Num Radiators");
         this.num_radiators = document.getElementById("num_radiators") as HTMLInputElement;
         this.num_radiators.onchange = () => { this.eng.SetNumberOfRadiators(this.num_radiators.valueAsNumber); };
         this.num_radiators.valueAsNumber = this.eng.GetNumberOfRadiators();
 
+        (document.getElementById("lbl_asymmetric") as HTMLLabelElement).textContent = lu("Engines Asymmetric Plane");
         this.is_asymmetric = document.getElementById("asymmetric") as HTMLInputElement;
         this.is_asymmetric.onchange = () => { this.eng.SetAsymmetry(this.is_asymmetric.checked); };
         this.is_asymmetric.checked = this.eng.GetAsymmetry();

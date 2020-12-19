@@ -42,13 +42,18 @@ class Wings_HTML extends Display {
         this.fw_list = [];
         this.mw_list = [];
 
+        (document.getElementById("lbl_wings") as HTMLLabelElement).textContent = lu("Wings Section Title");
+
+        (document.getElementById("lbl_wing_stagger") as HTMLLabelElement).textContent = lu("Wings Wing Stagger");
         this.stagger = document.getElementById("wing_stagger") as HTMLSelectElement;
+        (document.getElementById("lbl_wing_closed") as HTMLLabelElement).textContent = lu("Wings Closed Wing");
         this.closed = document.getElementById("wing_closed") as HTMLInputElement;
+        (document.getElementById("lbl_wing_swept") as HTMLLabelElement).textContent = lu("Wings Swept Wing");
         this.swept = document.getElementById("wing_swept") as HTMLInputElement;
 
         for (let s of w.GetStaggerList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.textContent = s.name;
+            opt.textContent = lu(s.name);
             this.stagger.append(opt);
         }
 
@@ -57,14 +62,15 @@ class Wings_HTML extends Display {
         this.swept.onchange = () => { this.wings.SetSwept(this.swept.checked); };
 
         var tbl = document.getElementById("wing_table") as HTMLTableElement;
+        var row = tbl.insertRow();
+        CreateTH(row, lu("Wings Wing Type"));
+        CreateTH(row, lu("Wings Wing Options"));
+        CreateTH(row, lu("Wings Wing Stats"));
+
         var full_row = tbl.insertRow();
+        CreateTH(full_row, lu("Wings Full Wings"));
         var mini_row = tbl.insertRow();
-        var full_type = document.createElement("TH") as HTMLTableHeaderCellElement;
-        full_type.textContent = "Full Wings";
-        full_row.appendChild(full_type);
-        var mini_type = document.createElement("TH") as HTMLTableHeaderCellElement;
-        mini_type.textContent = "Miniature Wings";
-        mini_row.appendChild(mini_type);
+        CreateTH(mini_row, lu("Wings Miniature Wings"));
 
         this.full_cell = full_row.insertCell();
         this.mini_cell = mini_row.insertCell();
@@ -79,32 +85,32 @@ class Wings_HTML extends Display {
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
         var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, "Wing Area");
-        CreateTH(h1_row, "Mass");
-        CreateTH(h1_row, "Drag");
+        CreateTH(h1_row, lu("Stat Wing Area"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Drag"));
         var c1_row = tbl_stat.insertRow();
         this.d_area = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, "Control");
-        CreateTH(h2_row, "Pitch Stability");
-        CreateTH(h2_row, "Lateral Stability");
+        CreateTH(h2_row, lu("Stat Control"));
+        CreateTH(h2_row, lu("Stat Pitch Stability"));
+        CreateTH(h2_row, lu("Stat Lateral Stability"));
         var c2_row = tbl_stat.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, "Raw Strain");
-        CreateTH(h3_row, "Crash Safety");
-        CreateTH(h3_row, "Lift Bleed");
+        CreateTH(h3_row, lu("Stat Raw Strain"));
+        CreateTH(h3_row, lu("Stat Crash Safety"));
+        CreateTH(h3_row, lu("Stat Lift Bleed"));
         var c3_row = tbl_stat.insertRow();
         this.d_maxs = c3_row.insertCell();
         this.d_crsh = c3_row.insertCell();
         this.d_lift = c3_row.insertCell();
         var h4_row = tbl_stat.insertRow();
-        CreateTH(h4_row, "Cost");
-        CreateTH(h4_row, "Visibility");
+        CreateTH(h4_row, lu("Stat Cost"));
+        CreateTH(h4_row, lu("Stat Visibility"));
         CreateTH(h4_row, "");
         var c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
@@ -112,8 +118,8 @@ class Wings_HTML extends Display {
         c4_row.insertCell();
         var h5_row = tbl_stat.insertRow();
         CreateTH(h5_row, "");
-        CreateTH(h5_row, "Sesquiplane");
-        CreateTH(h5_row, "Flammable");
+        CreateTH(h5_row, lu("Wings Sesquiplane"));
+        CreateTH(h5_row, lu("Derived Is Flammable Question"));
         var c5_row = tbl_stat.insertRow();
         c5_row.insertCell();
         this.d_sesq = c5_row.insertCell();
@@ -172,14 +178,14 @@ class Wings_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
         if (this.wings.GetIsSesquiplane().is)
-            BlinkIfChanged(this.d_sesq, "Yes");
+            BlinkIfChanged(this.d_sesq, lu("Yes"));
         else
-            BlinkIfChanged(this.d_sesq, "No");
+            BlinkIfChanged(this.d_sesq, lu("No"));
 
         if (this.wings.IsFlammable())
-            BlinkIfChanged(this.d_flam, "Yes");
+            BlinkIfChanged(this.d_flam, lu("Yes"));
         else
-            BlinkIfChanged(this.d_flam, "No");
+            BlinkIfChanged(this.d_flam, lu("No"));
     }
 
     private AddFullWing() {
@@ -197,35 +203,34 @@ class Wings_HTML extends Display {
         wing.span.appendChild(wing.deck);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION") as HTMLOptionElement;
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             wing.deck.append(opt);
         }
 
         wing.span.appendChild(wing.skin);
-        var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.textContent = s.name;
+            opt.textContent = lu(s.name);
             wing.skin.append(opt);
         }
 
-        CreateInput(" Area ", wing.area, wing.span, false);
+        CreateInput(lu("Wings Area"), wing.area, wing.span, false);
         wing.area.min = "3";
 
-        CreateInput(" Span ", wing.wspan, wing.span, false);
+        CreateInput(lu("Wings Span"), wing.wspan, wing.span, false);
         wing.wspan.min = "1";
 
-        CreateCheckbox(" Gull ", wing.gull, wing.span, false);
+        CreateCheckbox(lu("Wings Gull"), wing.gull, wing.span, false);
 
-        CreateInput(" Dihedral ", wing.dihedral, wing.span, false);
+        CreateInput(lu("Wings Dihedral"), wing.dihedral, wing.span, false);
         wing.dihedral.min = "0";
 
-        CreateInput(" Anhedral ", wing.anhedral, wing.span, false);
+        CreateInput(lu("Wings Anhedral"), wing.anhedral, wing.span, false);
         wing.anhedral.min = "0";
 
         this.full_cell.appendChild(wing.span);
@@ -314,28 +319,27 @@ class Wings_HTML extends Display {
         wing.span.appendChild(wing.deck);
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION") as HTMLOptionElement;
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             wing.deck.append(opt);
         }
 
         wing.span.appendChild(wing.skin);
-        var slist = this.wings.GetSkinList();
         for (let s of this.wings.GetSkinList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.textContent = s.name;
+            opt.textContent = lu(s.name);
             wing.skin.append(opt);
         }
 
-        CreateInput(" Area ", wing.area, wing.span, false);
+        CreateInput(lu("Wings Area"), wing.area, wing.span, false);
         wing.area.min = "1";
         wing.area.max = "2";
 
-        CreateInput(" Span ", wing.wspan, wing.span, false);
+        CreateInput(lu("Wings Span"), wing.wspan, wing.span, false);
         wing.wspan.min = "1";
 
         this.mini_cell.appendChild(wing.span);
@@ -390,13 +394,13 @@ class Wings_HTML extends Display {
         this.fw_add = document.createElement("SELECT") as HTMLSelectElement;
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION") as HTMLOptionElement;
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         this.fw_add.append(none_opt);
         var can = false;
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             if (!this.wings.CanAddFullWing(i)) {
                 opt.disabled = true;
             } else {
@@ -417,13 +421,13 @@ class Wings_HTML extends Display {
         this.mw_add = document.createElement("SELECT") as HTMLSelectElement;
         var dlist = this.wings.GetDeckList();
         var none_opt = document.createElement("OPTION") as HTMLOptionElement;
-        none_opt.textContent = "None";
+        none_opt.textContent = lu("Wings No Wing");
         this.mw_add.append(none_opt);
         var can = false;
         for (let i = 0; i < dlist.length; i++) {
             let d = dlist[i];
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.textContent = d.name;
+            opt.textContent = lu(d.name);
             if (!this.wings.CanAddMiniWing(i)) {
                 opt.disabled = true;
             } else {

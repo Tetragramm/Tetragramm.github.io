@@ -32,6 +32,8 @@ class Accessories_HTML extends Display {
         super();
         this.acc = acc;
 
+        (document.getElementById("lbl_accessories") as HTMLLabelElement).textContent = lu("Accessories Section Title");
+
         var tbl = document.getElementById("tbl_accessories") as HTMLTableElement;
         var row = tbl.insertRow();
         CreateTH(row, lu("Accessories Armour Coverage"));

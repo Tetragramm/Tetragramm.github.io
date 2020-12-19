@@ -13,16 +13,41 @@ class Passengers_HTML extends Display {
         super();
         this.pass = pass;
 
-        this.nseats = document.getElementById("num_seats") as HTMLInputElement;
-        this.nbeds = document.getElementById("num_beds") as HTMLInputElement;
-        this.mass = document.getElementById("passenger_mass") as HTMLTableCellElement;
-        this.reqseq = document.getElementById("passenger_req_seq") as HTMLTableCellElement;
+        (document.getElementById("lbl_passengers") as HTMLLabelElement).textContent = lu("Passengers Section Title");
 
-        var upg_cell = document.getElementById("passenger_upg") as HTMLTableCellElement;
+        var tbl = document.getElementById("table_passengers") as HTMLTableElement;
+        var row = tbl.insertRow();
+        CreateTH(row, lu("Passengers Number of Seats"));
+        CreateTH(row, lu("Passengers Number of Beds"));
+        CreateTH(row, lu("Passengers Upgrade"));
+        CreateTH(row, lu("Stat Mass"));
+        CreateTH(row, lu("Stat Required Sections"));
+
+        // < tr >
+        // <td><input type="number" id = "num_seats" min = "0" value = "0" /> </td>
+        // < td > <input type="number" id = "num_beds" min = "0" value = "0" /> </td>
+        // < td id = "passenger_upg" > </td>
+        // < td id = "passenger_mass" > </td>
+        // < td id = "passenger_req_seq" > </td>
+        // < /tr>
+
+        row = tbl.insertRow();
+        this.nseats = document.createElement("INPUT") as HTMLInputElement;
+        this.nseats.type = "number";
+        this.nseats.min = "0";
+        row.insertCell().append(this.nseats);
+        this.nbeds = document.createElement("INPUT") as HTMLInputElement;
+        this.nbeds.type = "number";
+        this.nbeds.min = "0";
+        row.insertCell().append(this.nbeds);
+
+        var upg_cell = row.insertCell();
         this.connect = document.createElement("INPUT") as HTMLInputElement;
         var fs = CreateFlexSection(upg_cell);
-        FlexCheckbox("Connectivity", this.connect, fs);
+        FlexCheckbox(lu("Passengers Connectivity"), this.connect, fs);
 
+        this.mass = row.insertCell();
+        this.reqseq = row.insertCell();
 
         this.connect.disabled = true;
         this.nseats.onchange = () => {

@@ -11,6 +11,10 @@ class Cockpits_HTML extends Display {
     constructor(cockpits: Cockpits) {
         super();
         this.cockpits = cockpits;
+
+        (document.getElementById("lbl_cockpits") as HTMLLabelElement).textContent = lu("Cockpit Section Title");
+        (document.getElementById("lbl_num_cockpits") as HTMLLabelElement).textContent = lu("Cockpit Num Cockpits");
+
         this.tbl = document.getElementById("table_cockpit") as HTMLTableElement;
         var row = this.tbl.insertRow();
         CreateTH(row, lu("Cockpit Option"));
