@@ -28,7 +28,7 @@ class Used_HTML extends Display {
         var row = this.tbl.insertRow();
         CreateTH(row, lu("Used Effect"));
         CreateTH(row, lu("Used Description"));
-        CreateTH(row, lu("Used Penalties(+) < br /> Benefits(-)"));
+        CreateTH(row, lu("Used Penalties(+) <br/> Benefits(-)"));
         this.InitTable(this.tbl);
     }
 

@@ -26,6 +26,7 @@ class Localization {
         } else if (this.languages["en"][key]) {
             return this.languages["en"][key];
         } else {
+            console.log("Failed to find " + key);
             return "!" + key + "!";
         }
     }

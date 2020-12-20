@@ -1055,8 +1055,8 @@ class Aircraft_HTML extends Display {
                     StringFmt.Join(" ", dirs),
                     wlist[w.GetWeaponSelected()].damage,
                     StringFmt.Join("\\", hits),
-                    StringFmt.Join("/", chgs),
-                    StringFmt.Join(",", tags)
+                    StringFmt.Join("\\", chgs),
+                    StringFmt.Join(", ", tags)
                 );
             } else {
                 weaphtml += lu("Weapon Description",
@@ -1066,7 +1066,7 @@ class Aircraft_HTML extends Display {
                     wlist[w.GetWeaponSelected()].damage,
                     StringFmt.Join("\\", hits),
                     w.GetShots(),
-                    StringFmt.Join(",", tags)
+                    StringFmt.Join(", ", tags)
                 );
             }
             weaphtml += "<br\>";

@@ -357,6 +357,7 @@ class Localization {
             return this.languages["en"][key];
         }
         else {
+            console.log("Failed to find " + key);
             return "!" + key + "!";
         }
     }
@@ -13391,10 +13392,10 @@ class Aircraft_HTML extends Display {
             }
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
-                weaphtml += lu("Weapon Description Heat Ray", w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), StringFmt.Join("/", chgs), StringFmt.Join(",", tags));
+                weaphtml += lu("Weapon Description Heat Ray", w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), StringFmt.Join("\\", chgs), StringFmt.Join(", ", tags));
             }
             else {
-                weaphtml += lu("Weapon Description", w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), w.GetShots(), StringFmt.Join(",", tags));
+                weaphtml += lu("Weapon Description", w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), w.GetShots(), StringFmt.Join(", ", tags));
             }
             weaphtml += "<br\>";
         }
@@ -14511,7 +14512,7 @@ class Used_HTML extends Display {
         var row = this.tbl.insertRow();
         CreateTH(row, lu("Used Effect"));
         CreateTH(row, lu("Used Description"));
-        CreateTH(row, lu("Used Penalties(+) < br /> Benefits(-)"));
+        CreateTH(row, lu("Used Penalties(+) <br/> Benefits(-)"));
         this.InitTable(this.tbl);
     }
     InitTable(tbl) {
