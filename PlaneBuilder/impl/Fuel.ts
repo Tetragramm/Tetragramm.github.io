@@ -27,7 +27,7 @@ class Fuel extends Part {
         this.self_sealing = false;
 
         this.is_cantilever = false;
-        this.wing_area = 0;
+        this.wing_area = -1;
     }
 
     public toJSON() {
@@ -42,6 +42,7 @@ class Fuel extends Part {
         this.tank_count = js["tank_count"];
         this.self_sealing = js["self_sealing"];
         this.fire_extinguisher = js["fire_extinguisher"];
+        this.wing_area = -1;
     }
 
     public serialize(s: Serialize) {
@@ -54,6 +55,7 @@ class Fuel extends Part {
         this.tank_count = d.GetNumArr();
         this.self_sealing = d.GetBool();
         this.fire_extinguisher = d.GetBool();
+        this.wing_area = -1;
     }
 
     public GetTankList() {
@@ -103,36 +105,39 @@ class Fuel extends Part {
     }
 
     private VerifyOK() {
-        //Count cantilever dependent tanks.
-        var ccount = 0;
-        for (let i = 0; i < this.tank_count.length; i++) {
-            if (this.tank_stats[i].cantilever)
-                ccount += this.tank_count[i];
-        }
-        //How many can you have?
-        var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
-        if (!this.is_cantilever)
-            allowed = 0;
-        //Do you have more than the allowed?
-        var diff = ccount - allowed;
-        var mod = diff > 0;
-        //Loop over and reduce by one until you don't.
-        while (diff > 0) {
-            for (let i = this.tank_count.length - 1; i >= 0; i--) {
-                if (this.tank_stats[i].cantilever) {
-                    this.tank_count[i]--;
-                    diff--;
-                    break;
+        if (this.wing_area != -1) {
+            //Count cantilever dependent tanks.
+            var ccount = 0;
+            for (let i = 0; i < this.tank_count.length; i++) {
+                if (this.tank_stats[i].cantilever)
+                    ccount += this.tank_count[i];
+            }
+            //How many can you have?
+            var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
+            if (!this.is_cantilever)
+                allowed = 0;
+            //Do you have more than the allowed?
+            var diff = ccount - allowed;
+            var mod = diff > 0;
+            //Loop over and reduce by one until you don't.
+            while (diff > 0) {
+                for (let i = this.tank_count.length - 1; i >= 0; i--) {
+                    if (this.tank_stats[i].cantilever) {
+                        this.tank_count[i]--;
+                        diff--;
+                        break;
+                    }
                 }
             }
-        }
-        //Limit microtanks to 4
-        for (let i = 0; i < this.tank_count.length; i++) {
-            if (this.tank_stats[i].stats.wetmass == 0) {
-                this.tank_count[i] = Math.min(4, this.tank_count[i]);
+            //Limit microtanks to 4
+            for (let i = 0; i < this.tank_count.length; i++) {
+                if (this.tank_stats[i].stats.wetmass == 0) {
+                    this.tank_count[i] = Math.min(4, this.tank_count[i]);
+                }
             }
+            return mod;
         }
-        return mod;
+        return false;
     }
 
     public GetSealingEnabled() {

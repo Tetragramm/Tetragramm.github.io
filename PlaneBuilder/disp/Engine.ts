@@ -324,7 +324,6 @@ class Engine_HTML extends Display {
             this.cool_count.min = "0";
             this.cool_count.max = this.engine.GetMaxCooling().toString();
             this.cool_count.valueAsNumber = this.engine.GetCooling();
-            console.log(this.engine.GetMaxCooling())
             this.cool_count.onchange = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
         }
     }
