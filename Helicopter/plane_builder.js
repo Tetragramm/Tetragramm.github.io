@@ -6643,7 +6643,8 @@ var SynchronizationType;
     SynchronizationType[SynchronizationType["SYNCH"] = 1] = "SYNCH";
     SynchronizationType[SynchronizationType["SPINNER"] = 2] = "SPINNER";
     SynchronizationType[SynchronizationType["DEFLECT"] = 3] = "DEFLECT";
-    SynchronizationType[SynchronizationType["ENUM_MAX"] = 4] = "ENUM_MAX";
+    SynchronizationType[SynchronizationType["NO_INTERFERENCE"] = 4] = "NO_INTERFERENCE";
+    SynchronizationType[SynchronizationType["ENUM_MAX"] = 5] = "ENUM_MAX";
 })(SynchronizationType || (SynchronizationType = {}));
 var ProjectileType;
 (function (ProjectileType) {
@@ -6805,7 +6806,7 @@ class Weapon extends Part {
     }
     CanSynch(num) {
         if (!this.fixed && !this.wing) {
-            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) {
+            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT || num == SynchronizationType.NO_INTERFERENCE) {
                 return true;
             }
             else {
@@ -7032,6 +7033,12 @@ class Weapon extends Part {
             stats.warnings.push({
                 source: lu(this.weapon_type.name),
                 warning: lu("Deflector Plate Warning"),
+            });
+        }
+        else if (this.synchronization == SynchronizationType.NO_INTERFERENCE) {
+            stats.warnings.push({
+                source: lu(this.weapon_type.name) + " " + lu("No Interference"),
+                warning: lu("No Interference Warning"),
             });
         }
         if (this.wing_reinforcement)
@@ -7711,7 +7718,7 @@ class Weapons extends Part {
     constructor(js) {
         super();
         this.direction_list = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
-        this.synchronization_list = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
+        this.synchronization_list = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate", "No Interference"];
         this.action_list = [
             { name: "Standard Action" },
             { name: "Mechanical Action" },
