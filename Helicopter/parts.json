@@ -1759,14 +1759,14 @@
             },
             {
                 "name": "Intercom System",
-                "charge": -1,
+                "charge": 0.0001,
                 "cost": 1
             },
             {
                 "name": "Radio Receiver",
                 "mass": 2,
                 "drag": 2,
-                "charge": -1,
+                "charge": 0.0001,
                 "cost": 3
             },
             {
@@ -1785,7 +1785,7 @@
             },
             {
                 "name": "Whalebone Radio Receiver",
-                "charge": -1,
+                "charge": 0.0001,
                 "cost": 5
             },
             {
@@ -1849,7 +1849,7 @@
             },
             {
                 "name": "Searchlight",
-                "charge": -2,
+                "charge": 0.0001,
                 "cost": 1
             }
         ],
@@ -1867,7 +1867,7 @@
             },
             {
                 "name": "Basic Fan",
-                "charge": -1,
+                "charge": 0.0001,
                 "req_radiator": false
             },
             {

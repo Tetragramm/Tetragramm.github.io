@@ -6293,6 +6293,16 @@ class Accessories extends Part {
             if (e > 0)
                 return true;
         }
+        for (let i = 0; i < this.clim_list.length; i++) {
+            if (this.clim_sel[i] && this.clim_list[i].stats.charge != 0)
+                return true;
+        }
+        for (let i = 0; i < this.visi_list.length; i++) {
+            if (this.visi_sel[i] && this.visi_list[i].stats.charge != 0)
+                return true;
+        }
+        if (this.radio_list[this.radio_sel].stats.charge != 0)
+            return true;
         if (this.auto_list[this.auto_sel].stats.charge != 0)
             return true;
         return false;
