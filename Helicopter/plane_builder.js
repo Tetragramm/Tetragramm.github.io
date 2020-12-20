@@ -4898,7 +4898,7 @@ class Stabilizers extends Part {
         if (this.vstab_list[this.vstab_sel].is_vtail) //V-Tail
             pairs = this.hstab_count - 1;
         else
-            pairs = Math.min(this.hstab_count, this.vstab_count) - 1;
+            pairs = Math.max(this.hstab_count, this.vstab_count) - 1;
         pairs = Math.max(0, pairs);
         var leftovers = Math.max(this.hstab_count - 1, this.vstab_count - 1) - pairs;
         var es_pairs = Math.min(this.engine_count - 1, pairs);
@@ -5504,7 +5504,7 @@ class Fuel extends Part {
         }
         this.self_sealing = false;
         this.is_cantilever = false;
-        this.wing_area = 0;
+        this.wing_area = -1;
     }
     toJSON() {
         return {
@@ -5517,6 +5517,7 @@ class Fuel extends Part {
         this.tank_count = js["tank_count"];
         this.self_sealing = js["self_sealing"];
         this.fire_extinguisher = js["fire_extinguisher"];
+        this.wing_area = -1;
     }
     serialize(s) {
         s.PushNumArr(this.tank_count);
@@ -5527,6 +5528,7 @@ class Fuel extends Part {
         this.tank_count = d.GetNumArr();
         this.self_sealing = d.GetBool();
         this.fire_extinguisher = d.GetBool();
+        this.wing_area = -1;
     }
     GetTankList() {
         return this.tank_stats;
@@ -5569,36 +5571,39 @@ class Fuel extends Part {
         this.wing_area = num;
     }
     VerifyOK() {
-        //Count cantilever dependent tanks.
-        var ccount = 0;
-        for (let i = 0; i < this.tank_count.length; i++) {
-            if (this.tank_stats[i].cantilever)
-                ccount += this.tank_count[i];
-        }
-        //How many can you have?
-        var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
-        if (!this.is_cantilever)
-            allowed = 0;
-        //Do you have more than the allowed?
-        var diff = ccount - allowed;
-        var mod = diff > 0;
-        //Loop over and reduce by one until you don't.
-        while (diff > 0) {
-            for (let i = this.tank_count.length - 1; i >= 0; i--) {
-                if (this.tank_stats[i].cantilever) {
-                    this.tank_count[i]--;
-                    diff--;
-                    break;
+        if (this.wing_area != -1) {
+            //Count cantilever dependent tanks.
+            var ccount = 0;
+            for (let i = 0; i < this.tank_count.length; i++) {
+                if (this.tank_stats[i].cantilever)
+                    ccount += this.tank_count[i];
+            }
+            //How many can you have?
+            var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
+            if (!this.is_cantilever)
+                allowed = 0;
+            //Do you have more than the allowed?
+            var diff = ccount - allowed;
+            var mod = diff > 0;
+            //Loop over and reduce by one until you don't.
+            while (diff > 0) {
+                for (let i = this.tank_count.length - 1; i >= 0; i--) {
+                    if (this.tank_stats[i].cantilever) {
+                        this.tank_count[i]--;
+                        diff--;
+                        break;
+                    }
                 }
             }
-        }
-        //Limit microtanks to 4
-        for (let i = 0; i < this.tank_count.length; i++) {
-            if (this.tank_stats[i].stats.wetmass == 0) {
-                this.tank_count[i] = Math.min(4, this.tank_count[i]);
+            //Limit microtanks to 4
+            for (let i = 0; i < this.tank_count.length; i++) {
+                if (this.tank_stats[i].stats.wetmass == 0) {
+                    this.tank_count[i] = Math.min(4, this.tank_count[i]);
+                }
             }
+            return mod;
         }
-        return mod;
+        return false;
     }
     GetSealingEnabled() {
         var internal_count = 0;
@@ -10030,7 +10035,6 @@ class Engine_HTML extends Display {
             this.cool_count.min = "0";
             this.cool_count.max = this.engine.GetMaxCooling().toString();
             this.cool_count.valueAsNumber = this.engine.GetCooling();
-            console.log(this.engine.GetMaxCooling());
             this.cool_count.onchange = () => { this.engine.SetCooling(this.cool_count.valueAsNumber); };
         }
     }
