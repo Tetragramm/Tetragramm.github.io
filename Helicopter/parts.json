@@ -164,7 +164,7 @@
                 "control": 0,
                 "escape": 0,
                 "cost": 1,
-                "flightstress": 0,
+                "flightstress": 1,
                 "visibility": 0,
                 "warning": "Isolated Warning"
             }
