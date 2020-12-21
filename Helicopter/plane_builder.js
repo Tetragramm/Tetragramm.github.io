@@ -4455,6 +4455,9 @@ class Wings extends Part {
                 biggest_deck = w.deck;
                 biggest_span = w.span;
             }
+            else if (w.area == biggest_area) {
+                biggest_deck = -1;
+            }
             if (smallest_area > w.area) {
                 smallest_area = w.area;
                 smallest_span = w.span;
@@ -4577,7 +4580,7 @@ class Wings extends Part {
         stats.latstab += Math.min(0, longest_span - 8);
         //Sesquiplanes!
         var sesp = this.GetIsSesquiplane();
-        if (sesp.is || this.GetMonoplane()) {
+        if ((sesp.is || this.GetMonoplane()) && sesp.deck != -1) {
             stats = stats.Add(this.long_list[sesp.deck].stats);
             stats.drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
         }
