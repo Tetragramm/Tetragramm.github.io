@@ -456,7 +456,7 @@
         "Cards Too Many Warnings Warning": "And More!  See the Plane Builder for details.",
         "Cards Gun String Reload": "{0} loads of {1} shots",
         "Cards Gun String No Reload": "{0} shots",
-        "Cards Uses Radiator": "Uses Radiator #{}",
+        "Cards Uses Radiator": "Uses Radiator #{0}",
         "Cockpit Section Title": "Cockpits",
         "Cockpit Num Cockpits": "Number of Cockpits:",
         "Cockpit Bombsight": "Bombsight",
