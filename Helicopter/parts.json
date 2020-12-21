@@ -965,7 +965,7 @@
             {
                 "name": "Transparent Celluloid",
                 "flammable": true,
-                "strainfactor": 0.9,
+                "strainfactor": 1.0,
                 "dragfactor": 1.0,
                 "toughness": -0.1,
                 "cost": 0.1,

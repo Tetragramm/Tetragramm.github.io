@@ -7,6 +7,7 @@ enum SynchronizationType {
     SYNCH,
     SPINNER,
     DEFLECT,
+    NO_INTERFERENCE,
     ENUM_MAX
 }
 enum ProjectileType {
@@ -220,7 +221,7 @@ class Weapon extends Part {
 
     private CanSynch(num: number) {
         if (!this.fixed && !this.wing) {
-            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) {
+            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT || num == SynchronizationType.NO_INTERFERENCE) {
                 return true;
             } else {
                 return false;
@@ -462,6 +463,11 @@ class Weapon extends Part {
             stats.warnings.push({
                 source: lu(this.weapon_type.name),
                 warning: lu("Deflector Plate Warning"),
+            });
+        } else if (this.synchronization == SynchronizationType.NO_INTERFERENCE) {
+            stats.warnings.push({
+                source: lu(this.weapon_type.name) + " " + lu("No Interference"),
+                warning: lu("No Interference Warning"),
             });
         }
 

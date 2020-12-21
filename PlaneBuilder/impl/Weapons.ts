@@ -14,7 +14,7 @@ class Weapons extends Part {
     }[];
     private wl_permute: number[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
-    private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
+    private synchronization_list: string[] = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate", "No Interference"];
     private action_list = [
         { name: "Standard Action" },
         { name: "Mechanical Action" },

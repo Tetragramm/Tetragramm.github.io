@@ -4894,16 +4894,17 @@ class Stabilizers extends Part {
         //Additional stabilizers
         stats.drag += 2 * (Math.max(0, this.hstab_count - 1) + Math.max(0, this.vstab_count - 1));
         //Pairs of stabilizers
-        var pairs = 0;
-        if (this.vstab_list[this.vstab_sel].is_vtail) //V-Tail
-            pairs = this.hstab_count - 1;
-        else
-            pairs = Math.max(this.hstab_count, this.vstab_count) - 1;
-        pairs = Math.max(0, pairs);
-        var leftovers = Math.max(this.hstab_count - 1, this.vstab_count - 1) - pairs;
-        var es_pairs = Math.min(this.engine_count - 1, pairs);
-        leftovers += 2 * (pairs - es_pairs);
-        stats.control += 3 * es_pairs + leftovers;
+        if (this.vstab_list[this.vstab_sel].increment != 0) {
+            var leftovers = Math.max(0, this.hstab_count - 1);
+            var es_pairs = Math.min(this.engine_count - 1, this.vstab_count - 1);
+            leftovers += Math.max(0, this.vstab_count - 1 - es_pairs);
+            stats.control += 3 * es_pairs + leftovers;
+        }
+        else {
+            var es_pairs = Math.max(0, Math.min(this.engine_count - 1, this.hstab_count - 1));
+            leftovers = Math.max(0, this.hstab_count - 1 - es_pairs);
+            stats.control += 3 * es_pairs + leftovers;
+        }
         return stats;
     }
 }
@@ -7202,6 +7203,7 @@ class WeaponSystem extends Part {
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
         this.final_weapon.jam = this.weapon_list[num].jam;
+        console.log(StringFmt.Format("ActionSel = {0}", this.action_sel));
         if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
@@ -7558,7 +7560,7 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
     SetHavePropeller(have) {
-        if (this.has_propeller && !have) {
+        if (this.has_propeller && !have && this.action_sel == ActionType.MECHANICAL) {
             this.has_propeller = have;
             this.SetAction(ActionType.STANDARD);
         }
