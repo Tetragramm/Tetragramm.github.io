@@ -1605,6 +1605,8 @@ class Cockpit extends Part {
         this.CalculateStats();
     }
     GetVisibility() {
+        if (this.types[this.selected_type].stats.visibility < -10)
+            return -1 / 0;
         return this.total_visibility;
     }
     GetFlightStress() {

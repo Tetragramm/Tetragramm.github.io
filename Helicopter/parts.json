@@ -81,7 +81,8 @@
                 "escape": -3,
                 "cost": 1,
                 "flightstress": -1,
-                "visibility": 0
+                "visibility": -99,
+                "warning": "Sealed Warning"
             },
             {
                 "name": "Narrow Canopy",

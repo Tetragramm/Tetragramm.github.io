@@ -13,6 +13,7 @@
         "Open": "Open",
         "Windscreen": "Windscreen",
         "Sealed": "Sealed",
+        "Sealed Warning": "This crewmember cannot see outside.",
         "Narrow Canopy": "Narrow Canopy",
         "Bubble Canopy": "Bubble Canopy",
         "Co-Pilot Controls": "Co-Pilot Controls",
