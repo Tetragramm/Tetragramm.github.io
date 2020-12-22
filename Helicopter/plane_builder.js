@@ -2649,8 +2649,12 @@ class Engine extends Part {
             stats.mass += 1;
         if (this.torque_to_struct)
             stats.structure -= this.etype_stats.torque;
-        else
-            stats.maxstrain -= this.etype_stats.torque;
+        else {
+            if (this.mount_list[this.selected_mount].mount_type == "wing")
+                stats.maxstrain -= this.etype_stats.torque;
+            else if (this.mount_list[this.selected_mount].mount_type == "fuselage")
+                stats.latstab -= this.etype_stats.torque;
+        }
         //ContraRotary Engines need geared propellers to function.
         if (this.IsContraRotary()) {
             this.gp_count = Math.max(1, this.gp_count);
@@ -2675,6 +2679,9 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.upkeep *= 2;
+            stats.reqsections *= 2;
+            if (this.mount_list[this.selected_mount].name == "Pod")
+                stats.reqsections -= 1;
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
         //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
