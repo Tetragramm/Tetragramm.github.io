@@ -242,8 +242,8 @@ class ControlSurfaces extends Part {
                 stats.cost += 2 * this.wing_area;
             }
             if (this.is_boom) {
-                stats.pitchstab -= 1;
-                stats.latstab -= 1;
+                stats.pitchstab -= 2;
+                stats.latstab -= 2;
                 stats.warnings.push({
                     source: lu("Wing Warping"),
                     warning: lu("Wing Warping Warning")

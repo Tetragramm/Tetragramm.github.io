@@ -427,7 +427,7 @@ class Engines extends Part {
             if (e.IsRotary()) {
                 if (e.IsTractor())
                     rotationT++;
-                else if (e.IsPusher())
+                if (e.IsPusher())
                     rotationT--;
             }
         }
