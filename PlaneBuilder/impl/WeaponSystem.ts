@@ -203,7 +203,6 @@ class WeaponSystem extends Part {
         this.final_weapon.deflection = this.weapon_list[num].deflection;
         this.final_weapon.jam = this.weapon_list[num].jam;
 
-        console.log(StringFmt.Format("ActionSel = {0}", this.action_sel));
         if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.rapid = this.weapon_list[num].rapid;

@@ -394,6 +394,7 @@ class Engine_HTML extends Display {
 
         this.mount_select.selectedIndex = this.engine.GetMountIndex();
         this.pushpull_input.checked = this.engine.GetUsePushPull();
+        this.pushpull_input.disabled = !this.engine.CanUsePushPull();
         this.torque_input.checked = this.engine.GetTorqueToStruct();
         this.torque_input.checked = this.engine.GetTorqueToStruct();
         this.torque_input.disabled = !this.engine.CanTorqueToStruct();
@@ -407,7 +408,6 @@ class Engine_HTML extends Display {
         if (e_stats.pulsejet) {
             this.mount_select.disabled = true;
             this.mount_select.selectedIndex = -1;
-            this.pushpull_input.disabled = true;
             for (let i = 0; i < this.mount_select.options.length; i++) {
                 if (this.mount_select.options[i].value == "fuselage") {
                     this.mount_select.options[i].disabled = true;
@@ -419,7 +419,6 @@ class Engine_HTML extends Display {
         }
         else {
             this.mount_select.disabled = false;
-            this.pushpull_input.disabled = false;
             var can_mount = this.engine.CanMountIndex();
             for (let i = 0; i < this.mount_select.options.length; i++) {
                 this.mount_select.options[i].disabled = !can_mount[i];

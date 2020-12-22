@@ -432,6 +432,19 @@ class Engine extends Part {
             for (let i = 0; i < can.length; ++i) {
                 can[i] = this.mount_list[i].helicopter;
             }
+        } else if (this.use_pp) {
+            for (let i = 0; i < can.length; ++i) {
+                if (this.mount_list[i].mount_type == "fuselage"
+                    && this.mount_list[i].name != "Fuselage Push-Pull") {
+                    can[i] = false;
+                }
+            }
+        } else {
+            for (let i = 0; i < can.length; ++i) {
+                if (this.mount_list[i].name == "Fuselage Push-Pull") {
+                    can[i] = false;
+                }
+            }
         }
         return can;
     }
@@ -451,12 +464,24 @@ class Engine extends Part {
         return this.selected_mount;
     }
 
+    public CanUsePushPull() {
+        return !(this.is_generator || this.GetIsPulsejet() || this.is_helicopter);
+    }
+
     public SetUsePushPull(use: boolean) {
         this.use_pp = use;
-        if (use)
+        if (use) {
             this.cooling_count *= 2;
-        else
+            if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
+                this.selected_mount = 8;
+            }
+        }
+        else {
             this.cooling_count /= 2;
+            if (this.mount_list[this.selected_mount].name == "Fuselage Push-Pull") {
+                this.selected_mount = 0;
+            }
+        }
         this.CalculateStats();
     }
 
@@ -525,7 +550,7 @@ class Engine extends Part {
     }
 
     public CanTorqueToStruct() {
-        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].mount_type == "wing";
+        return this.use_pp && this.etype_stats.torque > 0;
     }
 
     public UpdateReliability(num: number) {
@@ -659,7 +684,7 @@ class Engine extends Part {
     }
 
     public GetGeneratorEnabled() {
-        return !this.GetIsPulsejet();
+        return !(this.GetIsPulsejet() || this.use_pp);
     }
 
     public GetGenerator() {
@@ -705,7 +730,8 @@ class Engine extends Part {
         if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Tractor"
-            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
+            || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
 
     public GetTractor() {
@@ -719,7 +745,8 @@ class Engine extends Part {
         if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
-            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+            || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
 
     public GetPusher() {
@@ -734,6 +761,7 @@ class Engine extends Part {
             if (this.use_ds &&
                 (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
                     || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+                    || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull"
                 )) { //Uses Extended Driveshafts, can be arty, and rotary engine
                 return [true, true];
             }
@@ -768,7 +796,9 @@ class Engine extends Part {
     public IsTractorRotary() {
         if (this.GetGenerator())
             return false;
-        return this.IsRotary() && this.mount_list[this.selected_mount].name == "Tractor";
+        return this.IsRotary() &&
+            (this.mount_list[this.selected_mount].name == "Tractor"
+                || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull");
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -794,14 +824,10 @@ class Engine extends Part {
         if (this.etype_stats.oiltank)
             stats.mass += 1;
 
-        if (this.mount_list[this.selected_mount].mount_type == "fuselage")
-            stats.latstab -= this.etype_stats.torque;
-        else if (this.mount_list[this.selected_mount].mount_type == "wing") {
-            if (this.torque_to_struct)
-                stats.structure -= this.etype_stats.torque;
-            else
-                stats.maxstrain -= this.etype_stats.torque;
-        }
+        if (this.torque_to_struct)
+            stats.structure -= this.etype_stats.torque;
+        else
+            stats.maxstrain -= this.etype_stats.torque;
 
         //ContraRotary Engines need geared propellers to function.
         if (this.IsContraRotary()) {
@@ -836,8 +862,8 @@ class Engine extends Part {
         //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
         if (this.cowl_sel != 0 &&
             (this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher" ||
-                this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")
-            || (this.use_pp && this.mount_list[this.selected_mount].mount_type == "fuselage")) {
+                this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+                || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull")) {
             stats.cost += 2;
         }
 

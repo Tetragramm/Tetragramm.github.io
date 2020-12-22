@@ -240,8 +240,9 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "fuselage",
-                "powerfactor": 0.9,
-                "helicopter": false
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false
             },
             {
                 "name": "Center-Mounted Tractor",
@@ -254,8 +255,9 @@
                 "dragfactor": 0,
                 "location": "fuselage",
                 "reqED": true,
-                "powerfactor": 0.9,
-                "helicopter": true
+                "powerfactor": 1,
+                "helicopter": true,
+                "pushpull": false
             },
             {
                 "name": "Rear-Mounted Pusher",
@@ -268,8 +270,9 @@
                 "dragfactor": 0,
                 "escape": -2,
                 "location": "fuselage",
-                "powerfactor": 0.9,
-                "helicopter": false
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false
             },
             {
                 "name": "Center-Mounted Pusher",
@@ -283,8 +286,9 @@
                 "escape": -2,
                 "location": "fuselage",
                 "reqTail": true,
-                "powerfactor": 0.9,
-                "helicopter": false
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false
             },
             {
                 "name": "Pod",
@@ -297,7 +301,8 @@
                 "dragfactor": 0,
                 "location": "pod",
                 "powerfactor": 0.9,
-                "helicopter": true
+                "helicopter": true,
+                "pushpull": true
             },
             {
                 "name": "Nacelle (Inside)",
@@ -310,7 +315,8 @@
                 "dragfactor": 0,
                 "location": "wing",
                 "powerfactor": 0.8,
-                "helicopter": false
+                "helicopter": false,
+                "pushpull": true
             },
             {
                 "name": "Nacelle (Offset)",
@@ -323,7 +329,8 @@
                 "dragfactor": 1,
                 "location": "wing",
                 "powerfactor": 0.8,
-                "helicopter": false
+                "helicopter": false,
+                "pushpull": true
             },
             {
                 "name": "Channel Tractor",
@@ -336,7 +343,20 @@
                 "dragfactor": 0,
                 "location": "wing",
                 "powerfactor": 0.9,
-                "helicopter": false
+                "helicopter": false,
+                "pushpull": true
+            },
+            {
+                "name": "Fuselage Push-Pull",
+                "reqsections": 2,
+                "pitchstab": -2,
+                "escape": -2,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "fuselage",
+                "powerfactor": 0.9,
+                "helicopter": false,
+                "pushpull": true
             }
         ],
         "radiator-type": [
@@ -1762,14 +1782,14 @@
             },
             {
                 "name": "Intercom System",
-                "charge": 0.0001,
+                "charge": 1.0e-9,
                 "cost": 1
             },
             {
                 "name": "Radio Receiver",
                 "mass": 2,
                 "drag": 2,
-                "charge": 0.0001,
+                "charge": 1.0e-9,
                 "cost": 3
             },
             {
@@ -1788,7 +1808,7 @@
             },
             {
                 "name": "Whalebone Radio Receiver",
-                "charge": 0.0001,
+                "charge": 1.0e-9,
                 "cost": 5
             },
             {
@@ -1802,7 +1822,7 @@
                 "name": "Radio Receiver (High Quality)",
                 "mass": 1,
                 "drag": 2,
-                "charge": -1,
+                "charge": 1.0e-9,
                 "cost": 6
             },
             {
@@ -1852,7 +1872,7 @@
             },
             {
                 "name": "Searchlight",
-                "charge": 0.0001,
+                "charge": 1.0e-9,
                 "cost": 1
             }
         ],
@@ -1870,7 +1890,7 @@
             },
             {
                 "name": "Basic Fan",
-                "charge": 0.0001,
+                "charge": 1.0e-9,
                 "req_radiator": false
             },
             {

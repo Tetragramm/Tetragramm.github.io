@@ -2307,6 +2307,21 @@ class Engine extends Part {
                 can[i] = this.mount_list[i].helicopter;
             }
         }
+        else if (this.use_pp) {
+            for (let i = 0; i < can.length; ++i) {
+                if (this.mount_list[i].mount_type == "fuselage"
+                    && this.mount_list[i].name != "Fuselage Push-Pull") {
+                    can[i] = false;
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < can.length; ++i) {
+                if (this.mount_list[i].name == "Fuselage Push-Pull") {
+                    can[i] = false;
+                }
+            }
+        }
         return can;
     }
     SetMountIndex(num) {
@@ -2322,12 +2337,23 @@ class Engine extends Part {
             return -1;
         return this.selected_mount;
     }
+    CanUsePushPull() {
+        return !(this.is_generator || this.GetIsPulsejet() || this.is_helicopter);
+    }
     SetUsePushPull(use) {
         this.use_pp = use;
-        if (use)
+        if (use) {
             this.cooling_count *= 2;
-        else
+            if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
+                this.selected_mount = 8;
+            }
+        }
+        else {
             this.cooling_count /= 2;
+            if (this.mount_list[this.selected_mount].name == "Fuselage Push-Pull") {
+                this.selected_mount = 0;
+            }
+        }
         this.CalculateStats();
     }
     GetUsePushPull() {
@@ -2384,7 +2410,7 @@ class Engine extends Part {
         return this.torque_to_struct;
     }
     CanTorqueToStruct() {
-        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].mount_type == "wing";
+        return this.use_pp && this.etype_stats.torque > 0;
     }
     UpdateReliability(num) {
         this.total_reliability = this.etype_stats.stats.reliability;
@@ -2499,7 +2525,7 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetGeneratorEnabled() {
-        return !this.GetIsPulsejet();
+        return !(this.GetIsPulsejet() || this.use_pp);
     }
     GetGenerator() {
         return this.is_generator;
@@ -2540,7 +2566,8 @@ class Engine extends Part {
         if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Tractor"
-            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
+            || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
     GetTractor() {
         return {
@@ -2552,7 +2579,8 @@ class Engine extends Part {
         if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
-            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+            || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
     GetPusher() {
         return {
@@ -2564,7 +2592,8 @@ class Engine extends Part {
         if (this.gp_count > 0 && !this.GetGenerator()) {
             if (this.use_ds &&
                 (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
-                    || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")) { //Uses Extended Driveshafts, can be arty, and rotary engine
+                    || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+                    || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull")) { //Uses Extended Driveshafts, can be arty, and rotary engine
                 return [true, true];
             }
             else if (!this.etype_stats.oiltank) { //Not rotary, so room for gun but not arty.
@@ -2596,7 +2625,9 @@ class Engine extends Part {
     IsTractorRotary() {
         if (this.GetGenerator())
             return false;
-        return this.IsRotary() && this.mount_list[this.selected_mount].name == "Tractor";
+        return this.IsRotary() &&
+            (this.mount_list[this.selected_mount].name == "Tractor"
+                || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull");
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -2616,14 +2647,10 @@ class Engine extends Part {
         stats.upkeep = stats.power / 10;
         if (this.etype_stats.oiltank)
             stats.mass += 1;
-        if (this.mount_list[this.selected_mount].mount_type == "fuselage")
-            stats.latstab -= this.etype_stats.torque;
-        else if (this.mount_list[this.selected_mount].mount_type == "wing") {
-            if (this.torque_to_struct)
-                stats.structure -= this.etype_stats.torque;
-            else
-                stats.maxstrain -= this.etype_stats.torque;
-        }
+        if (this.torque_to_struct)
+            stats.structure -= this.etype_stats.torque;
+        else
+            stats.maxstrain -= this.etype_stats.torque;
         //ContraRotary Engines need geared propellers to function.
         if (this.IsContraRotary()) {
             this.gp_count = Math.max(1, this.gp_count);
@@ -2653,8 +2680,8 @@ class Engine extends Part {
         //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
         if (this.cowl_sel != 0 &&
             (this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher" ||
-                this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")
-            || (this.use_pp && this.mount_list[this.selected_mount].mount_type == "fuselage")) {
+                this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+                || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull")) {
             stats.cost += 2;
         }
         //Air Cooling Fan (only 1 / push-pull)
@@ -7208,7 +7235,6 @@ class WeaponSystem extends Part {
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
         this.final_weapon.jam = this.weapon_list[num].jam;
-        console.log(StringFmt.Format("ActionSel = {0}", this.action_sel));
         if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
@@ -10128,6 +10154,7 @@ class Engine_HTML extends Display {
         this.intake_fan.checked = this.engine.GetIntakeFan();
         this.mount_select.selectedIndex = this.engine.GetMountIndex();
         this.pushpull_input.checked = this.engine.GetUsePushPull();
+        this.pushpull_input.disabled = !this.engine.CanUsePushPull();
         this.torque_input.checked = this.engine.GetTorqueToStruct();
         this.torque_input.checked = this.engine.GetTorqueToStruct();
         this.torque_input.disabled = !this.engine.CanTorqueToStruct();
@@ -10140,7 +10167,6 @@ class Engine_HTML extends Display {
         if (e_stats.pulsejet) {
             this.mount_select.disabled = true;
             this.mount_select.selectedIndex = -1;
-            this.pushpull_input.disabled = true;
             for (let i = 0; i < this.mount_select.options.length; i++) {
                 if (this.mount_select.options[i].value == "fuselage") {
                     this.mount_select.options[i].disabled = true;
@@ -10152,7 +10178,6 @@ class Engine_HTML extends Display {
         }
         else {
             this.mount_select.disabled = false;
-            this.pushpull_input.disabled = false;
             var can_mount = this.engine.CanMountIndex();
             for (let i = 0; i < this.mount_select.options.length; i++) {
                 this.mount_select.options[i].disabled = !can_mount[i];
