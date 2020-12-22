@@ -2680,8 +2680,6 @@ class Engine extends Part {
             stats.maxstrain *= 2;
             stats.upkeep *= 2;
             stats.reqsections *= 2;
-            if (this.mount_list[this.selected_mount].name == "Pod")
-                stats.reqsections -= 1;
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
         //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost

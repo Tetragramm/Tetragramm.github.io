@@ -348,7 +348,7 @@
             },
             {
                 "name": "Fuselage Push-Pull",
-                "reqsections": 1,
+                "reqsections": 2,
                 "pitchstab": -2,
                 "escape": -2,
                 "strainfactor": 0,
