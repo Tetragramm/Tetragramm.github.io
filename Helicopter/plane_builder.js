@@ -3236,10 +3236,18 @@ class Engines extends Part {
         var rotationT = 0;
         for (let e of this.engines) {
             if (e.IsRotary()) {
-                if (e.IsTractor())
+                if (e.GetUsePushPull() && e.GetTorqueToStruct()) {
+                    // No change to RotationT
+                }
+                else if (e.GetUsePushPull() && e.IsTractor()) {
+                    rotationT += 2;
+                }
+                else if (e.GetTractor()) {
                     rotationT++;
-                if (e.IsPusher())
+                }
+                else if (e.IsPusher()) {
                     rotationT--;
+                }
             }
         }
         if (rotationT > 0) {
