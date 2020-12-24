@@ -1263,7 +1263,7 @@ class EngineBuilder {
         var Cool = this.CoolingTable[this.cool_sel];
         var EngineForce = this.engine_displacement * this.compression_ratio / 10;
         var Cost = (this.UpgradeCost() + EngineForce);
-        var PlusBSandEra = this.quality_fudge * Era.cost * Cost;
+        var PlusBSandEra = Era.cost * Cost;
         if (Cool.radiator > 0) {
             PlusBSandEra *= 1.4;
         }
@@ -1459,13 +1459,13 @@ function CreateFlexSection(elem) {
 }
 function CreateTH(row, content) {
     var th = document.createElement("TH");
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
 function CreateTD(row, content) {
     var th = document.createElement("TD");
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
@@ -3197,6 +3197,16 @@ class Accessories extends Part {
             if (e > 0)
                 return true;
         }
+        for (let i = 0; i < this.clim_list.length; i++) {
+            if (this.clim_sel[i] && this.clim_list[i].stats.charge != 0)
+                return true;
+        }
+        for (let i = 0; i < this.visi_list.length; i++) {
+            if (this.visi_sel[i] && this.visi_list[i].stats.charge != 0)
+                return true;
+        }
+        if (this.radio_list[this.radio_sel].stats.charge != 0)
+            return true;
         if (this.auto_list[this.auto_sel].stats.charge != 0)
             return true;
         return false;
@@ -3242,7 +3252,7 @@ class Accessories extends Part {
             if (AP == 2) {
                 count -= this.skin_armour;
             }
-            stats.mass += count * AP;
+            stats.mass += count * Math.pow(2, AP - 1);
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
             stats.toughness += this.armour_coverage[i] * AP;
             if (eff_armour[i] > 0) {
@@ -3310,6 +3320,7 @@ class Localization {
             return this.languages["en"][key];
         }
         else {
+            console.log("Failed to find " + key);
             return "!" + key + "!";
         }
     }
@@ -3481,6 +3492,8 @@ class Cockpit extends Part {
         this.CalculateStats();
     }
     GetVisibility() {
+        if (this.types[this.selected_type].stats.visibility < -10)
+            return -1 / 0;
         return this.total_visibility;
     }
     GetFlightStress() {
@@ -4181,6 +4194,21 @@ class Engine extends Part {
                 can[i] = this.mount_list[i].helicopter;
             }
         }
+        else if (this.use_pp) {
+            for (let i = 0; i < can.length; ++i) {
+                if (this.mount_list[i].mount_type == "fuselage"
+                    && this.mount_list[i].name != "Fuselage Push-Pull") {
+                    can[i] = false;
+                }
+            }
+        }
+        else {
+            for (let i = 0; i < can.length; ++i) {
+                if (this.mount_list[i].name == "Fuselage Push-Pull") {
+                    can[i] = false;
+                }
+            }
+        }
         return can;
     }
     SetMountIndex(num) {
@@ -4196,12 +4224,23 @@ class Engine extends Part {
             return -1;
         return this.selected_mount;
     }
+    CanUsePushPull() {
+        return !(this.is_generator || this.GetIsPulsejet() || this.is_helicopter);
+    }
     SetUsePushPull(use) {
         this.use_pp = use;
-        if (use)
+        if (use) {
             this.cooling_count *= 2;
-        else
+            if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
+                this.selected_mount = 8;
+            }
+        }
+        else {
             this.cooling_count /= 2;
+            if (this.mount_list[this.selected_mount].name == "Fuselage Push-Pull") {
+                this.selected_mount = 0;
+            }
+        }
         this.CalculateStats();
     }
     GetUsePushPull() {
@@ -4258,7 +4297,7 @@ class Engine extends Part {
         return this.torque_to_struct;
     }
     CanTorqueToStruct() {
-        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.selected_mount].mount_type == "wing";
+        return this.use_pp && this.etype_stats.torque > 0;
     }
     UpdateReliability(num) {
         this.total_reliability = this.etype_stats.stats.reliability;
@@ -4373,7 +4412,7 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetGeneratorEnabled() {
-        return !this.GetIsPulsejet();
+        return !(this.GetIsPulsejet() || this.use_pp);
     }
     GetGenerator() {
         return this.is_generator;
@@ -4414,7 +4453,8 @@ class Engine extends Part {
         if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Tractor"
-            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor";
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
+            || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
     GetTractor() {
         return {
@@ -4426,7 +4466,8 @@ class Engine extends Part {
         if (this.is_helicopter || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
-            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher";
+            || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+            || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
     GetPusher() {
         return {
@@ -4438,7 +4479,8 @@ class Engine extends Part {
         if (this.gp_count > 0 && !this.GetGenerator()) {
             if (this.use_ds &&
                 (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
-                    || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")) { //Uses Extended Driveshafts, can be arty, and rotary engine
+                    || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+                    || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull")) { //Uses Extended Driveshafts, can be arty, and rotary engine
                 return [true, true];
             }
             else if (!this.etype_stats.oiltank) { //Not rotary, so room for gun but not arty.
@@ -4470,7 +4512,9 @@ class Engine extends Part {
     IsTractorRotary() {
         if (this.GetGenerator())
             return false;
-        return this.IsRotary() && this.mount_list[this.selected_mount].name == "Tractor";
+        return this.IsRotary() &&
+            (this.mount_list[this.selected_mount].name == "Tractor"
+                || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull");
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -4490,13 +4534,13 @@ class Engine extends Part {
         stats.upkeep = stats.power / 10;
         if (this.etype_stats.oiltank)
             stats.mass += 1;
-        if (this.mount_list[this.selected_mount].mount_type == "fuselage")
-            stats.latstab -= this.etype_stats.torque;
-        else if (this.mount_list[this.selected_mount].mount_type == "wing") {
-            if (this.torque_to_struct)
-                stats.structure -= this.etype_stats.torque;
-            else
+        if (this.torque_to_struct)
+            stats.structure -= this.etype_stats.torque;
+        else {
+            if (this.mount_list[this.selected_mount].mount_type == "wing")
                 stats.maxstrain -= this.etype_stats.torque;
+            else if (this.mount_list[this.selected_mount].mount_type == "fuselage")
+                stats.latstab -= this.etype_stats.torque;
         }
         //ContraRotary Engines need geared propellers to function.
         if (this.IsContraRotary()) {
@@ -4522,13 +4566,14 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.upkeep *= 2;
+            stats.reqsections *= 2;
             stats.power = Math.floor(1.0e-6 + this.mount_list[this.selected_mount].powerfactor * stats.power);
         }
         //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
         if (this.cowl_sel != 0 &&
             (this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher" ||
-                this.mount_list[this.selected_mount].name == "Center-Mounted Pusher")
-            || (this.use_pp && this.mount_list[this.selected_mount].mount_type == "fuselage")) {
+                this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
+                || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull")) {
             stats.cost += 2;
         }
         //Air Cooling Fan (only 1 / push-pull)
@@ -5078,20 +5123,28 @@ class Engines extends Part {
         var rotationT = 0;
         for (let e of this.engines) {
             if (e.IsRotary()) {
-                if (e.IsTractor())
+                if (e.GetUsePushPull() && e.GetTorqueToStruct()) {
+                    // No change to RotationT
+                }
+                else if (e.GetUsePushPull() && e.IsTractor()) {
+                    rotationT += 2;
+                }
+                else if (e.GetTractor()) {
                     rotationT++;
-                else if (e.IsPusher())
+                }
+                else if (e.IsPusher()) {
                     rotationT--;
+                }
             }
         }
         if (rotationT > 0) {
             stats.warnings.push({
-                source: "Rotary", warning: lu("Rotary Right Warning")
+                source: lu("Rotary"), warning: lu("Rotary Right Warning")
             });
         }
         else if (rotationT < 0) {
             stats.warnings.push({
-                source: "Rotary", warning: lu("Rotary Left Warning")
+                source: lu("Rotary"), warning: lu("Rotary Left Warning")
             });
         }
         //Part local, gets handled in UpdateReliability
@@ -6329,6 +6382,9 @@ class Wings extends Part {
                 biggest_deck = w.deck;
                 biggest_span = w.span;
             }
+            else if (w.area == biggest_area) {
+                biggest_deck = -1;
+            }
             if (smallest_area > w.area) {
                 smallest_area = w.area;
                 smallest_span = w.span;
@@ -6451,7 +6507,7 @@ class Wings extends Part {
         stats.latstab += Math.min(0, longest_span - 8);
         //Sesquiplanes!
         var sesp = this.GetIsSesquiplane();
-        if (sesp.is || this.GetMonoplane()) {
+        if ((sesp.is || this.GetMonoplane()) && sesp.deck != -1) {
             stats = stats.Add(this.long_list[sesp.deck].stats);
             stats.drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
         }
@@ -6770,16 +6826,17 @@ class Stabilizers extends Part {
         //Additional stabilizers
         stats.drag += 2 * (Math.max(0, this.hstab_count - 1) + Math.max(0, this.vstab_count - 1));
         //Pairs of stabilizers
-        var pairs = 0;
-        if (this.vstab_list[this.vstab_sel].is_vtail) //V-Tail
-            pairs = this.hstab_count - 1;
-        else
-            pairs = Math.min(this.hstab_count, this.vstab_count) - 1;
-        pairs = Math.max(0, pairs);
-        var leftovers = Math.max(this.hstab_count - 1, this.vstab_count - 1) - pairs;
-        var es_pairs = Math.min(this.engine_count - 1, pairs);
-        leftovers += 2 * (pairs - es_pairs);
-        stats.control += 3 * es_pairs + leftovers;
+        if (this.vstab_list[this.vstab_sel].increment != 0) {
+            var leftovers = Math.max(0, this.hstab_count - 1);
+            var es_pairs = Math.min(this.engine_count - 1, this.vstab_count - 1);
+            leftovers += Math.max(0, this.vstab_count - 1 - es_pairs);
+            stats.control += 3 * es_pairs + leftovers;
+        }
+        else {
+            var es_pairs = Math.max(0, Math.min(this.engine_count - 1, this.hstab_count - 1));
+            leftovers = Math.max(0, this.hstab_count - 1 - es_pairs);
+            stats.control += 3 * es_pairs + leftovers;
+        }
         return stats;
     }
 }
@@ -6911,7 +6968,10 @@ class ControlSurfaces extends Part {
     GetFlapCost(mp) {
         if (mp)
             this.mp = mp;
-        return Math.max(1, Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp));
+        if (this.flaps_list[this.flaps_sel].costfactor > 0)
+            return Math.max(1, Math.floor(1.0e-6 + this.flaps_list[this.flaps_sel].costfactor * this.mp));
+        else
+            return 0;
     }
     GetSlatsList() {
         return this.slats_list;
@@ -6972,8 +7032,8 @@ class ControlSurfaces extends Part {
                 stats.cost += 2 * this.wing_area;
             }
             if (this.is_boom) {
-                stats.pitchstab -= 1;
-                stats.latstab -= 1;
+                stats.pitchstab -= 2;
+                stats.latstab -= 2;
                 stats.warnings.push({
                     source: lu("Wing Warping"),
                     warning: lu("Wing Warping Warning")
@@ -7377,7 +7437,7 @@ class Fuel extends Part {
         }
         this.self_sealing = false;
         this.is_cantilever = false;
-        this.wing_area = 0;
+        this.wing_area = -1;
     }
     toJSON() {
         return {
@@ -7390,6 +7450,7 @@ class Fuel extends Part {
         this.tank_count = js["tank_count"];
         this.self_sealing = js["self_sealing"];
         this.fire_extinguisher = js["fire_extinguisher"];
+        this.wing_area = -1;
     }
     serialize(s) {
         s.PushNumArr(this.tank_count);
@@ -7400,6 +7461,7 @@ class Fuel extends Part {
         this.tank_count = d.GetNumArr();
         this.self_sealing = d.GetBool();
         this.fire_extinguisher = d.GetBool();
+        this.wing_area = -1;
     }
     GetTankList() {
         return this.tank_stats;
@@ -7442,36 +7504,39 @@ class Fuel extends Part {
         this.wing_area = num;
     }
     VerifyOK() {
-        //Count cantilever dependent tanks.
-        var ccount = 0;
-        for (let i = 0; i < this.tank_count.length; i++) {
-            if (this.tank_stats[i].cantilever)
-                ccount += this.tank_count[i];
-        }
-        //How many can you have?
-        var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
-        if (!this.is_cantilever)
-            allowed = 0;
-        //Do you have more than the allowed?
-        var diff = ccount - allowed;
-        var mod = diff > 0;
-        //Loop over and reduce by one until you don't.
-        while (diff > 0) {
-            for (let i = this.tank_count.length - 1; i >= 0; i--) {
-                if (this.tank_stats[i].cantilever) {
-                    this.tank_count[i]--;
-                    diff--;
-                    break;
+        if (this.wing_area != -1) {
+            //Count cantilever dependent tanks.
+            var ccount = 0;
+            for (let i = 0; i < this.tank_count.length; i++) {
+                if (this.tank_stats[i].cantilever)
+                    ccount += this.tank_count[i];
+            }
+            //How many can you have?
+            var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
+            if (!this.is_cantilever)
+                allowed = 0;
+            //Do you have more than the allowed?
+            var diff = ccount - allowed;
+            var mod = diff > 0;
+            //Loop over and reduce by one until you don't.
+            while (diff > 0) {
+                for (let i = this.tank_count.length - 1; i >= 0; i--) {
+                    if (this.tank_stats[i].cantilever) {
+                        this.tank_count[i]--;
+                        diff--;
+                        break;
+                    }
                 }
             }
-        }
-        //Limit microtanks to 4
-        for (let i = 0; i < this.tank_count.length; i++) {
-            if (this.tank_stats[i].stats.wetmass == 0) {
-                this.tank_count[i] = Math.min(4, this.tank_count[i]);
+            //Limit microtanks to 4
+            for (let i = 0; i < this.tank_count.length; i++) {
+                if (this.tank_stats[i].stats.wetmass == 0) {
+                    this.tank_count[i] = Math.min(4, this.tank_count[i]);
+                }
             }
+            return mod;
         }
-        return mod;
+        return false;
     }
     GetSealingEnabled() {
         var internal_count = 0;
@@ -8188,7 +8253,8 @@ var SynchronizationType;
     SynchronizationType[SynchronizationType["SYNCH"] = 1] = "SYNCH";
     SynchronizationType[SynchronizationType["SPINNER"] = 2] = "SPINNER";
     SynchronizationType[SynchronizationType["DEFLECT"] = 3] = "DEFLECT";
-    SynchronizationType[SynchronizationType["ENUM_MAX"] = 4] = "ENUM_MAX";
+    SynchronizationType[SynchronizationType["NO_INTERFERENCE"] = 4] = "NO_INTERFERENCE";
+    SynchronizationType[SynchronizationType["ENUM_MAX"] = 5] = "ENUM_MAX";
 })(SynchronizationType || (SynchronizationType = {}));
 var ProjectileType;
 (function (ProjectileType) {
@@ -8350,7 +8416,7 @@ class Weapon extends Part {
     }
     CanSynch(num) {
         if (!this.fixed && !this.wing) {
-            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) {
+            if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT || num == SynchronizationType.NO_INTERFERENCE) {
                 return true;
             }
             else {
@@ -8577,6 +8643,12 @@ class Weapon extends Part {
             stats.warnings.push({
                 source: lu(this.weapon_type.name),
                 warning: lu("Deflector Plate Warning"),
+            });
+        }
+        else if (this.synchronization == SynchronizationType.NO_INTERFERENCE) {
+            stats.warnings.push({
+                source: lu(this.weapon_type.name) + " " + lu("No Interference"),
+                warning: lu("No Interference Warning"),
             });
         }
         if (this.wing_reinforcement)
@@ -8937,8 +9009,15 @@ class WeaponSystem extends Part {
         this.directions[num] = use;
         this.CalculateStats();
     }
-    GetWeaponCount() {
+    GetMountingCount() {
         return this.weapons.length;
+    }
+    GetWeaponCount() {
+        var count = 0;
+        for (let w of this.weapons) {
+            count += w.GetCount();
+        }
+        return count;
     }
     SWC(num) {
         if (num != num || num < 1)
@@ -8953,7 +9032,7 @@ class WeaponSystem extends Part {
             this.weapons.pop();
         }
     }
-    SetWeaponCount(num) {
+    SetMountingCount(num) {
         if (this.final_weapon.size == 16 || this.final_weapon.name == "Precision Rifle")
             num = 1;
         this.SWC(num);
@@ -9089,7 +9168,7 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
     SetHavePropeller(have) {
-        if (this.has_propeller && !have) {
+        if (this.has_propeller && !have && this.action_sel == ActionType.MECHANICAL) {
             this.has_propeller = have;
             this.SetAction(ActionType.STANDARD);
         }
@@ -9249,7 +9328,7 @@ class Weapons extends Part {
     constructor(js) {
         super();
         this.direction_list = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
-        this.synchronization_list = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate"];
+        this.synchronization_list = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate", "No Interference"];
         this.action_list = [
             { name: "Standard Action" },
             { name: "Mechanical Action" },
@@ -10607,54 +10686,54 @@ class Aircraft {
     VitalComponentList() {
         var derived = this.GetDerivedStats();
         var vital = [];
-        vital.push(lu("Controls"));
+        vital.push(lu("Vital Part Controls"));
         for (let i = 0; i < this.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push(lu("Aircrew") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Aircrew", i + 1));
         }
         if (derived.FuelUses > 0) {
-            vital.push(lu("Fuel Tanks"));
+            vital.push(lu("Vital Part Fuel Tanks"));
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfEngines(); i++) {
             if (this.GetEngines().GetEngine(i).GetUsePushPull()) {
-                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                vital.push(lu("Vital Part Engine Pusher", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                    vital.push(lu("Vital Part Oil Tank Pusher", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Pusher"));
+                    vital.push(lu("Vital Part Oil Cooler Pusher", i + 1));
                 }
-                vital.push(lu("Engine") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                vital.push(lu("Vital Part Engine Puller", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                    vital.push(lu("Vital Part Oil Tank Puller", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString() + " " + lu("Puller"));
+                    vital.push(lu("Vital Part Oil Cooler Puller", i + 1));
                 }
             }
             else {
-                vital.push(lu("Engine") + " #" + (i + 1).toString());
+                vital.push(lu("Vital Part Engine", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
-                    vital.push(lu("Oil Tank") + " #" + (i + 1).toString());
+                    vital.push(lu("Vital Part Oil Tank", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
-                    vital.push(lu("Oil Cooler") + " #" + (i + 1).toString());
+                    vital.push(lu("Vital Part Oil Cooler", i + 1));
                 }
             }
         }
         for (let i = 0; i < this.GetEngines().GetNumberOfRadiators(); i++) {
-            vital.push(lu("Radiator") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Radiator", i + 1));
         }
         if (this.IsElectrics()) {
-            vital.push(lu("Electrics"));
+            vital.push(lu("Vital Part Electrics"));
         }
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
-            vital.push(lu("Weapon Set") + " #" + (i + 1).toString());
+            vital.push(lu("Vital Part Weapon Set", i + 1));
         }
         if (this.GetLandingGear().IsVital()) {
-            vital.push(lu("Landing Gear"));
+            vital.push(lu("Vital Part Landing Gear"));
         }
         if (this.rotor.GetTailRotor()) {
-            vital.push(lu("Tail Rotor"));
+            vital.push(lu("Vital Part Tail Rotor"));
         }
         return vital;
     }
