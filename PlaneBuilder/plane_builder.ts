@@ -78,9 +78,9 @@ const init = () => {
     window.onscroll = SetScroll;
     window.onload = () => {
         console.log("onload " + document.getElementById("Flight").offsetTop);
-        location.hash = ihash;
+        // location.hash = ihash;
         setTimeout(() => {
-            // location.hash = ihash;
+            location.hash = ihash;
             console.log("Timeout " + document.getElementById("Flight").offsetTop);
         }, 500);
     };
