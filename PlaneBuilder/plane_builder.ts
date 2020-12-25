@@ -19,9 +19,9 @@ const init = () => {
         .then(
             resp => {
                 var string_JSON = resp[0];
-                var parts_JSON = resp[1];
-                var engine_JSON = resp[2];
-                var weapon_JSON = resp[3];
+                parts_JSON = resp[1];
+                engine_JSON = resp[2];
+                weapon_JSON = resp[3];
                 //Strings bit
                 local = new Localization(string_JSON);
                 if (lang) {
@@ -149,8 +149,8 @@ function SetScroll(ev) {
 }
 
 var parts_JSON: JSON;
-var engine_json: JSON;
-var weapon_json: JSON;
+var engine_JSON: JSON;
+var weapon_JSON: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
 var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);

@@ -12672,7 +12672,7 @@ class Aircraft_HTML extends Display {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result);
-                    var acft = new Aircraft(parts_JSON, weapon_json, false);
+                    var acft = new Aircraft(parts_JSON, weapon_JSON, false);
                     if (acft.fromJSON(str)) {
                         str = JSON.parse(reader.result);
                         console.log(str);
@@ -12691,7 +12691,7 @@ class Aircraft_HTML extends Display {
         load_text_area.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area.value);
-                var acft = new Aircraft(parts_JSON, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_JSON, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
@@ -12708,7 +12708,7 @@ class Aircraft_HTML extends Display {
         load_text_area2.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area2.value);
-                var acft = new Aircraft(parts_JSON, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_JSON, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
@@ -14232,9 +14232,9 @@ const init = () => {
         .then(ps => Promise.all(ps.map(p => p.json())))
         .then(resp => {
         var string_JSON = resp[0];
-        var parts_JSON = resp[1];
-        var engine_JSON = resp[2];
-        var weapon_JSON = resp[3];
+        parts_JSON = resp[1];
+        engine_JSON = resp[2];
+        weapon_JSON = resp[3];
         //Strings bit
         local = new Localization(string_JSON);
         if (lang) {
@@ -14362,8 +14362,8 @@ function SetScroll(ev) {
     }
 }
 var parts_JSON;
-var engine_json;
-var weapon_json;
+var engine_JSON;
+var weapon_JSON;
 var aircraft_model;
 var aircraft_display;
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);

@@ -214,7 +214,7 @@ class Aircraft_HTML extends Display {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result as string);
-                    var acft = new Aircraft(parts_JSON, weapon_json, false);
+                    var acft = new Aircraft(parts_JSON, weapon_JSON, false);
                     if (acft.fromJSON(str)) {
                         str = JSON.parse(reader.result as string);
                         console.log(str);
@@ -234,7 +234,7 @@ class Aircraft_HTML extends Display {
         load_text_area.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area.value);
-                var acft = new Aircraft(parts_JSON, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_JSON, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
@@ -249,7 +249,7 @@ class Aircraft_HTML extends Display {
         load_text_area2.onchange = () => {
             try {
                 var str = JSON.parse(load_text_area2.value);
-                var acft = new Aircraft(parts_JSON, weapon_json, false);
+                var acft = new Aircraft(parts_JSON, weapon_JSON, false);
                 if (acft.fromJSON(str)) {
                     this.acft.fromJSON(str);
                     this.acft.CalculateStats();
