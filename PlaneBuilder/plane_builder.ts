@@ -9,7 +9,7 @@ const init = () => {
     var qp = sp.get("json");
     var ep = sp.get("engine");
     var lang = sp.get("lang");
-    var ihash = window.location.hash;
+    ihash = window.location.hash;
     location.hash = "";
     loadJSON('/Helicopter/strings.json', (string_resp) => {
         local = new Localization(JSON.parse(string_resp));
@@ -67,15 +67,20 @@ const init = () => {
                     }
 
                     aircraft_model.CalculateStats();
-
-                    location.hash = ihash;
-                    window.onscroll = SetScroll;
                 });
             });
         });
     });
+
+    window.onscroll = SetScroll;
+    location.hash = ihash;
+    setTimeout(() => { location.hash = ihash; }, 500);
+    // window.onload = () => {
+    //     location.hash = ihash;
+    //     window.history.replaceState(null, null, "index.html" + ihash);
+    // };
 }
-window.onload = init;
+init();
 
 var hash = "";
 function SetScroll(ev) {
@@ -89,26 +94,26 @@ function SetScroll(ev) {
                 newhash = "Passengers";
                 if (off > document.getElementById("Engines").offsetTop) {
                     newhash = "Engines";
-                    if (off > document.getElementById("Propeller").offsetTop) {
-                        newhash = "Propeller";
-                        if (off > document.getElementById("Frames").offsetTop) {
-                            newhash = "Frames";
-                            if (off > document.getElementById("Tail").offsetTop) {
-                                newhash = "Tail";
-                                if (off > document.getElementById("Wings").offsetTop) {
-                                    newhash = "Wings";
-                                    if (off > document.getElementById("Stabilizers").offsetTop) {
-                                        newhash = "Stabilizers";
-                                        if (off > document.getElementById("ControlSurfaces").offsetTop) {
-                                            newhash = "ControlSurfaces";
-                                            if (off > document.getElementById("Reinforcements").offsetTop) {
-                                                newhash = "Reinforcements";
-                                                if (off > document.getElementById("Load").offsetTop) {
-                                                    newhash = "Load";
-                                                    if (off > document.getElementById("Landing_Gear").offsetTop) {
-                                                        newhash = "Landing_Gear";
-                                                        if (off > document.getElementById("Accessories").offsetTop) {
-                                                            newhash = "Accessories";
+                    if (off > document.getElementById("Frames").offsetTop) {
+                        newhash = "Frames";
+                        if (off > document.getElementById("Tail").offsetTop) {
+                            newhash = "Tail";
+                            if (off > document.getElementById("Wings").offsetTop) {
+                                newhash = "Wings";
+                                if (off > document.getElementById("Stabilizers").offsetTop) {
+                                    newhash = "Stabilizers";
+                                    if (off > document.getElementById("ControlSurfaces").offsetTop) {
+                                        newhash = "ControlSurfaces";
+                                        if (off > document.getElementById("Reinforcements").offsetTop) {
+                                            newhash = "Reinforcements";
+                                            if (off > document.getElementById("Load").offsetTop) {
+                                                newhash = "Load";
+                                                if (off > document.getElementById("Landing_Gear").offsetTop) {
+                                                    newhash = "Landing_Gear";
+                                                    if (off > document.getElementById("Accessories").offsetTop) {
+                                                        newhash = "Accessories";
+                                                        if (off > document.getElementById("Propeller").offsetTop) {
+                                                            newhash = "Propeller";
                                                             if (off > document.getElementById("Optimization").offsetTop) {
                                                                 newhash = "Optimization";
                                                                 if (off > document.getElementById("Stats").offsetTop) {
@@ -145,6 +150,7 @@ var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
 var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
 var local: Localization;
+var ihash: string;
 
 function lu(s: string, ...args: any[]): string {
     return StringFmt.Format(local.e(s), ...args);

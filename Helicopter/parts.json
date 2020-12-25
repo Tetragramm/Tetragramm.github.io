@@ -354,7 +354,6 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "fuselage",
-                "reqTail": true,
                 "powerfactor": 0.9,
                 "helicopter": false,
                 "pushpull": true

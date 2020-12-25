@@ -1261,9 +1261,10 @@ class EngineBuilder {
     CalcCost() {
         var Era = this.EraTable[this.era_sel];
         var Cool = this.CoolingTable[this.cool_sel];
+        var Quality = Math.max(1, this.quality_fudge);
         var EngineForce = this.engine_displacement * this.compression_ratio / 10;
         var Cost = (this.UpgradeCost() + EngineForce);
-        var PlusBSandEra = Era.cost * Cost;
+        var PlusBSandEra = Quality * Era.cost * Cost;
         if (Cool.radiator > 0) {
             PlusBSandEra *= 1.4;
         }
@@ -7162,7 +7163,7 @@ class Reinforcement extends Part {
         return this.cant_list;
     }
     CanExternalWood() {
-        var can = [...Array(this.ext_wood_list.length).fill(true)];
+        var can = [...Array(this.ext_wood_list.length).fill(this.has_wing)];
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_wood_list.length; i++) {
                 can[i] = this.ext_wood_list[i].small_sqp;
@@ -7181,7 +7182,7 @@ class Reinforcement extends Part {
         this.CalculateStats();
     }
     CanExternalSteel() {
-        var can = [...Array(this.ext_steel_list.length).fill(true)];
+        var can = [...Array(this.ext_steel_list.length).fill(this.has_wing)];
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_steel_list.length; i++) {
                 can[i] = this.ext_steel_list[i].small_sqp;

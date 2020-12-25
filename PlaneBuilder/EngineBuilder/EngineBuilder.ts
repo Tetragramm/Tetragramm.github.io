@@ -287,9 +287,11 @@ class EngineBuilder {
         var Era = this.EraTable[this.era_sel];
         var Cool = this.CoolingTable[this.cool_sel];
 
+        var Quality = Math.max(1, this.quality_fudge);
+
         var EngineForce = this.engine_displacement * this.compression_ratio / 10;
         var Cost = (this.UpgradeCost() + EngineForce);
-        var PlusBSandEra = Era.cost * Cost;
+        var PlusBSandEra = Quality * Era.cost * Cost;
         if (Cool.radiator > 0) {
             PlusBSandEra *= 1.4;
         }

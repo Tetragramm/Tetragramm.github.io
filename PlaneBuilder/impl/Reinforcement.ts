@@ -144,7 +144,7 @@ class Reinforcement extends Part {
     }
 
     public CanExternalWood() {
-        var can = [...Array(this.ext_wood_list.length).fill(true)];
+        var can = [...Array(this.ext_wood_list.length).fill(this.has_wing)];
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_wood_list.length; i++) {
                 can[i] = this.ext_wood_list[i].small_sqp;
@@ -166,7 +166,7 @@ class Reinforcement extends Part {
     }
 
     public CanExternalSteel() {
-        var can = [...Array(this.ext_steel_list.length).fill(true)];
+        var can = [...Array(this.ext_steel_list.length).fill(this.has_wing)];
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_steel_list.length; i++) {
                 can[i] = this.ext_steel_list[i].small_sqp;
