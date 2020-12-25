@@ -92,7 +92,7 @@ class Cards {
         this.dash_image = document.getElementById("dash_img") as HTMLImageElement;
         this.dash_image.width = 1122;
         this.dash_image.height = 786;
-        this.dash_image.src = './Cards/Dashboard.png';
+        // this.dash_image.src = './Cards/Dashboard.png';
 
         this.weap_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
         this.weap_canvas.width = 483;
@@ -100,7 +100,7 @@ class Cards {
         this.weap_image = document.getElementById("weap_img") as HTMLImageElement;
         this.weap_image.width = 483;
         this.weap_image.height = 291;
-        this.weap_image.src = './Cards/Weapon.png';
+        // this.weap_image.src = './Cards/Weapon.png';
 
         this.eng_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
         this.eng_canvas.width = 483;
@@ -108,7 +108,7 @@ class Cards {
         this.eng_image = document.getElementById("eng_img") as HTMLImageElement;
         this.eng_image.width = 483;
         this.eng_image.height = 289;
-        this.eng_image.src = './Cards/Engine.png';
+        // this.eng_image.src = './Cards/Engine.png';
 
         this.rad_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
         this.rad_canvas.width = 479;
@@ -116,7 +116,7 @@ class Cards {
         this.rad_image = document.getElementById("rad_img") as HTMLImageElement;
         this.rad_image.width = 479;
         this.rad_image.height = 290;
-        this.rad_image.src = './Cards/Radiator.png';
+        // this.rad_image.src = './Cards/Radiator.png';
 
         this.npc_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
         this.npc_canvas.width = 482;

@@ -12252,28 +12252,28 @@ class Cards {
         this.dash_image = document.getElementById("dash_img");
         this.dash_image.width = 1122;
         this.dash_image.height = 786;
-        this.dash_image.src = './Cards/Dashboard.png';
+        // this.dash_image.src = './Cards/Dashboard.png';
         this.weap_canvas = document.createElement("CANVAS");
         this.weap_canvas.width = 483;
         this.weap_canvas.height = 291;
         this.weap_image = document.getElementById("weap_img");
         this.weap_image.width = 483;
         this.weap_image.height = 291;
-        this.weap_image.src = './Cards/Weapon.png';
+        // this.weap_image.src = './Cards/Weapon.png';
         this.eng_canvas = document.createElement("CANVAS");
         this.eng_canvas.width = 483;
         this.eng_canvas.height = 289;
         this.eng_image = document.getElementById("eng_img");
         this.eng_image.width = 483;
         this.eng_image.height = 289;
-        this.eng_image.src = './Cards/Engine.png';
+        // this.eng_image.src = './Cards/Engine.png';
         this.rad_canvas = document.createElement("CANVAS");
         this.rad_canvas.width = 479;
         this.rad_canvas.height = 290;
         this.rad_image = document.getElementById("rad_img");
         this.rad_image.width = 479;
         this.rad_image.height = 290;
-        this.rad_image.src = './Cards/Radiator.png';
+        // this.rad_image.src = './Cards/Radiator.png';
         this.npc_canvas = document.createElement("CANVAS");
         this.npc_canvas.width = 482;
         this.npc_canvas.height = 290;
@@ -14224,77 +14224,81 @@ const init = () => {
     var qp = sp.get("json");
     var ep = sp.get("engine");
     var lang = sp.get("lang");
-    ihash = window.location.hash;
+    var ihash = window.location.hash;
     location.hash = "";
-    loadJSON('/Helicopter/strings.json', (string_resp) => {
-        local = new Localization(JSON.parse(string_resp));
+    var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
+    var proms = jsons.map(d => fetch(d));
+    Promise.all(proms)
+        .then(ps => Promise.all(ps.map(p => p.json())))
+        .then(resp => {
+        var string_JSON = resp[0];
+        var parts_JSON = resp[1];
+        var engine_JSON = resp[2];
+        var weapon_JSON = resp[3];
+        //Strings bit
+        local = new Localization(string_JSON);
         if (lang) {
             local.SetLanguages(lang);
         }
         else if (window.localStorage.getItem("language")) {
             local.SetLanguages(window.localStorage.getItem("language"));
         }
-        loadJSON('/Helicopter/parts.json', (part_resp) => {
-            // Parse JSON string into object
-            let acft_data = window.localStorage.aircraft;
-            parts_JSON = JSON.parse(part_resp);
-            loadJSON('/Helicopter/engines.json', (engine_resp) => {
-                engine_json = JSON.parse(engine_resp);
-                var nameliststr = window.localStorage.getItem("engines_names");
-                var namelist = [];
-                if (nameliststr) {
-                    namelist = JSON.parse(nameliststr);
-                    for (let n of namelist) {
-                        engine_list.set(n, new EngineList(n));
-                    }
-                }
-                for (let el of engine_json["lists"]) {
-                    if (!engine_list.has(el["name"]))
-                        engine_list.set(el["name"], new EngineList(el["name"]));
-                    engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
-                }
-                loadJSON('/Helicopter/weapons.json', (weapon_resp) => {
-                    weapon_json = JSON.parse(weapon_resp);
-                    aircraft_model = new Aircraft(parts_JSON, weapon_json, true);
-                    aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
-                    var loaded = false;
-                    if (qp && !loaded) {
-                        console.log("Used Query Parameter");
-                        try {
-                            var str = LZString.decompressFromEncodedURIComponent(qp);
-                            var arr = _stringToArrayBuffer(str);
-                            var des = new Deserialize(arr);
-                            aircraft_model.deserialize(des);
-                            loaded = true;
-                        }
-                        catch (e) {
-                            console.log("Compressed Query Parameter Failed.");
-                            console.log(e);
-                            aircraft_model.Reset();
-                        }
-                    }
-                    if (acft_data && !loaded) {
-                        console.log("Used Saved Data");
-                        try {
-                            loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
-                        }
-                        catch (_a) {
-                            console.log("Saved Data Failed.");
-                            aircraft_model.Reset();
-                        }
-                    }
-                    aircraft_model.CalculateStats();
-                });
-            });
-        });
+        //Parts bit
+        let acft_data = window.localStorage.aircraft;
+        //Engine bit
+        var nameliststr = window.localStorage.getItem("engines_names");
+        var namelist = [];
+        if (nameliststr) {
+            namelist = JSON.parse(nameliststr);
+            for (let n of namelist) {
+                engine_list.set(n, new EngineList(n));
+            }
+        }
+        for (let el of engine_JSON["lists"]) {
+            if (!engine_list.has(el["name"]))
+                engine_list.set(el["name"], new EngineList(el["name"]));
+            engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
+        }
+        //Weapons bit
+        aircraft_model = new Aircraft(parts_JSON, weapon_JSON, true);
+        aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
+        var loaded = false;
+        if (qp && !loaded) {
+            console.log("Used Query Parameter");
+            try {
+                var str = LZString.decompressFromEncodedURIComponent(qp);
+                var arr = _stringToArrayBuffer(str);
+                var des = new Deserialize(arr);
+                aircraft_model.deserialize(des);
+                loaded = true;
+            }
+            catch (e) {
+                console.log("Compressed Query Parameter Failed.");
+                console.log(e);
+                aircraft_model.Reset();
+            }
+        }
+        if (acft_data && !loaded) {
+            console.log("Used Saved Data");
+            try {
+                loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
+            }
+            catch (_a) {
+                console.log("Saved Data Failed.");
+                aircraft_model.Reset();
+            }
+        }
+        aircraft_model.CalculateStats();
     });
     window.onscroll = SetScroll;
-    location.hash = ihash;
-    setTimeout(() => { location.hash = ihash; }, 500);
-    // window.onload = () => {
-    //     location.hash = ihash;
-    //     window.history.replaceState(null, null, "index.html" + ihash);
-    // };
+    window.onload = () => {
+        console.log("onload " + document.getElementById("Flight").offsetTop);
+        location.hash = ihash;
+        setTimeout(() => {
+            // location.hash = ihash;
+            console.log("Timeout " + document.getElementById("Flight").offsetTop);
+        }, 500);
+    };
 };
 init();
 var hash = "";
@@ -14364,7 +14368,6 @@ var aircraft_model;
 var aircraft_display;
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);
 var local;
-var ihash;
 function lu(s, ...args) {
     return StringFmt.Format(local.e(s), ...args);
 }
