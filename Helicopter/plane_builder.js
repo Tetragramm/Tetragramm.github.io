@@ -14442,12 +14442,12 @@ const init = () => {
             }
         }
         aircraft_model.CalculateStats();
+        loaded = true;
     });
     window.addEventListener("load", () => {
         scrollToFragment();
         // location.hash = ihash;
         setTimeout(() => { window.onscroll = SetScroll; }, 1000);
-        loaded = true;
     });
 };
 window.addEventListener("DOMContentLoaded", init);

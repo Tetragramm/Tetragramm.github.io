@@ -73,6 +73,7 @@ const init = () => {
                 }
 
                 aircraft_model.CalculateStats();
+                loaded = true;
             }
         );
 
@@ -80,7 +81,6 @@ const init = () => {
         scrollToFragment();
         // location.hash = ihash;
         setTimeout(() => { window.onscroll = SetScroll; }, 1000);
-        loaded = true;
     });
 }
 window.addEventListener("DOMContentLoaded", init);
