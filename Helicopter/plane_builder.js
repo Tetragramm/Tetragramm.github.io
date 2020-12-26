@@ -12907,7 +12907,7 @@ class Aircraft_HTML extends Display {
         var dlist = aircraft_model.GetWeapons().GetDirectionList();
         var name = this.WeaponName(w);
         if (w.IsPlural()) {
-            name = w.GetWeaponCount().toString() + "x " + lu(name);
+            name = w.GetWeaponCount().toString() + "x " + name;
         }
         var ds = w.GetDirection();
         var dtag = "";
@@ -12925,7 +12925,7 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.hits = w.GetHits();
         this.cards.weap_data.jam = w.GetJam();
         this.cards.weap_data.tags = [dtag];
-        this.cards.weap_data.type = lu(name);
+        this.cards.weap_data.type = name;
         this.cards.weap_data.abrv = fweap.abrv;
         this.cards.weap_data.reload = fweap.reload;
         if (fweap.rapid) {
