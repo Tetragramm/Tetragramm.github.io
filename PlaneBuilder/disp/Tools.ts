@@ -276,7 +276,7 @@ function BlinkNeutral(elem: HTMLElement) {
 }
 
 function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
-    if (loaded) {
+    if (enable_anim) {
         if (elem.textContent != str) {
             if (positive_good == null) {
                 BlinkNeutral(elem);

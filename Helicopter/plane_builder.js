@@ -9531,7 +9531,7 @@ function BlinkNeutral(elem) {
     elem.classList.toggle("changed_n");
 }
 function BlinkIfChanged(elem, str, positive_good = null) {
-    if (loaded) {
+    if (enable_anim) {
         if (elem.textContent != str) {
             if (positive_good == null) {
                 BlinkNeutral(elem);
@@ -14442,7 +14442,7 @@ const init = () => {
             }
         }
         aircraft_model.CalculateStats();
-        loaded = true;
+        enable_anim = true;
     });
     window.addEventListener("load", () => {
         scrollToFragment();
@@ -14476,7 +14476,7 @@ var aircraft_model;
 var aircraft_display;
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);
 var local;
-var loaded = false;
+var enable_anim = false;
 function lu(s, ...args) {
     return StringFmt.Format(local.e(s), ...args);
 }
