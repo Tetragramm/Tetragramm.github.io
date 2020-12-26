@@ -80,6 +80,7 @@ const init = () => {
         scrollToFragment();
         // location.hash = ihash;
         setTimeout(() => { window.onscroll = SetScroll; }, 1000);
+        loaded = true;
     });
 }
 window.addEventListener("DOMContentLoaded", init);
@@ -109,6 +110,7 @@ var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
 var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
 var local: Localization;
+var loaded = false;
 
 function lu(s: string, ...args: any[]): string {
     return StringFmt.Format(local.e(s), ...args);

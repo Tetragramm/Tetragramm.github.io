@@ -276,15 +276,17 @@ function BlinkNeutral(elem: HTMLElement) {
 }
 
 function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
-    if (elem.textContent != str) {
-        if (positive_good == null) {
-            BlinkNeutral(elem);
-        } else {
-            var positive = parseInt(elem.textContent) < parseInt(str);
-            if (positive_good && positive || (!positive_good && !positive)) {
-                BlinkGood(elem);
+    if (loaded) {
+        if (elem.textContent != str) {
+            if (positive_good == null) {
+                BlinkNeutral(elem);
             } else {
-                BlinkBad(elem);
+                var positive = parseInt(elem.textContent) < parseInt(str);
+                if (positive_good && positive || (!positive_good && !positive)) {
+                    BlinkGood(elem);
+                } else {
+                    BlinkBad(elem);
+                }
             }
         }
     }

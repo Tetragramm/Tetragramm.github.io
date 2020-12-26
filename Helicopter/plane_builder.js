@@ -9531,17 +9531,19 @@ function BlinkNeutral(elem) {
     elem.classList.toggle("changed_n");
 }
 function BlinkIfChanged(elem, str, positive_good = null) {
-    if (elem.textContent != str) {
-        if (positive_good == null) {
-            BlinkNeutral(elem);
-        }
-        else {
-            var positive = parseInt(elem.textContent) < parseInt(str);
-            if (positive_good && positive || (!positive_good && !positive)) {
-                BlinkGood(elem);
+    if (loaded) {
+        if (elem.textContent != str) {
+            if (positive_good == null) {
+                BlinkNeutral(elem);
             }
             else {
-                BlinkBad(elem);
+                var positive = parseInt(elem.textContent) < parseInt(str);
+                if (positive_good && positive || (!positive_good && !positive)) {
+                    BlinkGood(elem);
+                }
+                else {
+                    BlinkBad(elem);
+                }
             }
         }
     }
@@ -14445,6 +14447,7 @@ const init = () => {
         scrollToFragment();
         // location.hash = ihash;
         setTimeout(() => { window.onscroll = SetScroll; }, 1000);
+        loaded = true;
     });
 };
 window.addEventListener("DOMContentLoaded", init);
@@ -14473,6 +14476,7 @@ var aircraft_model;
 var aircraft_display;
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);
 var local;
+var loaded = false;
 function lu(s, ...args) {
     return StringFmt.Format(local.e(s), ...args);
 }
