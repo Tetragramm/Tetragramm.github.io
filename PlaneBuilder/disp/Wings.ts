@@ -62,14 +62,15 @@ class Wings_HTML extends Display {
         this.swept.onchange = () => { this.wings.SetSwept(this.swept.checked); };
 
         var tbl = document.getElementById("wing_table") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Wings Wing Type"));
         CreateTH(row, lu("Wings Wing Options"));
         CreateTH(row, lu("Wings Wing Stats"));
 
-        var full_row = tbl.insertRow();
+        var full_row = insertRow(fragment);
         CreateTH(full_row, lu("Wings Full Wings"));
-        var mini_row = tbl.insertRow();
+        var mini_row = insertRow(fragment);
         CreateTH(mini_row, lu("Wings Miniature Wings"));
 
         this.full_cell = full_row.insertCell();
@@ -77,6 +78,7 @@ class Wings_HTML extends Display {
         var stat_cell = full_row.insertCell();
         stat_cell.rowSpan = 0;
         this.InitStatDisplay(stat_cell);
+        tbl.appendChild(fragment);
     }
 
     private InitStatDisplay(stat_cell: HTMLTableCellElement) {

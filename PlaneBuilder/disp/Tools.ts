@@ -239,6 +239,18 @@ function FlexSpace(fs: FlexSection) {
     fs.div2.appendChild(lbl2);
 }
 
+function insertRow(frag: DocumentFragment) {
+    var row = document.createElement("TR") as HTMLTableRowElement;
+    frag.append(row);
+    return row;
+}
+
+function insertCell(frag: DocumentFragment) {
+    var cell = document.createElement("TD") as HTMLTableCellElement;
+    frag.append(cell);
+    return cell;
+}
+
 function BlinkBad(elem: HTMLElement) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);

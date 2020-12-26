@@ -22,19 +22,22 @@ class Engines_HTML extends Display {
         (document.getElementById("lbl_engines") as HTMLLabelElement).textContent = lu("Engines Section Title");
 
         this.tbl = document.getElementById("table_engine") as HTMLTableElement;
-        var row = this.tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Engines Engine Type"));
         CreateTH(row, lu("Engines Options"));
         CreateTH(row, lu("Engines Options 2"));
         CreateTH(row, lu("Engines Engine Stats"));
+        this.tbl.appendChild(fragment);
 
+        fragment = document.createDocumentFragment();
         this.tblR = document.getElementById("table_radiator") as HTMLTableElement;
-        row = this.tblR.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Radiators Radiator Type"));
         CreateTH(row, lu("Radiators Mounting"));
         CreateTH(row, lu("Radiators Coolant"));
         CreateTH(row, lu("Radiators Radiator Stats"));
-
+        this.tblR.appendChild(fragment);
 
         (document.getElementById("lbl_num_engines") as HTMLLabelElement).textContent = lu("Engines Num Engines");
         this.num_engines = document.getElementById("num_engines") as HTMLInputElement;
@@ -63,11 +66,13 @@ class Engines_HTML extends Display {
             this.engines.pop();
             this.tbl.deleteRow(this.engines.length + 1);
         }
+        var fragment = document.createDocumentFragment();
         while (this.engines.length < num) {
             let tst = this.eng.GetEngine(this.engines.length);
-            let en = new Engine_HTML(tst, this.tbl.insertRow());
+            let en = new Engine_HTML(tst, insertRow(fragment));
             this.engines.push(en);
         }
+        this.tbl.appendChild(fragment);
 
         for (let i = 0; i < num; i++) {
             this.engines[i].UpdateEngine(this.eng.GetEngine(i));
@@ -88,10 +93,12 @@ class Engines_HTML extends Display {
             this.radiators.pop();
             this.tblR.deleteRow(this.radiators.length + 1);
         }
+        fragment = document.createDocumentFragment();
         while (this.radiators.length < rad) {
-            let en = new Radiator_HTML(this.tblR.insertRow(), this.eng.GetRadiator(this.radiators.length));
+            let en = new Radiator_HTML(insertRow(fragment), this.eng.GetRadiator(this.radiators.length));
             this.radiators.push(en);
         }
+        this.tblR.appendChild(fragment);
 
         for (let i = 0; i < rad; i++) {
             this.radiators[i].UpdateRadiator(this.eng.GetRadiator(i));

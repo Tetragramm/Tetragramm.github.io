@@ -31,11 +31,12 @@ class Cockpit_HTML extends Display {
         this.sft_chbxs = [];
         this.gun_chbxs = [];
 
-        var option = this.row.insertCell();
-        var upgrades = this.row.insertCell();
-        var safety = this.row.insertCell();
-        var gunsights = this.row.insertCell();
-        var stat_cell = this.row.insertCell();
+        var fragment = document.createDocumentFragment();
+        var option = insertCell(fragment);
+        var upgrades = insertCell(fragment);
+        var safety = insertCell(fragment);
+        var gunsights = insertCell(fragment);
+        var stat_cell = insertCell(fragment);
         var tbl = document.createElement("TABLE") as HTMLTableElement;
         var h1_row = tbl.insertRow();
         CreateTH(h1_row, lu("Stat Mass"));
@@ -127,6 +128,8 @@ class Cockpit_HTML extends Display {
 
         //Set the change event, add the box, and execute it.
         this.sel_type.onchange = () => { this.cockpit.SetType(this.sel_type.selectedIndex); };
+
+        this.row.appendChild(fragment);
     }
 
     public UpdateCockpit(cp: Cockpit) {

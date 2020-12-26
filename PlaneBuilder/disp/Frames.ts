@@ -57,14 +57,15 @@ class Frames_HTML extends Display {
         (document.getElementById("lbl_frames") as HTMLLabelElement).textContent = lu("Frames Frames and Covering");
 
         var table = document.getElementById("table_frames") as HTMLTableElement;
-        var row = table.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         this.all_frame = document.createElement("SELECT") as HTMLSelectElement;
         this.all_skin = document.createElement("SELECT") as HTMLSelectElement;
         CreateTH(row, lu("Frames Frame Type")).append(document.createElement("BR"), this.all_frame);
         CreateTH(row, lu("Frames Skin Type")).append(document.createElement("BR"), this.all_skin);
         CreateTH(row, lu("Frames Frame Options"));
         CreateTH(row, lu("Frames Frame Stats"));
-        row = table.insertRow();
+        row = insertRow(fragment);
         this.c_frame = row.insertCell();
         this.c_skin = row.insertCell();
         this.c_options = row.insertCell();
@@ -110,12 +111,12 @@ class Frames_HTML extends Display {
 
         this.c_stats.appendChild(tbl);
 
-        var row3 = table.insertRow();
+        var row3 = insertRow(fragment);
         CreateTH(row3, lu("Frames Tail Frame Type"));
         CreateTH(row3, lu("Frames Tail Skin Type"));
         CreateTH(row3, lu("Frames Tail Frame Options"));
 
-        var row4 = table.insertRow();
+        var row4 = insertRow(fragment);
         this.t_frame = row4.insertCell();
         this.t_skin = row4.insertCell();
         this.t_options = row4.insertCell();
@@ -160,6 +161,8 @@ class Frames_HTML extends Display {
         this.t_farman.onchange = () => { this.frames.SetUseFarman(this.t_farman.checked); };
         this.t_boom.onchange = () => { this.frames.SetUseBoom(this.t_boom.checked); };
         this.t_fwing.onchange = () => { this.frames.SetFlyingWing(this.t_fwing.checked); };
+
+        table.appendChild(fragment);
     }
 
     public UpdateDisplay() {

@@ -49,7 +49,8 @@ class Weapons_HTML extends Display {
     }
 
     private CreateWSetRow() {
-        var row = this.tbl.insertRow(this.wrow.length + 1);
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         var setcell = row.insertCell();
         var fs = CreateFlexSection(setcell);
 
@@ -147,6 +148,7 @@ class Weapons_HTML extends Display {
         type.stats.damg = c3_row.insertCell();
         type.stats.shots = c3_row.insertCell();
 
+        this.tbl.appendChild(fragment);
         return type;
     }
 

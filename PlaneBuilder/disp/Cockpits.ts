@@ -16,7 +16,8 @@ class Cockpits_HTML extends Display {
         (document.getElementById("lbl_num_cockpits") as HTMLLabelElement).textContent = lu("Cockpit Num Cockpits");
 
         this.tbl = document.getElementById("table_cockpit") as HTMLTableElement;
-        var row = this.tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Cockpit Option"));
         CreateTH(row, lu("Cockpit Upgrade"));
         CreateTH(row, lu("Cockpit Safety Options"));
@@ -27,6 +28,7 @@ class Cockpits_HTML extends Display {
         this.counter.onchange = (e) => {
             this.cockpits.SetNumberOfCockpits(this.counter.valueAsNumber);
         };
+        this.tbl.appendChild(fragment);
     }
 
     private CounterChange() {

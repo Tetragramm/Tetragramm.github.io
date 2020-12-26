@@ -9499,6 +9499,16 @@ function FlexSpace(fs) {
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
 }
+function insertRow(frag) {
+    var row = document.createElement("TR");
+    frag.append(row);
+    return row;
+}
+function insertCell(frag) {
+    var cell = document.createElement("TD");
+    frag.append(cell);
+    return cell;
+}
 function BlinkBad(elem) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
@@ -9578,12 +9588,13 @@ class Era_HTML extends Display {
         this.model = m;
         document.getElementById("lbl_era").textContent = lu("Era Section Title");
         var tbl = document.getElementById("table_era");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Era Option"));
         CreateTH(row, lu("Stat Lift Bleed"));
         CreateTH(row, lu("Stat Cost"));
         CreateTH(row, lu("Stat Pitch Stability"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         var selcell = row.insertCell();
         //Get used elements
         this.select = document.createElement("SELECT");
@@ -9603,6 +9614,7 @@ class Era_HTML extends Display {
             opt.text = lu(elem.name);
             this.select.add(opt);
         }
+        tbl.appendChild(fragment);
     }
     UpdateDisplay() {
         this.select.selectedIndex = this.model.GetSelected();
@@ -9622,11 +9634,12 @@ class Cockpit_HTML extends Display {
         this.upg_chbxs = [];
         this.sft_chbxs = [];
         this.gun_chbxs = [];
-        var option = this.row.insertCell();
-        var upgrades = this.row.insertCell();
-        var safety = this.row.insertCell();
-        var gunsights = this.row.insertCell();
-        var stat_cell = this.row.insertCell();
+        var fragment = document.createDocumentFragment();
+        var option = insertCell(fragment);
+        var upgrades = insertCell(fragment);
+        var safety = insertCell(fragment);
+        var gunsights = insertCell(fragment);
+        var stat_cell = insertCell(fragment);
         var tbl = document.createElement("TABLE");
         var h1_row = tbl.insertRow();
         CreateTH(h1_row, lu("Stat Mass"));
@@ -9711,6 +9724,7 @@ class Cockpit_HTML extends Display {
         this.bombsight.step = "1";
         //Set the change event, add the box, and execute it.
         this.sel_type.onchange = () => { this.cockpit.SetType(this.sel_type.selectedIndex); };
+        this.row.appendChild(fragment);
     }
     UpdateCockpit(cp) {
         this.cockpit = cp;
@@ -9752,7 +9766,8 @@ class Cockpits_HTML extends Display {
         document.getElementById("lbl_cockpits").textContent = lu("Cockpit Section Title");
         document.getElementById("lbl_num_cockpits").textContent = lu("Cockpit Num Cockpits");
         this.tbl = document.getElementById("table_cockpit");
-        var row = this.tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Cockpit Option"));
         CreateTH(row, lu("Cockpit Upgrade"));
         CreateTH(row, lu("Cockpit Safety Options"));
@@ -9763,6 +9778,7 @@ class Cockpits_HTML extends Display {
         this.counter.onchange = (e) => {
             this.cockpits.SetNumberOfCockpits(this.counter.valueAsNumber);
         };
+        this.tbl.appendChild(fragment);
     }
     CounterChange() {
         while (this.positions.length > this.counter.valueAsNumber) {
@@ -9799,7 +9815,8 @@ class Passengers_HTML extends Display {
         this.pass = pass;
         document.getElementById("lbl_passengers").textContent = lu("Passengers Section Title");
         var tbl = document.getElementById("table_passengers");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Passengers Number of Seats"));
         CreateTH(row, lu("Passengers Number of Beds"));
         CreateTH(row, lu("Passengers Upgrade"));
@@ -9812,7 +9829,7 @@ class Passengers_HTML extends Display {
         // < td id = "passenger_mass" > </td>
         // < td id = "passenger_req_seq" > </td>
         // < /tr>
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.nseats = document.createElement("INPUT");
         this.nseats.type = "number";
         this.nseats.min = "0";
@@ -9837,6 +9854,7 @@ class Passengers_HTML extends Display {
         this.connect.onchange = () => {
             this.pass.SetConnected(this.connect.checked);
         };
+        tbl.appendChild(fragment);
     }
     UpdateDisplay() {
         var stats = this.pass.PartStats();
@@ -10324,17 +10342,21 @@ class Engines_HTML extends Display {
         this.radiators = [];
         document.getElementById("lbl_engines").textContent = lu("Engines Section Title");
         this.tbl = document.getElementById("table_engine");
-        var row = this.tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Engines Engine Type"));
         CreateTH(row, lu("Engines Options"));
         CreateTH(row, lu("Engines Options 2"));
         CreateTH(row, lu("Engines Engine Stats"));
+        this.tbl.appendChild(fragment);
+        fragment = document.createDocumentFragment();
         this.tblR = document.getElementById("table_radiator");
-        row = this.tblR.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Radiators Radiator Type"));
         CreateTH(row, lu("Radiators Mounting"));
         CreateTH(row, lu("Radiators Coolant"));
         CreateTH(row, lu("Radiators Radiator Stats"));
+        this.tblR.appendChild(fragment);
         document.getElementById("lbl_num_engines").textContent = lu("Engines Num Engines");
         this.num_engines = document.getElementById("num_engines");
         this.num_engines.onchange = () => { this.eng.SetNumberOfEngines(this.num_engines.valueAsNumber); };
@@ -10359,11 +10381,13 @@ class Engines_HTML extends Display {
             this.engines.pop();
             this.tbl.deleteRow(this.engines.length + 1);
         }
+        var fragment = document.createDocumentFragment();
         while (this.engines.length < num) {
             let tst = this.eng.GetEngine(this.engines.length);
-            let en = new Engine_HTML(tst, this.tbl.insertRow());
+            let en = new Engine_HTML(tst, insertRow(fragment));
             this.engines.push(en);
         }
+        this.tbl.appendChild(fragment);
         for (let i = 0; i < num; i++) {
             this.engines[i].UpdateEngine(this.eng.GetEngine(i));
         }
@@ -10381,10 +10405,12 @@ class Engines_HTML extends Display {
             this.radiators.pop();
             this.tblR.deleteRow(this.radiators.length + 1);
         }
+        fragment = document.createDocumentFragment();
         while (this.radiators.length < rad) {
-            let en = new Radiator_HTML(this.tblR.insertRow(), this.eng.GetRadiator(this.radiators.length));
+            let en = new Radiator_HTML(insertRow(fragment), this.eng.GetRadiator(this.radiators.length));
             this.radiators.push(en);
         }
+        this.tblR.appendChild(fragment);
         for (let i = 0; i < rad; i++) {
             this.radiators[i].UpdateRadiator(this.eng.GetRadiator(i));
         }
@@ -10439,14 +10465,15 @@ class Frames_HTML extends Display {
         //Translate Section title
         document.getElementById("lbl_frames").textContent = lu("Frames Frames and Covering");
         var table = document.getElementById("table_frames");
-        var row = table.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         this.all_frame = document.createElement("SELECT");
         this.all_skin = document.createElement("SELECT");
         CreateTH(row, lu("Frames Frame Type")).append(document.createElement("BR"), this.all_frame);
         CreateTH(row, lu("Frames Skin Type")).append(document.createElement("BR"), this.all_skin);
         CreateTH(row, lu("Frames Frame Options"));
         CreateTH(row, lu("Frames Frame Stats"));
-        row = table.insertRow();
+        row = insertRow(fragment);
         this.c_frame = row.insertCell();
         this.c_skin = row.insertCell();
         this.c_options = row.insertCell();
@@ -10488,11 +10515,11 @@ class Frames_HTML extends Display {
         this.d_lift = c4_row.insertCell();
         c4_row.insertCell();
         this.c_stats.appendChild(tbl);
-        var row3 = table.insertRow();
+        var row3 = insertRow(fragment);
         CreateTH(row3, lu("Frames Tail Frame Type"));
         CreateTH(row3, lu("Frames Tail Skin Type"));
         CreateTH(row3, lu("Frames Tail Frame Options"));
-        var row4 = table.insertRow();
+        var row4 = insertRow(fragment);
         this.t_frame = row4.insertCell();
         this.t_skin = row4.insertCell();
         this.t_options = row4.insertCell();
@@ -10531,6 +10558,7 @@ class Frames_HTML extends Display {
         this.t_farman.onchange = () => { this.frames.SetUseFarman(this.t_farman.checked); };
         this.t_boom.onchange = () => { this.frames.SetUseBoom(this.t_boom.checked); };
         this.t_fwing.onchange = () => { this.frames.SetFlyingWing(this.t_fwing.checked); };
+        table.appendChild(fragment);
     }
     UpdateDisplay() {
         var section_list = this.frames.GetSectionList();
@@ -10761,19 +10789,21 @@ class Wings_HTML extends Display {
         this.closed.onchange = () => { this.wings.SetClosed(this.closed.checked); };
         this.swept.onchange = () => { this.wings.SetSwept(this.swept.checked); };
         var tbl = document.getElementById("wing_table");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Wings Wing Type"));
         CreateTH(row, lu("Wings Wing Options"));
         CreateTH(row, lu("Wings Wing Stats"));
-        var full_row = tbl.insertRow();
+        var full_row = insertRow(fragment);
         CreateTH(full_row, lu("Wings Full Wings"));
-        var mini_row = tbl.insertRow();
+        var mini_row = insertRow(fragment);
         CreateTH(mini_row, lu("Wings Miniature Wings"));
         this.full_cell = full_row.insertCell();
         this.mini_cell = mini_row.insertCell();
         var stat_cell = full_row.insertCell();
         stat_cell.rowSpan = 0;
         this.InitStatDisplay(stat_cell);
+        tbl.appendChild(fragment);
     }
     InitStatDisplay(stat_cell) {
         stat_cell.className = "inner_table";
@@ -11115,11 +11145,12 @@ class Stabilizers_HTML extends Display {
         this.stab = s;
         document.getElementById("lbl_stab").textContent = lu("Stabilizers Section Title");
         var tbl = document.getElementById("stab_table");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Stabilizers Horizontal Stabilizers"));
         CreateTH(row, lu("Stabilizers Vertical Stabilizers"));
         CreateTH(row, lu("Stabilizers Stabilizer Stats"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         var hcell = row.insertCell();
         var vcell = row.insertCell();
         this.h_type = document.createElement("SELECT");
@@ -11153,6 +11184,7 @@ class Stabilizers_HTML extends Display {
         var stat_cell = row.insertCell();
         stat_cell.rowSpan = 0;
         this.InitStatDisplay(stat_cell);
+        tbl.appendChild(fragment);
     }
     InitStatDisplay(stat_cell) {
         stat_cell.className = "inner_table";
@@ -11208,11 +11240,12 @@ class ControlSurfaces_HTML extends Display {
         this.cs = cs;
         document.getElementById("lbl_control_surfaces").textContent = lu("Control Surfaces Section Title");
         var tbl = document.getElementById("tbl_control_surfaces");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Control Surfaces Control Surfaces"));
         CreateTH(row, lu("Control Surfaces Drag Inducers"));
         CreateTH(row, lu("Control Surfaces Stats"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         var cs_cell = row.insertCell();
         this.aileron_select = document.createElement("SELECT");
         for (let a of cs.GetAileronList()) {
@@ -11266,6 +11299,7 @@ class ControlSurfaces_HTML extends Display {
             this.drag_chbx.push(cbx);
         }
         this.InitStatDisplay(row.insertCell());
+        tbl.appendChild(fragment);
     }
     InitStatDisplay(stat_cell) {
         stat_cell.className = "inner_table";
@@ -11334,14 +11368,16 @@ class Reinforcement_HTML extends Display {
         this.cant_inp = [];
         document.getElementById("lbl_reinforcements").textContent = lu("Reinforcement Section Title");
         var tbl = document.getElementById("tbl_reinforcements");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Reinforcement External Reinforcements"));
         CreateTH(row, lu("Reinforcement Internal Reinforcements"));
         CreateTH(row, lu("Reinforcement Reinforcement Stats"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitExternal(row.insertCell());
         this.InitInternal(row.insertCell());
         this.InitStatDisplay(row.insertCell());
+        tbl.appendChild(fragment);
     }
     InitExternal(cell) {
         var fs = CreateFlexSection(cell);
@@ -11457,16 +11493,18 @@ class Load_HTML extends Display {
         this.fuel_list = [];
         document.getElementById("lbl_load").textContent = lu("Load Section Title");
         var tbl = document.getElementById("tbl_load");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Load Fuel"));
         CreateTH(row, lu("Load Munitions"));
         CreateTH(row, lu("Load Cargo and Passengers"));
         CreateTH(row, lu("Load Load Stats"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitFuel(row.insertCell());
         this.InitMunitions(row.insertCell());
         this.InitCargoAndPassengers(row.insertCell());
         this.InitStats(row.insertCell());
+        tbl.appendChild(fragment);
     }
     InitFuel(cell) {
         var lst = this.fuel.GetTankList();
@@ -11582,14 +11620,16 @@ class LandingGear_HTML extends Display {
         this.gear = gear;
         document.getElementById("lbl_landing_gear").textContent = lu("Landing Gear Section Title");
         var tbl = document.getElementById("tbl_gear");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Landing Gear Landing Gear"));
         CreateTH(row, lu("Landing Gear Extras"));
         CreateTH(row, lu("Landing Gear Gear Stats"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitGear(row.insertCell());
         this.InitExtras(row.insertCell());
         this.InitStats(row.insertCell());
+        tbl.appendChild(fragment);
     }
     InitGear(cell) {
         var lst = this.gear.GetGearList();
@@ -11666,24 +11706,26 @@ class Accessories_HTML extends Display {
         this.acc = acc;
         document.getElementById("lbl_accessories").textContent = lu("Accessories Section Title");
         var tbl = document.getElementById("tbl_accessories");
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Accessories Armour Coverage"));
         CreateTH(row, lu("Accessories Climate"));
         CreateTH(row, lu("Accessories Visibility"));
         CreateTH(row, lu("Accessories Additional Part Stats"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitArmour(row.insertCell());
         this.InitClimate(row.insertCell());
         this.InitVisibility(row.insertCell());
         this.InitStats(row.insertCell());
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Accessories Information"));
         CreateTH(row, lu("Accessories Electrical"));
         CreateTH(row, lu("Accessories Control"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitInformation(row.insertCell());
         this.InitElectrical(row.insertCell());
         this.InitControl(row.insertCell());
+        tbl.appendChild(fragment);
     }
     InitArmour(cell) {
         var fs = CreateFlexSection(cell);
@@ -11856,7 +11898,8 @@ class Optimization_HTML extends Display {
         this.free_inp = document.getElementById("num_opt");
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
         var tbl = document.getElementById("tbl_optimization");
-        var row0 = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row0 = insertRow(fragment);
         CreateTH(row0, lu("Optimization Negative"));
         CreateTH(row0, lu("Optimization Effect"));
         CreateTH(row0, lu("Optimization Positive"));
@@ -11865,16 +11908,17 @@ class Optimization_HTML extends Display {
         // < th > Effect < /th>
         // < th > Positive < /th>
         // < th > Optimization Stats < /th>
-        var row1 = tbl.insertRow();
+        var row1 = insertRow(fragment);
         this.cost_cbx = this.InitRow(row1, lu("Optimization Cost"), (num) => this.opt.SetCost(num));
-        this.bleed_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Lift Bleed"), (num) => this.opt.SetBleed(num));
-        this.escape_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Leg Room"), (num) => this.opt.SetEscape(num));
-        this.mass_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Mass"), (num) => this.opt.SetMass(num));
-        this.toughness_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Toughness"), (num) => this.opt.SetToughness(num));
-        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Max Strain"), (num) => this.opt.SetMaxStrain(num));
-        this.reliability_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Reliability"), (num) => this.opt.SetReliability(num));
-        this.drag_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Drag"), (num) => this.opt.SetDrag(num));
+        this.bleed_cbx = this.InitRow(insertRow(fragment), lu("Optimization Lift Bleed"), (num) => this.opt.SetBleed(num));
+        this.escape_cbx = this.InitRow(insertRow(fragment), lu("Optimization Leg Room"), (num) => this.opt.SetEscape(num));
+        this.mass_cbx = this.InitRow(insertRow(fragment), lu("Optimization Mass"), (num) => this.opt.SetMass(num));
+        this.toughness_cbx = this.InitRow(insertRow(fragment), lu("Optimization Toughness"), (num) => this.opt.SetToughness(num));
+        this.maxstrain_cbx = this.InitRow(insertRow(fragment), lu("Optimization Max Strain"), (num) => this.opt.SetMaxStrain(num));
+        this.reliability_cbx = this.InitRow(insertRow(fragment), lu("Optimization Reliability"), (num) => this.opt.SetReliability(num));
+        this.drag_cbx = this.InitRow(insertRow(fragment), lu("Optimization Drag"), (num) => this.opt.SetDrag(num));
         this.InitStatDisplay(row1.insertCell());
+        tbl.appendChild(fragment);
     }
     InitRow(row, txt, call) {
         var cbxs = [];
@@ -12022,7 +12066,8 @@ class Weapons_HTML extends Display {
         this.wrow = [];
     }
     CreateWSetRow() {
-        var row = this.tbl.insertRow(this.wrow.length + 1);
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         var setcell = row.insertCell();
         var fs = CreateFlexSection(setcell);
         var type = {
@@ -12111,6 +12156,7 @@ class Weapons_HTML extends Display {
         type.stats.hits = c3_row.insertCell();
         type.stats.damg = c3_row.insertCell();
         type.stats.shots = c3_row.insertCell();
+        this.tbl.appendChild(fragment);
         return type;
     }
     CreateWRow(wcell) {
@@ -13113,7 +13159,8 @@ class Aircraft_HTML extends Display {
     //     this.a_crsh.onchange = () => { aircraft_model.GetAlter().stats.crashsafety = this.a_crsh.valueAsNumber; aircraft_model.CalculateStats(); };
     // }
     InitStats(tbl) {
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Stat Lift Bleed"));
         CreateTH(row, lu("Stat Drag"));
         CreateTH(row, lu("Stat Mass"));
@@ -13121,7 +13168,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, lu("Stat Bomb Mass"));
         CreateTH(row, lu("Stat Cost"));
         CreateTH(row, lu("Stat Upkeep"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.d_lift = row.insertCell();
         this.d_drag = row.insertCell();
         this.d_mass = row.insertCell();
@@ -13129,7 +13176,7 @@ class Aircraft_HTML extends Display {
         this.d_bmas = row.insertCell();
         this.d_cost = row.insertCell();
         this.d_upkp = row.insertCell();
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Stat Control"));
         CreateTH(row, lu("Stat Pitch Stability"));
         CreateTH(row, lu("Stat Lateral Stability"));
@@ -13137,7 +13184,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, lu("Stat Raw Strain"));
         CreateTH(row, lu("Stat Structure"));
         CreateTH(row, lu("Stat Toughness"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.d_cont = row.insertCell();
         this.d_pstb = row.insertCell();
         this.d_lstb = row.insertCell();
@@ -13145,7 +13192,7 @@ class Aircraft_HTML extends Display {
         this.d_mstr = row.insertCell();
         this.d_strc = row.insertCell();
         this.d_tugh = row.insertCell();
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Stat Power"));
         CreateTH(row, lu("Stat Fuel Consumption"));
         CreateTH(row, lu("Stat Fuel"));
@@ -13153,7 +13200,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, lu("Stat Pitch Boost"));
         CreateTH(row, lu("Stat Charge"));
         CreateTH(row, lu("Stat Crash Safety"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.d_powr = row.insertCell();
         this.d_fcom = row.insertCell();
         this.d_fuel = row.insertCell();
@@ -13161,9 +13208,11 @@ class Aircraft_HTML extends Display {
         this.d_pbst = row.insertCell();
         this.d_chrg = row.insertCell();
         this.d_crsh = row.insertCell();
+        tbl.appendChild(fragment);
     }
     InitDerived(tbl) {
-        var row0 = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row0 = insertRow(fragment);
         var name_cell = row0.insertCell();
         // Aircraft Name
         name_cell.colSpan = 2;
@@ -13180,7 +13229,7 @@ class Aircraft_HTML extends Display {
         // Rules Version
         CreateTH(row0, lu("Derived Version #"));
         this.version_cell = row0.insertCell();
-        var row1 = tbl.insertRow();
+        var row1 = insertRow(fragment);
         CreateTH(row1, lu("Derived Mass Variations"));
         CreateTH(row1, lu("Derived Boost"));
         CreateTH(row1, lu("Derived Handling"));
@@ -13188,7 +13237,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row1, lu("Derived Stall Speed"));
         CreateTH(row1, lu("Derived Top Speed"));
         CreateTH(row1, lu("Derived Vital Components")).colSpan = 2;
-        this.bomb_row2 = tbl.insertRow();
+        this.bomb_row2 = insertRow(fragment);
         CreateTH(this.bomb_row2, lu("Derived Full Fuel with Bombs"));
         this.boost_fullwB = this.bomb_row2.insertCell();
         this.hand_fullwB = this.bomb_row2.insertCell();
@@ -13198,40 +13247,40 @@ class Aircraft_HTML extends Display {
         this.vital_components = this.bomb_row2.insertCell();
         this.vital_components.rowSpan = 3;
         this.vital_components.colSpan = 3;
-        this.bomb_row1 = tbl.insertRow();
+        this.bomb_row1 = insertRow(fragment);
         CreateTH(this.bomb_row1, lu("Derived Half Fuel with Bombs"));
         this.boost_halfwB = this.bomb_row1.insertCell();
         this.hand_halfwB = this.bomb_row1.insertCell();
         this.roc_halfwB = this.bomb_row1.insertCell();
         this.ss_halfwB = this.bomb_row1.insertCell();
         this.ts_halfwB = this.bomb_row1.insertCell();
-        this.full_row = tbl.insertRow();
+        this.full_row = insertRow(fragment);
         CreateTH(this.full_row, lu("Derived Full Fuel"));
         this.boost_full = this.full_row.insertCell();
         this.hand_full = this.full_row.insertCell();
         this.roc_full = this.full_row.insertCell();
         this.ss_full = this.full_row.insertCell();
         this.ts_full = this.full_row.insertCell();
-        var half = tbl.insertRow();
+        var half = insertRow(fragment);
         CreateTH(half, lu("Derived Half Fuel"));
         this.boost_half = half.insertCell();
         this.hand_half = half.insertCell();
         this.roc_half = half.insertCell();
         this.ss_half = half.insertCell();
         this.ts_half = half.insertCell();
-        var empty = tbl.insertRow();
+        var empty = insertRow(fragment);
         CreateTH(empty, lu("Derived Empty Fuel"));
         this.boost_empty = empty.insertCell();
         this.hand_empty = empty.insertCell();
         this.roc_empty = empty.insertCell();
         this.ss_empty = empty.insertCell();
         this.ts_empty = empty.insertCell();
-        var row7 = tbl.insertRow();
+        var row7 = insertRow(fragment);
         CreateTH(row7, lu("Derived Propulsion")).colSpan = 2;
         CreateTH(row7, lu("Derived Aerodynamics")).colSpan = 2;
         CreateTH(row7, lu("Derived Survivability")).colSpan = 2;
         CreateTH(row7, lu("Derived Crew Members")).colSpan = 2;
-        var row8 = tbl.insertRow();
+        var row8 = insertRow(fragment);
         CreateTH(row8, lu("Derived Dropoff"));
         this.dropoff_cell = row8.insertCell();
         CreateTH(row8, lu("Derived Stability"));
@@ -13240,7 +13289,7 @@ class Aircraft_HTML extends Display {
         this.crashsafety_cell = row8.insertCell();
         CreateTH(row8, lu("Derived Crew/Passengers"));
         this.crew_cell = row8.insertCell();
-        var row9 = tbl.insertRow();
+        var row9 = insertRow(fragment);
         CreateTH(row9, lu("Derived Overspeed"));
         this.overspeed_cell = row9.insertCell();
         CreateTH(row9, lu("Derived Energy Loss"));
@@ -13249,7 +13298,7 @@ class Aircraft_HTML extends Display {
         this.toughness_cell = row9.insertCell();
         CreateTH(row9, lu("Stat Visibility"));
         this.visibility_cell = row9.insertCell();
-        var row10 = tbl.insertRow();
+        var row10 = insertRow(fragment);
         CreateTH(row10, lu("Derived Fuel Uses"));
         this.maxfuel_cell = row10.insertCell();
         CreateTH(row10, lu("Derived Turn Bleed"));
@@ -13258,7 +13307,7 @@ class Aircraft_HTML extends Display {
         this.mxstrain_cell = row10.insertCell();
         CreateTH(row10, lu("Derived Attack Modifier"));
         this.attack_cell = row10.insertCell();
-        var row11 = tbl.insertRow();
+        var row11 = insertRow(fragment);
         CreateTH(row11, lu("Stat Reliability"));
         this.reliability_cell = row11.insertCell();
         CreateTH(row11, lu("Derived Landing Gear"));
@@ -13267,7 +13316,7 @@ class Aircraft_HTML extends Display {
         this.communications_cell = row11.insertCell();
         CreateTH(row11, lu("Derived Escape"));
         this.escape_cell = row11.insertCell();
-        var row12 = tbl.insertRow();
+        var row12 = insertRow(fragment);
         CreateTH(row12, lu("Derived Ideal Engine Altitude"));
         this.maxalt_cell = row12.insertCell();
         CreateTH(row12, lu("Derived Is Flammable Question"));
@@ -13276,14 +13325,15 @@ class Aircraft_HTML extends Display {
         this.electric_cell = row12.insertCell();
         CreateTH(row12, lu("Stat Flight Stress"));
         this.flightstress_cell = row12.insertCell();
-        this.weapon_head = CreateTH(tbl.insertRow(), lu("Derived Weapon Systems"));
+        this.weapon_head = CreateTH(insertRow(fragment), lu("Derived Weapon Systems"));
         this.weapon_head.colSpan = 8;
-        this.weapon_cell = tbl.insertRow().insertCell();
+        this.weapon_cell = insertRow(fragment).insertCell();
         this.weapon_cell.colSpan = 8;
-        this.warning_head = CreateTH(tbl.insertRow(), lu("Derived Special Rules"));
+        this.warning_head = CreateTH(insertRow(fragment), lu("Derived Special Rules"));
         this.warning_head.colSpan = 8;
-        this.warning_cell = tbl.insertRow().insertCell();
+        this.warning_cell = insertRow(fragment).insertCell();
         this.warning_cell.colSpan = 8;
+        tbl.appendChild(fragment);
     }
     UpdateStats() {
         var stats = this.acft.GetStats();
@@ -14391,12 +14441,13 @@ const init = () => {
         }
         aircraft_model.CalculateStats();
     });
-    window.onload = () => {
+    window.addEventListener("load", () => {
         scrollToFragment();
+        // location.hash = ihash;
         setTimeout(() => { window.onscroll = SetScroll; }, 1000);
-    };
+    });
 };
-init();
+window.addEventListener("DOMContentLoaded", init);
 var hash = "";
 function SetScroll(ev) {
     const IDs = ["Era", "Cockpit", "Passengers", "Engines", "Frames", "Tail", "Wings", "Rotors", "Stabilizers", "ControlSurfaces", "Reinforcements", "Weapons", "Load", "Landing_Gear", "Accessories", "Propeller", "Optimization", "Stats", "Flight"];
@@ -14437,17 +14488,18 @@ class Rotor_HTML extends Display {
         this.reinforce_div = document.getElementById("Reinforcements");
         this.control_div = document.getElementById("ControlSurfaces");
         var tbl = document.getElementById("rotor_table");
-        this.InitAutogyro(tbl);
-        this.InitHelicopter(tbl);
-        // this.InitStatDisplay(stat_cell);
+        var fragment = document.createDocumentFragment();
+        this.InitAutogyro(fragment);
+        this.InitHelicopter(fragment);
+        tbl.appendChild(fragment);
     }
-    InitAutogyro(tbl) {
-        this.auto_header = tbl.insertRow();
+    InitAutogyro(fragment) {
+        this.auto_header = insertRow(fragment);
         CreateTH(this.auto_header, lu("Rotor Rotor"));
         CreateTH(this.auto_header, lu("Rotor Material"));
         CreateTH(this.auto_header, lu("Rotor Accessories"));
         CreateTH(this.auto_header, lu("Rotor Stats"));
-        this.auto_row = tbl.insertRow();
+        this.auto_row = insertRow(fragment);
         var rotor_cell = this.auto_row.insertCell();
         var rotor_fs = CreateFlexSection(rotor_cell);
         this.auto_min = document.createElement("LABEL");
@@ -14505,13 +14557,13 @@ class Rotor_HTML extends Display {
         BlinkIfChanged(this.a_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.a_area, stats.wingarea.toString(), true);
     }
-    InitHelicopter(tbl) {
-        this.heli_header = tbl.insertRow();
+    InitHelicopter(fragment) {
+        this.heli_header = insertRow(fragment);
         CreateTH(this.heli_header, lu("Rotor Rotor"));
         CreateTH(this.heli_header, lu("Rotor Material"));
         CreateTH(this.heli_header, lu("Rotor Accessories"));
         CreateTH(this.heli_header, lu("Rotor Stats"));
-        this.heli_row = tbl.insertRow();
+        this.heli_row = insertRow(fragment);
         var rotor_cell = this.heli_row.insertCell();
         var rotor_fs = CreateFlexSection(rotor_cell);
         this.heli_count = document.createElement("INPUT");
@@ -14639,13 +14691,15 @@ class Used_HTML extends Display {
         this.enabled = document.getElementById("is_used");
         this.enabled.onchange = () => { this.used.SetEnabled(this.enabled.checked); };
         this.tbl = document.getElementById("tbl_used");
-        var row = this.tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Used Effect"));
         CreateTH(row, lu("Used Description"));
         CreateTH(row, lu("Used Penalties(+) <br/> Benefits(-)"));
-        this.InitTable(this.tbl);
+        this.InitTable(fragment);
+        this.tbl.appendChild(fragment);
     }
-    InitTable(tbl) {
+    InitTable(fragment) {
         this.burnt_out = document.createElement("INPUT");
         this.ragged = document.createElement("INPUT");
         this.hefty = document.createElement("INPUT");
@@ -14654,42 +14708,42 @@ class Used_HTML extends Display {
         this.fragile = document.createElement("INPUT");
         this.leaky = document.createElement("INPUT");
         this.sluggish = document.createElement("INPUT");
-        var row = tbl.insertRow();
+        var row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Burnt Out");
         row.insertCell().textContent = lu("Used Burnt Out Description");
         var cell = row.insertCell();
         CreateInput("", this.burnt_out, cell, false);
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Ragged");
         row.insertCell().textContent = lu("Used Ragged Description");
         cell = row.insertCell();
         CreateInput("", this.ragged, cell, false);
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Hefty");
         row.insertCell().textContent = lu("Used Hefty Description");
         cell = row.insertCell();
         CreateInput("", this.hefty, cell, false);
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Sticky Guns");
         row.insertCell().textContent = lu("Used Sticky Guns Description");
         cell = row.insertCell();
         CreateInput("", this.sticky_guns, cell, false);
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Weak");
         row.insertCell().textContent = lu("Used Weak Description");
         cell = row.insertCell();
         CreateInput("", this.weak, cell, false);
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Fragile");
         row.insertCell().textContent = lu("Used Fragile Description");
         cell = row.insertCell();
         CreateInput("", this.fragile, cell, false);
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Leaky");
         row.insertCell().textContent = lu("Used Leaky Description");
         cell = row.insertCell();
         CreateInput("", this.leaky, cell, false);
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Sluggish");
         row.insertCell().textContent = lu("Used Sluggish Description");
         cell = row.insertCell();

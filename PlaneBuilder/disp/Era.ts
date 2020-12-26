@@ -14,13 +14,14 @@ class Era_HTML extends Display {
         (document.getElementById("lbl_era") as HTMLLabelElement).textContent = lu("Era Section Title");
 
         var tbl = document.getElementById("table_era") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Era Option"));
         CreateTH(row, lu("Stat Lift Bleed"));
         CreateTH(row, lu("Stat Cost"));
         CreateTH(row, lu("Stat Pitch Stability"));
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
 
         var selcell = row.insertCell();
         //Get used elements
@@ -41,6 +42,7 @@ class Era_HTML extends Display {
             opt.text = lu(elem.name);
             this.select.add(opt);
         }
+        tbl.appendChild(fragment);
     }
 
     public UpdateDisplay() {

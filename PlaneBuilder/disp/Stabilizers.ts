@@ -23,12 +23,13 @@ class Stabilizers_HTML extends Display {
         (document.getElementById("lbl_stab") as HTMLLabelElement).textContent = lu("Stabilizers Section Title");
 
         var tbl = document.getElementById("stab_table") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Stabilizers Horizontal Stabilizers"));
         CreateTH(row, lu("Stabilizers Vertical Stabilizers"));
         CreateTH(row, lu("Stabilizers Stabilizer Stats"));
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         var hcell = row.insertCell();
         var vcell = row.insertCell();
 
@@ -69,6 +70,7 @@ class Stabilizers_HTML extends Display {
         var stat_cell = row.insertCell();
         stat_cell.rowSpan = 0;
         this.InitStatDisplay(stat_cell);
+        tbl.appendChild(fragment);
     }
 
     private InitStatDisplay(stat_cell: HTMLTableCellElement) {

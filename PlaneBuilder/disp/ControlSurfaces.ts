@@ -29,12 +29,13 @@ class ControlSurfaces_HTML extends Display {
         (document.getElementById("lbl_control_surfaces") as HTMLLabelElement).textContent = lu("Control Surfaces Section Title");
 
         var tbl = document.getElementById("tbl_control_surfaces") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Control Surfaces Control Surfaces"));
         CreateTH(row, lu("Control Surfaces Drag Inducers"));
         CreateTH(row, lu("Control Surfaces Stats"));
 
-        row = tbl.insertRow()
+        row = insertRow(fragment);
         var cs_cell = row.insertCell();
 
         this.aileron_select = document.createElement("SELECT") as HTMLSelectElement;
@@ -96,6 +97,7 @@ class ControlSurfaces_HTML extends Display {
         }
 
         this.InitStatDisplay(row.insertCell());
+        tbl.appendChild(fragment);
     }
 
     private InitStatDisplay(stat_cell: HTMLTableCellElement) {

@@ -672,7 +672,8 @@ class Aircraft_HTML extends Display {
     // }
 
     private InitStats(tbl: HTMLTableElement) {
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Stat Lift Bleed"));
         CreateTH(row, lu("Stat Drag"));
         CreateTH(row, lu("Stat Mass"));
@@ -680,7 +681,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, lu("Stat Bomb Mass"));
         CreateTH(row, lu("Stat Cost"));
         CreateTH(row, lu("Stat Upkeep"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.d_lift = row.insertCell();
         this.d_drag = row.insertCell();
         this.d_mass = row.insertCell();
@@ -688,7 +689,7 @@ class Aircraft_HTML extends Display {
         this.d_bmas = row.insertCell();
         this.d_cost = row.insertCell();
         this.d_upkp = row.insertCell();
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Stat Control"));
         CreateTH(row, lu("Stat Pitch Stability"));
         CreateTH(row, lu("Stat Lateral Stability"));
@@ -696,7 +697,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, lu("Stat Raw Strain"));
         CreateTH(row, lu("Stat Structure"));
         CreateTH(row, lu("Stat Toughness"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.d_cont = row.insertCell();
         this.d_pstb = row.insertCell();
         this.d_lstb = row.insertCell();
@@ -704,7 +705,7 @@ class Aircraft_HTML extends Display {
         this.d_mstr = row.insertCell();
         this.d_strc = row.insertCell();
         this.d_tugh = row.insertCell();
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Stat Power"));
         CreateTH(row, lu("Stat Fuel Consumption"));
         CreateTH(row, lu("Stat Fuel"));
@@ -712,7 +713,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row, lu("Stat Pitch Boost"));
         CreateTH(row, lu("Stat Charge"));
         CreateTH(row, lu("Stat Crash Safety"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.d_powr = row.insertCell();
         this.d_fcom = row.insertCell();
         this.d_fuel = row.insertCell();
@@ -720,10 +721,12 @@ class Aircraft_HTML extends Display {
         this.d_pbst = row.insertCell();
         this.d_chrg = row.insertCell();
         this.d_crsh = row.insertCell();
+        tbl.appendChild(fragment);
     }
 
     private InitDerived(tbl: HTMLTableElement) {
-        var row0 = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row0 = insertRow(fragment);
         var name_cell = row0.insertCell();
         // Aircraft Name
         name_cell.colSpan = 2;
@@ -742,7 +745,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row0, lu("Derived Version #"));
         this.version_cell = row0.insertCell();
 
-        var row1 = tbl.insertRow();
+        var row1 = insertRow(fragment);
         CreateTH(row1, lu("Derived Mass Variations"));
         CreateTH(row1, lu("Derived Boost"));
         CreateTH(row1, lu("Derived Handling"));
@@ -752,7 +755,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row1, lu("Derived Vital Components")).colSpan = 2;
 
 
-        this.bomb_row2 = tbl.insertRow();
+        this.bomb_row2 = insertRow(fragment);
         CreateTH(this.bomb_row2, lu("Derived Full Fuel with Bombs"));
         this.boost_fullwB = this.bomb_row2.insertCell();
         this.hand_fullwB = this.bomb_row2.insertCell();
@@ -763,7 +766,7 @@ class Aircraft_HTML extends Display {
         this.vital_components.rowSpan = 3;
         this.vital_components.colSpan = 3;
 
-        this.bomb_row1 = tbl.insertRow();
+        this.bomb_row1 = insertRow(fragment);
         CreateTH(this.bomb_row1, lu("Derived Half Fuel with Bombs"));
         this.boost_halfwB = this.bomb_row1.insertCell();
         this.hand_halfwB = this.bomb_row1.insertCell();
@@ -771,7 +774,7 @@ class Aircraft_HTML extends Display {
         this.ss_halfwB = this.bomb_row1.insertCell();
         this.ts_halfwB = this.bomb_row1.insertCell();
 
-        this.full_row = tbl.insertRow();
+        this.full_row = insertRow(fragment);
         CreateTH(this.full_row, lu("Derived Full Fuel"));
         this.boost_full = this.full_row.insertCell();
         this.hand_full = this.full_row.insertCell();
@@ -779,7 +782,7 @@ class Aircraft_HTML extends Display {
         this.ss_full = this.full_row.insertCell();
         this.ts_full = this.full_row.insertCell();
 
-        var half = tbl.insertRow();
+        var half = insertRow(fragment);
         CreateTH(half, lu("Derived Half Fuel"));
         this.boost_half = half.insertCell();
         this.hand_half = half.insertCell();
@@ -787,7 +790,7 @@ class Aircraft_HTML extends Display {
         this.ss_half = half.insertCell();
         this.ts_half = half.insertCell();
 
-        var empty = tbl.insertRow();
+        var empty = insertRow(fragment);
         CreateTH(empty, lu("Derived Empty Fuel"));
         this.boost_empty = empty.insertCell();
         this.hand_empty = empty.insertCell();
@@ -795,13 +798,13 @@ class Aircraft_HTML extends Display {
         this.ss_empty = empty.insertCell();
         this.ts_empty = empty.insertCell();
 
-        var row7 = tbl.insertRow();
+        var row7 = insertRow(fragment);
         CreateTH(row7, lu("Derived Propulsion")).colSpan = 2;
         CreateTH(row7, lu("Derived Aerodynamics")).colSpan = 2;
         CreateTH(row7, lu("Derived Survivability")).colSpan = 2;
         CreateTH(row7, lu("Derived Crew Members")).colSpan = 2;
 
-        var row8 = tbl.insertRow();
+        var row8 = insertRow(fragment);
         CreateTH(row8, lu("Derived Dropoff"));
         this.dropoff_cell = row8.insertCell();
         CreateTH(row8, lu("Derived Stability"));
@@ -811,7 +814,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row8, lu("Derived Crew/Passengers"));
         this.crew_cell = row8.insertCell();
 
-        var row9 = tbl.insertRow();
+        var row9 = insertRow(fragment);
         CreateTH(row9, lu("Derived Overspeed"));
         this.overspeed_cell = row9.insertCell();
         CreateTH(row9, lu("Derived Energy Loss"));
@@ -821,7 +824,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row9, lu("Stat Visibility"));
         this.visibility_cell = row9.insertCell();
 
-        var row10 = tbl.insertRow();
+        var row10 = insertRow(fragment);
         CreateTH(row10, lu("Derived Fuel Uses"));
         this.maxfuel_cell = row10.insertCell();
         CreateTH(row10, lu("Derived Turn Bleed"));
@@ -831,7 +834,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row10, lu("Derived Attack Modifier"));
         this.attack_cell = row10.insertCell();
 
-        var row11 = tbl.insertRow();
+        var row11 = insertRow(fragment);
         CreateTH(row11, lu("Stat Reliability"));
         this.reliability_cell = row11.insertCell();
         CreateTH(row11, lu("Derived Landing Gear"));
@@ -841,7 +844,7 @@ class Aircraft_HTML extends Display {
         CreateTH(row11, lu("Derived Escape"));
         this.escape_cell = row11.insertCell();
 
-        var row12 = tbl.insertRow();
+        var row12 = insertRow(fragment);
         CreateTH(row12, lu("Derived Ideal Engine Altitude"));
         this.maxalt_cell = row12.insertCell();
         CreateTH(row12, lu("Derived Is Flammable Question"));
@@ -851,15 +854,16 @@ class Aircraft_HTML extends Display {
         CreateTH(row12, lu("Stat Flight Stress"));
         this.flightstress_cell = row12.insertCell();
 
-        this.weapon_head = CreateTH(tbl.insertRow(), lu("Derived Weapon Systems"));
+        this.weapon_head = CreateTH(insertRow(fragment), lu("Derived Weapon Systems"));
         this.weapon_head.colSpan = 8;
-        this.weapon_cell = tbl.insertRow().insertCell();
+        this.weapon_cell = insertRow(fragment).insertCell();
         this.weapon_cell.colSpan = 8;
 
-        this.warning_head = CreateTH(tbl.insertRow(), lu("Derived Special Rules"));
+        this.warning_head = CreateTH(insertRow(fragment), lu("Derived Special Rules"));
         this.warning_head.colSpan = 8;
-        this.warning_cell = tbl.insertRow().insertCell();
+        this.warning_cell = insertRow(fragment).insertCell();
         this.warning_cell.colSpan = 8;
+        tbl.appendChild(fragment);
     }
 
     private UpdateStats() {

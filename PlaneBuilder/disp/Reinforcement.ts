@@ -29,15 +29,17 @@ class Reinforcement_HTML extends Display {
         (document.getElementById("lbl_reinforcements") as HTMLLabelElement).textContent = lu("Reinforcement Section Title");
 
         var tbl = document.getElementById("tbl_reinforcements") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Reinforcement External Reinforcements"));
         CreateTH(row, lu("Reinforcement Internal Reinforcements"));
         CreateTH(row, lu("Reinforcement Reinforcement Stats"));
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitExternal(row.insertCell());
         this.InitInternal(row.insertCell());
         this.InitStatDisplay(row.insertCell());
+        tbl.appendChild(fragment);
     }
 
     private InitExternal(cell: HTMLTableCellElement) {

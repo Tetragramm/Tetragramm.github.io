@@ -76,12 +76,13 @@ const init = () => {
             }
         );
 
-    window.onload = () => {
+    window.addEventListener("load", () => {
         scrollToFragment();
+        // location.hash = ihash;
         setTimeout(() => { window.onscroll = SetScroll; }, 1000);
-    };
+    });
 }
-init();
+window.addEventListener("DOMContentLoaded", init);
 
 var hash = "";
 function SetScroll(ev) {

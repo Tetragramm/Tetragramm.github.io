@@ -49,21 +49,20 @@ class Rotor_HTML extends Display {
         this.reinforce_div = document.getElementById("Reinforcements") as HTMLDivElement;
         this.control_div = document.getElementById("ControlSurfaces") as HTMLDivElement;
         var tbl = document.getElementById("rotor_table") as HTMLTableElement;
-
-        this.InitAutogyro(tbl);
-        this.InitHelicopter(tbl);
-
-        // this.InitStatDisplay(stat_cell);
+        var fragment = document.createDocumentFragment();
+        this.InitAutogyro(fragment);
+        this.InitHelicopter(fragment);
+        tbl.appendChild(fragment);
     }
 
-    private InitAutogyro(tbl: HTMLTableElement) {
-        this.auto_header = tbl.insertRow();
+    private InitAutogyro(fragment: DocumentFragment) {
+        this.auto_header = insertRow(fragment);
         CreateTH(this.auto_header, lu("Rotor Rotor"));
         CreateTH(this.auto_header, lu("Rotor Material"));
         CreateTH(this.auto_header, lu("Rotor Accessories"));
         CreateTH(this.auto_header, lu("Rotor Stats"));
 
-        this.auto_row = tbl.insertRow();
+        this.auto_row = insertRow(fragment);
         var rotor_cell = this.auto_row.insertCell();
         var rotor_fs = CreateFlexSection(rotor_cell);
         this.auto_min = document.createElement("LABEL") as HTMLLabelElement;
@@ -131,14 +130,14 @@ class Rotor_HTML extends Display {
         BlinkIfChanged(this.a_area, stats.wingarea.toString(), true);
     }
 
-    private InitHelicopter(tbl: HTMLTableElement) {
-        this.heli_header = tbl.insertRow();
+    private InitHelicopter(fragment: DocumentFragment) {
+        this.heli_header = insertRow(fragment);
         CreateTH(this.heli_header, lu("Rotor Rotor"));
         CreateTH(this.heli_header, lu("Rotor Material"));
         CreateTH(this.heli_header, lu("Rotor Accessories"));
         CreateTH(this.heli_header, lu("Rotor Stats"));
 
-        this.heli_row = tbl.insertRow();
+        this.heli_row = insertRow(fragment);
         var rotor_cell = this.heli_row.insertCell();
         var rotor_fs = CreateFlexSection(rotor_cell);
         this.heli_count = document.createElement("INPUT") as HTMLInputElement;

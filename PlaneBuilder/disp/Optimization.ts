@@ -35,7 +35,8 @@ class Optimization_HTML extends Display {
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
 
         var tbl = document.getElementById("tbl_optimization") as HTMLTableElement;
-        var row0 = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row0 = insertRow(fragment);
         CreateTH(row0, lu("Optimization Negative"));
         CreateTH(row0, lu("Optimization Effect"));
         CreateTH(row0, lu("Optimization Positive"));
@@ -45,16 +46,17 @@ class Optimization_HTML extends Display {
         // < th > Positive < /th>
         // < th > Optimization Stats < /th>
 
-        var row1 = tbl.insertRow();
+        var row1 = insertRow(fragment);
         this.cost_cbx = this.InitRow(row1, lu("Optimization Cost"), (num: number) => this.opt.SetCost(num));
-        this.bleed_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Lift Bleed"), (num: number) => this.opt.SetBleed(num));
-        this.escape_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Leg Room"), (num: number) => this.opt.SetEscape(num));
-        this.mass_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Mass"), (num: number) => this.opt.SetMass(num));
-        this.toughness_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Toughness"), (num: number) => this.opt.SetToughness(num));
-        this.maxstrain_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Max Strain"), (num: number) => this.opt.SetMaxStrain(num));
-        this.reliability_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Reliability"), (num: number) => this.opt.SetReliability(num));
-        this.drag_cbx = this.InitRow(tbl.insertRow(), lu("Optimization Drag"), (num: number) => this.opt.SetDrag(num));
+        this.bleed_cbx = this.InitRow(insertRow(fragment), lu("Optimization Lift Bleed"), (num: number) => this.opt.SetBleed(num));
+        this.escape_cbx = this.InitRow(insertRow(fragment), lu("Optimization Leg Room"), (num: number) => this.opt.SetEscape(num));
+        this.mass_cbx = this.InitRow(insertRow(fragment), lu("Optimization Mass"), (num: number) => this.opt.SetMass(num));
+        this.toughness_cbx = this.InitRow(insertRow(fragment), lu("Optimization Toughness"), (num: number) => this.opt.SetToughness(num));
+        this.maxstrain_cbx = this.InitRow(insertRow(fragment), lu("Optimization Max Strain"), (num: number) => this.opt.SetMaxStrain(num));
+        this.reliability_cbx = this.InitRow(insertRow(fragment), lu("Optimization Reliability"), (num: number) => this.opt.SetReliability(num));
+        this.drag_cbx = this.InitRow(insertRow(fragment), lu("Optimization Drag"), (num: number) => this.opt.SetDrag(num));
         this.InitStatDisplay(row1.insertCell());
+        tbl.appendChild(fragment);
     }
 
     private InitRow(row: HTMLTableRowElement, txt: string, call: (num: number) => void) {

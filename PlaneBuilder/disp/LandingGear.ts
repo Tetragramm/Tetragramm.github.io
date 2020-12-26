@@ -20,15 +20,17 @@ class LandingGear_HTML extends Display {
 
         (document.getElementById("lbl_landing_gear") as HTMLLabelElement).textContent = lu("Landing Gear Section Title");
         var tbl = document.getElementById("tbl_gear") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Landing Gear Landing Gear"));
         CreateTH(row, lu("Landing Gear Extras"));
         CreateTH(row, lu("Landing Gear Gear Stats"));
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitGear(row.insertCell());
         this.InitExtras(row.insertCell());
         this.InitStats(row.insertCell());
+        tbl.appendChild(fragment);
     }
 
     private InitGear(cell: HTMLTableCellElement) {

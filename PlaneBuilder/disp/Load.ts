@@ -40,17 +40,19 @@ class Load_HTML extends Display {
         (document.getElementById("lbl_load") as HTMLLabelElement).textContent = lu("Load Section Title");
 
         var tbl = document.getElementById("tbl_load") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Load Fuel"));
         CreateTH(row, lu("Load Munitions"));
         CreateTH(row, lu("Load Cargo and Passengers"));
         CreateTH(row, lu("Load Load Stats"));
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitFuel(row.insertCell());
         this.InitMunitions(row.insertCell());
         this.InitCargoAndPassengers(row.insertCell());
         this.InitStats(row.insertCell());
+        tbl.appendChild(fragment);
     }
 
     private InitFuel(cell: HTMLTableCellElement) {

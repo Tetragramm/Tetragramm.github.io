@@ -35,24 +35,26 @@ class Accessories_HTML extends Display {
         (document.getElementById("lbl_accessories") as HTMLLabelElement).textContent = lu("Accessories Section Title");
 
         var tbl = document.getElementById("tbl_accessories") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Accessories Armour Coverage"));
         CreateTH(row, lu("Accessories Climate"));
         CreateTH(row, lu("Accessories Visibility"));
         CreateTH(row, lu("Accessories Additional Part Stats"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitArmour(row.insertCell());
         this.InitClimate(row.insertCell());
         this.InitVisibility(row.insertCell());
         this.InitStats(row.insertCell());
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         CreateTH(row, lu("Accessories Information"));
         CreateTH(row, lu("Accessories Electrical"));
         CreateTH(row, lu("Accessories Control"));
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.InitInformation(row.insertCell());
         this.InitElectrical(row.insertCell());
         this.InitControl(row.insertCell());
+        tbl.appendChild(fragment);
     }
 
     private InitArmour(cell: HTMLTableCellElement) {

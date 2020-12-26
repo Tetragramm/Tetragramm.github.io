@@ -25,14 +25,16 @@ class Used_HTML extends Display {
         this.enabled.onchange = () => { this.used.SetEnabled(this.enabled.checked); };
 
         this.tbl = document.getElementById("tbl_used") as HTMLTableElement;
-        var row = this.tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Used Effect"));
         CreateTH(row, lu("Used Description"));
         CreateTH(row, lu("Used Penalties(+) <br/> Benefits(-)"));
-        this.InitTable(this.tbl);
+        this.InitTable(fragment);
+        this.tbl.appendChild(fragment);
     }
 
-    private InitTable(tbl: HTMLTableElement) {
+    private InitTable(fragment: DocumentFragment) {
         this.burnt_out = document.createElement("INPUT") as HTMLInputElement;
         this.ragged = document.createElement("INPUT") as HTMLInputElement;
         this.hefty = document.createElement("INPUT") as HTMLInputElement;
@@ -42,49 +44,49 @@ class Used_HTML extends Display {
         this.leaky = document.createElement("INPUT") as HTMLInputElement;
         this.sluggish = document.createElement("INPUT") as HTMLInputElement;
 
-        var row = tbl.insertRow();
+        var row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Burnt Out");
         row.insertCell().textContent = lu("Used Burnt Out Description");
         var cell = row.insertCell();
         CreateInput("", this.burnt_out, cell, false);
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Ragged");
         row.insertCell().textContent = lu("Used Ragged Description");
         cell = row.insertCell();
         CreateInput("", this.ragged, cell, false);
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Hefty");
         row.insertCell().textContent = lu("Used Hefty Description");
         cell = row.insertCell();
         CreateInput("", this.hefty, cell, false);
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Sticky Guns");
         row.insertCell().textContent = lu("Used Sticky Guns Description");
         cell = row.insertCell();
         CreateInput("", this.sticky_guns, cell, false);
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Weak");
         row.insertCell().textContent = lu("Used Weak Description");
         cell = row.insertCell();
         CreateInput("", this.weak, cell, false);
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Fragile");
         row.insertCell().textContent = lu("Used Fragile Description");
         cell = row.insertCell();
         CreateInput("", this.fragile, cell, false);
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Leaky");
         row.insertCell().textContent = lu("Used Leaky Description");
         cell = row.insertCell();
         CreateInput("", this.leaky, cell, false);
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Sluggish");
         row.insertCell().textContent = lu("Used Sluggish Description");
         cell = row.insertCell();

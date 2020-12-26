@@ -16,7 +16,8 @@ class Passengers_HTML extends Display {
         (document.getElementById("lbl_passengers") as HTMLLabelElement).textContent = lu("Passengers Section Title");
 
         var tbl = document.getElementById("table_passengers") as HTMLTableElement;
-        var row = tbl.insertRow();
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
         CreateTH(row, lu("Passengers Number of Seats"));
         CreateTH(row, lu("Passengers Number of Beds"));
         CreateTH(row, lu("Passengers Upgrade"));
@@ -31,7 +32,7 @@ class Passengers_HTML extends Display {
         // < td id = "passenger_req_seq" > </td>
         // < /tr>
 
-        row = tbl.insertRow();
+        row = insertRow(fragment);
         this.nseats = document.createElement("INPUT") as HTMLInputElement;
         this.nseats.type = "number";
         this.nseats.min = "0";
@@ -59,6 +60,7 @@ class Passengers_HTML extends Display {
         this.connect.onchange = () => {
             this.pass.SetConnected(this.connect.checked);
         }
+        tbl.appendChild(fragment);
     }
 
     public UpdateDisplay() {
