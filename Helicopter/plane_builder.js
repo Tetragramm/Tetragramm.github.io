@@ -4665,9 +4665,10 @@ class Wings extends Part {
         }
         //Closed Wing effects
         if (this.is_closed) {
-            stats.mass += 1;
-            stats.control -= 5;
-            stats.maxstrain += 20;
+            var pairs = Math.floor(1.0e-6 + this.wing_list.length / 2.0);
+            stats.mass += 1 * pairs;
+            stats.control -= 5 * pairs;
+            stats.maxstrain += 20 * pairs;
         }
         //Stagger effects, monoplane is nothing.
         if (this.wing_list.length > 1) {
@@ -14214,18 +14215,118 @@ class StringBuilder {
         this.Values = [];
     }
 }
+// MIT License
+function scrollToFragment(options = {}) {
+    unmount();
+    getElement = options.getElement || getElementById;
+    scrollIntoView = options.scrollIntoView || defaultScrollIntoView;
+    mount();
+}
+function mount() {
+    documentObserver = new MutationObserver(handleDomMutation);
+    addEventListener("click", handleDocumentClick);
+    unlistenHistory = undefined;
+    startObserving();
+}
+function unmount() {
+    stopObserving();
+    removeEventListener("click", handleDocumentClick);
+    if (unlistenHistory)
+        unlistenHistory();
+    unlistenHistory = undefined;
+    documentObserver = undefined;
+}
+function startObserving() {
+    var _a;
+    stopObserving();
+    if (!getLocation().hash)
+        return;
+    STOP_EVENTS.forEach(addStopListener);
+    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.observe(document, OBSERVER_CONFIG);
+    adjustScrollPosition();
+    observeTimeout = setTimeout(stopObserving, OBSERVE_TIMEOUT_MS);
+}
+function stopObserving() {
+    var _a;
+    clearTimeout(observeTimeout);
+    cancelAnimationFrame(throttleRequestId);
+    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.disconnect();
+    STOP_EVENTS.forEach(removeStopListener);
+}
+function addStopListener(eventName) {
+    document.addEventListener(eventName, stopObserving);
+}
+function removeStopListener(eventName) {
+    document.removeEventListener(eventName, stopObserving);
+}
+function handleDocumentClick(event) {
+    if (event.defaultPrevented)
+        return;
+    const anchor = closestAIncludingSelf(event.target);
+    if (!anchor || !anchor.hash)
+        return;
+    if (anchor.pathname === getLocation().pathname)
+        throttle(startObserving);
+}
+function closestAIncludingSelf(element) {
+    let target = element;
+    while (target && target.nodeName !== "A")
+        target = target.parentElement;
+    return target;
+}
+function handleDomMutation() {
+    throttle(adjustScrollPosition);
+}
+function adjustScrollPosition() {
+    const hash = getLocation().hash;
+    if (!hash)
+        return;
+    const fragmentId = decodeURIComponent(hash.substring(1));
+    console.log("fragmentID = " + fragmentId);
+    const element = getElement.call(null, fragmentId);
+    if (element)
+        scrollIntoView.call(null, element);
+}
+function getLocation() {
+    return location;
+}
+function getElementById(id) {
+    return document.getElementById(id);
+}
+function defaultScrollIntoView(element) {
+    element.scrollIntoView();
+}
+function throttle(callback) {
+    cancelAnimationFrame(throttleRequestId);
+    throttleRequestId = requestAnimationFrame(callback);
+}
+let getElement;
+let scrollIntoView;
+let unlistenHistory;
+let documentObserver;
+let observeTimeout;
+let throttleRequestId;
+const OBSERVER_CONFIG = {
+    attributes: true,
+    characterData: true,
+    childList: true,
+    subtree: true,
+};
+const OBSERVE_TIMEOUT_MS = 10000;
+const STOP_EVENTS = ["selectstart", "touchend", "wheel"];
 /// <reference path="./impl/Aircraft.ts" />
 /// <reference path="./disp/Tools.ts" />
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 /// <reference path="./string/index.ts" />
+/// <reference path="./scroll/scroll.ts" />
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
     var ep = sp.get("engine");
     var lang = sp.get("lang");
     var ihash = window.location.hash;
-    location.hash = "";
+    // location.hash = "";
     var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
     var proms = jsons.map(d => fetch(d));
     Promise.all(proms)
@@ -14290,70 +14391,23 @@ const init = () => {
         }
         aircraft_model.CalculateStats();
     });
-    window.onscroll = SetScroll;
     window.onload = () => {
-        console.log("onload " + document.getElementById("Flight").offsetTop);
-        // location.hash = ihash;
-        setTimeout(() => {
-            location.hash = ihash;
-            console.log("Timeout " + document.getElementById("Flight").offsetTop);
-        }, 500);
+        scrollToFragment();
+        setTimeout(() => { window.onscroll = SetScroll; }, 1000);
     };
 };
 init();
 var hash = "";
 function SetScroll(ev) {
+    const IDs = ["Era", "Cockpit", "Passengers", "Engines", "Frames", "Tail", "Wings", "Rotors", "Stabilizers", "ControlSurfaces", "Reinforcements", "Weapons", "Load", "Landing_Gear", "Accessories", "Propeller", "Optimization", "Stats", "Flight"];
     var newhash = "";
     var off = window.pageYOffset;
-    if (off > document.getElementById("Era").offsetTop) {
-        newhash = "Era";
-        if (off > document.getElementById("Cockpit").offsetTop) {
-            newhash = "Cockpit";
-            if (off > document.getElementById("Passengers").offsetTop) {
-                newhash = "Passengers";
-                if (off > document.getElementById("Engines").offsetTop) {
-                    newhash = "Engines";
-                    if (off > document.getElementById("Frames").offsetTop) {
-                        newhash = "Frames";
-                        if (off > document.getElementById("Tail").offsetTop) {
-                            newhash = "Tail";
-                            if (off > document.getElementById("Wings").offsetTop) {
-                                newhash = "Wings";
-                                if (off > document.getElementById("Stabilizers").offsetTop) {
-                                    newhash = "Stabilizers";
-                                    if (off > document.getElementById("ControlSurfaces").offsetTop) {
-                                        newhash = "ControlSurfaces";
-                                        if (off > document.getElementById("Reinforcements").offsetTop) {
-                                            newhash = "Reinforcements";
-                                            if (off > document.getElementById("Load").offsetTop) {
-                                                newhash = "Load";
-                                                if (off > document.getElementById("Landing_Gear").offsetTop) {
-                                                    newhash = "Landing_Gear";
-                                                    if (off > document.getElementById("Accessories").offsetTop) {
-                                                        newhash = "Accessories";
-                                                        if (off > document.getElementById("Propeller").offsetTop) {
-                                                            newhash = "Propeller";
-                                                            if (off > document.getElementById("Optimization").offsetTop) {
-                                                                newhash = "Optimization";
-                                                                if (off > document.getElementById("Stats").offsetTop) {
-                                                                    newhash = "Stats";
-                                                                    if (off > document.getElementById("Flight").offsetTop) {
-                                                                        newhash = "Flight";
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    for (let id of IDs) {
+        if (off > document.getElementById(id).offsetTop) {
+            newhash = id;
+        }
+        else {
+            break;
         }
     }
     if (hash != newhash) {

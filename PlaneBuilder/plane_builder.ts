@@ -3,6 +3,7 @@
 /// <reference path="./disp/Aircraft.ts" />
 /// <reference path="./lz/lz-string.ts" />
 /// <reference path="./string/index.ts" />
+/// <reference path="./scroll/scroll.ts" />
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -10,7 +11,7 @@ const init = () => {
     var ep = sp.get("engine");
     var lang = sp.get("lang");
     var ihash = window.location.hash;
-    location.hash = "";
+    // location.hash = "";
 
     var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
     var proms = jsons.map(d => fetch(d));
@@ -75,71 +76,23 @@ const init = () => {
             }
         );
 
-    window.onscroll = SetScroll;
     window.onload = () => {
-        console.log("onload " + document.getElementById("Flight").offsetTop);
-        // location.hash = ihash;
-        setTimeout(() => {
-            location.hash = ihash;
-            console.log("Timeout " + document.getElementById("Flight").offsetTop);
-        }, 500);
+        scrollToFragment();
+        setTimeout(() => { window.onscroll = SetScroll; }, 1000);
     };
 }
 init();
 
 var hash = "";
 function SetScroll(ev) {
+    const IDs = ["Era", "Cockpit", "Passengers", "Engines", "Frames", "Tail", "Wings", "Rotors", "Stabilizers", "ControlSurfaces", "Reinforcements", "Weapons", "Load", "Landing_Gear", "Accessories", "Propeller", "Optimization", "Stats", "Flight"];
     var newhash = "";
     var off = window.pageYOffset;
-    if (off > document.getElementById("Era").offsetTop) {
-        newhash = "Era";
-        if (off > document.getElementById("Cockpit").offsetTop) {
-            newhash = "Cockpit";
-            if (off > document.getElementById("Passengers").offsetTop) {
-                newhash = "Passengers";
-                if (off > document.getElementById("Engines").offsetTop) {
-                    newhash = "Engines";
-                    if (off > document.getElementById("Frames").offsetTop) {
-                        newhash = "Frames";
-                        if (off > document.getElementById("Tail").offsetTop) {
-                            newhash = "Tail";
-                            if (off > document.getElementById("Wings").offsetTop) {
-                                newhash = "Wings";
-                                if (off > document.getElementById("Stabilizers").offsetTop) {
-                                    newhash = "Stabilizers";
-                                    if (off > document.getElementById("ControlSurfaces").offsetTop) {
-                                        newhash = "ControlSurfaces";
-                                        if (off > document.getElementById("Reinforcements").offsetTop) {
-                                            newhash = "Reinforcements";
-                                            if (off > document.getElementById("Load").offsetTop) {
-                                                newhash = "Load";
-                                                if (off > document.getElementById("Landing_Gear").offsetTop) {
-                                                    newhash = "Landing_Gear";
-                                                    if (off > document.getElementById("Accessories").offsetTop) {
-                                                        newhash = "Accessories";
-                                                        if (off > document.getElementById("Propeller").offsetTop) {
-                                                            newhash = "Propeller";
-                                                            if (off > document.getElementById("Optimization").offsetTop) {
-                                                                newhash = "Optimization";
-                                                                if (off > document.getElementById("Stats").offsetTop) {
-                                                                    newhash = "Stats";
-                                                                    if (off > document.getElementById("Flight").offsetTop) {
-                                                                        newhash = "Flight";
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+    for (let id of IDs) {
+        if (off > document.getElementById(id).offsetTop) {
+            newhash = id;
+        } else {
+            break;
         }
     }
     if (hash != newhash) {

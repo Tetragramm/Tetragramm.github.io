@@ -793,9 +793,10 @@ class Wings extends Part {
 
         //Closed Wing effects
         if (this.is_closed) {
-            stats.mass += 1;
-            stats.control -= 5;
-            stats.maxstrain += 20;
+            var pairs = Math.floor(1.0e-6 + this.wing_list.length / 2.0);
+            stats.mass += 1 * pairs;
+            stats.control -= 5 * pairs;
+            stats.maxstrain += 20 * pairs;
         }
 
         //Stagger effects, monoplane is nothing.
