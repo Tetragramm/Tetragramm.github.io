@@ -302,7 +302,7 @@
         "Vital Part Controls": "Controls",
         "Vital Part Aircrew": "Aircrew #{0}",
         "Vital Part Fuel Tanks": "Fuel Tanks",
-        "Vital Part Engine": "Engine",
+        "Vital Part Engine": "Engine #{0}",
         "Vital Part Oil Tank": "Oil Tank #{0}",
         "Vital Part Oil Cooler": "Oil Cooler #{0}",
         "Vital Part Engine Pusher": "Engine #{0} Pusher",
