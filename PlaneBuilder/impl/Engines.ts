@@ -264,12 +264,12 @@ class Engines extends Part {
         return this.is_asymmetric;
     }
 
-    public GetHavePropeller() {
+    public GetNumPropellers() {
+        var count = 0;
         for (let e of this.engines) {
-            if (e.GetHavePropeller())
-                return true;
+            count += e.GetNumPropellers();
         }
-        return false;
+        return count;
     }
 
     public GetOverspeed() {

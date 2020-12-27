@@ -2455,8 +2455,14 @@ class Engine extends Part {
             }
         }
     }
-    GetHavePropeller() {
-        return !(this.GetIsPulsejet() || this.GetGenerator());
+    GetNumPropellers() {
+        if (!(this.GetIsPulsejet() || this.GetGenerator())) {
+            if (this.use_pp) {
+                return 2;
+            }
+            return 1;
+        }
+        return 0;
     }
     GetIsTractorNacelle() {
         if (!this.GetIsPulsejet()
@@ -3095,12 +3101,12 @@ class Engines extends Part {
     GetAsymmetry() {
         return this.is_asymmetric;
     }
-    GetHavePropeller() {
+    GetNumPropellers() {
+        var count = 0;
         for (let e of this.engines) {
-            if (e.GetHavePropeller())
-                return true;
+            count += e.GetNumPropellers();
         }
-        return false;
+        return count;
     }
     GetOverspeed() {
         var os = 100;
@@ -3284,7 +3290,7 @@ class Propeller extends Part {
         super();
         this.idx_prop = 2;
         this.use_variable = false;
-        this.have_propellers = true;
+        this.num_propellers = 0;
         this.prop_list = [];
         for (let elem of json["props"]) {
             this.prop_list.push({
@@ -3337,30 +3343,30 @@ class Propeller extends Part {
     CanBeVariable() {
         return !this.prop_list[this.idx_prop].automatic;
     }
-    SetHavePropeller(have) {
-        this.have_propellers = have;
+    SetNumPropeller(have) {
+        this.num_propellers = have;
     }
-    GetHavePropeller() {
-        return this.have_propellers;
+    GetNumPropellers() {
+        return this.num_propellers;
     }
     GetEnergy() {
-        if (this.have_propellers)
+        if (this.num_propellers)
             return this.prop_list[this.idx_prop].energy;
         else
             return 5;
     }
     GetTurn() {
-        if (this.have_propellers)
+        if (this.num_propellers)
             return this.prop_list[this.idx_prop].turn;
         else
             return 7;
     }
     PartStats() {
         var stats = new Stats();
-        if (this.have_propellers) {
-            stats = stats.Add(this.prop_list[this.idx_prop].stats);
+        if (this.num_propellers) {
+            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             if (this.use_variable) {
-                stats.cost += 2;
+                stats.cost += 2 * this.num_propellers;
                 stats.warnings.push({
                     source: lu("Manually Variable Propeller"),
                     warning: lu("MVP_Warning")
@@ -8808,7 +8814,7 @@ class Aircraft {
             this.engines.SetHelicopter(true);
         }
         stats = stats.Add(this.engines.PartStats());
-        this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
+        this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
         stats = stats.Add(this.propeller.PartStats());
         //Fuel goes here, because it makes sections.
         stats = stats.Add(this.fuel.PartStats());
@@ -8819,7 +8825,7 @@ class Aircraft {
         this.weapons.SetTractorInfo(this.engines.GetTractor());
         this.weapons.SetPusherInfo(this.engines.GetPusher());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
-        this.weapons.SetHavePropeller(this.engines.GetHavePropeller());
+        this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
         stats = stats.Add(this.weapons.PartStats());
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());
@@ -10449,7 +10455,7 @@ class Propeller_HTML extends Display {
         this.input_variable.disabled = !this.prop.CanBeVariable();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
         this.select_prop.disabled = false;
-        if (!this.prop.GetHavePropeller()) {
+        if (this.prop.GetNumPropellers() == 0) {
             this.input_variable.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;

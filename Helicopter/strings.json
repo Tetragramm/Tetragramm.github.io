@@ -250,6 +250,8 @@
         "Gyroscopic Warning": "Gives +4 to Empty Seat rolls.",
         "Altitude Holding": "Altitude Holding",
         "Altitude Holding Warning": "Allows the Empty Seat rule to be ignored.",
+        "Clockwork Programmable": "Clockwork Programmable",
+        "Clockwork Programmable Warning": "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings. For Himmelgard only.",
         "Programmable": "Programmable",
         "Programmable Warning": "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings.",
         "Rattegehirn": "Rattegehirn",

@@ -1916,6 +1916,12 @@
                 "warning": "Altitude Holding Warning"
             },
             {
+                "name": "Clockwork Programmable",
+                "mass": 1,
+                "cost": 6,
+                "warning": "Clockwork Programmable Warning"
+            },
+            {
                 "name": "Programmable",
                 "mass": 1,
                 "charge": -2,

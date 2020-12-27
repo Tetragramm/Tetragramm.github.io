@@ -275,7 +275,7 @@ class Aircraft {
         }
         stats = stats.Add(this.engines.PartStats());
 
-        this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
+        this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
         stats = stats.Add(this.propeller.PartStats());
 
         //Fuel goes here, because it makes sections.
@@ -287,7 +287,7 @@ class Aircraft {
         this.weapons.SetTractorInfo(this.engines.GetTractor());
         this.weapons.SetPusherInfo(this.engines.GetPusher());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
-        this.weapons.SetHavePropeller(this.engines.GetHavePropeller());
+        this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
         stats = stats.Add(this.weapons.PartStats());
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());

@@ -33,7 +33,7 @@ class Propeller_HTML extends Display {
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
         this.select_prop.disabled = false;
 
-        if (!this.prop.GetHavePropeller()) {
+        if (this.prop.GetNumPropellers() == 0) {
             this.input_variable.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;

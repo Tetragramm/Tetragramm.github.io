@@ -5,13 +5,13 @@ class Propeller extends Part {
     private prop_list: { name: string, stats: Stats, automatic: boolean, energy: number, turn: number }[];
     private idx_prop: number;
     private use_variable: boolean;
-    private have_propellers: boolean;
+    private num_propellers: number;
 
     constructor(json: JSON) {
         super();
         this.idx_prop = 2;
         this.use_variable = false;
-        this.have_propellers = true;
+        this.num_propellers = 0;
         this.prop_list = [];
         for (let elem of json["props"]) {
             this.prop_list.push({
@@ -75,23 +75,23 @@ class Propeller extends Part {
         return !this.prop_list[this.idx_prop].automatic;
     }
 
-    public SetHavePropeller(have: boolean) {
-        this.have_propellers = have;
+    public SetNumPropeller(have: number) {
+        this.num_propellers = have;
     }
 
-    public GetHavePropeller() {
-        return this.have_propellers;
+    public GetNumPropellers() {
+        return this.num_propellers;
     }
 
     public GetEnergy() {
-        if (this.have_propellers)
+        if (this.num_propellers)
             return this.prop_list[this.idx_prop].energy;
         else
             return 5;
     }
 
     public GetTurn() {
-        if (this.have_propellers)
+        if (this.num_propellers)
             return this.prop_list[this.idx_prop].turn;
         else
             return 7;
@@ -99,10 +99,10 @@ class Propeller extends Part {
 
     public PartStats(): Stats {
         var stats = new Stats();
-        if (this.have_propellers) {
-            stats = stats.Add(this.prop_list[this.idx_prop].stats);
+        if (this.num_propellers) {
+            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             if (this.use_variable) {
-                stats.cost += 2;
+                stats.cost += 2 * this.num_propellers;
                 stats.warnings.push({
                     source: lu("Manually Variable Propeller"),
                     warning: lu("MVP_Warning")

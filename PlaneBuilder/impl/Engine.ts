@@ -600,8 +600,14 @@ class Engine extends Part {
         }
     }
 
-    public GetHavePropeller() {
-        return !(this.GetIsPulsejet() || this.GetGenerator());
+    public GetNumPropellers() {
+        if (!(this.GetIsPulsejet() || this.GetGenerator())) {
+            if (this.use_pp) {
+                return 2;
+            }
+            return 1;
+        }
+        return 0;
     }
 
     public GetIsTractorNacelle() {
