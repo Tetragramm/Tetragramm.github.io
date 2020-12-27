@@ -208,8 +208,6 @@ class Stats {
         res.fuelconsumption = this.fuelconsumption + other.fuelconsumption;
         res.maxstrain = this.maxstrain + other.maxstrain;
         res.structure = this.structure + other.structure;
-        res.pitchboost = this.pitchboost + other.pitchboost;
-        res.pitchspeed = this.pitchspeed + other.pitchspeed;
         res.wingarea = this.wingarea + other.wingarea;
         res.toughness = this.toughness + other.toughness;
         res.upkeep = this.upkeep + other.upkeep;
@@ -259,8 +257,6 @@ class Stats {
         res.fuelconsumption = this.fuelconsumption * other;
         res.maxstrain = this.maxstrain * other;
         res.structure = this.structure * other;
-        res.pitchboost = this.pitchboost * other;
-        res.pitchspeed = this.pitchspeed * other;
         res.wingarea = this.wingarea * other;
         res.toughness = this.toughness * other;
         res.upkeep = this.upkeep * other;

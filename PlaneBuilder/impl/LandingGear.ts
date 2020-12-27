@@ -149,7 +149,7 @@ class LandingGear extends Part {
     }
 
     public IsVital() {
-        return this.gear_list[this.gear_sel].can_retract;
+        return true;
     }
 
     public PartStats() {
