@@ -231,7 +231,7 @@ class Stats {
         return newList;
     }
     Multiply(other) {
-        var res = new Stats();
+        var res = this.Clone();
         res.liftbleed = this.liftbleed * other;
         res.wetmass = this.wetmass * other;
         res.mass = this.mass * other;
@@ -250,8 +250,7 @@ class Stats {
         res.fuelconsumption = this.fuelconsumption * other;
         res.maxstrain = this.maxstrain * other;
         res.structure = this.structure * other;
-        res.pitchboost = this.pitchboost;
-        res.pitchspeed = this.pitchspeed;
+        //Pitch Speed and Pitch Boost don't get multiplied.
         res.wingarea = this.wingarea * other;
         res.toughness = this.toughness * other;
         res.upkeep = this.upkeep * other;
