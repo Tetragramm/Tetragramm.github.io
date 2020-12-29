@@ -335,7 +335,8 @@ class Accessories extends Part {
     }
 
     public GetStorage() {
-        return 5 * this.electrical_count[2];
+        return 5 * this.electrical_count[2]
+            + 5 * this.electrical_count[3];
     }
 
     public GetWindmill() {
@@ -377,9 +378,11 @@ class Accessories extends Part {
 
         //Electrical
         for (let i = 0; i < this.electrical_count.length; i++) {
-            let ts = this.electric_list[i].stats.Clone();
-            ts = ts.Multiply(this.electrical_count[i]);
-            stats = stats.Add(ts);
+            if (this.electrical_count[i] > 0) {
+                let ts = this.electric_list[i].stats.Clone();
+                ts = ts.Multiply(this.electrical_count[i]);
+                stats = stats.Add(ts);
+            }
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
 
