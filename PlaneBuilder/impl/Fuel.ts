@@ -39,7 +39,7 @@ class Fuel extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
-        this.tank_count = js["tank_count"];
+        this.tank_count = NumArr(js["tank_count"], this.tank_count.length);
         this.self_sealing = js["self_sealing"];
         this.fire_extinguisher = js["fire_extinguisher"];
         this.wing_area = -1;
@@ -52,7 +52,7 @@ class Fuel extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        this.tank_count = d.GetNumArr();
+        this.tank_count = d.GetNumArr(this.tank_count.length);
         this.self_sealing = d.GetBool();
         this.fire_extinguisher = d.GetBool();
         this.wing_area = -1;

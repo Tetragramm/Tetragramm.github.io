@@ -53,9 +53,9 @@ class Cockpit extends Part {
 
     public fromJSON(js: JSON, json_version: number) {
         this.selected_type = js["type"];
-        this.selected_upgrades = js["upgrades"];
-        this.selected_safety = js["safety"];
-        this.selected_gunsights = js["sights"];
+        this.selected_upgrades = BoolArr(js["upgrades"], this.selected_upgrades.length);
+        this.selected_safety = BoolArr(js["safety"], this.selected_safety.length);
+        this.selected_gunsights = BoolArr(js["sights"], this.selected_gunsights.length);
         if (this.is_primary)
             this.selected_upgrades[0] = false;
         if (json_version > 10.35)
@@ -72,9 +72,9 @@ class Cockpit extends Part {
 
     public deserialize(d: Deserialize) {
         this.selected_type = d.GetNum();
-        this.selected_upgrades = d.GetBoolArr();
-        this.selected_safety = d.GetBoolArr();
-        this.selected_gunsights = d.GetBoolArr();
+        this.selected_upgrades = d.GetBoolArr(this.selected_upgrades.length);
+        this.selected_safety = d.GetBoolArr(this.selected_safety.length);
+        this.selected_gunsights = d.GetBoolArr(this.selected_gunsights.length);
         if (this.is_primary)
             this.selected_upgrades[0] = false;
         if (d.version > 10.35)

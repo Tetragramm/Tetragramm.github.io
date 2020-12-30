@@ -229,7 +229,7 @@ class Engine extends Part {
                 this.etype_inputs.era_sel = d.GetNum();
                 this.etype_inputs.material_fudge = d.GetNum();
                 this.etype_inputs.quality_fudge = d.GetNum();
-                this.etype_inputs.upgrades = d.GetBoolArr();
+                this.etype_inputs.upgrades = d.GetBoolArr(0);//Put 0, because we don't have a minimum, and below checks the actual length to decide which version
                 if (this.etype_inputs.upgrades.length == 6) {
                     this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
                     if (this.etype_inputs.upgrades[0]) {

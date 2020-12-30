@@ -103,11 +103,11 @@ class Accessories extends Part {
         if (js["v"] == 2) {
             this.armour_coverage = js["armour_coverage"];
         }
-        this.electrical_count = js["electrical_count"];
+        this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length);
         this.radio_sel = js["radio_sel"];
-        this.info_sel = js["info_sel"];
-        this.visi_sel = js["visi_sel"];
-        this.clim_sel = js["clim_sel"];
+        this.info_sel = BoolArr(js["info_sel"], this.info_sel.length);
+        this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
+        this.clim_sel = BoolArr(js["clim_sel"], this.clim_sel.length);
         this.auto_sel = js["auto_sel"];
         this.cont_sel = js["cont_sel"];
     }
@@ -124,12 +124,12 @@ class Accessories extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        this.armour_coverage = d.GetNumArr();
-        this.electrical_count = d.GetNumArr();
+        this.armour_coverage = d.GetNumArr(this.armour_coverage.length);
+        this.electrical_count = d.GetNumArr(this.electrical_count.length);
         this.radio_sel = d.GetNum();
-        this.info_sel = d.GetBoolArr();
-        this.visi_sel = d.GetBoolArr();
-        this.clim_sel = d.GetBoolArr();
+        this.info_sel = d.GetBoolArr(this.info_sel.length);
+        this.visi_sel = d.GetBoolArr(this.visi_sel.length);
+        this.clim_sel = d.GetBoolArr(this.clim_sel.length);
         this.auto_sel = d.GetNum();
         this.cont_sel = d.GetNum();
     }

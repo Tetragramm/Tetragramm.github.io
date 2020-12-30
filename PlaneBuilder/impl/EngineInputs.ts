@@ -115,7 +115,7 @@ class EngineInputs {
                 this.compressor_type = js["compressor_type"];
                 this.compressor_count = js["compressor_count"];
                 this.min_IAF = js["min_IAF"];
-                this.upgrades = js["upgrades"];
+                this.upgrades = BoolArr(js["upgrades"], this.upgrades.length);
                 break;
             }
             case ENGINE_TYPE.PULSEJET: {
@@ -180,7 +180,7 @@ class EngineInputs {
                 this.compressor_type = d.GetNum();
                 this.compressor_count = d.GetNum();
                 this.min_IAF = d.GetNum();
-                this.upgrades = d.GetBoolArr();
+                this.upgrades = d.GetBoolArr(this.upgrades.length);
                 break;
             }
             case ENGINE_TYPE.PULSEJET: {

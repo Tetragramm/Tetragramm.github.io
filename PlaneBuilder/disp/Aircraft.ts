@@ -985,6 +985,7 @@ class Aircraft_HTML extends Display {
         this.communications_cell.textContent = this.acft.GetCommunicationName();
         var wm = this.acft.GetAccessories().GetWindmill();
         var bat = this.acft.GetAccessories().GetStorage();
+        console.log(bat);
         var electric_str = stats.charge.toString();
         if (wm > 0)
             electric_str += " + " + wm.toString() + lu("Derived Per 10 Speed");

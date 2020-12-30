@@ -91,7 +91,7 @@ class WeaponSystem extends Part {
         this.raw_weapon_type = js["weapon_type"];
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = js["fixed"];
-        this.directions = js["directions"];
+        this.directions = BoolArr(js["directions"], this.directions.length);
         this.weapons = [];
         this.ammo = js["ammo"];
         if (this.ammo == null)
@@ -146,7 +146,7 @@ class WeaponSystem extends Part {
         this.raw_weapon_type = d.GetNum();
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
-        this.directions = d.GetBoolArr();
+        this.directions = d.GetBoolArr(this.directions.length);
         this.ammo = d.GetNum();
         var wlen = d.GetNum();
         this.weapons = [];

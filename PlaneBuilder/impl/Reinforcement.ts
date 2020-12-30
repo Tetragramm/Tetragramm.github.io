@@ -75,9 +75,9 @@ class Reinforcement extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
-        this.ext_wood_count = js["ext_wood_count"];
-        this.ext_steel_count = js["ext_steel_count"];
-        this.cant_count = js["cant_count"];
+        this.ext_wood_count = NumArr(js["ext_wood_count"], this.ext_wood_count.length);
+        this.ext_steel_count = NumArr(js["ext_steel_count"], this.ext_steel_count.length);
+        this.cant_count = NumArr(js["cant_count"], this.cant_count.length);
         this.wires = js["wires"];
         this.cabane_sel = js["cabane_sel"];
         if (json_version > 10.25) {
@@ -85,12 +85,6 @@ class Reinforcement extends Part {
         }
         else {
             this.wing_blades = false;
-        }
-        while (this.ext_wood_list.length > this.ext_wood_count.length) {
-            this.ext_wood_count.push(0);
-        }
-        while (this.ext_steel_list.length > this.ext_steel_count.length) {
-            this.ext_steel_count.push(0);
         }
         if (json_version < 10.45) {
             this.cant_count[0] *= 2;
@@ -110,9 +104,9 @@ class Reinforcement extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        this.ext_wood_count = d.GetNumArr();
-        this.ext_steel_count = d.GetNumArr();
-        this.cant_count = d.GetNumArr();
+        this.ext_wood_count = d.GetNumArr(this.ext_wood_count.length);
+        this.ext_steel_count = d.GetNumArr(this.ext_steel_count.length);
+        this.cant_count = d.GetNumArr(this.cant_count.length);
         this.wires = d.GetBool();
         this.cabane_sel = d.GetNum();
         if (d.version > 10.25) {
@@ -120,12 +114,6 @@ class Reinforcement extends Part {
         }
         else {
             this.wing_blades = false;
-        }
-        while (this.ext_wood_list.length > this.ext_wood_count.length) {
-            this.ext_wood_count.push(0);
-        }
-        while (this.ext_steel_list.length > this.ext_steel_count.length) {
-            this.ext_steel_count.push(0);
         }
         if (d.version < 10.45) {
             this.cant_count[0] *= 2;

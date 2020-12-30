@@ -108,22 +108,28 @@ class Deserialize {
         return String.fromCharCode(...arr);
     }
 
-    public GetNumArr() {
+    public GetNumArr(tgt_length: number) {
         this.Check();
         var len = this.GetNum();
         var arr = [];
         for (let i = 0; i < len; i++) {
             arr.push(this.GetNum());
         }
+        while (arr.length < tgt_length) {
+            arr.push(0);
+        }
         return arr;
     }
 
-    public GetBoolArr() {
+    public GetBoolArr(tgt_length: number) {
         this.Check();
         var len = this.GetNum();
         var arr = [];
         for (let i = 0; i < len; i++) {
             arr.push(this.GetBool());
+        }
+        while (arr.length < tgt_length) {
+            arr.push(false);
         }
         return arr;
     }
@@ -134,4 +140,18 @@ class Deserialize {
         this.offset += 4;
         return flt;
     }
+}
+
+function NumArr(arr: number[], tgt_length: number) {
+    while (arr.length < tgt_length) {
+        arr.push(0);
+    }
+    return arr;
+}
+
+function BoolArr(arr: boolean[], tgt_length: number) {
+    while (arr.length < tgt_length) {
+        arr.push(false);
+    }
+    return arr;
 }

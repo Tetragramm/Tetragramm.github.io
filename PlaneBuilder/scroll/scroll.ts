@@ -101,7 +101,6 @@ function adjustScrollPosition() {
   if (!hash) return;
 
   const fragmentId = decodeURIComponent(hash.substring(1));
-  console.log("fragmentID = " + fragmentId);
   const element = getElement.call(null, fragmentId);
   if (element) scrollIntoView.call(null, element);
 }

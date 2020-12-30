@@ -77,7 +77,7 @@ class ControlSurfaces extends Part {
         this.elevator_sel = js["elevator_sel"];
         this.flaps_sel = js["flaps_sel"];
         this.slats_sel = js["slats_sel"];
-        this.drag_sel = js["drag_sel"];
+        this.drag_sel = BoolArr(js["drag_sel"], this.drag_sel.length);
     }
 
     public serialize(s: Serialize) {
@@ -95,7 +95,7 @@ class ControlSurfaces extends Part {
         this.elevator_sel = d.GetNum();
         this.flaps_sel = d.GetNum();
         this.slats_sel = d.GetNum();
-        this.drag_sel = d.GetBoolArr();
+        this.drag_sel = d.GetBoolArr(this.drag_sel.length);
     }
 
     public GetAileronList() {

@@ -49,7 +49,7 @@ class LandingGear extends Part {
     public fromJSON(js: JSON, json_version: number) {
         this.gear_sel = js["gear_sel"];
         this.retract = js["retract"];
-        this.extra_sel = js["extra_sel"];
+        this.extra_sel = BoolArr(js["extra_sel"], this.extra_sel.length);
     }
 
     public serialize(s: Serialize) {
@@ -61,7 +61,7 @@ class LandingGear extends Part {
     public deserialize(d: Deserialize) {
         this.gear_sel = d.GetNum();
         this.retract = d.GetBool();
-        this.extra_sel = d.GetBoolArr();
+        this.extra_sel = d.GetBoolArr(this.extra_sel.length);
     }
 
     public GetGearName() {
