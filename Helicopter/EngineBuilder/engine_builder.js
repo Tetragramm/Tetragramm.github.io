@@ -2474,6 +2474,7 @@ const init = () => {
             console.log("Compressed Engine Parameter Failed.");
         }
     }
+    enable_anim = true;
 };
 window.onload = init;
 var ebuild;

@@ -40,6 +40,7 @@ const init = () => {
             ebuild.SelectEngine(num);
         } catch { console.log("Compressed Engine Parameter Failed."); }
     }
+    enable_anim = true;
 }
 window.onload = init;
 
