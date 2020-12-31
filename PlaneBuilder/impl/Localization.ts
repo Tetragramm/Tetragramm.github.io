@@ -31,3 +31,9 @@ class Localization {
         }
     }
 }
+
+
+
+function lu(s: string, ...args: any[]): string {
+    return StringFmt.Format(local.e(s), ...args);
+}

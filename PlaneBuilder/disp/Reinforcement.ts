@@ -2,6 +2,7 @@
 /// <reference path="../impl/Reinforcement.ts" />
 
 class Reinforcement_HTML extends Display {
+    private acft: Aircraft;
     private rf: Reinforcement;
     private ext_wood_inp: HTMLInputElement[];
     private ext_steel_inp: HTMLInputElement[];
@@ -19,8 +20,9 @@ class Reinforcement_HTML extends Display {
     private d_amax: HTMLTableCellElement;
 
 
-    constructor(rf: Reinforcement) {
+    constructor(acft: Aircraft, rf: Reinforcement) {
         super();
+        this.acft = acft;
         this.rf = rf;
         this.ext_wood_inp = [];
         this.ext_steel_inp = [];
@@ -149,7 +151,7 @@ class Reinforcement_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
         BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
-        var derivedMS = aircraft_model.GetDerivedStats().MaxStrain;
+        var derivedMS = this.acft.GetDerivedStats().MaxStrain;
         BlinkIfChanged(this.d_amax, derivedMS.toString(), true);
     }
 }

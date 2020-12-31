@@ -231,7 +231,7 @@ class Stats {
         return newList;
     }
     Multiply(other) {
-        var res = new Stats();
+        var res = this.Clone();
         res.liftbleed = this.liftbleed * other;
         res.wetmass = this.wetmass * other;
         res.mass = this.mass * other;
@@ -250,8 +250,7 @@ class Stats {
         res.fuelconsumption = this.fuelconsumption * other;
         res.maxstrain = this.maxstrain * other;
         res.structure = this.structure * other;
-        res.pitchboost = this.pitchboost * other;
-        res.pitchspeed = this.pitchspeed * other;
+        //Pitch Speed and Pitch Boost don't get multiplied.
         res.wingarea = this.wingarea * other;
         res.toughness = this.toughness * other;
         res.upkeep = this.upkeep * other;
@@ -416,21 +415,27 @@ class Deserialize {
         }
         return String.fromCharCode(...arr);
     }
-    GetNumArr() {
+    GetNumArr(tgt_length) {
         this.Check();
         var len = this.GetNum();
         var arr = [];
         for (let i = 0; i < len; i++) {
             arr.push(this.GetNum());
         }
+        while (arr.length < tgt_length) {
+            arr.push(0);
+        }
         return arr;
     }
-    GetBoolArr() {
+    GetBoolArr(tgt_length) {
         this.Check();
         var len = this.GetNum();
         var arr = [];
         for (let i = 0; i < len; i++) {
             arr.push(this.GetBool());
+        }
+        while (arr.length < tgt_length) {
+            arr.push(false);
         }
         return arr;
     }
@@ -440,6 +445,18 @@ class Deserialize {
         this.offset += 4;
         return flt;
     }
+}
+function NumArr(arr, tgt_length) {
+    while (arr.length < tgt_length) {
+        arr.push(0);
+    }
+    return arr;
+}
+function BoolArr(arr, tgt_length) {
+    while (arr.length < tgt_length) {
+        arr.push(false);
+    }
+    return arr;
 }
 /// <reference path="./Stats.ts" />
 /// <reference path="./EngineStats.ts" />
@@ -786,7 +803,7 @@ class EngineInputs {
                 this.compressor_type = js["compressor_type"];
                 this.compressor_count = js["compressor_count"];
                 this.min_IAF = js["min_IAF"];
-                this.upgrades = js["upgrades"];
+                this.upgrades = BoolArr(js["upgrades"], this.upgrades.length);
                 break;
             }
             case ENGINE_TYPE.PULSEJET: {
@@ -848,7 +865,7 @@ class EngineInputs {
                 this.compressor_type = d.GetNum();
                 this.compressor_count = d.GetNum();
                 this.min_IAF = d.GetNum();
-                this.upgrades = d.GetBoolArr();
+                this.upgrades = d.GetBoolArr(this.upgrades.length);
                 break;
             }
             case ENGINE_TYPE.PULSEJET: {
@@ -1340,7 +1357,7 @@ class EngineBuilder {
                 estats.stats.fuelconsumption = Math.floor(1.0e-6 + 1.25 * estats.stats.fuelconsumption);
                 estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
                 estats.stats.drag += this.min_IAF / 10;
-                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                estats.stats.cost += 1 + Math.floor(1.0e-6 + estats.stats.power / 50);
                 var extra = this.compressor_count - 1;
                 estats.altitude = 29 + 10 * 2 * extra;
                 estats.stats.reliability -= extra;
@@ -1353,7 +1370,7 @@ class EngineBuilder {
                 estats.stats.power = Math.floor(1.0e-6 + 1.25 * estats.stats.power);
                 estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
                 estats.stats.drag += 2 * (this.min_IAF / 10);
-                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                estats.stats.cost += 1 + Math.floor(1.0e-6 + estats.stats.power / 50);
                 var extra = this.compressor_count - 1;
                 estats.altitude = 49 + 10 * 2 * extra;
                 estats.stats.reliability -= extra;
@@ -1621,6 +1638,16 @@ function FlexSpace(fs) {
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
 }
+function insertRow(frag) {
+    var row = document.createElement("TR");
+    frag.append(row);
+    return row;
+}
+function insertCell(frag) {
+    var cell = document.createElement("TD");
+    frag.append(cell);
+    return cell;
+}
 function BlinkBad(elem) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
@@ -1643,17 +1670,19 @@ function BlinkNeutral(elem) {
     elem.classList.toggle("changed_n");
 }
 function BlinkIfChanged(elem, str, positive_good = null) {
-    if (elem.textContent != str) {
-        if (positive_good == null) {
-            BlinkNeutral(elem);
-        }
-        else {
-            var positive = parseInt(elem.textContent) < parseInt(str);
-            if (positive_good && positive || (!positive_good && !positive)) {
-                BlinkGood(elem);
+    if (enable_anim) {
+        if (elem.textContent != str) {
+            if (positive_good == null) {
+                BlinkNeutral(elem);
             }
             else {
-                BlinkBad(elem);
+                var positive = parseInt(elem.textContent) < parseInt(str);
+                if (positive_good && positive || (!positive_good && !positive)) {
+                    BlinkGood(elem);
+                }
+                else {
+                    BlinkBad(elem);
+                }
             }
         }
     }
@@ -2450,9 +2479,7 @@ window.onload = init;
 var ebuild;
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);
 var local;
-function lu(s, ...args) {
-    return StringFmt.Format(local.e(s), ...args);
-}
+var enable_anim = false;
 class EngineBuilder_HTML {
     constructor() {
         this.enginebuilder = new EngineBuilder();
@@ -3038,11 +3065,11 @@ class Accessories extends Part {
         if (js["v"] == 2) {
             this.armour_coverage = js["armour_coverage"];
         }
-        this.electrical_count = js["electrical_count"];
+        this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length);
         this.radio_sel = js["radio_sel"];
-        this.info_sel = js["info_sel"];
-        this.visi_sel = js["visi_sel"];
-        this.clim_sel = js["clim_sel"];
+        this.info_sel = BoolArr(js["info_sel"], this.info_sel.length);
+        this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
+        this.clim_sel = BoolArr(js["clim_sel"], this.clim_sel.length);
         this.auto_sel = js["auto_sel"];
         this.cont_sel = js["cont_sel"];
     }
@@ -3057,12 +3084,12 @@ class Accessories extends Part {
         s.PushNum(this.cont_sel);
     }
     deserialize(d) {
-        this.armour_coverage = d.GetNumArr();
-        this.electrical_count = d.GetNumArr();
+        this.armour_coverage = d.GetNumArr(this.armour_coverage.length);
+        this.electrical_count = d.GetNumArr(this.electrical_count.length);
         this.radio_sel = d.GetNum();
-        this.info_sel = d.GetBoolArr();
-        this.visi_sel = d.GetBoolArr();
-        this.clim_sel = d.GetBoolArr();
+        this.info_sel = d.GetBoolArr(this.info_sel.length);
+        this.visi_sel = d.GetBoolArr(this.visi_sel.length);
+        this.clim_sel = d.GetBoolArr(this.clim_sel.length);
         this.auto_sel = d.GetNum();
         this.cont_sel = d.GetNum();
     }
@@ -3232,7 +3259,8 @@ class Accessories extends Part {
         this.CalculateStats = callback;
     }
     GetStorage() {
-        return 5 * this.electrical_count[2];
+        return 5 * this.electrical_count[2]
+            + 5 * this.electrical_count[3];
     }
     GetWindmill() {
         var production = 0;
@@ -3269,9 +3297,11 @@ class Accessories extends Part {
         }
         //Electrical
         for (let i = 0; i < this.electrical_count.length; i++) {
-            let ts = this.electric_list[i].stats.Clone();
-            ts = ts.Multiply(this.electrical_count[i]);
-            stats = stats.Add(ts);
+            if (this.electrical_count[i] > 0) {
+                let ts = this.electric_list[i].stats.Clone();
+                ts = ts.Multiply(this.electrical_count[i]);
+                stats = stats.Add(ts);
+            }
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
         //Information
@@ -3325,6 +3355,9 @@ class Localization {
             return "!" + key + "!";
         }
     }
+}
+function lu(s, ...args) {
+    return StringFmt.Format(local.e(s), ...args);
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -3419,9 +3452,9 @@ class Cockpit extends Part {
     }
     fromJSON(js, json_version) {
         this.selected_type = js["type"];
-        this.selected_upgrades = js["upgrades"];
-        this.selected_safety = js["safety"];
-        this.selected_gunsights = js["sights"];
+        this.selected_upgrades = BoolArr(js["upgrades"], this.selected_upgrades.length);
+        this.selected_safety = BoolArr(js["safety"], this.selected_safety.length);
+        this.selected_gunsights = BoolArr(js["sights"], this.selected_gunsights.length);
         if (this.is_primary)
             this.selected_upgrades[0] = false;
         if (json_version > 10.35)
@@ -3436,9 +3469,9 @@ class Cockpit extends Part {
     }
     deserialize(d) {
         this.selected_type = d.GetNum();
-        this.selected_upgrades = d.GetBoolArr();
-        this.selected_safety = d.GetBoolArr();
-        this.selected_gunsights = d.GetBoolArr();
+        this.selected_upgrades = d.GetBoolArr(this.selected_upgrades.length);
+        this.selected_safety = d.GetBoolArr(this.selected_safety.length);
+        this.selected_gunsights = d.GetBoolArr(this.selected_gunsights.length);
         if (this.is_primary)
             this.selected_upgrades[0] = false;
         if (d.version > 10.35)
@@ -4017,7 +4050,7 @@ class Engine extends Part {
                 this.etype_inputs.era_sel = d.GetNum();
                 this.etype_inputs.material_fudge = d.GetNum();
                 this.etype_inputs.quality_fudge = d.GetNum();
-                this.etype_inputs.upgrades = d.GetBoolArr();
+                this.etype_inputs.upgrades = d.GetBoolArr(0); //Put 0, because we don't have a minimum, and below checks the actual length to decide which version
                 if (this.etype_inputs.upgrades.length == 6) {
                     this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
                     if (this.etype_inputs.upgrades[0]) {
@@ -4342,8 +4375,14 @@ class Engine extends Part {
             }
         }
     }
-    GetHavePropeller() {
-        return !(this.GetIsPulsejet() || this.GetGenerator());
+    GetNumPropellers() {
+        if (!(this.GetIsPulsejet() || this.GetGenerator())) {
+            if (this.use_pp) {
+                return 2;
+            }
+            return 1;
+        }
+        return 0;
     }
     GetIsTractorNacelle() {
         if (!this.GetIsPulsejet()
@@ -4982,12 +5021,12 @@ class Engines extends Part {
     GetAsymmetry() {
         return this.is_asymmetric;
     }
-    GetHavePropeller() {
+    GetNumPropellers() {
+        var count = 0;
         for (let e of this.engines) {
-            if (e.GetHavePropeller())
-                return true;
+            count += e.GetNumPropellers();
         }
-        return false;
+        return count;
     }
     GetOverspeed() {
         var os = 100;
@@ -5171,7 +5210,7 @@ class Propeller extends Part {
         super();
         this.idx_prop = 2;
         this.use_variable = false;
-        this.have_propellers = true;
+        this.num_propellers = 0;
         this.prop_list = [];
         for (let elem of json["props"]) {
             this.prop_list.push({
@@ -5224,30 +5263,30 @@ class Propeller extends Part {
     CanBeVariable() {
         return !this.prop_list[this.idx_prop].automatic;
     }
-    SetHavePropeller(have) {
-        this.have_propellers = have;
+    SetNumPropeller(have) {
+        this.num_propellers = have;
     }
-    GetHavePropeller() {
-        return this.have_propellers;
+    GetNumPropellers() {
+        return this.num_propellers;
     }
     GetEnergy() {
-        if (this.have_propellers)
+        if (this.num_propellers)
             return this.prop_list[this.idx_prop].energy;
         else
             return 5;
     }
     GetTurn() {
-        if (this.have_propellers)
+        if (this.num_propellers)
             return this.prop_list[this.idx_prop].turn;
         else
             return 7;
     }
     PartStats() {
         var stats = new Stats();
-        if (this.have_propellers) {
-            stats = stats.Add(this.prop_list[this.idx_prop].stats);
+        if (this.num_propellers) {
+            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             if (this.use_variable) {
-                stats.cost += 2;
+                stats.cost += 2 * this.num_propellers;
                 stats.warnings.push({
                     source: lu("Manually Variable Propeller"),
                     warning: lu("MVP_Warning")
@@ -6552,9 +6591,10 @@ class Wings extends Part {
         }
         //Closed Wing effects
         if (this.is_closed) {
-            stats.mass += 1;
-            stats.control -= 5;
-            stats.maxstrain += 20;
+            var pairs = Math.floor(1.0e-6 + this.wing_list.length / 2.0);
+            stats.mass += 1 * pairs;
+            stats.control -= 5 * pairs;
+            stats.maxstrain += 20 * pairs;
         }
         //Stagger effects, monoplane is nothing.
         if (this.wing_list.length > 1) {
@@ -6898,7 +6938,7 @@ class ControlSurfaces extends Part {
         this.elevator_sel = js["elevator_sel"];
         this.flaps_sel = js["flaps_sel"];
         this.slats_sel = js["slats_sel"];
-        this.drag_sel = js["drag_sel"];
+        this.drag_sel = BoolArr(js["drag_sel"], this.drag_sel.length);
     }
     serialize(s) {
         s.PushNum(this.aileron_sel);
@@ -6914,7 +6954,7 @@ class ControlSurfaces extends Part {
         this.elevator_sel = d.GetNum();
         this.flaps_sel = d.GetNum();
         this.slats_sel = d.GetNum();
-        this.drag_sel = d.GetBoolArr();
+        this.drag_sel = d.GetBoolArr(this.drag_sel.length);
     }
     GetAileronList() {
         return this.aileron_list;
@@ -7099,9 +7139,9 @@ class Reinforcement extends Part {
         };
     }
     fromJSON(js, json_version) {
-        this.ext_wood_count = js["ext_wood_count"];
-        this.ext_steel_count = js["ext_steel_count"];
-        this.cant_count = js["cant_count"];
+        this.ext_wood_count = NumArr(js["ext_wood_count"], this.ext_wood_count.length);
+        this.ext_steel_count = NumArr(js["ext_steel_count"], this.ext_steel_count.length);
+        this.cant_count = NumArr(js["cant_count"], this.cant_count.length);
         this.wires = js["wires"];
         this.cabane_sel = js["cabane_sel"];
         if (json_version > 10.25) {
@@ -7109,12 +7149,6 @@ class Reinforcement extends Part {
         }
         else {
             this.wing_blades = false;
-        }
-        while (this.ext_wood_list.length > this.ext_wood_count.length) {
-            this.ext_wood_count.push(0);
-        }
-        while (this.ext_steel_list.length > this.ext_steel_count.length) {
-            this.ext_steel_count.push(0);
         }
         if (json_version < 10.45) {
             this.cant_count[0] *= 2;
@@ -7132,9 +7166,9 @@ class Reinforcement extends Part {
         s.PushBool(this.wing_blades);
     }
     deserialize(d) {
-        this.ext_wood_count = d.GetNumArr();
-        this.ext_steel_count = d.GetNumArr();
-        this.cant_count = d.GetNumArr();
+        this.ext_wood_count = d.GetNumArr(this.ext_wood_count.length);
+        this.ext_steel_count = d.GetNumArr(this.ext_steel_count.length);
+        this.cant_count = d.GetNumArr(this.cant_count.length);
         this.wires = d.GetBool();
         this.cabane_sel = d.GetNum();
         if (d.version > 10.25) {
@@ -7142,12 +7176,6 @@ class Reinforcement extends Part {
         }
         else {
             this.wing_blades = false;
-        }
-        while (this.ext_wood_list.length > this.ext_wood_count.length) {
-            this.ext_wood_count.push(0);
-        }
-        while (this.ext_steel_list.length > this.ext_steel_count.length) {
-            this.ext_steel_count.push(0);
         }
         if (d.version < 10.45) {
             this.cant_count[0] *= 2;
@@ -7448,7 +7476,7 @@ class Fuel extends Part {
         };
     }
     fromJSON(js, json_version) {
-        this.tank_count = js["tank_count"];
+        this.tank_count = NumArr(js["tank_count"], this.tank_count.length);
         this.self_sealing = js["self_sealing"];
         this.fire_extinguisher = js["fire_extinguisher"];
         this.wing_area = -1;
@@ -7459,7 +7487,7 @@ class Fuel extends Part {
         s.PushBool(this.fire_extinguisher);
     }
     deserialize(d) {
-        this.tank_count = d.GetNumArr();
+        this.tank_count = d.GetNumArr(this.tank_count.length);
         this.self_sealing = d.GetBool();
         this.fire_extinguisher = d.GetBool();
         this.wing_area = -1;
@@ -7869,7 +7897,7 @@ class LandingGear extends Part {
     fromJSON(js, json_version) {
         this.gear_sel = js["gear_sel"];
         this.retract = js["retract"];
-        this.extra_sel = js["extra_sel"];
+        this.extra_sel = BoolArr(js["extra_sel"], this.extra_sel.length);
     }
     serialize(s) {
         s.PushNum(this.gear_sel);
@@ -7879,7 +7907,7 @@ class LandingGear extends Part {
     deserialize(d) {
         this.gear_sel = d.GetNum();
         this.retract = d.GetBool();
-        this.extra_sel = d.GetBoolArr();
+        this.extra_sel = d.GetBoolArr(this.extra_sel.length);
     }
     GetGearName() {
         if (this.retract && this.gear_list[this.gear_sel].name == "Boat Hull") {
@@ -7951,7 +7979,7 @@ class LandingGear extends Part {
         this.CalculateStats = callback;
     }
     IsVital() {
-        return this.gear_list[this.gear_sel].can_retract;
+        return true;
     }
     PartStats() {
         var stats = new Stats();
@@ -8708,7 +8736,7 @@ class WeaponSystem extends Part {
         this.raw_weapon_type = js["weapon_type"];
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = js["fixed"];
-        this.directions = js["directions"];
+        this.directions = BoolArr(js["directions"], this.directions.length);
         this.weapons = [];
         this.ammo = js["ammo"];
         if (this.ammo == null)
@@ -8760,7 +8788,7 @@ class WeaponSystem extends Part {
         this.raw_weapon_type = d.GetNum();
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
-        this.directions = d.GetBoolArr();
+        this.directions = d.GetBoolArr(this.directions.length);
         this.ammo = d.GetNum();
         var wlen = d.GetNum();
         this.weapons = [];
@@ -10371,7 +10399,7 @@ class Aircraft {
             this.engines.SetHelicopter(true);
         }
         stats = stats.Add(this.engines.PartStats());
-        this.propeller.SetHavePropeller(this.engines.GetHavePropeller());
+        this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
         stats = stats.Add(this.propeller.PartStats());
         //Fuel goes here, because it makes sections.
         stats = stats.Add(this.fuel.PartStats());
@@ -10382,7 +10410,7 @@ class Aircraft {
         this.weapons.SetTractorInfo(this.engines.GetTractor());
         this.weapons.SetPusherInfo(this.engines.GetPusher());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
-        this.weapons.SetHavePropeller(this.engines.GetHavePropeller());
+        this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
         stats = stats.Add(this.weapons.PartStats());
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());

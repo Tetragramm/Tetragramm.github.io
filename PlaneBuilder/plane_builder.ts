@@ -111,7 +111,3 @@ var aircraft_display: Aircraft_HTML;
 var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
 var local: Localization;
 var enable_anim = false;
-
-function lu(s: string, ...args: any[]): string {
-    return StringFmt.Format(local.e(s), ...args);
-}

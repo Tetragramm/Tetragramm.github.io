@@ -375,7 +375,7 @@ class EngineBuilder {
                 estats.stats.fuelconsumption = Math.floor(1.0e-6 + 1.25 * estats.stats.fuelconsumption);
                 estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
                 estats.stats.drag += this.min_IAF / 10;
-                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                estats.stats.cost += 1 + Math.floor(1.0e-6 + estats.stats.power / 50);
                 var extra = this.compressor_count - 1;
                 estats.altitude = 29 + 10 * 2 * extra;
                 estats.stats.reliability -= extra;
@@ -388,7 +388,7 @@ class EngineBuilder {
                 estats.stats.power = Math.floor(1.0e-6 + 1.25 * estats.stats.power);
                 estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
                 estats.stats.drag += 2 * (this.min_IAF / 10);
-                estats.stats.cost += Math.floor(1.0e-6 + estats.stats.power / 50);
+                estats.stats.cost += 1 + Math.floor(1.0e-6 + estats.stats.power / 50);
                 var extra = this.compressor_count - 1;
                 estats.altitude = 49 + 10 * 2 * extra;
                 estats.stats.reliability -= extra;
