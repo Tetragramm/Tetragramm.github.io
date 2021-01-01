@@ -113,7 +113,11 @@ class Cockpits extends Part {
     }
 
     public GetCrashList() {
-        return [this.positions[0].GetCrash()];
+        var lst = [];
+        for (let p of this.positions) {
+            lst.push(p.GetCrash());
+        }
+        return lst;
     }
 
     public SetNumberOfCockpits(num: number) {

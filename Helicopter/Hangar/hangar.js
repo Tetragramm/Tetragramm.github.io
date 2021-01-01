@@ -9600,8 +9600,1772 @@ const loadJSON = (path, callback) => {
     };
     xobj.send(null);
 };
+class Derived_HTML {
+    constructor(tbl) {
+        var fragment = document.createDocumentFragment();
+        var row0 = insertRow(fragment);
+        var name_cell = row0.insertCell();
+        // Aircraft Name
+        name_cell.colSpan = 2;
+        this.name_inp = document.createElement("INPUT");
+        this.name_inp.defaultValue = lu("Derived Aircraft Name");
+        name_cell.appendChild(this.name_inp);
+        CreateTH(row0, lu("Stat Cost"));
+        // Aircraft Cost
+        this.cost_cell = row0.insertCell();
+        CreateTH(row0, lu("Stat Upkeep"));
+        // Aircraft Upkeep
+        this.upkeep_cell = row0.insertCell();
+        // Rules Version
+        CreateTH(row0, lu("Derived Version #"));
+        this.version_cell = row0.insertCell();
+        var row1 = insertRow(fragment);
+        CreateTH(row1, lu("Derived Mass Variations"));
+        CreateTH(row1, lu("Derived Boost"));
+        CreateTH(row1, lu("Derived Handling"));
+        CreateTH(row1, lu("Derived Rate of Climb"));
+        CreateTH(row1, lu("Derived Stall Speed"));
+        CreateTH(row1, lu("Derived Top Speed"));
+        CreateTH(row1, lu("Derived Vital Components")).colSpan = 2;
+        this.bomb_row2 = insertRow(fragment);
+        CreateTH(this.bomb_row2, lu("Derived Full Fuel with Bombs"));
+        this.boost_fullwB = this.bomb_row2.insertCell();
+        this.hand_fullwB = this.bomb_row2.insertCell();
+        this.roc_fullwB = this.bomb_row2.insertCell();
+        this.ss_fullwB = this.bomb_row2.insertCell();
+        this.ts_fullwB = this.bomb_row2.insertCell();
+        this.vital_components = this.bomb_row2.insertCell();
+        this.vital_components.rowSpan = 3;
+        this.vital_components.colSpan = 3;
+        this.bomb_row1 = insertRow(fragment);
+        CreateTH(this.bomb_row1, lu("Derived Half Fuel with Bombs"));
+        this.boost_halfwB = this.bomb_row1.insertCell();
+        this.hand_halfwB = this.bomb_row1.insertCell();
+        this.roc_halfwB = this.bomb_row1.insertCell();
+        this.ss_halfwB = this.bomb_row1.insertCell();
+        this.ts_halfwB = this.bomb_row1.insertCell();
+        this.full_row = insertRow(fragment);
+        CreateTH(this.full_row, lu("Derived Full Fuel"));
+        this.boost_full = this.full_row.insertCell();
+        this.hand_full = this.full_row.insertCell();
+        this.roc_full = this.full_row.insertCell();
+        this.ss_full = this.full_row.insertCell();
+        this.ts_full = this.full_row.insertCell();
+        var half = insertRow(fragment);
+        CreateTH(half, lu("Derived Half Fuel"));
+        this.boost_half = half.insertCell();
+        this.hand_half = half.insertCell();
+        this.roc_half = half.insertCell();
+        this.ss_half = half.insertCell();
+        this.ts_half = half.insertCell();
+        var empty = insertRow(fragment);
+        CreateTH(empty, lu("Derived Empty Fuel"));
+        this.boost_empty = empty.insertCell();
+        this.hand_empty = empty.insertCell();
+        this.roc_empty = empty.insertCell();
+        this.ss_empty = empty.insertCell();
+        this.ts_empty = empty.insertCell();
+        var row7 = insertRow(fragment);
+        CreateTH(row7, lu("Derived Propulsion")).colSpan = 2;
+        CreateTH(row7, lu("Derived Aerodynamics")).colSpan = 2;
+        CreateTH(row7, lu("Derived Survivability")).colSpan = 2;
+        CreateTH(row7, lu("Derived Crew Members")).colSpan = 2;
+        var row8 = insertRow(fragment);
+        CreateTH(row8, lu("Derived Dropoff"));
+        this.dropoff_cell = row8.insertCell();
+        CreateTH(row8, lu("Derived Stability"));
+        this.stability_cell = row8.insertCell();
+        CreateTH(row8, lu("Derived Crash Safety"));
+        this.crashsafety_cell = row8.insertCell();
+        CreateTH(row8, lu("Derived Crew/Passengers"));
+        this.crew_cell = row8.insertCell();
+        var row9 = insertRow(fragment);
+        CreateTH(row9, lu("Derived Overspeed"));
+        this.overspeed_cell = row9.insertCell();
+        CreateTH(row9, lu("Derived Energy Loss"));
+        this.eloss_cell = row9.insertCell();
+        CreateTH(row9, lu("Stat Toughness"));
+        this.toughness_cell = row9.insertCell();
+        CreateTH(row9, lu("Stat Visibility"));
+        this.visibility_cell = row9.insertCell();
+        var row10 = insertRow(fragment);
+        CreateTH(row10, lu("Derived Fuel Uses"));
+        this.maxfuel_cell = row10.insertCell();
+        CreateTH(row10, lu("Derived Turn Bleed"));
+        this.turnbleed_cell = row10.insertCell();
+        CreateTH(row10, lu("Stat Max Strain"));
+        this.mxstrain_cell = row10.insertCell();
+        CreateTH(row10, lu("Derived Attack Modifier"));
+        this.attack_cell = row10.insertCell();
+        var row11 = insertRow(fragment);
+        CreateTH(row11, lu("Stat Reliability"));
+        this.reliability_cell = row11.insertCell();
+        CreateTH(row11, lu("Derived Landing Gear"));
+        this.landing_cell = row11.insertCell();
+        CreateTH(row11, lu("Derived Communications"));
+        this.communications_cell = row11.insertCell();
+        CreateTH(row11, lu("Derived Escape"));
+        this.escape_cell = row11.insertCell();
+        var row12 = insertRow(fragment);
+        CreateTH(row12, lu("Derived Ideal Engine Altitude"));
+        this.maxalt_cell = row12.insertCell();
+        CreateTH(row12, lu("Derived Is Flammable Question"));
+        this.flammable_cell = row12.insertCell();
+        CreateTH(row12, lu("Derived Electrics"));
+        this.electric_cell = row12.insertCell();
+        CreateTH(row12, lu("Stat Flight Stress"));
+        this.flightstress_cell = row12.insertCell();
+        this.weapon_head = CreateTH(insertRow(fragment), lu("Derived Weapon Systems"));
+        this.weapon_head.colSpan = 8;
+        this.weapon_cell = insertRow(fragment).insertCell();
+        this.weapon_cell.colSpan = 8;
+        this.warning_head = CreateTH(insertRow(fragment), lu("Derived Special Rules"));
+        this.warning_head.colSpan = 8;
+        this.warning_cell = insertRow(fragment).insertCell();
+        this.warning_cell.colSpan = 8;
+        tbl.appendChild(fragment);
+        this.tbl = tbl;
+    }
+    UpdateDisplay(acft) {
+        var stats = acft.GetStats();
+        var derived = acft.GetDerivedStats();
+        this.name_inp.value = acft.name;
+        this.version_cell.textContent = acft.GetVersion();
+        this.cost_cell.textContent = stats.cost.toString() + "þ ";
+        if (acft.GetUsed().GetEnabled()) {
+            this.cost_cell.textContent += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ " + lu("Price Word Used") + ")";
+        }
+        this.upkeep_cell.textContent = stats.upkeep.toString() + "þ";
+        //Empty
+        // this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
+        // this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
+        // this.hand_empty.textContent = derived.HandlingEmpty.toString();
+        // this.boost_empty.textContent = derived.BoostEmpty.toString();
+        // this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
+        this.ts_empty.textContent = (0).toString();
+        this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
+        this.hand_empty.textContent = derived.HandlingEmpty.toString();
+        this.boost_empty.textContent = (0).toString();
+        this.roc_empty.textContent = (0).toString();
+        //Half
+        this.ts_half.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
+        this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
+        this.hand_half.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
+        this.boost_half.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
+        this.roc_half.textContent = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2).toString();
+        //Full
+        this.ts_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
+        this.ss_full.textContent = derived.StallSpeedFull.toString();
+        this.hand_full.textContent = derived.HandlingFull.toString();
+        this.boost_full.textContent = derived.BoostFull.toString();
+        this.roc_full.textContent = derived.RateOfClimbFull.toString();
+        if (stats.bomb_mass > 0 || this.show_bombs) {
+            this.bomb_row1.hidden = false;
+            this.bomb_row2.hidden = false;
+            this.bomb_row2.appendChild(this.vital_components);
+            this.vital_components.rowSpan = 5;
+            //Half
+            this.ts_halfwB.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
+            this.ss_halfwB.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
+            this.hand_halfwB.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
+            this.boost_halfwB.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
+            this.roc_halfwB.textContent = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2).toString();
+            //Full
+            this.ts_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
+            this.ss_fullwB.textContent = derived.StallSpeedFullwBombs.toString();
+            this.hand_fullwB.textContent = derived.HandlingFullwBombs.toString();
+            this.boost_fullwB.textContent = derived.BoostFullwBombs.toString();
+            this.roc_fullwB.textContent = derived.RateOfClimbwBombs.toString();
+        }
+        else {
+            this.bomb_row1.hidden = true;
+            this.bomb_row2.hidden = true;
+            this.full_row.appendChild(this.vital_components);
+            this.vital_components.rowSpan = 3;
+        }
+        this.dropoff_cell.textContent = derived.Dropoff.toString();
+        this.overspeed_cell.textContent = derived.Overspeed.toString();
+        this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
+        if (acft.GetIsFlammable())
+            this.flammable_cell.textContent = lu("Yes");
+        else
+            this.flammable_cell.textContent = lu("No");
+        this.stability_cell.textContent = derived.Stabiilty.toString();
+        this.eloss_cell.textContent = derived.EnergyLoss.toString();
+        this.turnbleed_cell.textContent = derived.TurnBleed.toString();
+        this.landing_cell.textContent = acft.GetGearName();
+        this.maxalt_cell.textContent = acft.GetMinIAF().toString() + "-" + acft.GetMaxAltitude().toString();
+        this.reliability_cell.textContent = this.Array2Str(acft.GetReliabilityList());
+        this.toughness_cell.textContent = derived.Toughness.toString();
+        this.mxstrain_cell.textContent = derived.MaxStrain.toString();
+        this.escape_cell.textContent = this.Array2Str(acft.GetEscapeList());
+        this.crashsafety_cell.textContent = stats.crashsafety.toString();
+        this.crew_cell.textContent = acft.GetCockpits().GetNumberOfCockpits().toString() + "/" + (acft.GetPassengers().GetSeats() + acft.GetPassengers().GetBeds()).toString();
+        this.flightstress_cell.textContent = this.Array2Str(acft.GetStressList());
+        this.visibility_cell.textContent = this.Array2Str(acft.GetVisibilityList());
+        this.attack_cell.textContent = this.Array2Str(acft.GetAttackList());
+        this.communications_cell.textContent = acft.GetCommunicationName();
+        var wm = acft.GetAccessories().GetWindmill();
+        var bat = acft.GetAccessories().GetStorage();
+        var electric_str = stats.charge.toString();
+        if (wm > 0)
+            electric_str += " + " + wm.toString() + lu("Derived Per 10 Speed");
+        if (bat > 0)
+            electric_str += " + " + bat + " " + lu("Derived Battery word storage");
+        this.electric_cell.textContent = electric_str;
+        var vital = "";
+        var vlist = acft.VitalComponentList();
+        for (let v of vlist) {
+            vital += v + "<br/>";
+        }
+        this.vital_components.innerHTML = vital;
+        var wlist = acft.GetWeapons().GetWeaponList();
+        var dlist = acft.GetWeapons().GetDirectionList();
+        var bombs = acft.GetMunitions().GetBombCount();
+        var rockets = acft.GetMunitions().GetRocketCount();
+        var internal = acft.GetMunitions().GetInternalBombCount();
+        var weaphtml = "";
+        if (bombs > 0) {
+            var int_bomb = Math.min(bombs, internal);
+            var ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                weaphtml += (int_bomb.toString() + lu(" Bomb Mass Internally."));
+            if (ext_bomb > 0)
+                weaphtml += (ext_bomb.toString() + lu(" Bomb Mass Externally."));
+            if (int_bomb > 0) {
+                var mib = Math.min(int_bomb, acft.GetMunitions().GetMaxBombSize());
+                weaphtml += (lu("Largest Internal Bomb", mib.toString()));
+            }
+            internal -= int_bomb;
+            weaphtml += "<br/>";
+        }
+        if (rockets > 0) {
+            var int_rock = Math.min(rockets, internal);
+            var ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                weaphtml += (int_rock.toString() + lu(" Rocket Mass Internally."));
+            if (ext_rock > 0)
+                weaphtml += (ext_rock.toString() + lu(" Rocket Mass Externally."));
+            weaphtml += "<br/>";
+        }
+        for (let w of acft.GetWeapons().GetWeaponSets()) {
+            var ds = w.GetDirection();
+            var dirs = [];
+            for (let i = 0; i < dlist.length; i++) {
+                if (ds[i])
+                    dirs.push(lu(dlist[i]));
+            }
+            let hits = w.GetHits();
+            var tags = [lu("Weapon Tag Jam", w.GetJam())];
+            if (w.GetReload() > 0) {
+                tags.push(lu("Weapon Tag Reload", w.GetReload()));
+            }
+            if (w.GetFinalWeapon().rapid) {
+                tags.push(lu("Weapon Tag Rapid Fire"));
+            }
+            if (w.GetFinalWeapon().shells) {
+                tags.push(lu("Weapon Tag Shells"));
+            }
+            if (w.GetFinalWeapon().ap > 0) {
+                tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
+            }
+            if (w.GetProjectile() == ProjectileType.HEATRAY) {
+                let chgs = w.GetHRCharges();
+                weaphtml += lu("Weapon Description Heat Ray", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), StringFmt.Join("\\", chgs), StringFmt.Join(", ", tags));
+            }
+            else {
+                weaphtml += lu("Weapon Description", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), w.GetShots(), StringFmt.Join(", ", tags));
+            }
+            weaphtml += "<br\>";
+        }
+        this.weapon_cell.innerHTML = weaphtml;
+        var warnhtml = "";
+        for (let w of stats.warnings) {
+            warnhtml += w.source + ":  " + w.warning + "<br/>";
+        }
+        this.warning_cell.innerHTML = warnhtml;
+    }
+    WeaponName(acft, w) {
+        var wlist = acft.GetWeapons().GetWeaponList();
+        var ds = w.GetDirection();
+        var dircount = 0;
+        for (let d of ds) {
+            if (d)
+                dircount++;
+        }
+        var name = "";
+        if (dircount == 1 && w.GetFixed())
+            name += lu("Fixed") + " ";
+        else if (dircount <= 2)
+            name += lu("Flexible") + " ";
+        else
+            name += lu("Turreted") + " ";
+        if (w.GetAction() == ActionType.MECHANICAL) {
+            name += lu("Weapon Tag Mechanical Action") + " ";
+        }
+        else if (w.GetAction() == ActionType.GAST) {
+            name += lu("Weapon Tag Gast Principle") + " ";
+        }
+        else if (w.GetAction() == ActionType.ROTARY) {
+            name += lu("Weapon Tag Rotary") + " ";
+        }
+        if (w.GetProjectile() == ProjectileType.HEATRAY) {
+            name += lu("Weapon Tag Heat Ray") + " ";
+        }
+        else if (w.GetProjectile() == ProjectileType.GYROJETS) {
+            name += lu("Weapon Tag Gyrojet") + " ";
+        }
+        else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
+            name += lu("Weapon Tag Pneumatic") + " ";
+        }
+        name += wlist[w.GetWeaponSelected()].abrv;
+        return name;
+    }
+    GetName() {
+        return this.name_inp.value;
+    }
+    SetName(name) {
+        console.log(name);
+        this.name_inp.value = name;
+    }
+    SetShowBombs(set) {
+        this.show_bombs = set;
+    }
+    Array2Str(arr) {
+        var str = "";
+        for (let i = 0; i < arr.length - 1; i++) {
+            str += arr[i].toString() + ", ";
+        }
+        if (arr.length > 0)
+            str += arr[arr.length - 1].toString();
+        return str;
+    }
+}
+// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.4.4
+var LZString = (function () {
+    // private property
+    var f = String.fromCharCode;
+    var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+    var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+    var baseReverseDic = {};
+    function getBaseValue(alphabet, character) {
+        if (!baseReverseDic[alphabet]) {
+            baseReverseDic[alphabet] = {};
+            for (var i = 0; i < alphabet.length; i++) {
+                baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+            }
+        }
+        return baseReverseDic[alphabet][character];
+    }
+    var LZString = {
+        compressToBase64: function (input) {
+            if (input == null)
+                return "";
+            var res = LZString._compress(input, 6, function (a) { return keyStrBase64.charAt(a); });
+            switch (res.length % 4) { // To produce valid Base64
+                default: // When could this happen ?
+                case 0: return res;
+                case 1: return res + "===";
+                case 2: return res + "==";
+                case 3: return res + "=";
+            }
+        },
+        decompressFromBase64: function (input) {
+            if (input == null)
+                return "";
+            if (input == "")
+                return null;
+            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
+        },
+        compressToUTF16: function (input) {
+            if (input == null)
+                return "";
+            return LZString._compress(input, 15, function (a) { return f(a + 32); }) + " ";
+        },
+        decompressFromUTF16: function (compressed) {
+            if (compressed == null)
+                return "";
+            if (compressed == "")
+                return null;
+            return LZString._decompress(compressed.length, 16384, function (index) { return compressed.charCodeAt(index) - 32; });
+        },
+        //compress into uint8array (UCS-2 big endian format)
+        compressToUint8Array: function (uncompressed) {
+            var compressed = LZString.compress(uncompressed);
+            var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
+            for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
+                var current_value = compressed.charCodeAt(i);
+                buf[i * 2] = current_value >>> 8;
+                buf[i * 2 + 1] = current_value % 256;
+            }
+            return buf;
+        },
+        //decompress from uint8array (UCS-2 big endian format)
+        decompressFromUint8Array: function (compressed) {
+            if (compressed === null || compressed === undefined) {
+                return LZString.decompress(compressed);
+            }
+            else {
+                var buf = new Array(compressed.length / 2); // 2 bytes per character
+                for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
+                    buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
+                }
+                var result = [];
+                buf.forEach(function (c) {
+                    result.push(f(c));
+                });
+                return LZString.decompress(result.join(''));
+            }
+        },
+        //compress into a string that is already URI encoded
+        compressToEncodedURIComponent: function (input) {
+            if (input == null)
+                return "";
+            return LZString._compress(input, 6, function (a) { return keyStrUriSafe.charAt(a); });
+        },
+        //decompress from an output of compressToEncodedURIComponent
+        decompressFromEncodedURIComponent: function (input) {
+            if (input == null)
+                return "";
+            if (input == "")
+                return null;
+            input = input.replace(/ /g, "+");
+            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+        },
+        compress: function (uncompressed) {
+            return LZString._compress(uncompressed, 16, function (a) { return f(a); });
+        },
+        _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+            if (uncompressed == null)
+                return "";
+            var i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, // Compensate for the first entry which should not count
+            context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0, ii;
+            for (ii = 0; ii < uncompressed.length; ii += 1) {
+                context_c = uncompressed.charAt(ii);
+                if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
+                    context_dictionary[context_c] = context_dictSize++;
+                    context_dictionaryToCreate[context_c] = true;
+                }
+                context_wc = context_w + context_c;
+                if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
+                    context_w = context_wc;
+                }
+                else {
+                    if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                        if (context_w.charCodeAt(0) < 256) {
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 8; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        }
+                        else {
+                            value = 1;
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1) | value;
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = 0;
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 16; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                }
+                                else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        }
+                        context_enlargeIn--;
+                        if (context_enlargeIn == 0) {
+                            context_enlargeIn = Math.pow(2, context_numBits);
+                            context_numBits++;
+                        }
+                        delete context_dictionaryToCreate[context_w];
+                    }
+                    else {
+                        value = context_dictionary[context_w];
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    // Add wc to the dictionary.
+                    context_dictionary[context_wc] = context_dictSize++;
+                    context_w = String(context_c);
+                }
+            }
+            // Output the code for w.
+            if (context_w !== "") {
+                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                    if (context_w.charCodeAt(0) < 256) {
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 8; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    else {
+                        value = 1;
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | value;
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = 0;
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 16; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    delete context_dictionaryToCreate[context_w];
+                }
+                else {
+                    value = context_dictionary[context_w];
+                    for (i = 0; i < context_numBits; i++) {
+                        context_data_val = (context_data_val << 1) | (value & 1);
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                        value = value >> 1;
+                    }
+                }
+                context_enlargeIn--;
+                if (context_enlargeIn == 0) {
+                    context_enlargeIn = Math.pow(2, context_numBits);
+                    context_numBits++;
+                }
+            }
+            // Mark the end of the stream
+            value = 2;
+            for (i = 0; i < context_numBits; i++) {
+                context_data_val = (context_data_val << 1) | (value & 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data_position = 0;
+                    context_data.push(getCharFromInt(context_data_val));
+                    context_data_val = 0;
+                }
+                else {
+                    context_data_position++;
+                }
+                value = value >> 1;
+            }
+            // Flush the last char
+            while (true) {
+                context_data_val = (context_data_val << 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data.push(getCharFromInt(context_data_val));
+                    break;
+                }
+                else
+                    context_data_position++;
+            }
+            return context_data.join('');
+        },
+        decompress: function (compressed) {
+            if (compressed == null)
+                return "";
+            if (compressed == "")
+                return null;
+            return LZString._decompress(compressed.length, 32768, function (index) { return compressed.charCodeAt(index); });
+        },
+        _decompress: function (length, resetValue, getNextValue) {
+            var dictionary = [], next, enlargeIn = 4, dictSize = 4, numBits = 3, entry = "", result = [], i, w, bits, resb, maxpower, power, c, data = { val: getNextValue(0), position: resetValue, index: 1 };
+            for (i = 0; i < 3; i += 1) {
+                dictionary[i] = i;
+            }
+            bits = 0;
+            maxpower = Math.pow(2, 2);
+            power = 1;
+            while (power != maxpower) {
+                resb = data.val & data.position;
+                data.position >>= 1;
+                if (data.position == 0) {
+                    data.position = resetValue;
+                    data.val = getNextValue(data.index++);
+                }
+                bits |= (resb > 0 ? 1 : 0) * power;
+                power <<= 1;
+            }
+            switch (next = bits) {
+                case 0:
+                    bits = 0;
+                    maxpower = Math.pow(2, 8);
+                    power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = f(bits);
+                    break;
+                case 1:
+                    bits = 0;
+                    maxpower = Math.pow(2, 16);
+                    power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = f(bits);
+                    break;
+                case 2:
+                    return "";
+            }
+            dictionary[3] = c;
+            w = c;
+            result.push(c);
+            while (true) {
+                if (data.index > length) {
+                    return "";
+                }
+                bits = 0;
+                maxpower = Math.pow(2, numBits);
+                power = 1;
+                while (power != maxpower) {
+                    resb = data.val & data.position;
+                    data.position >>= 1;
+                    if (data.position == 0) {
+                        data.position = resetValue;
+                        data.val = getNextValue(data.index++);
+                    }
+                    bits |= (resb > 0 ? 1 : 0) * power;
+                    power <<= 1;
+                }
+                switch (c = bits) {
+                    case 0:
+                        bits = 0;
+                        maxpower = Math.pow(2, 8);
+                        power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = f(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 1:
+                        bits = 0;
+                        maxpower = Math.pow(2, 16);
+                        power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = f(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 2:
+                        return result.join('');
+                }
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+                if (dictionary[c]) {
+                    entry = dictionary[c];
+                }
+                else {
+                    if (c === dictSize) {
+                        entry = w + w.charAt(0);
+                    }
+                    else {
+                        return null;
+                    }
+                }
+                result.push(entry);
+                // Add w+entry[0] to the dictionary.
+                dictionary[dictSize++] = w + entry.charAt(0);
+                enlargeIn--;
+                w = entry;
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+            }
+        }
+    };
+    return LZString;
+})();
+// MIT License
+// Copyright(c) 2017 Sven Ulrich
+// https://github.com/iwt-svenulrich/typescript-string-operations
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files(the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and / or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+class StringFmt {
+    static IsNullOrWhiteSpace(value) {
+        try {
+            if (value == null || value == 'undefined') {
+                return true;
+            }
+            return value.toString().replace(/\s/g, '').length < 1;
+        }
+        catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+    static Join(delimiter, ...args) {
+        try {
+            let firstArg = args[0];
+            if (Array.isArray(firstArg) || firstArg instanceof Array) {
+                let tempString = StringFmt.Empty;
+                let count = 0;
+                for (let i = 0; i < firstArg.length; i++) {
+                    let current = firstArg[i];
+                    if (i < firstArg.length - 1) {
+                        tempString += current + delimiter;
+                    }
+                    else {
+                        tempString += current;
+                    }
+                }
+                return tempString;
+            }
+            else if (typeof firstArg === 'object') {
+                let tempString = StringFmt.Empty;
+                let objectArg = firstArg;
+                let keys = Object.keys(firstArg); //get all Properties of the Object as Array
+                keys.forEach(element => { tempString += objectArg[element] + delimiter; });
+                tempString = tempString.slice(0, tempString.length - delimiter.length); //remove last delimiter
+                return tempString;
+            }
+            let stringArray = args;
+            return StringFmt.join(delimiter, ...stringArray);
+        }
+        catch (e) {
+            console.log(e);
+            return StringFmt.Empty;
+        }
+    }
+    static Format(format, ...args) {
+        try {
+            if (format.match(StringFmt.regexNumber)) {
+                return StringFmt.format(StringFmt.regexNumber, format, args);
+            }
+            if (format.match(StringFmt.regexObject)) {
+                return StringFmt.format(StringFmt.regexObject, format, args, true);
+            }
+            return format;
+        }
+        catch (e) {
+            console.log(e);
+            return StringFmt.Empty;
+        }
+    }
+    static format(regex, format, args, parseByObject = false) {
+        return format.replace(regex, function (match, x) {
+            let s = match.split(':');
+            if (s.length > 1) {
+                x = s[0].replace('{', '');
+                match = s[1].replace('}', ''); //U
+            }
+            let arg;
+            if (parseByObject) {
+                arg = args[0][x];
+            }
+            else {
+                arg = args[x];
+            }
+            if (arg == null || arg == undefined || match.match(/{\d+}/)) {
+                return arg;
+            }
+            arg = StringFmt.parsePattern(match, arg);
+            return typeof arg != 'undefined' && arg != null ? arg : StringFmt.Empty;
+        });
+    }
+    static parsePattern(match, arg) {
+        switch (match) {
+            case 'L': {
+                arg = arg.toLocaleLowerCase();
+                return arg;
+            }
+            case 'U': {
+                arg = arg.toLocaleUpperCase();
+                return arg;
+            }
+            case 'd': {
+                if (typeof (arg) === 'string') {
+                    return StringFmt.getDisplayDateFromString(arg);
+                }
+                else if (arg instanceof Date) {
+                    return StringFmt.Format('{0:00}.{1:00}.{2:0000}', arg.getDate(), arg.getMonth(), arg.getFullYear());
+                }
+                break;
+            }
+            case 's': {
+                if (typeof (arg) === 'string') {
+                    return StringFmt.getSortableDateFromString(arg);
+                }
+                else if (arg instanceof Date) {
+                    return StringFmt.Format('{0:0000}-{1:00}-{2:00}', arg.getFullYear(), arg.getMonth(), arg.getDate());
+                }
+                break;
+            }
+            case 'n': { //Tausender Trennzeichen
+                if (typeof (arg) !== "string")
+                    arg = arg.toString();
+                let replacedString = arg.replace(/,/g, '.');
+                if (isNaN(parseFloat(replacedString)) || replacedString.length <= 3) {
+                    break;
+                }
+                let numberparts = replacedString.split(/[^0-9]+/g);
+                let parts = numberparts;
+                if (numberparts.length > 1) {
+                    parts = [StringFmt.join('', ...(numberparts.splice(0, numberparts.length - 1))), numberparts[numberparts.length - 1]];
+                }
+                let integer = parts[0];
+                var mod = integer.length % 3;
+                var output = (mod > 0 ? (integer.substring(0, mod)) : StringFmt.Empty);
+                var firstGroup = output;
+                var remainingGroups = integer.substring(mod).match(/.{3}/g);
+                output = output + '.' + StringFmt.Join('.', remainingGroups);
+                arg = output + (parts.length > 1 ? ',' + parts[1] : '');
+                return arg;
+            }
+            case 'x': {
+                return this.decimalToHexString(arg);
+            }
+            case 'X': {
+                return this.decimalToHexString(arg, true);
+            }
+            default: {
+                break;
+            }
+        }
+        if ((typeof (arg) === 'number' || !isNaN(arg)) && !isNaN(+match) && !StringFmt.IsNullOrWhiteSpace(arg)) {
+            return StringFmt.formatNumber(arg, match);
+        }
+        return arg;
+    }
+    static decimalToHexString(value, upperCase = false) {
+        const parsed = parseFloat(value);
+        const hexNumber = parsed.toString(16);
+        return upperCase ? hexNumber.toLocaleUpperCase() : hexNumber;
+    }
+    static getDisplayDateFromString(input) {
+        let splitted;
+        splitted = input.split('-');
+        if (splitted.length <= 1) {
+            return input;
+        }
+        let day = splitted[splitted.length - 1];
+        let month = splitted[splitted.length - 2];
+        let year = splitted[splitted.length - 3];
+        day = day.split('T')[0];
+        day = day.split(' ')[0];
+        return `${day}.${month}.${year}`;
+    }
+    static getSortableDateFromString(input) {
+        let splitted = input.replace(',', '').split('.');
+        if (splitted.length <= 1) {
+            return input;
+        }
+        let times = splitted[splitted.length - 1].split(' ');
+        let time = StringFmt.Empty;
+        if (times.length > 1) {
+            time = times[times.length - 1];
+        }
+        let year = splitted[splitted.length - 1].split(' ')[0];
+        let month = splitted[splitted.length - 2];
+        let day = splitted[splitted.length - 3];
+        let result = `${year}-${month}-${day}`;
+        if (!StringFmt.IsNullOrWhiteSpace(time) && time.length > 1) {
+            result += `T${time}`;
+        }
+        else {
+            result += "T00:00:00";
+        }
+        return result;
+    }
+    static formatNumber(input, formatTemplate) {
+        let count = formatTemplate.length;
+        let stringValue = input.toString();
+        if (count <= stringValue.length) {
+            return stringValue;
+        }
+        let remainingCount = count - stringValue.length;
+        remainingCount += 1; //Array must have an extra entry
+        return new Array(remainingCount).join('0') + stringValue;
+    }
+    static join(delimiter, ...args) {
+        let temp = StringFmt.Empty;
+        for (let i = 0; i < args.length; i++) {
+            if ((typeof args[i] == 'string' && StringFmt.IsNullOrWhiteSpace(args[i]))
+                || (typeof args[i] != "number" && typeof args[i] != "string")) {
+                continue;
+            }
+            let arg = "" + args[i];
+            temp += arg;
+            for (let i2 = i + 1; i2 < args.length; i2++) {
+                if (StringFmt.IsNullOrWhiteSpace(args[i2])) {
+                    continue;
+                }
+                temp += delimiter;
+                i = i2 - 1;
+                break;
+            }
+        }
+        return temp;
+    }
+}
+StringFmt.regexNumber = /{(\d+(:\w*)?)}/g;
+StringFmt.regexObject = /{(\w+(:\w*)?)}/g;
+StringFmt.Empty = '';
+class StringBuilder {
+    constructor(value) {
+        this.Values = [];
+        if (!StringFmt.IsNullOrWhiteSpace(value)) {
+            this.Values = new Array(value);
+        }
+    }
+    ToString() {
+        return this.Values.join('');
+    }
+    Append(value) {
+        this.Values.push(value);
+    }
+    AppendLine(value) {
+        this.Values.push('\r\n' + value);
+    }
+    AppendFormat(format, ...args) {
+        this.Values.push(StringFmt.Format(format, ...args));
+    }
+    AppendLineFormat(format, ...args) {
+        this.Values.push("\r\n" + StringFmt.Format(format, ...args));
+    }
+    Clear() {
+        this.Values = [];
+    }
+}
+// MIT License
+function scrollToFragment(options = {}) {
+    unmount();
+    getElement = options.getElement || getElementById;
+    scrollIntoView = options.scrollIntoView || defaultScrollIntoView;
+    mount();
+}
+function mount() {
+    documentObserver = new MutationObserver(handleDomMutation);
+    addEventListener("click", handleDocumentClick);
+    unlistenHistory = undefined;
+    startObserving();
+}
+function unmount() {
+    stopObserving();
+    removeEventListener("click", handleDocumentClick);
+    if (unlistenHistory)
+        unlistenHistory();
+    unlistenHistory = undefined;
+    documentObserver = undefined;
+}
+function startObserving() {
+    var _a;
+    stopObserving();
+    if (!getLocation().hash)
+        return;
+    STOP_EVENTS.forEach(addStopListener);
+    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.observe(document, OBSERVER_CONFIG);
+    adjustScrollPosition();
+    observeTimeout = setTimeout(stopObserving, OBSERVE_TIMEOUT_MS);
+}
+function stopObserving() {
+    var _a;
+    clearTimeout(observeTimeout);
+    cancelAnimationFrame(throttleRequestId);
+    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.disconnect();
+    STOP_EVENTS.forEach(removeStopListener);
+}
+function addStopListener(eventName) {
+    document.addEventListener(eventName, stopObserving);
+}
+function removeStopListener(eventName) {
+    document.removeEventListener(eventName, stopObserving);
+}
+function handleDocumentClick(event) {
+    if (event.defaultPrevented)
+        return;
+    const anchor = closestAIncludingSelf(event.target);
+    if (!anchor || !anchor.hash)
+        return;
+    if (anchor.pathname === getLocation().pathname)
+        throttle(startObserving);
+}
+function closestAIncludingSelf(element) {
+    let target = element;
+    while (target && target.nodeName !== "A")
+        target = target.parentElement;
+    return target;
+}
+function handleDomMutation() {
+    throttle(adjustScrollPosition);
+}
+function adjustScrollPosition() {
+    const hash = getLocation().hash;
+    if (!hash)
+        return;
+    const fragmentId = decodeURIComponent(hash.substring(1));
+    const element = getElement.call(null, fragmentId);
+    if (element)
+        scrollIntoView.call(null, element);
+}
+function getLocation() {
+    return location;
+}
+function getElementById(id) {
+    return document.getElementById(id);
+}
+function defaultScrollIntoView(element) {
+    element.scrollIntoView();
+}
+function throttle(callback) {
+    cancelAnimationFrame(throttleRequestId);
+    throttleRequestId = requestAnimationFrame(callback);
+}
+let getElement;
+let scrollIntoView;
+let unlistenHistory;
+let documentObserver;
+let observeTimeout;
+let throttleRequestId;
+const OBSERVER_CONFIG = {
+    attributes: true,
+    characterData: true,
+    childList: true,
+    subtree: true,
+};
+const OBSERVE_TIMEOUT_MS = 10000;
+const STOP_EVENTS = ["selectstart", "touchend", "wheel"];
+/// <reference path="../impl/Aircraft.ts" />
+/// <reference path="../disp/Tools.ts" />
+/// <reference path="../disp/Derived.ts" />
+/// <reference path="../lz/lz-string.ts" />
+/// <reference path="../string/index.ts" />
+/// <reference path="../scroll/scroll.ts" />
+const init = () => {
+    const sp = new URLSearchParams(location.search);
+    var lang = sp.get("lang");
+    var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
+    var proms = jsons.map(d => fetch(d));
+    Promise.all(proms)
+        .then(ps => Promise.all(ps.map(p => p.json())))
+        .then(resp => {
+        var string_JSON = resp[0];
+        parts_JSON = resp[1];
+        engine_JSON = resp[2];
+        weapon_JSON = resp[3];
+        //Strings bit
+        local = new Localization(string_JSON);
+        if (lang) {
+            local.SetLanguages(lang);
+        }
+        else if (window.localStorage.language) {
+            local.SetLanguages(window.localStorage.language);
+        }
+        //Engine bit
+        var nameliststr = window.localStorage.getItem("engines_names");
+        var namelist = [];
+        if (nameliststr) {
+            namelist = JSON.parse(nameliststr);
+            for (let n of namelist) {
+                engine_list.set(n, new EngineList(n));
+            }
+        }
+        for (let el of engine_JSON["lists"]) {
+            if (!engine_list.has(el["name"]))
+                engine_list.set(el["name"], new EngineList(el["name"]));
+            engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
+        }
+        InitHTML();
+        InitStats();
+        LoadFromHangar(0);
+    });
+};
+window.addEventListener("DOMContentLoaded", init);
+var engine_list = new Map([["Custom", new EngineList("Custom")]]);
+var local;
+var acft_builder;
+var stats_builder;
+var acft_hangar;
+var stats_hangar;
+var name_builder;
+var select_hangar;
+var select_acft;
+var chosen_hangar;
+var list_create;
+var list_delete;
+var list_input;
+var parts_JSON;
+var engine_JSON;
+var weapon_JSON;
+var enable_anim = false;
+function InitHTML() {
+    chosen_hangar = "Default";
+    select_hangar = document.createElement("SELECT");
+    select_hangar.onchange = () => {
+        chosen_hangar = select_hangar.options[select_hangar.selectedIndex].text;
+        RefreshAcftSelect(LoadAcftList());
+    };
+    RefreshHangarSelect(LoadHangarList());
+    select_acft = document.createElement("SELECT");
+    select_acft.onchange = () => { LoadFromHangar(select_acft.selectedIndex); };
+    RefreshAcftSelect(LoadAcftList());
+    name_builder = document.createElement("INPUT");
+    var load_btn = document.getElementById("btn_load");
+    load_btn.onclick = () => {
+        acft_builder.fromJSON(JSON.parse(JSON.stringify(acft_hangar.toJSON())));
+        stats_builder.UpdateDisplay(acft_builder);
+        window.localStorage.aircraft = JSON.stringify(acft_builder.toJSON());
+        RefreshDisplay();
+        BlinkNeutral(load_btn.parentElement);
+    };
+    var save_btn = document.getElementById("btn_save");
+    save_btn.onclick = () => {
+        acft_builder.name = name_builder.value;
+        AddToHangar(acft_builder);
+        BlinkNeutral(save_btn.parentElement);
+    };
+    var json_btn = document.getElementById("btn_json");
+    json_btn.multiple = false;
+    json_btn.accept = "application/JSON";
+    json_btn.onchange = (evt) => {
+        LoadJSON(json_btn);
+        BlinkNeutral(json_btn.parentElement);
+    };
+    var remove_btn = document.getElementById("btn_remove");
+    remove_btn.onclick = () => {
+        RemoveFromHangar(acft_hangar.name);
+        BlinkNeutral(remove_btn.parentElement);
+    };
+    var hangar_save = document.getElementById("btn_save_h");
+    hangar_save.onclick = () => {
+        download(JSON.stringify(LoadAcftList()), chosen_hangar + ".json", "json");
+        BlinkNeutral(hangar_save.parentElement);
+    };
+    var hangar_load = document.getElementById("btn_json_h");
+    hangar_load.setAttribute("type", "file");
+    hangar_load.multiple = false;
+    hangar_load.accept = "application/JSON";
+    hangar_load.onchange = (evt) => {
+        if (hangar_load.files.length == 0)
+            return;
+        BlinkNeutral(hangar_load.parentElement);
+        var file = hangar_load.files[0];
+        var reader = new FileReader();
+        reader.onloadend = () => {
+            try {
+                var name = file.name.substr(0, file.name.length - 5);
+                var acft_list;
+                acft_list = JSON.parse(reader.result);
+                if (acft_list.names.length != acft_list.acft.length) {
+                    throw "Bad";
+                }
+                AddHangar(name);
+                window.localStorage.setItem("hangar." + name, reader.result);
+                chosen_hangar = name;
+                RefreshHangarSelect(LoadHangarList());
+                RefreshAcftSelect(LoadAcftList());
+            }
+            catch (_a) {
+                BlinkBad(hangar_load.parentElement);
+            }
+        };
+        reader.readAsText(file);
+        hangar_load.value = "";
+    };
+    var list_create = document.getElementById("lbl_create_list");
+    var list_input = document.getElementById("btn_create_list");
+    list_create.onclick = () => {
+        select_hangar.selectedIndex = AddHangar(list_input.value);
+        chosen_hangar = list_input.value;
+        RefreshAcftSelect(LoadAcftList());
+        BlinkNeutral(list_create.parentElement);
+    };
+    var list_delete = document.getElementById("btn_delete_list");
+    list_delete.onclick = () => {
+        RemoveHangar(chosen_hangar);
+        BlinkNeutral(list_delete.parentElement);
+    };
+}
+function InitStats() {
+    let acft_data = window.localStorage.aircraft;
+    acft_builder = new Aircraft(parts_JSON, weapon_JSON, false);
+    if (acft_data) {
+        console.log("Used Saved Data");
+        try {
+            acft_builder.fromJSON(JSON.parse(acft_data));
+        }
+        catch (_a) {
+            console.log("Saved Data Failed.");
+            acft_builder.Reset();
+        }
+    }
+    stats_builder = new Derived_HTML(document.getElementById("table_builder"));
+    stats_builder.SetShowBombs(true);
+    stats_builder.UpdateDisplay(acft_builder);
+    acft_hangar = new Aircraft(parts_JSON, weapon_JSON, false);
+    stats_hangar = new Derived_HTML(document.getElementById("table_hangar"));
+    stats_hangar.SetShowBombs(true);
+}
+function LoadHangarList() {
+    var hangar_list;
+    if (!window.localStorage.getItem("hangar_names")) {
+        window.localStorage.setItem("hangar_names", JSON.stringify(["Default"]));
+    }
+    hangar_list = JSON.parse(window.localStorage.getItem("hangar_names"));
+    if (hangar_list.length == 0) {
+        window.localStorage.setItem("hangar_names", JSON.stringify(["Default"]));
+        hangar_list = JSON.parse(window.localStorage.getItem("hangar_names"));
+    }
+    return hangar_list;
+}
+function LoadAcftList() {
+    var acft_list;
+    if (window.localStorage.getItem("hangar." + chosen_hangar)) {
+        acft_list = JSON.parse(window.localStorage.getItem("hangar." + chosen_hangar));
+    }
+    else {
+        acft_list = {
+            names: ["Basic Biplane"],
+            acft: ["AAEAjGB0DMwLACECGBnAlgYwAQLQBwBskA7AU2AEBLgaAwGhmgUEZpFY+oHQAlACwD2xJFgCyAgC4CATgCMkAVywAtCFgAcABj55gAJGABcYACAaVVuwAQDdpw4B-h8BsAoex8+9BwsZJnySqpgGtq6NGYUAIKQAGaxAAIACQwAkJQA-AABNNm5OfZ2jE6eZhxlAMCeHmXVtdS1NjYeTRxVbKwW1J7tNOld1WmDnCweVBbsA8OsvS7TtnUMs0XzY8AVVLRT1BRde6sHDEA"]
+        };
+        window.localStorage.setItem("hangar." + chosen_hangar, JSON.stringify(acft_list));
+    }
+    return acft_list;
+}
+function LoadFromHangar(idx) {
+    var acft_list = LoadAcftList();
+    try {
+        var str = LZString.decompressFromEncodedURIComponent(acft_list.acft[idx]);
+        var arr = _stringToArrayBuffer(str);
+        var des = new Deserialize(arr);
+        acft_hangar.deserialize(des);
+    }
+    catch (e) {
+        console.log("Compressed Query Parameter Failed.");
+        console.log(e);
+        acft_hangar.Reset();
+    }
+    stats_hangar.UpdateDisplay(acft_hangar);
+    select_acft.selectedIndex = idx;
+    RefreshDisplay();
+}
+function AddHangar(hangar) {
+    var hangar_list = LoadHangarList();
+    var idx = hangar_list.findIndex(n => n == hangar);
+    if (idx == -1) {
+        hangar_list.push(hangar);
+        idx = hangar_list.length - 1;
+        SaveHangarList(hangar_list);
+    }
+    return idx;
+}
+function AddToHangar(acft) {
+    var s = new Serialize();
+    acft.serialize(s);
+    var arr = s.FinalArray();
+    var str2 = _arrayBufferToString(arr);
+    var data = LZString.compressToEncodedURIComponent(str2);
+    var acft_list = LoadAcftList();
+    var idx = acft_list.names.findIndex(n => n == acft.name);
+    if (idx == -1) {
+        acft_list.names.push(acft.name);
+        acft_list.acft.push(data);
+        idx = acft_list.names.length - 1;
+    }
+    else {
+        acft_list.acft[idx] = data;
+    }
+    SaveAcftList(acft_list);
+    return idx;
+}
+function RemoveHangar(name) {
+    var hangar_list = LoadHangarList();
+    var idx = hangar_list.findIndex(n => n == name);
+    if (idx != -1) {
+        hangar_list.splice(idx, 1);
+        window.localStorage.removeItem("hangar." + name);
+    }
+    SaveHangarList(hangar_list);
+    chosen_hangar = "Default";
+    RefreshHangarSelect(LoadHangarList());
+    RefreshAcftSelect(LoadAcftList());
+    LoadFromHangar(0);
+}
+function RemoveFromHangar(name) {
+    var acft_list = LoadAcftList();
+    var idx = acft_list.names.findIndex(n => n == name);
+    if (idx != -1) {
+        acft_list.names.splice(idx, 1);
+        acft_list.acft.splice(idx, 1);
+    }
+    SaveAcftList(acft_list);
+    LoadFromHangar(Math.min(acft_list.names.length - 1, idx));
+}
+function SaveAcftList(acft_list) {
+    window.localStorage.setItem("hangar." + chosen_hangar, JSON.stringify(acft_list));
+    RefreshAcftSelect(acft_list);
+}
+function SaveHangarList(hangar_list) {
+    window.localStorage.setItem("hangar_names", JSON.stringify(hangar_list));
+    RefreshHangarSelect(hangar_list);
+}
+function RefreshAcftSelect(acft_list) {
+    while (select_acft.options.length > 0) {
+        select_acft.options.remove(0);
+    }
+    for (let i = 0; i < acft_list.names.length; i++) {
+        let opt = document.createElement("OPTION");
+        opt.text = acft_list.names[i];
+        select_acft.add(opt);
+    }
+}
+function RefreshHangarSelect(hangar_list) {
+    while (select_hangar.options.length > 0) {
+        select_hangar.options.remove(0);
+    }
+    var idx = 0;
+    for (let i = 0; i < hangar_list.length; i++) {
+        let opt = document.createElement("OPTION");
+        opt.text = hangar_list[i];
+        select_hangar.add(opt);
+        if (hangar_list[i] == chosen_hangar)
+            idx = i;
+    }
+    select_hangar.selectedIndex = idx;
+}
+function LoadJSON(input) {
+    if (input.files.length == 0)
+        return;
+    var file = input.files[0];
+    var reader = new FileReader();
+    reader.onloadend = () => {
+        try {
+            var str = JSON.parse(reader.result);
+            var acft = new Aircraft(parts_JSON, weapon_JSON, false);
+            if (acft.fromJSON(str)) {
+                var idx = AddToHangar(acft);
+                LoadFromHangar(idx);
+            }
+        }
+        catch (e) {
+            console.error(e, e.stack);
+        }
+    };
+    reader.readAsText(file);
+    input.value = "";
+}
+function RefreshDisplay() {
+    var tbl1 = document.getElementById("table_builder");
+    var tbl2 = document.getElementById("table_hangar");
+    var tbl3 = document.getElementById("table_comp");
+    MergeTables(tbl1, tbl2, tbl3);
+}
+function MergeTables(tbl1, tbl2, tbl3) {
+    while (tbl3.children.length) {
+        tbl3.children[0].remove();
+    }
+    for (let r = 0; r < tbl1.children.length; r++) {
+        var row1 = tbl1.children[r];
+        var row2 = tbl2.children[r];
+        var row3 = tbl3.insertRow();
+        for (let c = 0; c < Math.max(row1.children.length, row2.children.length); c++) {
+            if (r == 0 && c == 0) {
+                var cell = row3.insertCell();
+                cell.colSpan = 2;
+                cell.appendChild(name_builder);
+                name_builder.value = acft_builder.name;
+                var hr = document.createElement("HR");
+                hr.className = "dashed";
+                cell.appendChild(hr);
+                cell.appendChild(select_hangar);
+                cell.appendChild(document.createElement("BR"));
+                cell.appendChild(select_acft);
+                continue;
+            }
+            var cell1 = row1.children[c];
+            var cell2 = row2.children[c];
+            if (cell1.nodeName == "TH") {
+                row3.appendChild(cell1.cloneNode(true));
+            }
+            else {
+                var clone = cell1.cloneNode(true);
+                clone.innerHTML += "<hr class=\"dashed\">" + cell2.innerHTML;
+                row3.appendChild(clone);
+            }
+        }
+    }
+}
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+class AlterStats extends Part {
+    constructor() {
+        super();
+        this.stats = new Stats();
+    }
+    PartStats() {
+        var stats = new Stats();
+        if (!this.stats.liftbleed)
+            this.stats.liftbleed = 0;
+        if (!this.stats.drag)
+            this.stats.drag = 0;
+        if (!this.stats.mass)
+            this.stats.mass = 0;
+        if (!this.stats.wetmass)
+            this.stats.wetmass = 0;
+        if (!this.stats.bomb_mass)
+            this.stats.bomb_mass = 0;
+        if (!this.stats.cost)
+            this.stats.cost = 0;
+        if (!this.stats.upkeep)
+            this.stats.upkeep = 0;
+        if (!this.stats.control)
+            this.stats.control = 0;
+        if (!this.stats.pitchstab)
+            this.stats.pitchstab = 0;
+        if (!this.stats.latstab)
+            this.stats.latstab = 0;
+        if (!this.stats.wingarea)
+            this.stats.wingarea = 0;
+        if (!this.stats.maxstrain)
+            this.stats.maxstrain = 0;
+        if (!this.stats.structure)
+            this.stats.structure = 0;
+        if (!this.stats.toughness)
+            this.stats.toughness = 0;
+        if (!this.stats.power)
+            this.stats.power = 0;
+        if (!this.stats.fuelconsumption)
+            this.stats.fuelconsumption = 0;
+        if (!this.stats.fuel)
+            this.stats.fuel = 0;
+        if (!this.stats.pitchspeed)
+            this.stats.pitchspeed = 0;
+        if (!this.stats.pitchboost)
+            this.stats.pitchboost = 0;
+        if (!this.stats.charge)
+            this.stats.charge = 0;
+        if (!this.stats.crashsafety)
+            this.stats.crashsafety = 0;
+        stats = stats.Add(this.stats);
+        return stats;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+}
 /// <reference path="./Tools.ts" />
 class Display {
+}
+/// <reference path="./Display.ts" />
+/// <reference path="../impl/Accessories.ts" />
+class Accessories_HTML extends Display {
+    constructor(acc) {
+        super();
+        this.acc = acc;
+        document.getElementById("lbl_accessories").textContent = lu("Accessories Section Title");
+        var tbl = document.getElementById("tbl_accessories");
+        var fragment = document.createDocumentFragment();
+        var row = insertRow(fragment);
+        CreateTH(row, lu("Accessories Armour Coverage"));
+        CreateTH(row, lu("Accessories Climate"));
+        CreateTH(row, lu("Accessories Visibility"));
+        CreateTH(row, lu("Accessories Additional Part Stats"));
+        row = insertRow(fragment);
+        this.InitArmour(row.insertCell());
+        this.InitClimate(row.insertCell());
+        this.InitVisibility(row.insertCell());
+        this.InitStats(row.insertCell());
+        row = insertRow(fragment);
+        CreateTH(row, lu("Accessories Information"));
+        CreateTH(row, lu("Accessories Electrical"));
+        CreateTH(row, lu("Accessories Control"));
+        row = insertRow(fragment);
+        this.InitInformation(row.insertCell());
+        this.InitElectrical(row.insertCell());
+        this.InitControl(row.insertCell());
+        tbl.appendChild(fragment);
+    }
+    InitArmour(cell) {
+        var fs = CreateFlexSection(cell);
+        var lfs = CreateFlexSection(fs.div1);
+        var rfs = CreateFlexSection(fs.div2);
+        this.a_AP = [];
+        var len = this.acc.GetArmourCoverage().length;
+        for (let i = 0; i < len; i++)
+            this.a_AP.push(document.createElement("INPUT"));
+        for (let i = 0; i < len / 2; i++) {
+            let AP = i + 1;
+            FlexInput("AP " + AP.toString(), this.a_AP[i], lfs);
+            this.a_AP[i].onchange = () => { this.acc.SetArmourCoverage(i, this.a_AP[i].valueAsNumber); };
+            let j = i + len / 2;
+            AP = j + 1;
+            FlexInput("AP " + AP.toString(), this.a_AP[j], rfs);
+            this.a_AP[j].onchange = () => { this.acc.SetArmourCoverage(j, this.a_AP[j].valueAsNumber); };
+        }
+    }
+    InitElectrical(cell) {
+        var fs = CreateFlexSection(cell);
+        this.radio = document.createElement("SELECT");
+        FlexSelect(lu("Accessories Radio"), this.radio, fs);
+        var rlist = this.acc.GetRadioList();
+        for (let i = 0; i < rlist.length; i++) {
+            let opt = document.createElement("OPTION");
+            opt.text = lu(rlist[i].name);
+            this.radio.add(opt);
+        }
+        this.radio.onchange = () => { this.acc.SetRadioSel(this.radio.selectedIndex); };
+        this.elect = [];
+        var elist = this.acc.GetElectricalList();
+        for (let i = 0; i < elist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexInput(lu(elist[i].name), inp, fs);
+            inp.onchange = () => { this.acc.SetElectricalCount(i, inp.valueAsNumber); };
+            this.elect.push(inp);
+        }
+    }
+    InitInformation(cell) {
+        var fs = CreateFlexSection(cell);
+        var ilist = this.acc.GetInfoList();
+        this.info = [];
+        for (let i = 0; i < ilist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexCheckbox(lu(ilist[i].name), inp, fs);
+            inp.onchange = () => { this.acc.SetInfoSel(i, inp.checked); };
+            this.info.push(inp);
+        }
+    }
+    InitVisibility(cell) {
+        var fs = CreateFlexSection(cell);
+        var vlist = this.acc.GetVisibilityList();
+        this.visi = [];
+        for (let i = 0; i < vlist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexCheckbox(lu(vlist[i].name), inp, fs);
+            inp.onchange = () => { this.acc.SetVisibilitySel(i, inp.checked); };
+            this.visi.push(inp);
+        }
+    }
+    InitClimate(cell) {
+        var fs = CreateFlexSection(cell);
+        var clist = this.acc.GetClimateList();
+        this.clim = [];
+        for (let i = 0; i < clist.length; i++) {
+            let inp = document.createElement("INPUT");
+            FlexCheckbox(lu(clist[i].name), inp, fs);
+            inp.onchange = () => { this.acc.SetClimateSel(i, inp.checked); };
+            this.clim.push(inp);
+        }
+    }
+    InitControl(cell) {
+        var fs = CreateFlexSection(cell);
+        this.auto = document.createElement("SELECT");
+        var alist = this.acc.GetAutopilotList();
+        FlexSelect(lu("Accessories Autopilot"), this.auto, fs);
+        for (let i = 0; i < alist.length; i++) {
+            let opt = document.createElement("OPTION");
+            opt.text = lu(alist[i].name);
+            this.auto.add(opt);
+        }
+        this.auto.onchange = () => { this.acc.SetAutopilotSel(this.auto.selectedIndex); };
+        var clist = this.acc.GetControlList();
+        this.cont = document.createElement("SELECT");
+        FlexSelect(lu("Accessories Control Aids"), this.cont, fs);
+        for (let i = 0; i < clist.length; i++) {
+            let opt = document.createElement("OPTION");
+            opt.text = lu(clist[i].name);
+            this.cont.add(opt);
+        }
+        this.cont.onchange = () => { this.acc.SetControlSel(this.cont.selectedIndex); };
+    }
+    InitStats(stat_cell) {
+        stat_cell.rowSpan = 3;
+        stat_cell.className = "inner_table";
+        var tbl_stat = document.createElement("TABLE");
+        tbl_stat.className = "inner_table";
+        stat_cell.appendChild(tbl_stat);
+        var h1_row = tbl_stat.insertRow();
+        CreateTH(h1_row, lu("Stat Drag"));
+        CreateTH(h1_row, lu("Stat Mass"));
+        CreateTH(h1_row, lu("Stat Cost"));
+        var c1_row = tbl_stat.insertRow();
+        this.d_drag = c1_row.insertCell();
+        this.d_mass = c1_row.insertCell();
+        this.d_cost = c1_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, lu("Stat Structure"));
+        CreateTH(h2_row, lu("Stat Charge"));
+        CreateTH(h2_row, lu("Stat Lift Bleed"));
+        var c2_row = tbl_stat.insertRow();
+        this.d_strc = c2_row.insertCell();
+        this.d_chgh = c2_row.insertCell();
+        this.d_lift = c2_row.insertCell();
+        var h3_row = tbl_stat.insertRow();
+        CreateTH(h3_row, lu("Stat Visibility"));
+        CreateTH(h3_row, lu("Stat Flight Stress"));
+        CreateTH(h3_row, "");
+        var c3_row = tbl_stat.insertRow();
+        this.d_visi = c3_row.insertCell();
+        this.d_strs = c3_row.insertCell();
+        c3_row.insertCell();
+    }
+    UpdateDisplay() {
+        var AP = this.acc.GetArmourCoverage();
+        for (let i = 0; i < AP.length; i++) {
+            this.a_AP[i].valueAsNumber = AP[i];
+        }
+        this.radio.selectedIndex = this.acc.GetRadioSel();
+        var elist = this.acc.GetElectricalCount();
+        for (let i = 0; i < elist.length; i++) {
+            this.elect[i].valueAsNumber = elist[i];
+        }
+        var ilist = this.acc.GetInfoSel();
+        for (let i = 0; i < ilist.length; i++) {
+            this.info[i].checked = ilist[i];
+        }
+        var vlist = this.acc.GetVisibilitySel();
+        for (let i = 0; i < vlist.length; i++) {
+            this.visi[i].checked = vlist[i];
+        }
+        var clist = this.acc.GetClimateSel();
+        var cenab = this.acc.GetClimateEnable();
+        for (let i = 0; i < vlist.length; i++) {
+            this.clim[i].checked = clist[i];
+            this.clim[i].disabled = !cenab[i];
+        }
+        this.auto.selectedIndex = this.acc.GetAutopilotSel();
+        this.cont.selectedIndex = this.acc.GetControlSel();
+        var stats = this.acc.PartStats();
+        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
+        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
+        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
+        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
+        BlinkIfChanged(this.d_chgh, stats.charge.toString(), true);
+        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_strs, stats.flightstress.toString(), false);
+    }
 }
 /// <reference path="./Display.ts" />
 /// <reference path="../impl/Era.ts" />
@@ -11723,195 +13487,6 @@ class LandingGear_HTML extends Display {
     }
 }
 /// <reference path="./Display.ts" />
-/// <reference path="../impl/Accessories.ts" />
-class Accessories_HTML extends Display {
-    constructor(acc) {
-        super();
-        this.acc = acc;
-        document.getElementById("lbl_accessories").textContent = lu("Accessories Section Title");
-        var tbl = document.getElementById("tbl_accessories");
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
-        CreateTH(row, lu("Accessories Armour Coverage"));
-        CreateTH(row, lu("Accessories Climate"));
-        CreateTH(row, lu("Accessories Visibility"));
-        CreateTH(row, lu("Accessories Additional Part Stats"));
-        row = insertRow(fragment);
-        this.InitArmour(row.insertCell());
-        this.InitClimate(row.insertCell());
-        this.InitVisibility(row.insertCell());
-        this.InitStats(row.insertCell());
-        row = insertRow(fragment);
-        CreateTH(row, lu("Accessories Information"));
-        CreateTH(row, lu("Accessories Electrical"));
-        CreateTH(row, lu("Accessories Control"));
-        row = insertRow(fragment);
-        this.InitInformation(row.insertCell());
-        this.InitElectrical(row.insertCell());
-        this.InitControl(row.insertCell());
-        tbl.appendChild(fragment);
-    }
-    InitArmour(cell) {
-        var fs = CreateFlexSection(cell);
-        var lfs = CreateFlexSection(fs.div1);
-        var rfs = CreateFlexSection(fs.div2);
-        this.a_AP = [];
-        var len = this.acc.GetArmourCoverage().length;
-        for (let i = 0; i < len; i++)
-            this.a_AP.push(document.createElement("INPUT"));
-        for (let i = 0; i < len / 2; i++) {
-            let AP = i + 1;
-            FlexInput("AP " + AP.toString(), this.a_AP[i], lfs);
-            this.a_AP[i].onchange = () => { this.acc.SetArmourCoverage(i, this.a_AP[i].valueAsNumber); };
-            let j = i + len / 2;
-            AP = j + 1;
-            FlexInput("AP " + AP.toString(), this.a_AP[j], rfs);
-            this.a_AP[j].onchange = () => { this.acc.SetArmourCoverage(j, this.a_AP[j].valueAsNumber); };
-        }
-    }
-    InitElectrical(cell) {
-        var fs = CreateFlexSection(cell);
-        this.radio = document.createElement("SELECT");
-        FlexSelect(lu("Accessories Radio"), this.radio, fs);
-        var rlist = this.acc.GetRadioList();
-        for (let i = 0; i < rlist.length; i++) {
-            let opt = document.createElement("OPTION");
-            opt.text = lu(rlist[i].name);
-            this.radio.add(opt);
-        }
-        this.radio.onchange = () => { this.acc.SetRadioSel(this.radio.selectedIndex); };
-        this.elect = [];
-        var elist = this.acc.GetElectricalList();
-        for (let i = 0; i < elist.length; i++) {
-            let inp = document.createElement("INPUT");
-            FlexInput(lu(elist[i].name), inp, fs);
-            inp.onchange = () => { this.acc.SetElectricalCount(i, inp.valueAsNumber); };
-            this.elect.push(inp);
-        }
-    }
-    InitInformation(cell) {
-        var fs = CreateFlexSection(cell);
-        var ilist = this.acc.GetInfoList();
-        this.info = [];
-        for (let i = 0; i < ilist.length; i++) {
-            let inp = document.createElement("INPUT");
-            FlexCheckbox(lu(ilist[i].name), inp, fs);
-            inp.onchange = () => { this.acc.SetInfoSel(i, inp.checked); };
-            this.info.push(inp);
-        }
-    }
-    InitVisibility(cell) {
-        var fs = CreateFlexSection(cell);
-        var vlist = this.acc.GetVisibilityList();
-        this.visi = [];
-        for (let i = 0; i < vlist.length; i++) {
-            let inp = document.createElement("INPUT");
-            FlexCheckbox(lu(vlist[i].name), inp, fs);
-            inp.onchange = () => { this.acc.SetVisibilitySel(i, inp.checked); };
-            this.visi.push(inp);
-        }
-    }
-    InitClimate(cell) {
-        var fs = CreateFlexSection(cell);
-        var clist = this.acc.GetClimateList();
-        this.clim = [];
-        for (let i = 0; i < clist.length; i++) {
-            let inp = document.createElement("INPUT");
-            FlexCheckbox(lu(clist[i].name), inp, fs);
-            inp.onchange = () => { this.acc.SetClimateSel(i, inp.checked); };
-            this.clim.push(inp);
-        }
-    }
-    InitControl(cell) {
-        var fs = CreateFlexSection(cell);
-        this.auto = document.createElement("SELECT");
-        var alist = this.acc.GetAutopilotList();
-        FlexSelect(lu("Accessories Autopilot"), this.auto, fs);
-        for (let i = 0; i < alist.length; i++) {
-            let opt = document.createElement("OPTION");
-            opt.text = lu(alist[i].name);
-            this.auto.add(opt);
-        }
-        this.auto.onchange = () => { this.acc.SetAutopilotSel(this.auto.selectedIndex); };
-        var clist = this.acc.GetControlList();
-        this.cont = document.createElement("SELECT");
-        FlexSelect(lu("Accessories Control Aids"), this.cont, fs);
-        for (let i = 0; i < clist.length; i++) {
-            let opt = document.createElement("OPTION");
-            opt.text = lu(clist[i].name);
-            this.cont.add(opt);
-        }
-        this.cont.onchange = () => { this.acc.SetControlSel(this.cont.selectedIndex); };
-    }
-    InitStats(stat_cell) {
-        stat_cell.rowSpan = 3;
-        stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE");
-        tbl_stat.className = "inner_table";
-        stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
-        CreateTH(h1_row, lu("Stat Drag"));
-        CreateTH(h1_row, lu("Stat Mass"));
-        CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl_stat.insertRow();
-        this.d_drag = c1_row.insertCell();
-        this.d_mass = c1_row.insertCell();
-        this.d_cost = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
-        CreateTH(h2_row, lu("Stat Structure"));
-        CreateTH(h2_row, lu("Stat Charge"));
-        CreateTH(h2_row, lu("Stat Lift Bleed"));
-        var c2_row = tbl_stat.insertRow();
-        this.d_strc = c2_row.insertCell();
-        this.d_chgh = c2_row.insertCell();
-        this.d_lift = c2_row.insertCell();
-        var h3_row = tbl_stat.insertRow();
-        CreateTH(h3_row, lu("Stat Visibility"));
-        CreateTH(h3_row, lu("Stat Flight Stress"));
-        CreateTH(h3_row, "");
-        var c3_row = tbl_stat.insertRow();
-        this.d_visi = c3_row.insertCell();
-        this.d_strs = c3_row.insertCell();
-        c3_row.insertCell();
-    }
-    UpdateDisplay() {
-        var AP = this.acc.GetArmourCoverage();
-        for (let i = 0; i < AP.length; i++) {
-            this.a_AP[i].valueAsNumber = AP[i];
-        }
-        this.radio.selectedIndex = this.acc.GetRadioSel();
-        var elist = this.acc.GetElectricalCount();
-        for (let i = 0; i < elist.length; i++) {
-            this.elect[i].valueAsNumber = elist[i];
-        }
-        var ilist = this.acc.GetInfoSel();
-        for (let i = 0; i < ilist.length; i++) {
-            this.info[i].checked = ilist[i];
-        }
-        var vlist = this.acc.GetVisibilitySel();
-        for (let i = 0; i < vlist.length; i++) {
-            this.visi[i].checked = vlist[i];
-        }
-        var clist = this.acc.GetClimateSel();
-        var cenab = this.acc.GetClimateEnable();
-        for (let i = 0; i < vlist.length; i++) {
-            this.clim[i].checked = clist[i];
-            this.clim[i].disabled = !cenab[i];
-        }
-        this.auto.selectedIndex = this.acc.GetAutopilotSel();
-        this.cont.selectedIndex = this.acc.GetControlSel();
-        var stats = this.acc.PartStats();
-        BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
-        BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
-        BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
-        BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
-        BlinkIfChanged(this.d_chgh, stats.charge.toString(), true);
-        BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
-        BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
-        BlinkIfChanged(this.d_strs, stats.flightstress.toString(), false);
-    }
-}
-/// <reference path="./Display.ts" />
 /// <reference path="../impl/Optimization.ts" />
 class Optimization_HTML extends Display {
     constructor(opt) {
@@ -12313,347 +13888,6 @@ class Weapons_HTML extends Display {
         this.UpdateWSets();
         this.inp_w_count.valueAsNumber = this.weap.GetWeaponSets().length;
         this.inp_w_brace.valueAsNumber = this.weap.GetBraceCount();
-    }
-}
-class Derived_HTML {
-    constructor(tbl) {
-        var fragment = document.createDocumentFragment();
-        var row0 = insertRow(fragment);
-        var name_cell = row0.insertCell();
-        // Aircraft Name
-        name_cell.colSpan = 2;
-        this.name_inp = document.createElement("INPUT");
-        this.name_inp.defaultValue = lu("Derived Aircraft Name");
-        name_cell.appendChild(this.name_inp);
-        CreateTH(row0, lu("Stat Cost"));
-        // Aircraft Cost
-        this.cost_cell = row0.insertCell();
-        CreateTH(row0, lu("Stat Upkeep"));
-        // Aircraft Upkeep
-        this.upkeep_cell = row0.insertCell();
-        // Rules Version
-        CreateTH(row0, lu("Derived Version #"));
-        this.version_cell = row0.insertCell();
-        var row1 = insertRow(fragment);
-        CreateTH(row1, lu("Derived Mass Variations"));
-        CreateTH(row1, lu("Derived Boost"));
-        CreateTH(row1, lu("Derived Handling"));
-        CreateTH(row1, lu("Derived Rate of Climb"));
-        CreateTH(row1, lu("Derived Stall Speed"));
-        CreateTH(row1, lu("Derived Top Speed"));
-        CreateTH(row1, lu("Derived Vital Components")).colSpan = 2;
-        this.bomb_row2 = insertRow(fragment);
-        CreateTH(this.bomb_row2, lu("Derived Full Fuel with Bombs"));
-        this.boost_fullwB = this.bomb_row2.insertCell();
-        this.hand_fullwB = this.bomb_row2.insertCell();
-        this.roc_fullwB = this.bomb_row2.insertCell();
-        this.ss_fullwB = this.bomb_row2.insertCell();
-        this.ts_fullwB = this.bomb_row2.insertCell();
-        this.vital_components = this.bomb_row2.insertCell();
-        this.vital_components.rowSpan = 3;
-        this.vital_components.colSpan = 3;
-        this.bomb_row1 = insertRow(fragment);
-        CreateTH(this.bomb_row1, lu("Derived Half Fuel with Bombs"));
-        this.boost_halfwB = this.bomb_row1.insertCell();
-        this.hand_halfwB = this.bomb_row1.insertCell();
-        this.roc_halfwB = this.bomb_row1.insertCell();
-        this.ss_halfwB = this.bomb_row1.insertCell();
-        this.ts_halfwB = this.bomb_row1.insertCell();
-        this.full_row = insertRow(fragment);
-        CreateTH(this.full_row, lu("Derived Full Fuel"));
-        this.boost_full = this.full_row.insertCell();
-        this.hand_full = this.full_row.insertCell();
-        this.roc_full = this.full_row.insertCell();
-        this.ss_full = this.full_row.insertCell();
-        this.ts_full = this.full_row.insertCell();
-        var half = insertRow(fragment);
-        CreateTH(half, lu("Derived Half Fuel"));
-        this.boost_half = half.insertCell();
-        this.hand_half = half.insertCell();
-        this.roc_half = half.insertCell();
-        this.ss_half = half.insertCell();
-        this.ts_half = half.insertCell();
-        var empty = insertRow(fragment);
-        CreateTH(empty, lu("Derived Empty Fuel"));
-        this.boost_empty = empty.insertCell();
-        this.hand_empty = empty.insertCell();
-        this.roc_empty = empty.insertCell();
-        this.ss_empty = empty.insertCell();
-        this.ts_empty = empty.insertCell();
-        var row7 = insertRow(fragment);
-        CreateTH(row7, lu("Derived Propulsion")).colSpan = 2;
-        CreateTH(row7, lu("Derived Aerodynamics")).colSpan = 2;
-        CreateTH(row7, lu("Derived Survivability")).colSpan = 2;
-        CreateTH(row7, lu("Derived Crew Members")).colSpan = 2;
-        var row8 = insertRow(fragment);
-        CreateTH(row8, lu("Derived Dropoff"));
-        this.dropoff_cell = row8.insertCell();
-        CreateTH(row8, lu("Derived Stability"));
-        this.stability_cell = row8.insertCell();
-        CreateTH(row8, lu("Derived Crash Safety"));
-        this.crashsafety_cell = row8.insertCell();
-        CreateTH(row8, lu("Derived Crew/Passengers"));
-        this.crew_cell = row8.insertCell();
-        var row9 = insertRow(fragment);
-        CreateTH(row9, lu("Derived Overspeed"));
-        this.overspeed_cell = row9.insertCell();
-        CreateTH(row9, lu("Derived Energy Loss"));
-        this.eloss_cell = row9.insertCell();
-        CreateTH(row9, lu("Stat Toughness"));
-        this.toughness_cell = row9.insertCell();
-        CreateTH(row9, lu("Stat Visibility"));
-        this.visibility_cell = row9.insertCell();
-        var row10 = insertRow(fragment);
-        CreateTH(row10, lu("Derived Fuel Uses"));
-        this.maxfuel_cell = row10.insertCell();
-        CreateTH(row10, lu("Derived Turn Bleed"));
-        this.turnbleed_cell = row10.insertCell();
-        CreateTH(row10, lu("Stat Max Strain"));
-        this.mxstrain_cell = row10.insertCell();
-        CreateTH(row10, lu("Derived Attack Modifier"));
-        this.attack_cell = row10.insertCell();
-        var row11 = insertRow(fragment);
-        CreateTH(row11, lu("Stat Reliability"));
-        this.reliability_cell = row11.insertCell();
-        CreateTH(row11, lu("Derived Landing Gear"));
-        this.landing_cell = row11.insertCell();
-        CreateTH(row11, lu("Derived Communications"));
-        this.communications_cell = row11.insertCell();
-        CreateTH(row11, lu("Derived Escape"));
-        this.escape_cell = row11.insertCell();
-        var row12 = insertRow(fragment);
-        CreateTH(row12, lu("Derived Ideal Engine Altitude"));
-        this.maxalt_cell = row12.insertCell();
-        CreateTH(row12, lu("Derived Is Flammable Question"));
-        this.flammable_cell = row12.insertCell();
-        CreateTH(row12, lu("Derived Electrics"));
-        this.electric_cell = row12.insertCell();
-        CreateTH(row12, lu("Stat Flight Stress"));
-        this.flightstress_cell = row12.insertCell();
-        this.weapon_head = CreateTH(insertRow(fragment), lu("Derived Weapon Systems"));
-        this.weapon_head.colSpan = 8;
-        this.weapon_cell = insertRow(fragment).insertCell();
-        this.weapon_cell.colSpan = 8;
-        this.warning_head = CreateTH(insertRow(fragment), lu("Derived Special Rules"));
-        this.warning_head.colSpan = 8;
-        this.warning_cell = insertRow(fragment).insertCell();
-        this.warning_cell.colSpan = 8;
-        tbl.appendChild(fragment);
-        this.tbl = tbl;
-    }
-    UpdateDisplay(acft) {
-        var stats = acft.GetStats();
-        var derived = acft.GetDerivedStats();
-        this.name_inp.value = acft.name;
-        this.version_cell.textContent = acft.GetVersion();
-        this.cost_cell.textContent = stats.cost.toString() + "þ ";
-        if (acft.GetUsed().GetEnabled()) {
-            this.cost_cell.textContent += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ " + lu("Price Word Used") + ")";
-        }
-        this.upkeep_cell.textContent = stats.upkeep.toString() + "þ";
-        //Empty
-        // this.ts_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedEmpty).toString();
-        // this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
-        // this.hand_empty.textContent = derived.HandlingEmpty.toString();
-        // this.boost_empty.textContent = derived.BoostEmpty.toString();
-        // this.roc_empty.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull - derived.StallSpeedFull + derived.BoostFull).toString();
-        this.ts_empty.textContent = (0).toString();
-        this.ss_empty.textContent = derived.StallSpeedEmpty.toString();
-        this.hand_empty.textContent = derived.HandlingEmpty.toString();
-        this.boost_empty.textContent = (0).toString();
-        this.roc_empty.textContent = (0).toString();
-        //Half
-        this.ts_half.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2).toString();
-        this.ss_half.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2).toString();
-        this.hand_half.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2).toString();
-        this.boost_half.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2).toString();
-        this.roc_half.textContent = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2).toString();
-        //Full
-        this.ts_full.textContent = Math.floor(1.0e-6 + derived.MaxSpeedFull).toString();
-        this.ss_full.textContent = derived.StallSpeedFull.toString();
-        this.hand_full.textContent = derived.HandlingFull.toString();
-        this.boost_full.textContent = derived.BoostFull.toString();
-        this.roc_full.textContent = derived.RateOfClimbFull.toString();
-        if (stats.bomb_mass > 0 || this.show_bombs) {
-            this.bomb_row1.hidden = false;
-            this.bomb_row2.hidden = false;
-            this.bomb_row2.appendChild(this.vital_components);
-            this.vital_components.rowSpan = 5;
-            //Half
-            this.ts_halfwB.textContent = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2).toString();
-            this.ss_halfwB.textContent = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2).toString();
-            this.hand_halfwB.textContent = Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2).toString();
-            this.boost_halfwB.textContent = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2).toString();
-            this.roc_halfwB.textContent = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2).toString();
-            //Full
-            this.ts_fullwB.textContent = Math.floor(1.0e-6 + derived.MaxSpeedwBombs).toString();
-            this.ss_fullwB.textContent = derived.StallSpeedFullwBombs.toString();
-            this.hand_fullwB.textContent = derived.HandlingFullwBombs.toString();
-            this.boost_fullwB.textContent = derived.BoostFullwBombs.toString();
-            this.roc_fullwB.textContent = derived.RateOfClimbwBombs.toString();
-        }
-        else {
-            this.bomb_row1.hidden = true;
-            this.bomb_row2.hidden = true;
-            this.full_row.appendChild(this.vital_components);
-            this.vital_components.rowSpan = 3;
-        }
-        this.dropoff_cell.textContent = derived.Dropoff.toString();
-        this.overspeed_cell.textContent = derived.Overspeed.toString();
-        this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
-        if (acft.GetIsFlammable())
-            this.flammable_cell.textContent = lu("Yes");
-        else
-            this.flammable_cell.textContent = lu("No");
-        this.stability_cell.textContent = derived.Stabiilty.toString();
-        this.eloss_cell.textContent = derived.EnergyLoss.toString();
-        this.turnbleed_cell.textContent = derived.TurnBleed.toString();
-        this.landing_cell.textContent = acft.GetGearName();
-        this.maxalt_cell.textContent = acft.GetMinIAF().toString() + "-" + acft.GetMaxAltitude().toString();
-        this.reliability_cell.textContent = this.Array2Str(acft.GetReliabilityList());
-        this.toughness_cell.textContent = derived.Toughness.toString();
-        this.mxstrain_cell.textContent = derived.MaxStrain.toString();
-        this.escape_cell.textContent = this.Array2Str(acft.GetEscapeList());
-        this.crashsafety_cell.textContent = stats.crashsafety.toString();
-        this.crew_cell.textContent = acft.GetCockpits().GetNumberOfCockpits().toString() + "/" + (acft.GetPassengers().GetSeats() + acft.GetPassengers().GetBeds()).toString();
-        this.flightstress_cell.textContent = this.Array2Str(acft.GetStressList());
-        this.visibility_cell.textContent = this.Array2Str(acft.GetVisibilityList());
-        this.attack_cell.textContent = this.Array2Str(acft.GetAttackList());
-        this.communications_cell.textContent = acft.GetCommunicationName();
-        var wm = acft.GetAccessories().GetWindmill();
-        var bat = acft.GetAccessories().GetStorage();
-        var electric_str = stats.charge.toString();
-        if (wm > 0)
-            electric_str += " + " + wm.toString() + lu("Derived Per 10 Speed");
-        if (bat > 0)
-            electric_str += " + " + bat + " " + lu("Derived Battery word storage");
-        this.electric_cell.textContent = electric_str;
-        var vital = "";
-        var vlist = acft.VitalComponentList();
-        for (let v of vlist) {
-            vital += v + "<br/>";
-        }
-        this.vital_components.innerHTML = vital;
-        var wlist = acft.GetWeapons().GetWeaponList();
-        var dlist = acft.GetWeapons().GetDirectionList();
-        var bombs = acft.GetMunitions().GetBombCount();
-        var rockets = acft.GetMunitions().GetRocketCount();
-        var internal = acft.GetMunitions().GetInternalBombCount();
-        var weaphtml = "";
-        if (bombs > 0) {
-            var int_bomb = Math.min(bombs, internal);
-            var ext_bomb = Math.max(0, bombs - int_bomb);
-            if (int_bomb > 0)
-                weaphtml += (int_bomb.toString() + lu(" Bomb Mass Internally."));
-            if (ext_bomb > 0)
-                weaphtml += (ext_bomb.toString() + lu(" Bomb Mass Externally."));
-            if (int_bomb > 0) {
-                var mib = Math.min(int_bomb, acft.GetMunitions().GetMaxBombSize());
-                weaphtml += (lu("Largest Internal Bomb", mib.toString()));
-            }
-            internal -= int_bomb;
-            weaphtml += "<br/>";
-        }
-        if (rockets > 0) {
-            var int_rock = Math.min(rockets, internal);
-            var ext_rock = Math.max(0, rockets - int_rock);
-            if (int_rock > 0)
-                weaphtml += (int_rock.toString() + lu(" Rocket Mass Internally."));
-            if (ext_rock > 0)
-                weaphtml += (ext_rock.toString() + lu(" Rocket Mass Externally."));
-            weaphtml += "<br/>";
-        }
-        for (let w of acft.GetWeapons().GetWeaponSets()) {
-            var ds = w.GetDirection();
-            var dirs = [];
-            for (let i = 0; i < dlist.length; i++) {
-                if (ds[i])
-                    dirs.push(lu(dlist[i]));
-            }
-            let hits = w.GetHits();
-            var tags = [lu("Weapon Tag Jam", w.GetJam())];
-            if (w.GetReload() > 0) {
-                tags.push(lu("Weapon Tag Reload", w.GetReload()));
-            }
-            if (w.GetFinalWeapon().rapid) {
-                tags.push(lu("Weapon Tag Rapid Fire"));
-            }
-            if (w.GetFinalWeapon().shells) {
-                tags.push(lu("Weapon Tag Shells"));
-            }
-            if (w.GetFinalWeapon().ap > 0) {
-                tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
-            }
-            if (w.GetProjectile() == ProjectileType.HEATRAY) {
-                let chgs = w.GetHRCharges();
-                weaphtml += lu("Weapon Description Heat Ray", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), StringFmt.Join("\\", chgs), StringFmt.Join(", ", tags));
-            }
-            else {
-                weaphtml += lu("Weapon Description", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), w.GetShots(), StringFmt.Join(", ", tags));
-            }
-            weaphtml += "<br\>";
-        }
-        this.weapon_cell.innerHTML = weaphtml;
-        var warnhtml = "";
-        for (let w of stats.warnings) {
-            warnhtml += w.source + ":  " + w.warning + "<br/>";
-        }
-        this.warning_cell.innerHTML = warnhtml;
-    }
-    WeaponName(acft, w) {
-        var wlist = acft.GetWeapons().GetWeaponList();
-        var ds = w.GetDirection();
-        var dircount = 0;
-        for (let d of ds) {
-            if (d)
-                dircount++;
-        }
-        var name = "";
-        if (dircount == 1 && w.GetFixed())
-            name += lu("Fixed") + " ";
-        else if (dircount <= 2)
-            name += lu("Flexible") + " ";
-        else
-            name += lu("Turreted") + " ";
-        if (w.GetAction() == ActionType.MECHANICAL) {
-            name += lu("Weapon Tag Mechanical Action") + " ";
-        }
-        else if (w.GetAction() == ActionType.GAST) {
-            name += lu("Weapon Tag Gast Principle") + " ";
-        }
-        else if (w.GetAction() == ActionType.ROTARY) {
-            name += lu("Weapon Tag Rotary") + " ";
-        }
-        if (w.GetProjectile() == ProjectileType.HEATRAY) {
-            name += lu("Weapon Tag Heat Ray") + " ";
-        }
-        else if (w.GetProjectile() == ProjectileType.GYROJETS) {
-            name += lu("Weapon Tag Gyrojet") + " ";
-        }
-        else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
-            name += lu("Weapon Tag Pneumatic") + " ";
-        }
-        name += wlist[w.GetWeaponSelected()].abrv;
-        return name;
-    }
-    GetName() {
-        return this.name_inp.value;
-    }
-    SetName(name) {
-        console.log(name);
-        this.name_inp.value = name;
-    }
-    SetShowBombs(set) {
-        this.show_bombs = set;
-    }
-    Array2Str(arr) {
-        var str = "";
-        for (let i = 0; i < arr.length - 1; i++) {
-            str += arr[i].toString() + ", ";
-        }
-        if (arr.length > 0)
-            str += arr[arr.length - 1].toString();
-        return str;
     }
 }
 class Cards {
@@ -13632,930 +14866,6 @@ class Aircraft_HTML extends Display {
         this.UpdateDerived();
     }
 }
-// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
-// This work is free. You can redistribute it and/or modify it
-// under the terms of the WTFPL, Version 2
-// For more information see LICENSE.txt or http://www.wtfpl.net/
-//
-// For more information, the home page:
-// http://pieroxy.net/blog/pages/lz-string/testing.html
-//
-// LZ-based compression algorithm, version 1.4.4
-var LZString = (function () {
-    // private property
-    var f = String.fromCharCode;
-    var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-    var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
-    var baseReverseDic = {};
-    function getBaseValue(alphabet, character) {
-        if (!baseReverseDic[alphabet]) {
-            baseReverseDic[alphabet] = {};
-            for (var i = 0; i < alphabet.length; i++) {
-                baseReverseDic[alphabet][alphabet.charAt(i)] = i;
-            }
-        }
-        return baseReverseDic[alphabet][character];
-    }
-    var LZString = {
-        compressToBase64: function (input) {
-            if (input == null)
-                return "";
-            var res = LZString._compress(input, 6, function (a) { return keyStrBase64.charAt(a); });
-            switch (res.length % 4) { // To produce valid Base64
-                default: // When could this happen ?
-                case 0: return res;
-                case 1: return res + "===";
-                case 2: return res + "==";
-                case 3: return res + "=";
-            }
-        },
-        decompressFromBase64: function (input) {
-            if (input == null)
-                return "";
-            if (input == "")
-                return null;
-            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
-        },
-        compressToUTF16: function (input) {
-            if (input == null)
-                return "";
-            return LZString._compress(input, 15, function (a) { return f(a + 32); }) + " ";
-        },
-        decompressFromUTF16: function (compressed) {
-            if (compressed == null)
-                return "";
-            if (compressed == "")
-                return null;
-            return LZString._decompress(compressed.length, 16384, function (index) { return compressed.charCodeAt(index) - 32; });
-        },
-        //compress into uint8array (UCS-2 big endian format)
-        compressToUint8Array: function (uncompressed) {
-            var compressed = LZString.compress(uncompressed);
-            var buf = new Uint8Array(compressed.length * 2); // 2 bytes per character
-            for (var i = 0, TotalLen = compressed.length; i < TotalLen; i++) {
-                var current_value = compressed.charCodeAt(i);
-                buf[i * 2] = current_value >>> 8;
-                buf[i * 2 + 1] = current_value % 256;
-            }
-            return buf;
-        },
-        //decompress from uint8array (UCS-2 big endian format)
-        decompressFromUint8Array: function (compressed) {
-            if (compressed === null || compressed === undefined) {
-                return LZString.decompress(compressed);
-            }
-            else {
-                var buf = new Array(compressed.length / 2); // 2 bytes per character
-                for (var i = 0, TotalLen = buf.length; i < TotalLen; i++) {
-                    buf[i] = compressed[i * 2] * 256 + compressed[i * 2 + 1];
-                }
-                var result = [];
-                buf.forEach(function (c) {
-                    result.push(f(c));
-                });
-                return LZString.decompress(result.join(''));
-            }
-        },
-        //compress into a string that is already URI encoded
-        compressToEncodedURIComponent: function (input) {
-            if (input == null)
-                return "";
-            return LZString._compress(input, 6, function (a) { return keyStrUriSafe.charAt(a); });
-        },
-        //decompress from an output of compressToEncodedURIComponent
-        decompressFromEncodedURIComponent: function (input) {
-            if (input == null)
-                return "";
-            if (input == "")
-                return null;
-            input = input.replace(/ /g, "+");
-            return LZString._decompress(input.length, 32, function (index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
-        },
-        compress: function (uncompressed) {
-            return LZString._compress(uncompressed, 16, function (a) { return f(a); });
-        },
-        _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
-            if (uncompressed == null)
-                return "";
-            var i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, // Compensate for the first entry which should not count
-            context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0, ii;
-            for (ii = 0; ii < uncompressed.length; ii += 1) {
-                context_c = uncompressed.charAt(ii);
-                if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
-                    context_dictionary[context_c] = context_dictSize++;
-                    context_dictionaryToCreate[context_c] = true;
-                }
-                context_wc = context_w + context_c;
-                if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
-                    context_w = context_wc;
-                }
-                else {
-                    if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
-                        if (context_w.charCodeAt(0) < 256) {
-                            for (i = 0; i < context_numBits; i++) {
-                                context_data_val = (context_data_val << 1);
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                }
-                                else {
-                                    context_data_position++;
-                                }
-                            }
-                            value = context_w.charCodeAt(0);
-                            for (i = 0; i < 8; i++) {
-                                context_data_val = (context_data_val << 1) | (value & 1);
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                }
-                                else {
-                                    context_data_position++;
-                                }
-                                value = value >> 1;
-                            }
-                        }
-                        else {
-                            value = 1;
-                            for (i = 0; i < context_numBits; i++) {
-                                context_data_val = (context_data_val << 1) | value;
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                }
-                                else {
-                                    context_data_position++;
-                                }
-                                value = 0;
-                            }
-                            value = context_w.charCodeAt(0);
-                            for (i = 0; i < 16; i++) {
-                                context_data_val = (context_data_val << 1) | (value & 1);
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                }
-                                else {
-                                    context_data_position++;
-                                }
-                                value = value >> 1;
-                            }
-                        }
-                        context_enlargeIn--;
-                        if (context_enlargeIn == 0) {
-                            context_enlargeIn = Math.pow(2, context_numBits);
-                            context_numBits++;
-                        }
-                        delete context_dictionaryToCreate[context_w];
-                    }
-                    else {
-                        value = context_dictionary[context_w];
-                        for (i = 0; i < context_numBits; i++) {
-                            context_data_val = (context_data_val << 1) | (value & 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            }
-                            else {
-                                context_data_position++;
-                            }
-                            value = value >> 1;
-                        }
-                    }
-                    context_enlargeIn--;
-                    if (context_enlargeIn == 0) {
-                        context_enlargeIn = Math.pow(2, context_numBits);
-                        context_numBits++;
-                    }
-                    // Add wc to the dictionary.
-                    context_dictionary[context_wc] = context_dictSize++;
-                    context_w = String(context_c);
-                }
-            }
-            // Output the code for w.
-            if (context_w !== "") {
-                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
-                    if (context_w.charCodeAt(0) < 256) {
-                        for (i = 0; i < context_numBits; i++) {
-                            context_data_val = (context_data_val << 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            }
-                            else {
-                                context_data_position++;
-                            }
-                        }
-                        value = context_w.charCodeAt(0);
-                        for (i = 0; i < 8; i++) {
-                            context_data_val = (context_data_val << 1) | (value & 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            }
-                            else {
-                                context_data_position++;
-                            }
-                            value = value >> 1;
-                        }
-                    }
-                    else {
-                        value = 1;
-                        for (i = 0; i < context_numBits; i++) {
-                            context_data_val = (context_data_val << 1) | value;
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            }
-                            else {
-                                context_data_position++;
-                            }
-                            value = 0;
-                        }
-                        value = context_w.charCodeAt(0);
-                        for (i = 0; i < 16; i++) {
-                            context_data_val = (context_data_val << 1) | (value & 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            }
-                            else {
-                                context_data_position++;
-                            }
-                            value = value >> 1;
-                        }
-                    }
-                    context_enlargeIn--;
-                    if (context_enlargeIn == 0) {
-                        context_enlargeIn = Math.pow(2, context_numBits);
-                        context_numBits++;
-                    }
-                    delete context_dictionaryToCreate[context_w];
-                }
-                else {
-                    value = context_dictionary[context_w];
-                    for (i = 0; i < context_numBits; i++) {
-                        context_data_val = (context_data_val << 1) | (value & 1);
-                        if (context_data_position == bitsPerChar - 1) {
-                            context_data_position = 0;
-                            context_data.push(getCharFromInt(context_data_val));
-                            context_data_val = 0;
-                        }
-                        else {
-                            context_data_position++;
-                        }
-                        value = value >> 1;
-                    }
-                }
-                context_enlargeIn--;
-                if (context_enlargeIn == 0) {
-                    context_enlargeIn = Math.pow(2, context_numBits);
-                    context_numBits++;
-                }
-            }
-            // Mark the end of the stream
-            value = 2;
-            for (i = 0; i < context_numBits; i++) {
-                context_data_val = (context_data_val << 1) | (value & 1);
-                if (context_data_position == bitsPerChar - 1) {
-                    context_data_position = 0;
-                    context_data.push(getCharFromInt(context_data_val));
-                    context_data_val = 0;
-                }
-                else {
-                    context_data_position++;
-                }
-                value = value >> 1;
-            }
-            // Flush the last char
-            while (true) {
-                context_data_val = (context_data_val << 1);
-                if (context_data_position == bitsPerChar - 1) {
-                    context_data.push(getCharFromInt(context_data_val));
-                    break;
-                }
-                else
-                    context_data_position++;
-            }
-            return context_data.join('');
-        },
-        decompress: function (compressed) {
-            if (compressed == null)
-                return "";
-            if (compressed == "")
-                return null;
-            return LZString._decompress(compressed.length, 32768, function (index) { return compressed.charCodeAt(index); });
-        },
-        _decompress: function (length, resetValue, getNextValue) {
-            var dictionary = [], next, enlargeIn = 4, dictSize = 4, numBits = 3, entry = "", result = [], i, w, bits, resb, maxpower, power, c, data = { val: getNextValue(0), position: resetValue, index: 1 };
-            for (i = 0; i < 3; i += 1) {
-                dictionary[i] = i;
-            }
-            bits = 0;
-            maxpower = Math.pow(2, 2);
-            power = 1;
-            while (power != maxpower) {
-                resb = data.val & data.position;
-                data.position >>= 1;
-                if (data.position == 0) {
-                    data.position = resetValue;
-                    data.val = getNextValue(data.index++);
-                }
-                bits |= (resb > 0 ? 1 : 0) * power;
-                power <<= 1;
-            }
-            switch (next = bits) {
-                case 0:
-                    bits = 0;
-                    maxpower = Math.pow(2, 8);
-                    power = 1;
-                    while (power != maxpower) {
-                        resb = data.val & data.position;
-                        data.position >>= 1;
-                        if (data.position == 0) {
-                            data.position = resetValue;
-                            data.val = getNextValue(data.index++);
-                        }
-                        bits |= (resb > 0 ? 1 : 0) * power;
-                        power <<= 1;
-                    }
-                    c = f(bits);
-                    break;
-                case 1:
-                    bits = 0;
-                    maxpower = Math.pow(2, 16);
-                    power = 1;
-                    while (power != maxpower) {
-                        resb = data.val & data.position;
-                        data.position >>= 1;
-                        if (data.position == 0) {
-                            data.position = resetValue;
-                            data.val = getNextValue(data.index++);
-                        }
-                        bits |= (resb > 0 ? 1 : 0) * power;
-                        power <<= 1;
-                    }
-                    c = f(bits);
-                    break;
-                case 2:
-                    return "";
-            }
-            dictionary[3] = c;
-            w = c;
-            result.push(c);
-            while (true) {
-                if (data.index > length) {
-                    return "";
-                }
-                bits = 0;
-                maxpower = Math.pow(2, numBits);
-                power = 1;
-                while (power != maxpower) {
-                    resb = data.val & data.position;
-                    data.position >>= 1;
-                    if (data.position == 0) {
-                        data.position = resetValue;
-                        data.val = getNextValue(data.index++);
-                    }
-                    bits |= (resb > 0 ? 1 : 0) * power;
-                    power <<= 1;
-                }
-                switch (c = bits) {
-                    case 0:
-                        bits = 0;
-                        maxpower = Math.pow(2, 8);
-                        power = 1;
-                        while (power != maxpower) {
-                            resb = data.val & data.position;
-                            data.position >>= 1;
-                            if (data.position == 0) {
-                                data.position = resetValue;
-                                data.val = getNextValue(data.index++);
-                            }
-                            bits |= (resb > 0 ? 1 : 0) * power;
-                            power <<= 1;
-                        }
-                        dictionary[dictSize++] = f(bits);
-                        c = dictSize - 1;
-                        enlargeIn--;
-                        break;
-                    case 1:
-                        bits = 0;
-                        maxpower = Math.pow(2, 16);
-                        power = 1;
-                        while (power != maxpower) {
-                            resb = data.val & data.position;
-                            data.position >>= 1;
-                            if (data.position == 0) {
-                                data.position = resetValue;
-                                data.val = getNextValue(data.index++);
-                            }
-                            bits |= (resb > 0 ? 1 : 0) * power;
-                            power <<= 1;
-                        }
-                        dictionary[dictSize++] = f(bits);
-                        c = dictSize - 1;
-                        enlargeIn--;
-                        break;
-                    case 2:
-                        return result.join('');
-                }
-                if (enlargeIn == 0) {
-                    enlargeIn = Math.pow(2, numBits);
-                    numBits++;
-                }
-                if (dictionary[c]) {
-                    entry = dictionary[c];
-                }
-                else {
-                    if (c === dictSize) {
-                        entry = w + w.charAt(0);
-                    }
-                    else {
-                        return null;
-                    }
-                }
-                result.push(entry);
-                // Add w+entry[0] to the dictionary.
-                dictionary[dictSize++] = w + entry.charAt(0);
-                enlargeIn--;
-                w = entry;
-                if (enlargeIn == 0) {
-                    enlargeIn = Math.pow(2, numBits);
-                    numBits++;
-                }
-            }
-        }
-    };
-    return LZString;
-})();
-// MIT License
-// Copyright(c) 2017 Sven Ulrich
-// https://github.com/iwt-svenulrich/typescript-string-operations
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files(the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and / or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-class StringFmt {
-    static IsNullOrWhiteSpace(value) {
-        try {
-            if (value == null || value == 'undefined') {
-                return true;
-            }
-            return value.toString().replace(/\s/g, '').length < 1;
-        }
-        catch (e) {
-            console.log(e);
-            return false;
-        }
-    }
-    static Join(delimiter, ...args) {
-        try {
-            let firstArg = args[0];
-            if (Array.isArray(firstArg) || firstArg instanceof Array) {
-                let tempString = StringFmt.Empty;
-                let count = 0;
-                for (let i = 0; i < firstArg.length; i++) {
-                    let current = firstArg[i];
-                    if (i < firstArg.length - 1) {
-                        tempString += current + delimiter;
-                    }
-                    else {
-                        tempString += current;
-                    }
-                }
-                return tempString;
-            }
-            else if (typeof firstArg === 'object') {
-                let tempString = StringFmt.Empty;
-                let objectArg = firstArg;
-                let keys = Object.keys(firstArg); //get all Properties of the Object as Array
-                keys.forEach(element => { tempString += objectArg[element] + delimiter; });
-                tempString = tempString.slice(0, tempString.length - delimiter.length); //remove last delimiter
-                return tempString;
-            }
-            let stringArray = args;
-            return StringFmt.join(delimiter, ...stringArray);
-        }
-        catch (e) {
-            console.log(e);
-            return StringFmt.Empty;
-        }
-    }
-    static Format(format, ...args) {
-        try {
-            if (format.match(StringFmt.regexNumber)) {
-                return StringFmt.format(StringFmt.regexNumber, format, args);
-            }
-            if (format.match(StringFmt.regexObject)) {
-                return StringFmt.format(StringFmt.regexObject, format, args, true);
-            }
-            return format;
-        }
-        catch (e) {
-            console.log(e);
-            return StringFmt.Empty;
-        }
-    }
-    static format(regex, format, args, parseByObject = false) {
-        return format.replace(regex, function (match, x) {
-            let s = match.split(':');
-            if (s.length > 1) {
-                x = s[0].replace('{', '');
-                match = s[1].replace('}', ''); //U
-            }
-            let arg;
-            if (parseByObject) {
-                arg = args[0][x];
-            }
-            else {
-                arg = args[x];
-            }
-            if (arg == null || arg == undefined || match.match(/{\d+}/)) {
-                return arg;
-            }
-            arg = StringFmt.parsePattern(match, arg);
-            return typeof arg != 'undefined' && arg != null ? arg : StringFmt.Empty;
-        });
-    }
-    static parsePattern(match, arg) {
-        switch (match) {
-            case 'L': {
-                arg = arg.toLocaleLowerCase();
-                return arg;
-            }
-            case 'U': {
-                arg = arg.toLocaleUpperCase();
-                return arg;
-            }
-            case 'd': {
-                if (typeof (arg) === 'string') {
-                    return StringFmt.getDisplayDateFromString(arg);
-                }
-                else if (arg instanceof Date) {
-                    return StringFmt.Format('{0:00}.{1:00}.{2:0000}', arg.getDate(), arg.getMonth(), arg.getFullYear());
-                }
-                break;
-            }
-            case 's': {
-                if (typeof (arg) === 'string') {
-                    return StringFmt.getSortableDateFromString(arg);
-                }
-                else if (arg instanceof Date) {
-                    return StringFmt.Format('{0:0000}-{1:00}-{2:00}', arg.getFullYear(), arg.getMonth(), arg.getDate());
-                }
-                break;
-            }
-            case 'n': { //Tausender Trennzeichen
-                if (typeof (arg) !== "string")
-                    arg = arg.toString();
-                let replacedString = arg.replace(/,/g, '.');
-                if (isNaN(parseFloat(replacedString)) || replacedString.length <= 3) {
-                    break;
-                }
-                let numberparts = replacedString.split(/[^0-9]+/g);
-                let parts = numberparts;
-                if (numberparts.length > 1) {
-                    parts = [StringFmt.join('', ...(numberparts.splice(0, numberparts.length - 1))), numberparts[numberparts.length - 1]];
-                }
-                let integer = parts[0];
-                var mod = integer.length % 3;
-                var output = (mod > 0 ? (integer.substring(0, mod)) : StringFmt.Empty);
-                var firstGroup = output;
-                var remainingGroups = integer.substring(mod).match(/.{3}/g);
-                output = output + '.' + StringFmt.Join('.', remainingGroups);
-                arg = output + (parts.length > 1 ? ',' + parts[1] : '');
-                return arg;
-            }
-            case 'x': {
-                return this.decimalToHexString(arg);
-            }
-            case 'X': {
-                return this.decimalToHexString(arg, true);
-            }
-            default: {
-                break;
-            }
-        }
-        if ((typeof (arg) === 'number' || !isNaN(arg)) && !isNaN(+match) && !StringFmt.IsNullOrWhiteSpace(arg)) {
-            return StringFmt.formatNumber(arg, match);
-        }
-        return arg;
-    }
-    static decimalToHexString(value, upperCase = false) {
-        const parsed = parseFloat(value);
-        const hexNumber = parsed.toString(16);
-        return upperCase ? hexNumber.toLocaleUpperCase() : hexNumber;
-    }
-    static getDisplayDateFromString(input) {
-        let splitted;
-        splitted = input.split('-');
-        if (splitted.length <= 1) {
-            return input;
-        }
-        let day = splitted[splitted.length - 1];
-        let month = splitted[splitted.length - 2];
-        let year = splitted[splitted.length - 3];
-        day = day.split('T')[0];
-        day = day.split(' ')[0];
-        return `${day}.${month}.${year}`;
-    }
-    static getSortableDateFromString(input) {
-        let splitted = input.replace(',', '').split('.');
-        if (splitted.length <= 1) {
-            return input;
-        }
-        let times = splitted[splitted.length - 1].split(' ');
-        let time = StringFmt.Empty;
-        if (times.length > 1) {
-            time = times[times.length - 1];
-        }
-        let year = splitted[splitted.length - 1].split(' ')[0];
-        let month = splitted[splitted.length - 2];
-        let day = splitted[splitted.length - 3];
-        let result = `${year}-${month}-${day}`;
-        if (!StringFmt.IsNullOrWhiteSpace(time) && time.length > 1) {
-            result += `T${time}`;
-        }
-        else {
-            result += "T00:00:00";
-        }
-        return result;
-    }
-    static formatNumber(input, formatTemplate) {
-        let count = formatTemplate.length;
-        let stringValue = input.toString();
-        if (count <= stringValue.length) {
-            return stringValue;
-        }
-        let remainingCount = count - stringValue.length;
-        remainingCount += 1; //Array must have an extra entry
-        return new Array(remainingCount).join('0') + stringValue;
-    }
-    static join(delimiter, ...args) {
-        let temp = StringFmt.Empty;
-        for (let i = 0; i < args.length; i++) {
-            if ((typeof args[i] == 'string' && StringFmt.IsNullOrWhiteSpace(args[i]))
-                || (typeof args[i] != "number" && typeof args[i] != "string")) {
-                continue;
-            }
-            let arg = "" + args[i];
-            temp += arg;
-            for (let i2 = i + 1; i2 < args.length; i2++) {
-                if (StringFmt.IsNullOrWhiteSpace(args[i2])) {
-                    continue;
-                }
-                temp += delimiter;
-                i = i2 - 1;
-                break;
-            }
-        }
-        return temp;
-    }
-}
-StringFmt.regexNumber = /{(\d+(:\w*)?)}/g;
-StringFmt.regexObject = /{(\w+(:\w*)?)}/g;
-StringFmt.Empty = '';
-class StringBuilder {
-    constructor(value) {
-        this.Values = [];
-        if (!StringFmt.IsNullOrWhiteSpace(value)) {
-            this.Values = new Array(value);
-        }
-    }
-    ToString() {
-        return this.Values.join('');
-    }
-    Append(value) {
-        this.Values.push(value);
-    }
-    AppendLine(value) {
-        this.Values.push('\r\n' + value);
-    }
-    AppendFormat(format, ...args) {
-        this.Values.push(StringFmt.Format(format, ...args));
-    }
-    AppendLineFormat(format, ...args) {
-        this.Values.push("\r\n" + StringFmt.Format(format, ...args));
-    }
-    Clear() {
-        this.Values = [];
-    }
-}
-// MIT License
-function scrollToFragment(options = {}) {
-    unmount();
-    getElement = options.getElement || getElementById;
-    scrollIntoView = options.scrollIntoView || defaultScrollIntoView;
-    mount();
-}
-function mount() {
-    documentObserver = new MutationObserver(handleDomMutation);
-    addEventListener("click", handleDocumentClick);
-    unlistenHistory = undefined;
-    startObserving();
-}
-function unmount() {
-    stopObserving();
-    removeEventListener("click", handleDocumentClick);
-    if (unlistenHistory)
-        unlistenHistory();
-    unlistenHistory = undefined;
-    documentObserver = undefined;
-}
-function startObserving() {
-    var _a;
-    stopObserving();
-    if (!getLocation().hash)
-        return;
-    STOP_EVENTS.forEach(addStopListener);
-    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.observe(document, OBSERVER_CONFIG);
-    adjustScrollPosition();
-    observeTimeout = setTimeout(stopObserving, OBSERVE_TIMEOUT_MS);
-}
-function stopObserving() {
-    var _a;
-    clearTimeout(observeTimeout);
-    cancelAnimationFrame(throttleRequestId);
-    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.disconnect();
-    STOP_EVENTS.forEach(removeStopListener);
-}
-function addStopListener(eventName) {
-    document.addEventListener(eventName, stopObserving);
-}
-function removeStopListener(eventName) {
-    document.removeEventListener(eventName, stopObserving);
-}
-function handleDocumentClick(event) {
-    if (event.defaultPrevented)
-        return;
-    const anchor = closestAIncludingSelf(event.target);
-    if (!anchor || !anchor.hash)
-        return;
-    if (anchor.pathname === getLocation().pathname)
-        throttle(startObserving);
-}
-function closestAIncludingSelf(element) {
-    let target = element;
-    while (target && target.nodeName !== "A")
-        target = target.parentElement;
-    return target;
-}
-function handleDomMutation() {
-    throttle(adjustScrollPosition);
-}
-function adjustScrollPosition() {
-    const hash = getLocation().hash;
-    if (!hash)
-        return;
-    const fragmentId = decodeURIComponent(hash.substring(1));
-    const element = getElement.call(null, fragmentId);
-    if (element)
-        scrollIntoView.call(null, element);
-}
-function getLocation() {
-    return location;
-}
-function getElementById(id) {
-    return document.getElementById(id);
-}
-function defaultScrollIntoView(element) {
-    element.scrollIntoView();
-}
-function throttle(callback) {
-    cancelAnimationFrame(throttleRequestId);
-    throttleRequestId = requestAnimationFrame(callback);
-}
-let getElement;
-let scrollIntoView;
-let unlistenHistory;
-let documentObserver;
-let observeTimeout;
-let throttleRequestId;
-const OBSERVER_CONFIG = {
-    attributes: true,
-    characterData: true,
-    childList: true,
-    subtree: true,
-};
-const OBSERVE_TIMEOUT_MS = 10000;
-const STOP_EVENTS = ["selectstart", "touchend", "wheel"];
-/// <reference path="./impl/Aircraft.ts" />
-/// <reference path="./disp/Tools.ts" />
-/// <reference path="./disp/Aircraft.ts" />
-/// <reference path="./lz/lz-string.ts" />
-/// <reference path="./string/index.ts" />
-/// <reference path="./scroll/scroll.ts" />
-const init = () => {
-    const sp = new URLSearchParams(location.search);
-    var qp = sp.get("json");
-    var lang = sp.get("lang");
-    // var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
-    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/parts.json', '/PlaneBuilder/engines.json', '/PlaneBuilder/weapons.json'];
-    var proms = jsons.map(d => fetch(d));
-    Promise.all(proms)
-        .then(ps => Promise.all(ps.map(p => p.json())))
-        .then(resp => {
-        var string_JSON = resp[0];
-        parts_JSON = resp[1];
-        engine_JSON = resp[2];
-        weapon_JSON = resp[3];
-        //Strings bit
-        local = new Localization(string_JSON);
-        if (lang) {
-            local.SetLanguages(lang);
-        }
-        else if (window.localStorage.language) {
-            local.SetLanguages(window.localStorage.language);
-        }
-        //Parts bit
-        let acft_data = window.localStorage.aircraft;
-        //Engine bit
-        var nameliststr = window.localStorage.getItem("engines_names");
-        var namelist = [];
-        if (nameliststr) {
-            namelist = JSON.parse(nameliststr);
-            for (let n of namelist) {
-                engine_list.set(n, new EngineList(n));
-            }
-        }
-        for (let el of engine_JSON["lists"]) {
-            if (!engine_list.has(el["name"]))
-                engine_list.set(el["name"], new EngineList(el["name"]));
-            engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
-        }
-        //Weapons bit
-        aircraft_model = new Aircraft(parts_JSON, weapon_JSON, true);
-        aircraft_display = new Aircraft_HTML(parts_JSON, aircraft_model);
-        var loaded = false;
-        if (qp && !loaded) {
-            console.log("Used Query Parameter");
-            try {
-                var str = LZString.decompressFromEncodedURIComponent(qp);
-                var arr = _stringToArrayBuffer(str);
-                var des = new Deserialize(arr);
-                aircraft_model.deserialize(des);
-                loaded = true;
-            }
-            catch (e) {
-                console.log("Compressed Query Parameter Failed.");
-                console.log(e);
-                aircraft_model.Reset();
-            }
-        }
-        if (acft_data && !loaded) {
-            console.log("Used Saved Data");
-            try {
-                loaded = aircraft_model.fromJSON(JSON.parse(acft_data));
-            }
-            catch (_a) {
-                console.log("Saved Data Failed.");
-                aircraft_model.Reset();
-            }
-        }
-        aircraft_model.CalculateStats();
-        enable_anim = true;
-    });
-    window.addEventListener("load", () => {
-        scrollToFragment();
-        setTimeout(() => { window.onscroll = SetScroll; }, 1000);
-    });
-};
-window.addEventListener("DOMContentLoaded", init);
-var hash = "";
-function SetScroll(ev) {
-    const IDs = ["Era", "Cockpit", "Passengers", "Engines", "Frames", "Tail", "Wings", "Rotors", "Stabilizers", "ControlSurfaces", "Reinforcements", "Weapons", "Load", "Landing_Gear", "Accessories", "Propeller", "Optimization", "Stats", "Flight"];
-    var newhash = "";
-    var off = window.pageYOffset;
-    for (let id of IDs) {
-        if (off > document.getElementById(id).offsetTop) {
-            newhash = id;
-        }
-        else {
-            break;
-        }
-    }
-    if (hash != newhash) {
-        hash = newhash;
-        window.history.replaceState(null, null, "index.html#" + newhash);
-    }
-}
-var parts_JSON;
-var engine_JSON;
-var weapon_JSON;
-var aircraft_model;
-var aircraft_display;
-var engine_list = new Map([["Custom", new EngineList("Custom")]]);
-var local;
-var enable_anim = false;
 /// <reference path="./Display.ts" />
 /// <reference path="../impl/Rotor.ts" />
 class Rotor_HTML extends Display {
@@ -14864,63 +15174,5 @@ class Used_HTML extends Display {
         this.sluggish.valueAsNumber = this.used.sluggish;
         this.enabled.checked = this.used.GetEnabled();
         this.tbl.hidden = !this.enabled.checked;
-    }
-}
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
-class AlterStats extends Part {
-    constructor() {
-        super();
-        this.stats = new Stats();
-    }
-    PartStats() {
-        var stats = new Stats();
-        if (!this.stats.liftbleed)
-            this.stats.liftbleed = 0;
-        if (!this.stats.drag)
-            this.stats.drag = 0;
-        if (!this.stats.mass)
-            this.stats.mass = 0;
-        if (!this.stats.wetmass)
-            this.stats.wetmass = 0;
-        if (!this.stats.bomb_mass)
-            this.stats.bomb_mass = 0;
-        if (!this.stats.cost)
-            this.stats.cost = 0;
-        if (!this.stats.upkeep)
-            this.stats.upkeep = 0;
-        if (!this.stats.control)
-            this.stats.control = 0;
-        if (!this.stats.pitchstab)
-            this.stats.pitchstab = 0;
-        if (!this.stats.latstab)
-            this.stats.latstab = 0;
-        if (!this.stats.wingarea)
-            this.stats.wingarea = 0;
-        if (!this.stats.maxstrain)
-            this.stats.maxstrain = 0;
-        if (!this.stats.structure)
-            this.stats.structure = 0;
-        if (!this.stats.toughness)
-            this.stats.toughness = 0;
-        if (!this.stats.power)
-            this.stats.power = 0;
-        if (!this.stats.fuelconsumption)
-            this.stats.fuelconsumption = 0;
-        if (!this.stats.fuel)
-            this.stats.fuel = 0;
-        if (!this.stats.pitchspeed)
-            this.stats.pitchspeed = 0;
-        if (!this.stats.pitchboost)
-            this.stats.pitchboost = 0;
-        if (!this.stats.charge)
-            this.stats.charge = 0;
-        if (!this.stats.crashsafety)
-            this.stats.crashsafety = 0;
-        stats = stats.Add(this.stats);
-        return stats;
-    }
-    SetCalculateStats(callback) {
-        this.CalculateStats = callback;
     }
 }

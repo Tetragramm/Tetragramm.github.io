@@ -79,7 +79,6 @@ a:focus {
 table {
 	border-collapse: collapse;
 	font-size: .8rem;
-	
 	/* extra-wide tables, you can just scroll to see */
 	display: block;
 	overflow: auto;
@@ -197,6 +196,15 @@ input[type='checkbox'][disabled]{
 	margin-left: 0.25em;
 	margin-right: 0.25em;
 	vertical-align: center;
+}
+
+/* Dashed border */
+hr.dashed {
+  border-top: 1px dashed var(--inp_bdr_color);
+  height: 0px;
+  margin: 0px;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 input[type='checkbox']{

@@ -8,12 +8,10 @@
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
-    var ep = sp.get("engine");
     var lang = sp.get("lang");
-    var ihash = window.location.hash;
-    // location.hash = "";
 
-    var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
+    // var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
+    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/parts.json', '/PlaneBuilder/engines.json', '/PlaneBuilder/weapons.json'];
     var proms = jsons.map(d => fetch(d));
     Promise.all(proms)
         .then(ps => Promise.all(ps.map(p => p.json())))
@@ -27,8 +25,8 @@ const init = () => {
                 local = new Localization(string_JSON);
                 if (lang) {
                     local.SetLanguages(lang);
-                } else if (window.localStorage.getItem("language")) {
-                    local.SetLanguages(window.localStorage.getItem("language"));
+                } else if (window.localStorage.language) {
+                    local.SetLanguages(window.localStorage.language);
                 }
 
                 //Parts bit
@@ -79,7 +77,6 @@ const init = () => {
 
     window.addEventListener("load", () => {
         scrollToFragment();
-        // location.hash = ihash;
         setTimeout(() => { window.onscroll = SetScroll; }, 1000);
     });
 }
