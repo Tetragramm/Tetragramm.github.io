@@ -1092,6 +1092,7 @@ class EngineBuilder {
     }
     CanUpgrade() {
         var can_upg = [...Array(this.Upgrades.length).fill(true)];
+        can_upg[0] = false;
         if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE) {
             can_upg[0] = false;
             can_upg[1] = false;
@@ -1416,10 +1417,7 @@ class EngineBuilder {
         this.compressor_type = js["compressor_type"];
         this.compressor_count = js["compressor_count"];
         this.min_IAF = js["min_IAF"];
-        var upgs = js["upgrades"];
-        for (let i = 0; i < upgs.length; i++) {
-            this.upg_sel[i] = upgs[i];
-        }
+        this.upg_sel = BoolArr(js["upgrades"], this.upg_sel.length);
         return this.EngineStats();
     }
 }
@@ -2580,7 +2578,8 @@ class EngineBuilder_HTML {
         this.e_mIAF.min = "0";
         this.e_mIAF.step = "10";
         this.e_upgs = [];
-        for (let i = 0; i < this.enginebuilder.Upgrades.length; i++) {
+        //NOTE: Asperator Boot depricated, so start from 1.
+        for (let i = 1; i < this.enginebuilder.Upgrades.length; i++) {
             let u = this.enginebuilder.Upgrades[i];
             let inp = document.createElement("INPUT");
             inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
@@ -2638,7 +2637,7 @@ class EngineBuilder_HTML {
         this.e_mIAF.valueAsNumber = this.enginebuilder.min_IAF;
         var can_upg = this.enginebuilder.CanUpgrade();
         for (let i = 0; i < this.e_upgs.length; i++) {
-            this.e_upgs[i].disabled = !can_upg[i];
+            this.e_upgs[i].disabled = !can_upg[i + 1]; //NOTE: Asperator Boot depricated, so start from 1.
         }
         BlinkIfChanged(this.ed_name, estats.name);
         BlinkIfChanged(this.ed_powr, estats.stats.power.toString(), true);
@@ -3727,7 +3726,11 @@ class Cockpits extends Part {
         return lst;
     }
     GetCrashList() {
-        return [this.positions[0].GetCrash()];
+        var lst = [];
+        for (let p of this.positions) {
+            lst.push(p.GetCrash());
+        }
+        return lst;
     }
     SetNumberOfCockpits(num) {
         if (num != num || num < 1)

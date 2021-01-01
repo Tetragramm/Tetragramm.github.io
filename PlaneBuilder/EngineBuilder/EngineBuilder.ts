@@ -74,6 +74,7 @@ class EngineBuilder {
 
     public CanUpgrade() {
         var can_upg = [...Array(this.Upgrades.length).fill(true)];
+        can_upg[0] = false;
         if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE) {
             can_upg[0] = false;
             can_upg[1] = false;
@@ -438,10 +439,7 @@ class EngineBuilder {
         this.compressor_type = js["compressor_type"];
         this.compressor_count = js["compressor_count"];
         this.min_IAF = js["min_IAF"];
-        var upgs = js["upgrades"];
-        for (let i = 0; i < upgs.length; i++) {
-            this.upg_sel[i] = upgs[i];
-        }
+        this.upg_sel = BoolArr(js["upgrades"], this.upg_sel.length);
         return this.EngineStats();
     }
 }

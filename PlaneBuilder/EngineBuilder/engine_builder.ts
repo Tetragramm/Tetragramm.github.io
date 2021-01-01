@@ -241,7 +241,8 @@ class EngineBuilder_HTML {
         this.e_mIAF.step = "10";
 
         this.e_upgs = [];
-        for (let i = 0; i < this.enginebuilder.Upgrades.length; i++) {
+        //NOTE: Asperator Boot depricated, so start from 1.
+        for (let i = 1; i < this.enginebuilder.Upgrades.length; i++) {
             let u = this.enginebuilder.Upgrades[i];
             let inp = document.createElement("INPUT") as HTMLInputElement;
             inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
@@ -303,7 +304,7 @@ class EngineBuilder_HTML {
 
         var can_upg = this.enginebuilder.CanUpgrade();
         for (let i = 0; i < this.e_upgs.length; i++) {
-            this.e_upgs[i].disabled = !can_upg[i];
+            this.e_upgs[i].disabled = !can_upg[i + 1];//NOTE: Asperator Boot depricated, so start from 1.
         }
 
         BlinkIfChanged(this.ed_name, estats.name);
