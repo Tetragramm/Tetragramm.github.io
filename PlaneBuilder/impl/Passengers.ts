@@ -77,13 +77,16 @@ class Passengers extends Part {
     }
 
     public PartStats(): Stats {
-        var s = new Stats();
-        s.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
+        var stats = new Stats();
+        stats.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
         if (this.seats + this.beds > 0 && this.connected) {
-            s.mass = 1;
+            stats.mass = 1;
         }
-        s.bomb_mass += this.seats + this.beds;
-        return s;
+        stats.bomb_mass += this.seats + this.beds;
+        //Because it is load, it rounds up to the nearest 5 mass.
+        if ((stats.bomb_mass % 5) > 0)
+            stats.bomb_mass += 5 - (stats.bomb_mass % 5);
+        return stats;
     }
 
     public SetCalculateStats(callback: () => void) {
