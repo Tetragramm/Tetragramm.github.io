@@ -249,7 +249,7 @@ class Wings_HTML extends Display {
     private UpdateFullWing(ht: WingHTMLType, idx: number, wing: WingType) {
         for (let i = 1; i < ht.deck.options.length; i++) {
             let opt = ht.deck.options[i];
-            if (wing.deck != i && !this.wings.CanAddFullWing(i - 1) && !this.wings.CanMoveFullWing(idx, i - 1))
+            if (wing.deck != (i - 1) && !this.wings.CanAddFullWing(i - 1) && !this.wings.CanMoveFullWing(idx, i - 1))
                 opt.disabled = true;
             else
                 opt.disabled = false;

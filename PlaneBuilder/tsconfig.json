@@ -7,7 +7,8 @@
     "exclude": [
         "./EngineBuilder",
         "./WeaponDisplay",
-        "./Standalone"
+        "./Standalone",
+        "./Hangar"
     ],
     "include": [
         ".",
