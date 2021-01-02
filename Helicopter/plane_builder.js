@@ -1959,6 +1959,7 @@ class Passengers extends Part {
         if (this.seats + this.beds > 0 && this.connected) {
             s.mass = 1;
         }
+        s.bomb_mass += this.seats + this.beds;
         return s;
     }
     SetCalculateStats(callback) {
