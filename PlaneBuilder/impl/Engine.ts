@@ -740,7 +740,7 @@ class Engine extends Part {
             || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
 
-    public GetTractor() {
+    public GetTractorSpinner() {
         return {
             has: this.IsTractor(),
             spinner: this.GetSpinner()
@@ -755,7 +755,7 @@ class Engine extends Part {
             || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
 
-    public GetPusher() {
+    public GetPusherSpinner() {
         return {
             has: this.IsPusher(),
             spinner: this.GetSpinner()

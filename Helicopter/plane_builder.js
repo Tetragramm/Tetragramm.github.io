@@ -2602,7 +2602,7 @@ class Engine extends Part {
             || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
             || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
-    GetTractor() {
+    GetTractorSpinner() {
         return {
             has: this.IsTractor(),
             spinner: this.GetSpinner()
@@ -2615,7 +2615,7 @@ class Engine extends Part {
             || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
             || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
-    GetPusher() {
+    GetPusherSpinner() {
         return {
             has: this.IsPusher(),
             spinner: this.GetSpinner()
@@ -3152,10 +3152,10 @@ class Engines extends Part {
             r = Math.max(r, e.GetRumble());
         return r;
     }
-    GetTractor() {
+    GetTractorSpinner() {
         var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
-            var t = e.GetTractor();
+            var t = e.GetTractorSpinner();
             if (t.has) {
                 ret.have = true;
                 if (t.spinner[0])
@@ -3166,10 +3166,10 @@ class Engines extends Part {
         }
         return ret;
     }
-    GetPusher() {
+    GetPusherSpinner() {
         var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
-            var t = e.GetPusher();
+            var t = e.GetPusherSpinner();
             if (t.has) {
                 ret.have = true;
                 if (t.spinner[0])
@@ -8839,8 +8839,8 @@ class Aircraft {
         stats = stats.Add(this.munitions.PartStats());
         //Weapons go here, because they make sections.
         this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
-        this.weapons.SetTractorInfo(this.engines.GetTractor());
-        this.weapons.SetPusherInfo(this.engines.GetPusher());
+        this.weapons.SetTractorInfo(this.engines.GetTractorSpinner());
+        this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
         stats = stats.Add(this.weapons.PartStats());

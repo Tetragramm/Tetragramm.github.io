@@ -284,8 +284,8 @@ class Aircraft {
         stats = stats.Add(this.munitions.PartStats());
         //Weapons go here, because they make sections.
         this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
-        this.weapons.SetTractorInfo(this.engines.GetTractor());
-        this.weapons.SetPusherInfo(this.engines.GetPusher());
+        this.weapons.SetTractorInfo(this.engines.GetTractorSpinner());
+        this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
         stats = stats.Add(this.weapons.PartStats());
