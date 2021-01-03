@@ -2582,7 +2582,7 @@ class EngineBuilder_HTML {
         for (let i = 1; i < this.enginebuilder.Upgrades.length; i++) {
             let u = this.enginebuilder.Upgrades[i];
             let inp = document.createElement("INPUT");
-            inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
+            inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i - 1].checked; this.UpdateEngine(); };
             FlexCheckbox(u.name, inp, fs);
             this.e_upgs.push(inp);
         }
@@ -2630,7 +2630,7 @@ class EngineBuilder_HTML {
         this.e_mfdg.valueAsNumber = this.enginebuilder.material_fudge;
         this.e_qfdg.valueAsNumber = this.enginebuilder.quality_fudge;
         for (let i = 0; i < this.e_upgs.length; i++) {
-            this.e_upgs[i].checked = this.enginebuilder.upg_sel[i];
+            this.e_upgs[i].checked = this.enginebuilder.upg_sel[i + 1];
         }
         this.e_ctyp.selectedIndex = this.enginebuilder.compressor_type;
         this.e_ccnt.valueAsNumber = this.enginebuilder.compressor_count;
@@ -3856,12 +3856,16 @@ class Passengers extends Part {
         this.CalculateStats();
     }
     PartStats() {
-        var s = new Stats();
-        s.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
+        var stats = new Stats();
+        stats.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
         if (this.seats + this.beds > 0 && this.connected) {
-            s.mass = 1;
+            stats.mass = 1;
         }
-        return s;
+        stats.bomb_mass += this.seats + this.beds;
+        //Because it is load, it rounds up to the nearest 5 mass.
+        if ((stats.bomb_mass % 5) > 0)
+            stats.bomb_mass += 5 - (stats.bomb_mass % 5);
+        return stats;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -4500,7 +4504,7 @@ class Engine extends Part {
             || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
             || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
-    GetTractor() {
+    GetTractorSpinner() {
         return {
             has: this.IsTractor(),
             spinner: this.GetSpinner()
@@ -4513,7 +4517,7 @@ class Engine extends Part {
             || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
             || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull";
     }
-    GetPusher() {
+    GetPusherSpinner() {
         return {
             has: this.IsPusher(),
             spinner: this.GetSpinner()
@@ -5050,10 +5054,10 @@ class Engines extends Part {
             r = Math.max(r, e.GetRumble());
         return r;
     }
-    GetTractor() {
+    GetTractorSpinner() {
         var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
-            var t = e.GetTractor();
+            var t = e.GetTractorSpinner();
             if (t.has) {
                 ret.have = true;
                 if (t.spinner[0])
@@ -5064,10 +5068,10 @@ class Engines extends Part {
         }
         return ret;
     }
-    GetPusher() {
+    GetPusherSpinner() {
         var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
-            var t = e.GetPusher();
+            var t = e.GetPusherSpinner();
             if (t.has) {
                 ret.have = true;
                 if (t.spinner[0])
@@ -5173,7 +5177,7 @@ class Engines extends Part {
                 else if (e.GetUsePushPull() && e.IsTractor()) {
                     rotationT += 2;
                 }
-                else if (e.GetTractor()) {
+                else if (e.IsTractor()) {
                     rotationT++;
                 }
                 else if (e.IsPusher()) {
@@ -10411,8 +10415,8 @@ class Aircraft {
         stats = stats.Add(this.munitions.PartStats());
         //Weapons go here, because they make sections.
         this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
-        this.weapons.SetTractorInfo(this.engines.GetTractor());
-        this.weapons.SetPusherInfo(this.engines.GetPusher());
+        this.weapons.SetTractorInfo(this.engines.GetTractorSpinner());
+        this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
         stats = stats.Add(this.weapons.PartStats());

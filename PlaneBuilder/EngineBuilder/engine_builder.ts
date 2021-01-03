@@ -245,7 +245,7 @@ class EngineBuilder_HTML {
         for (let i = 1; i < this.enginebuilder.Upgrades.length; i++) {
             let u = this.enginebuilder.Upgrades[i];
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i].checked; this.UpdateEngine(); };
+            inp.onchange = () => { this.enginebuilder.upg_sel[i] = this.e_upgs[i - 1].checked; this.UpdateEngine(); };
             FlexCheckbox(u.name, inp, fs);
             this.e_upgs.push(inp);
         }
@@ -296,7 +296,7 @@ class EngineBuilder_HTML {
         this.e_mfdg.valueAsNumber = this.enginebuilder.material_fudge;
         this.e_qfdg.valueAsNumber = this.enginebuilder.quality_fudge;
         for (let i = 0; i < this.e_upgs.length; i++) {
-            this.e_upgs[i].checked = this.enginebuilder.upg_sel[i];
+            this.e_upgs[i].checked = this.enginebuilder.upg_sel[i + 1];
         }
         this.e_ctyp.selectedIndex = this.enginebuilder.compressor_type;
         this.e_ccnt.valueAsNumber = this.enginebuilder.compressor_count;

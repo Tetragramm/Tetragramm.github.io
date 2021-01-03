@@ -293,10 +293,10 @@ class Engines extends Part {
         return r;
     }
 
-    public GetTractor() {
+    public GetTractorSpinner() {
         var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
-            var t = e.GetTractor();
+            var t = e.GetTractorSpinner();
             if (t.has) {
                 ret.have = true;
                 if (t.spinner[0])
@@ -308,10 +308,10 @@ class Engines extends Part {
         return ret;
     }
 
-    public GetPusher() {
+    public GetPusherSpinner() {
         var ret = { have: false, spin_count: 0, arty_spin_count: 0 };
         for (let e of this.engines) {
-            var t = e.GetPusher();
+            var t = e.GetPusherSpinner();
             if (t.has) {
                 ret.have = true;
                 if (t.spinner[0])
