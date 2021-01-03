@@ -7304,7 +7304,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.mass += this.weapon_list[num].stats.mass;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.hits = 3 * this.weapon_list[num].hits;
-            this.final_weapon.deflection += 1;
+            this.final_weapon.deflection -= 1;
             this.final_weapon.synched = false;
             var jams = this.final_weapon.jam.split('/');
             jams[0] = "9999";
