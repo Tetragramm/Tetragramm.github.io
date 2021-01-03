@@ -429,7 +429,7 @@ class Engines extends Part {
                     // No change to RotationT
                 } else if (e.GetUsePushPull() && e.IsTractor()) {
                     rotationT += 2;
-                } else if (e.GetTractor()) {
+                } else if (e.IsTractor()) {
                     rotationT++;
                 } else if (e.IsPusher()) {
                     rotationT--;
