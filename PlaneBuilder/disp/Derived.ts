@@ -202,9 +202,7 @@ class Derived_HTML {
         this.tbl = tbl;
     }
 
-    public UpdateDisplay(acft: Aircraft) {
-        var stats = acft.GetStats();
-        var derived = acft.GetDerivedStats();
+    public UpdateDisplay(acft: Aircraft, stats: Stats, derived: DerivedStats) {
         this.name_inp.value = acft.name;
         this.version_cell.textContent = acft.GetVersion();
         this.cost_cell.textContent = stats.cost.toString() + "þ ";

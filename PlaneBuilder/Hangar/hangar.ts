@@ -90,7 +90,7 @@ function InitHTML() {
     var load_btn = document.getElementById("btn_load") as HTMLButtonElement;
     load_btn.onclick = () => {
         acft_builder.fromJSON(JSON.parse(JSON.stringify(acft_hangar.toJSON())));
-        stats_builder.UpdateDisplay(acft_builder);
+        stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
         window.localStorage.aircraft = JSON.stringify(acft_builder.toJSON());
         RefreshDisplay();
         BlinkNeutral(load_btn.parentElement);
@@ -159,6 +159,7 @@ function InitHTML() {
         chosen_hangar = list_input.value;
         RefreshAcftSelect(LoadAcftList());
         BlinkNeutral(list_create.parentElement);
+        list_input.value = "";
     };
 
     var list_delete = document.getElementById("btn_delete_list") as HTMLButtonElement;
@@ -179,7 +180,7 @@ function InitStats() {
     }
     stats_builder = new Derived_HTML(document.getElementById("table_builder") as HTMLTableElement);
     stats_builder.SetShowBombs(true);
-    stats_builder.UpdateDisplay(acft_builder);
+    stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
 
     acft_hangar = new Aircraft(parts_JSON, weapon_JSON, false);
     stats_hangar = new Derived_HTML(document.getElementById("table_hangar") as HTMLTableElement);
@@ -222,7 +223,7 @@ function LoadFromHangar(idx: number) {
         acft_hangar.deserialize(des);
     } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); acft_hangar.Reset(); }
 
-    stats_hangar.UpdateDisplay(acft_hangar);
+    stats_hangar.UpdateDisplay(acft_hangar, acft_hangar.GetStats(), acft_hangar.GetDerivedStats());
     select_acft.selectedIndex = idx;
     RefreshDisplay();
 }

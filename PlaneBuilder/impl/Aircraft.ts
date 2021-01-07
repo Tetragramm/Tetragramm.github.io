@@ -22,13 +22,53 @@
 /// <reference path="./Used.ts" />
 /// <reference path="./Rotor.ts" />
 
+type DerivedStats = {
+    DryMP: number,
+    WetMP: number,
+    WetMPwBombs: number,
+    DPEmpty: number,
+    DPFull: number,
+    DPwBombs: number,
+    MaxSpeedEmpty: number,
+    MaxSpeedFull: number,
+    MaxSpeedwBombs: number,
+    StallSpeedEmpty: number,
+    StallSpeedFull: number,
+    StallSpeedFullwBombs: number,
+    Overspeed: number,
+    BoostEmpty: number,
+    BoostFull: number,
+    BoostFullwBombs: number,
+    Dropoff: number,
+    Stabiilty: number,
+    HandlingEmpty: number,
+    HandlingFull: number,
+    HandlingFullwBombs: number,
+    ElevatorsEmpty: number,
+    ElevatorsFull: number,
+    ElevatorsFullwBombs: number,
+    MaxStrain: number,
+    Toughness: number,
+    Structure: number,
+    EnergyLoss: number,
+    EnergyLosswBombs: number,
+    TurnBleed: number,
+    TurnBleedwBombs: number,
+    FuelUses: number,
+    CruiseRange: number,
+    CruiseRangewBombs: number,
+    FlightStress: number,
+    RateOfClimbFull: number,
+    RateOfClimbEmpty: number,
+    RateOfClimbwBombs: number,
+};
 class Aircraft {
     private use_storage: boolean = false;
     private version: string;
     public name: string;
     private stats: Stats;
     private updated_stats: boolean;
-    private freeze_display: boolean;
+    private freeze_calculation: boolean;
     private DisplayCallback: () => void;
     private aircraft_type: AIRCRAFT_TYPE;
     private era: Era;
@@ -55,6 +95,7 @@ class Aircraft {
     private reset_json = String.raw`{"version":"11.3","name":"Basic Biplane","aircraft_type":0,"era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.9,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":0},{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1}],"ammo":1,"action":0,"projectile":0,"repeating":false}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0},"rotor":{"type":0,"rotor_count":0,"rotor_span":0,"rotor_mat":0,"is_tandem":false,"accessory":false}}`;
 
     constructor(js: JSON, weapon_json: JSON, storage: boolean) {
+        this.freeze_calculation = true;
         this.stats = new Stats();
         this.name = "Prototype Aircraft";
         this.version = js['version'];
@@ -107,7 +148,7 @@ class Aircraft {
 
         this.use_storage = storage;
         this.updated_stats = false;
-        this.freeze_display = false;
+        this.freeze_calculation = false;
         this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
         this.Reset();
     }
@@ -140,7 +181,7 @@ class Aircraft {
     }
 
     public fromJSON(js: JSON, disp: boolean = true) {
-        this.freeze_display = true;
+        this.freeze_calculation = true;
         if (disp) {
             console.log(js);
             console.log(js["version"]);
@@ -177,7 +218,7 @@ class Aircraft {
         if (json_version > 11.05) {
             this.rotor.fromJSON(js["rotor"], json_version);
         }
-        this.freeze_display = false;
+        this.freeze_calculation = false;
         return true;
     }
 
@@ -207,7 +248,7 @@ class Aircraft {
     }
 
     public deserialize(d: Deserialize) {
-        this.freeze_display = true;
+        this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);
         this.name = d.GetString();
@@ -239,7 +280,7 @@ class Aircraft {
             this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
             this.rotor.SetType(AIRCRAFT_TYPE.AIRPLANE);
         }
-        this.freeze_display = false;
+        this.freeze_calculation = false;
     }
 
     public SetType(type: AIRCRAFT_TYPE) {
@@ -259,6 +300,9 @@ class Aircraft {
     }
 
     public CalculateStats() {
+        if (this.freeze_calculation) {
+            return;
+        }
         this.updated_stats = false;
         var stats = new Stats();
         stats = stats.Add(this.era.PartStats());
@@ -384,7 +428,9 @@ class Aircraft {
         // stats = stats.Add(this.alter.PartStats());
 
         //Can only do this last, but might trigger a recalc.
-        this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + stats.mass / 5), 1));
+        if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
+            this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + stats.mass / 5), 1));
+        }
 
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
@@ -430,7 +476,7 @@ class Aircraft {
                 });
             }
 
-            if (this.DisplayCallback && !this.freeze_display)
+            if (this.DisplayCallback && !this.freeze_calculation)
                 this.DisplayCallback();
 
             if (this.use_storage)
@@ -438,7 +484,7 @@ class Aircraft {
         }
     }
 
-    public GetDerivedStats() {
+    public GetDerivedStats(): DerivedStats {
         var DryMP = Math.floor(1.0e-6 + this.stats.mass / 5);
         DryMP = Math.max(DryMP, 1);
         var WetMP = Math.floor(1.0e-6 + (this.stats.mass + this.stats.wetmass) / 5);

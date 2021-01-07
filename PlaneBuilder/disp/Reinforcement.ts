@@ -151,7 +151,9 @@ class Reinforcement_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
         BlinkIfChanged(this.d_maxs, stats.maxstrain.toString(), true);
-        var derivedMS = this.acft.GetDerivedStats().MaxStrain;
-        BlinkIfChanged(this.d_amax, derivedMS.toString(), true);
+    }
+
+    public UpdateMaxStrain(strain: number) {
+        BlinkIfChanged(this.d_amax, strain.toString(), true);
     }
 }

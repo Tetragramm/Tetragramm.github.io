@@ -672,9 +672,8 @@ class Aircraft_HTML extends Display {
         this.derived = new Derived_HTML(tbl);
     }
 
-    private UpdateStats() {
+    private UpdateStats(stats: Stats) {
 
-        var stats = this.acft.GetStats();
         var dragbreak = stats.drag.toString() + " ("
             + ((stats.drag + Math.floor(1.0e-6 + stats.mass / 5)) % 5)
             + "/5)";
@@ -705,14 +704,18 @@ class Aircraft_HTML extends Display {
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
     }
 
-    private UpdateDerived() {
+    private UpdateDerived(stats: Stats, derived_stats: DerivedStats) {
         if (this.derived.GetName() != lu("Derived Aircraft Name")) {
             this.acft.name = this.derived.GetName();
         }
-        this.derived.UpdateDisplay(this.acft);
+
+        this.derived.UpdateDisplay(this.acft, stats, derived_stats);
     }
 
     public UpdateDisplay() {
+        var stats = this.acft.GetStats();
+        var derived_stats = this.acft.GetDerivedStats();
+
         this.acft_type.selectedIndex = this.acft.GetAircraftType();
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
@@ -724,7 +727,9 @@ class Aircraft_HTML extends Display {
         this.stabilizers.UpdateDisplay();
         this.controlsurfaces.UpdateDisplay();
         this.reinforcements.UpdateDisplay();
+        this.reinforcements.UpdateMaxStrain(derived_stats.MaxStrain);
         this.load.UpdateDisplay();
+        this.load.UpdateFuelUses(derived_stats.FuelUses);
         this.gear.UpdateDisplay();
         this.accessories.UpdateDisplay();
         this.optimization.UpdateDisplay();
@@ -732,7 +737,7 @@ class Aircraft_HTML extends Display {
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
 
-        this.UpdateStats();
-        this.UpdateDerived();
+        this.UpdateStats(stats);
+        this.UpdateDerived(stats, derived_stats);
     }
 }

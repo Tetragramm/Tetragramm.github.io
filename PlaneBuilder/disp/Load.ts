@@ -28,6 +28,7 @@ class Load_HTML extends Display {
     private d_rsec: HTMLTableCellElement;
     private d_fuel: HTMLTableCellElement;
     private d_cost: HTMLTableCellElement;
+    private d_fuse: HTMLTableCellElement;
 
     constructor(fuel: Fuel, boom: Munitions, cargo: CargoAndPassengers) {
         super();
@@ -130,6 +131,18 @@ class Load_HTML extends Display {
         this.d_rsec = c2_row.insertCell();
         this.d_fuel = c2_row.insertCell();
         this.d_cost = c2_row.insertCell();
+        var h2_row = tbl_stat.insertRow();
+        CreateTH(h2_row, "");
+        CreateTH(h2_row, lu("Derived Fuel Uses"));
+        CreateTH(h2_row, "");
+        var c2_row = tbl_stat.insertRow();
+        c2_row.insertCell();
+        this.d_fuse = c2_row.insertCell();
+        c2_row.insertCell();
+    }
+
+    public UpdateFuelUses(uses: number) {
+        BlinkIfChanged(this.d_fuse, (Math.round(uses * 10) / 10).toString(), false);
     }
 
     public UpdateDisplay() {

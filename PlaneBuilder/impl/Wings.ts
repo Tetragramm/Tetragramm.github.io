@@ -589,7 +589,6 @@ class Wings extends Part {
         var smallest_span = 0;
 
         for (let w of this.wing_list) {
-            console.log([w]);
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             if (w.area > biggest_area) {
                 biggest_area = w.area;
