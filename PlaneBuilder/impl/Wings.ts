@@ -540,7 +540,8 @@ class Wings extends Part {
         }
         //Sesquiplanes!
         var sesp = this.GetIsSesquiplane();
-        if (sesp.is || this.GetMonoplane()) {
+        if ((sesp.is || this.GetMonoplane()) && sesp.deck != -1) {
+            console.log(sesp.deck);
             drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
         }
         return drag;
@@ -588,6 +589,7 @@ class Wings extends Part {
         var smallest_span = 0;
 
         for (let w of this.wing_list) {
+            console.log([w]);
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             if (w.area > biggest_area) {
                 biggest_area = w.area;
