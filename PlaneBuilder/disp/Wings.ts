@@ -288,6 +288,7 @@ class Wings_HTML extends Display {
             this.wings.SetFullWing(idx, w);
         };
         ht.gull.checked = wing.gull;
+        ht.gull.disabled = !this.wings.CanGull(wing.deck);
 
         ht.dihedral.onchange = () => {
             let w = { ...wing };

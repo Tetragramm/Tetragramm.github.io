@@ -108,7 +108,7 @@ class Wings extends Part {
         for (let wt of wtl) {
             list.push({
                 surface: wt.surface, area: wt.area, span: wt.span, anhedral: wt.anhedral,
-                dihedral: wt.dihedral, gull: (wt.anhedral > 0 || wt.dihedral > 0), deck: wt.deck
+                dihedral: wt.dihedral, gull: false, deck: wt.deck
             });
         }
         return list;
@@ -157,7 +157,7 @@ class Wings extends Part {
             } else {
                 wing.dihedral = d.GetNum();
                 wing.anhedral = d.GetNum();
-                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+                wing.gull = false;
             }
             wing.deck = d.GetNum();
             this.wing_list.push(wing);
@@ -176,7 +176,7 @@ class Wings extends Part {
             } else {
                 wing.dihedral = d.GetNum();
                 wing.anhedral = d.GetNum();
-                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+                wing.gull = false;
             }
             wing.deck = d.GetNum();
             this.mini_wing_list.push(wing);
@@ -421,9 +421,9 @@ class Wings extends Part {
         return false;
     }
 
-    public CanGull(idx: number) {
-        if (this.wing_list[idx].deck == 0) {
-            if (this.HasShoulder())
+    public CanGull(deck: number) {
+        if (deck == 0) {
+            if (!this.GetTandem() && this.HasShoulder())
                 return false;
         }
         return true;
