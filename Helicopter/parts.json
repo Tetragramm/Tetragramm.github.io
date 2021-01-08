@@ -604,8 +604,8 @@
                 "pitchboost": 0.7,
                 "mass": 1,
                 "cost": 8,
-                "energy": 2,
-                "turn": 5,
+                "energy": 3,
+                "turn": 7,
                 "automatic": true
             }
         ]
