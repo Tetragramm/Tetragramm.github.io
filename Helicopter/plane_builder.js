@@ -2244,9 +2244,9 @@ class Engine extends Part {
     SetSelectedIndex(num) {
         this.etype_stats = engine_list.get(this.elist_idx).get_stats(num);
         this.etype_inputs = engine_list.get(this.elist_idx).get(num);
+        this.cooling_count = this.etype_stats.stats.cooling;
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
-        this.cooling_count = this.etype_stats.stats.cooling;
         this.CalculateStats();
     }
     GetSelectedIndex() {
@@ -2305,12 +2305,9 @@ class Engine extends Part {
     }
     SetSelectedList(n) {
         if (n != this.elist_idx) {
-            this.etype_stats = engine_list.get(n).get_stats(0);
-            this.etype_inputs = engine_list.get(n).get(0);
-            this.cooling_count = this.etype_stats.stats.cooling;
+            this.elist_idx = n;
+            this.SetSelectedIndex(0); //This calls CalculateStats
         }
-        this.elist_idx = n;
-        this.CalculateStats();
     }
     GetSelectedList() {
         return this.elist_idx;
@@ -2524,7 +2521,10 @@ class Engine extends Part {
     }
     GetCowlEnabled() {
         let lst = [];
+        console.log("Cowl Stuff");
+        console.log([this.GetIsPulsejet(), this.IsLiquidCooled(), this.IsRotary()]);
         for (let c of this.cowl_list) {
+            console.log([c.name, c.air, c.liquid, c.rotary]);
             if (this.GetIsPulsejet()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
@@ -2538,6 +2538,7 @@ class Engine extends Part {
                 lst.push(c.air);
             }
         }
+        console.log(lst);
         return lst;
     }
     GetHasOilTank() {
@@ -2548,9 +2549,10 @@ class Engine extends Part {
     }
     VerifyCowl(num) {
         var can = this.GetCowlEnabled();
+        console.log([num, this.cowl_sel]);
         if (can[num])
             this.cowl_sel = num;
-        else if (!can[this.cowl_sel])
+        if (!can[this.cowl_sel])
             this.cowl_sel = 0;
     }
     SetCowl(num) {
