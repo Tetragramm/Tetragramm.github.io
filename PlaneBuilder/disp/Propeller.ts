@@ -4,7 +4,7 @@
 class Propeller_HTML extends Display {
     private prop: Propeller;
     private select_prop: HTMLSelectElement;
-    private input_variable: HTMLInputElement;
+    private select_upgrade: HTMLSelectElement;
 
     constructor(prop: Propeller) {
         super();
@@ -22,19 +22,23 @@ class Propeller_HTML extends Display {
         }
         this.select_prop.onchange = () => { this.prop.SetPropIndex(this.select_prop.selectedIndex); };
 
-        (document.getElementById("lbl_propeller_variable") as HTMLLabelElement).textContent = lu("Propeller Manually Variable Propeller");
-        this.input_variable = document.getElementById("propeller_variable") as HTMLInputElement;
-        this.input_variable.onchange = () => { this.prop.SetVariable(this.input_variable.checked); };
+        (document.getElementById("lbl_propeller_upgrade") as HTMLLabelElement).textContent = lu("Propeller Propeller Upgrades:");
+        this.select_upgrade = document.getElementById("propeller_upgrade") as HTMLSelectElement;
+        for (let elem of prop.GetUpgradeList()) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = lu(elem.name);
+            this.select_upgrade.add(opt);
+        }
+        this.select_upgrade.onchange = () => { this.prop.SetUpgradeIndex(this.select_upgrade.selectedIndex); };
     }
 
     public UpdateDisplay() {
-        this.input_variable.checked = this.prop.GetVariable();
-        this.input_variable.disabled = !this.prop.CanBeVariable();
+        this.select_upgrade.selectedIndex = this.prop.GetUpgradeIndex();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
         this.select_prop.disabled = false;
 
         if (this.prop.GetNumPropellers() == 0) {
-            this.input_variable.disabled = true;
+            this.select_upgrade.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;
         }

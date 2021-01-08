@@ -2,56 +2,87 @@
 /// <reference path="./Stats.ts" />
 
 class Propeller extends Part {
-    private prop_list: { name: string, stats: Stats, automatic: boolean, energy: number, turn: number }[];
+    private prop_list: { name: string, stats: Stats, energy: number, turn: number }[];
+    private upg_list: { name: string, stats: Stats, energy: number, turn: number }[];
     private idx_prop: number;
-    private use_variable: boolean;
+    private idx_upg: number;
     private num_propellers: number;
 
     constructor(json: JSON) {
         super();
-        this.idx_prop = 2;
-        this.use_variable = false;
         this.num_propellers = 0;
+
+        this.idx_prop = 2;
         this.prop_list = [];
         for (let elem of json["props"]) {
             this.prop_list.push({
                 name: elem["name"], stats: new Stats(elem),
-                automatic: elem["automatic"],
                 energy: elem["energy"], turn: elem["turn"],
             });
         }
+
+        this.idx_upg = 0;
+        this.upg_list = [];
+        for (let elem of json["upgrades"]) {
+            this.upg_list.push({
+                name: elem["name"], stats: new Stats(elem),
+                energy: elem["energy"], turn: elem["turn"],
+            });
+        }
+
     }
 
     public toJSON() {
         return {
             type: this.idx_prop,
-            use_variable: this.use_variable
+            upgrade: this.idx_upg
         };
     }
 
     public fromJSON(js: JSON, json_version: number) {
         this.idx_prop = js["type"];
-        this.use_variable = js["use_variable"];
+        if (json_version < 11.35) {
+            if (js["use_variable"])
+                this.idx_upg = 1;
+            if (this.idx_prop == 5) {
+                this.idx_upg = 2
+                this.idx_prop = 2;
+            }
+        } else {
+            this.idx_upg = js["upgrade"];
+        }
     }
 
     public serialize(s: Serialize) {
         s.PushNum(this.idx_prop);
-        s.PushBool(this.use_variable);
+        s.PushNum(this.idx_upg);
     }
 
     public deserialize(d: Deserialize) {
         this.idx_prop = d.GetNum();
-        this.use_variable = d.GetBool();
+        if (d.version < 11.35) {
+            this.idx_upg = 0;
+            if (d.GetBool())
+                this.idx_upg = 1;
+            if (this.idx_prop == 5) {
+                this.idx_upg = 2
+                this.idx_prop = 2;
+            }
+        } else {
+            this.idx_upg = d.GetNum();
+        }
     }
 
     public GetPropList() {
         return this.prop_list;
     }
 
+    public GetUpgradeList() {
+        return this.upg_list;
+    }
+
     public SetPropIndex(num: number) {
         this.idx_prop = num;
-        if (this.prop_list[num].automatic)
-            this.use_variable = false;
         this.CalculateStats();
     }
 
@@ -59,20 +90,13 @@ class Propeller extends Part {
         return this.idx_prop;
     }
 
-    public SetVariable(use: boolean) {
-        if (!this.prop_list[this.idx_prop].automatic)
-            this.use_variable = use;
-        else
-            this.use_variable = false;
+    public SetUpgradeIndex(use: number) {
+        this.idx_upg = use;
         this.CalculateStats();
     }
 
-    public GetVariable() {
-        return this.use_variable;
-    }
-
-    public CanBeVariable() {
-        return !this.prop_list[this.idx_prop].automatic;
+    public GetUpgradeIndex() {
+        return this.idx_upg;
     }
 
     public SetNumPropeller(have: number) {
@@ -85,15 +109,15 @@ class Propeller extends Part {
 
     public GetEnergy() {
         if (this.num_propellers)
-            return this.prop_list[this.idx_prop].energy;
-        else
+            return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
+        else //Pulsejet
             return 5;
     }
 
     public GetTurn() {
         if (this.num_propellers)
-            return this.prop_list[this.idx_prop].turn;
-        else
+            return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
+        else //Pulsejet
             return 7;
     }
 
@@ -101,15 +125,9 @@ class Propeller extends Part {
         var stats = new Stats();
         if (this.num_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
-            if (this.use_variable) {
-                stats.cost += 2 * this.num_propellers;
-                stats.warnings.push({
-                    source: lu("Manually Variable Propeller"),
-                    warning: lu("MVP_Warning")
-                })
-            }
+            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         }
-        else {
+        else {//Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
         }

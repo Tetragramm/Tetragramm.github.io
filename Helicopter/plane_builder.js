@@ -2521,10 +2521,7 @@ class Engine extends Part {
     }
     GetCowlEnabled() {
         let lst = [];
-        console.log("Cowl Stuff");
-        console.log([this.GetIsPulsejet(), this.IsLiquidCooled(), this.IsRotary()]);
         for (let c of this.cowl_list) {
-            console.log([c.name, c.air, c.liquid, c.rotary]);
             if (this.GetIsPulsejet()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
@@ -2538,7 +2535,6 @@ class Engine extends Part {
                 lst.push(c.air);
             }
         }
-        console.log(lst);
         return lst;
     }
     GetHasOilTank() {
@@ -2549,7 +2545,6 @@ class Engine extends Part {
     }
     VerifyCowl(num) {
         var can = this.GetCowlEnabled();
-        console.log([num, this.cowl_sel]);
         if (can[num])
             this.cowl_sel = num;
         if (!can[this.cowl_sel])
@@ -3316,14 +3311,20 @@ class Engines extends Part {
 class Propeller extends Part {
     constructor(json) {
         super();
-        this.idx_prop = 2;
-        this.use_variable = false;
         this.num_propellers = 0;
+        this.idx_prop = 2;
         this.prop_list = [];
         for (let elem of json["props"]) {
             this.prop_list.push({
                 name: elem["name"], stats: new Stats(elem),
-                automatic: elem["automatic"],
+                energy: elem["energy"], turn: elem["turn"],
+            });
+        }
+        this.idx_upg = 0;
+        this.upg_list = [];
+        for (let elem of json["upgrades"]) {
+            this.upg_list.push({
+                name: elem["name"], stats: new Stats(elem),
                 energy: elem["energy"], turn: elem["turn"],
             });
         }
@@ -3331,45 +3332,61 @@ class Propeller extends Part {
     toJSON() {
         return {
             type: this.idx_prop,
-            use_variable: this.use_variable
+            upgrade: this.idx_upg
         };
     }
     fromJSON(js, json_version) {
         this.idx_prop = js["type"];
-        this.use_variable = js["use_variable"];
+        if (json_version < 11.35) {
+            if (js["use_variable"])
+                this.idx_upg = 1;
+            if (this.idx_prop == 5) {
+                this.idx_upg = 2;
+                this.idx_prop = 2;
+            }
+        }
+        else {
+            this.idx_upg = js["upgrade"];
+        }
     }
     serialize(s) {
         s.PushNum(this.idx_prop);
-        s.PushBool(this.use_variable);
+        s.PushNum(this.idx_upg);
     }
     deserialize(d) {
         this.idx_prop = d.GetNum();
-        this.use_variable = d.GetBool();
+        if (d.version < 11.35) {
+            this.idx_upg = 0;
+            if (d.GetBool())
+                this.idx_upg = 1;
+            if (this.idx_prop == 5) {
+                this.idx_upg = 2;
+                this.idx_prop = 2;
+            }
+        }
+        else {
+            this.idx_upg = d.GetNum();
+        }
     }
     GetPropList() {
         return this.prop_list;
     }
+    GetUpgradeList() {
+        return this.upg_list;
+    }
     SetPropIndex(num) {
         this.idx_prop = num;
-        if (this.prop_list[num].automatic)
-            this.use_variable = false;
         this.CalculateStats();
     }
     GetPropIndex() {
         return this.idx_prop;
     }
-    SetVariable(use) {
-        if (!this.prop_list[this.idx_prop].automatic)
-            this.use_variable = use;
-        else
-            this.use_variable = false;
+    SetUpgradeIndex(use) {
+        this.idx_upg = use;
         this.CalculateStats();
     }
-    GetVariable() {
-        return this.use_variable;
-    }
-    CanBeVariable() {
-        return !this.prop_list[this.idx_prop].automatic;
+    GetUpgradeIndex() {
+        return this.idx_upg;
     }
     SetNumPropeller(have) {
         this.num_propellers = have;
@@ -3379,29 +3396,23 @@ class Propeller extends Part {
     }
     GetEnergy() {
         if (this.num_propellers)
-            return this.prop_list[this.idx_prop].energy;
-        else
+            return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
+        else //Pulsejet
             return 5;
     }
     GetTurn() {
         if (this.num_propellers)
-            return this.prop_list[this.idx_prop].turn;
-        else
+            return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
+        else //Pulsejet
             return 7;
     }
     PartStats() {
         var stats = new Stats();
         if (this.num_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
-            if (this.use_variable) {
-                stats.cost += 2 * this.num_propellers;
-                stats.warnings.push({
-                    source: lu("Manually Variable Propeller"),
-                    warning: lu("MVP_Warning")
-                });
-            }
+            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         }
-        else {
+        else { //Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
         }
@@ -10472,17 +10483,21 @@ class Propeller_HTML extends Display {
             this.select_prop.add(opt);
         }
         this.select_prop.onchange = () => { this.prop.SetPropIndex(this.select_prop.selectedIndex); };
-        document.getElementById("lbl_propeller_variable").textContent = lu("Propeller Manually Variable Propeller");
-        this.input_variable = document.getElementById("propeller_variable");
-        this.input_variable.onchange = () => { this.prop.SetVariable(this.input_variable.checked); };
+        document.getElementById("lbl_propeller_upgrade").textContent = lu("Propeller Propeller Upgrades:");
+        this.select_upgrade = document.getElementById("propeller_upgrade");
+        for (let elem of prop.GetUpgradeList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = lu(elem.name);
+            this.select_upgrade.add(opt);
+        }
+        this.select_upgrade.onchange = () => { this.prop.SetUpgradeIndex(this.select_upgrade.selectedIndex); };
     }
     UpdateDisplay() {
-        this.input_variable.checked = this.prop.GetVariable();
-        this.input_variable.disabled = !this.prop.CanBeVariable();
+        this.select_upgrade.selectedIndex = this.prop.GetUpgradeIndex();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
         this.select_prop.disabled = false;
         if (this.prop.GetNumPropellers() == 0) {
-            this.input_variable.disabled = true;
+            this.select_upgrade.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;
         }

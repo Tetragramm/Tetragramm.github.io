@@ -1,5 +1,5 @@
 {
-    "version": "11.3",
+    "version": "11.4",
     "era": {
         "options": [
             {
@@ -559,8 +559,7 @@
                 "pitchboost": 0.9,
                 "cost": 0,
                 "energy": 1.5,
-                "turn": 8,
-                "automatic": false
+                "turn": 8
             },
             {
                 "name": "Power",
@@ -568,8 +567,7 @@
                 "pitchboost": 0.8,
                 "cost": 0,
                 "energy": 2,
-                "turn": 7,
-                "automatic": false
+                "turn": 7
             },
             {
                 "name": "Default",
@@ -577,8 +575,7 @@
                 "pitchboost": 0.6,
                 "cost": 0,
                 "energy": 3,
-                "turn": 6,
-                "automatic": false
+                "turn": 6
             },
             {
                 "name": "Speed",
@@ -586,8 +583,7 @@
                 "pitchboost": 0.4,
                 "cost": 0,
                 "energy": 4,
-                "turn": 5,
-                "automatic": false
+                "turn": 5
             },
             {
                 "name": "High Speed",
@@ -595,18 +591,30 @@
                 "pitchboost": 0.3,
                 "cost": 0,
                 "energy": 4.5,
-                "turn": 4,
-                "automatic": false
+                "turn": 4
+            }
+        ],
+        "upgrades": [
+            {
+                "name": "None",
+                "energy": 0,
+                "turn": 0
+            },
+            {
+                "name": "Manually Adjustable Pitch",
+                "energy": 0,
+                "turn": 0,
+                "cost": 2,
+                "warning": "MVP_Warning"
             },
             {
                 "name": "Automatic Pitch",
-                "pitchspeed": 1.1,
-                "pitchboost": 0.7,
+                "pitchspeed": 0.1,
+                "pitchboost": 0.1,
+                "energy": 0.5,
+                "turn": 1,
                 "mass": 1,
-                "cost": 8,
-                "energy": 3,
-                "turn": 7,
-                "automatic": true
+                "cost": 8
             }
         ]
     },

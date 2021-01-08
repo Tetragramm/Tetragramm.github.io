@@ -648,10 +648,7 @@ class Engine extends Part {
 
     public GetCowlEnabled() {
         let lst = [];
-        console.log("Cowl Stuff");
-        console.log([this.GetIsPulsejet(), this.IsLiquidCooled(), this.IsRotary()]);
         for (let c of this.cowl_list) {
-            console.log([c.name, c.air, c.liquid, c.rotary]);
             if (this.GetIsPulsejet()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
@@ -665,7 +662,6 @@ class Engine extends Part {
                 lst.push(c.air);
             }
         }
-        console.log(lst);
         return lst;
     }
 
@@ -679,7 +675,6 @@ class Engine extends Part {
 
     private VerifyCowl(num: number) {
         var can = this.GetCowlEnabled();
-        console.log([num, this.cowl_sel]);
         if (can[num])
             this.cowl_sel = num;
         if (!can[this.cowl_sel])
