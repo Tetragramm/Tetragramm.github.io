@@ -42,6 +42,7 @@ class Propeller extends Part {
     public fromJSON(js: JSON, json_version: number) {
         this.idx_prop = js["type"];
         if (json_version < 11.35) {
+            this.idx_upg = 0;
             if (js["use_variable"])
                 this.idx_upg = 1;
             if (this.idx_prop == 5) {
