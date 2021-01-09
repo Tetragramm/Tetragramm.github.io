@@ -5834,7 +5834,7 @@ class Munitions extends Part {
             count = 0;
         count = Math.floor(1.0e-6 + count);
         this.rocket_count = count;
-        this.LimitMass(true);
+        this.LimitMass();
         this.CalculateStats();
     }
     SetBombCount(count) {
@@ -5842,7 +5842,7 @@ class Munitions extends Part {
             count = 0;
         count = Math.floor(1.0e-6 + count);
         this.bomb_count = count;
-        this.LimitMass(true);
+        this.LimitMass();
         this.CalculateStats();
     }
     GetBayCount() {
@@ -5870,9 +5870,18 @@ class Munitions extends Part {
         }
         this.CalculateStats();
     }
-    LimitMass(bomb) {
+    LimitMass() {
         var reduce = false;
-        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb * this.gull_factor) {
+        var allowed_internal = Math.floor(1.0e-6 + 3 * this.acft_struct * this.maxbomb);
+        if (this.bomb_count > allowed_internal) {
+            this.rocket_count = 0;
+            reduce = true;
+            this.bomb_count = allowed_internal;
+        }
+        var internal_bombs = Math.min(this.GetInternalBombCount(), this.bomb_count);
+        var allowed_external = Math.floor(1.0e-6 + this.acft_struct * this.maxbomb - internal_bombs / 3) * this.gull_factor;
+        console.log([this.acft_struct, this.maxbomb, this.gull_factor, internal_bombs, this.bomb_count, this.rocket_count]);
+        while (this.bomb_count + this.rocket_count > internal_bombs + allowed_external) {
             reduce = true;
             if (this.rocket_count > 0) {
                 this.rocket_count--;
@@ -5902,7 +5911,7 @@ class Munitions extends Part {
             default:
                 this.gull_factor = 1;
         }
-        if (this.LimitMass(false)) {
+        if (this.LimitMass()) {
             this.CalculateStats();
         }
     }
