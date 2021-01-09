@@ -13630,8 +13630,8 @@ class Aircraft_HTML extends Display {
         BlinkIfChanged(this.d_powr, stats.power.toString(), true);
         BlinkIfChanged(this.d_fcom, stats.fuelconsumption.toString(), false);
         BlinkIfChanged(this.d_fuel, stats.fuel.toString(), true);
-        BlinkIfChanged(this.d_pspd, stats.pitchspeed.toString(), true);
-        BlinkIfChanged(this.d_pbst, stats.pitchboost.toString(), true);
+        BlinkIfChanged(this.d_pspd, (Math.round(stats.pitchspeed * 10) / 10).toString(), true);
+        BlinkIfChanged(this.d_pbst, (Math.round(stats.pitchboost * 10) / 10).toString(), true);
         BlinkIfChanged(this.d_wara, stats.wingarea.toString(), true);
         BlinkIfChanged(this.d_mstr, stats.maxstrain.toString(), true);
         BlinkIfChanged(this.d_strc, stats.structure.toString(), true);
