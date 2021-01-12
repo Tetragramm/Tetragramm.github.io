@@ -10914,6 +10914,7 @@ function InitHTML() {
     var load_btn = document.getElementById("btn_load");
     load_btn.onclick = () => {
         acft_builder.fromJSON(JSON.parse(JSON.stringify(acft_hangar.toJSON())));
+        acft_builder.CalculateStats();
         stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
         window.localStorage.aircraft = JSON.stringify(acft_builder.toJSON());
         RefreshDisplay();
@@ -11002,6 +11003,7 @@ function InitStats() {
         console.log("Used Saved Data");
         try {
             acft_builder.fromJSON(JSON.parse(acft_data));
+            acft_builder.CalculateStats();
         }
         catch (_a) {
             console.log("Saved Data Failed.");
@@ -11048,6 +11050,7 @@ function LoadFromHangar(idx) {
         var arr = _stringToArrayBuffer(str);
         var des = new Deserialize(arr);
         acft_hangar.deserialize(des);
+        acft_hangar.CalculateStats();
     }
     catch (e) {
         console.log("Compressed Query Parameter Failed.");
@@ -11173,6 +11176,7 @@ function MergeTables(tbl1, tbl2, tbl3) {
     while (tbl3.children.length) {
         tbl3.children[0].remove();
     }
+    console.log(acft_builder.GetStats());
     for (let r = 0; r < tbl1.children.length; r++) {
         var row1 = tbl1.children[r];
         var row2 = tbl2.children[r];
