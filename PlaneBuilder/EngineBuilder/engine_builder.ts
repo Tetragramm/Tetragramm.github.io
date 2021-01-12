@@ -14,11 +14,15 @@ const init = () => {
         var engine_json = JSON.parse(engine_resp);
 
         var nameliststr = window.localStorage.getItem("engines_names");
-        var namelist = [];
+        var namelist: string[] = [];
         if (nameliststr) {
-            namelist = JSON.parse(nameliststr);
+            namelist = JSON.parse(nameliststr) as string[];
             for (let n of namelist) {
-                engine_list.set(n, new EngineList(n));
+                n = n.trim();
+                n = n.replace(/\s+/g, ' ');
+                if (n != "") {
+                    engine_list.set(n, new EngineList(n));
+                }
             }
         }
 
@@ -494,6 +498,7 @@ class EngineBuilder_HTML {
         this.m_delete.onclick = () => {
             if (!engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).remove_name(this.UpdateManual().name);
+                this.list_idx = "Custom";
                 this.UpdateList();
                 BlinkGood(this.m_delete.parentElement);
             } else {
@@ -547,14 +552,19 @@ class EngineBuilder_HTML {
             this.m_load.value = "";
         };
         this.m_list_create.onclick = () => {
-            if (this.m_list_input.value != "") {
-                if (engine_list.has(this.m_list_input.value) && engine_list.get(this.m_list_input.value).constant) {
+            var nlist = this.m_list_input.value;
+            nlist = nlist.trim();
+            nlist = nlist.replace(/\s+/g, ' ');
+            if (nlist != "") {
+                if (engine_list.has(nlist) && engine_list.get(nlist).constant) {
                     BlinkBad(this.m_list_create.parentElement);
                 } else {
-                    engine_list.set(this.m_list_input.value, new EngineList(this.m_list_input.value));
+                    engine_list.set(nlist, new EngineList(nlist));
                     this.UpdateList();
                     BlinkGood(this.m_list_create.parentElement);
                 }
+            } else {
+                BlinkBad(this.m_list_create.parentElement);
             }
         };
         this.m_list_delete.onclick = () => {

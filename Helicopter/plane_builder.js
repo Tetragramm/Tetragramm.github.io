@@ -1350,6 +1350,9 @@ class EngineList {
     fromJSON(js, force = false) {
         if (js["name"])
             this.name = js["name"];
+        if (force) {
+            this.list = [];
+        }
         for (let elem of js["engines"]) {
             this.push(new EngineInputs(elem), force);
         }
@@ -7410,6 +7413,7 @@ class WeaponSystem extends Part {
         }
     }
     SetWeaponSelected(num) {
+        var wasLA = this.IsLightningArc();
         this.weapon_type = num;
         this.raw_weapon_type = this.wl_permute.findIndex((value) => { return value == num; });
         if (this.weapon_list[num].size == 16) {
@@ -7436,6 +7440,9 @@ class WeaponSystem extends Part {
         //Special Case for Lightning Arc
         if (this.IsLightningArc()) {
             this.SetFixed(true);
+        }
+        if (wasLA && !this.IsLightningArc()) {
+            this.weapons[0].SetSynchronization(SynchronizationType.NONE);
         }
         this.CalculateStats();
     }

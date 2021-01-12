@@ -42,6 +42,10 @@ class EngineList {
         if (js["name"])
             this.name = js["name"];
 
+        if (force) {
+            this.list = [];
+        }
+
         for (let elem of js["engines"]) {
             this.push(new EngineInputs(elem), force);
         }

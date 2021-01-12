@@ -299,6 +299,7 @@ class WeaponSystem extends Part {
     }
 
     public SetWeaponSelected(num: number) {
+        var wasLA = this.IsLightningArc();
         this.weapon_type = num;
         this.raw_weapon_type = this.wl_permute.findIndex((value) => { return value == num; });
         if (this.weapon_list[num].size == 16) {
@@ -326,6 +327,9 @@ class WeaponSystem extends Part {
         //Special Case for Lightning Arc
         if (this.IsLightningArc()) {
             this.SetFixed(true);
+        }
+        if (wasLA && !this.IsLightningArc()) {
+            this.weapons[0].SetSynchronization(SynchronizationType.NONE);
         }
 
         this.CalculateStats();
@@ -359,7 +363,6 @@ class WeaponSystem extends Part {
     }
 
     public SetFixed(use: boolean) {
-
         //Special Case for Lightning Arc
         if (this.IsLightningArc()) {
             use = true;

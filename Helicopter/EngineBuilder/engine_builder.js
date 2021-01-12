@@ -494,6 +494,9 @@ class EngineList {
     fromJSON(js, force = false) {
         if (js["name"])
             this.name = js["name"];
+        if (force) {
+            this.list = [];
+        }
         for (let elem of js["engines"]) {
             this.push(new EngineInputs(elem), force);
         }
@@ -2469,7 +2472,11 @@ const init = () => {
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
             for (let n of namelist) {
-                engine_list.set(n, new EngineList(n));
+                n = n.trim();
+                n = n.replace(/\s+/g, ' ');
+                if (n != "") {
+                    engine_list.set(n, new EngineList(n));
+                }
             }
         }
         for (let el of engine_json["lists"]) {
@@ -2833,6 +2840,7 @@ class EngineBuilder_HTML {
         this.m_delete.onclick = () => {
             if (!engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).remove_name(this.UpdateManual().name);
+                this.list_idx = "Custom";
                 this.UpdateList();
                 BlinkGood(this.m_delete.parentElement);
             }
@@ -2891,15 +2899,21 @@ class EngineBuilder_HTML {
             this.m_load.value = "";
         };
         this.m_list_create.onclick = () => {
-            if (this.m_list_input.value != "") {
-                if (engine_list.has(this.m_list_input.value) && engine_list.get(this.m_list_input.value).constant) {
+            var nlist = this.m_list_input.value;
+            nlist = nlist.trim();
+            nlist = nlist.replace(/\s+/g, ' ');
+            if (nlist != "") {
+                if (engine_list.has(nlist) && engine_list.get(nlist).constant) {
                     BlinkBad(this.m_list_create.parentElement);
                 }
                 else {
-                    engine_list.set(this.m_list_input.value, new EngineList(this.m_list_input.value));
+                    engine_list.set(nlist, new EngineList(nlist));
                     this.UpdateList();
                     BlinkGood(this.m_list_create.parentElement);
                 }
+            }
+            else {
+                BlinkBad(this.m_list_create.parentElement);
             }
         };
         this.m_list_delete.onclick = () => {
@@ -9024,6 +9038,7 @@ class WeaponSystem extends Part {
         }
     }
     SetWeaponSelected(num) {
+        var wasLA = this.IsLightningArc();
         this.weapon_type = num;
         this.raw_weapon_type = this.wl_permute.findIndex((value) => { return value == num; });
         if (this.weapon_list[num].size == 16) {
@@ -9048,8 +9063,11 @@ class WeaponSystem extends Part {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
         //Special Case for Lightning Arc
-        if (this.weapon_list[num].ammo == 0) {
+        if (this.IsLightningArc()) {
             this.SetFixed(true);
+        }
+        if (wasLA && !this.IsLightningArc()) {
+            this.weapons[0].SetSynchronization(SynchronizationType.NONE);
         }
         this.CalculateStats();
     }
@@ -9078,7 +9096,7 @@ class WeaponSystem extends Part {
     }
     SetFixed(use) {
         //Special Case for Lightning Arc
-        if (this.weapon_list[this.weapon_type].ammo == 0) {
+        if (this.IsLightningArc()) {
             use = true;
         }
         if (this.fixed != use) {
@@ -9344,7 +9362,7 @@ class WeaponSystem extends Part {
         this.sticky_guns = num;
     }
     GetHRCharges() {
-        if (this.final_weapon.ammo == 0) { //Special Case for Lightning Gun
+        if (this.IsLightningArc()) { //Special Case for Lightning Gun
             return [3];
         }
         var count = 0;
@@ -9381,6 +9399,9 @@ class WeaponSystem extends Part {
     }
     GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
+    }
+    IsLightningArc() {
+        return this.final_weapon.name == "Lightning Arc";
     }
     GetReload() {
         return this.final_weapon.reload;

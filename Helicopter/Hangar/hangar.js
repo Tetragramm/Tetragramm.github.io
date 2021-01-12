@@ -1350,6 +1350,9 @@ class EngineList {
     fromJSON(js, force = false) {
         if (js["name"])
             this.name = js["name"];
+        if (force) {
+            this.list = [];
+        }
         for (let elem of js["engines"]) {
             this.push(new EngineInputs(elem), force);
         }
@@ -7410,6 +7413,7 @@ class WeaponSystem extends Part {
         }
     }
     SetWeaponSelected(num) {
+        var wasLA = this.IsLightningArc();
         this.weapon_type = num;
         this.raw_weapon_type = this.wl_permute.findIndex((value) => { return value == num; });
         if (this.weapon_list[num].size == 16) {
@@ -7434,8 +7438,11 @@ class WeaponSystem extends Part {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
         //Special Case for Lightning Arc
-        if (this.weapon_list[num].ammo == 0) {
+        if (this.IsLightningArc()) {
             this.SetFixed(true);
+        }
+        if (wasLA && !this.IsLightningArc()) {
+            this.weapons[0].SetSynchronization(SynchronizationType.NONE);
         }
         this.CalculateStats();
     }
@@ -7464,7 +7471,7 @@ class WeaponSystem extends Part {
     }
     SetFixed(use) {
         //Special Case for Lightning Arc
-        if (this.weapon_list[this.weapon_type].ammo == 0) {
+        if (this.IsLightningArc()) {
             use = true;
         }
         if (this.fixed != use) {
@@ -7730,7 +7737,7 @@ class WeaponSystem extends Part {
         this.sticky_guns = num;
     }
     GetHRCharges() {
-        if (this.final_weapon.ammo == 0) { //Special Case for Lightning Gun
+        if (this.IsLightningArc()) { //Special Case for Lightning Gun
             return [3];
         }
         var count = 0;
@@ -7767,6 +7774,9 @@ class WeaponSystem extends Part {
     }
     GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
+    }
+    IsLightningArc() {
+        return this.final_weapon.name == "Lightning Arc";
     }
     GetReload() {
         return this.final_weapon.reload;
@@ -10945,6 +10955,8 @@ function InitHTML() {
         reader.onloadend = () => {
             try {
                 var name = file.name.substr(0, file.name.length - 5);
+                name = name.trim();
+                name = name.replace(/\s+/g, ' ');
                 var acft_list;
                 acft_list = JSON.parse(reader.result);
                 if (acft_list.names.length != acft_list.acft.length) {
@@ -10966,10 +10978,15 @@ function InitHTML() {
     var list_create = document.getElementById("lbl_create_list");
     var list_input = document.getElementById("btn_create_list");
     list_create.onclick = () => {
-        select_hangar.selectedIndex = AddHangar(list_input.value);
-        chosen_hangar = list_input.value;
-        RefreshAcftSelect(LoadAcftList());
-        BlinkNeutral(list_create.parentElement);
+        var n = list_input.value;
+        n = n.trim();
+        n = n.replace(/\s+/g, ' ');
+        if (n != "") {
+            select_hangar.selectedIndex = AddHangar(n);
+            chosen_hangar = n;
+            RefreshAcftSelect(LoadAcftList());
+            BlinkNeutral(list_create.parentElement);
+        }
         list_input.value = "";
     };
     var list_delete = document.getElementById("btn_delete_list");
@@ -13951,7 +13968,7 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
-        if (set.GetProjectile() == ProjectileType.HEATRAY || set.GetShots() == 0) { //Heat Rays or lightning guns
+        if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) { //Heat Rays or lightning guns
             let chgs = set.GetHRCharges();
             disp.stats.shots_header.textContent = lu("Weapons Stat Charges");
             BlinkIfChanged(disp.stats.shots, StringFmt.Join("\\", chgs));

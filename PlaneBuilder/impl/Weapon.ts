@@ -51,13 +51,7 @@ class Weapon extends Part {
     private action: ActionType;
     private projectile: ProjectileType;
 
-    constructor(weapon_type: {
-        name: string, era: string, size: number, stats: Stats,
-        damage: number, hits: number, ammo: number,
-        ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number,
-    }, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
+    constructor(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
         super();
         this.weapon_type = weapon_type;
         this.fixed = fixed;
@@ -120,13 +114,7 @@ class Weapon extends Part {
             this.repeating = d.GetBool();
     }
 
-    public SetWeaponType(weapon_type: {
-        name: string, era: string, size: number, stats: Stats,
-        damage: number, hits: number, ammo: number,
-        ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number,
-    }, action: ActionType, projectile: ProjectileType) {
+    public SetWeaponType(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType) {
         this.weapon_type = weapon_type;
         this.action = action;
         this.projectile = projectile;

@@ -139,6 +139,8 @@ function InitHTML() {
         reader.onloadend = () => {
             try {
                 var name = file.name.substr(0, file.name.length - 5);
+                name = name.trim();
+                name = name.replace(/\s+/g, ' ');
                 var acft_list: { names: string[], acft: string[] };
                 acft_list = JSON.parse(reader.result as string);
                 if (acft_list.names.length != acft_list.acft.length) {
@@ -158,10 +160,15 @@ function InitHTML() {
     var list_create = document.getElementById("lbl_create_list") as HTMLLabelElement;
     var list_input = document.getElementById("btn_create_list") as HTMLInputElement;
     list_create.onclick = () => {
-        select_hangar.selectedIndex = AddHangar(list_input.value);
-        chosen_hangar = list_input.value;
-        RefreshAcftSelect(LoadAcftList());
-        BlinkNeutral(list_create.parentElement);
+        var n = list_input.value;
+        n = n.trim();
+        n = n.replace(/\s+/g, ' ');
+        if (n != "") {
+            select_hangar.selectedIndex = AddHangar(n);
+            chosen_hangar = n;
+            RefreshAcftSelect(LoadAcftList());
+            BlinkNeutral(list_create.parentElement);
+        }
         list_input.value = "";
     };
 
