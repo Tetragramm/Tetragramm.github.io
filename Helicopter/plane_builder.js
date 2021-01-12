@@ -1318,6 +1318,7 @@ class EngineStats {
 /// <reference path="./EngineStats.ts" />
 class EngineList {
     constructor(name) {
+        this.constant = false;
         this.name = name;
         this.list = [];
         var ejson = window.localStorage.getItem("engines." + this.name);
@@ -1361,6 +1362,9 @@ class EngineList {
         }
     }
     deserialize(d) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         this.name = d.GetString();
         var len = d.GetNum();
         for (let i = 0; i < len; i++) {
@@ -1370,11 +1374,17 @@ class EngineList {
         }
     }
     deserializeEngine(d) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         let stats = new EngineInputs();
         stats.deserialize(d);
         return this.push(stats);
     }
     push(es, force = false) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         if (force) {
             this.remove(es);
         }
@@ -1424,6 +1434,9 @@ class EngineList {
         return -1;
     }
     remove(es) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         var idx = this.find(es);
         if (idx >= 0) {
             this.list.splice(idx, 1);
@@ -1431,6 +1444,9 @@ class EngineList {
         window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
     }
     remove_name(name) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         var idx = this.find_name(name);
         if (idx >= 0) {
             this.list.splice(idx, 1);
@@ -1439,6 +1455,9 @@ class EngineList {
     }
     get length() {
         return this.list.length;
+    }
+    SetConstant() {
+        this.constant = true;
     }
 }
 function SearchAllEngineLists(n) {
@@ -7415,7 +7434,7 @@ class WeaponSystem extends Part {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
         //Special Case for Lightning Arc
-        if (this.weapon_list[num].ammo == 0) {
+        if (this.IsLightningArc()) {
             this.SetFixed(true);
         }
         this.CalculateStats();
@@ -7445,7 +7464,7 @@ class WeaponSystem extends Part {
     }
     SetFixed(use) {
         //Special Case for Lightning Arc
-        if (this.weapon_list[this.weapon_type].ammo == 0) {
+        if (this.IsLightningArc()) {
             use = true;
         }
         if (this.fixed != use) {
@@ -7632,7 +7651,7 @@ class WeaponSystem extends Part {
                 jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
                 jams[1] = Math.max(jams[1], t[1] + this.sticky_guns);
             }
-            return jams[0].toString() + "/" + jams[1].toString();
+            return jams[0].toString() + "\\" + jams[1].toString();
         }
         else {
             var jam = 0;
@@ -7711,6 +7730,9 @@ class WeaponSystem extends Part {
         this.sticky_guns = num;
     }
     GetHRCharges() {
+        if (this.IsLightningArc()) { //Special Case for Lightning Gun
+            return [3];
+        }
         var count = 0;
         for (let w of this.weapons) {
             count += w.GetCount();
@@ -7745,6 +7767,9 @@ class WeaponSystem extends Part {
     }
     GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
+    }
+    IsLightningArc() {
+        return this.final_weapon.name == "Lightning Arc";
     }
     GetReload() {
         return this.final_weapon.reload;
@@ -9030,6 +9055,13 @@ class Aircraft {
         StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * Math.pow(1.2, this.used.hefty));
         StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * Math.pow(1.2, this.used.hefty));
         StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * Math.pow(1.2, this.used.hefty));
+        if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning")
+                });
+            }
+        }
         var Overspeed = this.engines.GetOverspeed();
         var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
         var BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
@@ -9118,6 +9150,13 @@ class Aircraft {
         var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
         //Used: Leaky
         FuelUses = FuelUses * Math.pow(0.8, this.used.leaky);
+        if (FuelUses < 6) {
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning")
+                });
+            }
+        }
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
         var FlightStress = 1 + this.stats.flightstress;
@@ -12153,7 +12192,7 @@ class Weapons_HTML extends Display {
             wcell: null,
             weaps: [],
             ammo: document.createElement("INPUT"),
-            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null, shots_header: null },
             repeating: document.createElement("INPUT"),
         };
         var wlist = this.weap.GetWeaponList();
@@ -12224,7 +12263,7 @@ class Weapons_HTML extends Display {
         var h3_row = stable.insertRow();
         CreateTH(h3_row, lu("Weapons Stat Hits"));
         CreateTH(h3_row, lu("Weapons Stat Damage"));
-        CreateTH(h3_row, lu("Weapons Stat Shots"));
+        type.stats.shots_header = CreateTH(h3_row, lu("Weapons Stat Shots"));
         var c3_row = stable.insertRow();
         type.stats.hits = c3_row.insertCell();
         type.stats.damg = c3_row.insertCell();
@@ -12338,7 +12377,15 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
-        BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
+        if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) { //Heat Rays or lightning guns
+            let chgs = set.GetHRCharges();
+            disp.stats.shots_header.textContent = lu("Weapons Stat Charges");
+            BlinkIfChanged(disp.stats.shots, StringFmt.Join("\\", chgs));
+        }
+        else {
+            disp.stats.shots_header.textContent = lu("Weapons Stat Shots");
+            BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
+        }
     }
     UpdateWSets() {
         var wsets = this.weap.GetWeaponSets();
@@ -14540,7 +14587,10 @@ const init = () => {
         for (let el of engine_JSON["lists"]) {
             if (!engine_list.has(el["name"]))
                 engine_list.set(el["name"], new EngineList(el["name"]));
-            engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
+            engine_list.get(el["name"]).fromJSON(el, true);
+            if (el["name"] != "Custom") {
+                engine_list.get(el["name"]).SetConstant();
+            }
         }
         //Weapons bit
         aircraft_model = new Aircraft(parts_JSON, weapon_JSON, true);

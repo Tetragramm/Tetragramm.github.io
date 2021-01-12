@@ -1318,6 +1318,7 @@ class EngineStats {
 /// <reference path="./EngineStats.ts" />
 class EngineList {
     constructor(name) {
+        this.constant = false;
         this.name = name;
         this.list = [];
         var ejson = window.localStorage.getItem("engines." + this.name);
@@ -1361,6 +1362,9 @@ class EngineList {
         }
     }
     deserialize(d) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         this.name = d.GetString();
         var len = d.GetNum();
         for (let i = 0; i < len; i++) {
@@ -1370,11 +1374,17 @@ class EngineList {
         }
     }
     deserializeEngine(d) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         let stats = new EngineInputs();
         stats.deserialize(d);
         return this.push(stats);
     }
     push(es, force = false) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         if (force) {
             this.remove(es);
         }
@@ -1424,6 +1434,9 @@ class EngineList {
         return -1;
     }
     remove(es) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         var idx = this.find(es);
         if (idx >= 0) {
             this.list.splice(idx, 1);
@@ -1431,6 +1444,9 @@ class EngineList {
         window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
     }
     remove_name(name) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         var idx = this.find_name(name);
         if (idx >= 0) {
             this.list.splice(idx, 1);
@@ -1439,6 +1455,9 @@ class EngineList {
     }
     get length() {
         return this.list.length;
+    }
+    SetConstant() {
+        this.constant = true;
     }
 }
 function SearchAllEngineLists(n) {
@@ -2244,9 +2263,9 @@ class Engine extends Part {
     SetSelectedIndex(num) {
         this.etype_stats = engine_list.get(this.elist_idx).get_stats(num);
         this.etype_inputs = engine_list.get(this.elist_idx).get(num);
+        this.cooling_count = this.etype_stats.stats.cooling;
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
-        this.cooling_count = this.etype_stats.stats.cooling;
         this.CalculateStats();
     }
     GetSelectedIndex() {
@@ -2305,12 +2324,9 @@ class Engine extends Part {
     }
     SetSelectedList(n) {
         if (n != this.elist_idx) {
-            this.etype_stats = engine_list.get(n).get_stats(0);
-            this.etype_inputs = engine_list.get(n).get(0);
-            this.cooling_count = this.etype_stats.stats.cooling;
+            this.elist_idx = n;
+            this.SetSelectedIndex(0); //This calls CalculateStats
         }
-        this.elist_idx = n;
-        this.CalculateStats();
     }
     GetSelectedList() {
         return this.elist_idx;
@@ -2550,7 +2566,7 @@ class Engine extends Part {
         var can = this.GetCowlEnabled();
         if (can[num])
             this.cowl_sel = num;
-        else if (!can[this.cowl_sel])
+        if (!can[this.cowl_sel])
             this.cowl_sel = 0;
     }
     SetCowl(num) {
@@ -3314,14 +3330,20 @@ class Engines extends Part {
 class Propeller extends Part {
     constructor(json) {
         super();
-        this.idx_prop = 2;
-        this.use_variable = false;
         this.num_propellers = 0;
+        this.idx_prop = 2;
         this.prop_list = [];
         for (let elem of json["props"]) {
             this.prop_list.push({
                 name: elem["name"], stats: new Stats(elem),
-                automatic: elem["automatic"],
+                energy: elem["energy"], turn: elem["turn"],
+            });
+        }
+        this.idx_upg = 0;
+        this.upg_list = [];
+        for (let elem of json["upgrades"]) {
+            this.upg_list.push({
+                name: elem["name"], stats: new Stats(elem),
                 energy: elem["energy"], turn: elem["turn"],
             });
         }
@@ -3329,45 +3351,62 @@ class Propeller extends Part {
     toJSON() {
         return {
             type: this.idx_prop,
-            use_variable: this.use_variable
+            upgrade: this.idx_upg
         };
     }
     fromJSON(js, json_version) {
         this.idx_prop = js["type"];
-        this.use_variable = js["use_variable"];
+        if (json_version < 11.35) {
+            this.idx_upg = 0;
+            if (js["use_variable"])
+                this.idx_upg = 1;
+            if (this.idx_prop == 5) {
+                this.idx_upg = 2;
+                this.idx_prop = 2;
+            }
+        }
+        else {
+            this.idx_upg = js["upgrade"];
+        }
     }
     serialize(s) {
         s.PushNum(this.idx_prop);
-        s.PushBool(this.use_variable);
+        s.PushNum(this.idx_upg);
     }
     deserialize(d) {
         this.idx_prop = d.GetNum();
-        this.use_variable = d.GetBool();
+        if (d.version < 11.35) {
+            this.idx_upg = 0;
+            if (d.GetBool())
+                this.idx_upg = 1;
+            if (this.idx_prop == 5) {
+                this.idx_upg = 2;
+                this.idx_prop = 2;
+            }
+        }
+        else {
+            this.idx_upg = d.GetNum();
+        }
     }
     GetPropList() {
         return this.prop_list;
     }
+    GetUpgradeList() {
+        return this.upg_list;
+    }
     SetPropIndex(num) {
         this.idx_prop = num;
-        if (this.prop_list[num].automatic)
-            this.use_variable = false;
         this.CalculateStats();
     }
     GetPropIndex() {
         return this.idx_prop;
     }
-    SetVariable(use) {
-        if (!this.prop_list[this.idx_prop].automatic)
-            this.use_variable = use;
-        else
-            this.use_variable = false;
+    SetUpgradeIndex(use) {
+        this.idx_upg = use;
         this.CalculateStats();
     }
-    GetVariable() {
-        return this.use_variable;
-    }
-    CanBeVariable() {
-        return !this.prop_list[this.idx_prop].automatic;
+    GetUpgradeIndex() {
+        return this.idx_upg;
     }
     SetNumPropeller(have) {
         this.num_propellers = have;
@@ -3377,29 +3416,23 @@ class Propeller extends Part {
     }
     GetEnergy() {
         if (this.num_propellers)
-            return this.prop_list[this.idx_prop].energy;
-        else
+            return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
+        else //Pulsejet
             return 5;
     }
     GetTurn() {
         if (this.num_propellers)
-            return this.prop_list[this.idx_prop].turn;
-        else
+            return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
+        else //Pulsejet
             return 7;
     }
     PartStats() {
         var stats = new Stats();
         if (this.num_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
-            if (this.use_variable) {
-                stats.cost += 2 * this.num_propellers;
-                stats.warnings.push({
-                    source: lu("Manually Variable Propeller"),
-                    warning: lu("MVP_Warning")
-                });
-            }
+            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         }
-        else {
+        else { //Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
         }
@@ -4102,7 +4135,7 @@ class Wings extends Part {
         for (let wt of wtl) {
             list.push({
                 surface: wt.surface, area: wt.area, span: wt.span, anhedral: wt.anhedral,
-                dihedral: wt.dihedral, gull: (wt.anhedral > 0 || wt.dihedral > 0), deck: wt.deck
+                dihedral: wt.dihedral, gull: false, deck: wt.deck
             });
         }
         return list;
@@ -4150,7 +4183,7 @@ class Wings extends Part {
             else {
                 wing.dihedral = d.GetNum();
                 wing.anhedral = d.GetNum();
-                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+                wing.gull = false;
             }
             wing.deck = d.GetNum();
             this.wing_list.push(wing);
@@ -4170,7 +4203,7 @@ class Wings extends Part {
             else {
                 wing.dihedral = d.GetNum();
                 wing.anhedral = d.GetNum();
-                wing.gull = (wing.dihedral > 0 || wing.anhedral > 0);
+                wing.gull = false;
             }
             wing.deck = d.GetNum();
             this.mini_wing_list.push(wing);
@@ -4372,9 +4405,9 @@ class Wings extends Part {
         }
         return false;
     }
-    CanGull(idx) {
-        if (this.wing_list[idx].deck == 0) {
-            if (this.HasShoulder())
+    CanGull(deck) {
+        if (deck == 0) {
+            if (!this.GetTandem() && this.HasShoulder())
                 return false;
         }
         return true;
@@ -5820,7 +5853,7 @@ class Munitions extends Part {
             count = 0;
         count = Math.floor(1.0e-6 + count);
         this.rocket_count = count;
-        this.LimitMass(true);
+        this.LimitMass();
         this.CalculateStats();
     }
     SetBombCount(count) {
@@ -5828,7 +5861,7 @@ class Munitions extends Part {
             count = 0;
         count = Math.floor(1.0e-6 + count);
         this.bomb_count = count;
-        this.LimitMass(true);
+        this.LimitMass();
         this.CalculateStats();
     }
     GetBayCount() {
@@ -5856,9 +5889,18 @@ class Munitions extends Part {
         }
         this.CalculateStats();
     }
-    LimitMass(bomb) {
+    LimitMass() {
         var reduce = false;
-        while (this.bomb_count + this.rocket_count > this.GetInternalBombCount() + this.acft_struct * this.maxbomb * this.gull_factor) {
+        var allowed_internal = Math.floor(1.0e-6 + 3 * this.acft_struct * this.maxbomb);
+        if (this.bomb_count > allowed_internal) {
+            this.rocket_count = 0;
+            reduce = true;
+            this.bomb_count = allowed_internal;
+        }
+        var internal_bombs = Math.min(this.GetInternalBombCount(), this.bomb_count);
+        var allowed_external = Math.floor(1.0e-6 + this.acft_struct * this.maxbomb - internal_bombs / 3) * this.gull_factor;
+        console.log([this.acft_struct, this.maxbomb, this.gull_factor, internal_bombs, this.bomb_count, this.rocket_count]);
+        while (this.bomb_count + this.rocket_count > internal_bombs + allowed_external) {
             reduce = true;
             if (this.rocket_count > 0) {
                 this.rocket_count--;
@@ -5888,7 +5930,7 @@ class Munitions extends Part {
             default:
                 this.gull_factor = 1;
         }
-        if (this.LimitMass(false)) {
+        if (this.LimitMass()) {
             this.CalculateStats();
         }
     }
@@ -7609,7 +7651,7 @@ class WeaponSystem extends Part {
                 jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
                 jams[1] = Math.max(jams[1], t[1] + this.sticky_guns);
             }
-            return jams[0].toString() + "/" + jams[1].toString();
+            return jams[0].toString() + "\\" + jams[1].toString();
         }
         else {
             var jam = 0;
@@ -7688,6 +7730,9 @@ class WeaponSystem extends Part {
         this.sticky_guns = num;
     }
     GetHRCharges() {
+        if (this.final_weapon.ammo == 0) { //Special Case for Lightning Gun
+            return [3];
+        }
         var count = 0;
         for (let w of this.weapons) {
             count += w.GetCount();
@@ -9007,6 +9052,13 @@ class Aircraft {
         StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * Math.pow(1.2, this.used.hefty));
         StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * Math.pow(1.2, this.used.hefty));
         StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * Math.pow(1.2, this.used.hefty));
+        if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning")
+                });
+            }
+        }
         var Overspeed = this.engines.GetOverspeed();
         var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
         var BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
@@ -9095,6 +9147,13 @@ class Aircraft {
         var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
         //Used: Leaky
         FuelUses = FuelUses * Math.pow(0.8, this.used.leaky);
+        if (FuelUses < 6) {
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning")
+                });
+            }
+        }
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
         var FlightStress = 1 + this.stats.flightstress;
@@ -10802,7 +10861,10 @@ const init = () => {
         for (let el of engine_JSON["lists"]) {
             if (!engine_list.has(el["name"]))
                 engine_list.set(el["name"], new EngineList(el["name"]));
-            engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
+            engine_list.get(el["name"]).fromJSON(el, true);
+            if (el["name"] != "Custom") {
+                engine_list.get(el["name"]).SetConstant();
+            }
         }
         InitHTML();
         InitStats();
@@ -12233,17 +12295,21 @@ class Propeller_HTML extends Display {
             this.select_prop.add(opt);
         }
         this.select_prop.onchange = () => { this.prop.SetPropIndex(this.select_prop.selectedIndex); };
-        document.getElementById("lbl_propeller_variable").textContent = lu("Propeller Manually Variable Propeller");
-        this.input_variable = document.getElementById("propeller_variable");
-        this.input_variable.onchange = () => { this.prop.SetVariable(this.input_variable.checked); };
+        document.getElementById("lbl_propeller_upgrade").textContent = lu("Propeller Propeller Upgrades:");
+        this.select_upgrade = document.getElementById("propeller_upgrade");
+        for (let elem of prop.GetUpgradeList()) {
+            let opt = document.createElement("OPTION");
+            opt.text = lu(elem.name);
+            this.select_upgrade.add(opt);
+        }
+        this.select_upgrade.onchange = () => { this.prop.SetUpgradeIndex(this.select_upgrade.selectedIndex); };
     }
     UpdateDisplay() {
-        this.input_variable.checked = this.prop.GetVariable();
-        this.input_variable.disabled = !this.prop.CanBeVariable();
+        this.select_upgrade.selectedIndex = this.prop.GetUpgradeIndex();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
         this.select_prop.disabled = false;
         if (this.prop.GetNumPropellers() == 0) {
-            this.input_variable.disabled = true;
+            this.select_upgrade.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;
         }
@@ -12786,6 +12852,7 @@ class Wings_HTML extends Display {
             this.wings.SetFullWing(idx, w);
         };
         ht.gull.checked = wing.gull;
+        ht.gull.disabled = !this.wings.CanGull(wing.deck);
         ht.dihedral.onchange = () => {
             let w = Object.assign({}, wing);
             w.dihedral = ht.dihedral.valueAsNumber;
@@ -13699,7 +13766,7 @@ class Weapons_HTML extends Display {
             wcell: null,
             weaps: [],
             ammo: document.createElement("INPUT"),
-            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null, shots_header: null },
             repeating: document.createElement("INPUT"),
         };
         var wlist = this.weap.GetWeaponList();
@@ -13770,7 +13837,7 @@ class Weapons_HTML extends Display {
         var h3_row = stable.insertRow();
         CreateTH(h3_row, lu("Weapons Stat Hits"));
         CreateTH(h3_row, lu("Weapons Stat Damage"));
-        CreateTH(h3_row, lu("Weapons Stat Shots"));
+        type.stats.shots_header = CreateTH(h3_row, lu("Weapons Stat Shots"));
         var c3_row = stable.insertRow();
         type.stats.hits = c3_row.insertCell();
         type.stats.damg = c3_row.insertCell();
@@ -13884,7 +13951,15 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
-        BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
+        if (set.GetProjectile() == ProjectileType.HEATRAY || set.GetShots() == 0) { //Heat Rays or lightning guns
+            let chgs = set.GetHRCharges();
+            disp.stats.shots_header.textContent = lu("Weapons Stat Charges");
+            BlinkIfChanged(disp.stats.shots, StringFmt.Join("\\", chgs));
+        }
+        else {
+            disp.stats.shots_header.textContent = lu("Weapons Stat Shots");
+            BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
+        }
     }
     UpdateWSets() {
         var wsets = this.weap.GetWeaponSets();
@@ -14847,8 +14922,8 @@ class Aircraft_HTML extends Display {
         BlinkIfChanged(this.d_powr, stats.power.toString(), true);
         BlinkIfChanged(this.d_fcom, stats.fuelconsumption.toString(), false);
         BlinkIfChanged(this.d_fuel, stats.fuel.toString(), true);
-        BlinkIfChanged(this.d_pspd, stats.pitchspeed.toString(), true);
-        BlinkIfChanged(this.d_pbst, stats.pitchboost.toString(), true);
+        BlinkIfChanged(this.d_pspd, (Math.round(stats.pitchspeed * 10) / 10).toString(), true);
+        BlinkIfChanged(this.d_pbst, (Math.round(stats.pitchboost * 10) / 10).toString(), true);
         BlinkIfChanged(this.d_wara, stats.wingarea.toString(), true);
         BlinkIfChanged(this.d_mstr, stats.maxstrain.toString(), true);
         BlinkIfChanged(this.d_strc, stats.structure.toString(), true);

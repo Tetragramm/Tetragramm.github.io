@@ -4,6 +4,7 @@
 class EngineList {
     private list: EngineInputs[];
     public name: string;
+    public constant = false;
 
     constructor(name: string) {
         this.name = name;
@@ -55,6 +56,9 @@ class EngineList {
     }
 
     public deserialize(d: Deserialize) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         this.name = d.GetString();
         var len = d.GetNum();
         for (let i = 0; i < len; i++) {
@@ -65,12 +69,18 @@ class EngineList {
     }
 
     public deserializeEngine(d: Deserialize) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         let stats = new EngineInputs();
         stats.deserialize(d);
         return this.push(stats);
     }
 
     public push(es: EngineInputs, force = false) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         if (force) {
             this.remove(es);
         } else {
@@ -126,6 +136,9 @@ class EngineList {
     }
 
     public remove(es: EngineInputs) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         var idx = this.find(es);
         if (idx >= 0) {
             this.list.splice(idx, 1);
@@ -134,6 +147,9 @@ class EngineList {
     }
 
     public remove_name(name: string) {
+        if (this.constant) {
+            throw "Engine List is Constant";
+        }
         var idx = this.find_name(name);
         if (idx >= 0) {
             this.list.splice(idx, 1);
@@ -143,6 +159,10 @@ class EngineList {
 
     get length(): number {
         return this.list.length;
+    }
+
+    public SetConstant() {
+        this.constant = true;
     }
 }
 

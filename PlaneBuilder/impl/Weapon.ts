@@ -24,14 +24,15 @@ enum ActionType {
     ROTARY,
     ENUM_MAX
 }
+type WeaponType = {
+    name: string, era: string, size: number, stats: Stats,
+    damage: number, hits: number, ammo: number,
+    ap: number, jam: string, reload: number,
+    rapid: boolean, synched: boolean, shells: boolean,
+    can_action: boolean, can_projectile: boolean, deflection: number,
+};
 class Weapon extends Part {
-    private weapon_type: {
-        name: string, era: string, size: number, stats: Stats,
-        damage: number, hits: number, ammo: number,
-        ap: number, jam: string, reload: number,
-        rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number,
-    };
+    private weapon_type: WeaponType
     private fixed: boolean;
     private wing: boolean;
     private covered: boolean;

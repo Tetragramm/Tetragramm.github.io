@@ -25,7 +25,10 @@ const init = () => {
         for (let el of engine_json["lists"]) {
             if (!engine_list.has(el["name"]))
                 engine_list.set(el["name"], new EngineList(el["name"]));
-            engine_list.get(el["name"]).fromJSON(el, false); //TODO: Overwrite defaults
+            engine_list.get(el["name"]).fromJSON(el, true);
+            if (el["name"] != "Custom") {
+                engine_list.get(el["name"]).SetConstant();
+            }
         }
 
         ebuild.UpdateList();
@@ -488,19 +491,33 @@ class EngineBuilder_HTML {
 
         this.m_list_select.onchange = () => { this.list_idx = this.m_list_select.options[this.m_list_select.selectedIndex].text; this.UpdateList(); };
         this.m_select.onchange = () => { this.SetValues(engine_list.get(this.list_idx).get(this.m_select.selectedIndex)); this.m_select.selectedIndex = -1; };
-        this.m_delete.onclick = () => { engine_list.get(this.list_idx).remove_name(this.UpdateManual().name); this.UpdateList(); }
+        this.m_delete.onclick = () => {
+            if (!engine_list.get(this.list_idx).constant) {
+                engine_list.get(this.list_idx).remove_name(this.UpdateManual().name);
+                this.UpdateList();
+                BlinkGood(this.m_delete.parentElement);
+            } else {
+                BlinkBad(this.m_delete.parentElement);
+            }
+        }
         this.m_add_eb.onclick = () => {
             var inputs = this.enginebuilder.EngineInputs();
-            if (inputs.name != "Default") {
+            if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
+                BlinkGood(this.m_add_eb.parentElement);
+            } else {
+                BlinkBad(this.m_add_eb.parentElement);
             }
         }
         this.m_add_pj.onclick = () => {
             var inputs = this.pulsejetbuilder.EngineInputs();
-            if (inputs.name != "Default") {
+            if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
+                BlinkGood(this.m_add_pj.parentElement);
+            } else {
+                BlinkBad(this.m_add_pj.parentElement);
             }
         }
         this.m_save.onclick = () => { download(JSON.stringify(engine_list.get(this.list_idx).toJSON()), this.list_idx + ".json", "json"); }
@@ -517,8 +534,13 @@ class EngineBuilder_HTML {
                     var str = JSON.parse(reader.result as string);
                     var newelist = new EngineList("");
                     newelist.fromJSON(str);
-                    engine_list.set(newelist.name, newelist);
-                    this.UpdateList();
+                    if (engine_list.has(newelist.name) && engine_list.get(newelist.name).constant) {
+                        BlinkBad(this.m_load.parentElement);
+                    } else {
+                        engine_list.set(newelist.name, newelist);
+                        this.UpdateList();
+                        BlinkGood(this.m_load.parentElement);
+                    }
                 } catch { }
             };
             reader.readAsText(file);
@@ -526,25 +548,35 @@ class EngineBuilder_HTML {
         };
         this.m_list_create.onclick = () => {
             if (this.m_list_input.value != "") {
-                engine_list.set(this.m_list_input.value, new EngineList(this.m_list_input.value));
-                this.UpdateList();
+                if (engine_list.has(this.m_list_input.value) && engine_list.get(this.m_list_input.value).constant) {
+                    BlinkBad(this.m_list_create.parentElement);
+                } else {
+                    engine_list.set(this.m_list_input.value, new EngineList(this.m_list_input.value));
+                    this.UpdateList();
+                    BlinkGood(this.m_list_create.parentElement);
+                }
             }
         };
         this.m_list_delete.onclick = () => {
             if (this.list_idx != "" && this.list_idx != "Custom") {
-                engine_list.delete(this.list_idx);
-                window.localStorage.removeItem("engines." + this.list_idx);
-                let namelist = JSON.parse(window.localStorage.getItem("engines_names"));
-                var idx = -1;
-                for (let i = 0; i < namelist.length; i++) {
-                    if (namelist[i] == this.list_idx)
-                        idx = i;
+                if (engine_list.get(this.list_idx).constant) {
+                    BlinkBad(this.m_list_delete.parentElement);
+                } else {
+                    engine_list.delete(this.list_idx);
+                    window.localStorage.removeItem("engines." + this.list_idx);
+                    let namelist = JSON.parse(window.localStorage.getItem("engines_names"));
+                    var idx = -1;
+                    for (let i = 0; i < namelist.length; i++) {
+                        if (namelist[i] == this.list_idx)
+                            idx = i;
+                    }
+                    if (idx != -1)
+                        namelist.splice(idx, 1);
+                    window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+                    this.list_idx = "Custom";
+                    this.UpdateList();
+                    BlinkGood(this.m_list_delete.parentElement);
                 }
-                if (idx != -1)
-                    namelist.splice(idx, 1);
-                window.localStorage.setItem("engines_names", JSON.stringify(namelist));
-                this.list_idx = "Custom";
-                this.UpdateList();
             }
         };
 

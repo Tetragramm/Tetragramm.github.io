@@ -324,7 +324,7 @@ class WeaponSystem extends Part {
         }
 
         //Special Case for Lightning Arc
-        if (this.weapon_list[num].ammo == 0) {
+        if (this.IsLightningArc()) {
             this.SetFixed(true);
         }
 
@@ -361,7 +361,7 @@ class WeaponSystem extends Part {
     public SetFixed(use: boolean) {
 
         //Special Case for Lightning Arc
-        if (this.weapon_list[this.weapon_type].ammo == 0) {
+        if (this.IsLightningArc()) {
             use = true;
         }
 
@@ -557,7 +557,7 @@ class WeaponSystem extends Part {
                 jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
                 jams[1] = Math.max(jams[1], t[1] + this.sticky_guns);
             }
-            return jams[0].toString() + "/" + jams[1].toString();
+            return jams[0].toString() + "\\" + jams[1].toString();
         }
         else {
             var jam = 0;
@@ -649,6 +649,9 @@ class WeaponSystem extends Part {
     }
 
     public GetHRCharges() {
+        if (this.IsLightningArc()) { //Special Case for Lightning Gun
+            return [3];
+        }
         var count = 0;
         for (let w of this.weapons) {
             count += w.GetCount();
@@ -682,6 +685,10 @@ class WeaponSystem extends Part {
 
     public GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
+    }
+
+    public IsLightningArc() {
+        return this.final_weapon.name == "Lightning Arc";
     }
 
     public GetReload() {

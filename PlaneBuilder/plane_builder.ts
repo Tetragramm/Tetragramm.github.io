@@ -45,7 +45,10 @@ const init = () => {
                 for (let el of engine_JSON["lists"]) {
                     if (!engine_list.has(el["name"]))
                         engine_list.set(el["name"], new EngineList(el["name"]));
-                    engine_list.get(el["name"]).fromJSON(el, false);//TODO: Overwrite defaults
+                    engine_list.get(el["name"]).fromJSON(el, true);
+                    if (el["name"] != "Custom") {
+                        engine_list.get(el["name"]).SetConstant();
+                    }
                 }
 
                 //Weapons bit

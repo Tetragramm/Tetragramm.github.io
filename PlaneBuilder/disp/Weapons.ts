@@ -10,6 +10,7 @@ type WStatType = {
     mass: HTMLTableCellElement, drag: HTMLTableCellElement, cost: HTMLTableCellElement,
     sect: HTMLTableCellElement, mounting: HTMLTableCellElement, jams: HTMLTableCellElement,
     hits: HTMLTableCellElement, damg: HTMLTableCellElement, shots: HTMLTableCellElement,
+    shots_header: HTMLTableHeaderCellElement,
 };
 type WSetType = {
     type: HTMLSelectElement, dirs: HTMLInputElement[],
@@ -64,7 +65,7 @@ class Weapons_HTML extends Display {
             wcell: null,
             weaps: [],
             ammo: document.createElement("INPUT") as HTMLInputElement,
-            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null },
+            stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null, shots_header: null },
             repeating: document.createElement("INPUT") as HTMLInputElement,
         };
 
@@ -142,7 +143,7 @@ class Weapons_HTML extends Display {
         var h3_row = stable.insertRow();
         CreateTH(h3_row, lu("Weapons Stat Hits"));
         CreateTH(h3_row, lu("Weapons Stat Damage"));
-        CreateTH(h3_row, lu("Weapons Stat Shots"));
+        type.stats.shots_header = CreateTH(h3_row, lu("Weapons Stat Shots"));
         var c3_row = stable.insertRow();
         type.stats.hits = c3_row.insertCell();
         type.stats.damg = c3_row.insertCell();
@@ -272,7 +273,14 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.jams, set.GetJam());
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
-        BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
+        if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) { //Heat Rays or lightning guns
+            let chgs = set.GetHRCharges();
+            disp.stats.shots_header.textContent = lu("Weapons Stat Charges");
+            BlinkIfChanged(disp.stats.shots, StringFmt.Join("\\", chgs));
+        } else {
+            disp.stats.shots_header.textContent = lu("Weapons Stat Shots");
+            BlinkIfChanged(disp.stats.shots, set.GetShots().toString());
+        }
     }
 
     private UpdateWSets() {
