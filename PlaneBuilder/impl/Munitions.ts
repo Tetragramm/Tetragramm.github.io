@@ -159,7 +159,6 @@ class Munitions extends Part {
         }
         var internal_bombs = Math.min(this.GetInternalBombCount(), this.bomb_count);
         var allowed_external = Math.floor(1.0e-6 + this.acft_struct * this.maxbomb - internal_bombs / 3) * this.gull_factor;
-        console.log([this.acft_struct, this.maxbomb, this.gull_factor, internal_bombs, this.bomb_count, this.rocket_count]);
         while (this.bomb_count + this.rocket_count > internal_bombs + allowed_external) {
             reduce = true;
             if (this.rocket_count > 0) {

@@ -216,12 +216,14 @@
                 "name": "Illuminated Reflex Sight",
                 "visibility": -1,
                 "attack": 2,
+                "charge": 1.0e-9,
                 "cost": 6
             },
             {
                 "name": "Gyro Gunsight",
                 "visibility": -1,
                 "attack": 2,
+                "charge": 1.0e-9,
                 "cost": 12,
                 "warning": "Gunsight Warning"
             }

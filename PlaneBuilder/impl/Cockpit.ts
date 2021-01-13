@@ -208,6 +208,10 @@ class Cockpit extends Part {
         this.has_rotary = has;
     }
 
+    public IsElectrics() {
+        return this.stats.charge != 0;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats();
         stats.reqsections = 1;

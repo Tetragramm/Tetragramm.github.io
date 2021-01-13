@@ -855,7 +855,7 @@ class Aircraft {
         return this.weapons;
     }
     public IsElectrics() {
-        return this.engines.IsElectrics() || this.accessories.IsElectrics();
+        return this.engines.IsElectrics() || this.accessories.IsElectrics() || this.cockpits.IsElectrics();
     }
     public GetUsed() {
         return this.used;

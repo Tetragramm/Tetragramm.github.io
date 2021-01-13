@@ -1701,6 +1701,9 @@ class Cockpit extends Part {
     SetHasRotary(has) {
         this.has_rotary = has;
     }
+    IsElectrics() {
+        return this.stats.charge != 0;
+    }
     PartStats() {
         var stats = new Stats();
         stats.reqsections = 1;
@@ -1891,6 +1894,13 @@ class Cockpits extends Part {
         for (let c of this.positions) {
             c.SetHasRotary(has);
         }
+    }
+    IsElectrics() {
+        for (let c of this.positions) {
+            if (c.IsElectrics())
+                return true;
+        }
+        return false;
     }
     PartStats() {
         var s = new Stats();
@@ -5902,7 +5912,6 @@ class Munitions extends Part {
         }
         var internal_bombs = Math.min(this.GetInternalBombCount(), this.bomb_count);
         var allowed_external = Math.floor(1.0e-6 + this.acft_struct * this.maxbomb - internal_bombs / 3) * this.gull_factor;
-        console.log([this.acft_struct, this.maxbomb, this.gull_factor, internal_bombs, this.bomb_count, this.rocket_count]);
         while (this.bomb_count + this.rocket_count > internal_bombs + allowed_external) {
             reduce = true;
             if (this.rocket_count > 0) {
@@ -9373,7 +9382,7 @@ class Aircraft {
         return this.weapons;
     }
     IsElectrics() {
-        return this.engines.IsElectrics() || this.accessories.IsElectrics();
+        return this.engines.IsElectrics() || this.accessories.IsElectrics() || this.cockpits.IsElectrics();
     }
     GetUsed() {
         return this.used;

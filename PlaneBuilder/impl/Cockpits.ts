@@ -165,6 +165,14 @@ class Cockpits extends Part {
         }
     }
 
+    public IsElectrics() {
+        for (let c of this.positions) {
+            if (c.IsElectrics())
+                return true;
+        }
+        return false;
+    }
+
     public PartStats(): Stats {
         var s = new Stats();
         for (let cp of this.positions) {
