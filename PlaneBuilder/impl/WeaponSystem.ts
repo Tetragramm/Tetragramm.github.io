@@ -327,6 +327,10 @@ class WeaponSystem extends Part {
         //Special Case for Lightning Arc
         if (this.IsLightningArc()) {
             this.SetFixed(true);
+            this.directions[0] = true;
+            for (let i = 1; i < this.directions.length; i++) {
+                this.directions[i] = false;
+            }
         }
         if (wasLA && !this.IsLightningArc()) {
             this.weapons[0].SetSynchronization(SynchronizationType.NONE);
@@ -388,7 +392,12 @@ class WeaponSystem extends Part {
     }
 
     public CanDirection() {
-        var directions = [...Array(6).fill(true)];
+
+        if (this.IsLightningArc()) {
+            return [...Array(this.directions.length).fill(false)];
+        }
+
+        var directions = [...Array(this.directions.length).fill(true)];
         if (this.weapons[0].GetArty() && this.fixed && !this.weapons[0].GetWing()) {
             var is_spinner = this.weapons[0].GetSynchronization() == SynchronizationType.SPINNER;
             if (this.tractor && !(this.spinner_t || (is_spinner && this.directions[0])))
@@ -752,7 +761,7 @@ class WeaponSystem extends Part {
             }
         }
 
-        if (this.projectile_sel == ProjectileType.HEATRAY) {
+        if (this.projectile_sel == ProjectileType.HEATRAY || this.IsLightningArc()) {
             //Cant have extra ammo for heatray.
             this.ammo = 1;
         }

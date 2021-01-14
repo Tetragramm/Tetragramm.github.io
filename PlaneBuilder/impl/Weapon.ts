@@ -317,6 +317,8 @@ class Weapon extends Part {
             this.w_count = 1;
             this.covered = true;
         }
+        if (this.IsLightningArc())
+            this.synchronization = SynchronizationType.NO_INTERFERENCE;
     }
 
     public GetArty() {
@@ -354,6 +356,10 @@ class Weapon extends Part {
             }
             return ret;
         }
+    }
+
+    private IsLightningArc() {
+        return this.weapon_type.name == "Lightning Arc";
     }
 
     public SetCalculateStats(callback: () => void) {
@@ -453,7 +459,7 @@ class Weapon extends Part {
                 source: lu(this.weapon_type.name),
                 warning: lu("Deflector Plate Warning"),
             });
-        } else if (this.synchronization == SynchronizationType.NO_INTERFERENCE) {
+        } else if (this.synchronization == SynchronizationType.NO_INTERFERENCE && !this.IsLightningArc()) {
             stats.warnings.push({
                 source: lu(this.weapon_type.name) + " " + lu("No Interference"),
                 warning: lu("No Interference Warning"),
