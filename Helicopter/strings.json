@@ -165,7 +165,7 @@
         "Air Brake": "Air Brake",
         "Air Brake Warning": "When deployed, immediately bleed of speed equal to Speed Factor and gain +1 to Dogfight!.",
         "Dive Brake": "Dive Brake",
-        "Dive Brake Warning": "When deployed, steep dives trade altitude for speed at 1-2 instead of 1-5.",
+        "Dive Brake Warning": "When deployed, steep dives trade altitude for speed at 1-2 instead of 1-3.",
         "Drogue Chute": "Drogue Chute",
         "Drogue Chute Warning": "Activate once per flight to: Give +3 to Go Down or take down a close pursuer.",
         "Wing Blades": "Wing Blades",
