@@ -258,9 +258,9 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.sect, stats.reqsections.toString(), false);
 
         var h = set.GetHits();
-        var hits = h[0].toString() + "\\"
-            + h[1].toString() + "\\"
-            + h[2].toString() + "\\"
+        var hits = h[0].toString() + "/"
+            + h[1].toString() + "/"
+            + h[2].toString() + "/"
             + h[3].toString();
 
         if (set.GetFixed())
@@ -276,7 +276,7 @@ class Weapons_HTML extends Display {
         if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) { //Heat Rays or lightning guns
             let chgs = set.GetHRCharges();
             disp.stats.shots_header.textContent = lu("Weapons Stat Charges");
-            BlinkIfChanged(disp.stats.shots, StringFmt.Join("\\", chgs));
+            BlinkIfChanged(disp.stats.shots, StringFmt.Join("/", chgs));
         } else {
             disp.stats.shots_header.textContent = lu("Weapons Stat Shots");
             BlinkIfChanged(disp.stats.shots, set.GetShots().toString());

@@ -359,8 +359,8 @@ class Derived_HTML {
                     this.WeaponName(acft, w),
                     StringFmt.Join(" ", dirs),
                     wlist[w.GetWeaponSelected()].damage,
-                    StringFmt.Join("\\", hits),
-                    StringFmt.Join("\\", chgs),
+                    StringFmt.Join("/", hits),
+                    StringFmt.Join("/", chgs),
                     StringFmt.Join(", ", tags)
                 );
             } else {
@@ -369,7 +369,7 @@ class Derived_HTML {
                     this.WeaponName(acft, w),
                     StringFmt.Join(" ", dirs),
                     wlist[w.GetWeaponSelected()].damage,
-                    StringFmt.Join("\\", hits),
+                    StringFmt.Join("/", hits),
                     w.GetShots(),
                     StringFmt.Join(", ", tags)
                 );

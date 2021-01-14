@@ -12394,9 +12394,9 @@ class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.cost, stats.cost.toString(), false);
         BlinkIfChanged(disp.stats.sect, stats.reqsections.toString(), false);
         var h = set.GetHits();
-        var hits = h[0].toString() + "\\"
-            + h[1].toString() + "\\"
-            + h[2].toString() + "\\"
+        var hits = h[0].toString() + "/"
+            + h[1].toString() + "/"
+            + h[2].toString() + "/"
             + h[3].toString();
         if (set.GetFixed())
             BlinkIfChanged(disp.stats.mounting, lu("Fixed"));
@@ -12410,7 +12410,7 @@ class Weapons_HTML extends Display {
         if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) { //Heat Rays or lightning guns
             let chgs = set.GetHRCharges();
             disp.stats.shots_header.textContent = lu("Weapons Stat Charges");
-            BlinkIfChanged(disp.stats.shots, StringFmt.Join("\\", chgs));
+            BlinkIfChanged(disp.stats.shots, StringFmt.Join("/", chgs));
         }
         else {
             disp.stats.shots_header.textContent = lu("Weapons Stat Shots");
@@ -12710,10 +12710,10 @@ class Derived_HTML {
             }
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
-                weaphtml += lu("Weapon Description Heat Ray", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), StringFmt.Join("\\", chgs), StringFmt.Join(", ", tags));
+                weaphtml += lu("Weapon Description Heat Ray", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
             }
             else {
-                weaphtml += lu("Weapon Description", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("\\", hits), w.GetShots(), StringFmt.Join(", ", tags));
+                weaphtml += lu("Weapon Description", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), w.GetShots(), StringFmt.Join(", ", tags));
             }
             weaphtml += "<br\>";
         }
