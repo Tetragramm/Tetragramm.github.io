@@ -614,9 +614,9 @@ class Aircraft {
             MaxSpeedwBombs = Math.min(37, MaxSpeedwBombs);
         }
 
-        var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
+        var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
-        FuelUses = FuelUses * Math.pow(0.8, this.used.leaky);
+        FuelUses = Math.floor(1.0e-6 + FuelUses * Math.pow(0.8, this.used.leaky));
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses") }) == -1) {
                 this.stats.warnings.push({

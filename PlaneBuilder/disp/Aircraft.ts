@@ -729,7 +729,7 @@ class Aircraft_HTML extends Display {
         this.reinforcements.UpdateDisplay();
         this.reinforcements.UpdateMaxStrain(derived_stats.MaxStrain);
         this.load.UpdateDisplay();
-        this.load.UpdateFuelUses(derived_stats.FuelUses);
+        this.load.UpdateFuelUses(stats.fuel / stats.fuelconsumption);//Do the calculation here because it's int rounded in derived stats, also no leaky
         this.gear.UpdateDisplay();
         this.accessories.UpdateDisplay();
         this.optimization.UpdateDisplay();
