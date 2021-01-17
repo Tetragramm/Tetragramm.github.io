@@ -151,14 +151,6 @@ class Cockpits extends Part {
         return this.positions[index];
     }
 
-    public HasOpen() {
-        for (let c of this.positions) {
-            if (c.IsOpen())
-                return true;
-        }
-        return false;
-    }
-
     public SetHasRotary(has: boolean) {
         for (let c of this.positions) {
             c.SetHasRotary(has);

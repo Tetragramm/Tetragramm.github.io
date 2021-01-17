@@ -1679,7 +1679,8 @@ class Cockpit extends Part {
         return can;
     }
     IsOpen() {
-        return this.types[this.selected_type].name == "Open";
+        return this.types[this.selected_type].name == "Open"
+            || this.types[this.selected_type].name == "Windscreen";
     }
     GetBombsightQuality() {
         return this.bombsight;
@@ -1741,7 +1742,7 @@ class Cockpit extends Part {
     CrewUpdate(escape, flightstress, visibility, crash) {
         this.total_escape = this.stats.escape + escape;
         this.total_stress = this.stats.flightstress + flightstress;
-        if (this.selected_type == 0 && this.has_rotary) { //Is open and has rotary
+        if (this.IsOpen() && this.has_rotary) { //Is open and has rotary
             this.total_stress += 1;
         }
         this.total_stress = Math.max(0, this.total_stress);
@@ -1882,13 +1883,6 @@ class Cockpits extends Part {
     }
     GetCockpit(index) {
         return this.positions[index];
-    }
-    HasOpen() {
-        for (let c of this.positions) {
-            if (c.IsOpen())
-                return true;
-        }
-        return false;
     }
     SetHasRotary(has) {
         for (let c of this.positions) {
