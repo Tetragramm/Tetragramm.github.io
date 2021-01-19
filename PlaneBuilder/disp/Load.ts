@@ -142,7 +142,7 @@ class Load_HTML extends Display {
     }
 
     public UpdateFuelUses(uses: number) {
-        BlinkIfChanged(this.d_fuse, (Math.round(uses * 10) / 10).toString(), false);
+        BlinkIfChanged(this.d_fuse, (Math.floor(1.0e-6 + uses * 10) / 10).toString(), false);
     }
 
     public UpdateDisplay() {

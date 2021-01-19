@@ -11709,7 +11709,7 @@ class Load_HTML extends Display {
         c2_row.insertCell();
     }
     UpdateFuelUses(uses) {
-        BlinkIfChanged(this.d_fuse, (Math.round(uses * 10) / 10).toString(), false);
+        BlinkIfChanged(this.d_fuse, (Math.floor(1.0e-6 + uses * 10) / 10).toString(), false);
     }
     UpdateDisplay() {
         var fl = this.fuel.GetTankCount();
@@ -12619,7 +12619,7 @@ class Derived_HTML {
         }
         this.dropoff_cell.textContent = derived.Dropoff.toString();
         this.overspeed_cell.textContent = derived.Overspeed.toString();
-        this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
+        this.maxfuel_cell.textContent = (Math.floor(1.0e-6 + derived.FuelUses * 10) / 10).toString();
         if (acft.GetIsFlammable())
             this.flammable_cell.textContent = lu("Yes");
         else

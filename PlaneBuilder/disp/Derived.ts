@@ -261,7 +261,7 @@ class Derived_HTML {
 
         this.dropoff_cell.textContent = derived.Dropoff.toString();
         this.overspeed_cell.textContent = derived.Overspeed.toString();
-        this.maxfuel_cell.textContent = (Math.round(derived.FuelUses * 10) / 10).toString();
+        this.maxfuel_cell.textContent = (Math.floor(1.0e-6 + derived.FuelUses * 10) / 10).toString();
         if (acft.GetIsFlammable())
             this.flammable_cell.textContent = lu("Yes");
         else
