@@ -10,7 +10,7 @@
             "damage": 1,
             "hits": 4,
             "ap": 0,
-            "ammo": 20,
+            "ammo": 10,
             "rapid": true,
             "manual": false,
             "synched": false,
@@ -20,7 +20,8 @@
             "size": 1,
             "can_action": true,
             "can_projectile": true,
-            "deflection": 0
+            "deflection": 0,
+            "warning": "SMG Warning"
         },
         {
             "name": "Scattergun",

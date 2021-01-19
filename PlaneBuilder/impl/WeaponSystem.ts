@@ -260,6 +260,7 @@ class WeaponSystem extends Part {
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
             this.final_weapon.deflection = 0;
+            this.final_weapon.ap = Math.max(0, this.final_weapon.ap - 1);
             this.final_weapon.stats.warnings.push({
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
@@ -548,7 +549,7 @@ class WeaponSystem extends Part {
                 for (let w of this.weapons) {
                     count += w.GetCount();
                 }
-                return [4 * count, 2 * count, 1 * count, 0];
+                return [3 * count, 2 * count, 1 * count, 0];
             }
         }
     }
@@ -569,7 +570,7 @@ class WeaponSystem extends Part {
                 jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
                 jams[1] = Math.max(jams[1], t[1] + this.sticky_guns);
             }
-            return jams[0].toString() + "\\" + jams[1].toString();
+            return jams[0].toString() + "/" + jams[1].toString();
         }
         else {
             var jam = 0;
@@ -670,7 +671,7 @@ class WeaponSystem extends Part {
         }
         if (this.final_weapon.hits > 0) {
             //Calc charges / shot.
-            var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
+            var ammo = this.weapon_list[this.weapon_type].stats.cost;
             if (this.action_sel == ActionType.GAST) {
                 ammo *= 2;
             }
@@ -682,15 +683,15 @@ class WeaponSystem extends Part {
             if (this.final_weapon.name == "Scattergun") {
                 //4 shot dice, d5, half damage
                 if (!this.final_weapon.rapid)
-                    return [Math.floor(1.0e-6 + 4 * 5 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 5 * 0.5 / 4)];
                 else
-                    return [Math.floor(1.0e-6 + 4 * 5 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 5 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 5 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 5 * 0.5 / 4)];
             } else if (this.final_weapon.name == "Punt Gun") {
                 //4 shot dice, d10, half damage
                 if (!this.final_weapon.rapid)
-                    return [Math.floor(1.0e-6 + 4 * 10 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 10 * 0.5 / 4)];
                 else
-                    return [Math.floor(1.0e-6 + 4 * 10 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 10 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 10 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 10 * 0.5 / 4)];
             }
         }
     }

@@ -425,6 +425,7 @@
         "Weapon Description": "{0}x {1} fires [{2}] for {3} damage with {4} hits with {5} ammunition. [{6}]",
         "Weapon Description Heat Ray": "{0}x {1} fires [{2}] for {3} damage with {4} hits with {5} charges. [{6}]",
         "Submachine Gun": "Submachine Gun",
+        "SMG Warning": "-3 to all Attacks beyond Knife Range.",
         "Scattergun": "Scattergun",
         "Scattergun Warning": "Rather than roll Open Fire, you roll a d5 per hit shown in the builder. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal.",
         "Light Machine Gun": "Light Machine Gun",
