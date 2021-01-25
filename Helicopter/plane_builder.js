@@ -1338,6 +1338,7 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
+        console.log(this.name);
         window.localStorage.setItem("engines_names", JSON.stringify(namelist));
     }
     toJSON() {
@@ -14606,7 +14607,11 @@ const init = () => {
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
             for (let n of namelist) {
-                engine_list.set(n, new EngineList(n));
+                n = n.trim();
+                n = n.replace(/\s+/g, ' ');
+                if (n != "") {
+                    engine_list.set(n, new EngineList(n));
+                }
             }
         }
         for (let el of engine_JSON["lists"]) {

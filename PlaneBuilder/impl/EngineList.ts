@@ -27,6 +27,7 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
+        console.log(this.name);
         window.localStorage.setItem("engines_names", JSON.stringify(namelist));
     }
 

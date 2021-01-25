@@ -38,7 +38,11 @@ const init = () => {
                 if (nameliststr) {
                     namelist = JSON.parse(nameliststr);
                     for (let n of namelist) {
-                        engine_list.set(n, new EngineList(n));
+                        n = n.trim();
+                        n = n.replace(/\s+/g, ' ');
+                        if (n != "") {
+                            engine_list.set(n, new EngineList(n));
+                        }
                     }
                 }
 

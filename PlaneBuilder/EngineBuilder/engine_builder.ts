@@ -539,7 +539,7 @@ class EngineBuilder_HTML {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result as string);
-                    var newelist = new EngineList("");
+                    var newelist = new EngineList(str["name"]);
                     newelist.fromJSON(str);
                     if (engine_list.has(newelist.name) && engine_list.get(newelist.name).constant) {
                         BlinkBad(this.m_load.parentElement);

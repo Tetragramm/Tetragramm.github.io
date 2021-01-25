@@ -482,6 +482,7 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
+        console.log(this.name);
         window.localStorage.setItem("engines_names", JSON.stringify(namelist));
     }
     toJSON() {
@@ -2885,7 +2886,7 @@ class EngineBuilder_HTML {
             reader.onloadend = () => {
                 try {
                     var str = JSON.parse(reader.result);
-                    var newelist = new EngineList("");
+                    var newelist = new EngineList(str["name"]);
                     newelist.fromJSON(str);
                     if (engine_list.has(newelist.name) && engine_list.get(newelist.name).constant) {
                         BlinkBad(this.m_load.parentElement);
@@ -3633,7 +3634,8 @@ class Cockpit extends Part {
         return can;
     }
     IsOpen() {
-        return this.types[this.selected_type].name == "Open";
+        return this.types[this.selected_type].name == "Open"
+            || this.types[this.selected_type].name == "Windscreen";
     }
     GetBombsightQuality() {
         return this.bombsight;
@@ -3654,6 +3656,9 @@ class Cockpit extends Part {
     }
     SetHasRotary(has) {
         this.has_rotary = has;
+    }
+    IsElectrics() {
+        return this.stats.charge != 0;
     }
     PartStats() {
         var stats = new Stats();
@@ -3692,7 +3697,7 @@ class Cockpit extends Part {
     CrewUpdate(escape, flightstress, visibility, crash) {
         this.total_escape = this.stats.escape + escape;
         this.total_stress = this.stats.flightstress + flightstress;
-        if (this.selected_type == 0 && this.has_rotary) { //Is open and has rotary
+        if (this.IsOpen() && this.has_rotary) { //Is open and has rotary
             this.total_stress += 1;
         }
         this.total_stress = Math.max(0, this.total_stress);
@@ -3834,17 +3839,17 @@ class Cockpits extends Part {
     GetCockpit(index) {
         return this.positions[index];
     }
-    HasOpen() {
-        for (let c of this.positions) {
-            if (c.IsOpen())
-                return true;
-        }
-        return false;
-    }
     SetHasRotary(has) {
         for (let c of this.positions) {
             c.SetHasRotary(has);
         }
+    }
+    IsElectrics() {
+        for (let c of this.positions) {
+            if (c.IsElectrics())
+                return true;
+        }
+        return false;
     }
     PartStats() {
         var s = new Stats();
@@ -7856,7 +7861,6 @@ class Munitions extends Part {
         }
         var internal_bombs = Math.min(this.GetInternalBombCount(), this.bomb_count);
         var allowed_external = Math.floor(1.0e-6 + this.acft_struct * this.maxbomb - internal_bombs / 3) * this.gull_factor;
-        console.log([this.acft_struct, this.maxbomb, this.gull_factor, internal_bombs, this.bomb_count, this.rocket_count]);
         while (this.bomb_count + this.rocket_count > internal_bombs + allowed_external) {
             reduce = true;
             if (this.rocket_count > 0) {
@@ -8652,6 +8656,8 @@ class Weapon extends Part {
             this.w_count = 1;
             this.covered = true;
         }
+        if (this.IsLightningArc())
+            this.synchronization = SynchronizationType.NO_INTERFERENCE;
     }
     GetArty() {
         return this.weapon_type.size == 16;
@@ -8686,6 +8692,9 @@ class Weapon extends Part {
             }
             return ret;
         }
+    }
+    IsLightningArc() {
+        return this.weapon_type.name == "Lightning Arc";
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -8780,7 +8789,7 @@ class Weapon extends Part {
                 warning: lu("Deflector Plate Warning"),
             });
         }
-        else if (this.synchronization == SynchronizationType.NO_INTERFERENCE) {
+        else if (this.synchronization == SynchronizationType.NO_INTERFERENCE && !this.IsLightningArc()) {
             stats.warnings.push({
                 source: lu(this.weapon_type.name) + " " + lu("No Interference"),
                 warning: lu("No Interference Warning"),
@@ -9002,6 +9011,7 @@ class WeaponSystem extends Part {
             this.final_weapon.shells = false;
             this.final_weapon.ammo = 0;
             this.final_weapon.deflection = 0;
+            this.final_weapon.ap = Math.max(0, this.final_weapon.ap - 1);
             this.final_weapon.stats.warnings.push({
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
@@ -9068,6 +9078,10 @@ class WeaponSystem extends Part {
         //Special Case for Lightning Arc
         if (this.IsLightningArc()) {
             this.SetFixed(true);
+            this.directions[0] = true;
+            for (let i = 1; i < this.directions.length; i++) {
+                this.directions[i] = false;
+            }
         }
         if (wasLA && !this.IsLightningArc()) {
             this.weapons[0].SetSynchronization(SynchronizationType.NONE);
@@ -9120,7 +9134,10 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
     CanDirection() {
-        var directions = [...Array(6).fill(true)];
+        if (this.IsLightningArc()) {
+            return [...Array(this.directions.length).fill(false)];
+        }
+        var directions = [...Array(this.directions.length).fill(true)];
         if (this.weapons[0].GetArty() && this.fixed && !this.weapons[0].GetWing()) {
             var is_spinner = this.weapons[0].GetSynchronization() == SynchronizationType.SPINNER;
             if (this.tractor && !(this.spinner_t || (is_spinner && this.directions[0])))
@@ -9268,7 +9285,7 @@ class WeaponSystem extends Part {
                 for (let w of this.weapons) {
                     count += w.GetCount();
                 }
-                return [4 * count, 2 * count, 1 * count, 0];
+                return [3 * count, 2 * count, 1 * count, 0];
             }
         }
     }
@@ -9286,7 +9303,7 @@ class WeaponSystem extends Part {
                 jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
                 jams[1] = Math.max(jams[1], t[1] + this.sticky_guns);
             }
-            return jams[0].toString() + "\\" + jams[1].toString();
+            return jams[0].toString() + "/" + jams[1].toString();
         }
         else {
             var jam = 0;
@@ -9374,7 +9391,7 @@ class WeaponSystem extends Part {
         }
         if (this.final_weapon.hits > 0) {
             //Calc charges / shot.
-            var ammo = Math.floor(this.final_weapon.damage * this.final_weapon.hits / 4);
+            var ammo = this.weapon_list[this.weapon_type].stats.cost;
             if (this.action_sel == ActionType.GAST) {
                 ammo *= 2;
             }
@@ -9387,16 +9404,16 @@ class WeaponSystem extends Part {
             if (this.final_weapon.name == "Scattergun") {
                 //4 shot dice, d5, half damage
                 if (!this.final_weapon.rapid)
-                    return [Math.floor(1.0e-6 + 4 * 5 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 5 * 0.5 / 4)];
                 else
-                    return [Math.floor(1.0e-6 + 4 * 5 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 5 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 5 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 5 * 0.5 / 4)];
             }
             else if (this.final_weapon.name == "Punt Gun") {
                 //4 shot dice, d10, half damage
                 if (!this.final_weapon.rapid)
-                    return [Math.floor(1.0e-6 + 4 * 10 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 10 * 0.5 / 4)];
                 else
-                    return [Math.floor(1.0e-6 + 4 * 10 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 10 * 0.5 / 4)];
+                    return [Math.floor(1.0e-6 + 3 * 10 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 10 * 0.5 / 4)];
             }
         }
     }
@@ -9456,7 +9473,7 @@ class WeaponSystem extends Part {
                 //Turret Size costs handled in Weapon.ts
             }
         }
-        if (this.projectile_sel == ProjectileType.HEATRAY) {
+        if (this.projectile_sel == ProjectileType.HEATRAY || this.IsLightningArc()) {
             //Cant have extra ammo for heatray.
             this.ammo = 1;
         }
@@ -10781,9 +10798,9 @@ class Aircraft {
             MaxSpeedFull = Math.min(37, MaxSpeedFull);
             MaxSpeedwBombs = Math.min(37, MaxSpeedwBombs);
         }
-        var FuelUses = this.stats.fuel / this.stats.fuelconsumption;
+        var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
-        FuelUses = FuelUses * Math.pow(0.8, this.used.leaky);
+        FuelUses = Math.floor(1.0e-6 + FuelUses * Math.pow(0.8, this.used.leaky));
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
                 this.stats.warnings.push({
@@ -11001,7 +11018,7 @@ class Aircraft {
         return this.weapons;
     }
     IsElectrics() {
-        return this.engines.IsElectrics() || this.accessories.IsElectrics();
+        return this.engines.IsElectrics() || this.accessories.IsElectrics() || this.cockpits.IsElectrics();
     }
     GetUsed() {
         return this.used;
