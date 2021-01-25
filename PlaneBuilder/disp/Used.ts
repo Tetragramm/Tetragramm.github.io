@@ -100,22 +100,22 @@ class Used_HTML extends Display {
         this.fragile.onchange = () => { this.used.fragile = this.fragile.valueAsNumber; this.used.TriggerCS(); };
         this.leaky.onchange = () => { this.used.leaky = this.leaky.valueAsNumber; this.used.TriggerCS(); };
         this.sluggish.onchange = () => { this.used.sluggish = this.sluggish.valueAsNumber; this.used.TriggerCS(); };
-        this.burnt_out.min = "-5";
-        this.burnt_out.max = "5";
-        this.ragged.min = "-5";
-        this.ragged.max = "5";
-        this.hefty.min = "-5";
-        this.hefty.max = "5";
-        this.sticky_guns.min = "-5";
-        this.sticky_guns.max = "5";
-        this.weak.min = "-5";
-        this.weak.max = "5";
-        this.fragile.min = "-5";
-        this.fragile.max = "5";
-        this.leaky.min = "-5";
-        this.leaky.max = "5";
-        this.sluggish.min = "-5";
-        this.sluggish.max = "5";
+        this.burnt_out.min = "-1";
+        this.burnt_out.max = "1";
+        this.ragged.min = "-1";
+        this.ragged.max = "1";
+        this.hefty.min = "-1";
+        this.hefty.max = "1";
+        this.sticky_guns.min = "-1";
+        this.sticky_guns.max = "1";
+        this.weak.min = "-1";
+        this.weak.max = "1";
+        this.fragile.min = "-1";
+        this.fragile.max = "1";
+        this.leaky.min = "-1";
+        this.leaky.max = "1";
+        this.sluggish.min = "-1";
+        this.sluggish.max = "1";
     }
 
     public UpdateDisplay() {

@@ -93,15 +93,25 @@ class Used extends Part {
         this.sluggish = d.GetNum();
     }
 
+    private Normalize(num: number) {
+        if (num != num) {
+            num = 0;
+        }
+        num = Math.floor(1.0e-6 + num);
+        num = Math.min(1, num);
+        num = Math.max(-1, num);
+        return num;
+    }
+
     public PartStats() {
-        this.burnt_out = Math.floor(1.0e-6 + this.burnt_out);
-        this.ragged = Math.floor(1.0e-6 + this.ragged);
-        this.hefty = Math.floor(1.0e-6 + this.hefty);
-        this.sticky_guns = Math.floor(1.0e-6 + this.sticky_guns);
-        this.weak = Math.floor(1.0e-6 + this.weak);
-        this.fragile = Math.floor(1.0e-6 + this.fragile);
-        this.leaky = Math.floor(1.0e-6 + this.leaky);
-        this.sluggish = Math.floor(1.0e-6 + this.sluggish);
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
         return new Stats();
     }
 
@@ -111,22 +121,14 @@ class Used extends Part {
 
     public TriggerCS() {
 
-        if (this.burnt_out != this.burnt_out)
-            this.burnt_out = 0;
-        if (this.ragged != this.ragged)
-            this.ragged = 0;
-        if (this.hefty != this.hefty)
-            this.hefty = 0;
-        if (this.sticky_guns != this.sticky_guns)
-            this.sticky_guns = 0;
-        if (this.weak != this.weak)
-            this.weak = 0;
-        if (this.fragile != this.fragile)
-            this.fragile = 0;
-        if (this.leaky != this.leaky)
-            this.leaky = 0;
-        if (this.sluggish != this.sluggish)
-            this.sluggish = 0;
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
 
         this.CalculateStats();
     }

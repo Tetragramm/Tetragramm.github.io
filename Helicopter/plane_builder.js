@@ -8345,37 +8345,38 @@ class Used extends Part {
         this.leaky = d.GetNum();
         this.sluggish = d.GetNum();
     }
+    Normalize(num) {
+        if (num != num) {
+            num = 0;
+        }
+        num = Math.floor(1.0e-6 + num);
+        num = Math.min(1, num);
+        num = Math.max(-1, num);
+        return num;
+    }
     PartStats() {
-        this.burnt_out = Math.floor(1.0e-6 + this.burnt_out);
-        this.ragged = Math.floor(1.0e-6 + this.ragged);
-        this.hefty = Math.floor(1.0e-6 + this.hefty);
-        this.sticky_guns = Math.floor(1.0e-6 + this.sticky_guns);
-        this.weak = Math.floor(1.0e-6 + this.weak);
-        this.fragile = Math.floor(1.0e-6 + this.fragile);
-        this.leaky = Math.floor(1.0e-6 + this.leaky);
-        this.sluggish = Math.floor(1.0e-6 + this.sluggish);
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
         return new Stats();
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
     TriggerCS() {
-        if (this.burnt_out != this.burnt_out)
-            this.burnt_out = 0;
-        if (this.ragged != this.ragged)
-            this.ragged = 0;
-        if (this.hefty != this.hefty)
-            this.hefty = 0;
-        if (this.sticky_guns != this.sticky_guns)
-            this.sticky_guns = 0;
-        if (this.weak != this.weak)
-            this.weak = 0;
-        if (this.fragile != this.fragile)
-            this.fragile = 0;
-        if (this.leaky != this.leaky)
-            this.leaky = 0;
-        if (this.sluggish != this.sluggish)
-            this.sluggish = 0;
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
         this.CalculateStats();
     }
 }
@@ -9064,20 +9065,20 @@ class Aircraft {
         var DPFull = DPEmpty; //Based on advice from Discord.
         var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
-        var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
-        var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
-        var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
+        var MaxSpeedEmpty = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9))));
+        var MaxSpeedFull = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9))));
+        var MaxSpeedwBombs = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9))));
         //Used: Ragged
-        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * Math.pow(0.9, this.used.ragged));
-        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * Math.pow(0.9, this.used.ragged));
-        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * Math.pow(0.9, this.used.ragged));
+        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * (1 - 0.1 * this.used.ragged));
+        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * (1 - 0.1 * this.used.ragged));
+        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * (1 - 0.1 * this.used.ragged));
         var StallSpeedEmpty = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea)));
         var StallSpeedFull = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea)));
         var StallSpeedFullwBombs = Math.max(Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea)));
         //Used: Hefty
-        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * Math.pow(1.2, this.used.hefty));
-        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * Math.pow(1.2, this.used.hefty));
-        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * Math.pow(1.2, this.used.hefty));
+        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * (1 + 0.2 * this.used.hefty));
+        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * (1 + 0.2 * this.used.hefty));
+        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * (1 + 0.2 * this.used.hefty));
         if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
                 this.stats.warnings.push({
@@ -9125,9 +9126,9 @@ class Aircraft {
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
         //Used: Sluggish
-        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty * Math.pow(0.95, this.used.sluggish));
-        HandlingFull = Math.floor(1.0e-6 + HandlingFull * Math.pow(0.95, this.used.sluggish));
-        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs * Math.pow(0.95, this.used.sluggish));
+        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty * (1 - 0.05 * this.used.sluggish));
+        HandlingFull = Math.floor(1.0e-6 + HandlingFull * (1 - 0.05 * this.used.sluggish));
+        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs * (1 - 0.05 * this.used.sluggish));
         var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
         var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
@@ -9142,7 +9143,7 @@ class Aircraft {
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;
         //Used: Fragile
-        MaxStrain = Math.floor(1.0e-6 + MaxStrain * Math.pow(0.8, this.used.fragile));
+        MaxStrain = Math.floor(1.0e-6 + MaxStrain * (1 - 0.2 * this.used.fragile));
         if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Max Strain"); }) == -1) {
             this.stats.warnings.push({
                 source: lu("Stat Max Strain"), warning: lu("Max Strain Warning")
@@ -9150,7 +9151,7 @@ class Aircraft {
         }
         var Toughness = this.stats.toughness;
         //Used: Weak
-        Toughness = Math.floor(1.0e-6 + Toughness * Math.pow(0.5, this.used.weak));
+        Toughness = Math.floor(1.0e-6 + Toughness * (1 - 0.5 * this.used.weak));
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(-1.0e-6 + DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
@@ -9172,7 +9173,7 @@ class Aircraft {
         }
         var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
-        FuelUses = Math.floor(1.0e-6 + FuelUses * Math.pow(0.8, this.used.leaky));
+        FuelUses = Math.floor(1.0e-6 + FuelUses * (1 - 0.2 * this.used.leaky));
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
                 this.stats.warnings.push({
@@ -14969,22 +14970,22 @@ class Used_HTML extends Display {
         this.fragile.onchange = () => { this.used.fragile = this.fragile.valueAsNumber; this.used.TriggerCS(); };
         this.leaky.onchange = () => { this.used.leaky = this.leaky.valueAsNumber; this.used.TriggerCS(); };
         this.sluggish.onchange = () => { this.used.sluggish = this.sluggish.valueAsNumber; this.used.TriggerCS(); };
-        this.burnt_out.min = "-5";
-        this.burnt_out.max = "5";
-        this.ragged.min = "-5";
-        this.ragged.max = "5";
-        this.hefty.min = "-5";
-        this.hefty.max = "5";
-        this.sticky_guns.min = "-5";
-        this.sticky_guns.max = "5";
-        this.weak.min = "-5";
-        this.weak.max = "5";
-        this.fragile.min = "-5";
-        this.fragile.max = "5";
-        this.leaky.min = "-5";
-        this.leaky.max = "5";
-        this.sluggish.min = "-5";
-        this.sluggish.max = "5";
+        this.burnt_out.min = "-1";
+        this.burnt_out.max = "1";
+        this.ragged.min = "-1";
+        this.ragged.max = "1";
+        this.hefty.min = "-1";
+        this.hefty.max = "1";
+        this.sticky_guns.min = "-1";
+        this.sticky_guns.max = "1";
+        this.weak.min = "-1";
+        this.weak.max = "1";
+        this.fragile.min = "-1";
+        this.fragile.max = "1";
+        this.leaky.min = "-1";
+        this.leaky.max = "1";
+        this.sluggish.min = "-1";
+        this.sluggish.max = "1";
     }
     UpdateDisplay() {
         this.burnt_out.valueAsNumber = this.used.burnt_out;
