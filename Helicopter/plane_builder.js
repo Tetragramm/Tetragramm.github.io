@@ -9126,9 +9126,9 @@ class Aircraft {
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
         //Used: Sluggish
-        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty * (1 - 0.05 * this.used.sluggish));
-        HandlingFull = Math.floor(1.0e-6 + HandlingFull * (1 - 0.05 * this.used.sluggish));
-        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs * (1 - 0.05 * this.used.sluggish));
+        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty - 5 * this.used.sluggish);
+        HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
+        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
         var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
         var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
