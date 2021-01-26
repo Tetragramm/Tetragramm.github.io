@@ -166,7 +166,7 @@ class Accessories extends Part {
     }
 
     private NormalizeCoverage() {
-        var coverage = -8 + Math.min(0, -Math.floor((this.vital_parts - 8) / 2));
+        var coverage = -8 + Math.min(0, -Math.floor(1.0e-6 + (this.vital_parts - 8) / 2));
         for (let i = this.armour_coverage.length - 1; i >= 0; i--) {
             if (i == 1) {
                 coverage += this.skin_armour;
