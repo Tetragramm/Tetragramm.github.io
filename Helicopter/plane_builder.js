@@ -1143,7 +1143,6 @@ class EngineInputs {
                 this.quality_rely = js["quality_rely"];
                 this.starter = js["starter"];
                 break;
-                break;
             }
             default:
                 throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
@@ -1239,7 +1238,9 @@ class EngineInputs {
                 pb.build_quality = this.quality_cost;
                 pb.overall_quality = this.quality_rely;
                 pb.starter = this.starter;
-                return pb.EngineStats();
+                let stats = pb.EngineStats();
+                this.name = stats.name;
+                return stats;
             }
             default:
                 throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
