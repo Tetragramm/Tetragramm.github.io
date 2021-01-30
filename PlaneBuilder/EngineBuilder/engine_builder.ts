@@ -7,38 +7,54 @@
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var ep = sp.get("engine");
+    var lang = sp.get("lang");
 
-    ebuild = new EngineBuilder_HTML();
-
-    loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
-        var engine_json = JSON.parse(engine_resp);
-
-        var nameliststr = window.localStorage.getItem("engines_names");
-        var namelist: string[] = [];
-        if (nameliststr) {
-            namelist = JSON.parse(nameliststr) as string[];
-            for (let n of namelist) {
-                n = n.trim();
-                n = n.replace(/\s+/g, ' ');
-                if (n != "") {
-                    engine_list.set(n, new EngineList(n));
+    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/engines.json'];
+    var proms = jsons.map(d => fetch(d));
+    Promise.all(proms)
+        .then(ps => Promise.all(ps.map(p => p.json())))
+        .then(
+            resp => {
+                var string_JSON = resp[0];
+                var engine_JSON = resp[1];
+                //Strings bit
+                local = new Localization(string_JSON);
+                if (lang) {
+                    local.SetLanguages(lang);
+                } else if (window.localStorage.language) {
+                    local.SetLanguages(window.localStorage.language);
                 }
-            }
-        }
 
-        for (let el of engine_json["lists"]) {
-            if (!engine_list.has(el["name"]))
-                engine_list.set(el["name"], new EngineList(el["name"]));
-            if (el["name"] != "Custom") {
-                engine_list.get(el["name"]).fromJSON(el, true);
-                engine_list.get(el["name"]).SetConstant();
-            } else {
-                engine_list.get(el["name"]).fromJSON(el, false);
-            }
-        }
+                //Engine Bit
+                var nameliststr = window.localStorage.getItem("engines_names");
+                var namelist: string[] = [];
+                if (nameliststr) {
+                    namelist = JSON.parse(nameliststr) as string[];
+                    for (let n of namelist) {
+                        n = n.trim();
+                        n = n.replace(/\s+/g, ' ');
+                        if (n != "") {
+                            engine_list.set(n, new EngineList(n));
+                        }
+                    }
+                }
 
-        ebuild.UpdateList();
-    });
+                for (let el of engine_JSON["lists"]) {
+                    if (!engine_list.has(el["name"]))
+                        engine_list.set(el["name"], new EngineList(el["name"]));
+                    if (el["name"] != "Custom") {
+                        engine_list.get(el["name"]).fromJSON(el, true);
+                        engine_list.get(el["name"]).SetConstant();
+                    } else {
+                        engine_list.get(el["name"]).fromJSON(el, false);
+                    }
+                }
+
+
+                ebuild = new EngineBuilder_HTML();
+                ebuild.UpdateList();
+            }
+        );
 
     if (ep != null) {
         try {

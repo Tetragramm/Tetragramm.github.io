@@ -49,7 +49,6 @@ class Weapon extends Part {
     public wing_reinforcement: boolean;
     public has_cantilever: boolean;
     private action: ActionType;
-    private projectile: ProjectileType;
 
     constructor(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
         super();
@@ -117,7 +116,6 @@ class Weapon extends Part {
     public SetWeaponType(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType) {
         this.weapon_type = weapon_type;
         this.action = action;
-        this.projectile = projectile;
         if (this.weapon_type.size == 16) {
             this.w_count = 1;
         }
@@ -446,12 +444,14 @@ class Weapon extends Part {
                 stats.cost += this.w_count * 2;
             }
 
+            stats.era.add({ name: lu("Interruptor Gear"), era: lu("WWI") });
         } else if (this.synchronization == SynchronizationType.SYNCH && this.action != ActionType.MECHANICAL) {
             stats.cost += this.w_count * 3;
 
             if (this.weapon_type.name == "Light Machine Cannon") {
                 stats.cost += this.w_count * 3;
             }
+            stats.era.add({ name: lu("Synchronization Gear"), era: lu("Roaring 20s") });
             //synchronization == 2 is spinner and costs nothing.
         } else if (this.synchronization == SynchronizationType.DEFLECT) {
             stats.cost += 1;

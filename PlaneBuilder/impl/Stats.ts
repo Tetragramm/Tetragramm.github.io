@@ -27,8 +27,10 @@ class Stats {
     public fuel: number = 0;
     public charge: number = 0;
     public warnings: { source: string, warning: string }[] = [];
+    public era: Set<{ name: string, era: string }>;
 
     constructor(js?: JSON) {
+        this.era = new Set<{ name: string, era: string }>();
         if (js) {
             this.fromJSON(js, 0);
         }
@@ -126,6 +128,13 @@ class Stats {
                 source: lu(js["name"]),
                 warning: lu(js["warning"])
             });
+        this.era.clear();
+        if (js["era"]) {
+            var temp = { name: "", era: "" };
+            temp.name = lu(js["name"]);
+            temp.era = lu(js["era"]);
+            this.era.add(temp);
+        }
     }
 
     public serialize(s: Serialize) {
@@ -218,6 +227,8 @@ class Stats {
         res.fuel = this.fuel + other.fuel;
         res.charge = this.charge + other.charge;
         res.warnings = this.MergeWarnings(other.warnings);
+        this.era.forEach((v) => res.era.add(v));
+        other.era.forEach((v) => res.era.add(v));
         return res;
     }
 
@@ -267,8 +278,10 @@ class Stats {
         res.bomb_mass = this.bomb_mass * other;
         res.fuel = this.fuel * other;
         res.charge = this.charge * other;
-        if (other != 0)
+        if (other != 0) {
             res.warnings = this.warnings;
+            this.era.forEach((v) => res.era.add(v));
+        }
         return res;
     }
 
@@ -341,3 +354,41 @@ class Stats {
         return this.Add(new Stats());
     }
 }
+
+var era2num = (era: string): number => {
+    switch (era) {
+        case "Pioneer":
+            return 0;
+        case "WWI":
+            return 1;
+        case "Roaring 20s":
+            return 2;
+        case "Coming Storm":
+            return 3;
+        case "WWII":
+            return 4;
+        case "Last Hurrah":
+            return 5;
+        case "Himmelgard":
+            return 6;
+    }
+};
+
+var num2era = (era: number): string => {
+    switch (era) {
+        case 0:
+            return "Pioneer";
+        case 1:
+            return "WWI";
+        case 2:
+            return "Roaring 20s";
+        case 3:
+            return "Coming Storm";
+        case 4:
+            return "WWII";
+        case 5:
+            return "Last Hurrah";
+        case 6:
+            return "Himmelgard";
+    }
+};

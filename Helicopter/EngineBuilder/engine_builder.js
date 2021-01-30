@@ -28,6 +28,7 @@ class Stats {
         this.fuel = 0;
         this.charge = 0;
         this.warnings = [];
+        this.era = new Set();
         if (js) {
             this.fromJSON(js, 0);
         }
@@ -123,6 +124,13 @@ class Stats {
                 source: lu(js["name"]),
                 warning: lu(js["warning"])
             });
+        this.era.clear();
+        if (js["era"]) {
+            var temp = { name: "", era: "" };
+            temp.name = lu(js["name"]);
+            temp.era = lu(js["era"]);
+            this.era.add(temp);
+        }
     }
     serialize(s) {
         s.PushNum(this.liftbleed);
@@ -212,6 +220,8 @@ class Stats {
         res.fuel = this.fuel + other.fuel;
         res.charge = this.charge + other.charge;
         res.warnings = this.MergeWarnings(other.warnings);
+        this.era.forEach((v) => res.era.add(v));
+        other.era.forEach((v) => res.era.add(v));
         return res;
     }
     MergeWarnings(owarn) {
@@ -258,8 +268,10 @@ class Stats {
         res.bomb_mass = this.bomb_mass * other;
         res.fuel = this.fuel * other;
         res.charge = this.charge * other;
-        if (other != 0)
+        if (other != 0) {
             res.warnings = this.warnings;
+            this.era.forEach((v) => res.era.add(v));
+        }
         return res;
     }
     Equal(other) {
@@ -328,6 +340,42 @@ class Stats {
         return this.Add(new Stats());
     }
 }
+var era2num = (era) => {
+    switch (era) {
+        case "Pioneer":
+            return 0;
+        case "WWI":
+            return 1;
+        case "Roaring 20s":
+            return 2;
+        case "Coming Storm":
+            return 3;
+        case "WWII":
+            return 4;
+        case "Last Hurrah":
+            return 5;
+        case "Himmelgard":
+            return 6;
+    }
+};
+var num2era = (era) => {
+    switch (era) {
+        case 0:
+            return "Pioneer";
+        case 1:
+            return "WWI";
+        case 2:
+            return "Roaring 20s";
+        case 3:
+            return "Coming Storm";
+        case 4:
+            return "WWII";
+        case 5:
+            return "Last Hurrah";
+        case 6:
+            return "Himmelgard";
+    }
+};
 class Serialize {
     constructor(arr) {
         this.array = new ArrayBuffer(51200);
@@ -482,7 +530,6 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
-        console.log(this.name);
         window.localStorage.setItem("engines_names", JSON.stringify(namelist));
     }
     toJSON() {
@@ -631,7 +678,8 @@ class PulsejetBuilder {
         this.EraTable = [
             { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
             { name: "WWI", cost: 0.75, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
-            { name: "Interbellum", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
+            { name: "Roaring 20s", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
+            { name: "Coming Storm", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
             { name: "WWII", cost: 0.25, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
             { name: "Last Hurrah", cost: 0.1, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
         ];
@@ -733,6 +781,7 @@ class PulsejetBuilder {
         estats.overspeed = 100;
         estats.altitude = 29;
         estats.pulsejet = true;
+        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
         return estats;
     }
 }
@@ -834,6 +883,7 @@ class EngineInputs {
                 this.quality_cost = js["quality_cost"];
                 this.quality_rely = js["quality_rely"];
                 this.starter = js["starter"];
+                break;
                 break;
             }
             default:
@@ -1363,6 +1413,7 @@ class EngineBuilder {
         estats.stats.cost = this.CalcCost();
         estats.pulsejet = false;
         estats.rumble = 0;
+        estats.stats.era.add({ name: this.name, era: lu(num2era(this.era_sel)) });
         switch (this.compressor_type) {
             case CompressorEnum.NONE: {
                 break;
@@ -2465,9 +2516,23 @@ class StringBuilder {
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var ep = sp.get("engine");
-    ebuild = new EngineBuilder_HTML();
-    loadJSON('/PlaneBuilder/engines.json', (engine_resp) => {
-        var engine_json = JSON.parse(engine_resp);
+    var lang = sp.get("lang");
+    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/engines.json'];
+    var proms = jsons.map(d => fetch(d));
+    Promise.all(proms)
+        .then(ps => Promise.all(ps.map(p => p.json())))
+        .then(resp => {
+        var string_JSON = resp[0];
+        var engine_JSON = resp[1];
+        //Strings bit
+        local = new Localization(string_JSON);
+        if (lang) {
+            local.SetLanguages(lang);
+        }
+        else if (window.localStorage.language) {
+            local.SetLanguages(window.localStorage.language);
+        }
+        //Engine Bit
         var nameliststr = window.localStorage.getItem("engines_names");
         var namelist = [];
         if (nameliststr) {
@@ -2480,7 +2545,7 @@ const init = () => {
                 }
             }
         }
-        for (let el of engine_json["lists"]) {
+        for (let el of engine_JSON["lists"]) {
             if (!engine_list.has(el["name"]))
                 engine_list.set(el["name"], new EngineList(el["name"]));
             if (el["name"] != "Custom") {
@@ -2491,6 +2556,7 @@ const init = () => {
                 engine_list.get(el["name"]).fromJSON(el, false);
             }
         }
+        ebuild = new EngineBuilder_HTML();
         ebuild.UpdateList();
     });
     if (ep != null) {
@@ -3196,7 +3262,7 @@ class Accessories extends Part {
         this.CalculateStats();
     }
     NormalizeCoverage() {
-        var coverage = -8 + Math.min(0, -Math.floor((this.vital_parts - 8) / 2));
+        var coverage = -8 + Math.min(0, -Math.floor(1.0e-6 + (this.vital_parts - 8) / 2));
         for (let i = this.armour_coverage.length - 1; i >= 0; i--) {
             if (i == 1) {
                 coverage += this.skin_armour;
@@ -3470,6 +3536,9 @@ class Era extends Part {
     }
     GetSelected() {
         return this.selected;
+    }
+    GetSelectedText() {
+        return this.vals[this.selected].name;
     }
     SetSelected(index) {
         this.selected = index;
@@ -6476,7 +6545,6 @@ class Wings extends Part {
         //Sesquiplanes!
         var sesp = this.GetIsSesquiplane();
         if ((sesp.is || this.GetMonoplane()) && sesp.deck != -1) {
-            console.log(sesp.deck);
             drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
         }
         return drag;
@@ -8473,7 +8541,6 @@ class Weapon extends Part {
     SetWeaponType(weapon_type, action, projectile) {
         this.weapon_type = weapon_type;
         this.action = action;
-        this.projectile = projectile;
         if (this.weapon_type.size == 16) {
             this.w_count = 1;
         }
@@ -8774,12 +8841,14 @@ class Weapon extends Part {
             if (this.weapon_type.name == "Light Machine Cannon") {
                 stats.cost += this.w_count * 2;
             }
+            stats.era.add({ name: lu("Interruptor Gear"), era: lu("WWI") });
         }
         else if (this.synchronization == SynchronizationType.SYNCH && this.action != ActionType.MECHANICAL) {
             stats.cost += this.w_count * 3;
             if (this.weapon_type.name == "Light Machine Cannon") {
                 stats.cost += this.w_count * 3;
             }
+            stats.era.add({ name: lu("Synchronization Gear"), era: lu("Roaring 20s") });
             //synchronization == 2 is spinner and costs nothing.
         }
         else if (this.synchronization == SynchronizationType.DEFLECT) {
@@ -8956,6 +9025,8 @@ class WeaponSystem extends Part {
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
         this.final_weapon.jam = this.weapon_list[num].jam;
+        this.final_weapon.stats.era.clear();
+        this.final_weapon.stats.era.add({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
         if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
@@ -8973,6 +9044,7 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
             this.final_weapon.synched = true;
+            this.final_weapon.stats.era.add({ name: lu("Mechanical Action"), era: lu("WWI") });
         }
         else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
@@ -8980,6 +9052,7 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = false;
+            this.final_weapon.stats.era.add({ name: lu("Gast Principle"), era: lu("WWI") });
         }
         else if (this.action_sel == ActionType.ROTARY) {
             //rotary conversion
@@ -8993,6 +9066,7 @@ class WeaponSystem extends Part {
             jams[0] = "9999";
             jams[1] = (parseInt(jams[1]) + 1).toString();
             this.final_weapon.jam = jams.join('/');
+            this.final_weapon.stats.era.add({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
         if (this.repeating) {
             this.final_weapon.reload = 0;
@@ -9016,6 +9090,7 @@ class WeaponSystem extends Part {
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
             });
+            this.final_weapon.stats.era.add({ name: lu("Heat Ray"), era: lu("WWI") });
         }
         else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
@@ -9025,6 +9100,7 @@ class WeaponSystem extends Part {
                 source: lu("Gyrojets"),
                 warning: lu("Gyrojets Warning"),
             });
+            this.final_weapon.stats.era.add({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
         }
         else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.final_weapon.ammo *= 2;
@@ -9037,6 +9113,7 @@ class WeaponSystem extends Part {
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 1"),
                 });
+                this.final_weapon.stats.era.add({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
             this.final_weapon.stats.warnings.push({
                 source: lu("Pneumatic"),
@@ -9526,24 +9603,6 @@ class Weapons extends Part {
             };
             this.weapon_list.push(weap);
         }
-        var era2num = (era) => {
-            switch (era) {
-                case "Pioneer":
-                    return 0;
-                case "WWI":
-                    return 1;
-                case "Roaring 20s":
-                    return 2;
-                case "Coming Storm":
-                    return 3;
-                case "WWII":
-                    return 4;
-                case "Last Hurrah":
-                    return 5;
-                case "Himmelgard":
-                    return 6;
-            }
-        };
         var pred = (a, b) => {
             var cvt2num = (l, r) => {
                 if (l < r)
@@ -9973,37 +10032,38 @@ class Used extends Part {
         this.leaky = d.GetNum();
         this.sluggish = d.GetNum();
     }
+    Normalize(num) {
+        if (num != num) {
+            num = 0;
+        }
+        num = Math.floor(1.0e-6 + num);
+        num = Math.min(1, num);
+        num = Math.max(-1, num);
+        return num;
+    }
     PartStats() {
-        this.burnt_out = Math.floor(1.0e-6 + this.burnt_out);
-        this.ragged = Math.floor(1.0e-6 + this.ragged);
-        this.hefty = Math.floor(1.0e-6 + this.hefty);
-        this.sticky_guns = Math.floor(1.0e-6 + this.sticky_guns);
-        this.weak = Math.floor(1.0e-6 + this.weak);
-        this.fragile = Math.floor(1.0e-6 + this.fragile);
-        this.leaky = Math.floor(1.0e-6 + this.leaky);
-        this.sluggish = Math.floor(1.0e-6 + this.sluggish);
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
         return new Stats();
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
     TriggerCS() {
-        if (this.burnt_out != this.burnt_out)
-            this.burnt_out = 0;
-        if (this.ragged != this.ragged)
-            this.ragged = 0;
-        if (this.hefty != this.hefty)
-            this.hefty = 0;
-        if (this.sticky_guns != this.sticky_guns)
-            this.sticky_guns = 0;
-        if (this.weak != this.weak)
-            this.weak = 0;
-        if (this.fragile != this.fragile)
-            this.fragile = 0;
-        if (this.leaky != this.leaky)
-            this.leaky = 0;
-        if (this.sluggish != this.sluggish)
-            this.sluggish = 0;
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
         this.CalculateStats();
     }
 }
@@ -10692,20 +10752,20 @@ class Aircraft {
         var DPFull = DPEmpty; //Based on advice from Discord.
         var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
-        var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
-        var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
-        var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
+        var MaxSpeedEmpty = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9))));
+        var MaxSpeedFull = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9))));
+        var MaxSpeedwBombs = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9))));
         //Used: Ragged
-        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * Math.pow(0.9, this.used.ragged));
-        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * Math.pow(0.9, this.used.ragged));
-        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * Math.pow(0.9, this.used.ragged));
+        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * (1 - 0.1 * this.used.ragged));
+        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * (1 - 0.1 * this.used.ragged));
+        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * (1 - 0.1 * this.used.ragged));
         var StallSpeedEmpty = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea)));
         var StallSpeedFull = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea)));
         var StallSpeedFullwBombs = Math.max(Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea)));
         //Used: Hefty
-        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * Math.pow(1.2, this.used.hefty));
-        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * Math.pow(1.2, this.used.hefty));
-        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * Math.pow(1.2, this.used.hefty));
+        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * (1 + 0.2 * this.used.hefty));
+        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * (1 + 0.2 * this.used.hefty));
+        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * (1 + 0.2 * this.used.hefty));
         if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
                 this.stats.warnings.push({
@@ -10753,9 +10813,9 @@ class Aircraft {
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
         //Used: Sluggish
-        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty * Math.pow(0.95, this.used.sluggish));
-        HandlingFull = Math.floor(1.0e-6 + HandlingFull * Math.pow(0.95, this.used.sluggish));
-        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs * Math.pow(0.95, this.used.sluggish));
+        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty - 5 * this.used.sluggish);
+        HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
+        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
         var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
         var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
@@ -10770,7 +10830,7 @@ class Aircraft {
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;
         //Used: Fragile
-        MaxStrain = Math.floor(1.0e-6 + MaxStrain * Math.pow(0.8, this.used.fragile));
+        MaxStrain = Math.floor(1.0e-6 + MaxStrain * (1 - 0.2 * this.used.fragile));
         if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Max Strain"); }) == -1) {
             this.stats.warnings.push({
                 source: lu("Stat Max Strain"), warning: lu("Max Strain Warning")
@@ -10778,7 +10838,7 @@ class Aircraft {
         }
         var Toughness = this.stats.toughness;
         //Used: Weak
-        Toughness = Math.floor(1.0e-6 + Toughness * Math.pow(0.5, this.used.weak));
+        Toughness = Math.floor(1.0e-6 + Toughness * (1 - 0.5 * this.used.weak));
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(-1.0e-6 + DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
@@ -10800,7 +10860,7 @@ class Aircraft {
         }
         var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
-        FuelUses = Math.floor(1.0e-6 + FuelUses * Math.pow(0.8, this.used.leaky));
+        FuelUses = Math.floor(1.0e-6 + FuelUses * (1 - 0.2 * this.used.leaky));
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
                 this.stats.warnings.push({

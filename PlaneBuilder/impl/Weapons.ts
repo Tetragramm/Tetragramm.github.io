@@ -65,26 +65,6 @@ class Weapons extends Part {
             this.weapon_list.push(weap);
         }
 
-
-
-        var era2num = (era: string): number => {
-            switch (era) {
-                case "Pioneer":
-                    return 0;
-                case "WWI":
-                    return 1;
-                case "Roaring 20s":
-                    return 2;
-                case "Coming Storm":
-                    return 3;
-                case "WWII":
-                    return 4;
-                case "Last Hurrah":
-                    return 5;
-                case "Himmelgard":
-                    return 6;
-            }
-        };
         var pred = (a, b): number => {
             var cvt2num = (l, r) => {
                 if (l < r)

@@ -77,7 +77,7 @@ class Derived_HTML {
         // Aircraft Upkeep
         this.upkeep_cell = row0.insertCell();
         // Rules Version
-        CreateTH(row0, lu("Derived Version #"));
+        CreateTH(row0, lu("Derived Era Report"));
         this.version_cell = row0.insertCell();
 
         var row1 = insertRow(fragment);
@@ -204,7 +204,48 @@ class Derived_HTML {
 
     public UpdateDisplay(acft: Aircraft, stats: Stats, derived: DerivedStats) {
         this.name_inp.value = acft.name;
-        this.version_cell.textContent = acft.GetVersion();
+
+        while (this.version_cell.children.length > 0) {
+            this.version_cell.removeChild(this.version_cell.children[0]);
+        }
+        this.version_cell.className = "tooltip"
+
+        var era_t_div = document.createElement("DIV") as HTMLDivElement;
+        era_t_div.className = "tooltiptext";
+        let div_text = document.createElement("P") as HTMLParagraphElement;
+        div_text.textContent = lu("Derived Problematic Parts");
+        era_t_div.appendChild(div_text);
+
+        var plane_era = era2num(acft.GetEra().GetSelectedText());
+        var era_break = 0;
+        for (let part of stats.era) {
+            var part_era = era2num(part.era);
+            if (part_era > plane_era) {
+                era_break += part_era - plane_era;
+                let part_text = document.createElement("P") as HTMLParagraphElement;
+                part_text.textContent = part.name + ": " + part.era;
+                era_t_div.appendChild(part_text);
+            }
+        }
+        if (era_break == 0) {
+            let part_text = document.createElement("P") as HTMLParagraphElement;
+            part_text.textContent = lu("None");
+            era_t_div.appendChild(part_text);
+        }
+
+
+        var era_p_elem = document.createElement("P") as HTMLParagraphElement;
+        era_p_elem.textContent = lu(acft.GetEra().GetSelectedText());
+        if (era_break == 0)
+            era_p_elem.className = "green";
+        else if (era_break > 2)
+            era_p_elem.className = "red";
+        else
+            era_p_elem.className = "yellow";
+        this.version_cell.appendChild(era_p_elem);
+        this.version_cell.appendChild(era_t_div);
+
+
         this.cost_cell.textContent = stats.cost.toString() + "þ ";
         if (acft.GetUsed().GetEnabled()) {
             this.cost_cell.textContent += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ " + lu("Price Word Used") + ")";
@@ -425,7 +466,6 @@ class Derived_HTML {
         return this.name_inp.value;
     }
     public SetName(name: string) {
-        console.log(name);
         this.name_inp.value = name;
     }
 

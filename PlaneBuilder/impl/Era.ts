@@ -44,6 +44,10 @@ class Era extends Part {
         return this.selected;
     }
 
+    public GetSelectedText() {
+        return this.vals[this.selected].name;
+    }
+
     public SetSelected(index: number) {
         this.selected = index;
         this.CalculateStats();

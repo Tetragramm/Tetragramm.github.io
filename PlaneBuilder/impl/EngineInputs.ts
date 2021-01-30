@@ -124,6 +124,7 @@ class EngineInputs {
                 this.quality_rely = js["quality_rely"];
                 this.starter = js["starter"];
                 break;
+                break;
             }
             default:
                 throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
