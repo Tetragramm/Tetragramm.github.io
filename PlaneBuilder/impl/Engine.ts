@@ -673,6 +673,10 @@ class Engine extends Part {
         return this.etype_stats.stats.cooling > 0;
     }
 
+    public GetHasOilPan() {
+        return this.IsAirCooled();
+    }
+
     private VerifyCowl(num: number) {
         var can = this.GetCowlEnabled();
         if (can[num])

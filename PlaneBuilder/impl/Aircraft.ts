@@ -704,12 +704,18 @@ class Aircraft {
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
                     vital.push(lu("Vital Part Oil Cooler Pusher", i + 1));
                 }
+                if (this.GetEngines().GetEngine(i).GetHasOilPan()) {
+                    vital.push(lu("Vital Part Oil Pan Pusher", i + 1));
+                }
                 vital.push(lu("Vital Part Engine Puller", i + 1));
                 if (this.GetEngines().GetEngine(i).GetHasOilTank()) {
                     vital.push(lu("Vital Part Oil Tank Puller", i + 1));
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
                     vital.push(lu("Vital Part Oil Cooler Puller", i + 1));
+                }
+                if (this.GetEngines().GetEngine(i).GetHasOilPan()) {
+                    vital.push(lu("Vital Part Oil Pan Puller", i + 1));
                 }
             }
             else {
@@ -719,6 +725,9 @@ class Aircraft {
                 }
                 if (this.GetEngines().GetEngine(i).GetHasOilCooler()) {
                     vital.push(lu("Vital Part Oil Cooler", i + 1));
+                }
+                if (this.GetEngines().GetEngine(i).GetHasOilPan()) {
+                    vital.push(lu("Vital Part Oil Pan", i + 1));
                 }
             }
         }
