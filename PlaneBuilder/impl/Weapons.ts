@@ -76,7 +76,7 @@ class Weapons extends Part {
             if (a.size != b.size)
                 return cvt2num(a.size, b.size);
             else if (a.era != b.era)
-                return cvt2num(era2num(a.era), era2num(b.era));
+                return cvt2num(era2numHh(a.era), era2numHh(b.era));
             else if (a.damage != b.damage)
                 return cvt2num(a.damage, b.damage);
             else

@@ -216,10 +216,10 @@ class Derived_HTML {
         div_text.textContent = lu("Derived Problematic Parts");
         era_t_div.appendChild(div_text);
 
-        var plane_era = era2num(acft.GetEra().GetSelectedText());
+        var plane_era = era2numHl(acft.GetEra().GetSelectedText());
         var era_break = 0;
         for (let part of stats.era) {
-            var part_era = era2num(part.era);
+            var part_era = era2numHl(part.era);
             if (part_era > plane_era) {
                 era_break += part_era - plane_era;
                 let part_text = document.createElement("P") as HTMLParagraphElement;

@@ -340,7 +340,7 @@ class Stats {
         return this.Add(new Stats());
     }
 }
-var era2num = (era) => {
+var era2numHh = (era) => {
     switch (era) {
         case "Pioneer":
             return 0;
@@ -354,8 +354,26 @@ var era2num = (era) => {
             return 4;
         case "Last Hurrah":
             return 5;
-        case "Himmelgard":
+        case "Himmilgard":
             return 6;
+    }
+};
+var era2numHl = (era) => {
+    switch (era) {
+        case "Pioneer":
+            return 0;
+        case "WWI":
+            return 1;
+        case "Roaring 20s":
+            return 2;
+        case "Coming Storm":
+            return 3;
+        case "WWII":
+            return 4;
+        case "Last Hurrah":
+            return 5;
+        case "Himmilgard":
+            return -1;
     }
 };
 var num2era = (era) => {
@@ -373,7 +391,8 @@ var num2era = (era) => {
         case 5:
             return "Last Hurrah";
         case 6:
-            return "Himmelgard";
+        case -1:
+            return "Himmilgard";
     }
 };
 /// <reference path="./Stats.ts" />
@@ -7451,7 +7470,7 @@ class WeaponSystem extends Part {
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
             });
-            this.final_weapon.stats.era.add({ name: lu("Heat Ray"), era: lu("WWI") });
+            this.final_weapon.stats.era.add({ name: lu("Heat Ray"), era: lu("Himmilgard") });
         }
         else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
@@ -7975,7 +7994,7 @@ class Weapons extends Part {
             if (a.size != b.size)
                 return cvt2num(a.size, b.size);
             else if (a.era != b.era)
-                return cvt2num(era2num(a.era), era2num(b.era));
+                return cvt2num(era2numHh(a.era), era2numHh(b.era));
             else if (a.damage != b.damage)
                 return cvt2num(a.damage, b.damage);
             else
@@ -12632,10 +12651,10 @@ class Derived_HTML {
         let div_text = document.createElement("P");
         div_text.textContent = lu("Derived Problematic Parts");
         era_t_div.appendChild(div_text);
-        var plane_era = era2num(acft.GetEra().GetSelectedText());
+        var plane_era = era2numHl(acft.GetEra().GetSelectedText());
         var era_break = 0;
         for (let part of stats.era) {
-            var part_era = era2num(part.era);
+            var part_era = era2numHl(part.era);
             if (part_era > plane_era) {
                 era_break += part_era - plane_era;
                 let part_text = document.createElement("P");

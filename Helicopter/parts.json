@@ -713,7 +713,7 @@
             },
             {
                 "name": "Wooden Ribs",
-                "era": "Roaring 20s",
+                "era": "WWI",
                 "basestructure": 30,
                 "basecost": 1,
                 "mass": 2,
@@ -816,7 +816,7 @@
             },
             {
                 "name": "Dragon Skin",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "dragfactor": 0.5,
                 "massfactor": 1,
                 "cost": 4,
@@ -1066,7 +1066,7 @@
             },
             {
                 "name": "Grand Eagle Feather",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
@@ -1077,7 +1077,7 @@
             },
             {
                 "name": "Solar Fiber",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
@@ -1088,7 +1088,7 @@
             },
             {
                 "name": "Dragon Skin",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "flammable": false,
                 "strainfactor": 0.4,
                 "dragfactor": 1.0,
@@ -2022,13 +2022,13 @@
             },
             {
                 "name": "Whalebone Radio Receiver",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "charge": 1.0e-9,
                 "cost": 5
             },
             {
                 "name": "Whalebone Radio Base Station",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "mass": 6,
                 "drag": 1,
                 "charge": -4,
@@ -2060,7 +2060,7 @@
             },
             {
                 "name": "Whalebone Radio Base Station (High Quality)",
-                "era": "WWI",
+                "era": "Himmilgard",
                 "mass": 5,
                 "drag": 1,
                 "charge": -4,
@@ -2149,7 +2149,7 @@
             },
             {
                 "name": "Clockwork Programmable",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "mass": 1,
                 "cost": 6,
                 "warning": "Clockwork Programmable Warning"
@@ -2164,7 +2164,7 @@
             },
             {
                 "name": "Rattegehirn",
-                "era": "Pioneer",
+                "era": "Himmilgard",
                 "mass": 3,
                 "charge": -3,
                 "cost": 25,

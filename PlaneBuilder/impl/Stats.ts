@@ -355,7 +355,7 @@ class Stats {
     }
 }
 
-var era2num = (era: string): number => {
+var era2numHh = (era: string): number => {
     switch (era) {
         case "Pioneer":
             return 0;
@@ -369,8 +369,27 @@ var era2num = (era: string): number => {
             return 4;
         case "Last Hurrah":
             return 5;
-        case "Himmelgard":
+        case "Himmilgard":
             return 6;
+    }
+};
+
+var era2numHl = (era: string): number => {
+    switch (era) {
+        case "Pioneer":
+            return 0;
+        case "WWI":
+            return 1;
+        case "Roaring 20s":
+            return 2;
+        case "Coming Storm":
+            return 3;
+        case "WWII":
+            return 4;
+        case "Last Hurrah":
+            return 5;
+        case "Himmilgard":
+            return -1;
     }
 };
 
@@ -389,6 +408,7 @@ var num2era = (era: number): string => {
         case 5:
             return "Last Hurrah";
         case 6:
-            return "Himmelgard";
+        case -1:
+            return "Himmilgard";
     }
 };
