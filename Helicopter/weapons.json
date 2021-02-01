@@ -270,7 +270,7 @@
         {
             "name": "Fliergerflammerwerfer",
             "abrv": "FFW",
-            "era": "WWII",
+            "era": "WWI",
             "cost": 4,
             "mass": 1,
             "drag": 3,
@@ -382,7 +382,7 @@
         {
             "name": "Lightning Arc",
             "abrv": "LA",
-            "era": "Himmelgard",
+            "era": "Himmilgard",
             "cost": 8,
             "mass": 5,
             "drag": 3,
@@ -405,7 +405,7 @@
         {
             "name": "Harpoon Launcher",
             "abrv": "HL",
-            "era": "Himmelgard",
+            "era": "Himmilgard",
             "cost": 3,
             "mass": 3,
             "drag": 2,
