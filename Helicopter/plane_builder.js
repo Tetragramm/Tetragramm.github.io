@@ -4495,6 +4495,9 @@ class Wings extends Part {
             if (!this.GetTandem() && this.HasShoulder())
                 return false;
         }
+        else if (deck == 1) {
+            return false;
+        }
         return true;
     }
     IsFlammable() {
@@ -4673,7 +4676,7 @@ class Wings extends Part {
     HasInvertedGull() {
         var ret = -1;
         for (let w of this.wing_list) {
-            if (w.gull) {
+            if (w.gull && w.deck > 1) {
                 ret = Math.max(ret, w.deck);
             }
         }
@@ -4794,7 +4797,7 @@ class Wings extends Part {
         }
         switch (this.HasInvertedGull()) {
             case 1: //Shoulder Wing
-                //Only affects landing gear
+                //Can't be gull.
                 break;
             case 2: //Mid wing
             case 3: //Low wing (same as Mid)
@@ -5111,7 +5114,7 @@ class ControlSurfaces extends Part {
     constructor(js) {
         super();
         this.span = 0;
-        this.is_cantilever = false;
+        this.is_cantilever = 0;
         this.wing_area = 0;
         this.mp = 0;
         this.is_boom = false;
@@ -5258,8 +5261,8 @@ class ControlSurfaces extends Part {
         this.drag_sel[num] = use;
         this.CalculateStats();
     }
-    SetIsCantilever(use) {
-        this.is_cantilever = use;
+    SetNumCantilever(count) {
+        this.is_cantilever = count;
     }
     SetSpan(span) {
         this.span = span;
@@ -5276,7 +5279,7 @@ class ControlSurfaces extends Part {
         for (let i = 0; i < this.drag_sel.length; i++)
             this.drag_sel[i] = false;
         this.span = 0;
-        this.is_cantilever = false;
+        this.is_cantilever = 0;
         this.wing_area = 0;
     }
     SetBoomTail(has) {
@@ -5294,7 +5297,7 @@ class ControlSurfaces extends Part {
         if (this.aileron_list[this.aileron_sel].warping) {
             stats.maxstrain -= this.span;
             if (this.is_cantilever) {
-                stats.cost += 2 * this.wing_area;
+                stats.cost += 2 * this.is_cantilever;
             }
             if (this.is_boom) {
                 stats.pitchstab -= 2;
@@ -5830,6 +5833,7 @@ class Fuel extends Part {
         if (this.self_sealing) {
             stats.mass += internal_count;
             stats.cost += 2 * internal_count;
+            stats.era.add({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
             stats.warnings.push({
                 source: lu("Self-Sealing Gas Tank"),
                 warning: lu("Self-Sealing Gas Tank Warning")
@@ -5838,6 +5842,7 @@ class Fuel extends Part {
         if (this.fire_extinguisher) {
             stats.mass += 2;
             stats.cost += 3;
+            stats.era.add({ name: "Remote Fire Extinguisher", era: "WWII" });
             stats.warnings.push({
                 source: lu("Remote Fire Extinguisher"),
                 warning: lu("Remote Fire Extinguisher Warning")

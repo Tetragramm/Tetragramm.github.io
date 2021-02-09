@@ -1802,7 +1802,7 @@
             },
             {
                 "name": "Whalebone",
-                "era": "WWI",
+                "era": "Himmilgard",
                 "mass": 1,
                 "liftbleed": -3,
                 "maxstrain": 5,
@@ -1978,7 +1978,7 @@
             },
             {
                 "name": "Battery (High Quality)",
-                "era": "WWI",
+                "era": "Roaring 20s",
                 "mass": 0,
                 "cost": 4,
                 "cp10s": 0,
@@ -2036,7 +2036,7 @@
             },
             {
                 "name": "Radio Receiver (High Quality)",
-                "era": "WWI",
+                "era": "Roaring 20s",
                 "mass": 1,
                 "drag": 2,
                 "charge": 1.0e-9,
@@ -2163,7 +2163,7 @@
                 "warning": "Programmable Warning"
             },
             {
-                "name": "Rattegehirn",
+                "name": "Rattenhirn",
                 "era": "Himmilgard",
                 "mass": 3,
                 "charge": -3,

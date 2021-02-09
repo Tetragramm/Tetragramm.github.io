@@ -16,7 +16,7 @@ class ControlSurfaces extends Part {
     private drag_sel: boolean[];
 
     private span: number = 0;
-    private is_cantilever: boolean = false;
+    private is_cantilever: number = 0;
     private wing_area: number = 0;
     private mp: number = 0;
     private is_boom: boolean = false;
@@ -196,8 +196,8 @@ class ControlSurfaces extends Part {
         this.CalculateStats();
     }
 
-    public SetIsCantilever(use: boolean) {
-        this.is_cantilever = use;
+    public SetNumCantilever(count: number) {
+        this.is_cantilever = count;
     }
 
     public SetSpan(span: number) {
@@ -217,7 +217,7 @@ class ControlSurfaces extends Part {
         for (let i = 0; i < this.drag_sel.length; i++)
             this.drag_sel[i] = false;
         this.span = 0;
-        this.is_cantilever = false;
+        this.is_cantilever = 0;
         this.wing_area = 0;
     }
 
@@ -239,7 +239,7 @@ class ControlSurfaces extends Part {
         if (this.aileron_list[this.aileron_sel].warping) {
             stats.maxstrain -= this.span;
             if (this.is_cantilever) {
-                stats.cost += 2 * this.wing_area;
+                stats.cost += 2 * this.is_cantilever;
             }
             if (this.is_boom) {
                 stats.pitchstab -= 2;

@@ -425,6 +425,8 @@ class Wings extends Part {
         if (deck == 0) {
             if (!this.GetTandem() && this.HasShoulder())
                 return false;
+        } else if (deck == 1) {
+            return false;
         }
         return true;
     }
@@ -624,7 +626,7 @@ class Wings extends Part {
     public HasInvertedGull(): number {
         var ret = -1;
         for (let w of this.wing_list) {
-            if (w.gull) {
+            if (w.gull && w.deck > 1) {
                 ret = Math.max(ret, w.deck);
             }
         }
@@ -770,7 +772,7 @@ class Wings extends Part {
         }
         switch (this.HasInvertedGull()) {
             case 1: //Shoulder Wing
-                //Only affects landing gear
+                //Can't be gull.
                 break;
             case 2: //Mid wing
             case 3: //Low wing (same as Mid)
