@@ -408,6 +408,7 @@
         "Derived Energy Loss": "Energy Loss",
         "Derived Fuel Uses": "Fuel Uses",
         "Derived Turn Bleed": "Turn Bleed",
+        "Derived Turn Bleed wB": "Turn Bleed (with Bombs)",
         "Derived Attack Modifier": "Attack Modifier",
         "Derived Landing Gear": "Landing Gear",
         "Derived Communications": "Communications",

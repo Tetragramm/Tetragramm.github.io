@@ -42,6 +42,7 @@ class Derived_HTML {
     private toughness_cell: HTMLTableCellElement;
     private visibility_cell: HTMLTableCellElement;
     private electric_cell: HTMLTableCellElement;
+    private turnbleed_label: HTMLTableCellElement;
     private turnbleed_cell: HTMLTableCellElement;
     private mxstrain_cell: HTMLTableCellElement;
     private attack_cell: HTMLTableCellElement;
@@ -162,7 +163,7 @@ class Derived_HTML {
         var row10 = insertRow(fragment);
         CreateTH(row10, lu("Derived Fuel Uses"));
         this.maxfuel_cell = row10.insertCell();
-        CreateTH(row10, lu("Derived Turn Bleed"));
+        this.turnbleed_label = CreateTH(row10, lu("Derived Turn Bleed"));
         this.turnbleed_cell = row10.insertCell();
         CreateTH(row10, lu("Stat Max Strain"));
         this.mxstrain_cell = row10.insertCell();
@@ -293,11 +294,17 @@ class Derived_HTML {
             this.boost_fullwB.textContent = derived.BoostFullwBombs.toString();
             this.roc_fullwB.textContent = derived.RateOfClimbwBombs.toString();
 
+            //Turn Bleed
+            this.turnbleed_label.textContent = lu("Derived Turn Bleed wB");
+            this.turnbleed_cell.textContent = StringFmt.Format("{0} ({1})", derived.TurnBleed, derived.TurnBleedwBombs);
         } else {
             this.bomb_row1.hidden = true;
             this.bomb_row2.hidden = true;
             this.full_row.appendChild(this.vital_components);
             this.vital_components.rowSpan = 3;
+            //Turn Bleed
+            this.turnbleed_label.textContent = lu("Derived Turn Bleed");
+            this.turnbleed_cell.textContent = StringFmt.Format("{0}", derived.TurnBleed);
         }
 
         this.dropoff_cell.textContent = derived.Dropoff.toString();
@@ -310,7 +317,7 @@ class Derived_HTML {
 
         this.stability_cell.textContent = derived.Stabiilty.toString();
         this.eloss_cell.textContent = derived.EnergyLoss.toString();
-        this.turnbleed_cell.textContent = derived.TurnBleed.toString();
+        //Turn bleed done in bomb mass section because affected by it.
         this.landing_cell.textContent = acft.GetGearName();
         this.maxalt_cell.textContent = acft.GetMinIAF().toString() + "-" + acft.GetMaxAltitude().toString();
 
