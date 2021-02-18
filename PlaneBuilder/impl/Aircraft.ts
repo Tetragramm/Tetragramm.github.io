@@ -737,8 +737,9 @@ class Aircraft {
         if (this.IsElectrics()) {
             vital.push(lu("Vital Part Electrics"));
         }
+        var wlist = this.GetWeapons().GetWeaponList();
         for (let i = 0; i < this.GetWeapons().GetWeaponSets().length; i++) {
-            vital.push(lu("Vital Part Weapon Set", i + 1));
+            vital.push(lu("Vital Part Weapon Set", i + 1, wlist[this.GetWeapons().GetWeaponSets()[i].GetWeaponSelected()].abrv));
         }
         if (this.GetLandingGear().IsVital()) {
             vital.push(lu("Vital Part Landing Gear"));

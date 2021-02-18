@@ -174,6 +174,11 @@ class Aircraft_HTML extends Display {
         (document.getElementById("lbl_acft_reset_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Default Aircraft");
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
         reset_button.onclick = () => { this.acft.Reset(); this.derived.SetName(this.acft.name); this.acft.CalculateStats(); };
+
+        (document.getElementById("lbl_acft_save_cat_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save Catalog");
+        (document.getElementById("lbl_acft_save_cat_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save Catalog");
+        var cat_button = document.getElementById("acft_save_cat");
+        cat_button.onclick = () => { this.CatalogStats(); }
     }
 
     private UpdateCard() {
@@ -368,6 +373,132 @@ class Aircraft_HTML extends Display {
         };
         reader.readAsText(file);
         load_button.value = "";
+    }
+
+    private CatalogStats() {
+        this.acft.name = this.derived.GetName();
+        var stats = this.acft.GetStats();
+        var derived = this.acft.GetDerivedStats();
+        var catalog_stats = "";
+        catalog_stats += this.acft.name + "\n";
+        catalog_stats += StringFmt.Format("{0}þ New, {1}þ Used\n", stats.cost, Math.floor(1.0e-6 + stats.cost / 2));
+        catalog_stats += StringFmt.Format("{0}þ Upkeep\n\n", stats.upkeep);
+        if (stats.bomb_mass > 0) {
+            catalog_stats += StringFmt.Format("Full Load\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+                derived.BoostFullwBombs,
+                derived.HandlingFullwBombs,
+                derived.RateOfClimbwBombs,
+                derived.StallSpeedFullwBombs,
+                derived.MaxSpeedwBombs);
+            catalog_stats += StringFmt.Format("½, Bombs\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+                Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2),
+                Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2),
+                Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2),
+                Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2),
+                Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2));
+        }
+        catalog_stats += StringFmt.Format("Full Fuel\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+            derived.BoostFull,
+            derived.HandlingFull,
+            derived.RateOfClimbFull,
+            derived.StallSpeedFull,
+            derived.MaxSpeedFull);
+        catalog_stats += StringFmt.Format("Half Fuel\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+            Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2),
+            Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2),
+            Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2),
+            Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2),
+            Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2));
+        catalog_stats += StringFmt.Format("Empty\t\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+            "-",
+            derived.HandlingEmpty,
+            "-",
+            derived.StallSpeedEmpty,
+            derived.MaxSpeedEmpty);
+        catalog_stats += "\nVital Parts\n";
+        catalog_stats += StringFmt.Join(", ", this.acft.VitalComponentList());
+        catalog_stats += "\n\n";
+        catalog_stats += StringFmt.Format("Dropoff {0}, Reliability {1}, Overspeed {2}, Ideal Alt. {3}, Fuel {4}\n\n",
+            derived.Dropoff,
+            StringFmt.Join("/", this.acft.GetReliabilityList()),
+            derived.Overspeed,
+            this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString(),
+            derived.FuelUses);
+        if (derived.TurnBleed == derived.TurnBleedwBombs) {
+            catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}\n\n",
+                StringFmt.Join("/", this.acft.GetVisibilityList()),
+                derived.Stabiilty,
+                derived.EnergyLoss,
+                derived.TurnBleed);
+        } else {
+            catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3} ({4})\n\n",
+                StringFmt.Join("/", this.acft.GetVisibilityList()),
+                derived.Stabiilty,
+                derived.EnergyLoss,
+                derived.TurnBleed,
+                derived.TurnBleedwBombs);
+        }
+        catalog_stats += StringFmt.Format("Toughness {0}, Max Strain {1}, Escape {2}, Crash Safety {3}, Flight Stress {4}\n\n",
+            derived.Toughness,
+            derived.MaxStrain,
+            StringFmt.Join("/", this.acft.GetEscapeList()),
+            StringFmt.Join("/", this.acft.GetCrashList()),
+            StringFmt.Join("/", this.acft.GetStressList()));
+
+        var wlist = this.acft.GetWeapons().GetWeaponList();
+        var dlist = this.acft.GetWeapons().GetDirectionList();
+        var bombs = this.acft.GetMunitions().GetBombCount();
+        var rockets = this.acft.GetMunitions().GetRocketCount();
+        var internal = this.acft.GetMunitions().GetInternalBombCount();
+        if (bombs > 0) {
+            var int_bomb = Math.min(bombs, internal);
+            var ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                catalog_stats += (int_bomb.toString() + lu(" Bomb Mass Internally."));
+            if (ext_bomb > 0)
+                catalog_stats += (ext_bomb.toString() + lu(" Bomb Mass Externally."));
+            if (int_bomb > 0) {
+                var mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
+                catalog_stats += (lu("Largest Internal Bomb", mib.toString()));
+            }
+            internal -= int_bomb;
+            catalog_stats += "\n";
+        }
+        if (rockets > 0) {
+            var int_rock = Math.min(rockets, internal);
+            var ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                catalog_stats += (int_rock.toString() + lu(" Rocket Mass Internally."));
+            if (ext_rock > 0)
+                catalog_stats += (ext_rock.toString() + lu(" Rocket Mass Externally."));
+            catalog_stats += "\n";
+        }
+
+        var wsets = this.acft.GetWeapons().GetWeaponSets();
+        for (let wi = 0; wi < wsets.length; wi++) {
+            var w = wsets[wi];
+            var ds = w.GetDirection();
+            var dirs = [];
+            for (let i = 0; i < dlist.length; i++) {
+                if (ds[i])
+                    dirs.push(lu(dlist[i]));
+            }
+
+            var acces = "";
+            if (w.GetWeapons()[0].GetAccessible()) {
+                acces = "Accessible";
+            }
+            catalog_stats += StringFmt.Format("#{0}: {1}x {2} {4} [{3}]\n",
+                wi + 1,
+                w.GetWeaponCount(),
+                this.WeaponName(w),
+                StringFmt.Join("/", dirs),
+                acces);
+        }
+        for (let w of stats.warnings) {
+            catalog_stats += w.source + ":  " + w.warning + "\n";
+        }
+        download(catalog_stats, this.acft.name + "_" + this.acft.GetVersion() + ".txt", "txt");
     }
 
     private LoadText(text_area: HTMLInputElement) {
