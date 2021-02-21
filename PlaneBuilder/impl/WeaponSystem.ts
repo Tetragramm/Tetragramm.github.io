@@ -210,13 +210,11 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.synched = this.weapon_list[num].synched;
         } else if (this.action_sel == ActionType.MECHANICAL) {
-            if (this.weapon_list[num].hits > 0)
-                this.final_weapon.hits = 1 + this.weapon_list[num].hits;
-            else
-                this.final_weapon.stats.warnings.push({
-                    source: lu("Mechanical Action"),
-                    warning: lu("Mechanical Action Warning"),
-                });
+            this.final_weapon.hits = 1 + this.weapon_list[num].hits;
+            this.final_weapon.stats.warnings.push({
+                source: lu("Mechanical Action"),
+                warning: lu("Mechanical Action Warning"),
+            });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
@@ -615,7 +613,7 @@ class WeaponSystem extends Part {
 
     public GetCanAction() {
         return [true,
-            this.has_propeller && this.weapon_list[this.weapon_type].can_action,
+            this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0,
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
         ];

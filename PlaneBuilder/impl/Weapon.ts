@@ -221,7 +221,8 @@ class Weapon extends Part {
             return false;
         }
 
-        if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH))
+        if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH ||
+            (num == SynchronizationType.SPINNER && this.CanSpinner())))
             return false;
 
         if (this.action == ActionType.GAST && num == SynchronizationType.SPINNER)
@@ -304,7 +305,7 @@ class Weapon extends Part {
                 //No valid synchronizations
                 this.SetWing(true);
             }
-        } else if (this.action == ActionType.MECHANICAL) {
+        } else if (this.action == ActionType.MECHANICAL && use != SynchronizationType.SPINNER) {
             this.synchronization = SynchronizationType.SYNCH;
         } else {
             this.synchronization = use;

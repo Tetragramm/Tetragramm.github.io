@@ -280,7 +280,7 @@
         "Gyrojets": "Gyrojets",
         "Pneumatic": "Pneumatic",
         "Himmilgard": "Himmilgard",
-        "Mechanical Action Warning": "Rapid-Firing Scatterguns roll +1 Shot Dice.",
+        "Mechanical Action Warning": "For each RPM past the first, use +1 Ammo and roll +1d10. Keep the two highest.  Advantage/Disadvantage is +/- 1d10.  Take 1 Wear per 1 rolled.  Weapon unsuable if engine dies.",
         "Heat Ray Warning": "Roll Crits +Damage done. On Crit, choose one: start a fire, destroy a radiator/oil component and push Cool Down, or injure crew. Take -2 forward to Eyeball after firing.",
         "Gyrojets Warning": "+1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife.",
         "Pneumatic Warning 1": "Weapon 'jams' after rapid fire as the compressor refills.",
