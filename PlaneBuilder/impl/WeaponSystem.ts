@@ -205,6 +205,15 @@ class WeaponSystem extends Part {
         this.final_weapon.stats.era.clear();
         this.final_weapon.stats.era.add({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
 
+        if (this.weapon_list[num].hits == 0) {
+            if (this.action_sel == ActionType.MECHANICAL) {
+                this.action_sel = ActionType.STANDARD;
+            }
+            if (this.projectile_sel == ProjectileType.GYROJETS || this.projectile_sel == ProjectileType.HEATRAY) {
+                this.projectile_sel = ProjectileType.BULLETS;
+            }
+        }
+
         if (this.action_sel == ActionType.STANDARD) {
             this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
@@ -636,8 +645,8 @@ class WeaponSystem extends Part {
 
     public GetCanProjectile() {
         return [true,
-            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST,
-            this.final_weapon.can_projectile,
+            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.weapon_list[this.weapon_type].hits > 0,
+            this.final_weapon.can_projectile && this.weapon_list[this.weapon_type].hits > 0,
             this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY];
     }
 
