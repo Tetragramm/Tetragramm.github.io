@@ -7020,6 +7020,10 @@ class Weapon extends Part {
         else if (!this.can_synchronize && num != SynchronizationType.NONE) {
             return false;
         }
+        if (this.weapon_type.name == "Fliergerflammenwerfer" &&
+            !(num == SynchronizationType.NONE || num == SynchronizationType.SPINNER || num == SynchronizationType.NO_INTERFERENCE)) {
+            return false;
+        }
         if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH ||
             (num == SynchronizationType.SPINNER && this.CanSpinner())))
             return false;
@@ -7507,10 +7511,12 @@ class WeaponSystem extends Part {
                 });
                 this.final_weapon.stats.era.add({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
-            this.final_weapon.stats.warnings.push({
-                source: lu("Pneumatic"),
-                warning: lu("Pneumatic Warning 2"),
-            });
+            if (this.final_weapon.hits > 0) {
+                this.final_weapon.stats.warnings.push({
+                    source: lu("Pneumatic"),
+                    warning: lu("Pneumatic Warning 2"),
+                });
+            }
         }
         if (this.final_weapon.deflection != 0) {
             this.final_weapon.stats.warnings.push({
@@ -7746,8 +7752,11 @@ class WeaponSystem extends Part {
             ];
         }
         else {
-            if (this.final_weapon.ammo == 0) {
+            if (this.IsLightningArc()) {
                 return [0, 0, 0, 0];
+            }
+            else if (this.final_weapon.ammo == 0) { //Fliergerflammenwerfer
+                return [3, 0, 0, 0];
             }
             else {
                 var count = 0;

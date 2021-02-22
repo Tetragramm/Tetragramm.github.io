@@ -221,6 +221,11 @@ class Weapon extends Part {
             return false;
         }
 
+        if (this.weapon_type.name == "Fliergerflammenwerfer" &&
+            !(num == SynchronizationType.NONE || num == SynchronizationType.SPINNER || num == SynchronizationType.NO_INTERFERENCE)) {
+            return false;
+        }
+
         if (this.action == ActionType.MECHANICAL && !(num == SynchronizationType.NONE || num == SynchronizationType.SYNCH ||
             (num == SynchronizationType.SPINNER && this.CanSpinner())))
             return false;

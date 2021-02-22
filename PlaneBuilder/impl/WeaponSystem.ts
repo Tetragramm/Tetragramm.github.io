@@ -300,10 +300,12 @@ class WeaponSystem extends Part {
                 });
                 this.final_weapon.stats.era.add({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
-            this.final_weapon.stats.warnings.push({
-                source: lu("Pneumatic"),
-                warning: lu("Pneumatic Warning 2"),
-            });
+            if (this.final_weapon.hits > 0) {
+                this.final_weapon.stats.warnings.push({
+                    source: lu("Pneumatic"),
+                    warning: lu("Pneumatic Warning 2"),
+                });
+            }
         }
 
         if (this.final_weapon.deflection != 0) {
@@ -557,8 +559,10 @@ class WeaponSystem extends Part {
                 Math.floor(1.0e-6 + centerline * 0.25) + Math.floor(1.0e-6 + wings * 0.1)
             ];
         } else {
-            if (this.final_weapon.ammo == 0) {
+            if (this.IsLightningArc()) {
                 return [0, 0, 0, 0];
+            } else if (this.final_weapon.ammo == 0) { //Fliergerflammenwerfer
+                return [3, 0, 0, 0];
             } else {
                 var count = 0;
                 for (let w of this.weapons) {
