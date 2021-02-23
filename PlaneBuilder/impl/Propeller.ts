@@ -110,6 +110,8 @@ class Propeller extends Part {
     }
 
     public GetEnergy() {
+        if (this.is_heli)
+            return 2.5;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
         else //Pulsejet
@@ -117,6 +119,8 @@ class Propeller extends Part {
     }
 
     public GetTurn() {
+        if (this.is_heli)
+            return 6;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
         else //Pulsejet
@@ -133,13 +137,13 @@ class Propeller extends Part {
 
     public PartStats(): Stats {
         var stats = new Stats();
-        if (this.num_propellers) {
+        if (this.is_heli) {
+            //Default, no auto pitch
+            stats.pitchboost = 0.6;
+            stats.pitchspeed = 1;
+        } else if (this.num_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
-        } else if (this.is_heli) {
-            //Default, no auto pitch
-            stats = stats.Add(this.prop_list[2].stats.Multiply(this.num_propellers));
-            stats = stats.Add(this.upg_list[0].stats.Multiply(this.num_propellers));
         } else {//Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
