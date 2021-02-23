@@ -8690,6 +8690,9 @@ class Rotor extends Part {
         }
         return 0;
     }
+    GetBladeCountIdx() {
+        return this.blade_idx;
+    }
     VerifySizes() {
         if (this.type == AIRCRAFT_TYPE.AIRPLANE) {
             this.rotor_count = 0;
