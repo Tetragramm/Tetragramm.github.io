@@ -8517,7 +8517,6 @@ class Rotor extends Part {
         for (let elem of js["blade_count"]) {
             this.blade_list.push({ name: elem["name"], rotor_bleed: elem["rotor_bleed"], sizing: elem["sizing"], stats: new Stats(elem) });
         }
-        console.log(this.blade_list);
     }
     toJSON() {
         return {
@@ -8713,7 +8712,6 @@ class Rotor extends Part {
             else {
                 this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
             }
-            console.log(this.blade_list[this.blade_idx].sizing);
             this.sizing_span = Math.min(100, this.sizing_span);
         }
     }
@@ -10704,11 +10702,14 @@ class Propeller_HTML extends Display {
     UpdateDisplay() {
         this.select_upgrade.selectedIndex = this.prop.GetUpgradeIndex();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
-        this.select_prop.disabled = false;
         if (this.prop.GetNumPropellers() == 0 || this.prop.IsHelicopter()) {
             this.select_upgrade.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;
+        }
+        else {
+            this.select_prop.disabled = false;
+            this.select_upgrade.disabled = false;
         }
     }
 }

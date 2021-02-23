@@ -35,12 +35,14 @@ class Propeller_HTML extends Display {
     public UpdateDisplay() {
         this.select_upgrade.selectedIndex = this.prop.GetUpgradeIndex();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
-        this.select_prop.disabled = false;
 
         if (this.prop.GetNumPropellers() == 0 || this.prop.IsHelicopter()) {
             this.select_upgrade.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;
+        } else {
+            this.select_prop.disabled = false;
+            this.select_upgrade.disabled = false;
         }
     }
 }

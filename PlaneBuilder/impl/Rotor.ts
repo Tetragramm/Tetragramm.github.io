@@ -44,7 +44,6 @@ class Rotor extends Part {
         for (let elem of js["blade_count"]) {
             this.blade_list.push({ name: elem["name"], rotor_bleed: elem["rotor_bleed"], sizing: elem["sizing"], stats: new Stats(elem) })
         }
-        console.log(this.blade_list)
     }
 
     public toJSON() {
@@ -267,7 +266,6 @@ class Rotor extends Part {
             } else {
                 this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
             }
-            console.log(this.blade_list[this.blade_idx].sizing)
             this.sizing_span = Math.min(100, this.sizing_span);
         }
     }
