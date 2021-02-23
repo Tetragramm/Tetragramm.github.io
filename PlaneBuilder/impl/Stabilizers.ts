@@ -21,6 +21,7 @@ class Stabilizers extends Part {
     private hstab_count: number;
     private vstab_sel: number;
     private vstab_count: number;
+    private is_heli: boolean;
 
     constructor(js: JSON) {
         super();
@@ -28,6 +29,7 @@ class Stabilizers extends Part {
         this.have_tail = true;
         this.is_tandem = false;
         this.is_swept = false;
+        this.is_heli = false;
 
         this.hstab_sel = 0;
         this.hstab_count = 1;
@@ -121,14 +123,19 @@ class Stabilizers extends Part {
 
     public GetHValidList() {
         var lst = [];
-        for (let t of this.hstab_list) {
-            if ((t.name == "The Wings" || t.name == "Outboard")
-                && !(this.is_tandem || this.is_swept))
-                lst.push(false);
-            else if (t.is_tail && !this.have_tail)
-                lst.push(false);
-            else
-                lst.push(true);
+        if (this.is_heli) {
+            lst = Array(this.hstab_list.length).fill(false);
+            lst[0] = true;
+        } else {
+            for (let t of this.hstab_list) {
+                if ((t.name == "The Wings" || t.name == "Outboard")
+                    && !(this.is_tandem || this.is_swept))
+                    lst.push(false);
+                else if (t.is_tail && !this.have_tail)
+                    lst.push(false);
+                else
+                    lst.push(true);
+            }
         }
         return lst;
     }
@@ -171,13 +178,18 @@ class Stabilizers extends Part {
 
     public GetVValidList() {
         var lst = [];
-        for (let t of this.vstab_list) {
-            if (t.name == "Outboard" && !this.CanVOutboard())
-                lst.push(false);
-            else if (t.is_tail && !this.have_tail)
-                lst.push(false);
-            else
-                lst.push(true);
+        if (this.is_heli) {
+            lst = Array(this.vstab_list.length).fill(false);
+            lst[0] = true;
+        } else {
+            for (let t of this.vstab_list) {
+                if (t.name == "Outboard" && !this.CanVOutboard())
+                    lst.push(false);
+                else if (t.is_tail && !this.have_tail)
+                    lst.push(false);
+                else
+                    lst.push(true);
+            }
         }
         return lst;
     }
@@ -276,16 +288,19 @@ class Stabilizers extends Part {
         }
     }
 
-    public SetHelicopter() {
-        this.have_tail = true;
-        this.is_tandem = false;
-        this.is_swept = false;
-        this.wing_area = 0;
-        this.engine_count = 0;
-        this.hstab_sel = 0;
-        this.hstab_count = 1;
-        this.vstab_sel = 0;
-        this.vstab_count = 1;
+    public SetHelicopter(is: boolean) {
+        this.is_heli = is;
+        if (is) {
+            this.have_tail = true;
+            this.is_tandem = false;
+            this.is_swept = false;
+            this.wing_area = 0;
+            this.engine_count = 0;
+            this.hstab_sel = 0;
+            this.hstab_count = 1;
+            this.vstab_sel = 0;
+            this.vstab_count = 1;
+        }
     }
 
     public SetCalculateStats(callback: () => void) {

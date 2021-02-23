@@ -404,13 +404,13 @@ class Weapons extends Part {
         }
 
         //Wing reinforcement. Do this so it gets included in parts display.
-        var wing_size = [0, 0];
+        var wing_size = 0;
         if (this.cant_type == 0)
-            wing_size = [2, 2];
+            wing_size = 2;
         else if (this.cant_type == 1)
-            wing_size = [4, 4];
+            wing_size = 8;
         else
-            wing_size = [8, 8];
+            wing_size = 16;
 
         //Create list of every weapon size and a ref to the weapon
         var slist = [];
@@ -419,8 +419,12 @@ class Weapons extends Part {
                 w.wing_reinforcement = false;
                 var s = { s: 0, w: w };
                 if (w.GetWing()) {
-                    s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
-                    slist.push(s);
+                    if (this.weapon_list[ws.GetWeaponSelected()].size == wing_size) {
+                        w.wing_reinforcement = true;
+                    } else {
+                        s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
+                        slist.push(s);
+                    }
                 }
             }
         }
@@ -428,17 +432,9 @@ class Weapons extends Part {
         //Sort by size to we reinforce as few weapons as possible
         slist.sort(function (a, b) { return a.s - b.s; });
         for (let s of slist) {
-            if (wing_size[0] > 0) {
-                wing_size[0] -= s.s;
-                if (wing_size[0] < 0) {
-                    wing_size[1] -= s.s;
-                    if (wing_size[1] < 0) {
-                        s.w.wing_reinforcement = true;
-                    }
-                }
-            } else {
-                wing_size[1] -= s.s;
-                if (wing_size[1] < 0) {
+            if (wing_size > 0) {
+                wing_size -= s.s;
+                if (wing_size < 0) {
                     s.w.wing_reinforcement = true;
                 }
             }

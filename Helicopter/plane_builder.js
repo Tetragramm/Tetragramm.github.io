@@ -4856,6 +4856,7 @@ class Stabilizers extends Part {
         this.have_tail = true;
         this.is_tandem = false;
         this.is_swept = false;
+        this.is_heli = false;
         this.hstab_sel = 0;
         this.hstab_count = 1;
         this.hstab_list = [];
@@ -4934,14 +4935,20 @@ class Stabilizers extends Part {
     }
     GetHValidList() {
         var lst = [];
-        for (let t of this.hstab_list) {
-            if ((t.name == "The Wings" || t.name == "Outboard")
-                && !(this.is_tandem || this.is_swept))
-                lst.push(false);
-            else if (t.is_tail && !this.have_tail)
-                lst.push(false);
-            else
-                lst.push(true);
+        if (this.is_heli) {
+            lst = Array(this.hstab_list.length).fill(false);
+            lst[0] = true;
+        }
+        else {
+            for (let t of this.hstab_list) {
+                if ((t.name == "The Wings" || t.name == "Outboard")
+                    && !(this.is_tandem || this.is_swept))
+                    lst.push(false);
+                else if (t.is_tail && !this.have_tail)
+                    lst.push(false);
+                else
+                    lst.push(true);
+            }
         }
         return lst;
     }
@@ -4975,13 +4982,19 @@ class Stabilizers extends Part {
     }
     GetVValidList() {
         var lst = [];
-        for (let t of this.vstab_list) {
-            if (t.name == "Outboard" && !this.CanVOutboard())
-                lst.push(false);
-            else if (t.is_tail && !this.have_tail)
-                lst.push(false);
-            else
-                lst.push(true);
+        if (this.is_heli) {
+            lst = Array(this.vstab_list.length).fill(false);
+            lst[0] = true;
+        }
+        else {
+            for (let t of this.vstab_list) {
+                if (t.name == "Outboard" && !this.CanVOutboard())
+                    lst.push(false);
+                else if (t.is_tail && !this.have_tail)
+                    lst.push(false);
+                else
+                    lst.push(true);
+            }
         }
         return lst;
     }
@@ -5065,16 +5078,19 @@ class Stabilizers extends Part {
             }
         }
     }
-    SetHelicopter() {
-        this.have_tail = true;
-        this.is_tandem = false;
-        this.is_swept = false;
-        this.wing_area = 0;
-        this.engine_count = 0;
-        this.hstab_sel = 0;
-        this.hstab_count = 1;
-        this.vstab_sel = 0;
-        this.vstab_count = 1;
+    SetHelicopter(is) {
+        this.is_heli = is;
+        if (is) {
+            this.have_tail = true;
+            this.is_tandem = false;
+            this.is_swept = false;
+            this.wing_area = 0;
+            this.engine_count = 0;
+            this.hstab_sel = 0;
+            this.hstab_count = 1;
+            this.vstab_sel = 0;
+            this.vstab_count = 1;
+        }
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -8320,13 +8336,13 @@ class Weapons extends Part {
             this.RemoveOnePusherSpinner();
         }
         //Wing reinforcement. Do this so it gets included in parts display.
-        var wing_size = [0, 0];
+        var wing_size = 0;
         if (this.cant_type == 0)
-            wing_size = [2, 2];
+            wing_size = 2;
         else if (this.cant_type == 1)
-            wing_size = [4, 4];
+            wing_size = 8;
         else
-            wing_size = [8, 8];
+            wing_size = 16;
         //Create list of every weapon size and a ref to the weapon
         var slist = [];
         for (let ws of this.weapon_sets) {
@@ -8334,26 +8350,22 @@ class Weapons extends Part {
                 w.wing_reinforcement = false;
                 var s = { s: 0, w: w };
                 if (w.GetWing()) {
-                    s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
-                    slist.push(s);
+                    if (this.weapon_list[ws.GetWeaponSelected()].size == wing_size) {
+                        w.wing_reinforcement = true;
+                    }
+                    else {
+                        s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
+                        slist.push(s);
+                    }
                 }
             }
         }
         //Sort by size to we reinforce as few weapons as possible
         slist.sort(function (a, b) { return a.s - b.s; });
         for (let s of slist) {
-            if (wing_size[0] > 0) {
-                wing_size[0] -= s.s;
-                if (wing_size[0] < 0) {
-                    wing_size[1] -= s.s;
-                    if (wing_size[1] < 0) {
-                        s.w.wing_reinforcement = true;
-                    }
-                }
-            }
-            else {
-                wing_size[1] -= s.s;
-                if (wing_size[1] < 0) {
+            if (wing_size > 0) {
+                wing_size -= s.s;
+                if (wing_size < 0) {
                     s.w.wing_reinforcement = true;
                 }
             }
@@ -9074,9 +9086,10 @@ class Aircraft {
             this.stabilizers.SetIsTandem(this.wings.GetTandem());
             this.stabilizers.SetIsSwept(this.wings.GetSwept());
             this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
+            this.stabilizers.SetHelicopter(false);
         }
         else {
-            this.stabilizers.SetHelicopter();
+            this.stabilizers.SetHelicopter(true);
         }
         this.stabilizers.SetWingArea(stats.wingarea);
         this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
@@ -15118,6 +15131,7 @@ class Rotor_HTML extends Display {
             this.heli_stagger.selectedIndex = 0;
         this.heli_mat.selectedIndex = this.rotor.GetCantilever();
         this.heli_shafts.checked = this.rotor.GetAccessory();
+        this.heli_blade_count.selectedIndex = this.rotor.GetBladeCountIdx();
         var stats = this.rotor.PartStats();
         BlinkIfChanged(this.h_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.h_mass, stats.mass.toString(), false);

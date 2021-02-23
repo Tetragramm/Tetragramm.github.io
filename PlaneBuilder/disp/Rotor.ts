@@ -237,6 +237,7 @@ class Rotor_HTML extends Display {
 
         this.heli_shafts.checked = this.rotor.GetAccessory();
 
+        this.heli_blade_count.selectedIndex = this.rotor.GetBladeCountIdx();
 
         var stats = this.rotor.PartStats();
         BlinkIfChanged(this.h_drag, stats.drag.toString(), false);

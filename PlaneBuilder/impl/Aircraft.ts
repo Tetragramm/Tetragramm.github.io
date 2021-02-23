@@ -367,8 +367,9 @@ class Aircraft {
             this.stabilizers.SetIsTandem(this.wings.GetTandem());
             this.stabilizers.SetIsSwept(this.wings.GetSwept());
             this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
+            this.stabilizers.SetHelicopter(false);
         } else {
-            this.stabilizers.SetHelicopter();
+            this.stabilizers.SetHelicopter(true);
         }
         this.stabilizers.SetWingArea(stats.wingarea);
         this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
