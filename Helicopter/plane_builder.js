@@ -8732,7 +8732,7 @@ class Rotor extends Part {
             stats.pitchstab = 4;
         }
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
-            stats.reliability = Math.min(0, this.rotor_span - this.sizing_span);
+            stats.reliability = 2 * Math.min(0, this.rotor_span - this.sizing_span);
             stats = stats.Add(this.blade_list[this.blade_idx].stats);
         }
         if (this.accessory) {

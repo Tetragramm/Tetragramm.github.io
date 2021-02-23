@@ -296,7 +296,7 @@ class Rotor extends Part {
         }
 
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
-            stats.reliability = Math.min(0, this.rotor_span - this.sizing_span);
+            stats.reliability = 2 * Math.min(0, this.rotor_span - this.sizing_span);
             stats = stats.Add(this.blade_list[this.blade_idx].stats);
         }
 
