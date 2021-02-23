@@ -8338,7 +8338,7 @@ class Weapons extends Part {
         //Wing reinforcement. Do this so it gets included in parts display.
         var wing_size = 0;
         if (this.cant_type == 0)
-            wing_size = 2;
+            wing_size = 4;
         else if (this.cant_type == 1)
             wing_size = 8;
         else
