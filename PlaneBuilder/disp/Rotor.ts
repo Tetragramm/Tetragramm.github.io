@@ -28,6 +28,7 @@ class Rotor_HTML extends Display {
     private heli_min: HTMLLabelElement;
     private heli_span: HTMLInputElement;
     private heli_stagger: HTMLSelectElement;
+    private heli_blade_count: HTMLSelectElement;
     private heli_mat: HTMLSelectElement;
     private heli_shafts: HTMLInputElement;
 
@@ -158,6 +159,17 @@ class Rotor_HTML extends Display {
         opt2.text = lu("Tandem");
         this.heli_stagger.add(opt2);
         this.heli_stagger.onchange = () => { this.rotor.SetTandem(this.heli_stagger.selectedIndex == 1); };
+
+        this.heli_blade_count = document.createElement("SELECT") as HTMLSelectElement;
+        FlexSelect(lu("Rotor Blade Count"), this.heli_blade_count, rotor_fs);
+        var blade_list = this.rotor.GetBladeList();
+        for (let b of blade_list) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.textContent = b.name;
+            this.heli_blade_count.add(opt);
+        }
+        this.heli_blade_count.onchange = () => { this.rotor.SetBladeCount(this.heli_blade_count.selectedIndex); };
+
 
         var mat_cell = this.heli_row.insertCell();
         var mat_fs = CreateFlexSection(mat_cell);

@@ -1,5 +1,5 @@
 {
-    "version": "11.5",
+    "version": "11.6",
     "era": {
         "options": [
             {
@@ -2201,6 +2201,34 @@
                 "cost": 10,
                 "max_mass_stress": 0,
                 "max_total_stress": 0
+            }
+        ]
+    },
+    "rotor": {
+        "blade_count": [
+            {
+                "name": "Two",
+                "sizing": 1.05,
+                "flightstress": 1,
+                "rotor_bleed": 0
+            },
+            {
+                "name": "Three",
+                "sizing": 1,
+                "cost": 2,
+                "rotor_bleed": 1
+            },
+            {
+                "name": "Four",
+                "sizing": 0.95,
+                "cost": 4,
+                "rotor_bleed": 2
+            },
+            {
+                "name": "Five",
+                "sizing": 0.9,
+                "cost": 6,
+                "rotor_bleed": 3
             }
         ]
     }

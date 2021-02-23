@@ -3511,11 +3511,22 @@ class Propeller extends Part {
         else //Pulsejet
             return 7;
     }
+    SetHelicopter(is) {
+        this.is_heli = is;
+    }
+    IsHelicopter() {
+        return this.is_heli;
+    }
     PartStats() {
         var stats = new Stats();
         if (this.num_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
+        }
+        else if (this.is_heli) {
+            //Default, no auto pitch
+            stats = stats.Add(this.prop_list[2].stats.Multiply(this.num_propellers));
+            stats = stats.Add(this.upg_list[0].stats.Multiply(this.num_propellers));
         }
         else { //Pulsejet
             stats.pitchboost = 0.6;
@@ -8478,19 +8489,31 @@ var AIRCRAFT_TYPE;
     AIRCRAFT_TYPE[AIRCRAFT_TYPE["HELICOPTER"] = 1] = "HELICOPTER";
     AIRCRAFT_TYPE[AIRCRAFT_TYPE["AUTOGYRO"] = 2] = "AUTOGYRO";
 })(AIRCRAFT_TYPE || (AIRCRAFT_TYPE = {}));
+var ROTOR_BLADE_COUNT;
+(function (ROTOR_BLADE_COUNT) {
+    ROTOR_BLADE_COUNT[ROTOR_BLADE_COUNT["Two"] = 2] = "Two";
+    ROTOR_BLADE_COUNT[ROTOR_BLADE_COUNT["Three"] = 3] = "Three";
+    ROTOR_BLADE_COUNT[ROTOR_BLADE_COUNT["Four"] = 4] = "Four";
+    ROTOR_BLADE_COUNT[ROTOR_BLADE_COUNT["Five"] = 5] = "Five";
+})(ROTOR_BLADE_COUNT || (ROTOR_BLADE_COUNT = {}));
 class Rotor extends Part {
-    constructor() {
+    constructor(js) {
         super();
         this.type = AIRCRAFT_TYPE.AIRPLANE;
         this.rotor_count = 0;
         this.rotor_span = 0;
         this.wing_area = 0;
         this.is_tandem = false;
-        this.rotor_pitch = -1;
         this.dryMP = 0;
         this.sizing_span = 0;
         this.cant_idx = 0;
         this.accessory = false;
+        this.blade_idx = 0;
+        this.blade_list = [];
+        for (let elem of js["blade_count"]) {
+            this.blade_list.push({ name: elem["name"], rotor_bleed: elem["rotor_bleed"], sizing: elem["sizing"], stats: new Stats(elem) });
+        }
+        console.log(this.blade_list);
     }
     toJSON() {
         return {
@@ -8500,6 +8523,7 @@ class Rotor extends Part {
             rotor_mat: this.cant_idx,
             is_tandem: this.is_tandem,
             accessory: this.accessory,
+            blade_idx: this.blade_idx,
         };
     }
     fromJSON(js, json_version) {
@@ -8509,6 +8533,9 @@ class Rotor extends Part {
         this.cant_idx = js["rotor_mat"];
         this.is_tandem = js["is_tandem"];
         this.accessory = js["accessory"];
+        if (json_version > 11.55) {
+            this.blade_idx = js["blade_idx"];
+        }
     }
     serialize(s) {
         s.PushNum(this.type);
@@ -8517,6 +8544,7 @@ class Rotor extends Part {
         s.PushNum(this.cant_idx);
         s.PushBool(this.is_tandem);
         s.PushBool(this.accessory);
+        s.PushNum(this.blade_idx);
     }
     deserialise(d) {
         this.type = d.GetNum();
@@ -8525,6 +8553,9 @@ class Rotor extends Part {
         this.cant_idx = d.GetNum();
         this.is_tandem = d.GetBool();
         this.accessory = d.GetBool();
+        if (d.version > 11.55) {
+            this.blade_idx = d.GetNum();
+        }
     }
     SetCantileverList(cant_list) {
         this.cant_list = cant_list;
@@ -8596,9 +8627,10 @@ class Rotor extends Part {
     GetTandem() {
         return this.is_tandem;
     }
-    SetPitch(pit) {
-        this.rotor_pitch = pit;
+    SetBladeCount(idx) {
+        this.blade_idx = idx;
         this.VerifySizes();
+        this.CalculateStats();
     }
     SetWingArea(num) {
         this.wing_area = num;
@@ -8646,21 +8678,14 @@ class Rotor extends Part {
     GetTailRotor() {
         return this.type == AIRCRAFT_TYPE.HELICOPTER && !this.is_tandem;
     }
-    PitchSizing() {
-        switch (this.rotor_pitch) {
-            case 0:
-                return 1.1;
-            case 1:
-                return 1.05;
-            case 2:
-                return 1;
-            case 3:
-                return 0.95;
-            case 4:
-                return 0.9;
-            default:
-                return 1000;
+    GetBladeList() {
+        return this.blade_list;
+    }
+    GetRotorBleed() {
+        if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
+            return this.blade_list[this.blade_idx].rotor_bleed;
         }
+        return 0;
     }
     VerifySizes() {
         if (this.type == AIRCRAFT_TYPE.AIRPLANE) {
@@ -8673,18 +8698,18 @@ class Rotor extends Part {
             this.sizing_span = Math.ceil(-1.0e-6 + Math.sqrt((0.6 * this.wing_area) / (Math.PI / 8)));
             this.rotor_span = Math.max(this.rotor_span, this.sizing_span);
             this.is_tandem = false;
-            this.rotor_pitch = -1;
         }
         else if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             this.rotor_count = Math.max(1, this.rotor_count);
             if (this.rotor_count > 1 && this.rotor_count % 2 == 1)
                 this.rotor_count = this.rotor_count - 1;
             if (this.rotor_count == 1) {
-                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 5 * this.PitchSizing());
+                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 5 * this.blade_list[this.blade_idx].sizing);
             }
             else {
-                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.PitchSizing());
+                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
             }
+            console.log(this.blade_list[this.blade_idx].sizing);
             this.sizing_span = Math.min(100, this.sizing_span);
         }
     }
@@ -8708,6 +8733,7 @@ class Rotor extends Part {
         }
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             stats.reliability = Math.min(0, this.rotor_span - this.sizing_span);
+            stats = stats.Add(this.blade_list[this.blade_idx].stats);
         }
         if (this.accessory) {
             if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
@@ -8804,7 +8830,7 @@ class Aircraft {
         this.optimization = new Optimization();
         this.weapons = new Weapons(weapon_json);
         this.used = new Used();
-        this.rotor = new Rotor();
+        this.rotor = new Rotor(js["rotor"]);
         this.alter = new AlterStats();
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
@@ -8996,6 +9022,12 @@ class Aircraft {
             this.engines.SetHelicopter(true);
         }
         stats = stats.Add(this.engines.PartStats());
+        if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
+            this.propeller.SetHelicopter(true);
+        }
+        else {
+            this.propeller.SetHelicopter(false);
+        }
         this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
         stats = stats.Add(this.propeller.PartStats());
         //Fuel goes here, because it makes sections.
@@ -9027,7 +9059,6 @@ class Aircraft {
         }
         //If there is a rotor...
         if (this.aircraft_type != AIRCRAFT_TYPE.AIRPLANE) {
-            this.rotor.SetPitch(this.propeller.GetPropIndex());
             this.rotor.SetEngineCount(this.engines.GetNumberOfEngines());
             stats = stats.Add(this.rotor.PartStats());
         }
@@ -9246,11 +9277,8 @@ class Aircraft {
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
         var TurnBleed = Math.ceil(-1.0e-6 + Math.floor(1.0e-6 + (StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
-        var TurnBleedwBombs = TurnBleed + 1;
-        TurnBleed = Math.max(TurnBleed, 1);
-        TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
         if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
-            TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2));
+            TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2)) + this.rotor.GetRotorBleed();
             EnergyLoss = Math.max(1, Math.floor(1.0e-6 + DPEmpty / 7));
             StallSpeedEmpty = 0;
             StallSpeedFull = 0;
@@ -9259,6 +9287,9 @@ class Aircraft {
             MaxSpeedFull = Math.min(37, MaxSpeedFull);
             MaxSpeedwBombs = Math.min(37, MaxSpeedwBombs);
         }
+        TurnBleed = Math.max(TurnBleed, 1);
+        var TurnBleedwBombs = TurnBleed + 1;
+        TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
         var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
         FuelUses = Math.floor(1.0e-6 + FuelUses * (1 - 0.2 * this.used.leaky));
@@ -10670,7 +10701,7 @@ class Propeller_HTML extends Display {
         this.select_upgrade.selectedIndex = this.prop.GetUpgradeIndex();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
         this.select_prop.disabled = false;
-        if (this.prop.GetNumPropellers() == 0) {
+        if (this.prop.GetNumPropellers() == 0 || this.prop.IsHelicopter()) {
             this.select_upgrade.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;
@@ -15012,6 +15043,15 @@ class Rotor_HTML extends Display {
         opt2.text = lu("Tandem");
         this.heli_stagger.add(opt2);
         this.heli_stagger.onchange = () => { this.rotor.SetTandem(this.heli_stagger.selectedIndex == 1); };
+        this.heli_blade_count = document.createElement("SELECT");
+        FlexSelect(lu("Rotor Blade Count"), this.heli_blade_count, rotor_fs);
+        var blade_list = this.rotor.GetBladeList();
+        for (let b of blade_list) {
+            let opt = document.createElement("OPTION");
+            opt.textContent = b.name;
+            this.heli_blade_count.add(opt);
+        }
+        this.heli_blade_count.onchange = () => { this.rotor.SetBladeCount(this.heli_blade_count.selectedIndex); };
         var mat_cell = this.heli_row.insertCell();
         var mat_fs = CreateFlexSection(mat_cell);
         this.heli_mat = document.createElement("SELECT");

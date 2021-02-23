@@ -117,7 +117,7 @@ class Aircraft {
         this.optimization = new Optimization();
         this.weapons = new Weapons(weapon_json);
         this.used = new Used();
-        this.rotor = new Rotor();
+        this.rotor = new Rotor(js["rotor"]);
         this.alter = new AlterStats();
 
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
@@ -319,6 +319,11 @@ class Aircraft {
         }
         stats = stats.Add(this.engines.PartStats());
 
+        if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
+            this.propeller.SetHelicopter(true);
+        } else {
+            this.propeller.SetHelicopter(false);
+        }
         this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
         stats = stats.Add(this.propeller.PartStats());
 
@@ -352,7 +357,6 @@ class Aircraft {
         }
         //If there is a rotor...
         if (this.aircraft_type != AIRCRAFT_TYPE.AIRPLANE) {
-            this.rotor.SetPitch(this.propeller.GetPropIndex());
             this.rotor.SetEngineCount(this.engines.GetNumberOfEngines());
             stats = stats.Add(this.rotor.PartStats());
         }
@@ -599,12 +603,9 @@ class Aircraft {
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
         var TurnBleed = Math.ceil(-1.0e-6 + Math.floor(1.0e-6 + (StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
-        var TurnBleedwBombs = TurnBleed + 1;
-        TurnBleed = Math.max(TurnBleed, 1);
-        TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
 
         if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
-            TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2));
+            TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2)) + this.rotor.GetRotorBleed();
             EnergyLoss = Math.max(1, Math.floor(1.0e-6 + DPEmpty / 7));
             StallSpeedEmpty = 0;
             StallSpeedFull = 0;
@@ -613,6 +614,9 @@ class Aircraft {
             MaxSpeedFull = Math.min(37, MaxSpeedFull);
             MaxSpeedwBombs = Math.min(37, MaxSpeedwBombs);
         }
+        TurnBleed = Math.max(TurnBleed, 1);
+        var TurnBleedwBombs = TurnBleed + 1;
+        TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
 
         var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky

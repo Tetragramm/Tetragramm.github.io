@@ -7,6 +7,7 @@ class Propeller extends Part {
     private idx_prop: number;
     private idx_upg: number;
     private num_propellers: number;
+    private is_heli: boolean;
 
     constructor(json: JSON) {
         super();
@@ -122,13 +123,24 @@ class Propeller extends Part {
             return 7;
     }
 
+    public SetHelicopter(is: boolean) {
+        this.is_heli = is;
+    }
+
+    public IsHelicopter() {
+        return this.is_heli;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats();
         if (this.num_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
-        }
-        else {//Pulsejet
+        } else if (this.is_heli) {
+            //Default, no auto pitch
+            stats = stats.Add(this.prop_list[2].stats.Multiply(this.num_propellers));
+            stats = stats.Add(this.upg_list[0].stats.Multiply(this.num_propellers));
+        } else {//Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
         }

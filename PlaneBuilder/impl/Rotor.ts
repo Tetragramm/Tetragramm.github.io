@@ -4,7 +4,13 @@
 enum AIRCRAFT_TYPE {
     AIRPLANE,
     HELICOPTER,
-    AUTOGYRO
+    AUTOGYRO,
+}
+enum ROTOR_BLADE_COUNT {
+    Two = 2,
+    Three = 3,
+    Four = 4,
+    Five = 5,
 }
 class Rotor extends Part {
     private type: AIRCRAFT_TYPE;
@@ -12,27 +18,33 @@ class Rotor extends Part {
     private rotor_span: number;
     private wing_area: number;
     private is_tandem: boolean;
-    private rotor_pitch: number;
     private dryMP: number;
     private sizing_span: number;
     private accessory: boolean;
     private engine_count: number;
+    private blade_list: { name: string, rotor_bleed: number, sizing: number, stats: Stats }[];
+    private blade_idx: number;
 
     private cant_idx: number;
     private cant_list: { name: string, limited: boolean, stats: Stats }[];
 
-    constructor() {
+    constructor(js: JSON) {
         super();
         this.type = AIRCRAFT_TYPE.AIRPLANE;
         this.rotor_count = 0;
         this.rotor_span = 0;
         this.wing_area = 0;
         this.is_tandem = false;
-        this.rotor_pitch = -1;
         this.dryMP = 0;
         this.sizing_span = 0;
         this.cant_idx = 0;
         this.accessory = false;
+        this.blade_idx = 0;
+        this.blade_list = [];
+        for (let elem of js["blade_count"]) {
+            this.blade_list.push({ name: elem["name"], rotor_bleed: elem["rotor_bleed"], sizing: elem["sizing"], stats: new Stats(elem) })
+        }
+        console.log(this.blade_list)
     }
 
     public toJSON() {
@@ -43,6 +55,7 @@ class Rotor extends Part {
             rotor_mat: this.cant_idx,
             is_tandem: this.is_tandem,
             accessory: this.accessory,
+            blade_idx: this.blade_idx,
         };
     }
 
@@ -53,6 +66,9 @@ class Rotor extends Part {
         this.cant_idx = js["rotor_mat"];
         this.is_tandem = js["is_tandem"];
         this.accessory = js["accessory"];
+        if (json_version > 11.55) {
+            this.blade_idx = js["blade_idx"];
+        }
     }
 
     public serialize(s: Serialize) {
@@ -62,6 +78,7 @@ class Rotor extends Part {
         s.PushNum(this.cant_idx);
         s.PushBool(this.is_tandem);
         s.PushBool(this.accessory);
+        s.PushNum(this.blade_idx);
     }
 
     public deserialise(d: Deserialize) {
@@ -71,6 +88,9 @@ class Rotor extends Part {
         this.cant_idx = d.GetNum();
         this.is_tandem = d.GetBool();
         this.accessory = d.GetBool();
+        if (d.version > 11.55) {
+            this.blade_idx = d.GetNum();
+        }
     }
 
     public SetCantileverList(cant_list: { name: string, limited: boolean, stats: Stats }[]) {
@@ -156,9 +176,10 @@ class Rotor extends Part {
         return this.is_tandem;
     }
 
-    public SetPitch(pit: number) {
-        this.rotor_pitch = pit;
+    public SetBladeCount(idx: number) {
+        this.blade_idx = idx;
         this.VerifySizes();
+        this.CalculateStats();
     }
 
     public SetWingArea(num: number) {
@@ -216,21 +237,15 @@ class Rotor extends Part {
         return this.type == AIRCRAFT_TYPE.HELICOPTER && !this.is_tandem;
     }
 
-    private PitchSizing() {
-        switch (this.rotor_pitch) {
-            case 0:
-                return 1.1;
-            case 1:
-                return 1.05;
-            case 2:
-                return 1;
-            case 3:
-                return 0.95;
-            case 4:
-                return 0.9;
-            default:
-                return 1000;
+    public GetBladeList() {
+        return this.blade_list;
+    }
+
+    public GetRotorBleed() {
+        if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
+            return this.blade_list[this.blade_idx].rotor_bleed;
         }
+        return 0;
     }
 
     private VerifySizes() {
@@ -243,16 +258,16 @@ class Rotor extends Part {
             this.sizing_span = Math.ceil(-1.0e-6 + Math.sqrt((0.6 * this.wing_area) / (Math.PI / 8)));
             this.rotor_span = Math.max(this.rotor_span, this.sizing_span);
             this.is_tandem = false;
-            this.rotor_pitch = -1;
         } else if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             this.rotor_count = Math.max(1, this.rotor_count);
             if (this.rotor_count > 1 && this.rotor_count % 2 == 1)
                 this.rotor_count = this.rotor_count - 1;
             if (this.rotor_count == 1) {
-                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 5 * this.PitchSizing());
+                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 5 * this.blade_list[this.blade_idx].sizing);
             } else {
-                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.PitchSizing());
+                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
             }
+            console.log(this.blade_list[this.blade_idx].sizing)
             this.sizing_span = Math.min(100, this.sizing_span);
         }
     }
@@ -282,6 +297,7 @@ class Rotor extends Part {
 
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             stats.reliability = Math.min(0, this.rotor_span - this.sizing_span);
+            stats = stats.Add(this.blade_list[this.blade_idx].stats);
         }
 
         if (this.accessory) {
