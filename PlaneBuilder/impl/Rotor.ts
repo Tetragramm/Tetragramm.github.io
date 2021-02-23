@@ -271,6 +271,7 @@ class Rotor extends Part {
                 this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
             }
             this.sizing_span = Math.min(100, this.sizing_span);
+            this.rotor_span = Math.max(this.rotor_span, Math.floor(1.0e-6 + this.sizing_span / 2));
         }
     }
 
