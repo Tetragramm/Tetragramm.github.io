@@ -9326,7 +9326,7 @@ class Aircraft {
         }
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
-        var ControlStress = this.stats.flightstress;
+        var ControlStress = 1 + this.stats.flightstress;
         if (Stability > 3 || Stability < -3)
             ControlStress++;
         //Flight Stress from Rumble.
