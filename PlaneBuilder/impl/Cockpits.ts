@@ -179,9 +179,9 @@ class Cockpits extends Part {
         return s;
     }
 
-    public UpdateCrewStats(escape: number, flightstress: number, visibility: number, crash: number) {
+    public UpdateCrewStats(escape: number, controlstress: number, rumblestress: number, visibility: number, crash: number) {
         for (let cp of this.positions) {
-            cp.CrewUpdate(escape, flightstress, visibility, crash);
+            cp.CrewUpdate(escape, controlstress, rumblestress, visibility, crash);
         }
     }
 

@@ -57,7 +57,8 @@ type DerivedStats = {
     FuelUses: number,
     CruiseRange: number,
     CruiseRangewBombs: number,
-    FlightStress: number,
+    ControlStress: number,
+    RumbleStress: number,
     RateOfClimbFull: number,
     RateOfClimbEmpty: number,
     RateOfClimbwBombs: number,
@@ -456,7 +457,7 @@ class Aircraft {
             this.weapons.SetStickyGuns(this.used.sticky_guns);
 
             //Update Part Local stuff
-            this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility, this.stats.crashsafety);
+            this.cockpits.UpdateCrewStats(this.stats.escape, derived.ControlStress, derived.RumbleStress, this.stats.visibility, this.stats.crashsafety);
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
@@ -633,16 +634,17 @@ class Aircraft {
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
 
-        var FlightStress = 1 + this.stats.flightstress;
+        var ControlStress = this.stats.flightstress;
         if (Stability > 3 || Stability < -3)
-            FlightStress++;
+            ControlStress++;
         //Flight Stress from Rumble.
+        var RumbleStress = 0;
         if (this.engines.GetMaxRumble() > 0) {
-            FlightStress += Math.max(1, this.engines.GetMaxRumble());
-            FlightStress = Math.floor(1.0e-6 + FlightStress);
+            RumbleStress += Math.max(1, this.engines.GetMaxRumble());
+            RumbleStress = Math.floor(1.0e-6 + RumbleStress);
         }
-        FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
-        FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
+        ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
+        ControlStress = Math.min(this.accessories.GetMaxTotalStress(), ControlStress);
 
         var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbEmpty = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty));
@@ -683,7 +685,8 @@ class Aircraft {
             FuelUses: FuelUses,
             CruiseRange: CruiseRange,
             CruiseRangewBombs: CruiseRangewBombs,
-            FlightStress: FlightStress,
+            ControlStress: ControlStress,
+            RumbleStress: RumbleStress,
             RateOfClimbFull: RateOfClimbFull,
             RateOfClimbEmpty: RateOfClimbEmpty,
             RateOfClimbwBombs: RateOfClimbwBombs,

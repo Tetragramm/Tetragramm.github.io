@@ -1814,9 +1814,14 @@ class Cockpit extends Part {
         }
         return stats;
     }
-    CrewUpdate(escape, flightstress, visibility, crash) {
+    CrewUpdate(escape, controlstress, rumblestress, visibility, crash) {
         this.total_escape = this.stats.escape + escape;
-        this.total_stress = this.stats.flightstress + flightstress;
+        this.total_stress = 0;
+        if (this.is_primary || this.selected_upgrades[0]) {
+            this.total_stress = this.stats.flightstress + controlstress;
+        }
+        this.total_stress = Math.max(0, this.total_stress);
+        this.total_stress += rumblestress;
         if (this.IsOpen() && this.has_rotary) { //Is open and has rotary
             this.total_stress += 1;
         }
@@ -1984,9 +1989,9 @@ class Cockpits extends Part {
         s.crashsafety = 0;
         return s;
     }
-    UpdateCrewStats(escape, flightstress, visibility, crash) {
+    UpdateCrewStats(escape, controlstress, rumblestress, visibility, crash) {
         for (let cp of this.positions) {
-            cp.CrewUpdate(escape, flightstress, visibility, crash);
+            cp.CrewUpdate(escape, controlstress, rumblestress, visibility, crash);
         }
     }
     SetCalculateStats(callback) {
@@ -9162,7 +9167,7 @@ class Aircraft {
             //Used: sticky_guns  (Just needs to happen before display)
             this.weapons.SetStickyGuns(this.used.sticky_guns);
             //Update Part Local stuff
-            this.cockpits.UpdateCrewStats(this.stats.escape, derived.FlightStress, this.stats.visibility, this.stats.crashsafety);
+            this.cockpits.UpdateCrewStats(this.stats.escape, derived.ControlStress, derived.RumbleStress, this.stats.visibility, this.stats.crashsafety);
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
@@ -9321,16 +9326,17 @@ class Aircraft {
         }
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
-        var FlightStress = 1 + this.stats.flightstress;
+        var ControlStress = this.stats.flightstress;
         if (Stability > 3 || Stability < -3)
-            FlightStress++;
+            ControlStress++;
         //Flight Stress from Rumble.
+        var RumbleStress = 0;
         if (this.engines.GetMaxRumble() > 0) {
-            FlightStress += Math.max(1, this.engines.GetMaxRumble());
-            FlightStress = Math.floor(1.0e-6 + FlightStress);
+            RumbleStress += Math.max(1, this.engines.GetMaxRumble());
+            RumbleStress = Math.floor(1.0e-6 + RumbleStress);
         }
-        FlightStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
-        FlightStress = Math.min(this.accessories.GetMaxTotalStress(), FlightStress);
+        ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
+        ControlStress = Math.min(this.accessories.GetMaxTotalStress(), ControlStress);
         var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbEmpty = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty));
         var RateOfClimbwBombs = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (23.0 / this.stats.pitchspeed) / DPwBombs));
@@ -9369,7 +9375,8 @@ class Aircraft {
             FuelUses: FuelUses,
             CruiseRange: CruiseRange,
             CruiseRangewBombs: CruiseRangewBombs,
-            FlightStress: FlightStress,
+            ControlStress: ControlStress,
+            RumbleStress: RumbleStress,
             RateOfClimbFull: RateOfClimbFull,
             RateOfClimbEmpty: RateOfClimbEmpty,
             RateOfClimbwBombs: RateOfClimbwBombs,
