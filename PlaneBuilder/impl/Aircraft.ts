@@ -644,7 +644,11 @@ class Aircraft {
             RumbleStress = Math.floor(1.0e-6 + RumbleStress);
         }
         ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
-        ControlStress = Math.min(this.accessories.GetMaxTotalStress(), ControlStress);
+        var MaxStress = this.accessories.GetMaxTotalStress();
+        ControlStress = Math.min(MaxStress, ControlStress);
+        if (MaxStress == 0) {
+            RumbleStress = Math.min(MaxStress, RumbleStress);
+        }
 
         var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbEmpty = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty));
