@@ -244,7 +244,6 @@ class Cockpit extends Part {
 
         this.stats = stats.Clone();
 
-
         //Special stuff for co-pilot controls
         if (this.selected_upgrades[0]) {
             stats.flightstress = this.upgrades[0].stats.flightstress;
@@ -259,9 +258,9 @@ class Cockpit extends Part {
 
     public CrewUpdate(escape: number, controlstress: number, rumblestress: number, visibility: number, crash: number) {
         this.total_escape = this.stats.escape + escape;
-        this.total_stress = 0;
+        this.total_stress = this.stats.flightstress;
         if (this.is_primary || this.selected_upgrades[0]) {
-            this.total_stress = this.stats.flightstress + controlstress;
+            this.total_stress += controlstress;
         }
         this.total_stress = Math.max(0, this.total_stress);
         this.total_stress += rumblestress;
