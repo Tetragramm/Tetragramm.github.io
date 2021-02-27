@@ -17,6 +17,7 @@
         "Narrow Canopy": "Narrow Canopy",
         "Bubble Canopy": "Bubble Canopy",
         "Co-Pilot Controls": "Co-Pilot Controls",
+        "Co-Pilot Warning": "Each of {0} possible co-pilots removes 2 flight stress, to a maximum of {1} flight stress removed.",
         "Escape Hatch": "Escape Hatch",
         "Ejection Seat": "Ejection Seat",
         "Connectivity": "Connectivity",

@@ -9326,20 +9326,26 @@ class Aircraft {
         }
         var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
         var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
-        var ControlStress = 1 + this.stats.flightstress;
+        var ControlStress = 1;
         if (Stability > 3 || Stability < -3)
             ControlStress++;
         //Flight Stress from Rumble.
         var RumbleStress = 0;
+        ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
+        var MaxStress = this.accessories.GetMaxTotalStress();
+        ControlStress = Math.min(MaxStress, ControlStress);
+        if (this.stats.flightstress != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls"); }) == -1) {
+            this.stats.warnings.push({
+                source: lu("Co-Pilot Controls"),
+                warning: lu("Co-Pilot Warning", -this.stats.flightstress / 2, Math.min(ControlStress, -this.stats.flightstress))
+            });
+        }
         if (this.engines.GetMaxRumble() > 0) {
             RumbleStress += Math.max(1, this.engines.GetMaxRumble());
             RumbleStress = Math.floor(1.0e-6 + RumbleStress);
         }
-        ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
-        var MaxStress = this.accessories.GetMaxTotalStress();
-        ControlStress = Math.min(MaxStress, ControlStress);
         if (MaxStress == 0) {
-            RumbleStress = Math.min(MaxStress, RumbleStress);
+            RumbleStress = 0;
         }
         var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbEmpty = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty));
