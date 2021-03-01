@@ -216,7 +216,12 @@ function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
-    fs.div2.appendChild(inp);
+
+    var lbl2 = document.createElement("LABEL") as HTMLLabelElement;
+    var span = document.createElement("SPAN") as HTMLSpanElement;
+    span.appendChild(lbl2);
+    span.appendChild(inp);
+    fs.div2.appendChild(span);
 }
 
 function FlexLabel(txt: string, div1: HTMLDivElement) {

@@ -253,6 +253,31 @@ class Weapons extends Part {
         }
     }
 
+    private CleanFreelyAccessible() {
+        var has_fa = Array(this.cockpit_count).fill(false);
+        for (let ws of this.weapon_sets) {
+            let seat = ws.GetSeat();
+            for (let w of ws.GetWeapons()) {
+                if (w.GetFreeAccessible() && has_fa[seat]) {
+                    w.SetFreeAccessible(false);
+                } else if (w.GetFreeAccessible()) {
+                    has_fa[seat] = true;
+                }
+            }
+        }
+
+        for (let ws of this.weapon_sets) {
+            let seat = ws.GetSeat();
+            for (let w of ws.GetWeapons()) {
+                if ((has_fa[seat] && !w.GetFreeAccessible()) || w.GetWing()) {
+                    w.can_free_accessible = false;
+                } else {
+                    w.can_free_accessible = true;
+                }
+            }
+        }
+    }
+
     private RemoveOneTractorSpinner() {
         for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
             if (this.weapon_sets[i].GetDirection()[0]) {
@@ -377,19 +402,32 @@ class Weapons extends Part {
         return sum;
     }
 
+    public GetSeatList() {
+        var lst = [];
+        for (let i = 0; i < this.cockpit_count; i++) {
+            lst.push(lu("Seat #", i + 1));
+        }
+        return lst;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)
             set.SetCalculateStats(callback);
     }
 
+    public SetNumberOfCockpits(num: number) {
+        this.cockpit_count = num;
+    }
+
     public PartStats() {
         var stats = new Stats();
 
         //Update Freely Accessible state.
-        while (this.CountFreelyAccessible() > this.cockpit_count) {
-            this.RemoveOneFreelyAccessible();
-        }
+        // while (this.CountFreelyAccessible() > this.cockpit_count) {
+        //     this.RemoveOneFreelyAccessible();
+        // }
+        this.CleanFreelyAccessible();
         while (this.CountArtyTractorSpinner() > this.tractor_arty_spinner_count) {
             this.RemoveOneArtyTractorSpinner();
         }
@@ -441,7 +479,6 @@ class Weapons extends Part {
         }
 
         for (let ws of this.weapon_sets) {
-            ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
             ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.CanArtyTractorSpinner(),
                 this.has_pusher, this.CanPusherSpinner(), this.CanArtyPusherSpinner());
             ws.has_cantilever = this.cant_type > 0;

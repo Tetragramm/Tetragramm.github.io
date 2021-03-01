@@ -142,6 +142,7 @@ select, input {
 	box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+	padding:0;
 	height: 1.5em !important;
 	background-color: var(--inp_bkg_color);
 	color: var(--inp_txt_color);
@@ -151,6 +152,7 @@ select, input {
 	line-height: 1.5em;
 	font-size: 1em;
 	vertical-align: center;
+	border-width: 1px;
 }
 
 select {
@@ -224,19 +226,19 @@ input[type='checkbox']{
 	line-height: 0.75em;
 	margin-left: 0.25em;
 	margin-right: 0.25em;
-	vertical-align: center;
+	vertical-align: top;
 }
 
 input[type='checkbox']:not(checked):after {
-	vertical-align: center;
+	vertical-align: top;
 	content: '';
 	line-height: 0.75em;
 }
 
 input[type='checkbox']:checked:after {
-	vertical-align: center;
+	vertical-align: top;
 	position: relative;
-	top:-2px;
+	top: 2px;
 	font-size: 0.75em;
 	line-height: 0.75em;
 	content: '\2713\0020';
@@ -263,6 +265,7 @@ button{
 	height: 1.5em !important;
 	font-size: 1em;
 	border:1px solid var(--inp_bdr_color);
+	vertical-align: top;
 }
 
 button[disabled] {
@@ -282,6 +285,63 @@ button[disabled] {
 	margin: 0px;
 	border: 1px solid var(--inp_bdr_color);
 	vertical-align: top;
+}
+
+.green {
+	color:#009900;
+}
+
+.yellow {
+	color:#ffcc00;
+}
+
+.red {
+	color:#FF0000;
+}
+
+/* The actual popup (appears on top) */
+.tooltip .tooltiptext {
+	display: none;
+	position: absolute;
+	background-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
+	text-align: left;
+	border-radius: 12px;
+	padding: 8px;
+	max-width: 200em;
+	width:max-content;
+	white-space: normal;
+	z-index: 1;
+}
+
+/* Toggle this class when clicking on the popup container (hide and show the popup) */
+.tooltip:hover .tooltiptext {
+	display: inline;
+	-webkit-animation: fadeIn 1s;
+	-moz-animation: fadeIn 1s;
+	-o-animation: fadeIn 1s;
+	animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@-moz-keyframes changed {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}
+
+@-o-keyframes changed {
+  from {opacity: 0;}
+  to {opacity:1 ;}
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1 ;}
 }
 
 /* Change Animations */

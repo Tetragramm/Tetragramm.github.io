@@ -642,7 +642,7 @@
         "Weapons Weapon Set": "Weapon Set",
         "Weapons Weapons": "Weapons",
         "Weapons Weapon Stats": "Weapon Stats",
-        "Weapons Type": "Type",
+        "Weapons Type": "Weapon Type",
         "Weapons Number of Mounts": "Number of Mounts",
         "Weapons Ammunition": "Ammunition",
         "Weapons Action": "Action",
@@ -684,6 +684,8 @@
         "Aircraft Button Save Catalog": "Save Catalog",
         "Aircraft Button Default Aircraft": "Default Aircraft",
         "Aircraft Stats Section Title": "Total Sum of Stats",
-        "Aircraft Derived Section Title": "Aircraft Derived Statistics"
+        "Aircraft Derived Section Title": "Aircraft Derived Statistics",
+        "Seat #": "Seat #{0}",
+        "Seat Location": "Choose Seat"
     }
 }

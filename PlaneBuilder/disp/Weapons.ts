@@ -17,7 +17,8 @@ type WSetType = {
     count: HTMLInputElement, action: HTMLSelectElement,
     projectile: HTMLSelectElement, fixed: HTMLInputElement,
     wcell: HTMLTableCellElement, ammo: HTMLInputElement,
-    weaps: WType[], stats: WStatType, repeating: HTMLInputElement
+    weaps: WType[], stats: WStatType, repeating: HTMLInputElement,
+    seat: HTMLSelectElement,
 };
 class Weapons_HTML extends Display {
     private weap: Weapons;
@@ -67,6 +68,7 @@ class Weapons_HTML extends Display {
             ammo: document.createElement("INPUT") as HTMLInputElement,
             stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null, shots_header: null },
             repeating: document.createElement("INPUT") as HTMLInputElement,
+            seat: document.createElement("SELECT") as HTMLSelectElement,
         };
 
         var wlist = this.weap.GetWeaponList();
@@ -76,6 +78,13 @@ class Weapons_HTML extends Display {
             type.type.add(opt);
         }
         type.type.required = true;
+
+        var slist = this.weap.GetSeatList();
+        for (let s of slist) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = s;
+            type.seat.add(opt);
+        }
 
         var alist = this.weap.GetActionList();
         for (let a of alist) {
@@ -94,6 +103,7 @@ class Weapons_HTML extends Display {
         type.projectile.required = true;
 
         FlexSelect(lu("Weapons Type"), type.type, fs);
+        FlexSelect(lu("Seat Location"), type.seat, fs);
 
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
@@ -186,6 +196,9 @@ class Weapons_HTML extends Display {
         disp.type.selectedIndex = set.GetWeaponSelected();
         disp.type.onchange = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
 
+        disp.seat.selectedIndex = set.GetSeat();
+        disp.seat.onchange = () => { set.SetSeat(disp.seat.selectedIndex); };
+
         disp.count.valueAsNumber = set.GetMountingCount();
         disp.count.onchange = () => { set.SetMountingCount(disp.count.valueAsNumber); };
 
@@ -228,6 +241,7 @@ class Weapons_HTML extends Display {
             var w = disp.weaps.pop();
             disp.wcell.removeChild(w.span);
         }
+
         for (let i = 0; i < wlist.length; i++) {
             disp.weaps[i].wing.checked = wlist[i].GetWing();
             disp.weaps[i].wing.onchange = () => { wlist[i].SetWing(disp.weaps[i].wing.checked); };

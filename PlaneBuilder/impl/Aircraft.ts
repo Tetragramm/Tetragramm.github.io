@@ -333,7 +333,7 @@ class Aircraft {
         //Munitions goes here, because it makes sections.
         stats = stats.Add(this.munitions.PartStats());
         //Weapons go here, because they make sections.
-        this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
+        this.weapons.SetNumberOfCockpits(this.cockpits.GetNumberOfCockpits());
         this.weapons.SetTractorInfo(this.engines.GetTractorSpinner());
         this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();

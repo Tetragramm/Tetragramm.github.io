@@ -7316,6 +7316,7 @@ class WeaponSystem extends Part {
         this.has_propeller = true;
         this.sticky_guns = 0;
         this.repeating = false;
+        this.seat = 0;
         this.final_weapon = {
             name: "", abrv: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -7340,6 +7341,7 @@ class WeaponSystem extends Part {
             action: this.action_sel,
             projectile: this.projectile_sel,
             repeating: this.repeating,
+            seat: this.seat,
         };
     }
     fromJSON(js, json_version) {
@@ -7376,6 +7378,12 @@ class WeaponSystem extends Part {
         else {
             this.repeating = js["repeating"];
         }
+        if (json_version > 11.65) {
+            this.seat = js["seat"];
+        }
+        else {
+            this.seat = 0;
+        }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -7393,6 +7401,7 @@ class WeaponSystem extends Part {
         s.PushNum(this.action_sel);
         s.PushNum(this.projectile_sel);
         s.PushBool(this.repeating);
+        s.PushNum(this.seat);
     }
     deserialize(d) {
         this.raw_weapon_type = d.GetNum();
@@ -7426,6 +7435,12 @@ class WeaponSystem extends Part {
         }
         else {
             this.repeating = d.GetBool();
+        }
+        if (d.version > 11.65) {
+            this.seat = d.GetNum();
+        }
+        else {
+            this.seat = 0;
         }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
@@ -7957,6 +7972,13 @@ class WeaponSystem extends Part {
         }
         return count;
     }
+    SetSeat(num) {
+        this.seat = num;
+        this.CalculateStats();
+    }
+    GetSeat() {
+        return this.seat;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -8210,6 +8232,31 @@ class Weapons extends Part {
             }
         }
     }
+    CleanFreelyAccessible() {
+        var has_fa = Array(this.cockpit_count).fill(false);
+        for (let ws of this.weapon_sets) {
+            let seat = ws.GetSeat();
+            for (let w of ws.GetWeapons()) {
+                if (w.GetFreeAccessible() && has_fa[seat]) {
+                    w.SetFreeAccessible(false);
+                }
+                else if (w.GetFreeAccessible()) {
+                    has_fa[seat] = true;
+                }
+            }
+        }
+        for (let ws of this.weapon_sets) {
+            let seat = ws.GetSeat();
+            for (let w of ws.GetWeapons()) {
+                if ((has_fa[seat] && !w.GetFreeAccessible()) || w.GetWing()) {
+                    w.can_free_accessible = false;
+                }
+                else {
+                    w.can_free_accessible = true;
+                }
+            }
+        }
+    }
     RemoveOneTractorSpinner() {
         for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
             if (this.weapon_sets[i].GetDirection()[0]) {
@@ -8317,17 +8364,28 @@ class Weapons extends Part {
         }
         return sum;
     }
+    GetSeatList() {
+        var lst = [];
+        for (let i = 0; i < this.cockpit_count; i++) {
+            lst.push(lu("Seat #", i + 1));
+        }
+        return lst;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)
             set.SetCalculateStats(callback);
     }
+    SetNumberOfCockpits(num) {
+        this.cockpit_count = num;
+    }
     PartStats() {
         var stats = new Stats();
         //Update Freely Accessible state.
-        while (this.CountFreelyAccessible() > this.cockpit_count) {
-            this.RemoveOneFreelyAccessible();
-        }
+        // while (this.CountFreelyAccessible() > this.cockpit_count) {
+        //     this.RemoveOneFreelyAccessible();
+        // }
+        this.CleanFreelyAccessible();
         while (this.CountArtyTractorSpinner() > this.tractor_arty_spinner_count) {
             this.RemoveOneArtyTractorSpinner();
         }
@@ -8376,7 +8434,6 @@ class Weapons extends Part {
             }
         }
         for (let ws of this.weapon_sets) {
-            ws.SetCanFreelyAccessible(this.CountFreelyAccessible() < this.cockpit_count);
             ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.CanArtyTractorSpinner(), this.has_pusher, this.CanPusherSpinner(), this.CanArtyPusherSpinner());
             ws.has_cantilever = this.cant_type > 0;
             stats = stats.Add(ws.PartStats());
@@ -9058,7 +9115,7 @@ class Aircraft {
         //Munitions goes here, because it makes sections.
         stats = stats.Add(this.munitions.PartStats());
         //Weapons go here, because they make sections.
-        this.weapons.cockpit_count = this.cockpits.GetNumberOfCockpits();
+        this.weapons.SetNumberOfCockpits(this.cockpits.GetNumberOfCockpits());
         this.weapons.SetTractorInfo(this.engines.GetTractorSpinner());
         this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
@@ -9763,7 +9820,11 @@ function FlexCheckbox(txt, inp, fs) {
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
-    fs.div2.appendChild(inp);
+    var lbl2 = document.createElement("LABEL");
+    var span = document.createElement("SPAN");
+    span.appendChild(lbl2);
+    span.appendChild(inp);
+    fs.div2.appendChild(span);
 }
 function FlexLabel(txt, div1) {
     var lbl = document.createElement("LABEL");
@@ -12389,6 +12450,7 @@ class Weapons_HTML extends Display {
             ammo: document.createElement("INPUT"),
             stats: { mass: null, drag: null, cost: null, sect: null, mounting: null, jams: null, hits: null, damg: null, shots: null, shots_header: null },
             repeating: document.createElement("INPUT"),
+            seat: document.createElement("SELECT"),
         };
         var wlist = this.weap.GetWeaponList();
         for (let w of wlist) {
@@ -12397,6 +12459,12 @@ class Weapons_HTML extends Display {
             type.type.add(opt);
         }
         type.type.required = true;
+        var slist = this.weap.GetSeatList();
+        for (let s of slist) {
+            let opt = document.createElement("OPTION");
+            opt.text = s;
+            type.seat.add(opt);
+        }
         var alist = this.weap.GetActionList();
         for (let a of alist) {
             let opt = document.createElement("OPTION");
@@ -12412,6 +12480,7 @@ class Weapons_HTML extends Display {
         }
         type.projectile.required = true;
         FlexSelect(lu("Weapons Type"), type.type, fs);
+        FlexSelect(lu("Seat Location"), type.seat, fs);
         var lfs = CreateFlexSection(fs.div1);
         var rfs = CreateFlexSection(fs.div2);
         FlexInput(lu("Weapons Number of Mounts"), type.count, lfs);
@@ -12495,6 +12564,8 @@ class Weapons_HTML extends Display {
     UpdateWSet(set, disp) {
         disp.type.selectedIndex = set.GetWeaponSelected();
         disp.type.onchange = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
+        disp.seat.selectedIndex = set.GetSeat();
+        disp.seat.onchange = () => { set.SetSeat(disp.seat.selectedIndex); };
         disp.count.valueAsNumber = set.GetMountingCount();
         disp.count.onchange = () => { set.SetMountingCount(disp.count.valueAsNumber); };
         disp.action.selectedIndex = set.GetAction();

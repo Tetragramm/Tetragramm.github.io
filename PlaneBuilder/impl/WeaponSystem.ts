@@ -28,6 +28,8 @@ class WeaponSystem extends Part {
     private sticky_guns: number;
     private repeating: boolean;
 
+    private seat: number;
+
     private weapon_list: {
         name: string, abrv: string, era: string, size: number, stats: Stats,
         damage: number, hits: number, ammo: number,
@@ -59,6 +61,7 @@ class WeaponSystem extends Part {
         this.has_propeller = true;
         this.sticky_guns = 0;
         this.repeating = false;
+        this.seat = 0;
         this.final_weapon = {
             name: "", abrv: "", era: "", size: 0, stats: new Stats(),
             damage: 0, hits: 0, ammo: 0,
@@ -84,6 +87,7 @@ class WeaponSystem extends Part {
             action: this.action_sel,
             projectile: this.projectile_sel,
             repeating: this.repeating,
+            seat: this.seat,
         }
     }
 
@@ -122,6 +126,12 @@ class WeaponSystem extends Part {
             this.repeating = js["repeating"];
         }
 
+        if (json_version > 11.65) {
+            this.seat = js["seat"];
+        } else {
+            this.seat = 0;
+        }
+
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -140,6 +150,7 @@ class WeaponSystem extends Part {
         s.PushNum(this.action_sel);
         s.PushNum(this.projectile_sel);
         s.PushBool(this.repeating);
+        s.PushNum(this.seat);
     }
 
     public deserialize(d: Deserialize) {
@@ -174,6 +185,12 @@ class WeaponSystem extends Part {
             }
         } else {
             this.repeating = d.GetBool();
+        }
+
+        if (d.version > 11.65) {
+            this.seat = d.GetNum();
+        } else {
+            this.seat = 0;
         }
 
         this.MakeFinalWeapon();
@@ -744,6 +761,15 @@ class WeaponSystem extends Part {
                 count++;
         }
         return count;
+    }
+
+    public SetSeat(num: number) {
+        this.seat = num;
+        this.CalculateStats();
+    }
+
+    public GetSeat() {
+        return this.seat;
     }
 
     public SetCalculateStats(callback: () => void) {
