@@ -211,6 +211,7 @@ hr.dashed {
 
 span {
 	height: 1.5em !important;
+	padding-top:2px;
 }
 
 input[type='checkbox']{
