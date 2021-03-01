@@ -2463,28 +2463,6 @@
                     ]
                 },
                 {
-                    "name": "Bertha F1666 220hp",
-                    "engine_type": 0,
-                    "type": 0,
-                    "era_sel": 1,
-                    "displacement": 19.7,
-                    "compression": 4.7,
-                    "cyl_per_row": 1,
-                    "rows": 8,
-                    "RPM_boost": 0.85,
-                    "material_fudge": 0.7,
-                    "quality_fudge": 1,
-                    "compressor_type": 0,
-                    "compressor_count": 0,
-                    "min_IAF": 0,
-                    "upgrades": [
-                        false,
-                        false,
-                        false,
-                        false
-                    ]
-                },
-                {
                     "name": "Bertha F4398 490hp",
                     "engine_type": 0,
                     "type": 0,
@@ -2727,7 +2705,7 @@
                     ]
                 },
                 {
-                    "name": "Bertha F2080",
+                    "name": "Bertha F2080 220hp",
                     "engine_type": 0,
                     "type": 0,
                     "era_sel": 1,
@@ -2749,7 +2727,7 @@
                     ]
                 },
                 {
-                    "name": "Bertha F2080U",
+                    "name": "Bertha F2080 Über 270hp",
                     "engine_type": 0,
                     "type": 0,
                     "era_sel": 1,
