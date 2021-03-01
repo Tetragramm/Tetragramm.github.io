@@ -209,6 +209,10 @@ hr.dashed {
   margin-bottom: 0.5em;
 }
 
+span {
+	height: 1.5em !important;
+}
+
 input[type='checkbox']{
 	width: 1em !important;
 	height: 1em !important;
@@ -230,15 +234,14 @@ input[type='checkbox']{
 }
 
 input[type='checkbox']:not(checked):after {
-	vertical-align: top;
+	vertical-align: center;
 	content: '';
 	line-height: 0.75em;
 }
 
 input[type='checkbox']:checked:after {
-	vertical-align: top;
+	vertical-align: center;
 	position: relative;
-	top: 2px;
 	font-size: 0.75em;
 	line-height: 0.75em;
 	content: '\2713\0020';
