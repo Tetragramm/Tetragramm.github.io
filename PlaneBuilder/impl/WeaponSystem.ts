@@ -236,7 +236,7 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.synched = this.weapon_list[num].synched;
         } else if (this.action_sel == ActionType.MECHANICAL) {
-            this.final_weapon.hits = 1 + this.weapon_list[num].hits;
+            this.final_weapon.hits = this.weapon_list[num].hits;
             this.final_weapon.stats.warnings.push({
                 source: lu("Mechanical Action"),
                 warning: lu("Mechanical Action Warning"),
