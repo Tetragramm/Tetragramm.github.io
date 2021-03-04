@@ -338,7 +338,7 @@ class Engine extends Part {
     }
 
     public NeedCooling(): boolean {
-        return this.cooling_count > 0;
+        return this.etype_stats.stats.cooling > 0;
     }
 
     public WarnCoolingReliability(): boolean {
@@ -350,6 +350,9 @@ class Engine extends Part {
             num = 0;
         num = Math.floor(1.0e-6 + num);
         this.cooling_count = num;
+        if (this.NeedCooling()) {
+            this.cooling_count = Math.max(1, this.cooling_count);
+        }
         this.CalculateStats();
     }
 

@@ -11,13 +11,14 @@ class Cockpit extends Part {
     private selected_upgrades: boolean[];
     private selected_safety: boolean[];
     private selected_gunsights: boolean[];
-    private total_stress: number;
+    private total_stress: number[];
     private total_escape: number;
     private total_visibility: number;
     private total_crash: number;
     private is_primary: boolean;
     private bombsight: number;
     private has_rotary: boolean;
+    private is_armed: boolean;
 
     constructor(tl: { name: string, stats: Stats }[],
         ul: { name: string, stats: Stats }[],
@@ -34,11 +35,12 @@ class Cockpit extends Part {
         this.selected_upgrades = [...Array(this.upgrades.length).fill(false)];
         this.selected_safety = [...Array(this.safety.length).fill(false)];
         this.selected_gunsights = [...Array(this.gunsights.length).fill(false)];
-        this.total_stress = 0;
+        this.total_stress = [0, 0];
         this.total_escape = 0;
         this.total_visibility = 0;
         this.is_primary = false;
         this.bombsight = 0;
+        this.is_armed = false;
     }
 
     public toJSON() {
@@ -213,6 +215,30 @@ class Cockpit extends Part {
         return this.stats.charge != 0;
     }
 
+    public IsCopilot() {
+        return this.selected_upgrades[0];
+    }
+
+    public SetArmed(is: boolean) {
+        this.is_armed = is;
+    }
+
+    public GetName() {
+        if (this.is_primary) {
+            return "Pilot";
+        }
+        if (this.bombsight > 0) {
+            return "Bombadier";
+        }
+        if (this.IsCopilot()) {
+            return "Co-Pilot";
+        }
+        if (this.is_armed) {
+            return "Gunner";
+        }
+        return "Aircrew";
+    }
+
     public PartStats(): Stats {
         var stats = new Stats();
         stats.reqsections = 1;
@@ -256,18 +282,25 @@ class Cockpit extends Part {
         return stats;
     }
 
-    public CrewUpdate(escape: number, controlstress: number, rumblestress: number, visibility: number, crash: number) {
+    public CrewUpdate(escape: number, controlstress: number, rumblestress: number, copilots: number, visibility: number, crash: number) {
         this.total_escape = this.stats.escape + escape;
-        this.total_stress = this.stats.flightstress;
+        let ncp_stress = this.stats.flightstress;
+        let cp_stress = this.stats.flightstress;
         if (this.is_primary || this.selected_upgrades[0]) {
-            this.total_stress += controlstress;
+            ncp_stress += controlstress;
+            cp_stress += controlstress - copilots * 2;
         }
-        this.total_stress = Math.max(0, this.total_stress);
-        this.total_stress += rumblestress;
+        ncp_stress = Math.max(0, ncp_stress);
+        cp_stress = Math.max(0, cp_stress);
+        ncp_stress += rumblestress;
+        cp_stress += rumblestress;
         if (this.IsOpen() && this.has_rotary) { //Is open and has rotary
-            this.total_stress += 1;
+            ncp_stress += 1;
+            cp_stress += 1;
         }
-        this.total_stress = Math.max(0, this.total_stress);
+        ncp_stress = Math.max(0, ncp_stress);
+        cp_stress = Math.max(0, cp_stress);
+        this.total_stress = [ncp_stress, cp_stress];
         this.total_visibility = this.stats.visibility + visibility;
         this.total_crash = this.stats.crashsafety + crash;
     }

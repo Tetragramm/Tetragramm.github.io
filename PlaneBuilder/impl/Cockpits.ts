@@ -179,9 +179,21 @@ class Cockpits extends Part {
         return s;
     }
 
+    public SetArmed(armed: boolean[]) {
+        for (let i = 0; i < this.positions.length; i++) {
+            this.positions[i].SetArmed(armed[i]);
+        }
+    }
+
     public UpdateCrewStats(escape: number, controlstress: number, rumblestress: number, visibility: number, crash: number) {
+        let copilots = 0;
         for (let cp of this.positions) {
-            cp.CrewUpdate(escape, controlstress, rumblestress, visibility, crash);
+            if (cp.IsCopilot()) {
+                copilots += 1;
+            }
+        }
+        for (let cp of this.positions) {
+            cp.CrewUpdate(escape, controlstress, rumblestress, copilots, visibility, crash);
         }
     }
 

@@ -1630,11 +1630,12 @@ class Cockpit extends Part {
         this.selected_upgrades = [...Array(this.upgrades.length).fill(false)];
         this.selected_safety = [...Array(this.safety.length).fill(false)];
         this.selected_gunsights = [...Array(this.gunsights.length).fill(false)];
-        this.total_stress = 0;
+        this.total_stress = [0, 0];
         this.total_escape = 0;
         this.total_visibility = 0;
         this.is_primary = false;
         this.bombsight = 0;
+        this.is_armed = false;
     }
     toJSON() {
         return {
@@ -1780,6 +1781,27 @@ class Cockpit extends Part {
     IsElectrics() {
         return this.stats.charge != 0;
     }
+    IsCopilot() {
+        return this.selected_upgrades[0];
+    }
+    SetArmed(is) {
+        this.is_armed = is;
+    }
+    GetName() {
+        if (this.is_primary) {
+            return "Pilot";
+        }
+        if (this.bombsight > 0) {
+            return "Bombadier";
+        }
+        if (this.IsCopilot()) {
+            return "Co-Pilot";
+        }
+        if (this.is_armed) {
+            return "Gunner";
+        }
+        return "Aircrew";
+    }
     PartStats() {
         var stats = new Stats();
         stats.reqsections = 1;
@@ -1814,18 +1836,25 @@ class Cockpit extends Part {
         }
         return stats;
     }
-    CrewUpdate(escape, controlstress, rumblestress, visibility, crash) {
+    CrewUpdate(escape, controlstress, rumblestress, copilots, visibility, crash) {
         this.total_escape = this.stats.escape + escape;
-        this.total_stress = this.stats.flightstress;
+        let ncp_stress = this.stats.flightstress;
+        let cp_stress = this.stats.flightstress;
         if (this.is_primary || this.selected_upgrades[0]) {
-            this.total_stress += controlstress;
+            ncp_stress += controlstress;
+            cp_stress += controlstress - copilots * 2;
         }
-        this.total_stress = Math.max(0, this.total_stress);
-        this.total_stress += rumblestress;
+        ncp_stress = Math.max(0, ncp_stress);
+        cp_stress = Math.max(0, cp_stress);
+        ncp_stress += rumblestress;
+        cp_stress += rumblestress;
         if (this.IsOpen() && this.has_rotary) { //Is open and has rotary
-            this.total_stress += 1;
+            ncp_stress += 1;
+            cp_stress += 1;
         }
-        this.total_stress = Math.max(0, this.total_stress);
+        ncp_stress = Math.max(0, ncp_stress);
+        cp_stress = Math.max(0, cp_stress);
+        this.total_stress = [ncp_stress, cp_stress];
         this.total_visibility = this.stats.visibility + visibility;
         this.total_crash = this.stats.crashsafety + crash;
     }
@@ -1989,9 +2018,20 @@ class Cockpits extends Part {
         s.crashsafety = 0;
         return s;
     }
+    SetArmed(armed) {
+        for (let i = 0; i < this.positions.length; i++) {
+            this.positions[i].SetArmed(armed[i]);
+        }
+    }
     UpdateCrewStats(escape, controlstress, rumblestress, visibility, crash) {
+        let copilots = 0;
         for (let cp of this.positions) {
-            cp.CrewUpdate(escape, controlstress, rumblestress, visibility, crash);
+            if (cp.IsCopilot()) {
+                copilots += 1;
+            }
+        }
+        for (let cp of this.positions) {
+            cp.CrewUpdate(escape, controlstress, rumblestress, copilots, visibility, crash);
         }
     }
     SetCalculateStats(callback) {
@@ -2362,7 +2402,7 @@ class Engine extends Part {
         return this.etype_stats.Clone();
     }
     NeedCooling() {
-        return this.cooling_count > 0;
+        return this.etype_stats.stats.cooling > 0;
     }
     WarnCoolingReliability() {
         return (this.cooling_count < this.etype_stats.stats.cooling);
@@ -2372,6 +2412,9 @@ class Engine extends Part {
             num = 0;
         num = Math.floor(1.0e-6 + num);
         this.cooling_count = num;
+        if (this.NeedCooling()) {
+            this.cooling_count = Math.max(1, this.cooling_count);
+        }
         this.CalculateStats();
     }
     GetCooling() {
@@ -10084,7 +10127,13 @@ class Cockpit_HTML extends Display {
         BlinkIfChanged(this.d_cont, stats.control.toString(), true);
         BlinkIfChanged(this.d_rseq, stats.reqsections.toString(), false);
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
-        BlinkIfChanged(this.d_strs, this.cockpit.GetFlightStress().toString(), true);
+        var fs = this.cockpit.GetFlightStress();
+        if (fs[0] != fs[1]) {
+            BlinkIfChanged(this.d_strs, StringFmt.Format("{0} ({1})", fs[0], fs[1]));
+        }
+        else {
+            BlinkIfChanged(this.d_strs, StringFmt.Format("{0}", fs[0]));
+        }
         BlinkIfChanged(this.d_escp, this.cockpit.GetEscape().toString(), true);
         BlinkIfChanged(this.d_visi, this.cockpit.GetVisibility().toString(), true);
         this.sel_type.selectedIndex = this.cockpit.GetType();
