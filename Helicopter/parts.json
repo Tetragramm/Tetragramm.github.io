@@ -1,5 +1,5 @@
 {
-    "version": "11.7",
+    "version": "11.8",
     "era": {
         "options": [
             {
@@ -509,7 +509,7 @@
                 "name": "Freon",
                 "era": "Coming Storm",
                 "warning": "Freon Warning",
-                "reliability": 1,
+                "reliability": 4,
                 "harden": false,
                 "cost": 3,
                 "flammable": false
@@ -518,7 +518,7 @@
                 "name": "Ammonia",
                 "era": "Pioneer",
                 "warning": "Ammonia Warning",
-                "reliability": 1,
+                "reliability": 4,
                 "harden": false,
                 "cost": 2,
                 "flammable": false

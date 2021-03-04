@@ -24,7 +24,7 @@ class Weapons extends Part {
     private projectile_list = [
         { name: "Standard" },
         { name: "Heat Ray" },
-        { name: "Gyrojets" },
+        // { name: "Gyrojets" },
         { name: "Pneumatic" },
     ];
     private brace_count: number;
@@ -173,18 +173,6 @@ class Weapons extends Part {
         return this.weapon_sets;
     }
 
-    private CountFreelyAccessible() {
-        var count = 0;
-        for (let ws of this.weapon_sets) {
-            var wlist = ws.GetWeapons();
-            for (let w of wlist) {
-                if (w.GetFreeAccessible())
-                    count++;
-            }
-        }
-        return count;
-    }
-
     private CountTractorSpinner() {
         var count = 0;
         for (let ws of this.weapon_sets) {
@@ -239,18 +227,6 @@ class Weapons extends Part {
             }
         }
         return count;
-    }
-
-    private RemoveOneFreelyAccessible() {
-        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
-            var wlist = this.weapon_sets[i].GetWeapons();
-            for (let j = wlist.length - 1; j >= 0; j--) {
-                if (wlist[j].GetFreeAccessible()) {
-                    wlist[j].SetFreeAccessible(false);
-                    return;
-                }
-            }
-        }
     }
 
     private CleanFreelyAccessible() {

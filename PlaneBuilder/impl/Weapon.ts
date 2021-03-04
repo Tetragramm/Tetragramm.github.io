@@ -13,9 +13,9 @@ enum SynchronizationType {
 enum ProjectileType {
     BULLETS,
     HEATRAY,
-    GYROJETS,
     PNEUMATIC,
-    ENUM_MAX
+    ENUM_MAX,
+    GYROJETS,
 }
 enum ActionType {
     STANDARD,

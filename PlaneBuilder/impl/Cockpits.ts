@@ -193,7 +193,6 @@ class Cockpits extends Part {
             }
         }
         for (let cp of this.positions) {
-            console.log([controlstress, rumblestress, copilots]);
             cp.CrewUpdate(escape, controlstress, rumblestress, copilots, visibility, crash);
         }
     }

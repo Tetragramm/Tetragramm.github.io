@@ -2037,7 +2037,6 @@ class Cockpits extends Part {
             }
         }
         for (let cp of this.positions) {
-            console.log([controlstress, rumblestress, copilots]);
             cp.CrewUpdate(escape, controlstress, rumblestress, copilots, visibility, crash);
         }
     }
@@ -6938,9 +6937,9 @@ var ProjectileType;
 (function (ProjectileType) {
     ProjectileType[ProjectileType["BULLETS"] = 0] = "BULLETS";
     ProjectileType[ProjectileType["HEATRAY"] = 1] = "HEATRAY";
-    ProjectileType[ProjectileType["GYROJETS"] = 2] = "GYROJETS";
-    ProjectileType[ProjectileType["PNEUMATIC"] = 3] = "PNEUMATIC";
-    ProjectileType[ProjectileType["ENUM_MAX"] = 4] = "ENUM_MAX";
+    ProjectileType[ProjectileType["PNEUMATIC"] = 2] = "PNEUMATIC";
+    ProjectileType[ProjectileType["ENUM_MAX"] = 3] = "ENUM_MAX";
+    ProjectileType[ProjectileType["GYROJETS"] = 4] = "GYROJETS";
 })(ProjectileType || (ProjectileType = {}));
 var ActionType;
 (function (ActionType) {
@@ -7411,6 +7410,15 @@ class WeaponSystem extends Part {
             this.action_sel = js["action"];
             this.projectile_sel = js["projectile"];
         }
+        if (json_version < 11.75) {
+            console.log("Projectile " + this.projectile_sel.toString());
+            if (this.projectile_sel == ProjectileType.PNEUMATIC) {
+                this.projectile_sel = ProjectileType.BULLETS;
+            }
+            else if (this.projectile_sel == ProjectileType.ENUM_MAX) {
+                this.projectile_sel = ProjectileType.PNEUMATIC;
+            }
+        }
         this.MakeFinalWeapon();
         for (let elem of js["weapons"]) {
             var w = new Weapon(this.final_weapon, this.action_sel, this.projectile_sel, this.fixed);
@@ -7475,6 +7483,14 @@ class WeaponSystem extends Part {
         else {
             this.action_sel = d.GetNum();
             this.projectile_sel = d.GetNum();
+        }
+        if (d.version < 10.75) {
+            if (this.projectile_sel == ProjectileType.PNEUMATIC) {
+                this.projectile_sel = ProjectileType.BULLETS;
+            }
+            else if (this.projectile_sel == ProjectileType.ENUM_MAX) {
+                this.projectile_sel = ProjectileType.PNEUMATIC;
+            }
         }
         //Repeating has been moved from Weapon to WeaponSystem
         if (d.version < 10.95) {
@@ -7935,7 +7951,7 @@ class WeaponSystem extends Part {
     GetCanProjectile() {
         return [true,
             this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.weapon_list[this.weapon_type].hits > 0,
-            this.final_weapon.can_projectile && this.weapon_list[this.weapon_type].hits > 0,
+            // this.final_weapon.can_projectile && this.weapon_list[this.weapon_type].hits > 0,
             this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY];
     }
     GetProjectile() {
@@ -8086,7 +8102,7 @@ class Weapons extends Part {
         this.projectile_list = [
             { name: "Standard" },
             { name: "Heat Ray" },
-            { name: "Gyrojets" },
+            // { name: "Gyrojets" },
             { name: "Pneumatic" },
         ];
         this.weapon_list = [];
@@ -8208,17 +8224,6 @@ class Weapons extends Part {
     GetWeaponSets() {
         return this.weapon_sets;
     }
-    CountFreelyAccessible() {
-        var count = 0;
-        for (let ws of this.weapon_sets) {
-            var wlist = ws.GetWeapons();
-            for (let w of wlist) {
-                if (w.GetFreeAccessible())
-                    count++;
-            }
-        }
-        return count;
-    }
     CountTractorSpinner() {
         var count = 0;
         for (let ws of this.weapon_sets) {
@@ -8270,17 +8275,6 @@ class Weapons extends Part {
             }
         }
         return count;
-    }
-    RemoveOneFreelyAccessible() {
-        for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
-            var wlist = this.weapon_sets[i].GetWeapons();
-            for (let j = wlist.length - 1; j >= 0; j--) {
-                if (wlist[j].GetFreeAccessible()) {
-                    wlist[j].SetFreeAccessible(false);
-                    return;
-                }
-            }
-        }
     }
     CleanFreelyAccessible() {
         var has_fa = Array(this.cockpit_count).fill(false);
@@ -11260,11 +11254,11 @@ class Wings_HTML extends Display {
         var h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, lu("Stat Cost"));
         CreateTH(h4_row, lu("Stat Visibility"));
-        CreateTH(h4_row, "");
+        CreateTH(h4_row, lu("Stat Charge"));
         var c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
         this.d_visi = c4_row.insertCell();
-        c4_row.insertCell();
+        this.d_chrg = c4_row.insertCell();
         var h5_row = tbl_stat.insertRow();
         CreateTH(h5_row, "");
         CreateTH(h5_row, lu("Wings Sesquiplane"));
@@ -11320,6 +11314,7 @@ class Wings_HTML extends Display {
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_chrg, stats.charge.toString(), true);
         if (this.wings.GetIsSesquiplane().is)
             BlinkIfChanged(this.d_sesq, lu("Yes"));
         else

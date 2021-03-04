@@ -35,6 +35,7 @@ class Wings_HTML extends Display {
     private d_cost: HTMLTableCellElement;
     private d_visi: HTMLTableCellElement;
     private d_flam: HTMLTableCellElement;
+    private d_chrg: HTMLTableCellElement;
 
     constructor(w: Wings) {
         super();
@@ -113,11 +114,11 @@ class Wings_HTML extends Display {
         var h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, lu("Stat Cost"));
         CreateTH(h4_row, lu("Stat Visibility"));
-        CreateTH(h4_row, "");
+        CreateTH(h4_row, lu("Stat Charge"));
         var c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
         this.d_visi = c4_row.insertCell();
-        c4_row.insertCell();
+        this.d_chrg = c4_row.insertCell();
         var h5_row = tbl_stat.insertRow();
         CreateTH(h5_row, "");
         CreateTH(h5_row, lu("Wings Sesquiplane"));
@@ -179,6 +180,7 @@ class Wings_HTML extends Display {
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
+        BlinkIfChanged(this.d_chrg, stats.charge.toString(), true);
         if (this.wings.GetIsSesquiplane().is)
             BlinkIfChanged(this.d_sesq, lu("Yes"));
         else
