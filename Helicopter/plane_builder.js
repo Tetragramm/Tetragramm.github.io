@@ -12628,6 +12628,17 @@ class Weapons_HTML extends Display {
     UpdateWSet(set, disp) {
         disp.type.selectedIndex = set.GetWeaponSelected();
         disp.type.onchange = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
+        var slist = this.weap.GetSeatList();
+        if (disp.seat.options.length != slist.length) {
+            while (disp.seat.options.length > 0) {
+                disp.seat.options.remove(0);
+            }
+            for (let s of slist) {
+                let opt = document.createElement("OPTION");
+                opt.text = s;
+                disp.seat.add(opt);
+            }
+        }
         disp.seat.selectedIndex = set.GetSeat();
         disp.seat.onchange = () => { set.SetSeat(disp.seat.selectedIndex); };
         disp.count.valueAsNumber = set.GetMountingCount();
