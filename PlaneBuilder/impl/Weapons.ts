@@ -410,6 +410,14 @@ class Weapons extends Part {
         return lst;
     }
 
+    public GetArmedSeats() {
+        var lst = Array(this.cockpit_count).fill(false);
+        for (let ws of this.weapon_sets) {
+            lst[ws.GetSeat()] = true;
+        }
+        return lst;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)

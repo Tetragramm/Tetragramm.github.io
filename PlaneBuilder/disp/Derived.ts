@@ -321,16 +321,16 @@ class Derived_HTML {
         this.landing_cell.textContent = acft.GetGearName();
         this.maxalt_cell.textContent = acft.GetMinIAF().toString() + "-" + acft.GetMaxAltitude().toString();
 
-        this.reliability_cell.textContent = this.Array2Str(acft.GetReliabilityList());
+        this.reliability_cell.textContent = StringFmt.Join(", ", acft.GetReliabilityList());
         this.toughness_cell.textContent = derived.Toughness.toString();
         this.mxstrain_cell.textContent = derived.MaxStrain.toString();
-        this.escape_cell.textContent = this.Array2Str(acft.GetEscapeList());
+        this.escape_cell.textContent = StringFmt.Join(", ", acft.GetEscapeList());
         this.crashsafety_cell.textContent = stats.crashsafety.toString();
 
         this.crew_cell.textContent = acft.GetCockpits().GetNumberOfCockpits().toString() + "/" + (acft.GetPassengers().GetSeats() + acft.GetPassengers().GetBeds()).toString();
-        this.flightstress_cell.textContent = this.Array2Str(acft.GetStressList());
-        this.visibility_cell.textContent = this.Array2Str(acft.GetVisibilityList());
-        this.attack_cell.textContent = this.Array2Str(acft.GetAttackList());
+        this.flightstress_cell.textContent = this.Stress2Str(acft.GetStressList());
+        this.visibility_cell.textContent = StringFmt.Join(", ", acft.GetVisibilityList());
+        this.attack_cell.textContent = StringFmt.Join(", ", acft.GetAttackList());
         this.communications_cell.textContent = acft.GetCommunicationName();
         var wm = acft.GetAccessories().GetWindmill();
         var bat = acft.GetAccessories().GetStorage();
@@ -358,9 +358,9 @@ class Derived_HTML {
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0)
-                weaphtml += (int_bomb.toString() + lu(" Bomb Mass Internally."));
+                weaphtml += lu(" Bomb Mass Internally.", int_bomb);
             if (ext_bomb > 0)
-                weaphtml += (ext_bomb.toString() + lu(" Bomb Mass Externally."));
+                weaphtml += lu(" Bomb Mass Externally.", ext_bomb);
             if (int_bomb > 0) {
                 var mib = Math.min(int_bomb, acft.GetMunitions().GetMaxBombSize());
                 weaphtml += (lu("Largest Internal Bomb", mib.toString()));
@@ -372,9 +372,9 @@ class Derived_HTML {
             var int_rock = Math.min(rockets, internal);
             var ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0)
-                weaphtml += (int_rock.toString() + lu(" Rocket Mass Internally."));
+                weaphtml += lu(" Rocket Mass Internally.", int_rock);
             if (ext_rock > 0)
-                weaphtml += (ext_rock.toString() + lu(" Rocket Mass Externally."));
+                weaphtml += lu(" Rocket Mass Externally.", ext_rock);
             weaphtml += "<br/>";
         }
 
@@ -403,6 +403,7 @@ class Derived_HTML {
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
                 weaphtml += lu("Weapon Description Heat Ray",
+                    lu("Seat #", w.GetSeat()),
                     w.GetWeaponCount(),
                     this.WeaponName(acft, w),
                     StringFmt.Join(" ", dirs),
@@ -413,6 +414,7 @@ class Derived_HTML {
                 );
             } else {
                 weaphtml += lu("Weapon Description",
+                    lu("Seat #", w.GetSeat()),
                     w.GetWeaponCount(),
                     this.WeaponName(acft, w),
                     StringFmt.Join(" ", dirs),
@@ -480,13 +482,23 @@ class Derived_HTML {
         this.show_bombs = set;
     }
 
-    private Array2Str(arr: any[]) {
+    private Stress2Str(arr: any[]) {
         var str = "";
         for (let i = 0; i < arr.length - 1; i++) {
-            str += arr[i].toString() + ", ";
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + "), ";
+            } else {
+                str += arr[i][0].toString() + ", ";
+            }
         }
-        if (arr.length > 0)
-            str += arr[arr.length - 1].toString();
+        if (arr.length > 0) {
+            var i = arr.length - 1;
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + ")";
+            } else {
+                str += arr[i][0].toString();
+            }
+        }
 
         return str;
     }

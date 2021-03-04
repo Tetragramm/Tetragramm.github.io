@@ -1789,18 +1789,18 @@ class Cockpit extends Part {
     }
     GetName() {
         if (this.is_primary) {
-            return "Pilot";
+            return "Crew Pilot";
         }
         if (this.bombsight > 0) {
-            return "Bombadier";
+            return "Crew Bombadier";
         }
         if (this.IsCopilot()) {
-            return "Co-Pilot";
+            return "Crew Co-Pilot";
         }
         if (this.is_armed) {
-            return "Gunner";
+            return "Crew Gunner";
         }
-        return "Aircrew";
+        return "Crew Aircrew";
     }
     PartStats() {
         var stats = new Stats();
@@ -1824,6 +1824,12 @@ class Cockpit extends Part {
                 source: lu("Bombsight"),
                 warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2")
             });
+            if (this.IsCopilot()) {
+                stats.warnings.push({
+                    source: lu("Bombadier Controls"),
+                    warning: lu("Bombadier Controls Warning"),
+                });
+            }
         }
         this.stats = stats.Clone();
         //Special stuff for co-pilot controls
@@ -8414,6 +8420,13 @@ class Weapons extends Part {
         }
         return lst;
     }
+    GetArmedSeats() {
+        var lst = Array(this.cockpit_count).fill(false);
+        for (let ws of this.weapon_sets) {
+            lst[ws.GetSeat()] = true;
+        }
+        return lst;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let set of this.weapon_sets)
@@ -9267,6 +9280,7 @@ class Aircraft {
             //Used: sticky_guns  (Just needs to happen before display)
             this.weapons.SetStickyGuns(this.used.sticky_guns);
             //Update Part Local stuff
+            this.cockpits.SetArmed(this.weapons.GetArmedSeats());
             this.cockpits.UpdateCrewStats(this.stats.escape, derived.ControlStress, derived.RumbleStress, this.stats.visibility, this.stats.crashsafety);
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
@@ -9437,7 +9451,7 @@ class Aircraft {
         if (this.stats.flightstress != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls"); }) == -1) {
             this.stats.warnings.push({
                 source: lu("Co-Pilot Controls"),
-                warning: lu("Co-Pilot Warning", -this.stats.flightstress / 2, Math.min(ControlStress, -this.stats.flightstress))
+                warning: lu("Co-Pilot Warning", Math.min(ControlStress, -this.stats.flightstress))
             });
         }
         if (this.engines.GetMaxRumble() > 0) {
@@ -9497,7 +9511,7 @@ class Aircraft {
         var vital = [];
         vital.push(lu("Vital Part Controls"));
         for (let i = 0; i < this.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push(lu("Vital Part Aircrew", i + 1));
+            vital.push(lu("Seat #", i + 1) + ": " + lu(this.GetCockpits().GetCockpit(i).GetName()));
         }
         if (derived.FuelUses > 0) {
             vital.push(lu("Vital Part Fuel Tanks"));
@@ -12959,15 +12973,15 @@ class Derived_HTML {
         //Turn bleed done in bomb mass section because affected by it.
         this.landing_cell.textContent = acft.GetGearName();
         this.maxalt_cell.textContent = acft.GetMinIAF().toString() + "-" + acft.GetMaxAltitude().toString();
-        this.reliability_cell.textContent = this.Array2Str(acft.GetReliabilityList());
+        this.reliability_cell.textContent = StringFmt.Join(", ", acft.GetReliabilityList());
         this.toughness_cell.textContent = derived.Toughness.toString();
         this.mxstrain_cell.textContent = derived.MaxStrain.toString();
-        this.escape_cell.textContent = this.Array2Str(acft.GetEscapeList());
+        this.escape_cell.textContent = StringFmt.Join(", ", acft.GetEscapeList());
         this.crashsafety_cell.textContent = stats.crashsafety.toString();
         this.crew_cell.textContent = acft.GetCockpits().GetNumberOfCockpits().toString() + "/" + (acft.GetPassengers().GetSeats() + acft.GetPassengers().GetBeds()).toString();
-        this.flightstress_cell.textContent = this.Array2Str(acft.GetStressList());
-        this.visibility_cell.textContent = this.Array2Str(acft.GetVisibilityList());
-        this.attack_cell.textContent = this.Array2Str(acft.GetAttackList());
+        this.flightstress_cell.textContent = this.Stress2Str(acft.GetStressList());
+        this.visibility_cell.textContent = StringFmt.Join(", ", acft.GetVisibilityList());
+        this.attack_cell.textContent = StringFmt.Join(", ", acft.GetAttackList());
         this.communications_cell.textContent = acft.GetCommunicationName();
         var wm = acft.GetAccessories().GetWindmill();
         var bat = acft.GetAccessories().GetStorage();
@@ -12993,9 +13007,9 @@ class Derived_HTML {
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0)
-                weaphtml += (int_bomb.toString() + lu(" Bomb Mass Internally."));
+                weaphtml += lu(" Bomb Mass Internally.", int_bomb);
             if (ext_bomb > 0)
-                weaphtml += (ext_bomb.toString() + lu(" Bomb Mass Externally."));
+                weaphtml += lu(" Bomb Mass Externally.", ext_bomb);
             if (int_bomb > 0) {
                 var mib = Math.min(int_bomb, acft.GetMunitions().GetMaxBombSize());
                 weaphtml += (lu("Largest Internal Bomb", mib.toString()));
@@ -13007,9 +13021,9 @@ class Derived_HTML {
             var int_rock = Math.min(rockets, internal);
             var ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0)
-                weaphtml += (int_rock.toString() + lu(" Rocket Mass Internally."));
+                weaphtml += lu(" Rocket Mass Internally.", int_rock);
             if (ext_rock > 0)
-                weaphtml += (ext_rock.toString() + lu(" Rocket Mass Externally."));
+                weaphtml += lu(" Rocket Mass Externally.", ext_rock);
             weaphtml += "<br/>";
         }
         for (let w of acft.GetWeapons().GetWeaponSets()) {
@@ -13035,10 +13049,10 @@ class Derived_HTML {
             }
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
-                weaphtml += lu("Weapon Description Heat Ray", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
+                weaphtml += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat()), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
             }
             else {
-                weaphtml += lu("Weapon Description", w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), w.GetShots(), StringFmt.Join(", ", tags));
+                weaphtml += lu("Weapon Description", lu("Seat #", w.GetSeat()), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), w.GetShots(), StringFmt.Join(", ", tags));
             }
             weaphtml += "<br\>";
         }
@@ -13094,13 +13108,25 @@ class Derived_HTML {
     SetShowBombs(set) {
         this.show_bombs = set;
     }
-    Array2Str(arr) {
+    Stress2Str(arr) {
         var str = "";
         for (let i = 0; i < arr.length - 1; i++) {
-            str += arr[i].toString() + ", ";
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + "), ";
+            }
+            else {
+                str += arr[i][0].toString() + ", ";
+            }
         }
-        if (arr.length > 0)
-            str += arr[arr.length - 1].toString();
+        if (arr.length > 0) {
+            var i = arr.length - 1;
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + ")";
+            }
+            else {
+                str += arr[i][0].toString();
+            }
+        }
         return str;
     }
 }

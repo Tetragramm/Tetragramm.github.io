@@ -225,18 +225,18 @@ class Cockpit extends Part {
 
     public GetName() {
         if (this.is_primary) {
-            return "Pilot";
+            return "Crew Pilot";
         }
         if (this.bombsight > 0) {
-            return "Bombadier";
+            return "Crew Bombadier";
         }
         if (this.IsCopilot()) {
-            return "Co-Pilot";
+            return "Crew Co-Pilot";
         }
         if (this.is_armed) {
-            return "Gunner";
+            return "Crew Gunner";
         }
-        return "Aircrew";
+        return "Crew Aircrew";
     }
 
     public PartStats(): Stats {
@@ -266,6 +266,12 @@ class Cockpit extends Part {
                 source: lu("Bombsight"),
                 warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2")
             });
+            if (this.IsCopilot()) {
+                stats.warnings.push({
+                    source: lu("Bombadier Controls"),
+                    warning: lu("Bombadier Controls Warning"),
+                });
+            }
         }
 
         this.stats = stats.Clone();

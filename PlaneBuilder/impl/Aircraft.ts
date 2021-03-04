@@ -457,6 +457,7 @@ class Aircraft {
             this.weapons.SetStickyGuns(this.used.sticky_guns);
 
             //Update Part Local stuff
+            this.cockpits.SetArmed(this.weapons.GetArmedSeats());
             this.cockpits.UpdateCrewStats(this.stats.escape, derived.ControlStress, derived.RumbleStress, this.stats.visibility, this.stats.crashsafety);
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
@@ -646,7 +647,7 @@ class Aircraft {
         if (this.stats.flightstress != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls") }) == -1) {
             this.stats.warnings.push({
                 source: lu("Co-Pilot Controls"),
-                warning: lu("Co-Pilot Warning", -this.stats.flightstress / 2, Math.min(ControlStress, -this.stats.flightstress))
+                warning: lu("Co-Pilot Warning", Math.min(ControlStress, -this.stats.flightstress))
             });
         }
 
@@ -711,7 +712,7 @@ class Aircraft {
         var vital = [];
         vital.push(lu("Vital Part Controls"));
         for (let i = 0; i < this.GetCockpits().GetNumberOfCockpits(); i++) {
-            vital.push(lu("Vital Part Aircrew", i + 1));
+            vital.push(lu("Seat #", i + 1) + ": " + lu(this.GetCockpits().GetCockpit(i).GetName()));
         }
         if (derived.FuelUses > 0) {
             vital.push(lu("Vital Part Fuel Tanks"));
