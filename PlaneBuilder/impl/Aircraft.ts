@@ -459,6 +459,18 @@ class Aircraft {
             //Update Part Local stuff
             this.cockpits.SetArmed(this.weapons.GetArmedSeats());
             this.cockpits.UpdateCrewStats(this.stats.escape, derived.ControlStress, derived.RumbleStress, this.stats.visibility, this.stats.crashsafety);
+            //Check Flight Stress for warnings
+            let stress_reduction = 0;
+            for (let s of this.cockpits.GetStressList()) {
+                stress_reduction = Math.max(stress_reduction, s[0] - s[1]);
+            }
+            if (stress_reduction != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls") }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Co-Pilot Controls"),
+                    warning: lu("Co-Pilot Warning", stress_reduction)
+                });
+            }
+
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
@@ -644,12 +656,6 @@ class Aircraft {
         ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
         var MaxStress = this.accessories.GetMaxTotalStress();
         ControlStress = Math.min(MaxStress, ControlStress);
-        if (this.stats.flightstress != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls") }) == -1) {
-            this.stats.warnings.push({
-                source: lu("Co-Pilot Controls"),
-                warning: lu("Co-Pilot Warning", Math.min(ControlStress, -this.stats.flightstress))
-            });
-        }
 
         if (this.engines.GetMaxRumble() > 0) {
             RumbleStress += Math.max(1, this.engines.GetMaxRumble());

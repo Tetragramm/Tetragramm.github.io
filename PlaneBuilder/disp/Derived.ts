@@ -403,7 +403,7 @@ class Derived_HTML {
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
                 weaphtml += lu("Weapon Description Heat Ray",
-                    lu("Seat #", w.GetSeat()),
+                    lu("Seat #", w.GetSeat() + 1),
                     w.GetWeaponCount(),
                     this.WeaponName(acft, w),
                     StringFmt.Join(" ", dirs),
@@ -414,7 +414,7 @@ class Derived_HTML {
                 );
             } else {
                 weaphtml += lu("Weapon Description",
-                    lu("Seat #", w.GetSeat()),
+                    lu("Seat #", w.GetSeat() + 1),
                     w.GetWeaponCount(),
                     this.WeaponName(acft, w),
                     StringFmt.Join(" ", dirs),

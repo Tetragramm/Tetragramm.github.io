@@ -2037,6 +2037,7 @@ class Cockpits extends Part {
             }
         }
         for (let cp of this.positions) {
+            console.log([controlstress, rumblestress, copilots]);
             cp.CrewUpdate(escape, controlstress, rumblestress, copilots, visibility, crash);
         }
     }
@@ -9282,6 +9283,17 @@ class Aircraft {
             //Update Part Local stuff
             this.cockpits.SetArmed(this.weapons.GetArmedSeats());
             this.cockpits.UpdateCrewStats(this.stats.escape, derived.ControlStress, derived.RumbleStress, this.stats.visibility, this.stats.crashsafety);
+            //Check Flight Stress for warnings
+            let stress_reduction = 0;
+            for (let s of this.cockpits.GetStressList()) {
+                stress_reduction = Math.max(stress_reduction, s[0] - s[1]);
+            }
+            if (stress_reduction != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Co-Pilot Controls"),
+                    warning: lu("Co-Pilot Warning", stress_reduction)
+                });
+            }
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
@@ -9448,12 +9460,6 @@ class Aircraft {
         ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
         var MaxStress = this.accessories.GetMaxTotalStress();
         ControlStress = Math.min(MaxStress, ControlStress);
-        if (this.stats.flightstress != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls"); }) == -1) {
-            this.stats.warnings.push({
-                source: lu("Co-Pilot Controls"),
-                warning: lu("Co-Pilot Warning", Math.min(ControlStress, -this.stats.flightstress))
-            });
-        }
         if (this.engines.GetMaxRumble() > 0) {
             RumbleStress += Math.max(1, this.engines.GetMaxRumble());
             RumbleStress = Math.floor(1.0e-6 + RumbleStress);
@@ -10143,7 +10149,7 @@ class Cockpit_HTML extends Display {
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
         var fs = this.cockpit.GetFlightStress();
         if (fs[0] != fs[1]) {
-            BlinkIfChanged(this.d_strs, StringFmt.Format("{0} ({1})", fs[0], fs[1]));
+            BlinkIfChanged(this.d_strs, StringFmt.Format("{0}({1})", fs[0], fs[1]));
         }
         else {
             BlinkIfChanged(this.d_strs, StringFmt.Format("{0}", fs[0]));
@@ -13049,10 +13055,10 @@ class Derived_HTML {
             }
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
-                weaphtml += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat()), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
+                weaphtml += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
             }
             else {
-                weaphtml += lu("Weapon Description", lu("Seat #", w.GetSeat()), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), w.GetShots(), StringFmt.Join(", ", tags));
+                weaphtml += lu("Weapon Description", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), w.GetShots(), StringFmt.Join(", ", tags));
             }
             weaphtml += "<br\>";
         }
