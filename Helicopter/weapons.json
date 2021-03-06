@@ -375,7 +375,7 @@
             "reload": 1,
             "size": 2,
             "can_action": false,
-            "can_projectile": true,
+            "can_projectile": false,
             "warning": "Precision Rifle Warning",
             "deflection": 0
         },

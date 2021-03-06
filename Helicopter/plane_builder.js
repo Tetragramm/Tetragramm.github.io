@@ -7663,6 +7663,9 @@ class WeaponSystem extends Part {
         else if (!this.repeating && this.action_sel == ActionType.GAST) {
             this.action_sel = ActionType.STANDARD;
         }
+        if (!this.CanRepeating()) {
+            this.repeating = false;
+        }
         this.MakeFinalWeapon();
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
@@ -7681,7 +7684,9 @@ class WeaponSystem extends Part {
         this.CalculateStats();
     }
     CanRepeating() {
-        return (!this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0) && this.weapon_list[this.weapon_type].ammo > 0;
+        return (!this.weapon_list[this.weapon_type].rapid || this.weapon_list[this.weapon_type].reload > 0)
+            && this.weapon_list[this.weapon_type].ammo > 0
+            && this.weapon_list[this.weapon_type].name != "Precision Rifle";
     }
     GetRepeating() {
         return this.repeating;
