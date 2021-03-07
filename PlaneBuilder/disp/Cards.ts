@@ -103,11 +103,11 @@ class Cards {
         // this.weap_image.src = './Cards/Weapon.png';
 
         this.eng_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
-        this.eng_canvas.width = 483;
-        this.eng_canvas.height = 289;
+        this.eng_canvas.width = 600;
+        this.eng_canvas.height = 360;
         this.eng_image = document.getElementById("eng_img") as HTMLImageElement;
-        this.eng_image.width = 483;
-        this.eng_image.height = 289;
+        this.eng_image.width = 600;
+        this.eng_image.height = 360;
         // this.eng_image.src = './Cards/Engine.png';
 
         this.rad_canvas = document.createElement("CANVAS") as HTMLCanvasElement;
@@ -305,18 +305,19 @@ class Cards {
         context.fillText(str, 335, 558, 375);
 
 
-        context.font = "8px Balthazar";
+        context.font = "14px Balthazar";
+        var max_idx = 6;
         var idx = 1;
         for (let r = 0; r < this.acft_data.warnings.length; ++r) {
             if (this.acft_data.warnings[r].source == lu("Armour"))
                 continue;
             let str = this.acft_data.warnings[r].source + ": " + this.acft_data.warnings[r].warning;
-            if (idx == 9 && this.acft_data.warnings.length > r + 1) {
-                context.fillText(lu("Cards Too Many Warnings Warning"), 335, 673 + idx * 9, 375);
-            } else if (idx > 9) {
+            if (idx == max_idx && this.acft_data.warnings.length > r + 1) {
+                context.fillText(lu("Cards Too Many Warnings Warning"), 335, 673 + idx * 14, 370);
+            } else if (idx > max_idx) {
 
             } else {
-                context.fillText(str, 335, 673 + idx * 9, 375);
+                context.fillText(str, 335, 673 + idx * 14, 370);
             }
             idx++;
         }
@@ -338,7 +339,7 @@ class Cards {
         context.font = "15px Balthazar";
         var ammo = "";
         if (this.weap_data.reload > 0) {
-            ammo += lu("Cards Gun String",
+            ammo += lu("Cards Gun String Reload",
                 (this.weap_data.ammo / this.weap_data.reload).toString(),
                 this.weap_data.reload.toString());
             this.weap_data.tags.push(lu("Weapon Tag Reload", this.weap_data.reload.toString()));
@@ -384,10 +385,10 @@ class Cards {
         context.font = "18px Balthazar";
         context.fillStyle = "#000";
         context.strokeStyle = "#000";
-        context.fillText(this.eng_data.reliability.toString(), 190, 62, 90);
+        context.fillText(this.eng_data.reliability.toString(), 235, 75, 110);
         var alt_string = this.eng_data.min_IAF.toString() + "-" + (this.eng_data.min_IAF + this.eng_data.altitude).toString();
-        context.fillText(alt_string, 280, 62, 90);
-        context.fillText(this.eng_data.overspeed.toString(), 370, 62, 90);
+        context.fillText(alt_string, 347, 75, 110);
+        context.fillText(this.eng_data.overspeed.toString(), 480, 75, 110);
 
         var note_str = "";
         for (let i = 0; i < this.eng_data.notes.length; i++) {
@@ -395,17 +396,17 @@ class Cards {
                 note_str += ", ";
             note_str += this.eng_data.notes[i];
         }
-        context.fillText(note_str, 280, 84, 270);
+        context.fillText(note_str, 365, 105, 306);
 
         if (this.eng_data.radiator >= 0) {
-            context.fillText(lu("Cards Uses Radiator", this.eng_data.radiator + 1), 109, 280, 270);
+            context.fillText(lu("Cards Uses Radiator", this.eng_data.radiator + 1), 109, 340, 270);
         }
 
         context.textAlign = "right";
-        context.font = "25px Balthazar";
+        context.font = "30px Balthazar";
         context.fillStyle = "#fff";
         context.strokeStyle = "#fff";
-        context.fillText("#" + engine_num.toString(), 37, 56, 35);
+        context.fillText("#" + engine_num.toString(), 37, 67, 35);
 
         this.download(this.name + "_Engine_" + engine_num.toString(), this.eng_canvas);
     }
