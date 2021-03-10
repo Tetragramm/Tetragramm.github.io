@@ -172,7 +172,7 @@
         "Drogue Chute": "Drogue Chute",
         "Drogue Chute Warning": "Activate once per flight to: Give +3 to Go Down or take down a close pursuer.",
         "Wing Blades": "Wing Blades",
-        "Wing Blades Warning": "Roll Dogfight! to use. 16+, enemy takes damage as per collision, user takes 1d10. 20+, user takes no damage.When used on a PC, use Evade Danger and Collision instead.",
+        "Wing Blades Warning": "Roll Dogfight! to use. 16+, enemy takes damage as per collision, user takes 1d10. 20+, user takes no damage. When used on a PC, use Evade Danger and Collision instead.",
         "Parallel Struts": "Parallel Struts",
         "N-Strut": "N-Strut",
         "V-Strut": "V-Strut",
@@ -693,6 +693,8 @@
         "Crew Bombadier": "Bombadier",
         "Crew Co-Pilot": "Co-Pilot",
         "Crew Gunner": "Gunner",
-        "Crew Aircrew": "Aircrew"
+        "Crew Aircrew": "Aircrew",
+        "Diesel": "Diesel Engine",
+        "Diesel Warning": "Engine won't catch fire."
     }
 }

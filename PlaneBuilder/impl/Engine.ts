@@ -811,6 +811,10 @@ class Engine extends Part {
                 || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull");
     }
 
+    public IsDiesel() {
+        return this.etype_inputs.upgrades[3];
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

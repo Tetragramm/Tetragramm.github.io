@@ -285,7 +285,15 @@ class Reinforcement extends Part {
     }
 
     public CanWingBlade() {
-        return this.cant_count[2] > 0;
+        for (let c of this.ext_wood_count) {
+            if (c > 0)
+                return false;
+        }
+        for (let c of this.ext_steel_count) {
+            if (c > 0)
+                return false;
+        }
+        return this.cabane_sel == 0 && this.cant_count[2] > 0;
     }
 
     public GetWingBlade() {
@@ -414,11 +422,11 @@ class Reinforcement extends Part {
         }
 
         //Wing Blades need Steel Cantilevers
-        if (this.cant_count[2] == 0) {
+        if (!this.CanWingBlade()) {
             this.wing_blades = false;
         } //So if we have them and are bladed...
         else if (this.wing_blades) {
-            stats.mass += this.cant_list[2].stats.mass * this.cant_count[2];
+            stats.mass *= 2;
             stats.warnings.push({
                 source: lu("Wing Blades"),
                 warning: lu("Wing Blades Warning"),

@@ -2817,6 +2817,9 @@ class Engine extends Part {
             (this.mount_list[this.selected_mount].name == "Tractor"
                 || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull");
     }
+    IsDiesel() {
+        return this.etype_inputs.upgrades[3];
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -3387,6 +3390,13 @@ class Engines extends Part {
         }
         return false;
     }
+    HasDiesel() {
+        for (let e of this.engines) {
+            if (e.IsDiesel())
+                return true;
+        }
+        return false;
+    }
     PartStats() {
         var stats = new Stats;
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
@@ -3411,14 +3421,14 @@ class Engines extends Part {
         //Asymmetric planes
         if (this.is_asymmetric)
             stats.latstab -= 3;
-        var is_pulsejet = false;
-        for (let en of this.engines) {
-            if (en.GetIsPulsejet())
-                is_pulsejet = true;
-        }
-        if (is_pulsejet) {
+        if (this.HasPulsejet()) {
             stats.warnings.push({
                 source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+            });
+        }
+        if (this.HasDiesel()) {
+            stats.warnings.push({
+                source: lu("Diesel"), warning: lu("Diesel Warning")
             });
         }
         var rotationT = 0;
@@ -5632,7 +5642,15 @@ class Reinforcement extends Part {
         this.cant_lift = use;
     }
     CanWingBlade() {
-        return this.cant_count[2] > 0;
+        for (let c of this.ext_wood_count) {
+            if (c > 0)
+                return false;
+        }
+        for (let c of this.ext_steel_count) {
+            if (c > 0)
+                return false;
+        }
+        return this.cabane_sel == 0 && this.cant_count[2] > 0;
     }
     GetWingBlade() {
         return this.wing_blades;
@@ -5745,11 +5763,11 @@ class Reinforcement extends Part {
             }
         }
         //Wing Blades need Steel Cantilevers
-        if (this.cant_count[2] == 0) {
+        if (!this.CanWingBlade()) {
             this.wing_blades = false;
         } //So if we have them and are bladed...
         else if (this.wing_blades) {
-            stats.mass += this.cant_list[2].stats.mass * this.cant_count[2];
+            stats.mass *= 2;
             stats.warnings.push({
                 source: lu("Wing Blades"),
                 warning: lu("Wing Blades Warning"),

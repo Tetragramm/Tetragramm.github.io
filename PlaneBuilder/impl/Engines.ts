@@ -383,6 +383,14 @@ class Engines extends Part {
         return false;
     }
 
+    public HasDiesel() {
+        for (let e of this.engines) {
+            if (e.IsDiesel())
+                return true;
+        }
+        return false;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
@@ -411,14 +419,14 @@ class Engines extends Part {
         if (this.is_asymmetric)
             stats.latstab -= 3;
 
-        var is_pulsejet = false;
-        for (let en of this.engines) {
-            if (en.GetIsPulsejet())
-                is_pulsejet = true;
-        }
-        if (is_pulsejet) {
+        if (this.HasPulsejet()) {
             stats.warnings.push({
                 source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+            });
+        }
+        if (this.HasDiesel()) {
+            stats.warnings.push({
+                source: lu("Diesel"), warning: lu("Diesel Warning")
             });
         }
 
