@@ -455,7 +455,7 @@
             "mass": 6,
             "drag": 4,
             "damage": 16,
-            "hits": 3,
+            "hits": 2,
             "ap": 2,
             "ammo": 5,
             "rapid": true,
