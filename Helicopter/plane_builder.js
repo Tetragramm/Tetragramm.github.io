@@ -3935,11 +3935,13 @@ class Frames extends Part {
             this.CalculateStats();
         }
     }
-    PossibleInternalBracing(convert = false) {
-        if (convert)
-            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length - 1;
-        else
-            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length;
+    PossibleInternalBracing(convert_sec_to_brace = false) {
+        var allowed = this.CountSections();
+        if (!this.farman)
+            allowed += this.tail_section_list.length;
+        if (convert_sec_to_brace)
+            allowed -= 1;
+        return this.CountInternalBracing() + 1 <= allowed;
     }
     PossibleGeodesic(num) {
         return this.frame_list[this.section_list[num].frame].geodesic && !this.section_list[num].monocoque;

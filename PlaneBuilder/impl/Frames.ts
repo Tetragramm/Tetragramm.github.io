@@ -387,11 +387,13 @@ class Frames extends Part {
         }
     }
 
-    public PossibleInternalBracing(convert: boolean = false) {
-        if (convert)
-            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length - 1;
-        else
-            return this.CountInternalBracing() + 1 <= this.CountSections() + this.tail_section_list.length;
+    public PossibleInternalBracing(convert_sec_to_brace: boolean = false) {
+        var allowed = this.CountSections();
+        if (!this.farman)
+            allowed += this.tail_section_list.length;
+        if (convert_sec_to_brace)
+            allowed -= 1;
+        return this.CountInternalBracing() + 1 <= allowed;
     }
 
     public PossibleGeodesic(num: number) {
