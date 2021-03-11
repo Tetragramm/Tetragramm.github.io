@@ -4207,6 +4207,7 @@ class Frames extends Part {
             stats.drag *= this.skin_list[this.sel_skin].dragfactor;
             stats.mass *= this.skin_list[this.sel_skin].massfactor;
             stats.visibility += this.tail_section_list.length;
+            tail_stats.mass = Math.floor(1.0e-6 + 0.5 * tail_stats.mass);
             //Apply factors before tail_stats
             stats = stats.Add(tail_stats);
         }
