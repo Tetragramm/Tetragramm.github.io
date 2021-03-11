@@ -258,7 +258,7 @@ class WeaponSystem extends Part {
             });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
-            this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
+            this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = true;
             this.final_weapon.stats.era.add({ name: lu("Mechanical Action"), era: lu("WWI") });
         } else if (this.action_sel == ActionType.GAST) {
