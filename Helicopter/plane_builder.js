@@ -2396,7 +2396,10 @@ class Engine extends Part {
     SetSelectedIndex(num) {
         this.etype_stats = engine_list.get(this.elist_idx).get_stats(num);
         this.etype_inputs = engine_list.get(this.elist_idx).get(num);
-        this.cooling_count = this.etype_stats.stats.cooling;
+        if (this.use_pp)
+            this.cooling_count = 2 * this.etype_stats.stats.cooling;
+        else
+            this.cooling_count = this.etype_stats.stats.cooling;
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
         this.CalculateStats();
@@ -2528,7 +2531,7 @@ class Engine extends Part {
             }
         }
         else {
-            this.cooling_count /= 2;
+            this.cooling_count = Math.floor(1.0e-6 + this.cooling_count / 2);
             if (this.mount_list[this.selected_mount].name == "Fuselage Push-Pull") {
                 this.selected_mount = 0;
             }
