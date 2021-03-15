@@ -79,3 +79,4 @@ const init = () => {
     });
 }
 window.onload = init;
+var enable_anim = false;

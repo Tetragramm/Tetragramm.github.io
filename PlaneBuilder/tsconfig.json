@@ -8,7 +8,8 @@
         "./EngineBuilder",
         "./WeaponDisplay",
         "./Standalone",
-        "./Hangar"
+        "./Hangar",
+        "./Helicopter"
     ],
     "include": [
         ".",

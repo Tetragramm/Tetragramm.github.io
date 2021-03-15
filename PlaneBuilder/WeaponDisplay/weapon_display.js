@@ -52,13 +52,13 @@ function CreateFlexSection(elem) {
 }
 function CreateTH(row, content) {
     var th = document.createElement("TH");
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
 function CreateTD(row, content) {
     var th = document.createElement("TD");
-    th.textContent = content;
+    th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
@@ -193,7 +193,11 @@ function FlexCheckbox(txt, inp, fs) {
     lbl.classList.add("flex-item");
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
-    fs.div2.appendChild(inp);
+    var lbl2 = document.createElement("LABEL");
+    var span = document.createElement("SPAN");
+    span.appendChild(lbl2);
+    span.appendChild(inp);
+    fs.div2.appendChild(span);
 }
 function FlexLabel(txt, div1) {
     var lbl = document.createElement("LABEL");
@@ -212,6 +216,16 @@ function FlexSpace(fs) {
     lbl2.textContent = " ";
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
+}
+function insertRow(frag) {
+    var row = document.createElement("TR");
+    frag.append(row);
+    return row;
+}
+function insertCell(frag) {
+    var cell = document.createElement("TD");
+    frag.append(cell);
+    return cell;
 }
 function BlinkBad(elem) {
     elem.classList.toggle("changed_b", false);
@@ -235,17 +249,19 @@ function BlinkNeutral(elem) {
     elem.classList.toggle("changed_n");
 }
 function BlinkIfChanged(elem, str, positive_good = null) {
-    if (elem.textContent != str) {
-        if (positive_good == null) {
-            BlinkNeutral(elem);
-        }
-        else {
-            var positive = parseInt(elem.textContent) < parseInt(str);
-            if (positive_good && positive || (!positive_good && !positive)) {
-                BlinkGood(elem);
+    if (enable_anim) {
+        if (elem.textContent != str) {
+            if (positive_good == null) {
+                BlinkNeutral(elem);
             }
             else {
-                BlinkBad(elem);
+                var positive = parseInt(elem.textContent) < parseInt(str);
+                if (positive_good && positive || (!positive_good && !positive)) {
+                    BlinkGood(elem);
+                }
+                else {
+                    BlinkBad(elem);
+                }
             }
         }
     }
@@ -357,3 +373,4 @@ const init = () => {
     });
 };
 window.onload = init;
+var enable_anim = false;
