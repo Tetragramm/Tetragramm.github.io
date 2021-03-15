@@ -855,6 +855,9 @@ class Engine extends Part {
             this.gp_count = Math.max(1, this.gp_count);
         }
         stats.cost += this.gp_count + this.gpr_count;
+        if (this.gpr_count > 0) {
+            stats.era.add({ name: "Reliable Gearing", era: "Roaring 20s" });
+        }
 
         //Extended Driveshafts
         if (this.use_ds) {
