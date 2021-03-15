@@ -2867,6 +2867,72 @@
                         false,
                         false
                     ]
+                },
+                {
+                    "name": "Braun UX 150hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 13.2,
+                    "compression": 4.3,
+                    "cyl_per_row": 2,
+                    "rows": 6,
+                    "RPM_boost": 1.23,
+                    "material_fudge": 1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Scholz Luch III 30hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 3.1,
+                    "compression": 4.5,
+                    "cyl_per_row": 3,
+                    "rows": 1,
+                    "RPM_boost": 1,
+                    "material_fudge": 1.1,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
+                },
+                {
+                    "name": "Scholz Luch VI 60hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 6.23,
+                    "compression": 4.5,
+                    "cyl_per_row": 3,
+                    "rows": 2,
+                    "RPM_boost": 1,
+                    "material_fudge": 1.1,
+                    "quality_fudge": 0.9,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ]
                 }
             ]
         },
