@@ -37,13 +37,13 @@ class Accessories_HTML extends Display {
         var tbl = document.getElementById("tbl_accessories") as HTMLTableElement;
         var fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
-        CreateTH(row, lu("Accessories Armour Coverage"));
         CreateTH(row, lu("Accessories Climate"));
+        CreateTH(row, lu("Accessories Armour Coverage"));
         CreateTH(row, lu("Accessories Visibility"));
         CreateTH(row, lu("Accessories Additional Part Stats"));
         row = insertRow(fragment);
-        this.InitArmour(row.insertCell());
         this.InitClimate(row.insertCell());
+        this.InitArmour(row.insertCell());
         this.InitVisibility(row.insertCell());
         this.InitStats(row.insertCell());
         row = insertRow(fragment);
@@ -68,11 +68,11 @@ class Accessories_HTML extends Display {
 
         for (let i = 0; i < len / 2; i++) {
             let AP = i + 1;
-            FlexInput("AP " + AP.toString(), this.a_AP[i], lfs);
+            FlexInput("Thickness " + AP.toString(), this.a_AP[i], lfs);
             this.a_AP[i].onchange = () => { this.acc.SetArmourCoverage(i, this.a_AP[i].valueAsNumber); };
             let j = i + len / 2;
             AP = j + 1;
-            FlexInput("AP " + AP.toString(), this.a_AP[j], rfs);
+            FlexInput("Thickness " + AP.toString(), this.a_AP[j], rfs);
             this.a_AP[j].onchange = () => { this.acc.SetArmourCoverage(j, this.a_AP[j].valueAsNumber); };
         }
     }
