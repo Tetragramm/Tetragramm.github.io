@@ -7912,7 +7912,7 @@ class Weapons extends Part {
                     return 4;
                 case "Last Hurrah":
                     return 5;
-                case "Himmelgard":
+                case "Himmilgard":
                     return 6;
             }
         };
@@ -8345,37 +8345,38 @@ class Used extends Part {
         this.leaky = d.GetNum();
         this.sluggish = d.GetNum();
     }
+    Normalize(num) {
+        if (num != num) {
+            num = 0;
+        }
+        num = Math.floor(1.0e-6 + num);
+        num = Math.min(1, num);
+        num = Math.max(-1, num);
+        return num;
+    }
     PartStats() {
-        this.burnt_out = Math.floor(1.0e-6 + this.burnt_out);
-        this.ragged = Math.floor(1.0e-6 + this.ragged);
-        this.hefty = Math.floor(1.0e-6 + this.hefty);
-        this.sticky_guns = Math.floor(1.0e-6 + this.sticky_guns);
-        this.weak = Math.floor(1.0e-6 + this.weak);
-        this.fragile = Math.floor(1.0e-6 + this.fragile);
-        this.leaky = Math.floor(1.0e-6 + this.leaky);
-        this.sluggish = Math.floor(1.0e-6 + this.sluggish);
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
         return new Stats();
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
     TriggerCS() {
-        if (this.burnt_out != this.burnt_out)
-            this.burnt_out = 0;
-        if (this.ragged != this.ragged)
-            this.ragged = 0;
-        if (this.hefty != this.hefty)
-            this.hefty = 0;
-        if (this.sticky_guns != this.sticky_guns)
-            this.sticky_guns = 0;
-        if (this.weak != this.weak)
-            this.weak = 0;
-        if (this.fragile != this.fragile)
-            this.fragile = 0;
-        if (this.leaky != this.leaky)
-            this.leaky = 0;
-        if (this.sluggish != this.sluggish)
-            this.sluggish = 0;
+        this.burnt_out = this.Normalize(this.burnt_out);
+        this.ragged = this.Normalize(this.ragged);
+        this.hefty = this.Normalize(this.hefty);
+        this.sticky_guns = this.Normalize(this.sticky_guns);
+        this.weak = this.Normalize(this.weak);
+        this.fragile = this.Normalize(this.fragile);
+        this.leaky = this.Normalize(this.leaky);
+        this.sluggish = this.Normalize(this.sluggish);
         this.CalculateStats();
     }
 }
@@ -8692,7 +8693,7 @@ class Rotor extends Part {
 class Aircraft {
     constructor(js, weapon_json, storage) {
         this.use_storage = false;
-        this.reset_json = String.raw `{"version":"11.3","name":"Basic Biplane","aircraft_type":0,"era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.9,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":0},{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1}],"ammo":1,"action":0,"projectile":0,"repeating":false}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0},"rotor":{"type":0,"rotor_count":0,"rotor_span":0,"rotor_mat":0,"is_tandem":false,"accessory":false}}`;
+        this.reset_json = String.raw`{"version":"11.3","name":"Basic Biplane","aircraft_type":0,"era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.9,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":0},{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1}],"ammo":1,"action":0,"projectile":0,"repeating":false}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0},"rotor":{"type":0,"rotor_count":0,"rotor_span":0,"rotor_mat":0,"is_tandem":false,"accessory":false}}`;
         this.freeze_calculation = true;
         this.stats = new Stats();
         this.name = "Prototype Aircraft";
@@ -9064,20 +9065,20 @@ class Aircraft {
         var DPFull = DPEmpty; //Based on advice from Discord.
         var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
-        var MaxSpeedEmpty = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9)));
-        var MaxSpeedFull = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9)));
-        var MaxSpeedwBombs = this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9)));
+        var MaxSpeedEmpty = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9))));
+        var MaxSpeedFull = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9))));
+        var MaxSpeedwBombs = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9))));
         //Used: Ragged
-        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * Math.pow(0.9, this.used.ragged));
-        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * Math.pow(0.9, this.used.ragged));
-        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * Math.pow(0.9, this.used.ragged));
+        MaxSpeedEmpty = Math.floor(1.0e-6 + MaxSpeedEmpty * (1 - 0.1 * this.used.ragged));
+        MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * (1 - 0.1 * this.used.ragged));
+        MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * (1 - 0.1 * this.used.ragged));
         var StallSpeedEmpty = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea)));
         var StallSpeedFull = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea)));
         var StallSpeedFullwBombs = Math.max(Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea)));
         //Used: Hefty
-        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * Math.pow(1.2, this.used.hefty));
-        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * Math.pow(1.2, this.used.hefty));
-        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * Math.pow(1.2, this.used.hefty));
+        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * (1 + 0.2 * this.used.hefty));
+        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * (1 + 0.2 * this.used.hefty));
+        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * (1 + 0.2 * this.used.hefty));
         if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
                 this.stats.warnings.push({
@@ -9125,9 +9126,9 @@ class Aircraft {
         var HandlingFull = HandlingEmpty + DryMP - WetMP;
         var HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
         //Used: Sluggish
-        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty * Math.pow(0.95, this.used.sluggish));
-        HandlingFull = Math.floor(1.0e-6 + HandlingFull * Math.pow(0.95, this.used.sluggish));
-        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs * Math.pow(0.95, this.used.sluggish));
+        HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty - 5 * this.used.sluggish);
+        HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
+        HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
         var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
         var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
@@ -9142,7 +9143,7 @@ class Aircraft {
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;
         //Used: Fragile
-        MaxStrain = Math.floor(1.0e-6 + MaxStrain * Math.pow(0.8, this.used.fragile));
+        MaxStrain = Math.floor(1.0e-6 + MaxStrain * (1 - 0.2 * this.used.fragile));
         if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Max Strain"); }) == -1) {
             this.stats.warnings.push({
                 source: lu("Stat Max Strain"), warning: lu("Max Strain Warning")
@@ -9150,7 +9151,7 @@ class Aircraft {
         }
         var Toughness = this.stats.toughness;
         //Used: Weak
-        Toughness = Math.floor(1.0e-6 + Toughness * Math.pow(0.5, this.used.weak));
+        Toughness = Math.floor(1.0e-6 + Toughness * (1 - 0.5 * this.used.weak));
         var Structure = this.stats.structure;
         var EnergyLoss = Math.ceil(-1.0e-6 + DPEmpty / this.propeller.GetEnergy());
         var EnergyLosswBombs = EnergyLoss + 1;
@@ -9172,7 +9173,7 @@ class Aircraft {
         }
         var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
-        FuelUses = Math.floor(1.0e-6 + FuelUses * Math.pow(0.8, this.used.leaky));
+        FuelUses = Math.floor(1.0e-6 + FuelUses * (1 - 0.2 * this.used.leaky));
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
                 this.stats.warnings.push({
@@ -10142,7 +10143,7 @@ var LZString = (function () {
             if (uncompressed == null)
                 return "";
             var i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, // Compensate for the first entry which should not count
-            context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0, ii;
+                context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0, ii;
             for (ii = 0; ii < uncompressed.length; ii += 1) {
                 context_c = uncompressed.charAt(ii);
                 if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
@@ -10866,46 +10867,46 @@ const init = () => {
     Promise.all(proms)
         .then(ps => Promise.all(ps.map(p => p.json())))
         .then(resp => {
-        var string_JSON = resp[0];
-        parts_JSON = resp[1];
-        engine_JSON = resp[2];
-        weapon_JSON = resp[3];
-        //Strings bit
-        local = new Localization(string_JSON);
-        if (lang) {
-            local.SetLanguages(lang);
-        }
-        else if (window.localStorage.language) {
-            local.SetLanguages(window.localStorage.language);
-        }
-        //Engine bit
-        var nameliststr = window.localStorage.getItem("engines_names");
-        var namelist = [];
-        if (nameliststr) {
-            namelist = JSON.parse(nameliststr);
-            for (let n of namelist) {
-                n = n.trim();
-                n = n.replace(/\s+/g, ' ');
-                if (n != "") {
-                    engine_list.set(n, new EngineList(n));
+            var string_JSON = resp[0];
+            parts_JSON = resp[1];
+            engine_JSON = resp[2];
+            weapon_JSON = resp[3];
+            //Strings bit
+            local = new Localization(string_JSON);
+            if (lang) {
+                local.SetLanguages(lang);
+            }
+            else if (window.localStorage.language) {
+                local.SetLanguages(window.localStorage.language);
+            }
+            //Engine bit
+            var nameliststr = window.localStorage.getItem("engines_names");
+            var namelist = [];
+            if (nameliststr) {
+                namelist = JSON.parse(nameliststr);
+                for (let n of namelist) {
+                    n = n.trim();
+                    n = n.replace(/\s+/g, ' ');
+                    if (n != "") {
+                        engine_list.set(n, new EngineList(n));
+                    }
                 }
             }
-        }
-        for (let el of engine_JSON["lists"]) {
-            if (!engine_list.has(el["name"]))
-                engine_list.set(el["name"], new EngineList(el["name"]));
-            if (el["name"] != "Custom") {
-                engine_list.get(el["name"]).fromJSON(el, true);
-                engine_list.get(el["name"]).SetConstant();
+            for (let el of engine_JSON["lists"]) {
+                if (!engine_list.has(el["name"]))
+                    engine_list.set(el["name"], new EngineList(el["name"]));
+                if (el["name"] != "Custom") {
+                    engine_list.get(el["name"]).fromJSON(el, true);
+                    engine_list.get(el["name"]).SetConstant();
+                }
+                else {
+                    engine_list.get(el["name"]).fromJSON(el, false);
+                }
             }
-            else {
-                engine_list.get(el["name"]).fromJSON(el, false);
-            }
-        }
-        InitHTML();
-        InitStats();
-        LoadFromHangar(0);
-    });
+            InitHTML();
+            InitStats();
+            LoadFromHangar(0);
+        });
 };
 window.addEventListener("DOMContentLoaded", init);
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);
@@ -15291,22 +15292,22 @@ class Used_HTML extends Display {
         this.fragile.onchange = () => { this.used.fragile = this.fragile.valueAsNumber; this.used.TriggerCS(); };
         this.leaky.onchange = () => { this.used.leaky = this.leaky.valueAsNumber; this.used.TriggerCS(); };
         this.sluggish.onchange = () => { this.used.sluggish = this.sluggish.valueAsNumber; this.used.TriggerCS(); };
-        this.burnt_out.min = "-5";
-        this.burnt_out.max = "5";
-        this.ragged.min = "-5";
-        this.ragged.max = "5";
-        this.hefty.min = "-5";
-        this.hefty.max = "5";
-        this.sticky_guns.min = "-5";
-        this.sticky_guns.max = "5";
-        this.weak.min = "-5";
-        this.weak.max = "5";
-        this.fragile.min = "-5";
-        this.fragile.max = "5";
-        this.leaky.min = "-5";
-        this.leaky.max = "5";
-        this.sluggish.min = "-5";
-        this.sluggish.max = "5";
+        this.burnt_out.min = "-1";
+        this.burnt_out.max = "1";
+        this.ragged.min = "-1";
+        this.ragged.max = "1";
+        this.hefty.min = "-1";
+        this.hefty.max = "1";
+        this.sticky_guns.min = "-1";
+        this.sticky_guns.max = "1";
+        this.weak.min = "-1";
+        this.weak.max = "1";
+        this.fragile.min = "-1";
+        this.fragile.max = "1";
+        this.leaky.min = "-1";
+        this.leaky.max = "1";
+        this.sluggish.min = "-1";
+        this.sluggish.max = "1";
     }
     UpdateDisplay() {
         this.burnt_out.valueAsNumber = this.used.burnt_out;

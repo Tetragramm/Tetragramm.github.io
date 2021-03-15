@@ -273,6 +273,7 @@ class WeaponSystem extends Part {
             //3x hits, awkward + 1(don't know if that's easy to do? Otherwise I may reconsider), can only rapid fire, weapon becomes open bolt but can fire down the spinner, +1 jam, +100 % mass, +100 % cost
             this.final_weapon.stats.mass += this.weapon_list[num].stats.mass;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
+            this.final_weapon.size += this.weapon_list[num].size;
             this.final_weapon.hits = 3 * this.weapon_list[num].hits;
             this.final_weapon.deflection -= 1;
             this.final_weapon.synched = false;

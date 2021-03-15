@@ -1,5 +1,5 @@
 {
-    "version": "11.0",
+    "version": "11.8",
     "era": {
         "options": [
             {
@@ -7,41 +7,47 @@
                 "liftbleed": 30,
                 "maxbomb": 0.166666666666,
                 "cost": -2,
-                "cant_lift": 4
+                "cant_lift": 4,
+                "pitchstab": 0
             },
             {
                 "name": "WWI",
                 "liftbleed": 25,
                 "maxbomb": 0.2,
-                "cant_lift": 3
+                "cant_lift": 3,
+                "pitchstab": 0
             },
             {
                 "name": "Roaring 20s",
                 "liftbleed": 22,
                 "maxbomb": 0.25,
                 "cost": 5,
-                "cant_lift": 1
+                "cant_lift": 1,
+                "pitchstab": 0
             },
             {
                 "name": "Coming Storm",
                 "liftbleed": 22,
                 "maxbomb": 0.333333333333,
                 "cost": 10,
-                "cant_lift": 0
+                "cant_lift": 0,
+                "pitchstab": 2
             },
             {
                 "name": "WWII",
                 "liftbleed": 20,
                 "maxbomb": 0.333333333333,
                 "cost": 15,
-                "cant_lift": 0
+                "cant_lift": 0,
+                "pitchstab": 2
             },
             {
                 "name": "Last Hurrah",
                 "liftbleed": 18,
                 "maxbomb": 0.5,
                 "cost": 20,
-                "cant_lift": 0
+                "cant_lift": 0,
+                "pitchstab": 2
             }
         ]
     },
@@ -49,36 +55,41 @@
         "options": [
             {
                 "name": "Open",
+                "era": "Pioneer",
                 "mass": 1,
                 "drag": 3,
                 "control": 0,
                 "escape": 2,
                 "cost": 0,
                 "flightstress": 0,
-                "visibility": 0
+                "visibility": 1
             },
             {
                 "name": "Windscreen",
+                "era": "Pioneer",
                 "mass": 2,
                 "drag": 1,
                 "control": 0,
                 "escape": 2,
                 "cost": 1,
                 "flightstress": 0,
-                "visibility": 0
+                "visibility": 1
             },
             {
                 "name": "Sealed",
+                "era": "Pioneer",
                 "mass": 2,
                 "drag": 0,
                 "control": 0,
                 "escape": -3,
                 "cost": 1,
                 "flightstress": -1,
-                "visibility": 0
+                "visibility": -99,
+                "warning": "Sealed Warning"
             },
             {
                 "name": "Narrow Canopy",
+                "era": "WWI",
                 "mass": 3,
                 "drag": 0,
                 "control": 0,
@@ -89,6 +100,7 @@
             },
             {
                 "name": "Bubble Canopy",
+                "era": "WWII",
                 "mass": 3,
                 "drag": -3,
                 "control": 0,
@@ -101,6 +113,7 @@
         "upgrades": [
             {
                 "name": "Co-Pilot Controls",
+                "era": "Pioneer",
                 "mass": 0,
                 "drag": 0,
                 "control": 0,
@@ -111,6 +124,7 @@
             },
             {
                 "name": "Escape Hatch",
+                "era": "Pioneer",
                 "mass": 1,
                 "drag": 0,
                 "control": 0,
@@ -121,6 +135,7 @@
             },
             {
                 "name": "Ejection Seat",
+                "era": "Last Hurrah",
                 "mass": 2,
                 "drag": 0,
                 "control": 0,
@@ -131,6 +146,7 @@
             },
             {
                 "name": "Connectivity",
+                "era": "Pioneer",
                 "mass": 1,
                 "drag": 0,
                 "control": 0,
@@ -141,7 +157,8 @@
             },
             {
                 "name": "Oxygen Mask",
-                "warning": "The pilot ignores the effects of high altitude and negates up to 2 G-Penalty.",
+                "era": "WWI",
+                "warning": "Oxygen Mask Warning",
                 "mass": 0,
                 "drag": 0,
                 "control": 0,
@@ -153,70 +170,82 @@
             },
             {
                 "name": "Isolated",
+                "era": "Pioneer",
                 "mass": 1,
                 "drag": 5,
                 "control": 0,
-                "escape": 0,
+                "escape": -2,
                 "cost": 1,
-                "flightstress": 0,
-                "visibility": 0,
-                "warning": "Position takes double Injury when you Go Down."
+                "flightstress": 1,
+                "visibility": 2,
+                "warning": "Isolated Warning"
             }
         ],
         "safety": [
             {
                 "name": "Padding",
+                "era": "Pioneer",
                 "cost": 1,
-                "warning": "Negates 1 Injury for this position when you Go Down"
+                "warning": "Injury Reduction Warning"
             },
             {
                 "name": "Harness",
+                "era": "Pioneer",
                 "escape": -1,
                 "cost": 1,
-                "warning": "Negates 1 Injury for this position when you Go Down"
+                "warning": "Injury Reduction Warning"
             },
             {
                 "name": "Fast Release System",
+                "era": "Coming Storm",
                 "escape": 2,
                 "cost": 1
             },
             {
                 "name": "Roll Bar",
+                "era": "WWI",
                 "mass": 2,
-                "warning": "Negates 1 Injury for this position when you Go Down"
+                "warning": "Injury Reduction Warning"
             },
             {
                 "name": "Flare Slot",
+                "era": "Roaring 20s",
                 "cost": 1,
-                "warning": "Allows flares to be fired out of a closed cockpit without opening the cockpit."
+                "warning": "Flare Slot Warning"
             }
         ],
         "gunsights": [
             {
                 "name": "X1 Collimated Gunsight",
+                "era": "WWI",
                 "visibility": -1,
                 "attack": 1,
                 "cost": 2
             },
             {
                 "name": "Telescopic Gunsight",
+                "era": "WWI",
                 "visibility": -1,
                 "attack": 0,
                 "cost": 3,
-                "warning": "+2 to attack if you Drew a Bead"
+                "warning": "Gunsight Warning"
             },
             {
                 "name": "Illuminated Reflex Sight",
+                "era": "WWI",
                 "visibility": -1,
                 "attack": 2,
+                "charge": 1.0e-9,
                 "cost": 6
             },
             {
                 "name": "Gyro Gunsight",
+                "era": "WWII",
                 "visibility": -1,
                 "attack": 2,
+                "charge": 1.0e-9,
                 "cost": 12,
-                "warning": "+2 to attack if you Drew a Bead"
+                "warning": "Gunsight Warning"
             }
         ]
     },
@@ -225,6 +254,7 @@
         "mounts": [
             {
                 "name": "Tractor",
+                "era": "Pioneer",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": 0,
@@ -233,10 +263,13 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "fuselage",
-                "powerfactor": 0.9
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false
             },
             {
                 "name": "Center-Mounted Tractor",
+                "era": "Pioneer",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -2,
@@ -246,10 +279,13 @@
                 "dragfactor": 0,
                 "location": "fuselage",
                 "reqED": true,
-                "powerfactor": 0.9
+                "powerfactor": 1,
+                "helicopter": true,
+                "pushpull": false
             },
             {
                 "name": "Rear-Mounted Pusher",
+                "era": "Pioneer",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -4,
@@ -257,11 +293,15 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 0,
+                "escape": -2,
                 "location": "fuselage",
-                "powerfactor": 0.9
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false
             },
             {
                 "name": "Center-Mounted Pusher",
+                "era": "Pioneer",
                 "drag": 0,
                 "reqsections": 1,
                 "pitchstab": -2,
@@ -269,12 +309,16 @@
                 "liftbleed": 0,
                 "strainfactor": 0,
                 "dragfactor": 0,
+                "escape": -2,
                 "location": "fuselage",
                 "reqTail": true,
-                "powerfactor": 0.9
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false
             },
             {
                 "name": "Pod",
+                "era": "Pioneer",
                 "drag": 5,
                 "reqsections": 1,
                 "pitchstab": 0,
@@ -283,10 +327,13 @@
                 "strainfactor": 0,
                 "dragfactor": 0,
                 "location": "pod",
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": true,
+                "pushpull": true
             },
             {
                 "name": "Nacelle (Inside)",
+                "era": "Pioneer",
                 "drag": 0,
                 "reqsections": 0,
                 "pitchstab": 0,
@@ -295,10 +342,13 @@
                 "strainfactor": 0.5,
                 "dragfactor": 0,
                 "location": "wing",
-                "powerfactor": 0.8
+                "powerfactor": 0.8,
+                "helicopter": false,
+                "pushpull": true
             },
             {
                 "name": "Nacelle (Offset)",
+                "era": "Pioneer",
                 "drag": 0,
                 "reqsections": 0,
                 "pitchstab": 0,
@@ -307,10 +357,13 @@
                 "strainfactor": 0,
                 "dragfactor": 1,
                 "location": "wing",
-                "powerfactor": 0.8
+                "powerfactor": 0.8,
+                "helicopter": false,
+                "pushpull": true
             },
             {
                 "name": "Channel Tractor",
+                "era": "Pioneer",
                 "drag": 0,
                 "reqsections": 0,
                 "pitchstab": 0,
@@ -319,12 +372,28 @@
                 "strainfactor": 1,
                 "dragfactor": 0,
                 "location": "wing",
-                "powerfactor": 0.9
+                "powerfactor": 0.9,
+                "helicopter": false,
+                "pushpull": true
+            },
+            {
+                "name": "Fuselage Push-Pull",
+                "era": "Pioneer",
+                "reqsections": 2,
+                "pitchstab": -2,
+                "escape": -2,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "fuselage",
+                "powerfactor": 0.9,
+                "helicopter": false,
+                "pushpull": true
             }
         ],
         "radiator-type": [
             {
                 "name": "Panel",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 0,
                 "cost": 0,
@@ -333,6 +402,7 @@
             },
             {
                 "name": "Box",
+                "era": "Pioneer",
                 "drag": 2,
                 "mass": -1,
                 "cost": 0,
@@ -341,6 +411,7 @@
             },
             {
                 "name": "Intake",
+                "era": "Roaring 20s",
                 "drag": 0,
                 "mass": 0,
                 "cost": 3,
@@ -349,7 +420,8 @@
             },
             {
                 "name": "Evaporation",
-                "warning": "Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.",
+                "era": "Coming Storm",
+                "warning": "Evaporation Warning",
                 "drag": 0,
                 "mass": 0,
                 "cost": 0,
@@ -360,27 +432,31 @@
         "radiator-mount": [
             {
                 "name": "Low",
-                "warning": "Force Cool Down when shot.",
+                "era": "Pioneer",
+                "warning": "Low Warning",
                 "reliability": 1,
                 "drag": 0,
                 "latstab": 0
             },
             {
                 "name": "Inline",
+                "era": "Pioneer",
                 "reliability": 0,
                 "drag": 0,
                 "latstab": 0
             },
             {
                 "name": "High",
-                "warning": "Bonus persists for 1 Cool Down after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!",
+                "era": "Pioneer",
+                "warning": "High Warning",
                 "reliability": 0,
                 "drag": 1,
                 "latstab": 0
             },
             {
                 "name": "High Offset",
-                "warning": "Bonus persists for 1 Cool Down after being shot.",
+                "era": "WWI",
+                "warning": "High Offset Warning",
                 "reliability": 0,
                 "drag": 1,
                 "latstab": -1
@@ -389,6 +465,7 @@
         "radiator-coolant": [
             {
                 "name": "Water",
+                "era": "Pioneer",
                 "cost": 0,
                 "harden": false,
                 "reliability": 0,
@@ -396,6 +473,7 @@
             },
             {
                 "name": "Salt Water",
+                "era": "Pioneer",
                 "cost": 1,
                 "harden": true,
                 "reliability": 1,
@@ -403,7 +481,8 @@
             },
             {
                 "name": "Mineral Oil",
-                "warning": "Absorbs 1 Miss to Cool Down.",
+                "era": "Pioneer",
+                "warning": "Mineral Oil Warning",
                 "cost": 1,
                 "harden": true,
                 "reliability": 0,
@@ -411,7 +490,8 @@
             },
             {
                 "name": "Castor Oil",
-                "warning": "Absorbs 1 Miss to Cool Down. +2 Stress if leaking.",
+                "era": "Pioneer",
+                "warning": "Castor Oil Warning",
                 "cost": 0,
                 "harden": false,
                 "reliability": 0,
@@ -419,6 +499,7 @@
             },
             {
                 "name": "Glycol",
+                "era": "Roaring 20s",
                 "reliability": 2,
                 "harden": false,
                 "cost": 2,
@@ -426,16 +507,18 @@
             },
             {
                 "name": "Freon",
-                "warning": "Caps RPM to 3.",
-                "reliability": 1,
+                "era": "Coming Storm",
+                "warning": "Freon Warning",
+                "reliability": 4,
                 "harden": false,
                 "cost": 3,
                 "flammable": false
             },
             {
                 "name": "Ammonia",
-                "warning": "Caps RPM to 3. Causes 2 Injury when leaking.",
-                "reliability": 1,
+                "era": "Pioneer",
+                "warning": "Ammonia Warning",
+                "reliability": 4,
                 "harden": false,
                 "cost": 2,
                 "flammable": false
@@ -444,6 +527,7 @@
         "cowling": [
             {
                 "name": "No Cowling",
+                "era": "Pioneer",
                 "ed": 1,
                 "mpd": 0,
                 "air": true,
@@ -452,6 +536,7 @@
             },
             {
                 "name": "Basic Cowl",
+                "era": "Pioneer",
                 "mass": 1,
                 "cost": 1,
                 "ed": 0.8,
@@ -462,6 +547,7 @@
             },
             {
                 "name": "Rotary Basic Cowl",
+                "era": "Pioneer",
                 "mass": 1,
                 "cost": 1,
                 "ed": 0.4,
@@ -472,6 +558,7 @@
             },
             {
                 "name": "Closed Cowl",
+                "era": "WWI",
                 "mass": 1,
                 "cost": 1,
                 "reliability": -1,
@@ -483,6 +570,7 @@
             },
             {
                 "name": "Adjustable Slat Cowl",
+                "era": "Coming Storm",
                 "mass": 2,
                 "reliability": 2,
                 "cost": 2,
@@ -494,6 +582,7 @@
             },
             {
                 "name": "Foil Cowl",
+                "era": "Roaring 20s",
                 "mass": 2,
                 "reliability": 3,
                 "cost": 3,
@@ -505,6 +594,7 @@
             },
             {
                 "name": "Sealed Cowl",
+                "era": "Pioneer",
                 "cost": 1,
                 "ed": 0.5,
                 "mpd": 0.333333333333,
@@ -518,66 +608,82 @@
         "props": [
             {
                 "name": "High Power",
+                "era": "Pioneer",
                 "pitchspeed": 0.8,
                 "pitchboost": 0.9,
                 "cost": 0,
                 "energy": 1.5,
-                "turn": 8,
-                "automatic": false
+                "turn": 8
             },
             {
                 "name": "Power",
+                "era": "Pioneer",
                 "pitchspeed": 0.9,
                 "pitchboost": 0.8,
                 "cost": 0,
                 "energy": 2,
-                "turn": 7,
-                "automatic": false
+                "turn": 7
             },
             {
                 "name": "Default",
+                "era": "Pioneer",
                 "pitchspeed": 1.0,
                 "pitchboost": 0.6,
                 "cost": 0,
                 "energy": 3,
-                "turn": 6,
-                "automatic": false
+                "turn": 6
             },
             {
                 "name": "Speed",
+                "era": "Pioneer",
                 "pitchspeed": 1.1,
                 "pitchboost": 0.4,
                 "cost": 0,
                 "energy": 4,
-                "turn": 5,
-                "automatic": false
+                "turn": 5
             },
             {
                 "name": "High Speed",
+                "era": "Pioneer",
                 "pitchspeed": 1.2,
                 "pitchboost": 0.3,
                 "cost": 0,
                 "energy": 4.5,
-                "turn": 4,
-                "automatic": false
-            },
-            {
-                "name": "Automatic",
-                "pitchspeed": 1.1,
-                "pitchboost": 0.7,
-                "mass": 1,
-                "cost": 8,
-                "energy": 2,
-                "turn": 5,
-                "automatic": true
+                "turn": 4
             }
         ],
-        "MVP_Warning": "Allows blad pitch to be adjusted on the ground without replacing it."
+        "upgrades": [
+            {
+                "name": "None",
+                "era": "Pioneer",
+                "energy": 0,
+                "turn": 0
+            },
+            {
+                "name": "Manually Adjustable Pitch",
+                "era": "Pioneer",
+                "energy": 0,
+                "turn": 0,
+                "cost": 2,
+                "warning": "MVP_Warning"
+            },
+            {
+                "name": "Automatic Pitch",
+                "era": "Roaring 20s",
+                "pitchspeed": 0.1,
+                "pitchboost": 0.1,
+                "energy": 0.5,
+                "turn": 1,
+                "mass": 1,
+                "cost": 8
+            }
+        ]
     },
     "frames": {
         "frames": [
             {
                 "name": "Wooden Spars",
+                "era": "Pioneer",
                 "basestructure": 15,
                 "basecost": 0,
                 "mass": 1,
@@ -587,6 +693,7 @@
             },
             {
                 "name": "Steel Spars",
+                "era": "Pioneer",
                 "basestructure": 25,
                 "basecost": 1,
                 "mass": 1,
@@ -596,6 +703,7 @@
             },
             {
                 "name": "Aluminum Spars",
+                "era": "WWI",
                 "basestructure": 20,
                 "basecost": 2,
                 "mass": 0.5,
@@ -605,6 +713,7 @@
             },
             {
                 "name": "Wooden Ribs",
+                "era": "WWI",
                 "basestructure": 30,
                 "basecost": 1,
                 "mass": 2,
@@ -614,6 +723,7 @@
             },
             {
                 "name": "Steel Ribs",
+                "era": "Roaring 20s",
                 "basestructure": 60,
                 "basecost": 2,
                 "mass": 3,
@@ -623,6 +733,7 @@
             },
             {
                 "name": "Aluminum Ribs",
+                "era": "Roaring 20s",
                 "basestructure": 50,
                 "basecost": 3,
                 "mass": 2,
@@ -632,6 +743,7 @@
             },
             {
                 "name": "Titanium",
+                "era": "Last Hurrah",
                 "basestructure": 0,
                 "basecost": 0,
                 "mass": 1,
@@ -641,18 +753,20 @@
             },
             {
                 "name": "Living Grove",
+                "era": "Pioneer",
                 "basestructure": 30,
                 "basecost": 8,
                 "mass": 2,
                 "structure": 4,
                 "cost": 0,
                 "geodesic": true,
-                "warning": "Free Repairs for Living Grove sections."
+                "warning": "Living Grove Warning"
             }
         ],
         "skin": [
             {
                 "name": "Naked",
+                "era": "Pioneer",
                 "dragfactor": 1,
                 "massfactor": 0.6,
                 "visibility": 1,
@@ -662,6 +776,7 @@
             },
             {
                 "name": "Cloth Canvas",
+                "era": "Pioneer",
                 "dragfactor": 0.5,
                 "massfactor": 1,
                 "flammable": false,
@@ -670,6 +785,7 @@
             },
             {
                 "name": "Transparent Celluloid",
+                "era": "Pioneer",
                 "dragfactor": 0.6,
                 "massfactor": 1,
                 "visibility": 1,
@@ -680,6 +796,7 @@
             },
             {
                 "name": "Treated Paper",
+                "era": "Pioneer",
                 "dragfactor": 0.5,
                 "massfactor": 0.75,
                 "flammable": true,
@@ -688,6 +805,7 @@
             },
             {
                 "name": "Tense Silk",
+                "era": "Pioneer",
                 "dragfactor": 0.5,
                 "massfactor": 1,
                 "toughness": 1,
@@ -698,6 +816,7 @@
             },
             {
                 "name": "Dragon Skin",
+                "era": "Himmilgard",
                 "dragfactor": 0.5,
                 "massfactor": 1,
                 "cost": 4,
@@ -707,6 +826,7 @@
             },
             {
                 "name": "Molded Plywood",
+                "era": "Pioneer",
                 "dragfactor": 0.4,
                 "massfactor": 1,
                 "cost": 0.5,
@@ -716,6 +836,7 @@
             },
             {
                 "name": "Clinker Build",
+                "era": "Pioneer",
                 "dragfactor": 0.5,
                 "massfactor": 1,
                 "cost": 0,
@@ -725,6 +846,7 @@
             },
             {
                 "name": "Glass Reinforced Plastic",
+                "era": "Last Hurrah",
                 "dragfactor": 0.3,
                 "massfactor": 1,
                 "cost": 1,
@@ -734,6 +856,7 @@
             },
             {
                 "name": "Corrugated Duralumin",
+                "era": "WWI",
                 "dragfactor": 0.5,
                 "massfactor": 1,
                 "toughness": 3,
@@ -744,6 +867,7 @@
             },
             {
                 "name": "Steel Sheet",
+                "era": "Pioneer",
                 "dragfactor": 0.35,
                 "massfactor": 1,
                 "cost": 1.5,
@@ -754,6 +878,7 @@
             },
             {
                 "name": "Aluminum Sheet",
+                "era": "Roaring 20s",
                 "dragfactor": 0.35,
                 "massfactor": 0.75,
                 "cost": 2,
@@ -766,21 +891,25 @@
         "tail": [
             {
                 "name": "Tailless",
+                "era": "Pioneer",
                 "reqsections": 0,
                 "pitchstab": -4
             },
             {
                 "name": "Stubby",
+                "era": "Pioneer",
                 "reqsections": 1,
                 "pitchstab": -3
             },
             {
                 "name": "Standard",
+                "era": "Pioneer",
                 "reqsections": 2,
                 "pitchstab": 0
             },
             {
                 "name": "Long",
+                "era": "Pioneer",
                 "reqsections": 3,
                 "pitchstab": 3
             }
@@ -790,23 +919,29 @@
         "decks": [
             {
                 "name": "Parasol",
+                "era": "Pioneer",
                 "pitchstab": 3,
                 "maxstrain": -10,
                 "liftbleed": -2,
+                "visibility": -1,
                 "limited": false
             },
             {
                 "name": "Shoulder",
+                "era": "Pioneer",
                 "pitchstab": 2,
                 "liftbleed": -1,
+                "visibility": -1,
                 "limited": true
             },
             {
                 "name": "Mid",
+                "era": "Pioneer",
                 "limited": true
             },
             {
                 "name": "Low",
+                "era": "Pioneer",
                 "pitchstab": -2,
                 "crashsafety": -1,
                 "liftbleed": -1,
@@ -814,6 +949,7 @@
             },
             {
                 "name": "Gear",
+                "era": "Pioneer",
                 "pitchstab": -3,
                 "maxstrain": -10,
                 "crashsafety": -1,
@@ -821,101 +957,168 @@
                 "limited": false
             }
         ],
+        "largest": [
+            {
+                "name": "Parasol",
+                "era": "Pioneer",
+                "latstab": 1,
+                "control": -1,
+                "dragfactor": 1
+            },
+            {
+                "name": "Shoulder",
+                "era": "Pioneer",
+                "control": -1,
+                "dragfactor": 1
+            },
+            {
+                "name": "Mid",
+                "era": "Pioneer",
+                "dragfactor": 0.9
+            },
+            {
+                "name": "Low",
+                "era": "Pioneer",
+                "latstab": -1,
+                "control": 2,
+                "dragfactor": 1
+            },
+            {
+                "name": "Gear",
+                "era": "Pioneer",
+                "latstab": -1,
+                "control": 3,
+                "dragfactor": 1
+            }
+        ],
         "surface": [
             {
                 "name": "Cloth Canvas",
+                "era": "Pioneer",
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Treated Paper",
+                "era": "Pioneer",
                 "flammable": true,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
                 "mass": -0.25,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Tense Silk Layers",
+                "era": "Pioneer",
                 "flammable": false,
                 "strainfactor": 0.9,
                 "dragfactor": 1.0,
                 "cost": 0.2,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Plywood",
+                "era": "Pioneer",
                 "flammable": false,
                 "strainfactor": 0.9,
                 "dragfactor": 1.0,
                 "mass": 0.2,
                 "cost": 0.1,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Aluminum Sheet",
+                "era": "Roaring 20s",
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 0.8,
                 "cost": 0.3,
-                "metal": true
+                "metal": true,
+                "transparent": false
             },
             {
                 "name": "Corrugated Steel",
+                "era": "Pioneer",
                 "flammable": false,
                 "strainfactor": 0.6,
                 "dragfactor": 1.0,
                 "mass": 0.25,
                 "cost": 0.2,
-                "metal": true
+                "metal": true,
+                "transparent": false
             },
             {
                 "name": "Thin Sheet Steel",
+                "era": "Roaring 20s",
                 "flammable": false,
                 "strainfactor": 0.6,
                 "dragfactor": 0.9,
                 "mass": 0.2,
                 "cost": 0.3,
-                "metal": true
+                "metal": true,
+                "transparent": false
             },
             {
                 "name": "Grand Eagle Feather",
+                "era": "Himmilgard",
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
                 "control": 0.2,
                 "cost": 0.6,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Solar Fiber",
+                "era": "Himmilgard",
                 "flammable": false,
                 "strainfactor": 1.0,
                 "dragfactor": 1.0,
                 "charge": 0.2,
                 "cost": 0.4,
-                "metal": false
+                "metal": false,
+                "transparent": false
             },
             {
                 "name": "Dragon Skin",
+                "era": "Himmilgard",
                 "flammable": false,
                 "strainfactor": 0.4,
                 "dragfactor": 1.0,
                 "cost": 0.8,
-                "metal": true
+                "metal": true,
+                "transparent": false
+            },
+            {
+                "name": "Transparent Celluloid",
+                "era": "Pioneer",
+                "flammable": true,
+                "strainfactor": 1.0,
+                "dragfactor": 1.0,
+                "toughness": -0.1,
+                "cost": 0.1,
+                "metal": false,
+                "transparent": true
             }
         ],
         "stagger": [
             {
                 "name": "Monoplane",
+                "era": "Pioneer",
                 "inline": false,
                 "wing_count": 1,
                 "hstab": true
             },
             {
                 "name": "Tandem",
+                "era": "Pioneer",
                 "inline": true,
                 "wing_count": 20,
                 "hstab": false,
@@ -923,6 +1126,7 @@
             },
             {
                 "name": "Extreme Positive",
+                "era": "Pioneer",
                 "inline": false,
                 "wing_count": 20,
                 "hstab": true,
@@ -931,6 +1135,7 @@
             },
             {
                 "name": "Positive",
+                "era": "Pioneer",
                 "inline": false,
                 "wing_count": 20,
                 "hstab": true,
@@ -939,12 +1144,14 @@
             },
             {
                 "name": "Unstaggered",
+                "era": "Pioneer",
                 "inline": false,
                 "wing_count": 20,
                 "hstab": true
             },
             {
                 "name": "Negative",
+                "era": "Pioneer",
                 "inline": false,
                 "wing_count": 20,
                 "hstab": true,
@@ -953,6 +1160,7 @@
             },
             {
                 "name": "Extreme Negative",
+                "era": "Pioneer",
                 "inline": false,
                 "wing_count": 20,
                 "hstab": true,
@@ -965,6 +1173,7 @@
         "hstab": [
             {
                 "name": "Tailplane",
+                "era": "Pioneer",
                 "dragfactor": 1,
                 "is_canard": false,
                 "increment": 1,
@@ -973,6 +1182,7 @@
             },
             {
                 "name": "The Wings",
+                "era": "Pioneer",
                 "dragfactor": 0,
                 "is_canard": false,
                 "increment": 0,
@@ -981,6 +1191,7 @@
             },
             {
                 "name": "Canards",
+                "era": "Pioneer",
                 "pitchstab": -3,
                 "dragfactor": 0.5,
                 "is_canard": true,
@@ -990,6 +1201,7 @@
             },
             {
                 "name": "Outboard",
+                "era": "Pioneer",
                 "latstab": 1,
                 "dragfactor": 1,
                 "is_canard": false,
@@ -999,6 +1211,7 @@
             },
             {
                 "name": "V-Tail",
+                "era": "Coming Storm",
                 "latstab": 2,
                 "pitchstab": 2,
                 "cost": 5,
@@ -1010,18 +1223,20 @@
             },
             {
                 "name": "T-Tail",
+                "era": "WWII",
                 "liftbleed": -2,
                 "dragfactor": 0.5,
                 "is_canard": false,
                 "increment": 1,
                 "is_vtail": false,
                 "is_tail": true,
-                "warning": "In the event of a spin/stall while above stall speed and under power, you are at a Disadvantage to recover."
+                "warning": "T-Tail Warning"
             }
         ],
         "vstab": [
             {
                 "name": "Tailfin",
+                "era": "Pioneer",
                 "dragfactor": 1,
                 "increment": 1,
                 "is_vtail": false,
@@ -1029,6 +1244,7 @@
             },
             {
                 "name": "Outboard",
+                "era": "Pioneer",
                 "dragfactor": 1,
                 "control": 1,
                 "increment": 2,
@@ -1037,6 +1253,7 @@
             },
             {
                 "name": "V-Tail",
+                "era": "Coming Storm",
                 "dragfactor": 0,
                 "increment": 0,
                 "is_vtail": true,
@@ -1048,22 +1265,26 @@
         "ailerons": [
             {
                 "name": "Flap Ailerons",
+                "era": "Pioneer",
                 "warping": false
             },
             {
                 "name": "Wing Warping",
+                "era": "Pioneer",
                 "drag": -1,
                 "warping": true,
-                "warning": "Get +1 to Dogfight! at 15 speed and below."
+                "warning": "Wing Warping Warning 2"
             },
             {
                 "name": "Spoilerons",
+                "era": "Pioneer",
                 "cost": 2,
                 "warping": false,
-                "warning": "When you Dogfight!, spend double speed but take +1"
+                "warning": "Spoilerons Warning"
             },
             {
                 "name": "None",
+                "era": "Pioneer",
                 "warping": false,
                 "control": -15,
                 "crashsafety": -1,
@@ -1072,64 +1293,76 @@
         ],
         "rudders": [
             {
-                "name": "Flap Rudder"
+                "name": "Flap Rudder",
+                "era": "Pioneer"
             },
             {
                 "name": "Flying Rudder",
-                "latstab": -2,
+                "era": "Pioneer",
+                "latstab": -1,
                 "control": 3
             }
         ],
         "elevators": [
             {
-                "name": "Flap Elevator"
+                "name": "Flap Elevator",
+                "era": "Pioneer"
             },
             {
                 "name": "Flying Elevator",
-                "pitchstab": -2,
+                "era": "Pioneer",
+                "pitchstab": -1,
                 "control": 2
             }
         ],
         "flaps": [
             {
                 "name": "None",
+                "era": "Pioneer",
                 "costfactor": 0
             },
             {
                 "name": "Basic Flaps",
+                "era": "WWI",
                 "liftbleed": -3,
                 "costfactor": 0.333333333333
             },
             {
                 "name": "Advanced Flaps",
+                "era": "Coming Storm",
                 "liftbleed": -5,
                 "costfactor": 0.666666666666
             },
             {
                 "name": "Control Flaps",
+                "era": "WWII",
                 "liftbleed": -5,
                 "control": 3,
                 "costfactor": 1
             },
             {
                 "name": "Lift Dumpers",
+                "era": "Last Hurrah",
                 "crashsafety": 2,
                 "costfactor": 1,
-                "warning": "Activate for +1 to Dogfight!, then immediately induce a stall."
+                "warning": "Lift Dumpers Warning"
             }
         ],
         "slats": [
             {
-                "name": "None"
+                "name": "None",
+                "era": "Pioneer"
             },
             {
                 "name": "Fixed Slots",
+                "era": "WWI",
                 "drag": 5,
                 "liftbleed": -3,
                 "cost": 1
             },
             {
                 "name": "Automatic Slats",
+                "era": "WWII",
                 "liftbleed": -1,
                 "control": 3,
                 "cost": 4
@@ -1138,20 +1371,23 @@
         "drag_inducers": [
             {
                 "name": "Air Brake",
+                "era": "Pioneer",
                 "mass": 1,
                 "cost": 3,
-                "warning": "When deployed, immediately bleed of speed equal to Speed Factor and gain +1 to Dogfight!."
+                "warning": "Air Brake Warning"
             },
             {
                 "name": "Dive Brake",
+                "era": "Pioneer",
                 "mass": 2,
                 "cost": 4,
-                "warning": "When deployed, steep dives trade altitude for speed at 1-2 instead of 1-3."
+                "warning": "Dive Brake Warning"
             },
             {
                 "name": "Drogue Chute",
+                "era": "Pioneer",
                 "cost": 3,
-                "warning": "Activate once per flight to: Give +3 to Go Down or take down a close pursuer."
+                "warning": "Drogue Chute Warning"
             }
         ]
     },
@@ -1159,6 +1395,7 @@
         "external_wood": [
             {
                 "name": "Parallel Struts",
+                "era": "Pioneer",
                 "drag": 2,
                 "mass": 1,
                 "structure": 5,
@@ -1166,10 +1403,12 @@
                 "tension": 30,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "N-Strut",
+                "era": "Pioneer",
                 "drag": 2,
                 "mass": 1,
                 "structure": 6,
@@ -1177,10 +1416,12 @@
                 "tension": 20,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "V-Strut",
+                "era": "Pioneer",
                 "drag": 1,
                 "mass": 1,
                 "structure": -5,
@@ -1188,40 +1429,48 @@
                 "tension": 30,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "I-Strut",
+                "era": "WWI",
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 20,
                 "tension": 15,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "W-Strut",
+                "era": "WWI",
                 "drag": 3,
                 "mass": 1,
                 "maxstrain": 35,
                 "tension": 0,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Single Strut",
+                "era": "Pioneer",
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 10,
                 "tension": 0,
                 "cost": 1,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Star Strut",
+                "era": "WWI",
                 "drag": 8,
                 "mass": 2,
                 "structure": 10,
@@ -1229,26 +1478,32 @@
                 "tension": 0,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Wing Truss",
+                "era": "Pioneer",
                 "drag": 4,
                 "tension": 40,
                 "cost": 1,
                 "config": false,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Wire Root",
+                "era": "Pioneer",
                 "tension": 10,
                 "config": true,
-                "first": false
+                "first": false,
+                "small_sqp": true
             }
         ],
         "external_steel": [
             {
                 "name": "Steel Parallel Struts",
+                "era": "Pioneer",
                 "drag": 2,
                 "mass": 1,
                 "structure": 10,
@@ -1256,10 +1511,12 @@
                 "tension": 15,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel N-Strut",
+                "era": "Pioneer",
                 "drag": 2,
                 "mass": 1,
                 "structure": 12,
@@ -1267,10 +1524,12 @@
                 "tension": 10,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel V-Strut",
+                "era": "Pioneer",
                 "drag": 1,
                 "mass": 1,
                 "structure": 0,
@@ -1278,40 +1537,48 @@
                 "tension": 15,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel I-Strut",
+                "era": "WWI",
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 25,
                 "tension": 7,
                 "cost": 4,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel W-Strut",
+                "era": "WWI",
                 "drag": 3,
                 "mass": 1,
                 "maxstrain": 40,
                 "tension": 0,
                 "cost": 4,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel Single Strut",
+                "era": "Pioneer",
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 15,
                 "tension": 0,
                 "cost": 2,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel Star Strut",
+                "era": "WWI",
                 "drag": 6,
                 "mass": 2,
                 "structure": 20,
@@ -1319,30 +1586,37 @@
                 "tension": 0,
                 "cost": 4,
                 "config": true,
-                "first": true
+                "first": true,
+                "small_sqp": false
             },
             {
                 "name": "Steel Wing Truss",
+                "era": "Pioneer",
                 "drag": 4,
                 "tension": 20,
                 "cost": 2,
                 "config": false,
-                "first": true
+                "first": true,
+                "small_sqp": true
             },
             {
                 "name": "Steel Wire Root",
+                "era": "Pioneer",
                 "tension": 10,
                 "config": true,
-                "first": false
+                "first": false,
+                "small_sqp": true
             }
         ],
         "cabane": [
             {
                 "name": "None",
+                "era": "Pioneer",
                 "tension": 0
             },
             {
                 "name": "Parallel Struts",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "structure": 5,
@@ -1353,6 +1627,7 @@
             },
             {
                 "name": "Steel Parallel Struts",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "structure": 10,
@@ -1363,6 +1638,7 @@
             },
             {
                 "name": "N-Strut",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "structure": 6,
@@ -1373,6 +1649,7 @@
             },
             {
                 "name": "Steel N-Strut",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "structure": 12,
@@ -1383,6 +1660,7 @@
             },
             {
                 "name": "V-Strut",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "structure": -5,
@@ -1393,6 +1671,7 @@
             },
             {
                 "name": "Steel V-Strut",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "structure": 0,
@@ -1403,6 +1682,7 @@
             },
             {
                 "name": "I-Strut",
+                "era": "WWI",
                 "drag": 0,
                 "mass": 1,
                 "maxstrain": 20,
@@ -1412,6 +1692,7 @@
             },
             {
                 "name": "Steel I-Strut",
+                "era": "WWI",
                 "drag": 0,
                 "mass": 1,
                 "maxstrain": 25,
@@ -1421,6 +1702,7 @@
             },
             {
                 "name": "W-Strut",
+                "era": "WWI",
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 35,
@@ -1430,6 +1712,7 @@
             },
             {
                 "name": "Steel W-Strut",
+                "era": "WWI",
                 "drag": 1,
                 "mass": 1,
                 "maxstrain": 40,
@@ -1439,6 +1722,7 @@
             },
             {
                 "name": "Single Strut",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "maxstrain": 10,
@@ -1448,6 +1732,7 @@
             },
             {
                 "name": "Steel Single Strut",
+                "era": "Pioneer",
                 "drag": 0,
                 "mass": 1,
                 "maxstrain": 15,
@@ -1457,6 +1742,7 @@
             },
             {
                 "name": "Star Strut",
+                "era": "WWI",
                 "drag": 6,
                 "mass": 2,
                 "structure": 10,
@@ -1467,6 +1753,7 @@
             },
             {
                 "name": "Steel Star Strut",
+                "era": "WWI",
                 "drag": 4,
                 "mass": 2,
                 "structure": 20,
@@ -1479,6 +1766,7 @@
         "cantilever": [
             {
                 "name": "Birch",
+                "era": "WWI",
                 "mass": 1,
                 "maxstrain": 10,
                 "toughness": 2,
@@ -1487,6 +1775,7 @@
             },
             {
                 "name": "Duralumin",
+                "era": "WWI",
                 "mass": 1,
                 "maxstrain": 15,
                 "toughness": 3,
@@ -1495,6 +1784,7 @@
             },
             {
                 "name": "Steel",
+                "era": "WWI",
                 "mass": 1,
                 "maxstrain": 20,
                 "toughness": 5,
@@ -1503,6 +1793,7 @@
             },
             {
                 "name": "Aluminium",
+                "era": "Roaring 20s",
                 "mass": 1,
                 "maxstrain": 25,
                 "toughness": 3,
@@ -1511,6 +1802,7 @@
             },
             {
                 "name": "Whalebone",
+                "era": "Himmilgard",
                 "mass": 1,
                 "liftbleed": -3,
                 "maxstrain": 5,
@@ -1523,6 +1815,7 @@
         "tanks": [
             {
                 "name": "Internal Fuselage Tank",
+                "era": "Pioneer",
                 "mass": 1,
                 "wetmass": 5,
                 "fuel": 125,
@@ -1532,67 +1825,65 @@
             },
             {
                 "name": "External Wing Tank",
+                "era": "Pioneer",
                 "mass": 1,
                 "wetmass": 5,
                 "fuel": 125,
                 "drag": 3,
+                "control": -1,
                 "internal": false,
                 "cantilever": false
             },
             {
                 "name": "Internal Wing Tank",
+                "era": "Pioneer",
                 "mass": 1,
                 "wetmass": 5,
                 "fuel": 125,
+                "control": -1,
                 "internal": true,
                 "cantilever": true
             },
             {
                 "name": "Microtank",
+                "era": "Pioneer",
                 "mass": 1,
                 "wetmass": 0,
                 "fuel": 25,
                 "internal": true,
                 "cantilever": false
             }
-        ],
-        "safety": [
-            {
-                "name": "Remote Fire Extinguisher",
-                "mass": 2,
-                "cost": 3,
-                "warning": "Spend to put out a fire."
-            },
-            {
-                "name": "Self-Sealing Gas Tank",
-                "mass": 1,
-                "cost": 2
-            }
         ]
     },
     "cargo": {
         "spaces": [
             {
-                "name": "None"
+                "name": "None",
+                "era": "Pioneer"
             },
             {
                 "name": "Tiny",
+                "era": "Pioneer",
                 "mass": 1
             },
             {
                 "name": "Small",
+                "era": "Pioneer",
                 "reqsections": 1
             },
             {
                 "name": "Medium",
+                "era": "Pioneer",
                 "reqsections": 3
             },
             {
                 "name": "Large",
+                "era": "Pioneer",
                 "reqsections": 5
             },
             {
                 "name": "Huge",
+                "era": "Pioneer",
                 "reqsections": 10
             }
         ]
@@ -1601,24 +1892,28 @@
         "gear": [
             {
                 "name": "Landing Gear",
+                "era": "Pioneer",
                 "DpLMP": 1,
                 "SpLMP": 0,
                 "can_retract": true
             },
             {
                 "name": "Floats",
+                "era": "Pioneer",
                 "DpLMP": 1.5,
                 "SpLMP": 0,
                 "can_retract": true
             },
             {
                 "name": "Hybrid Floats",
+                "era": "Pioneer",
                 "DpLMP": 2,
                 "SpLMP": 0,
                 "can_retract": true
             },
             {
                 "name": "Boat Hull",
+                "era": "Pioneer",
                 "mass": 5,
                 "DpLMP": 1,
                 "SpLMP": 1,
@@ -1626,26 +1921,30 @@
             },
             {
                 "name": "Landing Skid",
+                "era": "Pioneer",
                 "DpLMP": 0,
                 "SpLMP": 0,
                 "can_retract": false,
-                "warning": "All landings are crash landings."
+                "warning": "Landing Skid Warning"
             }
         ],
         "extras": [
             {
                 "name": "Zeppelin Hook",
+                "era": "Pioneer",
                 "mass": 1,
                 "MpLMP": 0,
-                "warning": "Allows landing inside airships or large planes."
+                "warning": "Zeppelin Hook Warning"
             },
             {
                 "name": "Carrier Hook",
+                "era": "Pioneer",
                 "MpLMP": 0.5,
-                "warning": "Allows landing on carriers."
+                "warning": "Carrier Hook Warning"
             },
             {
                 "name": "Underwing Skid",
+                "era": "Pioneer",
                 "MpLMP": 0,
                 "drag": 3,
                 "crashsafety": 2
@@ -1656,43 +1955,58 @@
         "electrical": [
             {
                 "name": "Windmill",
+                "era": "Pioneer",
                 "drag": 1,
                 "cost": 1,
                 "cp10s": 1,
-                "warning": "Generates 1 charge per 10 speed."
+                "warning": "Windmill Warning"
             },
             {
                 "name": "Ram Air Scoop",
+                "era": "WWI",
                 "charge": 1,
                 "cost": 3,
                 "cp10s": 0
             },
             {
                 "name": "Battery",
+                "era": "Pioneer",
                 "mass": 1,
                 "cost": 2,
                 "cp10s": 0,
-                "warning": "Stores 5 charge"
+                "warning": "Battery Warning"
+            },
+            {
+                "name": "Battery (High Quality)",
+                "era": "Roaring 20s",
+                "mass": 0,
+                "cost": 4,
+                "cp10s": 0,
+                "warning": "Battery Warning"
             }
         ],
         "radios": [
             {
-                "name": "Loud Yelling"
+                "name": "Loud Yelling",
+                "era": "Pioneer"
             },
             {
                 "name": "Intercom System",
-                "charge": -1,
+                "era": "Pioneer",
+                "charge": 1.0e-9,
                 "cost": 1
             },
             {
                 "name": "Radio Receiver",
+                "era": "Pioneer",
                 "mass": 2,
                 "drag": 2,
-                "charge": -1,
+                "charge": 1.0e-9,
                 "cost": 3
             },
             {
                 "name": "Radio Transmitter",
+                "era": "WWI",
                 "mass": 3,
                 "drag": 3,
                 "charge": -2,
@@ -1700,6 +2014,7 @@
             },
             {
                 "name": "Radio Transceiver",
+                "era": "WWI",
                 "mass": 5,
                 "drag": 3,
                 "charge": -2,
@@ -1707,65 +2022,108 @@
             },
             {
                 "name": "Whalebone Radio Receiver",
-                "charge": -1,
+                "era": "Himmilgard",
+                "charge": 1.0e-9,
                 "cost": 5
             },
             {
-                "name": "Whalebone Radio Node",
+                "name": "Whalebone Radio Base Station",
+                "era": "Himmilgard",
                 "mass": 6,
                 "drag": 1,
                 "charge": -4,
                 "cost": 12
+            },
+            {
+                "name": "Radio Receiver (High Quality)",
+                "era": "Roaring 20s",
+                "mass": 1,
+                "drag": 2,
+                "charge": 1.0e-9,
+                "cost": 6
+            },
+            {
+                "name": "Radio Transmitter (High Quality)",
+                "era": "Roaring 20s",
+                "mass": 2,
+                "drag": 3,
+                "charge": -2,
+                "cost": 6
+            },
+            {
+                "name": "Radio Transceiver (High Quality)",
+                "era": "Roaring 20s",
+                "mass": 4,
+                "drag": 3,
+                "charge": -2,
+                "cost": 6
+            },
+            {
+                "name": "Whalebone Radio Base Station (High Quality)",
+                "era": "Himmilgard",
+                "mass": 5,
+                "drag": 1,
+                "charge": -4,
+                "cost": 24
             }
         ],
         "information": [
             {
                 "name": "Reconnaissance Camera",
+                "era": "Pioneer",
                 "cost": 2,
-                "warning": "Can take pictures downward. Capabilities scale with era."
+                "warning": "Reconnaissance Camera Warning"
             },
             {
                 "name": "Guncam",
+                "era": "Pioneer",
                 "cost": 1,
-                "warning": "Confirms your kills for you."
+                "warning": "Guncam Warning"
             }
         ],
         "visibility": [
             {
                 "name": "Wing Cutouts",
+                "era": "Pioneer",
                 "visibility": 1,
                 "liftbleed": 1
             },
             {
                 "name": "Hull Cutouts",
+                "era": "Pioneer",
                 "visibility": 1,
                 "structure": -5
             },
             {
                 "name": "Searchlight",
-                "charge": -2,
+                "era": "Pioneer",
+                "charge": 1.0e-9,
                 "cost": 1
             }
         ],
         "climate": [
             {
                 "name": "Electric Heating",
+                "era": "Pioneer",
                 "charge": -1,
                 "cost": 1,
                 "req_radiator": false
             },
             {
                 "name": "Radiator Loop",
+                "era": "Pioneer",
                 "cost": 1,
                 "req_radiator": true
             },
             {
                 "name": "Basic Fan",
-                "charge": -1,
+                "era": "Pioneer",
+                "charge": 1.0e-9,
                 "req_radiator": false
             },
             {
                 "name": "Air Conditioning",
+                "era": "Pioneer",
                 "charge": -2,
                 "cost": 4,
                 "req_radiator": false
@@ -1773,42 +2131,56 @@
         ],
         "autopilots": [
             {
-                "name": "No Autopilot"
+                "name": "None",
+                "era": "Pioneer"
             },
             {
                 "name": "Gyroscopic",
+                "era": "WWI",
                 "cost": 3,
-                "warning": "Gives +4 to Empty Seat rolls."
+                "warning": "Gyroscopic Warning"
             },
             {
                 "name": "Altitude Holding",
+                "era": "Coming Storm",
                 "mass": 1,
                 "cost": 5,
-                "warning": "Allows the Empty Seat rule to be ignored."
+                "warning": "Altitude Holding Warning"
+            },
+            {
+                "name": "Clockwork Programmable",
+                "era": "Himmilgard",
+                "mass": 1,
+                "cost": 6,
+                "warning": "Clockwork Programmable Warning"
             },
             {
                 "name": "Programmable",
+                "era": "WWII",
                 "mass": 1,
                 "charge": -2,
                 "cost": 6,
-                "warning": "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings."
+                "warning": "Programmable Warning"
             },
             {
-                "name": "\"Rattegehirn\"",
+                "name": "Rattenhirn",
+                "era": "Himmilgard",
                 "mass": 3,
                 "charge": -3,
                 "cost": 25,
-                "warning": "Fully automated. For robo-planes."
+                "warning": "Rattenhirn Warning"
             }
         ],
         "control": [
             {
-                "name": "No Aids",
+                "name": "None",
+                "era": "Pioneer",
                 "max_mass_stress": 1000,
                 "max_total_stress": 1000
             },
             {
                 "name": "Control Rods",
+                "era": "WWI",
                 "mass": 1,
                 "cost": 2,
                 "max_mass_stress": 1,
@@ -1816,6 +2188,7 @@
             },
             {
                 "name": "Hydraulic-Assisted",
+                "era": "WWII",
                 "mass": 3,
                 "cost": 5,
                 "max_mass_stress": 0,
@@ -1823,10 +2196,39 @@
             },
             {
                 "name": "Fly by Wire",
+                "era": "Last Hurrah",
                 "mass": 3,
                 "cost": 10,
                 "max_mass_stress": 0,
                 "max_total_stress": 0
+            }
+        ]
+    },
+    "rotor": {
+        "blade_count": [
+            {
+                "name": "Two",
+                "sizing": 1.05,
+                "flightstress": 1,
+                "rotor_bleed": 0
+            },
+            {
+                "name": "Three",
+                "sizing": 1,
+                "cost": 2,
+                "rotor_bleed": 1
+            },
+            {
+                "name": "Four",
+                "sizing": 0.95,
+                "cost": 4,
+                "rotor_bleed": 2
+            },
+            {
+                "name": "Five",
+                "sizing": 0.9,
+                "cost": 6,
+                "rotor_bleed": 3
             }
         ]
     }
