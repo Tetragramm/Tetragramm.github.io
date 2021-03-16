@@ -1,5 +1,5 @@
 {
-    "version": "11.8",
+    "version": "11.9",
     "era": {
         "options": [
             {
@@ -1277,7 +1277,7 @@
             },
             {
                 "name": "Spoilerons",
-                "era": "Pioneer",
+                "era": "WWII",
                 "cost": 2,
                 "warping": false,
                 "warning": "Spoilerons Warning"
@@ -1371,7 +1371,7 @@
         "drag_inducers": [
             {
                 "name": "Air Brake",
-                "era": "Pioneer",
+                "era": "WWII",
                 "mass": 1,
                 "cost": 3,
                 "warning": "Air Brake Warning"
@@ -1385,7 +1385,7 @@
             },
             {
                 "name": "Drogue Chute",
-                "era": "Pioneer",
+                "era": "Last Hurrah",
                 "cost": 3,
                 "warning": "Drogue Chute Warning"
             }
@@ -1960,13 +1960,6 @@
                 "cost": 1,
                 "cp10s": 1,
                 "warning": "Windmill Warning"
-            },
-            {
-                "name": "Ram Air Scoop",
-                "era": "WWI",
-                "charge": 1,
-                "cost": 3,
-                "cp10s": 0
             },
             {
                 "name": "Battery",

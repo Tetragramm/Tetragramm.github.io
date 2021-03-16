@@ -15,7 +15,7 @@ const init = () => {
             var str = LZString.decompressFromEncodedURIComponent(qp);
             var arr = _stringToArrayBuffer(str);
             var des = new Deserialize(arr);
-            if (des.version < 11.85) {
+            if (des.version < 11.95) {
                 //Redirect
             }
             else {

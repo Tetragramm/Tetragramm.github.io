@@ -3415,6 +3415,9 @@ class Engine extends Part {
             this.gp_count = Math.max(1, this.gp_count);
         }
         stats.cost += this.gp_count + this.gpr_count;
+        if (this.gp_count > 0) {
+            stats.era.add({ name: "Propeller Gearing", era: "WWI" });
+        }
         if (this.gpr_count > 0) {
             stats.era.add({ name: "Reliable Gearing", era: "Roaring 20s" });
         }
@@ -5711,6 +5714,15 @@ class Frames_HTML extends Display {
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
+var WING_DECK;
+(function (WING_DECK) {
+    WING_DECK[WING_DECK["PARASOL"] = 0] = "PARASOL";
+    WING_DECK[WING_DECK["SHOULDER"] = 1] = "SHOULDER";
+    WING_DECK[WING_DECK["MID"] = 2] = "MID";
+    WING_DECK[WING_DECK["LOW"] = 3] = "LOW";
+    WING_DECK[WING_DECK["GEAR"] = 4] = "GEAR";
+})(WING_DECK || (WING_DECK = {}));
+;
 class Wings extends Part {
     constructor(js) {
         super();
@@ -5924,11 +5936,11 @@ class Wings extends Part {
         //     return false;
         if (!this.stagger_list[this.wing_stagger].inline) { //If not tandem...
             //No shoulder with gull parasol
-            if (deck == 1 && this.HasPolishWing())
+            if (deck == WING_DECK.SHOULDER && this.HasPolishWing())
                 return false;
             //Limited numbers of each deck
             var full_count = this.DeckCountFull();
-            if (full_count[deck] == 1 && this.deck_list[deck].limited)
+            if (full_count[deck] == WING_DECK.SHOULDER && this.deck_list[deck].limited)
                 return false;
         }
         var mini_count = this.DeckCountMini();
@@ -6038,20 +6050,24 @@ class Wings extends Part {
         }
         this.CalculateStats();
     }
-    HasShoulder() {
+    HasNonGullDeck(deck) {
         for (let w of this.wing_list) {
-            if (w.deck == 1) //If we have shoulder...
+            if (w.deck == deck && !w.gull) //If we have shoulder...
                 return true;
         }
         return false;
     }
     CanGull(deck) {
-        if (deck == 0) {
-            if (!this.GetTandem() && this.HasShoulder())
+        if (deck == WING_DECK.PARASOL) {
+            if (!this.GetTandem() && this.HasNonGullDeck(WING_DECK.SHOULDER))
                 return false;
         }
-        else if (deck == 1) {
+        else if (deck == WING_DECK.SHOULDER) {
             return false;
+        }
+        else {
+            if (!this.GetTandem() && this.HasNonGullDeck(deck - 1))
+                return false;
         }
         return true;
     }
@@ -6098,12 +6114,12 @@ class Wings extends Part {
     }
     GetParasol() {
         for (let w of this.wing_list) {
-            if (w.deck == 0) {
+            if (w.deck == WING_DECK.PARASOL) {
                 return true;
             }
         }
         for (let w of this.mini_wing_list) {
-            if (w.deck == 0) {
+            if (w.deck == WING_DECK.PARASOL) {
                 return true;
             }
         }
@@ -6222,7 +6238,7 @@ class Wings extends Part {
     }
     HasPolishWing() {
         for (let w of this.wing_list) {
-            if (w.deck == 0 && w.gull == true) {
+            if (w.deck == WING_DECK.PARASOL && w.gull == true) {
                 return true;
             }
         }
@@ -6231,7 +6247,7 @@ class Wings extends Part {
     HasInvertedGull() {
         var ret = -1;
         for (let w of this.wing_list) {
-            if (w.gull && w.deck > 1) {
+            if (w.gull && w.deck > WING_DECK.SHOULDER) {
                 ret = Math.max(ret, w.deck);
             }
         }
@@ -6365,6 +6381,9 @@ class Wings extends Part {
                 break;
             default:
             //NOTHING...
+        }
+        if (this.HasInvertedGull() > 0 || this.HasPolishWing()) {
+            stats.era.add({ name: "Gull Wing", era: "Coming Storm" });
         }
         //Wing Sweep effects
         if (this.is_swept) {
@@ -8859,7 +8878,14 @@ class Accessories extends Part {
         if (js["v"] == 2) {
             this.armour_coverage = js["armour_coverage"];
         }
-        this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length);
+        if (json_version < 11.85) {
+            this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length + 1);
+            this.electrical_count[0] += this.electrical_count[1];
+            this.electrical_count.splice(1, 1);
+        }
+        else {
+            this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length);
+        }
         this.radio_sel = js["radio_sel"];
         this.info_sel = BoolArr(js["info_sel"], this.info_sel.length);
         this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
@@ -8879,7 +8905,14 @@ class Accessories extends Part {
     }
     deserialize(d) {
         this.armour_coverage = d.GetNumArr(this.armour_coverage.length);
-        this.electrical_count = d.GetNumArr(this.electrical_count.length);
+        if (d.version < 11.85) {
+            this.electrical_count = d.GetNumArr(this.electrical_count.length + 1);
+            this.electrical_count[0] += this.electrical_count[1];
+            this.electrical_count.splice(1, 1);
+        }
+        else {
+            this.electrical_count = d.GetNumArr(this.electrical_count.length);
+        }
         this.radio_sel = d.GetNum();
         this.info_sel = d.GetBoolArr(this.info_sel.length);
         this.visi_sel = d.GetBoolArr(this.visi_sel.length);
@@ -14713,7 +14746,7 @@ const init = () => {
             var str = LZString.decompressFromEncodedURIComponent(qp);
             var arr = _stringToArrayBuffer(str);
             var des = new Deserialize(arr);
-            if (des.version < 11.85) {
+            if (des.version < 11.95) {
                 //Redirect
             }
             else {

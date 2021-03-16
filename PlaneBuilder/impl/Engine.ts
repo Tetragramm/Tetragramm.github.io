@@ -855,6 +855,9 @@ class Engine extends Part {
             this.gp_count = Math.max(1, this.gp_count);
         }
         stats.cost += this.gp_count + this.gpr_count;
+        if (this.gp_count > 0) {
+            stats.era.add({ name: "Propeller Gearing", era: "WWI" });
+        }
         if (this.gpr_count > 0) {
             stats.era.add({ name: "Reliable Gearing", era: "Roaring 20s" });
         }

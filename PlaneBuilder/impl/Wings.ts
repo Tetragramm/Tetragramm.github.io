@@ -10,6 +10,13 @@ type WingType = {
     dihedral: number, anhedral: number,
     gull: boolean, deck: number
 };
+enum WING_DECK {
+    PARASOL,
+    SHOULDER,
+    MID,
+    LOW,
+    GEAR,
+};
 class Wings extends Part {
     //Possible selections
     private wing_list: WingType[];
@@ -269,12 +276,12 @@ class Wings extends Part {
 
         if (!this.stagger_list[this.wing_stagger].inline) {//If not tandem...
             //No shoulder with gull parasol
-            if (deck == 1 && this.HasPolishWing())
+            if (deck == WING_DECK.SHOULDER && this.HasPolishWing())
                 return false;
 
             //Limited numbers of each deck
             var full_count = this.DeckCountFull();
-            if (full_count[deck] == 1 && this.deck_list[deck].limited)
+            if (full_count[deck] == WING_DECK.SHOULDER && this.deck_list[deck].limited)
                 return false
         }
 
@@ -413,20 +420,23 @@ class Wings extends Part {
         this.CalculateStats();
     }
 
-    private HasShoulder() {
+    private HasNonGullDeck(deck: number) {
         for (let w of this.wing_list) {
-            if (w.deck == 1)//If we have shoulder...
+            if (w.deck == deck && !w.gull)//If we have shoulder...
                 return true;
         }
         return false;
     }
 
     public CanGull(deck: number) {
-        if (deck == 0) {
-            if (!this.GetTandem() && this.HasShoulder())
+        if (deck == WING_DECK.PARASOL) {
+            if (!this.GetTandem() && this.HasNonGullDeck(WING_DECK.SHOULDER))
                 return false;
-        } else if (deck == 1) {
+        } else if (deck == WING_DECK.SHOULDER) {
             return false;
+        } else {
+            if (!this.GetTandem() && this.HasNonGullDeck(deck - 1))
+                return false;
         }
         return true;
     }
@@ -479,12 +489,12 @@ class Wings extends Part {
 
     public GetParasol() {
         for (let w of this.wing_list) {
-            if (w.deck == 0) {
+            if (w.deck == WING_DECK.PARASOL) {
                 return true;
             }
         }
         for (let w of this.mini_wing_list) {
-            if (w.deck == 0) {
+            if (w.deck == WING_DECK.PARASOL) {
                 return true;
             }
         }
@@ -616,7 +626,7 @@ class Wings extends Part {
 
     private HasPolishWing(): boolean {
         for (let w of this.wing_list) {
-            if (w.deck == 0 && w.gull == true) {
+            if (w.deck == WING_DECK.PARASOL && w.gull == true) {
                 return true;
             }
         }
@@ -626,7 +636,7 @@ class Wings extends Part {
     public HasInvertedGull(): number {
         var ret = -1;
         for (let w of this.wing_list) {
-            if (w.gull && w.deck > 1) {
+            if (w.gull && w.deck > WING_DECK.SHOULDER) {
                 ret = Math.max(ret, w.deck);
             }
         }
@@ -785,6 +795,9 @@ class Wings extends Part {
                 break;
             default:
             //NOTHING...
+        }
+        if (this.HasInvertedGull() > 0 || this.HasPolishWing()) {
+            stats.era.add({ name: "Gull Wing", era: "Coming Storm" });
         }
 
         //Wing Sweep effects
