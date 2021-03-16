@@ -108,8 +108,7 @@ class WeaponSystem extends Part {
             this.action_sel = js["action"];
             this.projectile_sel = js["projectile"];
         }
-        if (json_version < 11.65) {
-            console.log("Projectile " + this.projectile_sel.toString())
+        if (json_version < 11.75) {
             if (this.projectile_sel == ProjectileType.PNEUMATIC) {
                 this.projectile_sel = ProjectileType.BULLETS;
             } else if (this.projectile_sel == ProjectileType.ENUM_MAX) {
@@ -184,7 +183,7 @@ class WeaponSystem extends Part {
             this.action_sel = d.GetNum();
             this.projectile_sel = d.GetNum();
         }
-        if (d.version < 10.75) {
+        if (d.version < 11.75) {
             if (this.projectile_sel == ProjectileType.PNEUMATIC) {
                 this.projectile_sel = ProjectileType.BULLETS;
             } else if (this.projectile_sel == ProjectileType.ENUM_MAX) {
