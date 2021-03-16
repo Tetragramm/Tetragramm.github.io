@@ -108,7 +108,7 @@ class WeaponSystem extends Part {
             this.action_sel = js["action"];
             this.projectile_sel = js["projectile"];
         }
-        if (json_version < 11.75) {
+        if (json_version < 11.65) {
             console.log("Projectile " + this.projectile_sel.toString())
             if (this.projectile_sel == ProjectileType.PNEUMATIC) {
                 this.projectile_sel = ProjectileType.BULLETS;
