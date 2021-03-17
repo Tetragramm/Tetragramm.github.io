@@ -5215,7 +5215,7 @@ class Stabilizers extends Part {
             var drag = Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
             stats.drag += Math.max(1, drag);
         }
-        else if (this.hstab_sel >= 0 && this.hstab_list[this.hstab_sel].increment != 0) {
+        else if (this.hstab_sel < 0 || this.hstab_list[this.hstab_sel].increment != 0) {
             stats.pitchstab -= Math.floor(1.0e-6 + this.wing_area / 2);
             stats.liftbleed += 5;
         }
@@ -5225,7 +5225,7 @@ class Stabilizers extends Part {
             var drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
             stats.drag += Math.max(1, drag);
         }
-        else if (this.vstab_sel >= 0 && (this.vstab_list[this.vstab_sel].increment != 0 || (this.vstab_list[this.vstab_sel].increment == 0 && this.hstab_count == 0))) {
+        else if (this.vstab_sel < 0 || (this.vstab_list[this.vstab_sel].increment != 0 || (this.vstab_list[this.vstab_sel].increment == 0 && this.hstab_count == 0))) {
             stats.latstab -= this.wing_area;
         }
         //Additional stabilizers
