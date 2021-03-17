@@ -259,7 +259,7 @@ class Stabilizers extends Part {
     }
 
     public CanVOutboard() {
-        return this.is_swept || this.is_tandem || this.hstab_list[this.hstab_sel].is_canard;
+        return this.is_swept || this.is_tandem || (this.hstab_list[this.hstab_sel].is_canard && this.hstab_count > 0);
     }
 
     public GetVOutboard() {

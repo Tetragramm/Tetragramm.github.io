@@ -5145,7 +5145,7 @@ class Stabilizers extends Part {
         this.is_swept = is;
     }
     CanVOutboard() {
-        return this.is_swept || this.is_tandem || this.hstab_list[this.hstab_sel].is_canard;
+        return this.is_swept || this.is_tandem || (this.hstab_list[this.hstab_sel].is_canard && this.hstab_count > 0);
     }
     GetVOutboard() {
         return this.vstab_list[this.vstab_sel].name == "Outboard";
