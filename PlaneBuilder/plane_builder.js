@@ -5109,7 +5109,9 @@ class Stabilizers extends Part {
         this.CalculateStats();
     }
     GetHStabIncrement() {
-        return this.hstab_list[this.hstab_sel].increment;
+        if (this.hstab_sel >= 0)
+            return this.hstab_list[this.hstab_sel].increment;
+        return 1;
     }
     GetVStabCount() {
         return this.vstab_count;
@@ -5130,7 +5132,9 @@ class Stabilizers extends Part {
         this.CalculateStats();
     }
     GetVStabIncrement() {
-        return this.vstab_list[this.vstab_sel].increment;
+        if (this.vstab_sel >= 0)
+            return this.vstab_list[this.vstab_sel].increment;
+        return 1;
     }
     SetEngineCount(num) {
         this.engine_count = num;
@@ -5189,11 +5193,21 @@ class Stabilizers extends Part {
     }
     PartStats() {
         var vvalid = this.GetVValidList();
-        if (!vvalid[this.vstab_sel])
+        if (!vvalid[this.vstab_sel]) {
             this.vstab_sel = 0;
+            if (!vvalid[this.vstab_sel]) {
+                this.vstab_sel = -1;
+                this.vstab_count = 0;
+            }
+        }
         var hvalid = this.GetHValidList();
-        if (!hvalid[this.hstab_sel])
+        if (!hvalid[this.hstab_sel]) {
             this.hstab_sel = 0;
+            if (!hvalid[this.hstab_sel]) {
+                this.hstab_sel = -1;
+                this.hstab_count = 0;
+            }
+        }
         var stats = new Stats();
         //HSTAB
         if (this.hstab_count > 0) {
@@ -5201,7 +5215,7 @@ class Stabilizers extends Part {
             var drag = Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
             stats.drag += Math.max(1, drag);
         }
-        else if (this.hstab_list[this.hstab_sel].increment != 0) {
+        else if (this.hstab_sel >= 0 && this.hstab_list[this.hstab_sel].increment != 0) {
             stats.pitchstab -= Math.floor(1.0e-6 + this.wing_area / 2);
             stats.liftbleed += 5;
         }
@@ -5211,13 +5225,13 @@ class Stabilizers extends Part {
             var drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
             stats.drag += Math.max(1, drag);
         }
-        else if (this.vstab_list[this.vstab_sel].increment != 0 || (this.vstab_list[this.vstab_sel].increment == 0 && this.hstab_count == 0)) {
+        else if (this.vstab_sel >= 0 && (this.vstab_list[this.vstab_sel].increment != 0 || (this.vstab_list[this.vstab_sel].increment == 0 && this.hstab_count == 0))) {
             stats.latstab -= this.wing_area;
         }
         //Additional stabilizers
         stats.drag += 2 * (Math.max(0, this.hstab_count - 1) + Math.max(0, this.vstab_count - 1));
         //Pairs of stabilizers
-        if (this.vstab_list[this.vstab_sel].increment != 0) {
+        if (this.vstab_sel >= 0 && this.vstab_list[this.vstab_sel].increment != 0) {
             var leftovers = Math.max(0, this.hstab_count - 1);
             var es_pairs = Math.min(this.engine_count - 1, this.vstab_count - 1);
             leftovers += Math.max(0, this.vstab_count - 1 - es_pairs);
