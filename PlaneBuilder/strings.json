@@ -580,6 +580,7 @@
         "Passengers Number of Beds": "Number of 1st Class, Beds, or Stretchers",
         "Passengers Upgrade": "Upgrade",
         "Passengers Connectivity": "Connectivity",
+        "Passengers Count": "{0} cabin seats and {1} first class or stretcher steats.",
         "Propeller Section Title": "Propeller",
         "Propeller Propeller Pitch": "Propeller Pitch:",
         "Propeller Propeller Upgrades:": "Propeller Upgrades:",
@@ -695,6 +696,11 @@
         "Crew Gunner": "Gunner",
         "Crew Aircrew": "Aircrew",
         "Diesel": "Diesel Engine",
-        "Diesel Warning": "Engine won't catch fire."
+        "Diesel Warning": "Engine won't catch fire.",
+        "Cargo Tiny": "A small locker for personal stuff.",
+        "Cargo Small": "Will fit a trunk, barrel, or crate.",
+        "Cargo Medium": "Will fit a small vehicle like a motorcycle, car, or zeppelin engine.",
+        "Cargo Large": "Will fit a scout or fighter aircraft with the wings taken off.",
+        "Cargo Huge": "Will fit just about anything you can imagine."
     }
 }

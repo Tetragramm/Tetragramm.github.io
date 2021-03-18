@@ -86,6 +86,11 @@ class Passengers extends Part {
         //Because it is load, it rounds up to the nearest 5 mass.
         if ((stats.bomb_mass % 5) > 0)
             stats.bomb_mass += 5 - (stats.bomb_mass % 5);
+
+        stats.warnings.push({
+            source: lu("Passengers Section Title"),
+            warning: lu("Passengers Count", this.seats, this.beds),
+        })
         return stats;
     }
 

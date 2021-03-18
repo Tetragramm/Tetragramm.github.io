@@ -1864,27 +1864,32 @@
             {
                 "name": "Tiny",
                 "era": "Pioneer",
-                "mass": 1
+                "mass": 1,
+                "warning": "Cargo Tiny"
             },
             {
                 "name": "Small",
                 "era": "Pioneer",
-                "reqsections": 1
+                "reqsections": 1,
+                "warning": "Cargo Small"
             },
             {
                 "name": "Medium",
                 "era": "Pioneer",
-                "reqsections": 3
+                "reqsections": 3,
+                "warning": "Cargo Medium"
             },
             {
                 "name": "Large",
                 "era": "Pioneer",
-                "reqsections": 5
+                "reqsections": 5,
+                "warning": "Cargo Large"
             },
             {
                 "name": "Huge",
                 "era": "Pioneer",
-                "reqsections": 10
+                "reqsections": 10,
+                "warning": "Cargo Huge"
             }
         ]
     },
