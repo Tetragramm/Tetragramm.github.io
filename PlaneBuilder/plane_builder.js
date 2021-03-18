@@ -2897,6 +2897,7 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.cost += 4;
+            stats.era.add({ name: "Air Cooling Fan", era: "WWII" });
         }
         else {
             this.intake_fan = false;
@@ -10222,7 +10223,7 @@ class Cockpit_HTML extends Display {
         BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
         var fs = this.cockpit.GetFlightStress();
         if (fs[0] != fs[1]) {
-            BlinkIfChanged(this.d_strs, StringFmt.Format("{0}({1})", fs[0], fs[1]));
+            BlinkIfChanged(this.d_strs, StringFmt.Format("{0}", fs[0]));
         }
         else {
             BlinkIfChanged(this.d_strs, StringFmt.Format("{0}", fs[0]));

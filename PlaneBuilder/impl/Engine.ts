@@ -903,6 +903,7 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.cost += 4;
+            stats.era.add({ name: "Air Cooling Fan", era: "WWII" });
         }
         else {
             this.intake_fan = false;
