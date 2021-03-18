@@ -87,10 +87,13 @@ class Passengers extends Part {
         if ((stats.bomb_mass % 5) > 0)
             stats.bomb_mass += 5 - (stats.bomb_mass % 5);
 
-        stats.warnings.push({
-            source: lu("Passengers Section Title"),
-            warning: lu("Passengers Count", this.seats, this.beds),
-        })
+        if (this.seats + this.beds > 0) {
+            stats.warnings.push({
+                source: lu("Passengers Section Title"),
+                warning: lu("Passengers Count", this.seats, this.beds),
+            });
+        }
+
         return stats;
     }
 
