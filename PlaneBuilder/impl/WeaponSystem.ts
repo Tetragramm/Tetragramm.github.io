@@ -810,6 +810,7 @@ class WeaponSystem extends Part {
         var count = 0;
         for (let w of this.weapons) {
             w.has_cantilever = this.has_cantilever;
+            w.SetTurret(this.GetDirectionCount() > 2);
             stats = stats.Add(w.PartStats());
 
             count += w.GetCount();

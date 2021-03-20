@@ -7319,6 +7319,9 @@ class Weapon extends Part {
     IsLightningArc() {
         return this.weapon_type.name == "Lightning Arc";
     }
+    SetTurret(is) {
+        this.turret = is;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -7365,7 +7368,7 @@ class Weapon extends Part {
             stats.drag += this.w_count;
         //Arty size weapon turrets need a section
         //Arty weapons in the fuselage need a section
-        if ((!this.fixed && size > 8) || this.weapon_type.size == 16)
+        if ((this.turret && size > 8) || this.weapon_type.size == 16)
             stats.reqsections += 1;
         //Accessible Cost
         if (this.accessible) {
@@ -8146,6 +8149,7 @@ class WeaponSystem extends Part {
         var count = 0;
         for (let w of this.weapons) {
             w.has_cantilever = this.has_cantilever;
+            w.SetTurret(this.GetDirectionCount() > 2);
             stats = stats.Add(w.PartStats());
             count += w.GetCount();
             if (!this.fixed) {

@@ -49,6 +49,7 @@ class Weapon extends Part {
     public wing_reinforcement: boolean;
     public has_cantilever: boolean;
     private action: ActionType;
+    private turret: boolean;
 
     constructor(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
         super();
@@ -366,6 +367,10 @@ class Weapon extends Part {
         return this.weapon_type.name == "Lightning Arc";
     }
 
+    public SetTurret(is: boolean) {
+        this.turret = is;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
@@ -417,7 +422,7 @@ class Weapon extends Part {
 
         //Arty size weapon turrets need a section
         //Arty weapons in the fuselage need a section
-        if ((!this.fixed && size > 8) || this.weapon_type.size == 16)
+        if ((this.turret && size > 8) || this.weapon_type.size == 16)
             stats.reqsections += 1;
 
         //Accessible Cost
