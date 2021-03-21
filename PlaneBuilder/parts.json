@@ -930,7 +930,7 @@
     "wings": {
         "decks": [
             {
-                "name": "Parasol",
+                "name": "Wing Deck Parasol",
                 "era": "Pioneer",
                 "pitchstab": 3,
                 "maxstrain": -10,
@@ -939,7 +939,7 @@
                 "limited": false
             },
             {
-                "name": "Shoulder",
+                "name": "Wing Deck Shoulder",
                 "era": "Pioneer",
                 "pitchstab": 2,
                 "liftbleed": -1,
@@ -947,12 +947,12 @@
                 "limited": true
             },
             {
-                "name": "Mid",
+                "name": "Wing Deck Mid",
                 "era": "Pioneer",
                 "limited": true
             },
             {
-                "name": "Low",
+                "name": "Wing Deck Low",
                 "era": "Pioneer",
                 "pitchstab": -2,
                 "crashsafety": -1,
@@ -960,7 +960,7 @@
                 "limited": true
             },
             {
-                "name": "Gear",
+                "name": "Wing Deck Gear",
                 "era": "Pioneer",
                 "pitchstab": -3,
                 "maxstrain": -10,
@@ -971,32 +971,32 @@
         ],
         "largest": [
             {
-                "name": "Parasol",
+                "name": "Wing Deck Parasol",
                 "era": "Pioneer",
                 "latstab": 1,
                 "control": -1,
                 "dragfactor": 1
             },
             {
-                "name": "Shoulder",
+                "name": "Wing Deck Shoulder",
                 "era": "Pioneer",
                 "control": -1,
                 "dragfactor": 1
             },
             {
-                "name": "Mid",
+                "name": "Wing Deck Mid",
                 "era": "Pioneer",
                 "dragfactor": 0.9
             },
             {
-                "name": "Low",
+                "name": "Wing Deck Low",
                 "era": "Pioneer",
                 "latstab": -1,
                 "control": 2,
                 "dragfactor": 1
             },
             {
-                "name": "Gear",
+                "name": "Wing Deck Gear",
                 "era": "Pioneer",
                 "latstab": -1,
                 "control": 3,
