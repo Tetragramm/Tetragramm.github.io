@@ -161,8 +161,10 @@ class Cockpit_HTML extends Display {
         }
 
         var sfty = this.cockpit.GetSelectedSafety();
+        let can = this.cockpit.CanSafety();
         for (let i = 0; i < this.sft_chbxs.length; i++) {
             this.sft_chbxs[i].checked = sfty[i];
+            this.sft_chbxs[i].disabled = !can[i];
         }
 
         var guns = this.cockpit.GetSelectedGunsights();

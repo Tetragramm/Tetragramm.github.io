@@ -4,7 +4,7 @@
 
 class Cockpits extends Part {
     private positions: Cockpit[];
-    private types: { name: string, stats: Stats }[];
+    private types: { name: string, exposed: boolean, stats: Stats }[];
     private upgrades: { name: string, stats: Stats }[];
     private safety: { name: string, stats: Stats }[];
     private gunsights: { name: string, attack: number, stats: Stats }[];
@@ -16,7 +16,7 @@ class Cockpits extends Part {
         this.types = [];
         //Add all the cockpit types
         for (let elem of js["options"]) {
-            let opt = { name: elem["name"], stats: new Stats(elem) };
+            let opt = { name: elem["name"], exposed: elem["exposed"], stats: new Stats(elem) };
             this.types.push(opt);
         }
         this.upgrades = [];
@@ -51,8 +51,7 @@ class Cockpits extends Part {
         this.positions = [];
         for (let elem of js["positions"]) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
-            if (this.positions.length == 0)
-                cp.SetPrimary();
+            cp.SetSeatIndex(this.positions.length);
             cp.fromJSON(elem, json_version);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
@@ -72,8 +71,7 @@ class Cockpits extends Part {
         this.positions = [];
         for (let i = 0; i < len; i++) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
-            if (this.positions.length == 0)
-                cp.SetPrimary();
+            cp.SetSeatIndex(this.positions.length);
             cp.deserialize(d);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
@@ -133,8 +131,7 @@ class Cockpits extends Part {
         }
         while (this.positions.length < num) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
-            if (this.positions.length == 0)
-                cp.SetPrimary();
+            cp.SetSeatIndex(this.positions.length);
             if (js)
                 cp.fromJSON(JSON.parse(js), 1000);
             cp.SetCalculateStats(this.CalculateStats);

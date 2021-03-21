@@ -3,7 +3,7 @@
 
 class Cockpit extends Part {
     private stats: Stats;
-    private types: { name: string, stats: Stats }[];
+    private types: { name: string, exposed: boolean, stats: Stats }[];
     private upgrades: { name: string, stats: Stats }[];
     private safety: { name: string, stats: Stats }[];
     private gunsights: { name: string, attack: number, stats: Stats }[];
@@ -15,12 +15,12 @@ class Cockpit extends Part {
     private total_escape: number;
     private total_visibility: number;
     private total_crash: number;
-    private is_primary: boolean;
+    private seat_index: number;
     private bombsight: number;
     private has_rotary: boolean;
     private is_armed: boolean;
 
-    constructor(tl: { name: string, stats: Stats }[],
+    constructor(tl: { name: string, exposed: boolean, stats: Stats }[],
         ul: { name: string, stats: Stats }[],
         sl: { name: string, stats: Stats }[],
         gl: { name: string, attack: number, stats: Stats }[]
@@ -38,7 +38,7 @@ class Cockpit extends Part {
         this.total_stress = [0, 0];
         this.total_escape = 0;
         this.total_visibility = 0;
-        this.is_primary = false;
+        this.seat_index = 0;
         this.bombsight = 0;
         this.is_armed = false;
     }
@@ -58,7 +58,7 @@ class Cockpit extends Part {
         this.selected_upgrades = BoolArr(js["upgrades"], this.selected_upgrades.length);
         this.selected_safety = BoolArr(js["safety"], this.selected_safety.length);
         this.selected_gunsights = BoolArr(js["sights"], this.selected_gunsights.length);
-        if (this.is_primary)
+        if (this.IsPrimary())
             this.selected_upgrades[0] = false;
         if (json_version > 10.35)
             this.bombsight = js["bombsight"];
@@ -77,7 +77,7 @@ class Cockpit extends Part {
         this.selected_upgrades = d.GetBoolArr(this.selected_upgrades.length);
         this.selected_safety = d.GetBoolArr(this.selected_safety.length);
         this.selected_gunsights = d.GetBoolArr(this.selected_gunsights.length);
-        if (this.is_primary)
+        if (this.IsPrimary())
             this.selected_upgrades[0] = false;
         if (d.version > 10.35)
             this.bombsight = d.GetNum();
@@ -123,6 +123,12 @@ class Cockpit extends Part {
 
     public GetSelectedSafety() {
         return this.selected_safety;
+    }
+
+    public CanSafety() {
+        let lst = Array(this.safety.length).fill(true);
+        lst[5] = !this.types[this.selected_type].exposed;
+        return lst;
     }
 
     public SetSafety(index: number, state: boolean) {
@@ -171,13 +177,17 @@ class Cockpit extends Part {
         return mx;
     }
 
-    public SetPrimary() {
-        this.is_primary = true;
+    public SetSeatIndex(idx: number) {
+        this.seat_index = idx;
+    }
+
+    private IsPrimary() {
+        return this.seat_index == 0;
     }
 
     public CanUpgrades() {
         var can = [...Array(this.upgrades.length).fill(true)];
-        if (this.is_primary) {
+        if (this.IsPrimary()) {
             can[0] = false;
         }
         return can;
@@ -224,7 +234,7 @@ class Cockpit extends Part {
     }
 
     public GetName() {
-        if (this.is_primary) {
+        if (this.IsPrimary()) {
             return "Crew Pilot";
         }
         if (this.bombsight > 0) {
@@ -240,7 +250,7 @@ class Cockpit extends Part {
     }
 
     public PartStats(): Stats {
-        var stats = new Stats();
+        let stats = new Stats();
         stats.reqsections = 1;
 
         stats = stats.Add(this.types[this.selected_type].stats);
@@ -250,7 +260,11 @@ class Cockpit extends Part {
                 stats = stats.Add(this.upgrades[i].stats);
         }
 
+        let can = this.CanSafety();
         for (let i = 0; i < this.selected_safety.length; i++) {
+            if (!can[i])
+                this.selected_safety[i] = false;
+
             if (this.selected_safety[i])
                 stats = stats.Add(this.safety[i].stats);
         }
@@ -274,6 +288,10 @@ class Cockpit extends Part {
             }
         }
 
+        for (let w of stats.warnings) {
+            w.source = lu("Seat #", this.seat_index + 1) + " " + w.source;
+        }
+
         this.stats = stats.Clone();
 
         //Special stuff for co-pilot controls
@@ -292,7 +310,7 @@ class Cockpit extends Part {
         this.total_escape = this.stats.escape + escape;
         let ncp_stress = this.stats.flightstress;
         let cp_stress = this.stats.flightstress;
-        if (this.is_primary || this.selected_upgrades[0]) {
+        if (this.IsPrimary() || this.selected_upgrades[0]) {
             ncp_stress += controlstress;
             cp_stress += controlstress - copilots * 2;
         }

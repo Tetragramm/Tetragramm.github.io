@@ -98,9 +98,10 @@ class Load_HTML extends Display {
     }
 
     private InitCargoAndPassengers(cell: HTMLTableCellElement) {
-        var fs = CreateFlexSection(cell);
+        // var fs = CreateFlexSection(cell);
         this.carg = document.createElement("SELECT") as HTMLSelectElement;
-        FlexSelect(lu("Load Cargo"), this.carg, fs);
+        // FlexSelect(lu("Load Cargo"), this.carg, fs);
+        cell.appendChild(this.carg);
         var lst = this.cargo.GetSpaceList();
         for (let l of lst) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;

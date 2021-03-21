@@ -114,6 +114,9 @@ class Accessories extends Part {
         this.info_sel = BoolArr(js["info_sel"], this.info_sel.length);
         this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
         this.clim_sel = BoolArr(js["clim_sel"], this.clim_sel.length);
+        if (json_version < 11.95) {
+            this.clim_sel.splice(2, 1);
+        }
         this.auto_sel = js["auto_sel"];
         this.cont_sel = js["cont_sel"];
     }
@@ -142,6 +145,9 @@ class Accessories extends Part {
         this.info_sel = d.GetBoolArr(this.info_sel.length);
         this.visi_sel = d.GetBoolArr(this.visi_sel.length);
         this.clim_sel = d.GetBoolArr(this.clim_sel.length);
+        if (d.version < 11.95) {
+            this.clim_sel.splice(2, 1);
+        }
         this.auto_sel = d.GetNum();
         this.cont_sel = d.GetNum();
     }

@@ -1,5 +1,5 @@
 {
-    "version": "11.9",
+    "version": "12.0",
     "era": {
         "options": [
             {
@@ -62,7 +62,8 @@
                 "escape": 2,
                 "cost": 0,
                 "flightstress": 0,
-                "visibility": 1
+                "visibility": 1,
+                "exposed": true
             },
             {
                 "name": "Windscreen",
@@ -73,7 +74,8 @@
                 "escape": 2,
                 "cost": 1,
                 "flightstress": 0,
-                "visibility": 1
+                "visibility": 1,
+                "exposed": true
             },
             {
                 "name": "Sealed",
@@ -85,7 +87,8 @@
                 "cost": 1,
                 "flightstress": -1,
                 "visibility": -99,
-                "warning": "Sealed Warning"
+                "warning": "Sealed Warning",
+                "exposed": false
             },
             {
                 "name": "Narrow Canopy",
@@ -96,7 +99,8 @@
                 "escape": 0,
                 "cost": 3,
                 "flightstress": -1,
-                "visibility": -1
+                "visibility": -1,
+                "exposed": false
             },
             {
                 "name": "Bubble Canopy",
@@ -107,7 +111,8 @@
                 "escape": 0,
                 "cost": 8,
                 "flightstress": -1,
-                "visibility": 0
+                "visibility": 0,
+                "exposed": false
             }
         ],
         "upgrades": [
@@ -212,6 +217,13 @@
                 "era": "Roaring 20s",
                 "cost": 1,
                 "warning": "Flare Slot Warning"
+            },
+            {
+                "name": "Basic Fan",
+                "era": "Pioneer",
+                "charge": 1.0e-9,
+                "visibility": -1,
+                "warning": "Basic Fan Warning"
             }
         ],
         "gunsights": [
@@ -2112,12 +2124,6 @@
                 "era": "Pioneer",
                 "cost": 1,
                 "req_radiator": true
-            },
-            {
-                "name": "Basic Fan",
-                "era": "Pioneer",
-                "charge": 1.0e-9,
-                "req_radiator": false
             },
             {
                 "name": "Air Conditioning",

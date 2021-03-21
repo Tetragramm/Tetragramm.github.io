@@ -227,7 +227,7 @@ class Stats {
     MergeWarnings(owarn) {
         var newList = [];
         for (let w2 of this.warnings) {
-            newList.push(w2);
+            newList.push({ source: w2.source, warning: w2.warning });
         }
         for (let w of owarn) {
             let dup = false;
@@ -236,7 +236,7 @@ class Stats {
                     dup = true;
             }
             if (!dup)
-                newList.push(w);
+                newList.push({ source: w.source, warning: w.warning });
         }
         return newList;
     }
@@ -1633,7 +1633,7 @@ class Cockpit extends Part {
         this.total_stress = [0, 0];
         this.total_escape = 0;
         this.total_visibility = 0;
-        this.is_primary = false;
+        this.seat_index = 0;
         this.bombsight = 0;
         this.is_armed = false;
     }
@@ -1651,7 +1651,7 @@ class Cockpit extends Part {
         this.selected_upgrades = BoolArr(js["upgrades"], this.selected_upgrades.length);
         this.selected_safety = BoolArr(js["safety"], this.selected_safety.length);
         this.selected_gunsights = BoolArr(js["sights"], this.selected_gunsights.length);
-        if (this.is_primary)
+        if (this.IsPrimary())
             this.selected_upgrades[0] = false;
         if (json_version > 10.35)
             this.bombsight = js["bombsight"];
@@ -1668,7 +1668,7 @@ class Cockpit extends Part {
         this.selected_upgrades = d.GetBoolArr(this.selected_upgrades.length);
         this.selected_safety = d.GetBoolArr(this.selected_safety.length);
         this.selected_gunsights = d.GetBoolArr(this.selected_gunsights.length);
-        if (this.is_primary)
+        if (this.IsPrimary())
             this.selected_upgrades[0] = false;
         if (d.version > 10.35)
             this.bombsight = d.GetNum();
@@ -1705,6 +1705,11 @@ class Cockpit extends Part {
     }
     GetSelectedSafety() {
         return this.selected_safety;
+    }
+    CanSafety() {
+        let lst = Array(this.safety.length).fill(true);
+        lst[5] = !this.types[this.selected_type].exposed;
+        return lst;
     }
     SetSafety(index, state) {
         if (index >= this.safety.length)
@@ -1744,12 +1749,15 @@ class Cockpit extends Part {
         }
         return mx;
     }
-    SetPrimary() {
-        this.is_primary = true;
+    SetSeatIndex(idx) {
+        this.seat_index = idx;
+    }
+    IsPrimary() {
+        return this.seat_index == 0;
     }
     CanUpgrades() {
         var can = [...Array(this.upgrades.length).fill(true)];
-        if (this.is_primary) {
+        if (this.IsPrimary()) {
             can[0] = false;
         }
         return can;
@@ -1788,7 +1796,7 @@ class Cockpit extends Part {
         this.is_armed = is;
     }
     GetName() {
-        if (this.is_primary) {
+        if (this.IsPrimary()) {
             return "Crew Pilot";
         }
         if (this.bombsight > 0) {
@@ -1803,14 +1811,17 @@ class Cockpit extends Part {
         return "Crew Aircrew";
     }
     PartStats() {
-        var stats = new Stats();
+        let stats = new Stats();
         stats.reqsections = 1;
         stats = stats.Add(this.types[this.selected_type].stats);
         for (let i = 0; i < this.selected_upgrades.length; i++) {
             if (this.selected_upgrades[i])
                 stats = stats.Add(this.upgrades[i].stats);
         }
+        let can = this.CanSafety();
         for (let i = 0; i < this.selected_safety.length; i++) {
+            if (!can[i])
+                this.selected_safety[i] = false;
             if (this.selected_safety[i])
                 stats = stats.Add(this.safety[i].stats);
         }
@@ -1831,6 +1842,9 @@ class Cockpit extends Part {
                 });
             }
         }
+        for (let w of stats.warnings) {
+            w.source = lu("Seat #", this.seat_index + 1) + " " + w.source;
+        }
         this.stats = stats.Clone();
         //Special stuff for co-pilot controls
         if (this.selected_upgrades[0]) {
@@ -1846,7 +1860,7 @@ class Cockpit extends Part {
         this.total_escape = this.stats.escape + escape;
         let ncp_stress = this.stats.flightstress;
         let cp_stress = this.stats.flightstress;
-        if (this.is_primary || this.selected_upgrades[0]) {
+        if (this.IsPrimary() || this.selected_upgrades[0]) {
             ncp_stress += controlstress;
             cp_stress += controlstress - copilots * 2;
         }
@@ -1878,7 +1892,7 @@ class Cockpits extends Part {
         this.types = [];
         //Add all the cockpit types
         for (let elem of js["options"]) {
-            let opt = { name: elem["name"], stats: new Stats(elem) };
+            let opt = { name: elem["name"], exposed: elem["exposed"], stats: new Stats(elem) };
             this.types.push(opt);
         }
         this.upgrades = [];
@@ -1911,8 +1925,7 @@ class Cockpits extends Part {
         this.positions = [];
         for (let elem of js["positions"]) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
-            if (this.positions.length == 0)
-                cp.SetPrimary();
+            cp.SetSeatIndex(this.positions.length);
             cp.fromJSON(elem, json_version);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
@@ -1929,8 +1942,7 @@ class Cockpits extends Part {
         this.positions = [];
         for (let i = 0; i < len; i++) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
-            if (this.positions.length == 0)
-                cp.SetPrimary();
+            cp.SetSeatIndex(this.positions.length);
             cp.deserialize(d);
             cp.SetCalculateStats(this.CalculateStats);
             this.positions.push(cp);
@@ -1984,8 +1996,7 @@ class Cockpits extends Part {
         }
         while (this.positions.length < num) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
-            if (this.positions.length == 0)
-                cp.SetPrimary();
+            cp.SetSeatIndex(this.positions.length);
             if (js)
                 cp.fromJSON(JSON.parse(js), 1000);
             cp.SetCalculateStats(this.CalculateStats);
@@ -6496,6 +6507,9 @@ class Accessories extends Part {
         this.info_sel = BoolArr(js["info_sel"], this.info_sel.length);
         this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
         this.clim_sel = BoolArr(js["clim_sel"], this.clim_sel.length);
+        if (json_version < 11.95) {
+            this.clim_sel.splice(2, 1);
+        }
         this.auto_sel = js["auto_sel"];
         this.cont_sel = js["cont_sel"];
     }
@@ -6523,6 +6537,9 @@ class Accessories extends Part {
         this.info_sel = d.GetBoolArr(this.info_sel.length);
         this.visi_sel = d.GetBoolArr(this.visi_sel.length);
         this.clim_sel = d.GetBoolArr(this.clim_sel.length);
+        if (d.version < 11.95) {
+            this.clim_sel.splice(2, 1);
+        }
         this.auto_sel = d.GetNum();
         this.cont_sel = d.GetNum();
     }
@@ -10246,8 +10263,10 @@ class Cockpit_HTML extends Display {
             this.upg_chbxs[i].checked = upgs[i];
         }
         var sfty = this.cockpit.GetSelectedSafety();
+        let can = this.cockpit.CanSafety();
         for (let i = 0; i < this.sft_chbxs.length; i++) {
             this.sft_chbxs[i].checked = sfty[i];
+            this.sft_chbxs[i].disabled = !can[i];
         }
         var guns = this.cockpit.GetSelectedGunsights();
         for (let i = 0; i < this.gun_chbxs.length; i++) {
@@ -12052,9 +12071,10 @@ class Load_HTML extends Display {
         this.bay2.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
     }
     InitCargoAndPassengers(cell) {
-        var fs = CreateFlexSection(cell);
+        // var fs = CreateFlexSection(cell);
         this.carg = document.createElement("SELECT");
-        FlexSelect(lu("Load Cargo"), this.carg, fs);
+        // FlexSelect(lu("Load Cargo"), this.carg, fs);
+        cell.appendChild(this.carg);
         var lst = this.cargo.GetSpaceList();
         for (let l of lst) {
             let opt = document.createElement("OPTION");

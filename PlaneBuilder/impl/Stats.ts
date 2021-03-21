@@ -235,7 +235,7 @@ class Stats {
     private MergeWarnings(owarn: { source: string, warning: string }[]) {
         var newList = [];
         for (let w2 of this.warnings) {
-            newList.push(w2);
+            newList.push({ source: w2.source, warning: w2.warning });
         }
 
         for (let w of owarn) {
@@ -245,7 +245,7 @@ class Stats {
                     dup = true;
             }
             if (!dup)
-                newList.push(w);
+                newList.push({ source: w.source, warning: w.warning });
         }
         return newList;
     }
