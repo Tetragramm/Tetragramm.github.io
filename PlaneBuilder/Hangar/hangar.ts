@@ -9,7 +9,6 @@ const init = () => {
     const sp = new URLSearchParams(location.search);
     var lang = sp.get("lang");
 
-    // var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
     var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/parts.json', '/PlaneBuilder/engines.json', '/PlaneBuilder/weapons.json'];
     var proms = jsons.map(d => fetch(d));
     Promise.all(proms)

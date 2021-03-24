@@ -599,7 +599,11 @@ class WeaponSystem extends Part {
             if (this.IsLightningArc()) {
                 return [0, 0, 0, 0];
             } else if (this.final_weapon.ammo == 0) { //Fliergerflammenwerfer
-                return [3, 0, 0, 0];
+                var count = 0;
+                for (let w of this.weapons) {
+                    count += w.GetCount();
+                }
+                return [3 * count, 0, 0, 0];
             } else {
                 var count = 0;
                 for (let w of this.weapons) {
