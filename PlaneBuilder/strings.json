@@ -455,7 +455,7 @@
         "Autocannon": "Autocannon",
         "Battle Cannon": "Battle Cannon",
         "Precision Rifle": "Precision Rifle",
-        "Precision Rifle Warning": "Must be fired alone. Must Draw a Bead to fire. Never does more than 1 Hit worth of damage, but rolls Crits normally. Special Ammo: 1 Round per belt. Hits ammo adds or subtracts 5 Hits. Crit Ammo replaces normal Crits outright with the special effect.",
+        "Precision Rifle Warning": "Must be fired alone. Must Draw a Bead to fire. Never does more than 1 Hit worth of damage, but rolls Crits normally. Special Ammo: 1 Box per belt. Hits ammo adds or subtracts 5 Hits. Crit Ammo replaces normal Crits outright with the special effect.",
         "Lightning Arc": "Lightning Arc",
         "Lightning Arc Warning": "Uses 3 Charge to deal 1d10 damage to any aircraft within Close range.",
         "Harpoon Launcher": "Harpoon Launcher",
