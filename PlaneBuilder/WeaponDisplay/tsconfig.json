@@ -5,6 +5,8 @@
         "outFile": "weapon_display.js"
     },
     "include": [
-        "."
+        ".",
+        "../string/",
+        "../impl/Localization.ts"
     ]
 }
