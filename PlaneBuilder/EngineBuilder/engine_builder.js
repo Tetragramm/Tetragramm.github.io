@@ -1476,7 +1476,7 @@ class EngineBuilder {
                 break;
             }
         }
-        estats.stats.fuelconsumption = Math.min(1, estats.stats.fuelconsumption);
+        estats.stats.fuelconsumption = Math.max(1, estats.stats.fuelconsumption);
         return estats;
     }
     EngineInputs() {
