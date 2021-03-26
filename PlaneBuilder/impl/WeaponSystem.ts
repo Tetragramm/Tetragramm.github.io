@@ -736,7 +736,7 @@ class WeaponSystem extends Part {
                 ammo *= 2;
             }
             if (this.final_weapon.rapid)
-                return [count * ammo, Math.floor(1.0e-6 + 1.5 * count * ammo)];
+                return [count * ammo, Math.max(count * ammo + 1, Math.floor(1.0e-6 + 1.5 * count * ammo))];
             else
                 return [count * ammo];
         } else {
