@@ -402,6 +402,8 @@ class EngineBuilder {
             }
         }
 
+        estats.stats.fuelconsumption = Math.min(1, estats.stats.fuelconsumption);
+
         return estats;
     }
 
