@@ -1,5 +1,5 @@
 {
-    "version": "12.0",
+    "version": "12.1",
     "era": {
         "options": [
             {
@@ -2077,18 +2077,54 @@
                 "cost": 24
             }
         ],
-        "information": [
-            {
-                "name": "Reconnaissance Camera",
-                "era": "Pioneer",
-                "cost": 2,
-                "warning": "Reconnaissance Camera Warning"
-            },
+        "recon": [
             {
                 "name": "Guncam",
                 "era": "Pioneer",
                 "cost": 1,
                 "warning": "Guncam Warning"
+            },
+            {
+                "name": "Small Reconnaissance Camera",
+                "era": "Pioneer",
+                "mass": 1,
+                "drag": 1,
+                "warning": "Small Reconnaissance Camera Warning"
+            },
+            {
+                "name": "Medium Reconnaissance Camera",
+                "era": "Pioneer",
+                "mass": 2,
+                "drag": 2,
+                "warning": "Medium Reconnaissance Camera Warning"
+            },
+            {
+                "name": "Large Reconnaissance Camera",
+                "era": "Pioneer",
+                "mass": 3,
+                "drag": 3,
+                "warning": "Large Reconnaissance Camera Warning"
+            },
+            {
+                "name": "Internal Small Reconnaissance Camera",
+                "era": "Pioneer",
+                "mass": 1,
+                "cost": 2,
+                "warning": "Small Reconnaissance Camera Warning"
+            },
+            {
+                "name": "Internal Medium Reconnaissance Camera",
+                "era": "Pioneer",
+                "mass": 2,
+                "reqsections": 1,
+                "warning": "Medium Reconnaissance Camera Warning"
+            },
+            {
+                "name": "Internal Large Reconnaissance Camera",
+                "era": "Pioneer",
+                "mass": 3,
+                "reqsections": 1,
+                "warning": "Large Reconnaissance Camera Warning"
             }
         ],
         "visibility": [

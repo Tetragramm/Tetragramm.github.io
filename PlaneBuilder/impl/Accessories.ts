@@ -11,9 +11,9 @@ class Accessories extends Part {
     private electrical_count: number[];
     private radio_list: { name: string, stats: Stats }[];
     private radio_sel: number;
-    //Information
-    private info_list: { name: string, stats: Stats }[];
-    private info_sel: boolean[];
+    //Recon
+    private recon_list: { name: string, stats: Stats }[];
+    private recon_sel: number[];
     //Visibility
     private visi_list: { name: string, stats: Stats }[];
     private visi_sel: boolean[];
@@ -54,11 +54,11 @@ class Accessories extends Part {
             this.radio_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
 
-        this.info_list = [];
-        for (let elem of js["information"]) {
-            this.info_list.push({ name: elem["name"], stats: new Stats(elem) });
+        this.recon_list = [];
+        for (let elem of js["recon"]) {
+            this.recon_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
-        this.info_sel = [...Array(this.info_list.length).fill(false)];
+        this.recon_sel = Array(this.recon_list.length).fill(0);
 
         this.visi_list = [];
         for (let elem of js["visibility"]) {
@@ -91,7 +91,7 @@ class Accessories extends Part {
             armour_coverage: this.armour_coverage,
             electrical_count: this.electrical_count,
             radio_sel: this.radio_sel,
-            info_sel: this.info_sel,
+            recon_sel: this.recon_sel,
             visi_sel: this.visi_sel,
             clim_sel: this.clim_sel,
             auto_sel: this.auto_sel,
@@ -111,7 +111,16 @@ class Accessories extends Part {
             this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length);
         }
         this.radio_sel = js["radio_sel"];
-        this.info_sel = BoolArr(js["info_sel"], this.info_sel.length);
+        if (json_version < 12.05) {
+            let old_info = BoolArr(js["info_sel"], 2);
+            this.recon_sel = Array(this.recon_list.length).fill(0);
+            if (old_info[0])
+                this.recon_sel[1] = 1;
+            if (old_info[1])
+                this.recon_sel[0] = 1;
+        } else {
+            this.recon_sel = NumArr(js["recon_sel"], this.recon_sel.length);
+        }
         this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
         this.clim_sel = BoolArr(js["clim_sel"], this.clim_sel.length);
         if (json_version < 11.95) {
@@ -125,7 +134,7 @@ class Accessories extends Part {
         s.PushNumArr(this.armour_coverage);
         s.PushNumArr(this.electrical_count);
         s.PushNum(this.radio_sel);
-        s.PushBoolArr(this.info_sel);
+        s.PushNumArr(this.recon_sel)
         s.PushBoolArr(this.visi_sel);
         s.PushBoolArr(this.clim_sel);
         s.PushNum(this.auto_sel);
@@ -142,7 +151,16 @@ class Accessories extends Part {
             this.electrical_count = d.GetNumArr(this.electrical_count.length);
         }
         this.radio_sel = d.GetNum();
-        this.info_sel = d.GetBoolArr(this.info_sel.length);
+        if (d.version < 12.05) {
+            let old_info = d.GetBoolArr(2);
+            this.recon_sel = Array(this.recon_list.length).fill(0);
+            if (old_info[0])
+                this.recon_sel[1] = 1;
+            if (old_info[1])
+                this.recon_sel[0] = 1;
+        } else {
+            this.recon_sel = d.GetBoolArr(this.recon_sel.length);
+        }
         this.visi_sel = d.GetBoolArr(this.visi_sel.length);
         this.clim_sel = d.GetBoolArr(this.clim_sel.length);
         if (d.version < 11.95) {
@@ -224,16 +242,19 @@ class Accessories extends Part {
         this.CalculateStats();
     }
 
-    public GetInfoList() {
-        return this.info_list;
+    public GetReconList() {
+        return this.recon_list;
     }
 
-    public GetInfoSel() {
-        return this.info_sel;
+    public GetReconSel() {
+        return this.recon_sel;
     }
 
-    public SetInfoSel(idx: number, use: boolean) {
-        this.info_sel[idx] = use;
+    public SetReconSel(idx: number, num: number) {
+        num = Math.trunc(num);
+        if (num != num || num < 0)
+            num = 0;
+        this.recon_sel[idx] = num;
         this.CalculateStats();
     }
 
@@ -406,9 +427,8 @@ class Accessories extends Part {
 
 
         //Information
-        for (let i = 0; i < this.info_list.length; i++) {
-            if (this.info_sel[i])
-                stats = stats.Add(this.info_list[i].stats);
+        for (let i = 0; i < this.recon_list.length; i++) {
+            stats = stats.Add(this.recon_list[i].stats.Multiply(this.recon_sel[i]));
         }
 
 

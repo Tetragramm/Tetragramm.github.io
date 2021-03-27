@@ -6453,11 +6453,11 @@ class Accessories extends Part {
         for (let elem of js["radios"]) {
             this.radio_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
-        this.info_list = [];
-        for (let elem of js["information"]) {
-            this.info_list.push({ name: elem["name"], stats: new Stats(elem) });
+        this.recon_list = [];
+        for (let elem of js["recon"]) {
+            this.recon_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
-        this.info_sel = [...Array(this.info_list.length).fill(false)];
+        this.recon_sel = Array(this.recon_list.length).fill(0);
         this.visi_list = [];
         for (let elem of js["visibility"]) {
             this.visi_list.push({ name: elem["name"], stats: new Stats(elem) });
@@ -6485,7 +6485,7 @@ class Accessories extends Part {
             armour_coverage: this.armour_coverage,
             electrical_count: this.electrical_count,
             radio_sel: this.radio_sel,
-            info_sel: this.info_sel,
+            recon_sel: this.recon_sel,
             visi_sel: this.visi_sel,
             clim_sel: this.clim_sel,
             auto_sel: this.auto_sel,
@@ -6505,7 +6505,17 @@ class Accessories extends Part {
             this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length);
         }
         this.radio_sel = js["radio_sel"];
-        this.info_sel = BoolArr(js["info_sel"], this.info_sel.length);
+        if (json_version < 12.05) {
+            let old_info = BoolArr(js["info_sel"], 2);
+            this.recon_sel = Array(this.recon_list.length).fill(0);
+            if (old_info[0])
+                this.recon_sel[1] = 1;
+            if (old_info[1])
+                this.recon_sel[0] = 1;
+        }
+        else {
+            this.recon_sel = NumArr(js["recon_sel"], this.recon_sel.length);
+        }
         this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
         this.clim_sel = BoolArr(js["clim_sel"], this.clim_sel.length);
         if (json_version < 11.95) {
@@ -6518,7 +6528,7 @@ class Accessories extends Part {
         s.PushNumArr(this.armour_coverage);
         s.PushNumArr(this.electrical_count);
         s.PushNum(this.radio_sel);
-        s.PushBoolArr(this.info_sel);
+        s.PushNumArr(this.recon_sel);
         s.PushBoolArr(this.visi_sel);
         s.PushBoolArr(this.clim_sel);
         s.PushNum(this.auto_sel);
@@ -6535,7 +6545,17 @@ class Accessories extends Part {
             this.electrical_count = d.GetNumArr(this.electrical_count.length);
         }
         this.radio_sel = d.GetNum();
-        this.info_sel = d.GetBoolArr(this.info_sel.length);
+        if (d.version < 12.05) {
+            let old_info = d.GetBoolArr(2);
+            this.recon_sel = Array(this.recon_list.length).fill(0);
+            if (old_info[0])
+                this.recon_sel[1] = 1;
+            if (old_info[1])
+                this.recon_sel[0] = 1;
+        }
+        else {
+            this.recon_sel = d.GetBoolArr(this.recon_sel.length);
+        }
         this.visi_sel = d.GetBoolArr(this.visi_sel.length);
         this.clim_sel = d.GetBoolArr(this.clim_sel.length);
         if (d.version < 11.95) {
@@ -6605,14 +6625,17 @@ class Accessories extends Part {
         this.radio_sel = num;
         this.CalculateStats();
     }
-    GetInfoList() {
-        return this.info_list;
+    GetReconList() {
+        return this.recon_list;
     }
-    GetInfoSel() {
-        return this.info_sel;
+    GetReconSel() {
+        return this.recon_sel;
     }
-    SetInfoSel(idx, use) {
-        this.info_sel[idx] = use;
+    SetReconSel(idx, num) {
+        num = Math.trunc(num);
+        if (num != num || num < 0)
+            num = 0;
+        this.recon_sel[idx] = num;
         this.CalculateStats();
     }
     GetVisibilityList() {
@@ -6756,9 +6779,8 @@ class Accessories extends Part {
         }
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
         //Information
-        for (let i = 0; i < this.info_list.length; i++) {
-            if (this.info_sel[i])
-                stats = stats.Add(this.info_list[i].stats);
+        for (let i = 0; i < this.recon_list.length; i++) {
+            stats = stats.Add(this.recon_list[i].stats.Multiply(this.recon_sel[i]));
         }
         //Visibility
         for (let i = 0; i < this.visi_list.length; i++) {
@@ -12314,13 +12336,14 @@ class Accessories_HTML extends Display {
     }
     InitInformation(cell) {
         var fs = CreateFlexSection(cell);
-        var ilist = this.acc.GetInfoList();
-        this.info = [];
-        for (let i = 0; i < ilist.length; i++) {
+        var rlist = this.acc.GetReconList();
+        this.recon = [];
+        for (let i = 0; i < rlist.length; i++) {
             let inp = document.createElement("INPUT");
-            FlexCheckbox(lu(ilist[i].name), inp, fs);
-            inp.onchange = () => { this.acc.SetInfoSel(i, inp.checked); };
-            this.info.push(inp);
+            FlexInput(lu(rlist[i].name), inp, fs);
+            inp.min = "0";
+            inp.onchange = () => { this.acc.SetReconSel(i, inp.valueAsNumber); };
+            this.recon.push(inp);
         }
     }
     InitVisibility(cell) {
@@ -12391,11 +12414,11 @@ class Accessories_HTML extends Display {
         var h3_row = tbl_stat.insertRow();
         CreateTH(h3_row, lu("Stat Visibility"));
         CreateTH(h3_row, lu("Stat Flight Stress"));
-        CreateTH(h3_row, "");
+        CreateTH(h3_row, lu("Stat Required Sections"));
         var c3_row = tbl_stat.insertRow();
         this.d_visi = c3_row.insertCell();
         this.d_strs = c3_row.insertCell();
-        c3_row.insertCell();
+        this.d_rsec = c3_row.insertCell();
     }
     UpdateDisplay() {
         var AP = this.acc.GetArmourCoverage();
@@ -12407,9 +12430,9 @@ class Accessories_HTML extends Display {
         for (let i = 0; i < elist.length; i++) {
             this.elect[i].valueAsNumber = elist[i];
         }
-        var ilist = this.acc.GetInfoSel();
-        for (let i = 0; i < ilist.length; i++) {
-            this.info[i].checked = ilist[i];
+        var rlist = this.acc.GetReconSel();
+        for (let i = 0; i < rlist.length; i++) {
+            this.recon[i].valueAsNumber = rlist[i];
         }
         var vlist = this.acc.GetVisibilitySel();
         for (let i = 0; i < vlist.length; i++) {
@@ -12432,6 +12455,7 @@ class Accessories_HTML extends Display {
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
         BlinkIfChanged(this.d_strs, stats.flightstress.toString(), false);
+        BlinkIfChanged(this.d_rsec, stats.reqsections.toString(), false);
     }
 }
 /// <reference path="./Display.ts" />

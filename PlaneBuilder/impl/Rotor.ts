@@ -279,7 +279,7 @@ class Rotor extends Part {
         this.VerifySizes();
 
         var stats = new Stats();
-        var area = (Math.PI / 8) * this.rotor_span * this.rotor_span;
+        var area = (Math.PI / 9) * this.rotor_span * this.rotor_span;
         stats.wingarea += Math.floor(1.0e-6 + area);
         stats.drag = this.GetRotorDrag();
 

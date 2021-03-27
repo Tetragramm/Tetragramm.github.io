@@ -8,8 +8,8 @@ class Accessories_HTML extends Display {
     //Electrical
     private radio: HTMLSelectElement;
     private elect: HTMLInputElement[];
-    //Information
-    private info: HTMLInputElement[];
+    //Recon
+    private recon: HTMLInputElement[];
     //Visibility
     private visi: HTMLInputElement[];
     //Climate
@@ -27,6 +27,7 @@ class Accessories_HTML extends Display {
     private d_lift: HTMLTableCellElement;
     private d_visi: HTMLTableCellElement;
     private d_strs: HTMLTableCellElement;
+    private d_rsec: HTMLTableCellElement;
 
     constructor(acc: Accessories) {
         super();
@@ -101,13 +102,14 @@ class Accessories_HTML extends Display {
 
     private InitInformation(cell: HTMLTableCellElement) {
         var fs = CreateFlexSection(cell);
-        var ilist = this.acc.GetInfoList();
-        this.info = [];
-        for (let i = 0; i < ilist.length; i++) {
+        var rlist = this.acc.GetReconList();
+        this.recon = [];
+        for (let i = 0; i < rlist.length; i++) {
             let inp = document.createElement("INPUT") as HTMLInputElement;
-            FlexCheckbox(lu(ilist[i].name), inp, fs);
-            inp.onchange = () => { this.acc.SetInfoSel(i, inp.checked); };
-            this.info.push(inp);
+            FlexInput(lu(rlist[i].name), inp, fs);
+            inp.min = "0";
+            inp.onchange = () => { this.acc.SetReconSel(i, inp.valueAsNumber); };
+            this.recon.push(inp);
         }
     }
 
@@ -184,11 +186,11 @@ class Accessories_HTML extends Display {
         var h3_row = tbl_stat.insertRow();
         CreateTH(h3_row, lu("Stat Visibility"));
         CreateTH(h3_row, lu("Stat Flight Stress"));
-        CreateTH(h3_row, "");
+        CreateTH(h3_row, lu("Stat Required Sections"));
         var c3_row = tbl_stat.insertRow();
         this.d_visi = c3_row.insertCell();
         this.d_strs = c3_row.insertCell();
-        c3_row.insertCell();
+        this.d_rsec = c3_row.insertCell();
     }
 
 
@@ -204,9 +206,9 @@ class Accessories_HTML extends Display {
             this.elect[i].valueAsNumber = elist[i];
         }
 
-        var ilist = this.acc.GetInfoSel();
-        for (let i = 0; i < ilist.length; i++) {
-            this.info[i].checked = ilist[i];
+        var rlist = this.acc.GetReconSel();
+        for (let i = 0; i < rlist.length; i++) {
+            this.recon[i].valueAsNumber = rlist[i];
         }
 
         var vlist = this.acc.GetVisibilitySel();
@@ -233,5 +235,6 @@ class Accessories_HTML extends Display {
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.d_visi, stats.visibility.toString(), true);
         BlinkIfChanged(this.d_strs, stats.flightstress.toString(), false);
+        BlinkIfChanged(this.d_rsec, stats.reqsections.toString(), false);
     }
 }
