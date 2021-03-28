@@ -342,15 +342,6 @@ class Aircraft {
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());
 
-        this.frames.SetRequiredSections(stats.reqsections);
-        this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.frames.SetIsTandem(this.wings.GetTandem());
-        } else {
-            this.frames.SetIsTandem(false);
-        }
-        stats = stats.Add(this.frames.PartStats());
-
         //If there are wings...
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
             stats = stats.Add(this.wings.PartStats());
@@ -406,6 +397,15 @@ class Aircraft {
         this.accessories.SetSkinArmor(this.frames.GetArmor());
         this.accessories.SetVitalParts(this.VitalComponentList().length);
         stats = stats.Add(this.accessories.PartStats());
+
+        this.frames.SetRequiredSections(stats.reqsections);
+        this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
+        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
+            this.frames.SetIsTandem(this.wings.GetTandem());
+        } else {
+            this.frames.SetIsTandem(false);
+        }
+        stats = stats.Add(this.frames.PartStats());
 
         //Treated Paper needs to apply near to last
         this.wings.SetAircraftMass(stats.mass);

@@ -59,7 +59,6 @@ class Accessories extends Part {
             this.recon_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.recon_sel = Array(this.recon_list.length).fill(0);
-        console.log(this.recon_sel.toString());
 
         this.visi_list = [];
         for (let elem of js["visibility"]) {
@@ -122,7 +121,6 @@ class Accessories extends Part {
         } else {
             this.recon_sel = NumArr(js["recon_sel"], this.recon_sel.length);
         }
-        console.log(this.recon_sel.toString());
         this.visi_sel = BoolArr(js["visi_sel"], this.visi_sel.length);
         this.clim_sel = BoolArr(js["clim_sel"], this.clim_sel.length);
         if (json_version < 11.95) {
@@ -163,7 +161,6 @@ class Accessories extends Part {
         } else {
             this.recon_sel = d.GetNumArr(this.recon_sel.length);
         }
-        console.log(this.recon_sel.toString());
         this.visi_sel = d.GetBoolArr(this.visi_sel.length);
         this.clim_sel = d.GetBoolArr(this.clim_sel.length);
         if (d.version < 11.95) {
