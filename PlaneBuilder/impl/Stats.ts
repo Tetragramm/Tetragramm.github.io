@@ -278,7 +278,7 @@ class Stats {
         res.bomb_mass = this.bomb_mass * other;
         res.fuel = this.fuel * other;
         res.charge = this.charge * other;
-        if (other != 0) {
+        if (Math.abs(other) > 1.0e-6) {
             res.warnings = this.warnings;
             this.era.forEach((v) => res.era.add(v));
         }

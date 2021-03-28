@@ -268,7 +268,7 @@ class Stats {
         res.bomb_mass = this.bomb_mass * other;
         res.fuel = this.fuel * other;
         res.charge = this.charge * other;
-        if (other != 0) {
+        if (Math.abs(other) > 1.0e-6) {
             res.warnings = this.warnings;
             this.era.forEach((v) => res.era.add(v));
         }
@@ -3515,7 +3515,11 @@ class Accessories extends Part {
         stats = stats.Add(this.radio_list[this.radio_sel].stats);
         //Information
         for (let i = 0; i < this.recon_list.length; i++) {
-            stats = stats.Add(this.recon_list[i].stats.Multiply(this.recon_sel[i]));
+            if (this.recon_sel[i] > 0) {
+                let ts = this.recon_list[i].stats.Clone();
+                ts = ts.Multiply(this.recon_sel[i]);
+                stats = stats.Add(ts);
+            }
         }
         //Visibility
         for (let i = 0; i < this.visi_list.length; i++) {

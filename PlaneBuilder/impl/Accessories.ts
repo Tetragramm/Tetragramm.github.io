@@ -428,7 +428,11 @@ class Accessories extends Part {
 
         //Information
         for (let i = 0; i < this.recon_list.length; i++) {
-            stats = stats.Add(this.recon_list[i].stats.Multiply(this.recon_sel[i]));
+            if (this.recon_sel[i] > 0) {
+                let ts = this.recon_list[i].stats.Clone();
+                ts = ts.Multiply(this.recon_sel[i]);
+                stats = stats.Add(ts);
+            }
         }
 
 
