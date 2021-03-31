@@ -385,7 +385,7 @@ class Engine_HTML extends Display {
         this.e_cool.textContent = e_stats.stats.cooling.toString();
         this.e_over.textContent = e_stats.overspeed.toString();
         this.e_fuel.textContent = e_stats.stats.fuelconsumption.toString();
-        this.e_alti.textContent = b.toString() + "-" + t.toString();;
+        this.e_alti.textContent = b.toString() + "-" + t.toString();
         this.e_torq.textContent = e_stats.torque.toString();
         this.e_rumb.textContent = e_stats.rumble.toString();
         this.e_cost.textContent = e_stats.stats.cost.toString();
@@ -447,7 +447,7 @@ class Engine_HTML extends Display {
         BlinkIfChanged(this.d_visi, full_stats.visibility.toString(), true);
         BlinkIfChanged(this.d_over, this.engine.GetOverspeed().toString(), true);
         BlinkIfChanged(this.d_cost, full_stats.cost.toString(), false);
-        BlinkIfChanged(this.d_alti, e_stats.altitude.toString(), true);
+        BlinkIfChanged(this.d_alti, b.toString() + "-" + t.toString());
         BlinkIfChanged(this.d_fuel, full_stats.fuelconsumption.toString(), false);
         BlinkIfChanged(this.d_pstb, full_stats.pitchstab.toString(), true);
         BlinkIfChanged(this.d_lstb, full_stats.latstab.toString(), true);

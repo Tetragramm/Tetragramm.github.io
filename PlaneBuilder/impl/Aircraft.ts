@@ -398,6 +398,7 @@ class Aircraft {
         this.accessories.SetVitalParts(this.VitalComponentList().length);
         stats = stats.Add(this.accessories.PartStats());
 
+        //You know what, frames go last, because lots of things make sections.
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {

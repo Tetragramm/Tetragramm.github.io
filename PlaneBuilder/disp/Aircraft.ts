@@ -165,6 +165,12 @@ class Aircraft_HTML extends Display {
         var dash_button = document.getElementById("acft_save_dash") as HTMLButtonElement;
         dash_button.onclick = () => { this.SaveDash(); };
 
+
+        (document.getElementById("lbl_acft_interactive_dash_top") as HTMLLabelElement).textContent = lu("Aircraft Button Interactive Dashboard");
+        (document.getElementById("lbl_acft_interactive_dash_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Interactive Dashboard");
+        var interactive_button = document.getElementById("acft_interactive_dash") as HTMLButtonElement;
+        interactive_button.onclick = () => { this.SaveInteractive(); };
+
         (document.getElementById("lbl_acft_save_npc_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save NPC");
         (document.getElementById("lbl_acft_save_npc_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save NPC");
         var npc_button = document.getElementById("acft_save_npc");
@@ -226,9 +232,9 @@ class Aircraft_HTML extends Display {
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0)
-                ordinance.push(int_bomb.toString() + lu(" Bomb Mass Internally."));
+                ordinance.push(lu(" Bomb Mass Internally.", int_bomb));
             if (ext_bomb > 0)
-                ordinance.push(ext_bomb.toString() + lu(" Bomb Mass Externally."));
+                ordinance.push(lu(" Bomb Mass Externally.", ext_bomb));
             if (int_bomb > 0) {
                 var mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
                 ordinance.push(lu("Largest Internal Bomb", mib.toString()));
@@ -239,13 +245,13 @@ class Aircraft_HTML extends Display {
             var int_rock = Math.min(rockets, internal);
             var ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0)
-                ordinance.push(int_rock.toString() + lu(" Rocket Mass Internally."));
+                ordinance.push(lu(" Rocket Mass Internally.", int_rock));
             if (ext_rock > 0)
-                ordinance.push(ext_rock.toString() + lu(" Rocket Mass Externally."));
+                ordinance.push(lu(" Rocket Mass Externally.", ext_rock));
         }
         this.cards.acft_data.ordinance = ordinance;
         this.cards.acft_data.stability = derived.Stabiilty;
-        this.cards.acft_data.stress = this.acft.GetCockpits().GetStressList()[0];
+        this.cards.acft_data.stress = this.acft.GetCockpits().GetStressList()[0][0];
         this.cards.acft_data.toughness = derived.Toughness;
         this.cards.acft_data.turn_bleed = derived.TurnBleed;
         this.cards.acft_data.visibility = this.acft.GetCockpits().GetVisibilityList()[0];
@@ -549,6 +555,256 @@ class Aircraft_HTML extends Display {
             this.UpdateRadiatorCard(this.acft.GetEngines().GetRadiator(i));
             this.cards.SaveRadiator(i);
         }
+    }
+
+    private SaveInteractive() {
+        var link = ("https://dpierkowski.github.io/flying-circus/index.html?json=" + btoa(this.InteractiveDash()));
+        window.open(link, "_blank");
+    }
+
+    private InteractiveDash() {
+        this.acft.name = this.derived.GetName();
+        var stats = this.acft.GetStats();
+        var derived = this.acft.GetDerivedStats();
+
+        var str_vital = this.acft.VitalComponentList();
+        var remove = false;
+        while (str_vital.length > 10) {
+            str_vital.pop();
+            remove = true;
+        }
+        if (remove) {
+            str_vital.pop();
+            str_vital.push("And More. See Plane Builder for full list.");
+        }
+        while (str_vital.length < 10) {
+            str_vital.push("");
+        }
+        var coverage = this.acft.GetAccessories().GetEffectiveCoverage();
+        var armour_str = "";
+        for (let r = 0; r < coverage.length; ++r) {
+            let AP = r + 1;
+            if (coverage[r] > 0) {
+                if (armour_str != "")
+                    armour_str += ", ";
+                else
+                    armour_str += lu("Armour") + " ";
+                armour_str += AP.toString() + "/+" + (11 - coverage[r]).toString();
+            }
+        }
+
+        var ordinance = [];
+        var bombs = this.acft.GetMunitions().GetBombCount();
+        var rockets = this.acft.GetMunitions().GetRocketCount();
+        var internal = this.acft.GetMunitions().GetInternalBombCount();
+        if (bombs > 0 || rockets > 0) {
+            ordinance.push("Current load here.");
+        }
+        if (bombs > 0) {
+            var int_bomb = Math.min(bombs, internal);
+            var ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                ordinance.push(lu(" Bomb Mass Internally.", int_bomb));
+            if (ext_bomb > 0)
+                ordinance.push(lu(" Bomb Mass Externally.", ext_bomb));
+            if (int_bomb > 0) {
+                var mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
+                ordinance.push(lu("Largest Internal Bomb", mib.toString()));
+            }
+            internal -= int_bomb;
+        }
+        if (rockets > 0) {
+            var int_rock = Math.min(rockets, internal);
+            var ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                ordinance.push(lu(" Rocket Mass Internally.", int_rock));
+            if (ext_rock > 0)
+                ordinance.push(lu(" Rocket Mass Externally.", ext_rock));
+        }
+        while (ordinance.length < 5) {
+            ordinance.push("");
+        }
+
+        var warnings = "";
+        for (let w of stats.warnings) {
+            warnings += w.source + ": " + w.warning + "\n";
+        }
+
+        var planeState = {
+            "altitude": 0,
+            "airspeed": 0,
+            "fuel": derived.FuelUses,
+            "dropoff": derived.Dropoff,
+            "visibility": this.acft.GetCockpits().GetCockpit(0).GetVisibility(),
+            "energy_loss": derived.EnergyLoss,
+            "turn_bleed": derived.TurnBleed,
+            "stability": derived.Stabiilty,
+            "stress": this.acft.GetCockpits().GetCockpit(0).GetFlightStress()[0],
+            "plane_escape": this.acft.GetCockpits().GetCockpit(0).GetEscape(),
+            "crash": this.acft.GetCockpits().GetCockpit(0).GetCrash(),
+            "max_toughness": derived.Toughness,
+            "current_toughness": derived.Toughness,
+            "max_strain": derived.MaxStrain,
+            "current_strain": derived.MaxStrain,
+            "g_force": 0,
+            "kills": 0,
+            "full_load_boost": derived.BoostFullwBombs,
+            "full_load_handling": derived.HandlingFullwBombs,
+            "full_load_climb": derived.RateOfClimbwBombs,
+            "full_load_stall": derived.StallSpeedFullwBombs,
+            "full_load_speed": derived.MaxSpeedwBombs,
+            "half_fuel_bombs_boost": Math.floor((derived.BoostFullwBombs + derived.BoostEmpty) / 2),
+            "half_fuel_bombs_handling": Math.floor((derived.HandlingFullwBombs + derived.HandlingEmpty) / 2),
+            "half_fuel_bombs_climb": Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2),
+            "half_fuel_bombs_stall": Math.floor((derived.StallSpeedFullwBombs + derived.StallSpeedEmpty) / 2),
+            "half_fuel_bombs_speed": Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2),
+            "full_fuel_no_bombs_boost": derived.BoostFull,
+            "full_fuel_no_bombs_handling": derived.HandlingFull,
+            "full_fuel_no_bombs_climb": derived.RateOfClimbFull,
+            "full_fuel_no_bombs_stall": derived.StallSpeedFull,
+            "full_fuel_no_bombs_speed": Math.floor(1.0e-6 + derived.MaxSpeedFull),
+            "half_fuel_no_bombs_boost": Math.floor((derived.BoostFull + derived.BoostEmpty) / 2),
+            "half_fuel_no_bombs_handling": Math.floor((derived.HandlingFull + derived.HandlingEmpty) / 2),
+            "half_fuel_no_bombs_climb": Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2),
+            "half_fuel_no_bombs_stall": Math.floor((derived.StallSpeedFull + derived.StallSpeedEmpty) / 2),
+            "half_fuel_no_bombs_speed": Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2),
+            "empty_boost": derived.BoostEmpty,
+            "empty_handling": derived.HandlingEmpty,
+            "empty_climb": derived.RateOfClimbEmpty,
+            "empty_stall": derived.StallSpeedEmpty,
+            "empty_speed": Math.floor(1.0e-6 + derived.MaxSpeedEmpty),
+            "vital_part_1": str_vital[0],
+            "vital_part_2": str_vital[1],
+            "vital_part_3": str_vital[2],
+            "vital_part_4": str_vital[3],
+            "vital_part_5": str_vital[4],
+            "vital_part_6": str_vital[5],
+            "vital_part_7": str_vital[6],
+            "vital_part_8": str_vital[7],
+            "vital_part_9": str_vital[8],
+            "vital_part_10": str_vital[9],
+            "armor": armour_str,
+            "max_bomb_load": ordinance[0],
+            "ordinance_1": ordinance[1],
+            "ordinance_2": ordinance[2],
+            "ordinance_3": ordinance[3],
+            "ordinance_4": ordinance[4],
+            "notes": warnings,
+            "full_load_selected": true,
+            "half_fuel_bombs_selected": false,
+            "full_fuel_no_bombs_selected": false,
+            "half_fuel_no_bombs_selected": false,
+            "empty_selected": false,
+            "engines": this.InteractiveEngines(),
+            "weapons": this.InteractiveWeapons(),
+        };
+
+        return JSON.stringify(planeState);
+    }
+
+    private InteractiveEngines() {
+        var engines = [];
+        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
+            let e = this.acft.GetEngines().GetEngine(i);
+            let engine_state = {
+                "rpm": 0,
+                "wear": 0,
+                "reliability": e.GetReliability(),
+                "ideal_altitide": e.GetMaxAltitude(),
+                "overspeed": e.GetOverspeed(),
+                "notes": "",
+            };
+            var estats = e.GetCurrentStats();
+            var notes = [];
+            if (estats.pulsejet) {
+                notes.push(lu("Pulsejet"));
+                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
+                if (inputs.power > 0 && inputs.starter) {
+                    notes.push(lu("Starter"));
+                }
+            }
+            else {
+
+                if (e.IsRotary() && e.IsTractor()) {
+                    notes.push(lu("Turns Right"));
+                } else if (e.IsRotary() && e.IsPusher()) {
+                    notes.push(lu("Turns Left"));
+                }
+
+                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
+                if (inputs.upgrades[1]) {
+                    notes.push(lu("War Emergency Power"));
+                } else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {
+                    notes.push(lu("War Emergency Power from altitudes 0-10"));
+                }
+            }
+            engine_state.notes = StringFmt.Join(", ", notes);
+            engines.push(JSON.stringify(engine_state));
+        }
+        return engines;
+    }
+
+    private InteractiveWeapons() {
+        var wstates = [];
+        for (let w of this.acft.GetWeapons().GetWeaponSets()) {
+
+            var fweap = w.GetFinalWeapon();
+            var tags = [];
+            let weaponState = {
+                "type": this.WeaponName(w),
+                "ammo": w.GetShots(),
+                "ap": fweap.ap,
+                "jam": w.GetJam(),
+                "knife_hits": w.GetHits()[0],
+                "close_hits": w.GetHits()[1],
+                "long_hits": w.GetHits()[2],
+                "extreme_hits": w.GetHits()[3],
+                "knife_damage": w.GetHits()[0] * fweap.damage,
+                "close_damage": w.GetHits()[1] * fweap.damage,
+                "long_damage": w.GetHits()[2] * fweap.damage,
+                "extreme_damage": w.GetHits()[3] * fweap.damage,
+                "tags": "",
+            };
+
+            var dlist = this.acft.GetWeapons().GetDirectionList();
+
+            if (w.IsPlural()) {
+                weaponState.type = w.GetWeaponCount().toString() + "x " + weaponState.type;
+            }
+
+            var ds = w.GetDirection();
+            var dtag = "";
+            dtag += "[";
+            for (let i = 0; i < dlist.length; i++) {
+                if (ds[i])
+                    dtag += lu(dlist[i]) + " ";
+            }
+            dtag = dtag.substr(0, dtag.length - 1);
+            dtag += "]";
+            tags.push(dtag);
+
+            if (fweap.rapid) {
+                tags.push(lu("Weapon Tag Rapid Fire"));
+            }
+            if (fweap.shells) {
+                tags.push(lu("Weapon Tag Shells"));
+            }
+            if (fweap.deflection) {
+                tags.push(lu("Weapon Tag Awkward", fweap.deflection));
+            }
+            var deflector = false;
+            for (let iw of w.GetWeapons()) {
+                if (iw.GetSynchronization() == SynchronizationType.DEFLECT)
+                    deflector = true;
+            }
+            if (deflector) {
+                tags.push(lu("Weapon Tag: Deflector Plate"));
+            }
+            weaponState.tags = StringFmt.Join(", ", tags);
+
+            wstates.push(JSON.stringify(weaponState));
+        }
+        return wstates;
     }
 
     private SaveNPC() {
