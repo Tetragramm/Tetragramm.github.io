@@ -15486,21 +15486,30 @@ const init = () => {
     });
     window.addEventListener("load", () => {
         scrollToFragment();
-        setTimeout(() => { window.onscroll = SetScroll; }, 1000);
+        setTimeout(() => { window.onscroll = debounce(SetScroll, 250); }, 1000);
     });
 };
 window.addEventListener("DOMContentLoaded", init);
+function debounce(callback, delay) {
+    let timeout;
+    return function () {
+        clearTimeout(timeout);
+        timeout = setTimeout(callback, delay);
+    };
+}
 var hash = "";
 function SetScroll(ev) {
     const IDs = ["Era", "Cockpit", "Passengers", "Engines", "Frames", "Tail", "Wings", "Rotors", "Stabilizers", "ControlSurfaces", "Reinforcements", "Weapons", "Load", "Landing_Gear", "Accessories", "Propeller", "Optimization", "Stats", "Flight"];
     var newhash = "";
     var off = window.pageYOffset;
     for (let id of IDs) {
-        if (off > document.getElementById(id).offsetTop) {
-            newhash = id;
-        }
-        else {
-            break;
+        if (document.getElementById(id).offsetTop != 0) {
+            if (off > document.getElementById(id).offsetTop) {
+                newhash = id;
+            }
+            else {
+                break;
+            }
         }
     }
     if (hash != newhash) {
