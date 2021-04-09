@@ -77,6 +77,7 @@ var enable_anim = false;
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
     private enginebuilder: EngineBuilder;
+    private turbobuilder: TurboBuilder;
 
     //Engine Inputs
     private e_name: HTMLInputElement;
@@ -126,6 +127,26 @@ class EngineBuilder_HTML {
     private pd_malt: HTMLLabelElement;
     private pd_dcst: HTMLLabelElement;
 
+    //TurboX Inputs
+    private t_name: HTMLInputElement;
+    private t_fulq: HTMLInputElement;
+    private t_maxt: HTMLInputElement;
+    private t_effi: HTMLInputElement;
+    private t_diam: HTMLInputElement;
+    private t_comp: HTMLInputElement;
+    private t_fanp: HTMLInputElement;
+    private t_bypr: HTMLInputElement;
+    //TurboX Outputs
+    private td_name: HTMLLabelElement;
+    private td_powr: HTMLLabelElement;
+    private td_mass: HTMLLabelElement;
+    private td_drag: HTMLLabelElement;
+    private td_rely: HTMLLabelElement;
+    private td_fuel: HTMLLabelElement;
+    private td_rumb: HTMLLabelElement;
+    private td_cost: HTMLLabelElement;
+    private td_malt: HTMLLabelElement;
+
     //Manual Inputs
     private m_name: HTMLInputElement;
     private m_pwr: HTMLInputElement;
@@ -159,6 +180,7 @@ class EngineBuilder_HTML {
     constructor() {
         this.enginebuilder = new EngineBuilder();
         this.pulsejetbuilder = new PulsejetBuilder();
+        this.turbobuilder = new TurboBuilder();
 
         var etbl = document.getElementById("table_engine") as HTMLTableElement;
         var erow = etbl.insertRow();
@@ -172,6 +194,12 @@ class EngineBuilder_HTML {
         this.InitPulsejetInputs(prow.insertCell());
         this.InitPulsejetOutputs(prow.insertCell());
         this.UpdatePulsejet();
+
+        var ptbl = document.getElementById("table_turbox") as HTMLTableElement;
+        var prow = ptbl.insertRow();
+        this.InitTurboXInputs(prow.insertCell());
+        this.InitTurboXOutputs(prow.insertCell());
+        this.UpdateTurboX();
 
         var mtbl = document.getElementById("table_manual") as HTMLTableElement;
         var mrow = mtbl.insertRow();
@@ -428,6 +456,86 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.pd_cost, estats.stats.cost.toString());
         BlinkIfChanged(this.pd_malt, estats.altitude.toString());
         BlinkIfChanged(this.pd_dcst, this.pulsejetbuilder.DesignCost().toString());
+    }
+
+    private InitTurboXInputs(cell: HTMLTableCellElement) {
+        this.t_name = document.createElement("INPUT") as HTMLInputElement;
+        this.t_fulq = document.createElement("INPUT") as HTMLInputElement;
+        this.t_maxt = document.createElement("INPUT") as HTMLInputElement;
+        this.t_effi = document.createElement("INPUT") as HTMLInputElement;
+        this.t_diam = document.createElement("INPUT") as HTMLInputElement;
+        this.t_comp = document.createElement("INPUT") as HTMLInputElement;
+        this.t_fanp = document.createElement("INPUT") as HTMLInputElement;
+        this.t_bypr = document.createElement("INPUT") as HTMLInputElement;
+
+        var fs = CreateFlexSection(cell);
+        FlexText("Name", this.t_name, fs);
+        FlexInput("Fuel Heat Value", this.t_fulq, fs);
+        FlexInput("Max Turbine Temp", this.t_maxt, fs);
+        FlexInput("Base Efficiency", this.t_effi, fs);
+        FlexInput("Engine Diameter", this.t_diam, fs);
+        FlexInput("Compressor Pressure Ratio", this.t_comp, fs);
+        FlexInput("Fan Pressure Ratio", this.t_fanp, fs);
+        FlexInput("Bypass Ratio", this.t_bypr, fs);
+
+        this.t_effi.step = "0.05";
+        this.t_diam.step = "0.01";
+        this.t_comp.step = "0.01";
+        this.t_fanp.step = "0.01";
+        this.t_bypr.step = "0.1";
+
+        this.t_name.onchange = () => { this.turbobuilder.name = this.t_name.value; this.UpdateTurboX(); };
+        this.t_fulq.onchange = () => { this.turbobuilder.fuel_heat_value = this.t_fulq.valueAsNumber; this.UpdateTurboX(); };
+        this.t_maxt.onchange = () => { this.turbobuilder.max_turbine_temp = this.t_maxt.valueAsNumber; this.UpdateTurboX(); };
+        this.t_effi.onchange = () => { this.turbobuilder.base_efficiency = this.t_effi.valueAsNumber; this.UpdateTurboX(); };
+        this.t_diam.onchange = () => { this.turbobuilder.diameter = this.t_diam.valueAsNumber; this.UpdateTurboX(); };
+        this.t_comp.onchange = () => { this.turbobuilder.compression_ratio = this.t_comp.valueAsNumber; this.UpdateTurboX(); };
+        this.t_fanp.onchange = () => { this.turbobuilder.fan_pressure_ratio = this.t_fanp.valueAsNumber; this.UpdateTurboX(); };
+        this.t_bypr.onchange = () => { this.turbobuilder.bypass_ratio = this.t_bypr.valueAsNumber; this.UpdateTurboX(); };
+    }
+
+    private InitTurboXOutputs(cell: HTMLTableCellElement) {
+        this.td_name = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_powr = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_mass = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_drag = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_rely = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_fuel = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_rumb = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_cost = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_malt = document.createElement("LABEL") as HTMLLabelElement;
+        var fs = CreateFlexSection(cell);
+        FlexDisplay("Name", this.td_name, fs);
+        FlexDisplay("Power", this.td_powr, fs);
+        FlexDisplay("Mass", this.td_mass, fs);
+        FlexDisplay("Drag", this.td_drag, fs);
+        FlexDisplay("Reliability", this.td_rely, fs);
+        FlexDisplay("Fuel Consumption", this.td_fuel, fs);
+        FlexDisplay("Rumble", this.td_rumb, fs);
+        FlexDisplay("Cost", this.td_cost, fs);
+        FlexDisplay("Altitude", this.td_malt, fs);
+    }
+
+    private UpdateTurboX() {
+        this.t_name.value = this.turbobuilder.name;
+        this.t_fulq.valueAsNumber = this.turbobuilder.fuel_heat_value;
+        this.t_maxt.valueAsNumber = this.turbobuilder.max_turbine_temp;
+        this.t_effi.valueAsNumber = this.turbobuilder.base_efficiency;
+        this.t_diam.valueAsNumber = this.turbobuilder.diameter;
+        this.t_comp.valueAsNumber = this.turbobuilder.compression_ratio;
+        this.t_fanp.valueAsNumber = this.turbobuilder.fan_pressure_ratio;
+        this.t_bypr.valueAsNumber = this.turbobuilder.bypass_ratio;
+
+        var estats = this.turbobuilder.EngineStats();
+        BlinkIfChanged(this.td_name, estats.name);
+        BlinkIfChanged(this.td_powr, estats.stats.power.toString());
+        BlinkIfChanged(this.td_mass, estats.stats.mass.toString());
+        BlinkIfChanged(this.td_drag, estats.stats.drag.toString());
+        BlinkIfChanged(this.td_rely, estats.stats.reliability.toString());
+        BlinkIfChanged(this.td_fuel, estats.stats.fuelconsumption.toString());
+        BlinkIfChanged(this.td_rumb, estats.rumble.toString());
+        BlinkIfChanged(this.td_cost, estats.stats.cost.toString());
+        BlinkIfChanged(this.td_malt, estats.altitude.toString());
     }
 
     private InitManual(cell: HTMLTableCellElement) {

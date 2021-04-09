@@ -5,6 +5,7 @@
 enum ENGINE_TYPE {
     PROPELLER,
     PULSEJET,
+    TURBO_X,
 }
 
 class EngineInputs {
@@ -31,6 +32,15 @@ class EngineInputs {
     public quality_cost: number;
     public quality_rely: number;
     public starter: boolean;
+
+    //TurboX Stuff
+    public fuel_heat_value: number; // kJ/kg
+    public max_turbine_temp: number; // K
+    public base_efficiency: number; // 0-1
+    public diameter: number; // m
+    public compression_ratio: number; //1+
+    public fan_pressure_ratio: number; //0+
+    public bypass_ratio: number;//0+
 
     constructor(js?: JSON) {
         this.name = "Default";
@@ -230,10 +240,6 @@ class EngineInputs {
             default:
                 throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
         }
-    }
-
-    private AE(a: number, b: number) {
-        return Math.abs(a - b) < 1.0e-6;
     }
 
     public Equal(other: EngineInputs) {
