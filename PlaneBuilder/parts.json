@@ -248,7 +248,8 @@
                 "visibility": -1,
                 "attack": 2,
                 "charge": 1.0e-9,
-                "cost": 6
+                "cost": 6,
+                "warning": "Needs Electric"
             },
             {
                 "name": "Gyro Gunsight",
@@ -257,7 +258,7 @@
                 "attack": 2,
                 "charge": 1.0e-9,
                 "cost": 12,
-                "warning": "Gunsight Warning"
+                "warning": "Electric Gunsight Warning"
             }
         ]
     },
