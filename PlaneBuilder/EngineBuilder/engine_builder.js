@@ -1518,94 +1518,94 @@ class EngineBuilder {
 /// <reference path="../impl/EngineList.ts" />
 class TurboBuilder {
     constructor() {
-        this.EraTable = [
-            { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
-            { name: "WWI", cost: 0.75, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
-            { name: "Roaring 20s", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
-            { name: "Coming Storm", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
-            { name: "WWII", cost: 0.25, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
-            { name: "Last Hurrah", cost: 0.1, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
+        this.TypeTable = [
+            { name: "Turbojet", efficiency: 0, massfactor: 0.8, costfactor: 1 },
+            { name: "Turbofan", efficiency: 0, massfactor: 1.0, costfactor: 1 },
+            { name: "Propfan", efficiency: -9, massfactor: 0.8, costfactor: 1 },
+            { name: "Turboprop", efficiency: -3, massfactor: 0.8, costfactor: 1 },
         ];
+        this.EraTable = [
+            { name: "Gen 1 1945-1955", max_temp: 1100, efficiency: -2, costfactor: 0.5 },
+            { name: "Gen 1.5 1955-1965", max_temp: 1100, efficiency: -1, costfactor: 0.6 },
+            { name: "Gen 2 1965-1975", max_temp: 1400, efficiency: -1, costfactor: 0.7 },
+            { name: "Gen 2.5 1975-1985", max_temp: 1400, efficiency: 0, costfactor: 0.8 },
+            { name: "Gen 3 1985-1995", max_temp: 1800, efficiency: 0, costfactor: 0.9 },
+            { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
+            { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
+            { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
+        ];
+        this.name = "Default";
         this.era_sel = 0;
+        this.type_sel = 0;
         this.fuel_heat_value = 43020;
-        this.max_turbine_temp = 1023;
-        this.base_efficiency = 0.8;
+        this.base_efficiency = 0;
         this.diameter = 0.89;
         this.compression_ratio = 3.5;
-        this.fan_pressure_ratio = 0;
+        this.fan_pressure_ratio = 1.6;
         this.bypass_ratio = 0;
         this.quality_fudge = 1;
     }
     TempMass() {
         var Era = this.EraTable[this.era_sel];
-        return this.compression_ratio * this.diameter * 60.515;
+        var Type = this.TypeTable[this.type_sel];
+        return Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
     }
     CalcMass() {
-        return Math.max(1, Math.floor(1.0e-6 + this.TempMass()));
+        return Math.max(1, Math.floor(1.0e-6 + this.TempMass() / 25));
     }
     CalcDrag() {
         var Era = this.EraTable[this.era_sel];
-        return Math.floor(1.0e-6 + 10 * Math.PI * Math.pow(this.diameter / 2.0, 2));
+        var Type = this.TypeTable[this.type_sel];
+        return Math.floor(1.0e-6 + 5 * Math.PI * Math.pow(this.diameter / 2.0, 2));
     }
     CalcReliability() {
         var Era = this.EraTable[this.era_sel];
-        var Reliability = 10 - this.compression_ratio / 4 - Math.PI * Math.pow(this.diameter / 2.0, 2);
+        var Type = this.TypeTable[this.type_sel];
+        var Reliability = -Math.log2(this.compression_ratio) - 20 * this.base_efficiency;
         return Math.trunc(Reliability + this.quality_fudge);
     }
     CalcStages() {
+        var Era = this.EraTable[this.era_sel];
+        var Type = this.TypeTable[this.type_sel];
         const M = 0.0;
         const a0 = 340.3;
         const Pa = 108.9; //Ambient Pressure
         const Ta = 288.15; //Ambient Temp
         const Cp = 1.006; //Specific Heat at Constant Pressure
-        const R = 287.058; //Gas Constant
         const y = 1.4; //Specific Heat
-        const Lambda = Math.sqrt(y) * Math.pow(2 / (y + 1), (y + 1) / (2 * (y - 1)));
         const area = Math.PI * Math.pow(this.diameter / 2, 2);
+        const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.base_efficiency;
         var P3 = Pa * this.compression_ratio;
         var T3 = Ta * Math.pow(P3 / Pa, (y - 1) / y);
-        var TT = (this.max_turbine_temp - Ta) + Ta;
-        var ST11 = a0 * (Math.sqrt((2 / (y - 1)) * Math.pow(Math.sqrt(TT / Ta) - 1, 2) + M * M) - M) / 1000;
         var Tr = 1 + (y - 1) / 2 * M * M;
-        var Ty = TT / Ta;
+        var Ty = Era.max_temp / Ta;
         var Tc = Math.pow(this.compression_ratio, 1 - 1 / y);
-        ST11 = a0 * (Math.sqrt((2 * Tr) / (y - 1) * (Ty / (Tr * Tc) - 1) * (Tc - 1) + Ty / (Tr * Tc) * M * M) - M) * this.base_efficiency / 1000;
-        var f = (Cp * Ta / this.fuel_heat_value) * (this.max_turbine_temp / Ta - T3 / Ta);
-        var TSFC11 = f / ST11 * 1000;
-        var A4 = area * this.fan_pressure_ratio;
-        var FRtest = P3 / Math.sqrt(this.max_turbine_temp) * A4 * this.MFP(1);
-        console.log(FRtest);
-        var FR = this.CalcFlowRate();
-        // FR = FR * area;
-        return { thrust: ST11 * FR, fuel: TSFC11 * FR };
+        var ST11 = a0 * (Math.sqrt((2 * Tr) / (y - 1) * (Ty / (Tr * Tc) - 1) * (Tc - 1) + Ty / (Tr * Tc) * M * M) - M) * net_efficiency / 1000;
+        var Tcp = Math.pow(this.fan_pressure_ratio, 1 - 1 / y);
+        var ST13 = a0 * (Math.sqrt(2 / (y - 1) * (Tr * Tcp - 1)) - M) * net_efficiency / 1000;
+        var f = (Cp * Ta / this.fuel_heat_value) * (Era.max_temp / Ta - T3 / Ta);
+        var ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
+        var TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
+        var C2 = Pa * area * this.MFP(1) / ((1 + f));
+        var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
+        console.log(mc2);
+        return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
     }
     MFP(M) {
-        const g = 1; // Gravity
         const R = 287.058 / 1000; //Gas Constant
         const y = 1.4; //Specific Heat
-        return Math.sqrt(y * g / R) * M * Math.pow(1 + (y - 1) / 2 * M * M, (y + 1) / (2 * (y - 1)));
-    }
-    CalcFlowRate() {
-        const M = 0.8;
-        const V0 = M * 340.3;
-        // return 77;
-        return 12;
-        return 19.3; //BMW 003
-        // return 42; //GE J47
-        // return 22.78; //F.2
-        // return 70; //GE J73
-        // return 1.2985 * Math.PI * Math.pow(this.diameter / 2, 2) * V0;
+        return Math.sqrt(y / R) * M * Math.pow(1 + (y - 1) / 2 * M * M, (y + 1) / (2 * (y - 1)));
     }
     CalcCost() {
         var Era = this.EraTable[this.era_sel];
-        return Math.floor(1.0e-6 + this.TempMass() * this.quality_fudge * Era.cost) + 1;
+        var Type = this.TypeTable[this.type_sel];
+        return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.base_efficiency) * Era.costfactor * Type.costfactor) + 1;
     }
     VerifyValues() {
         this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
+        this.type_sel = Math.max(0, Math.min(this.TypeTable.length - 1, this.type_sel));
         this.quality_fudge = Math.max(1, this.quality_fudge);
-        this.fuel_heat_value = Math.max(1, this.fuel_heat_value);
-        this.max_turbine_temp = Math.max(1, this.max_turbine_temp);
-        this.base_efficiency = Math.max(0.05, Math.min(1, this.base_efficiency));
+        this.base_efficiency = Math.max(-0.5, Math.min(0.5, this.base_efficiency));
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.fan_pressure_ratio = Math.max(0, this.fan_pressure_ratio);
@@ -1617,8 +1617,7 @@ class TurboBuilder {
         ei.name = this.name;
         ei.engine_type = ENGINE_TYPE.TURBO_X;
         ei.era_sel = this.era_sel;
-        ei.fuel_heat_value = this.fuel_heat_value;
-        ei.max_turbine_temp = this.max_turbine_temp;
+        ei.type = this.type_sel;
         ei.base_efficiency = this.base_efficiency;
         ei.diameter = this.diameter;
         ei.compression_ratio = this.compression_ratio;
@@ -1631,12 +1630,13 @@ class TurboBuilder {
         var estats = new EngineStats();
         this.VerifyValues();
         var tf = this.CalcStages();
+        console.log(StringFmt.Format("Thrust = {0} kN FC = {1} g/(kN s)", tf.thrust, tf.fuel / tf.thrust));
         estats.name = this.name;
-        estats.stats.power = tf.thrust;
+        estats.stats.power = Math.round(tf.thrust * 1000 / 89);
         estats.stats.mass = this.CalcMass();
         estats.stats.drag = this.CalcDrag();
         estats.stats.reliability = this.CalcReliability();
-        estats.stats.fuelconsumption = tf.fuel;
+        estats.stats.fuelconsumption = Math.round(10 * 60 * tf.fuel / 1000);
         estats.rumble = 0;
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
@@ -2991,34 +2991,42 @@ class EngineBuilder_HTML {
     }
     InitTurboXInputs(cell) {
         this.t_name = document.createElement("INPUT");
-        this.t_fulq = document.createElement("INPUT");
-        this.t_maxt = document.createElement("INPUT");
+        this.t_era = document.createElement("SELECT");
+        this.t_type = document.createElement("SELECT");
         this.t_effi = document.createElement("INPUT");
         this.t_diam = document.createElement("INPUT");
         this.t_comp = document.createElement("INPUT");
-        this.t_fanp = document.createElement("INPUT");
         this.t_bypr = document.createElement("INPUT");
         var fs = CreateFlexSection(cell);
         FlexText("Name", this.t_name, fs);
-        FlexInput("Fuel Heat Value", this.t_fulq, fs);
-        FlexInput("Max Turbine Temp", this.t_maxt, fs);
-        FlexInput("Base Efficiency", this.t_effi, fs);
+        FlexSelect("Era", this.t_era, fs);
+        FlexSelect("Type", this.t_type, fs);
         FlexInput("Engine Diameter", this.t_diam, fs);
-        FlexInput("Compressor Pressure Ratio", this.t_comp, fs);
-        FlexInput("Fan Pressure Ratio", this.t_fanp, fs);
+        FlexInput("Overall Pressure Ratio", this.t_comp, fs);
         FlexInput("Bypass Ratio", this.t_bypr, fs);
+        FlexInput("Base Efficiency", this.t_effi, fs);
         this.t_effi.step = "0.05";
+        this.t_effi.min = "-0.5";
+        this.t_effi.max = "0.5";
         this.t_diam.step = "0.01";
         this.t_comp.step = "0.01";
-        this.t_fanp.step = "0.01";
         this.t_bypr.step = "0.1";
+        for (let e of this.turbobuilder.EraTable) {
+            let opt = document.createElement("OPTION");
+            opt.text = e.name;
+            this.t_era.add(opt);
+        }
+        for (let t of this.turbobuilder.TypeTable) {
+            let opt = document.createElement("OPTION");
+            opt.text = t.name;
+            this.t_type.add(opt);
+        }
         this.t_name.onchange = () => { this.turbobuilder.name = this.t_name.value; this.UpdateTurboX(); };
-        this.t_fulq.onchange = () => { this.turbobuilder.fuel_heat_value = this.t_fulq.valueAsNumber; this.UpdateTurboX(); };
-        this.t_maxt.onchange = () => { this.turbobuilder.max_turbine_temp = this.t_maxt.valueAsNumber; this.UpdateTurboX(); };
+        this.t_era.onchange = () => { this.turbobuilder.era_sel = this.t_era.selectedIndex; this.UpdateTurboX(); };
+        this.t_type.onchange = () => { this.turbobuilder.type_sel = this.t_type.selectedIndex; this.UpdateTurboX(); };
         this.t_effi.onchange = () => { this.turbobuilder.base_efficiency = this.t_effi.valueAsNumber; this.UpdateTurboX(); };
         this.t_diam.onchange = () => { this.turbobuilder.diameter = this.t_diam.valueAsNumber; this.UpdateTurboX(); };
         this.t_comp.onchange = () => { this.turbobuilder.compression_ratio = this.t_comp.valueAsNumber; this.UpdateTurboX(); };
-        this.t_fanp.onchange = () => { this.turbobuilder.fan_pressure_ratio = this.t_fanp.valueAsNumber; this.UpdateTurboX(); };
         this.t_bypr.onchange = () => { this.turbobuilder.bypass_ratio = this.t_bypr.valueAsNumber; this.UpdateTurboX(); };
     }
     InitTurboXOutputs(cell) {
@@ -3028,7 +3036,6 @@ class EngineBuilder_HTML {
         this.td_drag = document.createElement("LABEL");
         this.td_rely = document.createElement("LABEL");
         this.td_fuel = document.createElement("LABEL");
-        this.td_rumb = document.createElement("LABEL");
         this.td_cost = document.createElement("LABEL");
         this.td_malt = document.createElement("LABEL");
         var fs = CreateFlexSection(cell);
@@ -3038,19 +3045,23 @@ class EngineBuilder_HTML {
         FlexDisplay("Drag", this.td_drag, fs);
         FlexDisplay("Reliability", this.td_rely, fs);
         FlexDisplay("Fuel Consumption", this.td_fuel, fs);
-        FlexDisplay("Rumble", this.td_rumb, fs);
         FlexDisplay("Cost", this.td_cost, fs);
         FlexDisplay("Altitude", this.td_malt, fs);
     }
     UpdateTurboX() {
         this.t_name.value = this.turbobuilder.name;
-        this.t_fulq.valueAsNumber = this.turbobuilder.fuel_heat_value;
-        this.t_maxt.valueAsNumber = this.turbobuilder.max_turbine_temp;
+        this.t_era.selectedIndex = this.turbobuilder.era_sel;
+        this.t_type.selectedIndex = this.turbobuilder.type_sel;
         this.t_effi.valueAsNumber = this.turbobuilder.base_efficiency;
         this.t_diam.valueAsNumber = this.turbobuilder.diameter;
         this.t_comp.valueAsNumber = this.turbobuilder.compression_ratio;
-        this.t_fanp.valueAsNumber = this.turbobuilder.fan_pressure_ratio;
         this.t_bypr.valueAsNumber = this.turbobuilder.bypass_ratio;
+        if (this.turbobuilder.type_sel == 0) {
+            this.t_bypr.disabled = true;
+        }
+        else {
+            this.t_bypr.disabled = false;
+        }
         var estats = this.turbobuilder.EngineStats();
         BlinkIfChanged(this.td_name, estats.name);
         BlinkIfChanged(this.td_powr, estats.stats.power.toString());
@@ -3058,7 +3069,6 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.td_drag, estats.stats.drag.toString());
         BlinkIfChanged(this.td_rely, estats.stats.reliability.toString());
         BlinkIfChanged(this.td_fuel, estats.stats.fuelconsumption.toString());
-        BlinkIfChanged(this.td_rumb, estats.rumble.toString());
         BlinkIfChanged(this.td_cost, estats.stats.cost.toString());
         BlinkIfChanged(this.td_malt, estats.altitude.toString());
     }
@@ -3772,7 +3782,7 @@ class Localization {
             return this.languages["en"][key];
         }
         else {
-            console.log("Failed to find " + key);
+            console.error("Failed to find " + key);
             return "!" + key + "!";
         }
     }
