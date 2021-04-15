@@ -12,7 +12,10 @@ class TurboBuilder {
     public compression_ratio: number; //1+
     public fan_pressure_ratio: number; //0+
     public bypass_ratio: number;//0+
-    public quality_fudge: number;
+    public afterburner: boolean;
+
+    public kN: number;
+    public tsfc: number;
 
     readonly TypeTable: { name: string, efficiency: number, massfactor: number, costfactor: number, }[] = [
         { name: "Turbojet", efficiency: 0, massfactor: 0.8, costfactor: 1 },
@@ -42,14 +45,17 @@ class TurboBuilder {
         this.compression_ratio = 3.5;
         this.fan_pressure_ratio = 1.6;
         this.bypass_ratio = 0;
-        this.quality_fudge = 1;
     }
 
     private TempMass() {
         var Era = this.EraTable[this.era_sel];
         var Type = this.TypeTable[this.type_sel];
 
-        return Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
+        var tmass = Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
+        if (this.afterburner)
+            return tmass;
+        else
+            return 0.75 * tmass;
     }
 
     private CalcMass() {
@@ -68,7 +74,7 @@ class TurboBuilder {
         var Type = this.TypeTable[this.type_sel];
 
         var Reliability = - Math.log2(this.compression_ratio) - 20 * this.base_efficiency;
-        return Math.trunc(Reliability + this.quality_fudge);
+        return Math.trunc(Reliability + 1);
     }
 
     private CalcStages() {
@@ -98,8 +104,6 @@ class TurboBuilder {
 
         var C2 = Pa * area * this.MFP(1) / ((1 + f));
         var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
-        console.log(mc2);
-
         return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
     }
 
@@ -119,20 +123,21 @@ class TurboBuilder {
     private VerifyValues() {
         this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
         this.type_sel = Math.max(0, Math.min(this.TypeTable.length - 1, this.type_sel));
-        this.quality_fudge = Math.max(1, this.quality_fudge);
         this.base_efficiency = Math.max(-0.5, Math.min(0.5, this.base_efficiency));
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.fan_pressure_ratio = Math.max(0, this.fan_pressure_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
-        this.quality_fudge = Math.trunc(Math.max(0, this.quality_fudge));
+        if (this.type_sel < 2) {
+            this.afterburner = false;
+        }
     }
 
     public EngineInputs() {
         var ei = new EngineInputs();
 
         ei.name = this.name;
-        ei.engine_type = ENGINE_TYPE.TURBO_X;
+        ei.engine_type = ENGINE_TYPE.TURBOMACHINERY;
         ei.era_sel = this.era_sel;
         ei.type = this.type_sel;
         ei.base_efficiency = this.base_efficiency;
@@ -140,7 +145,7 @@ class TurboBuilder {
         ei.compression_ratio = this.compression_ratio;
         ei.fan_pressure_ratio = this.fan_pressure_ratio;
         ei.bypass_ratio = this.bypass_ratio;
-        ei.quality_cost = this.quality_fudge;
+        ei.upgrades[0] = this.afterburner;
         return ei;
     }
 
@@ -149,7 +154,8 @@ class TurboBuilder {
 
         this.VerifyValues();
         var tf = this.CalcStages();
-        console.log(StringFmt.Format("Thrust = {0} kN FC = {1} g/(kN s)", tf.thrust, tf.fuel / tf.thrust));
+        this.kN = tf.thrust;
+        this.tsfc = tf.fuel / tf.thrust;
         estats.name = this.name;
         estats.stats.power = Math.round(tf.thrust * 1000 / 89);
         estats.stats.mass = this.CalcMass();

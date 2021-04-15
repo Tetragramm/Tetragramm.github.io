@@ -5,7 +5,7 @@
 enum ENGINE_TYPE {
     PROPELLER,
     PULSEJET,
-    TURBO_X,
+    TURBOMACHINERY,
 }
 
 class EngineInputs {

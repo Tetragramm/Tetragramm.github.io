@@ -136,6 +136,7 @@ class EngineBuilder_HTML {
     private t_comp: HTMLInputElement;
     private t_bypr: HTMLInputElement;
     //TurboX Outputs
+    private t_desc: HTMLTableCellElement;
     private td_name: HTMLLabelElement;
     private td_powr: HTMLLabelElement;
     private td_mass: HTMLLabelElement;
@@ -196,6 +197,7 @@ class EngineBuilder_HTML {
         var ptbl = document.getElementById("table_turbox") as HTMLTableElement;
         var prow = ptbl.insertRow();
         this.InitTurboXInputs(prow.insertCell());
+        this.t_desc = prow.insertCell();
         this.InitTurboXOutputs(prow.insertCell());
         this.UpdateTurboX();
 
@@ -472,7 +474,7 @@ class EngineBuilder_HTML {
         FlexInput("Engine Diameter", this.t_diam, fs);
         FlexInput("Overall Pressure Ratio", this.t_comp, fs);
         FlexInput("Bypass Ratio", this.t_bypr, fs);
-        FlexInput("Base Efficiency", this.t_effi, fs);
+        FlexInput("Mass Flow Adjustment", this.t_effi, fs);
 
         this.t_effi.step = "0.05";
         this.t_effi.min = "-0.5";
@@ -520,6 +522,7 @@ class EngineBuilder_HTML {
         FlexDisplay("Fuel Consumption", this.td_fuel, fs);
         FlexDisplay("Cost", this.td_cost, fs);
         FlexDisplay("Altitude", this.td_malt, fs);
+        this.t_desc.classList.add("disp_cell");
     }
 
     private UpdateTurboX() {
@@ -531,7 +534,7 @@ class EngineBuilder_HTML {
         this.t_comp.valueAsNumber = this.turbobuilder.compression_ratio;
         this.t_bypr.valueAsNumber = this.turbobuilder.bypass_ratio;
 
-        if (this.turbobuilder.type_sel == 0) {
+        if (this.turbobuilder.type_sel == 0 || this.turbobuilder.type_sel == 3) {
             this.t_bypr.disabled = true;
         } else {
             this.t_bypr.disabled = false;
@@ -546,6 +549,67 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.td_fuel, estats.stats.fuelconsumption.toString());
         BlinkIfChanged(this.td_cost, estats.stats.cost.toString());
         BlinkIfChanged(this.td_malt, estats.altitude.toString());
+
+        switch (this.turbobuilder.type_sel) {
+            case 0:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `Engine Parameters:<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
+                    <br/>
+                    For a real engine, set the era, total engine diameter (not intake) and OPR. Then
+                    adjust the mass flow rate until the Thrust is just below the rated takeoff thrust.<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.<br/>
+                    `,
+                    Math.trunc(this.turbobuilder.kN * 100) / 100,
+                    Math.trunc(this.turbobuilder.tsfc * 100) / 100
+                );
+                break;
+            case 1:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `Engine Parameters:<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
+                    <br/>
+                    For a real engine, set the era, total engine diameter (not intake), Bypass
+                    Ratio and OPR. Then adjust the mass flow rate until the Thrust is just below
+                    the rated takeoff thrust.<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.
+                    `,
+                    Math.trunc(this.turbobuilder.kN * 100) / 100,
+                    Math.trunc(this.turbobuilder.tsfc * 100) / 100
+                );
+                break;
+            case 2:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `Engine Parameters:<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
+                    <br/>
+                    For a real engine, set the era, total diameter of the largest fan, Bypass
+                    Ratio and OPR. Then adjust the mass flow rate until the Thrust is just below
+                    the rated takeoff thrust.<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.
+                    `,
+                    Math.trunc(this.turbobuilder.kN * 100) / 100,
+                    Math.trunc(this.turbobuilder.tsfc * 100) / 100
+                );
+                break;
+            case 3:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `For a real engine, set the era, total engine diameter (not intake), Bypass
+                    Ratio and OPR. Then adjust the mass flow rate until the Power is just below
+                    the rated takeoff power (in effective shp if available, shp if not). Note
+                    that Power = 10*hp<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.
+                    `
+                );
+                break;
+        }
     }
 
     private InitManual(cell: HTMLTableCellElement) {
