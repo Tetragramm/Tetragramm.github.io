@@ -2389,6 +2389,7 @@ var ENGINE_TYPE;
 (function (ENGINE_TYPE) {
     ENGINE_TYPE[ENGINE_TYPE["PROPELLER"] = 0] = "PROPELLER";
     ENGINE_TYPE[ENGINE_TYPE["PULSEJET"] = 1] = "PULSEJET";
+    ENGINE_TYPE[ENGINE_TYPE["TURBOMACHINERY"] = 2] = "TURBOMACHINERY";
 })(ENGINE_TYPE || (ENGINE_TYPE = {}));
 class EngineInputs {
     constructor(js) {
@@ -2580,9 +2581,6 @@ class EngineInputs {
             default:
                 throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
         }
-    }
-    AE(a, b) {
-        return Math.abs(a - b) < 1.0e-6;
     }
     Equal(other) {
         return this.name == other.name;
@@ -12090,7 +12088,7 @@ class Localization {
             return this.languages["en"][key];
         }
         else {
-            console.log("Failed to find " + key);
+            console.error("Failed to find " + key);
             return "!" + key + "!";
         }
     }

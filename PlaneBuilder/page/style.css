@@ -291,6 +291,10 @@ button[disabled] {
 	vertical-align: top;
 }
 
+.disp_cell {
+	max-width: 20em;
+}
+
 .green {
 	color:#009900;
 }

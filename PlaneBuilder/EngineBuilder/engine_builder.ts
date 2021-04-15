@@ -77,6 +77,7 @@ var enable_anim = false;
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
     private enginebuilder: EngineBuilder;
+    private turbobuilder: TurboBuilder;
 
     //Engine Inputs
     private e_name: HTMLInputElement;
@@ -126,6 +127,25 @@ class EngineBuilder_HTML {
     private pd_malt: HTMLLabelElement;
     private pd_dcst: HTMLLabelElement;
 
+    //TurboX Inputs
+    private t_name: HTMLInputElement;
+    private t_era: HTMLSelectElement;
+    private t_type: HTMLSelectElement;
+    private t_effi: HTMLInputElement;
+    private t_diam: HTMLInputElement;
+    private t_comp: HTMLInputElement;
+    private t_bypr: HTMLInputElement;
+    //TurboX Outputs
+    private t_desc: HTMLTableCellElement;
+    private td_name: HTMLLabelElement;
+    private td_powr: HTMLLabelElement;
+    private td_mass: HTMLLabelElement;
+    private td_drag: HTMLLabelElement;
+    private td_rely: HTMLLabelElement;
+    private td_fuel: HTMLLabelElement;
+    private td_cost: HTMLLabelElement;
+    private td_malt: HTMLLabelElement;
+
     //Manual Inputs
     private m_name: HTMLInputElement;
     private m_pwr: HTMLInputElement;
@@ -159,6 +179,7 @@ class EngineBuilder_HTML {
     constructor() {
         this.enginebuilder = new EngineBuilder();
         this.pulsejetbuilder = new PulsejetBuilder();
+        this.turbobuilder = new TurboBuilder();
 
         var etbl = document.getElementById("table_engine") as HTMLTableElement;
         var erow = etbl.insertRow();
@@ -172,6 +193,13 @@ class EngineBuilder_HTML {
         this.InitPulsejetInputs(prow.insertCell());
         this.InitPulsejetOutputs(prow.insertCell());
         this.UpdatePulsejet();
+
+        var ptbl = document.getElementById("table_turbox") as HTMLTableElement;
+        var prow = ptbl.insertRow();
+        this.InitTurboXInputs(prow.insertCell());
+        this.t_desc = prow.insertCell();
+        this.InitTurboXOutputs(prow.insertCell());
+        this.UpdateTurboX();
 
         var mtbl = document.getElementById("table_manual") as HTMLTableElement;
         var mrow = mtbl.insertRow();
@@ -428,6 +456,160 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.pd_cost, estats.stats.cost.toString());
         BlinkIfChanged(this.pd_malt, estats.altitude.toString());
         BlinkIfChanged(this.pd_dcst, this.pulsejetbuilder.DesignCost().toString());
+    }
+
+    private InitTurboXInputs(cell: HTMLTableCellElement) {
+        this.t_name = document.createElement("INPUT") as HTMLInputElement;
+        this.t_era = document.createElement("SELECT") as HTMLSelectElement;
+        this.t_type = document.createElement("SELECT") as HTMLSelectElement;
+        this.t_effi = document.createElement("INPUT") as HTMLInputElement;
+        this.t_diam = document.createElement("INPUT") as HTMLInputElement;
+        this.t_comp = document.createElement("INPUT") as HTMLInputElement;
+        this.t_bypr = document.createElement("INPUT") as HTMLInputElement;
+
+        var fs = CreateFlexSection(cell);
+        FlexText("Name", this.t_name, fs);
+        FlexSelect("Era", this.t_era, fs);
+        FlexSelect("Type", this.t_type, fs);
+        FlexInput("Engine Diameter", this.t_diam, fs);
+        FlexInput("Overall Pressure Ratio", this.t_comp, fs);
+        FlexInput("Bypass Ratio", this.t_bypr, fs);
+        FlexInput("Mass Flow Adjustment", this.t_effi, fs);
+
+        this.t_effi.step = "0.05";
+        this.t_effi.min = "-0.5";
+        this.t_effi.max = "0.5";
+        this.t_diam.step = "0.01";
+        this.t_comp.step = "0.01";
+        this.t_bypr.step = "0.1";
+
+        for (let e of this.turbobuilder.EraTable) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = e.name;
+            this.t_era.add(opt);
+        }
+
+        for (let t of this.turbobuilder.TypeTable) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = t.name;
+            this.t_type.add(opt);
+        }
+
+        this.t_name.onchange = () => { this.turbobuilder.name = this.t_name.value; this.UpdateTurboX(); };
+        this.t_era.onchange = () => { this.turbobuilder.era_sel = this.t_era.selectedIndex; this.UpdateTurboX(); };
+        this.t_type.onchange = () => { this.turbobuilder.type_sel = this.t_type.selectedIndex; this.UpdateTurboX(); };
+        this.t_effi.onchange = () => { this.turbobuilder.base_efficiency = this.t_effi.valueAsNumber; this.UpdateTurboX(); };
+        this.t_diam.onchange = () => { this.turbobuilder.diameter = this.t_diam.valueAsNumber; this.UpdateTurboX(); };
+        this.t_comp.onchange = () => { this.turbobuilder.compression_ratio = this.t_comp.valueAsNumber; this.UpdateTurboX(); };
+        this.t_bypr.onchange = () => { this.turbobuilder.bypass_ratio = this.t_bypr.valueAsNumber; this.UpdateTurboX(); };
+    }
+
+    private InitTurboXOutputs(cell: HTMLTableCellElement) {
+        this.td_name = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_powr = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_mass = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_drag = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_rely = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_fuel = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_cost = document.createElement("LABEL") as HTMLLabelElement;
+        this.td_malt = document.createElement("LABEL") as HTMLLabelElement;
+        var fs = CreateFlexSection(cell);
+        FlexDisplay("Name", this.td_name, fs);
+        FlexDisplay("Power", this.td_powr, fs);
+        FlexDisplay("Mass", this.td_mass, fs);
+        FlexDisplay("Drag", this.td_drag, fs);
+        FlexDisplay("Reliability", this.td_rely, fs);
+        FlexDisplay("Fuel Consumption", this.td_fuel, fs);
+        FlexDisplay("Cost", this.td_cost, fs);
+        FlexDisplay("Altitude", this.td_malt, fs);
+        this.t_desc.classList.add("disp_cell");
+    }
+
+    private UpdateTurboX() {
+        this.t_name.value = this.turbobuilder.name;
+        this.t_era.selectedIndex = this.turbobuilder.era_sel;
+        this.t_type.selectedIndex = this.turbobuilder.type_sel;
+        this.t_effi.valueAsNumber = this.turbobuilder.base_efficiency;
+        this.t_diam.valueAsNumber = this.turbobuilder.diameter;
+        this.t_comp.valueAsNumber = this.turbobuilder.compression_ratio;
+        this.t_bypr.valueAsNumber = this.turbobuilder.bypass_ratio;
+
+        if (this.turbobuilder.type_sel == 0 || this.turbobuilder.type_sel == 3) {
+            this.t_bypr.disabled = true;
+        } else {
+            this.t_bypr.disabled = false;
+        }
+
+        var estats = this.turbobuilder.EngineStats();
+        BlinkIfChanged(this.td_name, estats.name);
+        BlinkIfChanged(this.td_powr, estats.stats.power.toString());
+        BlinkIfChanged(this.td_mass, estats.stats.mass.toString());
+        BlinkIfChanged(this.td_drag, estats.stats.drag.toString());
+        BlinkIfChanged(this.td_rely, estats.stats.reliability.toString());
+        BlinkIfChanged(this.td_fuel, estats.stats.fuelconsumption.toString());
+        BlinkIfChanged(this.td_cost, estats.stats.cost.toString());
+        BlinkIfChanged(this.td_malt, estats.altitude.toString());
+
+        switch (this.turbobuilder.type_sel) {
+            case 0:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `Engine Parameters:<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
+                    <br/>
+                    For a real engine, set the era, total engine diameter (not intake) and OPR. Then
+                    adjust the mass flow rate until the Thrust is just below the rated takeoff thrust.<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.<br/>
+                    `,
+                    Math.trunc(this.turbobuilder.kN * 100) / 100,
+                    Math.trunc(this.turbobuilder.tsfc * 100) / 100
+                );
+                break;
+            case 1:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `Engine Parameters:<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
+                    <br/>
+                    For a real engine, set the era, total engine diameter (not intake), Bypass
+                    Ratio and OPR. Then adjust the mass flow rate until the Thrust is just below
+                    the rated takeoff thrust.<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.
+                    `,
+                    Math.trunc(this.turbobuilder.kN * 100) / 100,
+                    Math.trunc(this.turbobuilder.tsfc * 100) / 100
+                );
+                break;
+            case 2:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `Engine Parameters:<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
+                    <br/>
+                    For a real engine, set the era, total diameter of the largest fan, Bypass
+                    Ratio and OPR. Then adjust the mass flow rate until the Thrust is just below
+                    the rated takeoff thrust.<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.
+                    `,
+                    Math.trunc(this.turbobuilder.kN * 100) / 100,
+                    Math.trunc(this.turbobuilder.tsfc * 100) / 100
+                );
+                break;
+            case 3:
+                this.t_desc.innerHTML = StringFmt.Format(
+                    `For a real engine, set the era, total engine diameter (not intake), Bypass
+                    Ratio and OPR. Then adjust the mass flow rate until the Power is just below
+                    the rated takeoff power (in effective shp if available, shp if not). Note
+                    that Power = 10*hp<br/>
+                    <br/>
+                    For a fictional engine, it is not suggested to adjust the mass flow rate.
+                    `
+                );
+                break;
+        }
     }
 
     private InitManual(cell: HTMLTableCellElement) {
