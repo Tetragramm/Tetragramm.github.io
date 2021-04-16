@@ -135,6 +135,7 @@ class EngineBuilder_HTML {
     private t_diam: HTMLInputElement;
     private t_comp: HTMLInputElement;
     private t_bypr: HTMLInputElement;
+    private t_aftb: HTMLInputElement;
     //TurboX Outputs
     private t_desc: HTMLTableCellElement;
     private td_name: HTMLLabelElement;
@@ -466,15 +467,17 @@ class EngineBuilder_HTML {
         this.t_diam = document.createElement("INPUT") as HTMLInputElement;
         this.t_comp = document.createElement("INPUT") as HTMLInputElement;
         this.t_bypr = document.createElement("INPUT") as HTMLInputElement;
+        this.t_aftb = document.createElement("INPUT") as HTMLInputElement;
 
         var fs = CreateFlexSection(cell);
         FlexText("Name", this.t_name, fs);
         FlexSelect("Era", this.t_era, fs);
         FlexSelect("Type", this.t_type, fs);
-        FlexInput("Engine Diameter", this.t_diam, fs);
+        FlexInput("Engine Diameter (m)", this.t_diam, fs);
         FlexInput("Overall Pressure Ratio", this.t_comp, fs);
         FlexInput("Bypass Ratio", this.t_bypr, fs);
         FlexInput("Mass Flow Adjustment", this.t_effi, fs);
+        FlexCheckbox("Afterburner", this.t_aftb, fs);
 
         this.t_effi.step = "0.05";
         this.t_effi.min = "-0.5";
@@ -498,10 +501,11 @@ class EngineBuilder_HTML {
         this.t_name.onchange = () => { this.turbobuilder.name = this.t_name.value; this.UpdateTurboX(); };
         this.t_era.onchange = () => { this.turbobuilder.era_sel = this.t_era.selectedIndex; this.UpdateTurboX(); };
         this.t_type.onchange = () => { this.turbobuilder.type_sel = this.t_type.selectedIndex; this.UpdateTurboX(); };
-        this.t_effi.onchange = () => { this.turbobuilder.base_efficiency = this.t_effi.valueAsNumber; this.UpdateTurboX(); };
+        this.t_effi.onchange = () => { this.turbobuilder.flow_adjustment = this.t_effi.valueAsNumber; this.UpdateTurboX(); };
         this.t_diam.onchange = () => { this.turbobuilder.diameter = this.t_diam.valueAsNumber; this.UpdateTurboX(); };
         this.t_comp.onchange = () => { this.turbobuilder.compression_ratio = this.t_comp.valueAsNumber; this.UpdateTurboX(); };
         this.t_bypr.onchange = () => { this.turbobuilder.bypass_ratio = this.t_bypr.valueAsNumber; this.UpdateTurboX(); };
+        this.t_aftb.onchange = () => { this.turbobuilder.afterburner = this.t_aftb.checked; this.UpdateTurboX(); };
     }
 
     private InitTurboXOutputs(cell: HTMLTableCellElement) {
@@ -529,10 +533,11 @@ class EngineBuilder_HTML {
         this.t_name.value = this.turbobuilder.name;
         this.t_era.selectedIndex = this.turbobuilder.era_sel;
         this.t_type.selectedIndex = this.turbobuilder.type_sel;
-        this.t_effi.valueAsNumber = this.turbobuilder.base_efficiency;
+        this.t_effi.valueAsNumber = this.turbobuilder.flow_adjustment;
         this.t_diam.valueAsNumber = this.turbobuilder.diameter;
         this.t_comp.valueAsNumber = this.turbobuilder.compression_ratio;
         this.t_bypr.valueAsNumber = this.turbobuilder.bypass_ratio;
+        this.t_aftb.checked = this.turbobuilder.afterburner;
 
         if (this.turbobuilder.type_sel == 0 || this.turbobuilder.type_sel == 3) {
             this.t_bypr.disabled = true;

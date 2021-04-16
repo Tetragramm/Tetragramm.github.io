@@ -1538,11 +1538,12 @@ class TurboBuilder {
         this.era_sel = 0;
         this.type_sel = 0;
         this.fuel_heat_value = 43020;
-        this.base_efficiency = 0;
+        this.flow_adjustment = 0;
         this.diameter = 0.89;
         this.compression_ratio = 3.5;
         this.fan_pressure_ratio = 1.6;
         this.bypass_ratio = 0;
+        this.afterburner = false;
     }
     TempMass() {
         var Era = this.EraTable[this.era_sel];
@@ -1554,7 +1555,8 @@ class TurboBuilder {
             return 0.75 * tmass;
     }
     CalcMass() {
-        return Math.max(1, Math.floor(1.0e-6 + this.TempMass() / 25));
+        console.log([this.TempMass() / 25, this.flow_adjustment, 95.684 * this.flow_adjustment]);
+        return Math.max(1, Math.floor(1.0e-6 + this.TempMass() / 25 + 95.684 * this.flow_adjustment));
     }
     CalcDrag() {
         var Era = this.EraTable[this.era_sel];
@@ -1564,7 +1566,7 @@ class TurboBuilder {
     CalcReliability() {
         var Era = this.EraTable[this.era_sel];
         var Type = this.TypeTable[this.type_sel];
-        var Reliability = -Math.log2(this.compression_ratio) - 20 * this.base_efficiency;
+        var Reliability = -Math.log2(this.compression_ratio) - 20 * this.flow_adjustment;
         return Math.trunc(Reliability + 1);
     }
     CalcStages() {
@@ -1577,7 +1579,7 @@ class TurboBuilder {
         const Cp = 1.006; //Specific Heat at Constant Pressure
         const y = 1.4; //Specific Heat
         const area = Math.PI * Math.pow(this.diameter / 2, 2);
-        const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.base_efficiency;
+        const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.flow_adjustment;
         var P3 = Pa * this.compression_ratio;
         var T3 = Ta * Math.pow(P3 / Pa, (y - 1) / y);
         var Tr = 1 + (y - 1) / 2 * M * M;
@@ -1601,17 +1603,17 @@ class TurboBuilder {
     CalcCost() {
         var Era = this.EraTable[this.era_sel];
         var Type = this.TypeTable[this.type_sel];
-        return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.base_efficiency) * Era.costfactor * Type.costfactor) + 1;
+        return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.flow_adjustment) * Era.costfactor * Type.costfactor) + 1;
     }
     VerifyValues() {
         this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
         this.type_sel = Math.max(0, Math.min(this.TypeTable.length - 1, this.type_sel));
-        this.base_efficiency = Math.max(-0.5, Math.min(0.5, this.base_efficiency));
+        this.flow_adjustment = Math.max(-0.5, Math.min(0.5, this.flow_adjustment));
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.fan_pressure_ratio = Math.max(0, this.fan_pressure_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
-        if (this.type_sel < 2) {
+        if (this.type_sel > 2) {
             this.afterburner = false;
         }
     }
@@ -1621,7 +1623,7 @@ class TurboBuilder {
         ei.engine_type = ENGINE_TYPE.TURBOMACHINERY;
         ei.era_sel = this.era_sel;
         ei.type = this.type_sel;
-        ei.base_efficiency = this.base_efficiency;
+        ei.base_efficiency = this.flow_adjustment;
         ei.diameter = this.diameter;
         ei.compression_ratio = this.compression_ratio;
         ei.fan_pressure_ratio = this.fan_pressure_ratio;
@@ -3002,14 +3004,16 @@ class EngineBuilder_HTML {
         this.t_diam = document.createElement("INPUT");
         this.t_comp = document.createElement("INPUT");
         this.t_bypr = document.createElement("INPUT");
+        this.t_aftb = document.createElement("INPUT");
         var fs = CreateFlexSection(cell);
         FlexText("Name", this.t_name, fs);
         FlexSelect("Era", this.t_era, fs);
         FlexSelect("Type", this.t_type, fs);
-        FlexInput("Engine Diameter", this.t_diam, fs);
+        FlexInput("Engine Diameter (m)", this.t_diam, fs);
         FlexInput("Overall Pressure Ratio", this.t_comp, fs);
         FlexInput("Bypass Ratio", this.t_bypr, fs);
         FlexInput("Mass Flow Adjustment", this.t_effi, fs);
+        FlexCheckbox("Afterburner", this.t_aftb, fs);
         this.t_effi.step = "0.05";
         this.t_effi.min = "-0.5";
         this.t_effi.max = "0.5";
@@ -3029,10 +3033,11 @@ class EngineBuilder_HTML {
         this.t_name.onchange = () => { this.turbobuilder.name = this.t_name.value; this.UpdateTurboX(); };
         this.t_era.onchange = () => { this.turbobuilder.era_sel = this.t_era.selectedIndex; this.UpdateTurboX(); };
         this.t_type.onchange = () => { this.turbobuilder.type_sel = this.t_type.selectedIndex; this.UpdateTurboX(); };
-        this.t_effi.onchange = () => { this.turbobuilder.base_efficiency = this.t_effi.valueAsNumber; this.UpdateTurboX(); };
+        this.t_effi.onchange = () => { this.turbobuilder.flow_adjustment = this.t_effi.valueAsNumber; this.UpdateTurboX(); };
         this.t_diam.onchange = () => { this.turbobuilder.diameter = this.t_diam.valueAsNumber; this.UpdateTurboX(); };
         this.t_comp.onchange = () => { this.turbobuilder.compression_ratio = this.t_comp.valueAsNumber; this.UpdateTurboX(); };
         this.t_bypr.onchange = () => { this.turbobuilder.bypass_ratio = this.t_bypr.valueAsNumber; this.UpdateTurboX(); };
+        this.t_aftb.onchange = () => { this.turbobuilder.afterburner = this.t_aftb.checked; this.UpdateTurboX(); };
     }
     InitTurboXOutputs(cell) {
         this.td_name = document.createElement("LABEL");
@@ -3058,10 +3063,11 @@ class EngineBuilder_HTML {
         this.t_name.value = this.turbobuilder.name;
         this.t_era.selectedIndex = this.turbobuilder.era_sel;
         this.t_type.selectedIndex = this.turbobuilder.type_sel;
-        this.t_effi.valueAsNumber = this.turbobuilder.base_efficiency;
+        this.t_effi.valueAsNumber = this.turbobuilder.flow_adjustment;
         this.t_diam.valueAsNumber = this.turbobuilder.diameter;
         this.t_comp.valueAsNumber = this.turbobuilder.compression_ratio;
         this.t_bypr.valueAsNumber = this.turbobuilder.bypass_ratio;
+        this.t_aftb.checked = this.turbobuilder.afterburner;
         if (this.turbobuilder.type_sel == 0 || this.turbobuilder.type_sel == 3) {
             this.t_bypr.disabled = true;
         }

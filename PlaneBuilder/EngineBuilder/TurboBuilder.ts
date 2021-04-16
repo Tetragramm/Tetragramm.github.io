@@ -7,7 +7,7 @@ class TurboBuilder {
     public era_sel: number; //Era
     public type_sel: number;
     private fuel_heat_value: number; // kJ/kg
-    public base_efficiency: number; // 0-1
+    public flow_adjustment: number; // 0-1
     public diameter: number; // m
     public compression_ratio: number; //1+
     public fan_pressure_ratio: number; //0+
@@ -40,11 +40,12 @@ class TurboBuilder {
         this.era_sel = 0;
         this.type_sel = 0;
         this.fuel_heat_value = 43020;
-        this.base_efficiency = 0;
+        this.flow_adjustment = 0;
         this.diameter = 0.89;
         this.compression_ratio = 3.5;
         this.fan_pressure_ratio = 1.6;
         this.bypass_ratio = 0;
+        this.afterburner = false;
     }
 
     private TempMass() {
@@ -59,7 +60,8 @@ class TurboBuilder {
     }
 
     private CalcMass() {
-        return Math.max(1, Math.floor(1.0e-6 + this.TempMass() / 25));
+        console.log([this.TempMass() / 25, this.flow_adjustment, 95.684 * this.flow_adjustment]);
+        return Math.max(1, Math.floor(1.0e-6 + this.TempMass() / 25 + 95.684 * this.flow_adjustment));
     }
 
     private CalcDrag() {
@@ -73,7 +75,7 @@ class TurboBuilder {
         var Era = this.EraTable[this.era_sel];
         var Type = this.TypeTable[this.type_sel];
 
-        var Reliability = - Math.log2(this.compression_ratio) - 20 * this.base_efficiency;
+        var Reliability = - Math.log2(this.compression_ratio) - 20 * this.flow_adjustment;
         return Math.trunc(Reliability + 1);
     }
 
@@ -87,7 +89,7 @@ class TurboBuilder {
         const Cp = 1.006; //Specific Heat at Constant Pressure
         const y = 1.4; //Specific Heat
         const area = Math.PI * Math.pow(this.diameter / 2, 2);
-        const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.base_efficiency;
+        const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.flow_adjustment;
 
         var P3 = Pa * this.compression_ratio;
         var T3 = Ta * Math.pow(P3 / Pa, (y - 1) / y);
@@ -117,18 +119,18 @@ class TurboBuilder {
         var Era = this.EraTable[this.era_sel];
         var Type = this.TypeTable[this.type_sel];
 
-        return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.base_efficiency) * Era.costfactor * Type.costfactor) + 1;
+        return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.flow_adjustment) * Era.costfactor * Type.costfactor) + 1;
     }
 
     private VerifyValues() {
         this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
         this.type_sel = Math.max(0, Math.min(this.TypeTable.length - 1, this.type_sel));
-        this.base_efficiency = Math.max(-0.5, Math.min(0.5, this.base_efficiency));
+        this.flow_adjustment = Math.max(-0.5, Math.min(0.5, this.flow_adjustment));
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.fan_pressure_ratio = Math.max(0, this.fan_pressure_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
-        if (this.type_sel < 2) {
+        if (this.type_sel > 2) {
             this.afterburner = false;
         }
     }
@@ -140,7 +142,7 @@ class TurboBuilder {
         ei.engine_type = ENGINE_TYPE.TURBOMACHINERY;
         ei.era_sel = this.era_sel;
         ei.type = this.type_sel;
-        ei.base_efficiency = this.base_efficiency;
+        ei.base_efficiency = this.flow_adjustment;
         ei.diameter = this.diameter;
         ei.compression_ratio = this.compression_ratio;
         ei.fan_pressure_ratio = this.fan_pressure_ratio;
