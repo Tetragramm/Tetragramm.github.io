@@ -19,7 +19,7 @@ class TurboBuilder {
 
     readonly TypeTable: { name: string, efficiency: number, massfactor: number, costfactor: number, }[] = [
         { name: "Turbojet", efficiency: 0, massfactor: 0.8, costfactor: 1 },
-        { name: "Turbofan", efficiency: 0, massfactor: 1.0, costfactor: 1 },
+        { name: "Turbofan", efficiency: 0, massfactor: 1., costfactor: 1 },
         { name: "Propfan", efficiency: -9, massfactor: 0.8, costfactor: 1 },
         { name: "Turboprop", efficiency: -3, massfactor: 0.8, costfactor: 1 },
     ];
@@ -53,15 +53,23 @@ class TurboBuilder {
         var Type = this.TypeTable[this.type_sel];
 
         var tmass = Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
-        if (this.afterburner)
-            return tmass;
-        else
-            return 0.75 * tmass;
+        return 0.75 * tmass;
     }
 
     private CalcMass() {
-        console.log([this.TempMass() / 25, this.flow_adjustment, 95.684 * this.flow_adjustment]);
-        return Math.max(1, Math.floor(1.0e-6 + this.TempMass() / 25 + 95.684 * this.flow_adjustment));
+        var tmass = this.TempMass();
+        //Turbofan fit.  Using list from jet-engines.net and an excel curve to align them.
+        if (this.type_sel == 1) {
+            tmass = tmass * (0.4833 * Math.log(this.compression_ratio) - 0.3168);
+        }
+        var mass = tmass / 25 + 95.684 * this.flow_adjustment
+        //Turboprop fit.  Using list from jet-engines.net and an excel curve to align them.
+        //Because turboprops have too much variation, some end up negative. So needs to be done here.
+        if (this.type_sel == 2 || this.type_sel == 3) {
+            var x = 0.5 - this.flow_adjustment;
+            mass = Math.abs(mass) * (19.74 * Math.pow(x, 3) - 11.462 * x * x + 1.0666 * x + 0.4333);
+        }
+        return Math.max(1, Math.floor(1.0e-6 + mass));
     }
 
     private CalcDrag() {
