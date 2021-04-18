@@ -10,7 +10,6 @@ class TurboBuilder {
     public flow_adjustment: number; // 0-1
     public diameter: number; // m
     public compression_ratio: number; //1+
-    public fan_pressure_ratio: number; //0+
     public bypass_ratio: number;//0+
     public afterburner: boolean;
 
@@ -43,7 +42,6 @@ class TurboBuilder {
         this.flow_adjustment = 0;
         this.diameter = 0.89;
         this.compression_ratio = 3.5;
-        this.fan_pressure_ratio = 1.6;
         this.bypass_ratio = 0;
         this.afterburner = false;
     }
@@ -96,6 +94,7 @@ class TurboBuilder {
         const Ta = 288.15; //Ambient Temp
         const Cp = 1.006; //Specific Heat at Constant Pressure
         const y = 1.4; //Specific Heat
+        const fan_pressure_ratio = 1.6;
         const area = Math.PI * Math.pow(this.diameter / 2, 2);
         const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.flow_adjustment;
 
@@ -106,7 +105,7 @@ class TurboBuilder {
         var Ty = Era.max_temp / Ta;
         var Tc = Math.pow(this.compression_ratio, 1 - 1 / y);
         var ST11 = a0 * (Math.sqrt((2 * Tr) / (y - 1) * (Ty / (Tr * Tc) - 1) * (Tc - 1) + Ty / (Tr * Tc) * M * M) - M) * net_efficiency / 1000;
-        var Tcp = Math.pow(this.fan_pressure_ratio, 1 - 1 / y);
+        var Tcp = Math.pow(fan_pressure_ratio, 1 - 1 / y);
         var ST13 = a0 * (Math.sqrt(2 / (y - 1) * (Tr * Tcp - 1)) - M) * net_efficiency / 1000;
         var f = (Cp * Ta / this.fuel_heat_value) * (Era.max_temp / Ta - T3 / Ta);
         var ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
@@ -136,7 +135,6 @@ class TurboBuilder {
         this.flow_adjustment = Math.max(-0.5, Math.min(0.5, this.flow_adjustment));
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
-        this.fan_pressure_ratio = Math.max(0, this.fan_pressure_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
         if (this.type_sel > 2) {
             this.afterburner = false;
@@ -150,10 +148,9 @@ class TurboBuilder {
         ei.engine_type = ENGINE_TYPE.TURBOMACHINERY;
         ei.era_sel = this.era_sel;
         ei.type = this.type_sel;
-        ei.base_efficiency = this.flow_adjustment;
+        ei.flow_adjustment = this.flow_adjustment;
         ei.diameter = this.diameter;
         ei.compression_ratio = this.compression_ratio;
-        ei.fan_pressure_ratio = this.fan_pressure_ratio;
         ei.bypass_ratio = this.bypass_ratio;
         ei.upgrades[0] = this.afterburner;
         return ei;
@@ -171,12 +168,11 @@ class TurboBuilder {
         estats.stats.mass = this.CalcMass();
         estats.stats.drag = this.CalcDrag();
         estats.stats.reliability = this.CalcReliability();
-        estats.stats.fuelconsumption = Math.round(10 * 60 * tf.fuel / 1000);
+        estats.stats.fuelconsumption = Math.round(10 * 20 * tf.fuel / 1000);
         estats.rumble = 0;
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
         estats.altitude = 59;
-        estats.pulsejet = true;
         estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
 
         return estats;

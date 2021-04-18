@@ -804,13 +804,158 @@ class PulsejetBuilder {
         return estats;
     }
 }
+/// <reference path="../impl/EngineStats.ts" />
+/// <reference path="../impl/EngineList.ts" />
+class TurboBuilder {
+    constructor() {
+        this.TypeTable = [
+            { name: "Turbojet", efficiency: 0, massfactor: 0.8, costfactor: 1 },
+            { name: "Turbofan", efficiency: 0, massfactor: 1., costfactor: 1 },
+            { name: "Propfan", efficiency: -9, massfactor: 0.8, costfactor: 1 },
+            { name: "Turboprop", efficiency: -3, massfactor: 0.8, costfactor: 1 },
+        ];
+        this.EraTable = [
+            { name: "Gen 1 1945-1955", max_temp: 1100, efficiency: -2, costfactor: 0.5 },
+            { name: "Gen 1.5 1955-1965", max_temp: 1100, efficiency: -1, costfactor: 0.6 },
+            { name: "Gen 2 1965-1975", max_temp: 1400, efficiency: -1, costfactor: 0.7 },
+            { name: "Gen 2.5 1975-1985", max_temp: 1400, efficiency: 0, costfactor: 0.8 },
+            { name: "Gen 3 1985-1995", max_temp: 1800, efficiency: 0, costfactor: 0.9 },
+            { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
+            { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
+            { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
+        ];
+        this.name = "Default";
+        this.era_sel = 0;
+        this.type_sel = 0;
+        this.fuel_heat_value = 43020;
+        this.flow_adjustment = 0;
+        this.diameter = 0.89;
+        this.compression_ratio = 3.5;
+        this.bypass_ratio = 0;
+        this.afterburner = false;
+    }
+    TempMass() {
+        var Era = this.EraTable[this.era_sel];
+        var Type = this.TypeTable[this.type_sel];
+        var tmass = Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
+        return 0.75 * tmass;
+    }
+    CalcMass() {
+        var tmass = this.TempMass();
+        //Turbofan fit.  Using list from jet-engines.net and an excel curve to align them.
+        if (this.type_sel == 1) {
+            tmass = tmass * (0.4833 * Math.log(this.compression_ratio) - 0.3168);
+        }
+        var mass = tmass / 25 + 95.684 * this.flow_adjustment;
+        //Turboprop fit.  Using list from jet-engines.net and an excel curve to align them.
+        //Because turboprops have too much variation, some end up negative. So needs to be done here.
+        if (this.type_sel == 2 || this.type_sel == 3) {
+            var x = 0.5 - this.flow_adjustment;
+            mass = Math.abs(mass) * (19.74 * Math.pow(x, 3) - 11.462 * x * x + 1.0666 * x + 0.4333);
+        }
+        return Math.max(1, Math.floor(1.0e-6 + mass));
+    }
+    CalcDrag() {
+        var Era = this.EraTable[this.era_sel];
+        var Type = this.TypeTable[this.type_sel];
+        return Math.floor(1.0e-6 + 5 * Math.PI * Math.pow(this.diameter / 2.0, 2));
+    }
+    CalcReliability() {
+        var Era = this.EraTable[this.era_sel];
+        var Type = this.TypeTable[this.type_sel];
+        var Reliability = -Math.log2(this.compression_ratio) - 20 * this.flow_adjustment;
+        return Math.trunc(Reliability + 1);
+    }
+    CalcStages() {
+        var Era = this.EraTable[this.era_sel];
+        var Type = this.TypeTable[this.type_sel];
+        const M = 0.0;
+        const a0 = 340.3;
+        const Pa = 108.9; //Ambient Pressure
+        const Ta = 288.15; //Ambient Temp
+        const Cp = 1.006; //Specific Heat at Constant Pressure
+        const y = 1.4; //Specific Heat
+        const fan_pressure_ratio = 1.6;
+        const area = Math.PI * Math.pow(this.diameter / 2, 2);
+        const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.flow_adjustment;
+        var P3 = Pa * this.compression_ratio;
+        var T3 = Ta * Math.pow(P3 / Pa, (y - 1) / y);
+        var Tr = 1 + (y - 1) / 2 * M * M;
+        var Ty = Era.max_temp / Ta;
+        var Tc = Math.pow(this.compression_ratio, 1 - 1 / y);
+        var ST11 = a0 * (Math.sqrt((2 * Tr) / (y - 1) * (Ty / (Tr * Tc) - 1) * (Tc - 1) + Ty / (Tr * Tc) * M * M) - M) * net_efficiency / 1000;
+        var Tcp = Math.pow(fan_pressure_ratio, 1 - 1 / y);
+        var ST13 = a0 * (Math.sqrt(2 / (y - 1) * (Tr * Tcp - 1)) - M) * net_efficiency / 1000;
+        var f = (Cp * Ta / this.fuel_heat_value) * (Era.max_temp / Ta - T3 / Ta);
+        var ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
+        var TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
+        var C2 = Pa * area * this.MFP(1) / ((1 + f));
+        var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
+        return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
+    }
+    MFP(M) {
+        const R = 287.058 / 1000; //Gas Constant
+        const y = 1.4; //Specific Heat
+        return Math.sqrt(y / R) * M * Math.pow(1 + (y - 1) / 2 * M * M, (y + 1) / (2 * (y - 1)));
+    }
+    CalcCost() {
+        var Era = this.EraTable[this.era_sel];
+        var Type = this.TypeTable[this.type_sel];
+        return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.flow_adjustment) * Era.costfactor * Type.costfactor) + 1;
+    }
+    VerifyValues() {
+        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
+        this.type_sel = Math.max(0, Math.min(this.TypeTable.length - 1, this.type_sel));
+        this.flow_adjustment = Math.max(-0.5, Math.min(0.5, this.flow_adjustment));
+        this.diameter = Math.max(0.1, this.diameter);
+        this.compression_ratio = Math.max(1, this.compression_ratio);
+        this.bypass_ratio = Math.max(0, this.bypass_ratio);
+        if (this.type_sel > 2) {
+            this.afterburner = false;
+        }
+    }
+    EngineInputs() {
+        var ei = new EngineInputs();
+        ei.name = this.name;
+        ei.engine_type = ENGINE_TYPE.TURBOMACHINERY;
+        ei.era_sel = this.era_sel;
+        ei.type = this.type_sel;
+        ei.flow_adjustment = this.flow_adjustment;
+        ei.diameter = this.diameter;
+        ei.compression_ratio = this.compression_ratio;
+        ei.bypass_ratio = this.bypass_ratio;
+        ei.upgrades[0] = this.afterburner;
+        return ei;
+    }
+    EngineStats() {
+        var estats = new EngineStats();
+        this.VerifyValues();
+        var tf = this.CalcStages();
+        this.kN = tf.thrust;
+        this.tsfc = tf.fuel / tf.thrust;
+        estats.name = this.name;
+        estats.stats.power = Math.round(tf.thrust * 1000 / 89);
+        estats.stats.mass = this.CalcMass();
+        estats.stats.drag = this.CalcDrag();
+        estats.stats.reliability = this.CalcReliability();
+        estats.stats.fuelconsumption = Math.round(10 * 20 * tf.fuel / 1000);
+        estats.rumble = 0;
+        estats.stats.cost = this.CalcCost();
+        estats.overspeed = 100;
+        estats.altitude = 59;
+        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        return estats;
+    }
+}
 /// <reference path="./Serialize.ts"/>
 /// <reference path="../EngineBuilder/EngineBuilder.ts"/>
 /// <reference path="../EngineBuilder/PulsejetBuilder.ts"/>
+/// <reference path="../EngineBuilder/TurboBuilder.ts"/>
 var ENGINE_TYPE;
 /// <reference path="./Serialize.ts"/>
 /// <reference path="../EngineBuilder/EngineBuilder.ts"/>
 /// <reference path="../EngineBuilder/PulsejetBuilder.ts"/>
+/// <reference path="../EngineBuilder/TurboBuilder.ts"/>
 (function (ENGINE_TYPE) {
     ENGINE_TYPE[ENGINE_TYPE["PROPELLER"] = 0] = "PROPELLER";
     ENGINE_TYPE[ENGINE_TYPE["PULSEJET"] = 1] = "PULSEJET";
@@ -837,6 +982,10 @@ class EngineInputs {
         this.quality_cost = 0;
         this.quality_rely = 0;
         this.starter = false;
+        this.flow_adjustment = 0;
+        this.diameter = 0;
+        this.compression_ratio = 0;
+        this.bypass_ratio = 0;
         if (js) {
             this.fromJSON(js);
         }
@@ -874,6 +1023,19 @@ class EngineInputs {
                     starter: this.starter,
                 };
             }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                return {
+                    name: this.name,
+                    engine_type: this.engine_type,
+                    type: this.type,
+                    era_sel: this.era_sel,
+                    flow_adjustment: this.flow_adjustment,
+                    diameter: this.diameter,
+                    compression_ratio: this.compression_ratio,
+                    bypass_ratio: this.bypass_ratio,
+                    upgrades: this.upgrades,
+                };
+            }
             default:
                 throw "EngineInputs.toJSON: Oh dear, you have a new engine type.";
         }
@@ -903,6 +1065,14 @@ class EngineInputs {
                 this.quality_cost = js["quality_cost"];
                 this.quality_rely = js["quality_rely"];
                 this.starter = js["starter"];
+                break;
+            }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                this.flow_adjustment = js["flow_adjustment"];
+                this.diameter = js["diameter"];
+                this.compression_ratio = js["compression_ratio"];
+                this.bypass_ratio = js["bypass_ratio"];
+                this.upgrades = js["upgrades"];
                 break;
             }
             default:
@@ -936,6 +1106,14 @@ class EngineInputs {
                 s.PushBool(this.starter);
                 break;
             }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                s.PushFloat(this.flow_adjustment);
+                s.PushFloat(this.diameter);
+                s.PushFloat(this.compression_ratio);
+                s.PushFloat(this.bypass_ratio);
+                s.PushBoolArr(this.upgrades);
+                break;
+            }
             default:
                 throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
         }
@@ -965,6 +1143,14 @@ class EngineInputs {
                 this.quality_cost = d.GetFloat();
                 this.quality_rely = d.GetFloat();
                 this.starter = d.GetBool();
+                break;
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                this.flow_adjustment = d.GetFloat();
+                this.diameter = d.GetFloat();
+                this.compression_ratio = d.GetFloat();
+                this.bypass_ratio = d.GetFloat();
+                this.upgrades = d.GetBoolArr(this.upgrades.length);
                 break;
             }
             default:
@@ -1003,6 +1189,18 @@ class EngineInputs {
                 this.name = stats.name;
                 return stats;
             }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                var tb = new TurboBuilder();
+                tb.type_sel = this.type;
+                tb.era_sel = this.era_sel;
+                tb.flow_adjustment = this.flow_adjustment;
+                tb.diameter = this.diameter;
+                tb.compression_ratio = this.compression_ratio;
+                tb.bypass_ratio = this.bypass_ratio;
+                tb.afterburner = this.upgrades[0];
+                tb.name = this.name;
+                return tb.EngineStats();
+            }
             default:
                 throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
         }
@@ -1033,6 +1231,10 @@ class EngineInputs {
         for (let i = 0; i < this.upgrades.length; i++) {
             n.upgrades[i] = this.upgrades[i];
         }
+        n.flow_adjustment = this.flow_adjustment;
+        n.diameter = this.diameter;
+        n.compression_ratio = this.compression_ratio;
+        n.bypass_ratio = this.bypass_ratio;
         return n;
     }
 }
@@ -1512,152 +1714,6 @@ class EngineBuilder {
         this.min_IAF = js["min_IAF"];
         this.upg_sel = BoolArr(js["upgrades"], this.upg_sel.length);
         return this.EngineStats();
-    }
-}
-/// <reference path="../impl/EngineStats.ts" />
-/// <reference path="../impl/EngineList.ts" />
-class TurboBuilder {
-    constructor() {
-        this.TypeTable = [
-            { name: "Turbojet", efficiency: 0, massfactor: 0.8, costfactor: 1 },
-            { name: "Turbofan", efficiency: 0, massfactor: 1., costfactor: 1 },
-            { name: "Propfan", efficiency: -9, massfactor: 0.8, costfactor: 1 },
-            { name: "Turboprop", efficiency: -3, massfactor: 0.8, costfactor: 1 },
-        ];
-        this.EraTable = [
-            { name: "Gen 1 1945-1955", max_temp: 1100, efficiency: -2, costfactor: 0.5 },
-            { name: "Gen 1.5 1955-1965", max_temp: 1100, efficiency: -1, costfactor: 0.6 },
-            { name: "Gen 2 1965-1975", max_temp: 1400, efficiency: -1, costfactor: 0.7 },
-            { name: "Gen 2.5 1975-1985", max_temp: 1400, efficiency: 0, costfactor: 0.8 },
-            { name: "Gen 3 1985-1995", max_temp: 1800, efficiency: 0, costfactor: 0.9 },
-            { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
-            { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
-            { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
-        ];
-        this.name = "Default";
-        this.era_sel = 0;
-        this.type_sel = 0;
-        this.fuel_heat_value = 43020;
-        this.flow_adjustment = 0;
-        this.diameter = 0.89;
-        this.compression_ratio = 3.5;
-        this.fan_pressure_ratio = 1.6;
-        this.bypass_ratio = 0;
-        this.afterburner = false;
-    }
-    TempMass() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
-        var tmass = Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
-        return 0.75 * tmass;
-    }
-    CalcMass() {
-        var tmass = this.TempMass();
-        //Turbofan fit.  Using list from jet-engines.net and an excel curve to align them.
-        if (this.type_sel == 1) {
-            tmass = tmass * (0.4833 * Math.log(this.compression_ratio) - 0.3168);
-        }
-        var mass = tmass / 25 + 95.684 * this.flow_adjustment;
-        //Turboprop fit.  Using list from jet-engines.net and an excel curve to align them.
-        //Because turboprops have too much variation, some end up negative. So needs to be done here.
-        if (this.type_sel == 2 || this.type_sel == 3) {
-            var x = 0.5 - this.flow_adjustment;
-            mass = Math.abs(mass) * (19.74 * Math.pow(x, 3) - 11.462 * x * x + 1.0666 * x + 0.4333);
-        }
-        return Math.max(1, Math.floor(1.0e-6 + mass));
-    }
-    CalcDrag() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
-        return Math.floor(1.0e-6 + 5 * Math.PI * Math.pow(this.diameter / 2.0, 2));
-    }
-    CalcReliability() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
-        var Reliability = -Math.log2(this.compression_ratio) - 20 * this.flow_adjustment;
-        return Math.trunc(Reliability + 1);
-    }
-    CalcStages() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
-        const M = 0.0;
-        const a0 = 340.3;
-        const Pa = 108.9; //Ambient Pressure
-        const Ta = 288.15; //Ambient Temp
-        const Cp = 1.006; //Specific Heat at Constant Pressure
-        const y = 1.4; //Specific Heat
-        const area = Math.PI * Math.pow(this.diameter / 2, 2);
-        const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.flow_adjustment;
-        var P3 = Pa * this.compression_ratio;
-        var T3 = Ta * Math.pow(P3 / Pa, (y - 1) / y);
-        var Tr = 1 + (y - 1) / 2 * M * M;
-        var Ty = Era.max_temp / Ta;
-        var Tc = Math.pow(this.compression_ratio, 1 - 1 / y);
-        var ST11 = a0 * (Math.sqrt((2 * Tr) / (y - 1) * (Ty / (Tr * Tc) - 1) * (Tc - 1) + Ty / (Tr * Tc) * M * M) - M) * net_efficiency / 1000;
-        var Tcp = Math.pow(this.fan_pressure_ratio, 1 - 1 / y);
-        var ST13 = a0 * (Math.sqrt(2 / (y - 1) * (Tr * Tcp - 1)) - M) * net_efficiency / 1000;
-        var f = (Cp * Ta / this.fuel_heat_value) * (Era.max_temp / Ta - T3 / Ta);
-        var ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
-        var TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
-        var C2 = Pa * area * this.MFP(1) / ((1 + f));
-        var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
-        return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
-    }
-    MFP(M) {
-        const R = 287.058 / 1000; //Gas Constant
-        const y = 1.4; //Specific Heat
-        return Math.sqrt(y / R) * M * Math.pow(1 + (y - 1) / 2 * M * M, (y + 1) / (2 * (y - 1)));
-    }
-    CalcCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
-        return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.flow_adjustment) * Era.costfactor * Type.costfactor) + 1;
-    }
-    VerifyValues() {
-        this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
-        this.type_sel = Math.max(0, Math.min(this.TypeTable.length - 1, this.type_sel));
-        this.flow_adjustment = Math.max(-0.5, Math.min(0.5, this.flow_adjustment));
-        this.diameter = Math.max(0.1, this.diameter);
-        this.compression_ratio = Math.max(1, this.compression_ratio);
-        this.fan_pressure_ratio = Math.max(0, this.fan_pressure_ratio);
-        this.bypass_ratio = Math.max(0, this.bypass_ratio);
-        if (this.type_sel > 2) {
-            this.afterburner = false;
-        }
-    }
-    EngineInputs() {
-        var ei = new EngineInputs();
-        ei.name = this.name;
-        ei.engine_type = ENGINE_TYPE.TURBOMACHINERY;
-        ei.era_sel = this.era_sel;
-        ei.type = this.type_sel;
-        ei.base_efficiency = this.flow_adjustment;
-        ei.diameter = this.diameter;
-        ei.compression_ratio = this.compression_ratio;
-        ei.fan_pressure_ratio = this.fan_pressure_ratio;
-        ei.bypass_ratio = this.bypass_ratio;
-        ei.upgrades[0] = this.afterburner;
-        return ei;
-    }
-    EngineStats() {
-        var estats = new EngineStats();
-        this.VerifyValues();
-        var tf = this.CalcStages();
-        this.kN = tf.thrust;
-        this.tsfc = tf.fuel / tf.thrust;
-        estats.name = this.name;
-        estats.stats.power = Math.round(tf.thrust * 1000 / 89);
-        estats.stats.mass = this.CalcMass();
-        estats.stats.drag = this.CalcDrag();
-        estats.stats.reliability = this.CalcReliability();
-        estats.stats.fuelconsumption = Math.round(10 * 60 * tf.fuel / 1000);
-        estats.rumble = 0;
-        estats.stats.cost = this.CalcCost();
-        estats.overspeed = 100;
-        estats.altitude = 59;
-        estats.pulsejet = true;
-        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
-        return estats;
     }
 }
 var internal_id = 0;
@@ -3210,6 +3266,7 @@ class EngineBuilder_HTML {
         this.m_delete = document.createElement("BUTTON");
         this.m_add_eb = document.createElement("BUTTON");
         this.m_add_pj = document.createElement("BUTTON");
+        this.m_add_tb = document.createElement("BUTTON");
         this.m_save = document.createElement("BUTTON");
         this.m_load = document.createElement("INPUT");
         this.m_list_create = document.createElement("BUTTON");
@@ -3248,6 +3305,17 @@ class EngineBuilder_HTML {
             }
             else {
                 BlinkBad(this.m_add_pj.parentElement);
+            }
+        };
+        this.m_add_tb.onclick = () => {
+            var inputs = this.turbobuilder.EngineInputs();
+            if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
+                engine_list.get(this.list_idx).push(inputs);
+                this.UpdateList();
+                BlinkGood(this.m_add_tb.parentElement);
+            }
+            else {
+                BlinkBad(this.m_add_tb.parentElement);
             }
         };
         this.m_save.onclick = () => { download(JSON.stringify(engine_list.get(this.list_idx).toJSON()), this.list_idx + ".json", "json"); };
@@ -3326,6 +3394,7 @@ class EngineBuilder_HTML {
         CreateButton("Load Engine List", this.m_load, cell);
         CreateButton("Add From Engine Builder", this.m_add_eb, cell);
         CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
+        CreateButton("Add From Turbine Builder", this.m_add_tb, cell);
         CreateButton("Delete Engine", this.m_delete, cell);
         var span = document.createElement("SPAN");
         var txtSpan = document.createElement("LABEL");
@@ -3423,6 +3492,18 @@ class EngineBuilder_HTML {
                 this.pulsejetbuilder.overall_quality = e_input.quality_rely;
                 this.pulsejetbuilder.starter = e_input.starter;
                 this.UpdatePulsejet();
+                break;
+            }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                this.turbobuilder.name = e_input.name;
+                this.turbobuilder.era_sel = e_input.era_sel;
+                this.turbobuilder.type_sel = e_input.type;
+                this.turbobuilder.diameter = e_input.diameter;
+                this.turbobuilder.compression_ratio = e_input.compression_ratio;
+                this.turbobuilder.bypass_ratio = e_input.bypass_ratio;
+                this.turbobuilder.flow_adjustment = e_input.flow_adjustment;
+                this.turbobuilder.afterburner = e_input.upgrades[0];
+                this.UpdateTurboX();
                 break;
             }
             default:
@@ -5270,12 +5351,12 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetMountIndex() {
-        if (this.GetIsPulsejet())
+        if (this.GetIsPulsejet() || this.GetIsTurbine())
             return -1;
         return this.selected_mount;
     }
     CanUsePushPull() {
-        return !(this.is_generator || this.GetIsPulsejet() || this.is_helicopter);
+        return !(this.is_generator || (this.GetNumPropellers() == 0) || this.is_helicopter);
     }
     SetUsePushPull(use) {
         this.use_pp = use;
@@ -5300,7 +5381,7 @@ class Engine extends Part {
         return this.mount_list;
     }
     CanUseExtendedDriveshaft() {
-        return !(this.GetIsPulsejet() || this.is_helicopter || this.GetGenerator());
+        return !((this.GetNumPropellers() == 0) || this.is_helicopter || this.GetGenerator());
     }
     SetUseExtendedDriveshaft(use) {
         if (!this.GetGenerator()) {
@@ -5315,7 +5396,7 @@ class Engine extends Part {
         return this.use_ds;
     }
     CanUseGears() {
-        return !(this.GetIsPulsejet() || this.GetGenerator());
+        return !((this.GetNumPropellers() == 0) || this.GetGenerator());
     }
     SetGearCount(num) {
         if (num != num || num < 0)
@@ -5391,8 +5472,33 @@ class Engine extends Part {
             }
         }
     }
+    GetIsTurbine() {
+        return this.etype_inputs.engine_type == ENGINE_TYPE.TURBOMACHINERY;
+    }
+    GetIsTurboprop() {
+        return this.etype_inputs.engine_type == ENGINE_TYPE.TURBOMACHINERY && this.etype_inputs.type == 3;
+    }
+    TurbineCheck() {
+        if (this.GetIsTurbine()) {
+            if (this.GetNumPropellers() == 0) {
+                this.use_ds = false;
+                this.gp_count = 0;
+                this.gpr_count = 0;
+                if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
+                    for (let i = 0; i < this.mount_list.length; i++) {
+                        this.selected_mount = i;
+                        if (this.mount_list[this.selected_mount].mount_type != "fuselage")
+                            break;
+                    }
+                }
+            }
+            this.use_pp = false;
+            this.cooling_count = 0;
+            this.cowl_sel = 0;
+        }
+    }
     GetNumPropellers() {
-        if (!(this.GetIsPulsejet() || this.GetGenerator())) {
+        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop()) {
             if (this.use_pp) {
                 return 2;
             }
@@ -5401,7 +5507,7 @@ class Engine extends Part {
         return 0;
     }
     GetIsTractorNacelle() {
-        if (!this.GetIsPulsejet()
+        if (this.GetNumPropellers() > 0
             && !this.GetUsePushPull()
             && this.mount_list[this.selected_mount].powerfactor == 0.8
             && !this.is_helicopter)
@@ -5424,7 +5530,7 @@ class Engine extends Part {
         return false;
     }
     IsAirCooled() {
-        return !this.GetIsPulsejet() && !this.IsLiquidCooled() && !this.IsRotary();
+        return !this.GetIsPulsejet() && !this.GetIsTurbine() && !this.IsLiquidCooled() && !this.IsRotary();
     }
     GetCowlList() {
         return this.cowl_list;
@@ -5435,7 +5541,7 @@ class Engine extends Part {
     GetCowlEnabled() {
         let lst = [];
         for (let c of this.cowl_list) {
-            if (this.GetIsPulsejet()) { //Pulsejets no cowl
+            if (this.GetIsPulsejet() || this.GetIsTurbine()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
             else if (this.IsLiquidCooled()) {
@@ -5591,8 +5697,11 @@ class Engine extends Part {
     }
     PartStats() {
         this.PulseJetCheck();
+        this.TurbineCheck();
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
+        console.log("Beginning Engine Calc");
+        console.log(stats.drag);
         stats.upkeep = stats.power / 10;
         if (this.etype_stats.oiltank)
             stats.mass += 1;
@@ -5623,6 +5732,7 @@ class Engine extends Part {
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
         stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
         stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
+        console.log(stats.drag);
         //Push-pull
         if (this.use_pp) {
             stats.power *= 2;
@@ -5661,13 +5771,15 @@ class Engine extends Part {
         if (this.GetHasOilCooler()) {
             stats.drag += Math.floor(stats.power / 15);
         }
+        console.log(stats.drag);
         // Mounting modifiers (only get applied once, even with push/pull)
         //No Mounting for pulse-jets, just bolted on
-        if (!this.etype_stats.pulsejet) {
+        if (!(this.GetIsPulsejet())) {
             stats = stats.Add(this.mount_list[this.selected_mount].stats);
             stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(1.0e-6 + this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
+        console.log(stats.drag);
         // Power Generation
         if (this.is_generator) {
             stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
@@ -6155,6 +6267,13 @@ class Engines extends Part {
         }
         return false;
     }
+    HasTurbineNoProp() {
+        for (let e of this.engines) {
+            if (e.GetIsTurbine() && e.GetNumPropellers() == 0)
+                return true;
+        }
+        return false;
+    }
     HasDiesel() {
         for (let e of this.engines) {
             if (e.IsDiesel())
@@ -6189,6 +6308,11 @@ class Engines extends Part {
         if (this.HasPulsejet()) {
             stats.warnings.push({
                 source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+            });
+        }
+        if (this.HasTurbineNoProp()) {
+            stats.warnings.push({
+                source: lu("Turbine"), warning: lu("Turbine Boost Warning")
             });
         }
         if (this.HasDiesel()) {
@@ -11833,6 +11957,7 @@ class Aircraft {
         var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
         var MaxSpeedEmpty = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9))));
+        console.log([this.stats.pitchspeed, this.stats.power, DPEmpty]);
         var MaxSpeedFull = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9))));
         var MaxSpeedwBombs = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9))));
         //Used: Ragged

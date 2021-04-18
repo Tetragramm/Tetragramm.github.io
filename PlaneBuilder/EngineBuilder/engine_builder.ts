@@ -171,6 +171,7 @@ class EngineBuilder_HTML {
     private m_delete: HTMLButtonElement;
     private m_add_eb: HTMLButtonElement;
     private m_add_pj: HTMLButtonElement;
+    private m_add_tb: HTMLButtonElement;
     private m_save: HTMLButtonElement;
     private m_load: HTMLInputElement;
     private m_list_create: HTMLButtonElement;
@@ -692,6 +693,7 @@ class EngineBuilder_HTML {
         this.m_delete = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_eb = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_pj = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_add_tb = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_save = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_load = document.createElement("INPUT") as HTMLInputElement;
         this.m_list_create = document.createElement("BUTTON") as HTMLButtonElement;
@@ -728,6 +730,16 @@ class EngineBuilder_HTML {
                 BlinkGood(this.m_add_pj.parentElement);
             } else {
                 BlinkBad(this.m_add_pj.parentElement);
+            }
+        }
+        this.m_add_tb.onclick = () => {
+            var inputs = this.turbobuilder.EngineInputs();
+            if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
+                engine_list.get(this.list_idx).push(inputs);
+                this.UpdateList();
+                BlinkGood(this.m_add_tb.parentElement);
+            } else {
+                BlinkBad(this.m_add_tb.parentElement);
             }
         }
         this.m_save.onclick = () => { download(JSON.stringify(engine_list.get(this.list_idx).toJSON()), this.list_idx + ".json", "json"); }
@@ -802,6 +814,7 @@ class EngineBuilder_HTML {
         CreateButton("Load Engine List", this.m_load, cell);
         CreateButton("Add From Engine Builder", this.m_add_eb, cell);
         CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
+        CreateButton("Add From Turbine Builder", this.m_add_tb, cell);
         CreateButton("Delete Engine", this.m_delete, cell);
 
         var span = document.createElement("SPAN") as HTMLSpanElement;
@@ -905,6 +918,18 @@ class EngineBuilder_HTML {
                 this.pulsejetbuilder.overall_quality = e_input.quality_rely;
                 this.pulsejetbuilder.starter = e_input.starter;
                 this.UpdatePulsejet();
+                break;
+            }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                this.turbobuilder.name = e_input.name;
+                this.turbobuilder.era_sel = e_input.era_sel;
+                this.turbobuilder.type_sel = e_input.type;
+                this.turbobuilder.diameter = e_input.diameter;
+                this.turbobuilder.compression_ratio = e_input.compression_ratio;
+                this.turbobuilder.bypass_ratio = e_input.bypass_ratio;
+                this.turbobuilder.flow_adjustment = e_input.flow_adjustment;
+                this.turbobuilder.afterburner = e_input.upgrades[0];
+                this.UpdateTurboX();
                 break;
             }
             default:
