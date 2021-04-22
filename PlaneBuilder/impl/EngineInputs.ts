@@ -1,6 +1,7 @@
 /// <reference path="./Serialize.ts"/>
 /// <reference path="../EngineBuilder/EngineBuilder.ts"/>
 /// <reference path="../EngineBuilder/PulsejetBuilder.ts"/>
+/// <reference path="../EngineBuilder/TurboBuilder.ts"/>
 
 enum ENGINE_TYPE {
     PROPELLER,
@@ -34,12 +35,9 @@ class EngineInputs {
     public starter: boolean;
 
     //TurboX Stuff
-    public fuel_heat_value: number; // kJ/kg
-    public max_turbine_temp: number; // K
-    public base_efficiency: number; // 0-1
+    public flow_adjustment: number; // 0-1
     public diameter: number; // m
     public compression_ratio: number; //1+
-    public fan_pressure_ratio: number; //0+
     public bypass_ratio: number;//0+
 
     constructor(js?: JSON) {
@@ -64,6 +62,11 @@ class EngineInputs {
         this.quality_cost = 0;
         this.quality_rely = 0;
         this.starter = false;
+
+        this.flow_adjustment = 0;
+        this.diameter = 0;
+        this.compression_ratio = 0;
+        this.bypass_ratio = 0;
 
         if (js) {
             this.fromJSON(js);
@@ -103,6 +106,19 @@ class EngineInputs {
                     starter: this.starter,
                 }
             }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                return {
+                    name: this.name,
+                    engine_type: this.engine_type,
+                    type: this.type,
+                    era_sel: this.era_sel,
+                    flow_adjustment: this.flow_adjustment,
+                    diameter: this.diameter,
+                    compression_ratio: this.compression_ratio,
+                    bypass_ratio: this.bypass_ratio,
+                    upgrades: this.upgrades,
+                };
+            }
             default:
                 throw "EngineInputs.toJSON: Oh dear, you have a new engine type.";
         }
@@ -133,6 +149,14 @@ class EngineInputs {
                 this.quality_cost = js["quality_cost"];
                 this.quality_rely = js["quality_rely"];
                 this.starter = js["starter"];
+                break;
+            }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                this.flow_adjustment = js["flow_adjustment"];
+                this.diameter = js["diameter"];
+                this.compression_ratio = js["compression_ratio"];
+                this.bypass_ratio = js["bypass_ratio"];
+                this.upgrades = js["upgrades"];
                 break;
             }
             default:
@@ -168,6 +192,14 @@ class EngineInputs {
                 s.PushBool(this.starter);
                 break;
             }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                s.PushFloat(this.flow_adjustment);
+                s.PushFloat(this.diameter);
+                s.PushFloat(this.compression_ratio);
+                s.PushFloat(this.bypass_ratio);
+                s.PushBoolArr(this.upgrades);
+                break;
+            }
             default:
                 throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
         }
@@ -198,6 +230,14 @@ class EngineInputs {
                 this.quality_cost = d.GetFloat();
                 this.quality_rely = d.GetFloat();
                 this.starter = d.GetBool();
+                break;
+            }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                this.flow_adjustment = d.GetFloat();
+                this.diameter = d.GetFloat();
+                this.compression_ratio = d.GetFloat();
+                this.bypass_ratio = d.GetFloat();
+                this.upgrades = d.GetBoolArr(this.upgrades.length);
                 break;
             }
             default:
@@ -237,6 +277,18 @@ class EngineInputs {
                 this.name = stats.name;
                 return stats;
             }
+            case ENGINE_TYPE.TURBOMACHINERY: {
+                var tb = new TurboBuilder();
+                tb.type_sel = this.type;
+                tb.era_sel = this.era_sel;
+                tb.flow_adjustment = this.flow_adjustment;
+                tb.diameter = this.diameter;
+                tb.compression_ratio = this.compression_ratio;
+                tb.bypass_ratio = this.bypass_ratio;
+                tb.afterburner = this.upgrades[0];
+                tb.name = this.name;
+                return tb.EngineStats();
+            }
             default:
                 throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
         }
@@ -269,6 +321,10 @@ class EngineInputs {
         for (let i = 0; i < this.upgrades.length; i++) {
             n.upgrades[i] = this.upgrades[i];
         }
+        n.flow_adjustment = this.flow_adjustment;
+        n.diameter = this.diameter;
+        n.compression_ratio = this.compression_ratio;
+        n.bypass_ratio = this.bypass_ratio;
         return n;
     }
 }

@@ -468,7 +468,7 @@ class Engine extends Part {
     }
 
     public CanUsePushPull() {
-        return !(this.is_generator || this.GetIsPulsejet() || this.is_helicopter);
+        return !(this.is_generator || (this.GetNumPropellers() == 0) || this.is_helicopter);
     }
 
     public SetUsePushPull(use: boolean) {
@@ -497,7 +497,7 @@ class Engine extends Part {
     }
 
     public CanUseExtendedDriveshaft() {
-        return !(this.GetIsPulsejet() || this.is_helicopter || this.GetGenerator());
+        return !((this.GetNumPropellers() == 0) || this.is_helicopter || this.GetGenerator());
     }
 
     public SetUseExtendedDriveshaft(use: boolean) {
@@ -514,7 +514,7 @@ class Engine extends Part {
     }
 
     public CanUseGears() {
-        return !(this.GetIsPulsejet() || this.GetGenerator());
+        return !((this.GetNumPropellers() == 0) || this.GetGenerator());
     }
 
     public SetGearCount(num: number) {
@@ -603,8 +603,30 @@ class Engine extends Part {
         }
     }
 
+    public GetIsTurbine(): boolean {
+        return this.etype_inputs.engine_type == ENGINE_TYPE.TURBOMACHINERY;
+    }
+
+    private GetIsTurboprop(): boolean {
+        return this.etype_inputs.engine_type == ENGINE_TYPE.TURBOMACHINERY && this.etype_inputs.type == 3;
+    }
+
+    private TurbineCheck() {
+        if (this.GetIsTurbine()) {
+            if (this.GetNumPropellers() == 0) {
+                this.use_ds = false;
+                this.gp_count = 0;
+                this.gpr_count = 0;
+                this.selected_mount = 5;
+            }
+            this.use_pp = false;
+            this.cooling_count = 0;
+            this.cowl_sel = 0;
+        }
+    }
+
     public GetNumPropellers() {
-        if (!(this.GetIsPulsejet() || this.GetGenerator())) {
+        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop()) {
             if (this.use_pp) {
                 return 2;
             }
@@ -614,7 +636,7 @@ class Engine extends Part {
     }
 
     public GetIsTractorNacelle() {
-        if (!this.GetIsPulsejet()
+        if (this.GetNumPropellers() > 0
             && !this.GetUsePushPull()
             && this.mount_list[this.selected_mount].powerfactor == 0.8
             && !this.is_helicopter)
@@ -641,7 +663,7 @@ class Engine extends Part {
     }
 
     public IsAirCooled() {
-        return !this.GetIsPulsejet() && !this.IsLiquidCooled() && !this.IsRotary();
+        return !this.GetIsPulsejet() && !this.GetIsTurbine() && !this.IsLiquidCooled() && !this.IsRotary();
     }
 
     public GetCowlList() {
@@ -655,7 +677,7 @@ class Engine extends Part {
     public GetCowlEnabled() {
         let lst = [];
         for (let c of this.cowl_list) {
-            if (this.GetIsPulsejet()) { //Pulsejets no cowl
+            if (this.GetIsPulsejet() || this.GetIsTurbine()) { //Pulsejets no cowl
                 lst.push(c.air && c.rotary && c.liquid); //Only no cowl
             }
             else if (this.IsLiquidCooled()) {
@@ -833,6 +855,7 @@ class Engine extends Part {
 
     public PartStats(): Stats {
         this.PulseJetCheck();
+        this.TurbineCheck();
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
 
@@ -916,7 +939,7 @@ class Engine extends Part {
 
         // Mounting modifiers (only get applied once, even with push/pull)
         //No Mounting for pulse-jets, just bolted on
-        if (!this.etype_stats.pulsejet) {
+        if (!(this.GetIsPulsejet())) {
             stats = stats.Add(this.mount_list[this.selected_mount].stats);
             stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(1.0e-6 + this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);

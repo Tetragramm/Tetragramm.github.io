@@ -272,6 +272,21 @@ class Engines extends Part {
         return count;
     }
 
+    public GetEngineType() {
+        var type = 9999;
+        for (let e of this.engines) {
+            if (e.GetIsPulsejet()) {
+                type = Math.min(type, ENGINE_TYPE.PULSEJET);
+            }
+            if (e.GetIsTurbine()) {
+                type = Math.min(type, ENGINE_TYPE.TURBOMACHINERY);
+            }
+        }
+        if (type == 9999)
+            type = ENGINE_TYPE.PROPELLER;
+        return type;
+    }
+
     public GetOverspeed() {
         var os = 100;
         for (let e of this.engines)
@@ -383,6 +398,14 @@ class Engines extends Part {
         return false;
     }
 
+    public HasTurbineNoProp() {
+        for (let e of this.engines) {
+            if (e.GetIsTurbine() && e.GetNumPropellers() == 0)
+                return true;
+        }
+        return false;
+    }
+
     public HasDiesel() {
         for (let e of this.engines) {
             if (e.IsDiesel())
@@ -422,6 +445,11 @@ class Engines extends Part {
         if (this.HasPulsejet()) {
             stats.warnings.push({
                 source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+            });
+        }
+        if (this.HasTurbineNoProp()) {
+            stats.warnings.push({
+                source: lu("Turbine"), warning: lu("Turbine Boost Warning")
             });
         }
         if (this.HasDiesel()) {

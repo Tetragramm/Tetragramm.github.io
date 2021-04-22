@@ -823,6 +823,7 @@ class TurboBuilder {
             { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
             { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
             { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
+            { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -4, costfactor: 0.5 },
         ];
         this.name = "Default";
         this.era_sel = 0;
@@ -1145,7 +1146,7 @@ class EngineInputs {
                 this.starter = d.GetBool();
                 break;
             }
-            case ENGINE_TYPE.PULSEJET: {
+            case ENGINE_TYPE.TURBOMACHINERY: {
                 this.flow_adjustment = d.GetFloat();
                 this.diameter = d.GetFloat();
                 this.compression_ratio = d.GetFloat();
@@ -5351,7 +5352,7 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetMountIndex() {
-        if (this.GetIsPulsejet() || this.GetIsTurbine())
+        if (this.GetIsPulsejet())
             return -1;
         return this.selected_mount;
     }
@@ -5484,13 +5485,7 @@ class Engine extends Part {
                 this.use_ds = false;
                 this.gp_count = 0;
                 this.gpr_count = 0;
-                if (this.mount_list[this.selected_mount].mount_type == "fuselage") {
-                    for (let i = 0; i < this.mount_list.length; i++) {
-                        this.selected_mount = i;
-                        if (this.mount_list[this.selected_mount].mount_type != "fuselage")
-                            break;
-                    }
-                }
+                this.selected_mount = 5;
             }
             this.use_pp = false;
             this.cooling_count = 0;
@@ -5700,8 +5695,6 @@ class Engine extends Part {
         this.TurbineCheck();
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
-        console.log("Beginning Engine Calc");
-        console.log(stats.drag);
         stats.upkeep = stats.power / 10;
         if (this.etype_stats.oiltank)
             stats.mass += 1;
@@ -5732,7 +5725,6 @@ class Engine extends Part {
         stats = stats.Add(this.cowl_list[this.cowl_sel].stats);
         stats.mass += Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].mpd);
         stats.drag = Math.floor(1.0e-6 + stats.drag * this.cowl_list[this.cowl_sel].ed);
-        console.log(stats.drag);
         //Push-pull
         if (this.use_pp) {
             stats.power *= 2;
@@ -5771,7 +5763,6 @@ class Engine extends Part {
         if (this.GetHasOilCooler()) {
             stats.drag += Math.floor(stats.power / 15);
         }
-        console.log(stats.drag);
         // Mounting modifiers (only get applied once, even with push/pull)
         //No Mounting for pulse-jets, just bolted on
         if (!(this.GetIsPulsejet())) {
@@ -5779,7 +5770,6 @@ class Engine extends Part {
             stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.selected_mount].strainfactor * this.etype_stats.stats.mass);
             stats.drag += Math.floor(1.0e-6 + this.mount_list[this.selected_mount].dragfactor * this.etype_stats.stats.mass);
         }
-        console.log(stats.drag);
         // Power Generation
         if (this.is_generator) {
             stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
@@ -6169,6 +6159,20 @@ class Engines extends Part {
         }
         return count;
     }
+    GetEngineType() {
+        var type = 9999;
+        for (let e of this.engines) {
+            if (e.GetIsPulsejet()) {
+                type = Math.min(type, ENGINE_TYPE.PULSEJET);
+            }
+            if (e.GetIsTurbine()) {
+                type = Math.min(type, ENGINE_TYPE.TURBOMACHINERY);
+            }
+        }
+        if (type == 9999)
+            type = ENGINE_TYPE.PROPELLER;
+        return type;
+    }
     GetOverspeed() {
         var os = 100;
         for (let e of this.engines)
@@ -6446,8 +6450,9 @@ class Propeller extends Part {
     GetUpgradeIndex() {
         return this.idx_upg;
     }
-    SetNumPropeller(have) {
+    SetNumPropeller(have, etype) {
         this.num_propellers = have;
+        this.etype = etype;
     }
     GetNumPropellers() {
         return this.num_propellers;
@@ -6485,9 +6490,13 @@ class Propeller extends Part {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         }
-        else { //Pulsejet
+        else if (this.etype == ENGINE_TYPE.PULSEJET) { //Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
+        }
+        else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) { //Turbojets
+            stats.pitchboost = 0.2;
+            stats.pitchspeed = 1.3;
         }
         return stats;
     }
@@ -11786,7 +11795,7 @@ class Aircraft {
         else {
             this.propeller.SetHelicopter(false);
         }
-        this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
+        this.propeller.SetNumPropeller(this.engines.GetNumPropellers(), this.engines.GetEngineType());
         stats = stats.Add(this.propeller.PartStats());
         //Fuel goes here, because it makes sections.
         stats = stats.Add(this.fuel.PartStats());
@@ -11957,7 +11966,6 @@ class Aircraft {
         var DPwBombs = Math.floor(1.0e-6 + (this.stats.drag + this.munitions.GetExternalMass() + DryMP) / 5);
         DPwBombs = Math.max(DPwBombs, 1);
         var MaxSpeedEmpty = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPEmpty * 9))));
-        console.log([this.stats.pitchspeed, this.stats.power, DPEmpty]);
         var MaxSpeedFull = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPFull * 9))));
         var MaxSpeedwBombs = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (DPwBombs * 9))));
         //Used: Ragged
@@ -12575,7 +12583,7 @@ class Helicopter {
         this.engines.SetHelicopter(true);
         stats = stats.Add(this.engines.PartStats());
         this.propeller.SetHelicopter(true);
-        this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
+        this.propeller.SetNumPropeller(this.engines.GetNumPropellers(), ENGINE_TYPE.PROPELLER);
         stats = stats.Add(this.propeller.PartStats());
         //Fuel goes here, because it makes sections.
         stats = stats.Add(this.fuel.PartStats());

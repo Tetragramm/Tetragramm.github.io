@@ -7,6 +7,7 @@ class Propeller extends Part {
     private idx_prop: number;
     private idx_upg: number;
     private num_propellers: number;
+    private etype: ENGINE_TYPE;
     private is_heli: boolean;
 
     constructor(json: JSON) {
@@ -101,8 +102,9 @@ class Propeller extends Part {
         return this.idx_upg;
     }
 
-    public SetNumPropeller(have: number) {
+    public SetNumPropeller(have: number, etype: ENGINE_TYPE) {
         this.num_propellers = have;
+        this.etype = etype;
     }
 
     public GetNumPropellers() {
@@ -144,9 +146,12 @@ class Propeller extends Part {
         } else if (this.num_propellers) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
             stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
-        } else {//Pulsejet
+        } else if (this.etype == ENGINE_TYPE.PULSEJET) {//Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
+        } else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) {//Turbojets
+            stats.pitchboost = 0.2;
+            stats.pitchspeed = 1.3;
         }
         return stats;
     }

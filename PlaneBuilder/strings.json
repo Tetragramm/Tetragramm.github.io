@@ -47,7 +47,7 @@
         "Pulsejets": "Pulsejets",
         "Pulsejet Boost Warning": "Pulsejets double Boost when above dropoff speed, instead of below dropoff.",
         "Turbine": "Turbine",
-        "Turbine Boost Warning": "Turbines double Boost when above dropoff speed, instead of below dropoff.",
+        "Turbine Boost Warning": "Turbines ignore dropoff speed, providing constant Boost at all speeds.",
         "Rotary": "Rotary",
         "Rotary Right Warning": "+1 to Dogfight! when turning right.",
         "Rotary Left Warning": "+1 to Dogfight! when turning left.",

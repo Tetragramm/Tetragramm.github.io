@@ -325,7 +325,7 @@ class Aircraft {
         } else {
             this.propeller.SetHelicopter(false);
         }
-        this.propeller.SetNumPropeller(this.engines.GetNumPropellers());
+        this.propeller.SetNumPropeller(this.engines.GetNumPropellers(), this.engines.GetEngineType());
         stats = stats.Add(this.propeller.PartStats());
 
         //Fuel goes here, because it makes sections.
