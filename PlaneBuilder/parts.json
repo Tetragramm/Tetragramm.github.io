@@ -2090,6 +2090,7 @@
                 "era": "Pioneer",
                 "mass": 1,
                 "drag": 1,
+                "cost": 2,
                 "warning": "Small Reconnaissance Camera Warning"
             },
             {
@@ -2097,6 +2098,7 @@
                 "era": "Pioneer",
                 "mass": 2,
                 "drag": 2,
+                "cost": 2,
                 "warning": "Medium Reconnaissance Camera Warning"
             },
             {
@@ -2104,6 +2106,7 @@
                 "era": "Pioneer",
                 "mass": 3,
                 "drag": 3,
+                "cost": 2,
                 "warning": "Large Reconnaissance Camera Warning"
             },
             {
@@ -2117,6 +2120,7 @@
                 "name": "Internal Medium Reconnaissance Camera",
                 "era": "Pioneer",
                 "mass": 2,
+                "cost": 2,
                 "reqsections": 1,
                 "warning": "Medium Reconnaissance Camera Warning"
             },
@@ -2124,6 +2128,7 @@
                 "name": "Internal Large Reconnaissance Camera",
                 "era": "Pioneer",
                 "mass": 3,
+                "cost": 2,
                 "reqsections": 1,
                 "warning": "Large Reconnaissance Camera Warning"
             }
