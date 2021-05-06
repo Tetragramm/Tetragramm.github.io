@@ -759,10 +759,10 @@ class Aircraft_HTML extends Display {
                 "close_hits": w.GetHits()[1],
                 "long_hits": w.GetHits()[2],
                 "extreme_hits": w.GetHits()[3],
-                "knife_damage": w.GetHits()[0] * fweap.damage,
-                "close_damage": w.GetHits()[1] * fweap.damage,
-                "long_damage": w.GetHits()[2] * fweap.damage,
-                "extreme_damage": w.GetHits()[3] * fweap.damage,
+                "knife_damage": Math.floor(1.0e-6 + w.GetHits()[0] * fweap.damage),
+                "close_damage": Math.floor(1.0e-6 + w.GetHits()[1] * fweap.damage),
+                "long_damage": Math.floor(1.0e-6 + w.GetHits()[2] * fweap.damage),
+                "extreme_damage": Math.floor(1.0e-6 + w.GetHits()[3] * fweap.damage),
                 "tags": "",
             };
 

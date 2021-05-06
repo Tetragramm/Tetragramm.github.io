@@ -355,10 +355,10 @@ class Cards {
         context.fillText(this.weap_data.hits[2].toString(), 157 + 160, 208, 80);
         context.fillText(this.weap_data.hits[3].toString(), 157 + 240, 208, 80);
 
-        context.fillText((this.weap_data.damage * this.weap_data.hits[0]).toString(), 157, 208 + 23, 80);
-        context.fillText((this.weap_data.damage * this.weap_data.hits[1]).toString(), 157 + 80, 208 + 23, 80);
-        context.fillText((this.weap_data.damage * this.weap_data.hits[2]).toString(), 157 + 160, 208 + 23, 80);
-        context.fillText((this.weap_data.damage * this.weap_data.hits[3]).toString(), 157 + 240, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[0])).toString(), 157, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[1])).toString(), 157 + 80, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[2])).toString(), 157 + 160, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[3])).toString(), 157 + 240, 208 + 23, 80);
 
         context.textAlign = "left";
         context.fillText(this.weap_data.tags[0], 90, 256, 350);
@@ -459,8 +459,16 @@ class Cards {
             context.font = "12px Avenir";
             context.fillText(wep.abrv, 232, 71, 91);
             context.font = "20px Balthazar";
-            var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
-            var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+            var hits = StringFmt.Join("/",
+                [wep.hits[0],
+                wep.hits[1],
+                wep.hits[2],
+                wep.hits[3]]);
+            var dam = StringFmt.Join("/",
+                [Math.floor(1.0e-6 + wep.hits[0] * wep.damage),
+                Math.floor(1.0e-6 + wep.hits[1] * wep.damage),
+                Math.floor(1.0e-6 + wep.hits[2] * wep.damage),
+                Math.floor(1.0e-6 + wep.hits[3] * wep.damage)]);
             context.fillText(hits, 320, 71, 80);
             context.fillText(dam, 401, 71, 80);
         }
@@ -470,8 +478,16 @@ class Cards {
             context.font = "12px Avenir";
             context.fillText(wep.abrv, 232, 103, 91);
             context.font = "20px Balthazar";
-            var hits = wep.hits[0] + "/" + wep.hits[1] + "/" + wep.hits[2] + "/" + wep.hits[3];
-            var dam = wep.hits[0] * wep.damage + "/" + wep.hits[1] * wep.damage + "/" + wep.hits[2] * wep.damage + "/" + wep.hits[3] * wep.damage;
+            var hits = StringFmt.Join("/",
+                [wep.hits[0],
+                wep.hits[1],
+                wep.hits[2],
+                wep.hits[3]]);
+            var dam = StringFmt.Join("/",
+                [Math.floor(1.0e-6 + wep.hits[0] * wep.damage),
+                Math.floor(1.0e-6 + wep.hits[1] * wep.damage),
+                Math.floor(1.0e-6 + wep.hits[2] * wep.damage),
+                Math.floor(1.0e-6 + wep.hits[3] * wep.damage)]);
             context.fillText(hits, 320, 103, 80);
             context.fillText(dam, 401, 103, 80);
         }
