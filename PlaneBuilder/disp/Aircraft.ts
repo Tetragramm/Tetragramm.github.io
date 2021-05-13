@@ -281,8 +281,19 @@ class Aircraft_HTML extends Display {
 
         this.cards.weap_data.ammo = w.GetShots();
         this.cards.weap_data.ap = fweap.ap;
-        this.cards.weap_data.damage = fweap.damage;
         this.cards.weap_data.hits = w.GetHits();
+
+        var wlist = this.acft.GetWeapons().GetWeaponList();
+        if (wlist[w.GetWeaponSelected()].abrv == "PR") {
+            this.cards.weap_data.damage = [5, 5, 5, 5];
+        } else {
+            this.cards.weap_data.damage = [
+                fweap.damage * this.cards.weap_data.hits[0],
+                fweap.damage * this.cards.weap_data.hits[1],
+                fweap.damage * this.cards.weap_data.hits[2],
+                fweap.damage * this.cards.weap_data.hits[3]];
+        }
+
         this.cards.weap_data.jam = w.GetJam();
         this.cards.weap_data.tags = [dtag];
         this.cards.weap_data.type = name;
@@ -748,6 +759,20 @@ class Aircraft_HTML extends Display {
         var wstates = [];
         for (let w of this.acft.GetWeapons().GetWeaponSets()) {
 
+            var wlist = this.acft.GetWeapons().GetWeaponList();
+            var damage = [];
+            if (wlist[w.GetWeaponSelected()].abrv == "PR") {
+                damage.push(5);
+                damage.push(5);
+                damage.push(5);
+                damage.push(5);
+            } else {
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[0]));
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[1]));
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[2]));
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[3]));
+            }
+
             var fweap = w.GetFinalWeapon();
             var tags = [];
             let weaponState = {
@@ -759,10 +784,10 @@ class Aircraft_HTML extends Display {
                 "close_hits": w.GetHits()[1],
                 "long_hits": w.GetHits()[2],
                 "extreme_hits": w.GetHits()[3],
-                "knife_damage": Math.floor(1.0e-6 + w.GetHits()[0] * fweap.damage),
-                "close_damage": Math.floor(1.0e-6 + w.GetHits()[1] * fweap.damage),
-                "long_damage": Math.floor(1.0e-6 + w.GetHits()[2] * fweap.damage),
-                "extreme_damage": Math.floor(1.0e-6 + w.GetHits()[3] * fweap.damage),
+                "knife_damage": damage[0],
+                "close_damage": damage[1],
+                "long_damage": damage[2],
+                "extreme_damage": damage[3],
                 "tags": "",
             };
 

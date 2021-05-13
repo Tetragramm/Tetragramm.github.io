@@ -62,7 +62,7 @@ class Cards {
         ap: number,
         jam: string,
         hits: number[],
-        damage: number,
+        damage: number[],
         tags: string[],
         reload: number,
         gyrojet: boolean,
@@ -355,10 +355,10 @@ class Cards {
         context.fillText(this.weap_data.hits[2].toString(), 157 + 160, 208, 80);
         context.fillText(this.weap_data.hits[3].toString(), 157 + 240, 208, 80);
 
-        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[0])).toString(), 157, 208 + 23, 80);
-        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[1])).toString(), 157 + 80, 208 + 23, 80);
-        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[2])).toString(), 157 + 160, 208 + 23, 80);
-        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage * this.weap_data.hits[3])).toString(), 157 + 240, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage[0])).toString(), 157, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage[1])).toString(), 157 + 80, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage[2])).toString(), 157 + 160, 208 + 23, 80);
+        context.fillText((Math.floor(1.0e-6 + this.weap_data.damage[3])).toString(), 157 + 240, 208 + 23, 80);
 
         context.textAlign = "left";
         context.fillText(this.weap_data.tags[0], 90, 256, 350);
