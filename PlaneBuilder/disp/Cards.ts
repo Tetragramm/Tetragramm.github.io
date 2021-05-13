@@ -176,7 +176,7 @@ class Cards {
             ap: 0,
             jam: "",
             hits: [],
-            damage: 0,
+            damage: [],
             tags: [],
             reload: 0,
             gyrojet: false,

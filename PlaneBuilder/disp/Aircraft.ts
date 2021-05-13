@@ -760,6 +760,7 @@ class Aircraft_HTML extends Display {
         for (let w of this.acft.GetWeapons().GetWeaponSets()) {
 
             var wlist = this.acft.GetWeapons().GetWeaponList();
+            var hits = w.GetHits();
             var damage = [];
             if (wlist[w.GetWeaponSelected()].abrv == "PR") {
                 damage.push(5);
@@ -767,10 +768,10 @@ class Aircraft_HTML extends Display {
                 damage.push(5);
                 damage.push(5);
             } else {
-                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[0]));
-                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[1]));
-                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[2]));
-                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * w.GetHits()[3]));
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * hits[0]));
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * hits[1]));
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * hits[2]));
+                damage.push(Math.floor(1.0e-6 + wlist[w.GetWeaponSelected()].damage * hits[3]));
             }
 
             var fweap = w.GetFinalWeapon();
@@ -780,10 +781,10 @@ class Aircraft_HTML extends Display {
                 "ammo": w.GetShots(),
                 "ap": fweap.ap,
                 "jam": w.GetJam(),
-                "knife_hits": w.GetHits()[0],
-                "close_hits": w.GetHits()[1],
-                "long_hits": w.GetHits()[2],
-                "extreme_hits": w.GetHits()[3],
+                "knife_hits": hits[0],
+                "close_hits": hits[1],
+                "long_hits": hits[2],
+                "extreme_hits": hits[3],
                 "knife_damage": damage[0],
                 "close_damage": damage[1],
                 "long_damage": damage[2],
