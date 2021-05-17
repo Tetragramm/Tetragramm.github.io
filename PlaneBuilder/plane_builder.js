@@ -13864,10 +13864,10 @@ class Cards {
                 wep.hits[1],
                 wep.hits[2],
                 wep.hits[3]]);
-            var dam = StringFmt.Join("/", [Math.floor(1.0e-6 + wep.hits[0] * wep.damage),
-                Math.floor(1.0e-6 + wep.hits[1] * wep.damage),
-                Math.floor(1.0e-6 + wep.hits[2] * wep.damage),
-                Math.floor(1.0e-6 + wep.hits[3] * wep.damage)]);
+            var dam = StringFmt.Join("/", [Math.floor(1.0e-6 + this.weap_data.damage[0]),
+                Math.floor(1.0e-6 + this.weap_data.damage[1]),
+                Math.floor(1.0e-6 + this.weap_data.damage[2]),
+                Math.floor(1.0e-6 + this.weap_data.damage[3])]);
             context.fillText(hits, 320, 71, 80);
             context.fillText(dam, 401, 71, 80);
         }
