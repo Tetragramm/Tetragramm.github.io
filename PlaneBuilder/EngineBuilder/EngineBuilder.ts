@@ -367,8 +367,8 @@ class EngineBuilder {
                 estats.stats.cost += 3;
                 estats.altitude = 49;
                 estats.stats.warnings.push({
-                    source: "Altitude Throttle",
-                    warning: "This engine has the WEP upgrade at Altitudes 0-10."
+                    source: lu("Altitude Throttle"),
+                    warning: lu("Altitude Throttle Warning")
                 });
                 break;
             }

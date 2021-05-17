@@ -876,8 +876,8 @@ class EngineBuilder {
                 estats.stats.cost += 3;
                 estats.altitude = 49;
                 estats.stats.warnings.push({
-                    source: "Altitude Throttle",
-                    warning: "This engine has the WEP upgrade at Altitudes 0-10."
+                    source: lu("Altitude Throttle"),
+                    warning: lu("Altitude Throttle Warning")
                 });
                 break;
             }
@@ -16067,7 +16067,7 @@ class Aircraft_HTML extends Display {
                     this.cards.eng_data.notes.push(lu("War Emergency Power"));
                 }
                 else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {
-                    this.cards.eng_data.notes.push(lu("War Emergency Power from altitudes 0-10"));
+                    this.cards.eng_data.notes.push(lu("War Emergency Power from altitudes 0-9"));
                 }
             }
         }
@@ -16393,7 +16393,7 @@ class Aircraft_HTML extends Display {
                     notes.push(lu("War Emergency Power"));
                 }
                 else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {
-                    notes.push(lu("War Emergency Power from altitudes 0-10"));
+                    notes.push(lu("War Emergency Power from altitudes 0-9"));
                 }
             }
             engine_state.notes = StringFmt.Join(", ", notes);

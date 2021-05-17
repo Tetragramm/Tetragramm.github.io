@@ -355,7 +355,7 @@ class Aircraft_HTML extends Display {
                 if (inputs.upgrades[1]) {
                     this.cards.eng_data.notes.push(lu("War Emergency Power"));
                 } else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {
-                    this.cards.eng_data.notes.push(lu("War Emergency Power from altitudes 0-10"));
+                    this.cards.eng_data.notes.push(lu("War Emergency Power from altitudes 0-9"));
                 }
             }
         }
@@ -746,7 +746,7 @@ class Aircraft_HTML extends Display {
                 if (inputs.upgrades[1]) {
                     notes.push(lu("War Emergency Power"));
                 } else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {
-                    notes.push(lu("War Emergency Power from altitudes 0-10"));
+                    notes.push(lu("War Emergency Power from altitudes 0-9"));
                 }
             }
             engine_state.notes = StringFmt.Join(", ", notes);
