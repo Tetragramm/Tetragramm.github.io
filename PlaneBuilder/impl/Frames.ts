@@ -542,7 +542,7 @@ class Frames extends Part {
     public SetTailFrame(num: number, type: number) {
         this.tail_section_list[num].frame = type;
         if (!this.frame_list[type].geodesic)
-            this.section_list[num].geodesic = false;
+            this.tail_section_list[num].geodesic = false;
         this.CalculateStats();
     }
 
