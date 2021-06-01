@@ -464,7 +464,7 @@
             "shells": true,
             "jam": "4/6",
             "reload": 2,
-            "size": 8,
+            "size": 16,
             "can_action": true,
             "can_projectile": true,
             "deflection": -3
