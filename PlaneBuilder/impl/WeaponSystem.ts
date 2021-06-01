@@ -669,7 +669,7 @@ class WeaponSystem extends Part {
         return [true,
             this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0,
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
-            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
+            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid && this.weapon_list[this.weapon_type].size < 16
         ];
     }
 
