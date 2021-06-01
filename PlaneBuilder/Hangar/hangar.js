@@ -14900,7 +14900,11 @@ class Load_HTML extends Display {
         c2_row.insertCell();
     }
     UpdateFuelUses(uses) {
-        BlinkIfChanged(this.d_fuse, (Math.floor(1.0e-6 + uses * 10) / 10).toString(), false);
+        var value = Math.floor(1.0e-6 + uses * 10) / 10;
+        if (!isFinite(value)) {
+            value = 0;
+        }
+        BlinkIfChanged(this.d_fuse, (value).toString(), false);
     }
     UpdateDisplay() {
         var fl = this.fuel.GetTankCount();
