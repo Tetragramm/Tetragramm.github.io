@@ -273,6 +273,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.mass += this.weapon_list[num].stats.mass;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.size += this.weapon_list[num].size;
+            this.final_weapon.size = Math.min(16, this.final_weapon.size);
             this.final_weapon.hits = 3 * this.weapon_list[num].hits;
             this.final_weapon.deflection -= 1;
             this.final_weapon.synched = false;
@@ -669,7 +670,7 @@ class WeaponSystem extends Part {
         return [true,
             this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0,
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
-            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid && this.weapon_list[this.weapon_type].size < 16
+            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
         ];
     }
 

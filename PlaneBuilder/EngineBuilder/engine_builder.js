@@ -10198,6 +10198,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.mass += this.weapon_list[num].stats.mass;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.size += this.weapon_list[num].size;
+            this.final_weapon.size = Math.min(16, this.final_weapon.size);
             this.final_weapon.hits = 3 * this.weapon_list[num].hits;
             this.final_weapon.deflection -= 1;
             this.final_weapon.synched = false;
@@ -12080,6 +12081,9 @@ class Aircraft {
         var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
         FuelUses = Math.floor(1.0e-6 + FuelUses * (1 - 0.2 * this.used.leaky));
+        if (FuelUses != FuelUses) {
+            FuelUses = 0;
+        }
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
                 this.stats.warnings.push({
@@ -12104,9 +12108,14 @@ class Aircraft {
         if (MaxStress == 0) {
             RumbleStress = 0;
         }
-        var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbEmpty = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty));
+        var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbwBombs = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (23.0 / this.stats.pitchspeed) / DPwBombs));
+        if (RateOfClimbEmpty != RateOfClimbEmpty) {
+            RateOfClimbEmpty = 0;
+            RateOfClimbFull = 0;
+            RateOfClimbwBombs = 0;
+        }
         return {
             DryMP: DryMP,
             WetMP: WetMP,
