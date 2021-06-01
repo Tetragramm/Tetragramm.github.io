@@ -643,7 +643,7 @@ class Aircraft {
         var FuelUses = Math.floor(1.0e-6 + this.stats.fuel / this.stats.fuelconsumption);
         //Used: Leaky
         FuelUses = Math.floor(1.0e-6 + FuelUses * (1 - 0.2 * this.used.leaky));
-        if (FuelUses != FuelUses) {
+        if (!isFinite(FuelUses)) {
             FuelUses = 0;
         }
         if (FuelUses < 6) {
@@ -679,7 +679,7 @@ class Aircraft {
         var RateOfClimbEmpty = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / DryMP) * (23.0 / this.stats.pitchspeed) / DPEmpty));
         var RateOfClimbFull = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMP) * (23.0 / this.stats.pitchspeed) / DPFull));
         var RateOfClimbwBombs = Math.max(1, Math.floor(1.0e-6 + (this.stats.power / WetMPwBombs) * (23.0 / this.stats.pitchspeed) / DPwBombs));
-        if (RateOfClimbEmpty != RateOfClimbEmpty) {
+        if (!isFinite(RateOfClimbEmpty)) {
             RateOfClimbEmpty = 0;
             RateOfClimbFull = 0;
             RateOfClimbwBombs = 0;
