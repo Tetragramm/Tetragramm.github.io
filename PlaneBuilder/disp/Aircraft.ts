@@ -392,6 +392,27 @@ class Aircraft_HTML extends Display {
         load_button.value = "";
     }
 
+    private Stress2Str(arr: any[]) {
+        var str = "";
+        for (let i = 0; i < arr.length - 1; i++) {
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + "), ";
+            } else {
+                str += arr[i][0].toString() + ", ";
+            }
+        }
+        if (arr.length > 0) {
+            var i = arr.length - 1;
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + ")";
+            } else {
+                str += arr[i][0].toString();
+            }
+        }
+
+        return str;
+    }
+
     private CatalogStats() {
         this.acft.name = this.derived.GetName();
         var stats = this.acft.GetStats();
@@ -460,7 +481,7 @@ class Aircraft_HTML extends Display {
             derived.MaxStrain,
             StringFmt.Join("/", this.acft.GetEscapeList()),
             StringFmt.Join("/", this.acft.GetCrashList()),
-            StringFmt.Join("/", this.acft.GetStressList()));
+            this.Stress2Str(this.acft.GetStressList()));
 
         var wlist = this.acft.GetWeapons().GetWeaponList();
         var dlist = this.acft.GetWeapons().GetDirectionList();

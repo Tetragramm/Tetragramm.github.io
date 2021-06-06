@@ -16119,6 +16119,27 @@ class Aircraft_HTML extends Display {
         reader.readAsText(file);
         load_button.value = "";
     }
+    Stress2Str(arr) {
+        var str = "";
+        for (let i = 0; i < arr.length - 1; i++) {
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + "), ";
+            }
+            else {
+                str += arr[i][0].toString() + ", ";
+            }
+        }
+        if (arr.length > 0) {
+            var i = arr.length - 1;
+            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+                str += arr[i][0].toString() + "(" + arr[i][1].toString() + ")";
+            }
+            else {
+                str += arr[i][0].toString();
+            }
+        }
+        return str;
+    }
     CatalogStats() {
         this.acft.name = this.derived.GetName();
         var stats = this.acft.GetStats();
@@ -16144,7 +16165,7 @@ class Aircraft_HTML extends Display {
         else {
             catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3} ({4})\n\n", StringFmt.Join("/", this.acft.GetVisibilityList()), derived.Stabiilty, derived.EnergyLoss, derived.TurnBleed, derived.TurnBleedwBombs);
         }
-        catalog_stats += StringFmt.Format("Toughness {0}, Max Strain {1}, Escape {2}, Crash Safety {3}, Flight Stress {4}\n\n", derived.Toughness, derived.MaxStrain, StringFmt.Join("/", this.acft.GetEscapeList()), StringFmt.Join("/", this.acft.GetCrashList()), StringFmt.Join("/", this.acft.GetStressList()));
+        catalog_stats += StringFmt.Format("Toughness {0}, Max Strain {1}, Escape {2}, Crash Safety {3}, Flight Stress {4}\n\n", derived.Toughness, derived.MaxStrain, StringFmt.Join("/", this.acft.GetEscapeList()), StringFmt.Join("/", this.acft.GetCrashList()), this.Stress2Str(this.acft.GetStressList()));
         var wlist = this.acft.GetWeapons().GetWeaponList();
         var dlist = this.acft.GetWeapons().GetDirectionList();
         var bombs = this.acft.GetMunitions().GetBombCount();
