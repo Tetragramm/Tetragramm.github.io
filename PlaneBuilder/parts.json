@@ -1606,6 +1606,7 @@
                 "name": "Steel Wing Truss",
                 "era": "Pioneer",
                 "drag": 4,
+                "maxstrain": 5,
                 "tension": 20,
                 "cost": 2,
                 "config": false,
