@@ -417,8 +417,9 @@ class Aircraft_HTML extends Display {
         this.acft.name = this.derived.GetName();
         var stats = this.acft.GetStats();
         var derived = this.acft.GetDerivedStats();
-        var catalog_stats = "";
+        var catalog_stats = this.MakeLink() + "\n";
         catalog_stats += this.acft.name + "\n";
+        catalog_stats += "Insert Nickname Here\n";
         catalog_stats += StringFmt.Format("{0}þ New, {1}þ Used\n", stats.cost, Math.floor(1.0e-6 + stats.cost / 2));
         catalog_stats += StringFmt.Format("{0}þ Upkeep\n\n", stats.upkeep);
         if (stats.bomb_mass > 0) {
@@ -452,7 +453,7 @@ class Aircraft_HTML extends Display {
             derived.HandlingEmpty,
             "-",
             derived.StallSpeedEmpty,
-            derived.MaxSpeedEmpty);
+            0);
         catalog_stats += "\nVital Parts\n";
         catalog_stats += StringFmt.Join(", ", this.acft.VitalComponentList());
         catalog_stats += "\n\n";
@@ -492,9 +493,9 @@ class Aircraft_HTML extends Display {
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0)
-                catalog_stats += (int_bomb.toString() + lu(" Bomb Mass Internally."));
+                catalog_stats += lu(" Bomb Mass Internally.", int_bomb);
             if (ext_bomb > 0)
-                catalog_stats += (ext_bomb.toString() + lu(" Bomb Mass Externally."));
+                catalog_stats += lu(" Bomb Mass Externally.", ext_bomb);
             if (int_bomb > 0) {
                 var mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
                 catalog_stats += (lu("Largest Internal Bomb", mib.toString()));
@@ -506,9 +507,9 @@ class Aircraft_HTML extends Display {
             var int_rock = Math.min(rockets, internal);
             var ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0)
-                catalog_stats += (int_rock.toString() + lu(" Rocket Mass Internally."));
+                catalog_stats += lu(" Rocket Mass Internally.", int_rock);
             if (ext_rock > 0)
-                catalog_stats += (ext_rock.toString() + lu(" Rocket Mass Externally."));
+                catalog_stats += lu(" Rocket Mass Externally.", ext_rock);
             catalog_stats += "\n";
         }
 
@@ -560,7 +561,7 @@ class Aircraft_HTML extends Display {
         download(JSON.stringify(this.acft.toJSON()), this.acft.name + "_" + this.acft.GetVersion() + ".json", "json");
     }
 
-    private SaveLink() {
+    private MakeLink() {
         this.acft.name = this.derived.GetName();
         var ser = new Serialize();
         this.acft.serialize(ser);
@@ -568,7 +569,11 @@ class Aircraft_HTML extends Display {
         var str2 = _arrayBufferToString(arr);
         var txt2 = LZString.compressToEncodedURIComponent(str2);
         var link = (location.protocol + "//" + location.host + location.pathname + "?json=" + txt2);
-        copyStringToClipboard(link);
+        return link;
+    }
+
+    private SaveLink() {
+        copyStringToClipboard(this.MakeLink());
     }
 
     private SaveDash() {
