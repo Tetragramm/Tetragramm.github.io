@@ -285,11 +285,6 @@ class Aircraft {
     }
 
     public SetType(type: AIRCRAFT_TYPE) {
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER
-            && type == AIRCRAFT_TYPE.HELICOPTER
-            && this.engines.HasPulsejet()) {
-            this.engines.SetNumberOfEngines(0);
-        }
         this.aircraft_type = type;
         this.rotor.SetType(type);
 
@@ -311,21 +306,13 @@ class Aircraft {
         stats = stats.Add(this.passengers.PartStats());
 
         this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard());
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.engines.SetHelicopter(false);
-            this.engines.SetMetalArea(this.wings.GetMetalArea());
-            this.engines.HaveParasol(this.wings.GetParasol());
-        } else {
-            this.engines.SetHelicopter(true);
-        }
+        this.engines.SetHelicopter(false);
+        this.engines.SetMetalArea(this.wings.GetMetalArea());
+        this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
 
-        if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
-            this.propeller.SetHelicopter(true);
-        } else {
-            this.propeller.SetHelicopter(false);
-        }
         this.propeller.SetNumPropeller(this.engines.GetNumPropellers(), this.engines.GetEngineType());
+        this.propeller.SetAcftType(this.aircraft_type);
         stats = stats.Add(this.propeller.PartStats());
 
         //Fuel goes here, because it makes sections.
@@ -343,48 +330,34 @@ class Aircraft {
         stats = stats.Add(this.cargo.PartStats());
 
         //If there are wings...
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            stats = stats.Add(this.wings.PartStats());
-            this.rotor.SetWingArea(stats.wingarea);
-        }
+        stats = stats.Add(this.wings.PartStats());
+        this.rotor.SetWingArea(stats.wingarea);
         //If there is a rotor...
-        if (this.aircraft_type != AIRCRAFT_TYPE.AIRPLANE) {
+        if (this.aircraft_type == AIRCRAFT_TYPE.AUTOGYRO) {
             this.rotor.SetEngineCount(this.engines.GetNumberOfEngines());
             stats = stats.Add(this.rotor.PartStats());
         }
 
-        //Stabilizer is different for helicopters
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
-            this.stabilizers.SetIsTandem(this.wings.GetTandem());
-            this.stabilizers.SetIsSwept(this.wings.GetSwept());
-            this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
-            this.stabilizers.SetHelicopter(false);
-        } else {
-            this.stabilizers.SetHelicopter(true);
-        }
+        this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
+        this.stabilizers.SetIsTandem(this.wings.GetTandem());
+        this.stabilizers.SetIsSwept(this.wings.GetSwept());
+        this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
+        this.stabilizers.SetHelicopter(false);
         this.stabilizers.SetWingArea(stats.wingarea);
         this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
         stats = stats.Add(this.stabilizers.PartStats());
 
         this.controlsurfaces.SetWingArea(stats.wingarea);
         this.controlsurfaces.SetBoomTail(this.frames.GetUseBoom());
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.controlsurfaces.SetSpan(this.wings.GetSpan());
-        } else {
-            this.controlsurfaces.SetHelicopter();
-        }
+        this.controlsurfaces.SetSpan(this.wings.GetSpan());
+        this.controlsurfaces.SetAcftType(this.aircraft_type);
         stats = stats.Add(this.controlsurfaces.PartStats());
 
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
-            this.reinforcements.SetTandem(this.wings.GetTandem());
-            this.reinforcements.SetStaggered(this.wings.GetStaggered());
-            this.reinforcements.SetHasWing(this.wings.GetArea() > 0);
-            this.reinforcements.SetSesquiplane(this.wings.GetIsSesquiplane());
-        } else {
-            this.reinforcements.SetHelicopter();
-        }
+        this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
+        this.reinforcements.SetTandem(this.wings.GetTandem());
+        this.reinforcements.SetStaggered(this.wings.GetStaggered());
+        this.reinforcements.SetCanUseExternal(this.wings.GetArea() > 0 && this.aircraft_type != AIRCRAFT_TYPE.ORNITHOPTER);
+        this.reinforcements.SetSesquiplane(this.wings.GetIsSesquiplane());
         this.reinforcements.SetCantLift(this.era.GetCantLift());
         stats = stats.Add(this.reinforcements.PartStats());
 
@@ -401,11 +374,7 @@ class Aircraft {
         //You know what, frames go last, because lots of things make sections.
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.frames.SetIsTandem(this.wings.GetTandem());
-        } else {
-            this.frames.SetIsTandem(false);
-        }
+        this.frames.SetIsTandem(this.wings.GetTandem());
         stats = stats.Add(this.frames.PartStats());
 
         //Treated Paper needs to apply near to last
@@ -417,11 +386,7 @@ class Aircraft {
         //Gear go last, because they need total mass.
         this.gear.SetGull(this.wings.HasInvertedGull());
         this.gear.SetLoadedMass(stats.mass + stats.wetmass);
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-            this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
-        } else {
-            this.gear.CanBoat(this.engines.GetEngineHeight(), 5);
-        }
+        this.gear.CanBoat(this.engines.GetEngineHeight(), this.wings.GetWingHeight());
         stats = stats.Add(this.gear.PartStats());
 
         //Add toughness here so it gets optimized properly.
@@ -433,11 +398,6 @@ class Aircraft {
         this.cockpits.SetHasRotary(this.engines.HasTractorRotary());
 
         stats = stats.Add(this.alter.PartStats());
-
-        //Can only do this last, but might trigger a recalc.
-        if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
-            this.rotor.SetMP(Math.max(Math.floor(1.0e-6 + stats.mass / 5), 1));
-        }
 
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
@@ -472,14 +432,14 @@ class Aircraft {
                 });
             }
 
+            if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+                stats.reliability -= 2;
+            }
+
             this.engines.UpdateReliability(stats);
             //Not really part local, but only affects number limits.
             this.reinforcements.SetAcftStructure(stats.structure);
-            if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER) {
-                this.fuel.SetArea(this.wings.GetArea());
-            } else {
-                this.fuel.SetArea(0);
-            }
+            this.fuel.SetArea(this.wings.GetArea());
             this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
             this.munitions.SetAcftParameters(stats.structure, this.era.GetMaxBomb(), this.wings.HasInvertedGull());
 
@@ -586,7 +546,7 @@ class Aircraft {
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
 
         var MaxStrain = 1 / 0;
-        if (this.aircraft_type != AIRCRAFT_TYPE.HELICOPTER && (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0)) {
+        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0) {
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         } else {
             MaxStrain = Math.min(this.stats.structure + this.stats.maxstrain, this.stats.structure);
@@ -683,6 +643,19 @@ class Aircraft {
             RateOfClimbEmpty = 0;
             RateOfClimbFull = 0;
             RateOfClimbwBombs = 0;
+        }
+
+        //Ornithopter Stuff
+        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+            HandlingEmpty += this.stats.power;
+            HandlingFull += this.stats.power;
+            HandlingFullwBombs += this.stats.power;
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Stall") }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning")
+                });
+            }
+            Overspeed = MaxStrain;
         }
 
         return {

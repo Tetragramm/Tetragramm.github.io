@@ -116,7 +116,7 @@ class Propeller extends Part {
             return 2.5;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
-        else //Pulsejet
+        else //Pulsejet, Turbines, Ornithopters
             return 5;
     }
 
@@ -125,33 +125,38 @@ class Propeller extends Part {
             return 6;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
-        else //Pulsejet
+        else //Pulsejet, Turbines, Ornithopters
             return 7;
     }
 
-    public SetHelicopter(is: boolean) {
-        this.is_heli = is;
-    }
-
-    public IsHelicopter() {
-        return this.is_heli;
+    public SetAcftType(type: AIRCRAFT_TYPE) {
+        switch (type) {
+            case AIRCRAFT_TYPE.AIRPLANE:
+            case AIRCRAFT_TYPE.AUTOGYRO:
+                break;
+            case AIRCRAFT_TYPE.HELICOPTER:
+                this.is_heli = true;
+            case AIRCRAFT_TYPE.ORNITHOPTER:
+                this.num_propellers = 0;
+                break;
+        }
     }
 
     public PartStats(): Stats {
         var stats = new Stats();
-        if (this.is_heli) {
+        if (this.num_propellers == 0) {
             //Default, no auto pitch
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
-        } else if (this.num_propellers) {
-            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
-            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         } else if (this.etype == ENGINE_TYPE.PULSEJET) {//Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
         } else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) {//Turbojets
             stats.pitchboost = 0.2;
             stats.pitchspeed = 1.3;
+        } else {
+            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
+            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         }
         return stats;
     }

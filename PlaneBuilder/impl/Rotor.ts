@@ -5,6 +5,7 @@ enum AIRCRAFT_TYPE {
     AIRPLANE,
     HELICOPTER,
     AUTOGYRO,
+    ORNITHOPTER,
 }
 enum ROTOR_BLADE_COUNT {
     Two = 2,

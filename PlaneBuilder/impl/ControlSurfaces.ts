@@ -20,6 +20,7 @@ class ControlSurfaces extends Part {
     private wing_area: number = 0;
     private mp: number = 0;
     private is_boom: boolean = false;
+    private acft_type: AIRCRAFT_TYPE = AIRCRAFT_TYPE.AIRPLANE;
 
     constructor(js: JSON) {
         super();
@@ -104,11 +105,17 @@ class ControlSurfaces extends Part {
 
     public CanAileron() {
         var can = [];
-        for (let a of this.aileron_list) {
-            if (a.warping && this.wing_area == 0)
-                can.push(false)
-            else
-                can.push(true);
+        if (this.acft_type != AIRCRAFT_TYPE.ORNITHOPTER) {
+            for (let a of this.aileron_list) {
+                if (a.warping && this.wing_area == 0)
+                    can.push(false)
+                else
+                    can.push(true);
+            }
+        } else { //Is Ornithopter
+            for (let a of this.aileron_list) {
+                can.push(a.warping);
+            }
         }
         return can;
     }
@@ -208,17 +215,24 @@ class ControlSurfaces extends Part {
         this.wing_area = wa;
     }
 
-    public SetHelicopter() {
-        this.aileron_sel = 0;
-        this.rudder_sel = 0;
-        this.elevator_sel = 0;
-        this.flaps_sel = 0;
-        this.slats_sel = 0;
-        for (let i = 0; i < this.drag_sel.length; i++)
-            this.drag_sel[i] = false;
-        this.span = 0;
-        this.is_cantilever = 0;
-        this.wing_area = 0;
+    public SetAcftType(acft_type: AIRCRAFT_TYPE) {
+        this.acft_type = acft_type;
+        if (this.acft_type == AIRCRAFT_TYPE.HELICOPTER) {
+            this.aileron_sel = 0;
+            this.rudder_sel = 0;
+            this.elevator_sel = 0;
+            this.flaps_sel = 0;
+            this.slats_sel = 0;
+            for (let i = 0; i < this.drag_sel.length; i++)
+                this.drag_sel[i] = false;
+            this.span = 0;
+            this.is_cantilever = 0;
+            this.wing_area = 0;
+        } else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+            var can = this.CanAileron();
+            console.log(can);
+            this.aileron_sel = can.findIndex((element) => { return element; })
+        }
     }
 
     public SetBoomTail(has: boolean) {

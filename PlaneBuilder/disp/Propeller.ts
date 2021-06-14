@@ -36,7 +36,7 @@ class Propeller_HTML extends Display {
         this.select_upgrade.selectedIndex = this.prop.GetUpgradeIndex();
         this.select_prop.selectedIndex = this.prop.GetPropIndex();
 
-        if (this.prop.GetNumPropellers() == 0 || this.prop.IsHelicopter()) {
+        if (this.prop.GetNumPropellers() == 0) {
             this.select_upgrade.disabled = true;
             this.select_prop.disabled = true;
             this.select_prop.selectedIndex = -1;

@@ -17,7 +17,7 @@ class Reinforcement extends Part {
     private is_staggered: boolean;
     private is_tandem: boolean;
     private is_monoplane: boolean;
-    private has_wing: boolean;
+    private can_external: boolean;
     private acft_structure: number;
     private cant_lift: number;
     private tension_sqp: boolean;
@@ -58,7 +58,7 @@ class Reinforcement extends Part {
         this.is_staggered = false;
         this.is_tandem = false;
         this.is_monoplane = false;
-        this.has_wing = true;
+        this.can_external = true;
         this.acft_structure = 0;
         this.cant_lift = 0;
     }
@@ -132,7 +132,7 @@ class Reinforcement extends Part {
     }
 
     public CanExternalWood() {
-        var can = [...Array(this.ext_wood_list.length).fill(this.has_wing)];
+        var can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_wood_list.length; i++) {
                 can[i] = this.ext_wood_list[i].small_sqp;
@@ -154,7 +154,7 @@ class Reinforcement extends Part {
     }
 
     public CanExternalSteel() {
-        var can = [...Array(this.ext_steel_list.length).fill(this.has_wing)];
+        var can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
         if (this.limited_sqp) {
             for (let i = 0; i < this.ext_steel_list.length; i++) {
                 can[i] = this.ext_steel_list[i].small_sqp;
@@ -230,8 +230,8 @@ class Reinforcement extends Part {
         this.is_monoplane = is;
     }
 
-    public SetHasWing(has: boolean) {
-        this.has_wing = has;
+    public SetCanUseExternal(has: boolean) {
+        this.can_external = has;
     }
 
     public SetAcftStructure(struct: number) {
@@ -306,7 +306,7 @@ class Reinforcement extends Part {
     }
 
     public SetHelicopter() {
-        this.has_wing = false;
+        this.can_external = false;
         this.is_monoplane = false;
         this.is_tandem = false;
         this.is_staggered = false;
@@ -346,7 +346,7 @@ class Reinforcement extends Part {
             tension_multiple -= 0.15;
         }
 
-        if (!this.has_wing) {
+        if (!this.can_external) {
             for (let i = 0; i < this.ext_wood_count.length; i++) {
                 this.ext_wood_count[i] = 0;
             }
@@ -433,11 +433,10 @@ class Reinforcement extends Part {
             });
         }
 
-        if (use_cant)
+        if (use_cant) {
             stats.cost += 5;
-
-        if (use_cant && this.has_wing)
             stats.liftbleed -= this.cant_lift;
+        }
 
         return stats;
     }
