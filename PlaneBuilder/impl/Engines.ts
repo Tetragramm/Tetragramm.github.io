@@ -378,9 +378,9 @@ class Engines extends Part {
         return false;
     }
 
-    public SetHelicopter(is: boolean) {
+    public SetInternal(is: boolean) {
         for (let e of this.engines) {
-            e.SetHelicopter(is);
+            e.SetInternal(is);
         }
         if (is) {
             for (let r of this.radiators) {

@@ -306,7 +306,7 @@ class Aircraft {
         stats = stats.Add(this.passengers.PartStats());
 
         this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard());
-        this.engines.SetHelicopter(false);
+        this.engines.SetInternal(this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER || this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER);
         this.engines.SetMetalArea(this.wings.GetMetalArea());
         this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
@@ -356,8 +356,9 @@ class Aircraft {
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
         this.reinforcements.SetTandem(this.wings.GetTandem());
         this.reinforcements.SetStaggered(this.wings.GetStaggered());
-        this.reinforcements.SetCanUseExternal(this.wings.GetArea() > 0 && this.aircraft_type != AIRCRAFT_TYPE.ORNITHOPTER);
+        this.reinforcements.SetCanUseExternal(this.wings.GetArea() > 0);
         this.reinforcements.SetSesquiplane(this.wings.GetIsSesquiplane());
+        this.reinforcements.SetAircraftType(this.aircraft_type);
         this.reinforcements.SetCantLift(this.era.GetCantLift());
         stats = stats.Add(this.reinforcements.PartStats());
 

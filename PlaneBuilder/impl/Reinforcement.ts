@@ -2,8 +2,8 @@
 /// <reference path="./Stats.ts" />
 
 class Reinforcement extends Part {
-    private ext_wood_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, stats: Stats }[];
-    private ext_steel_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, stats: Stats }[];
+    private ext_wood_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, ornith: boolean, stats: Stats }[];
+    private ext_steel_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, ornith: boolean, stats: Stats }[];
     private ext_cabane_list: { name: string, tension: number, stats: Stats }[];
     private ext_wood_count: number[];
     private ext_steel_count: number[];
@@ -22,6 +22,7 @@ class Reinforcement extends Part {
     private cant_lift: number;
     private tension_sqp: boolean;
     private limited_sqp: boolean;
+    private acft_type: AIRCRAFT_TYPE;
 
     constructor(js: JSON) {
         super();
@@ -29,14 +30,14 @@ class Reinforcement extends Part {
         this.ext_wood_list = [];
         for (let elem of js["external_wood"]) {
             this.ext_wood_list.push({
-                name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], stats: new Stats(elem)
+                name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], ornith: elem["ornith"], stats: new Stats(elem)
             });
         }
         this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
 
         this.ext_steel_list = [];
         for (let elem of js["external_steel"]) {
-            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], stats: new Stats(elem) });
+            this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], ornith: elem["ornith"], stats: new Stats(elem) });
         }
         this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
 
@@ -61,6 +62,7 @@ class Reinforcement extends Part {
         this.can_external = true;
         this.acft_structure = 0;
         this.cant_lift = 0;
+        this.acft_type = AIRCRAFT_TYPE.AIRPLANE;
     }
 
     public toJSON() {
@@ -133,8 +135,11 @@ class Reinforcement extends Part {
 
     public CanExternalWood() {
         var can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
-        if (this.limited_sqp) {
-            for (let i = 0; i < this.ext_wood_list.length; i++) {
+        for (let i = 0; i < this.ext_wood_list.length; i++) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+                can[i] = this.ext_wood_list[i].ornith;
+            }
+            else if (this.limited_sqp) {
                 can[i] = this.ext_wood_list[i].small_sqp;
             }
         }
@@ -155,8 +160,11 @@ class Reinforcement extends Part {
 
     public CanExternalSteel() {
         var can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
-        if (this.limited_sqp) {
-            for (let i = 0; i < this.ext_steel_list.length; i++) {
+        for (let i = 0; i < this.ext_steel_list.length; i++) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+                can[i] = this.ext_steel_list[i].ornith;
+            }
+            else if (this.limited_sqp) {
                 can[i] = this.ext_steel_list[i].small_sqp;
             }
         }
@@ -305,11 +313,14 @@ class Reinforcement extends Part {
         this.CalculateStats();
     }
 
-    public SetHelicopter() {
-        this.can_external = false;
-        this.is_monoplane = false;
-        this.is_tandem = false;
-        this.is_staggered = false;
+    public SetAircraftType(type: AIRCRAFT_TYPE) {
+        this.acft_type = type;
+        if (type == AIRCRAFT_TYPE.HELICOPTER) {
+            this.can_external = false;
+            this.is_monoplane = false;
+            this.is_tandem = false;
+            this.is_staggered = false;
+        }
     }
 
     public SetSesquiplane(sqp: { is: boolean, deck: number, super_small: boolean }) {
@@ -333,6 +344,16 @@ class Reinforcement extends Part {
 
     public PartStats() {
         var stats = new Stats();
+
+        switch (this.acft_type) {
+            case AIRCRAFT_TYPE.AIRPLANE:
+            case AIRCRAFT_TYPE.AUTOGYRO:
+                break;
+            case AIRCRAFT_TYPE.HELICOPTER:
+            case AIRCRAFT_TYPE.ORNITHOPTER:
+                this.cabane_sel = 0;
+                break;
+        }
 
         var tension_multiple = 1.0;
         if (this.is_monoplane)

@@ -27,7 +27,7 @@ class Engine extends Part {
 
     private is_generator: boolean;
     private has_alternator: boolean;
-    private is_helicopter: boolean;
+    private is_internal: boolean;
 
     private total_reliability: number;
 
@@ -311,7 +311,7 @@ class Engine extends Part {
     public CanSelectIndex() {
         var elist_temp = engine_list.get(this.elist_idx);
         var can = [...Array(elist_temp.length).fill(true)];
-        if (this.is_helicopter) {
+        if (this.is_internal) {
             for (let i = 0; i < elist_temp.length; i++) {
                 if (elist_temp.get(i).engine_type == ENGINE_TYPE.PULSEJET)
                     can[i] = false;
@@ -419,7 +419,7 @@ class Engine extends Part {
     }
 
     public RequiresExtendedDriveshafts(): boolean {
-        if (this.is_helicopter)
+        if (this.is_internal)
             return false;
         return this.mount_list[this.selected_mount].reqED;
     }
@@ -431,7 +431,7 @@ class Engine extends Part {
 
     public CanMountIndex() {
         var can = [...Array(this.mount_list.length).fill(true)];
-        if (this.is_helicopter) {
+        if (this.is_internal) {
             for (let i = 0; i < can.length; ++i) {
                 can[i] = this.mount_list[i].helicopter;
             }
@@ -468,7 +468,7 @@ class Engine extends Part {
     }
 
     public CanUsePushPull() {
-        return !(this.is_generator || (this.GetNumPropellers() == 0) || this.is_helicopter);
+        return !(this.is_generator || (this.GetNumPropellers() == 0) || this.is_internal);
     }
 
     public SetUsePushPull(use: boolean) {
@@ -497,7 +497,7 @@ class Engine extends Part {
     }
 
     public CanUseExtendedDriveshaft() {
-        return !((this.GetNumPropellers() == 0) || this.is_helicopter || this.GetGenerator());
+        return !((this.GetNumPropellers() == 0) || this.is_internal || this.GetGenerator());
     }
 
     public SetUseExtendedDriveshaft(use: boolean) {
@@ -639,7 +639,7 @@ class Engine extends Part {
         if (this.GetNumPropellers() > 0
             && !this.GetUsePushPull()
             && this.mount_list[this.selected_mount].powerfactor == 0.8
-            && !this.is_helicopter)
+            && !this.is_internal)
             return true;
         return false;
     }
@@ -762,7 +762,7 @@ class Engine extends Part {
     }
 
     public IsTractor() {
-        if (this.is_helicopter || this.GetGenerator())
+        if (this.is_internal || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Tractor"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
@@ -777,7 +777,7 @@ class Engine extends Part {
     }
 
     public IsPusher() {
-        if (this.is_helicopter || this.GetGenerator())
+        if (this.is_internal || this.GetGenerator())
             return false;
         return this.mount_list[this.selected_mount].name == "Rear-Mounted Pusher"
             || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
@@ -814,7 +814,7 @@ class Engine extends Part {
 
     public GetEngineHeight() {
         if (!this.GetGenerator()) {
-            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_helicopter)
+            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_internal)
                 return 2;
             else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
                 return 1;
@@ -844,8 +844,8 @@ class Engine extends Part {
         this.CalculateStats = callback;
     }
 
-    public SetHelicopter(is: boolean) {
-        this.is_helicopter = is;
+    public SetInternal(is: boolean) {
+        this.is_internal = is;
         if (is) {
             this.use_ds = false;
             if (!this.CanMountIndex()[this.selected_mount])

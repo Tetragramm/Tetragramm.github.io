@@ -1417,7 +1417,8 @@
                 "cost": 1,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "N-Strut",
@@ -1430,7 +1431,8 @@
                 "cost": 1,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "V-Strut",
@@ -1443,7 +1445,8 @@
                 "cost": 1,
                 "config": true,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": false
             },
             {
                 "name": "I-Strut",
@@ -1455,7 +1458,8 @@
                 "cost": 2,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "W-Strut",
@@ -1467,7 +1471,8 @@
                 "cost": 2,
                 "config": true,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": false
             },
             {
                 "name": "Single Strut",
@@ -1479,7 +1484,8 @@
                 "cost": 1,
                 "config": true,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": false
             },
             {
                 "name": "Star Strut",
@@ -1492,7 +1498,8 @@
                 "cost": 2,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "Wing Truss",
@@ -1502,7 +1509,8 @@
                 "cost": 1,
                 "config": false,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": true
             },
             {
                 "name": "Wire Root",
@@ -1510,7 +1518,8 @@
                 "tension": 10,
                 "config": true,
                 "first": false,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": true
             }
         ],
         "external_steel": [
@@ -1525,7 +1534,8 @@
                 "cost": 2,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "Steel N-Strut",
@@ -1538,7 +1548,8 @@
                 "cost": 2,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "Steel V-Strut",
@@ -1551,7 +1562,8 @@
                 "cost": 2,
                 "config": true,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": false
             },
             {
                 "name": "Steel I-Strut",
@@ -1563,7 +1575,8 @@
                 "cost": 4,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "Steel W-Strut",
@@ -1575,7 +1588,8 @@
                 "cost": 4,
                 "config": true,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": false
             },
             {
                 "name": "Steel Single Strut",
@@ -1587,7 +1601,8 @@
                 "cost": 2,
                 "config": true,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": false
             },
             {
                 "name": "Steel Star Strut",
@@ -1600,7 +1615,8 @@
                 "cost": 4,
                 "config": true,
                 "first": true,
-                "small_sqp": false
+                "small_sqp": false,
+                "ornith": false
             },
             {
                 "name": "Steel Wing Truss",
@@ -1611,7 +1627,8 @@
                 "cost": 2,
                 "config": false,
                 "first": true,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": true
             },
             {
                 "name": "Steel Wire Root",
@@ -1619,7 +1636,8 @@
                 "tension": 10,
                 "config": true,
                 "first": false,
-                "small_sqp": true
+                "small_sqp": true,
+                "ornith": true
             }
         ],
         "cabane": [

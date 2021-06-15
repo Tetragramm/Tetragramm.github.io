@@ -230,7 +230,6 @@ class ControlSurfaces extends Part {
             this.wing_area = 0;
         } else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
             var can = this.CanAileron();
-            console.log(can);
             this.aileron_sel = can.findIndex((element) => { return element; })
         }
     }
