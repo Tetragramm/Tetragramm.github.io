@@ -9193,7 +9193,7 @@ class Rotor extends Part {
         return this.rotor_count * Math.max(1, 2 * this.rotor_span + area - 10);
     }
     GetRotorDrag() {
-        if (this.type != AIRCRAFT_TYPE.AIRPLANE) {
+        if (this.type == AIRCRAFT_TYPE.HELICOPTER || this.type == AIRCRAFT_TYPE.AUTOGYRO) {
             var area = (Math.PI / 8) * this.rotor_span * this.rotor_span;
             if (this.rotor_count == 1) {
                 return Math.floor(1.0e-6 + 6 * area * area / (this.rotor_span * this.rotor_span));
