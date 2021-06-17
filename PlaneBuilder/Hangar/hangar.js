@@ -1171,6 +1171,7 @@ class TurboBuilder {
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
+        this.bypass_ratio = Math.min(20, this.bypass_ratio);
         if (this.type_sel > 2) {
             this.afterburner = false;
         }
@@ -3869,10 +3870,9 @@ class Propeller extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        if (this.num_propellers == 0) {
-            //Default, no auto pitch
-            stats.pitchboost = 0.6;
-            stats.pitchspeed = 1;
+        if (this.num_propellers != 0) {
+            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
+            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         }
         else if (this.etype == ENGINE_TYPE.PULSEJET) { //Pulsejet
             stats.pitchboost = 0.6;
@@ -3883,8 +3883,9 @@ class Propeller extends Part {
             stats.pitchspeed = 1.3;
         }
         else {
-            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
-            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
+            //Default, no auto pitch
+            stats.pitchboost = 0.6;
+            stats.pitchspeed = 1;
         }
         return stats;
     }

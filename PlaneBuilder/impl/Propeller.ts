@@ -144,10 +144,9 @@ class Propeller extends Part {
 
     public PartStats(): Stats {
         var stats = new Stats();
-        if (this.num_propellers == 0) {
-            //Default, no auto pitch
-            stats.pitchboost = 0.6;
-            stats.pitchspeed = 1;
+        if (this.num_propellers != 0) {
+            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
+            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
         } else if (this.etype == ENGINE_TYPE.PULSEJET) {//Pulsejet
             stats.pitchboost = 0.6;
             stats.pitchspeed = 1;
@@ -155,8 +154,9 @@ class Propeller extends Part {
             stats.pitchboost = 0.2;
             stats.pitchspeed = 1.3;
         } else {
-            stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.num_propellers));
-            stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.num_propellers));
+            //Default, no auto pitch
+            stats.pitchboost = 0.6;
+            stats.pitchspeed = 1;
         }
         return stats;
     }
