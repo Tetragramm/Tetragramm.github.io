@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "system",
+        "outFile": "hangar.js"
+    },
+    "include": [
+        ".",
+        "../impl",
+        "../disp"
+    ]
+}

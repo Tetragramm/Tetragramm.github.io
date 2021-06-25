@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "system",
+        "outFile": "weapon_display.js"
+    },
+    "include": [
+        ".",
+        "../string/",
+        "../impl/Localization.ts"
+    ]
+}

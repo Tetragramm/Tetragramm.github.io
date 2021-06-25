@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "system",
+        "outFile": "../../Helicopter/helicopter.js"
+    },
+    "exclude": [
+        "../EngineBuilder",
+        "../WeaponDisplay",
+        "../Standalone",
+        "../Hangar",
+        "../plane_builder.ts"
+    ],
+    "include": [
+        ".."
+    ]
+}

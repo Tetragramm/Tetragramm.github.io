@@ -1,0 +1,126 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "Watch Plane Builder"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "EngineBuilder/tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "Watch Engine Builder"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "Helicopter/tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "Watch Helicopter"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "Hangar/tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "Watch Hangar"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "WeaponDisplay/tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "Watch Weapon Display"
+		},
+		,
+		{
+			"label": "Build All",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": [
+				"Watch Plane Builder",
+				"Watch Engine Builder",
+				"Watch Helicopter",
+				"Watch Hangar",
+				"Watch Weapon Display"
+			]
+		}
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "Build Plane Builder"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "EngineBuilder/tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "Build Engine Builder"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "Helicopter/tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "Build Helicopter"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "Hangar/tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "Build Hangar"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "WeaponDisplay/tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "Build Weapon Display"
+		},
+		{
+			"label": "Build All",
+			"group": "build",
+			"dependsOn": [
+				"Build Plane Builder",
+				"Build Engine Builder",
+				"Build Helicopter",
+				"Build Hangar",
+				"Build Weapon Display"
+			]
+		}
+	]
+}
