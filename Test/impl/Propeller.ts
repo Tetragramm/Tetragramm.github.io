@@ -143,6 +143,9 @@ class Propeller extends Part {
 
     public SetAcftType(type: AIRCRAFT_TYPE) {
         this.acft_type = type;
+        if(IsAnyOrnithopter(type)){
+            this.num_propellers = 0;
+        }
     }
 
     public PartStats(): Stats {
@@ -155,7 +158,7 @@ class Propeller extends Part {
             stats.pitchspeed = 1;
         } else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) {//Turbojets
             stats.pitchboost = 0.2;
-            stats.pitchspeed = 1.3;
+            // stats.pitchspeed = 1.3; //Created by Engine Builder. Not from here.
         } else if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
             stats.pitchboost = 0.6;
             stats.pitchspeed = 0.8;

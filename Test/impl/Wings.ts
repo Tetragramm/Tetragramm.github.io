@@ -252,10 +252,12 @@ class Wings extends Part {
 
     public SetFlutterer(is:boolean){
         this.is_flutterer = is;
-        if(this.wing_list.length > 1)
-            this.wing_stagger = 1;
-        else
-            this.wing_stagger = 0;
+        if(is){
+            if(this.wing_list.length > 1)
+                this.wing_stagger = 1;
+            else
+                this.wing_stagger = 0;
+        }
     }
 
     public SetStagger(index: number) {

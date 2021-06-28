@@ -158,6 +158,16 @@ class TurboBuilder {
         return ei;
     }
 
+    private GetPitchSpeed(){
+        if(this.bypass_ratio > 8)
+            return 1;
+        if(this.bypass_ratio > 3.5)
+            return 1.1;
+        if(this.bypass_ratio > 1)
+            return 1.2;
+        return 1;
+    }
+
     public EngineStats() {
         var estats = new EngineStats();
 
@@ -176,6 +186,7 @@ class TurboBuilder {
         estats.overspeed = 100;
         estats.altitude = 59;
         estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.pitchspeed = this.GetPitchSpeed();
 
         return estats;
     }

@@ -929,6 +929,15 @@ class TurboBuilder {
         ei.upgrades[0] = this.afterburner;
         return ei;
     }
+    GetPitchSpeed() {
+        if (this.bypass_ratio > 8)
+            return 1;
+        if (this.bypass_ratio > 3.5)
+            return 1.1;
+        if (this.bypass_ratio > 1)
+            return 1.2;
+        return 1;
+    }
     EngineStats() {
         var estats = new EngineStats();
         this.VerifyValues();
@@ -946,6 +955,7 @@ class TurboBuilder {
         estats.overspeed = 100;
         estats.altitude = 59;
         estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.pitchspeed = this.GetPitchSpeed();
         return estats;
     }
 }
@@ -6503,6 +6513,9 @@ class Propeller extends Part {
     }
     SetAcftType(type) {
         this.acft_type = type;
+        if (IsAnyOrnithopter(type)) {
+            this.num_propellers = 0;
+        }
     }
     PartStats() {
         var stats = new Stats();
@@ -6516,7 +6529,7 @@ class Propeller extends Part {
         }
         else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) { //Turbojets
             stats.pitchboost = 0.2;
-            stats.pitchspeed = 1.3;
+            // stats.pitchspeed = 1.3; //Created by Engine Builder. Not from here.
         }
         else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
             stats.pitchboost = 0.6;
@@ -7380,10 +7393,12 @@ class Wings extends Part {
     }
     SetFlutterer(is) {
         this.is_flutterer = is;
-        if (this.wing_list.length > 1)
-            this.wing_stagger = 1;
-        else
-            this.wing_stagger = 0;
+        if (is) {
+            if (this.wing_list.length > 1)
+                this.wing_stagger = 1;
+            else
+                this.wing_stagger = 0;
+        }
     }
     SetStagger(index) {
         this.wing_stagger = index;
