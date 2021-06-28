@@ -1205,11 +1205,12 @@ class TurboBuilder {
         return ei;
     }
     GetPitchSpeed() {
-        if (this.bypass_ratio > 8)
+        console.log(this.bypass_ratio);
+        if (this.bypass_ratio >= 8)
             return 1;
-        if (this.bypass_ratio > 3.5)
+        if (this.bypass_ratio >= 3.5)
             return 1.1;
-        if (this.bypass_ratio > 1)
+        if (this.bypass_ratio >= 1)
             return 1.2;
         return 1;
     }
@@ -3182,6 +3183,7 @@ class Engine extends Part {
         if (this.is_generator) {
             stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
             stats.power = 0;
+            stats.pitchspeed = 0;
         }
         else if (this.has_alternator) {
             stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
@@ -3697,15 +3699,22 @@ class Engines extends Part {
         var stats = new Stats;
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
         var ecost = 0;
+        var pitchspeedmin = 100;
         //Engine stuff
         for (let en of this.engines) {
-            stats = stats.Add(en.PartStats());
+            let enstats = en.PartStats();
+            stats = stats.Add(enstats);
             if (en.NeedCooling()) {
                 needCool[en.GetRadiator()].cool += en.GetCooling();
                 needCool[en.GetRadiator()].count += 1;
             }
             ecost += en.GetCurrentStats().stats.cost;
+            if (enstats.pitchspeed > 0) {
+                pitchspeedmin = Math.min(pitchspeedmin, enstats.pitchspeed);
+            }
         }
+        if (pitchspeedmin < 100)
+            stats.pitchspeed = pitchspeedmin;
         //Upkeep calc only uses engine costs
         stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
         //Include radiaators

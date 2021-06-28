@@ -159,11 +159,12 @@ class TurboBuilder {
     }
 
     private GetPitchSpeed(){
-        if(this.bypass_ratio > 8)
+        console.log(this.bypass_ratio)
+        if(this.bypass_ratio >= 8)
             return 1;
-        if(this.bypass_ratio > 3.5)
+        if(this.bypass_ratio >= 3.5)
             return 1.1;
-        if(this.bypass_ratio > 1)
+        if(this.bypass_ratio >= 1)
             return 1.2;
         return 1;
     }

@@ -418,15 +418,23 @@ class Engines extends Part {
         var stats = new Stats;
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
         var ecost = 0;
+        var pitchspeedmin = 100;
         //Engine stuff
         for (let en of this.engines) {
-            stats = stats.Add(en.PartStats());
+            let enstats = en.PartStats();
+            stats = stats.Add(enstats);
             if (en.NeedCooling()) {
                 needCool[en.GetRadiator()].cool += en.GetCooling();
                 needCool[en.GetRadiator()].count += 1;
             }
             ecost += en.GetCurrentStats().stats.cost;
+            if(enstats.pitchspeed > 0){
+                pitchspeedmin = Math.min(pitchspeedmin, enstats.pitchspeed);
+            }
         }
+
+        if(pitchspeedmin < 100)
+            stats.pitchspeed = pitchspeedmin;
 
         //Upkeep calc only uses engine costs
         stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
