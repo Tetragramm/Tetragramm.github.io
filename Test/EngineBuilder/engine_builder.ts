@@ -9,7 +9,7 @@ const init = () => {
     var ep = sp.get("engine");
     var lang = sp.get("lang");
 
-    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/engines.json'];
+    var jsons = ['/Test/strings.json', '/Test/engines.json'];
     var proms = jsons.map(d => fetch(d));
     Promise.all(proms)
         .then(ps => Promise.all(ps.map(p => p.json())))

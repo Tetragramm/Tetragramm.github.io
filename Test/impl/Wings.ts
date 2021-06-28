@@ -43,6 +43,7 @@ class Wings extends Part {
     private is_swept: boolean;
     private is_closed: boolean;
     private plane_mass: number;
+    private is_flutterer: boolean;
 
     constructor(js: JSON) {
         super();
@@ -83,6 +84,7 @@ class Wings extends Part {
         this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
         this.is_swept = false;
         this.is_closed = false;
+        this.is_flutterer = false;
     }
 
     public toJSON() {
@@ -231,14 +233,29 @@ class Wings extends Part {
 
     public CanStagger() {
         var can = [...Array(this.stagger_list.length).fill(false)];
-        if (this.wing_list.length > 1) {
-            for (let i = 1; i < this.stagger_list.length; i++)
-                can[i] = true;
-        }
-        if (this.wing_list.length == 1) {
-            can[0] = true;
+        if(this.is_flutterer) {
+            if (this.wing_list.length > 1) 
+                can[1] = true;
+            else
+                can[0] = true;
+        } else {
+            if (this.wing_list.length > 1) {
+                for (let i = 1; i < this.stagger_list.length; i++)
+                    can[i] = true;
+            }
+            if (this.wing_list.length == 1) {
+                can[0] = true;
+            }
         }
         return can;
+    }
+
+    public SetFlutterer(is:boolean){
+        this.is_flutterer = is;
+        if(this.wing_list.length > 1)
+            this.wing_stagger = 1;
+        else
+            this.wing_stagger = 0;
     }
 
     public SetStagger(index: number) {

@@ -117,14 +117,23 @@ class Aircraft_HTML extends Display {
 
         (document.getElementById("lbl_acft_type") as HTMLLabelElement).textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type") as HTMLSelectElement;
+        let heli = false;
+        let idx = 0;
         for (let type in AIRCRAFT_TYPE) {
             if (isNaN(Number(type))) {
+                idx = idx+1;
+                if(idx != 2){
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = lu(type);
                 this.acft_type.add(opt);
+                }
             }
         }
-        this.acft_type.onchange = () => { this.acft.SetType(this.acft_type.selectedIndex); };
+        this.acft_type.onchange = () => { let idx = this.acft_type.selectedIndex;
+            if(idx >= 1)
+                idx += 1;
+            this.acft.SetType(idx);
+         };
 
         (document.getElementById("lbl_stats") as HTMLLabelElement).textContent = lu("Aircraft Stats Section Title");
         var tbl = document.getElementById("tbl_stats") as HTMLTableElement;
@@ -1155,7 +1164,10 @@ class Aircraft_HTML extends Display {
         var stats = this.acft.GetStats();
         var derived_stats = this.acft.GetDerivedStats();
 
-        this.acft_type.selectedIndex = this.acft.GetAircraftType();
+        let idx = this.acft.GetAircraftType();
+        if(idx >= 1)
+            idx -= 1;
+        this.acft_type.selectedIndex = idx;
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
         this.passengers.UpdateDisplay();

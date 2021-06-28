@@ -396,6 +396,21 @@ var num2era = (era) => {
     }
 };
 /// <reference path="./Stats.ts" />
+var AIRCRAFT_TYPE;
+/// <reference path="./Stats.ts" />
+(function (AIRCRAFT_TYPE) {
+    AIRCRAFT_TYPE[AIRCRAFT_TYPE["AIRPLANE"] = 0] = "AIRPLANE";
+    AIRCRAFT_TYPE[AIRCRAFT_TYPE["HELICOPTER"] = 1] = "HELICOPTER";
+    AIRCRAFT_TYPE[AIRCRAFT_TYPE["AUTOGYRO"] = 2] = "AUTOGYRO";
+    AIRCRAFT_TYPE[AIRCRAFT_TYPE["ORNITHOPTER_BASIC"] = 3] = "ORNITHOPTER_BASIC";
+    AIRCRAFT_TYPE[AIRCRAFT_TYPE["ORNITHOPTER_FLUTTER"] = 4] = "ORNITHOPTER_FLUTTER";
+    AIRCRAFT_TYPE[AIRCRAFT_TYPE["ORNITHOPTER_BUZZER"] = 5] = "ORNITHOPTER_BUZZER";
+})(AIRCRAFT_TYPE || (AIRCRAFT_TYPE = {}));
+function IsAnyOrnithopter(type) {
+    return type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC
+        || type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER
+        || type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER;
+}
 class Part {
 }
 class Localization {
@@ -3841,32 +3856,35 @@ class Propeller extends Part {
         return this.num_propellers;
     }
     GetEnergy() {
-        if (this.is_heli)
+        if (this.acft_type == AIRCRAFT_TYPE.HELICOPTER)
             return 2.5;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
-        else //Pulsejet, Turbines, Ornithopters
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
+            return 6;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER)
+            return 8;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER)
             return 5;
+        //Pulsejet, Turbines
+        return 9;
     }
     GetTurn() {
-        if (this.is_heli)
+        if (this.acft_type)
             return 6;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
-        else //Pulsejet, Turbines, Ornithopters
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
             return 7;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER)
+            return 8;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER)
+            return 5;
+        //Pulsejet, Turbines
+        return 4;
     }
     SetAcftType(type) {
-        switch (type) {
-            case AIRCRAFT_TYPE.AIRPLANE:
-            case AIRCRAFT_TYPE.AUTOGYRO:
-                break;
-            case AIRCRAFT_TYPE.HELICOPTER:
-                this.is_heli = true;
-            case AIRCRAFT_TYPE.ORNITHOPTER:
-                this.num_propellers = 0;
-                break;
-        }
+        this.acft_type = type;
     }
     PartStats() {
         var stats = new Stats();
@@ -3881,6 +3899,18 @@ class Propeller extends Part {
         else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) { //Turbojets
             stats.pitchboost = 0.2;
             stats.pitchspeed = 1.3;
+        }
+        else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
+            stats.pitchboost = 0.6;
+            stats.pitchspeed = 0.8;
+        }
+        else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
+            stats.pitchboost = 0.8;
+            stats.pitchspeed = 0.8;
+        }
+        else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            stats.pitchboost = 1;
+            stats.pitchspeed = 0.6;
         }
         else {
             //Default, no auto pitch
@@ -4234,13 +4264,19 @@ class Frames extends Part {
         return this.frame_list[this.section_list[num].frame].geodesic && !this.section_list[num].monocoque;
     }
     PossibleMonocoque(num) {
-        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing;
+        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing && !this.section_list[num].lifting_body;
+    }
+    PossibleLiftingBody(num) {
+        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing && !this.section_list[num].monocoque;
     }
     PossibleTailGeodesic(num) {
         return this.frame_list[this.tail_section_list[num].frame].geodesic && !this.tail_section_list[num].monocoque;
     }
     PossibleTailMonocoque(num) {
-        return this.skin_list[this.sel_skin].monocoque && !this.farman;
+        return this.skin_list[this.sel_skin].monocoque && !this.farman && !this.tail_section_list[num].lifting_body;
+    }
+    PossibleTailLiftingBody(num) {
+        return this.skin_list[this.sel_skin].monocoque && !this.farman && !this.tail_section_list[num].monocoque;
     }
     PossibleRemoveSections() {
         return this.CountSections() > this.required_sections;
@@ -4568,6 +4604,7 @@ class Wings extends Part {
         this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
         this.is_swept = false;
         this.is_closed = false;
+        this.is_flutterer = false;
     }
     toJSON() {
         return {
@@ -4706,14 +4743,29 @@ class Wings extends Part {
     }
     CanStagger() {
         var can = [...Array(this.stagger_list.length).fill(false)];
-        if (this.wing_list.length > 1) {
-            for (let i = 1; i < this.stagger_list.length; i++)
-                can[i] = true;
+        if (this.is_flutterer) {
+            if (this.wing_list.length > 1)
+                can[1] = true;
+            else
+                can[0] = true;
         }
-        if (this.wing_list.length == 1) {
-            can[0] = true;
+        else {
+            if (this.wing_list.length > 1) {
+                for (let i = 1; i < this.stagger_list.length; i++)
+                    can[i] = true;
+            }
+            if (this.wing_list.length == 1) {
+                can[0] = true;
+            }
         }
         return can;
+    }
+    SetFlutterer(is) {
+        this.is_flutterer = is;
+        if (this.wing_list.length > 1)
+            this.wing_stagger = 1;
+        else
+            this.wing_stagger = 0;
     }
     SetStagger(index) {
         this.wing_stagger = index;
@@ -5604,7 +5656,7 @@ class ControlSurfaces extends Part {
     }
     CanAileron() {
         var can = [];
-        if (this.acft_type != AIRCRAFT_TYPE.ORNITHOPTER) {
+        if (!IsAnyOrnithopter(this.acft_type)) {
             for (let a of this.aileron_list) {
                 if (a.warping && this.wing_area == 0)
                     can.push(false);
@@ -5707,7 +5759,7 @@ class ControlSurfaces extends Part {
             this.is_cantilever = 0;
             this.wing_area = 0;
         }
-        else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+        else if (IsAnyOrnithopter(this.acft_type)) {
             var can = this.CanAileron();
             this.aileron_sel = can.findIndex((element) => { return element; });
         }
@@ -5851,7 +5903,7 @@ class Reinforcement extends Part {
     CanExternalWood() {
         var can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_wood_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER || this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
                 can[i] = this.ext_wood_list[i].ornith;
             }
             else if (this.limited_sqp) {
@@ -5873,7 +5925,7 @@ class Reinforcement extends Part {
     CanExternalSteel() {
         var can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_steel_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER || this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
                 can[i] = this.ext_steel_list[i].ornith;
             }
             else if (this.limited_sqp) {
@@ -6009,6 +6061,16 @@ class Reinforcement extends Part {
             this.is_tandem = false;
             this.is_staggered = false;
         }
+        var can_wood = this.CanExternalWood();
+        for (let i = 0; i < this.ext_wood_count.length; i++) {
+            if (!can_wood[i])
+                this.ext_wood_count[i] = 0;
+        }
+        var can_steel = this.CanExternalSteel();
+        for (let i = 0; i < this.ext_steel_count.length; i++) {
+            if (!can_steel[i])
+                this.ext_steel_count[i] = 0;
+        }
     }
     SetSesquiplane(sqp) {
         this.tension_sqp = sqp.is && sqp.super_small;
@@ -6032,9 +6094,11 @@ class Reinforcement extends Part {
         switch (this.acft_type) {
             case AIRCRAFT_TYPE.AIRPLANE:
             case AIRCRAFT_TYPE.AUTOGYRO:
+            case AIRCRAFT_TYPE.ORNITHOPTER_BASIC:
                 break;
             case AIRCRAFT_TYPE.HELICOPTER:
-            case AIRCRAFT_TYPE.ORNITHOPTER:
+            case AIRCRAFT_TYPE.ORNITHOPTER_BUZZER:
+            case AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER:
                 this.cabane_sel = 0;
                 break;
         }
@@ -6047,6 +6111,10 @@ class Reinforcement extends Part {
             tension_multiple = 0.9;
         if (this.tension_sqp) {
             tension_multiple -= 0.15;
+        }
+        //Ornithopter multiple is less than any other option.
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
+            tension_multiple = 0.5;
         }
         if (!this.can_external) {
             for (let i = 0; i < this.ext_wood_count.length; i++) {
@@ -6088,6 +6156,11 @@ class Reinforcement extends Part {
                 else
                     tension += this.ext_steel_list[i].tension * this.ext_steel_count[i];
             }
+        }
+        //Reduce strain from regular struts by 50%
+        //Does not affect Cabane, and tension is taken care off by multiplier.
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
+            stats.maxstrain = Math.floor(1.0e-6 + 0.5 * stats.maxstrain);
         }
         //First Strut Bonus
         if (has_valid_first) {
@@ -9042,16 +9115,9 @@ class Used extends Part {
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
-var AIRCRAFT_TYPE;
+var ROTOR_BLADE_COUNT;
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
-(function (AIRCRAFT_TYPE) {
-    AIRCRAFT_TYPE[AIRCRAFT_TYPE["AIRPLANE"] = 0] = "AIRPLANE";
-    AIRCRAFT_TYPE[AIRCRAFT_TYPE["HELICOPTER"] = 1] = "HELICOPTER";
-    AIRCRAFT_TYPE[AIRCRAFT_TYPE["AUTOGYRO"] = 2] = "AUTOGYRO";
-    AIRCRAFT_TYPE[AIRCRAFT_TYPE["ORNITHOPTER"] = 3] = "ORNITHOPTER";
-})(AIRCRAFT_TYPE || (AIRCRAFT_TYPE = {}));
-var ROTOR_BLADE_COUNT;
 (function (ROTOR_BLADE_COUNT) {
     ROTOR_BLADE_COUNT[ROTOR_BLADE_COUNT["Two"] = 2] = "Two";
     ROTOR_BLADE_COUNT[ROTOR_BLADE_COUNT["Three"] = 3] = "Three";
@@ -9572,7 +9638,7 @@ class Aircraft {
         stats = stats.Add(this.cockpits.PartStats());
         stats = stats.Add(this.passengers.PartStats());
         this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard());
-        this.engines.SetInternal(this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER || this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER);
+        this.engines.SetInternal(this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER || IsAnyOrnithopter(this.aircraft_type));
         this.engines.SetMetalArea(this.wings.GetMetalArea());
         this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
@@ -9636,6 +9702,7 @@ class Aircraft {
         stats = stats.Add(this.frames.PartStats());
         //Treated Paper needs to apply near to last
         this.wings.SetAircraftMass(stats.mass);
+        this.wings.SetFlutterer(this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER);
         stats.mass += this.wings.GetPaperMass();
         //Because treated paper brings mass down.
         stats.mass = Math.max(1, stats.mass);
@@ -9677,7 +9744,10 @@ class Aircraft {
                     warning: lu("Co-Pilot Warning", stress_reduction)
                 });
             }
-            if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+            if (IsAnyOrnithopter(this.aircraft_type)) {
+                stats.upkeep += 1;
+            }
+            if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
                 stats.reliability -= 2;
             }
             this.engines.UpdateReliability(stats);
@@ -9777,12 +9847,7 @@ class Aircraft {
         var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
         var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
         var MaxStrain = 1 / 0;
-        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0) {
-            MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
-        }
-        else {
-            MaxStrain = Math.min(this.stats.structure + this.stats.maxstrain, this.stats.structure);
-        }
+        MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         //And store the results so they can be displayed
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;
@@ -9866,16 +9931,38 @@ class Aircraft {
             RateOfClimbwBombs = 0;
         }
         //Ornithopter Stuff
-        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
-            HandlingEmpty += this.stats.power;
-            HandlingFull += this.stats.power;
-            HandlingFullwBombs += this.stats.power;
+        if (IsAnyOrnithopter(this.aircraft_type)) {
+            HandlingEmpty += 5;
+            HandlingFull += 5;
+            HandlingFullwBombs += 5;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Stall"); }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning")
                 });
             }
             Overspeed = MaxStrain;
+        }
+        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
+            HandlingEmpty += 5;
+            HandlingFull += 5;
+            HandlingFullwBombs += 5;
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Flutterer Attack"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning")
+                });
+            }
+        }
+        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Boost"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Ornithopter Buzzer Boost"), warning: lu("Ornithopter Buzzer Boost Warning")
+                });
+            }
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Stall"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Ornithopter Buzzer Stall"), warning: lu("Ornithopter Buzzer Stall Warning")
+                });
+            }
         }
         return {
             DryMP: DryMP,
@@ -11527,7 +11614,7 @@ class Frames_HTML extends Display {
         else
             fsec.int.disabled = false;
         fsec.lb.checked = sec.lifting_body;
-        fsec.lb.disabled = !this.frames.PossibleMonocoque(i);
+        fsec.lb.disabled = !this.frames.PossibleLiftingBody(i);
     }
     CreateTailSection(i, sec) {
         var tsec = {
@@ -11593,7 +11680,7 @@ class Frames_HTML extends Display {
         tsec.mono.checked = sec.monocoque;
         tsec.mono.disabled = !this.frames.PossibleTailMonocoque(i);
         tsec.lb.checked = sec.lifting_body;
-        tsec.lb.disabled = !this.frames.PossibleTailMonocoque(i);
+        tsec.lb.disabled = !this.frames.PossibleTailLiftingBody(i);
     }
 }
 /// <reference path="./Display.ts" />
@@ -13971,14 +14058,24 @@ class Aircraft_HTML extends Display {
         this.InitAlter(tbla);
         document.getElementById("lbl_acft_type").textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type");
+        let heli = false;
+        let idx = 0;
         for (let type in AIRCRAFT_TYPE) {
             if (isNaN(Number(type))) {
-                let opt = document.createElement("OPTION");
-                opt.text = lu(type);
-                this.acft_type.add(opt);
+                idx = idx + 1;
+                if (idx != 2) {
+                    let opt = document.createElement("OPTION");
+                    opt.text = lu(type);
+                    this.acft_type.add(opt);
+                }
             }
         }
-        this.acft_type.onchange = () => { this.acft.SetType(this.acft_type.selectedIndex); };
+        this.acft_type.onchange = () => {
+            let idx = this.acft_type.selectedIndex;
+            if (idx >= 1)
+                idx += 1;
+            this.acft.SetType(idx);
+        };
         document.getElementById("lbl_stats").textContent = lu("Aircraft Stats Section Title");
         var tbl = document.getElementById("tbl_stats");
         this.InitStats(tbl);
@@ -14899,7 +14996,10 @@ class Aircraft_HTML extends Display {
     UpdateDisplay() {
         var stats = this.acft.GetStats();
         var derived_stats = this.acft.GetDerivedStats();
-        this.acft_type.selectedIndex = this.acft.GetAircraftType();
+        let idx = this.acft.GetAircraftType();
+        if (idx >= 1)
+            idx -= 1;
+        this.acft_type.selectedIndex = idx;
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
         this.passengers.UpdateDisplay();
@@ -15663,20 +15763,18 @@ function unmount() {
     documentObserver = undefined;
 }
 function startObserving() {
-    var _a;
     stopObserving();
     if (!getLocation().hash)
         return;
     STOP_EVENTS.forEach(addStopListener);
-    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.observe(document, OBSERVER_CONFIG);
+    documentObserver === null || documentObserver === void 0 ? void 0 : documentObserver.observe(document, OBSERVER_CONFIG);
     adjustScrollPosition();
     observeTimeout = setTimeout(stopObserving, OBSERVE_TIMEOUT_MS);
 }
 function stopObserving() {
-    var _a;
     clearTimeout(observeTimeout);
     cancelAnimationFrame(throttleRequestId);
-    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.disconnect();
+    documentObserver === null || documentObserver === void 0 ? void 0 : documentObserver.disconnect();
     STOP_EVENTS.forEach(removeStopListener);
 }
 function addStopListener(eventName) {
@@ -15750,7 +15848,7 @@ const init = () => {
     var qp = sp.get("json");
     var lang = sp.get("lang");
     // var jsons = ['/Helicopter/strings.json', '/Helicopter/parts.json', '/Helicopter/engines.json', '/Helicopter/weapons.json'];
-    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/parts.json', '/PlaneBuilder/engines.json', '/PlaneBuilder/weapons.json'];
+    var jsons = ['/Test/strings.json', '/Test/parts.json', '/Test/engines.json', '/Test/weapons.json'];
     var proms = jsons.map(d => fetch(d));
     Promise.all(proms)
         .then(ps => Promise.all(ps.map(p => p.json())))

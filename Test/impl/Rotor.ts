@@ -1,12 +1,6 @@
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 
-enum AIRCRAFT_TYPE {
-    AIRPLANE,
-    HELICOPTER,
-    AUTOGYRO,
-    ORNITHOPTER,
-}
 enum ROTOR_BLADE_COUNT {
     Two = 2,
     Three = 3,

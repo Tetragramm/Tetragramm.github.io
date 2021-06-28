@@ -360,8 +360,8 @@ class Frames extends Part {
 
     public SetMonocoque(num: number, use: boolean) {
         if (this.skin_list[this.sel_skin].monocoque) {
-            this.section_list[num].monocoque = use;
-            this.CalculateStats();
+                this.section_list[num].monocoque = use;
+                this.CalculateStats();
         }
     }
 
@@ -401,7 +401,11 @@ class Frames extends Part {
     }
 
     public PossibleMonocoque(num: number) {
-        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing;
+        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing && !this.section_list[num].lifting_body;
+    }
+
+    public PossibleLiftingBody(num: number) {
+        return this.skin_list[this.sel_skin].monocoque && !this.section_list[num].internal_bracing && !this.section_list[num].monocoque;
     }
 
     public PossibleTailGeodesic(num: number) {
@@ -409,7 +413,11 @@ class Frames extends Part {
     }
 
     public PossibleTailMonocoque(num: number) {
-        return this.skin_list[this.sel_skin].monocoque && !this.farman;
+        return this.skin_list[this.sel_skin].monocoque && !this.farman && !this.tail_section_list[num].lifting_body;
+    }
+
+    public PossibleTailLiftingBody(num: number) {
+        return this.skin_list[this.sel_skin].monocoque && !this.farman && !this.tail_section_list[num].monocoque;
     }
 
     public PossibleRemoveSections() {

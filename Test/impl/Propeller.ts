@@ -8,7 +8,7 @@ class Propeller extends Part {
     private idx_upg: number;
     private num_propellers: number;
     private etype: ENGINE_TYPE;
-    private is_heli: boolean;
+    private acft_type: AIRCRAFT_TYPE;
 
     constructor(json: JSON) {
         super();
@@ -112,34 +112,37 @@ class Propeller extends Part {
     }
 
     public GetEnergy() {
-        if (this.is_heli)
+        if (this.acft_type == AIRCRAFT_TYPE.HELICOPTER)
             return 2.5;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
-        else //Pulsejet, Turbines, Ornithopters
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
+            return 6;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER)
+            return 8;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER)
             return 5;
+        //Pulsejet, Turbines
+        return 9;
     }
 
     public GetTurn() {
-        if (this.is_heli)
+        if (this.acft_type)
             return 6;
         if (this.num_propellers)
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
-        else //Pulsejet, Turbines, Ornithopters
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
             return 7;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER)
+            return 8;
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER)
+            return 5;
+        //Pulsejet, Turbines
+        return 4;
     }
 
     public SetAcftType(type: AIRCRAFT_TYPE) {
-        switch (type) {
-            case AIRCRAFT_TYPE.AIRPLANE:
-            case AIRCRAFT_TYPE.AUTOGYRO:
-                break;
-            case AIRCRAFT_TYPE.HELICOPTER:
-                this.is_heli = true;
-            case AIRCRAFT_TYPE.ORNITHOPTER:
-                this.num_propellers = 0;
-                break;
-        }
+        this.acft_type = type;
     }
 
     public PartStats(): Stats {
@@ -153,6 +156,15 @@ class Propeller extends Part {
         } else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) {//Turbojets
             stats.pitchboost = 0.2;
             stats.pitchspeed = 1.3;
+        } else if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
+            stats.pitchboost = 0.6;
+            stats.pitchspeed = 0.8;
+        } else if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
+            stats.pitchboost = 0.8;
+            stats.pitchspeed = 0.8;
+        } else if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            stats.pitchboost = 1;
+            stats.pitchspeed = 0.6;
         } else {
             //Default, no auto pitch
             stats.pitchboost = 0.6;
