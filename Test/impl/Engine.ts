@@ -626,7 +626,7 @@ class Engine extends Part {
     }
 
     public GetNumPropellers() {
-        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop()) {
+        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop() || this.is_internal) {
             if (this.use_pp) {
                 return 2;
             }

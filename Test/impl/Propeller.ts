@@ -127,7 +127,7 @@ class Propeller extends Part {
     }
 
     public GetTurn() {
-        if (this.acft_type)
+        if (this.acft_type == AIRCRAFT_TYPE.HELICOPTER)
             return 6;
         if (this.num_propellers && !IsAnyOrnithopter(this.acft_type))
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;

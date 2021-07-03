@@ -5520,7 +5520,7 @@ class Engine extends Part {
         }
     }
     GetNumPropellers() {
-        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop()) {
+        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop() || this.is_internal) {
             if (this.use_pp) {
                 return 2;
             }
@@ -6507,7 +6507,7 @@ class Propeller extends Part {
         return 9;
     }
     GetTurn() {
-        if (this.acft_type)
+        if (this.acft_type == AIRCRAFT_TYPE.HELICOPTER)
             return 6;
         if (this.num_propellers && !IsAnyOrnithopter(this.acft_type))
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
