@@ -7551,11 +7551,17 @@ class Weapon extends Part {
             this.CalculateStats();
         }
     }
+    SetCanWing(can) {
+        this.canwing = can;
+        if (this.wing && !can) {
+            this.wing = false;
+        }
+    }
     GetWing() {
         return this.wing;
     }
     CanWing() {
-        return this.weapon_type.size <= 16;
+        return this.weapon_type.size <= 16 && this.canwing;
     }
     SetWing(use) {
         if (use && this.CanWing()) {
