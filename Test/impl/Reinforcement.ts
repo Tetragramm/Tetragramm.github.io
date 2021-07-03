@@ -136,7 +136,7 @@ class Reinforcement extends Part {
     public CanExternalWood() {
         var can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_wood_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER || this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
                 can[i] = this.ext_wood_list[i].ornith;
             }
             else if (this.limited_sqp) {
@@ -161,7 +161,7 @@ class Reinforcement extends Part {
     public CanExternalSteel() {
         var can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_steel_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER || this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
                 can[i] = this.ext_steel_list[i].ornith;
             }
             else if (this.limited_sqp) {
@@ -321,14 +321,17 @@ class Reinforcement extends Part {
             this.is_tandem = false;
             this.is_staggered = false;
         }
+        if (type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            this.can_external = false;
+        }
         var can_wood = this.CanExternalWood();
-        for(let i = 0; i<this.ext_wood_count.length; i++){
-            if(!can_wood[i])
+        for (let i = 0; i < this.ext_wood_count.length; i++) {
+            if (!can_wood[i])
                 this.ext_wood_count[i] = 0;
         }
         var can_steel = this.CanExternalSteel();
-        for(let i = 0; i<this.ext_steel_count.length; i++){
-            if(!can_steel[i])
+        for (let i = 0; i < this.ext_steel_count.length; i++) {
+            if (!can_steel[i])
                 this.ext_steel_count[i] = 0;
         }
     }
@@ -380,7 +383,7 @@ class Reinforcement extends Part {
         }
 
         //Ornithopter multiple is less than any other option.
-        if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC){
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
             tension_multiple = 0.5;
         }
 
@@ -427,11 +430,11 @@ class Reinforcement extends Part {
             }
         }
 
-        
+
         //Reduce strain from regular struts by 50%
         //Does not affect Cabane, and tension is taken care off by multiplier.
-        if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC){
-            stats.maxstrain = Math.floor(1.0e-6 + 0.5*stats.maxstrain)
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
+            stats.maxstrain = Math.floor(1.0e-6 + 0.5 * stats.maxstrain)
         }
 
         //First Strut Bonus

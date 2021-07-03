@@ -43,7 +43,7 @@ class Wings extends Part {
     private is_swept: boolean;
     private is_closed: boolean;
     private plane_mass: number;
-    private is_flutterer: boolean;
+    private acft_type: AIRCRAFT_TYPE;
 
     constructor(js: JSON) {
         super();
@@ -84,7 +84,6 @@ class Wings extends Part {
         this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
         this.is_swept = false;
         this.is_closed = false;
-        this.is_flutterer = false;
     }
 
     public toJSON() {
@@ -233,8 +232,8 @@ class Wings extends Part {
 
     public CanStagger() {
         var can = [...Array(this.stagger_list.length).fill(false)];
-        if(this.is_flutterer) {
-            if (this.wing_list.length > 1) 
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
+            if (this.wing_list.length > 1)
                 can[1] = true;
             else
                 can[0] = true;
@@ -250,10 +249,10 @@ class Wings extends Part {
         return can;
     }
 
-    public SetFlutterer(is:boolean){
-        this.is_flutterer = is;
-        if(is){
-            if(this.wing_list.length > 1)
+    public SetAcftType(type: AIRCRAFT_TYPE) {
+        this.acft_type = type;
+        if (type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
+            if (this.wing_list.length > 1)
                 this.wing_stagger = 1;
             else
                 this.wing_stagger = 0;
@@ -696,6 +695,10 @@ class Wings extends Part {
             wStats.wingarea = w.area;
             //Wings cannot generate positive max strain
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
+            //Buzzers double stress
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER)
+                wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
+
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
 
             if (this.skin_list[w.surface].transparent) {

@@ -114,7 +114,7 @@ class Propeller extends Part {
     public GetEnergy() {
         if (this.acft_type == AIRCRAFT_TYPE.HELICOPTER)
             return 2.5;
-        if (this.num_propellers)
+        if (this.num_propellers && !IsAnyOrnithopter(this.acft_type))
             return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
         if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
             return 6;
@@ -129,7 +129,7 @@ class Propeller extends Part {
     public GetTurn() {
         if (this.acft_type)
             return 6;
-        if (this.num_propellers)
+        if (this.num_propellers && !IsAnyOrnithopter(this.acft_type))
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
         if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
             return 7;
@@ -143,7 +143,7 @@ class Propeller extends Part {
 
     public SetAcftType(type: AIRCRAFT_TYPE) {
         this.acft_type = type;
-        if(IsAnyOrnithopter(type)){
+        if (IsAnyOrnithopter(type)) {
             this.num_propellers = 0;
         }
     }
@@ -159,13 +159,13 @@ class Propeller extends Part {
         } else if (this.etype == ENGINE_TYPE.TURBOMACHINERY) {//Turbojets
             stats.pitchboost = 0.2;
             // stats.pitchspeed = 1.3; //Created by Engine Builder. Not from here.
-        } else if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
+        } else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC) {
             stats.pitchboost = 0.6;
             stats.pitchspeed = 0.8;
-        } else if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
+        } else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
             stats.pitchboost = 0.8;
             stats.pitchspeed = 0.8;
-        } else if(this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+        } else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
             stats.pitchboost = 1;
             stats.pitchspeed = 0.6;
         } else {

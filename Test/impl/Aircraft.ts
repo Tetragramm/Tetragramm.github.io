@@ -380,7 +380,7 @@ class Aircraft {
 
         //Treated Paper needs to apply near to last
         this.wings.SetAircraftMass(stats.mass);
-        this.wings.SetFlutterer(this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER);
+        this.wings.SetAcftType(this.aircraft_type);
         stats.mass += this.wings.GetPaperMass();
         //Because treated paper brings mass down.
         stats.mass = Math.max(1, stats.mass);
@@ -434,7 +434,7 @@ class Aircraft {
                 });
             }
 
-            if(IsAnyOrnithopter(this.aircraft_type)){
+            if (IsAnyOrnithopter(this.aircraft_type)) {
                 stats.upkeep += 1;
             }
 
@@ -660,10 +660,11 @@ class Aircraft {
             Overspeed = MaxStrain;
         }
 
-        if(this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER){
+        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
             HandlingEmpty += 5;
             HandlingFull += 5;
             HandlingFullwBombs += 5;
+            Overspeed = Infinity;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Flutterer Attack") }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning")
@@ -671,7 +672,7 @@ class Aircraft {
             }
         }
 
-        if(this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER){
+        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Boost") }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Ornithopter Buzzer Boost"), warning: lu("Ornithopter Buzzer Boost Warning")

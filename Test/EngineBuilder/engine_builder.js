@@ -6495,7 +6495,7 @@ class Propeller extends Part {
     GetEnergy() {
         if (this.acft_type == AIRCRAFT_TYPE.HELICOPTER)
             return 2.5;
-        if (this.num_propellers)
+        if (this.num_propellers && !IsAnyOrnithopter(this.acft_type))
             return this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy;
         if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
             return 6;
@@ -6509,7 +6509,7 @@ class Propeller extends Part {
     GetTurn() {
         if (this.acft_type)
             return 6;
-        if (this.num_propellers)
+        if (this.num_propellers && !IsAnyOrnithopter(this.acft_type))
             return this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn;
         if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC)
             return 7;
@@ -7244,7 +7244,6 @@ class Wings extends Part {
         this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
         this.is_swept = false;
         this.is_closed = false;
-        this.is_flutterer = false;
     }
     toJSON() {
         return {
@@ -7383,7 +7382,7 @@ class Wings extends Part {
     }
     CanStagger() {
         var can = [...Array(this.stagger_list.length).fill(false)];
-        if (this.is_flutterer) {
+        if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
             if (this.wing_list.length > 1)
                 can[1] = true;
             else
@@ -7400,9 +7399,9 @@ class Wings extends Part {
         }
         return can;
     }
-    SetFlutterer(is) {
-        this.is_flutterer = is;
-        if (is) {
+    SetAcftType(type) {
+        this.acft_type = type;
+        if (type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
             if (this.wing_list.length > 1)
                 this.wing_stagger = 1;
             else
@@ -7786,6 +7785,9 @@ class Wings extends Part {
             wStats.wingarea = w.area;
             //Wings cannot generate positive max strain
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
+            //Buzzers double stress
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER)
+                wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             if (this.skin_list[w.surface].transparent) {
                 wStats.visibility += 1;
@@ -8545,7 +8547,7 @@ class Reinforcement extends Part {
     CanExternalWood() {
         var can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_wood_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER || this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
                 can[i] = this.ext_wood_list[i].ornith;
             }
             else if (this.limited_sqp) {
@@ -8567,7 +8569,7 @@ class Reinforcement extends Part {
     CanExternalSteel() {
         var can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_steel_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER || this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
                 can[i] = this.ext_steel_list[i].ornith;
             }
             else if (this.limited_sqp) {
@@ -8702,6 +8704,9 @@ class Reinforcement extends Part {
             this.is_monoplane = false;
             this.is_tandem = false;
             this.is_staggered = false;
+        }
+        if (type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            this.can_external = false;
         }
         var can_wood = this.CanExternalWood();
         for (let i = 0; i < this.ext_wood_count.length; i++) {
@@ -11972,7 +11977,7 @@ class Aircraft {
         stats = stats.Add(this.frames.PartStats());
         //Treated Paper needs to apply near to last
         this.wings.SetAircraftMass(stats.mass);
-        this.wings.SetFlutterer(this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER);
+        this.wings.SetAcftType(this.aircraft_type);
         stats.mass += this.wings.GetPaperMass();
         //Because treated paper brings mass down.
         stats.mass = Math.max(1, stats.mass);
@@ -12216,6 +12221,7 @@ class Aircraft {
             HandlingEmpty += 5;
             HandlingFull += 5;
             HandlingFullwBombs += 5;
+            Overspeed = Infinity;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Flutterer Attack"); }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning")
