@@ -325,6 +325,7 @@ class Aircraft {
         this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
+        this.weapons.SetCanWing(!IsAnyOrnithopter(this.aircraft_type));
         stats = stats.Add(this.weapons.PartStats());
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());

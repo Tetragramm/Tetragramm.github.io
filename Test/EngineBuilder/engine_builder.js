@@ -10710,6 +10710,11 @@ class WeaponSystem extends Part {
         }
         this.has_propeller = have;
     }
+    SetCanWing(can) {
+        for (let w of this.weapons) {
+            w.SetCanWing(can);
+        }
+    }
     GetAction() {
         return this.action_sel;
     }
@@ -11180,6 +11185,11 @@ class Weapons extends Part {
     SetHavePropeller(have) {
         for (let ws of this.weapon_sets) {
             ws.SetHavePropeller(have);
+        }
+    }
+    SetCanWing(can) {
+        for (let ws of this.weapon_sets) {
+            ws.SetCanWing(can);
         }
     }
     SetStickyGuns(num) {
@@ -11936,6 +11946,7 @@ class Aircraft {
         this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
+        this.weapons.SetCanWing(!IsAnyOrnithopter(this.aircraft_type));
         stats = stats.Add(this.weapons.PartStats());
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());

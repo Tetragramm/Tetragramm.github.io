@@ -364,6 +364,12 @@ class Weapons extends Part {
         }
     }
 
+    public SetCanWing(can: boolean) {
+        for (let ws of this.weapon_sets) {
+            ws.SetCanWing(can);
+        }
+    }
+
     public SetStickyGuns(num: number) {
         for (let ws of this.weapon_sets) {
             ws.SetStickyGuns(num);

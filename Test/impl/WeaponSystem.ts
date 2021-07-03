@@ -662,6 +662,12 @@ class WeaponSystem extends Part {
         this.has_propeller = have;
     }
 
+    public SetCanWing(can: boolean) {
+        for (let w of this.weapons) {
+            w.SetCanWing(can);
+        }
+    }
+
     public GetAction() {
         return this.action_sel;
     }
