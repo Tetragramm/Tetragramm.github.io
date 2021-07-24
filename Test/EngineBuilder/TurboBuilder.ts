@@ -114,6 +114,11 @@ class TurboBuilder {
 
         var C2 = Pa * area * this.MFP(1) / ((1 + f));
         var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
+        if (!isFinite(ST) || !isFinite(mc2) || !isFinite(TSFC11)) {
+            ST = 0;
+            mc2 = 0;
+            TSFC11 = 0;
+        }
         return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
     }
 
@@ -137,7 +142,7 @@ class TurboBuilder {
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
-        this.bypass_ratio = Math.min(20, this.bypass_ratio);
+        // this.bypass_ratio = Math.min(20, this.bypass_ratio);
         if (this.type_sel > 2) {
             this.afterburner = false;
         }
@@ -158,13 +163,13 @@ class TurboBuilder {
         return ei;
     }
 
-    private GetPitchSpeed(){
+    private GetPitchSpeed() {
         console.log(this.bypass_ratio)
-        if(this.bypass_ratio >= 8)
+        if (this.bypass_ratio >= 8)
             return 1;
-        if(this.bypass_ratio >= 3.5)
+        if (this.bypass_ratio >= 3.5)
             return 1.1;
-        if(this.bypass_ratio >= 1)
+        if (this.bypass_ratio >= 1)
             return 1.2;
         return 1;
     }

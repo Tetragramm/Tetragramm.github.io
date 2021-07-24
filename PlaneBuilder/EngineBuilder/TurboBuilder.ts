@@ -114,6 +114,11 @@ class TurboBuilder {
 
         var C2 = Pa * area * this.MFP(1) / ((1 + f));
         var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
+        if (!isFinite(ST) || !isFinite(mc2) || !isFinite(TSFC11)) {
+            ST = 0;
+            mc2 = 0;
+            TSFC11 = 0;
+        }
         return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
     }
 
