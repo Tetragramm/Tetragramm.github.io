@@ -8577,10 +8577,15 @@ class Reinforcement extends Part {
     }
     TotalStructure() {
         var struct_count = this.ext_cabane_list[this.cabane_sel].stats.structure;
+        var first = false;
         for (let i = 0; i < this.ext_wood_list.length; i++) {
             struct_count += this.ext_wood_count[i] * this.ext_wood_list[i].stats.structure;
             struct_count += this.ext_steel_count[i] * this.ext_steel_list[i].stats.structure;
+            if (this.ext_wood_count[i] > 0 || this.ext_steel_count[i] > 0)
+                first = true;
         }
+        if (first)
+            struct_count += 5;
         return this.acft_structure + struct_count;
     }
     GetCantileverType() {

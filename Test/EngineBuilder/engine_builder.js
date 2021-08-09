@@ -8613,6 +8613,7 @@ class Reinforcement extends Part {
         var diff = count - this.cant_count[idx];
         if (this.cant_list[idx].limited && count > 0) {
             var total_structure = this.TotalStructure();
+            console.log([total_structure, count]);
             for (let i = 0; i < this.cant_list.length; i++) {
                 if (this.cant_list[i].limited) {
                     total_structure -= 5 * this.cant_count[i] * this.cant_list[i].stats.mass;
@@ -8655,10 +8656,15 @@ class Reinforcement extends Part {
     }
     TotalStructure() {
         var struct_count = this.ext_cabane_list[this.cabane_sel].stats.structure;
+        var first = false;
         for (let i = 0; i < this.ext_wood_list.length; i++) {
             struct_count += this.ext_wood_count[i] * this.ext_wood_list[i].stats.structure;
             struct_count += this.ext_steel_count[i] * this.ext_steel_list[i].stats.structure;
+            if (this.ext_wood_count[i] > 0 || this.ext_steel_count[i] > 0)
+                first = true;
         }
+        if (first)
+            struct_count += 5;
         return this.acft_structure + struct_count;
     }
     GetCantileverType() {
@@ -12164,6 +12170,7 @@ class Aircraft {
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
         var TurnBleed = Math.ceil(-1.0e-6 + Math.floor(1.0e-6 + (StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
+        console.log(StringFmt.Format("Pitch Speed is {0}, Pitch Boost is {1}, Energy is {2}, Turn is {3}", this.stats.pitchspeed, this.stats.pitchboost, this.propeller.GetEnergy(), this.propeller.GetTurn()));
         if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
             TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2)) + this.rotor.GetRotorBleed();
             EnergyLoss = Math.max(1, Math.floor(1.0e-6 + DPEmpty / 7));
