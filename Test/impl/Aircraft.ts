@@ -331,6 +331,11 @@ class Aircraft {
         stats = stats.Add(this.cargo.PartStats());
 
         //If there are wings...
+        if (this.aircraft_type == AIRCRAFT_TYPE.AUTOGYRO) {
+            this.wings.SetRotorSpan(this.rotor.GetRotorSpan());
+        } else {
+            this.wings.SetRotorSpan(0);
+        }
         stats = stats.Add(this.wings.PartStats());
         this.rotor.SetWingArea(stats.wingarea);
         //If there is a rotor...
@@ -574,6 +579,8 @@ class Aircraft {
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
         var TurnBleed = Math.ceil(-1.0e-6 + Math.floor(1.0e-6 + (StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
+
+        console.log(StringFmt.Format("Pitch Speed is {0}, Pitch Boost is {1}, Energy is {2}, Turn is {3}", this.stats.pitchspeed, this.stats.pitchboost, this.propeller.GetEnergy(), this.propeller.GetTurn()));
 
         if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
             TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2)) + this.rotor.GetRotorBleed();

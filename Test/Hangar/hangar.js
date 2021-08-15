@@ -4631,6 +4631,7 @@ class Wings extends Part {
         this.wing_stagger = Math.floor(1.0e-6 + this.stagger_list.length / 2);
         this.is_swept = false;
         this.is_closed = false;
+        this.rotor_span = 0;
     }
     toJSON() {
         return {
@@ -4737,6 +4738,9 @@ class Wings extends Part {
         this.wing_stagger = d.GetNum();
         this.is_swept = d.GetBool();
         this.is_closed = d.GetBool();
+    }
+    SetRotorSpan(s) {
+        this.rotor_span = s;
     }
     GetWingList() {
         return this.wing_list;
@@ -5153,7 +5157,7 @@ class Wings extends Part {
         var have_wing = false;
         var deck_count = this.DeckCountFull();
         var have_mini_wing = false;
-        var longest_span = 0;
+        var longest_span = this.rotor_span;
         var longest_drag = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
@@ -5995,7 +5999,6 @@ class Reinforcement extends Part {
         var diff = count - this.cant_count[idx];
         if (this.cant_list[idx].limited && count > 0) {
             var total_structure = this.TotalStructure();
-            console.log([total_structure, count]);
             for (let i = 0; i < this.cant_list.length; i++) {
                 if (this.cant_list[i].limited) {
                     total_structure -= 5 * this.cant_count[i] * this.cant_list[i].stats.mass;
@@ -9716,6 +9719,12 @@ class Aircraft {
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());
         //If there are wings...
+        if (this.aircraft_type == AIRCRAFT_TYPE.AUTOGYRO) {
+            this.wings.SetRotorSpan(this.rotor.GetRotorSpan());
+        }
+        else {
+            this.wings.SetRotorSpan(0);
+        }
         stats = stats.Add(this.wings.PartStats());
         this.rotor.SetWingArea(stats.wingarea);
         //If there is a rotor...

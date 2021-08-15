@@ -2039,7 +2039,7 @@
                 "era": "WWI",
                 "mass": 3,
                 "drag": 3,
-                "charge": -2,
+                "charge": -1.0e-9,
                 "cost": 3
             },
             {
@@ -2047,7 +2047,7 @@
                 "era": "WWI",
                 "mass": 5,
                 "drag": 3,
-                "charge": -2,
+                "charge": -1.0e-9,
                 "cost": 3
             },
             {
@@ -2061,7 +2061,7 @@
                 "era": "Himmilgard",
                 "mass": 6,
                 "drag": 1,
-                "charge": -4,
+                "charge": -1.0e-9,
                 "cost": 12
             },
             {
@@ -2077,7 +2077,7 @@
                 "era": "Roaring 20s",
                 "mass": 2,
                 "drag": 3,
-                "charge": -2,
+                "charge": -1.0e-9,
                 "cost": 6
             },
             {
@@ -2085,7 +2085,7 @@
                 "era": "Roaring 20s",
                 "mass": 4,
                 "drag": 3,
-                "charge": -2,
+                "charge": -1.0e-9,
                 "cost": 6
             },
             {
@@ -2093,7 +2093,7 @@
                 "era": "Himmilgard",
                 "mass": 5,
                 "drag": 1,
-                "charge": -4,
+                "charge": -1.0e-9,
                 "cost": 24
             }
         ],
