@@ -932,6 +932,7 @@ class EngineBuilder_HTML {
         CreateButton("Add From Engine Builder", this.m_add_eb, cell);
         CreateButton("Add From Pulsejet Builder", this.m_add_pj, cell);
         CreateButton("Add From Turbine Builder", this.m_add_tb, cell);
+        CreateButton("Add From Electric Builder", this.m_add_el, cell);
         CreateButton("Delete Engine", this.m_delete, cell);
 
         var span = document.createElement("SPAN") as HTMLSpanElement;
@@ -1047,6 +1048,16 @@ class EngineBuilder_HTML {
                 this.turbobuilder.flow_adjustment = e_input.flow_adjustment;
                 this.turbobuilder.afterburner = e_input.upgrades[0];
                 this.UpdateTurboX();
+                break;
+            }
+            case ENGINE_TYPE.ELECTRIC: {
+                this.electricbuilder.name = e_input.name;
+                this.electricbuilder.era_sel = e_input.era_sel;
+                this.electricbuilder.winding_sel = e_input.winding_sel;
+                this.electricbuilder.power = e_input.power;
+                this.electricbuilder.chonk = e_input.material_fudge;
+                this.electricbuilder.quality_fudge = e_input.quality_fudge;
+                this.UpdateElectric();
                 break;
             }
             default:
