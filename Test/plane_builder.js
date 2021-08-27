@@ -1498,7 +1498,7 @@ class EngineInputs {
                 this.upgrades = js["upgrades"];
                 break;
             }
-            case ENGINE_TYPE.PULSEJET: {
+            case ENGINE_TYPE.ELECTRIC: {
                 this.power = js["power"];
                 this.winding_sel = js["winding_sel"];
                 this.material_fudge = js["material_fudge"];
@@ -1645,14 +1645,14 @@ class EngineInputs {
                 tb.name = this.name;
                 return tb.EngineStats();
             }
-            case ENGINE_TYPE.PULSEJET: {
+            case ENGINE_TYPE.ELECTRIC: {
                 var ecb = new ElectricBuilder();
                 ecb.era_sel = this.era_sel;
                 ecb.winding_sel = this.winding_sel;
                 ecb.power = this.power;
                 ecb.chonk = this.material_fudge;
                 ecb.quality_fudge = this.quality_fudge;
-                let stats = pb.EngineStats();
+                let stats = ecb.EngineStats();
                 this.name = stats.name;
                 return stats;
             }
