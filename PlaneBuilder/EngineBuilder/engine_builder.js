@@ -6877,6 +6877,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
+            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;
@@ -6899,6 +6900,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
+            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;
@@ -8474,12 +8476,11 @@ class Reinforcement extends Part {
     CanExternalWood() {
         var can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_wood_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
-                can[i] = this.ext_wood_list[i].ornith;
-            }
-            else if (this.limited_sqp) {
+            if (this.limited_sqp) {
                 can[i] = this.ext_wood_list[i].small_sqp;
             }
+            if (!this.wires && (this.ext_wood_list[i].name == "Wing Truss" || this.ext_wood_list[i].name == "Wire Root"))
+                can[i] = false;
         }
         return can;
     }
@@ -8496,12 +8497,11 @@ class Reinforcement extends Part {
     CanExternalSteel() {
         var can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_steel_list.length; i++) {
-            if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
-                can[i] = this.ext_steel_list[i].ornith;
-            }
-            else if (this.limited_sqp) {
+            if (this.limited_sqp) {
                 can[i] = this.ext_steel_list[i].small_sqp;
             }
+            if (!this.wires && (this.ext_steel_list[i].name == "Steel Wing Truss" || this.ext_steel_list[i].name == "Steel Wire Root"))
+                can[i] = false;
         }
         return can;
     }
