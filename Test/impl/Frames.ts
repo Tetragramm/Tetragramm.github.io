@@ -360,8 +360,8 @@ class Frames extends Part {
 
     public SetMonocoque(num: number, use: boolean) {
         if (this.skin_list[this.sel_skin].monocoque) {
-                this.section_list[num].monocoque = use;
-                this.CalculateStats();
+            this.section_list[num].monocoque = use;
+            this.CalculateStats();
         }
     }
 
@@ -437,6 +437,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
+            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;
@@ -463,6 +464,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
+            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;

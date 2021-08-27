@@ -311,7 +311,7 @@ class Aircraft {
         this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
 
-        this.propeller.SetNumPropeller(this.engines.GetNumPropellers(), this.engines.GetEngineType());
+        this.propeller.SetEngineTypes(this.engines.GetEngineTypes());
         this.propeller.SetAcftType(this.aircraft_type);
         stats = stats.Add(this.propeller.PartStats());
 
@@ -579,8 +579,6 @@ class Aircraft {
         EnergyLoss = Math.min(EnergyLoss, 10);
         EnergyLosswBombs = Math.min(EnergyLosswBombs, 10);
         var TurnBleed = Math.ceil(-1.0e-6 + Math.floor(1.0e-6 + (StallSpeedEmpty + StallSpeedFull) / 2) / this.propeller.GetTurn());
-
-        console.log(StringFmt.Format("Pitch Speed is {0}, Pitch Boost is {1}, Energy is {2}, Turn is {3}", this.stats.pitchspeed, this.stats.pitchboost, this.propeller.GetEnergy(), this.propeller.GetTurn()));
 
         if (this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER) {
             TurnBleed = Math.max(1, Math.floor(1.0e-6 + DryMP / 2)) + this.rotor.GetRotorBleed();

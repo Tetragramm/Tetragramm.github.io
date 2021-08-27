@@ -272,21 +272,6 @@ class Engines extends Part {
         return count;
     }
 
-    public GetEngineType() {
-        var type = 9999;
-        for (let e of this.engines) {
-            if (e.GetIsPulsejet()) {
-                type = Math.min(type, ENGINE_TYPE.PULSEJET);
-            }
-            if (e.GetIsTurbine()) {
-                type = Math.min(type, ENGINE_TYPE.TURBOMACHINERY);
-            }
-        }
-        if (type == 9999)
-            type = ENGINE_TYPE.PROPELLER;
-        return type;
-    }
-
     public GetOverspeed() {
         var os = 100;
         for (let e of this.engines)
@@ -414,6 +399,20 @@ class Engines extends Part {
         return false;
     }
 
+    public GetEngineTypes() {
+        var lst = [];
+        for (let en of this.engines) {
+            if (en.GetNumPropellers() > 0) {
+                lst.push({ type: DRIVE_TYPE.PROPELLER, num: en.GetNumPropellers() });
+            } else if (en.GetIsPulsejet()) {
+                lst.push({ type: DRIVE_TYPE.PULSEJET, num: 0 });
+            } else if (en.GetIsTurbine()) {
+                lst.push({ type: DRIVE_TYPE.TURBINE, num: en.GetCurrentStats().stats.pitchspeed });
+            }
+        }
+        return lst;
+    }
+
     public PartStats(): Stats {
         var stats = new Stats;
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
@@ -428,12 +427,12 @@ class Engines extends Part {
                 needCool[en.GetRadiator()].count += 1;
             }
             ecost += en.GetCurrentStats().stats.cost;
-            if(enstats.pitchspeed > 0){
+            if (enstats.pitchspeed > 0) {
                 pitchspeedmin = Math.min(pitchspeedmin, enstats.pitchspeed);
             }
         }
 
-        if(pitchspeedmin < 100)
+        if (pitchspeedmin < 100)
             stats.pitchspeed = pitchspeedmin;
 
         //Upkeep calc only uses engine costs

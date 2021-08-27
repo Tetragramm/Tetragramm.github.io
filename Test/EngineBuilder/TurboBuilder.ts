@@ -142,7 +142,6 @@ class TurboBuilder {
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
-        // this.bypass_ratio = Math.min(20, this.bypass_ratio);
         if (this.type_sel > 2) {
             this.afterburner = false;
         }
@@ -171,7 +170,7 @@ class TurboBuilder {
             return 1.1;
         if (this.bypass_ratio >= 1)
             return 1.2;
-        return 1;
+        return 1.3;
     }
 
     public EngineStats() {

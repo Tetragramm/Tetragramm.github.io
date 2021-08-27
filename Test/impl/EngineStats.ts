@@ -2,6 +2,12 @@
 /// <reference path="./Serialize.ts"/>
 /// <reference path="./EngineInputs.ts"/>
 
+enum DRIVE_TYPE {
+    PROPELLER,
+    TURBINE,
+    PULSEJET,
+}
+
 class EngineStats {
     public name: string = "Default";
     public overspeed: number = 0;

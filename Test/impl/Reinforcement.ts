@@ -142,6 +142,8 @@ class Reinforcement extends Part {
             else if (this.limited_sqp) {
                 can[i] = this.ext_wood_list[i].small_sqp;
             }
+            if (!this.wires && (this.ext_wood_list[i].name == "Wing Truss" || this.ext_wood_list[i].name == "Wire Root"))
+                can[i] = false;
         }
         return can;
     }
@@ -167,6 +169,8 @@ class Reinforcement extends Part {
             else if (this.limited_sqp) {
                 can[i] = this.ext_steel_list[i].small_sqp;
             }
+            if (!this.wires && (this.ext_steel_list[i].name == "Steel Wing Truss" || this.ext_steel_list[i].name == "Steel Wire Root"))
+                can[i] = false;
         }
         return can;
     }

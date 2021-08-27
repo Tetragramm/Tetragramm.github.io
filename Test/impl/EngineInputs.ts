@@ -2,11 +2,13 @@
 /// <reference path="../EngineBuilder/EngineBuilder.ts"/>
 /// <reference path="../EngineBuilder/PulsejetBuilder.ts"/>
 /// <reference path="../EngineBuilder/TurboBuilder.ts"/>
+/// <reference path="../EngineBuilder/ElectricBuilder.ts"/>
 
 enum ENGINE_TYPE {
     PROPELLER,
     PULSEJET,
     TURBOMACHINERY,
+    ELECTRIC,
 }
 
 class EngineInputs {
@@ -40,6 +42,9 @@ class EngineInputs {
     public compression_ratio: number; //1+
     public bypass_ratio: number;//0+
 
+    //Electric Stuff
+    public winding_sel: number;
+
     constructor(js?: JSON) {
         this.name = "Default";
         this.engine_type = ENGINE_TYPE.PROPELLER;
@@ -67,6 +72,8 @@ class EngineInputs {
         this.diameter = 0;
         this.compression_ratio = 0;
         this.bypass_ratio = 0;
+
+        this.winding_sel = 0;
 
         if (js) {
             this.fromJSON(js);
@@ -119,6 +126,18 @@ class EngineInputs {
                     upgrades: this.upgrades,
                 };
             }
+            case ENGINE_TYPE.ELECTRIC: {
+                return {
+                    name: this.name,
+                    engine_type: this.engine_type,
+                    power: this.power,
+                    era_sel: this.era_sel,
+                    winding_sel: this.winding_sel,
+                    diameter: this.diameter,
+                    material_fudge: this.material_fudge,
+                    quality_fudge: this.quality_fudge,
+                };
+            }
             default:
                 throw "EngineInputs.toJSON: Oh dear, you have a new engine type.";
         }
@@ -157,6 +176,13 @@ class EngineInputs {
                 this.compression_ratio = js["compression_ratio"];
                 this.bypass_ratio = js["bypass_ratio"];
                 this.upgrades = js["upgrades"];
+                break;
+            }
+            case ENGINE_TYPE.PULSEJET: {
+                this.power = js["power"];
+                this.winding_sel = js["winding_sel"];
+                this.material_fudge = js["material_fudge"];
+                this.quality_fudge = js["quality_fudge"];
                 break;
             }
             default:
@@ -200,6 +226,13 @@ class EngineInputs {
                 s.PushBoolArr(this.upgrades);
                 break;
             }
+            case ENGINE_TYPE.ELECTRIC: {
+                s.PushNum(this.power);
+                s.PushNum(this.winding_sel);
+                s.PushNum(this.material_fudge);
+                s.PushFloat(this.quality_fudge);
+                break;
+            }
             default:
                 throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
         }
@@ -238,6 +271,13 @@ class EngineInputs {
                 this.compression_ratio = d.GetFloat();
                 this.bypass_ratio = d.GetFloat();
                 this.upgrades = d.GetBoolArr(this.upgrades.length);
+                break;
+            }
+            case ENGINE_TYPE.ELECTRIC: {
+                this.power = d.GetNum();
+                this.winding_sel = d.GetNum();
+                this.material_fudge = d.GetNum();
+                this.quality_fudge = d.GetFloat();
                 break;
             }
             default:
@@ -289,6 +329,17 @@ class EngineInputs {
                 tb.name = this.name;
                 return tb.EngineStats();
             }
+            case ENGINE_TYPE.PULSEJET: {
+                var ecb = new ElectricBuilder();
+                ecb.era_sel = this.era_sel;
+                ecb.winding_sel = this.winding_sel;
+                ecb.power = this.power;
+                ecb.chonk = this.material_fudge;
+                ecb.quality_fudge = this.quality_fudge;
+                let stats = pb.EngineStats();
+                this.name = stats.name;
+                return stats;
+            }
             default:
                 throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
         }
@@ -325,6 +376,7 @@ class EngineInputs {
         n.diameter = this.diameter;
         n.compression_ratio = this.compression_ratio;
         n.bypass_ratio = this.bypass_ratio;
+        n.winding_sel = this.winding_sel;
         return n;
     }
 }

@@ -78,6 +78,7 @@ class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
     private enginebuilder: EngineBuilder;
     private turbobuilder: TurboBuilder;
+    private electricbuilder: ElectricBuilder;
 
     //Engine Inputs
     private e_name: HTMLInputElement;
@@ -137,7 +138,7 @@ class EngineBuilder_HTML {
     private t_bypr: HTMLInputElement;
     private t_aftb: HTMLInputElement;
     //TurboX Outputs
-    private t_desc: HTMLTableCellElement;
+    private td_desc: HTMLTableCellElement;
     private td_name: HTMLLabelElement;
     private td_powr: HTMLLabelElement;
     private td_mass: HTMLLabelElement;
@@ -146,6 +147,23 @@ class EngineBuilder_HTML {
     private td_fuel: HTMLLabelElement;
     private td_cost: HTMLLabelElement;
     private td_malt: HTMLLabelElement;
+
+    //Electric Inputs
+    private el_name: HTMLInputElement;
+    private el_era: HTMLSelectElement;
+    private el_wind: HTMLSelectElement;
+    private el_powi: HTMLInputElement;
+    private el_size: HTMLInputElement;
+    private el_qual: HTMLInputElement;
+    //Electric Outputs
+    private eld_name: HTMLLabelElement;
+    private eld_powr: HTMLLabelElement;
+    private eld_mass: HTMLLabelElement;
+    private eld_drag: HTMLLabelElement;
+    private eld_rely: HTMLLabelElement;
+    private eld_draw: HTMLLabelElement;
+    private eld_over: HTMLLabelElement;
+    private eld_cost: HTMLLabelElement;
 
     //Manual Inputs
     private m_name: HTMLInputElement;
@@ -172,6 +190,7 @@ class EngineBuilder_HTML {
     private m_add_eb: HTMLButtonElement;
     private m_add_pj: HTMLButtonElement;
     private m_add_tb: HTMLButtonElement;
+    private m_add_el: HTMLButtonElement;
     private m_save: HTMLButtonElement;
     private m_load: HTMLInputElement;
     private m_list_create: HTMLButtonElement;
@@ -182,6 +201,7 @@ class EngineBuilder_HTML {
         this.enginebuilder = new EngineBuilder();
         this.pulsejetbuilder = new PulsejetBuilder();
         this.turbobuilder = new TurboBuilder();
+        this.electricbuilder = new ElectricBuilder();
 
         var etbl = document.getElementById("table_engine") as HTMLTableElement;
         var erow = etbl.insertRow();
@@ -199,9 +219,15 @@ class EngineBuilder_HTML {
         var ptbl = document.getElementById("table_turbox") as HTMLTableElement;
         var prow = ptbl.insertRow();
         this.InitTurboXInputs(prow.insertCell());
-        this.t_desc = prow.insertCell();
+        this.td_desc = prow.insertCell();
         this.InitTurboXOutputs(prow.insertCell());
         this.UpdateTurboX();
+
+        var ptbl = document.getElementById("table_electric") as HTMLTableElement;
+        var prow = ptbl.insertRow();
+        this.InitElectricInputs(prow.insertCell());
+        this.InitElectricOutputs(prow.insertCell());
+        this.UpdateElectric();
 
         var mtbl = document.getElementById("table_manual") as HTMLTableElement;
         var mrow = mtbl.insertRow();
@@ -527,7 +553,7 @@ class EngineBuilder_HTML {
         FlexDisplay("Fuel Consumption", this.td_fuel, fs);
         FlexDisplay("Cost", this.td_cost, fs);
         FlexDisplay("Altitude", this.td_malt, fs);
-        this.t_desc.classList.add("disp_cell");
+        this.td_desc.classList.add("disp_cell");
     }
 
     private UpdateTurboX() {
@@ -558,7 +584,7 @@ class EngineBuilder_HTML {
 
         switch (this.turbobuilder.type_sel) {
             case 0:
-                this.t_desc.innerHTML = StringFmt.Format(
+                this.td_desc.innerHTML = StringFmt.Format(
                     `Engine Parameters:<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
@@ -573,7 +599,7 @@ class EngineBuilder_HTML {
                 );
                 break;
             case 1:
-                this.t_desc.innerHTML = StringFmt.Format(
+                this.td_desc.innerHTML = StringFmt.Format(
                     `Engine Parameters:<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
@@ -589,7 +615,7 @@ class EngineBuilder_HTML {
                 );
                 break;
             case 2:
-                this.t_desc.innerHTML = StringFmt.Format(
+                this.td_desc.innerHTML = StringFmt.Format(
                     `Engine Parameters:<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Thrust = {0} kN<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = {1} g/(kN*s)<br/>
@@ -605,7 +631,7 @@ class EngineBuilder_HTML {
                 );
                 break;
             case 3:
-                this.t_desc.innerHTML = StringFmt.Format(
+                this.td_desc.innerHTML = StringFmt.Format(
                     `For a real engine, set the era, total engine diameter (not intake), Bypass
                     Ratio and OPR. Then adjust the mass flow rate until the Power is just below
                     the rated takeoff power (in effective shp if available, shp if not). Note
@@ -616,6 +642,86 @@ class EngineBuilder_HTML {
                 );
                 break;
         }
+    }
+
+    private InitElectricInputs(cell: HTMLTableCellElement) {
+        this.el_name = document.createElement("INPUT") as HTMLInputElement;
+        this.el_era = document.createElement("SELECT") as HTMLSelectElement;
+        this.el_wind = document.createElement("SELECT") as HTMLSelectElement;
+        this.el_powi = document.createElement("INPUT") as HTMLInputElement;
+        this.el_size = document.createElement("INPUT") as HTMLInputElement;
+        this.el_qual = document.createElement("INPUT") as HTMLInputElement;
+
+        var fs = CreateFlexSection(cell);
+        FlexText("Name", this.el_name, fs);
+        FlexSelect("Era", this.el_era, fs);
+        FlexSelect("Winding", this.el_wind, fs);
+        FlexInput("Desired Power", this.el_powi, fs);
+        FlexInput("Chonk", this.el_size, fs);
+        FlexInput("Quality", this.el_qual, fs);
+
+        this.el_qual.step = "0.05";
+        this.el_qual.min = "0.5";
+        this.el_qual.max = "2";
+
+        for (let e of this.electricbuilder.EraTable) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = e.name;
+            this.el_era.add(opt);
+        }
+
+        for (let t of this.electricbuilder.Winding) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.text = t.name;
+            this.el_wind.add(opt);
+        }
+
+        this.el_name.onchange = () => { this.electricbuilder.name = this.el_name.value; this.UpdateElectric(); };
+        this.el_era.onchange = () => { this.electricbuilder.era_sel = this.el_era.selectedIndex; this.UpdateElectric(); };
+        this.el_wind.onchange = () => { this.electricbuilder.winding_sel = this.el_wind.selectedIndex; this.UpdateElectric(); };
+        this.el_powi.onchange = () => { this.electricbuilder.power = this.el_powi.valueAsNumber; this.UpdateElectric(); };
+        this.el_size.onchange = () => { this.electricbuilder.chonk = this.el_size.valueAsNumber; this.UpdateElectric(); };
+        this.el_qual.onchange = () => { this.electricbuilder.quality_fudge = this.el_qual.valueAsNumber; this.UpdateElectric(); };
+    }
+
+    private InitElectricOutputs(cell: HTMLTableCellElement) {
+        this.eld_name = document.createElement("LABEL") as HTMLLabelElement;
+        this.eld_powr = document.createElement("LABEL") as HTMLLabelElement;
+        this.eld_mass = document.createElement("LABEL") as HTMLLabelElement;
+        this.eld_drag = document.createElement("LABEL") as HTMLLabelElement;
+        this.eld_rely = document.createElement("LABEL") as HTMLLabelElement;
+        this.eld_draw = document.createElement("LABEL") as HTMLLabelElement;
+        this.eld_over = document.createElement("LABEL") as HTMLLabelElement;
+        this.eld_cost = document.createElement("LABEL") as HTMLLabelElement;
+        var fs = CreateFlexSection(cell);
+        FlexDisplay("Name", this.eld_name, fs);
+        FlexDisplay("Power", this.eld_powr, fs);
+        FlexDisplay("Mass", this.eld_mass, fs);
+        FlexDisplay("Drag", this.eld_drag, fs);
+        FlexDisplay("Reliability", this.eld_rely, fs);
+        FlexDisplay("Charge Draw", this.eld_draw, fs);
+        FlexDisplay("Overspeed", this.eld_over, fs);
+        FlexDisplay("Cost", this.eld_cost, fs);
+    }
+
+    private UpdateElectric() {
+        this.el_name.value = this.electricbuilder.name;
+        this.el_era.selectedIndex = this.electricbuilder.era_sel;
+        this.el_wind.selectedIndex = this.electricbuilder.winding_sel;
+        this.el_powi.valueAsNumber = this.electricbuilder.power;
+        this.el_size.valueAsNumber = this.electricbuilder.chonk;
+        this.el_qual.valueAsNumber = this.electricbuilder.quality_fudge;
+
+
+        var estats = this.electricbuilder.EngineStats();
+        BlinkIfChanged(this.eld_name, estats.name);
+        BlinkIfChanged(this.eld_powr, estats.stats.power.toString());
+        BlinkIfChanged(this.eld_mass, estats.stats.mass.toString());
+        BlinkIfChanged(this.eld_drag, estats.stats.drag.toString());
+        BlinkIfChanged(this.eld_rely, estats.stats.reliability.toString());
+        BlinkIfChanged(this.eld_draw, estats.stats.charge.toString());
+        BlinkIfChanged(this.eld_over, estats.overspeed.toString());
+        BlinkIfChanged(this.eld_cost, estats.stats.cost.toString());
     }
 
     private InitManual(cell: HTMLTableCellElement) {
@@ -694,6 +800,7 @@ class EngineBuilder_HTML {
         this.m_add_eb = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_pj = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_tb = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_add_el = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_save = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_load = document.createElement("INPUT") as HTMLInputElement;
         this.m_list_create = document.createElement("BUTTON") as HTMLButtonElement;
@@ -740,6 +847,16 @@ class EngineBuilder_HTML {
                 BlinkGood(this.m_add_tb.parentElement);
             } else {
                 BlinkBad(this.m_add_tb.parentElement);
+            }
+        }
+        this.m_add_el.onclick = () => {
+            var inputs = this.electricbuilder.EngineInputs();
+            if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
+                engine_list.get(this.list_idx).push(inputs);
+                this.UpdateList();
+                BlinkGood(this.m_add_el.parentElement);
+            } else {
+                BlinkBad(this.m_add_el.parentElement);
             }
         }
         this.m_save.onclick = () => { download(JSON.stringify(engine_list.get(this.list_idx).toJSON()), this.list_idx + ".json", "json"); }
