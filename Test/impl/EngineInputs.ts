@@ -336,8 +336,8 @@ class EngineInputs {
                 ecb.power = this.power;
                 ecb.chonk = this.material_fudge;
                 ecb.quality_fudge = this.quality_fudge;
+                ecb.name = this.name;
                 let stats = ecb.EngineStats();
-                this.name = stats.name;
                 return stats;
             }
             default:

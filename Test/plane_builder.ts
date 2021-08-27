@@ -30,10 +30,10 @@ const init = () => {
                 }
 
                 //Parts bit
-                let acft_data = window.localStorage.aircraft;
+                let acft_data = window.localStorage.getItem("test.aircraft");
 
                 //Engine bit
-                var nameliststr = window.localStorage.getItem("engines_names");
+                var nameliststr = window.localStorage.getItem("test.engines_names");
                 var namelist = [];
                 if (nameliststr) {
                     namelist = JSON.parse(nameliststr);

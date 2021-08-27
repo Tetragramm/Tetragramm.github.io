@@ -1652,8 +1652,8 @@ class EngineInputs {
                 ecb.power = this.power;
                 ecb.chonk = this.material_fudge;
                 ecb.quality_fudge = this.quality_fudge;
+                ecb.name = this.name;
                 let stats = ecb.EngineStats();
-                this.name = stats.name;
                 return stats;
             }
             default:
@@ -1799,10 +1799,10 @@ class EngineList {
         this.constant = false;
         this.name = name;
         this.list = [];
-        var ejson = window.localStorage.getItem("engines." + this.name);
+        var ejson = window.localStorage.getItem("test.engines." + this.name);
         if (ejson != null)
             this.fromJSON(JSON.parse(ejson));
-        var nameliststr = window.localStorage.getItem("engines_names");
+        var nameliststr = window.localStorage.getItem("test.engines_names");
         var namelist = [];
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
@@ -1816,7 +1816,7 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
-        window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+        window.localStorage.setItem("test.engines_names", JSON.stringify(namelist));
     }
     toJSON() {
         var ret = [];
@@ -1879,7 +1879,7 @@ class EngineList {
         }
         this.list.push(es.Clone());
         this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
         return this.find(es);
     }
     get(i) {
@@ -1922,7 +1922,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
     remove_name(name) {
         if (this.constant) {
@@ -1932,7 +1932,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
     get length() {
         return this.list.length;
@@ -8830,6 +8830,20 @@ class WeaponSystem extends Part {
     GetSeat() {
         return this.seat;
     }
+    GetIsFullyAccessible() {
+        for (let w of this.weapons) {
+            if (!w.GetAccessible())
+                return false;
+        }
+        return true;
+    }
+    GetIsPartlyAccessible() {
+        for (let w of this.weapons) {
+            if (w.GetAccessible())
+                return true;
+        }
+        return false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -10063,7 +10077,7 @@ class Aircraft {
             if (this.DisplayCallback && !this.freeze_calculation)
                 this.DisplayCallback();
             if (this.use_storage)
-                window.localStorage.aircraft = JSON.stringify(this);
+                window.localStorage.setItem("test.aircraft", JSON.stringify(this));
         }
     }
     GetDerivedStats() {
@@ -11082,6 +11096,12 @@ class Derived_HTML {
             if (w.GetFinalWeapon().ap > 0) {
                 tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
             }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
+            }
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
                 weaphtml += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
@@ -12008,7 +12028,7 @@ const init = () => {
             local.SetLanguages(window.localStorage.language);
         }
         //Engine bit
-        var nameliststr = window.localStorage.getItem("engines_names");
+        var nameliststr = window.localStorage.getItem("test.engines_names");
         var namelist = [];
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
@@ -12071,7 +12091,7 @@ function InitHTML() {
         acft_builder.fromJSON(JSON.parse(JSON.stringify(acft_hangar.toJSON())));
         acft_builder.CalculateStats();
         stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
-        window.localStorage.aircraft = JSON.stringify(acft_builder.toJSON());
+        window.localStorage.setItem("test.aircraft", JSON.stringify(acft_builder.toJSON()));
         RefreshDisplay();
         BlinkNeutral(load_btn.parentElement);
     };
@@ -12119,7 +12139,7 @@ function InitHTML() {
                     throw "Bad";
                 }
                 AddHangar(name);
-                window.localStorage.setItem("hangar." + name, reader.result);
+                window.localStorage.setItem("test.hangar." + name, reader.result);
                 chosen_hangar = name;
                 RefreshHangarSelect(LoadHangarList());
                 RefreshAcftSelect(LoadAcftList());
@@ -12152,7 +12172,7 @@ function InitHTML() {
     };
 }
 function InitStats() {
-    let acft_data = window.localStorage.aircraft;
+    let acft_data = window.localStorage.getItem("test.aircraft");
     acft_builder = new Aircraft(parts_JSON, weapon_JSON, false);
     if (acft_data) {
         console.log("Used Saved Data");
@@ -12174,27 +12194,27 @@ function InitStats() {
 }
 function LoadHangarList() {
     var hangar_list;
-    if (!window.localStorage.getItem("hangar_names")) {
-        window.localStorage.setItem("hangar_names", JSON.stringify(["Default"]));
+    if (!window.localStorage.getItem("test.hangar_names")) {
+        window.localStorage.setItem("test.hangar_names", JSON.stringify(["Default"]));
     }
-    hangar_list = JSON.parse(window.localStorage.getItem("hangar_names"));
+    hangar_list = JSON.parse(window.localStorage.getItem("test.hangar_names"));
     if (hangar_list.length == 0) {
-        window.localStorage.setItem("hangar_names", JSON.stringify(["Default"]));
-        hangar_list = JSON.parse(window.localStorage.getItem("hangar_names"));
+        window.localStorage.setItem("test.hangar_names", JSON.stringify(["Default"]));
+        hangar_list = JSON.parse(window.localStorage.getItem("test.hangar_names"));
     }
     return hangar_list;
 }
 function LoadAcftList() {
     var acft_list;
-    if (window.localStorage.getItem("hangar." + chosen_hangar)) {
-        acft_list = JSON.parse(window.localStorage.getItem("hangar." + chosen_hangar));
+    if (window.localStorage.getItem("test.hangar." + chosen_hangar)) {
+        acft_list = JSON.parse(window.localStorage.getItem("test.hangar." + chosen_hangar));
     }
     else {
         acft_list = {
             names: ["Basic Biplane"],
             acft: ["AAEAjGB0DMwLACECGBnAlgYwAQLQBwBskA7AU2AEBLgaAwGhmgUEZpFY+oHQAlACwD2xJFgCyAgC4CATgCMkAVywAtCFgAcABj55gAJGABcYACAaVVuwAQDdpw4B-h8BsAoex8+9BwsZJnySqpgGtq6NGYUAIKQAGaxAAIACQwAkJQA-AABNNm5OfZ2jE6eZhxlAMCeHmXVtdS1NjYeTRxVbKwW1J7tNOld1WmDnCweVBbsA8OsvS7TtnUMs0XzY8AVVLRT1BRde6sHDEA"]
         };
-        window.localStorage.setItem("hangar." + chosen_hangar, JSON.stringify(acft_list));
+        window.localStorage.setItem("test.hangar." + chosen_hangar, JSON.stringify(acft_list));
     }
     return acft_list;
 }
@@ -12250,7 +12270,7 @@ function RemoveHangar(name) {
     var idx = hangar_list.findIndex(n => n == name);
     if (idx != -1) {
         hangar_list.splice(idx, 1);
-        window.localStorage.removeItem("hangar." + name);
+        window.localStorage.removeItem("test.hangar." + name);
     }
     SaveHangarList(hangar_list);
     chosen_hangar = "Default";
@@ -12269,11 +12289,11 @@ function RemoveFromHangar(name) {
     LoadFromHangar(Math.min(acft_list.names.length - 1, idx));
 }
 function SaveAcftList(acft_list) {
-    window.localStorage.setItem("hangar." + chosen_hangar, JSON.stringify(acft_list));
+    window.localStorage.setItem("test.hangar." + chosen_hangar, JSON.stringify(acft_list));
     RefreshAcftSelect(acft_list);
 }
 function SaveHangarList(hangar_list) {
-    window.localStorage.setItem("hangar_names", JSON.stringify(hangar_list));
+    window.localStorage.setItem("test.hangar_names", JSON.stringify(hangar_list));
     RefreshHangarSelect(hangar_list);
 }
 function RefreshAcftSelect(acft_list) {
@@ -15797,6 +15817,12 @@ class Aircraft_HTML extends Display {
         if (deflector) {
             this.cards.weap_data.tags.push(lu("Weapon Tag: Deflector Plate"));
         }
+        if (w.GetIsFullyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Fully Accessible"));
+        }
+        else if (w.GetIsPartlyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Partly Accessible"));
+        }
     }
     UpdateEngineCard(e) {
         var estats = e.GetCurrentStats();
@@ -15952,8 +15978,11 @@ class Aircraft_HTML extends Display {
                     dirs.push(lu(dlist[i]));
             }
             var acces = "";
-            if (w.GetWeapons()[0].GetAccessible()) {
-                acces = "Accessible";
+            if (w.GetIsFullyAccessible()) {
+                acces = "Fully Accessible";
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                acces = "Partly Accessible";
             }
             catalog_stats += StringFmt.Format("#{0}: {1}x {2} {4} [{3}]\n", wi + 1, w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join("/", dirs), acces);
         }
@@ -16257,6 +16286,12 @@ class Aircraft_HTML extends Display {
             }
             if (deflector) {
                 tags.push(lu("Weapon Tag: Deflector Plate"));
+            }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
             }
             weaponState.tags = StringFmt.Join(", ", tags);
             wstates.push(JSON.stringify(weaponState));

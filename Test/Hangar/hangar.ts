@@ -28,7 +28,7 @@ const init = () => {
                 }
 
                 //Engine bit
-                var nameliststr = window.localStorage.getItem("engines_names");
+                var nameliststr = window.localStorage.getItem("test.engines_names");
                 var namelist = [];
                 if (nameliststr) {
                     namelist = JSON.parse(nameliststr);
@@ -102,7 +102,7 @@ function InitHTML() {
         acft_builder.fromJSON(JSON.parse(JSON.stringify(acft_hangar.toJSON())));
         acft_builder.CalculateStats();
         stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
-        window.localStorage.aircraft = JSON.stringify(acft_builder.toJSON());
+        window.localStorage.setItem("test.aircraft", JSON.stringify(acft_builder.toJSON()));
         RefreshDisplay();
         BlinkNeutral(load_btn.parentElement);
     };
@@ -155,7 +155,7 @@ function InitHTML() {
                     throw "Bad";
                 }
                 AddHangar(name);
-                window.localStorage.setItem("hangar." + name, reader.result as string);
+                window.localStorage.setItem("test.hangar." + name, reader.result as string);
                 chosen_hangar = name;
                 RefreshHangarSelect(LoadHangarList());
                 RefreshAcftSelect(LoadAcftList());
@@ -188,7 +188,7 @@ function InitHTML() {
 }
 
 function InitStats() {
-    let acft_data = window.localStorage.aircraft;
+    let acft_data = window.localStorage.getItem("test.aircraft");
     acft_builder = new Aircraft(parts_JSON, weapon_JSON, false);
     if (acft_data) {
         console.log("Used Saved Data");
@@ -208,27 +208,27 @@ function InitStats() {
 
 function LoadHangarList() {
     var hangar_list: string[];
-    if (!window.localStorage.getItem("hangar_names")) {
-        window.localStorage.setItem("hangar_names", JSON.stringify(["Default"]));
+    if (!window.localStorage.getItem("test.hangar_names")) {
+        window.localStorage.setItem("test.hangar_names", JSON.stringify(["Default"]));
     }
-    hangar_list = JSON.parse(window.localStorage.getItem("hangar_names"));
+    hangar_list = JSON.parse(window.localStorage.getItem("test.hangar_names"));
     if (hangar_list.length == 0) {
-        window.localStorage.setItem("hangar_names", JSON.stringify(["Default"]));
-        hangar_list = JSON.parse(window.localStorage.getItem("hangar_names"));
+        window.localStorage.setItem("test.hangar_names", JSON.stringify(["Default"]));
+        hangar_list = JSON.parse(window.localStorage.getItem("test.hangar_names"));
     }
     return hangar_list;
 }
 
 function LoadAcftList() {
     var acft_list: { names: string[], acft: string[] };
-    if (window.localStorage.getItem("hangar." + chosen_hangar)) {
-        acft_list = JSON.parse(window.localStorage.getItem("hangar." + chosen_hangar));
+    if (window.localStorage.getItem("test.hangar." + chosen_hangar)) {
+        acft_list = JSON.parse(window.localStorage.getItem("test.hangar." + chosen_hangar));
     } else {
         acft_list = {
             names: ["Basic Biplane"],
             acft: ["AAEAjGB0DMwLACECGBnAlgYwAQLQBwBskA7AU2AEBLgaAwGhmgUEZpFY+oHQAlACwD2xJFgCyAgC4CATgCMkAVywAtCFgAcABj55gAJGABcYACAaVVuwAQDdpw4B-h8BsAoex8+9BwsZJnySqpgGtq6NGYUAIKQAGaxAAIACQwAkJQA-AABNNm5OfZ2jE6eZhxlAMCeHmXVtdS1NjYeTRxVbKwW1J7tNOld1WmDnCweVBbsA8OsvS7TtnUMs0XzY8AVVLRT1BRde6sHDEA"]
         };
-        window.localStorage.setItem("hangar." + chosen_hangar, JSON.stringify(acft_list));
+        window.localStorage.setItem("test.hangar." + chosen_hangar, JSON.stringify(acft_list));
     }
     return acft_list;
 }
@@ -284,7 +284,7 @@ function RemoveHangar(name: string) {
     var idx = hangar_list.findIndex(n => n == name);
     if (idx != -1) {
         hangar_list.splice(idx, 1);
-        window.localStorage.removeItem("hangar." + name);
+        window.localStorage.removeItem("test.hangar." + name);
     }
     SaveHangarList(hangar_list);
     chosen_hangar = "Default";
@@ -305,12 +305,12 @@ function RemoveFromHangar(name: string) {
 }
 
 function SaveAcftList(acft_list: { names: string[], acft: string[] }) {
-    window.localStorage.setItem("hangar." + chosen_hangar, JSON.stringify(acft_list));
+    window.localStorage.setItem("test.hangar." + chosen_hangar, JSON.stringify(acft_list));
     RefreshAcftSelect(acft_list);
 }
 
 function SaveHangarList(hangar_list: string[]) {
-    window.localStorage.setItem("hangar_names", JSON.stringify(hangar_list));
+    window.localStorage.setItem("test.hangar_names", JSON.stringify(hangar_list));
     RefreshHangarSelect(hangar_list);
 }
 

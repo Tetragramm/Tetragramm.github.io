@@ -26,7 +26,7 @@ const init = () => {
                 }
 
                 //Engine Bit
-                var nameliststr = window.localStorage.getItem("engines_names");
+                var nameliststr = window.localStorage.getItem("test.engines_names");
                 var namelist: string[] = [];
                 if (nameliststr) {
                     namelist = JSON.parse(nameliststr) as string[];
@@ -907,8 +907,8 @@ class EngineBuilder_HTML {
                     BlinkBad(this.m_list_delete.parentElement);
                 } else {
                     engine_list.delete(this.list_idx);
-                    window.localStorage.removeItem("engines." + this.list_idx);
-                    let namelist = JSON.parse(window.localStorage.getItem("engines_names"));
+                    window.localStorage.removeItem("test.engines." + this.list_idx);
+                    let namelist = JSON.parse(window.localStorage.getItem("test.engines_names"));
                     var idx = -1;
                     for (let i = 0; i < namelist.length; i++) {
                         if (namelist[i] == this.list_idx)
@@ -916,7 +916,7 @@ class EngineBuilder_HTML {
                     }
                     if (idx != -1)
                         namelist.splice(idx, 1);
-                    window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+                    window.localStorage.setItem("test.engines_names", JSON.stringify(namelist));
                     this.list_idx = "Custom";
                     this.UpdateList();
                     BlinkGood(this.m_list_delete.parentElement);

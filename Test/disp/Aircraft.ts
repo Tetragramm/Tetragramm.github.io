@@ -326,6 +326,11 @@ class Aircraft_HTML extends Display {
         if (deflector) {
             this.cards.weap_data.tags.push(lu("Weapon Tag: Deflector Plate"));
         }
+        if (w.GetIsFullyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Fully Accessible"));
+        } else if (w.GetIsPartlyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Partly Accessible"));
+        }
     }
 
     private UpdateEngineCard(e: Engine) {
@@ -533,8 +538,10 @@ class Aircraft_HTML extends Display {
             }
 
             var acces = "";
-            if (w.GetWeapons()[0].GetAccessible()) {
-                acces = "Accessible";
+            if (w.GetIsFullyAccessible()) {
+                acces = "Fully Accessible";
+            } else if (w.GetIsPartlyAccessible()) {
+                acces = "Partly Accessible";
             }
             catalog_stats += StringFmt.Format("#{0}: {1}x {2} {4} [{3}]\n",
                 wi + 1,
@@ -860,6 +867,11 @@ class Aircraft_HTML extends Display {
             }
             if (deflector) {
                 tags.push(lu("Weapon Tag: Deflector Plate"));
+            }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            } else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
             }
             weaponState.tags = StringFmt.Join(", ", tags);
 

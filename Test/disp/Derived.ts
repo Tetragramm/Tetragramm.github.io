@@ -399,6 +399,11 @@ class Derived_HTML {
             if (w.GetFinalWeapon().ap > 0) {
                 tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
             }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            } else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
+            }
 
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();

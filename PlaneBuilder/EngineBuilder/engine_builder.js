@@ -565,7 +565,12 @@ class EngineList {
             this.list = [];
         }
         for (let elem of js["engines"]) {
-            this.push(new EngineInputs(elem), force);
+            try {
+                this.push(new EngineInputs(elem), force);
+            }
+            catch (e) {
+                console.error(e);
+            }
         }
     }
     serialize(s) {
@@ -10731,6 +10736,20 @@ class WeaponSystem extends Part {
     }
     GetSeat() {
         return this.seat;
+    }
+    GetIsFullyAccessible() {
+        for (let w of this.weapons) {
+            if (!w.GetAccessible())
+                return false;
+        }
+        return true;
+    }
+    GetIsPartlyAccessible() {
+        for (let w of this.weapons) {
+            if (w.GetAccessible())
+                return true;
+        }
+        return false;
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;

@@ -532,10 +532,10 @@ class EngineList {
         this.constant = false;
         this.name = name;
         this.list = [];
-        var ejson = window.localStorage.getItem("engines." + this.name);
+        var ejson = window.localStorage.getItem("test.engines." + this.name);
         if (ejson != null)
             this.fromJSON(JSON.parse(ejson));
-        var nameliststr = window.localStorage.getItem("engines_names");
+        var nameliststr = window.localStorage.getItem("test.engines_names");
         var namelist = [];
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
@@ -549,7 +549,7 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
-        window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+        window.localStorage.setItem("test.engines_names", JSON.stringify(namelist));
     }
     toJSON() {
         var ret = [];
@@ -612,7 +612,7 @@ class EngineList {
         }
         this.list.push(es.Clone());
         this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
         return this.find(es);
     }
     get(i) {
@@ -655,7 +655,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
     remove_name(name) {
         if (this.constant) {
@@ -665,7 +665,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
     get length() {
         return this.list.length;
@@ -1651,8 +1651,8 @@ class EngineInputs {
                 ecb.power = this.power;
                 ecb.chonk = this.material_fudge;
                 ecb.quality_fudge = this.quality_fudge;
+                ecb.name = this.name;
                 let stats = ecb.EngineStats();
-                this.name = stats.name;
                 return stats;
             }
             default:
@@ -2948,7 +2948,7 @@ const init = () => {
             local.SetLanguages(window.localStorage.language);
         }
         //Engine Bit
-        var nameliststr = window.localStorage.getItem("engines_names");
+        var nameliststr = window.localStorage.getItem("test.engines_names");
         var namelist = [];
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
@@ -3649,8 +3649,8 @@ class EngineBuilder_HTML {
                 }
                 else {
                     engine_list.delete(this.list_idx);
-                    window.localStorage.removeItem("engines." + this.list_idx);
-                    let namelist = JSON.parse(window.localStorage.getItem("engines_names"));
+                    window.localStorage.removeItem("test.engines." + this.list_idx);
+                    let namelist = JSON.parse(window.localStorage.getItem("test.engines_names"));
                     var idx = -1;
                     for (let i = 0; i < namelist.length; i++) {
                         if (namelist[i] == this.list_idx)
@@ -3658,7 +3658,7 @@ class EngineBuilder_HTML {
                     }
                     if (idx != -1)
                         namelist.splice(idx, 1);
-                    window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+                    window.localStorage.setItem("test.engines_names", JSON.stringify(namelist));
                     this.list_idx = "Custom";
                     this.UpdateList();
                     BlinkGood(this.m_list_delete.parentElement);
@@ -11175,6 +11175,20 @@ class WeaponSystem extends Part {
     GetSeat() {
         return this.seat;
     }
+    GetIsFullyAccessible() {
+        for (let w of this.weapons) {
+            if (!w.GetAccessible())
+                return false;
+        }
+        return true;
+    }
+    GetIsPartlyAccessible() {
+        for (let w of this.weapons) {
+            if (w.GetAccessible())
+                return true;
+        }
+        return false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -12408,7 +12422,7 @@ class Aircraft {
             if (this.DisplayCallback && !this.freeze_calculation)
                 this.DisplayCallback();
             if (this.use_storage)
-                window.localStorage.aircraft = JSON.stringify(this);
+                window.localStorage.setItem("test.aircraft", JSON.stringify(this));
         }
     }
     GetDerivedStats() {

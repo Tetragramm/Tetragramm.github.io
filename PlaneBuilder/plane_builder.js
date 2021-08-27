@@ -1634,7 +1634,12 @@ class EngineList {
             this.list = [];
         }
         for (let elem of js["engines"]) {
-            this.push(new EngineInputs(elem), force);
+            try {
+                this.push(new EngineInputs(elem), force);
+            }
+            catch (e) {
+                console.error(e);
+            }
         }
     }
     serialize(s) {
@@ -8486,6 +8491,20 @@ class WeaponSystem extends Part {
     GetSeat() {
         return this.seat;
     }
+    GetIsFullyAccessible() {
+        for (let w of this.weapons) {
+            if (!w.GetAccessible())
+                return false;
+        }
+        return true;
+    }
+    GetIsPartlyAccessible() {
+        for (let w of this.weapons) {
+            if (w.GetAccessible())
+                return true;
+        }
+        return false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -13490,6 +13509,12 @@ class Derived_HTML {
             if (w.GetFinalWeapon().ap > 0) {
                 tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
             }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
+            }
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
                 weaphtml += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
@@ -14160,6 +14185,12 @@ class Aircraft_HTML extends Display {
         if (deflector) {
             this.cards.weap_data.tags.push(lu("Weapon Tag: Deflector Plate"));
         }
+        if (w.GetIsFullyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Fully Accessible"));
+        }
+        else if (w.GetIsPartlyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Partly Accessible"));
+        }
     }
     UpdateEngineCard(e) {
         var estats = e.GetCurrentStats();
@@ -14315,8 +14346,11 @@ class Aircraft_HTML extends Display {
                     dirs.push(lu(dlist[i]));
             }
             var acces = "";
-            if (w.GetWeapons()[0].GetAccessible()) {
-                acces = "Accessible";
+            if (w.GetIsFullyAccessible()) {
+                acces = "Fully Accessible";
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                acces = "Partly Accessible";
             }
             catalog_stats += StringFmt.Format("#{0}: {1}x {2} {4} [{3}]\n", wi + 1, w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join("/", dirs), acces);
         }
@@ -14620,6 +14654,12 @@ class Aircraft_HTML extends Display {
             }
             if (deflector) {
                 tags.push(lu("Weapon Tag: Deflector Plate"));
+            }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
             }
             weaponState.tags = StringFmt.Join(", ", tags);
             wstates.push(JSON.stringify(weaponState));

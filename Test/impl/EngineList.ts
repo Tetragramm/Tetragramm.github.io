@@ -9,11 +9,11 @@ class EngineList {
     constructor(name: string) {
         this.name = name;
         this.list = [];
-        var ejson = window.localStorage.getItem("engines." + this.name);
+        var ejson = window.localStorage.getItem("test.engines." + this.name);
         if (ejson != null)
             this.fromJSON(JSON.parse(ejson));
 
-        var nameliststr = window.localStorage.getItem("engines_names");
+        var nameliststr = window.localStorage.getItem("test.engines_names");
         var namelist = [];
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
@@ -27,7 +27,7 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
-        window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+        window.localStorage.setItem("test.engines_names", JSON.stringify(namelist));
     }
 
     public toJSON() {
@@ -97,7 +97,7 @@ class EngineList {
         }
         this.list.push(es.Clone());
         this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
         return this.find(es);
     }
 
@@ -147,7 +147,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
 
     public remove_name(name: string) {
@@ -158,7 +158,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
 
     get length(): number {

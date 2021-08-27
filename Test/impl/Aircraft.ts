@@ -472,7 +472,7 @@ class Aircraft {
                 this.DisplayCallback();
 
             if (this.use_storage)
-                window.localStorage.aircraft = JSON.stringify(this);
+                window.localStorage.setItem("test.aircraft", JSON.stringify(this));
         }
     }
 

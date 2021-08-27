@@ -797,6 +797,22 @@ class WeaponSystem extends Part {
         return this.seat;
     }
 
+    public GetIsFullyAccessible() {
+        for (let w of this.weapons) {
+            if (!w.GetAccessible())
+                return false;
+        }
+        return true;
+    }
+
+    public GetIsPartlyAccessible() {
+        for (let w of this.weapons) {
+            if (w.GetAccessible())
+                return true;
+        }
+        return false;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {

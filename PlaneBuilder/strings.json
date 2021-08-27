@@ -375,6 +375,8 @@
         "Weapon Tag AP": "AP {0}",
         "Weapon Tag Jam": "Jam {0}",
         "Weapon Tag Awkward": "Awkward {0}",
+        "Weapon Tag Fully Accessible": "Fully Accessible",
+        "Weapon Tag Partly Accessible": "Partly Accessible",
         "Stat Lift Bleed": "Lift Bleed",
         "Stat Drag": "Drag",
         "Stat Mass": "Mass",

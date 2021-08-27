@@ -1652,8 +1652,8 @@ class EngineInputs {
                 ecb.power = this.power;
                 ecb.chonk = this.material_fudge;
                 ecb.quality_fudge = this.quality_fudge;
+                ecb.name = this.name;
                 let stats = ecb.EngineStats();
-                this.name = stats.name;
                 return stats;
             }
             default:
@@ -1799,10 +1799,10 @@ class EngineList {
         this.constant = false;
         this.name = name;
         this.list = [];
-        var ejson = window.localStorage.getItem("engines." + this.name);
+        var ejson = window.localStorage.getItem("test.engines." + this.name);
         if (ejson != null)
             this.fromJSON(JSON.parse(ejson));
-        var nameliststr = window.localStorage.getItem("engines_names");
+        var nameliststr = window.localStorage.getItem("test.engines_names");
         var namelist = [];
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
@@ -1816,7 +1816,7 @@ class EngineList {
         }
         if (!hasname)
             namelist.push(name);
-        window.localStorage.setItem("engines_names", JSON.stringify(namelist));
+        window.localStorage.setItem("test.engines_names", JSON.stringify(namelist));
     }
     toJSON() {
         var ret = [];
@@ -1879,7 +1879,7 @@ class EngineList {
         }
         this.list.push(es.Clone());
         this.list = this.list.sort((a, b) => { return ('' + a.name).localeCompare(b.name); });
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
         return this.find(es);
     }
     get(i) {
@@ -1922,7 +1922,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
     remove_name(name) {
         if (this.constant) {
@@ -1932,7 +1932,7 @@ class EngineList {
         if (idx >= 0) {
             this.list.splice(idx, 1);
         }
-        window.localStorage.setItem("engines." + this.name, JSON.stringify(this.toJSON()));
+        window.localStorage.setItem("test.engines." + this.name, JSON.stringify(this.toJSON()));
     }
     get length() {
         return this.list.length;
@@ -8830,6 +8830,20 @@ class WeaponSystem extends Part {
     GetSeat() {
         return this.seat;
     }
+    GetIsFullyAccessible() {
+        for (let w of this.weapons) {
+            if (!w.GetAccessible())
+                return false;
+        }
+        return true;
+    }
+    GetIsPartlyAccessible() {
+        for (let w of this.weapons) {
+            if (w.GetAccessible())
+                return true;
+        }
+        return false;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
         for (let w of this.weapons) {
@@ -10063,7 +10077,7 @@ class Aircraft {
             if (this.DisplayCallback && !this.freeze_calculation)
                 this.DisplayCallback();
             if (this.use_storage)
-                window.localStorage.aircraft = JSON.stringify(this);
+                window.localStorage.setItem("test.aircraft", JSON.stringify(this));
         }
     }
     GetDerivedStats() {
@@ -13861,6 +13875,12 @@ class Derived_HTML {
             if (w.GetFinalWeapon().ap > 0) {
                 tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
             }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
+            }
             if (w.GetProjectile() == ProjectileType.HEATRAY) {
                 let chgs = w.GetHRCharges();
                 weaphtml += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
@@ -14541,6 +14561,12 @@ class Aircraft_HTML extends Display {
         if (deflector) {
             this.cards.weap_data.tags.push(lu("Weapon Tag: Deflector Plate"));
         }
+        if (w.GetIsFullyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Fully Accessible"));
+        }
+        else if (w.GetIsPartlyAccessible()) {
+            this.cards.weap_data.tags.push(lu("Weapon Tag Partly Accessible"));
+        }
     }
     UpdateEngineCard(e) {
         var estats = e.GetCurrentStats();
@@ -14696,8 +14722,11 @@ class Aircraft_HTML extends Display {
                     dirs.push(lu(dlist[i]));
             }
             var acces = "";
-            if (w.GetWeapons()[0].GetAccessible()) {
-                acces = "Accessible";
+            if (w.GetIsFullyAccessible()) {
+                acces = "Fully Accessible";
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                acces = "Partly Accessible";
             }
             catalog_stats += StringFmt.Format("#{0}: {1}x {2} {4} [{3}]\n", wi + 1, w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join("/", dirs), acces);
         }
@@ -15001,6 +15030,12 @@ class Aircraft_HTML extends Display {
             }
             if (deflector) {
                 tags.push(lu("Weapon Tag: Deflector Plate"));
+            }
+            if (w.GetIsFullyAccessible()) {
+                tags.push(lu("Weapon Tag Fully Accessible"));
+            }
+            else if (w.GetIsPartlyAccessible()) {
+                tags.push(lu("Weapon Tag Partly Accessible"));
             }
             weaponState.tags = StringFmt.Join(", ", tags);
             wstates.push(JSON.stringify(weaponState));
@@ -16162,9 +16197,9 @@ const init = () => {
             local.SetLanguages(window.localStorage.language);
         }
         //Parts bit
-        let acft_data = window.localStorage.aircraft;
+        let acft_data = window.localStorage.getItem("test.aircraft");
         //Engine bit
-        var nameliststr = window.localStorage.getItem("engines_names");
+        var nameliststr = window.localStorage.getItem("test.engines_names");
         var namelist = [];
         if (nameliststr) {
             namelist = JSON.parse(nameliststr);
