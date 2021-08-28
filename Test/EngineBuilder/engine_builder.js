@@ -1815,7 +1815,7 @@ class ElectricBuilder {
         this.name = "Default";
         this.era_sel = 0;
         this.winding_sel = 0;
-        this.power = 0;
+        this.power = 1;
         this.chonk = 1;
         this.quality_fudge = 1;
     }
@@ -1868,8 +1868,9 @@ class ElectricBuilder {
         this.winding_sel = Math.max(0, Math.min(this.Winding.length - 1, this.winding_sel));
         this.power = Math.max(1, this.power);
         this.power = Math.floor(1.0e-6 + this.power);
-        this.chonk = Math.max(0.1, this.chonk);
-        this.chonk = Math.min(100.0, this.chonk);
+        this.chonk = Math.floor(1.0e-6 + this.chonk);
+        this.chonk = Math.max(-10, this.chonk);
+        this.chonk = Math.min(10.0, this.chonk);
         this.quality_fudge = Math.max(0.5, this.quality_fudge);
         this.quality_fudge = Math.min(2.0, this.quality_fudge);
     }
