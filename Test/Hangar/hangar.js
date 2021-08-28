@@ -1244,12 +1244,12 @@ class TurboBuilder {
 class ElectricBuilder {
     constructor() {
         this.EraTable = [
-            { name: "Pioneer", draw: 3, drawfactor: 1 / 5, massfactor: 1 / 5, reliability: -1, costfactor: 1 / 2.5, overspeed: 20, },
-            { name: "WWI", draw: 1, drawfactor: 1 / 5, massfactor: 1 / 6, reliability: 0, costfactor: 1 / 2.25, overspeed: 25, },
-            { name: "Roaring 20s", draw: 1, drawfactor: 1 / 7, massfactor: 1 / 7, reliability: 1, costfactor: 1 / 2, overspeed: 30, },
-            { name: "Coming Storm", draw: 0, drawfactor: 1 / 7, massfactor: 1 / 8, reliability: 2, costfactor: 1 / 1.9, overspeed: 35, },
-            { name: "WWII", draw: 0, drawfactor: 1 / 8, massfactor: 1 / 10, reliability: 3, costfactor: 1 / 1.8, overspeed: 40, },
-            { name: "Last Hurrah", draw: 0, drawfactor: 1 / 10, massfactor: 1 / 12, reliability: 4, costfactor: 1 / 1.75, overspeed: 45, },
+            { name: "Pioneer", draw: 3, drawfactor: 2 / 5, massfactor: 2 / 5, reliability: -1, costfactor: 1 / 2.5, overspeed: 20, },
+            { name: "WWI", draw: 1, drawfactor: 2 / 5, massfactor: 1 / 3, reliability: 0, costfactor: 1 / 2.25, overspeed: 25, },
+            { name: "Roaring 20s", draw: 1, drawfactor: 2 / 7, massfactor: 2 / 7, reliability: 1, costfactor: 1 / 2, overspeed: 30, },
+            { name: "Coming Storm", draw: 0, drawfactor: 2 / 7, massfactor: 1 / 4, reliability: 2, costfactor: 1 / 1.9, overspeed: 35, },
+            { name: "WWII", draw: 0, drawfactor: 1 / 4, massfactor: 1 / 5, reliability: 3, costfactor: 1 / 1.8, overspeed: 40, },
+            { name: "Last Hurrah", draw: 0, drawfactor: 1 / 5, massfactor: 1 / 6, reliability: 4, costfactor: 1 / 1.75, overspeed: 45, },
         ];
         this.Winding = [
             { name: "Aluminum", drawmod: 1.1, mass: -2, drag: 1, costfactor: 1, reliabilty: 0 },
