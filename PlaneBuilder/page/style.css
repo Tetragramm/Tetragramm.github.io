@@ -154,6 +154,10 @@ select, input {
 	font-size: 1em;
 	vertical-align: center;
 	border-width: 1px;
+    text-align-last: center;
+   text-align: center;
+   -ms-text-align-last: center;
+   -moz-text-align-last: center;
 }
 
 select {
@@ -170,6 +174,10 @@ select {
 		1em 0.5em,
 		100%, 100%;
 	background-repeat: no-repeat;
+}
+
+option {
+    text-align:initial;
 }
 
 input[type=number] {
