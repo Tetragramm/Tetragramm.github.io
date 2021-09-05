@@ -8376,7 +8376,7 @@ class WeaponSystem extends Part {
     }
     GetCanAction() {
         return [true,
-            this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0,
+            this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
         ];
@@ -10710,39 +10710,7 @@ class Derived_HTML {
             weaphtml += "<br/>";
         }
         for (let w of acft.GetWeapons().GetWeaponSets()) {
-            var ds = w.GetDirection();
-            var dirs = [];
-            for (let i = 0; i < dlist.length; i++) {
-                if (ds[i])
-                    dirs.push(lu(dlist[i]));
-            }
-            let hits = w.GetHits();
-            var tags = [lu("Weapon Tag Jam", w.GetJam())];
-            if (w.GetReload() > 0) {
-                tags.push(lu("Weapon Tag Reload", w.GetReload()));
-            }
-            if (w.GetFinalWeapon().rapid) {
-                tags.push(lu("Weapon Tag Rapid Fire"));
-            }
-            if (w.GetFinalWeapon().shells) {
-                tags.push(lu("Weapon Tag Shells"));
-            }
-            if (w.GetFinalWeapon().ap > 0) {
-                tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
-            }
-            if (w.GetIsFullyAccessible()) {
-                tags.push(lu("Weapon Tag Fully Accessible"));
-            }
-            else if (w.GetIsPartlyAccessible()) {
-                tags.push(lu("Weapon Tag Partly Accessible"));
-            }
-            if (w.GetProjectile() == ProjectileType.HEATRAY) {
-                let chgs = w.GetHRCharges();
-                weaphtml += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
-            }
-            else {
-                weaphtml += lu("Weapon Description", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(acft, w), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), w.GetShots(), StringFmt.Join(", ", tags));
-            }
+            weaphtml += WeaponString(w, wlist, dlist);
             weaphtml += "<br\>";
         }
         this.weapon_cell.innerHTML = weaphtml;
@@ -10751,42 +10719,6 @@ class Derived_HTML {
             warnhtml += w.source + ":  " + w.warning + "<br/>";
         }
         this.warning_cell.innerHTML = warnhtml;
-    }
-    WeaponName(acft, w) {
-        var wlist = acft.GetWeapons().GetWeaponList();
-        var ds = w.GetDirection();
-        var dircount = 0;
-        for (let d of ds) {
-            if (d)
-                dircount++;
-        }
-        var name = "";
-        if (dircount == 1 && w.GetFixed())
-            name += lu("Fixed") + " ";
-        else if (dircount <= 2)
-            name += lu("Flexible") + " ";
-        else
-            name += lu("Turreted") + " ";
-        if (w.GetAction() == ActionType.MECHANICAL) {
-            name += lu("Weapon Tag Mechanical Action") + " ";
-        }
-        else if (w.GetAction() == ActionType.GAST) {
-            name += lu("Weapon Tag Gast Principle") + " ";
-        }
-        else if (w.GetAction() == ActionType.ROTARY) {
-            name += lu("Weapon Tag Rotary") + " ";
-        }
-        if (w.GetProjectile() == ProjectileType.HEATRAY) {
-            name += lu("Weapon Tag Heat Ray") + " ";
-        }
-        else if (w.GetProjectile() == ProjectileType.GYROJETS) {
-            name += lu("Weapon Tag Gyrojet") + " ";
-        }
-        else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
-            name += lu("Weapon Tag Pneumatic") + " ";
-        }
-        name += wlist[w.GetWeaponSelected()].abrv;
-        return name;
     }
     GetName() {
         return this.name_inp.value;
@@ -14854,6 +14786,91 @@ class Weapons_HTML extends Display {
         this.inp_w_brace.valueAsNumber = this.weap.GetBraceCount();
     }
 }
+function WeaponName(w, wlist) {
+    var ds = w.GetDirection();
+    var dircount = 0;
+    for (let d of ds) {
+        if (d)
+            dircount++;
+    }
+    var name = "";
+    if (dircount == 1 && w.GetFixed())
+        name += lu("Fixed") + " ";
+    else if (dircount <= 2)
+        name += lu("Flexible") + " ";
+    else
+        name += lu("Turreted") + " ";
+    if (w.GetAction() == ActionType.MECHANICAL) {
+        name += lu("Weapon Tag Mechanical Action") + " ";
+    }
+    else if (w.GetAction() == ActionType.GAST) {
+        name += lu("Weapon Tag Gast Principle") + " ";
+    }
+    else if (w.GetAction() == ActionType.ROTARY) {
+        name += lu("Weapon Tag Rotary") + " ";
+    }
+    if (w.GetProjectile() == ProjectileType.HEATRAY) {
+        name += lu("Weapon Tag Heat Ray") + " ";
+    }
+    else if (w.GetProjectile() == ProjectileType.GYROJETS) {
+        name += lu("Weapon Tag Gyrojet") + " ";
+    }
+    else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
+        name += lu("Weapon Tag Pneumatic") + " ";
+    }
+    name += wlist[w.GetWeaponSelected()].abrv;
+    return name;
+}
+function WeaponTags(w) {
+    var tags = [lu("Weapon Tag Jam", w.GetJam())];
+    let fweap = w.GetFinalWeapon();
+    if (w.GetReload() > 0) {
+        if (w.GetReload() == 1) {
+            tags.push(lu("Weapon Tag Manual"));
+        }
+        else {
+            tags.push(lu("Weapon Tag Reload", w.GetReload()));
+        }
+    }
+    if (fweap.rapid) {
+        tags.push(lu("Weapon Tag Rapid Fire"));
+    }
+    if (fweap.shells) {
+        tags.push(lu("Weapon Tag Shells"));
+    }
+    if (fweap.ap > 0) {
+        tags.push(lu("Weapon Tag AP", fweap.ap));
+    }
+    if (w.GetIsFullyAccessible()) {
+        tags.push(lu("Weapon Tag Fully Accessible"));
+    }
+    else if (w.GetIsPartlyAccessible()) {
+        tags.push(lu("Weapon Tag Partly Accessible"));
+    }
+    if (fweap.deflection) {
+        tags.push(lu("Weapon Tag Awkward", fweap.deflection));
+    }
+    return tags;
+}
+function WeaponString(w, wlist, dlist) {
+    var wstring = "";
+    var ds = w.GetDirection();
+    var dirs = [];
+    for (let i = 0; i < dlist.length; i++) {
+        if (ds[i])
+            dirs.push(lu(dlist[i]));
+    }
+    let hits = w.GetHits();
+    let tags = WeaponTags(w);
+    if (w.GetProjectile() == ProjectileType.HEATRAY) {
+        let chgs = w.GetHRCharges();
+        wstring += lu("Weapon Description Heat Ray", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(w, wlist), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), StringFmt.Join("/", chgs), StringFmt.Join(", ", tags));
+    }
+    else {
+        wstring += lu("Weapon Description", lu("Seat #", w.GetSeat() + 1), w.GetWeaponCount(), this.WeaponName(w, wlist), StringFmt.Join(" ", dirs), wlist[w.GetWeaponSelected()].damage, StringFmt.Join("/", hits), w.GetShots(), StringFmt.Join(", ", tags));
+    }
+    return wstring;
+}
 class Cards {
     constructor() {
         this.dash_canvas = document.createElement("CANVAS");
@@ -15389,8 +15406,9 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.warnings = stats.warnings;
     }
     UpdateWeaponCard(w) {
+        var wlist = this.acft.GetWeapons().GetWeaponList();
         var dlist = this.acft.GetWeapons().GetDirectionList();
-        var name = this.WeaponName(w);
+        var name = WeaponName(w, wlist);
         if (w.IsPlural()) {
             name = w.GetWeaponCount().toString() + "x " + name;
         }
@@ -15407,7 +15425,6 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.ammo = w.GetShots();
         this.cards.weap_data.ap = fweap.ap;
         this.cards.weap_data.hits = w.GetHits();
-        var wlist = this.acft.GetWeapons().GetWeaponList();
         if (wlist[w.GetWeaponSelected()].abrv == "PR") {
             this.cards.weap_data.damage = [5, 5, 5, 5];
         }
@@ -15424,29 +15441,7 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.type = name;
         this.cards.weap_data.abrv = fweap.abrv;
         this.cards.weap_data.reload = fweap.reload;
-        if (fweap.rapid) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Rapid Fire"));
-        }
-        if (fweap.shells) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Shells"));
-        }
-        if (fweap.deflection) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Awkward", fweap.deflection));
-        }
-        var deflector = false;
-        for (let iw of w.GetWeapons()) {
-            if (iw.GetSynchronization() == SynchronizationType.DEFLECT)
-                deflector = true;
-        }
-        if (deflector) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag: Deflector Plate"));
-        }
-        if (w.GetIsFullyAccessible()) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Fully Accessible"));
-        }
-        else if (w.GetIsPartlyAccessible()) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Partly Accessible"));
-        }
+        this.cards.weap_data.tags.concat(WeaponTags(w));
     }
     UpdateEngineCard(e) {
         var estats = e.GetCurrentStats();
@@ -15595,20 +15590,7 @@ class Aircraft_HTML extends Display {
         var wsets = this.acft.GetWeapons().GetWeaponSets();
         for (let wi = 0; wi < wsets.length; wi++) {
             var w = wsets[wi];
-            var ds = w.GetDirection();
-            var dirs = [];
-            for (let i = 0; i < dlist.length; i++) {
-                if (ds[i])
-                    dirs.push(lu(dlist[i]));
-            }
-            var acces = "";
-            if (w.GetIsFullyAccessible()) {
-                acces = "Fully Accessible";
-            }
-            else if (w.GetIsPartlyAccessible()) {
-                acces = "Partly Accessible";
-            }
-            catalog_stats += StringFmt.Format("#{0}: {1}x {2} {4} [{3}]\n", wi + 1, w.GetWeaponCount(), this.WeaponName(w), StringFmt.Join("/", dirs), acces);
+            catalog_stats += WeaponString(w, wlist, dlist) + "\n";
         }
         for (let w of stats.warnings) {
             catalog_stats += w.source + ":  " + w.warning + "\n";
@@ -15866,7 +15848,7 @@ class Aircraft_HTML extends Display {
             var fweap = w.GetFinalWeapon();
             var tags = [];
             let weaponState = {
-                "type": this.WeaponName(w),
+                "type": WeaponName(w, wlist),
                 "ammo": w.GetShots(),
                 "ap": fweap.ap,
                 "jam": w.GetJam(),
@@ -15894,29 +15876,7 @@ class Aircraft_HTML extends Display {
             dtag = dtag.substr(0, dtag.length - 1);
             dtag += "]";
             tags.push(dtag);
-            if (fweap.rapid) {
-                tags.push(lu("Weapon Tag Rapid Fire"));
-            }
-            if (fweap.shells) {
-                tags.push(lu("Weapon Tag Shells"));
-            }
-            if (fweap.deflection) {
-                tags.push(lu("Weapon Tag Awkward", fweap.deflection));
-            }
-            var deflector = false;
-            for (let iw of w.GetWeapons()) {
-                if (iw.GetSynchronization() == SynchronizationType.DEFLECT)
-                    deflector = true;
-            }
-            if (deflector) {
-                tags.push(lu("Weapon Tag: Deflector Plate"));
-            }
-            if (w.GetIsFullyAccessible()) {
-                tags.push(lu("Weapon Tag Fully Accessible"));
-            }
-            else if (w.GetIsPartlyAccessible()) {
-                tags.push(lu("Weapon Tag Partly Accessible"));
-            }
+            tags.concat(WeaponTags(w));
             weaponState.tags = StringFmt.Join(", ", tags);
             wstates.push(JSON.stringify(weaponState));
         }
@@ -15941,42 +15901,6 @@ class Aircraft_HTML extends Display {
             this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data));
         }
         this.cards.SaveNPC();
-    }
-    WeaponName(w) {
-        var wlist = this.acft.GetWeapons().GetWeaponList();
-        var ds = w.GetDirection();
-        var dircount = 0;
-        for (let d of ds) {
-            if (d)
-                dircount++;
-        }
-        var name = "";
-        if (dircount == 1 && w.GetFixed())
-            name += lu("Fixed") + " ";
-        else if (dircount <= 2)
-            name += lu("Flexible") + " ";
-        else
-            name += lu("Turreted") + " ";
-        if (w.GetAction() == ActionType.MECHANICAL) {
-            name += lu("Weapon Tag Mechanical Action") + " ";
-        }
-        else if (w.GetAction() == ActionType.GAST) {
-            name += lu("Weapon Tag Gast Principle") + " ";
-        }
-        else if (w.GetAction() == ActionType.ROTARY) {
-            name += lu("Weapon Tag Rotary") + " ";
-        }
-        if (w.GetProjectile() == ProjectileType.HEATRAY) {
-            name += lu("Weapon Tag Heat Ray") + " ";
-        }
-        else if (w.GetProjectile() == ProjectileType.GYROJETS) {
-            name += lu("Weapon Tag Gyrojet") + " ";
-        }
-        else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
-            name += lu("Weapon Tag Pneumatic") + " ";
-        }
-        name += wlist[w.GetWeaponSelected()].abrv;
-        return name;
     }
     InitAlter(tbl) {
         var row = tbl.insertRow();
