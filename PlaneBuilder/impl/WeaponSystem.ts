@@ -8,7 +8,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number
+        can_action: boolean, can_projectile: boolean, deflection: number,
     };
     private weapon_type: number;
     private raw_weapon_type: number;
@@ -668,7 +668,7 @@ class WeaponSystem extends Part {
 
     public GetCanAction() {
         return [true,
-            this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0,
+            this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
         ];

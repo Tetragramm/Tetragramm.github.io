@@ -8142,7 +8142,7 @@ class WeaponSystem extends Part {
             damage: 0, hits: 0, ammo: 0,
             ap: 0, jam: "", reload: 0,
             rapid: false, synched: false, shells: false,
-            can_action: false, can_projectile: false, deflection: 0, manual: false,
+            can_action: false, can_projectile: false, deflection: 0,
         };
         this.MakeFinalWeapon();
         this.SWC(1);
@@ -8301,7 +8301,6 @@ class WeaponSystem extends Part {
         this.final_weapon.size = this.weapon_list[num].size;
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
-        this.final_weapon.manual = this.weapon_list[num].manual;
         this.final_weapon.jam = this.weapon_list[num].jam;
         this.final_weapon.stats.era.clear();
         this.final_weapon.stats.era.add({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
@@ -8357,7 +8356,6 @@ class WeaponSystem extends Part {
         if (this.repeating) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
-            this.final_weapon.manual = false;
         }
         if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL)
             && this.projectile_sel == ProjectileType.HEATRAY) {
@@ -8800,9 +8798,6 @@ class WeaponSystem extends Part {
             }
         }
     }
-    GetManual() {
-        return this.final_weapon.manual;
-    }
     GetShots() {
         return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
     }
@@ -8931,7 +8926,6 @@ class Weapons extends Part {
                 can_action: elem["can_action"],
                 can_projectile: elem["can_projectile"],
                 deflection: elem["deflection"],
-                manual: elem["manual"],
             };
             this.weapon_list.push(weap);
         }
