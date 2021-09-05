@@ -10,7 +10,7 @@ class Weapons extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number,
+        can_action: boolean, can_projectile: boolean, deflection: number, manual: boolean,
     }[];
     private wl_permute: number[];
     private direction_list: string[] = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
@@ -61,6 +61,7 @@ class Weapons extends Part {
                 can_action: elem["can_action"],
                 can_projectile: elem["can_projectile"],
                 deflection: elem["deflection"],
+                manual: elem["manual"],
             };
             this.weapon_list.push(weap);
         }

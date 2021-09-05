@@ -121,19 +121,20 @@ class Aircraft_HTML extends Display {
         let idx = 0;
         for (let type in AIRCRAFT_TYPE) {
             if (isNaN(Number(type))) {
-                idx = idx+1;
-                if(idx != 2){
-                let opt = document.createElement("OPTION") as HTMLOptionElement;
-                opt.text = lu(type);
-                this.acft_type.add(opt);
+                idx = idx + 1;
+                if (idx != 2) {
+                    let opt = document.createElement("OPTION") as HTMLOptionElement;
+                    opt.text = lu(type);
+                    this.acft_type.add(opt);
                 }
             }
         }
-        this.acft_type.onchange = () => { let idx = this.acft_type.selectedIndex;
-            if(idx >= 1)
+        this.acft_type.onchange = () => {
+            let idx = this.acft_type.selectedIndex;
+            if (idx >= 1)
                 idx += 1;
             this.acft.SetType(idx);
-         };
+        };
 
         (document.getElementById("lbl_stats") as HTMLLabelElement).textContent = lu("Aircraft Stats Section Title");
         var tbl = document.getElementById("tbl_stats") as HTMLTableElement;
@@ -269,9 +270,10 @@ class Aircraft_HTML extends Display {
     }
 
     private UpdateWeaponCard(w: WeaponSystem) {
+        var wlist = this.acft.GetWeapons().GetWeaponList();
         var dlist = this.acft.GetWeapons().GetDirectionList();
 
-        var name = this.WeaponName(w);
+        var name = WeaponName(w, wlist);
         if (w.IsPlural()) {
             name = w.GetWeaponCount().toString() + "x " + name;
         }
@@ -292,7 +294,6 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.ap = fweap.ap;
         this.cards.weap_data.hits = w.GetHits();
 
-        var wlist = this.acft.GetWeapons().GetWeaponList();
         if (wlist[w.GetWeaponSelected()].abrv == "PR") {
             this.cards.weap_data.damage = [5, 5, 5, 5];
         } else {
@@ -309,28 +310,7 @@ class Aircraft_HTML extends Display {
         this.cards.weap_data.abrv = fweap.abrv;
         this.cards.weap_data.reload = fweap.reload;
 
-        if (fweap.rapid) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Rapid Fire"));
-        }
-        if (fweap.shells) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Shells"));
-        }
-        if (fweap.deflection) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Awkward", fweap.deflection));
-        }
-        var deflector = false;
-        for (let iw of w.GetWeapons()) {
-            if (iw.GetSynchronization() == SynchronizationType.DEFLECT)
-                deflector = true;
-        }
-        if (deflector) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag: Deflector Plate"));
-        }
-        if (w.GetIsFullyAccessible()) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Fully Accessible"));
-        } else if (w.GetIsPartlyAccessible()) {
-            this.cards.weap_data.tags.push(lu("Weapon Tag Partly Accessible"));
-        }
+        this.cards.weap_data.tags.concat(WeaponTags(w))
     }
 
     private UpdateEngineCard(e: Engine) {
@@ -530,25 +510,7 @@ class Aircraft_HTML extends Display {
         var wsets = this.acft.GetWeapons().GetWeaponSets();
         for (let wi = 0; wi < wsets.length; wi++) {
             var w = wsets[wi];
-            var ds = w.GetDirection();
-            var dirs = [];
-            for (let i = 0; i < dlist.length; i++) {
-                if (ds[i])
-                    dirs.push(lu(dlist[i]));
-            }
-
-            var acces = "";
-            if (w.GetIsFullyAccessible()) {
-                acces = "Fully Accessible";
-            } else if (w.GetIsPartlyAccessible()) {
-                acces = "Partly Accessible";
-            }
-            catalog_stats += StringFmt.Format("#{0}: {1}x {2} {4} [{3}]\n",
-                wi + 1,
-                w.GetWeaponCount(),
-                this.WeaponName(w),
-                StringFmt.Join("/", dirs),
-                acces);
+            catalog_stats += WeaponString(w, wlist, dlist) + "\n";
         }
         for (let w of stats.warnings) {
             catalog_stats += w.source + ":  " + w.warning + "\n";
@@ -819,7 +781,7 @@ class Aircraft_HTML extends Display {
             var fweap = w.GetFinalWeapon();
             var tags = [];
             let weaponState = {
-                "type": this.WeaponName(w),
+                "type": WeaponName(w, wlist),
                 "ammo": w.GetShots(),
                 "ap": fweap.ap,
                 "jam": w.GetJam(),
@@ -849,30 +811,10 @@ class Aircraft_HTML extends Display {
             }
             dtag = dtag.substr(0, dtag.length - 1);
             dtag += "]";
-            tags.push(dtag);
 
-            if (fweap.rapid) {
-                tags.push(lu("Weapon Tag Rapid Fire"));
-            }
-            if (fweap.shells) {
-                tags.push(lu("Weapon Tag Shells"));
-            }
-            if (fweap.deflection) {
-                tags.push(lu("Weapon Tag Awkward", fweap.deflection));
-            }
-            var deflector = false;
-            for (let iw of w.GetWeapons()) {
-                if (iw.GetSynchronization() == SynchronizationType.DEFLECT)
-                    deflector = true;
-            }
-            if (deflector) {
-                tags.push(lu("Weapon Tag: Deflector Plate"));
-            }
-            if (w.GetIsFullyAccessible()) {
-                tags.push(lu("Weapon Tag Fully Accessible"));
-            } else if (w.GetIsPartlyAccessible()) {
-                tags.push(lu("Weapon Tag Partly Accessible"));
-            }
+            tags.push(dtag);
+            tags.concat(WeaponTags(w));
+
             weaponState.tags = StringFmt.Join(", ", tags);
 
             wstates.push(JSON.stringify(weaponState));
@@ -902,42 +844,6 @@ class Aircraft_HTML extends Display {
         }
 
         this.cards.SaveNPC();
-    }
-
-    private WeaponName(w: WeaponSystem): string {
-        var wlist = this.acft.GetWeapons().GetWeaponList();
-        var ds = w.GetDirection();
-        var dircount = 0;
-        for (let d of ds) {
-            if (d)
-                dircount++;
-        }
-        var name = "";
-        if (dircount == 1 && w.GetFixed())
-            name += lu("Fixed") + " ";
-        else if (dircount <= 2)
-            name += lu("Flexible") + " ";
-        else
-            name += lu("Turreted") + " ";
-
-        if (w.GetAction() == ActionType.MECHANICAL) {
-            name += lu("Weapon Tag Mechanical Action") + " ";
-        } else if (w.GetAction() == ActionType.GAST) {
-            name += lu("Weapon Tag Gast Principle") + " ";
-        } else if (w.GetAction() == ActionType.ROTARY) {
-            name += lu("Weapon Tag Rotary") + " ";
-        }
-
-        if (w.GetProjectile() == ProjectileType.HEATRAY) {
-            name += lu("Weapon Tag Heat Ray") + " ";
-        } else if (w.GetProjectile() == ProjectileType.GYROJETS) {
-            name += lu("Weapon Tag Gyrojet") + " ";
-        } else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
-            name += lu("Weapon Tag Pneumatic") + " ";
-        }
-
-        name += wlist[w.GetWeaponSelected()].abrv;
-        return name;
     }
 
     private InitAlter(tbl: HTMLTableElement) {
@@ -1177,7 +1083,7 @@ class Aircraft_HTML extends Display {
         var derived_stats = this.acft.GetDerivedStats();
 
         let idx = this.acft.GetAircraftType();
-        if(idx >= 1)
+        if (idx >= 1)
             idx -= 1;
         this.acft_type.selectedIndex = idx;
         this.era.UpdateDisplay();

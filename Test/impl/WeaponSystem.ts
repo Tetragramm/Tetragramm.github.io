@@ -8,7 +8,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number
+        can_action: boolean, can_projectile: boolean, deflection: number, manual: boolean,
     };
     private weapon_type: number;
     private raw_weapon_type: number;
@@ -35,7 +35,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number,
+        can_action: boolean, can_projectile: boolean, deflection: number, manual: boolean,
     }[];
     private wl_permute: number[];
 
@@ -44,7 +44,7 @@ class WeaponSystem extends Part {
         damage: number, hits: number, ammo: number,
         ap: number, jam: string, reload: number,
         rapid: boolean, synched: boolean, shells: boolean,
-        can_action: boolean, can_projectile: boolean, deflection: number,
+        can_action: boolean, can_projectile: boolean, deflection: number, manual: boolean,
     }[], wl_permute: number[]) {
         super();
         this.weapon_list = weapon_list;
@@ -67,7 +67,7 @@ class WeaponSystem extends Part {
             damage: 0, hits: 0, ammo: 0,
             ap: 0, jam: "", reload: 0,
             rapid: false, synched: false, shells: false,
-            can_action: false, can_projectile: false, deflection: 0,
+            can_action: false, can_projectile: false, deflection: 0, manual: false,
         };
         this.MakeFinalWeapon();
         this.SWC(1);
@@ -232,6 +232,7 @@ class WeaponSystem extends Part {
         this.final_weapon.size = this.weapon_list[num].size;
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
+        this.final_weapon.manual = this.weapon_list[num].manual;
         this.final_weapon.jam = this.weapon_list[num].jam;
         this.final_weapon.stats.era.clear();
         this.final_weapon.stats.era.add({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
@@ -288,6 +289,7 @@ class WeaponSystem extends Part {
         if (this.repeating) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
+            this.final_weapon.manual = false;
         }
 
         if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL)
@@ -674,7 +676,7 @@ class WeaponSystem extends Part {
 
     public GetCanAction() {
         return [true,
-            this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0,
+            this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
         ];
@@ -761,6 +763,10 @@ class WeaponSystem extends Part {
                     return [Math.floor(1.0e-6 + 3 * 10 * 0.5 / 4), Math.floor(1.0e-6 + 5 * 10 * 0.5 / 4)];
             }
         }
+    }
+
+    public GetManual() {
+        return this.final_weapon.manual;
     }
 
     public GetShots() {

@@ -334,3 +334,136 @@ class Weapons_HTML extends Display {
         this.inp_w_brace.valueAsNumber = this.weap.GetBraceCount();
     }
 }
+
+function WeaponName(w: WeaponSystem, wlist: {
+    name: string,
+    abrv: string, era: string,
+    size: number, stats: Stats,
+    damage: number, hits: number,
+    ammo: number, ap: number,
+    jam: string, reload: number,
+    rapid: boolean, synched: boolean,
+    shells: boolean, can_action: boolean,
+    can_projectile: boolean, deflection: number,
+}[]): string {
+    var ds = w.GetDirection();
+    var dircount = 0;
+    for (let d of ds) {
+        if (d)
+            dircount++;
+    }
+    var name = "";
+    if (dircount == 1 && w.GetFixed())
+        name += lu("Fixed") + " ";
+    else if (dircount <= 2)
+        name += lu("Flexible") + " ";
+    else
+        name += lu("Turreted") + " ";
+
+    if (w.GetAction() == ActionType.MECHANICAL) {
+        name += lu("Weapon Tag Mechanical Action") + " ";
+    } else if (w.GetAction() == ActionType.GAST) {
+        name += lu("Weapon Tag Gast Principle") + " ";
+    } else if (w.GetAction() == ActionType.ROTARY) {
+        name += lu("Weapon Tag Rotary") + " ";
+    }
+
+    if (w.GetProjectile() == ProjectileType.HEATRAY) {
+        name += lu("Weapon Tag Heat Ray") + " ";
+    } else if (w.GetProjectile() == ProjectileType.GYROJETS) {
+        name += lu("Weapon Tag Gyrojet") + " ";
+    } else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
+        name += lu("Weapon Tag Pneumatic") + " ";
+    }
+
+    name += wlist[w.GetWeaponSelected()].abrv;
+    return name;
+}
+
+function WeaponTags(w: WeaponSystem) {
+    var tags = [lu("Weapon Tag Jam", w.GetJam())];
+    let fweap = w.GetFinalWeapon();
+
+    if (w.GetReload() > 0) {
+        if (w.GetReload() == 1) {
+            tags.push(lu("Weapon Tag Manual"));
+        } else {
+            tags.push(lu("Weapon Tag Reload", w.GetReload()));
+        }
+    }
+
+    if (fweap.rapid) {
+        tags.push(lu("Weapon Tag Rapid Fire"));
+    }
+
+    if (fweap.shells) {
+        tags.push(lu("Weapon Tag Shells"));
+    }
+
+    if (fweap.ap > 0) {
+        tags.push(lu("Weapon Tag AP", fweap.ap));
+    }
+
+    if (w.GetIsFullyAccessible()) {
+        tags.push(lu("Weapon Tag Fully Accessible"));
+    } else if (w.GetIsPartlyAccessible()) {
+        tags.push(lu("Weapon Tag Partly Accessible"));
+    }
+
+    if (fweap.deflection) {
+        tags.push(lu("Weapon Tag Awkward", fweap.deflection));
+    }
+    return tags;
+}
+
+function WeaponString(w: WeaponSystem,
+    wlist: {
+        name: string,
+        abrv: string, era: string,
+        size: number, stats: Stats,
+        damage: number, hits: number,
+        ammo: number, ap: number,
+        jam: string, reload: number,
+        rapid: boolean, synched: boolean,
+        shells: boolean, can_action: boolean,
+        can_projectile: boolean, deflection: number,
+    }[],
+    dlist: string[]) {
+
+    var wstring = "";
+    var ds = w.GetDirection();
+    var dirs = [];
+    for (let i = 0; i < dlist.length; i++) {
+        if (ds[i])
+            dirs.push(lu(dlist[i]));
+    }
+    let hits = w.GetHits();
+    let tags = WeaponTags(w);
+
+    if (w.GetProjectile() == ProjectileType.HEATRAY) {
+        let chgs = w.GetHRCharges();
+        wstring += lu("Weapon Description Heat Ray",
+            lu("Seat #", w.GetSeat() + 1),
+            w.GetWeaponCount(),
+            this.WeaponName(w, wlist),
+            StringFmt.Join(" ", dirs),
+            wlist[w.GetWeaponSelected()].damage,
+            StringFmt.Join("/", hits),
+            StringFmt.Join("/", chgs),
+            StringFmt.Join(", ", tags)
+        );
+    } else {
+        wstring += lu("Weapon Description",
+            lu("Seat #", w.GetSeat() + 1),
+            w.GetWeaponCount(),
+            this.WeaponName(w, wlist),
+            StringFmt.Join(" ", dirs),
+            wlist[w.GetWeaponSelected()].damage,
+            StringFmt.Join("/", hits),
+            w.GetShots(),
+            StringFmt.Join(", ", tags)
+        );
+    }
+
+    return wstring;
+}

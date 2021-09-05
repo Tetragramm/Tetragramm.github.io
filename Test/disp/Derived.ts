@@ -379,56 +379,7 @@ class Derived_HTML {
         }
 
         for (let w of acft.GetWeapons().GetWeaponSets()) {
-            var ds = w.GetDirection();
-            var dirs = [];
-            for (let i = 0; i < dlist.length; i++) {
-                if (ds[i])
-                    dirs.push(lu(dlist[i]));
-            }
-            let hits = w.GetHits();
-            var tags = [lu("Weapon Tag Jam", w.GetJam())];
-            if (w.GetReload() > 0) {
-                tags.push(lu("Weapon Tag Reload", w.GetReload()));
-            }
-            if (w.GetFinalWeapon().rapid) {
-                tags.push(lu("Weapon Tag Rapid Fire"));
-            }
-            if (w.GetFinalWeapon().shells) {
-                tags.push(lu("Weapon Tag Shells"));
-            }
-            if (w.GetFinalWeapon().ap > 0) {
-                tags.push(lu("Weapon Tag AP", w.GetFinalWeapon().ap));
-            }
-            if (w.GetIsFullyAccessible()) {
-                tags.push(lu("Weapon Tag Fully Accessible"));
-            } else if (w.GetIsPartlyAccessible()) {
-                tags.push(lu("Weapon Tag Partly Accessible"));
-            }
-
-            if (w.GetProjectile() == ProjectileType.HEATRAY) {
-                let chgs = w.GetHRCharges();
-                weaphtml += lu("Weapon Description Heat Ray",
-                    lu("Seat #", w.GetSeat() + 1),
-                    w.GetWeaponCount(),
-                    this.WeaponName(acft, w),
-                    StringFmt.Join(" ", dirs),
-                    wlist[w.GetWeaponSelected()].damage,
-                    StringFmt.Join("/", hits),
-                    StringFmt.Join("/", chgs),
-                    StringFmt.Join(", ", tags)
-                );
-            } else {
-                weaphtml += lu("Weapon Description",
-                    lu("Seat #", w.GetSeat() + 1),
-                    w.GetWeaponCount(),
-                    this.WeaponName(acft, w),
-                    StringFmt.Join(" ", dirs),
-                    wlist[w.GetWeaponSelected()].damage,
-                    StringFmt.Join("/", hits),
-                    w.GetShots(),
-                    StringFmt.Join(", ", tags)
-                );
-            }
+            weaphtml += WeaponString(w, wlist, dlist);
             weaphtml += "<br\>";
         }
         this.weapon_cell.innerHTML = weaphtml;
@@ -438,42 +389,6 @@ class Derived_HTML {
             warnhtml += w.source + ":  " + w.warning + "<br/>";
         }
         this.warning_cell.innerHTML = warnhtml;
-    }
-
-    private WeaponName(acft: Aircraft, w: WeaponSystem): string {
-        var wlist = acft.GetWeapons().GetWeaponList();
-        var ds = w.GetDirection();
-        var dircount = 0;
-        for (let d of ds) {
-            if (d)
-                dircount++;
-        }
-        var name = "";
-        if (dircount == 1 && w.GetFixed())
-            name += lu("Fixed") + " ";
-        else if (dircount <= 2)
-            name += lu("Flexible") + " ";
-        else
-            name += lu("Turreted") + " ";
-
-        if (w.GetAction() == ActionType.MECHANICAL) {
-            name += lu("Weapon Tag Mechanical Action") + " ";
-        } else if (w.GetAction() == ActionType.GAST) {
-            name += lu("Weapon Tag Gast Principle") + " ";
-        } else if (w.GetAction() == ActionType.ROTARY) {
-            name += lu("Weapon Tag Rotary") + " ";
-        }
-
-        if (w.GetProjectile() == ProjectileType.HEATRAY) {
-            name += lu("Weapon Tag Heat Ray") + " ";
-        } else if (w.GetProjectile() == ProjectileType.GYROJETS) {
-            name += lu("Weapon Tag Gyrojet") + " ";
-        } else if (w.GetProjectile() == ProjectileType.PNEUMATIC) {
-            name += lu("Weapon Tag Pneumatic") + " ";
-        }
-
-        name += wlist[w.GetWeaponSelected()].abrv;
-        return name;
     }
 
     public GetName() {
