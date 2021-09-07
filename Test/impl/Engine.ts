@@ -950,7 +950,6 @@ class Engine extends Part {
         if (this.is_generator) {
             stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
             stats.power = 0;
-            stats.pitchspeed = 0;
         } else if (this.has_alternator) {
             stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
             stats.mass += 1;
@@ -958,6 +957,7 @@ class Engine extends Part {
         }
 
 
+        stats.pitchspeed = 0;
         //Reliability is a part local issue.
         stats.reliability = 0;
 

@@ -14847,6 +14847,9 @@ function WeaponTags(w) {
     else if (w.GetIsPartlyAccessible()) {
         tags.push(lu("Weapon Tag Partly Accessible"));
     }
+    else {
+        tags.push(lu("Weapon Tag Inaccessible"));
+    }
     if (fweap.deflection) {
         tags.push(lu("Weapon Tag Awkward", fweap.deflection));
     }

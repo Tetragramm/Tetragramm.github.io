@@ -1323,7 +1323,6 @@ class TurboBuilder {
         return ei;
     }
     GetPitchSpeed() {
-        console.log(this.bypass_ratio);
         if (this.bypass_ratio >= 8)
             return 1;
         if (this.bypass_ratio >= 3.5)
@@ -6079,13 +6078,13 @@ class Engine extends Part {
         if (this.is_generator) {
             stats.charge = Math.floor(1.0e-6 + 2 * stats.power / 10) + 2;
             stats.power = 0;
-            stats.pitchspeed = 0;
         }
         else if (this.has_alternator) {
             stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
             stats.mass += 1;
             stats.cost += 2;
         }
+        stats.pitchspeed = 0;
         //Reliability is a part local issue.
         stats.reliability = 0;
         return stats;
@@ -6882,7 +6881,6 @@ class Propeller extends Part {
                 }
             }
         }
-        console.log(StringFmt.Format("Pitch Speed is {0}, Pitch Boost is {1}, Energy is {2}, Turn is {3}", stats.pitchspeed, stats.pitchboost, this.GetEnergy(), this.GetTurn()));
         return stats;
     }
     SetCalculateStats(callback) {

@@ -223,7 +223,6 @@ class Propeller extends Part {
 
             }
         }
-        console.log(StringFmt.Format("Pitch Speed is {0}, Pitch Boost is {1}, Energy is {2}, Turn is {3}", stats.pitchspeed, stats.pitchboost, this.GetEnergy(), this.GetTurn()));
         return stats;
     }
 
