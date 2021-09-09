@@ -27,6 +27,7 @@ class Engine_HTML extends Display {
     private torque_input: HTMLInputElement;
     //Upgrade Elements
     private ds_input: HTMLInputElement;
+    private op_input: HTMLInputElement;
     private gp_input: HTMLInputElement;
     private gpr_input: HTMLInputElement;
     //Cowl Elements
@@ -188,15 +189,18 @@ class Engine_HTML extends Display {
 
     private InitUpgradeSelect(upg_cell: HTMLTableCellElement) {
         this.ds_input = document.createElement("INPUT") as HTMLInputElement;
+        this.op_input = document.createElement("INPUT") as HTMLInputElement;
         this.gp_input = document.createElement("INPUT") as HTMLInputElement;
         this.gpr_input = document.createElement("INPUT") as HTMLInputElement;
         var fs = CreateFlexSection(upg_cell);
         FlexCheckbox(lu("Engine Extended Driveshafts"), this.ds_input, fs);
+        FlexCheckbox(lu("Engine Outboard Propeller"), this.op_input, fs);
         FlexInput(lu("Engine Geared Propeller"), this.gp_input, fs);
         FlexInput(lu("Engine Negate Reliability Penalty"), this.gpr_input, fs);
         this.gp_input.onchange = () => { this.engine.SetGearCount(this.gp_input.valueAsNumber); };
         this.gpr_input.onchange = () => { this.engine.SetGearReliability(this.gpr_input.valueAsNumber); };
         this.ds_input.onchange = () => { this.engine.SetUseExtendedDriveshaft(this.ds_input.checked); };
+        this.op_input.onchange = () => { this.engine.SetOutboardProp(this.op_input.checked); };
 
     }
 
@@ -400,6 +404,8 @@ class Engine_HTML extends Display {
         this.torque_input.disabled = !this.engine.CanTorqueToStruct();
         this.ds_input.checked = this.engine.GetUseExtendedDriveshaft();
         this.ds_input.disabled = !this.engine.CanUseExtendedDriveshaft();
+        this.op_input.checked = this.engine.GetOutboardProp();
+        this.op_input.disabled = !this.engine.CanOutboardProp();
         this.gp_input.valueAsNumber = this.engine.GetGearCount();
         this.gp_input.disabled = !this.engine.CanUseGears();
         this.gpr_input.valueAsNumber = this.engine.GetGearReliability();

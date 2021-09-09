@@ -5282,6 +5282,8 @@ class Engine extends Part {
         this.torque_to_struct = false;
         this.cowl_list = cl;
         this.cowl_sel = 0;
+        this.use_ds = false;
+        this.outboard_prop = false;
         this.gp_count = 0;
         this.gpr_count = 0;
         this.total_reliability = 0;
@@ -5306,6 +5308,7 @@ class Engine extends Part {
             is_generator: this.is_generator,
             has_alternator: this.has_alternator,
             intake_fan: this.intake_fan,
+            outboard_prop: this.outboard_prop,
         };
     }
     oldJSON(js, json_version) {
@@ -5401,6 +5404,12 @@ class Engine extends Part {
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
         this.intake_fan = js["intake_fan"];
+        if (json_version >= 12.15) {
+            this.outboard_prop = js["outboard_prop"];
+        }
+        else {
+            this.outboard_prop = false;
+        }
     }
     serialize(s) {
         this.etype_stats.serialize(s);
@@ -5417,6 +5426,7 @@ class Engine extends Part {
         s.PushBool(this.is_generator);
         s.PushBool(this.has_alternator);
         s.PushBool(this.intake_fan);
+        s.PushBool(this.outboard_prop);
     }
     oldDeserialize(d) {
         this.etype_stats.name = d.GetString();
@@ -5514,6 +5524,12 @@ class Engine extends Part {
         this.is_generator = d.GetBool();
         this.has_alternator = d.GetBool();
         this.intake_fan = d.GetBool();
+        if (d.version >= 12.15) {
+            this.outboard_prop = d.GetBool();
+        }
+        else {
+            this.outboard_prop = false;
+        }
         this.elist_idx = elist_idx;
     }
     GetMaxAltitude() {
@@ -5601,6 +5617,21 @@ class Engine extends Part {
     }
     GetIntakeFan() {
         return this.intake_fan;
+    }
+    CanOutboardProp() {
+        return this.use_ds;
+    }
+    GetOutboardProp() {
+        return this.outboard_prop;
+    }
+    SetOutboardProp(use) {
+        if (use && this.use_ds) {
+            this.outboard_prop = true;
+        }
+        else {
+            this.outboard_prop = false;
+        }
+        this.CalculateStats();
     }
     SetSelectedList(n) {
         if (n != this.elist_idx) {
@@ -5744,6 +5775,9 @@ class Engine extends Part {
         }
         if (this.GetIntakeFan()) {
             this.total_reliability += 6;
+        }
+        if (this.outboard_prop) {
+            this.total_reliability -= 1;
         }
         this.total_reliability += num;
     }
@@ -5922,7 +5956,7 @@ class Engine extends Part {
     }
     GetTractorSpinner() {
         return {
-            has: this.IsTractor(),
+            has: this.IsTractor() && !this.outboard_prop,
             spinner: this.GetSpinner()
         };
     }
@@ -5935,12 +5969,12 @@ class Engine extends Part {
     }
     GetPusherSpinner() {
         return {
-            has: this.IsPusher(),
+            has: this.IsPusher() && !this.outboard_prop,
             spinner: this.GetSpinner()
         };
     }
     GetSpinner() {
-        if (this.gp_count > 0 && !this.GetGenerator()) {
+        if (this.gp_count > 0 && !this.GetGenerator() && !this.outboard_prop) {
             if (this.use_ds &&
                 (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
                     || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
@@ -5959,7 +5993,7 @@ class Engine extends Part {
     }
     GetEngineHeight() {
         if (!this.GetGenerator()) {
-            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_internal)
+            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_internal || this.outboard_prop)
                 return 2;
             else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
                 return 1;
@@ -6083,6 +6117,9 @@ class Engine extends Part {
             stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
             stats.mass += 1;
             stats.cost += 2;
+        }
+        if (this.outboard_prop) {
+            stats.drag += 3;
         }
         stats.pitchspeed = 0;
         //Reliability is a part local issue.
@@ -12081,6 +12118,7 @@ class Rotor extends Part {
 class Aircraft {
     constructor(js, weapon_json, storage) {
         this.use_storage = false;
+        // private alter: AlterStats;
         this.reset_json = String.raw `{"version":"11.3","name":"Basic Biplane","aircraft_type":0,"era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.9,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":0},{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1}],"ammo":1,"action":0,"projectile":0,"repeating":false}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0},"rotor":{"type":0,"rotor_count":0,"rotor_span":0,"rotor_mat":0,"is_tandem":false,"accessory":false}}`;
         this.freeze_calculation = true;
         this.stats = new Stats();
@@ -12105,7 +12143,7 @@ class Aircraft {
         this.weapons = new Weapons(weapon_json);
         this.used = new Used();
         this.rotor = new Rotor(js["rotor"]);
-        this.alter = new AlterStats();
+        // this.alter = new AlterStats();
         this.era.SetCalculateStats(() => { this.CalculateStats(); });
         this.cockpits.SetCalculateStats(() => { this.CalculateStats(); });
         this.passengers.SetCalculateStats(() => { this.CalculateStats(); });
@@ -12125,7 +12163,7 @@ class Aircraft {
         this.weapons.SetCalculateStats(() => { this.CalculateStats(); });
         this.used.SetCalculateStats(() => { this.CalculateStats(); });
         this.rotor.SetCalculateStats(() => { this.CalculateStats(); });
-        this.alter.SetCalculateStats(() => { this.CalculateStats(); });
+        // this.alter.SetCalculateStats(() => { this.CalculateStats(); });
         this.rotor.SetCantileverList(this.reinforcements.GetCantileverList());
         this.cockpits.SetNumberOfCockpits(1);
         this.engines.SetNumberOfEngines(1);
@@ -12368,7 +12406,7 @@ class Aircraft {
         stats = stats.Add(this.optimization.PartStats());
         //Has flight stress from open cockpit + tractor rotary.
         this.cockpits.SetHasRotary(this.engines.HasTractorRotary());
-        stats = stats.Add(this.alter.PartStats());
+        // stats = stats.Add(this.alter.PartStats());
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
         if (!this.updated_stats) {
@@ -12830,9 +12868,6 @@ class Aircraft {
     GetRotor() {
         return this.rotor;
     }
-    GetAlter() {
-        return this.alter;
-    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -12840,52 +12875,57 @@ class AlterStats extends Part {
     constructor() {
         super();
         this.stats = new Stats();
+        var cp_json = JSON.parse(window.localStorage.getItem('test.CustomParts'));
+        for (let elem of cp_json) {
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+        this.part_store = [];
+    }
+    AddPart(name, stats) {
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        if (idx != -1) {
+            this.custom_parts[idx].stats = stats;
+        }
+        else {
+            this.custom_parts.push({ name: name, stats: stats });
+        }
+    }
+    RemovePart(name) {
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        if (idx != -1) {
+            this.custom_parts = this.custom_parts.splice(idx, 1);
+        }
+    }
+    GetParts() {
+        return this.custom_parts;
+    }
+    GetUsedParts() {
+        return this.part_store;
+    }
+    SetUsedPart(which, idx, qty) {
+        if (which == this.part_store.length) {
+            this.part_store.push({ idx: idx, qty: qty });
+        }
+        else if (which < this.part_store.length) {
+            if (qty != 0 && idx != -1) {
+                this.part_store[which].idx = idx;
+                this.part_store[which].qty = qty;
+            }
+            else {
+                this.part_store = this.part_store.splice(which, 1);
+            }
+        }
+        else {
+            console.error("Item outside of list, got " + which.toString() + " for list of size " + this.part_store.length.toString());
+        }
     }
     PartStats() {
         var stats = new Stats();
-        if (!this.stats.liftbleed)
-            this.stats.liftbleed = 0;
-        if (!this.stats.drag)
-            this.stats.drag = 0;
-        if (!this.stats.mass)
-            this.stats.mass = 0;
-        if (!this.stats.wetmass)
-            this.stats.wetmass = 0;
-        if (!this.stats.bomb_mass)
-            this.stats.bomb_mass = 0;
-        if (!this.stats.cost)
-            this.stats.cost = 0;
-        if (!this.stats.upkeep)
-            this.stats.upkeep = 0;
-        if (!this.stats.control)
-            this.stats.control = 0;
-        if (!this.stats.pitchstab)
-            this.stats.pitchstab = 0;
-        if (!this.stats.latstab)
-            this.stats.latstab = 0;
-        if (!this.stats.wingarea)
-            this.stats.wingarea = 0;
-        if (!this.stats.maxstrain)
-            this.stats.maxstrain = 0;
-        if (!this.stats.structure)
-            this.stats.structure = 0;
-        if (!this.stats.toughness)
-            this.stats.toughness = 0;
-        if (!this.stats.power)
-            this.stats.power = 0;
-        if (!this.stats.fuelconsumption)
-            this.stats.fuelconsumption = 0;
-        if (!this.stats.fuel)
-            this.stats.fuel = 0;
-        if (!this.stats.pitchspeed)
-            this.stats.pitchspeed = 0;
-        if (!this.stats.pitchboost)
-            this.stats.pitchboost = 0;
-        if (!this.stats.charge)
-            this.stats.charge = 0;
-        if (!this.stats.crashsafety)
-            this.stats.crashsafety = 0;
-        stats = stats.Add(this.stats);
+        for (let part of this.part_store) {
+            let pstats = this.custom_parts[part.idx].stats.Clone();
+            pstats = pstats.Multiply(part.qty);
+            stats = stats.Add(pstats);
+        }
         return stats;
     }
     SetCalculateStats(callback) {
