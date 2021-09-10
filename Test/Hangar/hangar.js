@@ -2902,7 +2902,7 @@ class Engine extends Part {
         return this.intake_fan;
     }
     CanOutboardProp() {
-        return this.use_ds && this.IsTractor();
+        return this.use_ds && (this.IsTractor() && !this.use_pp);
     }
     GetOutboardProp() {
         return this.outboard_prop;

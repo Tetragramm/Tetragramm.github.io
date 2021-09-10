@@ -420,7 +420,7 @@ class Engine extends Part {
     }
 
     public CanOutboardProp() {
-        return this.use_ds && this.IsTractor();
+        return this.use_ds && (this.IsTractor() && !this.use_pp);
     }
 
     public GetOutboardProp() {
