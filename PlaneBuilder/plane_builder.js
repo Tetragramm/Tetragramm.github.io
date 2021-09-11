@@ -6452,22 +6452,41 @@ class Munitions extends Part {
     }
     LimitMass() {
         var reduce = false;
-        var allowed_internal = Math.floor(1.0e-6 + 3 * this.acft_struct * this.maxbomb);
+        var allowed_internal = Math.min(this.GetInternalBombCount(), Math.floor(1.0e-6 + 3 * this.acft_struct * this.maxbomb));
+        var ib = 0;
+        var ir = 0;
+        var eb = 0;
+        var er = 0;
         if (this.bomb_count > allowed_internal) {
-            this.rocket_count = 0;
-            reduce = true;
-            this.bomb_count = allowed_internal;
+            ib = allowed_internal;
         }
-        var internal_bombs = Math.min(this.GetInternalBombCount(), this.bomb_count);
-        var allowed_external = Math.floor(1.0e-6 + this.acft_struct * this.maxbomb - internal_bombs / 3) * this.gull_factor;
-        while (this.bomb_count + this.rocket_count > internal_bombs + allowed_external) {
-            reduce = true;
-            if (this.rocket_count > 0) {
-                this.rocket_count--;
+        else {
+            ib = this.bomb_count;
+        }
+        if (this.rocket_count + ib > allowed_internal) {
+            ir = allowed_internal - ib;
+        }
+        else {
+            ir = this.rocket_count;
+        }
+        eb = this.bomb_count - ib;
+        er = this.rocket_count - ir;
+        var allowed_external = Math.floor(1.0e-6 + this.acft_struct * this.maxbomb - (ib + ir) / 3) * this.gull_factor;
+        while (eb + er > allowed_external) {
+            if (er > 0) {
+                er--;
             }
             else {
-                this.bomb_count--;
+                eb--;
             }
+        }
+        if (this.bomb_count > ib + eb) {
+            reduce = true;
+            this.bomb_count = ib + eb;
+        }
+        if (this.rocket_count > ir + er) {
+            reduce = true;
+            this.rocket_count = ir + er;
         }
         return reduce;
     }
