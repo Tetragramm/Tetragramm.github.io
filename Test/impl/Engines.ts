@@ -343,9 +343,9 @@ class Engines extends Part {
         }
     }
 
-    public SetTailMods(forb: boolean, swr: boolean) {
+    public SetTailMods(forb: boolean, swr: boolean, canard: boolean) {
         for (let e of this.engines)
-            e.SetTailMods(forb, swr);
+            e.SetTailMods(forb, swr, canard);
     }
 
     public GetEngineHeight() {

@@ -420,7 +420,7 @@ class Engine extends Part {
     }
 
     public CanOutboardProp() {
-        return this.use_ds && (this.IsTractor() && !this.use_pp);
+        return this.use_ds && (this.IsTractor() || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull");
     }
 
     public GetOutboardProp() {
@@ -457,8 +457,10 @@ class Engine extends Part {
         return this.mount_list[this.selected_mount].reqED;
     }
 
-    public SetTailMods(forb: boolean, swr: boolean) {
+    public SetTailMods(forb: boolean, swr: boolean, canard: boolean) {
         if (this.mount_list[this.selected_mount].reqTail && !(forb || swr) && !this.GetGenerator())
+            this.use_ds = true;
+        if (this.mount_list[this.selected_mount].reqED && !this.GetGenerator() && !(canard && (forb || swr)))
             this.use_ds = true;
     }
 
@@ -534,10 +536,10 @@ class Engine extends Part {
     }
 
     public SetUseExtendedDriveshaft(use: boolean) {
-        if (!this.GetGenerator()) {
-            this.use_ds = use || this.RequiresExtendedDriveshafts();
-        } else {
+        if (this.GetGenerator() || this.is_internal) {
             this.use_ds = false;
+        } else {
+            this.use_ds = use;
         }
         this.CalculateStats();
     }
@@ -807,7 +809,7 @@ class Engine extends Part {
 
     public GetTractorSpinner() {
         return {
-            has: this.IsTractor() && !this.outboard_prop,
+            has: this.IsTractor() && (!this.outboard_prop && !this.use_pp),
             spinner: this.GetSpinner()
         };
     }
@@ -993,6 +995,9 @@ class Engine extends Part {
 
         if (this.outboard_prop) {
             stats.drag += 3;
+            if (this.use_pp) {
+                stats.escape += 2;
+            }
         }
 
 
