@@ -5958,7 +5958,7 @@ class Engine extends Part {
     }
     GetTractorSpinner() {
         return {
-            has: this.IsTractor() && (!this.outboard_prop && !this.use_pp),
+            has: this.IsTractor() && !(this.outboard_prop && !this.use_pp),
             spinner: this.GetSpinner()
         };
     }
