@@ -270,6 +270,10 @@ class Stabilizers extends Part {
         return this.vstab_list[this.vstab_sel].name == "Outboard";
     }
 
+    public GetCanard() {
+        return this.hstab_list[this.hstab_sel].is_canard;
+    }
+
     public SetWingArea(num: number) {
         this.wing_area = num;
     }

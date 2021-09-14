@@ -5326,8 +5326,10 @@ class Engine extends Part {
             return false;
         return this.mount_list[this.selected_mount].reqED;
     }
-    SetTailMods(forb, swr) {
+    SetTailMods(forb, swr, canard) {
         if (this.mount_list[this.selected_mount].reqTail && !(forb || swr) && !this.GetGenerator())
+            this.use_ds = true;
+        if (this.mount_list[this.selected_mount].reqED && !this.GetGenerator() && !(canard && (forb || swr)))
             this.use_ds = true;
     }
     CanMountIndex() {
@@ -5396,11 +5398,11 @@ class Engine extends Part {
         return !((this.GetNumPropellers() == 0) || this.is_internal || this.GetGenerator());
     }
     SetUseExtendedDriveshaft(use) {
-        if (!this.GetGenerator()) {
-            this.use_ds = use || this.RequiresExtendedDriveshafts();
+        if (this.GetGenerator() || this.is_internal) {
+            this.use_ds = false;
         }
         else {
-            this.use_ds = false;
+            this.use_ds = use;
         }
         this.CalculateStats();
     }
@@ -6247,9 +6249,9 @@ class Engines extends Part {
             r.SetMetalArea(num);
         }
     }
-    SetTailMods(forb, swr) {
+    SetTailMods(forb, swr, canard) {
         for (let e of this.engines)
-            e.SetTailMods(forb, swr);
+            e.SetTailMods(forb, swr, canard);
     }
     GetEngineHeight() {
         var min = 2;
@@ -8061,6 +8063,9 @@ class Stabilizers extends Part {
     }
     GetVOutboard() {
         return this.vstab_list[this.vstab_sel].name == "Outboard";
+    }
+    GetCanard() {
+        return this.hstab_list[this.hstab_sel].is_canard;
     }
     SetWingArea(num) {
         this.wing_area = num;
@@ -11865,7 +11870,7 @@ class Aircraft {
         stats = stats.Add(this.era.PartStats());
         stats = stats.Add(this.cockpits.PartStats());
         stats = stats.Add(this.passengers.PartStats());
-        this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard());
+        this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard(), this.stabilizers.GetCanard());
         this.engines.SetInternal(this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER || this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER);
         this.engines.SetMetalArea(this.wings.GetMetalArea());
         this.engines.HaveParasol(this.wings.GetParasol());
