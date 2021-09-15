@@ -19,6 +19,7 @@ class Engine extends Part {
 
     private intake_fan: boolean;
     private use_ds: boolean;
+    private outboard_prop: boolean;
     private gp_count: number;
     private gpr_count: number;
 
@@ -56,6 +57,8 @@ class Engine extends Part {
         this.cowl_list = cl;
         this.cowl_sel = 0;
 
+        this.use_ds = false;
+        this.outboard_prop = false;
         this.gp_count = 0;
         this.gpr_count = 0;
 
@@ -84,6 +87,7 @@ class Engine extends Part {
             is_generator: this.is_generator,
             has_alternator: this.has_alternator,
             intake_fan: this.intake_fan,
+            outboard_prop: this.outboard_prop,
         };
     }
 
@@ -181,6 +185,11 @@ class Engine extends Part {
         this.is_generator = js["is_generator"];
         this.has_alternator = js["has_alternator"];
         this.intake_fan = js["intake_fan"];
+        if (json_version >= 12.15) {
+            this.outboard_prop = js["outboard_prop"];
+        } else {
+            this.outboard_prop = false;
+        }
     }
 
     public serialize(s: Serialize) {
@@ -198,6 +207,7 @@ class Engine extends Part {
         s.PushBool(this.is_generator);
         s.PushBool(this.has_alternator);
         s.PushBool(this.intake_fan);
+        s.PushBool(this.outboard_prop);
     }
 
     private oldDeserialize(d: Deserialize): EngineInputs {
@@ -296,6 +306,11 @@ class Engine extends Part {
         this.is_generator = d.GetBool();
         this.has_alternator = d.GetBool();
         this.intake_fan = d.GetBool();
+        if (d.version >= 12.15) {
+            this.outboard_prop = d.GetBool();
+        } else {
+            this.outboard_prop = false;
+        }
 
         this.elist_idx = elist_idx;
     }
@@ -401,6 +416,23 @@ class Engine extends Part {
 
     public GetIntakeFan() {
         return this.intake_fan;
+    }
+
+    public CanOutboardProp() {
+        return this.use_ds && (this.IsTractor() || this.mount_list[this.selected_mount].name == "Fuselage Push-Pull");
+    }
+
+    public GetOutboardProp() {
+        return this.outboard_prop;
+    }
+
+    public SetOutboardProp(use: boolean) {
+        if (use && this.use_ds) {
+            this.outboard_prop = true;
+        } else {
+            this.outboard_prop = false;
+        }
+        this.CalculateStats();
     }
 
     public SetSelectedList(n: string) {
@@ -568,6 +600,9 @@ class Engine extends Part {
         if (this.GetIntakeFan()) {
             this.total_reliability += 6;
         }
+        if (this.outboard_prop) {
+            this.total_reliability -= 1;
+        }
         this.total_reliability += num;
     }
 
@@ -628,7 +663,7 @@ class Engine extends Part {
     }
 
     public GetNumPropellers() {
-        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop()) {
+        if (!(this.GetIsPulsejet() || this.GetIsTurbine() || this.GetGenerator()) || this.GetIsTurboprop() || this.is_internal) {
             if (this.use_pp) {
                 return 2;
             }
@@ -773,7 +808,7 @@ class Engine extends Part {
 
     public GetTractorSpinner() {
         return {
-            has: this.IsTractor(),
+            has: this.IsTractor() && !(this.outboard_prop && !this.use_pp),
             spinner: this.GetSpinner()
         };
     }
@@ -788,13 +823,13 @@ class Engine extends Part {
 
     public GetPusherSpinner() {
         return {
-            has: this.IsPusher(),
+            has: this.IsPusher() && !this.outboard_prop,
             spinner: this.GetSpinner()
         };
     }
 
     private GetSpinner() {
-        if (this.gp_count > 0 && !this.GetGenerator()) {
+        if (this.gp_count > 0 && !this.GetGenerator() && !this.outboard_prop) {
             if (this.use_ds &&
                 (this.mount_list[this.selected_mount].name == "Center-Mounted Tractor"
                     || this.mount_list[this.selected_mount].name == "Center-Mounted Pusher"
@@ -816,7 +851,7 @@ class Engine extends Part {
 
     public GetEngineHeight() {
         if (!this.GetGenerator()) {
-            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_internal)
+            if (this.mount_list[this.selected_mount].name == "Pod" || this.etype_stats.pulsejet || this.is_internal || this.outboard_prop)
                 return 2;
             else if (this.mount_list[this.selected_mount].name == "Nacelle (Offset)")
                 return 1;
@@ -955,6 +990,13 @@ class Engine extends Part {
             stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
             stats.mass += 1;
             stats.cost += 2;
+        }
+
+        if (this.outboard_prop) {
+            stats.drag += 3;
+            if (this.use_pp) {
+                stats.escape += 2;
+            }
         }
 
 
