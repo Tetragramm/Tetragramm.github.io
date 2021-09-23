@@ -27,10 +27,10 @@ class Stats {
     public fuel: number = 0;
     public charge: number = 0;
     public warnings: { source: string, warning: string }[] = [];
-    public era: Set<{ name: string, era: string }>;
+    public era: { name: string, era: string }[];
 
     constructor(js?: JSON) {
-        this.era = new Set<{ name: string, era: string }>();
+        this.era = [];
         if (js) {
             this.fromJSON(js, 0);
         }
@@ -128,12 +128,11 @@ class Stats {
                 source: lu(js["name"]),
                 warning: lu(js["warning"])
             });
-        this.era.clear();
         if (js["era"]) {
-            var temp = { name: "", era: "" };
-            temp.name = lu(js["name"]);
-            temp.era = lu(js["era"]);
-            this.era.add(temp);
+            this.era.push({
+                name: lu(js["name"]),
+                era: lu(js["era"])
+            });
         }
     }
 
@@ -165,6 +164,16 @@ class Stats {
         s.PushNum(this.bomb_mass);
         s.PushNum(this.fuel);
         s.PushNum(this.charge);
+        s.PushNum(this.warnings.length);
+        for (let warn of this.warnings) {
+            s.PushString(warn.source);
+            s.PushString(warn.warning);
+        }
+        s.PushNum(this.era.length);
+        for (let e of this.era) {
+            s.PushString(e.name);
+            s.PushString(e.era);
+        }
     }
 
     public deserialize(d: Deserialize) {
@@ -195,6 +204,18 @@ class Stats {
         this.bomb_mass = d.GetNum();
         this.fuel = d.GetNum();
         this.charge = d.GetNum();
+        if (d.version > 12.25) {
+            var wcount = d.GetNum();
+            this.warnings = [];
+            for (let i = 0; i < wcount; i++) {
+                this.warnings.push({ source: d.GetString(), warning: d.GetString() });
+            }
+            var ecount = d.GetNum();
+            this.era = [];
+            for (let i = 0; i < ecount; i++) {
+                this.era.push({ name: d.GetString(), era: d.GetString() });
+            }
+        }
     }
 
     public Add(other: Stats): Stats {
@@ -227,8 +248,7 @@ class Stats {
         res.fuel = this.fuel + other.fuel;
         res.charge = this.charge + other.charge;
         res.warnings = this.MergeWarnings(other.warnings);
-        this.era.forEach((v) => res.era.add(v));
-        other.era.forEach((v) => res.era.add(v));
+        res.era = this.MergeEra(other.era);
         return res;
     }
 
@@ -246,6 +266,24 @@ class Stats {
             }
             if (!dup)
                 newList.push({ source: w.source, warning: w.warning });
+        }
+        return newList;
+    }
+
+    private MergeEra(oera: { name: string, era: string }[]) {
+        var newList = [];
+        for (let w2 of this.era) {
+            newList.push({ name: w2.name, era: w2.era });
+        }
+
+        for (let w of oera) {
+            let dup = false;
+            for (let w2 of this.era) {
+                if (w.name == w2.name && w.era == w2.era)
+                    dup = true;
+            }
+            if (!dup)
+                newList.push({ name: w.name, era: w.era });
         }
         return newList;
     }
@@ -280,7 +318,7 @@ class Stats {
         res.charge = this.charge * other;
         if (Math.abs(other) > 1.0e-6) {
             res.warnings = this.warnings;
-            this.era.forEach((v) => res.era.add(v));
+            res.era = this.era;
         }
         return res;
     }

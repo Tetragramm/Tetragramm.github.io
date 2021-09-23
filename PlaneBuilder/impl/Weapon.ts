@@ -455,14 +455,14 @@ class Weapon extends Part {
                 stats.cost += this.w_count * 2;
             }
 
-            stats.era.add({ name: lu("Interruptor Gear"), era: lu("WWI") });
+            stats.era.push({ name: lu("Interruptor Gear"), era: lu("WWI") });
         } else if (this.synchronization == SynchronizationType.SYNCH && this.action != ActionType.MECHANICAL) {
             stats.cost += this.w_count * 3;
 
             if (this.weapon_type.name == "Light Machine Cannon") {
                 stats.cost += this.w_count * 3;
             }
-            stats.era.add({ name: lu("Synchronization Gear"), era: lu("Roaring 20s") });
+            stats.era.push({ name: lu("Synchronization Gear"), era: lu("Roaring 20s") });
             //synchronization == 2 is spinner and costs nothing.
         } else if (this.synchronization == SynchronizationType.DEFLECT) {
             stats.cost += 1;

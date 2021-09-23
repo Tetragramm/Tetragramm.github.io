@@ -28,7 +28,7 @@ class Stats {
         this.fuel = 0;
         this.charge = 0;
         this.warnings = [];
-        this.era = new Set();
+        this.era = [];
         if (js) {
             this.fromJSON(js, 0);
         }
@@ -124,12 +124,11 @@ class Stats {
                 source: lu(js["name"]),
                 warning: lu(js["warning"])
             });
-        this.era.clear();
         if (js["era"]) {
-            var temp = { name: "", era: "" };
-            temp.name = lu(js["name"]);
-            temp.era = lu(js["era"]);
-            this.era.add(temp);
+            this.era.push({
+                name: lu(js["name"]),
+                era: lu(js["era"])
+            });
         }
     }
     serialize(s) {
@@ -220,8 +219,7 @@ class Stats {
         res.fuel = this.fuel + other.fuel;
         res.charge = this.charge + other.charge;
         res.warnings = this.MergeWarnings(other.warnings);
-        this.era.forEach((v) => res.era.add(v));
-        other.era.forEach((v) => res.era.add(v));
+        res.era = this.MergeEra(other.era);
         return res;
     }
     MergeWarnings(owarn) {
@@ -237,6 +235,22 @@ class Stats {
             }
             if (!dup)
                 newList.push({ source: w.source, warning: w.warning });
+        }
+        return newList;
+    }
+    MergeEra(oera) {
+        var newList = [];
+        for (let w2 of this.era) {
+            newList.push({ name: w2.name, era: w2.era });
+        }
+        for (let w of oera) {
+            let dup = false;
+            for (let w2 of this.era) {
+                if (w.name == w2.name && w.era == w2.era)
+                    dup = true;
+            }
+            if (!dup)
+                newList.push({ name: w.name, era: w.era });
         }
         return newList;
     }
@@ -270,7 +284,7 @@ class Stats {
         res.charge = this.charge * other;
         if (Math.abs(other) > 1.0e-6) {
             res.warnings = this.warnings;
-            this.era.forEach((v) => res.era.add(v));
+            res.era = this.era;
         }
         return res;
     }
@@ -867,7 +881,7 @@ class EngineBuilder {
         estats.stats.cost = this.CalcCost();
         estats.pulsejet = false;
         estats.rumble = 0;
-        estats.stats.era.add({ name: this.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.era.push({ name: this.name, era: lu(num2era(this.era_sel)) });
         switch (this.compressor_type) {
             case CompressorEnum.NONE: {
                 break;
@@ -1060,7 +1074,7 @@ class PulsejetBuilder {
         estats.overspeed = 100;
         estats.altitude = 29;
         estats.pulsejet = true;
-        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
         return estats;
     }
 }
@@ -1210,7 +1224,7 @@ class TurboBuilder {
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
         estats.altitude = 59;
-        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
         return estats;
     }
 }
@@ -2867,13 +2881,20 @@ class Engine extends Part {
         if (this.GetIntakeFan()) {
             this.total_reliability += 6;
         }
-        if (this.outboard_prop) {
-            this.total_reliability -= 1;
-        }
         this.total_reliability += num;
     }
     GetReliability() {
-        return this.total_reliability;
+        if (this.use_pp) {
+            if (this.outboard_prop) {
+                return this.total_reliability.toString() + '/' + (this.total_reliability - 2).toString();
+            }
+            return this.total_reliability.toString() + '/' + this.total_reliability.toString();
+        }
+        //else
+        if (this.outboard_prop) {
+            return (this.total_reliability - 2).toString();
+        }
+        return this.total_reliability.toString();
     }
     GetOverspeed() {
         if (this.is_generator)
@@ -3122,6 +3143,9 @@ class Engine extends Part {
     PartStats() {
         this.PulseJetCheck();
         this.TurbineCheck();
+        if (!this.CanOutboardProp()) {
+            this.outboard_prop = false;
+        }
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
         stats.upkeep = stats.power / 10;
@@ -3141,10 +3165,10 @@ class Engine extends Part {
         }
         stats.cost += this.gp_count + this.gpr_count;
         if (this.gp_count > 0) {
-            stats.era.add({ name: "Propeller Gearing", era: "WWI" });
+            stats.era.push({ name: "Propeller Gearing", era: "WWI" });
         }
         if (this.gpr_count > 0) {
-            stats.era.add({ name: "Reliable Gearing", era: "Roaring 20s" });
+            stats.era.push({ name: "Reliable Gearing", era: "Roaring 20s" });
         }
         //Extended Driveshafts
         if (this.use_ds) {
@@ -3183,7 +3207,7 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.cost += 4;
-            stats.era.add({ name: "Air Cooling Fan", era: "WWII" });
+            stats.era.push({ name: "Air Cooling Fan", era: "WWII" });
         }
         else {
             this.intake_fan = false;
@@ -4306,7 +4330,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
-            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
+            stats.era.push({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;
@@ -4329,7 +4353,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
-            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
+            stats.era.push({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;
@@ -5248,7 +5272,7 @@ class Wings extends Part {
             //NOTHING...
         }
         if (this.HasInvertedGull() > 0 || this.HasPolishWing()) {
-            stats.era.add({ name: "Gull Wing", era: "Coming Storm" });
+            stats.era.push({ name: "Gull Wing", era: "Coming Storm" });
         }
         //Wing Sweep effects
         if (this.is_swept) {
@@ -6350,7 +6374,7 @@ class Fuel extends Part {
         if (this.self_sealing) {
             stats.mass += internal_count;
             stats.cost += 2 * internal_count;
-            stats.era.add({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
+            stats.era.push({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
             stats.warnings.push({
                 source: lu("Self-Sealing Gas Tank"),
                 warning: lu("Self-Sealing Gas Tank Warning")
@@ -6359,7 +6383,7 @@ class Fuel extends Part {
         if (this.fire_extinguisher) {
             stats.mass += 2;
             stats.cost += 3;
-            stats.era.add({ name: "Remote Fire Extinguisher", era: "WWII" });
+            stats.era.push({ name: "Remote Fire Extinguisher", era: "WWII" });
             stats.warnings.push({
                 source: lu("Remote Fire Extinguisher"),
                 warning: lu("Remote Fire Extinguisher Warning")
@@ -7816,14 +7840,14 @@ class Weapon extends Part {
             if (this.weapon_type.name == "Light Machine Cannon") {
                 stats.cost += this.w_count * 2;
             }
-            stats.era.add({ name: lu("Interruptor Gear"), era: lu("WWI") });
+            stats.era.push({ name: lu("Interruptor Gear"), era: lu("WWI") });
         }
         else if (this.synchronization == SynchronizationType.SYNCH && this.action != ActionType.MECHANICAL) {
             stats.cost += this.w_count * 3;
             if (this.weapon_type.name == "Light Machine Cannon") {
                 stats.cost += this.w_count * 3;
             }
-            stats.era.add({ name: lu("Synchronization Gear"), era: lu("Roaring 20s") });
+            stats.era.push({ name: lu("Synchronization Gear"), era: lu("Roaring 20s") });
             //synchronization == 2 is spinner and costs nothing.
         }
         else if (this.synchronization == SynchronizationType.DEFLECT) {
@@ -8031,8 +8055,8 @@ class WeaponSystem extends Part {
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
         this.final_weapon.jam = this.weapon_list[num].jam;
-        this.final_weapon.stats.era.clear();
-        this.final_weapon.stats.era.add({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
+        this.final_weapon.stats.era = [];
+        this.final_weapon.stats.era.push({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
         if (this.weapon_list[num].hits == 0) {
             if (this.action_sel == ActionType.MECHANICAL) {
                 this.action_sel = ActionType.STANDARD;
@@ -8056,7 +8080,7 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = true;
-            this.final_weapon.stats.era.add({ name: lu("Mechanical Action"), era: lu("WWI") });
+            this.final_weapon.stats.era.push({ name: lu("Mechanical Action"), era: lu("WWI") });
         }
         else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
@@ -8064,7 +8088,7 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = false;
-            this.final_weapon.stats.era.add({ name: lu("Gast Principle"), era: lu("WWI") });
+            this.final_weapon.stats.era.push({ name: lu("Gast Principle"), era: lu("WWI") });
         }
         else if (this.action_sel == ActionType.ROTARY) {
             //rotary conversion
@@ -8080,7 +8104,7 @@ class WeaponSystem extends Part {
             jams[0] = "9999";
             jams[1] = (parseInt(jams[1]) + 1).toString();
             this.final_weapon.jam = jams.join('/');
-            this.final_weapon.stats.era.add({ name: lu("Rotary_Gun"), era: lu("WWI") });
+            this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
         if (this.repeating) {
             this.final_weapon.reload = 0;
@@ -8104,7 +8128,7 @@ class WeaponSystem extends Part {
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
             });
-            this.final_weapon.stats.era.add({ name: lu("Heat Ray"), era: lu("Himmilgard") });
+            this.final_weapon.stats.era.push({ name: lu("Heat Ray"), era: lu("Himmilgard") });
         }
         else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
@@ -8114,7 +8138,7 @@ class WeaponSystem extends Part {
                 source: lu("Gyrojets"),
                 warning: lu("Gyrojets Warning"),
             });
-            this.final_weapon.stats.era.add({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
+            this.final_weapon.stats.era.push({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
         }
         else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.final_weapon.ammo *= 2;
@@ -8127,7 +8151,7 @@ class WeaponSystem extends Part {
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 1"),
                 });
-                this.final_weapon.stats.era.add({ name: lu("Pneumatic"), era: lu("Pioneer") });
+                this.final_weapon.stats.era.push({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
             if (this.final_weapon.hits > 0) {
                 this.final_weapon.stats.warnings.push({
@@ -14943,6 +14967,13 @@ function WeaponString(w, wlist, dlist) {
     }
     return wstring;
 }
+var ENGINE_TEXT;
+(function (ENGINE_TEXT) {
+    ENGINE_TEXT[ENGINE_TEXT["SINGLE"] = 0] = "SINGLE";
+    ENGINE_TEXT[ENGINE_TEXT["PUSHER"] = 1] = "PUSHER";
+    ENGINE_TEXT[ENGINE_TEXT["PULLER"] = 2] = "PULLER";
+})(ENGINE_TEXT || (ENGINE_TEXT = {}));
+;
 class Cards {
     constructor() {
         this.dash_canvas = document.createElement("CANVAS");
@@ -15035,7 +15066,7 @@ class Cards {
             gyrojet: false,
         };
         this.eng_data = {
-            reliability: 0,
+            reliability: "0",
             min_IAF: 0,
             altitude: 0,
             overspeed: 0,
@@ -15195,7 +15226,7 @@ class Cards {
         context.fillText(tags, 90, 276, 350);
         this.download(this.name + "_Weapon_" + weapon_num.toString(), this.weap_canvas);
     }
-    SaveEngine(engine_num) {
+    SaveEngine(engine_num, text = ENGINE_TEXT.SINGLE) {
         engine_num++;
         var context = this.eng_canvas.getContext("2d");
         context.clearRect(0, 0, this.eng_canvas.width, this.eng_canvas.height);
@@ -15204,7 +15235,7 @@ class Cards {
         context.font = "18px Balthazar";
         context.fillStyle = "#000";
         context.strokeStyle = "#000";
-        context.fillText(this.eng_data.reliability.toString(), 235, 75, 110);
+        context.fillText(this.eng_data.reliability, 235, 75, 110);
         var alt_string = this.eng_data.min_IAF.toString() + "-" + (this.eng_data.min_IAF + this.eng_data.altitude).toString();
         context.fillText(alt_string, 347, 75, 110);
         context.fillText(this.eng_data.overspeed.toString(), 480, 75, 110);
@@ -15223,7 +15254,17 @@ class Cards {
         context.fillStyle = "#fff";
         context.strokeStyle = "#fff";
         context.fillText("#" + engine_num.toString(), 37, 67, 35);
-        this.download(this.name + "_Engine_" + engine_num.toString(), this.eng_canvas);
+        switch (text) {
+            case ENGINE_TEXT.SINGLE:
+                this.download(this.name + "_Engine_" + engine_num.toString(), this.eng_canvas);
+                break;
+            case ENGINE_TEXT.PUSHER:
+                this.download(this.name + "_Engine_" + engine_num.toString() + "_Pusher", this.eng_canvas);
+                break;
+            case ENGINE_TEXT.PULLER:
+                this.download(this.name + "_Engine_" + engine_num.toString() + "_Puller", this.eng_canvas);
+                break;
+        }
     }
     SaveRadiator(radiator_num) {
         radiator_num++;
@@ -15712,8 +15753,19 @@ class Aircraft_HTML extends Display {
             this.cards.SaveWeapon(i);
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            this.UpdateEngineCard(this.acft.GetEngines().GetEngine(i));
-            this.cards.SaveEngine(i);
+            let e = this.acft.GetEngines().GetEngine(i);
+            this.UpdateEngineCard(e);
+            if (e.GetUsePushPull()) {
+                var rely = this.cards.eng_data.reliability;
+                var rely2 = rely.split('/');
+                this.cards.eng_data.reliability = rely2[0].toString();
+                this.cards.SaveEngine(i, ENGINE_TEXT.PULLER);
+                this.cards.eng_data.reliability = rely2[0].toString();
+                this.cards.SaveEngine(i, ENGINE_TEXT.PUSHER);
+            }
+            else {
+                this.cards.SaveEngine(i);
+            }
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
             this.UpdateRadiatorCard(this.acft.GetEngines().GetRadiator(i));
@@ -15895,7 +15947,17 @@ class Aircraft_HTML extends Display {
                 }
             }
             engine_state.notes = StringFmt.Join(", ", notes);
-            engines.push(JSON.stringify(engine_state));
+            if (e.GetUsePushPull()) {
+                var rely = engine_state.reliability;
+                var rely2 = rely.split('/');
+                engine_state.reliability = rely2[0].toString();
+                engines.push(JSON.stringify(engine_state));
+                engine_state.reliability = rely2[0].toString();
+                engines.push(JSON.stringify(engine_state));
+            }
+            else {
+                engines.push(JSON.stringify(engine_state));
+            }
         }
         return engines;
     }

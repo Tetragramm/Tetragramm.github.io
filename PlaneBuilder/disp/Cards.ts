@@ -1,3 +1,8 @@
+enum ENGINE_TEXT {
+    SINGLE,
+    PUSHER,
+    PULLER,
+};
 class Cards {
     private dash_canvas: HTMLCanvasElement;
     private dash_image: HTMLImageElement;
@@ -69,7 +74,7 @@ class Cards {
     }
 
     public eng_data: {
-        reliability: number,
+        reliability: string,
         min_IAF: number,
         altitude: number,
         overspeed: number,
@@ -183,7 +188,7 @@ class Cards {
         }
 
         this.eng_data = {
-            reliability: 0,
+            reliability: "0",
             min_IAF: 0,
             altitude: 0,
             overspeed: 0,
@@ -373,7 +378,8 @@ class Cards {
         this.download(this.name + "_Weapon_" + weapon_num.toString(), this.weap_canvas);
     }
 
-    public SaveEngine(engine_num: number) {
+
+    public SaveEngine(engine_num: number, text: ENGINE_TEXT = ENGINE_TEXT.SINGLE) {
         engine_num++;
         var context = this.eng_canvas.getContext("2d");
 
@@ -385,7 +391,7 @@ class Cards {
         context.font = "18px Balthazar";
         context.fillStyle = "#000";
         context.strokeStyle = "#000";
-        context.fillText(this.eng_data.reliability.toString(), 235, 75, 110);
+        context.fillText(this.eng_data.reliability, 235, 75, 110);
         var alt_string = this.eng_data.min_IAF.toString() + "-" + (this.eng_data.min_IAF + this.eng_data.altitude).toString();
         context.fillText(alt_string, 347, 75, 110);
         context.fillText(this.eng_data.overspeed.toString(), 480, 75, 110);
@@ -408,7 +414,17 @@ class Cards {
         context.strokeStyle = "#fff";
         context.fillText("#" + engine_num.toString(), 37, 67, 35);
 
-        this.download(this.name + "_Engine_" + engine_num.toString(), this.eng_canvas);
+        switch (text) {
+            case ENGINE_TEXT.SINGLE:
+                this.download(this.name + "_Engine_" + engine_num.toString(), this.eng_canvas);
+                break;
+            case ENGINE_TEXT.PUSHER:
+                this.download(this.name + "_Engine_" + engine_num.toString() + "_Pusher", this.eng_canvas);
+                break;
+            case ENGINE_TEXT.PULLER:
+                this.download(this.name + "_Engine_" + engine_num.toString() + "_Puller", this.eng_canvas);
+                break;
+        }
     }
 
     public SaveRadiator(radiator_num: number) {

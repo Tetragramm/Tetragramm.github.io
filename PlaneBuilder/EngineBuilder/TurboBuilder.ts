@@ -180,7 +180,7 @@ class TurboBuilder {
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
         estats.altitude = 59;
-        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
 
         return estats;
     }

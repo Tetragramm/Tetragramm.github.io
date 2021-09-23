@@ -47,7 +47,11 @@ class EngineList {
         }
 
         for (let elem of js["engines"]) {
-            this.push(new EngineInputs(elem), force);
+            try {
+                this.push(new EngineInputs(elem), force);
+            } catch (e) {
+                console.error(e);
+            }
         }
     }
 

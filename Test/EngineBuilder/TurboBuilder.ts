@@ -142,6 +142,7 @@ class TurboBuilder {
         this.diameter = Math.max(0.1, this.diameter);
         this.compression_ratio = Math.max(1, this.compression_ratio);
         this.bypass_ratio = Math.max(0, this.bypass_ratio);
+        this.bypass_ratio = Math.min(20, this.bypass_ratio);
         if (this.type_sel > 2) {
             this.afterburner = false;
         }
@@ -189,7 +190,7 @@ class TurboBuilder {
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
         estats.altitude = 59;
-        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
         estats.stats.pitchspeed = this.GetPitchSpeed();
 
         return estats;

@@ -437,7 +437,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
-            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
+            stats.era.push({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;
@@ -464,7 +464,7 @@ class Frames extends Part {
         if (sec.geodesic) {
             stats.structure *= 1.5;
             stats.cost *= 2;
-            stats.era.add({ name: "Geodesic", era: "Coming Storm" });
+            stats.era.push({ name: "Geodesic", era: "Coming Storm" });
         }
         if (sec.lifting_body) {
             stats.wingarea += 3;

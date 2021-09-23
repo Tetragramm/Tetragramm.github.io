@@ -906,7 +906,8 @@
                 "name": "Tailless",
                 "era": "Pioneer",
                 "reqsections": 0,
-                "pitchstab": -4
+                "pitchstab": -4,
+                "visibility": 3
             },
             {
                 "name": "Stubby",

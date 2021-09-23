@@ -180,6 +180,13 @@ option {
     text-align:initial;
 }
 
+input[type=text] {
+	width: auto; 
+	box-sizing: border-box;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing: border-box;
+}
+
 input[type=number] {
 	width:4em;
 	text-align: center;

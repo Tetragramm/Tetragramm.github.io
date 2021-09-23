@@ -141,7 +141,7 @@ class PulsejetBuilder {
         estats.overspeed = 100;
         estats.altitude = 29;
         estats.pulsejet = true;
-        estats.stats.era.add({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
 
         return estats;
     }

@@ -343,7 +343,6 @@ class Aircraft_HTML extends Display {
                 }
             }
         }
-
     }
 
     private UpdateRadiatorCard(r: Radiator) {
@@ -550,11 +549,22 @@ class Aircraft_HTML extends Display {
         var wsetlist = this.acft.GetWeapons().GetWeaponSets();
         for (let i = 0; i < wsetlist.length; i++) {
             this.UpdateWeaponCard(wsetlist[i]);
-            this.cards.SaveWeapon(i)
+            this.cards.SaveWeapon(i);
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            this.UpdateEngineCard(this.acft.GetEngines().GetEngine(i));
-            this.cards.SaveEngine(i);
+            let e = this.acft.GetEngines().GetEngine(i);
+            this.UpdateEngineCard(e);
+
+            if (e.GetUsePushPull()) {
+                var rely = this.cards.eng_data.reliability;
+                var rely2 = rely.split('/');
+                this.cards.eng_data.reliability = rely2[0].toString();
+                this.cards.SaveEngine(i, ENGINE_TEXT.PULLER);
+                this.cards.eng_data.reliability = rely2[0].toString();
+                this.cards.SaveEngine(i, ENGINE_TEXT.PUSHER);
+            } else {
+                this.cards.SaveEngine(i);
+            }
         }
         for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
             this.UpdateRadiatorCard(this.acft.GetEngines().GetRadiator(i));
@@ -744,7 +754,16 @@ class Aircraft_HTML extends Display {
                 }
             }
             engine_state.notes = StringFmt.Join(", ", notes);
-            engines.push(JSON.stringify(engine_state));
+            if (e.GetUsePushPull()) {
+                var rely = engine_state.reliability;
+                var rely2 = rely.split('/');
+                engine_state.reliability = rely2[0].toString();
+                engines.push(JSON.stringify(engine_state));
+                engine_state.reliability = rely2[0].toString();
+                engines.push(JSON.stringify(engine_state));
+            } else {
+                engines.push(JSON.stringify(engine_state));
+            }
         }
         return engines;
     }

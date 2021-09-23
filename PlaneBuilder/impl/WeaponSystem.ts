@@ -233,8 +233,8 @@ class WeaponSystem extends Part {
         this.final_weapon.stats = this.weapon_list[num].stats.Clone();
         this.final_weapon.deflection = this.weapon_list[num].deflection;
         this.final_weapon.jam = this.weapon_list[num].jam;
-        this.final_weapon.stats.era.clear();
-        this.final_weapon.stats.era.add({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
+        this.final_weapon.stats.era = [];
+        this.final_weapon.stats.era.push({ name: this.weapon_list[num].name, era: this.weapon_list[num].era });
 
         if (this.weapon_list[num].hits == 0) {
             if (this.action_sel == ActionType.MECHANICAL) {
@@ -259,14 +259,14 @@ class WeaponSystem extends Part {
             this.final_weapon.rapid = true;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = true;
-            this.final_weapon.stats.era.add({ name: lu("Mechanical Action"), era: lu("WWI") });
+            this.final_weapon.stats.era.push({ name: lu("Mechanical Action"), era: lu("WWI") });
         } else if (this.action_sel == ActionType.GAST) {
             this.final_weapon.hits = 2 * this.weapon_list[num].hits;
             this.final_weapon.ammo = this.weapon_list[num].ammo / 2;
             this.final_weapon.rapid = this.weapon_list[num].rapid;
             this.final_weapon.stats.cost += this.weapon_list[num].stats.cost;
             this.final_weapon.synched = false;
-            this.final_weapon.stats.era.add({ name: lu("Gast Principle"), era: lu("WWI") });
+            this.final_weapon.stats.era.push({ name: lu("Gast Principle"), era: lu("WWI") });
         } else if (this.action_sel == ActionType.ROTARY) {
             //rotary conversion
             //3x hits, awkward + 1(don't know if that's easy to do? Otherwise I may reconsider), can only rapid fire, weapon becomes open bolt but can fire down the spinner, +1 jam, +100 % mass, +100 % cost
@@ -282,7 +282,7 @@ class WeaponSystem extends Part {
             jams[0] = "9999";
             jams[1] = (parseInt(jams[1]) + 1).toString();
             this.final_weapon.jam = jams.join('/');
-            this.final_weapon.stats.era.add({ name: lu("Rotary_Gun"), era: lu("WWI") });
+            this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
 
         if (this.repeating) {
@@ -310,7 +310,7 @@ class WeaponSystem extends Part {
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
             });
-            this.final_weapon.stats.era.add({ name: lu("Heat Ray"), era: lu("Himmilgard") });
+            this.final_weapon.stats.era.push({ name: lu("Heat Ray"), era: lu("Himmilgard") });
         } else if (this.projectile_sel == ProjectileType.GYROJETS) {
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
             this.final_weapon.shells = false;
@@ -319,7 +319,7 @@ class WeaponSystem extends Part {
                 source: lu("Gyrojets"),
                 warning: lu("Gyrojets Warning"),
             });
-            this.final_weapon.stats.era.add({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
+            this.final_weapon.stats.era.push({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
         } else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.final_weapon.ammo *= 2;
             this.final_weapon.shells = false;
@@ -331,7 +331,7 @@ class WeaponSystem extends Part {
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 1"),
                 });
-                this.final_weapon.stats.era.add({ name: lu("Pneumatic"), era: lu("Pioneer") });
+                this.final_weapon.stats.era.push({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
             if (this.final_weapon.hits > 0) {
                 this.final_weapon.stats.warnings.push({

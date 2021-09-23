@@ -186,7 +186,7 @@ class Fuel extends Part {
         if (this.self_sealing) {
             stats.mass += internal_count;
             stats.cost += 2 * internal_count;
-            stats.era.add({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
+            stats.era.push({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
             stats.warnings.push({
                 source: lu("Self-Sealing Gas Tank"),
                 warning: lu("Self-Sealing Gas Tank Warning")
@@ -196,7 +196,7 @@ class Fuel extends Part {
         if (this.fire_extinguisher) {
             stats.mass += 2;
             stats.cost += 3;
-            stats.era.add({ name: "Remote Fire Extinguisher", era: "WWII" });
+            stats.era.push({ name: "Remote Fire Extinguisher", era: "WWII" });
             stats.warnings.push({
                 source: lu("Remote Fire Extinguisher"),
                 warning: lu("Remote Fire Extinguisher Warning")

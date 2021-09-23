@@ -131,7 +131,7 @@ class ElectricBuilder {
         estats.stats.cost = this.CalcCost();
         estats.pulsejet = false;
         estats.rumble = 0;
-        estats.stats.era.add({ name: this.name, era: lu(num2era(this.era_sel)) });
+        estats.stats.era.push({ name: this.name, era: lu(num2era(this.era_sel)) });
 
         return estats;
     }

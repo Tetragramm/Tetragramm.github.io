@@ -601,14 +601,21 @@ class Engine extends Part {
         if (this.GetIntakeFan()) {
             this.total_reliability += 6;
         }
-        if (this.outboard_prop) {
-            this.total_reliability -= 1;
-        }
         this.total_reliability += num;
     }
 
-    public GetReliability(): number {
-        return this.total_reliability;
+    public GetReliability() {
+        if (this.use_pp) {
+            if (this.outboard_prop) {
+                return this.total_reliability.toString() + '/' + (this.total_reliability - 2).toString();
+            }
+            return this.total_reliability.toString() + '/' + this.total_reliability.toString();
+        }
+        //else
+        if (this.outboard_prop) {
+            return (this.total_reliability - 2).toString();
+        }
+        return this.total_reliability.toString();
     }
 
     public GetOverspeed(): number {
@@ -894,6 +901,9 @@ class Engine extends Part {
     public PartStats(): Stats {
         this.PulseJetCheck();
         this.TurbineCheck();
+        if (!this.CanOutboardProp()) {
+            this.outboard_prop = false;
+        }
         let stats = new Stats;
         stats = stats.Add(this.etype_stats.stats);
 
@@ -917,10 +927,10 @@ class Engine extends Part {
         }
         stats.cost += this.gp_count + this.gpr_count;
         if (this.gp_count > 0) {
-            stats.era.add({ name: "Propeller Gearing", era: "WWI" });
+            stats.era.push({ name: "Propeller Gearing", era: "WWI" });
         }
         if (this.gpr_count > 0) {
-            stats.era.add({ name: "Reliable Gearing", era: "Roaring 20s" });
+            stats.era.push({ name: "Reliable Gearing", era: "Roaring 20s" });
         }
 
         //Extended Driveshafts
@@ -964,7 +974,7 @@ class Engine extends Part {
             stats.structure *= 2;
             stats.maxstrain *= 2;
             stats.cost += 4;
-            stats.era.add({ name: "Air Cooling Fan", era: "WWII" });
+            stats.era.push({ name: "Air Cooling Fan", era: "WWII" });
         }
         else {
             this.intake_fan = false;

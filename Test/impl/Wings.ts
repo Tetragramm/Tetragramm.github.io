@@ -825,7 +825,7 @@ class Wings extends Part {
             //NOTHING...
         }
         if (this.HasInvertedGull() > 0 || this.HasPolishWing()) {
-            stats.era.add({ name: "Gull Wing", era: "Coming Storm" });
+            stats.era.push({ name: "Gull Wing", era: "Coming Storm" });
         }
 
         //Wing Sweep effects

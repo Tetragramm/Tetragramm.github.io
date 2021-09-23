@@ -2,58 +2,119 @@
 /// <reference path="./Stats.ts" />
 
 class AlterStats extends Part {
-    public stats: Stats;
+    public custom_parts: { name: string, stats: Stats }[];
+    private part_store: { idx: number, qty: number }[];
 
     constructor() {
         super();
-        this.stats = new Stats();
+        var cp_json = JSON.parse(window.localStorage.getItem('test.CustomParts'));
+        if (!cp_json) {
+            cp_json = [];
+            window.localStorage.setItem('test.CustomParts', JSON.stringify([]));
+        }
+        for (let elem of cp_json) {
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem) });
+        }
+
+        this.part_store = [];
+    }
+
+    public toJSON() {
+        var plist = [];
+        for (let p of this.part_store) {
+            plist.push({ name: this.custom_parts[p.idx].name, stats: this.custom_parts[p.idx].stats.toJSON(), qty: p.qty });
+        }
+        return {
+            part_list: plist,
+        };
+    }
+
+    public fromJSON(js: JSON, json_version: number) {
+        this.part_store = [];
+        for (let elem of js["part_list"]) {
+            var idx = this.custom_parts.findIndex((value) => { return value.name == elem["name"]; });
+            if (idx == -1) {
+                idx = this.custom_parts.length;
+                this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]) });
+            }
+            this.part_store.push({ idx: idx, qty: elem["qty"] });
+        }
+    }
+
+    public serialize(s: Serialize) {
+        s.PushNum(this.part_store.length);
+        for (let p of this.part_store) {
+            s.PushString(this.custom_parts[p.idx].name);
+            this.custom_parts[p.idx].stats.serialize(s);
+            s.PushNum(p.qty);
+        }
+    }
+
+    public deserialize(d: Deserialize) {
+        this.part_store = [];
+        var pcount = d.GetNum();
+        for (let i = 0; i < pcount; i++) {
+            let name = d.GetString();
+            let stats = new Stats();
+            stats.deserialize(d);
+            let qty = d.GetNum();
+
+            var idx = this.custom_parts.findIndex((value) => { return value.name == name; });
+            if (idx == -1) {
+                idx = this.custom_parts.length;
+                this.custom_parts.push({ name: name, stats: stats });
+            }
+            this.part_store.push({ idx: idx, qty: qty });
+        }
+    }
+
+
+    public AddPart(name: string, stats: Stats) {
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        if (idx != -1) {
+            this.custom_parts[idx].stats = stats;
+        } else {
+            this.custom_parts.push({ name: name, stats: stats });
+        }
+    }
+
+    public RemovePart(name: string) {
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        if (idx != -1) {
+            this.custom_parts = this.custom_parts.splice(idx, 1);
+        }
+    }
+
+    public GetParts() {
+        return this.custom_parts;
+    }
+
+    public GetUsedParts() {
+        return this.part_store;
+    }
+
+    public SetUsedPart(which: number, idx: number, qty: number) {
+        if (which == this.part_store.length) {
+            this.part_store.push({ idx: idx, qty: qty });
+        } else if (which < this.part_store.length) {
+            if (qty != 0 && idx != -1) {
+                this.part_store[which].idx = idx;
+                this.part_store[which].qty = qty;
+            } else {
+                this.part_store = this.part_store.splice(which, 1);
+            }
+        } else {
+            console.error("Item outside of list, got " + which.toString() + " for list of size " + this.part_store.length.toString());
+        }
     }
 
     public PartStats(): Stats {
         var stats = new Stats();
-        if (!this.stats.liftbleed)
-            this.stats.liftbleed = 0;
-        if (!this.stats.drag)
-            this.stats.drag = 0;
-        if (!this.stats.mass)
-            this.stats.mass = 0;
-        if (!this.stats.wetmass)
-            this.stats.wetmass = 0;
-        if (!this.stats.bomb_mass)
-            this.stats.bomb_mass = 0;
-        if (!this.stats.cost)
-            this.stats.cost = 0;
-        if (!this.stats.upkeep)
-            this.stats.upkeep = 0;
-        if (!this.stats.control)
-            this.stats.control = 0;
-        if (!this.stats.pitchstab)
-            this.stats.pitchstab = 0;
-        if (!this.stats.latstab)
-            this.stats.latstab = 0;
-        if (!this.stats.wingarea)
-            this.stats.wingarea = 0;
-        if (!this.stats.maxstrain)
-            this.stats.maxstrain = 0;
-        if (!this.stats.structure)
-            this.stats.structure = 0;
-        if (!this.stats.toughness)
-            this.stats.toughness = 0;
-        if (!this.stats.power)
-            this.stats.power = 0;
-        if (!this.stats.fuelconsumption)
-            this.stats.fuelconsumption = 0;
-        if (!this.stats.fuel)
-            this.stats.fuel = 0;
-        if (!this.stats.pitchspeed)
-            this.stats.pitchspeed = 0;
-        if (!this.stats.pitchboost)
-            this.stats.pitchboost = 0;
-        if (!this.stats.charge)
-            this.stats.charge = 0;
-        if (!this.stats.crashsafety)
-            this.stats.crashsafety = 0;
-        stats = stats.Add(this.stats);
+        for (let part of this.part_store) {
+            let pstats = this.custom_parts[part.idx].stats.Clone();
+            pstats = pstats.Multiply(part.qty);
+            stats = stats.Add(pstats);
+        }
         return stats;
     }
 
