@@ -184,6 +184,7 @@ function CreateButton(txt, elem, table, br = true) {
     var txtSpan = document.createElement("LABEL");
     elem.hidden = true;
     elem.id = GenerateID();
+    elem.textContent = txt;
     txtSpan.htmlFor = elem.id;
     txtSpan.style.marginLeft = "0.25em";
     txtSpan.style.marginRight = "0.5em";
@@ -202,6 +203,7 @@ function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
+    lbl.id = GenerateID();
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
     lbl.textContent = txt;

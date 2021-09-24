@@ -413,7 +413,7 @@ class Aircraft {
         //Has flight stress from open cockpit + tractor rotary.
         this.cockpits.SetHasRotary(this.engines.HasTractorRotary());
 
-        // stats = stats.Add(this.alter.PartStats());
+        stats = stats.Add(this.alter.PartStats());
 
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();

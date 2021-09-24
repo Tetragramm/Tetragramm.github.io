@@ -965,6 +965,7 @@ class Aircraft_HTML extends Display {
         this.weapons.UpdateDisplay();
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
+        this.alter.UpdateDisplay();
 
         this.UpdateStats(stats);
         this.UpdateDerived(stats, derived_stats);

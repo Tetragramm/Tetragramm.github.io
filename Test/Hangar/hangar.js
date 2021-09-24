@@ -10147,7 +10147,7 @@ class Aircraft {
         stats = stats.Add(this.optimization.PartStats());
         //Has flight stress from open cockpit + tractor rotary.
         this.cockpits.SetHasRotary(this.engines.HasTractorRotary());
-        // stats = stats.Add(this.alter.PartStats());
+        stats = stats.Add(this.alter.PartStats());
         //Have to round after optimizations, because otherwise it's wrong.
         stats.Round();
         if (!this.updated_stats) {
@@ -10799,6 +10799,7 @@ function CreateButton(txt, elem, table, br = true) {
     var txtSpan = document.createElement("LABEL");
     elem.hidden = true;
     elem.id = GenerateID();
+    elem.textContent = txt;
     txtSpan.htmlFor = elem.id;
     txtSpan.style.marginLeft = "0.25em";
     txtSpan.style.marginRight = "0.5em";
@@ -10817,6 +10818,7 @@ function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
+    lbl.id = GenerateID();
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
     lbl.textContent = txt;
@@ -12464,41 +12466,55 @@ class AlterStats extends Part {
             cp_json = [];
             window.localStorage.setItem('test.CustomParts', JSON.stringify([]));
         }
+        this.custom_parts = [];
         for (let elem of cp_json) {
-            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem) });
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem), qty: 0 });
         }
-        this.part_store = [];
     }
     toJSON() {
         var plist = [];
-        for (let p of this.part_store) {
-            plist.push({ name: this.custom_parts[p.idx].name, stats: this.custom_parts[p.idx].stats.toJSON(), qty: p.qty });
+        var plist_save = [];
+        for (let p of this.custom_parts) {
+            plist_save.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+            if (p.qty > 0)
+                plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
         }
+        window.localStorage.setItem('test.CustomParts', JSON.stringify(plist_save));
         return {
             part_list: plist,
         };
     }
     fromJSON(js, json_version) {
-        this.part_store = [];
+        for (let p of this.custom_parts) {
+            p.qty = 0;
+        }
         for (let elem of js["part_list"]) {
             var idx = this.custom_parts.findIndex((value) => { return value.name == elem["name"]; });
             if (idx == -1) {
-                idx = this.custom_parts.length;
-                this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]) });
+                this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: elem["qty"] });
             }
-            this.part_store.push({ idx: idx, qty: elem["qty"] });
+            else {
+                this.custom_parts[idx].qty = elem["qty"];
+            }
         }
     }
     serialize(s) {
-        s.PushNum(this.part_store.length);
-        for (let p of this.part_store) {
-            s.PushString(this.custom_parts[p.idx].name);
-            this.custom_parts[p.idx].stats.serialize(s);
+        var plist = [];
+        for (let p of this.custom_parts) {
+            if (p.qty > 0)
+                plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+        }
+        s.PushNum(plist.length);
+        for (let p of plist) {
+            s.PushString(p.name);
+            p.stats.serialize(s);
             s.PushNum(p.qty);
         }
     }
     deserialize(d) {
-        this.part_store = [];
+        for (let p of this.custom_parts) {
+            p.qty = 0;
+        }
         var pcount = d.GetNum();
         for (let i = 0; i < pcount; i++) {
             let name = d.GetString();
@@ -12508,53 +12524,72 @@ class AlterStats extends Part {
             var idx = this.custom_parts.findIndex((value) => { return value.name == name; });
             if (idx == -1) {
                 idx = this.custom_parts.length;
-                this.custom_parts.push({ name: name, stats: stats });
+                this.custom_parts.push({ name: name, stats: stats, qty: qty });
             }
-            this.part_store.push({ idx: idx, qty: qty });
+            else {
+                this.custom_parts[idx].qty = qty;
+            }
         }
     }
     AddPart(name, stats) {
+        var sumstats = 0;
+        sumstats += Math.abs(stats.drag);
+        sumstats += Math.abs(stats.mass);
+        sumstats += Math.abs(stats.wetmass);
+        sumstats += Math.abs(stats.bomb_mass);
+        sumstats += Math.abs(stats.cost);
+        sumstats += Math.abs(stats.upkeep);
+        sumstats += Math.abs(stats.liftbleed);
+        sumstats += Math.abs(stats.wingarea);
+        sumstats += Math.abs(stats.control);
+        sumstats += Math.abs(stats.pitchstab);
+        sumstats += Math.abs(stats.latstab);
+        sumstats += Math.abs(stats.maxstrain);
+        sumstats += Math.abs(stats.structure);
+        sumstats += Math.abs(stats.toughness);
+        sumstats += Math.abs(stats.power);
+        sumstats += Math.abs(stats.fuelconsumption);
+        sumstats += Math.abs(stats.fuel);
+        sumstats += Math.abs(stats.charge);
+        sumstats += Math.abs(stats.crashsafety);
+        sumstats += Math.abs(stats.visibility);
+        sumstats += Math.abs(stats.escape);
+        sumstats += Math.abs(stats.warnings.length);
+        if (sumstats == 0) {
+            return;
+        }
         var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
         if (idx != -1) {
             this.custom_parts[idx].stats = stats;
         }
         else {
-            this.custom_parts.push({ name: name, stats: stats });
+            this.custom_parts.push({ name: name, stats: stats, qty: 0 });
         }
+        this.custom_parts.sort((a, b) => a.name.localeCompare(b.name));
+        this.CalculateStats();
     }
     RemovePart(name) {
+        console.log(name);
+        console.log(this.custom_parts.length);
         var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        console.log(idx);
         if (idx != -1) {
-            this.custom_parts = this.custom_parts.splice(idx, 1);
+            this.custom_parts.splice(idx, 1);
         }
+        console.log(this.custom_parts.length);
+        this.CalculateStats();
     }
     GetParts() {
         return this.custom_parts;
     }
-    GetUsedParts() {
-        return this.part_store;
-    }
-    SetUsedPart(which, idx, qty) {
-        if (which == this.part_store.length) {
-            this.part_store.push({ idx: idx, qty: qty });
-        }
-        else if (which < this.part_store.length) {
-            if (qty != 0 && idx != -1) {
-                this.part_store[which].idx = idx;
-                this.part_store[which].qty = qty;
-            }
-            else {
-                this.part_store = this.part_store.splice(which, 1);
-            }
-        }
-        else {
-            console.error("Item outside of list, got " + which.toString() + " for list of size " + this.part_store.length.toString());
-        }
+    SetUsedPart(idx, qty) {
+        this.custom_parts[idx].qty = qty;
+        this.CalculateStats();
     }
     PartStats() {
         var stats = new Stats();
-        for (let part of this.part_store) {
-            let pstats = this.custom_parts[part.idx].stats.Clone();
+        for (let part of this.custom_parts) {
+            let pstats = part.stats.Clone();
             pstats = pstats.Multiply(part.qty);
             stats = stats.Add(pstats);
         }
@@ -16630,6 +16665,7 @@ class Aircraft_HTML extends Display {
         this.weapons.UpdateDisplay();
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
+        this.alter.UpdateDisplay();
         this.UpdateStats(stats);
         this.UpdateDerived(stats, derived_stats);
     }
@@ -16649,16 +16685,20 @@ class AlterStats_HTML extends Display {
     }
     InitAddCell() {
         this.add_list = [];
-        let fs = CreateFlexSection(this.add_cell);
+        this.add_fs = CreateFlexSection(this.add_cell);
         let lbl_part = document.createElement("LABEL");
         lbl_part.textContent = lu("Alter Select Part");
-        fs.div1.appendChild(lbl_part);
+        this.add_fs.div1.appendChild(lbl_part);
         let lbl_qty = document.createElement("LABEL");
         lbl_qty.textContent = lu("Alter Quantity");
-        fs.div2.appendChild(lbl_qty);
+        this.add_fs.div2.appendChild(lbl_qty);
+        lbl_part.style.marginLeft = "0.25em";
+        lbl_part.style.marginRight = "0.5em";
+        lbl_qty.style.marginLeft = "0.25em";
+        lbl_qty.style.marginRight = "0.5em";
     }
     InitEditCell() {
-        this.name_inp = document.createElement("INPUT");
+        this.name = document.createElement("INPUT");
         ;
         this.drag = document.createElement("INPUT");
         ;
@@ -16704,49 +16744,67 @@ class AlterStats_HTML extends Display {
         ;
         this.sprl = document.createElement("INPUT");
         ;
-        CreateText(lu("Alter Part Name"), this.name_inp, this.edit_cell);
-        var fsabc7 = CreateFlexSection(this.edit_cell);
-        var fsabc = CreateFlexSection(fsabc7.div1);
+        var fsabc = CreateFlexSection(this.edit_cell);
         var fsab = CreateFlexSection(fsabc.div1);
-        var fs12 = CreateFlexSection(fsab.div1);
-        var fs34 = CreateFlexSection(fsab.div2);
-        var fs56 = CreateFlexSection(fsabc.div2);
-        var fs1 = CreateFlexSection(fs12.div1);
-        var fs2 = CreateFlexSection(fs12.div2);
-        var fs3 = CreateFlexSection(fs34.div1);
-        var fs4 = CreateFlexSection(fs34.div2);
-        var fs5 = CreateFlexSection(fs56.div1);
-        var fs6 = CreateFlexSection(fs56.div2);
-        var fs7 = CreateFlexSection(fsabc7.div2);
+        FlexText(lu("Alter Part Name"), this.name, fsab);
+        var fs1 = CreateFlexSection(fsab.div1);
+        var fs2 = CreateFlexSection(fsab.div2);
+        var fs3 = CreateFlexSection(fsabc.div2);
+        FlexInput("Cost", this.cost, fs3);
+        FlexInput("Mass", this.mass, fs1);
+        FlexInput("Wet Mass", this.wmas, fs2);
+        FlexInput("Bomb Mass", this.bmas, fs3);
         FlexInput("Drag", this.drag, fs1);
-        FlexInput("Mass", this.mass, fs2);
-        FlexInput("Wet Mass", this.wmas, fs3);
-        FlexInput("Bomb Mass", this.bmas, fs4);
-        FlexInput("Cost", this.cost, fs5);
-        FlexInput("Upkeep", this.upkp, fs6);
-        FlexInput("Lift Bleed", this.lfbd, fs7);
-        FlexInput("Wing Area", this.area, fs1);
-        FlexInput("Control", this.ctrl, fs2);
-        FlexInput("Pitch Stability", this.pstb, fs3);
-        FlexInput("Lateral Stability", this.lstb, fs4);
-        FlexInput("Raw Strain", this.rstn, fs5);
-        FlexInput("Structure", this.strc, fs6);
-        FlexInput("Toughness", this.tugh, fs7);
+        FlexInput("Lift Bleed", this.lfbd, fs2);
+        FlexInput("Wing Area", this.area, fs3);
+        FlexInput("Control", this.ctrl, fs1);
+        FlexInput("Pitch Stability", this.pstb, fs2);
+        FlexInput("Lateral Stability", this.lstb, fs3);
+        FlexInput("Raw Strain", this.rstn, fs1);
+        FlexInput("Structure", this.strc, fs2);
+        FlexInput("Toughness", this.tugh, fs3);
         FlexInput("Power", this.powr, fs1);
         FlexInput("Fuel Consumption", this.fcon, fs2);
         FlexInput("Fuel", this.fuel, fs3);
-        FlexInput("Charge", this.chrg, fs4);
-        FlexInput("Crash Safety", this.sfty, fs5);
-        FlexInput("Visibility", this.visi, fs6);
-        FlexInput("Escape", this.escp, fs7);
+        FlexInput("Visibility", this.visi, fs1);
+        FlexInput("Crash Safety", this.sfty, fs2);
+        FlexInput("Escape", this.escp, fs3);
+        FlexInput("Charge", this.chrg, fs1);
+        FlexInput("Upkeep", this.upkp, fs2);
         CreateText(lu("Alter Part Special Rules"), this.sprl, this.edit_cell, false);
+        this.drag.min = "";
+        this.mass.min = "";
+        this.wmas.min = "";
+        this.bmas.min = "";
+        this.cost.min = "";
+        this.upkp.min = "";
+        this.lfbd.min = "";
+        this.area.min = "";
+        this.ctrl.min = "";
+        this.pstb.min = "";
+        this.lstb.min = "";
+        this.rstn.min = "";
+        this.strc.min = "";
+        this.tugh.min = "";
+        this.powr.min = "";
+        this.fcon.min = "";
+        this.fuel.min = "";
+        this.chrg.min = "";
+        this.sfty.min = "";
+        this.visi.min = "";
+        this.escp.min = "";
+        this.sprl.size = 47;
         var span = document.createElement("SPAN");
         this.sel = document.createElement("SELECT");
         span.appendChild(this.sel);
-        this.add = document.createElement("BTN");
+        this.UpdateSelect();
+        this.sel.selectedIndex = -1;
+        this.add = document.createElement("BUTTON");
         CreateButton("Add Part", this.add, span, false);
-        this.rem = document.createElement("BTN");
+        this.rem = document.createElement("BUTTON");
         CreateButton("Remove Part", this.rem, span, false);
+        this.edit_cell.appendChild(document.createElement("BR"));
+        this.edit_cell.appendChild(span);
         this.add.onclick = () => {
             let stats = new Stats();
             stats.drag = this.drag.valueAsNumber;
@@ -16770,12 +16828,116 @@ class AlterStats_HTML extends Display {
             stats.crashsafety = this.sfty.valueAsNumber;
             stats.visibility = this.visi.valueAsNumber;
             stats.escape = this.escp.valueAsNumber;
-            stats.warnings.push({ source: this.name_inp.value, warning: this.sprl.value });
-            this.alter.AddPart(this.name_inp.value, stats);
+            this.sprl.value = this.sprl.value.trim();
+            if (this.sprl.value.length > 0) {
+                stats.warnings.push({ source: this.name.value, warning: this.sprl.value });
+            }
+            this.alter.AddPart(this.name.value, stats);
+            this.UpdateSelect();
+            this.sel.selectedIndex = -1;
         };
-        this.rem.onclick = () => { this.alter.RemovePart(this.name_inp.value); };
+        this.rem.onclick = () => {
+            this.alter.RemovePart(this.name.value);
+            this.ResetInputs();
+            this.UpdateSelect();
+            this.sel.selectedIndex = -1;
+        };
+        this.sel.onchange = () => {
+            let part = this.alter.GetParts()[this.sel.selectedIndex];
+            this.name.value = part.name;
+            this.drag.valueAsNumber = part.stats.drag;
+            this.mass.valueAsNumber = part.stats.mass;
+            this.wmas.valueAsNumber = part.stats.wetmass;
+            this.bmas.valueAsNumber = part.stats.bomb_mass;
+            this.cost.valueAsNumber = part.stats.cost;
+            this.upkp.valueAsNumber = part.stats.upkeep;
+            this.lfbd.valueAsNumber = part.stats.liftbleed;
+            this.area.valueAsNumber = part.stats.wingarea;
+            this.ctrl.valueAsNumber = part.stats.control;
+            this.pstb.valueAsNumber = part.stats.pitchstab;
+            this.lstb.valueAsNumber = part.stats.latstab;
+            this.rstn.valueAsNumber = part.stats.maxstrain;
+            this.strc.valueAsNumber = part.stats.structure;
+            this.tugh.valueAsNumber = part.stats.toughness;
+            this.powr.valueAsNumber = part.stats.power;
+            this.fcon.valueAsNumber = part.stats.fuelconsumption;
+            this.fuel.valueAsNumber = part.stats.fuel;
+            this.chrg.valueAsNumber = part.stats.charge;
+            this.sfty.valueAsNumber = part.stats.crashsafety;
+            this.visi.valueAsNumber = part.stats.visibility;
+            this.escp.valueAsNumber = part.stats.escape;
+            var text = [];
+            for (let warn of part.stats.warnings) {
+                text.push(warn.warning);
+            }
+            this.sprl.value = StringFmt.Join("   ", text);
+            this.sel.selectedIndex = -1;
+        };
+        this.ResetInputs();
+    }
+    ResetInputs() {
+        this.name.value = "Default";
+        this.drag.valueAsNumber = 0;
+        this.mass.valueAsNumber = 0;
+        this.wmas.valueAsNumber = 0;
+        this.bmas.valueAsNumber = 0;
+        this.cost.valueAsNumber = 0;
+        this.upkp.valueAsNumber = 0;
+        this.lfbd.valueAsNumber = 0;
+        this.area.valueAsNumber = 0;
+        this.ctrl.valueAsNumber = 0;
+        this.pstb.valueAsNumber = 0;
+        this.lstb.valueAsNumber = 0;
+        this.rstn.valueAsNumber = 0;
+        this.strc.valueAsNumber = 0;
+        this.tugh.valueAsNumber = 0;
+        this.powr.valueAsNumber = 0;
+        this.fcon.valueAsNumber = 0;
+        this.fuel.valueAsNumber = 0;
+        this.chrg.valueAsNumber = 0;
+        this.sfty.valueAsNumber = 0;
+        this.visi.valueAsNumber = 0;
+        this.escp.valueAsNumber = 0;
+        this.sprl.value = "";
+    }
+    UpdateSelect() {
+        while (this.sel.options.length) {
+            this.sel.remove(this.sel.options.length - 1);
+        }
+        var all_parts = this.alter.GetParts();
+        for (let p of all_parts) {
+            let opt = document.createElement("OPTION");
+            opt.textContent = p.name;
+            this.sel.add(opt);
+        }
     }
     UpdateDisplay() {
+        var plist = this.alter.GetParts();
+        for (let i = 0; i < plist.length; i++) {
+            if (this.add_list.length <= i) {
+                let item = {
+                    lbl: document.createElement("LABEL"),
+                    qty: document.createElement("INPUT")
+                };
+                item.lbl.style.marginLeft = "0.25em";
+                item.lbl.style.marginRight = "0.5em";
+                item.qty.type = "number";
+                item.qty.min = "0";
+                item.qty.step = "1";
+                item.qty.valueAsNumber = 0;
+                item.qty.onchange = () => { this.alter.SetUsedPart(i, item.qty.valueAsNumber); };
+                this.add_fs.div1.appendChild(item.lbl);
+                this.add_fs.div2.appendChild(item.qty);
+                this.add_list.push(item);
+            }
+            this.add_list[i].lbl.textContent = plist[i].name;
+            this.add_list[i].qty.valueAsNumber = plist[i].qty;
+        }
+        while (this.add_list.length > plist.length) {
+            this.add_list[this.add_list.length - 1].lbl.remove();
+            this.add_list[this.add_list.length - 1].qty.remove();
+            this.add_list.pop();
+        }
     }
 }
 /// <reference path="./Display.ts" />
