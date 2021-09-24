@@ -3,7 +3,6 @@
 
 class Used_HTML extends Display {
     private used: Used;
-    private enabled: HTMLInputElement;
     private burnt_out: HTMLInputElement;
     private ragged: HTMLInputElement;
     private hefty: HTMLInputElement;
@@ -19,10 +18,6 @@ class Used_HTML extends Display {
         this.used = used;
 
         (document.getElementById("lbl_used") as HTMLLabelElement).textContent = lu("Used Section Title");
-
-        (document.getElementById("lbl_is_used") as HTMLLabelElement).textContent = lu("Used Is Aircraft Used?");
-        this.enabled = document.getElementById("is_used") as HTMLInputElement;
-        this.enabled.onchange = () => { this.used.SetEnabled(this.enabled.checked); };
 
         this.tbl = document.getElementById("tbl_used") as HTMLTableElement;
         var fragment = document.createDocumentFragment();
@@ -127,8 +122,5 @@ class Used_HTML extends Display {
         this.fragile.valueAsNumber = this.used.fragile;
         this.leaky.valueAsNumber = this.used.leaky;
         this.sluggish.valueAsNumber = this.used.sluggish;
-
-        this.enabled.checked = this.used.GetEnabled();
-        this.tbl.hidden = !this.enabled.checked;
     }
 }

@@ -1,7 +1,6 @@
 /// <reference path="./Part.ts" />
 
 class Used extends Part {
-    private enabled: boolean;
     public burnt_out: number;
     public ragged: number;
     public hefty: number;
@@ -13,7 +12,6 @@ class Used extends Part {
 
     constructor() {
         super();
-        this.enabled = false;
         this.burnt_out = 0;
         this.ragged = 0;
         this.hefty = 0;
@@ -25,27 +23,32 @@ class Used extends Part {
     }
 
     public GetEnabled() {
-        return this.enabled;
+        var total = Math.abs(this.burnt_out) +
+            Math.abs(this.ragged) +
+            Math.abs(this.hefty) +
+            Math.abs(this.sticky_guns) +
+            Math.abs(this.weak) +
+            Math.abs(this.fragile) +
+            Math.abs(this.leaky) +
+            Math.abs(this.sluggish);
+        return total != 0;
     }
 
     public SetEnabled(use: boolean) {
-        this.enabled = use;
-        if (!this.enabled) {
-            this.burnt_out = 0;
-            this.ragged = 0;
-            this.hefty = 0;
-            this.sticky_guns = 0;
-            this.weak = 0;
-            this.fragile = 0;
-            this.leaky = 0;
-            this.sluggish = 0;
-        }
+        this.burnt_out = 0;
+        this.ragged = 0;
+        this.hefty = 0;
+        this.sticky_guns = 0;
+        this.weak = 0;
+        this.fragile = 0;
+        this.leaky = 0;
+        this.sluggish = 0;
         this.CalculateStats();
     }
 
     public toJSON() {
         return {
-            enabled: this.enabled,
+            enabled: true,
             burnt_out: this.burnt_out,
             ragged: this.ragged,
             hefty: this.hefty,
@@ -58,7 +61,6 @@ class Used extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
-        this.enabled = js["enabled"];
         this.burnt_out = js["burnt_out"];
         this.ragged = js["ragged"];
         this.hefty = js["hefty"];
@@ -70,7 +72,7 @@ class Used extends Part {
     }
 
     public serialize(s: Serialize) {
-        s.PushBool(this.enabled);
+        s.PushBool(true);
         s.PushNum(this.burnt_out);
         s.PushNum(this.ragged);
         s.PushNum(this.hefty);
@@ -82,7 +84,7 @@ class Used extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        this.enabled = d.GetBool();
+        d.GetBool();
         this.burnt_out = d.GetNum();
         this.ragged = d.GetNum();
         this.hefty = d.GetNum();

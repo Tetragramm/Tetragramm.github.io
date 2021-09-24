@@ -32,7 +32,7 @@ class TurboBuilder {
         { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
         { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
         { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
-        { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -4, costfactor: 0.5 },
+        { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -10, costfactor: 0.5 },
     ];
 
     constructor() {
@@ -119,6 +119,7 @@ class TurboBuilder {
             mc2 = 0;
             TSFC11 = 0;
         }
+        console.log(Era.max_temp);
         return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
     }
 
@@ -190,7 +191,11 @@ class TurboBuilder {
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
         estats.altitude = 59;
-        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        if (this.era_sel == 8) {
+            estats.stats.era.push({ name: estats.name, era: lu(num2era(-1)) });
+        } else {
+            estats.stats.era.push({ name: estats.name, era: lu(num2era(5)) });
+        }
         estats.stats.pitchspeed = this.GetPitchSpeed();
 
         return estats;

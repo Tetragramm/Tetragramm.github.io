@@ -1253,7 +1253,7 @@ class TurboBuilder {
             { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
             { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
             { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
-            { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -4, costfactor: 0.5 },
+            { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -10, costfactor: 0.5 },
         ];
         this.name = "Default";
         this.era_sel = 0;
@@ -1327,6 +1327,7 @@ class TurboBuilder {
             mc2 = 0;
             TSFC11 = 0;
         }
+        console.log(Era.max_temp);
         return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
     }
     MFP(M) {
@@ -1389,7 +1390,12 @@ class TurboBuilder {
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
         estats.altitude = 59;
-        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        if (this.era_sel == 8) {
+            estats.stats.era.push({ name: estats.name, era: lu(num2era(-1)) });
+        }
+        else {
+            estats.stats.era.push({ name: estats.name, era: lu(num2era(5)) });
+        }
         estats.stats.pitchspeed = this.GetPitchSpeed();
         return estats;
     }
@@ -11783,7 +11789,6 @@ class Weapons extends Part {
 class Used extends Part {
     constructor() {
         super();
-        this.enabled = false;
         this.burnt_out = 0;
         this.ragged = 0;
         this.hefty = 0;
@@ -11794,25 +11799,30 @@ class Used extends Part {
         this.sluggish = 0;
     }
     GetEnabled() {
-        return this.enabled;
+        var total = Math.abs(this.burnt_out) +
+            Math.abs(this.ragged) +
+            Math.abs(this.hefty) +
+            Math.abs(this.sticky_guns) +
+            Math.abs(this.weak) +
+            Math.abs(this.fragile) +
+            Math.abs(this.leaky) +
+            Math.abs(this.sluggish);
+        return total != 0;
     }
     SetEnabled(use) {
-        this.enabled = use;
-        if (!this.enabled) {
-            this.burnt_out = 0;
-            this.ragged = 0;
-            this.hefty = 0;
-            this.sticky_guns = 0;
-            this.weak = 0;
-            this.fragile = 0;
-            this.leaky = 0;
-            this.sluggish = 0;
-        }
+        this.burnt_out = 0;
+        this.ragged = 0;
+        this.hefty = 0;
+        this.sticky_guns = 0;
+        this.weak = 0;
+        this.fragile = 0;
+        this.leaky = 0;
+        this.sluggish = 0;
         this.CalculateStats();
     }
     toJSON() {
         return {
-            enabled: this.enabled,
+            enabled: true,
             burnt_out: this.burnt_out,
             ragged: this.ragged,
             hefty: this.hefty,
@@ -11824,7 +11834,6 @@ class Used extends Part {
         };
     }
     fromJSON(js, json_version) {
-        this.enabled = js["enabled"];
         this.burnt_out = js["burnt_out"];
         this.ragged = js["ragged"];
         this.hefty = js["hefty"];
@@ -11835,7 +11844,7 @@ class Used extends Part {
         this.sluggish = js["sluggish"];
     }
     serialize(s) {
-        s.PushBool(this.enabled);
+        s.PushBool(true);
         s.PushNum(this.burnt_out);
         s.PushNum(this.ragged);
         s.PushNum(this.hefty);
@@ -11846,7 +11855,7 @@ class Used extends Part {
         s.PushNum(this.sluggish);
     }
     deserialize(d) {
-        this.enabled = d.GetBool();
+        d.GetBool();
         this.burnt_out = d.GetNum();
         this.ragged = d.GetNum();
         this.hefty = d.GetNum();
