@@ -12554,6 +12554,7 @@ class AlterStats extends Part {
         sumstats += Math.abs(stats.crashsafety);
         sumstats += Math.abs(stats.visibility);
         sumstats += Math.abs(stats.escape);
+        sumstats += Math.abs(stats.reliability);
         sumstats += Math.abs(stats.warnings.length);
         if (sumstats == 0) {
             return;
@@ -16699,51 +16700,29 @@ class AlterStats_HTML extends Display {
     }
     InitEditCell() {
         this.name = document.createElement("INPUT");
-        ;
         this.drag = document.createElement("INPUT");
-        ;
         this.mass = document.createElement("INPUT");
-        ;
         this.wmas = document.createElement("INPUT");
-        ;
         this.bmas = document.createElement("INPUT");
-        ;
         this.cost = document.createElement("INPUT");
-        ;
         this.upkp = document.createElement("INPUT");
-        ;
         this.lfbd = document.createElement("INPUT");
-        ;
         this.area = document.createElement("INPUT");
-        ;
         this.ctrl = document.createElement("INPUT");
-        ;
         this.pstb = document.createElement("INPUT");
-        ;
         this.lstb = document.createElement("INPUT");
-        ;
         this.rstn = document.createElement("INPUT");
-        ;
         this.strc = document.createElement("INPUT");
-        ;
         this.tugh = document.createElement("INPUT");
-        ;
         this.powr = document.createElement("INPUT");
-        ;
         this.fcon = document.createElement("INPUT");
-        ;
         this.fuel = document.createElement("INPUT");
-        ;
         this.chrg = document.createElement("INPUT");
-        ;
         this.sfty = document.createElement("INPUT");
-        ;
         this.visi = document.createElement("INPUT");
-        ;
         this.escp = document.createElement("INPUT");
-        ;
+        this.rely = document.createElement("INPUT");
         this.sprl = document.createElement("INPUT");
-        ;
         var fsabc = CreateFlexSection(this.edit_cell);
         var fsab = CreateFlexSection(fsabc.div1);
         FlexText(lu("Alter Part Name"), this.name, fsab);
@@ -16771,6 +16750,7 @@ class AlterStats_HTML extends Display {
         FlexInput("Escape", this.escp, fs3);
         FlexInput("Charge", this.chrg, fs1);
         FlexInput("Upkeep", this.upkp, fs2);
+        FlexInput("Reliability", this.rely, fs3);
         CreateText(lu("Alter Part Special Rules"), this.sprl, this.edit_cell, false);
         this.drag.min = "";
         this.mass.min = "";
@@ -16793,6 +16773,7 @@ class AlterStats_HTML extends Display {
         this.sfty.min = "";
         this.visi.min = "";
         this.escp.min = "";
+        this.rely.min = "";
         this.sprl.size = 47;
         var span = document.createElement("SPAN");
         this.sel = document.createElement("SELECT");
@@ -16828,6 +16809,7 @@ class AlterStats_HTML extends Display {
             stats.crashsafety = this.sfty.valueAsNumber;
             stats.visibility = this.visi.valueAsNumber;
             stats.escape = this.escp.valueAsNumber;
+            stats.reliability = this.rely.valueAsNumber;
             this.sprl.value = this.sprl.value.trim();
             if (this.sprl.value.length > 0) {
                 stats.warnings.push({ source: this.name.value, warning: this.sprl.value });
@@ -16866,6 +16848,7 @@ class AlterStats_HTML extends Display {
             this.sfty.valueAsNumber = part.stats.crashsafety;
             this.visi.valueAsNumber = part.stats.visibility;
             this.escp.valueAsNumber = part.stats.escape;
+            this.rely.valueAsNumber = part.stats.reliability;
             var text = [];
             for (let warn of part.stats.warnings) {
                 text.push(warn.warning);
@@ -16898,6 +16881,7 @@ class AlterStats_HTML extends Display {
         this.sfty.valueAsNumber = 0;
         this.visi.valueAsNumber = 0;
         this.escp.valueAsNumber = 0;
+        this.rely.valueAsNumber = 0;
         this.sprl.value = "";
     }
     UpdateSelect() {

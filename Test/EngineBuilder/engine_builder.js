@@ -13074,6 +13074,7 @@ class AlterStats extends Part {
         sumstats += Math.abs(stats.crashsafety);
         sumstats += Math.abs(stats.visibility);
         sumstats += Math.abs(stats.escape);
+        sumstats += Math.abs(stats.reliability);
         sumstats += Math.abs(stats.warnings.length);
         if (sumstats == 0) {
             return;

@@ -34,6 +34,7 @@ class AlterStats_HTML extends Display {
     private sfty: HTMLInputElement;
     private visi: HTMLInputElement;
     private escp: HTMLInputElement;
+    private rely: HTMLInputElement;
 
     private sprl: HTMLInputElement;
 
@@ -74,29 +75,30 @@ class AlterStats_HTML extends Display {
     }
 
     private InitEditCell() {
-        this.name = document.createElement("INPUT") as HTMLInputElement;;
-        this.drag = document.createElement("INPUT") as HTMLInputElement;;
-        this.mass = document.createElement("INPUT") as HTMLInputElement;;
-        this.wmas = document.createElement("INPUT") as HTMLInputElement;;
-        this.bmas = document.createElement("INPUT") as HTMLInputElement;;
-        this.cost = document.createElement("INPUT") as HTMLInputElement;;
-        this.upkp = document.createElement("INPUT") as HTMLInputElement;;
-        this.lfbd = document.createElement("INPUT") as HTMLInputElement;;
-        this.area = document.createElement("INPUT") as HTMLInputElement;;
-        this.ctrl = document.createElement("INPUT") as HTMLInputElement;;
-        this.pstb = document.createElement("INPUT") as HTMLInputElement;;
-        this.lstb = document.createElement("INPUT") as HTMLInputElement;;
-        this.rstn = document.createElement("INPUT") as HTMLInputElement;;
-        this.strc = document.createElement("INPUT") as HTMLInputElement;;
-        this.tugh = document.createElement("INPUT") as HTMLInputElement;;
-        this.powr = document.createElement("INPUT") as HTMLInputElement;;
-        this.fcon = document.createElement("INPUT") as HTMLInputElement;;
-        this.fuel = document.createElement("INPUT") as HTMLInputElement;;
-        this.chrg = document.createElement("INPUT") as HTMLInputElement;;
-        this.sfty = document.createElement("INPUT") as HTMLInputElement;;
-        this.visi = document.createElement("INPUT") as HTMLInputElement;;
-        this.escp = document.createElement("INPUT") as HTMLInputElement;;
-        this.sprl = document.createElement("INPUT") as HTMLInputElement;;
+        this.name = document.createElement("INPUT") as HTMLInputElement;
+        this.drag = document.createElement("INPUT") as HTMLInputElement;
+        this.mass = document.createElement("INPUT") as HTMLInputElement;
+        this.wmas = document.createElement("INPUT") as HTMLInputElement;
+        this.bmas = document.createElement("INPUT") as HTMLInputElement;
+        this.cost = document.createElement("INPUT") as HTMLInputElement;
+        this.upkp = document.createElement("INPUT") as HTMLInputElement;
+        this.lfbd = document.createElement("INPUT") as HTMLInputElement;
+        this.area = document.createElement("INPUT") as HTMLInputElement;
+        this.ctrl = document.createElement("INPUT") as HTMLInputElement;
+        this.pstb = document.createElement("INPUT") as HTMLInputElement;
+        this.lstb = document.createElement("INPUT") as HTMLInputElement;
+        this.rstn = document.createElement("INPUT") as HTMLInputElement;
+        this.strc = document.createElement("INPUT") as HTMLInputElement;
+        this.tugh = document.createElement("INPUT") as HTMLInputElement;
+        this.powr = document.createElement("INPUT") as HTMLInputElement;
+        this.fcon = document.createElement("INPUT") as HTMLInputElement;
+        this.fuel = document.createElement("INPUT") as HTMLInputElement;
+        this.chrg = document.createElement("INPUT") as HTMLInputElement;
+        this.sfty = document.createElement("INPUT") as HTMLInputElement;
+        this.visi = document.createElement("INPUT") as HTMLInputElement;
+        this.escp = document.createElement("INPUT") as HTMLInputElement;
+        this.rely = document.createElement("INPUT") as HTMLInputElement;
+        this.sprl = document.createElement("INPUT") as HTMLInputElement;
 
         var fsabc = CreateFlexSection(this.edit_cell);
         var fsab = CreateFlexSection(fsabc.div1);
@@ -134,6 +136,7 @@ class AlterStats_HTML extends Display {
 
         FlexInput("Charge", this.chrg, fs1);
         FlexInput("Upkeep", this.upkp, fs2);
+        FlexInput("Reliability", this.rely, fs3);
 
         CreateText(lu("Alter Part Special Rules"), this.sprl, this.edit_cell, false);
         this.drag.min = "";
@@ -157,6 +160,7 @@ class AlterStats_HTML extends Display {
         this.sfty.min = "";
         this.visi.min = "";
         this.escp.min = "";
+        this.rely.min = "";
         this.sprl.size = 47;
 
         var span = document.createElement("SPAN") as HTMLSpanElement;
@@ -195,6 +199,7 @@ class AlterStats_HTML extends Display {
             stats.crashsafety = this.sfty.valueAsNumber;
             stats.visibility = this.visi.valueAsNumber;
             stats.escape = this.escp.valueAsNumber;
+            stats.reliability = this.rely.valueAsNumber;
             this.sprl.value = this.sprl.value.trim();
             if (this.sprl.value.length > 0) {
                 stats.warnings.push({ source: this.name.value, warning: this.sprl.value });
@@ -234,6 +239,7 @@ class AlterStats_HTML extends Display {
             this.sfty.valueAsNumber = part.stats.crashsafety;
             this.visi.valueAsNumber = part.stats.visibility;
             this.escp.valueAsNumber = part.stats.escape;
+            this.rely.valueAsNumber = part.stats.reliability;
             var text = [];
             for (let warn of part.stats.warnings) {
                 text.push(warn.warning);
@@ -267,6 +273,7 @@ class AlterStats_HTML extends Display {
         this.sfty.valueAsNumber = 0;
         this.visi.valueAsNumber = 0;
         this.escp.valueAsNumber = 0;
+        this.rely.valueAsNumber = 0;
         this.sprl.value = "";
     }
 
