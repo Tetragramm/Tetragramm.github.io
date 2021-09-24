@@ -557,6 +557,10 @@ button[disabled] {
 	transition: max-height 0.2s ease-in-out;
 }
 
+.collapsible {
+	max-width: max-content;
+}
+
 .collapsible::before {
 	content: '\02795'; /* Unicode character for "plus" sign (+) */
 	color: white;
