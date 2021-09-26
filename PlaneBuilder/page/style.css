@@ -180,6 +180,13 @@ option {
     text-align:initial;
 }
 
+input[type=text] {
+	width: auto; 
+	box-sizing: border-box;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing: border-box;
+}
+
 input[type=number] {
 	width:4em;
 	text-align: center;
@@ -542,4 +549,25 @@ button[disabled] {
 
 .flex-item {
 	width: 100%;
+}
+
+.content {
+	max-height:inherit;
+	overflow: hidden;
+	transition: max-height 0.2s ease-in-out;
+}
+
+.collapsible {
+	max-width: max-content;
+}
+
+.collapsible::before {
+	content: '\02795'; /* Unicode character for "plus" sign (+) */
+	color: white;
+	float: left;
+	margin-right: 5px;
+}
+
+.active::before {
+	content: "\2796"; /* Unicode character for "minus" sign (-) */
 }

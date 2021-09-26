@@ -89,6 +89,20 @@ const init = () => {
         scrollToFragment();
         setTimeout(() => { window.onscroll = debounce(SetScroll, 250); }, 1000);
     });
+
+    var coll = document.getElementsByClassName("collapsible");
+    for (let i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+            var active = this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            content = content.nextElementSibling;
+            if (!active) {
+                content.style.maxHeight = "0px";
+            } else {
+                content.style.maxHeight = "inherit";
+            }
+        });
+    }
 }
 window.addEventListener("DOMContentLoaded", init);
 

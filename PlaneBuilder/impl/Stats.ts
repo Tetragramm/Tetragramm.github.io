@@ -164,6 +164,16 @@ class Stats {
         s.PushNum(this.bomb_mass);
         s.PushNum(this.fuel);
         s.PushNum(this.charge);
+        s.PushNum(this.warnings.length);
+        for (let warn of this.warnings) {
+            s.PushString(warn.source);
+            s.PushString(warn.warning);
+        }
+        s.PushNum(this.era.length);
+        for (let e of this.era) {
+            s.PushString(e.name);
+            s.PushString(e.era);
+        }
     }
 
     public deserialize(d: Deserialize) {
@@ -194,6 +204,18 @@ class Stats {
         this.bomb_mass = d.GetNum();
         this.fuel = d.GetNum();
         this.charge = d.GetNum();
+        if (d.version > 12.25) {
+            var wcount = d.GetNum();
+            this.warnings = [];
+            for (let i = 0; i < wcount; i++) {
+                this.warnings.push({ source: d.GetString(), warning: d.GetString() });
+            }
+            var ecount = d.GetNum();
+            this.era = [];
+            for (let i = 0; i < ecount; i++) {
+                this.era.push({ name: d.GetString(), era: d.GetString() });
+            }
+        }
     }
 
     public Add(other: Stats): Stats {

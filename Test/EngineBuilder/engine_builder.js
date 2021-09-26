@@ -1327,7 +1327,6 @@ class TurboBuilder {
             mc2 = 0;
             TSFC11 = 0;
         }
-        console.log(Era.max_temp);
         return { thrust: ST * mc2, fuel: TSFC11 * ST * mc2 };
     }
     MFP(M) {

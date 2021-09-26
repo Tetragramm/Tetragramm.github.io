@@ -159,6 +159,16 @@ class Stats {
         s.PushNum(this.bomb_mass);
         s.PushNum(this.fuel);
         s.PushNum(this.charge);
+        s.PushNum(this.warnings.length);
+        for (let warn of this.warnings) {
+            s.PushString(warn.source);
+            s.PushString(warn.warning);
+        }
+        s.PushNum(this.era.length);
+        for (let e of this.era) {
+            s.PushString(e.name);
+            s.PushString(e.era);
+        }
     }
     deserialize(d) {
         this.liftbleed = d.GetNum();
@@ -188,6 +198,18 @@ class Stats {
         this.bomb_mass = d.GetNum();
         this.fuel = d.GetNum();
         this.charge = d.GetNum();
+        if (d.version > 12.25) {
+            var wcount = d.GetNum();
+            this.warnings = [];
+            for (let i = 0; i < wcount; i++) {
+                this.warnings.push({ source: d.GetString(), warning: d.GetString() });
+            }
+            var ecount = d.GetNum();
+            this.era = [];
+            for (let i = 0; i < ecount; i++) {
+                this.era.push({ name: d.GetString(), era: d.GetString() });
+            }
+        }
     }
     Add(other) {
         var res = new Stats();
@@ -842,7 +864,7 @@ class TurboBuilder {
             { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
             { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
             { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
-            { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -4, costfactor: 0.5 },
+            { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -10, costfactor: 0.5 },
         ];
         this.name = "Default";
         this.era_sel = 0;
@@ -1907,11 +1929,28 @@ function CreateSelect(txt, elem, table, br = true) {
     if (br)
         table.appendChild(document.createElement("BR"));
 }
+function CreateText(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var lbl = document.createElement("LABEL");
+    elem.id = GenerateID();
+    lbl.htmlFor = elem.id;
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
+    elem.setAttribute("type", "text");
+    elem.value = "Default";
+    span.appendChild(lbl);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
 function CreateButton(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
     var txtSpan = document.createElement("LABEL");
     elem.hidden = true;
     elem.id = GenerateID();
+    elem.textContent = txt;
     txtSpan.htmlFor = elem.id;
     txtSpan.style.marginLeft = "0.25em";
     txtSpan.style.marginRight = "0.5em";
@@ -1930,6 +1969,7 @@ function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
+    lbl.id = GenerateID();
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
     lbl.textContent = txt;
@@ -11295,7 +11335,6 @@ class Weapons extends Part {
 class Used extends Part {
     constructor() {
         super();
-        this.enabled = false;
         this.burnt_out = 0;
         this.ragged = 0;
         this.hefty = 0;
@@ -11306,25 +11345,30 @@ class Used extends Part {
         this.sluggish = 0;
     }
     GetEnabled() {
-        return this.enabled;
+        var total = Math.abs(this.burnt_out) +
+            Math.abs(this.ragged) +
+            Math.abs(this.hefty) +
+            Math.abs(this.sticky_guns) +
+            Math.abs(this.weak) +
+            Math.abs(this.fragile) +
+            Math.abs(this.leaky) +
+            Math.abs(this.sluggish);
+        return total != 0;
     }
     SetEnabled(use) {
-        this.enabled = use;
-        if (!this.enabled) {
-            this.burnt_out = 0;
-            this.ragged = 0;
-            this.hefty = 0;
-            this.sticky_guns = 0;
-            this.weak = 0;
-            this.fragile = 0;
-            this.leaky = 0;
-            this.sluggish = 0;
-        }
+        this.burnt_out = 0;
+        this.ragged = 0;
+        this.hefty = 0;
+        this.sticky_guns = 0;
+        this.weak = 0;
+        this.fragile = 0;
+        this.leaky = 0;
+        this.sluggish = 0;
         this.CalculateStats();
     }
     toJSON() {
         return {
-            enabled: this.enabled,
+            enabled: true,
             burnt_out: this.burnt_out,
             ragged: this.ragged,
             hefty: this.hefty,
@@ -11336,7 +11380,6 @@ class Used extends Part {
         };
     }
     fromJSON(js, json_version) {
-        this.enabled = js["enabled"];
         this.burnt_out = js["burnt_out"];
         this.ragged = js["ragged"];
         this.hefty = js["hefty"];
@@ -11347,7 +11390,7 @@ class Used extends Part {
         this.sluggish = js["sluggish"];
     }
     serialize(s) {
-        s.PushBool(this.enabled);
+        s.PushBool(true);
         s.PushNum(this.burnt_out);
         s.PushNum(this.ragged);
         s.PushNum(this.hefty);
@@ -11358,7 +11401,7 @@ class Used extends Part {
         s.PushNum(this.sluggish);
     }
     deserialize(d) {
-        this.enabled = d.GetBool();
+        d.GetBool();
         this.burnt_out = d.GetNum();
         this.ragged = d.GetNum();
         this.hefty = d.GetNum();
@@ -11813,6 +11856,7 @@ class Aircraft {
             weapons: this.weapons.toJSON(),
             used: this.used.toJSON(),
             rotor: this.rotor.toJSON(),
+            alter: this.alter.toJSON(),
         };
     }
     fromJSON(js, disp = true) {
@@ -11854,6 +11898,9 @@ class Aircraft {
         if (json_version > 11.05) {
             this.rotor.fromJSON(js["rotor"], json_version);
         }
+        if (json_version > 12.25) {
+            this.alter.fromJSON(js["alter"], json_version);
+        }
         this.freeze_calculation = false;
         return true;
     }
@@ -11879,6 +11926,7 @@ class Aircraft {
         this.weapons.serialize(s);
         this.used.serialize(s);
         this.rotor.serialize(s);
+        this.alter.serialize(s);
         s.PushNum(this.aircraft_type);
     }
     deserialize(d) {
@@ -11914,6 +11962,9 @@ class Aircraft {
         else {
             this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
             this.rotor.SetType(AIRCRAFT_TYPE.AIRPLANE);
+        }
+        if (d.version > 12.25) {
+            this.alter.deserialize(d);
         }
         this.freeze_calculation = false;
     }
@@ -12463,53 +12514,139 @@ class Aircraft {
 class AlterStats extends Part {
     constructor() {
         super();
-        this.stats = new Stats();
+        var cp_json = JSON.parse(window.localStorage.getItem('CustomParts'));
+        if (!cp_json) {
+            cp_json = [];
+            window.localStorage.setItem('CustomParts', JSON.stringify([]));
+        }
+        this.custom_parts = [];
+        for (let elem of cp_json) {
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem), qty: 0 });
+        }
+    }
+    toJSON() {
+        var plist = [];
+        var plist_save = [];
+        for (let p of this.custom_parts) {
+            plist_save.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+            if (p.qty > 0)
+                plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+        }
+        window.localStorage.setItem('CustomParts', JSON.stringify(plist_save));
+        return {
+            part_list: plist,
+        };
+    }
+    fromJSON(js, json_version) {
+        for (let p of this.custom_parts) {
+            p.qty = 0;
+        }
+        for (let elem of js["part_list"]) {
+            var idx = this.custom_parts.findIndex((value) => { return value.name == elem["name"]; });
+            if (idx == -1) {
+                this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: elem["qty"] });
+            }
+            else {
+                this.custom_parts[idx].qty = elem["qty"];
+            }
+        }
+    }
+    serialize(s) {
+        var plist = [];
+        for (let p of this.custom_parts) {
+            if (p.qty > 0)
+                plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+        }
+        s.PushNum(plist.length);
+        for (let p of plist) {
+            s.PushString(p.name);
+            p.stats.serialize(s);
+            s.PushNum(p.qty);
+        }
+    }
+    deserialize(d) {
+        for (let p of this.custom_parts) {
+            p.qty = 0;
+        }
+        var pcount = d.GetNum();
+        for (let i = 0; i < pcount; i++) {
+            let name = d.GetString();
+            let stats = new Stats();
+            stats.deserialize(d);
+            let qty = d.GetNum();
+            var idx = this.custom_parts.findIndex((value) => { return value.name == name; });
+            if (idx == -1) {
+                idx = this.custom_parts.length;
+                this.custom_parts.push({ name: name, stats: stats, qty: qty });
+            }
+            else {
+                this.custom_parts[idx].qty = qty;
+            }
+        }
+    }
+    AddPart(name, stats) {
+        var sumstats = 0;
+        sumstats += Math.abs(stats.drag);
+        sumstats += Math.abs(stats.mass);
+        sumstats += Math.abs(stats.wetmass);
+        sumstats += Math.abs(stats.bomb_mass);
+        sumstats += Math.abs(stats.cost);
+        sumstats += Math.abs(stats.upkeep);
+        sumstats += Math.abs(stats.liftbleed);
+        sumstats += Math.abs(stats.wingarea);
+        sumstats += Math.abs(stats.control);
+        sumstats += Math.abs(stats.pitchstab);
+        sumstats += Math.abs(stats.latstab);
+        sumstats += Math.abs(stats.maxstrain);
+        sumstats += Math.abs(stats.structure);
+        sumstats += Math.abs(stats.toughness);
+        sumstats += Math.abs(stats.power);
+        sumstats += Math.abs(stats.fuelconsumption);
+        sumstats += Math.abs(stats.fuel);
+        sumstats += Math.abs(stats.charge);
+        sumstats += Math.abs(stats.crashsafety);
+        sumstats += Math.abs(stats.visibility);
+        sumstats += Math.abs(stats.escape);
+        sumstats += Math.abs(stats.reliability);
+        sumstats += Math.abs(stats.warnings.length);
+        if (sumstats == 0) {
+            return;
+        }
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        if (idx != -1) {
+            this.custom_parts[idx].stats = stats;
+        }
+        else {
+            this.custom_parts.push({ name: name, stats: stats, qty: 0 });
+        }
+        this.custom_parts.sort((a, b) => a.name.localeCompare(b.name));
+        this.CalculateStats();
+    }
+    RemovePart(name) {
+        console.log(name);
+        console.log(this.custom_parts.length);
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        console.log(idx);
+        if (idx != -1) {
+            this.custom_parts.splice(idx, 1);
+        }
+        console.log(this.custom_parts.length);
+        this.CalculateStats();
+    }
+    GetParts() {
+        return this.custom_parts;
+    }
+    SetUsedPart(idx, qty) {
+        this.custom_parts[idx].qty = qty;
+        this.CalculateStats();
     }
     PartStats() {
         var stats = new Stats();
-        if (!this.stats.liftbleed)
-            this.stats.liftbleed = 0;
-        if (!this.stats.drag)
-            this.stats.drag = 0;
-        if (!this.stats.mass)
-            this.stats.mass = 0;
-        if (!this.stats.wetmass)
-            this.stats.wetmass = 0;
-        if (!this.stats.bomb_mass)
-            this.stats.bomb_mass = 0;
-        if (!this.stats.cost)
-            this.stats.cost = 0;
-        if (!this.stats.upkeep)
-            this.stats.upkeep = 0;
-        if (!this.stats.control)
-            this.stats.control = 0;
-        if (!this.stats.pitchstab)
-            this.stats.pitchstab = 0;
-        if (!this.stats.latstab)
-            this.stats.latstab = 0;
-        if (!this.stats.wingarea)
-            this.stats.wingarea = 0;
-        if (!this.stats.maxstrain)
-            this.stats.maxstrain = 0;
-        if (!this.stats.structure)
-            this.stats.structure = 0;
-        if (!this.stats.toughness)
-            this.stats.toughness = 0;
-        if (!this.stats.power)
-            this.stats.power = 0;
-        if (!this.stats.fuelconsumption)
-            this.stats.fuelconsumption = 0;
-        if (!this.stats.fuel)
-            this.stats.fuel = 0;
-        if (!this.stats.pitchspeed)
-            this.stats.pitchspeed = 0;
-        if (!this.stats.pitchboost)
-            this.stats.pitchboost = 0;
-        if (!this.stats.charge)
-            this.stats.charge = 0;
-        if (!this.stats.crashsafety)
-            this.stats.crashsafety = 0;
-        stats = stats.Add(this.stats);
+        for (let part of this.custom_parts) {
+            let pstats = part.stats.Clone();
+            pstats = pstats.Multiply(part.qty);
+            stats = stats.Add(pstats);
+        }
         return stats;
     }
     SetCalculateStats(callback) {

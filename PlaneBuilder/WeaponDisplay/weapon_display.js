@@ -163,11 +163,28 @@ function CreateSelect(txt, elem, table, br = true) {
     if (br)
         table.appendChild(document.createElement("BR"));
 }
+function CreateText(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var lbl = document.createElement("LABEL");
+    elem.id = GenerateID();
+    lbl.htmlFor = elem.id;
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
+    elem.setAttribute("type", "text");
+    elem.value = "Default";
+    span.appendChild(lbl);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
 function CreateButton(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
     var txtSpan = document.createElement("LABEL");
     elem.hidden = true;
     elem.id = GenerateID();
+    elem.textContent = txt;
     txtSpan.htmlFor = elem.id;
     txtSpan.style.marginLeft = "0.25em";
     txtSpan.style.marginRight = "0.5em";
@@ -186,6 +203,7 @@ function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
+    lbl.id = GenerateID();
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
     lbl.textContent = txt;

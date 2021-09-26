@@ -731,6 +731,10 @@
         "Cargo Small": "Will fit a trunk, barrel, or crate.",
         "Cargo Medium": "Will fit a small vehicle like a motorcycle, car, or zeppelin engine.",
         "Cargo Large": "Will fit a scout or fighter aircraft with the wings taken off.",
-        "Cargo Huge": "Will fit just about anything you can imagine."
+        "Cargo Huge": "Will fit just about anything you can imagine.",
+        "Alter Select Part": "Select Part",
+        "Alter Quantity": "Quantity",
+        "Alter Part Name": "Part Name",
+        "Alter Part Special Rules": "Special Rules"
     }
 }

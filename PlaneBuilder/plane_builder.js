@@ -159,6 +159,16 @@ class Stats {
         s.PushNum(this.bomb_mass);
         s.PushNum(this.fuel);
         s.PushNum(this.charge);
+        s.PushNum(this.warnings.length);
+        for (let warn of this.warnings) {
+            s.PushString(warn.source);
+            s.PushString(warn.warning);
+        }
+        s.PushNum(this.era.length);
+        for (let e of this.era) {
+            s.PushString(e.name);
+            s.PushString(e.era);
+        }
     }
     deserialize(d) {
         this.liftbleed = d.GetNum();
@@ -188,6 +198,18 @@ class Stats {
         this.bomb_mass = d.GetNum();
         this.fuel = d.GetNum();
         this.charge = d.GetNum();
+        if (d.version > 12.25) {
+            var wcount = d.GetNum();
+            this.warnings = [];
+            for (let i = 0; i < wcount; i++) {
+                this.warnings.push({ source: d.GetString(), warning: d.GetString() });
+            }
+            var ecount = d.GetNum();
+            this.era = [];
+            for (let i = 0; i < ecount; i++) {
+                this.era.push({ name: d.GetString(), era: d.GetString() });
+            }
+        }
     }
     Add(other) {
         var res = new Stats();
@@ -1097,7 +1119,7 @@ class TurboBuilder {
             { name: "Gen 3.5 1995-2005", max_temp: 1800, efficiency: 1, costfactor: 1.0 },
             { name: "Gen 4 2005-2015", max_temp: 2000, efficiency: 1, costfactor: 1.1 },
             { name: "Gen 4.5 2015-2025", max_temp: 2000, efficiency: 2, costfactor: 1.2 },
-            { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -4, costfactor: 0.5 },
+            { name: "Gen 0 Himmilgard", max_temp: 800, efficiency: -10, costfactor: 0.5 },
         ];
         this.name = "Default";
         this.era_sel = 0;
@@ -9049,7 +9071,6 @@ class Weapons extends Part {
 class Used extends Part {
     constructor() {
         super();
-        this.enabled = false;
         this.burnt_out = 0;
         this.ragged = 0;
         this.hefty = 0;
@@ -9060,25 +9081,30 @@ class Used extends Part {
         this.sluggish = 0;
     }
     GetEnabled() {
-        return this.enabled;
+        var total = Math.abs(this.burnt_out) +
+            Math.abs(this.ragged) +
+            Math.abs(this.hefty) +
+            Math.abs(this.sticky_guns) +
+            Math.abs(this.weak) +
+            Math.abs(this.fragile) +
+            Math.abs(this.leaky) +
+            Math.abs(this.sluggish);
+        return total != 0;
     }
     SetEnabled(use) {
-        this.enabled = use;
-        if (!this.enabled) {
-            this.burnt_out = 0;
-            this.ragged = 0;
-            this.hefty = 0;
-            this.sticky_guns = 0;
-            this.weak = 0;
-            this.fragile = 0;
-            this.leaky = 0;
-            this.sluggish = 0;
-        }
+        this.burnt_out = 0;
+        this.ragged = 0;
+        this.hefty = 0;
+        this.sticky_guns = 0;
+        this.weak = 0;
+        this.fragile = 0;
+        this.leaky = 0;
+        this.sluggish = 0;
         this.CalculateStats();
     }
     toJSON() {
         return {
-            enabled: this.enabled,
+            enabled: true,
             burnt_out: this.burnt_out,
             ragged: this.ragged,
             hefty: this.hefty,
@@ -9090,7 +9116,6 @@ class Used extends Part {
         };
     }
     fromJSON(js, json_version) {
-        this.enabled = js["enabled"];
         this.burnt_out = js["burnt_out"];
         this.ragged = js["ragged"];
         this.hefty = js["hefty"];
@@ -9101,7 +9126,7 @@ class Used extends Part {
         this.sluggish = js["sluggish"];
     }
     serialize(s) {
-        s.PushBool(this.enabled);
+        s.PushBool(true);
         s.PushNum(this.burnt_out);
         s.PushNum(this.ragged);
         s.PushNum(this.hefty);
@@ -9112,7 +9137,7 @@ class Used extends Part {
         s.PushNum(this.sluggish);
     }
     deserialize(d) {
-        this.enabled = d.GetBool();
+        d.GetBool();
         this.burnt_out = d.GetNum();
         this.ragged = d.GetNum();
         this.hefty = d.GetNum();
@@ -9567,6 +9592,7 @@ class Aircraft {
             weapons: this.weapons.toJSON(),
             used: this.used.toJSON(),
             rotor: this.rotor.toJSON(),
+            alter: this.alter.toJSON(),
         };
     }
     fromJSON(js, disp = true) {
@@ -9608,6 +9634,9 @@ class Aircraft {
         if (json_version > 11.05) {
             this.rotor.fromJSON(js["rotor"], json_version);
         }
+        if (json_version > 12.25) {
+            this.alter.fromJSON(js["alter"], json_version);
+        }
         this.freeze_calculation = false;
         return true;
     }
@@ -9633,6 +9662,7 @@ class Aircraft {
         this.weapons.serialize(s);
         this.used.serialize(s);
         this.rotor.serialize(s);
+        this.alter.serialize(s);
         s.PushNum(this.aircraft_type);
     }
     deserialize(d) {
@@ -9668,6 +9698,9 @@ class Aircraft {
         else {
             this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
             this.rotor.SetType(AIRCRAFT_TYPE.AIRPLANE);
+        }
+        if (d.version > 12.25) {
+            this.alter.deserialize(d);
         }
         this.freeze_calculation = false;
     }
@@ -10377,11 +10410,28 @@ function CreateSelect(txt, elem, table, br = true) {
     if (br)
         table.appendChild(document.createElement("BR"));
 }
+function CreateText(txt, elem, table, br = true) {
+    var span = document.createElement("SPAN");
+    var lbl = document.createElement("LABEL");
+    elem.id = GenerateID();
+    lbl.htmlFor = elem.id;
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
+    elem.setAttribute("type", "text");
+    elem.value = "Default";
+    span.appendChild(lbl);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
 function CreateButton(txt, elem, table, br = true) {
     var span = document.createElement("SPAN");
     var txtSpan = document.createElement("LABEL");
     elem.hidden = true;
     elem.id = GenerateID();
+    elem.textContent = txt;
     txtSpan.htmlFor = elem.id;
     txtSpan.style.marginLeft = "0.25em";
     txtSpan.style.marginRight = "0.5em";
@@ -10400,6 +10450,7 @@ function FlexCheckbox(txt, inp, fs) {
     var lbl = document.createElement("LABEL");
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
+    lbl.id = GenerateID();
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
     lbl.textContent = txt;
@@ -14132,8 +14183,7 @@ class Aircraft_HTML extends Display {
         this.weapons = new Weapons_HTML(aircraft.GetWeapons());
         this.used = new Used_HTML(aircraft.GetUsed());
         this.rotor = new Rotor_HTML(aircraft.GetRotor());
-        var tbla = document.getElementById("tbl_alter");
-        this.InitAlter(tbla);
+        this.alter = new AlterStats_HTML(aircraft.GetAlter());
         document.getElementById("lbl_acft_type").textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type");
         for (let type in AIRCRAFT_TYPE) {
@@ -14780,140 +14830,6 @@ class Aircraft_HTML extends Display {
         }
         this.cards.SaveNPC();
     }
-    InitAlter(tbl) {
-        var row = tbl.insertRow();
-        CreateTH(row, "Lift Bleed");
-        CreateTH(row, "Drag");
-        CreateTH(row, "Mass");
-        CreateTH(row, "Wet Mass");
-        CreateTH(row, "Bomb Mass");
-        CreateTH(row, "Cost");
-        CreateTH(row, "Upkeep");
-        row = tbl.insertRow();
-        this.a_lift = document.createElement("INPUT");
-        this.a_drag = document.createElement("INPUT");
-        this.a_mass = document.createElement("INPUT");
-        this.a_wmas = document.createElement("INPUT");
-        this.a_bmas = document.createElement("INPUT");
-        this.a_cost = document.createElement("INPUT");
-        this.a_upkp = document.createElement("INPUT");
-        row.insertCell().appendChild(this.a_lift);
-        row.insertCell().appendChild(this.a_drag);
-        row.insertCell().appendChild(this.a_mass);
-        row.insertCell().appendChild(this.a_wmas);
-        row.insertCell().appendChild(this.a_bmas);
-        row.insertCell().appendChild(this.a_cost);
-        row.insertCell().appendChild(this.a_upkp);
-        this.a_lift.setAttribute("type", "number");
-        this.a_drag.setAttribute("type", "number");
-        this.a_mass.setAttribute("type", "number");
-        this.a_wmas.setAttribute("type", "number");
-        this.a_bmas.setAttribute("type", "number");
-        this.a_cost.setAttribute("type", "number");
-        this.a_upkp.setAttribute("type", "number");
-        this.a_lift.valueAsNumber = 0;
-        this.a_drag.valueAsNumber = 0;
-        this.a_mass.valueAsNumber = 0;
-        this.a_wmas.valueAsNumber = 0;
-        this.a_bmas.valueAsNumber = 0;
-        this.a_cost.valueAsNumber = 0;
-        this.a_upkp.valueAsNumber = 0;
-        this.a_lift.onchange = () => { this.acft.GetAlter().stats.liftbleed = this.a_lift.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_drag.onchange = () => { this.acft.GetAlter().stats.drag = this.a_drag.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_mass.onchange = () => { this.acft.GetAlter().stats.mass = this.a_mass.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_wmas.onchange = () => { this.acft.GetAlter().stats.wetmass = this.a_wmas.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_bmas.onchange = () => { this.acft.GetAlter().stats.bomb_mass = this.a_bmas.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_cost.onchange = () => { this.acft.GetAlter().stats.cost = this.a_cost.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_upkp.onchange = () => { this.acft.GetAlter().stats.upkeep = this.a_upkp.valueAsNumber; this.acft.CalculateStats(); };
-        row = tbl.insertRow();
-        CreateTH(row, "Control");
-        CreateTH(row, "Pitch Stability");
-        CreateTH(row, "Lateral Stability");
-        CreateTH(row, "Wing Area");
-        CreateTH(row, "Raw Strain");
-        CreateTH(row, "Structure");
-        CreateTH(row, "Toughness");
-        row = tbl.insertRow();
-        this.a_cont = document.createElement("INPUT");
-        this.a_pstb = document.createElement("INPUT");
-        this.a_lstb = document.createElement("INPUT");
-        this.a_wara = document.createElement("INPUT");
-        this.a_mstr = document.createElement("INPUT");
-        this.a_strc = document.createElement("INPUT");
-        this.a_tugh = document.createElement("INPUT");
-        row.insertCell().appendChild(this.a_cont);
-        row.insertCell().appendChild(this.a_pstb);
-        row.insertCell().appendChild(this.a_lstb);
-        row.insertCell().appendChild(this.a_wara);
-        row.insertCell().appendChild(this.a_mstr);
-        row.insertCell().appendChild(this.a_strc);
-        row.insertCell().appendChild(this.a_tugh);
-        this.a_cont.setAttribute("type", "number");
-        this.a_pstb.setAttribute("type", "number");
-        this.a_lstb.setAttribute("type", "number");
-        this.a_wara.setAttribute("type", "number");
-        this.a_mstr.setAttribute("type", "number");
-        this.a_strc.setAttribute("type", "number");
-        this.a_tugh.setAttribute("type", "number");
-        this.a_cont.valueAsNumber = 0;
-        this.a_pstb.valueAsNumber = 0;
-        this.a_lstb.valueAsNumber = 0;
-        this.a_wara.valueAsNumber = 0;
-        this.a_mstr.valueAsNumber = 0;
-        this.a_strc.valueAsNumber = 0;
-        this.a_tugh.valueAsNumber = 0;
-        this.a_cont.onchange = () => { this.acft.GetAlter().stats.control = this.a_cont.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_pstb.onchange = () => { this.acft.GetAlter().stats.pitchstab = this.a_pstb.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_lstb.onchange = () => { this.acft.GetAlter().stats.latstab = this.a_lstb.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_wara.onchange = () => { this.acft.GetAlter().stats.wingarea = this.a_wara.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_mstr.onchange = () => { this.acft.GetAlter().stats.maxstrain = this.a_mstr.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_strc.onchange = () => { this.acft.GetAlter().stats.structure = this.a_strc.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_tugh.onchange = () => { this.acft.GetAlter().stats.toughness = this.a_tugh.valueAsNumber; this.acft.CalculateStats(); };
-        row = tbl.insertRow();
-        CreateTH(row, "Power");
-        CreateTH(row, "Fuel Consumption");
-        CreateTH(row, "Fuel");
-        CreateTH(row, "Pitch Speed");
-        CreateTH(row, "Pitch Boost");
-        CreateTH(row, "Charge");
-        CreateTH(row, "Crash Safety");
-        row = tbl.insertRow();
-        this.a_powr = document.createElement("INPUT");
-        this.a_fcom = document.createElement("INPUT");
-        this.a_fuel = document.createElement("INPUT");
-        this.a_pspd = document.createElement("INPUT");
-        this.a_pbst = document.createElement("INPUT");
-        this.a_chrg = document.createElement("INPUT");
-        this.a_crsh = document.createElement("INPUT");
-        row.insertCell().appendChild(this.a_powr);
-        row.insertCell().appendChild(this.a_fcom);
-        row.insertCell().appendChild(this.a_fuel);
-        row.insertCell().appendChild(this.a_pspd);
-        row.insertCell().appendChild(this.a_pbst);
-        row.insertCell().appendChild(this.a_chrg);
-        row.insertCell().appendChild(this.a_crsh);
-        this.a_powr.setAttribute("type", "number");
-        this.a_fcom.setAttribute("type", "number");
-        this.a_fuel.setAttribute("type", "number");
-        this.a_pspd.setAttribute("type", "number");
-        this.a_pbst.setAttribute("type", "number");
-        this.a_chrg.setAttribute("type", "number");
-        this.a_crsh.setAttribute("type", "number");
-        this.a_powr.valueAsNumber = 0;
-        this.a_fcom.valueAsNumber = 0;
-        this.a_fuel.valueAsNumber = 0;
-        this.a_pspd.valueAsNumber = 0;
-        this.a_pbst.valueAsNumber = 0;
-        this.a_chrg.valueAsNumber = 0;
-        this.a_crsh.valueAsNumber = 0;
-        this.a_powr.onchange = () => { this.acft.GetAlter().stats.power = this.a_powr.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_fcom.onchange = () => { this.acft.GetAlter().stats.fuelconsumption = this.a_fcom.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_fuel.onchange = () => { this.acft.GetAlter().stats.fuel = this.a_fuel.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_pspd.onchange = () => { this.acft.GetAlter().stats.pitchspeed = this.a_pspd.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_pbst.onchange = () => { this.acft.GetAlter().stats.pitchboost = this.a_pbst.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_chrg.onchange = () => { this.acft.GetAlter().stats.charge = this.a_chrg.valueAsNumber; this.acft.CalculateStats(); };
-        this.a_crsh.onchange = () => { this.acft.GetAlter().stats.crashsafety = this.a_crsh.valueAsNumber; this.acft.CalculateStats(); };
-    }
     InitStats(tbl) {
         var fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
@@ -15027,6 +14943,7 @@ class Aircraft_HTML extends Display {
         this.weapons.UpdateDisplay();
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
+        this.alter.UpdateDisplay();
         this.UpdateStats(stats);
         this.UpdateDerived(stats, derived_stats);
     }
@@ -15937,6 +15854,20 @@ const init = () => {
         scrollToFragment();
         setTimeout(() => { window.onscroll = debounce(SetScroll, 250); }, 1000);
     });
+    var coll = document.getElementsByClassName("collapsible");
+    for (let i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+            var active = this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            content = content.nextElementSibling;
+            if (!active) {
+                content.style.maxHeight = "0px";
+            }
+            else {
+                content.style.maxHeight = "inherit";
+            }
+        });
+    }
 };
 window.addEventListener("DOMContentLoaded", init);
 function debounce(callback, delay) {
@@ -15974,6 +15905,403 @@ var aircraft_display;
 var engine_list = new Map([["Custom", new EngineList("Custom")]]);
 var local;
 var enable_anim = false;
+/// <reference path="./Part.ts" />
+/// <reference path="./Stats.ts" />
+class AlterStats extends Part {
+    constructor() {
+        super();
+        var cp_json = JSON.parse(window.localStorage.getItem('CustomParts'));
+        if (!cp_json) {
+            cp_json = [];
+            window.localStorage.setItem('CustomParts', JSON.stringify([]));
+        }
+        this.custom_parts = [];
+        for (let elem of cp_json) {
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem), qty: 0 });
+        }
+    }
+    toJSON() {
+        var plist = [];
+        var plist_save = [];
+        for (let p of this.custom_parts) {
+            plist_save.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+            if (p.qty > 0)
+                plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+        }
+        window.localStorage.setItem('CustomParts', JSON.stringify(plist_save));
+        return {
+            part_list: plist,
+        };
+    }
+    fromJSON(js, json_version) {
+        for (let p of this.custom_parts) {
+            p.qty = 0;
+        }
+        for (let elem of js["part_list"]) {
+            var idx = this.custom_parts.findIndex((value) => { return value.name == elem["name"]; });
+            if (idx == -1) {
+                this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: elem["qty"] });
+            }
+            else {
+                this.custom_parts[idx].qty = elem["qty"];
+            }
+        }
+    }
+    serialize(s) {
+        var plist = [];
+        for (let p of this.custom_parts) {
+            if (p.qty > 0)
+                plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+        }
+        s.PushNum(plist.length);
+        for (let p of plist) {
+            s.PushString(p.name);
+            p.stats.serialize(s);
+            s.PushNum(p.qty);
+        }
+    }
+    deserialize(d) {
+        for (let p of this.custom_parts) {
+            p.qty = 0;
+        }
+        var pcount = d.GetNum();
+        for (let i = 0; i < pcount; i++) {
+            let name = d.GetString();
+            let stats = new Stats();
+            stats.deserialize(d);
+            let qty = d.GetNum();
+            var idx = this.custom_parts.findIndex((value) => { return value.name == name; });
+            if (idx == -1) {
+                idx = this.custom_parts.length;
+                this.custom_parts.push({ name: name, stats: stats, qty: qty });
+            }
+            else {
+                this.custom_parts[idx].qty = qty;
+            }
+        }
+    }
+    AddPart(name, stats) {
+        var sumstats = 0;
+        sumstats += Math.abs(stats.drag);
+        sumstats += Math.abs(stats.mass);
+        sumstats += Math.abs(stats.wetmass);
+        sumstats += Math.abs(stats.bomb_mass);
+        sumstats += Math.abs(stats.cost);
+        sumstats += Math.abs(stats.upkeep);
+        sumstats += Math.abs(stats.liftbleed);
+        sumstats += Math.abs(stats.wingarea);
+        sumstats += Math.abs(stats.control);
+        sumstats += Math.abs(stats.pitchstab);
+        sumstats += Math.abs(stats.latstab);
+        sumstats += Math.abs(stats.maxstrain);
+        sumstats += Math.abs(stats.structure);
+        sumstats += Math.abs(stats.toughness);
+        sumstats += Math.abs(stats.power);
+        sumstats += Math.abs(stats.fuelconsumption);
+        sumstats += Math.abs(stats.fuel);
+        sumstats += Math.abs(stats.charge);
+        sumstats += Math.abs(stats.crashsafety);
+        sumstats += Math.abs(stats.visibility);
+        sumstats += Math.abs(stats.escape);
+        sumstats += Math.abs(stats.reliability);
+        sumstats += Math.abs(stats.warnings.length);
+        if (sumstats == 0) {
+            return;
+        }
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        if (idx != -1) {
+            this.custom_parts[idx].stats = stats;
+        }
+        else {
+            this.custom_parts.push({ name: name, stats: stats, qty: 0 });
+        }
+        this.custom_parts.sort((a, b) => a.name.localeCompare(b.name));
+        this.CalculateStats();
+    }
+    RemovePart(name) {
+        console.log(name);
+        console.log(this.custom_parts.length);
+        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        console.log(idx);
+        if (idx != -1) {
+            this.custom_parts.splice(idx, 1);
+        }
+        console.log(this.custom_parts.length);
+        this.CalculateStats();
+    }
+    GetParts() {
+        return this.custom_parts;
+    }
+    SetUsedPart(idx, qty) {
+        this.custom_parts[idx].qty = qty;
+        this.CalculateStats();
+    }
+    PartStats() {
+        var stats = new Stats();
+        for (let part of this.custom_parts) {
+            let pstats = part.stats.Clone();
+            pstats = pstats.Multiply(part.qty);
+            stats = stats.Add(pstats);
+        }
+        return stats;
+    }
+    SetCalculateStats(callback) {
+        this.CalculateStats = callback;
+    }
+}
+/// <reference path="./Display.ts" />
+/// <reference path="../impl/AlterStats.ts" />
+class AlterStats_HTML extends Display {
+    constructor(alter) {
+        super();
+        this.alter = alter;
+        let tbl = window.getElementById("alter_table");
+        let row = tbl.insertRow();
+        this.add_cell = row.insertCell();
+        this.edit_cell = row.insertCell();
+        this.InitAddCell();
+        this.InitEditCell();
+    }
+    InitAddCell() {
+        this.add_list = [];
+        this.add_fs = CreateFlexSection(this.add_cell);
+        let lbl_part = document.createElement("LABEL");
+        lbl_part.textContent = lu("Alter Select Part");
+        this.add_fs.div1.appendChild(lbl_part);
+        let lbl_qty = document.createElement("LABEL");
+        lbl_qty.textContent = lu("Alter Quantity");
+        this.add_fs.div2.appendChild(lbl_qty);
+        lbl_part.style.marginLeft = "0.25em";
+        lbl_part.style.marginRight = "0.5em";
+        lbl_qty.style.marginLeft = "0.25em";
+        lbl_qty.style.marginRight = "0.5em";
+    }
+    InitEditCell() {
+        this.name = document.createElement("INPUT");
+        this.drag = document.createElement("INPUT");
+        this.mass = document.createElement("INPUT");
+        this.wmas = document.createElement("INPUT");
+        this.bmas = document.createElement("INPUT");
+        this.cost = document.createElement("INPUT");
+        this.upkp = document.createElement("INPUT");
+        this.lfbd = document.createElement("INPUT");
+        this.area = document.createElement("INPUT");
+        this.ctrl = document.createElement("INPUT");
+        this.pstb = document.createElement("INPUT");
+        this.lstb = document.createElement("INPUT");
+        this.rstn = document.createElement("INPUT");
+        this.strc = document.createElement("INPUT");
+        this.tugh = document.createElement("INPUT");
+        this.powr = document.createElement("INPUT");
+        this.fcon = document.createElement("INPUT");
+        this.fuel = document.createElement("INPUT");
+        this.chrg = document.createElement("INPUT");
+        this.sfty = document.createElement("INPUT");
+        this.visi = document.createElement("INPUT");
+        this.escp = document.createElement("INPUT");
+        this.rely = document.createElement("INPUT");
+        this.sprl = document.createElement("INPUT");
+        var fsabc = CreateFlexSection(this.edit_cell);
+        var fsab = CreateFlexSection(fsabc.div1);
+        FlexText(lu("Alter Part Name"), this.name, fsab);
+        var fs1 = CreateFlexSection(fsab.div1);
+        var fs2 = CreateFlexSection(fsab.div2);
+        var fs3 = CreateFlexSection(fsabc.div2);
+        FlexInput("Cost", this.cost, fs3);
+        FlexInput("Mass", this.mass, fs1);
+        FlexInput("Wet Mass", this.wmas, fs2);
+        FlexInput("Bomb Mass", this.bmas, fs3);
+        FlexInput("Drag", this.drag, fs1);
+        FlexInput("Lift Bleed", this.lfbd, fs2);
+        FlexInput("Wing Area", this.area, fs3);
+        FlexInput("Control", this.ctrl, fs1);
+        FlexInput("Pitch Stability", this.pstb, fs2);
+        FlexInput("Lateral Stability", this.lstb, fs3);
+        FlexInput("Raw Strain", this.rstn, fs1);
+        FlexInput("Structure", this.strc, fs2);
+        FlexInput("Toughness", this.tugh, fs3);
+        FlexInput("Power", this.powr, fs1);
+        FlexInput("Fuel Consumption", this.fcon, fs2);
+        FlexInput("Fuel", this.fuel, fs3);
+        FlexInput("Visibility", this.visi, fs1);
+        FlexInput("Crash Safety", this.sfty, fs2);
+        FlexInput("Escape", this.escp, fs3);
+        FlexInput("Charge", this.chrg, fs1);
+        FlexInput("Upkeep", this.upkp, fs2);
+        FlexInput("Reliability", this.rely, fs3);
+        CreateText(lu("Alter Part Special Rules"), this.sprl, this.edit_cell, false);
+        this.drag.min = "";
+        this.mass.min = "";
+        this.wmas.min = "";
+        this.bmas.min = "";
+        this.cost.min = "";
+        this.upkp.min = "";
+        this.lfbd.min = "";
+        this.area.min = "";
+        this.ctrl.min = "";
+        this.pstb.min = "";
+        this.lstb.min = "";
+        this.rstn.min = "";
+        this.strc.min = "";
+        this.tugh.min = "";
+        this.powr.min = "";
+        this.fcon.min = "";
+        this.fuel.min = "";
+        this.chrg.min = "";
+        this.sfty.min = "";
+        this.visi.min = "";
+        this.escp.min = "";
+        this.rely.min = "";
+        this.sprl.size = 47;
+        var span = document.createElement("SPAN");
+        this.sel = document.createElement("SELECT");
+        span.appendChild(this.sel);
+        this.UpdateSelect();
+        this.sel.selectedIndex = -1;
+        this.add = document.createElement("BUTTON");
+        CreateButton("Add Part", this.add, span, false);
+        this.rem = document.createElement("BUTTON");
+        CreateButton("Remove Part", this.rem, span, false);
+        this.edit_cell.appendChild(document.createElement("BR"));
+        this.edit_cell.appendChild(span);
+        this.add.onclick = () => {
+            let stats = new Stats();
+            stats.drag = this.drag.valueAsNumber;
+            stats.mass = this.mass.valueAsNumber;
+            stats.wetmass = this.wmas.valueAsNumber;
+            stats.bomb_mass = this.bmas.valueAsNumber;
+            stats.cost = this.cost.valueAsNumber;
+            stats.upkeep = this.upkp.valueAsNumber;
+            stats.liftbleed = this.lfbd.valueAsNumber;
+            stats.wingarea = this.area.valueAsNumber;
+            stats.control = this.ctrl.valueAsNumber;
+            stats.pitchstab = this.pstb.valueAsNumber;
+            stats.latstab = this.lstb.valueAsNumber;
+            stats.maxstrain = this.rstn.valueAsNumber;
+            stats.structure = this.strc.valueAsNumber;
+            stats.toughness = this.tugh.valueAsNumber;
+            stats.power = this.powr.valueAsNumber;
+            stats.fuelconsumption = this.fcon.valueAsNumber;
+            stats.fuel = this.fuel.valueAsNumber;
+            stats.charge = this.chrg.valueAsNumber;
+            stats.crashsafety = this.sfty.valueAsNumber;
+            stats.visibility = this.visi.valueAsNumber;
+            stats.escape = this.escp.valueAsNumber;
+            stats.reliability = this.rely.valueAsNumber;
+            this.sprl.value = this.sprl.value.trim();
+            if (this.sprl.value.length > 0) {
+                stats.warnings.push({ source: this.name.value, warning: this.sprl.value });
+            }
+            this.alter.AddPart(this.name.value, stats);
+            this.UpdateSelect();
+            this.sel.selectedIndex = -1;
+        };
+        this.rem.onclick = () => {
+            this.alter.RemovePart(this.name.value);
+            this.ResetInputs();
+            this.UpdateSelect();
+            this.sel.selectedIndex = -1;
+        };
+        this.sel.onchange = () => {
+            let part = this.alter.GetParts()[this.sel.selectedIndex];
+            this.name.value = part.name;
+            this.drag.valueAsNumber = part.stats.drag;
+            this.mass.valueAsNumber = part.stats.mass;
+            this.wmas.valueAsNumber = part.stats.wetmass;
+            this.bmas.valueAsNumber = part.stats.bomb_mass;
+            this.cost.valueAsNumber = part.stats.cost;
+            this.upkp.valueAsNumber = part.stats.upkeep;
+            this.lfbd.valueAsNumber = part.stats.liftbleed;
+            this.area.valueAsNumber = part.stats.wingarea;
+            this.ctrl.valueAsNumber = part.stats.control;
+            this.pstb.valueAsNumber = part.stats.pitchstab;
+            this.lstb.valueAsNumber = part.stats.latstab;
+            this.rstn.valueAsNumber = part.stats.maxstrain;
+            this.strc.valueAsNumber = part.stats.structure;
+            this.tugh.valueAsNumber = part.stats.toughness;
+            this.powr.valueAsNumber = part.stats.power;
+            this.fcon.valueAsNumber = part.stats.fuelconsumption;
+            this.fuel.valueAsNumber = part.stats.fuel;
+            this.chrg.valueAsNumber = part.stats.charge;
+            this.sfty.valueAsNumber = part.stats.crashsafety;
+            this.visi.valueAsNumber = part.stats.visibility;
+            this.escp.valueAsNumber = part.stats.escape;
+            this.rely.valueAsNumber = part.stats.reliability;
+            var text = [];
+            for (let warn of part.stats.warnings) {
+                text.push(warn.warning);
+            }
+            this.sprl.value = StringFmt.Join("   ", text);
+            this.sel.selectedIndex = -1;
+        };
+        this.ResetInputs();
+    }
+    ResetInputs() {
+        this.name.value = "Default";
+        this.drag.valueAsNumber = 0;
+        this.mass.valueAsNumber = 0;
+        this.wmas.valueAsNumber = 0;
+        this.bmas.valueAsNumber = 0;
+        this.cost.valueAsNumber = 0;
+        this.upkp.valueAsNumber = 0;
+        this.lfbd.valueAsNumber = 0;
+        this.area.valueAsNumber = 0;
+        this.ctrl.valueAsNumber = 0;
+        this.pstb.valueAsNumber = 0;
+        this.lstb.valueAsNumber = 0;
+        this.rstn.valueAsNumber = 0;
+        this.strc.valueAsNumber = 0;
+        this.tugh.valueAsNumber = 0;
+        this.powr.valueAsNumber = 0;
+        this.fcon.valueAsNumber = 0;
+        this.fuel.valueAsNumber = 0;
+        this.chrg.valueAsNumber = 0;
+        this.sfty.valueAsNumber = 0;
+        this.visi.valueAsNumber = 0;
+        this.escp.valueAsNumber = 0;
+        this.rely.valueAsNumber = 0;
+        this.sprl.value = "";
+    }
+    UpdateSelect() {
+        while (this.sel.options.length) {
+            this.sel.remove(this.sel.options.length - 1);
+        }
+        var all_parts = this.alter.GetParts();
+        for (let p of all_parts) {
+            let opt = document.createElement("OPTION");
+            opt.textContent = p.name;
+            this.sel.add(opt);
+        }
+    }
+    UpdateDisplay() {
+        var plist = this.alter.GetParts();
+        for (let i = 0; i < plist.length; i++) {
+            if (this.add_list.length <= i) {
+                let item = {
+                    lbl: document.createElement("LABEL"),
+                    qty: document.createElement("INPUT")
+                };
+                item.lbl.style.marginLeft = "0.25em";
+                item.lbl.style.marginRight = "0.5em";
+                item.qty.type = "number";
+                item.qty.min = "0";
+                item.qty.step = "1";
+                item.qty.valueAsNumber = 0;
+                item.qty.onchange = () => { this.alter.SetUsedPart(i, item.qty.valueAsNumber); };
+                this.add_fs.div1.appendChild(item.lbl);
+                this.add_fs.div2.appendChild(item.qty);
+                this.add_list.push(item);
+            }
+            this.add_list[i].lbl.textContent = plist[i].name;
+            this.add_list[i].qty.valueAsNumber = plist[i].qty;
+        }
+        while (this.add_list.length > plist.length) {
+            this.add_list[this.add_list.length - 1].lbl.remove();
+            this.add_list[this.add_list.length - 1].qty.remove();
+            this.add_list.pop();
+        }
+    }
+}
 /// <reference path="./Display.ts" />
 /// <reference path="../impl/Rotor.ts" />
 class Rotor_HTML extends Display {
@@ -16195,9 +16523,6 @@ class Used_HTML extends Display {
         super();
         this.used = used;
         document.getElementById("lbl_used").textContent = lu("Used Section Title");
-        document.getElementById("lbl_is_used").textContent = lu("Used Is Aircraft Used?");
-        this.enabled = document.getElementById("is_used");
-        this.enabled.onchange = () => { this.used.SetEnabled(this.enabled.checked); };
         this.tbl = document.getElementById("tbl_used");
         var fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
@@ -16290,65 +16615,5 @@ class Used_HTML extends Display {
         this.fragile.valueAsNumber = this.used.fragile;
         this.leaky.valueAsNumber = this.used.leaky;
         this.sluggish.valueAsNumber = this.used.sluggish;
-        this.enabled.checked = this.used.GetEnabled();
-        this.tbl.hidden = !this.enabled.checked;
-    }
-}
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
-class AlterStats extends Part {
-    constructor() {
-        super();
-        this.stats = new Stats();
-    }
-    PartStats() {
-        var stats = new Stats();
-        if (!this.stats.liftbleed)
-            this.stats.liftbleed = 0;
-        if (!this.stats.drag)
-            this.stats.drag = 0;
-        if (!this.stats.mass)
-            this.stats.mass = 0;
-        if (!this.stats.wetmass)
-            this.stats.wetmass = 0;
-        if (!this.stats.bomb_mass)
-            this.stats.bomb_mass = 0;
-        if (!this.stats.cost)
-            this.stats.cost = 0;
-        if (!this.stats.upkeep)
-            this.stats.upkeep = 0;
-        if (!this.stats.control)
-            this.stats.control = 0;
-        if (!this.stats.pitchstab)
-            this.stats.pitchstab = 0;
-        if (!this.stats.latstab)
-            this.stats.latstab = 0;
-        if (!this.stats.wingarea)
-            this.stats.wingarea = 0;
-        if (!this.stats.maxstrain)
-            this.stats.maxstrain = 0;
-        if (!this.stats.structure)
-            this.stats.structure = 0;
-        if (!this.stats.toughness)
-            this.stats.toughness = 0;
-        if (!this.stats.power)
-            this.stats.power = 0;
-        if (!this.stats.fuelconsumption)
-            this.stats.fuelconsumption = 0;
-        if (!this.stats.fuel)
-            this.stats.fuel = 0;
-        if (!this.stats.pitchspeed)
-            this.stats.pitchspeed = 0;
-        if (!this.stats.pitchboost)
-            this.stats.pitchboost = 0;
-        if (!this.stats.charge)
-            this.stats.charge = 0;
-        if (!this.stats.crashsafety)
-            this.stats.crashsafety = 0;
-        stats = stats.Add(this.stats);
-        return stats;
-    }
-    SetCalculateStats(callback) {
-        this.CalculateStats = callback;
     }
 }

@@ -74,12 +74,12 @@
 				</div>
 				<br />
 				<div id="Era">
-					<h3><label id="lbl_era">Era</label>
+					<h3 class="collapsible active"><label id="lbl_era">Era</label>
 						<h4>
 							<span>(<a href="./Rules/Rules.htm#_Era"><u>Rules</u></a>)</span>
 						</h4>
 					</h3>
-					<table style="width:100%" id="table_era">
+					<table style="width:100%" id="table_era" class="content">
 					</table>
 				</div>
 				<br />
@@ -88,29 +88,39 @@
 						<h4>
 							<span>(<a href="./Rules/Rules.htm#_Crew"><u>Rules</u></a>)</span>
 							<br />
+						</h4>
+					</h3>
+					<div class="content">
+						<h4>
 							<span> <label id="lbl_num_cockpits" for="num_cockpits">Number of Cockpits:</label> <input
 									type="number" id="num_cockpits" min="1" max="20" value="1" /></span>
 						</h4>
-					</h3>
-					<table style="width:100%" id="table_cockpit">
-					</table>
+						<table style="width:100%" id="table_cockpit">
+						</table>
+					</div>
 				</div>
 				<br />
 				<div id="Passengers">
-					<h3><label id="lbl_passengers">Passengers</label>
-						<h4><span>(<a href="./Rules/Rules.htm#_Passenger_Capacity"><u>Rules</u></a>)</span></h4>
+					<h3 class="collapsible"><label id="lbl_passengers">Passengers</label>
 					</h3>
-					<table style="width:100%" id="table_passengers">
+					<h4><span>(<a href="./Rules/Rules.htm#_Passenger_Capacity"><u>Rules</u></a>)</span></h4>
+					<div class="content" style="max-height: 0px;">
+						<table style="width:100%" id="table_passengers">
+					</div>
 					</table>
 				</div>
 				<br />
 				<div id="Engines">
-					<h3><label id="lbl_engines">Engines</label>
+					<h3 class="collapsible active"><label id="lbl_engines">Engines</label>
 						<h4>
 							<span>(<a href="./Rules/Rules.htm#_Engines"><u>Engine Rules</u></a>)</span>
 							<span>(<a href="./Rules/Rules.htm#_Engine_Upgrades"><u>Upgrade Rules</u></a>)</span>
 							<span>(<a href="./Rules/Rules.htm#_Cooling_(Air)"><u>Cooling Rules</u></a>)</span>
 							<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
+						</h4>
+					</h3>
+					<div class="content">
+						<h4>
 							<span> <label id="lbl_num_engines" for="num_engines">Number of Engines:</label> <input
 									type="number" id="num_engines" min="0" max="20" value="1" /></span>
 							<span> <label id="lbl_num_radiators" for="num_radiators">Number of Radiators:</label> <input
@@ -118,148 +128,154 @@
 							<span><label id="lbl_asymmetric" for="asymmetric">Asymmetric Plane:</label> <input
 									type="checkbox" id="asymmetric" /></span>
 						</h4>
-					</h3>
-
-					<table style="width:100%" id="table_engine">
-					</table>
-					<br />
-					<table style="width:100%" id="table_radiator">
-					</table>
+						<table style="width:100%" id="table_engine">
+						</table>
+						<br />
+						<table style="width:100%" id="table_radiator">
+						</table>
+					</div>
 				</div>
 			</div>
 			<br />
 			<div id="Frames">
-				<h3><label id="lbl_frames">Frames and Covering</label>
+				<h3 class="collapsible active"><label id="lbl_frames">Frames and Covering</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Frame_and_Covering"><u>Rules</u></a>)</span>
 						<span><label id="lbl_flying_wing" for="flying_wing">Flying Wing:</label> <input type="checkbox"
 								id="flying_wing" /></span>
 					</h4>
 				</h3>
-				<table id="table_frames">
+				<table id="table_frames" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="Tail">
-				<h3><label id="lbl_tail">Tail</label>
+				<h3 class="collapsible active"><label id="lbl_tail">Tail</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Tail"><u>Rules</u></a>)</span><br />
-						<span> <label id="lbl_tail_type" for="tail_type">Tail Length:</label> <select
-								id="tail_type"></select></span>
-						<span> <label id="lbl_tail_farman" for="tail_farman">Farman Tail:</label> <input type="checkbox"
-								id="tail_farman" /></span>
-						<span> <label id="lbl_tail_boom" for="tail_boom">Boom Tail:</label> <input type="checkbox"
-								id="tail_boom" /></span>
 					</h4>
 				</h3>
+				<h4 class="content">
+					<span> <label id="lbl_tail_type" for="tail_type">Tail Length:</label> <select
+							id="tail_type"></select></span>
+					<span> <label id="lbl_tail_farman" for="tail_farman">Farman Tail:</label> <input type="checkbox"
+							id="tail_farman" /></span>
+					<span> <label id="lbl_tail_boom" for="tail_boom">Boom Tail:</label> <input type="checkbox"
+							id="tail_boom" /></span>
+				</h4>
 			</div>
 			<br />
 			<div id="Wings">
-				<h3><label id="lbl_wings">Wings</label>
+				<h3 class="collapsible active"><label id="lbl_wings">Wings</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Wings"><u>Rules</u></a>)</span>
 						<br />
-						<span> <label id="lbl_wing_stagger" for="wing_stagger">Wing Stagger:</label> <select
+					</h4>
+				</h3>
+				<div class="content">
+					<h4><span> <label id="lbl_wing_stagger" for="wing_stagger">Wing Stagger:</label> <select
 								id="wing_stagger"></select></span>
 						<span> <label id="lbl_wing_closed" for="wing_closed">Closed Wing:</label> <input type="checkbox"
 								id="wing_closed" /></span>
 						<span> <label id="lbl_wing_swept" for="wing_swept">Swept Wings:</label> <input type="checkbox"
 								id="wing_swept" /></span>
 					</h4>
-				</h3>
-				<table id="wing_table">
-				</table>
+					<table id="wing_table"></table>
+				</div>
 			</div><br />
 			<div id="Rotors" hidden="true">
-				<h3><label id="lbl_rotor">Rotors</label>
+				<h3 class="collapsible active"><label id="lbl_rotor">Rotors</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
-				<table id="rotor_table">
-				</table>
+				<table id="rotor_table" class="content">
+				</table><br />
 			</div>
-			<br />
 			<div id="Stabilizers">
-				<h3><label id="lbl_stab">Stabilizers</label>
+				<h3 class="collapsible active"><label id="lbl_stab">Stabilizers</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Stabilizers"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
-				<table id="stab_table">
+				<table id="stab_table" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="ControlSurfaces">
-				<h3><label id="lbl_control_surfaces">Control Surfaces</label>
+				<h3 class="collapsible active"><label id="lbl_control_surfaces">Control Surfaces</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Control_Surfaces"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
-				<table id="tbl_control_surfaces">
+				<table id="tbl_control_surfaces" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="Reinforcements">
-				<h3><label id="lbl_reinforcements">Reinforcements</label>
+				<h3 class="collapsible active"><label id="lbl_reinforcements">Reinforcements</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Reinforcement"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
-				<table id="tbl_reinforcements">
+				<table id="tbl_reinforcements" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="Weapons">
-				<h3><label id="lbl_weapons">Weapons</label>
+				<h3 class="collapsible active"><label id="lbl_weapons">Weapons</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Weapons"><u>Rules</u></a>)
 							<a href="./WeaponDisplay/weapons.html"><b>Weapon List</b></a></span> <br />
-						<span> <label id="lbl_num_wsets" for="num_wsets">Number of Weapon Sets:</label> <input
+					</h4>
+				</h3>
+				<div class="content">
+					<h4><span> <label id="lbl_num_wsets" for="num_wsets">Number of Weapon Sets:</label> <input
 								type="number" id="num_wsets" min="0" max="20" value="1" /></span>
 						<span> <label id="lbl_num_wbraces" for="num_wbraces">Number of Weapon Braces:</label> <input
 								type="number" id="num_wbraces" min="0" max="99" step="3" value="1" /></span>
 					</h4>
-				</h3>
-				<table style="width:100%" id="table_weapons">
+					<table style="width:100%" id="table_weapons" class="content">
+				</div>
 				</table>
-				</h3>
 			</div>
 			<br />
 			<div id="Load">
-				<h3><label id="lbl_load">Load</label>
+				<h3 class="collapsible active"><label id="lbl_load">Load</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Load"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
-				<table id="tbl_load">
+				<table id="tbl_load" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="Landing_Gear">
-				<h3><label id="lbl_landing_gear">Landing Gear</label>
+				<h3 class="collapsible active"><label id="lbl_landing_gear">Landing Gear</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Landing_Gear"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
-				<table id="tbl_gear">
+				<table id="tbl_gear" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="Accessories">
-				<h3><label id="lbl_accessories">Additional Parts</label>
+				<h3 class="collapsible active"><label id="lbl_accessories">Additional Parts</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Upgrades"><u>Rules</u></a>)</span>
 					</h4>
 				</h3>
-				<table id="tbl_accessories">
+				<table id="tbl_accessories" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="Propeller">
-				<h3><label id="lbl_propeller">Propeller</label>
+				<h3 class="collapsible active"><label id="lbl_propeller">Propeller</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Propeller"><u>Rules</u></a>)</span> <br />
+					</h4>
+					<h4 class="content">
 						<span> <label id="lbl_propeller_pitch" for="propeller_pitch">Propeller Pitch:</label> <select
 								id="propeller_pitch"></select></span>
 						<span><label id="lbl_propeller_upgrade" for="propeller_upgrade"> Propeller Upgrades:</label>
@@ -269,42 +285,44 @@
 			</div>
 			<br />
 			<div id="Optimization">
-				<h3><label id="lbl_optimization">Optimizations</label>
-					<h4>
-						<span>(<a href="./Rules/Rules.htm#_Optimization"><u>Rules</u></a>)</span>
-						<br />
-					</h4>
-				</h3>
-				<span> <label id="lbl_num_opt" for="num_opt">Number of Free Optimizations:</label> <input type="number"
-						id="num_opt" min="0" max="20" value="0" /></span><br />
-				<table id="tbl_optimization">
+				<h3 class="collapsible"><label id="lbl_optimization">Optimizations</label></h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Optimization"><u>Rules</u></a>)</span>
+					<br />
+				</h4>
+				<div class="content" style="max-height: 0px;">
+					<h4><span> <label id="lbl_num_opt" for="num_opt">Number of Free Optimizations:</label> <input
+								type="number" id="num_opt" min="0" max="20" value="0" /></span><br /></h4>
+					<table id="tbl_optimization" class="content">
+				</div>
 				</table>
 			</div><br />
 			<div id="Used Planes">
-				<h3><label id="lbl_used">Used Plane</label>
+				<h3 class="collapsible active"><label id="lbl_used">Used Plane</label>
 					<h4>
 						<span>(<a href="./Rules/Rules.htm#_Used_Planes"><u>Rules</u></a>)</span>
 						<br />
 					</h4>
 				</h3>
-				<span> <label id="lbl_is_used" for="is_used">Is Aircraft Used? </label> <input type="checkbox"
-						id="is_used" /></span><br />
-				<table hidden id="tbl_used">
-				</table>
-			</div>
-			<div id="Stats" hidden>
-				<h3>Manual Alteration
-					<br />
-				</h3>
-				<table id="tbl_alter">
+				<table id="tbl_used" class="content">
 				</table>
 			</div>
 			<br />
 			<div id="Stats">
-				<h3><label id="lbl_stats">Total Sum of Stats</label>
+				<h3 class="collapsible">Custom Parts and Alterations
 					<br />
 				</h3>
-				<table id="tbl_stats">
+				<h4></h4>
+				<table id="alter_table" class="content" style="max-height: 0px;">
+				</table>
+			</div>
+			<br />
+			<div id="Stats">
+				<h3 class="collapsible"><label id="lbl_stats">Total Sum of Stats</label>
+					<br />
+				</h3>
+				<h4></h4>
+				<table id="tbl_stats" class="content" style="max-height: 0px;">
 				</table>
 			</div>
 			<br />

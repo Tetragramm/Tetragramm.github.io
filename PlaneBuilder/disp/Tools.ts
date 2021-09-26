@@ -183,11 +183,29 @@ function CreateSelect(txt: string, elem: HTMLSelectElement, table: HTMLElement, 
         table.appendChild(document.createElement("BR"));
 }
 
+function CreateText(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
+    var span = document.createElement("SPAN") as HTMLSpanElement;
+    var lbl = document.createElement("LABEL") as HTMLLabelElement;
+    elem.id = GenerateID();
+    lbl.htmlFor = elem.id;
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txt;
+    elem.setAttribute("type", "text");
+    elem.value = "Default";
+    span.appendChild(lbl);
+    span.appendChild(elem);
+    table.appendChild(span);
+    if (br)
+        table.appendChild(document.createElement("BR"));
+}
+
 function CreateButton(txt: string, elem: HTMLButtonElement, table: HTMLElement, br = true) {
     var span = document.createElement("SPAN") as HTMLSpanElement;
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.hidden = true;
     elem.id = GenerateID();
+    elem.textContent = txt;
     txtSpan.htmlFor = elem.id;
     txtSpan.style.marginLeft = "0.25em";
     txtSpan.style.marginRight = "0.5em";
@@ -208,6 +226,7 @@ function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
+    lbl.id = GenerateID();
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
     lbl.textContent = txt;

@@ -178,6 +178,7 @@ class Aircraft {
             weapons: this.weapons.toJSON(),
             used: this.used.toJSON(),
             rotor: this.rotor.toJSON(),
+            alter: this.alter.toJSON(),
         };
     }
 
@@ -219,6 +220,9 @@ class Aircraft {
         if (json_version > 11.05) {
             this.rotor.fromJSON(js["rotor"], json_version);
         }
+        if (json_version > 12.25) {
+            this.alter.fromJSON(js["alter"], json_version);
+        }
         this.freeze_calculation = false;
         return true;
     }
@@ -245,6 +249,7 @@ class Aircraft {
         this.weapons.serialize(s);
         this.used.serialize(s);
         this.rotor.serialize(s);
+        this.alter.serialize(s);
         s.PushNum(this.aircraft_type);
     }
 
@@ -280,6 +285,9 @@ class Aircraft {
         } else {
             this.aircraft_type = AIRCRAFT_TYPE.AIRPLANE;
             this.rotor.SetType(AIRCRAFT_TYPE.AIRPLANE);
+        }
+        if (d.version > 12.25) {
+            this.alter.deserialize(d);
         }
         this.freeze_calculation = false;
     }
