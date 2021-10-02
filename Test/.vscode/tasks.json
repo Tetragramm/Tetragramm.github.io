@@ -2,6 +2,24 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-m",
+				"http.server",
+				"8080"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"options": {
+				"cwd": ".."
+			},
+			"label": "Local Server"
+		},
+		{
 			"type": "typescript",
 			"tsconfig": "tsconfig.json",
 			"option": "watch",
@@ -51,21 +69,21 @@
 			"group": "build",
 			"label": "Watch Weapon Display"
 		},
-		,
 		{
-			"label": "Build All",
+			"label": "Watch All",
 			"group": {
 				"kind": "build",
 				"isDefault": true
 			},
 			"dependsOn": [
+				"Local Server",
 				"Watch Plane Builder",
 				"Watch Engine Builder",
 				"Watch Helicopter",
 				"Watch Hangar",
 				"Watch Weapon Display"
 			]
-		}
+		},
 		{
 			"type": "typescript",
 			"tsconfig": "tsconfig.json",
@@ -115,6 +133,7 @@
 			"label": "Build All",
 			"group": "build",
 			"dependsOn": [
+				"Local Server",
 				"Build Plane Builder",
 				"Build Engine Builder",
 				"Build Helicopter",
