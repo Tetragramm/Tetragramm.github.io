@@ -5885,7 +5885,7 @@ class Stabilizers extends Part {
         if (!vvalid[this.vstab_sel]) {
             this.vstab_sel = 0;
             if (!vvalid[this.vstab_sel]) {
-                this.vstab_sel = -1;
+                this.vstab_sel = 0;
                 this.vstab_count = 0;
             }
         }
@@ -5893,7 +5893,7 @@ class Stabilizers extends Part {
         if (!hvalid[this.hstab_sel]) {
             this.hstab_sel = 0;
             if (!hvalid[this.hstab_sel]) {
-                this.hstab_sel = -1;
+                this.hstab_sel = 0;
                 this.hstab_count = 0;
             }
         }
