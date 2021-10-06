@@ -346,15 +346,6 @@ class Aircraft {
             stats = stats.Add(this.rotor.PartStats());
         }
 
-        this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
-        this.stabilizers.SetIsTandem(this.wings.GetTandem());
-        this.stabilizers.SetIsSwept(this.wings.GetSwept());
-        this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
-        this.stabilizers.SetHelicopter(false);
-        this.stabilizers.SetWingArea(stats.wingarea);
-        this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
-        stats = stats.Add(this.stabilizers.PartStats());
-
         this.controlsurfaces.SetWingArea(stats.wingarea);
         this.controlsurfaces.SetBoomTail(this.frames.GetUseBoom());
         this.controlsurfaces.SetSpan(this.wings.GetSpan());
@@ -385,6 +376,16 @@ class Aircraft {
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.frames.SetIsTandem(this.wings.GetTandem());
         stats = stats.Add(this.frames.PartStats());
+
+        //Depends on wing area
+        this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
+        this.stabilizers.SetIsTandem(this.wings.GetTandem());
+        this.stabilizers.SetIsSwept(this.wings.GetSwept());
+        this.stabilizers.SetHaveTail(!this.frames.GetIsTailless());
+        this.stabilizers.SetHelicopter(false);
+        this.stabilizers.SetLiftingArea(stats.wingarea);
+        this.stabilizers.wing_drag = this.wings.GetWingDrag() + this.rotor.GetRotorDrag();
+        stats = stats.Add(this.stabilizers.PartStats());
 
         //Treated Paper needs to apply near to last
         this.wings.SetAircraftMass(stats.mass);

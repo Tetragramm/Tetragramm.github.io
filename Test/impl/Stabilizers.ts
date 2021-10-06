@@ -5,7 +5,7 @@ class Stabilizers extends Part {
     private have_tail: boolean;
     private is_tandem: boolean;
     private is_swept: boolean;
-    private wing_area: number;
+    private lifting_area: number;
     private engine_count: number;
 
     private hstab_list: {
@@ -274,8 +274,8 @@ class Stabilizers extends Part {
         return this.hstab_list[this.hstab_sel].is_canard;
     }
 
-    public SetWingArea(num: number) {
-        this.wing_area = num;
+    public SetLiftingArea(num: number) {
+        this.lifting_area = num;
     }
 
     public SetHaveTail(use: boolean) {
@@ -302,7 +302,7 @@ class Stabilizers extends Part {
             this.have_tail = true;
             this.is_tandem = false;
             this.is_swept = false;
-            this.wing_area = 0;
+            this.lifting_area = 0;
             this.engine_count = 0;
             this.hstab_sel = 0;
             this.hstab_count = 1;
@@ -342,7 +342,7 @@ class Stabilizers extends Part {
             stats.drag += Math.max(1, drag);
         }
         else if (this.hstab_sel < 0 || this.hstab_list[this.hstab_sel].increment != 0) {
-            stats.pitchstab -= Math.floor(1.0e-6 + this.wing_area / 2);
+            stats.pitchstab -= Math.floor(1.0e-6 + this.lifting_area / 2);
             stats.liftbleed += 5;
         }
 
@@ -353,7 +353,7 @@ class Stabilizers extends Part {
             stats.drag += Math.max(1, drag);
         }
         else if (this.vstab_sel < 0 || (this.vstab_list[this.vstab_sel].increment != 0 || (this.vstab_list[this.vstab_sel].increment == 0 && this.hstab_count == 0))) {
-            stats.latstab -= this.wing_area;
+            stats.latstab -= this.lifting_area;
         }
 
         //Additional stabilizers
