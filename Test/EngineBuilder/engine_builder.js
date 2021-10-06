@@ -12372,8 +12372,8 @@ class Aircraft {
         this.weapons.serialize(s);
         this.used.serialize(s);
         this.rotor.serialize(s);
-        this.alter.serialize(s);
         s.PushNum(this.aircraft_type);
+        this.alter.serialize(s);
     }
     deserialize(d) {
         this.freeze_calculation = true;
@@ -12997,7 +12997,7 @@ class AlterStats extends Part {
         }
         this.custom_parts = [];
         for (let elem of cp_json) {
-            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem), qty: 0 });
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: 0 });
         }
     }
     toJSON() {

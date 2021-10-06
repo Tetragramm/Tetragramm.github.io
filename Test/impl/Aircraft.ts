@@ -249,8 +249,8 @@ class Aircraft {
         this.weapons.serialize(s);
         this.used.serialize(s);
         this.rotor.serialize(s);
-        this.alter.serialize(s);
         s.PushNum(this.aircraft_type);
+        this.alter.serialize(s);
     }
 
     public deserialize(d: Deserialize) {

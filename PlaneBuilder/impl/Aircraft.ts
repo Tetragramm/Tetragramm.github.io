@@ -249,8 +249,8 @@ class Aircraft {
         this.weapons.serialize(s);
         this.used.serialize(s);
         this.rotor.serialize(s);
-        this.alter.serialize(s);
         s.PushNum(this.aircraft_type);
+        this.alter.serialize(s);
     }
 
     public deserialize(d: Deserialize) {
@@ -377,7 +377,7 @@ class Aircraft {
         this.frames.SetIsTandem(this.wings.GetTandem());
         stats = stats.Add(this.frames.PartStats());
 
-        //Depends on wing area
+        //Depends on Lifting area.
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
         this.stabilizers.SetIsTandem(this.wings.GetTandem());
         this.stabilizers.SetIsSwept(this.wings.GetSwept());

@@ -9662,8 +9662,8 @@ class Aircraft {
         this.weapons.serialize(s);
         this.used.serialize(s);
         this.rotor.serialize(s);
-        this.alter.serialize(s);
         s.PushNum(this.aircraft_type);
+        this.alter.serialize(s);
     }
     deserialize(d) {
         this.freeze_calculation = true;
@@ -9776,7 +9776,7 @@ class Aircraft {
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.frames.SetIsTandem(this.wings.GetTandem());
         stats = stats.Add(this.frames.PartStats());
-        //Depends on wing area
+        //Depends on Lifting area.
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
         this.stabilizers.SetIsTandem(this.wings.GetTandem());
         this.stabilizers.SetIsSwept(this.wings.GetSwept());
@@ -12101,7 +12101,7 @@ class AlterStats extends Part {
         }
         this.custom_parts = [];
         for (let elem of cp_json) {
-            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem), qty: 0 });
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: 0 });
         }
     }
     toJSON() {

@@ -13,7 +13,7 @@ class AlterStats extends Part {
         }
         this.custom_parts = [];
         for (let elem of cp_json) {
-            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem), qty: 0 });
+            this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: 0 });
         }
     }
 
