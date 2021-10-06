@@ -5881,20 +5881,20 @@ class Stabilizers extends Part {
         this.CalculateStats = callback;
     }
     PartStats() {
-        var vvalid = this.GetVValidList();
-        if (!vvalid[this.vstab_sel]) {
-            this.vstab_sel = 0;
-            if (!vvalid[this.vstab_sel]) {
-                this.vstab_sel = 0;
-                this.vstab_count = 0;
-            }
-        }
         var hvalid = this.GetHValidList();
         if (!hvalid[this.hstab_sel]) {
             this.hstab_sel = 0;
             if (!hvalid[this.hstab_sel]) {
                 this.hstab_sel = 0;
                 this.hstab_count = 0;
+            }
+        }
+        var vvalid = this.GetVValidList();
+        if (!vvalid[this.vstab_sel]) {
+            this.vstab_sel = 0;
+            if (!vvalid[this.vstab_sel]) {
+                this.vstab_sel = 0;
+                this.vstab_count = 0;
             }
         }
         var stats = new Stats();

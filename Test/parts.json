@@ -1211,7 +1211,7 @@
                 "is_canard": true,
                 "increment": 1,
                 "is_vtail": false,
-                "is_tail": false
+                "is_tail": true
             },
             {
                 "name": "Outboard",
