@@ -166,7 +166,6 @@ class AlterStats_HTML extends Display {
         var span = document.createElement("SPAN") as HTMLSpanElement;
         this.sel = document.createElement("SELECT") as HTMLSelectElement;
         span.appendChild(this.sel);
-        this.UpdateSelect();
         this.sel.selectedIndex = -1;
         this.add = document.createElement("BUTTON") as HTMLButtonElement;
         CreateButton("Add Part", this.add, span, false);
@@ -248,6 +247,7 @@ class AlterStats_HTML extends Display {
             this.sel.selectedIndex = -1;
         }
         this.ResetInputs();
+        this.UpdateSelect();
     }
 
     private ResetInputs() {
@@ -290,6 +290,7 @@ class AlterStats_HTML extends Display {
     }
 
     public UpdateDisplay() {
+        this.UpdateSelect();
         var plist = this.alter.GetParts();
         for (let i = 0; i < plist.length; i++) {
             if (this.add_list.length <= i) {
