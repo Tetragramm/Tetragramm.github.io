@@ -50,7 +50,7 @@ class AlterStats extends Part {
         var plist = [];
         for (let p of this.custom_parts) {
             if (p.qty > 0)
-                plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
+                plist.push({ name: p.name, stats: p.stats, qty: p.qty });
         }
         s.PushNum(plist.length);
         for (let p of plist) {
