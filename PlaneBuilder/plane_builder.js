@@ -871,6 +871,7 @@ class EngineBuilder {
         }
         this.min_IAF = 10 * Math.round(1.0e-6 + this.min_IAF / 10);
         this.compressor_count = Math.floor(1.0e-6 + this.compressor_count);
+        this.compressor_count = Math.min(5, this.compressor_count);
         if (this.compressor_type == CompressorEnum.NONE) {
             this.compressor_count = 0;
             this.min_IAF = 0;
