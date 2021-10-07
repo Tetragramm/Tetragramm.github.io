@@ -1631,6 +1631,7 @@ class EngineBuilder {
     }
     VerifyValues() {
         this.engine_displacement = Math.max(0.01, this.engine_displacement);
+        this.engine_displacement = Math.min(150, this.engine_displacement);
         this.era_sel = Math.max(0, Math.min(this.EraTable.length - 1, this.era_sel));
         this.cool_sel = Math.max(0, Math.min(this.CoolingTable.length - 1, this.cool_sel));
         this.num_cyl_per_row = Math.floor(Math.max(1, this.num_cyl_per_row));
