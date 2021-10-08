@@ -287,6 +287,7 @@ class AlterStats_HTML extends Display {
             opt.textContent = p.name;
             this.sel.add(opt);
         }
+        this.sel.selectedIndex = -1;
     }
 
     public UpdateDisplay() {
