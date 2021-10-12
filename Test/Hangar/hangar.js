@@ -8778,10 +8778,13 @@ class WeaponSystem extends Part {
                 }
                 return [3 * count, 0, 0, 0];
             }
-            else {
+            else { //Scatterguns
                 var count = 0;
                 for (let w of this.weapons) {
                     count += w.GetCount();
+                }
+                if (this.action_sel == ActionType.GAST) {
+                    count *= 2;
                 }
                 return [3 * count, 2 * count, 1 * count, 0];
             }
