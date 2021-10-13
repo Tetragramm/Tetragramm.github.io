@@ -12353,6 +12353,9 @@ class Aircraft {
         if (json_version > 12.25) {
             this.alter.fromJSON(js["alter"], json_version);
         }
+        else {
+            this.alter.ClearAll();
+        }
         this.freeze_calculation = false;
         return true;
     }
@@ -12417,6 +12420,9 @@ class Aircraft {
         }
         if (d.version > 12.25) {
             this.alter.deserialize(d);
+        }
+        else {
+            this.alter.ClearAll();
         }
         this.freeze_calculation = false;
     }
@@ -13064,6 +13070,11 @@ class AlterStats extends Part {
             else {
                 this.custom_parts[idx].qty = qty;
             }
+        }
+    }
+    ClearAll() {
+        for (let p of this.custom_parts) {
+            p.qty = 0;
         }
     }
     AddPart(name, stats) {

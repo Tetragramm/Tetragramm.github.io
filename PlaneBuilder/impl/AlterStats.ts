@@ -82,6 +82,12 @@ class AlterStats extends Part {
         }
     }
 
+    public ClearAll() {
+        for (let p of this.custom_parts) {
+            p.qty = 0;
+        }
+    }
+
 
     public AddPart(name: string, stats: Stats) {
         var sumstats = 0;
