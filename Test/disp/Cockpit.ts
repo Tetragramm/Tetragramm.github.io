@@ -18,7 +18,6 @@ class Cockpit_HTML extends Display {
     private d_cost: HTMLTableCellElement;
     private d_cont: HTMLTableCellElement;
     private d_rseq: HTMLTableCellElement;
-    private d_crsh: HTMLTableCellElement;
     private d_strs: HTMLTableCellElement;
     private d_escp: HTMLTableCellElement;
     private d_visi: HTMLTableCellElement;
@@ -49,11 +48,11 @@ class Cockpit_HTML extends Display {
         var h2_row = tbl.insertRow();
         CreateTH(h2_row, lu("Stat Control"));
         CreateTH(h2_row, lu("Stat Required Sections"));
-        CreateTH(h2_row, lu("Stat Crash Safety"));
+        CreateTH(h2_row, "");
         var c2_row = tbl.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_rseq = c2_row.insertCell();
-        this.d_crsh = c2_row.insertCell();
+        c2_row.insertCell();
         var h3_row = tbl.insertRow();
         CreateTH(h3_row, lu("Stat Flight Stress"));
         CreateTH(h3_row, lu("Stat Escape"));
@@ -73,7 +72,6 @@ class Cockpit_HTML extends Display {
         this.d_strs.className = "part_local";
         this.d_visi.className = "part_local";
         this.d_escp.className = "part_local";
-        this.d_crsh.className = "part_local";
 
         //Add all the cockpit types to the select box
         for (let elem of cp.GetTypeList()) {
@@ -143,7 +141,6 @@ class Cockpit_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_cont, stats.control.toString(), true);
         BlinkIfChanged(this.d_rseq, stats.reqsections.toString(), false);
-        BlinkIfChanged(this.d_crsh, stats.crashsafety.toString(), true);
         var fs = this.cockpit.GetFlightStress();
         if (fs[0] != fs[1]) {
             BlinkIfChanged(this.d_strs, StringFmt.Format("{0}", fs[0]));
