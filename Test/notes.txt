@@ -2,40 +2,13 @@ Non-identical radiator demuxing.
 
 Electric Motors from samd6
 
-Update Manual Alteration for custom parts. Special Rules, hide if not needed ect.
-
 Idea: have the Plane Creator Thingy output a performance chart. Not to replace the rules, which still need to be in, but as an aid.
-
-Lifting Body suggestions:
-    No monocoque
-    No stress = Strain, need cantilevers
-    Cantilever no 5th startup fee
 
 Helicopter no Torque penalty? Yes/no arguments
 
 Helicopter no Rotary bonus to dogfight
 
 maybe something that classifies your plane "biplane, high-wing monoplane, sequiplane, sesqui-triplane, quadplane, etc (Include Annular Monoplane separate from tandem biplane
-
-Ornithopters:
-No Propeller stats
-+(Power?) Handling
--2 Reliability
-Automatic Wing Warping Applied
-Cantilever Only, maybe Wing Truss?
-Adjust Energy Stat on "Propeller"
-Stall Speed when powered is halved
-Overspeed = Max Strain
-
-Guns must be hull mounted.
-
-
-30 = 15
-5 = 2
-10
-10
-
-
 
 
 - britain: turny & shooty

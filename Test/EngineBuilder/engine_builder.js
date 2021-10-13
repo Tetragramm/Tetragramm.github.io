@@ -9687,7 +9687,7 @@ class Munitions extends Part {
         var stats = new Stats();
         var ext_bomb_count = this.GetExternalMass();
         stats.reqsections += this.internal_bay_count;
-        if (this.bomb_count > 0 && this.internal_bay_count > 0) {
+        if (this.internal_bay_count > 0) {
             var count = stats.reqsections;
             if (this.internal_bay_1) {
                 stats.reqsections += count;
