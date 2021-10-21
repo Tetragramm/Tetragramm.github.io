@@ -890,12 +890,8 @@ class Aircraft_HTML extends Display {
 
     private UpdateStats(stats: Stats) {
 
-        var dragbreak = stats.drag.toString() + " ("
-            + ((stats.drag + Math.floor(1.0e-6 + stats.mass / 5)) % 5)
-            + "/5)";
-        var massbreak = stats.mass.toString() + " ("
-            + (stats.mass % 5).toString()
-            + "/5)";
+        var dragbreak = StringFmt.Format("{0} + {1} ({2}/5)", stats.drag, Math.floor(1.0e-6 + stats.mass / 5), (stats.drag + Math.floor(1.0e-6 + stats.mass / 5)) % 5);
+        var massbreak = StringFmt.Format("{0} ({1}/5)", stats.mass, stats.mass % 5);
 
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.d_drag, dragbreak);

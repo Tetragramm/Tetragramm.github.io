@@ -16462,7 +16462,7 @@ class Aircraft_HTML extends Display {
         this.derived = new Derived_HTML(tbl);
     }
     UpdateStats(stats) {
-        var dragbreak = stats.drag.toString() + " ("
+        var dragbreak = (stats.drag + Math.floor(1.0e-6 + stats.mass / 5)).toString() + " ("
             + ((stats.drag + Math.floor(1.0e-6 + stats.mass / 5)) % 5)
             + "/5)";
         var massbreak = stats.mass.toString() + " ("
