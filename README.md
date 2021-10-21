@@ -101,3 +101,5 @@ W3.CSS 4.13 is by Jan Egil and Borge Refsnes and is free to use. No license is n
 Scroll-to-Fragment is Copyright(c) 2020 David Császár, distributed under the MIT License.
 
 StringFmt is Copyright(c) 2017 Sven Ulrich, distributed under the MIT License.
+
+JSON2CSV is Copyright (c) 2014 Martin Drapeau, distributed under the MIT License.

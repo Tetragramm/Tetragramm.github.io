@@ -152,9 +152,11 @@ class AlterStats extends Part {
     public PartStats(): Stats {
         var stats = new Stats();
         for (let part of this.custom_parts) {
-            let pstats = part.stats.Clone();
-            pstats = pstats.Multiply(part.qty);
-            stats = stats.Add(pstats);
+            if (part.qty > 0) {
+                let pstats = part.stats.Clone();
+                pstats = pstats.Multiply(part.qty);
+                stats = stats.Add(pstats);
+            }
         }
         return stats;
     }

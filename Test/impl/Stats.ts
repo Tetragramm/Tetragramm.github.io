@@ -65,6 +65,8 @@ class Stats {
             bomb_mass: this.bomb_mass,
             fuel: this.fuel,
             charge: this.charge,
+            warnings: this.warnings,
+            eras: this.era,
         };
     }
 
@@ -128,11 +130,33 @@ class Stats {
                 source: lu(js["name"]),
                 warning: lu(js["warning"])
             });
+        if (js["warnings"]) {
+            let warnings = js["warnings"];
+            let newwarn = [];
+            for (let w of warnings) {
+                newwarn.push({
+                    source: w["source"],
+                    warning: w["warning"],
+                });
+            }
+            this.warnings = this.MergeWarnings(newwarn);
+        }
         if (js["era"]) {
             this.era.push({
                 name: lu(js["name"]),
                 era: lu(js["era"])
             });
+        }
+        if (js["eras"]) {
+            let eras = js["eras"];
+            let newera = [];
+            for (let e of eras) {
+                newera.push({
+                    name: e["name"],
+                    era: e["era"],
+                });
+            }
+            this.era = this.MergeEra(newera);
         }
     }
 

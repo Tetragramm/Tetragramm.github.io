@@ -62,6 +62,8 @@ class Stats {
             bomb_mass: this.bomb_mass,
             fuel: this.fuel,
             charge: this.charge,
+            warnings: this.warnings,
+            eras: this.era,
         };
     }
     fromJSON(js, json_version) {
@@ -124,11 +126,33 @@ class Stats {
                 source: lu(js["name"]),
                 warning: lu(js["warning"])
             });
+        if (js["warnings"]) {
+            let warnings = js["warnings"];
+            let newwarn = [];
+            for (let w of warnings) {
+                newwarn.push({
+                    source: w["source"],
+                    warning: w["warning"],
+                });
+            }
+            this.warnings = this.MergeWarnings(newwarn);
+        }
         if (js["era"]) {
             this.era.push({
                 name: lu(js["name"]),
                 era: lu(js["era"])
             });
+        }
+        if (js["eras"]) {
+            let eras = js["eras"];
+            let newera = [];
+            for (let e of eras) {
+                newera.push({
+                    name: e["name"],
+                    era: e["era"],
+                });
+            }
+            this.era = this.MergeEra(newera);
         }
     }
     serialize(s) {
@@ -704,7 +728,7 @@ class EngineBuilder {
     CalcMass() {
         var Era = this.EraTable[this.era_sel];
         var Cool = this.CoolingTable[this.cool_sel];
-        var CylMass = Math.pow(this.engine_displacement, 2) * this.compression_ratio / 1000;
+        var CylMass = this.engine_displacement ** 2 * this.compression_ratio / 1000;
         var CrankMass = (this.engine_displacement * this.num_rows) / 10 + 1;
         var PistMass = this.engine_displacement / 5;
         var Mass = Math.floor(1.0e-6 + (CylMass + CrankMass + PistMass) * this.UpgradeMass() * this.material_fudge * Cool.massfactor);
@@ -762,13 +786,13 @@ class EngineBuilder {
             case "Liquid Cooled":
                 return 2;
             case "Air Cooled":
-                return (2 + (Math.pow(this.num_rows, 2))) * EraBurnout;
+                return (2 + (this.num_rows ** 2)) * EraBurnout;
             case "Rotary":
-                return (Math.pow(this.num_rows, 2)) / (this.GearedRPM() / 10);
+                return (this.num_rows ** 2) / (this.GearedRPM() / 10);
             case "Contrarotary":
-                return (Math.pow(this.num_rows, 2)) / (this.GearedRPM() / 10);
+                return (this.num_rows ** 2) / (this.GearedRPM() / 10);
             case "Semi-Radial":
-                return (2 + (Math.pow(this.num_rows, 2)) / 2) * EraBurnout;
+                return (2 + (this.num_rows ** 2) / 2) * EraBurnout;
             case "Liquid Radial":
                 return 0.5;
         }
@@ -777,7 +801,7 @@ class EngineBuilder {
     MaterialModifier() {
         var EraBurnout = this.EraTable[this.era_sel].materials;
         var num_cyl = this.num_cyl_per_row * this.num_rows;
-        var CylinderBurnout = this.engine_displacement / num_cyl * (Math.pow(this.compression_ratio, 2)) * EraBurnout;
+        var CylinderBurnout = this.engine_displacement / num_cyl * (this.compression_ratio ** 2) * EraBurnout;
         var GearingBurnout = this.rpm_boost * CylinderBurnout * this.CoolBurnout();
         return GearingBurnout * this.rpm_boost;
     }
@@ -1562,7 +1586,16 @@ class EngineStats {
         }
     }
     toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
+        return {
+            name: this.name,
+            overspeed: this.overspeed,
+            altitude: this.altitude,
+            torque: this.torque,
+            rumble: this.rumble,
+            oiltank: this.oiltank,
+            pulsejet: this.pulsejet,
+            ...this.stats.toJSON()
+        };
     }
     fromJSON(js, json_version = 9999) {
         if (js["name"])
@@ -9936,9 +9969,6 @@ class Aircraft {
         HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty - 5 * this.used.sluggish);
         HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
         HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
-        var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
-        var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
-        var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
         var MaxStrain = 1 / 0;
         if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0) {
             MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
@@ -10003,8 +10033,6 @@ class Aircraft {
                 });
             }
         }
-        var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
-        var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
         var ControlStress = 1;
         if (Stability > 3 || Stability < -3)
             ControlStress++;
@@ -10062,9 +10090,6 @@ class Aircraft {
             HandlingEmpty: HandlingEmpty,
             HandlingFull: HandlingFull,
             HandlingFullwBombs: HandlingFullwBombs,
-            ElevatorsEmpty: ElevatorsEmpty,
-            ElevatorsFull: ElevatorsFull,
-            ElevatorsFullwBombs: ElevatorsFullwBombs,
             MaxStrain: MaxStrain,
             Toughness: Toughness,
             Structure: Structure,
@@ -10073,8 +10098,6 @@ class Aircraft {
             TurnBleed: TurnBleed,
             TurnBleedwBombs: TurnBleedwBombs,
             FuelUses: FuelUses,
-            CruiseRange: CruiseRange,
-            CruiseRangewBombs: CruiseRangewBombs,
             ControlStress: ControlStress,
             RumbleStress: RumbleStress,
             RateOfClimbFull: RateOfClimbFull,
@@ -11643,20 +11666,18 @@ function unmount() {
     documentObserver = undefined;
 }
 function startObserving() {
-    var _a;
     stopObserving();
     if (!getLocation().hash)
         return;
     STOP_EVENTS.forEach(addStopListener);
-    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.observe(document, OBSERVER_CONFIG);
+    documentObserver === null || documentObserver === void 0 ? void 0 : documentObserver.observe(document, OBSERVER_CONFIG);
     adjustScrollPosition();
     observeTimeout = setTimeout(stopObserving, OBSERVE_TIMEOUT_MS);
 }
 function stopObserving() {
-    var _a;
     clearTimeout(observeTimeout);
     cancelAnimationFrame(throttleRequestId);
-    (_a = documentObserver) === null || _a === void 0 ? void 0 : _a.disconnect();
+    documentObserver === null || documentObserver === void 0 ? void 0 : documentObserver.disconnect();
     STOP_EVENTS.forEach(removeStopListener);
 }
 function addStopListener(eventName) {
@@ -11719,12 +11740,179 @@ const OBSERVER_CONFIG = {
 };
 const OBSERVE_TIMEOUT_MS = 10000;
 const STOP_EVENTS = ["selectstart", "touchend", "wheel"];
+/**
+*
+* CSVJSON.json2csv(data, options)
+*
+* Converts JSON to CSV
+*
+* Available options:
+*  - separator: Character which acts as separator. For CSV use a comma (,).
+*               For TSV use a tab (\t).
+*  - flatten: Boolean indicating whether to flatten nested arrays or not.
+*             Optional. Default false.
+*  - output_csvjson_variant: Boolean indicating whether to output objects and
+*             arrays as is as per the CSVJSON format variant. Default is false.
+*
+* The MIT License (MIT)
+*
+* Copyright (c) 2014 Martin Drapeau
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+*/
+class JSON2CSV {
+    constructor() {
+        this.errorMissingSeparator = 'Missing separator option.';
+        this.errorEmpty = 'JSON is empty.';
+        this.errorEmptyHeader = 'Could not detect header. Ensure first row contains your column headers.';
+        this.errorNotAnArray = 'Your JSON must be an array or an object.';
+        this.errorItemNotAnObject = 'Item in array is not an object: {0}';
+    }
+    flattenArray(array, ancestors = []) {
+        function combineKeys(a, b) {
+            let result = a.slice(0);
+            if (!Array.isArray(b))
+                return result;
+            for (let i = 0; i < b.length; i++)
+                if (result.indexOf(b[i]) === -1)
+                    result.push(b[i]);
+            return result;
+        }
+        function extend(target, source) {
+            target = target || {};
+            for (let prop in source) {
+                if (typeof source[prop] === 'object') {
+                    target[prop] = extend(target[prop], source[prop]);
+                }
+                else {
+                    target[prop] = source[prop];
+                }
+            }
+            return target;
+        }
+        var rows = [];
+        for (let i = 0; i < array.length; i++) {
+            let o = array[i];
+            let row = {};
+            let orows = {};
+            let count = 1;
+            if (o !== undefined && o !== null && (!this.isObject(o) || Array.isArray(o)))
+                throw this.errorItemNotAnObject.replace('{0}', JSON.stringify(o));
+            let keys = this.getKeys(o);
+            for (let k = 0; k < keys.length; k++) {
+                let value = o[keys[k]], keyChain = combineKeys(ancestors, [keys[k]]), key = keyChain.join('.');
+                if (Array.isArray(value)) {
+                    orows[key] = this.flattenArray(value, keyChain);
+                    count += orows[key].length;
+                }
+                else {
+                    row[key] = value;
+                }
+            }
+            if (count == 1) {
+                rows.push(row);
+            }
+            else {
+                let keys = this.getKeys(orows);
+                for (let k = 0; k < keys.length; k++) {
+                    let key = keys[k];
+                    for (let r = 0; r < orows[key].length; r++) {
+                        rows.push(extend(extend({}, row), orows[key][r]));
+                    }
+                }
+            }
+        }
+        return rows;
+    }
+    isObject(o) {
+        return o && typeof o == 'object';
+    }
+    getKeys(o) {
+        if (!this.isObject(o))
+            return [];
+        return Object.keys(o);
+    }
+    convert(data, options) {
+        options || (options = {});
+        if (!this.isObject(data))
+            throw this.errorNotAnArray;
+        if (!Array.isArray(data))
+            data = [data];
+        var separator = options.separator || ',';
+        if (!separator)
+            throw this.errorMissingSeparator;
+        var flatten = options.flatten || false;
+        if (flatten)
+            data = this.flattenArray(data);
+        var allKeys = [];
+        var allRows = [];
+        for (let i = 0; i < data.length; i++) {
+            let o = data[i];
+            let row = {};
+            if (o !== undefined && o !== null && (!this.isObject(o) || Array.isArray(o)))
+                throw this.errorItemNotAnObject.replace('{0}', JSON.stringify(o));
+            let keys = this.getKeys(o);
+            for (let k = 0; k < keys.length; k++) {
+                let key = keys[k];
+                if (allKeys.indexOf(key) === -1)
+                    allKeys.push(key);
+                let value = o[key];
+                if (value === undefined && value === null)
+                    continue;
+                if (typeof value == 'string') {
+                    row[key] = '"' + value.replace(/"/g, options.output_csvjson_variant ? '\\"' : '""') + '"';
+                    if (options.output_csvjson_variant)
+                        row[key] = row[key].replace(/\n/g, '\\n');
+                }
+                else {
+                    row[key] = JSON.stringify(value);
+                    if (!options.output_csvjson_variant && (this.isObject(value) || Array.isArray(value)))
+                        row[key] = '"' + row[key].replace(/"/g, '\\"').replace(/\n/g, '\\n') + '"';
+                }
+            }
+            allRows.push(row);
+        }
+        var keyValues = [];
+        for (let i = 0; i < allKeys.length; i++) {
+            keyValues.push('"' + allKeys[i].replace(/"/g, options.output_csvjson_variant ? '\\"' : '""') + '"');
+        }
+        var csv = keyValues.join(separator) + '\n';
+        for (let r = 0; r < allRows.length; r++) {
+            let row = allRows[r];
+            let rowArray = [];
+            for (let k = 0; k < allKeys.length; k++) {
+                let key = allKeys[k];
+                rowArray.push(row[key] || (options.output_csvjson_variant ? 'null' : ''));
+            }
+            csv += rowArray.join(separator) + (r < allRows.length - 1 ? '\n' : '');
+        }
+        return csv;
+    }
+}
 /// <reference path="../impl/Aircraft.ts" />
 /// <reference path="../disp/Tools.ts" />
 /// <reference path="../disp/Derived.ts" />
 /// <reference path="../lz/lz-string.ts" />
 /// <reference path="../string/index.ts" />
 /// <reference path="../scroll/scroll.ts" />
+/// <reference path="./json2csv.ts" />
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var lang = sp.get("lang");
@@ -11862,7 +12050,7 @@ function InitHTML() {
                 RefreshHangarSelect(LoadHangarList());
                 RefreshAcftSelect(LoadAcftList());
             }
-            catch (_a) {
+            catch {
                 BlinkBad(hangar_load.parentElement);
             }
         };
@@ -11888,6 +12076,34 @@ function InitHTML() {
         RemoveHangar(chosen_hangar);
         BlinkNeutral(list_delete.parentElement);
     };
+    var to_csv = document.getElementById("btn_to_csv");
+    to_csv.onclick = () => {
+        var acft_list = LoadAcftList();
+        var DerivedStats = [];
+        var curr_acft = JSON.stringify(acft_hangar.toJSON());
+        for (let acft of acft_list.acft) {
+            try {
+                var str = LZString.decompressFromEncodedURIComponent(acft);
+                var arr = _stringToArrayBuffer(str);
+                var des = new Deserialize(arr);
+                acft_hangar.deserialize(des);
+                acft_hangar.CalculateStats();
+            }
+            catch (e) {
+                console.log("Compressed Query Parameter Failed.");
+                console.log(e);
+                acft_hangar.Reset();
+            }
+            let dstats = acft_hangar.GetDerivedStats();
+            let entries = Object.entries(dstats);
+            entries.splice(0, 0, ["name", acft_hangar.name]);
+            let dstatsn = Object.fromEntries(entries);
+            DerivedStats.push(dstatsn);
+        }
+        acft_hangar.fromJSON(JSON.parse(curr_acft));
+        var json2csv = new JSON2CSV();
+        download(json2csv.convert(DerivedStats, { separator: ',', flatten: true, output_csvjson_variant: false }), chosen_hangar + ".csv", "csv");
+    };
 }
 function InitStats() {
     let acft_data = window.localStorage.aircraft;
@@ -11898,7 +12114,7 @@ function InitStats() {
             acft_builder.fromJSON(JSON.parse(acft_data));
             acft_builder.CalculateStats();
         }
-        catch (_a) {
+        catch {
             console.log("Saved Data Failed.");
             acft_builder.Reset();
         }
@@ -12240,9 +12456,11 @@ class AlterStats extends Part {
     PartStats() {
         var stats = new Stats();
         for (let part of this.custom_parts) {
-            let pstats = part.stats.Clone();
-            pstats = pstats.Multiply(part.qty);
-            stats = stats.Add(pstats);
+            if (part.qty > 0) {
+                let pstats = part.stats.Clone();
+                pstats = pstats.Multiply(part.qty);
+                stats = stats.Add(pstats);
+            }
         }
         return stats;
     }
@@ -13844,45 +14062,45 @@ class Wings_HTML extends Display {
                 opt.disabled = false;
         }
         ht.deck.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.deck = ht.deck.selectedIndex - 1;
             this.wings.SetFullWing(idx, w);
         };
         ht.deck.selectedIndex = wing.deck + 1;
         ht.skin.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.surface = ht.skin.selectedIndex;
             this.wings.SetFullWing(idx, w);
         };
         ht.skin.selectedIndex = wing.surface;
         ht.area.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.area = ht.area.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
         ht.area.valueAsNumber = wing.area;
         ht.wspan.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.span = ht.wspan.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
         ht.wspan.valueAsNumber = wing.span;
         ht.gull.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.gull = ht.gull.checked;
             this.wings.SetFullWing(idx, w);
         };
         ht.gull.checked = wing.gull;
         ht.gull.disabled = !this.wings.CanGull(wing.deck);
         ht.dihedral.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.dihedral = ht.dihedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
         ht.dihedral.max = (wing.span - wing.anhedral - 1).toString();
         ht.dihedral.valueAsNumber = wing.dihedral;
         ht.anhedral.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.anhedral = ht.anhedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
@@ -13936,25 +14154,25 @@ class Wings_HTML extends Display {
                 opt.disabled = false;
         }
         ht.deck.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.deck = ht.deck.selectedIndex - 1;
             this.wings.SetMiniWing(idx, w);
         };
         ht.deck.selectedIndex = wing.deck + 1;
         ht.skin.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.surface = ht.skin.selectedIndex;
             this.wings.SetMiniWing(idx, w);
         };
         ht.skin.selectedIndex = wing.surface;
         ht.area.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.area = ht.area.valueAsNumber;
             this.wings.SetMiniWing(idx, w);
         };
         ht.area.valueAsNumber = wing.area;
         ht.wspan.onchange = () => {
-            let w = Object.assign({}, wing);
+            let w = { ...wing };
             w.span = ht.wspan.valueAsNumber;
             this.wings.SetMiniWing(idx, w);
         };
@@ -15872,7 +16090,7 @@ class Aircraft_HTML extends Display {
                 this.acft.CalculateStats();
             }
         }
-        catch (_a) {
+        catch {
             BlinkBad(text_area.parentElement);
         }
         finally {

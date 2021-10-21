@@ -44,9 +44,6 @@ type DerivedStats = {
     HandlingEmpty: number,
     HandlingFull: number,
     HandlingFullwBombs: number,
-    ElevatorsEmpty: number,
-    ElevatorsFull: number,
-    ElevatorsFullwBombs: number,
     MaxStrain: number,
     Toughness: number,
     Structure: number,
@@ -55,8 +52,6 @@ type DerivedStats = {
     TurnBleed: number,
     TurnBleedwBombs: number,
     FuelUses: number,
-    CruiseRange: number,
-    CruiseRangewBombs: number,
     ControlStress: number,
     RumbleStress: number,
     RateOfClimbFull: number,
@@ -566,10 +561,6 @@ class Aircraft {
         HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
         HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
 
-        var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
-        var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
-        var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
-
         var MaxStrain = 1 / 0;
         MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         //And store the results so they can be displayed
@@ -634,10 +625,6 @@ class Aircraft {
                 });
             }
         }
-
-        var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
-        var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
-
 
         var ControlStress = 1;
         if (Stability > 3 || Stability < -3)
@@ -726,9 +713,6 @@ class Aircraft {
             HandlingEmpty: HandlingEmpty,
             HandlingFull: HandlingFull,
             HandlingFullwBombs: HandlingFullwBombs,
-            ElevatorsEmpty: ElevatorsEmpty,
-            ElevatorsFull: ElevatorsFull,
-            ElevatorsFullwBombs: ElevatorsFullwBombs,
             MaxStrain: MaxStrain,
             Toughness: Toughness,
             Structure: Structure,
@@ -737,8 +721,6 @@ class Aircraft {
             TurnBleed: TurnBleed,
             TurnBleedwBombs: TurnBleedwBombs,
             FuelUses: FuelUses,
-            CruiseRange: CruiseRange,
-            CruiseRangewBombs: CruiseRangewBombs,
             ControlStress: ControlStress,
             RumbleStress: RumbleStress,
             RateOfClimbFull: RateOfClimbFull,

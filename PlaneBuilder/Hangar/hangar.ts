@@ -4,6 +4,7 @@
 /// <reference path="../lz/lz-string.ts" />
 /// <reference path="../string/index.ts" />
 /// <reference path="../scroll/scroll.ts" />
+/// <reference path="./json2csv.ts" />
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -184,6 +185,31 @@ function InitHTML() {
     list_delete.onclick = () => {
         RemoveHangar(chosen_hangar);
         BlinkNeutral(list_delete.parentElement);
+    }
+
+    var to_csv = document.getElementById("btn_to_csv") as HTMLButtonElement;
+    to_csv.onclick = () => {
+        var acft_list = LoadAcftList();
+        var DerivedStats = [];
+        var curr_acft = JSON.stringify(acft_hangar.toJSON());
+        for (let acft of acft_list.acft) {
+            try {
+                var str = LZString.decompressFromEncodedURIComponent(acft);
+                var arr = _stringToArrayBuffer(str);
+                var des = new Deserialize(arr);
+                acft_hangar.deserialize(des);
+                acft_hangar.CalculateStats();
+            } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); acft_hangar.Reset(); }
+
+            let dstats = acft_hangar.GetDerivedStats();
+            let entries = Object.entries<any>(dstats);
+            entries.splice(0, 0, ["name", acft_hangar.name]);
+            let dstatsn = Object.fromEntries(entries);
+            DerivedStats.push(dstatsn);
+        }
+        acft_hangar.fromJSON(JSON.parse(curr_acft));
+        var json2csv = new JSON2CSV();
+        download(json2csv.convert(DerivedStats, { separator: ',', flatten: true, output_csvjson_variant: false }), chosen_hangar + ".csv", "csv");
     }
 }
 

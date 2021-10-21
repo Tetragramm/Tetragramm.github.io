@@ -62,6 +62,8 @@ class Stats {
             bomb_mass: this.bomb_mass,
             fuel: this.fuel,
             charge: this.charge,
+            warnings: this.warnings,
+            eras: this.era,
         };
     }
     fromJSON(js, json_version) {
@@ -124,11 +126,33 @@ class Stats {
                 source: lu(js["name"]),
                 warning: lu(js["warning"])
             });
+        if (js["warnings"]) {
+            let warnings = js["warnings"];
+            let newwarn = [];
+            for (let w of warnings) {
+                newwarn.push({
+                    source: w["source"],
+                    warning: w["warning"],
+                });
+            }
+            this.warnings = this.MergeWarnings(newwarn);
+        }
         if (js["era"]) {
             this.era.push({
                 name: lu(js["name"]),
                 era: lu(js["era"])
             });
+        }
+        if (js["eras"]) {
+            let eras = js["eras"];
+            let newera = [];
+            for (let e of eras) {
+                newera.push({
+                    name: e["name"],
+                    era: e["era"],
+                });
+            }
+            this.era = this.MergeEra(newera);
         }
     }
     serialize(s) {
@@ -12657,9 +12681,6 @@ class Aircraft {
         HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty - 5 * this.used.sluggish);
         HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
         HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
-        var ElevatorsEmpty = Math.max(1, Math.floor(1.0e-6 + HandlingEmpty / 10));
-        var ElevatorsFull = Math.max(1, Math.floor(1.0e-6 + HandlingFull / 10));
-        var ElevatorsFullwBombs = Math.max(1, Math.floor(1.0e-6 + HandlingFullwBombs / 10));
         var MaxStrain = 1 / 0;
         MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         //And store the results so they can be displayed
@@ -12719,8 +12740,6 @@ class Aircraft {
                 });
             }
         }
-        var CruiseRange = FuelUses / 3 * (MaxSpeedFull + MaxSpeedEmpty) / 2 * 10 * 0.7;
-        var CruiseRangewBombs = FuelUses / 3 * MaxSpeedwBombs * 10 * 0.7;
         var ControlStress = 1;
         if (Stability > 3 || Stability < -3)
             ControlStress++;
@@ -12801,9 +12820,6 @@ class Aircraft {
             HandlingEmpty: HandlingEmpty,
             HandlingFull: HandlingFull,
             HandlingFullwBombs: HandlingFullwBombs,
-            ElevatorsEmpty: ElevatorsEmpty,
-            ElevatorsFull: ElevatorsFull,
-            ElevatorsFullwBombs: ElevatorsFullwBombs,
             MaxStrain: MaxStrain,
             Toughness: Toughness,
             Structure: Structure,
@@ -12812,8 +12828,6 @@ class Aircraft {
             TurnBleed: TurnBleed,
             TurnBleedwBombs: TurnBleedwBombs,
             FuelUses: FuelUses,
-            CruiseRange: CruiseRange,
-            CruiseRangewBombs: CruiseRangewBombs,
             ControlStress: ControlStress,
             RumbleStress: RumbleStress,
             RateOfClimbFull: RateOfClimbFull,
@@ -13136,9 +13150,11 @@ class AlterStats extends Part {
     PartStats() {
         var stats = new Stats();
         for (let part of this.custom_parts) {
-            let pstats = part.stats.Clone();
-            pstats = pstats.Multiply(part.qty);
-            stats = stats.Add(pstats);
+            if (part.qty > 0) {
+                let pstats = part.stats.Clone();
+                pstats = pstats.Multiply(part.qty);
+                stats = stats.Add(pstats);
+            }
         }
         return stats;
     }
