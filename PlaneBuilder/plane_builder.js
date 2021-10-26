@@ -8018,6 +8018,7 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
+        console.log("json Repeating = " + this.repeating);
     }
     serialize(s) {
         s.PushNum(this.raw_weapon_type);
@@ -8034,6 +8035,7 @@ class WeaponSystem extends Part {
         s.PushNum(this.seat);
     }
     deserialize(d) {
+        console.log("Do Deserialize");
         this.raw_weapon_type = d.GetNum();
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
@@ -8084,6 +8086,7 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
+        console.log("Repeating = " + this.repeating);
     }
     GetWeaponSelected() {
         return this.weapon_type;
@@ -8155,7 +8158,7 @@ class WeaponSystem extends Part {
             this.final_weapon.jam = jams.join('/');
             this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
-        if (this.repeating) {
+        if (this.repeating && this.final_weapon.reload != 0) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
@@ -9699,6 +9702,7 @@ class Aircraft {
         this.alter.serialize(s);
     }
     deserialize(d) {
+        console.log("Acft Deserialize");
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);
@@ -14115,7 +14119,7 @@ class Cards {
         context.fillText(this.name, 100, 100, 145);
         context.fillText("" + this.lowest_overspeed, 70, 158, 40);
         context.fillText("" + this.acft_data.full_speed, 126, 158, 40);
-        var combat_speed = Math.floor(1.0e-6 + 0.9 * this.acft_data.full_speed - this.acft_data.turn_bleed);
+        var combat_speed = this.acft_data.full_speed - this.acft_data.turn_bleed - Math.floor(1.0e-6 + 0.1 * this.acft_data.full_speed);
         context.fillText("" + combat_speed, 187, 158, 40);
         context.fillText("" + this.acft_data.full_stall, 245, 158, 40);
         var structure = this.acft_data.toughness + this.acft_data.max_strain;

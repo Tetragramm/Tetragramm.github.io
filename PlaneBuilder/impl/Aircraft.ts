@@ -251,6 +251,7 @@ class Aircraft {
     }
 
     public deserialize(d: Deserialize) {
+        console.log("Acft Deserialize");
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);

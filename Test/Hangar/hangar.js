@@ -8508,7 +8508,7 @@ class WeaponSystem extends Part {
             this.final_weapon.jam = jams.join('/');
             this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
-        if (this.repeating) {
+        if (this.repeating && this.final_weapon.reload != 0) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
@@ -16042,7 +16042,7 @@ class Cards {
         context.fillText(this.name, 100, 100, 145);
         context.fillText("" + this.lowest_overspeed, 70, 158, 40);
         context.fillText("" + this.acft_data.full_speed, 126, 158, 40);
-        var combat_speed = Math.floor(1.0e-6 + 0.9 * this.acft_data.full_speed - this.acft_data.turn_bleed);
+        var combat_speed = this.acft_data.full_speed - this.acft_data.turn_bleed - Math.floor(1.0e-6 + 0.1 * this.acft_data.full_speed);
         context.fillText("" + combat_speed, 187, 158, 40);
         context.fillText("" + this.acft_data.full_stall, 245, 158, 40);
         var structure = this.acft_data.toughness + this.acft_data.max_strain;

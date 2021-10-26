@@ -143,6 +143,8 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
+        
+        console.log("json Repeating = "+this.repeating);
     }
 
     public serialize(s: Serialize) {
@@ -161,6 +163,7 @@ class WeaponSystem extends Part {
     }
 
     public deserialize(d: Deserialize) {
+        console.log("Do Deserialize");
         this.raw_weapon_type = d.GetNum();
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
@@ -211,6 +214,7 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
+        console.log("Repeating = "+this.repeating);
     }
 
     public GetWeaponSelected() {
@@ -285,7 +289,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
 
-        if (this.repeating) {
+        if (this.repeating && this.final_weapon.reload != 0) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
