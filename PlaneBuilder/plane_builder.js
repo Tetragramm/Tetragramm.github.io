@@ -4419,17 +4419,24 @@ class Frames extends Part {
         }
         return stats;
     }
-    CountLiftingBody() {
+    CountMainLiftingBody() {
         var count = 0;
         for (let s of this.section_list) {
             if (s.lifting_body)
                 count++;
         }
+        return count;
+    }
+    CountTailLiftingBody() {
+        var count = 0;
         for (let s of this.tail_section_list) {
             if (s.lifting_body)
                 count++;
         }
         return count;
+    }
+    CountLiftingBody() {
+        return this.CountMainLiftingBody() + this.CountTailLiftingBody();
     }
     SetIsTandem(use) {
         if (this.is_tandem != use) {
@@ -4642,6 +4649,12 @@ class Frames extends Part {
         }
         else {
             stats.drag += lb_count;
+        }
+        if (this.PossibleRemoveSections() && this.CountMainLiftingBody() < this.CountSections()) {
+            stats.warnings.push({
+                source: lu("Frame Count"),
+                warning: lu("Frame Count Warning"),
+            });
         }
         stats.structure = Math.floor(1.0e-6 + stats.structure);
         stats.cost = Math.floor(1.0e-6 + stats.cost);
