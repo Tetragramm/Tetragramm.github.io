@@ -134,4 +134,9 @@ class Used extends Part {
 
         this.CalculateStats();
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }

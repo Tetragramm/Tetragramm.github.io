@@ -197,4 +197,15 @@ class Cockpits extends Part {
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+
+        for (let c of this.positions) {
+            value = MergeElectrics(value, c.GetElectrics());
+        }
+
+        return value;
+    }
+
 }

@@ -2207,6 +2207,20 @@ function FlexLabel(txt, div1) {
     lbl.classList.add("flex-item");
     div1.appendChild(lbl);
 }
+function FlexLabels(txtL, txtR, fs) {
+    var lbl = document.createElement("LABEL");
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txtL;
+    lbl.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+    var lbl2 = document.createElement("LABEL");
+    lbl2.style.marginLeft = "0.25em";
+    lbl2.style.marginRight = "0.5em";
+    lbl2.textContent = txtR;
+    lbl2.classList.add("flex-item");
+    fs.div2.appendChild(lbl2);
+}
 function FlexSpace(fs) {
     var lbl = document.createElement("LABEL");
     lbl.textContent = " ";
@@ -4360,6 +4374,37 @@ function IsAnyOrnithopter(type) {
         || type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER;
 }
 class Part {
+    FormatEquipment(equipment, name, charge) {
+        if (Math.abs(charge) > 0.5) {
+            equipment.push({
+                source: lu(name),
+                charge: charge.toString(),
+            });
+        }
+        else if (charge > 0 && charge < 1.0e-6) {
+            equipment.push({
+                source: lu(name),
+                charge: "-",
+            });
+        }
+        return equipment;
+    }
+}
+function MergeElectrics(a, b) {
+    for (let bi = 0; bi < b.equipment.length; bi++) {
+        let merge = false;
+        for (let ai = 0; ai < a.equipment.length; ai++) {
+            if (a.equipment[ai].source == b.equipment[bi].source && !isNaN(parseInt(a.equipment[ai].charge))) {
+                a.equipment[ai].charge = (parseInt(a.equipment[ai].charge) + parseInt(b.equipment[bi].charge)).toString();
+                merge = true;
+                break;
+            }
+        }
+        if (!merge) {
+            a.equipment.push(b.equipment[bi]);
+        }
+    }
+    return { storage: a.storage + b.storage, equipment: a.equipment };
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -4374,7 +4419,7 @@ class Accessories extends Part {
         for (let elem of js["electrical"]) {
             this.electric_list.push({
                 name: elem["name"], stats: new Stats(elem),
-                cp10s: elem["cp10s"]
+                cp10s: elem["cp10s"], storage: elem["storage"],
             });
         }
         this.electrical_count = [...Array(this.electric_list.length).fill(0)];
@@ -4732,6 +4777,55 @@ class Accessories extends Part {
         stats.Round();
         return stats;
     }
+    GetElectrics() {
+        var battery_storage = 0;
+        var equipment = [];
+        for (let i = 0; i < this.electric_list.length; i++) {
+            let item = this.electric_list[i];
+            let count = this.electrical_count[i];
+            if (count > 0) {
+                battery_storage += item.storage * count;
+                if (item.cp10s > 0) {
+                    equipment.push({
+                        source: lu(item.name),
+                        charge: StringFmt.Format("{0}" + lu("Derived Per 10 Speed"), Math.floor(1.0e-6 + count * item.cp10s)),
+                    });
+                }
+                else if (item.stats.charge != 0) {
+                    equipment.push({
+                        source: lu(item.name),
+                        charge: (count * item.stats.charge).toString(),
+                    });
+                }
+            }
+        }
+        let radio = this.radio_list[this.radio_sel];
+        equipment = this.FormatEquipment(equipment, radio.name, radio.stats.charge);
+        for (let i = 0; i < this.clim_list.length; i++) {
+            if (this.clim_sel[i]) {
+                let item = this.clim_list[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+        for (let i = 0; i < this.recon_list.length; i++) {
+            let item = this.recon_list[i];
+            let count = this.recon_sel[i];
+            if (count > 0) {
+                equipment = this.FormatEquipment(equipment, item.name, count * item.stats.charge);
+            }
+        }
+        for (let i = 0; i < this.visi_list.length; i++) {
+            if (this.visi_sel[i]) {
+                let item = this.visi_list[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+        let autopilot = this.auto_list[this.auto_sel];
+        equipment = this.FormatEquipment(equipment, autopilot.name, autopilot.stats.charge);
+        let controls = this.cont_list[this.cont_sel];
+        equipment = this.FormatEquipment(equipment, controls.name, controls.stats.charge);
+        return { storage: battery_storage, equipment: equipment };
+    }
 }
 class Localization {
     constructor(js) {
@@ -4829,6 +4923,10 @@ class Era extends Part {
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -5096,6 +5194,35 @@ class Cockpit extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    GetElectrics() {
+        var battery_storage = 0;
+        var equipment = [];
+        for (let i = 0; i < this.upgrades.length; i++) {
+            if (this.selected_upgrades[i]) {
+                let item = this.upgrades[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+        for (let i = 0; i < this.upgrades.length; i++) {
+            if (this.selected_upgrades[i]) {
+                let item = this.upgrades[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+        for (let i = 0; i < this.safety.length; i++) {
+            if (this.selected_safety[i]) {
+                let item = this.safety[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+        for (let i = 0; i < this.gunsights.length; i++) {
+            if (this.selected_gunsights[i]) {
+                let item = this.gunsights[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+        return { storage: battery_storage, equipment: equipment };
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -5269,6 +5396,13 @@ class Cockpits extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        for (let c of this.positions) {
+            value = MergeElectrics(value, c.GetElectrics());
+        }
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -5351,6 +5485,10 @@ class Passengers extends Part {
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -6233,6 +6371,10 @@ class Engine extends Part {
         stats.reliability = 0;
         return stats;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -6374,6 +6516,10 @@ class Radiator extends Part {
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -6823,6 +6969,22 @@ class Engines extends Part {
         }
         return has > 1;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        for (let e = 0; e < this.engines.length; e++) {
+            let s = this.engines[e].PartStats();
+            if (s.charge != 0) {
+                value.equipment.push({
+                    source: lu("Vital Part Engine", e),
+                    charge: s.charge.toString(),
+                });
+            }
+        }
+        for (let r of this.radiators) {
+            value = MergeElectrics(value, r.GetElectrics());
+        }
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -7029,6 +7191,10 @@ class Propeller extends Part {
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -7680,6 +7846,10 @@ class Frames extends Part {
         stats.visibility = Math.min(stats.visibility, 3);
         stats.Round();
         return stats;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -8400,6 +8570,26 @@ class Wings extends Part {
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        var total_charge = 0;
+        var source = "";
+        for (let wing of this.wing_list) {
+            let skin = this.skin_list[wing.surface];
+            if (skin.stats.charge != 0) {
+                source = lu(skin.name);
+                total_charge += skin.stats.charge * wing.area;
+            }
+        }
+        total_charge = Math.floor(1.0e-6 + total_charge);
+        if (total_charge != 0) {
+            value.equipment.push({
+                source: source,
+                charge: total_charge.toString(),
+            });
+        }
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -8708,6 +8898,10 @@ class Stabilizers extends Part {
         }
         return stats;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -8933,6 +9127,10 @@ class ControlSurfaces extends Part {
                 stats = stats.Add(this.drag_list[i].stats);
         }
         return stats;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -9352,6 +9550,10 @@ class Reinforcement extends Part {
         }
         return stats;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -9528,6 +9730,10 @@ class Fuel extends Part {
         if ((stats.wetmass % 5) > 0)
             stats.wetmass += 5 - (stats.wetmass % 5);
         return stats;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -9743,6 +9949,10 @@ class Munitions extends Part {
             stats.bomb_mass += 5 - (stats.bomb_mass % 5);
         return stats;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -9790,6 +10000,11 @@ class CargoAndPassengers extends Part {
         if ((stats.bomb_mass % 5) > 0)
             stats.bomb_mass += 5 - (stats.bomb_mass % 5);
         return stats;
+    }
+    GetElectrics() {
+        var battery_storage = 0;
+        var equipment = [];
+        return { storage: battery_storage, equipment: equipment };
     }
 }
 /// <reference path="./Part.ts" />
@@ -9960,6 +10175,10 @@ class LandingGear extends Part {
         }
         stats.Round();
         return stats;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -10201,6 +10420,10 @@ class Optimization extends Part {
         stats.reliability = this.reliability * 2;
         stats.drag = Math.floor(1.0e-6 + -(this.drag * this.acft_stats.drag / 10));
         return stats;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -10636,6 +10859,10 @@ class Weapon extends Part {
             stats.mass += 2;
         stats.Round();
         return stats;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -11409,6 +11636,10 @@ class WeaponSystem extends Part {
         stats.mass += (this.ammo - 1) * count;
         return stats;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -11826,6 +12057,23 @@ class Weapons extends Part {
         stats.control -= Math.floor(1.0e-6 + this.GetWingWeight() / 5);
         return stats;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        for (let i = 0; i < this.weapon_sets.length; i++) {
+            let set = this.weapon_sets[i];
+            if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) {
+                let charges = set.GetHRCharges();
+                //Negate the values for display
+                for (let c = 0; c < charges.length; c++)
+                    charges[c] *= -1;
+                value.equipment.push({
+                    source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
+                    charge: StringFmt.Join('/', charges),
+                });
+            }
+        }
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 class Used extends Part {
@@ -11940,6 +12188,10 @@ class Used extends Part {
         this.leaky = this.Normalize(this.leaky);
         this.sluggish = this.Normalize(this.sluggish);
         this.CalculateStats();
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -12238,6 +12490,10 @@ class Rotor extends Part {
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
+    }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }
 /// <reference path="./Part.ts" />
@@ -13023,6 +13279,50 @@ class Aircraft {
     GetAlter() {
         return this.alter;
     }
+    GetElectrics() {
+        let value = { storage: 0, equipment: [] };
+        value = MergeElectrics(value, this.accessories.GetElectrics());
+        value = MergeElectrics(value, this.wings.GetElectrics());
+        value = MergeElectrics(value, this.cockpits.GetElectrics());
+        value = MergeElectrics(value, this.alter.GetElectrics());
+        value = MergeElectrics(value, this.cargo.GetElectrics());
+        value = MergeElectrics(value, this.era.GetElectrics());
+        value = MergeElectrics(value, this.frames.GetElectrics());
+        value = MergeElectrics(value, this.fuel.GetElectrics());
+        value = MergeElectrics(value, this.gear.GetElectrics());
+        value = MergeElectrics(value, this.munitions.GetElectrics());
+        value = MergeElectrics(value, this.optimization.GetElectrics());
+        value = MergeElectrics(value, this.passengers.GetElectrics());
+        value = MergeElectrics(value, this.reinforcements.GetElectrics());
+        value = MergeElectrics(value, this.rotor.GetElectrics());
+        value = MergeElectrics(value, this.stabilizers.GetElectrics());
+        value = MergeElectrics(value, this.used.GetElectrics());
+        value.equipment = value.equipment.sort((a, b) => {
+            var ac = parseInt(a.charge);
+            if (a.charge == "-")
+                ac = 0;
+            var bc = parseInt(b.charge);
+            if (b.charge == "-")
+                bc = 0;
+            if (isNaN(ac) && isNaN(bc))
+                return 0;
+            if (isNaN(ac))
+                return -1;
+            if (isNaN(bc))
+                return 1;
+            return bc - ac;
+        });
+        value = MergeElectrics(this.engines.GetElectrics(), value);
+        value = MergeElectrics(value, this.weapons.GetElectrics());
+        //Add + symbols
+        for (let eq of value.equipment) {
+            let chg = parseInt(eq.charge);
+            if (!isNaN(chg) && chg > 0) {
+                eq.charge = "+" + eq.charge;
+            }
+        }
+        return value;
+    }
 }
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
@@ -13170,6 +13470,16 @@ class AlterStats extends Part {
             }
         }
         return stats;
+    }
+    GetElectrics() {
+        var battery_storage = 0;
+        var equipment = [];
+        for (let part of this.custom_parts) {
+            if (part.qty > 0) {
+                equipment = this.FormatEquipment(equipment, part.name, part.stats.charge);
+            }
+        }
+        return { storage: battery_storage, equipment: equipment };
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;

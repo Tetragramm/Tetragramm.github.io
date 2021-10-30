@@ -78,4 +78,9 @@ class Era extends Part {
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }

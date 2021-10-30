@@ -37,8 +37,6 @@
         "X1 Collimated Gunsight": "X1 Collimated Gunsight",
         "Telescopic Gunsight": "Telescopic Gunsight",
         "Gunsight Warning": "+2 to Open Fire if you Drew a Bead.",
-        "Electric Gunsight Warning": "+2 to Open Fire if you Drew a Bead. Disabled when the Electrics Vital Part is hit.",
-        "Needs Electric": "Disabled when the Electrics Vital Part is hit.",
         "Illuminated Reflex Sight": "Illuminated Reflex Sight",
         "Gyro Gunsight": "Gyro Gunsight",
         "Bombsight": "Bombsight",
@@ -461,7 +459,7 @@
         "Yes": "Yes",
         "No": "No",
         "Derived Per 10 Speed": "/10 speed",
-        "Derived Battery word storage": "storage",
+        "Derived Battery": "Battery Storage",
         "Weapon Description": "{0}: {1}x {2} fires [{3}] for {4} damage with {5} hits with {6} ammunition. [{7}]",
         "Weapon Description Heat Ray": "{0}: {1}x {2} fires [{3}] for {4} damage with {5} hits with {6} charges. [{7}]",
         "Submachine Gun": "Submachine Gun",
@@ -744,7 +742,7 @@
         "Alter Quantity": "Quantity",
         "Alter Part Name": "Part Name",
         "Alter Part Special Rules": "Special Rules",
-        "Frame Count":"Frame Count",
-        "Frame Count Warning":"This plane appears to have unused frame sections.  Check to see if this is intentional."
+        "Frame Count": "Frame Count",
+        "Frame Count Warning": "This plane appears to have unused frame sections.  Check to see if this is intentional."
     }
 }

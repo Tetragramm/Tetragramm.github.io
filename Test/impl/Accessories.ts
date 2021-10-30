@@ -6,7 +6,7 @@ class Accessories extends Part {
     //Electrical
     private electric_list: {
         name: string, stats: Stats,
-        cp10s: number
+        cp10s: number, storage: number,
     }[];
     private electrical_count: number[];
     private radio_list: { name: string, stats: Stats }[];
@@ -43,7 +43,7 @@ class Accessories extends Part {
         for (let elem of js["electrical"]) {
             this.electric_list.push({
                 name: elem["name"], stats: new Stats(elem),
-                cp10s: elem["cp10s"]
+                cp10s: elem["cp10s"], storage: elem["storage"],
             });
         }
         this.electrical_count = [...Array(this.electric_list.length).fill(0)];
@@ -456,5 +456,63 @@ class Accessories extends Part {
 
         stats.Round();
         return stats;
+    }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        var battery_storage = 0;
+        var equipment: { source: string, charge: string }[] = [];
+        for (let i = 0; i < this.electric_list.length; i++) {
+            let item = this.electric_list[i];
+            let count = this.electrical_count[i];
+            if (count > 0) {
+                battery_storage += item.storage * count;
+                if (item.cp10s > 0) {
+                    equipment.push({
+                        source: lu(item.name),
+                        charge: StringFmt.Format("{0}" + lu("Derived Per 10 Speed"), Math.floor(1.0e-6 + count * item.cp10s)),
+                    });
+                } else if (item.stats.charge != 0) {
+                    equipment.push({
+                        source: lu(item.name),
+                        charge: (count * item.stats.charge).toString(),
+                    });
+                }
+            }
+        }
+
+        let radio = this.radio_list[this.radio_sel];
+        equipment = this.FormatEquipment(equipment, radio.name, radio.stats.charge);
+
+        for (let i = 0; i < this.clim_list.length; i++) {
+            if (this.clim_sel[i]) {
+                let item = this.clim_list[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+
+        for (let i = 0; i < this.recon_list.length; i++) {
+            let item = this.recon_list[i];
+            let count = this.recon_sel[i];
+            if (count > 0) {
+                equipment = this.FormatEquipment(equipment, item.name, count * item.stats.charge);
+            }
+        }
+
+        for (let i = 0; i < this.visi_list.length; i++) {
+            if (this.visi_sel[i]) {
+                let item = this.visi_list[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+
+        let autopilot = this.auto_list[this.auto_sel];
+        equipment = this.FormatEquipment(equipment, autopilot.name, autopilot.stats.charge);
+
+        let controls = this.cont_list[this.cont_sel];
+        equipment = this.FormatEquipment(equipment, controls.name, controls.stats.charge);
+
+
+
+        return { storage: battery_storage, equipment: equipment };
     }
 }

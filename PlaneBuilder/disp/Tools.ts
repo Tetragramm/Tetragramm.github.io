@@ -252,6 +252,22 @@ function FlexLabel(txt: string, div1: HTMLDivElement) {
     div1.appendChild(lbl);
 }
 
+function FlexLabels(txtL: string, txtR: string, fs: FlexSection) {
+    var lbl = document.createElement("LABEL") as HTMLLabelElement;
+    lbl.style.marginLeft = "0.25em";
+    lbl.style.marginRight = "0.5em";
+    lbl.textContent = txtL;
+    lbl.classList.add("flex-item");
+    fs.div1.appendChild(lbl);
+
+    var lbl2 = document.createElement("LABEL") as HTMLLabelElement;
+    lbl2.style.marginLeft = "0.25em";
+    lbl2.style.marginRight = "0.5em";
+    lbl2.textContent = txtR;
+    lbl2.classList.add("flex-item");
+    fs.div2.appendChild(lbl2);
+}
+
 function FlexSpace(fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     lbl.textContent = " ";

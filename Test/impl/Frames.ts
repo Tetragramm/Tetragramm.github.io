@@ -750,10 +750,10 @@ class Frames extends Part {
             stats.drag += lb_count;
         }
 
-        if(this.PossibleRemoveSections() && this.CountMainLiftingBody() < this.CountSections()){
+        if (this.PossibleRemoveSections() && this.CountMainLiftingBody() < this.CountSections()) {
             stats.warnings.push({
-                source:lu("Frame Count"),
-                warning:lu("Frame Count Warning"),
+                source: lu("Frame Count"),
+                warning: lu("Frame Count Warning"),
             });
         }
 
@@ -764,5 +764,10 @@ class Frames extends Part {
         stats.Round();
 
         return stats;
+    }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }

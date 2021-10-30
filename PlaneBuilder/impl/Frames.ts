@@ -474,7 +474,7 @@ class Frames extends Part {
         return stats;
     }
 
-    private CountMainLiftingBody(){
+    private CountMainLiftingBody() {
         var count = 0;
         for (let s of this.section_list) {
             if (s.lifting_body)
@@ -482,8 +482,8 @@ class Frames extends Part {
         }
         return count;
     }
-    
-    private CountTailLiftingBody(){
+
+    private CountTailLiftingBody() {
         var count = 0;
         for (let s of this.tail_section_list) {
             if (s.lifting_body)
@@ -742,10 +742,10 @@ class Frames extends Part {
             stats.drag += lb_count;
         }
 
-        if(this.PossibleRemoveSections() && this.CountMainLiftingBody() < this.CountSections()){
+        if (this.PossibleRemoveSections() && this.CountMainLiftingBody() < this.CountSections()) {
             stats.warnings.push({
-                source:lu("Frame Count"),
-                warning:lu("Frame Count Warning"),
+                source: lu("Frame Count"),
+                warning: lu("Frame Count Warning"),
             });
         }
 
@@ -756,5 +756,10 @@ class Frames extends Part {
         stats.Round();
 
         return stats;
+    }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }

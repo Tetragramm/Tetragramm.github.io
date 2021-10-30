@@ -61,4 +61,11 @@ class CargoAndPassengers extends Part {
 
         return stats;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        var battery_storage = 0;
+        var equipment: { source: string, charge: string }[] = [];
+
+        return { storage: battery_storage, equipment: equipment };
+    }
 }

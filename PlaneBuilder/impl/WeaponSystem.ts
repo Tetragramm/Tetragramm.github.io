@@ -143,8 +143,6 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
-        
-        console.log("json Repeating = "+this.repeating);
     }
 
     public serialize(s: Serialize) {
@@ -163,7 +161,6 @@ class WeaponSystem extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        console.log("Do Deserialize");
         this.raw_weapon_type = d.GetNum();
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
@@ -214,7 +211,6 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
-        console.log("Repeating = "+this.repeating);
     }
 
     public GetWeaponSelected() {
@@ -865,5 +861,10 @@ class WeaponSystem extends Part {
         stats.mass += (this.ammo - 1) * count;
 
         return stats;
+    }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+        return value;
     }
 }

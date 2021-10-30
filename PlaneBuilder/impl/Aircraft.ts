@@ -251,7 +251,6 @@ class Aircraft {
     }
 
     public deserialize(d: Deserialize) {
-        console.log("Acft Deserialize");
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);
@@ -888,5 +887,54 @@ class Aircraft {
     }
     public GetAlter() {
         return this.alter;
+    }
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value: { storage: number, equipment: { source: string, charge: string }[] } = { storage: 0, equipment: [] };
+        value = MergeElectrics(value, this.accessories.GetElectrics());
+        value = MergeElectrics(value, this.wings.GetElectrics());
+        value = MergeElectrics(value, this.cockpits.GetElectrics());
+        value = MergeElectrics(value, this.alter.GetElectrics());
+
+        value = MergeElectrics(value, this.cargo.GetElectrics());
+        value = MergeElectrics(value, this.era.GetElectrics());
+        value = MergeElectrics(value, this.frames.GetElectrics());
+        value = MergeElectrics(value, this.fuel.GetElectrics());
+        value = MergeElectrics(value, this.gear.GetElectrics());
+        value = MergeElectrics(value, this.munitions.GetElectrics());
+        value = MergeElectrics(value, this.optimization.GetElectrics());
+        value = MergeElectrics(value, this.passengers.GetElectrics());
+        value = MergeElectrics(value, this.reinforcements.GetElectrics());
+        value = MergeElectrics(value, this.rotor.GetElectrics());
+        value = MergeElectrics(value, this.stabilizers.GetElectrics());
+        value = MergeElectrics(value, this.used.GetElectrics());
+
+        value.equipment = value.equipment.sort((a, b) => {
+            var ac = parseInt(a.charge);
+            if (a.charge == "-")
+                ac = 0;
+            var bc = parseInt(b.charge);
+            if (b.charge == "-")
+                bc = 0;
+            if (isNaN(ac) && isNaN(bc))
+                return 0;
+            if (isNaN(ac))
+                return -1;
+            if (isNaN(bc))
+                return 1;
+            return bc - ac;
+        });
+
+        value = MergeElectrics(this.engines.GetElectrics(), value);
+        value = MergeElectrics(value, this.weapons.GetElectrics());
+
+        //Add + symbols
+        for (let eq of value.equipment) {
+            let chg = parseInt(eq.charge);
+            if (!isNaN(chg) && chg > 0) {
+                eq.charge = "+" + eq.charge;
+            }
+        }
+
+        return value;
     }
 }

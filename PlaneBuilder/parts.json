@@ -248,8 +248,7 @@
                 "visibility": -1,
                 "attack": 2,
                 "charge": 1.0e-9,
-                "cost": 6,
-                "warning": "Needs Electric"
+                "cost": 6
             },
             {
                 "name": "Gyro Gunsight",
@@ -258,7 +257,7 @@
                 "attack": 2,
                 "charge": 1.0e-9,
                 "cost": 12,
-                "warning": "Electric Gunsight Warning"
+                "warning": "Gunsight Warning"
             }
         ]
     },
@@ -1997,7 +1996,7 @@
                 "drag": 1,
                 "cost": 1,
                 "cp10s": 1,
-                "warning": "Windmill Warning"
+                "storage": 0
             },
             {
                 "name": "Battery",
@@ -2005,7 +2004,7 @@
                 "mass": 1,
                 "cost": 2,
                 "cp10s": 0,
-                "warning": "Battery Warning"
+                "storage": 5
             },
             {
                 "name": "Battery (High Quality)",
@@ -2013,7 +2012,7 @@
                 "mass": 0,
                 "cost": 4,
                 "cp10s": 0,
-                "warning": "Battery Warning"
+                "storage": 5
             }
         ],
         "radios": [

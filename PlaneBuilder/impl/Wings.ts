@@ -825,4 +825,29 @@ class Wings extends Part {
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+
+        var total_charge = 0;
+        var source = "";
+        for (let wing of this.wing_list) {
+            let skin = this.skin_list[wing.surface];
+            if (skin.stats.charge != 0) {
+                source = lu(skin.name);
+                total_charge += skin.stats.charge * wing.area;
+            }
+        }
+
+        total_charge = Math.floor(1.0e-6 + total_charge);
+
+        if (total_charge != 0) {
+            value.equipment.push({
+                source: source,
+                charge: total_charge.toString(),
+            });
+        }
+
+        return value;
+    }
 }

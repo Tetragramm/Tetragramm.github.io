@@ -497,4 +497,9 @@ class Reinforcement extends Part {
 
         return stats;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+        return value;
+    }
 }

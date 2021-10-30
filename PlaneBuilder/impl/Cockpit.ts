@@ -332,4 +332,39 @@ class Cockpit extends Part {
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        var battery_storage = 0;
+        var equipment: { source: string, charge: string }[] = [];
+
+        for (let i = 0; i < this.upgrades.length; i++) {
+            if (this.selected_upgrades[i]) {
+                let item = this.upgrades[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+
+        for (let i = 0; i < this.upgrades.length; i++) {
+            if (this.selected_upgrades[i]) {
+                let item = this.upgrades[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+
+        for (let i = 0; i < this.safety.length; i++) {
+            if (this.selected_safety[i]) {
+                let item = this.safety[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+
+        for (let i = 0; i < this.gunsights.length; i++) {
+            if (this.selected_gunsights[i]) {
+                let item = this.gunsights[i];
+                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
+            }
+        }
+
+        return { storage: battery_storage, equipment: equipment };
+    }
 }

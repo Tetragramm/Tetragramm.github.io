@@ -500,4 +500,23 @@ class Engines extends Part {
         }
         return has > 1;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+
+        for (let e = 0; e < this.engines.length; e++) {
+            let s = this.engines[e].PartStats();
+            if (s.charge != 0) {
+                value.equipment.push({
+                    source: lu("Vital Part Engine", e),
+                    charge: s.charge.toString(),
+                });
+            }
+        }
+        for (let r of this.radiators) {
+            value = MergeElectrics(value, r.GetElectrics());
+        }
+
+        return value;
+    }
 }

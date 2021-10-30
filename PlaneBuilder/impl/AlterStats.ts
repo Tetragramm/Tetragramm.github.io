@@ -161,6 +161,19 @@ class AlterStats extends Part {
         return stats;
     }
 
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        var battery_storage = 0;
+        var equipment: { source: string, charge: string }[] = [];
+
+        for (let part of this.custom_parts) {
+            if (part.qty > 0) {
+                equipment = this.FormatEquipment(equipment, part.name, part.stats.charge);
+            }
+        }
+
+        return { storage: battery_storage, equipment: equipment };
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

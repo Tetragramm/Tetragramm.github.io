@@ -477,4 +477,23 @@ class Weapons extends Part {
 
         return stats;
     }
+
+    public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
+        let value = { storage: 0, equipment: [] };
+        for (let i = 0; i < this.weapon_sets.length; i++) {
+            let set = this.weapon_sets[i];
+            if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) {
+                let charges = set.GetHRCharges();
+                //Negate the values for display
+                for (let c = 0; c < charges.length; c++)
+                    charges[c] *= -1;
+
+                value.equipment.push({
+                    source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
+                    charge: StringFmt.Join('/', charges),
+                });
+            }
+        }
+        return value;
+    }
 }

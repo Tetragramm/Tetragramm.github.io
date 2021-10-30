@@ -185,20 +185,29 @@ class Derived_HTML {
         this.maxalt_cell = row12.insertCell();
         CreateTH(row12, lu("Derived Is Flammable Question"));
         this.flammable_cell = row12.insertCell();
-        CreateTH(row12, lu("Derived Electrics"));
-        this.electric_cell = row12.insertCell();
+        CreateTH(row12, ""); //Former Cell for Electrics
+        row12.insertCell();
         CreateTH(row12, lu("Stat Flight Stress"));
         this.flightstress_cell = row12.insertCell();
 
-        this.weapon_head = CreateTH(insertRow(fragment), lu("Derived Weapon Systems"));
-        this.weapon_head.colSpan = 8;
-        this.weapon_cell = insertRow(fragment).insertCell();
-        this.weapon_cell.colSpan = 8;
+        var head_row = insertRow(fragment);
+        var body_row = insertRow(fragment);
+        this.weapon_head = CreateTH(head_row, lu("Derived Weapon Systems"));
+        this.weapon_head.colSpan = 6;
+        this.weapon_cell = body_row.insertCell();
+        this.weapon_cell.colSpan = 6;
 
         this.warning_head = CreateTH(insertRow(fragment), lu("Derived Special Rules"));
-        this.warning_head.colSpan = 8;
+        this.warning_head.colSpan = 6;
         this.warning_cell = insertRow(fragment).insertCell();
-        this.warning_cell.colSpan = 8;
+        this.warning_cell.colSpan = 6;
+
+        var electric_head = CreateTH(head_row, lu("Derived Electrics"));
+        electric_head.colSpan = 2;
+        this.electric_cell = body_row.insertCell();
+        this.electric_cell.colSpan = 2;
+        this.electric_cell.rowSpan = 3;
+
         tbl.appendChild(fragment);
         this.tbl = tbl;
     }
@@ -332,14 +341,18 @@ class Derived_HTML {
         this.visibility_cell.textContent = StringFmt.Join(", ", acft.GetVisibilityList());
         this.attack_cell.textContent = StringFmt.Join(", ", acft.GetAttackList());
         this.communications_cell.textContent = acft.GetCommunicationName();
-        var wm = acft.GetAccessories().GetWindmill();
-        var bat = acft.GetAccessories().GetStorage();
-        var electric_str = stats.charge.toString();
-        if (wm > 0)
-            electric_str += " + " + wm.toString() + lu("Derived Per 10 Speed");
-        if (bat > 0)
-            electric_str += " + " + bat + " " + lu("Derived Battery word storage");
-        this.electric_cell.textContent = electric_str;
+
+        while (this.electric_cell.childElementCount > 0) {
+            this.electric_cell.removeChild(this.electric_cell.firstChild);
+        }
+        var electrics = acft.GetElectrics();
+        var elec_fs = CreateFlexSection(this.electric_cell);
+        if (electrics.storage > 0) {
+            FlexLabels(lu("Derived Battery"), electrics.storage.toString(), elec_fs);
+        }
+        for (let equip of electrics.equipment) {
+            FlexLabels(equip.source, equip.charge, elec_fs);
+        }
 
         var vital = "";
         var vlist = acft.VitalComponentList();
