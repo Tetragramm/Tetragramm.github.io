@@ -10522,7 +10522,6 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
-        console.log("json Repeating = " + this.repeating);
     }
     serialize(s) {
         s.PushNum(this.raw_weapon_type);
@@ -10539,7 +10538,6 @@ class WeaponSystem extends Part {
         s.PushNum(this.seat);
     }
     deserialize(d) {
-        console.log("Do Deserialize");
         this.raw_weapon_type = d.GetNum();
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
@@ -10590,7 +10588,6 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
-        console.log("Repeating = " + this.repeating);
     }
     GetWeaponSelected() {
         return this.weapon_type;
@@ -12235,7 +12232,6 @@ class Aircraft {
         this.alter.serialize(s);
     }
     deserialize(d) {
-        console.log("Acft Deserialize");
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);

@@ -8253,7 +8253,6 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
-        console.log("json Repeating = " + this.repeating);
     }
     serialize(s) {
         s.PushNum(this.raw_weapon_type);
@@ -8270,7 +8269,6 @@ class WeaponSystem extends Part {
         s.PushNum(this.seat);
     }
     deserialize(d) {
-        console.log("Do Deserialize");
         this.raw_weapon_type = d.GetNum();
         this.weapon_type = this.wl_permute[this.raw_weapon_type];
         this.fixed = d.GetBool();
@@ -8321,7 +8319,6 @@ class WeaponSystem extends Part {
         for (let w of this.weapons) {
             w.SetWeaponType(this.final_weapon, this.action_sel, this.projectile_sel);
         }
-        console.log("Repeating = " + this.repeating);
     }
     GetWeaponSelected() {
         return this.weapon_type;
@@ -9966,7 +9963,6 @@ class Aircraft {
         this.alter.serialize(s);
     }
     deserialize(d) {
-        console.log("Acft Deserialize");
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
         console.log(d.version);
@@ -11026,8 +11022,8 @@ class Derived_HTML {
         this.maxalt_cell = row12.insertCell();
         CreateTH(row12, lu("Derived Is Flammable Question"));
         this.flammable_cell = row12.insertCell();
-        CreateTH(row12, ""); //Former Cell for Electrics
-        row12.insertCell();
+        this.desc_cell = row12.insertCell();
+        this.desc_cell.colSpan = 2;
         CreateTH(row12, lu("Stat Flight Stress"));
         this.flightstress_cell = row12.insertCell();
         var head_row = insertRow(fragment);
@@ -11221,6 +11217,94 @@ class Derived_HTML {
             warnhtml += w.source + ":  " + w.warning + "<br/>";
         }
         this.warning_cell.innerHTML = warnhtml;
+        var description = "";
+        var num_wings = acft.GetWings().GetWingList().length;
+        if (num_wings == 1) {
+            var deck = acft.GetWings().GetWingList()[0].deck;
+            if (deck < WING_DECK.MID) {
+                description += "High-Wing Monoplane ";
+            }
+            else if (deck == WING_DECK.MID) {
+                description += "Mid-Wing Monoplane ";
+            }
+            else {
+                description += "Low-Wing Monoplane ";
+            }
+        }
+        else {
+            var is_sesqui = acft.GetWings().GetIsSesquiplane().is;
+            if (is_sesqui) {
+                if (num_wings == 2)
+                    description += "Sesquiplane ";
+                else
+                    description += "Sesqui-" + this.prefix(num_wings);
+            }
+            else if (acft.GetWings().GetTandem()) {
+                if (num_wings == 2 && acft.GetWings().GetClosed())
+                    description += "Annular Monoplane ";
+                else
+                    description += "Tandem " + this.prefix(num_wings);
+            }
+            else {
+                description += this.prefix(num_wings);
+            }
+        }
+        if (acft.GetFrames().GetFlyingWing()) {
+            description += "Flying Wing ";
+        }
+        else if (acft.GetFrames().CanFlyingWing()) {
+            description += "Lifting Body ";
+        }
+        else if (num_wings == 0) {
+            description += "Falling Rock ";
+        }
+        this.desc_cell.textContent = description;
+    }
+    prefix(num_wings) {
+        switch (num_wings) {
+            case 1:
+                return "Monoplane ";
+            case 2:
+                return "Biplane ";
+            case 3:
+                return "Triplane ";
+            case 4:
+                return "Quadruplane ";
+            case 5:
+                return "Pentaplane ";
+            case 6:
+                return "Hexaplane ";
+            case 7:
+                return "Heptaplane ";
+            case 8:
+                return "Octoplane ";
+            case 9:
+                return "Nonaplane ";
+            case 10:
+                return "Decaplane ";
+            case 11:
+                return "Undecaplane ";
+            case 12:
+                return "Duodecaplane ";
+            case 13:
+                return "Tredecaplane ";
+            case 14:
+                return "Quattuordecaplane ";
+            case 15:
+                return "Quindecaplane ";
+            case 16:
+                return "Sexdecaplane ";
+            case 17:
+                return "Septendecaplane ";
+            case 18:
+                return "Octodecaplane ";
+            case 19:
+                return "Novendecaplane ";
+            case 20:
+                return "Vigintiplane ";
+            default:
+                return "Window Blinds ";
+        }
     }
     GetName() {
         return this.name_inp.value;
