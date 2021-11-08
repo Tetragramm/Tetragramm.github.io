@@ -6093,7 +6093,7 @@ class Engine extends Part {
         return this.etype_stats.oiltank;
     }
     IsContraRotary() {
-        if (!this.GetIsPulsejet()) {
+        if (!this.GetIsPulsejet() && !this.GetIsTurbine()) {
             if (this.elist_idx != ""
                 && this.etype_inputs.type == 3) {
                 return true;

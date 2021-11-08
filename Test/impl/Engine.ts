@@ -698,7 +698,7 @@ class Engine extends Part {
     }
 
     public IsContraRotary() {
-        if (!this.GetIsPulsejet()) {
+        if (!this.GetIsPulsejet() && !this.GetIsTurbine()) {
             if (this.elist_idx != ""
                 && this.etype_inputs.type == 3) {
                 return true;
