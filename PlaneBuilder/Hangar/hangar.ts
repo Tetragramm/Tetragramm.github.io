@@ -4,7 +4,7 @@
 /// <reference path="../lz/lz-string.ts" />
 /// <reference path="../string/index.ts" />
 /// <reference path="../scroll/scroll.ts" />
-/// <reference path="./json2csv.ts" />
+/// <reference path="../JSON2CSV/json2csv.ts" />
 
 const init = () => {
     const sp = new URLSearchParams(location.search);

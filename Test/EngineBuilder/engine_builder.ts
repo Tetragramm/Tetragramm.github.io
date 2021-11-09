@@ -3,6 +3,7 @@
 /// <reference path="./PulsejetBuilder.ts" />
 /// <reference path="../lz/lz-string.ts" />
 /// <reference path="../string/index.ts" />
+/// <reference path="../JSON2CSV/json2csv.ts" />
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -191,6 +192,7 @@ class EngineBuilder_HTML {
     private m_add_pj: HTMLButtonElement;
     private m_add_tb: HTMLButtonElement;
     private m_add_el: HTMLButtonElement;
+    private m_save_csv: HTMLButtonElement;
     private m_save: HTMLButtonElement;
     private m_load: HTMLInputElement;
     private m_list_create: HTMLButtonElement;
@@ -801,6 +803,7 @@ class EngineBuilder_HTML {
         this.m_add_pj = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_tb = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_add_el = document.createElement("BUTTON") as HTMLButtonElement;
+        this.m_save_csv = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_save = document.createElement("BUTTON") as HTMLButtonElement;
         this.m_load = document.createElement("INPUT") as HTMLInputElement;
         this.m_list_create = document.createElement("BUTTON") as HTMLButtonElement;
@@ -924,6 +927,27 @@ class EngineBuilder_HTML {
             }
         };
 
+        this.m_save_csv.onclick = () => {
+            let output = [];
+            let list = engine_list.get(this.list_idx);
+            for (let i = 0; i < list.length; i++) {
+                let estats = list.get_stats(i);
+                output.push({
+                    name: estats.name,
+                    power: estats.stats.power,
+                    mass: estats.stats.mass,
+                    drag: estats.stats.drag,
+                    cooling: estats.stats.cooling,
+                    reliability: estats.stats.reliability,
+                    fuelconsumption: estats.stats.fuelconsumption,
+                    overspeed: estats.overspeed,
+                    cost: estats.stats.cost,
+                });
+            }
+            var json2csv = new JSON2CSV();
+            download(json2csv.convert(output, { separator: ',', flatten: true, output_csvjson_variant: false }), this.list_idx + ".csv", "csv");
+        }
+
         CreateSelect("Lists", this.m_list_select, cell);
         CreateSelect("Engines", this.m_select, cell);
         cell.appendChild(document.createElement("BR"));
@@ -950,6 +974,7 @@ class EngineBuilder_HTML {
         cell.appendChild(document.createElement("BR"));
         cell.appendChild(document.createElement("BR"));
         CreateButton("Delete List", this.m_list_delete, cell);
+        CreateButton("Save Engine List as CSV", this.m_save_csv, cell);
 
         this.UpdateList();
     }

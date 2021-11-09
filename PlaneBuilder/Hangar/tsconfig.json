@@ -7,6 +7,7 @@
     "include": [
         ".",
         "../impl",
-        "../disp"
+        "../disp",
+        "../JSON2CSV/json2csv.ts"
     ]
 }
