@@ -314,7 +314,7 @@ class Engine_HTML extends Display {
 
             var numrad = this.engine.GetNumRadiators();
             while (this.cool_select.options.length > 0) {
-                this.cool_select.options.remove(0);
+                this.cool_select.options.remove(this.cool_select.options.length - 1);
             }
             for (let i = 1; i < numrad + 1; i++) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -334,10 +334,10 @@ class Engine_HTML extends Display {
 
     public UpdateDisplay() {
         while (this.e_list_select.options.length > 0) {
-            this.e_list_select.options.remove(0);
+            this.e_list_select.options.remove(this.e_list_select.options.length - 1);
         }
         while (this.e_select.options.length > 0) {
-            this.e_select.options.remove(0);
+            this.e_select.options.remove(this.e_select.options.length - 1);
         }
         var list_idx = this.engine.GetSelectedList();
         if (list_idx != "") {
@@ -380,8 +380,8 @@ class Engine_HTML extends Display {
             this.e_select.selectedIndex = 0;
         }
         var e_stats = this.engine.GetCurrentStats();
-        var b = this.engine.GetMinIAF();
-        var t = b + e_stats.altitude;
+        var b = this.engine.GetMinAltitude();
+        var t = this.engine.GetMaxAltitude();
         this.e_pwr.textContent = e_stats.stats.power.toString();
         this.e_mass.textContent = e_stats.stats.mass.toString();
         this.e_drag.textContent = e_stats.stats.drag.toString();

@@ -136,7 +136,7 @@ class Engine extends Part {
             } else {
                 this.etype_inputs.compressor_type = ieb["compressor_type"];
                 this.etype_inputs.compressor_count = ieb["compressor_count"];
-                this.etype_inputs.min_IAF = ieb["min_IAF"];
+                this.etype_inputs.min_IdealAlt = ieb["min_IAF"];
             }
         } else {
             this.etype_stats.altitude = this.etype_stats.altitude * 10 - 1;
@@ -254,7 +254,7 @@ class Engine extends Part {
                 } else {
                     this.etype_inputs.compressor_type = d.GetNum();
                     this.etype_inputs.compressor_count = d.GetNum();
-                    this.etype_inputs.min_IAF = d.GetNum();
+                    this.etype_inputs.min_IdealAlt = d.GetNum();
                 }
             }
         } else {
@@ -315,12 +315,20 @@ class Engine extends Part {
         this.elist_idx = elist_idx;
     }
 
+    public GetMinAltitude() {
+        return this.etype_inputs.min_IdealAlt;
+    }
+
     public GetMaxAltitude() {
-        return this.GetMinIAF() + this.etype_stats.altitude;
+        return this.GetMinAltitude() + this.etype_stats.altitude;
     }
 
     public GetMinIAF() {
-        return this.etype_inputs.min_IAF;
+        return Math.floor(1.0e-6 + this.GetMinAltitude() / 10);
+    }
+
+    public GetMaxIAF() {
+        return Math.floor(1.0e-6 + this.GetMaxAltitude() / 10);
     }
 
     public CanSelectIndex() {
@@ -619,7 +627,7 @@ class Engine extends Part {
 
     public GetOverspeed(): number {
         if (this.is_generator)
-            return 100;
+            return 1000;
         return this.etype_stats.overspeed + Math.floor(1.0e-6 + this.gp_count * this.etype_stats.overspeed / 2);
     }
 

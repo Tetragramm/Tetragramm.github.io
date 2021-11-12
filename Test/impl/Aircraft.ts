@@ -838,6 +838,14 @@ class Aircraft {
         return this.engines.GetMinIAF();
     }
 
+    public GetMaxIAF() {
+        return this.engines.GetMaxIAF();
+    }
+
+    public GetMinAltitude() {
+        return this.engines.GetMinAltitude();
+    }
+
     public GetMaxAltitude() {
         return this.engines.GetMaxAltitude();
     }

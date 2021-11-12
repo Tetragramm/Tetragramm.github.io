@@ -1033,7 +1033,7 @@ class EngineBuilder {
         ei.displacement = this.engine_displacement;
         ei.era_sel = this.era_sel;
         ei.material_fudge = this.material_fudge;
-        ei.min_IAF = this.min_IAF;
+        ei.min_IdealAlt = this.min_IAF;
         ei.name = this.name;
         ei.quality_fudge = this.quality_fudge;
         ei.rows = this.num_rows;
@@ -1486,7 +1486,7 @@ class EngineInputs {
         this.quality_fudge = 0;
         this.compressor_type = 0;
         this.compressor_count = 0;
-        this.min_IAF = 0;
+        this.min_IdealAlt = 0;
         this.upgrades = [...Array(4).fill(false)];
         this.power = 0;
         this.quality_cost = 0;
@@ -1518,7 +1518,7 @@ class EngineInputs {
                     quality_fudge: this.quality_fudge,
                     compressor_type: this.compressor_type,
                     compressor_count: this.compressor_count,
-                    min_IAF: this.min_IAF,
+                    min_IAF: this.min_IdealAlt,
                     upgrades: this.upgrades,
                 };
             }
@@ -1579,7 +1579,7 @@ class EngineInputs {
                 this.quality_fudge = js["quality_fudge"];
                 this.compressor_type = js["compressor_type"];
                 this.compressor_count = js["compressor_count"];
-                this.min_IAF = js["min_IAF"];
+                this.min_IdealAlt = js["min_IAF"];
                 this.upgrades = BoolArr(js["upgrades"], this.upgrades.length);
                 break;
             }
@@ -1625,7 +1625,7 @@ class EngineInputs {
                 s.PushFloat(this.quality_fudge);
                 s.PushNum(this.compressor_type);
                 s.PushNum(this.compressor_count);
-                s.PushNum(this.min_IAF);
+                s.PushNum(this.min_IdealAlt);
                 s.PushBoolArr(this.upgrades);
                 break;
             }
@@ -1671,7 +1671,7 @@ class EngineInputs {
                 this.quality_fudge = d.GetFloat();
                 this.compressor_type = d.GetNum();
                 this.compressor_count = d.GetNum();
-                this.min_IAF = d.GetNum();
+                this.min_IdealAlt = d.GetNum();
                 this.upgrades = d.GetBoolArr(this.upgrades.length);
                 break;
             }
@@ -1717,7 +1717,7 @@ class EngineInputs {
                 eb.quality_fudge = this.quality_fudge;
                 eb.compressor_type = this.compressor_type;
                 eb.compressor_count = this.compressor_count;
-                eb.min_IAF = this.min_IAF;
+                eb.min_IAF = this.min_IdealAlt;
                 eb.upg_sel = this.upgrades;
                 return eb.EngineStats();
             }
@@ -1778,7 +1778,7 @@ class EngineInputs {
         n.quality_fudge = this.quality_fudge;
         n.compressor_type = this.compressor_type;
         n.compressor_count = this.compressor_count;
-        n.min_IAF = this.min_IAF;
+        n.min_IdealAlt = this.min_IdealAlt;
         n.power = this.power;
         n.quality_cost = this.quality_cost;
         n.quality_rely = this.quality_rely;
@@ -2788,7 +2788,7 @@ class Engine extends Part {
             else {
                 this.etype_inputs.compressor_type = ieb["compressor_type"];
                 this.etype_inputs.compressor_count = ieb["compressor_count"];
-                this.etype_inputs.min_IAF = ieb["min_IAF"];
+                this.etype_inputs.min_IdealAlt = ieb["min_IAF"];
             }
         }
         else {
@@ -2906,7 +2906,7 @@ class Engine extends Part {
                 else {
                     this.etype_inputs.compressor_type = d.GetNum();
                     this.etype_inputs.compressor_count = d.GetNum();
-                    this.etype_inputs.min_IAF = d.GetNum();
+                    this.etype_inputs.min_IdealAlt = d.GetNum();
                 }
             }
         }
@@ -2964,11 +2964,17 @@ class Engine extends Part {
         }
         this.elist_idx = elist_idx;
     }
+    GetMinAltitude() {
+        return this.etype_inputs.min_IdealAlt;
+    }
     GetMaxAltitude() {
-        return this.GetMinIAF() + this.etype_stats.altitude;
+        return this.GetMinAltitude() + this.etype_stats.altitude;
     }
     GetMinIAF() {
-        return this.etype_inputs.min_IAF;
+        return Math.floor(1.0e-6 + this.GetMinAltitude() / 10);
+    }
+    GetMaxIAF() {
+        return Math.floor(1.0e-6 + this.GetMaxAltitude() / 10);
     }
     CanSelectIndex() {
         var elist_temp = engine_list.get(this.elist_idx);
@@ -3227,7 +3233,7 @@ class Engine extends Part {
     }
     GetOverspeed() {
         if (this.is_generator)
-            return 100;
+            return 1000;
         return this.etype_stats.overspeed + Math.floor(1.0e-6 + this.gp_count * this.etype_stats.overspeed / 2);
     }
     GetIsPulsejet() {
@@ -3856,8 +3862,22 @@ class Engines extends Part {
         }
         return m;
     }
+    GetMaxIAF() {
+        var m = 0;
+        for (let e of this.engines) {
+            m = Math.max(m, e.GetMaxIAF());
+        }
+        return m;
+    }
+    GetMinAltitude() {
+        var m = 0;
+        for (let e of this.engines) {
+            m = Math.max(m, e.GetMinAltitude());
+        }
+        return m;
+    }
     GetMaxAltitude() {
-        var m = 100;
+        var m = 1000;
         for (let e of this.engines) {
             m = Math.min(m, e.GetMaxAltitude());
         }
@@ -4548,7 +4568,7 @@ class Frames extends Part {
         if (d.version > 10.25)
             this.sel_skin = d.GetNum();
     }
-    DuplicateSection(num) {
+    DuplicateSection(num, count = 1) {
         var sec = this.section_list[num];
         var new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
@@ -4557,10 +4577,12 @@ class Frames extends Part {
         if (new_section.internal_bracing && this.CountSections() + this.tail_section_list.length == this.CountInternalBracing()) {
             return;
         }
-        this.section_list.splice(num, 0, new_section);
+        for (let i = 0; i < count; i++) {
+            this.section_list.splice(num, 0, new_section);
+        }
         this.CalculateStats();
     }
-    DuplicateTailSection(num) {
+    DuplicateTailSection(num, count = 1) {
         var sec = this.tail_section_list[num];
         var new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
@@ -4569,7 +4591,9 @@ class Frames extends Part {
         if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
             return;
         }
-        this.tail_section_list.splice(num, 0, new_section);
+        for (let i = 0; i < count; i++) {
+            this.tail_section_list.splice(num, 0, new_section);
+        }
         this.CalculateStats();
     }
     DeleteSection(num) {
@@ -4596,12 +4620,12 @@ class Frames extends Part {
                     lifting_body: false, internal_bracing: false
                 });
             }
-            for (let i = this.section_list.length - 1; i >= 0; i--) {
-                if (!this.section_list[i].internal_bracing) {
-                    while (this.required_sections > this.CountSections()) {
-                        this.DuplicateSection(i);
+            if (this.required_sections - this.CountSections() > 0) {
+                for (let i = this.section_list.length - 1; i >= 0; i--) {
+                    if (!this.section_list[i].internal_bracing) {
+                        this.DuplicateSection(i, this.required_sections - this.CountSections());
+                        return;
                     }
-                    return;
                 }
             }
         }
@@ -4614,9 +4638,8 @@ class Frames extends Part {
                     lifting_body: false, internal_bracing: false
                 });
             }
-            while (num > this.tail_section_list.length) {
-                this.DuplicateTailSection(this.tail_section_list.length - 1);
-            }
+            if (num - this.tail_section_list.length > 0)
+                this.DuplicateTailSection(this.tail_section_list.length - 1, num - this.tail_section_list.length);
         }
         while (num < this.tail_section_list.length) {
             this.tail_section_list.pop();
@@ -10824,6 +10847,12 @@ class Aircraft {
     GetMinIAF() {
         return this.engines.GetMinIAF();
     }
+    GetMaxIAF() {
+        return this.engines.GetMaxIAF();
+    }
+    GetMinAltitude() {
+        return this.engines.GetMinAltitude();
+    }
     GetMaxAltitude() {
         return this.engines.GetMaxAltitude();
     }
@@ -11229,6 +11258,11 @@ function BlinkNeutral(elem) {
     elem.offsetHeight;
     elem.classList.toggle("changed_n");
 }
+function BlinkNone(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+}
 function BlinkIfChanged(elem, str, positive_good = null) {
     if (enable_anim) {
         if (elem.textContent != str) {
@@ -11244,6 +11278,9 @@ function BlinkIfChanged(elem, str, positive_good = null) {
                     BlinkBad(elem);
                 }
             }
+        }
+        else {
+            BlinkNone(elem);
         }
     }
     elem.textContent = str;
@@ -11814,7 +11851,7 @@ class Engine_HTML extends Display {
             FlexInput(lu("Engine Cooling Amount"), this.cool_count, fs);
             var numrad = this.engine.GetNumRadiators();
             while (this.cool_select.options.length > 0) {
-                this.cool_select.options.remove(0);
+                this.cool_select.options.remove(this.cool_select.options.length - 1);
             }
             for (let i = 1; i < numrad + 1; i++) {
                 let opt = document.createElement("OPTION");
@@ -11833,10 +11870,10 @@ class Engine_HTML extends Display {
     }
     UpdateDisplay() {
         while (this.e_list_select.options.length > 0) {
-            this.e_list_select.options.remove(0);
+            this.e_list_select.options.remove(this.e_list_select.options.length - 1);
         }
         while (this.e_select.options.length > 0) {
-            this.e_select.options.remove(0);
+            this.e_select.options.remove(this.e_select.options.length - 1);
         }
         var list_idx = this.engine.GetSelectedList();
         if (list_idx != "") {
@@ -11879,8 +11916,8 @@ class Engine_HTML extends Display {
             this.e_select.selectedIndex = 0;
         }
         var e_stats = this.engine.GetCurrentStats();
-        var b = this.engine.GetMinIAF();
-        var t = b + e_stats.altitude;
+        var b = this.engine.GetMinAltitude();
+        var t = this.engine.GetMaxAltitude();
         this.e_pwr.textContent = e_stats.stats.power.toString();
         this.e_mass.textContent = e_stats.stats.mass.toString();
         this.e_drag.textContent = e_stats.stats.drag.toString();
@@ -12182,7 +12219,7 @@ class Frames_HTML extends Display {
         this.frames = frames;
         //Translate Section title
         document.getElementById("lbl_frames").textContent = lu("Frames Frames and Covering");
-        var table = document.getElementById("table_frames");
+        this.table = document.getElementById("table_frames");
         var fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
         this.all_frame = document.createElement("SELECT");
@@ -12276,9 +12313,13 @@ class Frames_HTML extends Display {
         this.t_farman.onchange = () => { this.frames.SetUseFarman(this.t_farman.checked); };
         this.t_boom.onchange = () => { this.frames.SetUseBoom(this.t_boom.checked); };
         this.t_fwing.onchange = () => { this.frames.SetFlyingWing(this.t_fwing.checked); };
-        table.appendChild(fragment);
+        this.table.appendChild(fragment);
     }
     UpdateDisplay() {
+        var fragment = document.createDocumentFragment();
+        while (this.table.children.length) {
+            fragment.append(this.table.children[0]);
+        }
         var section_list = this.frames.GetSectionList();
         var tail_section_list = this.frames.GetTailSectionList();
         while (section_list.length > this.c_sec.length) {
@@ -12329,6 +12370,7 @@ class Frames_HTML extends Display {
         BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
         BlinkIfChanged(this.d_strn, stats.maxstrain.toString(), true);
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        this.table.appendChild(fragment);
     }
     CreateSection(i, sec) {
         var fsec = {
@@ -13939,7 +13981,7 @@ class Weapons_HTML extends Display {
         var slist = this.weap.GetSeatList();
         if (disp.seat.options.length != slist.length) {
             while (disp.seat.options.length > 0) {
-                disp.seat.options.remove(0);
+                disp.seat.options.remove(disp.seat.options.length - 1);
             }
             for (let s of slist) {
                 let opt = document.createElement("OPTION");
@@ -14387,7 +14429,7 @@ class Derived_HTML {
         this.eloss_cell.textContent = derived.EnergyLoss.toString();
         //Turn bleed done in bomb mass section because affected by it.
         this.landing_cell.textContent = acft.GetGearName();
-        this.maxalt_cell.textContent = acft.GetMinIAF().toString() + "-" + acft.GetMaxAltitude().toString();
+        this.maxalt_cell.textContent = acft.GetMinAltitude().toString() + "-" + acft.GetMaxAltitude().toString();
         this.reliability_cell.textContent = StringFmt.Join(", ", acft.GetReliabilityList());
         this.toughness_cell.textContent = derived.Toughness.toString();
         this.mxstrain_cell.textContent = derived.MaxStrain.toString();
@@ -14572,6 +14614,122 @@ class Derived_HTML {
             }
         }
         return str;
+    }
+}
+/// <reference path="./Display.ts" />
+var FUEL_STATE;
+/// <reference path="./Display.ts" />
+(function (FUEL_STATE) {
+    FUEL_STATE[FUEL_STATE["FULLWBOMBS"] = 0] = "FULLWBOMBS";
+    FUEL_STATE[FUEL_STATE["HALFWBOMBS"] = 1] = "HALFWBOMBS";
+    FUEL_STATE[FUEL_STATE["FULL"] = 2] = "FULL";
+    FUEL_STATE[FUEL_STATE["HALF"] = 3] = "HALF";
+    FUEL_STATE[FUEL_STATE["EMPTY"] = 4] = "EMPTY";
+})(FUEL_STATE || (FUEL_STATE = {}));
+class Altitude_HTML {
+    constructor() {
+        document.getElementById("lbl_altitude").textContent = lu("Altitude Section Title");
+        this.tbl = document.getElementById("table_altitude");
+        this.fRow = insertRow(this.tbl);
+        CreateTH(this.fRow, lu("Altitude Altitude"));
+        CreateTH(this.fRow, lu("Derived Boost"));
+        CreateTH(this.fRow, lu("Derived Rate of Climb"));
+        CreateTH(this.fRow, lu("Derived Stall Speed"));
+        CreateTH(this.fRow, lu("Derived Top Speed"));
+        this.rows = [];
+    }
+    AddRow(af) {
+        var row = document.createElement("TR");
+        let af_cell = row.insertCell();
+        af_cell.textContent = StringFmt.Format("{0}-{1}", af * 10, af * 10 + 9);
+        row.insertCell();
+        row.insertCell();
+        row.insertCell();
+        row.insertCell();
+        this.rows.push(row);
+    }
+    UpdateDisplay(acft, derived) {
+        while (this.tbl.lastChild) {
+            this.tbl.removeChild(this.tbl.lastChild);
+        }
+        var fragment = document.createDocumentFragment();
+        fragment.appendChild(this.fRow);
+        var fuelstate = 0;
+        var Boost = 0;
+        var RoC = 0;
+        var Stall = 0;
+        var Speed = 0;
+        switch (fuelstate) {
+            case FUEL_STATE.FULLWBOMBS:
+                Boost = derived.BoostFullwBombs;
+                RoC = derived.RateOfClimbwBombs;
+                Stall = derived.StallSpeedFullwBombs;
+                Speed = derived.MaxSpeedwBombs;
+                break;
+            case FUEL_STATE.HALFWBOMBS:
+                Boost = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2);
+                RoC = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2);
+                Stall = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2);
+                Speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2);
+                break;
+            case FUEL_STATE.FULL:
+                Boost = derived.BoostFull;
+                RoC = derived.RateOfClimbFull;
+                Stall = derived.StallSpeedFull;
+                Speed = derived.MaxSpeedFull;
+                break;
+            case FUEL_STATE.HALF:
+                Boost = Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2);
+                RoC = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2);
+                Stall = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2);
+                Speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
+                break;
+            case FUEL_STATE.EMPTY:
+                Boost = 0;
+                RoC = 0;
+                Stall = derived.StallSpeedEmpty;
+                Speed = 0;
+                break;
+        }
+        for (let af = 0; af < 100; af++) {
+            var PowerReduction = 0;
+            var SpeedIncrease = 0;
+            if (af < acft.GetMinIAF()) {
+                PowerReduction = acft.GetMinIAF() - af;
+            }
+            else {
+                SpeedIncrease = Math.min(af - acft.GetMinIAF(), acft.GetMaxIAF() - acft.GetMinIAF());
+                if (af > acft.GetMaxIAF()) {
+                    PowerReduction = af - acft.GetMaxIAF();
+                }
+            }
+            if (this.rows.length <= af) {
+                this.AddRow(af);
+            }
+            var row = this.rows[af];
+            var adjBoost = 0;
+            if (PowerReduction > 0) {
+                adjBoost = Math.max(1, Boost - 1);
+            }
+            else {
+                adjBoost = Boost;
+            }
+            var adjRoC = Math.max(1, RoC - PowerReduction);
+            var adjStall = Math.max(1, Stall + af);
+            var adjSpeed = Math.max(1, Speed + SpeedIncrease - PowerReduction);
+            row.children[1].textContent = adjBoost.toString();
+            row.children[2].textContent = adjRoC.toString();
+            row.children[3].textContent = adjStall.toString();
+            row.children[4].textContent = adjSpeed.toString();
+            fragment.appendChild(row);
+            if (adjStall > adjSpeed) {
+                while (this.rows.length > af) {
+                    var r = this.rows.pop();
+                }
+                break;
+            }
+        }
+        this.tbl.appendChild(fragment);
     }
 }
 var ENGINE_TEXT;
@@ -14972,6 +15130,7 @@ class Cards {
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="./Derived.ts" />
+/// <reference path="./Altitude.ts" />
 /// <reference path="../impl/Aircraft.ts" />
 /// <reference path="./Cards.ts"/>
 class Aircraft_HTML extends Display {
@@ -14996,6 +15155,7 @@ class Aircraft_HTML extends Display {
         this.used = new Used_HTML(aircraft.GetUsed());
         this.rotor = new Rotor_HTML(aircraft.GetRotor());
         this.alter = new AlterStats_HTML(aircraft.GetAlter());
+        this.altitude = new Altitude_HTML();
         document.getElementById("lbl_acft_type").textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type");
         let heli = false;
@@ -15202,7 +15362,7 @@ class Aircraft_HTML extends Display {
             }
             if (e.GetSelectedList() != "") {
                 var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
-                this.cards.eng_data.min_IAF = inputs.min_IAF;
+                this.cards.eng_data.min_IAF = inputs.min_IdealAlt;
                 if (inputs.upgrades[1]) {
                     this.cards.eng_data.notes.push(lu("War Emergency Power"));
                 }
@@ -15280,7 +15440,7 @@ class Aircraft_HTML extends Display {
         catalog_stats += "\nVital Parts\n";
         catalog_stats += StringFmt.Join(", ", this.acft.VitalComponentList());
         catalog_stats += "\n\n";
-        catalog_stats += StringFmt.Format("Dropoff {0}, Reliability {1}, Overspeed {2}, Ideal Alt. {3}, Fuel {4}\n\n", derived.Dropoff, StringFmt.Join("/", this.acft.GetReliabilityList()), derived.Overspeed, this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString(), derived.FuelUses);
+        catalog_stats += StringFmt.Format("Dropoff {0}, Reliability {1}, Overspeed {2}, Ideal Alt. {3}, Fuel {4}\n\n", derived.Dropoff, StringFmt.Join("/", this.acft.GetReliabilityList()), derived.Overspeed, this.acft.GetMinAltitude().toString() + "-" + this.acft.GetMaxAltitude().toString(), derived.FuelUses);
         if (derived.TurnBleed == derived.TurnBleedwBombs) {
             catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}\n\n", StringFmt.Join("/", this.acft.GetVisibilityList()), derived.Stabiilty, derived.EnergyLoss, derived.TurnBleed);
         }
@@ -15737,6 +15897,7 @@ class Aircraft_HTML extends Display {
             this.acft.name = this.derived.GetName();
         }
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
+        this.altitude.UpdateDisplay(this.acft, derived_stats);
     }
     UpdateDisplay() {
         var stats = this.acft.GetStats();

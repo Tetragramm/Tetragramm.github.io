@@ -94,7 +94,7 @@ class EngineBuilder_HTML {
     private e_qfdg: HTMLInputElement;
     private e_ctyp: HTMLSelectElement;
     private e_ccnt: HTMLInputElement;
-    private e_mIAF: HTMLInputElement;
+    private e_mIA: HTMLInputElement;
     private e_upgs: HTMLInputElement[];
     //Engine Outputs
     private ed_name: HTMLLabelElement;
@@ -309,19 +309,19 @@ class EngineBuilder_HTML {
             this.e_ctyp.add(opt);
         }
         this.e_ccnt = document.createElement("INPUT") as HTMLInputElement;
-        this.e_mIAF = document.createElement("INPUT") as HTMLInputElement;
+        this.e_mIA = document.createElement("INPUT") as HTMLInputElement;
 
         this.e_ctyp.onchange = () => { this.enginebuilder.compressor_type = this.e_ctyp.selectedIndex; this.UpdateEngine(); };
         this.e_ccnt.onchange = () => { this.enginebuilder.compressor_count = this.e_ccnt.valueAsNumber; this.UpdateEngine(); };
-        this.e_mIAF.onchange = () => { this.enginebuilder.min_IAF = this.e_mIAF.valueAsNumber; this.UpdateEngine(); };
+        this.e_mIA.onchange = () => { this.enginebuilder.min_IAF = this.e_mIA.valueAsNumber; this.UpdateEngine(); };
 
         FlexSelect("Compressor Type", this.e_ctyp, fs);
         FlexInput("Compressor Count", this.e_ccnt, fs);
-        FlexInput("Minimum IAF", this.e_mIAF, fs);
+        FlexInput("Minimum Ideal Altitude", this.e_mIA, fs);
         this.e_ccnt.min = "0";
         this.e_ccnt.step = "1";
-        this.e_mIAF.min = "0";
-        this.e_mIAF.step = "10";
+        this.e_mIA.min = "0";
+        this.e_mIA.step = "10";
 
         this.e_upgs = [];
         //NOTE: Asperator Boot depricated, so start from 1.
@@ -383,7 +383,7 @@ class EngineBuilder_HTML {
         }
         this.e_ctyp.selectedIndex = this.enginebuilder.compressor_type;
         this.e_ccnt.valueAsNumber = this.enginebuilder.compressor_count;
-        this.e_mIAF.valueAsNumber = this.enginebuilder.min_IAF;
+        this.e_mIA.valueAsNumber = this.enginebuilder.min_IAF;
 
         var can_upg = this.enginebuilder.CanUpgrade();
         for (let i = 0; i < this.e_upgs.length; i++) {
@@ -982,7 +982,7 @@ class EngineBuilder_HTML {
     public UpdateList() {
         var l_idx = this.m_list_select.selectedIndex;
         while (this.m_list_select.options.length > 0) {
-            this.m_list_select.options.remove(0);
+            this.m_list_select.options.remove(this.m_list_select.options.length - 1);
         }
         for (let key of engine_list.keys()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -995,7 +995,7 @@ class EngineBuilder_HTML {
 
         var idx = this.m_select.selectedIndex;
         while (this.m_select.options.length > 0) {
-            this.m_select.options.remove(0);
+            this.m_select.options.remove(this.m_select.options.length - 1);
         }
         for (let i = 0; i < engine_list.get(this.list_idx).length; i++) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -1049,7 +1049,7 @@ class EngineBuilder_HTML {
                 }
                 this.enginebuilder.compressor_type = e_input.compressor_type;
                 this.enginebuilder.compressor_count = e_input.compressor_count;
-                this.enginebuilder.min_IAF = e_input.min_IAF;
+                this.enginebuilder.min_IAF = e_input.min_IdealAlt;
                 this.UpdateEngine();
                 break;
             }

@@ -15,6 +15,7 @@
 /// <reference path="./Optimization.ts" />
 /// <reference path="./Weapons.ts" />
 /// <reference path="./Derived.ts" />
+/// <reference path="./Altitude.ts" />
 /// <reference path="../impl/Aircraft.ts" />
 /// <reference path="./Cards.ts"/>
 
@@ -39,6 +40,7 @@ class Aircraft_HTML extends Display {
     private rotor: Rotor_HTML;
     private derived: Derived_HTML;
     private alter: AlterStats_HTML;
+    private altitude: Altitude_HTML;
 
     private acft_type: HTMLSelectElement;
 
@@ -90,6 +92,7 @@ class Aircraft_HTML extends Display {
         this.used = new Used_HTML(aircraft.GetUsed());
         this.rotor = new Rotor_HTML(aircraft.GetRotor());
         this.alter = new AlterStats_HTML(aircraft.GetAlter());
+        this.altitude = new Altitude_HTML();
 
         (document.getElementById("lbl_acft_type") as HTMLLabelElement).textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type") as HTMLSelectElement;
@@ -311,7 +314,7 @@ class Aircraft_HTML extends Display {
             if (e.GetSelectedList() != "") {
                 var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
 
-                this.cards.eng_data.min_IAF = inputs.min_IAF;
+                this.cards.eng_data.min_IAF = inputs.min_IdealAlt;
                 if (inputs.upgrades[1]) {
                     this.cards.eng_data.notes.push(lu("War Emergency Power"));
                 } else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {
@@ -420,7 +423,7 @@ class Aircraft_HTML extends Display {
             derived.Dropoff,
             StringFmt.Join("/", this.acft.GetReliabilityList()),
             derived.Overspeed,
-            this.acft.GetMinIAF().toString() + "-" + this.acft.GetMaxAltitude().toString(),
+            this.acft.GetMinAltitude().toString() + "-" + this.acft.GetMaxAltitude().toString(),
             derived.FuelUses);
         if (derived.TurnBleed == derived.TurnBleedwBombs) {
             catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}\n\n",
@@ -922,6 +925,7 @@ class Aircraft_HTML extends Display {
         }
 
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
+        this.altitude.UpdateDisplay(this.acft, derived_stats);
     }
 
     public UpdateDisplay() {

@@ -27,7 +27,7 @@ class EngineInputs {
     public quality_fudge: number;
     public compressor_type: number;
     public compressor_count: number;
-    public min_IAF: number;
+    public min_IdealAlt: number;
     public upgrades: boolean[];
 
     //Pulsejet Stuff
@@ -60,7 +60,7 @@ class EngineInputs {
         this.quality_fudge = 0;
         this.compressor_type = 0;
         this.compressor_count = 0;
-        this.min_IAF = 0;
+        this.min_IdealAlt = 0;
         this.upgrades = [...Array(4).fill(false)];
 
         this.power = 0;
@@ -97,7 +97,7 @@ class EngineInputs {
                     quality_fudge: this.quality_fudge,
                     compressor_type: this.compressor_type,
                     compressor_count: this.compressor_count,
-                    min_IAF: this.min_IAF,
+                    min_IAF: this.min_IdealAlt,
                     upgrades: this.upgrades,
                 };
             }
@@ -159,7 +159,7 @@ class EngineInputs {
                 this.quality_fudge = js["quality_fudge"];
                 this.compressor_type = js["compressor_type"];
                 this.compressor_count = js["compressor_count"];
-                this.min_IAF = js["min_IAF"];
+                this.min_IdealAlt = js["min_IAF"];
                 this.upgrades = BoolArr(js["upgrades"], this.upgrades.length);
                 break;
             }
@@ -207,7 +207,7 @@ class EngineInputs {
                 s.PushFloat(this.quality_fudge);
                 s.PushNum(this.compressor_type);
                 s.PushNum(this.compressor_count);
-                s.PushNum(this.min_IAF);
+                s.PushNum(this.min_IdealAlt);
                 s.PushBoolArr(this.upgrades);
                 break;
             }
@@ -254,7 +254,7 @@ class EngineInputs {
                 this.quality_fudge = d.GetFloat();
                 this.compressor_type = d.GetNum();
                 this.compressor_count = d.GetNum();
-                this.min_IAF = d.GetNum();
+                this.min_IdealAlt = d.GetNum();
                 this.upgrades = d.GetBoolArr(this.upgrades.length);
                 break;
             }
@@ -301,7 +301,7 @@ class EngineInputs {
                 eb.quality_fudge = this.quality_fudge;
                 eb.compressor_type = this.compressor_type;
                 eb.compressor_count = this.compressor_count;
-                eb.min_IAF = this.min_IAF;
+                eb.min_IAF = this.min_IdealAlt;
                 eb.upg_sel = this.upgrades;
                 return eb.EngineStats();
             }
@@ -364,7 +364,7 @@ class EngineInputs {
         n.quality_fudge = this.quality_fudge;
         n.compressor_type = this.compressor_type;
         n.compressor_count = this.compressor_count;
-        n.min_IAF = this.min_IAF;
+        n.min_IdealAlt = this.min_IdealAlt;
         n.power = this.power;
         n.quality_cost = this.quality_cost;
         n.quality_rely = this.quality_rely;

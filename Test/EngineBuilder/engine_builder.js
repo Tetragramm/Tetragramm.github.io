@@ -1121,7 +1121,7 @@ class EngineBuilder {
         ei.displacement = this.engine_displacement;
         ei.era_sel = this.era_sel;
         ei.material_fudge = this.material_fudge;
-        ei.min_IAF = this.min_IAF;
+        ei.min_IdealAlt = this.min_IAF;
         ei.name = this.name;
         ei.quality_fudge = this.quality_fudge;
         ei.rows = this.num_rows;
@@ -1458,7 +1458,7 @@ class EngineInputs {
         this.quality_fudge = 0;
         this.compressor_type = 0;
         this.compressor_count = 0;
-        this.min_IAF = 0;
+        this.min_IdealAlt = 0;
         this.upgrades = [...Array(4).fill(false)];
         this.power = 0;
         this.quality_cost = 0;
@@ -1490,7 +1490,7 @@ class EngineInputs {
                     quality_fudge: this.quality_fudge,
                     compressor_type: this.compressor_type,
                     compressor_count: this.compressor_count,
-                    min_IAF: this.min_IAF,
+                    min_IAF: this.min_IdealAlt,
                     upgrades: this.upgrades,
                 };
             }
@@ -1551,7 +1551,7 @@ class EngineInputs {
                 this.quality_fudge = js["quality_fudge"];
                 this.compressor_type = js["compressor_type"];
                 this.compressor_count = js["compressor_count"];
-                this.min_IAF = js["min_IAF"];
+                this.min_IdealAlt = js["min_IAF"];
                 this.upgrades = BoolArr(js["upgrades"], this.upgrades.length);
                 break;
             }
@@ -1597,7 +1597,7 @@ class EngineInputs {
                 s.PushFloat(this.quality_fudge);
                 s.PushNum(this.compressor_type);
                 s.PushNum(this.compressor_count);
-                s.PushNum(this.min_IAF);
+                s.PushNum(this.min_IdealAlt);
                 s.PushBoolArr(this.upgrades);
                 break;
             }
@@ -1643,7 +1643,7 @@ class EngineInputs {
                 this.quality_fudge = d.GetFloat();
                 this.compressor_type = d.GetNum();
                 this.compressor_count = d.GetNum();
-                this.min_IAF = d.GetNum();
+                this.min_IdealAlt = d.GetNum();
                 this.upgrades = d.GetBoolArr(this.upgrades.length);
                 break;
             }
@@ -1689,7 +1689,7 @@ class EngineInputs {
                 eb.quality_fudge = this.quality_fudge;
                 eb.compressor_type = this.compressor_type;
                 eb.compressor_count = this.compressor_count;
-                eb.min_IAF = this.min_IAF;
+                eb.min_IAF = this.min_IdealAlt;
                 eb.upg_sel = this.upgrades;
                 return eb.EngineStats();
             }
@@ -1750,7 +1750,7 @@ class EngineInputs {
         n.quality_fudge = this.quality_fudge;
         n.compressor_type = this.compressor_type;
         n.compressor_count = this.compressor_count;
-        n.min_IAF = this.min_IAF;
+        n.min_IdealAlt = this.min_IdealAlt;
         n.power = this.power;
         n.quality_cost = this.quality_cost;
         n.quality_rely = this.quality_rely;
@@ -2262,6 +2262,11 @@ function BlinkNeutral(elem) {
     elem.offsetHeight;
     elem.classList.toggle("changed_n");
 }
+function BlinkNone(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+}
 function BlinkIfChanged(elem, str, positive_good = null) {
     if (enable_anim) {
         if (elem.textContent != str) {
@@ -2277,6 +2282,9 @@ function BlinkIfChanged(elem, str, positive_good = null) {
                     BlinkBad(elem);
                 }
             }
+        }
+        else {
+            BlinkNone(elem);
         }
     }
     elem.textContent = str;
@@ -3366,17 +3374,17 @@ class EngineBuilder_HTML {
             this.e_ctyp.add(opt);
         }
         this.e_ccnt = document.createElement("INPUT");
-        this.e_mIAF = document.createElement("INPUT");
+        this.e_mIA = document.createElement("INPUT");
         this.e_ctyp.onchange = () => { this.enginebuilder.compressor_type = this.e_ctyp.selectedIndex; this.UpdateEngine(); };
         this.e_ccnt.onchange = () => { this.enginebuilder.compressor_count = this.e_ccnt.valueAsNumber; this.UpdateEngine(); };
-        this.e_mIAF.onchange = () => { this.enginebuilder.min_IAF = this.e_mIAF.valueAsNumber; this.UpdateEngine(); };
+        this.e_mIA.onchange = () => { this.enginebuilder.min_IAF = this.e_mIA.valueAsNumber; this.UpdateEngine(); };
         FlexSelect("Compressor Type", this.e_ctyp, fs);
         FlexInput("Compressor Count", this.e_ccnt, fs);
-        FlexInput("Minimum IAF", this.e_mIAF, fs);
+        FlexInput("Minimum Ideal Altitude", this.e_mIA, fs);
         this.e_ccnt.min = "0";
         this.e_ccnt.step = "1";
-        this.e_mIAF.min = "0";
-        this.e_mIAF.step = "10";
+        this.e_mIA.min = "0";
+        this.e_mIA.step = "10";
         this.e_upgs = [];
         //NOTE: Asperator Boot depricated, so start from 1.
         for (let i = 1; i < this.enginebuilder.Upgrades.length; i++) {
@@ -3434,7 +3442,7 @@ class EngineBuilder_HTML {
         }
         this.e_ctyp.selectedIndex = this.enginebuilder.compressor_type;
         this.e_ccnt.valueAsNumber = this.enginebuilder.compressor_count;
-        this.e_mIAF.valueAsNumber = this.enginebuilder.min_IAF;
+        this.e_mIA.valueAsNumber = this.enginebuilder.min_IAF;
         var can_upg = this.enginebuilder.CanUpgrade();
         for (let i = 0; i < this.e_upgs.length; i++) {
             this.e_upgs[i].disabled = !can_upg[i + 1]; //NOTE: Asperator Boot depricated, so start from 1.
@@ -3990,7 +3998,7 @@ class EngineBuilder_HTML {
     UpdateList() {
         var l_idx = this.m_list_select.selectedIndex;
         while (this.m_list_select.options.length > 0) {
-            this.m_list_select.options.remove(0);
+            this.m_list_select.options.remove(this.m_list_select.options.length - 1);
         }
         for (let key of engine_list.keys()) {
             let opt = document.createElement("OPTION");
@@ -4002,7 +4010,7 @@ class EngineBuilder_HTML {
         this.m_list_select.selectedIndex = l_idx;
         var idx = this.m_select.selectedIndex;
         while (this.m_select.options.length > 0) {
-            this.m_select.options.remove(0);
+            this.m_select.options.remove(this.m_select.options.length - 1);
         }
         for (let i = 0; i < engine_list.get(this.list_idx).length; i++) {
             let opt = document.createElement("OPTION");
@@ -4054,7 +4062,7 @@ class EngineBuilder_HTML {
                 }
                 this.enginebuilder.compressor_type = e_input.compressor_type;
                 this.enginebuilder.compressor_count = e_input.compressor_count;
-                this.enginebuilder.min_IAF = e_input.min_IAF;
+                this.enginebuilder.min_IAF = e_input.min_IdealAlt;
                 this.UpdateEngine();
                 break;
             }
@@ -5775,7 +5783,7 @@ class Engine extends Part {
             else {
                 this.etype_inputs.compressor_type = ieb["compressor_type"];
                 this.etype_inputs.compressor_count = ieb["compressor_count"];
-                this.etype_inputs.min_IAF = ieb["min_IAF"];
+                this.etype_inputs.min_IdealAlt = ieb["min_IAF"];
             }
         }
         else {
@@ -5893,7 +5901,7 @@ class Engine extends Part {
                 else {
                     this.etype_inputs.compressor_type = d.GetNum();
                     this.etype_inputs.compressor_count = d.GetNum();
-                    this.etype_inputs.min_IAF = d.GetNum();
+                    this.etype_inputs.min_IdealAlt = d.GetNum();
                 }
             }
         }
@@ -5951,11 +5959,17 @@ class Engine extends Part {
         }
         this.elist_idx = elist_idx;
     }
+    GetMinAltitude() {
+        return this.etype_inputs.min_IdealAlt;
+    }
     GetMaxAltitude() {
-        return this.GetMinIAF() + this.etype_stats.altitude;
+        return this.GetMinAltitude() + this.etype_stats.altitude;
     }
     GetMinIAF() {
-        return this.etype_inputs.min_IAF;
+        return Math.floor(1.0e-6 + this.GetMinAltitude() / 10);
+    }
+    GetMaxIAF() {
+        return Math.floor(1.0e-6 + this.GetMaxAltitude() / 10);
     }
     CanSelectIndex() {
         var elist_temp = engine_list.get(this.elist_idx);
@@ -6214,7 +6228,7 @@ class Engine extends Part {
     }
     GetOverspeed() {
         if (this.is_generator)
-            return 100;
+            return 1000;
         return this.etype_stats.overspeed + Math.floor(1.0e-6 + this.gp_count * this.etype_stats.overspeed / 2);
     }
     GetIsPulsejet() {
@@ -6843,8 +6857,22 @@ class Engines extends Part {
         }
         return m;
     }
+    GetMaxIAF() {
+        var m = 0;
+        for (let e of this.engines) {
+            m = Math.max(m, e.GetMaxIAF());
+        }
+        return m;
+    }
+    GetMinAltitude() {
+        var m = 0;
+        for (let e of this.engines) {
+            m = Math.max(m, e.GetMinAltitude());
+        }
+        return m;
+    }
     GetMaxAltitude() {
-        var m = 100;
+        var m = 1000;
         for (let e of this.engines) {
             m = Math.min(m, e.GetMaxAltitude());
         }
@@ -7535,7 +7563,7 @@ class Frames extends Part {
         if (d.version > 10.25)
             this.sel_skin = d.GetNum();
     }
-    DuplicateSection(num) {
+    DuplicateSection(num, count = 1) {
         var sec = this.section_list[num];
         var new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
@@ -7544,10 +7572,12 @@ class Frames extends Part {
         if (new_section.internal_bracing && this.CountSections() + this.tail_section_list.length == this.CountInternalBracing()) {
             return;
         }
-        this.section_list.splice(num, 0, new_section);
+        for (let i = 0; i < count; i++) {
+            this.section_list.splice(num, 0, new_section);
+        }
         this.CalculateStats();
     }
-    DuplicateTailSection(num) {
+    DuplicateTailSection(num, count = 1) {
         var sec = this.tail_section_list[num];
         var new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
@@ -7556,7 +7586,9 @@ class Frames extends Part {
         if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
             return;
         }
-        this.tail_section_list.splice(num, 0, new_section);
+        for (let i = 0; i < count; i++) {
+            this.tail_section_list.splice(num, 0, new_section);
+        }
         this.CalculateStats();
     }
     DeleteSection(num) {
@@ -7583,12 +7615,12 @@ class Frames extends Part {
                     lifting_body: false, internal_bracing: false
                 });
             }
-            for (let i = this.section_list.length - 1; i >= 0; i--) {
-                if (!this.section_list[i].internal_bracing) {
-                    while (this.required_sections > this.CountSections()) {
-                        this.DuplicateSection(i);
+            if (this.required_sections - this.CountSections() > 0) {
+                for (let i = this.section_list.length - 1; i >= 0; i--) {
+                    if (!this.section_list[i].internal_bracing) {
+                        this.DuplicateSection(i, this.required_sections - this.CountSections());
+                        return;
                     }
-                    return;
                 }
             }
         }
@@ -7601,9 +7633,8 @@ class Frames extends Part {
                     lifting_body: false, internal_bracing: false
                 });
             }
-            while (num > this.tail_section_list.length) {
-                this.DuplicateTailSection(this.tail_section_list.length - 1);
-            }
+            if (num - this.tail_section_list.length > 0)
+                this.DuplicateTailSection(this.tail_section_list.length - 1, num - this.tail_section_list.length);
         }
         while (num < this.tail_section_list.length) {
             this.tail_section_list.pop();
@@ -13389,6 +13420,12 @@ class Aircraft {
     }
     GetMinIAF() {
         return this.engines.GetMinIAF();
+    }
+    GetMaxIAF() {
+        return this.engines.GetMaxIAF();
+    }
+    GetMinAltitude() {
+        return this.engines.GetMinAltitude();
     }
     GetMaxAltitude() {
         return this.engines.GetMaxAltitude();

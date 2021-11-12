@@ -158,8 +158,24 @@ class Engines extends Part {
         return m;
     }
 
+    public GetMaxIAF() {
+        var m = 0;
+        for (let e of this.engines) {
+            m = Math.max(m, e.GetMaxIAF());
+        }
+        return m;
+    }
+
+    public GetMinAltitude() {
+        var m = 0;
+        for (let e of this.engines) {
+            m = Math.max(m, e.GetMinAltitude());
+        }
+        return m;
+    }
+
     public GetMaxAltitude() {
-        var m = 100;
+        var m = 1000;
         for (let e of this.engines) {
             m = Math.min(m, e.GetMaxAltitude());
         }

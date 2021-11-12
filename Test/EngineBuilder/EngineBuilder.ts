@@ -421,7 +421,7 @@ class EngineBuilder {
         ei.displacement = this.engine_displacement;
         ei.era_sel = this.era_sel;
         ei.material_fudge = this.material_fudge;
-        ei.min_IAF = this.min_IAF;
+        ei.min_IdealAlt = this.min_IAF;
         ei.name = this.name;
         ei.quality_fudge = this.quality_fudge;
         ei.rows = this.num_rows;

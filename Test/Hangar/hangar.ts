@@ -341,8 +341,8 @@ function SaveHangarList(hangar_list: string[]) {
 }
 
 function RefreshAcftSelect(acft_list: { names: string[], acft: string[] }) {
-    while (select_acft.options.length > 0) {
-        select_acft.options.remove(0);
+    while (select_acft.lastChild) {
+        select_acft.removeChild(select_acft.lastChild);
     }
     for (let i = 0; i < acft_list.names.length; i++) {
         let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -352,8 +352,8 @@ function RefreshAcftSelect(acft_list: { names: string[], acft: string[] }) {
 }
 
 function RefreshHangarSelect(hangar_list: string[]) {
-    while (select_hangar.options.length > 0) {
-        select_hangar.options.remove(0);
+    while (select_hangar.lastChild) {
+        select_hangar.removeChild(select_hangar.lastChild);
     }
     var idx = 0;
     for (let i = 0; i < hangar_list.length; i++) {
@@ -396,8 +396,8 @@ function RefreshDisplay() {
 }
 
 function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLTableElement) {
-    while (tbl3.children.length) {
-        tbl3.children[0].remove();
+    while (tbl3.lastChild) {
+        tbl3.removeChild(tbl3.lastChild);
     }
     console.log(acft_builder.GetStats());
     for (let r = 0; r < tbl1.children.length; r++) {

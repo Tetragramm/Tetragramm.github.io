@@ -188,7 +188,7 @@ class Frames extends Part {
             this.sel_skin = d.GetNum();
     }
 
-    public DuplicateSection(num: number) {
+    public DuplicateSection(num: number, count: number = 1) {
         var sec = this.section_list[num];
         var new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
@@ -197,11 +197,13 @@ class Frames extends Part {
         if (new_section.internal_bracing && this.CountSections() + this.tail_section_list.length == this.CountInternalBracing()) {
             return;
         }
-        this.section_list.splice(num, 0, new_section);
+        for (let i = 0; i < count; i++) {
+            this.section_list.splice(num, 0, new_section);
+        }
         this.CalculateStats();
     }
 
-    private DuplicateTailSection(num: number) {
+    private DuplicateTailSection(num: number, count: number = 1) {
         var sec = this.tail_section_list[num];
         var new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
@@ -210,7 +212,9 @@ class Frames extends Part {
         if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
             return;
         }
-        this.tail_section_list.splice(num, 0, new_section);
+        for (let i = 0; i < count; i++) {
+            this.tail_section_list.splice(num, 0, new_section);
+        }
         this.CalculateStats();
     }
 
@@ -239,12 +243,12 @@ class Frames extends Part {
                     lifting_body: false, internal_bracing: false
                 });
             }
-            for (let i = this.section_list.length - 1; i >= 0; i--) {
-                if (!this.section_list[i].internal_bracing) {
-                    while (this.required_sections > this.CountSections()) {
-                        this.DuplicateSection(i);
+            if (this.required_sections - this.CountSections() > 0) {
+                for (let i = this.section_list.length - 1; i >= 0; i--) {
+                    if (!this.section_list[i].internal_bracing) {
+                        this.DuplicateSection(i, this.required_sections - this.CountSections());
+                        return;
                     }
-                    return;
                 }
             }
         }
@@ -258,9 +262,8 @@ class Frames extends Part {
                     lifting_body: false, internal_bracing: false
                 });
             }
-            while (num > this.tail_section_list.length) {
-                this.DuplicateTailSection(this.tail_section_list.length - 1);
-            }
+            if (num - this.tail_section_list.length > 0)
+                this.DuplicateTailSection(this.tail_section_list.length - 1, num - this.tail_section_list.length);
         }
 
         while (num < this.tail_section_list.length) {
@@ -482,7 +485,7 @@ class Frames extends Part {
         return stats;
     }
 
-    private CountMainLiftingBody(){
+    private CountMainLiftingBody() {
         var count = 0;
         for (let s of this.section_list) {
             if (s.lifting_body)
@@ -490,8 +493,8 @@ class Frames extends Part {
         }
         return count;
     }
-    
-    private CountTailLiftingBody(){
+
+    private CountTailLiftingBody() {
         var count = 0;
         for (let s of this.tail_section_list) {
             if (s.lifting_body)

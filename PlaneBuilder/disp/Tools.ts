@@ -279,13 +279,13 @@ function FlexSpace(fs: FlexSection) {
     fs.div2.appendChild(lbl2);
 }
 
-function insertRow(frag: DocumentFragment) {
+function insertRow(frag: DocumentFragment | HTMLElement) {
     var row = document.createElement("TR") as HTMLTableRowElement;
     frag.append(row);
     return row;
 }
 
-function insertCell(frag: DocumentFragment) {
+function insertCell(frag: DocumentFragment | HTMLElement) {
     var cell = document.createElement("TD") as HTMLTableCellElement;
     frag.append(cell);
     return cell;
@@ -315,6 +315,12 @@ function BlinkNeutral(elem: HTMLElement) {
     elem.classList.toggle("changed_n");
 }
 
+function BlinkNone(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+}
+
 function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
     if (enable_anim) {
         if (elem.textContent != str) {
@@ -328,6 +334,8 @@ function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
                     BlinkBad(elem);
                 }
             }
+        } else {
+            BlinkNone(elem);
         }
     }
     elem.textContent = str;

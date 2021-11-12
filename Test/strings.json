@@ -743,6 +743,8 @@
         "Alter Part Name": "Part Name",
         "Alter Part Special Rules": "Special Rules",
         "Frame Count": "Frame Count",
-        "Frame Count Warning": "This plane appears to have unused frame sections.  Check to see if this is intentional."
+        "Frame Count Warning": "This plane appears to have unused frame sections.  Check to see if this is intentional.",
+        "Altitude Section Title": "Altitude Effects",
+        "Altitude Altitude": "Altitude"
     }
 }

@@ -280,6 +280,11 @@ function BlinkNeutral(elem) {
     elem.offsetHeight;
     elem.classList.toggle("changed_n");
 }
+function BlinkNone(elem) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+}
 function BlinkIfChanged(elem, str, positive_good = null) {
     if (enable_anim) {
         if (elem.textContent != str) {
@@ -295,6 +300,9 @@ function BlinkIfChanged(elem, str, positive_good = null) {
                     BlinkBad(elem);
                 }
             }
+        }
+        else {
+            BlinkNone(elem);
         }
     }
     elem.textContent = str;

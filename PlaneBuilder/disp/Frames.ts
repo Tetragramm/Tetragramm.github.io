@@ -47,6 +47,9 @@ class Frames_HTML extends Display {
     private d_strn: HTMLTableCellElement;
     private d_lift: HTMLTableCellElement;
 
+    //Updates faster?
+    private table: HTMLTableElement;
+
     constructor(frames: Frames) {
         super();
         this.c_sec = [];
@@ -56,7 +59,7 @@ class Frames_HTML extends Display {
         //Translate Section title
         (document.getElementById("lbl_frames") as HTMLLabelElement).textContent = lu("Frames Frames and Covering");
 
-        var table = document.getElementById("table_frames") as HTMLTableElement;
+        this.table = document.getElementById("table_frames") as HTMLTableElement;
         var fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
         this.all_frame = document.createElement("SELECT") as HTMLSelectElement;
@@ -162,10 +165,14 @@ class Frames_HTML extends Display {
         this.t_boom.onchange = () => { this.frames.SetUseBoom(this.t_boom.checked); };
         this.t_fwing.onchange = () => { this.frames.SetFlyingWing(this.t_fwing.checked); };
 
-        table.appendChild(fragment);
+        this.table.appendChild(fragment);
     }
 
     public UpdateDisplay() {
+        var fragment = document.createDocumentFragment();
+        while (this.table.children.length) {
+            fragment.append(this.table.children[0]);
+        }
         var section_list = this.frames.GetSectionList();
         var tail_section_list = this.frames.GetTailSectionList();
 
@@ -223,6 +230,7 @@ class Frames_HTML extends Display {
         BlinkIfChanged(this.d_pstb, stats.pitchstab.toString(), true);
         BlinkIfChanged(this.d_strn, stats.maxstrain.toString(), true);
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
+        this.table.appendChild(fragment);
     }
 
     private CreateSection(i: number, sec: {

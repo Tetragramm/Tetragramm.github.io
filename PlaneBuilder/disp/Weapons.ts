@@ -199,7 +199,7 @@ class Weapons_HTML extends Display {
         var slist = this.weap.GetSeatList();
         if (disp.seat.options.length != slist.length) {
             while (disp.seat.options.length > 0) {
-                disp.seat.options.remove(0);
+                disp.seat.options.remove(disp.seat.options.length - 1);
             }
             for (let s of slist) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
