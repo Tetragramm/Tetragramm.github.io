@@ -444,6 +444,8 @@ class Derived_HTML {
 
     private prefix(num_wings: number): string {
         switch (num_wings) {
+            case 0:
+                return "";
             case 1:
                 return "Monoplane ";
             case 2:

@@ -5097,12 +5097,6 @@ class Cockpit extends Part {
                 equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
             }
         }
-        for (let i = 0; i < this.upgrades.length; i++) {
-            if (this.selected_upgrades[i]) {
-                let item = this.upgrades[i];
-                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
-            }
-        }
         for (let i = 0; i < this.safety.length; i++) {
             if (this.selected_safety[i]) {
                 let item = this.safety[i];

@@ -2405,12 +2405,6 @@ class Cockpit extends Part {
                 equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
             }
         }
-        for (let i = 0; i < this.upgrades.length; i++) {
-            if (this.selected_upgrades[i]) {
-                let item = this.upgrades[i];
-                equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
-            }
-        }
         for (let i = 0; i < this.safety.length; i++) {
             if (this.selected_safety[i]) {
                 let item = this.safety[i];
@@ -14541,6 +14535,8 @@ class Derived_HTML {
     }
     prefix(num_wings) {
         switch (num_wings) {
+            case 0:
+                return "";
             case 1:
                 return "Monoplane ";
             case 2:
