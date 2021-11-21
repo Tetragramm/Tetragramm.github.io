@@ -288,10 +288,6 @@ class Cockpit extends Part {
             }
         }
 
-        for (let w of stats.warnings) {
-            w.source = lu("Seat #", this.seat_index + 1) + " " + w.source;
-        }
-
         this.stats = stats.Clone();
 
         //Special stuff for co-pilot controls

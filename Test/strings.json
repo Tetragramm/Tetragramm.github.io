@@ -725,6 +725,7 @@
         "Aircraft Stats Section Title": "Total Sum of Stats",
         "Aircraft Derived Section Title": "Aircraft Derived Statistics",
         "Seat #": "Seat #{0}",
+        "Seats #": "Seats # {0}",
         "Seat Location": "Choose Seat",
         "Crew Pilot": "Pilot",
         "Crew Bombadier": "Bombadier",

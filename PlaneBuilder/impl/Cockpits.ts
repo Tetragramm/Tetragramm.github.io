@@ -164,9 +164,27 @@ class Cockpits extends Part {
 
     public PartStats(): Stats {
         var s = new Stats();
-        for (let cp of this.positions) {
-            s = s.Add(cp.PartStats());
+        let warningmap = new Map();
+        for (let i = 0; i < this.positions.length; i++) {
+            let cp = this.positions[i];
+            let cps = cp.PartStats();
+            s = s.Add(cps);
+            // We want to merge all the warnings for different seats so we don't end up with a pile of warnings.
+            for (let w of cps.warnings) {
+                let exist = warningmap.get(w.source);
+                if (exist) {
+                    exist.push(i + 1);
+                    warningmap.set(w.source, exist);
+                } else {
+                    warningmap.set(w.source, [i + 1]);
+                }
+            }
         }
+
+        for (let w of s.warnings) {
+            w.source = lu("Seats #", StringFmt.Join(",", warningmap.get(w.source))) + " " + w.source;
+        }
+
         //Local only stats don't get rolled up into the aircraft as a whole.
         s.escape = 0;
         //This needs special work for co-pilot controls
