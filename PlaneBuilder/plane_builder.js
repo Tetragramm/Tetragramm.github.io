@@ -3506,6 +3506,9 @@ class Radiator extends Part {
             this.harden_cool = true;
         }
     }
+    GetIsFlammable() {
+        return this.coolant_list[this.idx_coolant].flammable;
+    }
     PartStats() {
         this.VerifyHarden();
         var stats = new Stats();
@@ -3516,11 +3519,6 @@ class Radiator extends Part {
         stats.drag += Math.ceil(-1.0e-6 + this.type_list[this.idx_type].dragpercool * (this.need_cool - stats.cooling));
         if (this.harden_cool) {
             stats.cost += 2;
-        }
-        if (this.coolant_list[this.idx_coolant].flammable) {
-            stats.warnings.push({
-                source: lu("Radiator Fluid"), warning: lu("Radiator Fluid Warning")
-            });
         }
         return stats;
     }
@@ -3904,6 +3902,13 @@ class Engines extends Part {
         }
         return false;
     }
+    GetIsFlammable() {
+        for (let r of this.radiators) {
+            if (r.GetIsFlammable())
+                return true;
+        }
+        return false;
+    }
     PartStats() {
         var stats = new Stats;
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
@@ -3920,11 +3925,29 @@ class Engines extends Part {
         //Upkeep calc only uses engine costs
         stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
         //Include radiaators
+        let radstats = new Stats();
+        let warningmap = new Map();
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
             rad.SetNeedCool(needCool[i].cool, needCool[i].count);
-            stats = stats.Add(rad.PartStats());
+            let rstats = rad.PartStats();
+            radstats = radstats.Add(rstats);
+            // We want to merge all the warnings for different radiators so we don't end up with a pile of warnings.
+            for (let w of rstats.warnings) {
+                let exist = warningmap.get(w.source);
+                if (exist) {
+                    exist.push(i + 1);
+                    warningmap.set(w.source, exist);
+                }
+                else {
+                    warningmap.set(w.source, [i + 1]);
+                }
+            }
         }
+        for (let w of radstats.warnings) {
+            w.source = lu("Radiators #", StringFmt.Join(",", warningmap.get(w.source))) + " " + w.source;
+        }
+        stats = stats.Add(radstats);
         //Asymmetric planes
         if (this.is_asymmetric)
             stats.latstab -= 3;
@@ -10492,7 +10515,7 @@ class Aircraft {
         return this.gear.GetGearName();
     }
     GetIsFlammable() {
-        return this.frames.GetIsFlammable() || this.wings.GetIsFlammable();
+        return this.frames.GetIsFlammable() || this.wings.GetIsFlammable() || this.engines.GetIsFlammable();
     }
     GetAircraftType() {
         return this.aircraft_type;
@@ -11678,12 +11701,14 @@ class Radiator_HTML extends Display {
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Reliability"));
         CreateTH(h1_row, lu("Stat Lateral Stability"));
+        CreateTH(h1_row, lu("Derived Is Flammable Question"));
         var c1_row = tbl.insertRow();
         this.c_mass = c1_row.insertCell();
         this.c_cost = c1_row.insertCell();
         this.c_drag = c1_row.insertCell();
         this.c_rely = c1_row.insertCell();
         this.c_lstb = c1_row.insertCell();
+        this.c_flam = c1_row.insertCell();
         stats_cell.appendChild(tbl);
     }
     UpdateRadiator(rad) {
@@ -11708,6 +11733,10 @@ class Radiator_HTML extends Display {
         BlinkIfChanged(this.c_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.c_rely, stats.reliability.toString(), true);
         BlinkIfChanged(this.c_lstb, stats.latstab.toString(), true);
+        if (this.radiator.GetIsFlammable())
+            BlinkIfChanged(this.c_flam, lu("Yes"));
+        else
+            BlinkIfChanged(this.c_flam, lu("No"));
     }
 }
 /// <reference path="./Display.ts" />

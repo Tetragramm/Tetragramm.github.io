@@ -12,6 +12,7 @@ class Radiator_HTML extends Display {
     private c_cost: HTMLTableCellElement;
     private c_rely: HTMLTableCellElement;
     private c_lstb: HTMLTableCellElement;
+    private c_flam: HTMLTableCellElement;
 
     constructor(row: HTMLTableRowElement, rad: Radiator) {
         super();
@@ -66,12 +67,14 @@ class Radiator_HTML extends Display {
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Reliability"));
         CreateTH(h1_row, lu("Stat Lateral Stability"));
+        CreateTH(h1_row, lu("Derived Is Flammable Question"));
         var c1_row = tbl.insertRow();
         this.c_mass = c1_row.insertCell();
         this.c_cost = c1_row.insertCell();
         this.c_drag = c1_row.insertCell();
         this.c_rely = c1_row.insertCell();
         this.c_lstb = c1_row.insertCell();
+        this.c_flam = c1_row.insertCell();
         stats_cell.appendChild(tbl);
     }
 
@@ -98,5 +101,9 @@ class Radiator_HTML extends Display {
         BlinkIfChanged(this.c_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.c_rely, stats.reliability.toString(), true);
         BlinkIfChanged(this.c_lstb, stats.latstab.toString(), true);
+        if (this.radiator.GetIsFlammable())
+            BlinkIfChanged(this.c_flam, lu("Yes"));
+        else
+            BlinkIfChanged(this.c_flam, lu("No"));
     }
 }

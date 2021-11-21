@@ -154,6 +154,10 @@ class Radiator extends Part {
         }
     }
 
+    public GetIsFlammable(): boolean {
+        return this.coolant_list[this.idx_coolant].flammable;
+    }
+
     public PartStats(): Stats {
         this.VerifyHarden();
 
@@ -167,12 +171,6 @@ class Radiator extends Part {
 
         if (this.harden_cool) {
             stats.cost += 2;
-        }
-
-        if (this.coolant_list[this.idx_coolant].flammable) {
-            stats.warnings.push({
-                source: lu("Radiator Fluid"), warning: lu("Radiator Fluid Warning")
-            });
         }
 
         return stats;

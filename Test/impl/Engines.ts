@@ -429,8 +429,16 @@ class Engines extends Part {
         return lst;
     }
 
+    public GetIsFlammable(): boolean {
+        for (let r of this.radiators) {
+            if (r.GetIsFlammable())
+                return true;
+        }
+        return false;
+    }
+
     public PartStats(): Stats {
-        var stats = new Stats;
+        var stats = new Stats();
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
         var ecost = 0;
         var pitchspeedmin = 100;
@@ -455,11 +463,31 @@ class Engines extends Part {
         stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
 
         //Include radiaators
+        let radstats = new Stats();
+        let warningmap = new Map();
         for (let i = 0; i < this.radiators.length; i++) {
             let rad = this.radiators[i];
             rad.SetNeedCool(needCool[i].cool, needCool[i].count);
-            stats = stats.Add(rad.PartStats());
+
+            let rstats = rad.PartStats();
+            radstats = radstats.Add(rstats);
+
+            // We want to merge all the warnings for different radiators so we don't end up with a pile of warnings.
+            for (let w of rstats.warnings) {
+                let exist = warningmap.get(w.source);
+                if (exist) {
+                    exist.push(i + 1);
+                    warningmap.set(w.source, exist);
+                } else {
+                    warningmap.set(w.source, [i + 1]);
+                }
+            }
         }
+
+        for (let w of radstats.warnings) {
+            w.source = lu("Radiators #", StringFmt.Join(",", warningmap.get(w.source))) + " " + w.source;
+        }
+        stats = stats.Add(radstats);
 
         //Asymmetric planes
         if (this.is_asymmetric)

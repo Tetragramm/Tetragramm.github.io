@@ -823,7 +823,7 @@ class Aircraft {
     }
 
     public GetIsFlammable() {
-        return this.frames.GetIsFlammable() || this.wings.GetIsFlammable();
+        return this.frames.GetIsFlammable() || this.wings.GetIsFlammable() || this.engines.GetIsFlammable();
     }
 
     public GetAircraftType() {
