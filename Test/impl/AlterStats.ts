@@ -129,14 +129,10 @@ class AlterStats extends Part {
     }
 
     public RemovePart(name: string) {
-        console.log(name);
-        console.log(this.custom_parts.length);
         var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
-        console.log(idx);
         if (idx != -1) {
             this.custom_parts.splice(idx, 1);
         }
-        console.log(this.custom_parts.length);
         this.CalculateStats();
     }
 

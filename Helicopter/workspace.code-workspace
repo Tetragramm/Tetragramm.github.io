@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\Test\\disp"
+		},
+		{
+			"path": "..\\Test\\impl"
+		}
+	],
+	"settings": {}
+}

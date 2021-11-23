@@ -2,7 +2,6 @@
 /// <reference path="../impl/Reinforcement.ts" />
 
 class Reinforcement_HTML extends Display {
-    private acft: Aircraft;
     private rf: Reinforcement;
     private ext_wood_inp: HTMLInputElement[];
     private ext_steel_inp: HTMLInputElement[];
@@ -20,9 +19,8 @@ class Reinforcement_HTML extends Display {
     private d_amax: HTMLTableCellElement;
 
 
-    constructor(acft: Aircraft, rf: Reinforcement) {
+    constructor(rf: Reinforcement) {
         super();
-        this.acft = acft;
         this.rf = rf;
         this.ext_wood_inp = [];
         this.ext_steel_inp = [];

@@ -511,7 +511,7 @@ class Engine extends Part {
     }
 
     public CanUsePushPull() {
-        return !(this.is_generator || (this.GetNumPropellers() == 0) || this.is_internal);
+        return !(this.is_generator || (this.GetNumPropellers() == 0) || this.is_internal || this.mount_list[this.selected_mount].helicopter);
     }
 
     public SetUsePushPull(use: boolean) {
@@ -540,7 +540,7 @@ class Engine extends Part {
     }
 
     public CanUseExtendedDriveshaft() {
-        return !((this.GetNumPropellers() == 0) || this.is_internal || this.GetGenerator());
+        return !((this.GetNumPropellers() == 0) || this.is_internal || this.GetGenerator() || this.mount_list[this.selected_mount].helicopter);
     }
 
     public SetUseExtendedDriveshaft(use: boolean) {
@@ -909,6 +909,9 @@ class Engine extends Part {
     public PartStats(): Stats {
         this.PulseJetCheck();
         this.TurbineCheck();
+        if (!this.CanUseExtendedDriveshaft()) {
+            this.use_ds = false;
+        }
         if (!this.CanOutboardProp()) {
             this.outboard_prop = false;
         }
@@ -920,13 +923,22 @@ class Engine extends Part {
         if (this.etype_stats.oiltank)
             stats.mass += 1;
 
+        var torque = this.etype_stats.torque;
+        if (this.mount_list[this.selected_mount].helicopter) {
+            if (this.IsRotary())
+                torque = Math.floor(1.0e-6 + torque / 2);
+            else
+                torque = 0;
+        }
+
+
         if (this.torque_to_struct)
-            stats.structure -= this.etype_stats.torque;
+            stats.structure -= torque;
         else {
             if (this.mount_list[this.selected_mount].mount_type == "wing")
-                stats.maxstrain -= this.etype_stats.torque;
+                stats.maxstrain -= torque;
             else if (this.mount_list[this.selected_mount].mount_type == "fuselage")
-                stats.latstab -= this.etype_stats.torque;
+                stats.latstab -= torque;
         }
 
         //ContraRotary Engines need geared propellers to function.

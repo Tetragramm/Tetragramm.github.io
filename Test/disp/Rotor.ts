@@ -152,13 +152,13 @@ class Rotor_HTML extends Display {
 
         this.heli_stagger = document.createElement("SELECT") as HTMLSelectElement;
         FlexSelect(lu("Rotor Stagger"), this.heli_stagger, rotor_fs);
-        let opt1 = document.createElement("OPTION") as HTMLOptionElement;
-        opt1.text = lu("Unstaggered");
-        this.heli_stagger.add(opt1);
-        let opt2 = document.createElement("OPTION") as HTMLOptionElement;
-        opt2.text = lu("Tandem");
-        this.heli_stagger.add(opt2);
-        this.heli_stagger.onchange = () => { this.rotor.SetTandem(this.heli_stagger.selectedIndex == 1); };
+        var staggers = this.rotor.GetStaggerList();
+        for (let s of staggers) {
+            let opt1 = document.createElement("OPTION") as HTMLOptionElement;
+            opt1.text = lu(s.name);
+            this.heli_stagger.add(opt1);
+        }
+        this.heli_stagger.onchange = () => { this.rotor.SetStagger(this.heli_stagger.selectedIndex); };
 
         this.heli_blade_count = document.createElement("SELECT") as HTMLSelectElement;
         FlexSelect(lu("Rotor Blade Count"), this.heli_blade_count, rotor_fs);
@@ -223,15 +223,12 @@ class Rotor_HTML extends Display {
 
         this.heli_min.innerText = "" + this.rotor.GetSizingSpan();
         this.heli_span.valueAsNumber = this.rotor.GetRotorSpan();
-        if (this.rotor.GetRotorCount() > 1)
-            this.heli_stagger.disabled = false;
-        else
-            this.heli_stagger.disabled = true;
+        var can_stagger = this.rotor.CanStagger();
+        for (let i = 0; i < can_stagger.length; i++) {
+            this.heli_stagger.options[i].disabled = !can_stagger[i];
+        }
 
-        if (this.rotor.GetTandem())
-            this.heli_stagger.selectedIndex = 1;
-        else
-            this.heli_stagger.selectedIndex = 0;
+        this.heli_stagger.selectedIndex = this.rotor.GetStagger();
 
         this.heli_mat.selectedIndex = this.rotor.GetCantilever();
 

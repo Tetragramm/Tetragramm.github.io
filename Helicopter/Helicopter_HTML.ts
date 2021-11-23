@@ -1,35 +1,35 @@
-/// <reference path="./Display.ts" />
-/// <reference path="./Era.ts" />
-/// <reference path="./Cockpits.ts" />
-/// <reference path="./Passengers.ts" />
-/// <reference path="./Engines.ts" />
-/// <reference path="./Propeller.ts" />
-/// <reference path="./Frames.ts" />
-/// <reference path="./Wings.ts" />
-/// <reference path="./Stabilizers.ts" />
-/// <reference path="./ControlSurfaces.ts" />
-/// <reference path="./Reinforcement.ts" />
-/// <reference path="./Load.ts" />
-/// <reference path="./LandingGear.ts" />
-/// <reference path="./Accessories.ts" />
-/// <reference path="./Optimization.ts" />
-/// <reference path="./Weapons.ts" />
-/// <reference path="./Derived.ts" />
-/// <reference path="./Altitude.ts" />
-/// <reference path="../impl/Aircraft.ts" />
-/// <reference path="./Cards.ts"/>
+/// <reference path="../Test/disp/Display.ts" />
+/// <reference path="../Test/disp/Era.ts" />
+/// <reference path="../Test/disp/Cockpits.ts" />
+/// <reference path="../Test/disp/Passengers.ts" />
+/// <reference path="../Test/disp/Engines.ts" />
+/// <reference path="../Test/disp/Propeller.ts" />
+/// <reference path="../Test/disp/Frames.ts" />
+/// <reference path="../Test/disp/Wings.ts" />
+/// <reference path="../Test/disp/Stabilizers.ts" />
+/// <reference path="../Test/disp/ControlSurfaces.ts" />
+/// <reference path="../Test/disp/Reinforcement.ts" />
+/// <reference path="../Test/disp/Load.ts" />
+/// <reference path="../Test/disp/LandingGear.ts" />
+/// <reference path="../Test/disp/Accessories.ts" />
+/// <reference path="../Test/disp/Optimization.ts" />
+/// <reference path="../Test/disp/Weapons.ts" />
+/// <reference path="../Test/disp/Used.ts" />
+/// <reference path="../Test/disp/AlterStats.ts" />
+/// <reference path="../Test/disp/Rotor.ts" />
+/// <reference path="../Test/disp/Derived.ts" />
+/// <reference path="../Test/disp/Altitude.ts" />
+/// <reference path="../Test/impl/Aircraft.ts" />
+/// <reference path="../Test/disp/Cards.ts"/>
 
-class Aircraft_HTML extends Display {
-    private acft: Aircraft;
+class Helicopter_HTML extends Display {
+    private heli: Helicopter;
     private era: Era_HTML;
     private cockpits: Cockpits_HTML;
     private passengers: Passengers_HTML;
     private engines: Engines_HTML;
-    private propeller: Propeller_HTML;
     private frames: Frames_HTML;
-    private wings: Wings_HTML;
     private stabilizers: Stabilizers_HTML;
-    private controlsurfaces: ControlSurfaces_HTML;
     private reinforcements: Reinforcement_HTML;
     private load: Load_HTML;
     private gear: LandingGear_HTML;
@@ -38,9 +38,8 @@ class Aircraft_HTML extends Display {
     private weapons: Weapons_HTML;
     private used: Used_HTML;
     private rotor: Rotor_HTML;
-    private derived: Derived_HTML;
+    private derived: Derived_Heli_HTML;
     private alter: AlterStats_HTML;
-    private altitude: Altitude_HTML;
 
     private acft_type: HTMLSelectElement;
 
@@ -70,49 +69,39 @@ class Aircraft_HTML extends Display {
     private cards: Cards;
 
 
-    constructor(js: JSON, aircraft: Aircraft) {
+    constructor(js: JSON, heli: Helicopter) {
         super();
 
-        this.acft = aircraft;
-        this.era = new Era_HTML(this.acft.GetEra());
-        this.cockpits = new Cockpits_HTML(aircraft.GetCockpits());
-        this.passengers = new Passengers_HTML(aircraft.GetPassengers());
-        this.engines = new Engines_HTML(aircraft.GetEngines());
-        this.propeller = new Propeller_HTML(aircraft.GetPropeller());
-        this.frames = new Frames_HTML(aircraft.GetFrames());
-        this.wings = new Wings_HTML(aircraft.GetWings());
-        this.stabilizers = new Stabilizers_HTML(aircraft.GetStabilizers());
-        this.controlsurfaces = new ControlSurfaces_HTML(aircraft.GetControlSurfaces());
-        this.reinforcements = new Reinforcement_HTML(aircraft.GetReinforcements());
-        this.load = new Load_HTML(aircraft.GetFuel(), aircraft.GetMunitions(), aircraft.GetCargoAndPassengers());
-        this.gear = new LandingGear_HTML(aircraft.GetLandingGear());
-        this.accessories = new Accessories_HTML(aircraft.GetAccessories());
-        this.optimization = new Optimization_HTML(aircraft.GetOptimization());
-        this.weapons = new Weapons_HTML(aircraft.GetWeapons());
-        this.used = new Used_HTML(aircraft.GetUsed());
-        this.rotor = new Rotor_HTML(aircraft.GetRotor());
-        this.alter = new AlterStats_HTML(aircraft.GetAlter());
-        this.altitude = new Altitude_HTML();
+        this.heli = heli;
+        this.era = new Era_HTML(this.heli.GetEra());
+        this.cockpits = new Cockpits_HTML(heli.GetCockpits());
+        this.passengers = new Passengers_HTML(heli.GetPassengers());
+        this.engines = new Engines_HTML(heli.GetEngines());
+        this.frames = new Frames_HTML(heli.GetFrames());
+        this.stabilizers = new Stabilizers_HTML(heli.GetStabilizers());
+        this.reinforcements = new Reinforcement_HTML(heli.GetReinforcements());
+        this.load = new Load_HTML(heli.GetFuel(), heli.GetMunitions(), heli.GetCargoAndPassengers());
+        this.gear = new LandingGear_HTML(heli.GetLandingGear());
+        this.accessories = new Accessories_HTML(heli.GetAccessories());
+        this.optimization = new Optimization_HTML(heli.GetOptimization());
+        this.weapons = new Weapons_HTML(heli.GetWeapons());
+        this.used = new Used_HTML(heli.GetUsed());
+        this.rotor = new Rotor_HTML(heli.GetRotor());
+        this.alter = new AlterStats_HTML(heli.GetAlter());
 
         (document.getElementById("lbl_acft_type") as HTMLLabelElement).textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type") as HTMLSelectElement;
-        let heli = false;
         let idx = 0;
         for (let type in AIRCRAFT_TYPE) {
             if (isNaN(Number(type))) {
-                idx = idx + 1;
-                if (idx != 2) {
-                    let opt = document.createElement("OPTION") as HTMLOptionElement;
-                    opt.text = lu(type);
-                    this.acft_type.add(opt);
-                }
+                let opt = document.createElement("OPTION") as HTMLOptionElement;
+                opt.text = lu(type);
+                this.acft_type.add(opt);
             }
         }
+        this.acft_type.selectedIndex = 1;
         this.acft_type.onchange = () => {
-            let idx = this.acft_type.selectedIndex;
-            if (idx >= 1)
-                idx += 1;
-            this.acft.SetType(idx);
+            this.acft_type.selectedIndex = 1;
         };
 
         (document.getElementById("lbl_stats") as HTMLLabelElement).textContent = lu("Aircraft Stats Section Title");
@@ -123,7 +112,7 @@ class Aircraft_HTML extends Display {
         var tbl2 = document.getElementById("tbl_derived") as HTMLTableElement;
         this.InitDerived(tbl2);
 
-        this.acft.SetDisplayCallback(() => { this.UpdateDisplay(); });
+        this.heli.SetDisplayCallback(() => { this.UpdateDisplay(); });
 
         (document.getElementById("lbl_acft_save_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save");
         (document.getElementById("lbl_acft_save_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save");
@@ -168,7 +157,7 @@ class Aircraft_HTML extends Display {
         (document.getElementById("lbl_acft_reset_top") as HTMLLabelElement).textContent = lu("Aircraft Button Default Aircraft");
         (document.getElementById("lbl_acft_reset_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Default Aircraft");
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
-        reset_button.onclick = () => { this.acft.Reset(); this.derived.SetName(this.acft.name); this.acft.CalculateStats(); };
+        reset_button.onclick = () => { this.heli.Reset(); this.derived.SetName(this.heli.name); this.heli.CalculateStats(); };
 
         (document.getElementById("lbl_acft_save_cat_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save Catalog");
         (document.getElementById("lbl_acft_save_cat_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save Catalog");
@@ -177,11 +166,11 @@ class Aircraft_HTML extends Display {
     }
 
     private UpdateCard() {
-        this.acft.name = this.derived.GetName();
-        var stats = this.acft.GetStats();
-        var derived = this.acft.GetDerivedStats();
-        this.cards.name = this.acft.name;
-        this.cards.acft_data.armour = this.acft.GetAccessories().GetEffectiveCoverage();
+        this.heli.name = this.derived.GetName();
+        var stats = this.heli.GetStats();
+        var derived = this.heli.GetDerivedStats();
+        this.cards.name = this.heli.name;
+        this.cards.acft_data.armour = this.heli.GetAccessories().GetEffectiveCoverage();
         this.cards.acft_data.crash = stats.crashsafety;
         this.cards.acft_data.dropoff = derived.Dropoff;
         this.cards.acft_data.empty_boost = derived.BoostEmpty;
@@ -190,7 +179,7 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.empty_stall = derived.StallSpeedEmpty;
         this.cards.acft_data.empty_speed = Math.floor(1.0e-6 + derived.MaxSpeedEmpty);
         this.cards.acft_data.energy_loss = derived.EnergyLoss;
-        this.cards.acft_data.escape = this.acft.GetCockpits().GetEscapeList()[0];
+        this.cards.acft_data.escape = this.heli.GetCockpits().GetEscapeList()[0];
         this.cards.acft_data.fuel = derived.FuelUses;
         this.cards.acft_data.full_bomb_boost = derived.BoostFullwBombs;
         this.cards.acft_data.full_bomb_hand = derived.HandlingFullwBombs;
@@ -214,9 +203,9 @@ class Aircraft_HTML extends Display {
         this.cards.acft_data.half_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
         this.cards.acft_data.max_strain = derived.MaxStrain;
         var ordinance = [];
-        var bombs = this.acft.GetMunitions().GetBombCount();
-        var rockets = this.acft.GetMunitions().GetRocketCount();
-        var internal = this.acft.GetMunitions().GetInternalBombCount();
+        var bombs = this.heli.GetMunitions().GetBombCount();
+        var rockets = this.heli.GetMunitions().GetRocketCount();
+        var internal = this.heli.GetMunitions().GetInternalBombCount();
         if (bombs > 0) {
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
@@ -225,7 +214,7 @@ class Aircraft_HTML extends Display {
             if (ext_bomb > 0)
                 ordinance.push(lu(" Bomb Mass Externally.", ext_bomb));
             if (int_bomb > 0) {
-                var mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
+                var mib = Math.min(int_bomb, this.heli.GetMunitions().GetMaxBombSize());
                 ordinance.push(lu("Largest Internal Bomb", mib.toString()));
             }
             internal -= int_bomb;
@@ -240,17 +229,17 @@ class Aircraft_HTML extends Display {
         }
         this.cards.acft_data.ordinance = ordinance;
         this.cards.acft_data.stability = derived.Stabiilty;
-        this.cards.acft_data.stress = this.acft.GetCockpits().GetStressList()[0][0];
+        this.cards.acft_data.stress = this.heli.GetCockpits().GetStressList()[0][0];
         this.cards.acft_data.toughness = derived.Toughness;
         this.cards.acft_data.turn_bleed = derived.TurnBleed;
-        this.cards.acft_data.visibility = this.acft.GetCockpits().GetVisibilityList()[0];
-        this.cards.acft_data.vital_parts = this.acft.VitalComponentList();
+        this.cards.acft_data.visibility = this.heli.GetCockpits().GetVisibilityList()[0];
+        this.cards.acft_data.vital_parts = this.heli.VitalComponentList();
         this.cards.acft_data.warnings = stats.warnings;
     }
 
     private UpdateWeaponCard(w: WeaponSystem) {
-        var wlist = this.acft.GetWeapons().GetWeaponList();
-        var dlist = this.acft.GetWeapons().GetDirectionList();
+        var wlist = this.heli.GetWeapons().GetWeaponList();
+        var dlist = this.heli.GetWeapons().GetDirectionList();
 
         var name = WeaponName(w, wlist);
         if (w.IsPlural()) {
@@ -351,9 +340,9 @@ class Aircraft_HTML extends Display {
                 if (acft.fromJSON(str)) {
                     str = JSON.parse(reader.result as string);
                     console.log(str);
-                    this.acft.fromJSON(str);
-                    this.derived.SetName(this.acft.name);
-                    this.acft.CalculateStats();
+                    this.heli.fromJSON(str);
+                    this.derived.SetName(this.heli.name);
+                    this.heli.CalculateStats();
                 }
 
             } catch (e) {
@@ -386,11 +375,11 @@ class Aircraft_HTML extends Display {
     }
 
     private CatalogStats() {
-        this.acft.name = this.derived.GetName();
-        var stats = this.acft.GetStats();
-        var derived = this.acft.GetDerivedStats();
+        this.heli.name = this.derived.GetName();
+        var stats = this.heli.GetStats();
+        var derived = this.heli.GetDerivedStats();
         var catalog_stats = this.MakeLink() + "\n";
-        catalog_stats += this.acft.name + "\n";
+        catalog_stats += this.heli.name + "\n";
         catalog_stats += "Insert Nickname Here\n";
         catalog_stats += StringFmt.Format("{0}þ New, {1}þ Used\n", stats.cost, Math.floor(1.0e-6 + stats.cost / 2));
         catalog_stats += StringFmt.Format("{0}þ Upkeep\n\n", stats.upkeep);
@@ -427,23 +416,23 @@ class Aircraft_HTML extends Display {
             derived.StallSpeedEmpty,
             0);
         catalog_stats += "\nVital Parts\n";
-        catalog_stats += StringFmt.Join(", ", this.acft.VitalComponentList());
+        catalog_stats += StringFmt.Join(", ", this.heli.VitalComponentList());
         catalog_stats += "\n\n";
         catalog_stats += StringFmt.Format("Dropoff {0}, Reliability {1}, Overspeed {2}, Ideal Alt. {3}, Fuel {4}\n\n",
             derived.Dropoff,
-            StringFmt.Join("/", this.acft.GetReliabilityList()),
+            StringFmt.Join("/", this.heli.GetReliabilityList()),
             derived.Overspeed,
-            this.acft.GetMinAltitude().toString() + "-" + this.acft.GetMaxAltitude().toString(),
+            this.heli.GetMinAltitude().toString() + "-" + this.heli.GetMaxAltitude().toString(),
             derived.FuelUses);
         if (derived.TurnBleed == derived.TurnBleedwBombs) {
             catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}\n\n",
-                StringFmt.Join("/", this.acft.GetVisibilityList()),
+                StringFmt.Join("/", this.heli.GetVisibilityList()),
                 derived.Stabiilty,
                 derived.EnergyLoss,
                 derived.TurnBleed);
         } else {
             catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3} ({4})\n\n",
-                StringFmt.Join("/", this.acft.GetVisibilityList()),
+                StringFmt.Join("/", this.heli.GetVisibilityList()),
                 derived.Stabiilty,
                 derived.EnergyLoss,
                 derived.TurnBleed,
@@ -452,15 +441,15 @@ class Aircraft_HTML extends Display {
         catalog_stats += StringFmt.Format("Toughness {0}, Max Strain {1}, Escape {2}, Crash Safety {3}, Flight Stress {4}\n\n",
             derived.Toughness,
             derived.MaxStrain,
-            StringFmt.Join("/", this.acft.GetEscapeList()),
-            StringFmt.Join("/", this.acft.GetCrashList()),
-            this.Stress2Str(this.acft.GetStressList()));
+            StringFmt.Join("/", this.heli.GetEscapeList()),
+            StringFmt.Join("/", this.heli.GetCrashList()),
+            this.Stress2Str(this.heli.GetStressList()));
 
-        var wlist = this.acft.GetWeapons().GetWeaponList();
-        var dlist = this.acft.GetWeapons().GetDirectionList();
-        var bombs = this.acft.GetMunitions().GetBombCount();
-        var rockets = this.acft.GetMunitions().GetRocketCount();
-        var internal = this.acft.GetMunitions().GetInternalBombCount();
+        var wlist = this.heli.GetWeapons().GetWeaponList();
+        var dlist = this.heli.GetWeapons().GetDirectionList();
+        var bombs = this.heli.GetMunitions().GetBombCount();
+        var rockets = this.heli.GetMunitions().GetRocketCount();
+        var internal = this.heli.GetMunitions().GetInternalBombCount();
         if (bombs > 0) {
             var int_bomb = Math.min(bombs, internal);
             var ext_bomb = Math.max(0, bombs - int_bomb);
@@ -469,7 +458,7 @@ class Aircraft_HTML extends Display {
             if (ext_bomb > 0)
                 catalog_stats += lu(" Bomb Mass Externally.", ext_bomb);
             if (int_bomb > 0) {
-                var mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
+                var mib = Math.min(int_bomb, this.heli.GetMunitions().GetMaxBombSize());
                 catalog_stats += (lu("Largest Internal Bomb", mib.toString()));
             }
             internal -= int_bomb;
@@ -485,7 +474,7 @@ class Aircraft_HTML extends Display {
             catalog_stats += "\n";
         }
 
-        var wsets = this.acft.GetWeapons().GetWeaponSets();
+        var wsets = this.heli.GetWeapons().GetWeaponSets();
         for (let wi = 0; wi < wsets.length; wi++) {
             var w = wsets[wi];
             catalog_stats += WeaponString(w, wlist, dlist) + "\n";
@@ -493,7 +482,7 @@ class Aircraft_HTML extends Display {
         for (let w of stats.warnings) {
             catalog_stats += w.source + ":  " + w.warning + "\n";
         }
-        download(catalog_stats, this.acft.name + "_" + this.acft.GetVersion() + ".txt", "txt");
+        download(catalog_stats, this.heli.name + "_" + this.heli.GetVersion() + ".txt", "txt");
     }
 
     private LoadText(text_area: HTMLInputElement) {
@@ -501,9 +490,9 @@ class Aircraft_HTML extends Display {
             var str = JSON.parse(text_area.value);
             var acft = new Aircraft(parts_JSON, weapon_JSON, false);
             if (acft.fromJSON(str)) {
-                this.acft.fromJSON(str);
-                this.derived.SetName(this.acft.name);
-                this.acft.CalculateStats();
+                this.heli.fromJSON(str);
+                this.derived.SetName(this.heli.name);
+                this.heli.CalculateStats();
             }
         } catch {
             BlinkBad(text_area.parentElement);
@@ -513,14 +502,14 @@ class Aircraft_HTML extends Display {
     }
 
     private SaveJSON() {
-        this.acft.name = this.derived.GetName();
-        download(JSON.stringify(this.acft.toJSON()), this.acft.name + "_" + this.acft.GetVersion() + ".json", "json");
+        this.heli.name = this.derived.GetName();
+        download(JSON.stringify(this.heli.toJSON()), this.heli.name + "_" + this.heli.GetVersion() + ".json", "json");
     }
 
     private MakeLink() {
-        this.acft.name = this.derived.GetName();
+        this.heli.name = this.derived.GetName();
         var ser = new Serialize();
-        this.acft.serialize(ser);
+        this.heli.serialize(ser);
         var arr = ser.FinalArray();
         var str2 = _arrayBufferToString(arr);
         var txt2 = LZString.compressToEncodedURIComponent(str2);
@@ -535,13 +524,13 @@ class Aircraft_HTML extends Display {
     private SaveDash() {
         this.UpdateCard();
         this.cards.SaveDash();
-        var wsetlist = this.acft.GetWeapons().GetWeaponSets();
+        var wsetlist = this.heli.GetWeapons().GetWeaponSets();
         for (let i = 0; i < wsetlist.length; i++) {
             this.UpdateWeaponCard(wsetlist[i]);
             this.cards.SaveWeapon(i);
         }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            let e = this.acft.GetEngines().GetEngine(i);
+        for (let i = 0; i < this.heli.GetEngines().GetNumberOfEngines(); i++) {
+            let e = this.heli.GetEngines().GetEngine(i);
             this.UpdateEngineCard(e);
 
             if (e.GetUsePushPull()) {
@@ -555,8 +544,8 @@ class Aircraft_HTML extends Display {
                 this.cards.SaveEngine(i);
             }
         }
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfRadiators(); i++) {
-            this.UpdateRadiatorCard(this.acft.GetEngines().GetRadiator(i));
+        for (let i = 0; i < this.heli.GetEngines().GetNumberOfRadiators(); i++) {
+            this.UpdateRadiatorCard(this.heli.GetEngines().GetRadiator(i));
             this.cards.SaveRadiator(i);
         }
     }
@@ -567,11 +556,11 @@ class Aircraft_HTML extends Display {
     }
 
     private InteractiveDash() {
-        this.acft.name = this.derived.GetName();
-        var stats = this.acft.GetStats();
-        var derived = this.acft.GetDerivedStats();
+        this.heli.name = this.derived.GetName();
+        var stats = this.heli.GetStats();
+        var derived = this.heli.GetDerivedStats();
 
-        var str_vital = this.acft.VitalComponentList();
+        var str_vital = this.heli.VitalComponentList();
         var remove = false;
         while (str_vital.length > 10) {
             str_vital.pop();
@@ -584,7 +573,7 @@ class Aircraft_HTML extends Display {
         while (str_vital.length < 10) {
             str_vital.push("");
         }
-        var coverage = this.acft.GetAccessories().GetEffectiveCoverage();
+        var coverage = this.heli.GetAccessories().GetEffectiveCoverage();
         var armour_str = "";
         for (let r = 0; r < coverage.length; ++r) {
             let AP = r + 1;
@@ -598,9 +587,9 @@ class Aircraft_HTML extends Display {
         }
 
         var ordinance = [];
-        var bombs = this.acft.GetMunitions().GetBombCount();
-        var rockets = this.acft.GetMunitions().GetRocketCount();
-        var internal = this.acft.GetMunitions().GetInternalBombCount();
+        var bombs = this.heli.GetMunitions().GetBombCount();
+        var rockets = this.heli.GetMunitions().GetRocketCount();
+        var internal = this.heli.GetMunitions().GetInternalBombCount();
         if (bombs > 0 || rockets > 0) {
             ordinance.push("Current load here.");
         }
@@ -612,7 +601,7 @@ class Aircraft_HTML extends Display {
             if (ext_bomb > 0)
                 ordinance.push(lu(" Bomb Mass Externally.", ext_bomb));
             if (int_bomb > 0) {
-                var mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
+                var mib = Math.min(int_bomb, this.heli.GetMunitions().GetMaxBombSize());
                 ordinance.push(lu("Largest Internal Bomb", mib.toString()));
             }
             internal -= int_bomb;
@@ -639,13 +628,13 @@ class Aircraft_HTML extends Display {
             "airspeed": 0,
             "fuel": derived.FuelUses,
             "dropoff": derived.Dropoff,
-            "visibility": this.acft.GetCockpits().GetCockpit(0).GetVisibility(),
+            "visibility": this.heli.GetCockpits().GetCockpit(0).GetVisibility(),
             "energy_loss": derived.EnergyLoss,
             "turn_bleed": derived.TurnBleed,
             "stability": derived.Stabiilty,
-            "stress": this.acft.GetCockpits().GetCockpit(0).GetFlightStress()[0],
-            "plane_escape": this.acft.GetCockpits().GetCockpit(0).GetEscape(),
-            "crash": this.acft.GetCockpits().GetCockpit(0).GetCrash(),
+            "stress": this.heli.GetCockpits().GetCockpit(0).GetFlightStress()[0],
+            "plane_escape": this.heli.GetCockpits().GetCockpit(0).GetEscape(),
+            "crash": this.heli.GetCockpits().GetCockpit(0).GetCrash(),
             "max_toughness": derived.Toughness,
             "current_toughness": derived.Toughness,
             "max_strain": derived.MaxStrain,
@@ -708,8 +697,8 @@ class Aircraft_HTML extends Display {
 
     private InteractiveEngines() {
         var engines = [];
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            let e = this.acft.GetEngines().GetEngine(i);
+        for (let i = 0; i < this.heli.GetEngines().GetNumberOfEngines(); i++) {
+            let e = this.heli.GetEngines().GetEngine(i);
             let engine_state = {
                 "rpm": 0,
                 "wear": 0,
@@ -759,9 +748,9 @@ class Aircraft_HTML extends Display {
 
     private InteractiveWeapons() {
         var wstates = [];
-        for (let w of this.acft.GetWeapons().GetWeaponSets()) {
+        for (let w of this.heli.GetWeapons().GetWeaponSets()) {
 
-            var wlist = this.acft.GetWeapons().GetWeaponList();
+            var wlist = this.heli.GetWeapons().GetWeaponList();
             var hits = w.GetHits();
             var damage = [];
             if (wlist[w.GetWeaponSelected()].abrv == "PR") {
@@ -794,7 +783,7 @@ class Aircraft_HTML extends Display {
                 "tags": "",
             };
 
-            var dlist = this.acft.GetWeapons().GetDirectionList();
+            var dlist = this.heli.GetWeapons().GetDirectionList();
 
             if (w.IsPlural()) {
                 weaponState.type = w.GetWeaponCount().toString() + "x " + weaponState.type;
@@ -826,8 +815,8 @@ class Aircraft_HTML extends Display {
 
         //pick the lowest overspeed among all engines, treat that as the overspeed for the plane. 
         this.cards.lowest_overspeed = -1;
-        for (let i = 0; i < this.acft.GetEngines().GetNumberOfEngines(); i++) {
-            var engine = this.acft.GetEngines().GetEngine(i);
+        for (let i = 0; i < this.heli.GetEngines().GetNumberOfEngines(); i++) {
+            var engine = this.heli.GetEngines().GetEngine(i);
             if (engine.GetOverspeed() < this.cards.lowest_overspeed || this.cards.lowest_overspeed < 0) {
                 this.cards.lowest_overspeed = engine.GetOverspeed();
             }
@@ -835,7 +824,7 @@ class Aircraft_HTML extends Display {
 
         //append weapon data to card so we can use it. 
         this.cards.all_weapons = [];
-        var wsetlist = this.acft.GetWeapons().GetWeaponSets();
+        var wsetlist = this.heli.GetWeapons().GetWeaponSets();
         for (let i = 0; i < wsetlist.length; i++) {
             this.UpdateWeaponCard(wsetlist[i]);
             this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data));
@@ -898,7 +887,7 @@ class Aircraft_HTML extends Display {
     }
 
     private InitDerived(tbl: HTMLTableElement) {
-        this.derived = new Derived_HTML(tbl);
+        this.derived = new Derived_Heli_HTML(tbl);
     }
 
     private UpdateStats(stats: Stats) {
@@ -931,30 +920,24 @@ class Aircraft_HTML extends Display {
 
     private UpdateDerived(stats: Stats, derived_stats: DerivedStats) {
         if (this.derived.GetName() != lu("Derived Aircraft Name")) {
-            this.acft.name = this.derived.GetName();
+            this.heli.name = this.derived.GetName();
         }
 
-        this.derived.UpdateDisplay(this.acft, stats, derived_stats);
-        this.altitude.UpdateDisplay(this.acft, derived_stats);
+        this.derived.UpdateDisplay(this.heli, stats, derived_stats);
     }
 
     public UpdateDisplay() {
-        var stats = this.acft.GetStats();
-        var derived_stats = this.acft.GetDerivedStats();
+        var stats = this.heli.GetStats();
+        var derived_stats = this.heli.GetDerivedStats();
 
-        let idx = this.acft.GetAircraftType();
-        if (idx >= 1)
-            idx -= 1;
+        let idx = this.heli.GetAircraftType();
         this.acft_type.selectedIndex = idx;
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
         this.passengers.UpdateDisplay();
         this.engines.UpdateDisplay();
-        this.propeller.UpdateDisplay();
         this.frames.UpdateDisplay();
-        this.wings.UpdateDisplay();
         this.stabilizers.UpdateDisplay();
-        this.controlsurfaces.UpdateDisplay();
         this.reinforcements.UpdateDisplay();
         this.reinforcements.UpdateMaxStrain(derived_stats.MaxStrain);
         this.load.UpdateDisplay();

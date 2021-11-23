@@ -129,7 +129,7 @@ class Cards {
         this.npc_image = document.getElementById("npc_img") as HTMLImageElement;
         this.npc_image.width = 482;
         this.npc_image.height = 290;
-        this.npc_image.src = './Cards/NPC.png';
+        // this.npc_image.src = './Cards/NPC.png';
 
         this.acft_data = {
             full_bomb_boost: 0,

@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"-m",
+				"http.server",
+				"8080"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"options": {
+				"cwd": ".."
+			},
+			"label": "Local Server"
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "Watch Helicopter Builder"
+		},
+		{
+			"label": "Watch All",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": [
+				"Local Server",
+				"Watch Helicopter Builder",
+			]
+		},
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.json",
+			"problemMatcher": [
+				"$tsc"
+			],
+			"group": "build",
+			"label": "Build Helicopter Builder"
+		},
+		{
+			"label": "Build All",
+			"group": "build",
+			"dependsOn": [
+				"Local Server",
+				"Build Helicopter Builder"
+			]
+		}
+	]
+}

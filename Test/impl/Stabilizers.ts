@@ -125,7 +125,10 @@ class Stabilizers extends Part {
         var lst = [];
         if (this.is_heli) {
             lst = Array(this.hstab_list.length).fill(false);
-            lst[0] = true;
+            if (this.have_tail)
+                lst[0] = true;
+            else
+                lst[1] = true;
         } else {
             for (let t of this.hstab_list) {
                 if ((t.name == "The Wings" || t.name == "Outboard")
@@ -294,6 +297,14 @@ class Stabilizers extends Part {
                     this.vstab_count++;
             }
         }
+        if (this.is_heli) {
+            if (this.have_tail) {
+                this.hstab_sel = 0;
+            } else {
+                this.hstab_sel = 1;
+            }
+            this.hstab_count = 1;
+        }
     }
 
     public SetHelicopter(is: boolean) {
@@ -338,8 +349,14 @@ class Stabilizers extends Part {
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
-            var drag = Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
-            stats.drag += Math.max(1, drag);
+            var drag = 0;
+            if (this.is_heli) {
+                drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.hstab_list[this.hstab_sel].dragfactor);
+                stats.drag += Math.max(Math.ceil(1 * this.hstab_list[this.hstab_sel].dragfactor), drag);
+            } else {
+                drag = Math.floor(1.0e-6 + this.wing_drag / 4 * this.hstab_list[this.hstab_sel].dragfactor);
+                stats.drag += Math.max(1, drag);
+            }
         }
         else if (this.hstab_sel < 0 || this.hstab_list[this.hstab_sel].increment != 0) {
             stats.pitchstab -= Math.floor(1.0e-6 + this.lifting_area / 2);
@@ -349,8 +366,14 @@ class Stabilizers extends Part {
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
-            var drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
-            stats.drag += Math.max(1, drag);
+            var drag = 0;
+            if (this.is_heli) {
+                drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
+                stats.drag += Math.max(Math.ceil(1 * this.hstab_list[this.hstab_sel].dragfactor), drag);
+            } else {
+                drag = Math.floor(1.0e-6 + this.wing_drag / 16 * this.vstab_list[this.vstab_sel].dragfactor);
+                stats.drag += Math.max(1, drag);
+            }
         }
         else if (this.vstab_sel < 0 || (this.vstab_list[this.vstab_sel].increment != 0 || (this.vstab_list[this.vstab_sel].increment == 0 && this.hstab_count == 0))) {
             stats.latstab -= this.lifting_area;

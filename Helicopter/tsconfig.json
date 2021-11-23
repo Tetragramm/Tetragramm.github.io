@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "system",
+        "outFile": "helicopter_builder.js"
+    },
+    "exclude": [],
+    "include": [
+        ".",
+    ]
+}
