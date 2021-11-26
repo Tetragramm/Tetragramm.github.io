@@ -11459,10 +11459,10 @@ class WeaponSystem extends Part {
                 this.weapons.pop();
             }
         }
-        if (!this.weapon_list[num].can_action) {
+        if (!this.weapon_list[num].can_action || !this.GetCanAction()[this.action_sel]) {
             this.action_sel = ActionType.STANDARD;
         }
-        if (!this.weapon_list[num].can_projectile) {
+        if (!this.weapon_list[num].can_projectile || !this.GetCanProjectile()[this.projectile_sel]) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
         if (this.weapon_list[num].rapid) {
@@ -11769,7 +11769,7 @@ class WeaponSystem extends Part {
         return [true,
             this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
-            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid
+            this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
         ];
     }
     SetAction(num) {
@@ -11824,9 +11824,8 @@ class WeaponSystem extends Part {
         if (this.final_weapon.hits > 0) {
             //Calc charges / shot.
             var ammo = this.weapon_list[this.weapon_type].stats.cost;
-            if (this.action_sel == ActionType.GAST) {
+            if (this.action_sel == ActionType.ROTARY)
                 ammo *= 2;
-            }
             if (this.final_weapon.rapid)
                 return [count * ammo, Math.max(count * ammo + 1, Math.floor(1.0e-6 + 1.5 * count * ammo))];
             else
