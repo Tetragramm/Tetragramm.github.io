@@ -15,5 +15,5 @@
         ".",
         "./disp",
         "./impl"
-, "../Helicopter/Derived_Heli.ts"    ]
+    ]
 }

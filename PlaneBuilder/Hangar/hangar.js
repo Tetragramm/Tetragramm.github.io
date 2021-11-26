@@ -9358,24 +9358,19 @@ class Weapons extends Part {
                 w.wing_reinforcement = false;
                 var s = { s: 0, w: w };
                 if (w.GetWing()) {
-                    if (this.weapon_list[ws.GetWeaponSelected()].size == wing_size) {
-                        w.wing_reinforcement = true;
-                    }
-                    else {
-                        s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
-                        slist.push(s);
-                    }
+                    s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
+                    slist.push(s);
                 }
             }
         }
         //Sort by size to we reinforce as few weapons as possible
         slist.sort(function (a, b) { return a.s - b.s; });
         for (let s of slist) {
-            if (wing_size > 0) {
+            if (wing_size >= 0) {
                 wing_size -= s.s;
-                if (wing_size < 0) {
-                    s.w.wing_reinforcement = true;
-                }
+            }
+            if (wing_size < 0) {
+                s.w.wing_reinforcement = true;
             }
         }
         for (let ws of this.weapon_sets) {

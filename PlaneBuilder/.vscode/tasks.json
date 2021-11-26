@@ -41,16 +41,6 @@
 		},
 		{
 			"type": "typescript",
-			"tsconfig": "Helicopter/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Helicopter"
-		},
-		{
-			"type": "typescript",
 			"tsconfig": "Hangar/tsconfig.json",
 			"option": "watch",
 			"problemMatcher": [
@@ -79,7 +69,6 @@
 				"Local Server",
 				"Watch Plane Builder",
 				"Watch Engine Builder",
-				"Watch Helicopter",
 				"Watch Hangar",
 				"Watch Weapon Display"
 			]
@@ -101,15 +90,6 @@
 			],
 			"group": "build",
 			"label": "Build Engine Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "Helicopter/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Helicopter"
 		},
 		{
 			"type": "typescript",
@@ -136,7 +116,6 @@
 				"Local Server",
 				"Build Plane Builder",
 				"Build Engine Builder",
-				"Build Helicopter",
 				"Build Hangar",
 				"Build Weapon Display"
 			]

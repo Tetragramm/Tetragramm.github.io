@@ -41,16 +41,6 @@
 		},
 		{
 			"type": "typescript",
-			"tsconfig": "Helicopter/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Helicopter"
-		},
-		{
-			"type": "typescript",
 			"tsconfig": "Hangar/tsconfig.json",
 			"option": "watch",
 			"problemMatcher": [
@@ -101,15 +91,6 @@
 			],
 			"group": "build",
 			"label": "Build Engine Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "Helicopter/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Helicopter"
 		},
 		{
 			"type": "typescript",
