@@ -2295,6 +2295,7 @@
                 "cost": 6,
                 "rotor_bleed": 3
             }
-        ]
+        ],
+        "arrangement": []
     }
 }
