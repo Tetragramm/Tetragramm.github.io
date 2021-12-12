@@ -241,6 +241,7 @@ function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     span.appendChild(lbl2);
     span.appendChild(inp);
     fs.div2.appendChild(span);
+    return lbl;
 }
 
 function FlexLabel(txt: string, div1: HTMLDivElement) {
@@ -250,6 +251,7 @@ function FlexLabel(txt: string, div1: HTMLDivElement) {
     lbl.textContent = txt;
     lbl.classList.add("flex-item");
     div1.appendChild(lbl);
+    return lbl;
 }
 
 function FlexLabels(txtL: string, txtR: string, fs: FlexSection) {
@@ -266,6 +268,7 @@ function FlexLabels(txtL: string, txtR: string, fs: FlexSection) {
     lbl2.textContent = txtR;
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
+    return [lbl, lbl2];
 }
 
 function FlexSpace(fs: FlexSection) {

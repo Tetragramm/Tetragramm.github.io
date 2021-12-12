@@ -216,6 +216,7 @@ function FlexCheckbox(txt, inp, fs) {
     span.appendChild(lbl2);
     span.appendChild(inp);
     fs.div2.appendChild(span);
+    return lbl;
 }
 function FlexLabel(txt, div1) {
     var lbl = document.createElement("LABEL");
@@ -224,6 +225,7 @@ function FlexLabel(txt, div1) {
     lbl.textContent = txt;
     lbl.classList.add("flex-item");
     div1.appendChild(lbl);
+    return lbl;
 }
 function FlexLabels(txtL, txtR, fs) {
     var lbl = document.createElement("LABEL");
@@ -238,6 +240,7 @@ function FlexLabels(txtL, txtR, fs) {
     lbl2.textContent = txtR;
     lbl2.classList.add("flex-item");
     fs.div2.appendChild(lbl2);
+    return [lbl, lbl2];
 }
 function FlexSpace(fs) {
     var lbl = document.createElement("LABEL");

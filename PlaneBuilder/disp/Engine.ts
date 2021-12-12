@@ -23,6 +23,7 @@ class Engine_HTML extends Display {
     private intake_fan: HTMLInputElement;
     //Mounting Elements
     private mount_select: HTMLSelectElement;
+    private pushpull_label: HTMLLabelElement;
     private pushpull_input: HTMLInputElement;
     private torque_input: HTMLInputElement;
     //Upgrade Elements
@@ -179,7 +180,7 @@ class Engine_HTML extends Display {
         this.pushpull_input = document.createElement("INPUT") as HTMLInputElement;
         this.torque_input = document.createElement("INPUT") as HTMLInputElement;
         var fs = CreateFlexSection(mount_cell);
-        FlexCheckbox(" " + lu("Engine Push Pull"), this.pushpull_input, fs);
+        this.pushpull_label = FlexCheckbox(" " + lu("Engine Push Pull"), this.pushpull_input, fs);
         FlexCheckbox(" " + lu("Engine Torque To Structure"), this.torque_input, fs);
         this.pushpull_input.checked = this.engine.GetUsePushPull();
         this.torque_input.checked = this.engine.GetUsePushPull();
@@ -397,6 +398,11 @@ class Engine_HTML extends Display {
         this.intake_fan.checked = this.engine.GetIntakeFan();
 
         this.mount_select.selectedIndex = this.engine.GetMountIndex();
+        if (this.engine.GetIsTurbine()) {
+            this.pushpull_label.textContent = " " + lu("Engine Side-by-Side");
+        } else {
+            this.pushpull_label.textContent = " " + lu("Engine Push Pull");
+        }
         this.pushpull_input.checked = this.engine.GetUsePushPull();
         this.pushpull_input.disabled = !this.engine.CanUsePushPull();
         this.torque_input.checked = this.engine.GetTorqueToStruct();

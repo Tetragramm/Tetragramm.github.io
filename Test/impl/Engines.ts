@@ -6,7 +6,7 @@
 
 class Engines extends Part {
     private engines: Engine[];
-    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean, helicopter: boolean }[];
+    private mount_list: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean, helicopter: boolean, turbine: boolean, }[];
     private radiators: Radiator[];
     private is_asymmetric: boolean;
     private r_type_list: { name: string, stats: Stats, dragpercool: number }[];
@@ -21,7 +21,7 @@ class Engines extends Part {
 
         this.mount_list = [];
         for (let elem of js["mounts"]) {
-            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false, helicopter: elem["helicopter"] };
+            let mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false, helicopter: elem["helicopter"], turbine: elem["turbine"], };
             if (elem["reqED"])
                 mount.reqED = true;
             if (elem["reqTail"])

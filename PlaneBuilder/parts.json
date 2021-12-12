@@ -277,7 +277,8 @@
                 "location": "fuselage",
                 "powerfactor": 1,
                 "helicopter": false,
-                "pushpull": false
+                "pushpull": false,
+                "turbine": false
             },
             {
                 "name": "Center-Mounted Tractor",
@@ -293,7 +294,8 @@
                 "reqED": true,
                 "powerfactor": 1,
                 "helicopter": true,
-                "pushpull": false
+                "pushpull": false,
+                "turbine": false
             },
             {
                 "name": "Rear-Mounted Pusher",
@@ -309,7 +311,8 @@
                 "location": "fuselage",
                 "powerfactor": 1,
                 "helicopter": false,
-                "pushpull": false
+                "pushpull": false,
+                "turbine": false
             },
             {
                 "name": "Center-Mounted Pusher",
@@ -326,7 +329,8 @@
                 "reqTail": true,
                 "powerfactor": 1,
                 "helicopter": false,
-                "pushpull": false
+                "pushpull": false,
+                "turbine": false
             },
             {
                 "name": "Pod",
@@ -341,7 +345,8 @@
                 "location": "pod",
                 "powerfactor": 0.9,
                 "helicopter": true,
-                "pushpull": true
+                "pushpull": true,
+                "turbine": false
             },
             {
                 "name": "Nacelle (Inside)",
@@ -356,7 +361,8 @@
                 "location": "wing",
                 "powerfactor": 0.8,
                 "helicopter": false,
-                "pushpull": true
+                "pushpull": true,
+                "turbine": false
             },
             {
                 "name": "Nacelle (Offset)",
@@ -371,7 +377,8 @@
                 "location": "wing",
                 "powerfactor": 0.8,
                 "helicopter": false,
-                "pushpull": true
+                "pushpull": true,
+                "turbine": false
             },
             {
                 "name": "Channel Tractor",
@@ -386,7 +393,8 @@
                 "location": "wing",
                 "powerfactor": 0.9,
                 "helicopter": false,
-                "pushpull": true
+                "pushpull": true,
+                "turbine": false
             },
             {
                 "name": "Fuselage Push-Pull",
@@ -399,7 +407,44 @@
                 "location": "fuselage",
                 "powerfactor": 0.9,
                 "helicopter": false,
-                "pushpull": true
+                "pushpull": true,
+                "turbine": false
+            },
+            {
+                "name": "Front Intake",
+                "era": "Pioneer",
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "fuselage",
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false,
+                "turbine": true
+            },
+            {
+                "name": "Wing Pod",
+                "era": "Pioneer",
+                "liftbleed": 1,
+                "strainfactor": 0.5,
+                "dragfactor": 0,
+                "location": "wing",
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false,
+                "turbine": true
+            },
+            {
+                "name": "Underwing Pod",
+                "era": "Pioneer",
+                "drag": 3,
+                "visibility": -1,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "location": "wing",
+                "powerfactor": 1,
+                "helicopter": false,
+                "pushpull": false,
+                "turbine": true
             }
         ],
         "radiator-type": [
@@ -2295,6 +2340,7 @@
                 "cost": 6,
                 "rotor_bleed": 3
             }
-        ]
+        ],
+        "arrangement": []
     }
 }

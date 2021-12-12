@@ -7,7 +7,7 @@ class LandingGear extends Part {
     private retract: boolean;
     private extra_list: { name: string, stats: Stats, MpLMP: number }[];
     private extra_sel: boolean[];
-    private loadedMP: number;
+    private loadedMass: number;
     public can_boat: boolean;
     private gull_deck: number;
 
@@ -126,7 +126,7 @@ class LandingGear extends Part {
     }
 
     public SetLoadedMass(mass: number) {
-        this.loadedMP = Math.floor(1.0e-6 + mass / 5);
+        this.loadedMass = mass;
     }
 
     public CanBoat(engine_height: number, wing_height: number) {
@@ -157,14 +157,24 @@ class LandingGear extends Part {
         if (!this.CanGear()[this.gear_sel])
             this.gear_sel = 0;
 
+        //Do this first, so we can add the Zepplin Hook to the mass
+        //TODO: This is a hack, and it is terrible. Separate hook?
+        for (let i = 0; i < this.extra_list.length; i++) {
+            if (this.extra_sel[i]) {
+                stats = stats.Add(this.extra_list[i].stats);
+                this.loadedMass += this.extra_list[i].stats.mass;
+                stats.mass += Math.floor(1.0e-6 + this.extra_list[i].MpLMP * Math.floor(1.0e-6 + this.loadedMass / 5));
+            }
+        }
+
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
-        var pdrag = this.gear_list[this.gear_sel].DpLMP * this.loadedMP;
+        var pdrag = this.gear_list[this.gear_sel].DpLMP * Math.floor(1.0e-6 + this.loadedMass / 5);
 
         //Retractable gear with Boat Hull adds normal hull drag,
         // plus the mass and cost of normal retrctable gear
         if (this.gear_list[this.gear_sel].name == "Boat Hull" && this.retract) {
             stats.drag += pdrag;
-            pdrag = this.gear_list[0].DpLMP * this.loadedMP;
+            pdrag = this.gear_list[0].DpLMP * Math.floor(1.0e-6 + this.loadedMass / 5);
         }
 
         //Gull wings don't affect Boat Hulls, but do affect the normal gear you get
@@ -193,14 +203,7 @@ class LandingGear extends Part {
         } else {
             stats.drag += pdrag;
         }
-        stats.structure += this.gear_list[this.gear_sel].SpLMP * this.loadedMP;
-
-        for (let i = 0; i < this.extra_list.length; i++) {
-            if (this.extra_sel[i]) {
-                stats = stats.Add(this.extra_list[i].stats);
-                stats.mass += Math.floor(1.0e-6 + this.extra_list[i].MpLMP * this.loadedMP);
-            }
-        }
+        stats.structure += this.gear_list[this.gear_sel].SpLMP * Math.floor(1.0e-6 + this.loadedMass / 5);
 
         stats.Round();
 
