@@ -7101,20 +7101,21 @@ class LandingGear extends Part {
             this.gear_sel = 0;
         //Do this first, so we can add the Zepplin Hook to the mass
         //TODO: This is a hack, and it is terrible. Separate hook?
+        var tempMass = this.loadedMass;
         for (let i = 0; i < this.extra_list.length; i++) {
             if (this.extra_sel[i]) {
                 stats = stats.Add(this.extra_list[i].stats);
-                this.loadedMass += this.extra_list[i].stats.mass;
-                stats.mass += Math.floor(1.0e-6 + this.extra_list[i].MpLMP * Math.floor(1.0e-6 + this.loadedMass / 5));
+                tempMass += this.extra_list[i].stats.mass;
+                stats.mass += Math.floor(1.0e-6 + this.extra_list[i].MpLMP * Math.floor(1.0e-6 + tempMass / 5));
             }
         }
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
-        var pdrag = this.gear_list[this.gear_sel].DpLMP * Math.floor(1.0e-6 + this.loadedMass / 5);
+        var pdrag = this.gear_list[this.gear_sel].DpLMP * Math.floor(1.0e-6 + tempMass / 5);
         //Retractable gear with Boat Hull adds normal hull drag,
         // plus the mass and cost of normal retrctable gear
         if (this.gear_list[this.gear_sel].name == "Boat Hull" && this.retract) {
             stats.drag += pdrag;
-            pdrag = this.gear_list[0].DpLMP * Math.floor(1.0e-6 + this.loadedMass / 5);
+            pdrag = this.gear_list[0].DpLMP * Math.floor(1.0e-6 + tempMass / 5);
         }
         //Gull wings don't affect Boat Hulls, but do affect the normal gear you get
         //if you put retract on your boat hull.  Since the hull is already applied,
@@ -7142,7 +7143,7 @@ class LandingGear extends Part {
         else {
             stats.drag += pdrag;
         }
-        stats.structure += this.gear_list[this.gear_sel].SpLMP * Math.floor(1.0e-6 + this.loadedMass / 5);
+        stats.structure += this.gear_list[this.gear_sel].SpLMP * Math.floor(1.0e-6 + tempMass / 5);
         stats.Round();
         return stats;
     }
