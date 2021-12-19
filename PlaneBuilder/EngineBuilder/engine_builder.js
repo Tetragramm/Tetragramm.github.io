@@ -12826,9 +12826,9 @@ class Aircraft {
         TurnBleedwBombs = Math.max(TurnBleedwBombs, 1);
         //Used: Hefty
         // Comes after Turnbleed so Used only affects the one number, not multiple.
-        StallSpeedEmpty = Math.floor(1.0e-6 + StallSpeedEmpty * (1 + 0.2 * this.used.hefty));
-        StallSpeedFull = Math.floor(1.0e-6 + StallSpeedFull * (1 + 0.2 * this.used.hefty));
-        StallSpeedFullwBombs = Math.floor(1.0e-6 + StallSpeedFullwBombs * (1 + 0.2 * this.used.hefty));
+        StallSpeedEmpty = Math.max(1, Math.floor(1.0e-6 + StallSpeedEmpty * (1 + 0.2 * this.used.hefty)));
+        StallSpeedFull = Math.max(1, Math.floor(1.0e-6 + StallSpeedFull * (1 + 0.2 * this.used.hefty)));
+        StallSpeedFullwBombs = Math.max(1, Math.floor(1.0e-6 + StallSpeedFullwBombs * (1 + 0.2 * this.used.hefty)));
         if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
                 this.stats.warnings.push({
