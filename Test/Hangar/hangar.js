@@ -8217,7 +8217,8 @@ var ActionType;
     ActionType[ActionType["MECHANICAL"] = 1] = "MECHANICAL";
     ActionType[ActionType["GAST"] = 2] = "GAST";
     ActionType[ActionType["ROTARY"] = 3] = "ROTARY";
-    ActionType[ActionType["ENUM_MAX"] = 4] = "ENUM_MAX";
+    ActionType[ActionType["HENRY"] = 4] = "HENRY";
+    ActionType[ActionType["ENUM_MAX"] = 5] = "ENUM_MAX";
 })(ActionType || (ActionType = {}));
 class Weapon extends Part {
     constructor(weapon_type, action, projectile, fixed = false) {
@@ -8865,11 +8866,28 @@ class WeaponSystem extends Part {
             this.final_weapon.jam = jams.join('/');
             this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
+        else if (this.action_sel == ActionType.HENRY) {
+            this.final_weapon.hits = this.weapon_list[num].hits;
+            this.final_weapon.rapid = this.weapon_list[num].rapid;
+            this.final_weapon.synched = this.weapon_list[num].synched;
+            if (this.final_weapon.rapid) {
+                var jams = this.final_weapon.jam.split('/');
+                jams[0] = (parseInt(jams[0]) + 1).toString();
+                jams[1] = (parseInt(jams[1]) + 1).toString();
+                this.final_weapon.jam = jams.join('/');
+            }
+            else {
+                this.final_weapon.jam = (parseInt(this.final_weapon.jam) + 1).toString();
+                ;
+            }
+            this.final_weapon.stats.mass += 1;
+            this.final_weapon.stats.cost += 2;
+        }
         if (this.repeating && this.final_weapon.reload != 0) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
-        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL)
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL || this.action_sel == ActionType.HENRY)
             && this.projectile_sel == ProjectileType.HEATRAY) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
@@ -9246,6 +9264,7 @@ class WeaponSystem extends Part {
             this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
+            this.weapon_list[this.weapon_type].can_action,
         ];
     }
     SetAction(num) {
@@ -9429,6 +9448,7 @@ class Weapons extends Part {
             { name: "Mechanical Action" },
             { name: "Gast Principle" },
             { name: "Rotary_Gun" },
+            { name: "Henry" },
         ];
         this.projectile_list = [
             { name: "Standard" },
@@ -9842,6 +9862,13 @@ class Weapons extends Part {
                 value.equipment.push({
                     source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
                     charge: StringFmt.Join('/', charges),
+                });
+            }
+            else if (set.GetAction() == ActionType.HENRY) {
+                let count = set.GetWeaponCount();
+                value.equipment.push({
+                    source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
+                    charge: StringFmt.Join('/', [count, 2 * count]),
                 });
             }
         }
@@ -16298,6 +16325,9 @@ function WeaponName(w, wlist) {
     }
     else if (w.GetAction() == ActionType.ROTARY) {
         name += lu("Weapon Tag Rotary") + " ";
+    }
+    else if (w.GetAction() == ActionType.HENRY) {
+        name += lu("Weapon Tag Henry") + " ";
     }
     if (w.GetProjectile() == ProjectileType.HEATRAY) {
         name += lu("Weapon Tag Heat Ray") + " ";

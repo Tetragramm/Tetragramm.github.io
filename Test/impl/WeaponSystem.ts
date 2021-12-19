@@ -284,6 +284,21 @@ class WeaponSystem extends Part {
             jams[1] = (parseInt(jams[1]) + 1).toString();
             this.final_weapon.jam = jams.join('/');
             this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
+        } else if (this.action_sel == ActionType.HENRY) {
+            this.final_weapon.hits = this.weapon_list[num].hits;
+            this.final_weapon.rapid = this.weapon_list[num].rapid;
+            this.final_weapon.synched = this.weapon_list[num].synched;
+            if (this.final_weapon.rapid) {
+                var jams = this.final_weapon.jam.split('/');
+                jams[0] = (parseInt(jams[0]) + 1).toString();
+                jams[1] = (parseInt(jams[1]) + 1).toString();
+                this.final_weapon.jam = jams.join('/');
+            } else {
+                this.final_weapon.jam = (parseInt(this.final_weapon.jam) + 1).toString();;
+            }
+
+            this.final_weapon.stats.mass += 1;
+            this.final_weapon.stats.cost += 2;
         }
 
         if (this.repeating && this.final_weapon.reload != 0) {
@@ -291,7 +306,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
 
-        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL)
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL || this.action_sel == ActionType.HENRY)
             && this.projectile_sel == ProjectileType.HEATRAY) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
@@ -692,6 +707,7 @@ class WeaponSystem extends Part {
             this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
+            this.weapon_list[this.weapon_type].can_action,
         ];
     }
 

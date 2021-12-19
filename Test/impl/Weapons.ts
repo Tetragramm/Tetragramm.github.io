@@ -20,6 +20,7 @@ class Weapons extends Part {
         { name: "Mechanical Action" },
         { name: "Gast Principle" },
         { name: "Rotary_Gun" },
+        { name: "Henry" },
     ];
     private projectile_list = [
         { name: "Standard" },
@@ -499,6 +500,13 @@ class Weapons extends Part {
                 value.equipment.push({
                     source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
                     charge: StringFmt.Join('/', charges),
+                });
+            } else if (set.GetAction() == ActionType.HENRY) {
+                let count = set.GetWeaponCount();
+
+                value.equipment.push({
+                    source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
+                    charge: StringFmt.Join('/', [count, 2 * count]),
                 });
             }
         }

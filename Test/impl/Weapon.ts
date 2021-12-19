@@ -22,6 +22,7 @@ enum ActionType {
     MECHANICAL,
     GAST,
     ROTARY,
+    HENRY,
     ENUM_MAX
 }
 type WeaponType = {
