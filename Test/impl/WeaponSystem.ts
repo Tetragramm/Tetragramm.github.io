@@ -728,7 +728,7 @@ class WeaponSystem extends Part {
 
     public GetCanProjectile() {
         return [true,
-            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.weapon_list[this.weapon_type].hits > 0,
+            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.action_sel != ActionType.HENRY && this.weapon_list[this.weapon_type].hits > 0,
             // this.final_weapon.can_projectile && this.weapon_list[this.weapon_type].hits > 0,
             this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY];
     }
