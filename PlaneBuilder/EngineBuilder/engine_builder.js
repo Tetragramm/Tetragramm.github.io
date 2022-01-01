@@ -6598,9 +6598,9 @@ class Engines extends Part {
         return m;
     }
     GetMaxIAF() {
-        var m = 0;
+        var m = 100;
         for (let e of this.engines) {
-            m = Math.max(m, e.GetMaxIAF());
+            m = Math.min(m, e.GetMaxIAF());
         }
         return m;
     }
@@ -6845,7 +6845,7 @@ class Engines extends Part {
         return false;
     }
     PartStats() {
-        var stats = new Stats;
+        var stats = new Stats();
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
         var ecost = 0;
         //Engine stuff
@@ -13262,14 +13262,10 @@ class AlterStats extends Part {
         this.CalculateStats();
     }
     RemovePart(name) {
-        console.log(name);
-        console.log(this.custom_parts.length);
         var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
-        console.log(idx);
         if (idx != -1) {
             this.custom_parts.splice(idx, 1);
         }
-        console.log(this.custom_parts.length);
         this.CalculateStats();
     }
     GetParts() {

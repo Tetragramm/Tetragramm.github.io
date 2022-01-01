@@ -159,9 +159,9 @@ class Engines extends Part {
     }
 
     public GetMaxIAF() {
-        var m = 0;
+        var m = 100;
         for (let e of this.engines) {
-            m = Math.max(m, e.GetMaxIAF());
+            m = Math.min(m, e.GetMaxIAF());
         }
         return m;
     }
@@ -439,7 +439,7 @@ class Engines extends Part {
     }
 
     public PartStats(): Stats {
-        var stats = new Stats;
+        var stats = new Stats();
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
         var ecost = 0;
         //Engine stuff

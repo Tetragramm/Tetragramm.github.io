@@ -6912,9 +6912,9 @@ class Engines extends Part {
         return m;
     }
     GetMaxIAF() {
-        var m = 0;
+        var m = 100;
         for (let e of this.engines) {
-            m = Math.max(m, e.GetMaxIAF());
+            m = Math.min(m, e.GetMaxIAF());
         }
         return m;
     }

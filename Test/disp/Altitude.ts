@@ -37,13 +37,12 @@ class Altitude_HTML {
         this.rows.push(row)
     }
 
-    public UpdateDisplay(acft: Aircraft, derived: DerivedStats) {
+    public UpdateDisplay(acft: Aircraft, derived: DerivedStats, fuelstate: number) {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
         var fragment = document.createDocumentFragment();
         fragment.appendChild(this.fRow);
-        var fuelstate = 0;
 
         var Boost = 0;
         var RoC = 0;
@@ -73,12 +72,6 @@ class Altitude_HTML {
                 RoC = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2);
                 Stall = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2);
                 Speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
-                break;
-            case FUEL_STATE.EMPTY:
-                Boost = 0;
-                RoC = 0;
-                Stall = derived.StallSpeedEmpty;
-                Speed = 0;
                 break;
         }
 

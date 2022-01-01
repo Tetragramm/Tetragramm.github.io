@@ -43,6 +43,7 @@ class Aircraft_HTML extends Display {
     private altitude: Altitude_HTML;
 
     private acft_type: HTMLSelectElement;
+    private alt_fuel_state: HTMLSelectElement;
 
     //Stats Display
     private d_lift: HTMLTableCellElement;
@@ -174,6 +175,21 @@ class Aircraft_HTML extends Display {
         (document.getElementById("lbl_acft_save_cat_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save Catalog");
         var cat_button = document.getElementById("acft_save_cat");
         cat_button.onclick = () => { this.CatalogStats(); }
+
+        this.alt_fuel_state = document.getElementById("select_fuelstate") as HTMLSelectElement;
+        let opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Full Fuel with Bombs");
+        this.alt_fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Half Fuel with Bombs");
+        this.alt_fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Full Fuel");
+        this.alt_fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Half Fuel");
+        this.alt_fuel_state.appendChild(opt);
+        this.alt_fuel_state.onchange = () => { this.UpdateDisplay(); }
     }
 
     private UpdateCard() {
@@ -935,7 +951,7 @@ class Aircraft_HTML extends Display {
         }
 
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
-        this.altitude.UpdateDisplay(this.acft, derived_stats);
+        this.altitude.UpdateDisplay(this.acft, derived_stats, this.alt_fuel_state.selectedIndex);
     }
 
     public UpdateDisplay() {

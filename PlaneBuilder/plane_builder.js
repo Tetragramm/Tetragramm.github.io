@@ -3703,9 +3703,9 @@ class Engines extends Part {
         return m;
     }
     GetMaxIAF() {
-        var m = 0;
+        var m = 100;
         for (let e of this.engines) {
-            m = Math.max(m, e.GetMaxIAF());
+            m = Math.min(m, e.GetMaxIAF());
         }
         return m;
     }
@@ -3950,7 +3950,7 @@ class Engines extends Part {
         return false;
     }
     PartStats() {
-        var stats = new Stats;
+        var stats = new Stats();
         var needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
         var ecost = 0;
         //Engine stuff
@@ -14354,13 +14354,12 @@ class Altitude_HTML {
         row.insertCell();
         this.rows.push(row);
     }
-    UpdateDisplay(acft, derived) {
+    UpdateDisplay(acft, derived, fuelstate) {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
         var fragment = document.createDocumentFragment();
         fragment.appendChild(this.fRow);
-        var fuelstate = 0;
         var Boost = 0;
         var RoC = 0;
         var Stall = 0;
@@ -14389,12 +14388,6 @@ class Altitude_HTML {
                 RoC = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2);
                 Stall = Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2);
                 Speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
-                break;
-            case FUEL_STATE.EMPTY:
-                Boost = 0;
-                RoC = 0;
-                Stall = derived.StallSpeedEmpty;
-                Speed = 0;
                 break;
         }
         for (let af = 0; af < 100; af++) {
@@ -14481,7 +14474,7 @@ class Cards {
         this.npc_image = document.getElementById("npc_img");
         this.npc_image.width = 482;
         this.npc_image.height = 290;
-        this.npc_image.src = './Cards/NPC.png';
+        // this.npc_image.src = './Cards/NPC.png';
         this.acft_data = {
             full_bomb_boost: 0,
             half_bomb_boost: 0,
@@ -14918,6 +14911,20 @@ class Aircraft_HTML extends Display {
         document.getElementById("lbl_acft_save_cat_bot").textContent = lu("Aircraft Button Save Catalog");
         var cat_button = document.getElementById("acft_save_cat");
         cat_button.onclick = () => { this.CatalogStats(); };
+        this.alt_fuel_state = document.getElementById("select_fuelstate");
+        let opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Full Fuel with Bombs");
+        this.alt_fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Half Fuel with Bombs");
+        this.alt_fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Full Fuel");
+        this.alt_fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Half Fuel");
+        this.alt_fuel_state.appendChild(opt);
+        this.alt_fuel_state.onchange = () => { this.UpdateDisplay(); };
     }
     UpdateCard() {
         this.acft.name = this.derived.GetName();
@@ -15593,7 +15600,7 @@ class Aircraft_HTML extends Display {
             this.acft.name = this.derived.GetName();
         }
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
-        this.altitude.UpdateDisplay(this.acft, derived_stats);
+        this.altitude.UpdateDisplay(this.acft, derived_stats, this.alt_fuel_state.selectedIndex);
     }
     UpdateDisplay() {
         var stats = this.acft.GetStats();
@@ -16863,14 +16870,10 @@ class AlterStats extends Part {
         this.CalculateStats();
     }
     RemovePart(name) {
-        console.log(name);
-        console.log(this.custom_parts.length);
         var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
-        console.log(idx);
         if (idx != -1) {
             this.custom_parts.splice(idx, 1);
         }
-        console.log(this.custom_parts.length);
         this.CalculateStats();
     }
     GetParts() {
