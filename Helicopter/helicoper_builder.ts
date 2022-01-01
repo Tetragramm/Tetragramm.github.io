@@ -64,13 +64,24 @@ const init = () => {
                 var loaded = false;
                 if (qp && !loaded) {
                     console.log("Used Query Parameter");
+                    var oldplane = false;
                     try {
                         var str = LZString.decompressFromEncodedURIComponent(qp);
                         var arr = _stringToArrayBuffer(str);
                         var des = new Deserialize(arr);
+                        if (des.version < 12.25 && des.CheckLastNum() == AIRCRAFT_TYPE.AIRPLANE) {
+                            oldplane = true;
+                        }
                         helicopter_model.deserialize(des);
                         loaded = true;
-                    } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); helicopter_model.Reset(); }
+                    } catch (e) {
+                        console.log("Compressed Query Parameter Failed."); console.log(e); helicopter_model.Reset();
+
+                        if (oldplane) {
+                            window.history.replaceState(null, null, "/PlaneBuilder/index.html?json=" + qp);
+                            window.history.go();
+                        }
+                    }
                 }
                 if (acft_data && !loaded) {
                     console.log("Used Saved Data");
