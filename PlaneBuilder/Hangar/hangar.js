@@ -3077,6 +3077,7 @@ class Engine extends Part {
             this.has_alternator = false;
             this.is_generator = false;
             this.cowl_sel = 0;
+            this.radiator_index = -1;
         }
     }
     GetIsTurbine() {
@@ -3094,6 +3095,7 @@ class Engine extends Part {
             }
             this.cooling_count = 0;
             this.cowl_sel = 0;
+            this.radiator_index = -1;
         }
     }
     GetNumPropellers() {

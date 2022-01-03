@@ -514,6 +514,11 @@ class Deserialize {
         this.array = arr;
         this.view = new DataView(this.array);
         this.offset = 0;
+        this.version = parseFloat(this.GetString());
+        this.Reset();
+    }
+    Reset() {
+        this.offset = 0;
     }
     Check() {
         if (this.offset >= this.array.byteLength)
@@ -571,6 +576,10 @@ class Deserialize {
         var flt = this.view.getFloat32(this.offset, false);
         this.offset += 4;
         return flt;
+    }
+    CheckLastNum() {
+        var num = this.view.getInt16(this.array.byteLength - 2, false);
+        return num;
     }
 }
 function NumArr(arr, tgt_length) {
@@ -6269,6 +6278,7 @@ class Engine extends Part {
             this.has_alternator = false;
             this.is_generator = false;
             this.cowl_sel = 0;
+            this.radiator_index = -1;
         }
     }
     GetIsTurbine() {
@@ -6286,6 +6296,7 @@ class Engine extends Part {
             }
             this.cooling_count = 0;
             this.cowl_sel = 0;
+            this.radiator_index = -1;
         }
     }
     GetNumPropellers() {
