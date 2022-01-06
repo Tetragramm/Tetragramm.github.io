@@ -481,6 +481,9 @@ class Engine extends Part {
             for (let i = 0; i < can.length; ++i) {
                 can[i] = this.mount_list[i].turbine;
             }
+        } else if (this.is_generator) {
+            can = [...Array(this.mount_list.length).fill(false)];
+            can[0] = true;
         } else {
             if (this.use_pp) {
                 for (let i = 0; i < can.length; ++i) {
@@ -929,6 +932,8 @@ class Engine extends Part {
         } else if (this.is_internal) {
             if (!this.CanMountIndex()[this.mount_sel])
                 this.mount_sel = 1;
+        } else if (this.is_generator) {
+            this.mount_sel = 0;
         } else {
             if (this.mount_list[this.mount_sel].turbine) {
                 if (this.use_pp) {
@@ -940,8 +945,17 @@ class Engine extends Part {
         }
     }
 
+    private VerifyCooling() {
+        if (this.NeedCooling() && this.radiator_index < 0) {
+            this.radiator_index = 0;
+        } else if (!this.NeedCooling()) {
+            this.radiator_index = -1;
+        }
+    }
+
     public PartStats(): Stats {
         this.VerifyMount();
+        this.VerifyCooling();
         this.PulseJetCheck();
         this.TurbineCheck();
         if (!this.CanUseExtendedDriveshaft()) {
