@@ -368,13 +368,15 @@ class Aircraft {
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         this.accessories.SetSkinArmor(this.frames.GetArmor());
         this.accessories.SetVitalParts(this.VitalComponentList().length);
+        this.accessories.SetCanCutouts(this.wings.CanCutout(), this.frames.CanCutout());
         stats = stats.Add(this.accessories.PartStats());
 
         //You know what, frames go last, because lots of things make sections.
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.frames.SetIsTandem(this.wings.GetTandem());
-        stats = stats.Add(this.frames.PartStats());
+        let fstats = this.frames.PartStats()
+        stats = stats.Add(fstats);
 
         //Depends on Lifting area.
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());

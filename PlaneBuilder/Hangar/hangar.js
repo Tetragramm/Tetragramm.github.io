@@ -4819,6 +4819,16 @@ class Frames extends Part {
     GetSkin() {
         return this.sel_skin;
     }
+    CanCutout() {
+        let vcount = this.section_list.length * this.skin_list[this.sel_skin].stats.visibility;
+        if (this.farman) {
+            vcount += this.tail_section_list.length;
+        }
+        else {
+            vcount += this.tail_section_list.length * this.skin_list[this.sel_skin].stats.visibility;
+        }
+        return vcount < 3;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -5432,6 +5442,15 @@ class Wings extends Part {
         }
         return ret;
     }
+    CanCutout() {
+        let vcount = 0;
+        for (let w of this.wing_list) {
+            if (this.skin_list[w.surface].transparent) {
+                vcount += 1;
+            }
+        }
+        return vcount < 3;
+    }
     PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -5443,6 +5462,7 @@ class Wings extends Part {
         var have_mini_wing = false;
         var longest_span = 0;
         var longest_drag = 0;
+        var celluloid_count = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             longest_span = Math.max(longest_span, w.span);
@@ -5461,8 +5481,9 @@ class Wings extends Part {
             //Wings cannot generate positive max strain
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
-            if (this.skin_list[w.surface].transparent) {
+            if (this.skin_list[w.surface].transparent && celluloid_count < 3) {
                 wStats.visibility += 1;
+                celluloid_count += 1;
             }
             //Drag is modified by area, span, and the leading wing
             let wspan = w.span;
@@ -7202,6 +7223,7 @@ class Accessories extends Part {
             this.visi_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.visi_sel = [...Array(this.visi_list.length).fill(false)];
+        this.can_visi = [...Array(this.visi_list.length).fill(true)];
         this.clim_list = [];
         for (let elem of js["climate"]) {
             this.clim_list.push({ name: elem["name"], stats: new Stats(elem), req_radiator: elem["req_radiator"] });
@@ -7380,6 +7402,9 @@ class Accessories extends Part {
     GetVisibilityList() {
         return this.visi_list;
     }
+    GetCanVisibility() {
+        return this.can_visi;
+    }
     GetVisibilitySel() {
         return this.visi_sel;
     }
@@ -7481,6 +7506,16 @@ class Accessories extends Part {
             production += this.electric_list[i].cp10s * this.electrical_count[i];
         }
         return production;
+    }
+    SetCanCutouts(wing, frame) {
+        this.can_visi[0] = wing;
+        this.can_visi[1] = frame;
+        if (!wing) {
+            this.visi_sel[0] = false;
+        }
+        if (!frame) {
+            this.visi_sel[1] = false;
+        }
     }
     PartStats() {
         var stats = new Stats();
@@ -10180,12 +10215,14 @@ class Aircraft {
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         this.accessories.SetSkinArmor(this.frames.GetArmor());
         this.accessories.SetVitalParts(this.VitalComponentList().length);
+        this.accessories.SetCanCutouts(this.wings.CanCutout(), this.frames.CanCutout());
         stats = stats.Add(this.accessories.PartStats());
         //You know what, frames go last, because lots of things make sections.
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.frames.SetIsTandem(this.wings.GetTandem());
-        stats = stats.Add(this.frames.PartStats());
+        let fstats = this.frames.PartStats();
+        stats = stats.Add(fstats);
         //Depends on Lifting area.
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
         this.stabilizers.SetIsTandem(this.wings.GetTandem());
@@ -13181,8 +13218,10 @@ class Accessories_HTML extends Display {
             this.recon[i].valueAsNumber = rlist[i];
         }
         var vlist = this.acc.GetVisibilitySel();
+        var cvlist = this.acc.GetCanVisibility();
         for (let i = 0; i < vlist.length; i++) {
             this.visi[i].checked = vlist[i];
+            this.visi[i].disabled = !cvlist[i];
         }
         var clist = this.acc.GetClimateSel();
         var cenab = this.acc.GetClimateEnable();

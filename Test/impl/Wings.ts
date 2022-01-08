@@ -667,6 +667,16 @@ class Wings extends Part {
         return ret;
     }
 
+    public CanCutout(): boolean {
+        let vcount = 0;
+        for (let w of this.wing_list) {
+            if (this.skin_list[w.surface].transparent) {
+                vcount += 1;
+            }
+        }
+        return vcount < 3;
+    }
+
     public PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -680,6 +690,7 @@ class Wings extends Part {
         var have_mini_wing = false;
         var longest_span = this.rotor_span;
         var longest_drag = 0;
+        var celluloid_count = 0;
 
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
@@ -707,8 +718,9 @@ class Wings extends Part {
 
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
 
-            if (this.skin_list[w.surface].transparent) {
+            if (this.skin_list[w.surface].transparent && celluloid_count < 3) {
                 wStats.visibility += 1;
+                celluloid_count += 1;
             }
 
             //Drag is modified by area, span, and the leading wing

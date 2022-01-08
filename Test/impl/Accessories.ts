@@ -17,6 +17,7 @@ class Accessories extends Part {
     //Visibility
     private visi_list: { name: string, stats: Stats }[];
     private visi_sel: boolean[];
+    private can_visi: boolean[];
     //Climate
     private clim_list: { name: string, stats: Stats, req_radiator: boolean }[];
     private clim_sel: boolean[];
@@ -26,7 +27,6 @@ class Accessories extends Part {
     private cont_list: { name: string, max_mass_stress: number, max_total_stress: number, stats: Stats }[];
     private cont_sel: number;
 
-    private acft_power: number;
     private acft_rad: boolean;
     private skin_armour: number;
     private vital_parts: number;
@@ -35,7 +35,6 @@ class Accessories extends Part {
         super();
 
         this.armour_coverage = [...Array(8).fill(0)];
-        this.acft_power = 0;
         this.acft_rad = false;
         this.skin_armour = 0;
 
@@ -65,6 +64,7 @@ class Accessories extends Part {
             this.visi_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.visi_sel = [...Array(this.visi_list.length).fill(false)];
+        this.can_visi = [...Array(this.visi_list.length).fill(true)];
 
         this.clim_list = [];
         for (let elem of js["climate"]) {
@@ -262,6 +262,10 @@ class Accessories extends Part {
         return this.visi_list;
     }
 
+    public GetCanVisibility() {
+        return this.can_visi;
+    }
+
     public GetVisibilitySel() {
         return this.visi_sel;
     }
@@ -319,10 +323,6 @@ class Accessories extends Part {
     public SetControlSel(num: number) {
         this.cont_sel = num;
         this.CalculateStats();
-    }
-
-    public SetAcftPower(pwr: number) {
-        this.acft_power = pwr;
     }
 
     public SetAcftRadiator(have: boolean) {
@@ -384,6 +384,22 @@ class Accessories extends Part {
             production += this.electric_list[i].cp10s * this.electrical_count[i];
         }
         return production;
+    }
+
+    public SetCanCutouts(wing: boolean, frame: boolean) {
+        for (let i = 0; i < this.visi_list.length; i++) {
+            let can = true;
+            switch (this.visi_list[i].name) {
+                case "Wing Cutouts":
+                    can = wing;
+                    break;
+                case "Hull Cutouts":
+                    can = frame;
+                    break;
+            }
+            this.can_visi[i] = can;
+            if (!can) this.visi_sel[i] = false;
+        }
     }
 
     public PartStats() {

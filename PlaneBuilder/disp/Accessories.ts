@@ -212,8 +212,10 @@ class Accessories_HTML extends Display {
         }
 
         var vlist = this.acc.GetVisibilitySel();
+        var cvlist = this.acc.GetCanVisibility();
         for (let i = 0; i < vlist.length; i++) {
             this.visi[i].checked = vlist[i];
+            this.visi[i].disabled = !cvlist[i];
         }
 
         var clist = this.acc.GetClimateSel();

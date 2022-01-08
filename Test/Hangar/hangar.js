@@ -5123,6 +5123,16 @@ class Frames extends Part {
     GetSkin() {
         return this.sel_skin;
     }
+    CanCutout() {
+        let vcount = this.section_list.length * this.skin_list[this.sel_skin].stats.visibility;
+        if (this.farman) {
+            vcount += this.tail_section_list.length;
+        }
+        else {
+            vcount += this.tail_section_list.length * this.skin_list[this.sel_skin].stats.visibility;
+        }
+        return vcount < 3;
+    }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
     }
@@ -5757,6 +5767,15 @@ class Wings extends Part {
         }
         return ret;
     }
+    CanCutout() {
+        let vcount = 0;
+        for (let w of this.wing_list) {
+            if (this.skin_list[w.surface].transparent) {
+                vcount += 1;
+            }
+        }
+        return vcount < 3;
+    }
     PartStats() {
         if (!this.CanClosed())
             this.is_closed = false;
@@ -5768,6 +5787,7 @@ class Wings extends Part {
         var have_mini_wing = false;
         var longest_span = this.rotor_span;
         var longest_drag = 0;
+        var celluloid_count = 0;
         for (let w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             longest_span = Math.max(longest_span, w.span);
@@ -5789,8 +5809,9 @@ class Wings extends Part {
             if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER)
                 wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
-            if (this.skin_list[w.surface].transparent) {
+            if (this.skin_list[w.surface].transparent && celluloid_count < 3) {
                 wStats.visibility += 1;
+                celluloid_count += 1;
             }
             //Drag is modified by area, span, and the leading wing
             let wspan = w.span;
@@ -7560,7 +7581,6 @@ class Accessories extends Part {
     constructor(js) {
         super();
         this.armour_coverage = [...Array(8).fill(0)];
-        this.acft_power = 0;
         this.acft_rad = false;
         this.skin_armour = 0;
         this.electric_list = [];
@@ -7586,6 +7606,7 @@ class Accessories extends Part {
             this.visi_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.visi_sel = [...Array(this.visi_list.length).fill(false)];
+        this.can_visi = [...Array(this.visi_list.length).fill(true)];
         this.clim_list = [];
         for (let elem of js["climate"]) {
             this.clim_list.push({ name: elem["name"], stats: new Stats(elem), req_radiator: elem["req_radiator"] });
@@ -7764,6 +7785,9 @@ class Accessories extends Part {
     GetVisibilityList() {
         return this.visi_list;
     }
+    GetCanVisibility() {
+        return this.can_visi;
+    }
     GetVisibilitySel() {
         return this.visi_sel;
     }
@@ -7810,9 +7834,6 @@ class Accessories extends Part {
     SetControlSel(num) {
         this.cont_sel = num;
         this.CalculateStats();
-    }
-    SetAcftPower(pwr) {
-        this.acft_power = pwr;
     }
     SetAcftRadiator(have) {
         this.acft_rad = have;
@@ -7865,6 +7886,22 @@ class Accessories extends Part {
             production += this.electric_list[i].cp10s * this.electrical_count[i];
         }
         return production;
+    }
+    SetCanCutouts(wing, frame) {
+        for (let i = 0; i < this.visi_list.length; i++) {
+            let can = true;
+            switch (this.visi_list[i].name) {
+                case "Wing Cutouts":
+                    can = wing;
+                    break;
+                case "Hull Cutouts":
+                    can = frame;
+                    break;
+            }
+            this.can_visi[i] = can;
+            if (!can)
+                this.visi_sel[i] = false;
+        }
     }
     PartStats() {
         var stats = new Stats();
@@ -10676,10 +10713,10 @@ class Aircraft {
         if (this.rotor.GetTailRotor()) {
             stats.power = Math.floor(1.0e-6 + 0.9 * stats.power);
         }
-        this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         this.accessories.SetSkinArmor(this.frames.GetArmor());
         this.accessories.SetVitalParts(this.VitalComponentList().length);
+        this.accessories.SetCanCutouts(this.wings.CanCutout(), this.frames.CanCutout());
         stats = stats.Add(this.accessories.PartStats());
         //You know what, frames go last, because lots of things make sections.
         this.frames.SetRequiredSections(stats.reqsections);
@@ -13703,8 +13740,10 @@ class Accessories_HTML extends Display {
             this.recon[i].valueAsNumber = rlist[i];
         }
         var vlist = this.acc.GetVisibilitySel();
+        var cvlist = this.acc.GetCanVisibility();
         for (let i = 0; i < vlist.length; i++) {
             this.visi[i].checked = vlist[i];
+            this.visi[i].disabled = !cvlist[i];
         }
         var clist = this.acc.GetClimateSel();
         var cenab = this.acc.GetClimateEnable();

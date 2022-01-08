@@ -688,6 +688,16 @@ class Frames extends Part {
         return this.sel_skin;
     }
 
+    public CanCutout(): boolean {
+        let vcount = this.section_list.length * this.skin_list[this.sel_skin].stats.visibility;
+        if (this.farman) {
+            vcount += this.tail_section_list.length;
+        } else {
+            vcount += this.tail_section_list.length * this.skin_list[this.sel_skin].stats.visibility;
+        }
+        return vcount < 3;
+    }
+
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
     }

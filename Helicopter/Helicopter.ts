@@ -310,10 +310,10 @@ class Helicopter {
             stats.power = Math.floor(1.0e-6 + 0.9 * stats.power);
         }
 
-        this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         this.accessories.SetSkinArmor(this.frames.GetArmor());
         this.accessories.SetVitalParts(this.VitalComponentList().length);
+        this.accessories.SetCanCutouts(false, this.frames.CanCutout());
         stats = stats.Add(this.accessories.PartStats());
 
         //You know what, frames go last, because lots of things make sections.

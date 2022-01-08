@@ -17,6 +17,7 @@ class Accessories extends Part {
     //Visibility
     private visi_list: { name: string, stats: Stats }[];
     private visi_sel: boolean[];
+    private can_visi: boolean[];
     //Climate
     private clim_list: { name: string, stats: Stats, req_radiator: boolean }[];
     private clim_sel: boolean[];
@@ -65,6 +66,7 @@ class Accessories extends Part {
             this.visi_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.visi_sel = [...Array(this.visi_list.length).fill(false)];
+        this.can_visi = [...Array(this.visi_list.length).fill(true)];
 
         this.clim_list = [];
         for (let elem of js["climate"]) {
@@ -262,6 +264,10 @@ class Accessories extends Part {
         return this.visi_list;
     }
 
+    public GetCanVisibility() {
+        return this.can_visi;
+    }
+
     public GetVisibilitySel() {
         return this.visi_sel;
     }
@@ -384,6 +390,17 @@ class Accessories extends Part {
             production += this.electric_list[i].cp10s * this.electrical_count[i];
         }
         return production;
+    }
+
+    public SetCanCutouts(wing: boolean, frame: boolean) {
+        this.can_visi[0] = wing;
+        this.can_visi[1] = frame;
+        if (!wing) {
+            this.visi_sel[0] = false;
+        }
+        if (!frame) {
+            this.visi_sel[1] = false;
+        }
     }
 
     public PartStats() {
