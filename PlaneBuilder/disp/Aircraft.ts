@@ -44,6 +44,7 @@ class Aircraft_HTML extends Display {
 
     private acft_type: HTMLSelectElement;
     private alt_fuel_state: HTMLSelectElement;
+    private alt_fires: HTMLInputElement;
 
     //Stats Display
     private d_lift: HTMLTableCellElement;
@@ -180,6 +181,9 @@ class Aircraft_HTML extends Display {
         opt.textContent = lu("Derived Half Fuel");
         this.alt_fuel_state.appendChild(opt);
         this.alt_fuel_state.onchange = () => { this.UpdateDisplay(); }
+
+        this.alt_fires = document.getElementById("input_fires") as HTMLInputElement;
+        this.alt_fires.onchange = () => { this.UpdateDisplay(); }
     }
 
     private UpdateCard() {
@@ -941,7 +945,7 @@ class Aircraft_HTML extends Display {
         }
 
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
-        this.altitude.UpdateDisplay(this.acft, derived_stats, this.alt_fuel_state.selectedIndex);
+        this.altitude.UpdateDisplay(this.acft, derived_stats, this.alt_fuel_state.selectedIndex, this.alt_fires.checked);
     }
 
     public UpdateDisplay() {

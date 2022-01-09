@@ -14935,7 +14935,7 @@ class Altitude_HTML {
         row.insertCell();
         this.rows.push(row);
     }
-    UpdateDisplay(acft, derived, fuelstate) {
+    UpdateDisplay(acft, derived, fuelstate, fires) {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
@@ -14983,6 +14983,8 @@ class Altitude_HTML {
                     PowerReduction = af - acft.GetMaxIAF();
                 }
             }
+            if (fires)
+                PowerReduction = 0;
             if (this.rows.length <= af) {
                 this.AddRow(af);
             }
@@ -15516,6 +15518,8 @@ class Aircraft_HTML extends Display {
         opt.textContent = lu("Derived Half Fuel");
         this.alt_fuel_state.appendChild(opt);
         this.alt_fuel_state.onchange = () => { this.UpdateDisplay(); };
+        this.alt_fires = document.getElementById("input_fires");
+        this.alt_fires.onchange = () => { this.UpdateDisplay(); };
     }
     UpdateCard() {
         this.acft.name = this.derived.GetName();
@@ -16191,7 +16195,7 @@ class Aircraft_HTML extends Display {
             this.acft.name = this.derived.GetName();
         }
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
-        this.altitude.UpdateDisplay(this.acft, derived_stats, this.alt_fuel_state.selectedIndex);
+        this.altitude.UpdateDisplay(this.acft, derived_stats, this.alt_fuel_state.selectedIndex, this.alt_fires.checked);
     }
     UpdateDisplay() {
         var stats = this.acft.GetStats();

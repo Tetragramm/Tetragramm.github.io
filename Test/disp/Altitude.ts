@@ -37,7 +37,7 @@ class Altitude_HTML {
         this.rows.push(row)
     }
 
-    public UpdateDisplay(acft: Aircraft, derived: DerivedStats, fuelstate: number) {
+    public UpdateDisplay(acft: Aircraft, derived: DerivedStats, fuelstate: number, fires:boolean) {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
@@ -86,6 +86,9 @@ class Altitude_HTML {
                     PowerReduction = af - acft.GetMaxIAF();
                 }
             }
+
+            if (fires)
+                PowerReduction = 0;
 
             if (this.rows.length <= af) {
                 this.AddRow(af);
