@@ -1,5 +1,5 @@
 {
-    "version": "12.3",
+    "version": "12.4",
     "era": {
         "options": [
             {
@@ -2341,6 +2341,50 @@
                 "rotor_bleed": 3
             }
         ],
-        "arrangement": []
+        "arrangement": [
+            {
+                "name": "Single Rotor",
+                "count": 1,
+                "powerfactor": 1,
+                "blades": 0
+            },
+            {
+                "name": "Coaxial",
+                "count": 2,
+                "cost": 2,
+                "reliability": -1,
+                "powerfactor": 1,
+                "blades": 0
+            },
+            {
+                "name": "Synchropter",
+                "count": 2,
+                "cost": -2,
+                "powerfactor": 0.95,
+                "blades": 0
+            },
+            {
+                "name": "Tandem",
+                "count": 2,
+                "pitchstab": 4,
+                "powerfactor": 1,
+                "blades": 0
+            },
+            {
+                "name": "Transverse",
+                "count": 2,
+                "latstab": 4,
+                "powerfactor": 1,
+                "blades": 0
+            },
+            {
+                "name": "Tandem Transverse",
+                "count": 3,
+                "pitchstab": 4,
+                "latstab": 4,
+                "powerfactor": 1,
+                "blades": 0
+            }
+        ]
     }
 }

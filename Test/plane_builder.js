@@ -10102,7 +10102,12 @@ class Rotor extends Part {
         this.rotor_count = js["rotor_count"];
         this.rotor_span = js["rotor_span"];
         this.cant_idx = js["rotor_mat"];
-        this.stagger_sel = js["stagger_sel"];
+        if (json_version < 12.35) {
+            this.stagger_sel = 0;
+        }
+        else {
+            this.stagger_sel = js["stagger_sel"];
+        }
         this.accessory = js["accessory"];
         if (json_version > 11.55) {
             this.blade_idx = js["blade_idx"];
@@ -10122,7 +10127,13 @@ class Rotor extends Part {
         this.rotor_count = d.GetNum();
         this.rotor_span = d.GetNum();
         this.cant_idx = d.GetNum();
-        this.stagger_sel = d.GetNum();
+        if (d.version < 12.35) {
+            d.GetBool();
+            this.stagger_sel = 0;
+        }
+        else {
+            this.stagger_sel = d.GetNum();
+        }
         this.accessory = d.GetBool();
         if (d.version > 11.55) {
             this.blade_idx = d.GetNum();
