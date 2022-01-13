@@ -1383,6 +1383,7 @@
                 "name": "Basic Flaps",
                 "era": "WWI",
                 "liftbleed": -3,
+                "control": -3,
                 "costfactor": 0.333333333333
             },
             {
