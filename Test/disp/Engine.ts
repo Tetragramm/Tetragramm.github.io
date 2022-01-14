@@ -16,6 +16,7 @@ class Engine_HTML extends Display {
     private e_torq: HTMLLabelElement;
     private e_rumb: HTMLLabelElement;
     private e_cost: HTMLLabelElement;
+    private e_rarity: HTMLLabelElement;
     //Cooling Elements
     private cool_cell: HTMLTableDataCellElement;
     private cool_select: HTMLSelectElement;
@@ -95,6 +96,7 @@ class Engine_HTML extends Display {
     }
 
     private InitTypeSelect(row: HTMLTableRowElement) {
+        this.e_rarity = document.createElement("LABEL") as HTMLLabelElement;
         this.e_pwr = document.createElement("LABEL") as HTMLLabelElement;
         this.e_mass = document.createElement("LABEL") as HTMLLabelElement;
         this.e_drag = document.createElement("LABEL") as HTMLLabelElement;
@@ -132,8 +134,10 @@ class Engine_HTML extends Display {
             opt.text = eng.name;
             this.e_select.add(opt);
         }
+
         var fs = CreateFlexSection(tcell);
         //Set up the individual stat input boxes
+        FlexDisplay(lu("Rarity"), this.e_rarity, fs);
         FlexDisplay(lu("Stat Power"), this.e_pwr, fs);
         FlexDisplay(lu("Stat Mass"), this.e_mass, fs);
         FlexDisplay(lu("Stat Drag"), this.e_drag, fs);
@@ -381,6 +385,25 @@ class Engine_HTML extends Display {
             this.e_select.selectedIndex = 0;
         }
         var e_stats = this.engine.GetCurrentStats();
+        switch (e_stats.rarity) {
+            case ENGINE_RARITY.CUSTOM:
+                this.e_rarity.textContent = lu("Rarity Custom");
+                this.e_rarity.className = "ER_Custom";
+                break;
+            case ENGINE_RARITY.COMMON:
+                this.e_rarity.textContent = lu("Rarity Common");
+                this.e_rarity.className = "";
+                break;
+            case ENGINE_RARITY.RARE:
+                this.e_rarity.textContent = lu("Rarity Rare");
+                this.e_rarity.className = "ER_Rare";
+                break;
+            case ENGINE_RARITY.LEGENDARY:
+                this.e_rarity.textContent = lu("Rarity Legendary");
+                this.e_rarity.className = "ER_Legendary";
+                break;
+        }
+
         var b = this.engine.GetMinAltitude();
         var t = this.engine.GetMaxAltitude();
         this.e_pwr.textContent = e_stats.stats.power.toString();

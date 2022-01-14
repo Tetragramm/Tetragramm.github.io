@@ -9,11 +9,19 @@ enum ENGINE_TYPE {
     TURBOMACHINERY,
 }
 
+enum ENGINE_RARITY {
+    CUSTOM,
+    COMMON,
+    RARE,
+    LEGENDARY,
+}
+
 class EngineInputs {
     public name: string;
     public engine_type: ENGINE_TYPE;
     public type: number;
     public era_sel: number;
+    public rarity: ENGINE_RARITY;
 
     //Engine Stuff
     public displacement: number;
@@ -45,6 +53,7 @@ class EngineInputs {
         this.engine_type = ENGINE_TYPE.PROPELLER;
         this.type = 0;
         this.era_sel = 0;
+        this.rarity = ENGINE_RARITY.CUSTOM;
 
         this.displacement = 0;
         this.compression = 0;
@@ -92,6 +101,7 @@ class EngineInputs {
                     compressor_count: this.compressor_count,
                     min_IAF: this.min_IdealAlt,
                     upgrades: this.upgrades,
+                    rarity: this.rarity,
                 };
             }
             case ENGINE_TYPE.PULSEJET: {
@@ -104,6 +114,7 @@ class EngineInputs {
                     quality_cost: this.quality_cost,
                     quality_rely: this.quality_rely,
                     starter: this.starter,
+                    rarity: this.rarity,
                 }
             }
             case ENGINE_TYPE.TURBOMACHINERY: {
@@ -117,6 +128,7 @@ class EngineInputs {
                     compression_ratio: this.compression_ratio,
                     bypass_ratio: this.bypass_ratio,
                     upgrades: this.upgrades,
+                    rarity: this.rarity,
                 };
             }
             default:
@@ -162,6 +174,11 @@ class EngineInputs {
             default:
                 throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
         }
+        if (js["rarity"]) {
+            this.rarity = js["rarity"];
+        } else {
+            this.rarity = ENGINE_RARITY.CUSTOM;
+        }
     }
 
     public serialize(s: Serialize) {
@@ -203,6 +220,8 @@ class EngineInputs {
             default:
                 throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
         }
+
+        s.PushNum(this.rarity);
     }
 
     public deserialize(d: Deserialize) {
@@ -243,6 +262,12 @@ class EngineInputs {
             default:
                 throw "EngineInputs.deserialize: Oh dear, you have a new engine type.";
         }
+
+        if (d.version > 12.35) {
+            this.rarity = d.GetNum();
+        } else {
+            this.rarity = ENGINE_RARITY.CUSTOM;
+        }
     }
 
     public PartStats() {
@@ -263,6 +288,7 @@ class EngineInputs {
                 eb.compressor_count = this.compressor_count;
                 eb.min_IAF = this.min_IdealAlt;
                 eb.upg_sel = this.upgrades;
+                eb.rarity = this.rarity;
                 return eb.EngineStats();
             }
             case ENGINE_TYPE.PULSEJET: {
@@ -273,6 +299,7 @@ class EngineInputs {
                 pb.build_quality = this.quality_cost;
                 pb.overall_quality = this.quality_rely;
                 pb.starter = this.starter;
+                pb.rarity = this.rarity;
                 let stats = pb.EngineStats();
                 this.name = stats.name;
                 return stats;
@@ -287,6 +314,7 @@ class EngineInputs {
                 tb.bypass_ratio = this.bypass_ratio;
                 tb.afterburner = this.upgrades[0];
                 tb.name = this.name;
+                tb.rarity = this.rarity;
                 return tb.EngineStats();
             }
             default:
@@ -325,6 +353,7 @@ class EngineInputs {
         n.diameter = this.diameter;
         n.compression_ratio = this.compression_ratio;
         n.bypass_ratio = this.bypass_ratio;
+        n.rarity = this.rarity;
         return n;
     }
 }

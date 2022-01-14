@@ -52,6 +52,7 @@ class EngineBuilder {
     public rpm_boost: number;
     public material_fudge: number;
     public quality_fudge: number;
+    public rarity: ENGINE_RARITY;
 
 
     constructor() {
@@ -70,6 +71,7 @@ class EngineBuilder {
         this.compressor_type = CompressorEnum.NONE;
         this.compressor_count = 0;
         this.min_IAF = 0;
+        this.rarity = ENGINE_RARITY.CUSTOM;
     }
 
     public CanUpgrade() {
@@ -406,6 +408,7 @@ class EngineBuilder {
         }
 
         estats.stats.fuelconsumption = Math.max(1, estats.stats.fuelconsumption);
+        estats.rarity = this.rarity;
 
         return estats;
     }
@@ -428,6 +431,7 @@ class EngineBuilder {
         ei.type = this.cool_sel;
         for (let i = 0; i < ei.upgrades.length; i++)
             ei.upgrades[i] = this.upg_sel[i];
+        ei.rarity = this.rarity;
 
         return ei;
     }
@@ -446,6 +450,11 @@ class EngineBuilder {
         this.compressor_count = js["compressor_count"];
         this.min_IAF = js["min_IAF"];
         this.upg_sel = BoolArr(js["upgrades"], this.upg_sel.length);
+        if (js["rarity"]) {
+            this.rarity = js["rarity"];
+        } else {
+            this.rarity = ENGINE_RARITY.CUSTOM;
+        }
         return this.EngineStats();
     }
 }

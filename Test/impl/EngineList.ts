@@ -55,27 +55,6 @@ class EngineList {
         }
     }
 
-    public serialize(s: Serialize) {
-        s.PushString(this.name);
-        s.PushNum(this.list.length);
-        for (let li of this.list) {
-            li.serialize(s);
-        }
-    }
-
-    public deserialize(d: Deserialize) {
-        if (this.constant) {
-            throw "Engine List is Constant";
-        }
-        this.name = d.GetString();
-        var len = d.GetNum();
-        for (let i = 0; i < len; i++) {
-            let stats = new EngineInputs();
-            stats.deserialize(d);
-            this.push(stats);
-        }
-    }
-
     public deserializeEngine(d: Deserialize) {
         if (this.constant) {
             throw "Engine List is Constant";

@@ -89,7 +89,7 @@ class Rotor extends Part {
         this.rotor_count = d.GetNum();
         this.rotor_span = d.GetNum();
         this.cant_idx = d.GetNum();
-        if (d.version < 12.35) {
+        if (d.version < 12.45) {
             d.GetBool();
             this.stagger_sel = 0;
         } else {

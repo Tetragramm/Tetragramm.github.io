@@ -17,6 +17,7 @@ class EngineStats {
     public oiltank: boolean = false;
     public pulsejet: boolean = false;
     public stats: Stats = new Stats();
+    public rarity: ENGINE_RARITY = ENGINE_RARITY.CUSTOM;
 
     constructor(js?: JSON) {
         if (js) {
@@ -33,6 +34,7 @@ class EngineStats {
             rumble: this.rumble,
             oiltank: this.oiltank,
             pulsejet: this.pulsejet,
+            rarity: this.rarity,
             ...this.stats.toJSON()
         };
     }
@@ -52,7 +54,8 @@ class EngineStats {
             this.oiltank = js["oiltank"];
         if (js["pulsejet"])
             this.pulsejet = js["pulsejet"];
-
+        if (js["rarity"])
+            this.rarity = js["rarity"];
         this.stats = new Stats(js);
     }
 
@@ -64,6 +67,7 @@ class EngineStats {
         s.PushNum(this.rumble);
         s.PushBool(this.oiltank);
         s.PushBool(this.pulsejet);
+        s.PushNum(this.rarity);
         this.stats.serialize(s);
     }
 
@@ -75,6 +79,9 @@ class EngineStats {
         this.rumble = d.GetNum();
         this.oiltank = d.GetBool();
         this.pulsejet = d.GetBool();
+        if (d.version > 12.35) {
+            this.rarity = d.GetNum();
+        }
         this.stats.deserialize(d);
     }
 
@@ -90,7 +97,8 @@ class EngineStats {
             && this.torque == other.torque
             && this.rumble == other.rumble
             && this.oiltank == other.oiltank
-            && this.pulsejet == other.pulsejet;
+            && this.pulsejet == other.pulsejet
+            && this.rarity == other.rarity;
     }
     public Verify() {
         if (this.oiltank) {

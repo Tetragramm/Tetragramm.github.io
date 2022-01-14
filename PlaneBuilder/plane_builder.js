@@ -707,6 +707,7 @@ class EngineBuilder {
         this.compressor_type = CompressorEnum.NONE;
         this.compressor_count = 0;
         this.min_IAF = 0;
+        this.rarity = ENGINE_RARITY.CUSTOM;
     }
     CanUpgrade() {
         var can_upg = [...Array(this.Upgrades.length).fill(true)];
@@ -1005,6 +1006,7 @@ class EngineBuilder {
             }
         }
         estats.stats.fuelconsumption = Math.max(1, estats.stats.fuelconsumption);
+        estats.rarity = this.rarity;
         return estats;
     }
     EngineInputs() {
@@ -1025,6 +1027,7 @@ class EngineBuilder {
         ei.type = this.cool_sel;
         for (let i = 0; i < ei.upgrades.length; i++)
             ei.upgrades[i] = this.upg_sel[i];
+        ei.rarity = this.rarity;
         return ei;
     }
     fromJSON(js) {
@@ -1041,6 +1044,12 @@ class EngineBuilder {
         this.compressor_count = js["compressor_count"];
         this.min_IAF = js["min_IAF"];
         this.upg_sel = BoolArr(js["upgrades"], this.upg_sel.length);
+        if (js["rarity"]) {
+            this.rarity = js["rarity"];
+        }
+        else {
+            this.rarity = ENGINE_RARITY.CUSTOM;
+        }
         return this.EngineStats();
     }
 }
@@ -1066,6 +1075,7 @@ class PulsejetBuilder {
         this.build_quality = 1;
         this.overall_quality = 1;
         this.starter = false;
+        this.rarity = ENGINE_RARITY.CUSTOM;
     }
     TempMass() {
         var Era = this.EraTable[this.era_sel];
@@ -1135,6 +1145,7 @@ class PulsejetBuilder {
         ei.starter = this.starter;
         ei.quality_cost = this.build_quality;
         ei.quality_rely = this.overall_quality;
+        ei.rarity = this.rarity;
         return ei;
     }
     EngineStats() {
@@ -1155,6 +1166,7 @@ class PulsejetBuilder {
         estats.altitude = 29;
         estats.pulsejet = true;
         estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.rarity = this.rarity;
         return estats;
     }
 }
@@ -1188,6 +1200,7 @@ class TurboBuilder {
         this.compression_ratio = 3.5;
         this.bypass_ratio = 0;
         this.afterburner = false;
+        this.rarity = ENGINE_RARITY.CUSTOM;
     }
     TempMass() {
         var Era = this.EraTable[this.era_sel];
@@ -1286,6 +1299,7 @@ class TurboBuilder {
         ei.compression_ratio = this.compression_ratio;
         ei.bypass_ratio = this.bypass_ratio;
         ei.upgrades[0] = this.afterburner;
+        ei.rarity = this.rarity;
         return ei;
     }
     EngineStats() {
@@ -1305,6 +1319,7 @@ class TurboBuilder {
         estats.overspeed = 100;
         estats.altitude = 59;
         estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.rarity = this.rarity;
         return estats;
     }
 }
@@ -1322,12 +1337,20 @@ var ENGINE_TYPE;
     ENGINE_TYPE[ENGINE_TYPE["PULSEJET"] = 1] = "PULSEJET";
     ENGINE_TYPE[ENGINE_TYPE["TURBOMACHINERY"] = 2] = "TURBOMACHINERY";
 })(ENGINE_TYPE || (ENGINE_TYPE = {}));
+var ENGINE_RARITY;
+(function (ENGINE_RARITY) {
+    ENGINE_RARITY[ENGINE_RARITY["CUSTOM"] = 0] = "CUSTOM";
+    ENGINE_RARITY[ENGINE_RARITY["COMMON"] = 1] = "COMMON";
+    ENGINE_RARITY[ENGINE_RARITY["RARE"] = 2] = "RARE";
+    ENGINE_RARITY[ENGINE_RARITY["LEGENDARY"] = 3] = "LEGENDARY";
+})(ENGINE_RARITY || (ENGINE_RARITY = {}));
 class EngineInputs {
     constructor(js) {
         this.name = "Default";
         this.engine_type = ENGINE_TYPE.PROPELLER;
         this.type = 0;
         this.era_sel = 0;
+        this.rarity = ENGINE_RARITY.CUSTOM;
         this.displacement = 0;
         this.compression = 0;
         this.cyl_per_row = 0;
@@ -1370,6 +1393,7 @@ class EngineInputs {
                     compressor_count: this.compressor_count,
                     min_IAF: this.min_IdealAlt,
                     upgrades: this.upgrades,
+                    rarity: this.rarity,
                 };
             }
             case ENGINE_TYPE.PULSEJET: {
@@ -1382,6 +1406,7 @@ class EngineInputs {
                     quality_cost: this.quality_cost,
                     quality_rely: this.quality_rely,
                     starter: this.starter,
+                    rarity: this.rarity,
                 };
             }
             case ENGINE_TYPE.TURBOMACHINERY: {
@@ -1395,6 +1420,7 @@ class EngineInputs {
                     compression_ratio: this.compression_ratio,
                     bypass_ratio: this.bypass_ratio,
                     upgrades: this.upgrades,
+                    rarity: this.rarity,
                 };
             }
             default:
@@ -1439,6 +1465,12 @@ class EngineInputs {
             default:
                 throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
         }
+        if (js["rarity"]) {
+            this.rarity = js["rarity"];
+        }
+        else {
+            this.rarity = ENGINE_RARITY.CUSTOM;
+        }
     }
     serialize(s) {
         s.PushString(this.name);
@@ -1478,6 +1510,7 @@ class EngineInputs {
             default:
                 throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
         }
+        s.PushNum(this.rarity);
     }
     deserialize(d) {
         this.name = d.GetString();
@@ -1517,6 +1550,12 @@ class EngineInputs {
             default:
                 throw "EngineInputs.deserialize: Oh dear, you have a new engine type.";
         }
+        if (d.version > 12.35) {
+            this.rarity = d.GetNum();
+        }
+        else {
+            this.rarity = ENGINE_RARITY.CUSTOM;
+        }
     }
     PartStats() {
         switch (this.engine_type) {
@@ -1536,6 +1575,7 @@ class EngineInputs {
                 eb.compressor_count = this.compressor_count;
                 eb.min_IAF = this.min_IdealAlt;
                 eb.upg_sel = this.upgrades;
+                eb.rarity = this.rarity;
                 return eb.EngineStats();
             }
             case ENGINE_TYPE.PULSEJET: {
@@ -1546,6 +1586,7 @@ class EngineInputs {
                 pb.build_quality = this.quality_cost;
                 pb.overall_quality = this.quality_rely;
                 pb.starter = this.starter;
+                pb.rarity = this.rarity;
                 let stats = pb.EngineStats();
                 this.name = stats.name;
                 return stats;
@@ -1560,6 +1601,7 @@ class EngineInputs {
                 tb.bypass_ratio = this.bypass_ratio;
                 tb.afterburner = this.upgrades[0];
                 tb.name = this.name;
+                tb.rarity = this.rarity;
                 return tb.EngineStats();
             }
             default:
@@ -1596,6 +1638,7 @@ class EngineInputs {
         n.diameter = this.diameter;
         n.compression_ratio = this.compression_ratio;
         n.bypass_ratio = this.bypass_ratio;
+        n.rarity = this.rarity;
         return n;
     }
 }
@@ -1612,12 +1655,13 @@ class EngineStats {
         this.oiltank = false;
         this.pulsejet = false;
         this.stats = new Stats();
+        this.rarity = ENGINE_RARITY.CUSTOM;
         if (js) {
             this.fromJSON(js);
         }
     }
     toJSON() {
-        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet }, this.stats.toJSON());
+        return Object.assign({ name: this.name, overspeed: this.overspeed, altitude: this.altitude, torque: this.torque, rumble: this.rumble, oiltank: this.oiltank, pulsejet: this.pulsejet, rarity: this.rarity }, this.stats.toJSON());
     }
     fromJSON(js, json_version = 9999) {
         if (js["name"])
@@ -1634,6 +1678,8 @@ class EngineStats {
             this.oiltank = js["oiltank"];
         if (js["pulsejet"])
             this.pulsejet = js["pulsejet"];
+        if (js["rarity"])
+            this.rarity = js["rarity"];
         this.stats = new Stats(js);
     }
     serialize(s) {
@@ -1644,6 +1690,7 @@ class EngineStats {
         s.PushNum(this.rumble);
         s.PushBool(this.oiltank);
         s.PushBool(this.pulsejet);
+        s.PushNum(this.rarity);
         this.stats.serialize(s);
     }
     deserialize(d) {
@@ -1654,6 +1701,9 @@ class EngineStats {
         this.rumble = d.GetNum();
         this.oiltank = d.GetBool();
         this.pulsejet = d.GetBool();
+        if (d.version > 12.35) {
+            this.rarity = d.GetNum();
+        }
         this.stats.deserialize(d);
     }
     Clone() {
@@ -1668,7 +1718,8 @@ class EngineStats {
             && this.torque == other.torque
             && this.rumble == other.rumble
             && this.oiltank == other.oiltank
-            && this.pulsejet == other.pulsejet;
+            && this.pulsejet == other.pulsejet
+            && this.rarity == other.rarity;
     }
     Verify() {
         if (this.oiltank) {
@@ -1734,25 +1785,6 @@ class EngineList {
             catch (e) {
                 console.error(e);
             }
-        }
-    }
-    serialize(s) {
-        s.PushString(this.name);
-        s.PushNum(this.list.length);
-        for (let li of this.list) {
-            li.serialize(s);
-        }
-    }
-    deserialize(d) {
-        if (this.constant) {
-            throw "Engine List is Constant";
-        }
-        this.name = d.GetString();
-        var len = d.GetNum();
-        for (let i = 0; i < len; i++) {
-            let stats = new EngineInputs();
-            stats.deserialize(d);
-            this.push(stats);
         }
     }
     deserializeEngine(d) {
@@ -11394,6 +11426,7 @@ class Engine_HTML extends Display {
         this.intake_fan.onchange = () => { this.engine.SetIntakeFan(this.intake_fan.checked); };
     }
     InitTypeSelect(row) {
+        this.e_rarity = document.createElement("LABEL");
         this.e_pwr = document.createElement("LABEL");
         this.e_mass = document.createElement("LABEL");
         this.e_drag = document.createElement("LABEL");
@@ -11431,6 +11464,7 @@ class Engine_HTML extends Display {
         }
         var fs = CreateFlexSection(tcell);
         //Set up the individual stat input boxes
+        FlexDisplay(lu("Rarity"), this.e_rarity, fs);
         FlexDisplay(lu("Stat Power"), this.e_pwr, fs);
         FlexDisplay(lu("Stat Mass"), this.e_mass, fs);
         FlexDisplay(lu("Stat Drag"), this.e_drag, fs);
@@ -11663,6 +11697,24 @@ class Engine_HTML extends Display {
             this.e_select.selectedIndex = 0;
         }
         var e_stats = this.engine.GetCurrentStats();
+        switch (e_stats.rarity) {
+            case ENGINE_RARITY.CUSTOM:
+                this.e_rarity.textContent = lu("Rarity Custom");
+                this.e_rarity.className = "ER_Custom";
+                break;
+            case ENGINE_RARITY.COMMON:
+                this.e_rarity.textContent = lu("Rarity Common");
+                this.e_rarity.className = "";
+                break;
+            case ENGINE_RARITY.RARE:
+                this.e_rarity.textContent = lu("Rarity Rare");
+                this.e_rarity.className = "ER_Rare";
+                break;
+            case ENGINE_RARITY.LEGENDARY:
+                this.e_rarity.textContent = lu("Rarity Legendary");
+                this.e_rarity.className = "ER_Legendary";
+                break;
+        }
         var b = this.engine.GetMinAltitude();
         var t = this.engine.GetMaxAltitude();
         this.e_pwr.textContent = e_stats.stats.power.toString();

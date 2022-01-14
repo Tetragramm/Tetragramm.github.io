@@ -743,6 +743,11 @@
         "Frame Count": "Frame Count",
         "Frame Count Warning": "This plane appears to have unused frame sections.  Check to see if this is intentional.",
         "Altitude Section Title": "Altitude Effects",
-        "Altitude Altitude": "Altitude"
+        "Altitude Altitude": "Altitude",
+        "Rarity": "Rarity",
+        "Rarity Custom": "Custom",
+        "Rarity Common": "Common",
+        "Rarity Rare": "Rare",
+        "Rarity Legendary": "Legendary"
     }
 }

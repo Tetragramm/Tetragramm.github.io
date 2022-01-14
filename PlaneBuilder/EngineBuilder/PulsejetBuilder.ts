@@ -9,6 +9,7 @@ class PulsejetBuilder {
     public build_quality: number;
     public overall_quality: number;
     public starter: boolean;
+    public rarity: ENGINE_RARITY;
 
     readonly EraTable: { name: string, cost: number, drag: number, mass: number, fuel: number, vibe: number, material: number }[] = [
         { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
@@ -30,6 +31,7 @@ class PulsejetBuilder {
         this.build_quality = 1;
         this.overall_quality = 1;
         this.starter = false;
+        this.rarity = ENGINE_RARITY.CUSTOM;
     }
 
     private TempMass() {
@@ -118,6 +120,7 @@ class PulsejetBuilder {
         ei.starter = this.starter;
         ei.quality_cost = this.build_quality;
         ei.quality_rely = this.overall_quality;
+        ei.rarity = this.rarity;
         return ei;
     }
 
@@ -142,6 +145,7 @@ class PulsejetBuilder {
         estats.altitude = 29;
         estats.pulsejet = true;
         estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.rarity = this.rarity;
 
         return estats;
     }

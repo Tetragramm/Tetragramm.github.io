@@ -571,3 +571,18 @@ button[disabled] {
 .active::before {
 	content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
+
+.ER_Custom {
+	color:white;
+	background-color: black;
+}
+
+.ER_Rare {
+	color:white;
+	background-color: green;
+}
+
+.ER_Legendary{
+	color:black;
+	background-color: gold;
+}

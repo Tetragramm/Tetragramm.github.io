@@ -12,6 +12,7 @@ class TurboBuilder {
     public compression_ratio: number; //1+
     public bypass_ratio: number;//0+
     public afterburner: boolean;
+    public rarity: ENGINE_RARITY;
 
     public kN: number;
     public tsfc: number;
@@ -45,6 +46,7 @@ class TurboBuilder {
         this.compression_ratio = 3.5;
         this.bypass_ratio = 0;
         this.afterburner = false;
+        this.rarity = ENGINE_RARITY.CUSTOM;
     }
 
     private TempMass() {
@@ -160,6 +162,7 @@ class TurboBuilder {
         ei.compression_ratio = this.compression_ratio;
         ei.bypass_ratio = this.bypass_ratio;
         ei.upgrades[0] = this.afterburner;
+        ei.rarity = this.rarity;
         return ei;
     }
 
@@ -181,6 +184,7 @@ class TurboBuilder {
         estats.overspeed = 100;
         estats.altitude = 59;
         estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        estats.rarity = this.rarity;
 
         return estats;
     }

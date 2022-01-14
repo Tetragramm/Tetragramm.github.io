@@ -1856,7 +1856,8 @@
                     "power": 15,
                     "quality_cost": 1,
                     "quality_rely": 1,
-                    "starter": false
+                    "starter": false,
+                    "rarity": 1
                 }
             ]
         },
@@ -1883,7 +1884,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Einsort MR 150hp",
@@ -1905,7 +1907,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Gernsback Motor 0005",
@@ -1927,7 +1930,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 }
             ]
         },
@@ -1954,7 +1958,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Bertha F1466 170hp",
@@ -1976,7 +1981,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Bertha F1466 Über 180hp",
@@ -1998,7 +2004,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Bertha F2000 250hp",
@@ -2020,7 +2027,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Brandt Krieger I 370hp",
@@ -2042,7 +2050,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "Brandt Kurier XVI 180hp",
@@ -2064,7 +2073,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Fleischmann F10 250hp",
@@ -2086,7 +2096,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Fleischmann F10ü 300hp",
@@ -2108,7 +2119,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Fokker Fungizidherstellung Typ 247 160hp",
@@ -2130,7 +2142,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Meier Ochs 2 160hp",
@@ -2152,7 +2165,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Meier Windhund 70hp",
@@ -2174,7 +2188,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Nationales Motorbüro Arbeiter XVII 170hp",
@@ -2196,7 +2211,8 @@
                         false,
                         false,
                         true
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Nationales Motorbüro D-1140 220hp",
@@ -2218,7 +2234,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Nationales Motorbüro D-760 150hp",
@@ -2240,7 +2257,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Nationales Motorbüro D-760tgl 180hp",
@@ -2262,7 +2280,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Nationales Motorbüro D-840 160hp",
@@ -2284,7 +2303,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Nationales Motorbüro Kurier XXI 210hp",
@@ -2306,7 +2326,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "SAM Kurier XII 150hp",
@@ -2328,7 +2349,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "SAM Kurier XX 200hp",
@@ -2350,7 +2372,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "SAM Transporter I 300hp",
@@ -2372,7 +2395,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "SAM Transporter III 320hp",
@@ -2394,7 +2418,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "SAM Transporter V 350hp",
@@ -2416,7 +2441,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Schrankhut RD.300V 230hp",
@@ -2438,7 +2464,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "Wollsteinkraft Verteidiger C 250hp",
@@ -2460,7 +2487,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Wollsteinkraft Verteidiger H 360hp",
@@ -2482,7 +2510,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Wollsteinkraft Wagehals C 290hp",
@@ -2504,7 +2533,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Bertha F4398 490hp",
@@ -2526,7 +2556,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Brandt Patriot 210hp",
@@ -2548,7 +2579,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Brandt Turbolader-Patriot 260hp",
@@ -2570,7 +2602,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Meier Bär 400hp",
@@ -2592,7 +2625,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "Meier Eisbär 500hp",
@@ -2614,29 +2648,8 @@
                         false,
                         false,
                         false
-                    ]
-                },
-                {
-                    "name": "Rhona Motorbau Stämmig 24L",
-                    "engine_type": 0,
-                    "type": 0,
-                    "era_sel": 1,
-                    "displacement": 24,
-                    "compression": 6,
-                    "cyl_per_row": 1,
-                    "rows": 6,
-                    "RPM_boost": 0.5,
-                    "material_fudge": 1,
-                    "quality_fudge": 1,
-                    "compressor_type": 0,
-                    "compressor_count": 0,
-                    "min_IAF": 0,
-                    "upgrades": [
-                        false,
-                        false,
-                        true,
-                        true
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "SAM Kurier XIII 180hp",
@@ -2658,7 +2671,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "SAM Transporter IV 320hp",
@@ -2680,7 +2694,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Sonnenmotor EGH3 220hp",
@@ -2702,7 +2717,8 @@
                         false,
                         false,
                         true
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "Wollsteinkraft Wagehals T 360hp",
@@ -2724,7 +2740,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "SAM Kurier L 300hp",
@@ -2746,7 +2763,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "Bertha F2080 220hp",
@@ -2768,7 +2786,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Bertha F2080 Über 270hp",
@@ -2790,7 +2809,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 }
             ]
         },
@@ -2817,7 +2837,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Nationales Motorbüro R-1190 110hp",
@@ -2839,7 +2860,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 }
             ]
         },
@@ -2866,7 +2888,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Braun ULK 110hp",
@@ -2888,7 +2911,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Scholz Luchs X 110hp",
@@ -2910,7 +2934,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Braun UX 150hp",
@@ -2932,7 +2957,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Scholz Luchs III 30hp",
@@ -2954,7 +2980,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Scholz Luchs VI 60hp",
@@ -2976,7 +3003,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Breitbusch Libelle '320hp'",
@@ -2998,7 +3026,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 }
             ]
         },
@@ -3025,7 +3054,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 }
             ]
         },
@@ -3052,7 +3082,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "Robur Herausforderer 180hp",
@@ -3074,7 +3105,8 @@
                         false,
                         true,
                         true
-                    ]
+                    ],
+                    "rarity": 3
                 },
                 {
                     "name": "Rhona Motorbau Z11 80hp",
@@ -3096,7 +3128,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Rhona Motorbau Z11tgl 100hp",
@@ -3118,7 +3151,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Rhona Motorbau Z12 110hp",
@@ -3140,7 +3174,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Schreiber B.IX 130hp",
@@ -3162,7 +3197,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Schreiber G.IX 110hp",
@@ -3184,7 +3220,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Schreiber O.VII 50hp",
@@ -3206,7 +3243,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Schreiber L.VII 80hp",
@@ -3228,7 +3266,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Schreiber TG.IX 130hp",
@@ -3250,7 +3289,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 1
                 },
                 {
                     "name": "Schreiber T.IX 160hp",
@@ -3272,7 +3312,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "W.O.1 150hp",
@@ -3294,7 +3335,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 2
                 },
                 {
                     "name": "W.O.3 230hp",
@@ -3316,7 +3358,8 @@
                         false,
                         false,
                         false
-                    ]
+                    ],
+                    "rarity": 3
                 }
             ]
         }
