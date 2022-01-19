@@ -10499,7 +10499,7 @@ class Rotor extends Part {
         this.rotor_count = d.GetNum();
         this.rotor_span = d.GetNum();
         this.cant_idx = d.GetNum();
-        if (d.version < 12.45) {
+        if (d.version < 12.35) {
             d.GetBool();
             this.stagger_sel = 0;
         }
@@ -17711,7 +17711,7 @@ class Helicopter_HTML extends Display {
         }
     }
     SaveInteractive() {
-        var link = ("https://dpierkowski.github.io/flying-circus/index.html?json=" + btoa(this.InteractiveDash()));
+        var link = ("https://tetragramm.github.io/InteractiveDash/index.html?json=" + btoa(this.InteractiveDash()));
         window.open(link, "_blank");
     }
     InteractiveDash() {

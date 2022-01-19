@@ -582,7 +582,7 @@ class Aircraft_HTML extends Display {
     }
 
     private SaveInteractive() {
-        var link = ("https://dpierkowski.github.io/flying-circus/index.html?json=" + btoa(this.InteractiveDash()));
+        var link = ("https://tetragramm.github.io/InteractiveDash/index.html?json=" + btoa(this.InteractiveDash()));
         window.open(link, "_blank");
     }
 
