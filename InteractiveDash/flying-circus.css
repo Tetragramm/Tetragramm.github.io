@@ -1,0 +1,1219 @@
+body {
+	font-family: Balthazar, serif;
+}
+
+div.instrument_panel {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 1125px;
+	height: 792px;
+	background-image: url("instrument_panel.png");
+	background-repeat: no-repeat;
+	float: left;
+}
+
+div.engine {
+	position: absolute;
+	top: 780px;
+	left: 0px;		
+	width: 554px;
+	height: 322px;
+	background-image: url("engine.png");
+	float: left;
+	margin-top: 9px;
+}
+
+div.weapon {
+	position: absolute;
+	top: 780px;
+	left: 554px;
+	width: 561px;
+	height: 347px;
+	background-image: url("weapon.png");
+	float: left;
+}
+
+div.move_reference {
+	position: absolute;
+	top: 0px;
+	left: 1126px;
+}
+
+div.load_selected {
+	background: rgba(200, 100, 0, 0.3);
+}
+
+div.load_indicator {
+	position: absolute;
+	height: 40px;
+	width: 375px;
+	z-index: 1;
+	cursor: pointer;
+}
+
+div.full_load {
+	top: 63px;
+	left: 392px;
+}
+
+div.half_fuel_bombs {
+	top: 103px;
+	left: 392px;
+}
+
+div.full_fuel_no_bombs {
+	top: 143px;
+	left: 392px;
+}
+
+div.half_fuel_no_bombs {
+	top: 183px;
+	left: 392px;
+}
+
+div.empty {
+	top: 223px;
+	left: 392px;
+}
+
+div.g_force_gauge {
+	position: absolute;
+	z-index: 1;
+	height: 39px;
+	width: 50px;
+	left: 731px;
+	cursor: pointer;
+}
+
+div.g_force_hidden {
+	background: rgba(255, 255, 255, 0);
+}
+
+div.g_force_0 {
+	background: rgba(0, 200, 96, 0.3);
+	top: 672px;
+	visibility: visible;
+}
+
+div.g_force_1 {
+	top: 633px;
+}
+
+div.g_force_1_visible {
+	background: rgba(20, 180, 88, 0.3);
+}
+
+div.g_force_2 {
+	top: 594px;
+}
+
+div.g_force_2_visible {
+	background: rgba(40, 160, 80, 0.3);
+}
+
+div.g_force_3 {
+	top: 556px;
+}
+
+div.g_force_3_visible {
+	background: rgba(60, 140, 72, 0.3);
+}
+
+div.g_force_4 {
+	top: 517px;
+}
+
+div.g_force_4_visible {
+	background: rgba(80, 120, 88, 0.3);
+}
+
+div.g_force_5 {
+	top: 478px;
+}
+
+div.g_force_5_visible {
+	background: rgba(100, 100, 60, 0.3);
+}
+
+div.g_force_6 {
+	top: 440px;
+}
+
+div.g_force_6_visible {
+	background: rgba(120, 80, 52, 0.3);
+}
+
+div.g_force_7 {
+	top: 401px;
+}
+
+div.g_force_7_visible {
+	background: rgba(140, 60, 44, 0.3);
+}
+
+div.g_force_8 {
+	top: 363px;
+}
+
+div.g_force_8_visible {
+	background: rgba(160, 40, 36, 0.3);
+}
+
+div.g_force_9 {
+	top: 324px;
+}
+
+div.g_force_9_visible {
+	background: rgba(180, 20, 28, 0.3);
+}
+
+div.g_force_10 {
+	top: 285px;
+}
+
+div.g_force_10_visible {
+	background: rgba(200, 0, 20, 0.3);
+}
+
+div.move_odd {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 3px;
+}
+
+div.move_even {
+	padding-top: 5px;
+	padding-bottom: 3px;
+	padding-left: 3px;
+	background: rgba(200, 200, 200);
+}
+
+span.move_title {
+	padding-right: 5px;
+	font-weight: bold;
+}
+
+input.number {
+	width: 40px;
+	border: 0px none;
+	font-family: Balthazar, serif;
+	font-size: 16;
+	text-align: right;
+	z-index: 10;
+	background: rgba(255, 255, 255, 0);
+}
+
+input.big_number {
+	width: 60px;
+	border: 0px none;
+	font-family: Balthazar, serif;
+	font-size: 40px;
+	text-align: right;
+	background: rgba(255, 255, 255, 0);
+}
+
+input.text {
+	border: 0px none;
+	font-family: Balthazar, serif;
+}
+
+textarea.notes {
+	border: 0px none;
+	font-family: Balthazar, serif;
+	position: absolute;
+	top: 672px;
+	left: 332px;
+	width: 375px;
+	height: 62px;
+	resize: none;
+}
+
+input.altitude {
+	position: absolute;
+	top: 162px;
+	left: 162px;
+	background: rgba(255, 255, 255, 1);
+	border: 1px solid;
+	z-index: 4;
+}
+
+.dial_polygon {
+	cursor: pointer;
+	pointer-events: auto;
+	position: absolute;
+	z-index: 3;
+}
+
+.altimeter_long_hand {
+	z-index: 1;
+	position: absolute;
+	height: 234px;
+	width: 12px;
+	top: 68px;
+	left: 185px;
+	pointer-events: none;
+}
+
+.altimeter_short_hand {
+	z-index: 2;
+	position: absolute;
+	height: 134px;
+	width: 20px;
+	top: 118px;
+	left: 181px;
+	pointer-events: none;
+}
+
+.altimeter_000 {
+	position: absolute;
+	top: 42px;
+	left: 145px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+	z-index: 3;
+}
+
+.altimeter_100 {
+	position: absolute;
+	top: 50px;
+	left: 215px;
+	height: 92px;
+	width: 90px;
+	pointer-events: none;
+}
+
+.altimeter_200 {
+	position: absolute;
+	top: 103px;
+	left: 250px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_300 {
+	position: absolute;
+	top: 184px;
+	left: 250px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_400 {
+	position: absolute;
+	top: 228px;
+	left: 212px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_500 {
+	position: absolute;
+	top: 253px;
+	left: 145px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_600 {
+	position: absolute;
+	top: 228px;
+	left: 80px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_700 {
+	position: absolute;
+	top: 185px;
+	left: 54px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_800 {
+	position: absolute;
+	top: 103px;
+	left: 54px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_900 {
+	position: absolute;
+	top: 55px;
+	left: 80px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.altimeter_0000 {
+	position: absolute;
+	top: 114px;
+	left: 170px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_1000 {
+	position: absolute;
+	top: 114px;
+	left: 197px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_2000 {
+	position: absolute;
+	top: 145px;
+	left: 206px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_3000 {
+	position: absolute;
+	top: 185px;
+	left: 206px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_4000 {
+	position: absolute;
+	top: 195px;
+	left: 197px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_5000 {
+	position: absolute;
+	top: 202px;
+	left: 168px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_6000 {
+	position: absolute;
+	top: 195px;
+	left: 128px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_7000 {
+	position: absolute;
+	top: 185px;
+	left: 100px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_8000 {
+	position: absolute;
+	top: 145px;
+	left: 100px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.altimeter_9000 {
+	position: absolute;
+	top: 115px;
+	left: 128px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_long_hand {
+	z-index: 1;
+	position: absolute;
+	height: 234px;
+	width: 12px;
+	top: 68px;
+	left: 931px;
+	pointer-events: none;
+}
+
+.airspeed_short_hand {
+	z-index: 2;
+	position: absolute;
+	height: 134px;
+	width: 20px;
+	top: 118px;
+	left: 927px;
+	pointer-events: none;
+}
+
+.airspeed_000 {
+	position: absolute;
+	top: 42px;
+	left: 893px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+	z-index: 3;
+}
+
+.airspeed_100 {
+	position: absolute;
+	top: 50px;
+	left: 963px;
+	height: 92px;
+	width: 90px;
+	pointer-events: none;
+}
+
+.airspeed_200 {
+	position: absolute;
+	top: 103px;
+	left: 998px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_300 {
+	position: absolute;
+	top: 184px;
+	left: 998;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_400 {
+	position: absolute;
+	top: 228px;
+	left: 960px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_500 {
+	position: absolute;
+	top: 253px;
+	left: 893px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_600 {
+	position: absolute;
+	top: 228px;
+	left: 828;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_700 {
+	position: absolute;
+	top: 185px;
+	left: 802px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_800 {
+	position: absolute;
+	top: 103px;
+	left: 802px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_900 {
+	position: absolute;
+	top: 55px;
+	left: 828px;
+	height: 100px;
+	width: 100px;
+	pointer-events: none;
+}
+
+.airspeed_0000 {
+	position: absolute;
+	top: 114px;
+	left: 918px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_1000 {
+	position: absolute;
+	top: 114px;
+	left: 945px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_2000 {
+	position: absolute;
+	top: 145px;
+	left: 954px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_3000 {
+	position: absolute;
+	top: 185px;
+	left: 954px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_4000 {
+	position: absolute;
+	top: 195px;
+	left: 945px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_5000 {
+	position: absolute;
+	top: 202px;
+	left: 916px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_6000 {
+	position: absolute;
+	top: 195px;
+	left: 876px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_7000 {
+	position: absolute;
+	top: 185px;
+	left: 848px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_8000 {
+	position: absolute;
+	top: 145px;
+	left: 848px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.airspeed_9000 {
+	position: absolute;
+	top: 115px;
+	left: 876px;
+	height: 73px;
+	width: 89px;
+	pointer-events: none;
+}
+
+.visibility {
+	position: absolute;
+	top: 422px;
+	left: 104px;
+}
+
+.energy_loss {
+	position: absolute;
+	top: 467px;
+	left: 42px;
+}
+
+.turn_bleed {
+	position: absolute;
+	top: 467px;
+	left: 167px;
+}
+
+.stability {
+	position: absolute;
+	top: 517px;
+	left: 104px;
+}
+
+.stress {
+	position: absolute;
+	top: 457px;
+	left: 251px;
+}
+
+.escape {
+	position: absolute;
+	top: 599px;
+	left: 50px;
+}
+
+.crash {
+	position: absolute;
+	top: 679px;
+	left: 50px;
+}
+
+.current_toughness {
+	position: absolute;
+	top: 607px;
+	left: 157px;
+}
+
+.max_toughness {
+	position: absolute;
+	top: 607px;
+	left: 222px;
+}
+
+.current_strain {
+	position: absolute;
+	top: 687px;
+	left: 157px;
+}
+
+.max_strain {
+	position: absolute;
+	top: 687px;
+	left: 222px;
+	
+}
+
+.fuel {
+	position: absolute;
+	top: 278px;
+	left: 392px;
+	width: 50px;
+	border: 0px none;
+	font-family: Balthazar, serif;
+	font-size: 30px;
+	text-align: right;
+}
+
+.full_load_boost {
+	position: absolute;
+	top: 72px;
+	left: 472px;
+}
+
+.full_load_handling {
+	position: absolute;
+	top: 72px;
+	left: 534px;
+}
+
+.full_load_climb {
+	position: absolute;
+	top: 72px;
+	left: 596px;
+}
+
+.full_load_stall {
+	position: absolute;
+	top: 72px;
+	left: 658px;
+}
+
+.full_load_speed {
+	position: absolute;
+	top: 72px;
+	left: 720px;
+}
+
+.half_fuel_bombs_boost {
+	position: absolute;
+	top: 112px;
+	left: 472px;
+}
+
+.half_fuel_bombs_handling {
+	position: absolute;
+	top: 112px;
+	left: 534px;
+}
+
+.half_fuel_bombs_climb {
+	position: absolute;
+	top: 112px;
+	left: 596px;
+}
+
+.half_fuel_bombs_stall {
+	position: absolute;
+	top: 112px;
+	left: 658px;
+}
+
+.half_fuel_bombs_speed {
+	position: absolute;
+	top: 112px;
+	left: 720px;
+}
+
+.full_fuel_no_bombs_boost {
+	position: absolute;
+	top: 152px;
+	left: 472px;
+}
+
+.full_fuel_no_bombs_handling {
+	position: absolute;
+	top: 152px;
+	left: 534px;
+}
+
+.full_fuel_no_bombs_climb {
+	position: absolute;
+	top: 152px;
+	left: 596px;
+}
+
+.full_fuel_no_bombs_stall {
+	position: absolute;
+	top: 152px;
+	left: 658px;
+}
+
+.full_fuel_no_bombs_speed {
+	position: absolute;
+	top: 152px;
+	left: 720px;
+}
+
+.half_fuel_no_bombs_boost {
+	position: absolute;
+	top: 192px;
+	left: 472px;
+}
+
+.half_fuel_no_bombs_handling {
+	position: absolute;
+	top: 192px;
+	left: 534px;
+}
+
+.half_fuel_no_bombs_climb {
+	position: absolute;
+	top: 192px;
+	left: 596px;
+}
+
+.half_fuel_no_bombs_stall {
+	position: absolute;
+	top: 192px;
+	left: 658px;
+}
+
+.half_fuel_no_bombs_speed {
+	position: absolute;
+	top: 192px;
+	left: 720px;
+}
+
+.empty_boost {
+	position: absolute;
+	top: 232px;
+	left: 472px;
+}
+
+.empty_handling {
+	position: absolute;
+	top: 232px;
+	left: 534px;
+}
+
+.empty_climb {
+	position: absolute;
+	top: 232px;
+	left: 596px;
+}
+
+.empty_stall {
+	position: absolute;
+	top: 232px;
+	left: 658px;
+}
+
+.empty_speed {
+	position: absolute;
+	top: 232px;
+	left: 720px;
+}
+
+.vital_part_1 {
+	position: absolute;
+	top: 372px;
+	left: 332px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_2 {
+	position: absolute;
+	top: 400px;
+	left: 332px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_3 {
+	position: absolute;
+	top: 428px;
+	left: 332px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_4 {
+	position: absolute;
+	top: 455px;
+	left: 332px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_5 {
+	position: absolute;
+	top: 482px;
+	left: 332px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_6 {
+	position: absolute;
+	top: 372px;
+	left: 520px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_7 {
+	position: absolute;
+	top: 400px;
+	left: 520px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_8 {
+	position: absolute;
+	top: 428px;
+	left: 520px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_9 {
+	position: absolute;
+	top: 455px;
+	left: 520px;
+	height: 25px;
+	width: 185px;
+}
+
+.vital_part_10 {
+	position: absolute;
+	top: 482px;
+	left: 520px;
+	height: 25px;
+	width: 185px;
+}
+
+.armor {
+	position: absolute;
+	top: 537px;
+	left: 332px;
+	height: 25px;
+	width: 375;
+}
+
+.ordinance_1 {
+	position: absolute;
+	top: 592px;
+	left: 332px;
+	height: 25px;
+	width: 185px;
+}
+
+.max_bomb_load {
+	position: absolute;
+	top: 564px;
+	left: 587px;
+	height: 25px;
+	width: 97;
+}
+
+.ordinance_2 {
+	position: absolute;
+	top: 620px;
+	left: 332px;
+	height: 25px;
+	width: 185px;
+}
+
+.ordinance_3 {
+	position: absolute;
+	top: 592px;
+	left: 520px;
+	height: 25px;
+	width: 185px;
+}
+
+.ordinance_4 {
+	position: absolute;
+	top: 620px;
+	left: 520px;
+	height: 25px;
+	width: 185px;
+}
+
+input.airspeed {
+	position: absolute;
+	top: 162px;
+	left: 912px;
+	background: rgba(255, 255, 255, 1);
+	border: 1px solid;
+	z-index: 4;
+}
+
+.dropoff {
+	position: absolute;
+	top: 337px;
+	left: 1017px;
+}
+
+.kills {
+	position: absolute;
+	top: 412px;
+	left: 807px;
+	height: 50px;
+	width: 265px;
+	border: 0px none;
+	font-family: Balthazar, serif;
+	resize: none;
+}
+
+input.rpm {
+	position: absolute;
+	top: 159px;
+	left: 77px;
+	background: rgba(255, 255, 255, 1);
+	border: 1px solid;
+}
+
+input.wear {
+	position: absolute;
+	top: 159px;
+	left: 421px;
+	background: rgba(255, 255, 255, 1);
+	border: 1px solid;
+}
+
+.reliability {
+	position: absolute;
+	top: 38px;
+	left: 192px;
+	height: 26px;
+}
+
+.ideal_altitide_0 {
+	position: absolute;
+	top: 43px;
+	left: 306px;
+	height: 26px;
+}
+
+.ideal_altitide {
+	position: absolute;
+	top: 38px;
+	left: 317px;
+	height: 26px;
+}
+
+.overspeed {
+	position: absolute;
+	top: 38px;
+	left: 417px;
+	height: 26px;
+}
+
+.engine_notes {
+	position: absolute;
+	top: 67px;
+	left: 155px;
+	height: 26px;
+	width: 338px;
+}
+
+.weapon_type {
+	position: absolute;
+	top: 100px;
+	left: 38px;
+	height: 26px;
+	width: 260px;
+}
+
+.ammo {
+	position: absolute;
+	top: 167px;
+	left: 73px;
+	height: 26px;
+}
+
+.ap {
+	position: absolute;
+	top: 167px;
+	left: 175px;
+	height: 26px;
+}
+
+.jam {
+	position: absolute;
+	top: 167px;
+	left: 234px;
+	height: 25px;
+	width: 75px;
+	text-align: center;
+}
+
+.knife_hits {
+	position: absolute;
+	top: 230px;
+	left: 152px;
+	height: 26px;
+}
+
+.close_hits {
+	position: absolute;
+	top: 230px;
+	left: 252px;
+	height: 26px;
+}
+
+.long_hits {
+	position: absolute;
+	top: 230px;
+	left: 352px;
+	height: 26px;
+}
+
+.extreme_hits {
+	position: absolute;
+	top: 230px;
+	left: 452px;
+	height: 26px;
+}
+
+.knife_damage {
+	position: absolute;
+	top: 257px;
+	left: 152px;
+	height: 26px;
+}
+
+.close_damage {
+	position: absolute;
+	top: 257px;
+	left: 252px;
+	height: 26px;
+}
+
+.long_damage {
+	position: absolute;
+	top: 257px;
+	left: 352px;
+	height: 26px;
+}
+
+.extreme_damage {
+	position: absolute;
+	top: 257px;
+	left: 452px;
+	height: 26px;
+}
+
+.weapon_tags {
+	border: 0px none;
+	font-family: Balthazar, serif;
+	position: absolute;
+	top: 283px;
+	left: 26px;
+	height: 60px;
+	width: 499px;
+	resize: none;
+	border: 2px solid #606060;
+}
+
+button.remove_engine {
+	font-family: Balthazar, serif;
+	position: absolute;
+	top: 75px;
+	left: 495px;
+	width: 60px;
+}
+
+button.remove_weapon {
+	font-family: Balthazar, serif;
+	position: absolute;
+	top: 85px;
+	left: 495px;
+	width: 60px;
+}
+
+div.add_engine {
+	font-family: Balthazar, serif;
+	position: absolute;
+	top: 783px;
+}
+
+button.add_engine {
+	font-family: Balthazar, serif;
+}
+
+div.add_weapon {
+	font-family: Balthazar, serif;
+	position: absolute;
+	top: 783px;
+	left: 1020px;
+}
+
+button.add_weapon {
+	font-family: Balthazar, serif;
+}
+

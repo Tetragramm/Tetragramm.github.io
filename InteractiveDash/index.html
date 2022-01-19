@@ -1,0 +1,492 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<link href='https://fonts.googleapis.com/css?family=Balthazar' rel='stylesheet'>
+	<link rel="stylesheet" href="flying-circus.css">
+	<script data-main="flying-circus.js" src="require.js"></script>
+</head>
+
+<body>
+	<div class="instrument_panel">
+		<!-- These are the inputs for the plane state -->
+		<input type="number" class="big_number altitude"
+			data-bind="value: altitude, event: {change: persistState}"></input>
+		<input type="number" class="big_number airspeed"
+			data-bind="value: airspeed, event: {change: persistState}"></input>
+		<input type="number" class="fuel" data-bind="value: fuel, event: {change: persistState}"></input>
+		<input type="number" class="big_number dropoff"
+			data-bind="value: dropoff, event: {change: persistState}"></input>
+		<input type="number" class="big_number visibility"
+			data-bind="value: visibility, event: {change: persistState}"></input>
+		<input type="number" class="big_number energy_loss"
+			data-bind="value: energy_loss, event: {change: persistState}"></input>
+		<input type="number" class="big_number turn_bleed"
+			data-bind="value: turn_bleed, event: {change: persistState}"></input>
+		<input type="number" class="big_number stability"
+			data-bind="value: stability, event: {change: persistState}"></input>
+		<input type="number" class="big_number stress" data-bind="value: stress, event: {change: persistState}"></input>
+		<input type="number" class="big_number escape"
+			data-bind="value: plane_escape, event: {change: persistState}"></input>
+		<input type="number" class="big_number crash" data-bind="value: crash, event: {change: persistState}"></input>
+		<input type="number" class="big_number max_toughness"
+			data-bind="value: max_toughness, event: {change: persistState}"></input>
+		<input type="number" class="big_number current_toughness"
+			data-bind="value: current_toughness, event: {change: persistState}"></input>
+		<input type="number" class="big_number max_strain"
+			data-bind="value: max_strain, event: {change: persistState}"></input>
+		<input type="number" class="big_number current_strain"
+			data-bind="value: current_strain, event: {change: persistState}"></input>
+		<textarea class="kills" data-bind="value: kills, event: {change: persistState}"
+			placeholder="click here to type..."></textarea>
+
+		<input type="number" class="number full_load_boost"
+			data-bind="value: full_load_boost, event: {change: persistState}"></input>
+		<input type="number" class="number full_load_handling"
+			data-bind="value: full_load_handling, event: {change: persistState}"></input>
+		<input type="number" class="number full_load_climb"
+			data-bind="value: full_load_climb, event: {change: persistState}"></input>
+		<input type="number" class="number full_load_stall"
+			data-bind="value: full_load_stall, event: {change: persistState}"></input>
+		<input type="number" class="number full_load_speed"
+			data-bind="value: full_load_speed, event: {change: persistState}"></input>
+
+		<input type="number" class="number half_fuel_bombs_boost"
+			data-bind="value: half_fuel_bombs_boost, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_bombs_handling"
+			data-bind="value: half_fuel_bombs_handling, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_bombs_climb"
+			data-bind="value: half_fuel_bombs_climb, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_bombs_stall"
+			data-bind="value: half_fuel_bombs_stall, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_bombs_speed"
+			data-bind="value: half_fuel_bombs_speed, event: {change: persistState}"></input>
+
+		<input type="number" class="number full_fuel_no_bombs_boost"
+			data-bind="value: full_fuel_no_bombs_boost, event: {change: persistState}"></input>
+		<input type="number" class="number full_fuel_no_bombs_handling"
+			data-bind="value: full_fuel_no_bombs_handling, event: {change: persistState}"></input>
+		<input type="number" class="number full_fuel_no_bombs_climb"
+			data-bind="value: full_fuel_no_bombs_climb, event: {change: persistState}"></input>
+		<input type="number" class="number full_fuel_no_bombs_stall"
+			data-bind="value: full_fuel_no_bombs_stall, event: {change: persistState}"></input>
+		<input type="number" class="number full_fuel_no_bombs_speed"
+			data-bind="value: full_fuel_no_bombs_speed, event: {change: persistState}"></input>
+
+		<input type="number" class="number half_fuel_no_bombs_boost"
+			data-bind="value: half_fuel_no_bombs_boost, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_no_bombs_handling"
+			data-bind="value: half_fuel_no_bombs_handling, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_no_bombs_climb"
+			data-bind="value: half_fuel_no_bombs_climb, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_no_bombs_stall"
+			data-bind="value: half_fuel_no_bombs_stall, event: {change: persistState}"></input>
+		<input type="number" class="number half_fuel_no_bombs_speed"
+			data-bind="value: half_fuel_no_bombs_speed, event: {change: persistState}"></input>
+
+		<input type="number" class="number empty_boost"
+			data-bind="value: empty_boost, event: {change: persistState}"></input>
+		<input type="number" class="number empty_handling"
+			data-bind="value: empty_handling, event: {change: persistState}"></input>
+		<input type="number" class="number empty_climb"
+			data-bind="value: empty_climb, event: {change: persistState}"></input>
+		<input type="number" class="number empty_stall"
+			data-bind="value: empty_stall, event: {change: persistState}"></input>
+		<input type="number" class="number empty_speed"
+			data-bind="value: empty_speed, event: {change: persistState}"></input>
+
+		<input class="text vital_part_1" data-bind="value: vital_part_1, event: {change: persistState}"
+			placeholder="click here to type..."></input>
+		<input class="text vital_part_2" data-bind="value: vital_part_2, event: {change: persistState}"></input>
+		<input class="text vital_part_3" data-bind="value: vital_part_3, event: {change: persistState}"></input>
+		<input class="text vital_part_4" data-bind="value: vital_part_4, event: {change: persistState}"></input>
+		<input class="text vital_part_5" data-bind="value: vital_part_5, event: {change: persistState}"></input>
+		<input class="text vital_part_6" data-bind="value: vital_part_6, event: {change: persistState}"></input>
+		<input class="text vital_part_7" data-bind="value: vital_part_7, event: {change: persistState}"></input>
+		<input class="text vital_part_8" data-bind="value: vital_part_8, event: {change: persistState}"></input>
+		<input class="text vital_part_9" data-bind="value: vital_part_9, event: {change: persistState}"></input>
+		<input class="text vital_part_10" data-bind="value: vital_part_10, event: {change: persistState}"></input>
+	</div>
+
+	<input class="text armor" data-bind="value: armor, event: {change: persistState}"
+		placeholder="click here to type..."></input>
+	<input class="text max_bomb_load" data-bind="value: max_bomb_load, event: {change: persistState}"
+		placeholder="click here to type...">
+
+	<input class="text ordinance_1" data-bind="value: ordinance_1, event: {change: persistState}"
+		placeholder="click here to type..."></input>
+	<input class="text ordinance_2" data-bind="value: ordinance_2, event: {change: persistState}"></input>
+	<input class="text ordinance_3" data-bind="value: ordinance_3, event: {change: persistState}"></input>
+	<input class="text ordinance_4" data-bind="value: ordinance_4, event: {change: persistState}"></input>
+
+	<textarea class="notes" data-bind="value: notes, event: {change: persistState}"
+		placeholder="click here to type..."></textarea>
+
+	<!-- These are the divs for the load indicator -->
+	<div class="load_indicator full_load"
+		data-bind="event: {click: function(data, event) {selectLoad('full_load')}}, css: {load_selected: full_load_selected()}">
+	</div>
+
+	<div class="load_indicator half_fuel_bombs"
+		data-bind="event: {click: function(data, event) {selectLoad('half_fuel_bombs')}}, css: {load_selected: half_fuel_bombs_selected()}">
+	</div>
+
+	<div class="load_indicator full_fuel_no_bombs"
+		data-bind="event: {click: function(data, event) {selectLoad('full_fuel_no_bombs')}}, css: {load_selected: full_fuel_no_bombs_selected()}">
+	</div>
+
+	<div class="load_indicator half_fuel_no_bombs"
+		data-bind="event: {click: function(data, event) {selectLoad('half_fuel_no_bombs')}}, css: {load_selected: half_fuel_no_bombs_selected()}">
+	</div>
+
+	<div class="load_indicator empty"
+		data-bind="event: {click: function(data, event) {selectLoad('empty')}}, css: {load_selected: empty_selected()}">
+	</div>
+
+	<!-- These are the divs for the g-force gauge -->
+	<div class="g_force_gauge g_force_0"
+		data-bind="event: {click: function(data, event) {g_force(0); persistState();}}"></div>
+	<div class="g_force_gauge g_force_1"
+		data-bind="event: {click: function(data, event) {g_force(1); persistState();}}, css: {g_force_hidden: g_force() < 1, g_force_1_visible: g_force() > 0}">
+	</div>
+	<div class="g_force_gauge g_force_2"
+		data-bind="event: {click: function(data, event) {g_force(2); persistState();}}, css: {g_force_hidden: g_force() < 2, g_force_2_visible: g_force() > 1}">
+	</div>
+	<div class="g_force_gauge g_force_3"
+		data-bind="event: {click: function(data, event) {g_force(3); persistState();}}, css: {g_force_hidden: g_force() < 3, g_force_3_visible: g_force() > 2}">
+	</div>
+	<div class="g_force_gauge g_force_4"
+		data-bind="event: {click: function(data, event) {g_force(4); persistState();}}, css: {g_force_hidden: g_force() < 4, g_force_4_visible: g_force() > 3}">
+	</div>
+	<div class="g_force_gauge g_force_5"
+		data-bind="event: {click: function(data, event) {g_force(5); persistState();}}, css: {g_force_hidden: g_force() < 5, g_force_5_visible: g_force() > 4}">
+	</div>
+	<div class="g_force_gauge g_force_6"
+		data-bind="event: {click: function(data, event) {g_force(6); persistState();}}, css: {g_force_hidden: g_force() < 6, g_force_6_visible: g_force() > 5}">
+	</div>
+	<div class="g_force_gauge g_force_7"
+		data-bind="event: {click: function(data, event) {g_force(7); persistState();}}, css: {g_force_hidden: g_force() < 7, g_force_7_visible: g_force() > 6}">
+	</div>
+	<div class="g_force_gauge g_force_8"
+		data-bind="event: {click: function(data, event) {g_force(8); persistState();}}, css: {g_force_hidden: g_force() < 8, g_force_8_visible: g_force() > 7}">
+	</div>
+	<div class="g_force_gauge g_force_9"
+		data-bind="event: {click: function(data, event) {g_force(9); persistState();}}, css: {g_force_hidden: g_force() < 9, g_force_9_visible: g_force() > 8}">
+	</div>
+	<div class="g_force_gauge g_force_10"
+		data-bind="event: {click: function(data, event) {g_force(10); persistState();}}, css: {g_force_hidden: g_force() < 10, g_force_9_visible: g_force() > 9}">
+	</div>
+
+	<!-- These are the SVGs for the altitude gauge -->
+	<svg class="altimeter_000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('0'); }}"
+			points="0,10 24,73 68,73 90,10 40,0" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_100">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('1'); }}"
+			points="20,0 0,63 37,90 88,51 60,20" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_200">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('2'); }}"
+			points="55,0 0,41 15,81, 80,81 75,40" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_300">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('3'); }}"
+			points="14,0 0,44 55,85 75,42 80,0" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_400">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('4'); }}"
+			points="36,0 0,25 20,88 60,68 90,40" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_500">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('5'); }}"
+			points="66,0 23,0 4,62 45,68 85,62" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_600">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('6'); }}"
+			points="88,23 52,0 0,40 32,70 69,86" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_700">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('7'); }}"
+			points="0,0 8,43 25,81 78,43 64,0" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_800">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('8'); }}"
+			points="25,2 6,40 0,81 64,81 75,38" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_900">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('9'); }}"
+			points="0,50 50,85 88,60 65,0 32,15" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_0000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('00'); }}"
+			points="0,3 16,55 26,55 42,3 21,0" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_1000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('10'); }}"
+			points="18,0 0,55 10,60 53,30" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_2000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('20'); }}"
+			points="42,0 0,30 0,40 56,40 53,20" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_3000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('30'); }}"
+			points="0,0 0,10 40,41 51,20 55,0" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_4000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('40'); }}"
+			points="9,0 0,8 15,55 35,45 48,31" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_5000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('50'); }}"
+			points="18,0 0,50 45,50 30,0" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_6000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('60'); }}"
+			points="50,0 6,32 41,55 58,5" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_7000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('70'); }}"
+			points="71,0 18,0 35,40 75,11" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="altimeter_8000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('80'); }}"
+			points="75,27 34,0 25,20 20,40 75,40" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="altimeter_9000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAltitude('90'); }}"
+			points="39,0 0,28 45,58 57,50" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<div class="altimeter_long_hand"
+		data-bind="style: { transform: ( 'rotate(' + altimeterLongHandRotation() + 'deg') }">
+		<svg>
+			<polygon class="dial_polygon" points="6,0 0,20 4,100 8,100 12,20" style="fill:rgba(0, 0, 0);" />
+			<polyline points="6,6 3,20 6,100 9,20 6,6" style="fill:none;stroke:white;stroke-width:1" />
+		</svg>
+	</div>
+	<div class="altimeter_short_hand"
+		data-bind="style: { transform: ( 'rotate(' + altimeterShortHandRotation() + 'deg') }">
+		<svg>
+			<polygon class="dial_polygon" points="10,0 0,20 4,50 16,50 20,20" style="fill:rgba(100, 100, 100);" />
+			<polyline points="10,6 3,20 7,51 13,51 17,20 10,6" style="fill:none;stroke:white;stroke-width:1" />
+		</svg>
+	</div>
+
+	<!-- These are the SVGs for the airspeed gauge -->
+	<svg class="airspeed_000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('0'); }}"
+			points="0,10 24,73 68,73 90,10 40,0" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_100">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('1'); }}"
+			points="20,0 0,63 37,90 88,51 60,20" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_200">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('2'); }}"
+			points="55,0 0,41 15,81, 80,81 75,40" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_300">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('3'); }}"
+			points="14,0 0,44 55,85 75,42 80,0" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_400">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('4'); }}"
+			points="36,0 0,25 20,88 60,68 90,40" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_500">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('5'); }}"
+			points="66,0 23,0 4,62 45,68 85,62" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_600">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('6'); }}"
+			points="88,23 52,0 0,40 32,70 69,86" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_700">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('7'); }}"
+			points="0,0 8,43 25,81 78,43 64,0" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_800">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('8'); }}"
+			points="25,2 6,40 0,81 64,81 75,38" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_900">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('9'); }}"
+			points="0,50 50,85 88,60 65,0 32,15" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_0000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('00'); }}"
+			points="0,3 16,55 26,55 42,3 21,0" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_1000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('10'); }}"
+			points="18,0 0,55 10,60 53,30" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_2000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('20'); }}"
+			points="42,0 0,30 0,40 56,40 53,20" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_3000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('30'); }}"
+			points="0,0 0,10 40,41 51,20 55,0" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_4000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('40'); }}"
+			points="9,0 0,8 15,55 35,45 48,31" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_5000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('50'); }}"
+			points="18,0 0,50 45,50 30,0" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_6000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('60'); }}"
+			points="50,0 6,32 41,55 58,5" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_7000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('70'); }}"
+			points="71,0 18,0 35,40 75,11" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<svg class="airspeed_8000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('80'); }}"
+			points="75,27 31,0 25,20 20,40 75,40" style="fill:rgba(255, 0, 0, 0);" />
+	</svg>
+	<svg class="airspeed_9000">
+		<polygon class="dial_polygon" data-bind="event: {click: function() { selectAirspeed('90'); }}"
+			points="39,0 0,28 45,58 57,50" style="fill:rgba(0, 0, 255, 0);" />
+	</svg>
+	<div class="airspeed_long_hand" data-bind="style: { transform: ( 'rotate(' + airspeedLongHandRotation() + 'deg') }">
+		<svg>
+			<polygon class="dial_polygon" points="6,0 0,20 4,100 8,100 12,20" style="fill:rgba(0, 0, 0);" />
+			<polyline points="6,6 3,20 6,100 9,20 6,6" style="fill:none;stroke:white;stroke-width:1" />
+		</svg>
+	</div>
+	<div class="airspeed_short_hand"
+		data-bind="style: { transform: ( 'rotate(' + airspeedShortHandRotation() + 'deg') }">
+		<svg>
+			<polygon class="dial_polygon" points="10,0 0,20 4,50 16,50 20,20" style="fill:rgba(100, 100, 100);" />
+			<polyline points="10,6 3,20 7,51 13,51 17,20 10,6" style="fill:none;stroke:white;stroke-width:1" />
+		</svg>
+	</div>
+	</div>
+
+	<!-- ko foreach: {data: engines, as: 'engine'}  -->
+	<div class="engine" data-bind="style: { top: top($index()) }">
+		<input type="number" class="big_number rpm"
+			data-bind="value: rpm, event: {change: $parent.persistState}"></input>
+		<input type="number" class="big_number wear"
+			data-bind="value: wear, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number reliability"
+			data-bind="value: reliability, event: {change: $parent.persistState}"></input>
+		<span class="ideal_altitide_0">0 - </span>
+		<input type="number" class="number ideal_altitide"
+			data-bind="value: ideal_altitide, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number overspeed"
+			data-bind="value: overspeed, event: {change: $parent.persistState}"></input>
+		<input class="text engine_notes" data-bind="value: notes, event: {change: $parent.persistState}"
+			placeholder="click here to type..."></input>
+		<button class="remove_engine" data-bind="click: $parent.removeEngine">Remove</button>
+	</div>
+	<!-- /ko -->
+
+	<!-- ko foreach: {data: weapons, as: 'weapon'}  -->
+	<div class="weapon" data-bind="style: { top: top($index()) }">
+		<input class="text weapon_type" data-bind="value: type, event: {change: $parent.persistState}"
+			placeholder="click here to type..."></input>
+		<input type="number" class="number ammo" data-bind="value: ammo, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number ap" data-bind="value: ap, event: {change: $parent.persistState}"></input>
+		<input class="text jam" data-bind="value: jam, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number knife_hits"
+			data-bind="value: knife_hits, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number close_hits"
+			data-bind="value: close_hits, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number long_hits"
+			data-bind="value: long_hits, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number extreme_hits"
+			data-bind="value: extreme_hits, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number knife_damage"
+			data-bind="value: knife_damage, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number close_damage"
+			data-bind="value: close_damage, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number long_damage"
+			data-bind="value: long_damage, event: {change: $parent.persistState}"></input>
+		<input type="number" class="number extreme_damage"
+			data-bind="value: extreme_damage, event: {change: $parent.persistState}"></input>
+		<textarea class="weapon_tags" data-bind="value: tags, event: {change: $parent.persistState}"
+			placeholder="click here to type..."></textarea>
+		<button class="remove_weapon" data-bind="click: $parent.removeWeapon">Remove</button>
+	</div>
+	<!-- /ko -->
+
+	<div class="move_reference">
+		<div class="move_odd"><span class="move_title">Extend</span> Speed-&gt;Max (<span
+				data-bind="text: currentMaxSpeed"></span>); G-Force-&gt;0; +1RPM; disengage if clear, vulnerable if
+			still in the fight</div>
+		<div class="move_even"><span class="move_title">Alt Adjustment++</span> Trade speed for altitude 5 to 1</div>
+		<div class="move_odd"><span class="move_title">Alt Adjustment+ steady</span> Speed-&gt;Stall (<span
+				data-bind="text: currentStall"></span>); Alt+Climb (<span data-bind="text: currentClimb"></span>); +1RPM
+		</div>
+		<div class="move_even"><span class="move_title">Not Diving</span> If speed&gt;Max (<span
+				data-bind="text: currentMaxSpeed"></span>), reduce airspeed by Energy Loss (<span
+				data-bind="text: energy_loss"></span>), but not below Max Speed (<span
+				data-bind="text: currentMaxSpeed"></span>)</div>
+		<div class="move_odd"><span class="move_title">Alt Adjustment - dive</span> Trade altitude for speed 1 to 3, can
+			exceed Max Speed (<span data-bind="text: currentMaxSpeed"></span>)</div>
+		<div class="move_even"><span class="move_title">Pull Up</span> G-Force+Speed Factor (<span
+				data-bind="text: speedFactor"></span>); spend altitude to reduce G-force taken 1 to 1</div>
+		<div class="move_odd"><span class="move_title">Overstrain</span> When G-force&gt;<span
+				data-bind="text: overstrain"></span>: Damage; G-Force-&gt;<span data-bind="text: overstrain"></span>
+		</div>
+		<div class="move_even"><span class="move_title">Overspeed</span> When Airspeed&gt;Overspeed (<span
+				data-bind="text: overspeed"></span>), +1RPM, +1 per 5 extra speed</div>
+		<div class="move_odd"><span class="move_title">Boost</span> Speed+Boost (<span
+				data-bind="text: currentBoost"></span>); if Speed&lt;Dropoff (<span data-bind="text: dropoff"></span>),
+			Speed+2xBoost (2x<span data-bind="text: currentBoost"></span>); +1RPM</div>
+		<div class="move_even"><span class="move_title">Cool Off</span> When RPM&gt;7: Reduce Speed to Max Speed (<span
+				data-bind="text: currentMaxSpeed"></span>) or less; Check Wear; RPM-&gt;0; G-Force-&gt;0; Hard Move
+		</div>
+		<div class="move_odd"><span class="move_title">Stall/Spin</span> When you lose control, or when Speed&lt;Stall
+			(<span data-bind="text: currentStall"></span>). Try to Recover, or take 1 last move and accept the
+			consequences</div>
+		<div class="move_even"><span class="move_title">Recover</span> Roll+Calm; Spend energy to recover depending on
+			result</div>
+		<div class="move_odd"><span class="move_title">Collision</span> Both planes take damage equal to 1d20 per Speed
+			Factor of the faster plane (1d10 if Speed Factor is 0)</div>
+		<div>&nbsp;</div>
+		<div class="move_odd"><span class="move_title">Dogfight, Attack, Pursue</span> +Hard+Agility, <br /> Reduce
+			Speed (<span data-bind="text: airspeed"></span>) by (Turn Bleed (<span data-bind="text: turn_bleed"></span>)
+			+ Speed Factor (<span data-bind="text: speedFactor"></span>))</div>
+		<div class="move_even"><span class="move_title">Dogfight, Escape, Bait, Defend</span> +Keen+Agility, <br />
+			Reduce Speed (<span data-bind="text: airspeed"></span>) by (Turn Bleed (<span
+				data-bind="text: turn_bleed"></span>) + Speed Factor (<span data-bind="text: speedFactor"></span>))
+		</div>
+		<div class="move_odd"><span class="move_title">Dogfight, Turn Tables</span> +Daring+Agility, <br /> Reduce Speed
+			(<span data-bind="text: airspeed"></span>) by (Turn Bleed (<span data-bind="text: turn_bleed"></span>) +
+			Speed Factor (<span data-bind="text: speedFactor"></span>))</div>
+		<div class="move_even"><span class="move_title">...Agility Bonus</span> +1 if your Handling is better, +1/10
+			points of superior handling; -1 if your handling is worse, -1/10 points of lesser handling</div>
+		<div class="move_odd"><span class="move_title">...Commit to the Turn</span> Bonus = +1/Turn Bleed (<span
+				data-bind="text: turn_bleed"></span>) spent; G-Force + Speed Factor (<span
+				data-bind="text: speedFactor"></span>) +1 per 10 Speed spent.</div>
+		<div class="move_even"><span class="move_title">Open Fire</span> +Hard, spend Ammo, determine the range</div>
+		<div class="move_odd"><span class="move_title">Take Fire</span> -Keen</div>
+		<div class="move_even"><span class="move_title">Stay on Target</span> +Calm</div>
+		<div class="move_odd"><span class="move_title">Draw a Bead</span> When you carefully line up a shot, choose 1,
+			then Open Fire...</div>
+		<div class="move_even"><span class="move_title">Evade Danger</span> +Keen</div>
+		<div class="move_odd"><span class="move_title">Chase</span> compare speeds...</div>
+		<div class="move_even"><span class="move_title">Overwatch</span> Hold 1, Spend to protect friend</div>
+		<div>&nbsp;</div>
+		<div class="move_odd"><span class="move_title">Bail Out</span> +Calm+Escape (<span
+				data-bind="text: plane_escape"></span>); tell the GM one thing you take with you and roll </div>
+		<div class="move_even"><span class="move_title">Go Down</span> +Calm+Crash Safety (<span
+				data-bind="text: crash"></span>)</div>
+	</div>
+	<div class="add_engine">
+		<button class="add_engine" data-bind="click: addEngine">Add Engine</button>
+	</div>
+	<div class="add_weapon">
+		<button class="add_weapon" data-bind="click: addWeapon">Add Weapon</button>
+	</div>
+</body>
+
+</html>
