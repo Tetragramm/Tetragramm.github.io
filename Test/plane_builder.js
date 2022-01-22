@@ -3443,7 +3443,7 @@ class Engine extends Part {
         this.CalculateStats();
     }
     GetAlternatorEnabled() {
-        return !this.GetIsPulsejet() && !this.is_generator;
+        return !this.GetIsPulsejet() && !this.is_generator && this.etype_inputs.engine_type != ENGINE_TYPE.ELECTRIC;
     }
     GetAlternator() {
         return this.has_alternator;
@@ -3581,11 +3581,17 @@ class Engine extends Part {
             this.radiator_index = -1;
         }
     }
+    ElectricCheck() {
+        if (this.etype_inputs.engine_type == ENGINE_TYPE.ELECTRIC) {
+            this.has_alternator = false;
+        }
+    }
     PartStats() {
         this.VerifyMount();
         this.VerifyCooling();
         this.PulseJetCheck();
         this.TurbineCheck();
+        this.ElectricCheck();
         if (!this.CanUseExtendedDriveshaft()) {
             this.use_ds = false;
         }

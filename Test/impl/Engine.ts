@@ -808,7 +808,7 @@ class Engine extends Part {
     }
 
     public GetAlternatorEnabled() {
-        return !this.GetIsPulsejet() && !this.is_generator;
+        return !this.GetIsPulsejet() && !this.is_generator && this.etype_inputs.engine_type != ENGINE_TYPE.ELECTRIC;
     }
 
     public GetAlternator() {
@@ -956,11 +956,18 @@ class Engine extends Part {
         }
     }
 
+    private ElectricCheck() {
+        if (this.etype_inputs.engine_type == ENGINE_TYPE.ELECTRIC) {
+            this.has_alternator = false;
+        }
+    }
+
     public PartStats(): Stats {
         this.VerifyMount();
         this.VerifyCooling();
         this.PulseJetCheck();
         this.TurbineCheck();
+        this.ElectricCheck();
         if (!this.CanUseExtendedDriveshaft()) {
             this.use_ds = false;
         }
