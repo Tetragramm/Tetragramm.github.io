@@ -13450,6 +13450,13 @@ class Aircraft {
         var BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
         var BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
         var BoostFullwBombs = Math.floor(1.0e-6 + this.stats.power / WetMPwBombs);
+        if (BoostFullwBombs == 0) {
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Boost"); }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Derived Boost"), warning: lu("Boost Warning")
+                });
+            }
+        }
         var Dropoff = Math.floor(1.0e-6 + this.stats.pitchboost * MaxSpeedEmpty);
         //Used: Ragged
         // Comes after Dropoff so Used only affects the one number, not multiple.

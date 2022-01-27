@@ -748,6 +748,7 @@
         "Rarity Custom": "Custom",
         "Rarity Common": "Common",
         "Rarity Rare": "Rare",
-        "Rarity Legendary": "Legendary"
+        "Rarity Legendary": "Legendary",
+        "Boost Warning": "Boost is 0 for some loads.  The plane cannot accelerate to take off."
     }
 }
