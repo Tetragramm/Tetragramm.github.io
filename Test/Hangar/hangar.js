@@ -8476,6 +8476,12 @@ class Weapon extends Part {
     }
     CanSynch(num) {
         if (!this.fixed && !this.wing) {
+            if (!this.can_synchronize) {
+                if (num == SynchronizationType.NONE)
+                    return true;
+                else
+                    return false;
+            }
             if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT || num == SynchronizationType.NO_INTERFERENCE) {
                 return true;
             }
