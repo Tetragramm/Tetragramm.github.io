@@ -311,7 +311,7 @@ class WeaponSystem extends Part {
             this.projectile_sel = ProjectileType.BULLETS;
         }
 
-        if (this.action_sel == ActionType.ROTARY
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.ROTARY)
             && this.projectile_sel == ProjectileType.PNEUMATIC) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
@@ -730,7 +730,7 @@ class WeaponSystem extends Part {
         return [true,
             this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.action_sel != ActionType.HENRY && this.weapon_list[this.weapon_type].hits > 0,
             // this.final_weapon.can_projectile && this.weapon_list[this.weapon_type].hits > 0,
-            this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY];
+            this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY && this.action_sel != ActionType.GAST];
     }
 
     public GetProjectile() {
