@@ -336,7 +336,7 @@ class Helicopter_HTML extends Display {
         reader.onloadend = () => {
             try {
                 var str = JSON.parse(reader.result as string);
-                var acft = new Aircraft(parts_JSON, weapon_JSON, false);
+                var acft = new Helicopter(parts_JSON, weapon_JSON, false);
                 if (acft.fromJSON(str)) {
                     str = JSON.parse(reader.result as string);
                     console.log(str);
