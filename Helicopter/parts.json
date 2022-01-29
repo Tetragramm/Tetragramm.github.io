@@ -236,6 +236,7 @@
                 "powerfactor": 1,
                 "helicopter": true,
                 "pushpull": false,
+                "turbine": false,
                 "reqED": false
             },
             {
@@ -249,6 +250,7 @@
                 "powerfactor": 1,
                 "helicopter": true,
                 "pushpull": false,
+                "turbine": false,
                 "reqED": false
             },
             {
@@ -263,6 +265,7 @@
                 "powerfactor": 1,
                 "helicopter": true,
                 "pushpull": false,
+                "turbine": false,
                 "reqED": false
             },
             {
@@ -278,6 +281,7 @@
                 "powerfactor": 1,
                 "helicopter": true,
                 "pushpull": false,
+                "turbine": false,
                 "reqED": false
             },
             {
@@ -293,6 +297,23 @@
                 "powerfactor": 1,
                 "helicopter": true,
                 "pushpull": false,
+                "turbine": false,
+                "reqED": false
+            },
+            {
+                "name": "Not Allowed",
+                "era": "Pioneer",
+                "drag": 9999,
+                "reqsections": 0,
+                "pitchstab": 0,
+                "strainfactor": 0,
+                "dragfactor": 0,
+                "massfactor": 0,
+                "location": "fuselage",
+                "powerfactor": 0,
+                "helicopter": true,
+                "pushpull": false,
+                "turbine": true,
                 "reqED": false
             }
         ],
