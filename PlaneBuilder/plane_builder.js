@@ -1259,7 +1259,7 @@ class TurboBuilder {
         var TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
         var C2 = Pa * area * this.MFP(1) / ((1 + f));
         var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
-        if (!isFinite(ST) || !isFinite(mc2) || !isFinite(TSFC11)) {
+        if (!isFinite(ST) || !isFinite(mc2) || !isFinite(TSFC11) || ST < 0 || mc2 < 0 || TSFC11 < 0) {
             ST = 0;
             mc2 = 0;
             TSFC11 = 0;
