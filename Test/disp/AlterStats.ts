@@ -201,7 +201,7 @@ class AlterStats_HTML extends Display {
             stats.reliability = this.rely.valueAsNumber;
             this.sprl.value = this.sprl.value.trim();
             if (this.sprl.value.length > 0) {
-                stats.warnings.push({ source: this.name.value, warning: this.sprl.value });
+                stats.warnings.push({ source: this.name.value, warning: this.sprl.value, color: WARNING_COLOR.WHITE });
             }
             this.alter.AddPart(this.name.value, stats);
             this.UpdateSelect();

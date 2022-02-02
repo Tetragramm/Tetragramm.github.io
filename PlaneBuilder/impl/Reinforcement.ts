@@ -454,6 +454,7 @@ class Reinforcement extends Part {
             stats.warnings.push({
                 source: lu("Wing Blades"),
                 warning: lu("Wing Blades Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 

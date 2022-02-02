@@ -373,7 +373,8 @@ class EngineBuilder {
                 estats.altitude = 49;
                 estats.stats.warnings.push({
                     source: lu("Altitude Throttle"),
-                    warning: lu("Altitude Throttle Warning")
+                    warning: lu("Altitude Throttle Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
                 break;
             }

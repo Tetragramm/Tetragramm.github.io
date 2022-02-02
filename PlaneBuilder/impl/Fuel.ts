@@ -189,7 +189,8 @@ class Fuel extends Part {
             stats.era.push({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
             stats.warnings.push({
                 source: lu("Self-Sealing Gas Tank"),
-                warning: lu("Self-Sealing Gas Tank Warning")
+                warning: lu("Self-Sealing Gas Tank Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 
@@ -199,7 +200,8 @@ class Fuel extends Part {
             stats.era.push({ name: "Remote Fire Extinguisher", era: "WWII" });
             stats.warnings.push({
                 source: lu("Remote Fire Extinguisher"),
-                warning: lu("Remote Fire Extinguisher Warning")
+                warning: lu("Remote Fire Extinguisher Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 

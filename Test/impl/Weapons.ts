@@ -501,13 +501,6 @@ class Weapons extends Part {
                     source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
                     charge: StringFmt.Join('/', charges),
                 });
-            } else if (set.GetAction() == ActionType.HENRY) {
-                let count = set.GetWeaponCount();
-
-                value.equipment.push({
-                    source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
-                    charge: StringFmt.Join('/', [count, 2 * count]),
-                });
             }
         }
         return value;

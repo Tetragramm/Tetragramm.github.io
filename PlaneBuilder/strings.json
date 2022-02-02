@@ -36,9 +36,12 @@
         "Flare Slot Warning": "Allows flares to be fired out of a closed cockpit without opening the cockpit.",
         "X1 Collimated Gunsight": "X1 Collimated Gunsight",
         "Telescopic Gunsight": "Telescopic Gunsight",
-        "Gunsight Warning": "+2 to Open Fire if you Drew a Bead.",
         "Illuminated Reflex Sight": "Illuminated Reflex Sight",
         "Gyro Gunsight": "Gyro Gunsight",
+        "X1 Collimated Gunsight Warning": "+1 to Open Fire.",
+        "Telescopic Gunsight Warning": "+2 to Open Fire if you Drew a Bead.",
+        "Illuminated Reflex Sight Warning": "+2 to Open Fire.",
+        "Gyro Gunsight Warning": "+2 to Open Fire and additional +2 if you Draw a Bead.",
         "Bombsight": "Bombsight",
         "Bombsight Warning 1": "Subtract ",
         "Bombsight Warning 2": " from your Altitude when rolling for bombing.",
@@ -749,6 +752,8 @@
         "Rarity Common": "Common",
         "Rarity Rare": "Rare",
         "Rarity Legendary": "Legendary",
-        "Boost Warning": "Boost is 0 for some loads.  The plane cannot accelerate to take off."
+        "Boost Warning": "Boost is 0 for some loads.  The plane cannot accelerate to take off.",
+        "Insufficient Charge": "Insufficient Charge",
+        "Insufficient Charge Warning": "This aircraft has electrical systems with nothing to power them."
     }
 }

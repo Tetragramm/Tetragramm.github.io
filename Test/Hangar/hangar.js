@@ -1,3 +1,10 @@
+var WARNING_COLOR;
+(function (WARNING_COLOR) {
+    WARNING_COLOR[WARNING_COLOR["WHITE"] = 0] = "WHITE";
+    WARNING_COLOR[WARNING_COLOR["YELLOW"] = 1] = "YELLOW";
+    WARNING_COLOR[WARNING_COLOR["RED"] = 2] = "RED";
+})(WARNING_COLOR || (WARNING_COLOR = {}));
+;
 class Stats {
     constructor(js) {
         this.liftbleed = 0;
@@ -124,7 +131,8 @@ class Stats {
         if (js["warning"])
             this.warnings.push({
                 source: lu(js["name"]),
-                warning: lu(js["warning"])
+                warning: lu(js["warning"]),
+                color: WARNING_COLOR.WHITE,
             });
         if (js["warnings"]) {
             let warnings = js["warnings"];
@@ -226,7 +234,11 @@ class Stats {
             var wcount = d.GetNum();
             this.warnings = [];
             for (let i = 0; i < wcount; i++) {
-                this.warnings.push({ source: d.GetString(), warning: d.GetString() });
+                this.warnings.push({
+                    source: d.GetString(),
+                    warning: d.GetString(),
+                    color: WARNING_COLOR.WHITE,
+                });
             }
             var ecount = d.GetNum();
             this.era = [];
@@ -271,7 +283,7 @@ class Stats {
     MergeWarnings(owarn) {
         var newList = [];
         for (let w2 of this.warnings) {
-            newList.push({ source: w2.source, warning: w2.warning });
+            newList.push({ source: w2.source, warning: w2.warning, color: w2.color, });
         }
         for (let w of owarn) {
             let dup = false;
@@ -280,7 +292,7 @@ class Stats {
                     dup = true;
             }
             if (!dup)
-                newList.push({ source: w.source, warning: w.warning });
+                newList.push({ source: w.source, warning: w.warning, color: w.color });
         }
         return newList;
     }
@@ -996,7 +1008,8 @@ class EngineBuilder {
                 estats.altitude = 49;
                 estats.stats.warnings.push({
                     source: lu("Altitude Throttle"),
-                    warning: lu("Altitude Throttle Warning")
+                    warning: lu("Altitude Throttle Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
                 break;
             }
@@ -2401,12 +2414,14 @@ class Cockpit extends Part {
             stats.cost += Math.floor(1.0e-6 + 2 + (this.bombsight - 4) / 3);
             stats.warnings.push({
                 source: lu("Bombsight"),
-                warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2")
+                warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2"),
+                color: WARNING_COLOR.WHITE,
             });
             if (this.IsCopilot()) {
                 stats.warnings.push({
                     source: lu("Bombadier Controls"),
                     warning: lu("Bombadier Controls Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -2742,6 +2757,7 @@ class Passengers extends Part {
             stats.warnings.push({
                 source: lu("Passengers Section Title"),
                 warning: lu("Passengers Count", this.seats, this.beds),
+                color: WARNING_COLOR.WHITE,
             });
         }
         return stats;
@@ -4293,17 +4309,20 @@ class Engines extends Part {
             stats.latstab -= 3;
         if (this.HasPulsejet()) {
             stats.warnings.push({
-                source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+                source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.HasTurbineNoProp()) {
             stats.warnings.push({
-                source: lu("Turbine"), warning: lu("Turbine Boost Warning")
+                source: lu("Turbine"), warning: lu("Turbine Boost Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.HasDiesel()) {
             stats.warnings.push({
-                source: lu("Diesel"), warning: lu("Diesel Warning")
+                source: lu("Diesel"), warning: lu("Diesel Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         var rotationT = 0;
@@ -4325,12 +4344,14 @@ class Engines extends Part {
         }
         if (rotationT > 0) {
             stats.warnings.push({
-                source: lu("Rotary"), warning: lu("Rotary Right Warning")
+                source: lu("Rotary"), warning: lu("Rotary Right Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         else if (rotationT < 0) {
             stats.warnings.push({
-                source: lu("Rotary"), warning: lu("Rotary Left Warning")
+                source: lu("Rotary"), warning: lu("Rotary Left Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         //Part local, gets handled in UpdateReliability
@@ -5231,6 +5252,7 @@ class Frames extends Part {
             stats.warnings.push({
                 source: lu("Frame Count"),
                 warning: lu("Frame Count Warning"),
+                color: WARNING_COLOR.YELLOW,
             });
         }
         stats.structure = Math.floor(1.0e-6 + stats.structure);
@@ -6543,7 +6565,8 @@ class ControlSurfaces extends Part {
                 stats.latstab -= 2;
                 stats.warnings.push({
                     source: lu("Wing Warping"),
-                    warning: lu("Wing Warping Warning")
+                    warning: lu("Wing Warping Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -6971,6 +6994,7 @@ class Reinforcement extends Part {
             stats.warnings.push({
                 source: lu("Wing Blades"),
                 warning: lu("Wing Blades Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (use_cant) {
@@ -7143,7 +7167,8 @@ class Fuel extends Part {
             stats.era.push({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
             stats.warnings.push({
                 source: lu("Self-Sealing Gas Tank"),
-                warning: lu("Self-Sealing Gas Tank Warning")
+                warning: lu("Self-Sealing Gas Tank Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.fire_extinguisher) {
@@ -7152,7 +7177,8 @@ class Fuel extends Part {
             stats.era.push({ name: "Remote Fire Extinguisher", era: "WWII" });
             stats.warnings.push({
                 source: lu("Remote Fire Extinguisher"),
-                warning: lu("Remote Fire Extinguisher Warning")
+                warning: lu("Remote Fire Extinguisher Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         //Because it is load, it rounds up to the nearest 5 mass.
@@ -7965,7 +7991,8 @@ class Accessories extends Part {
         }
         if (armour_str != "") {
             stats.warnings.push({
-                source: lu("Armour"), warning: armour_str
+                source: lu("Armour"), warning: armour_str,
+                color: WARNING_COLOR.WHITE,
             });
         }
         //Electrical
@@ -8324,8 +8351,7 @@ var ActionType;
     ActionType[ActionType["MECHANICAL"] = 1] = "MECHANICAL";
     ActionType[ActionType["GAST"] = 2] = "GAST";
     ActionType[ActionType["ROTARY"] = 3] = "ROTARY";
-    ActionType[ActionType["HENRY"] = 4] = "HENRY";
-    ActionType[ActionType["ENUM_MAX"] = 5] = "ENUM_MAX";
+    ActionType[ActionType["ENUM_MAX"] = 4] = "ENUM_MAX";
 })(ActionType || (ActionType = {}));
 class Weapon extends Part {
     constructor(weapon_type, action, projectile, fixed = false) {
@@ -8724,12 +8750,14 @@ class Weapon extends Part {
             stats.warnings.push({
                 source: lu(this.weapon_type.name),
                 warning: lu("Deflector Plate Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         else if (this.synchronization == SynchronizationType.NO_INTERFERENCE && !this.IsLightningArc()) {
             stats.warnings.push({
                 source: lu(this.weapon_type.name) + " " + lu("No Interference"),
                 warning: lu("No Interference Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.wing_reinforcement)
@@ -8948,6 +8976,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Mechanical Action"),
                 warning: lu("Mechanical Action Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
@@ -8979,28 +9008,11 @@ class WeaponSystem extends Part {
             this.final_weapon.jam = jams.join('/');
             this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
         }
-        else if (this.action_sel == ActionType.HENRY) {
-            this.final_weapon.hits = this.weapon_list[num].hits;
-            this.final_weapon.rapid = this.weapon_list[num].rapid;
-            this.final_weapon.synched = this.weapon_list[num].synched;
-            if (this.final_weapon.rapid) {
-                var jams = this.final_weapon.jam.split('/');
-                jams[0] = (parseInt(jams[0]) + 1).toString();
-                jams[1] = (parseInt(jams[1]) + 1).toString();
-                this.final_weapon.jam = jams.join('/');
-            }
-            else {
-                this.final_weapon.jam = (parseInt(this.final_weapon.jam) + 1).toString();
-                ;
-            }
-            this.final_weapon.stats.mass += 1;
-            this.final_weapon.stats.cost += 2;
-        }
         if (this.repeating && this.final_weapon.reload != 0) {
             this.final_weapon.reload = 0;
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
-        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL || this.action_sel == ActionType.HENRY)
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL)
             && this.projectile_sel == ProjectileType.HEATRAY) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
@@ -9017,6 +9029,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Heat Ray"), era: lu("Himmilgard") });
         }
@@ -9027,6 +9040,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Gyrojets"),
                 warning: lu("Gyrojets Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
         }
@@ -9040,6 +9054,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 1"),
+                    color: WARNING_COLOR.WHITE,
                 });
                 this.final_weapon.stats.era.push({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
@@ -9047,6 +9062,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 2"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -9054,6 +9070,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu(this.final_weapon.name),
                 warning: lu("Deflection Warning", this.final_weapon.deflection),
+                color: WARNING_COLOR.WHITE,
             });
         }
     }
@@ -9377,7 +9394,6 @@ class WeaponSystem extends Part {
             this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
-            this.weapon_list[this.weapon_type].can_action,
         ];
     }
     SetAction(num) {
@@ -9395,7 +9411,7 @@ class WeaponSystem extends Part {
     }
     GetCanProjectile() {
         return [true,
-            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.action_sel != ActionType.HENRY && this.weapon_list[this.weapon_type].hits > 0,
+            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.weapon_list[this.weapon_type].hits > 0,
             // this.final_weapon.can_projectile && this.weapon_list[this.weapon_type].hits > 0,
             this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY && this.action_sel != ActionType.GAST];
     }
@@ -9977,13 +9993,6 @@ class Weapons extends Part {
                     charge: StringFmt.Join('/', charges),
                 });
             }
-            else if (set.GetAction() == ActionType.HENRY) {
-                let count = set.GetWeaponCount();
-                value.equipment.push({
-                    source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
-                    charge: StringFmt.Join('/', [count, 2 * count]),
-                });
-            }
         }
         return value;
     }
@@ -10283,11 +10292,6 @@ class Rotor extends Part {
         var area = this.GetRotorArea();
         return this.rotor_count * Math.max(1, 2 * (this.sizing_span + this.rotor_span) + area - 10);
     }
-    GetExcessStrain() {
-        var area = this.GetIdealRotorArea();
-        var ideal_strain = this.rotor_count * Math.max(1, 2 * (this.sizing_span) + area - 10);
-        return this.GetRotorStrain() - ideal_strain;
-    }
     GetRotorArea() {
         return (Math.PI / 9) * (this.sizing_span + this.rotor_span) * (this.sizing_span + this.rotor_span);
     }
@@ -10430,7 +10434,7 @@ class Rotor extends Part {
         var ts = this.cant_list[this.cant_idx].stats.Clone();
         var count = Math.ceil(-1.0e-6 + strain / ts.maxstrain);
         ts = ts.Multiply(count);
-        ts.maxstrain = this.GetExcessStrain();
+        ts.maxstrain = 0;
         ts.toughness = 0;
         stats = stats.Add(ts);
         stats = stats.Add(this.stagger_list[this.stagger_sel].stats.Clone());
@@ -10456,27 +10460,32 @@ class Rotor extends Part {
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             stats.warnings.push({
                 source: lu("Helicopter Landing"),
-                warning: lu("Helicopter Landing Warning")
+                warning: lu("Helicopter Landing Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Descent"),
-                warning: lu("Helicopter Descent Warning")
+                warning: lu("Helicopter Descent Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Stall"),
-                warning: lu("Helicopter Stall Warning")
+                warning: lu("Helicopter Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             if (stats.reliability < 0) {
                 stats.warnings.push({
                     source: lu("Rotor Span"),
                     warning: lu("Rotor Span Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
         else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
             stats.warnings.push({
                 source: lu("Autogyro Stall"),
-                warning: lu("Autogyro Stall Warning")
+                warning: lu("Autogyro Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         return stats;
@@ -10841,7 +10850,8 @@ class Aircraft {
             if (stress_reduction != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls"); }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Co-Pilot Controls"),
-                    warning: lu("Co-Pilot Warning", stress_reduction)
+                    warning: lu("Co-Pilot Warning", stress_reduction),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
             if (IsAnyOrnithopter(this.aircraft_type)) {
@@ -10864,7 +10874,8 @@ class Aircraft {
                 this.stats.power = 0;
                 this.stats.warnings.push({
                     source: lu("Stat Rumble"),
-                    warning: lu("Rumble Warning")
+                    warning: lu("Rumble Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
             if (this.DisplayCallback && !this.freeze_calculation)
@@ -10902,7 +10913,8 @@ class Aircraft {
         if (BoostFullwBombs == 0) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Boost"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Boost"), warning: lu("Boost Warning")
+                    source: lu("Derived Boost"), warning: lu("Boost Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -10922,7 +10934,8 @@ class Aircraft {
             HandlingEmpty = -1 / 0;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Stability"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Stability"), warning: lu("Stability Warning")
+                    source: lu("Derived Stability"), warning: lu("Stability Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -10959,7 +10972,8 @@ class Aircraft {
         MaxStrain = Math.floor(1.0e-6 + MaxStrain * (1 - 0.2 * this.used.fragile));
         if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Max Strain"); }) == -1) {
             this.stats.warnings.push({
-                source: lu("Stat Max Strain"), warning: lu("Max Strain Warning")
+                source: lu("Stat Max Strain"), warning: lu("Max Strain Warning"),
+                color: WARNING_COLOR.RED,
             });
         }
         var Toughness = this.stats.toughness;
@@ -10992,7 +11006,8 @@ class Aircraft {
         if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning")
+                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -11005,7 +11020,8 @@ class Aircraft {
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning")
+                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning"),
+                    color: WARNING_COLOR.YELLOW,
                 });
             }
         }
@@ -11039,7 +11055,8 @@ class Aircraft {
             HandlingFullwBombs += 5;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Stall"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning")
+                    source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
             Overspeed = MaxStrain;
@@ -11051,19 +11068,22 @@ class Aircraft {
             Overspeed = Infinity;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Flutterer Attack"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning")
+                    source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
         if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Boost"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Buzzer Boost"), warning: lu("Ornithopter Buzzer Boost Warning")
+                    source: lu("Ornithopter Buzzer Boost"), warning: lu("Ornithopter Buzzer Boost Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Stall"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Buzzer Stall"), warning: lu("Ornithopter Buzzer Stall Warning")
+                    source: lu("Ornithopter Buzzer Stall"), warning: lu("Ornithopter Buzzer Stall Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -11320,12 +11340,23 @@ class Aircraft {
         });
         value = MergeElectrics(this.engines.GetElectrics(), value);
         value = MergeElectrics(value, this.weapons.GetElectrics());
+        var have_generation = false;
         //Add + symbols
         for (let eq of value.equipment) {
             let chg = parseInt(eq.charge);
             if (!isNaN(chg) && chg > 0) {
                 eq.charge = "+" + eq.charge;
+                have_generation = true;
             }
+        }
+        if (value.equipment.length > 0
+            && value.storage <= 0
+            && !have_generation
+            && this.stats.warnings.findIndex((value) => { return value.source == lu("Insufficient Charge"); }) == -1) {
+            this.stats.warnings.push({
+                source: lu("Insufficient Charge"), warning: lu("Insufficient Charge Warning"),
+                color: WARNING_COLOR.RED,
+            });
         }
         return value;
     }
@@ -11969,9 +12000,22 @@ class Derived_HTML {
             weaphtml += "<br\>";
         }
         this.weapon_cell.innerHTML = weaphtml;
+        stats.warnings.sort((a, b) => { return a.color - b.color; });
         var warnhtml = "";
         for (let w of stats.warnings) {
-            warnhtml += w.source + ":  " + w.warning + "<br/>";
+            switch (w.color) {
+                case WARNING_COLOR.RED:
+                    warnhtml += "<div style=\"color:#FF0000;\">";
+                    break;
+                case WARNING_COLOR.YELLOW:
+                    warnhtml += "<div style=\"color:#FFFF00;\">";
+                    break;
+                case WARNING_COLOR.WHITE:
+                default:
+                    warnhtml += "<div style=\"color:var(--inp_txt_color);;\">";
+                    break;
+            }
+            warnhtml += w.source + ":  " + w.warning + "</div>";
         }
         this.warning_cell.innerHTML = warnhtml;
         var description = "";
@@ -16487,9 +16531,6 @@ function WeaponName(w, wlist) {
     else if (w.GetAction() == ActionType.ROTARY) {
         name += lu("Weapon Tag Rotary") + " ";
     }
-    else if (w.GetAction() == ActionType.HENRY) {
-        name += lu("Weapon Tag Henry") + " ";
-    }
     if (w.GetProjectile() == ProjectileType.HEATRAY) {
         name += lu("Weapon Tag Heat Ray") + " ";
     }
@@ -18020,7 +18061,7 @@ class AlterStats_HTML extends Display {
             stats.reliability = this.rely.valueAsNumber;
             this.sprl.value = this.sprl.value.trim();
             if (this.sprl.value.length > 0) {
-                stats.warnings.push({ source: this.name.value, warning: this.sprl.value });
+                stats.warnings.push({ source: this.name.value, warning: this.sprl.value, color: WARNING_COLOR.WHITE });
             }
             this.alter.AddPart(this.name.value, stats);
             this.UpdateSelect();

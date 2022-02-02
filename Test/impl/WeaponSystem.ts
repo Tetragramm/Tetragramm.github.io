@@ -255,6 +255,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Mechanical Action"),
                 warning: lu("Mechanical Action Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
@@ -284,21 +285,6 @@ class WeaponSystem extends Part {
             jams[1] = (parseInt(jams[1]) + 1).toString();
             this.final_weapon.jam = jams.join('/');
             this.final_weapon.stats.era.push({ name: lu("Rotary_Gun"), era: lu("WWI") });
-        } else if (this.action_sel == ActionType.HENRY) {
-            this.final_weapon.hits = this.weapon_list[num].hits;
-            this.final_weapon.rapid = this.weapon_list[num].rapid;
-            this.final_weapon.synched = this.weapon_list[num].synched;
-            if (this.final_weapon.rapid) {
-                var jams = this.final_weapon.jam.split('/');
-                jams[0] = (parseInt(jams[0]) + 1).toString();
-                jams[1] = (parseInt(jams[1]) + 1).toString();
-                this.final_weapon.jam = jams.join('/');
-            } else {
-                this.final_weapon.jam = (parseInt(this.final_weapon.jam) + 1).toString();;
-            }
-
-            this.final_weapon.stats.mass += 1;
-            this.final_weapon.stats.cost += 2;
         }
 
         if (this.repeating && this.final_weapon.reload != 0) {
@@ -306,7 +292,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.cost += Math.max(1, Math.floor(1.0e-6 + 0.5 * this.weapon_list[num].stats.cost));
         }
 
-        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL || this.action_sel == ActionType.HENRY)
+        if ((this.action_sel == ActionType.GAST || this.action_sel == ActionType.MECHANICAL)
             && this.projectile_sel == ProjectileType.HEATRAY) {
             this.projectile_sel = ProjectileType.BULLETS;
         }
@@ -325,6 +311,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Heat Ray"), era: lu("Himmilgard") });
         } else if (this.projectile_sel == ProjectileType.GYROJETS) {
@@ -334,6 +321,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Gyrojets"),
                 warning: lu("Gyrojets Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
         } else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
@@ -346,6 +334,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 1"),
+                    color: WARNING_COLOR.WHITE,
                 });
                 this.final_weapon.stats.era.push({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
@@ -353,6 +342,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 2"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -361,6 +351,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu(this.final_weapon.name),
                 warning: lu("Deflection Warning", this.final_weapon.deflection),
+                color: WARNING_COLOR.WHITE,
             });
         }
     }
@@ -707,7 +698,6 @@ class WeaponSystem extends Part {
             this.has_propeller && this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].hits > 0 && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && (this.repeating || this.weapon_list[this.weapon_type].rapid),
             this.weapon_list[this.weapon_type].can_action && this.weapon_list[this.weapon_type].rapid,
-            this.weapon_list[this.weapon_type].can_action,
         ];
     }
 
@@ -728,7 +718,7 @@ class WeaponSystem extends Part {
 
     public GetCanProjectile() {
         return [true,
-            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.action_sel != ActionType.HENRY && this.weapon_list[this.weapon_type].hits > 0,
+            this.final_weapon.can_projectile && this.action_sel != ActionType.MECHANICAL && this.action_sel != ActionType.GAST && this.weapon_list[this.weapon_type].hits > 0,
             // this.final_weapon.can_projectile && this.weapon_list[this.weapon_type].hits > 0,
             this.final_weapon.can_projectile && this.action_sel != ActionType.ROTARY && this.action_sel != ActionType.GAST];
     }

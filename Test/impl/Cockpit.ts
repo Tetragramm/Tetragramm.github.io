@@ -278,12 +278,14 @@ class Cockpit extends Part {
             stats.cost += Math.floor(1.0e-6 + 2 + (this.bombsight - 4) / 3);
             stats.warnings.push({
                 source: lu("Bombsight"),
-                warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2")
+                warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2"),
+                color: WARNING_COLOR.WHITE,
             });
             if (this.IsCopilot()) {
                 stats.warnings.push({
                     source: lu("Bombadier Controls"),
                     warning: lu("Bombadier Controls Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }

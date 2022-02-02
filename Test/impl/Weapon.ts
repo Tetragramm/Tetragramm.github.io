@@ -22,7 +22,6 @@ enum ActionType {
     MECHANICAL,
     GAST,
     ROTARY,
-    HENRY,
     ENUM_MAX
 }
 type WeaponType = {
@@ -485,11 +484,13 @@ class Weapon extends Part {
             stats.warnings.push({
                 source: lu(this.weapon_type.name),
                 warning: lu("Deflector Plate Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         } else if (this.synchronization == SynchronizationType.NO_INTERFERENCE && !this.IsLightningArc()) {
             stats.warnings.push({
                 source: lu(this.weapon_type.name) + " " + lu("No Interference"),
                 warning: lu("No Interference Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 

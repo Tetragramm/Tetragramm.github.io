@@ -1,3 +1,10 @@
+var WARNING_COLOR;
+(function (WARNING_COLOR) {
+    WARNING_COLOR[WARNING_COLOR["WHITE"] = 0] = "WHITE";
+    WARNING_COLOR[WARNING_COLOR["YELLOW"] = 1] = "YELLOW";
+    WARNING_COLOR[WARNING_COLOR["RED"] = 2] = "RED";
+})(WARNING_COLOR || (WARNING_COLOR = {}));
+;
 class Stats {
     constructor(js) {
         this.liftbleed = 0;
@@ -124,7 +131,8 @@ class Stats {
         if (js["warning"])
             this.warnings.push({
                 source: lu(js["name"]),
-                warning: lu(js["warning"])
+                warning: lu(js["warning"]),
+                color: WARNING_COLOR.WHITE,
             });
         if (js["warnings"]) {
             let warnings = js["warnings"];
@@ -226,7 +234,11 @@ class Stats {
             var wcount = d.GetNum();
             this.warnings = [];
             for (let i = 0; i < wcount; i++) {
-                this.warnings.push({ source: d.GetString(), warning: d.GetString() });
+                this.warnings.push({
+                    source: d.GetString(),
+                    warning: d.GetString(),
+                    color: WARNING_COLOR.WHITE,
+                });
             }
             var ecount = d.GetNum();
             this.era = [];
@@ -271,7 +283,7 @@ class Stats {
     MergeWarnings(owarn) {
         var newList = [];
         for (let w2 of this.warnings) {
-            newList.push({ source: w2.source, warning: w2.warning });
+            newList.push({ source: w2.source, warning: w2.warning, color: w2.color, });
         }
         for (let w of owarn) {
             let dup = false;
@@ -280,7 +292,7 @@ class Stats {
                     dup = true;
             }
             if (!dup)
-                newList.push({ source: w.source, warning: w.warning });
+                newList.push({ source: w.source, warning: w.warning, color: w.color });
         }
         return newList;
     }
@@ -1742,7 +1754,8 @@ class EngineBuilder {
                 estats.altitude = 49;
                 estats.stats.warnings.push({
                     source: lu("Altitude Throttle"),
-                    warning: lu("Altitude Throttle Warning")
+                    warning: lu("Altitude Throttle Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
                 break;
             }
@@ -4680,7 +4693,8 @@ class Accessories extends Part {
         }
         if (armour_str != "") {
             stats.warnings.push({
-                source: lu("Armour"), warning: armour_str
+                source: lu("Armour"), warning: armour_str,
+                color: WARNING_COLOR.WHITE,
             });
         }
         //Electrical
@@ -5085,12 +5099,14 @@ class Cockpit extends Part {
             stats.cost += Math.floor(1.0e-6 + 2 + (this.bombsight - 4) / 3);
             stats.warnings.push({
                 source: lu("Bombsight"),
-                warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2")
+                warning: lu("Bombsight Warning 1") + this.bombsight.toString() + lu("Bombsight Warning 2"),
+                color: WARNING_COLOR.WHITE,
             });
             if (this.IsCopilot()) {
                 stats.warnings.push({
                     source: lu("Bombadier Controls"),
                     warning: lu("Bombadier Controls Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -5426,6 +5442,7 @@ class Passengers extends Part {
             stats.warnings.push({
                 source: lu("Passengers Section Title"),
                 warning: lu("Passengers Count", this.seats, this.beds),
+                color: WARNING_COLOR.WHITE,
             });
         }
         return stats;
@@ -6952,17 +6969,20 @@ class Engines extends Part {
             stats.latstab -= 3;
         if (this.HasPulsejet()) {
             stats.warnings.push({
-                source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+                source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.HasTurbineNoProp()) {
             stats.warnings.push({
-                source: lu("Turbine"), warning: lu("Turbine Boost Warning")
+                source: lu("Turbine"), warning: lu("Turbine Boost Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.HasDiesel()) {
             stats.warnings.push({
-                source: lu("Diesel"), warning: lu("Diesel Warning")
+                source: lu("Diesel"), warning: lu("Diesel Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         var rotationT = 0;
@@ -6984,12 +7004,14 @@ class Engines extends Part {
         }
         if (rotationT > 0) {
             stats.warnings.push({
-                source: lu("Rotary"), warning: lu("Rotary Right Warning")
+                source: lu("Rotary"), warning: lu("Rotary Right Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         else if (rotationT < 0) {
             stats.warnings.push({
-                source: lu("Rotary"), warning: lu("Rotary Left Warning")
+                source: lu("Rotary"), warning: lu("Rotary Left Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         //Part local, gets handled in UpdateReliability
@@ -7820,6 +7842,7 @@ class Frames extends Part {
             stats.warnings.push({
                 source: lu("Frame Count"),
                 warning: lu("Frame Count Warning"),
+                color: WARNING_COLOR.YELLOW,
             });
         }
         stats.structure = Math.floor(1.0e-6 + stats.structure);
@@ -9082,7 +9105,8 @@ class ControlSurfaces extends Part {
                 stats.latstab -= 2;
                 stats.warnings.push({
                     source: lu("Wing Warping"),
-                    warning: lu("Wing Warping Warning")
+                    warning: lu("Wing Warping Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -9480,6 +9504,7 @@ class Reinforcement extends Part {
             stats.warnings.push({
                 source: lu("Wing Blades"),
                 warning: lu("Wing Blades Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (use_cant) {
@@ -9652,7 +9677,8 @@ class Fuel extends Part {
             stats.era.push({ name: "Self-Sealing Gas Tank", era: "Roaring 20s" });
             stats.warnings.push({
                 source: lu("Self-Sealing Gas Tank"),
-                warning: lu("Self-Sealing Gas Tank Warning")
+                warning: lu("Self-Sealing Gas Tank Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.fire_extinguisher) {
@@ -9661,7 +9687,8 @@ class Fuel extends Part {
             stats.era.push({ name: "Remote Fire Extinguisher", era: "WWII" });
             stats.warnings.push({
                 source: lu("Remote Fire Extinguisher"),
-                warning: lu("Remote Fire Extinguisher Warning")
+                warning: lu("Remote Fire Extinguisher Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         //Because it is load, it rounds up to the nearest 5 mass.
@@ -10789,12 +10816,14 @@ class Weapon extends Part {
             stats.warnings.push({
                 source: lu(this.weapon_type.name),
                 warning: lu("Deflector Plate Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         else if (this.synchronization == SynchronizationType.NO_INTERFERENCE && !this.IsLightningArc()) {
             stats.warnings.push({
                 source: lu(this.weapon_type.name) + " " + lu("No Interference"),
                 warning: lu("No Interference Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.wing_reinforcement)
@@ -11013,6 +11042,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Mechanical Action"),
                 warning: lu("Mechanical Action Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
@@ -11065,6 +11095,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Heat Ray"), era: lu("Himmilgard") });
         }
@@ -11075,6 +11106,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Gyrojets"),
                 warning: lu("Gyrojets Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
         }
@@ -11088,6 +11120,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 1"),
+                    color: WARNING_COLOR.WHITE,
                 });
                 this.final_weapon.stats.era.push({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
@@ -11095,6 +11128,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 2"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -11102,6 +11136,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu(this.final_weapon.name),
                 warning: lu("Deflection Warning", this.final_weapon.deflection),
+                color: WARNING_COLOR.WHITE,
             });
         }
     }
@@ -12464,27 +12499,32 @@ class Rotor extends Part {
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             stats.warnings.push({
                 source: lu("Helicopter Landing"),
-                warning: lu("Helicopter Landing Warning")
+                warning: lu("Helicopter Landing Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Descent"),
-                warning: lu("Helicopter Descent Warning")
+                warning: lu("Helicopter Descent Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Stall"),
-                warning: lu("Helicopter Stall Warning")
+                warning: lu("Helicopter Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             if (stats.reliability < 0) {
                 stats.warnings.push({
                     source: lu("Rotor Span"),
                     warning: lu("Rotor Span Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
         else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
             stats.warnings.push({
                 source: lu("Autogyro Stall"),
-                warning: lu("Autogyro Stall Warning")
+                warning: lu("Autogyro Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         return stats;
@@ -12843,7 +12883,8 @@ class Aircraft {
             if (stress_reduction != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls"); }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Co-Pilot Controls"),
-                    warning: lu("Co-Pilot Warning", stress_reduction)
+                    warning: lu("Co-Pilot Warning", stress_reduction),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
             if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
@@ -12863,7 +12904,8 @@ class Aircraft {
                 this.stats.power = 0;
                 this.stats.warnings.push({
                     source: lu("Stat Rumble"),
-                    warning: lu("Rumble Warning")
+                    warning: lu("Rumble Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
             if (this.DisplayCallback && !this.freeze_calculation)
@@ -12901,7 +12943,8 @@ class Aircraft {
         if (BoostFullwBombs == 0) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Boost"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Boost"), warning: lu("Boost Warning")
+                    source: lu("Derived Boost"), warning: lu("Boost Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -12921,7 +12964,8 @@ class Aircraft {
             HandlingEmpty = -1 / 0;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Stability"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Stability"), warning: lu("Stability Warning")
+                    source: lu("Derived Stability"), warning: lu("Stability Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -12963,7 +13007,8 @@ class Aircraft {
         MaxStrain = Math.floor(1.0e-6 + MaxStrain * (1 - 0.2 * this.used.fragile));
         if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Max Strain"); }) == -1) {
             this.stats.warnings.push({
-                source: lu("Stat Max Strain"), warning: lu("Max Strain Warning")
+                source: lu("Stat Max Strain"), warning: lu("Max Strain Warning"),
+                color: WARNING_COLOR.RED,
             });
         }
         var Toughness = this.stats.toughness;
@@ -12996,7 +13041,8 @@ class Aircraft {
         if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning")
+                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -13009,7 +13055,8 @@ class Aircraft {
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning")
+                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning"),
+                    color: WARNING_COLOR.YELLOW,
                 });
             }
         }
@@ -13043,7 +13090,8 @@ class Aircraft {
             HandlingFullwBombs += this.stats.power;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Stall"); }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning")
+                    source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
             Overspeed = MaxStrain;
@@ -13301,12 +13349,23 @@ class Aircraft {
         });
         value = MergeElectrics(this.engines.GetElectrics(), value);
         value = MergeElectrics(value, this.weapons.GetElectrics());
+        var have_generation = false;
         //Add + symbols
         for (let eq of value.equipment) {
             let chg = parseInt(eq.charge);
             if (!isNaN(chg) && chg > 0) {
                 eq.charge = "+" + eq.charge;
+                have_generation = true;
             }
+        }
+        if (value.equipment.length > 0
+            && value.storage <= 0
+            && !have_generation
+            && this.stats.warnings.findIndex((value) => { return value.source == lu("Insufficient Charge"); }) == -1) {
+            this.stats.warnings.push({
+                source: lu("Insufficient Charge"), warning: lu("Insufficient Charge Warning"),
+                color: WARNING_COLOR.RED,
+            });
         }
         return value;
     }

@@ -427,7 +427,8 @@ class Accessories extends Part {
         }
         if (armour_str != "") {
             stats.warnings.push({
-                source: lu("Armour"), warning: armour_str
+                source: lu("Armour"), warning: armour_str,
+                color: WARNING_COLOR.WHITE,
             });
         }
 

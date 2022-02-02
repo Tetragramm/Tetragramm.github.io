@@ -1,3 +1,9 @@
+enum WARNING_COLOR {
+    WHITE,
+    YELLOW,
+    RED,
+};
+
 class Stats {
     public liftbleed: number = 0;
     public wetmass: number = 0;
@@ -26,7 +32,7 @@ class Stats {
     public bomb_mass: number = 0;
     public fuel: number = 0;
     public charge: number = 0;
-    public warnings: { source: string, warning: string }[] = [];
+    public warnings: { source: string, warning: string, color: WARNING_COLOR }[] = [];
     public era: { name: string, era: string }[];
 
     constructor(js?: JSON) {
@@ -128,7 +134,8 @@ class Stats {
         if (js["warning"])
             this.warnings.push({
                 source: lu(js["name"]),
-                warning: lu(js["warning"])
+                warning: lu(js["warning"]),
+                color: WARNING_COLOR.WHITE,
             });
         if (js["warnings"]) {
             let warnings = js["warnings"];
@@ -232,7 +239,11 @@ class Stats {
             var wcount = d.GetNum();
             this.warnings = [];
             for (let i = 0; i < wcount; i++) {
-                this.warnings.push({ source: d.GetString(), warning: d.GetString() });
+                this.warnings.push({
+                    source: d.GetString(),
+                    warning: d.GetString(),
+                    color: WARNING_COLOR.WHITE,
+                });
             }
             var ecount = d.GetNum();
             this.era = [];
@@ -276,10 +287,10 @@ class Stats {
         return res;
     }
 
-    private MergeWarnings(owarn: { source: string, warning: string }[]) {
+    private MergeWarnings(owarn: { source: string, warning: string, color: WARNING_COLOR }[]) {
         var newList = [];
         for (let w2 of this.warnings) {
-            newList.push({ source: w2.source, warning: w2.warning });
+            newList.push({ source: w2.source, warning: w2.warning, color: w2.color, });
         }
 
         for (let w of owarn) {
@@ -289,7 +300,7 @@ class Stats {
                     dup = true;
             }
             if (!dup)
-                newList.push({ source: w.source, warning: w.warning });
+                newList.push({ source: w.source, warning: w.warning, color: w.color });
         }
         return newList;
     }

@@ -254,6 +254,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Mechanical Action"),
                 warning: lu("Mechanical Action Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.jam = "0/0";
             this.final_weapon.rapid = true;
@@ -309,6 +310,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Heat Ray"),
                 warning: lu("Heat Ray Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Heat Ray"), era: lu("Himmilgard") });
         } else if (this.projectile_sel == ProjectileType.GYROJETS) {
@@ -318,6 +320,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu("Gyrojets"),
                 warning: lu("Gyrojets Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             this.final_weapon.stats.era.push({ name: lu("Gyrojets"), era: lu("Roaring 20s") });
         } else if (this.projectile_sel == ProjectileType.PNEUMATIC) {
@@ -330,6 +333,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 1"),
+                    color: WARNING_COLOR.WHITE,
                 });
                 this.final_weapon.stats.era.push({ name: lu("Pneumatic"), era: lu("Pioneer") });
             }
@@ -337,6 +341,7 @@ class WeaponSystem extends Part {
                 this.final_weapon.stats.warnings.push({
                     source: lu("Pneumatic"),
                     warning: lu("Pneumatic Warning 2"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -345,6 +350,7 @@ class WeaponSystem extends Part {
             this.final_weapon.stats.warnings.push({
                 source: lu(this.final_weapon.name),
                 warning: lu("Deflection Warning", this.final_weapon.deflection),
+                color: WARNING_COLOR.WHITE,
             });
         }
     }

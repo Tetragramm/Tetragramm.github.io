@@ -91,6 +91,7 @@ class Passengers extends Part {
             stats.warnings.push({
                 source: lu("Passengers Section Title"),
                 warning: lu("Passengers Count", this.seats, this.beds),
+                color: WARNING_COLOR.WHITE,
             });
         }
 

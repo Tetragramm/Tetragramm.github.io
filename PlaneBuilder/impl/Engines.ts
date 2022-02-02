@@ -488,17 +488,20 @@ class Engines extends Part {
 
         if (this.HasPulsejet()) {
             stats.warnings.push({
-                source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning")
+                source: lu("Pulsejets"), warning: lu("Pulsejet Boost Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.HasTurbineNoProp()) {
             stats.warnings.push({
-                source: lu("Turbine"), warning: lu("Turbine Boost Warning")
+                source: lu("Turbine"), warning: lu("Turbine Boost Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
         if (this.HasDiesel()) {
             stats.warnings.push({
-                source: lu("Diesel"), warning: lu("Diesel Warning")
+                source: lu("Diesel"), warning: lu("Diesel Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 
@@ -518,11 +521,13 @@ class Engines extends Part {
         }
         if (rotationT > 0) {
             stats.warnings.push({
-                source: lu("Rotary"), warning: lu("Rotary Right Warning")
+                source: lu("Rotary"), warning: lu("Rotary Right Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         } else if (rotationT < 0) {
             stats.warnings.push({
-                source: lu("Rotary"), warning: lu("Rotary Left Warning")
+                source: lu("Rotary"), warning: lu("Rotary Left Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 

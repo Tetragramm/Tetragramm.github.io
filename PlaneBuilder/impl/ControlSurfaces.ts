@@ -259,7 +259,8 @@ class ControlSurfaces extends Part {
                 stats.latstab -= 2;
                 stats.warnings.push({
                     source: lu("Wing Warping"),
-                    warning: lu("Wing Warping Warning")
+                    warning: lu("Wing Warping Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }

@@ -939,7 +939,6 @@ class Helicopter_HTML extends Display {
         this.frames.UpdateDisplay();
         this.stabilizers.UpdateDisplay();
         this.reinforcements.UpdateDisplay();
-        this.reinforcements.UpdateMaxStrain(derived_stats.MaxStrain);
         this.load.UpdateDisplay();
         this.load.UpdateFuelUses(stats.fuel / stats.fuelconsumption);//Do the calculation here because it's int rounded in derived stats, also no leaky
         this.gear.UpdateDisplay();
@@ -948,6 +947,7 @@ class Helicopter_HTML extends Display {
         this.weapons.UpdateDisplay();
         this.used.UpdateDisplay();
         this.rotor.UpdateDisplay();
+        this.rotor.UpdateMaxStrain(derived_stats.MaxStrain);
         this.alter.UpdateDisplay();
 
         this.UpdateStats(stats);

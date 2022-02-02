@@ -398,9 +398,22 @@ class Derived_HTML {
         }
         this.weapon_cell.innerHTML = weaphtml;
 
+        stats.warnings.sort((a, b) => { return a.color - b.color });
         var warnhtml = "";
         for (let w of stats.warnings) {
-            warnhtml += w.source + ":  " + w.warning + "<br/>";
+            switch (w.color) {
+                case WARNING_COLOR.RED:
+                    warnhtml += "<div style=\"color:#FF0000;\">";
+                    break;
+                case WARNING_COLOR.YELLOW:
+                    warnhtml += "<div style=\"color:#FFFF00;\">";
+                    break;
+                case WARNING_COLOR.WHITE:
+                default:
+                    warnhtml += "<div style=\"color:var(--inp_txt_color);;\">";
+                    break;
+            }
+            warnhtml += w.source + ":  " + w.warning + "</div>";
         }
         this.warning_cell.innerHTML = warnhtml;
 

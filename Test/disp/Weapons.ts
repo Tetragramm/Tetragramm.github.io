@@ -366,8 +366,6 @@ function WeaponName(w: WeaponSystem, wlist: {
         name += lu("Weapon Tag Gast Principle") + " ";
     } else if (w.GetAction() == ActionType.ROTARY) {
         name += lu("Weapon Tag Rotary") + " ";
-    } else if (w.GetAction() == ActionType.HENRY) {
-        name += lu("Weapon Tag Henry") + " ";
     }
 
     if (w.GetProjectile() == ProjectileType.HEATRAY) {

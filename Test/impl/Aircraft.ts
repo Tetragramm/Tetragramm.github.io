@@ -444,7 +444,8 @@ class Aircraft {
             if (stress_reduction != 0 && this.stats.warnings.findIndex((value) => { return value.source == lu("Co-Pilot Controls") }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Co-Pilot Controls"),
-                    warning: lu("Co-Pilot Warning", stress_reduction)
+                    warning: lu("Co-Pilot Warning", stress_reduction),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
 
@@ -472,7 +473,8 @@ class Aircraft {
                 this.stats.power = 0;
                 this.stats.warnings.push({
                     source: lu("Stat Rumble"),
-                    warning: lu("Rumble Warning")
+                    warning: lu("Rumble Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
 
@@ -516,7 +518,8 @@ class Aircraft {
         if (BoostFullwBombs == 0) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Boost") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Boost"), warning: lu("Boost Warning")
+                    source: lu("Derived Boost"), warning: lu("Boost Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -540,7 +543,8 @@ class Aircraft {
             HandlingEmpty = -1 / 0;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Stability") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Stability"), warning: lu("Stability Warning")
+                    source: lu("Derived Stability"), warning: lu("Stability Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         } else if (Stability == 10)
@@ -579,7 +583,8 @@ class Aircraft {
         MaxStrain = Math.floor(1.0e-6 + MaxStrain * (1 - 0.2 * this.used.fragile));
         if (MaxStrain < 10 && this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Max Strain") }) == -1) {
             this.stats.warnings.push({
-                source: lu("Stat Max Strain"), warning: lu("Max Strain Warning")
+                source: lu("Stat Max Strain"), warning: lu("Max Strain Warning"),
+                color: WARNING_COLOR.RED,
             });
         }
 
@@ -616,7 +621,8 @@ class Aircraft {
         if (MaxSpeedwBombs <= StallSpeedFullwBombs || MaxSpeedFull <= StallSpeedFull) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stall Speed") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning")
+                    source: lu("Stall Speed"), warning: lu("Stall Speed Warning"),
+                    color: WARNING_COLOR.RED,
                 });
             }
         }
@@ -630,7 +636,8 @@ class Aircraft {
         if (FuelUses < 6) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning")
+                    source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning"),
+                    color: WARNING_COLOR.YELLOW,
                 });
             }
         }
@@ -669,7 +676,8 @@ class Aircraft {
             HandlingFullwBombs += 5;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Stall") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning")
+                    source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
             Overspeed = MaxStrain;
@@ -682,7 +690,8 @@ class Aircraft {
             Overspeed = Infinity;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Flutterer Attack") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning")
+                    source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -690,12 +699,14 @@ class Aircraft {
         if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Boost") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Buzzer Boost"), warning: lu("Ornithopter Buzzer Boost Warning")
+                    source: lu("Ornithopter Buzzer Boost"), warning: lu("Ornithopter Buzzer Boost Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Stall") }) == -1) {
                 this.stats.warnings.push({
-                    source: lu("Ornithopter Buzzer Stall"), warning: lu("Ornithopter Buzzer Stall Warning")
+                    source: lu("Ornithopter Buzzer Stall"), warning: lu("Ornithopter Buzzer Stall Warning"),
+                    color: WARNING_COLOR.WHITE,
                 });
             }
         }
@@ -976,12 +987,24 @@ class Aircraft {
         value = MergeElectrics(this.engines.GetElectrics(), value);
         value = MergeElectrics(value, this.weapons.GetElectrics());
 
+        var have_generation = false;
         //Add + symbols
         for (let eq of value.equipment) {
             let chg = parseInt(eq.charge);
             if (!isNaN(chg) && chg > 0) {
                 eq.charge = "+" + eq.charge;
+                have_generation = true;
             }
+        }
+
+        if (value.equipment.length > 0
+            && value.storage <= 0
+            && !have_generation
+            && this.stats.warnings.findIndex((value) => { return value.source == lu("Insufficient Charge") }) == -1) {
+            this.stats.warnings.push({
+                source: lu("Insufficient Charge"), warning: lu("Insufficient Charge Warning"),
+                color: WARNING_COLOR.RED,
+            });
         }
 
         return value;

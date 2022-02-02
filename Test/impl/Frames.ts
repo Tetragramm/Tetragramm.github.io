@@ -767,6 +767,7 @@ class Frames extends Part {
             stats.warnings.push({
                 source: lu("Frame Count"),
                 warning: lu("Frame Count Warning"),
+                color: WARNING_COLOR.YELLOW,
             });
         }
 

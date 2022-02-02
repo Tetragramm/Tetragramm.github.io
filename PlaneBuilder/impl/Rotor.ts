@@ -386,26 +386,31 @@ class Rotor extends Part {
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             stats.warnings.push({
                 source: lu("Helicopter Landing"),
-                warning: lu("Helicopter Landing Warning")
+                warning: lu("Helicopter Landing Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Descent"),
-                warning: lu("Helicopter Descent Warning")
+                warning: lu("Helicopter Descent Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Stall"),
-                warning: lu("Helicopter Stall Warning")
+                warning: lu("Helicopter Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             if (stats.reliability < 0) {
                 stats.warnings.push({
                     source: lu("Rotor Span"),
                     warning: lu("Rotor Span Warning"),
+                    color: WARNING_COLOR.YELLOW,
                 });
             }
         } else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
             stats.warnings.push({
                 source: lu("Autogyro Stall"),
-                warning: lu("Autogyro Stall Warning")
+                warning: lu("Autogyro Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 

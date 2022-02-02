@@ -207,12 +207,6 @@ class Rotor extends Part {
         return this.rotor_count * Math.max(1, 2 * (this.sizing_span + this.rotor_span) + area - 10);
     }
 
-    private GetExcessStrain() {
-        var area = this.GetIdealRotorArea();
-        var ideal_strain = this.rotor_count * Math.max(1, 2 * (this.sizing_span) + area - 10);
-        return this.GetRotorStrain() - ideal_strain;
-    }
-
     public GetRotorArea() {
         return (Math.PI / 9) * (this.sizing_span + this.rotor_span) * (this.sizing_span + this.rotor_span);
     }
@@ -366,7 +360,7 @@ class Rotor extends Part {
         var ts = this.cant_list[this.cant_idx].stats.Clone();
         var count = Math.ceil(-1.0e-6 + strain / ts.maxstrain);
         ts = ts.Multiply(count);
-        ts.maxstrain = this.GetExcessStrain();
+        ts.maxstrain = 0;
         ts.toughness = 0;
         stats = stats.Add(ts);
 
@@ -394,26 +388,31 @@ class Rotor extends Part {
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             stats.warnings.push({
                 source: lu("Helicopter Landing"),
-                warning: lu("Helicopter Landing Warning")
+                warning: lu("Helicopter Landing Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Descent"),
-                warning: lu("Helicopter Descent Warning")
+                warning: lu("Helicopter Descent Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             stats.warnings.push({
                 source: lu("Helicopter Stall"),
-                warning: lu("Helicopter Stall Warning")
+                warning: lu("Helicopter Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
             if (stats.reliability < 0) {
                 stats.warnings.push({
                     source: lu("Rotor Span"),
                     warning: lu("Rotor Span Warning"),
+                    color: WARNING_COLOR.YELLOW,
                 });
             }
         } else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
             stats.warnings.push({
                 source: lu("Autogyro Stall"),
-                warning: lu("Autogyro Stall Warning")
+                warning: lu("Autogyro Stall Warning"),
+                color: WARNING_COLOR.WHITE,
             });
         }
 
