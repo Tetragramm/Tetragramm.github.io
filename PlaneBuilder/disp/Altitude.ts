@@ -11,10 +11,36 @@ class Altitude_HTML {
     private tbl: HTMLTableElement;
     private fRow: HTMLTableRowElement;
     private rows: HTMLTableRowElement[];
-    constructor() {
+
+    private fuel_state: HTMLSelectElement;
+    private fires: HTMLInputElement;
+    private oxidized: HTMLInputElement;
+
+    constructor(callback: () => void) {
         (document.getElementById("lbl_altitude") as HTMLLabelElement).textContent = lu("Altitude Section Title");
 
         this.tbl = document.getElementById("table_altitude") as HTMLTableElement;
+
+        this.fuel_state = document.getElementById("select_fuelstate") as HTMLSelectElement;
+        let opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Full Fuel with Bombs");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Half Fuel with Bombs");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Full Fuel");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION") as HTMLOptionElement;
+        opt.textContent = lu("Derived Half Fuel");
+        this.fuel_state.appendChild(opt);
+        this.fuel_state.onchange = () => { callback(); }
+
+        this.fires = document.getElementById("input_fires") as HTMLInputElement;
+        this.fires.onchange = () => { callback(); }
+
+        this.oxidized = document.getElementById("input_oxidized") as HTMLInputElement;
+        this.oxidized.onchange = () => { callback(); }
 
         this.fRow = insertRow(this.tbl);
         CreateTH(this.fRow, lu("Altitude Altitude"));
@@ -37,7 +63,7 @@ class Altitude_HTML {
         this.rows.push(row)
     }
 
-    public UpdateDisplay(acft: Aircraft, derived: DerivedStats, fuelstate: number, fires:boolean) {
+    public UpdateDisplay(acft: Aircraft, derived: DerivedStats) {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
@@ -48,7 +74,7 @@ class Altitude_HTML {
         var RoC = 0;
         var Stall = 0;
         var Speed = 0;
-        switch (fuelstate) {
+        switch (this.fuel_state.selectedIndex) {
             case FUEL_STATE.FULLWBOMBS:
                 Boost = derived.BoostFullwBombs;
                 RoC = derived.RateOfClimbwBombs;
@@ -81,13 +107,16 @@ class Altitude_HTML {
             if (af < acft.GetMinIAF()) {
                 PowerReduction = acft.GetMinIAF() - af;
             } else {
-                SpeedIncrease = Math.min(af - acft.GetMinIAF(), acft.GetMaxIAF() - acft.GetMinIAF())
-                if (af > acft.GetMaxIAF()) {
-                    PowerReduction = af - acft.GetMaxIAF();
+                let maxIAF = acft.GetMaxIAF();
+                if (this.oxidized.checked)
+                    maxIAF += 3;
+                SpeedIncrease = Math.min(af - acft.GetMinIAF(), maxIAF - acft.GetMinIAF())
+                if (af > maxIAF) {
+                    PowerReduction = af - maxIAF;
                 }
             }
 
-            if (fires)
+            if (this.fires.checked)
                 PowerReduction = 0;
 
             if (this.rows.length <= af) {

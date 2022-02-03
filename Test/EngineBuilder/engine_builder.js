@@ -13040,7 +13040,7 @@ class Rotor extends Part {
                 stats.warnings.push({
                     source: lu("Rotor Span"),
                     warning: lu("Rotor Span Warning"),
-                    color: WARNING_COLOR.WHITE,
+                    color: WARNING_COLOR.YELLOW,
                 });
             }
         }

@@ -10477,7 +10477,7 @@ class Rotor extends Part {
                 stats.warnings.push({
                     source: lu("Rotor Span"),
                     warning: lu("Rotor Span Warning"),
-                    color: WARNING_COLOR.WHITE,
+                    color: WARNING_COLOR.YELLOW,
                 });
             }
         }
@@ -16607,9 +16607,27 @@ var FUEL_STATE;
     FUEL_STATE[FUEL_STATE["EMPTY"] = 4] = "EMPTY";
 })(FUEL_STATE || (FUEL_STATE = {}));
 class Altitude_HTML {
-    constructor() {
+    constructor(callback) {
         document.getElementById("lbl_altitude").textContent = lu("Altitude Section Title");
         this.tbl = document.getElementById("table_altitude");
+        this.fuel_state = document.getElementById("select_fuelstate");
+        let opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Full Fuel with Bombs");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Half Fuel with Bombs");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Full Fuel");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Half Fuel");
+        this.fuel_state.appendChild(opt);
+        this.fuel_state.onchange = () => { callback(); };
+        this.fires = document.getElementById("input_fires");
+        this.fires.onchange = () => { callback(); };
+        this.oxidized = document.getElementById("input_oxidized");
+        this.oxidized.onchange = () => { callback(); };
         this.fRow = insertRow(this.tbl);
         CreateTH(this.fRow, lu("Altitude Altitude"));
         CreateTH(this.fRow, lu("Derived Boost"));
@@ -16628,7 +16646,7 @@ class Altitude_HTML {
         row.insertCell();
         this.rows.push(row);
     }
-    UpdateDisplay(acft, derived, fuelstate, fires) {
+    UpdateDisplay(acft, derived) {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
@@ -16638,7 +16656,7 @@ class Altitude_HTML {
         var RoC = 0;
         var Stall = 0;
         var Speed = 0;
-        switch (fuelstate) {
+        switch (this.fuel_state.selectedIndex) {
             case FUEL_STATE.FULLWBOMBS:
                 Boost = derived.BoostFullwBombs;
                 RoC = derived.RateOfClimbwBombs;
@@ -16671,12 +16689,15 @@ class Altitude_HTML {
                 PowerReduction = acft.GetMinIAF() - af;
             }
             else {
-                SpeedIncrease = Math.min(af - acft.GetMinIAF(), acft.GetMaxIAF() - acft.GetMinIAF());
-                if (af > acft.GetMaxIAF()) {
-                    PowerReduction = af - acft.GetMaxIAF();
+                let maxIAF = acft.GetMaxIAF();
+                if (this.oxidized.checked)
+                    maxIAF += 3;
+                SpeedIncrease = Math.min(af - acft.GetMinIAF(), maxIAF - acft.GetMinIAF());
+                if (af > maxIAF) {
+                    PowerReduction = af - maxIAF;
                 }
             }
-            if (fires)
+            if (this.fires.checked)
                 PowerReduction = 0;
             if (this.rows.length <= af) {
                 this.AddRow(af);
@@ -17130,7 +17151,7 @@ class Aircraft_HTML extends Display {
         this.used = new Used_HTML(aircraft.GetUsed());
         this.rotor = new Rotor_HTML(aircraft.GetRotor());
         this.alter = new AlterStats_HTML(aircraft.GetAlter());
-        this.altitude = new Altitude_HTML();
+        this.altitude = new Altitude_HTML(() => { this.UpdateDisplay(); });
         document.getElementById("lbl_acft_type").textContent = lu("Aircraft Type Section Title");
         this.acft_type = document.getElementById("acft_type");
         let heli = false;
@@ -17197,22 +17218,6 @@ class Aircraft_HTML extends Display {
         document.getElementById("lbl_acft_save_cat_bot").textContent = lu("Aircraft Button Save Catalog");
         var cat_button = document.getElementById("acft_save_cat");
         cat_button.onclick = () => { this.CatalogStats(); };
-        this.alt_fuel_state = document.getElementById("select_fuelstate");
-        let opt = document.createElement("OPTION");
-        opt.textContent = lu("Derived Full Fuel with Bombs");
-        this.alt_fuel_state.appendChild(opt);
-        opt = document.createElement("OPTION");
-        opt.textContent = lu("Derived Half Fuel with Bombs");
-        this.alt_fuel_state.appendChild(opt);
-        opt = document.createElement("OPTION");
-        opt.textContent = lu("Derived Full Fuel");
-        this.alt_fuel_state.appendChild(opt);
-        opt = document.createElement("OPTION");
-        opt.textContent = lu("Derived Half Fuel");
-        this.alt_fuel_state.appendChild(opt);
-        this.alt_fuel_state.onchange = () => { this.UpdateDisplay(); };
-        this.alt_fires = document.getElementById("input_fires");
-        this.alt_fires.onchange = () => { this.UpdateDisplay(); };
     }
     UpdateCard() {
         this.acft.name = this.derived.GetName();
@@ -17888,7 +17893,7 @@ class Aircraft_HTML extends Display {
             this.acft.name = this.derived.GetName();
         }
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
-        this.altitude.UpdateDisplay(this.acft, derived_stats, this.alt_fuel_state.selectedIndex, this.alt_fires.checked);
+        this.altitude.UpdateDisplay(this.acft, derived_stats);
     }
     UpdateDisplay() {
         var stats = this.acft.GetStats();
