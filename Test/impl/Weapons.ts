@@ -20,7 +20,6 @@ class Weapons extends Part {
         { name: "Mechanical Action" },
         { name: "Gast Principle" },
         { name: "Rotary_Gun" },
-        { name: "Henry" },
     ];
     private projectile_list = [
         { name: "Standard" },
