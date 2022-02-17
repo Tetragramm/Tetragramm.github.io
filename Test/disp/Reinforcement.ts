@@ -114,6 +114,7 @@ class Reinforcement_HTML extends Display {
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
         this.d_amax = c2_row.insertCell();
+        this.d_amax.className = "part_local";
     }
 
     public UpdateDisplay() {

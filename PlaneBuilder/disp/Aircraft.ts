@@ -83,7 +83,7 @@ class Aircraft_HTML extends Display {
         this.wings = new Wings_HTML(aircraft.GetWings());
         this.stabilizers = new Stabilizers_HTML(aircraft.GetStabilizers());
         this.controlsurfaces = new ControlSurfaces_HTML(aircraft.GetControlSurfaces());
-        this.reinforcements = new Reinforcement_HTML(aircraft, aircraft.GetReinforcements());
+        this.reinforcements = new Reinforcement_HTML(aircraft.GetReinforcements());
         this.load = new Load_HTML(aircraft.GetFuel(), aircraft.GetMunitions(), aircraft.GetCargoAndPassengers());
         this.gear = new LandingGear_HTML(aircraft.GetLandingGear());
         this.accessories = new Accessories_HTML(aircraft.GetAccessories());

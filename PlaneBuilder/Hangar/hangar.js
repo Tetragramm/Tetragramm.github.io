@@ -15265,9 +15265,8 @@ class ControlSurfaces_HTML extends Display {
 /// <reference path="./Display.ts" />
 /// <reference path="../impl/Reinforcement.ts" />
 class Reinforcement_HTML extends Display {
-    constructor(acft, rf) {
+    constructor(rf) {
         super();
-        this.acft = acft;
         this.rf = rf;
         this.ext_wood_inp = [];
         this.ext_steel_inp = [];
@@ -15354,6 +15353,7 @@ class Reinforcement_HTML extends Display {
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
         this.d_amax = c2_row.insertCell();
+        this.d_amax.className = "part_local";
     }
     UpdateDisplay() {
         this.cabane.selectedIndex = this.rf.GetCabane();
@@ -16688,7 +16688,7 @@ class Aircraft_HTML extends Display {
         this.wings = new Wings_HTML(aircraft.GetWings());
         this.stabilizers = new Stabilizers_HTML(aircraft.GetStabilizers());
         this.controlsurfaces = new ControlSurfaces_HTML(aircraft.GetControlSurfaces());
-        this.reinforcements = new Reinforcement_HTML(aircraft, aircraft.GetReinforcements());
+        this.reinforcements = new Reinforcement_HTML(aircraft.GetReinforcements());
         this.load = new Load_HTML(aircraft.GetFuel(), aircraft.GetMunitions(), aircraft.GetCargoAndPassengers());
         this.gear = new LandingGear_HTML(aircraft.GetLandingGear());
         this.accessories = new Accessories_HTML(aircraft.GetAccessories());
