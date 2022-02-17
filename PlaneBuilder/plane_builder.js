@@ -9762,7 +9762,7 @@ class Rotor extends Part {
         this.rotor_count = d.GetNum();
         this.rotor_span = d.GetNum();
         this.cant_idx = d.GetNum();
-        if (d.version < 12.45) {
+        if (d.version < 12.35) {
             d.GetBool();
             this.stagger_sel = 0;
         }
@@ -17067,6 +17067,7 @@ class AlterStats extends Part {
     serialize(s) {
         var plist = [];
         for (let p of this.custom_parts) {
+            console.log([p.name, p.qty]);
             if (p.qty > 0)
                 plist.push({ name: p.name, stats: p.stats, qty: p.qty });
         }
@@ -17082,12 +17083,15 @@ class AlterStats extends Part {
             p.qty = 0;
         }
         var pcount = d.GetNum();
+        console.log("Part Count is " + pcount.toString());
         for (let i = 0; i < pcount; i++) {
             let name = d.GetString();
             let stats = new Stats();
             stats.deserialize(d);
             let qty = d.GetNum();
+            console.log([name, stats, qty]);
             var idx = this.custom_parts.findIndex((value) => { return value.name == name; });
+            console.log(idx);
             if (idx == -1) {
                 idx = this.custom_parts.length;
                 this.custom_parts.push({ name: name, stats: stats, qty: qty });
