@@ -8606,6 +8606,8 @@ class Wings extends Part {
             this.wing_stagger = 4;
         else if (this.wing_list.length <= 1)
             this.wing_stagger = 0;
+        w.dihedral = Math.min(w.dihedral, w.span - 1);
+        w.anhedral = Math.min(w.anhedral, w.span - 1 - w.dihedral);
         this.CalculateStats();
     }
     SetMiniWing(idx, w) {
@@ -9461,6 +9463,14 @@ class ControlSurfaces extends Part {
     GetRudderList() {
         return this.rudder_list;
     }
+    CanRudder() {
+        return this.can_rudder;
+    }
+    SetCanRudder(can) {
+        this.can_rudder = can;
+        if (!can)
+            this.rudder_sel = 0;
+    }
     GetRudder() {
         return this.rudder_sel;
     }
@@ -9470,6 +9480,14 @@ class ControlSurfaces extends Part {
     }
     GetElevatorList() {
         return this.elevator_list;
+    }
+    CanElevator() {
+        return this.can_elevator;
+    }
+    SetCanElevator(can) {
+        this.can_elevator = can;
+        if (!can)
+            this.elevator_sel = 0;
     }
     GetElevator() {
         return this.elevator_sel;
@@ -13340,6 +13358,8 @@ class Aircraft {
         this.controlsurfaces.SetBoomTail(this.frames.GetUseBoom());
         this.controlsurfaces.SetSpan(this.wings.GetSpan());
         this.controlsurfaces.SetAcftType(this.aircraft_type);
+        this.controlsurfaces.SetCanElevator(this.stabilizers.GetHStabCount() > 0);
+        this.controlsurfaces.SetCanRudder(this.stabilizers.GetVStabCount() > 0);
         stats = stats.Add(this.controlsurfaces.PartStats());
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
         this.reinforcements.SetTandem(this.wings.GetTandem());

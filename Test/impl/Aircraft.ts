@@ -355,6 +355,8 @@ class Aircraft {
         this.controlsurfaces.SetBoomTail(this.frames.GetUseBoom());
         this.controlsurfaces.SetSpan(this.wings.GetSpan());
         this.controlsurfaces.SetAcftType(this.aircraft_type);
+        this.controlsurfaces.SetCanElevator(this.stabilizers.GetHStabCount() > 0);
+        this.controlsurfaces.SetCanRudder(this.stabilizers.GetVStabCount() > 0);
         stats = stats.Add(this.controlsurfaces.PartStats());
 
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());

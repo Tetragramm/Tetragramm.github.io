@@ -21,6 +21,8 @@ class ControlSurfaces extends Part {
     private mp: number = 0;
     private is_boom: boolean = false;
     private acft_type: AIRCRAFT_TYPE = AIRCRAFT_TYPE.AIRPLANE;
+    private can_rudder: boolean;
+    private can_elevator: boolean;
 
     constructor(js: JSON) {
         super();
@@ -133,6 +135,16 @@ class ControlSurfaces extends Part {
         return this.rudder_list;
     }
 
+    public CanRudder() {
+        return this.can_rudder;
+    }
+
+    public SetCanRudder(can: boolean) {
+        this.can_rudder = can;
+        if (!can)
+            this.rudder_sel = 0;
+    }
+
     public GetRudder() {
         return this.rudder_sel;
     }
@@ -144,6 +156,16 @@ class ControlSurfaces extends Part {
 
     public GetElevatorList() {
         return this.elevator_list;
+    }
+
+    public CanElevator() {
+        return this.can_elevator;
+    }
+
+    public SetCanElevator(can: boolean) {
+        this.can_elevator = can;
+        if (!can)
+            this.elevator_sel = 0;
     }
 
     public GetElevator() {

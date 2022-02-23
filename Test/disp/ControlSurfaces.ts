@@ -138,7 +138,9 @@ class ControlSurfaces_HTML extends Display {
         }
         this.aileron_select.selectedIndex = this.cs.GetAileron();
         this.rudder_select.selectedIndex = this.cs.GetRudder();
+        this.rudder_select.disabled = !this.cs.CanRudder();
         this.elevator_select.selectedIndex = this.cs.GetElevator();
+        this.elevator_select.disabled = !this.cs.CanElevator();
         this.flaps_select.selectedIndex = this.cs.GetFlaps();
         this.slats_select.selectedIndex = this.cs.GetSlats();
         var drag = this.cs.GetDrag();

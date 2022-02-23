@@ -418,6 +418,9 @@ class Wings extends Part {
         else if (this.wing_list.length <= 1)
             this.wing_stagger = 0;
 
+        w.dihedral = Math.min(w.dihedral, w.span - 1);
+        w.anhedral = Math.min(w.anhedral, w.span - 1 - w.dihedral);
+
         this.CalculateStats();
     }
 
