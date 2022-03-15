@@ -259,6 +259,12 @@ class ControlSurfaces extends Part {
     public SetBoomTail(has: boolean) {
         this.is_boom = has;
     }
+    
+    public SetIsVTail(is: boolean){
+        if(is){
+            this.rudder_sel = this.elevator_sel;
+        }
+    }
 
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;

@@ -140,6 +140,10 @@ class Stabilizers extends Part {
         return lst;
     }
 
+    public GetIsVTail(){
+        return this.hstab_list[this.hstab_sel].is_vtail;
+    }
+
     private SetVTail() {
         for (let i = 0; i < this.hstab_list.length; i++) {
             if (this.hstab_list[i].is_vtail)
