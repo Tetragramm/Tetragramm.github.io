@@ -6455,6 +6455,9 @@ class Stabilizers extends Part {
         }
         return lst;
     }
+    GetIsVTail() {
+        return this.hstab_list[this.hstab_sel].is_vtail;
+    }
     SetVTail() {
         for (let i = 0; i < this.hstab_list.length; i++) {
             if (this.hstab_list[i].is_vtail)
@@ -6893,6 +6896,11 @@ class ControlSurfaces extends Part {
     }
     SetBoomTail(has) {
         this.is_boom = has;
+    }
+    SetIsVTail(is) {
+        if (is) {
+            this.rudder_sel = this.elevator_sel;
+        }
     }
     SetCalculateStats(callback) {
         this.CalculateStats = callback;
@@ -16440,6 +16448,7 @@ class Aircraft {
         this.controlsurfaces.SetAcftType(this.aircraft_type);
         this.controlsurfaces.SetCanElevator(this.stabilizers.GetHStabCount() > 0);
         this.controlsurfaces.SetCanRudder(this.stabilizers.GetVStabCount() > 0);
+        this.controlsurfaces.SetIsVTail(this.stabilizers.GetIsVTail());
         stats = stats.Add(this.controlsurfaces.PartStats());
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
         this.reinforcements.SetTandem(this.wings.GetTandem());
