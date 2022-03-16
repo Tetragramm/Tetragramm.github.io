@@ -107,7 +107,7 @@ class ControlSurfaces extends Part {
 
     public CanAileron() {
         var can = [];
-        if (this.acft_type != AIRCRAFT_TYPE.ORNITHOPTER) {
+        if (!IsAnyOrnithopter(this.acft_type)) {
             for (let a of this.aileron_list) {
                 if (a.warping && this.wing_area == 0)
                     can.push(false)
@@ -250,7 +250,7 @@ class ControlSurfaces extends Part {
             this.span = 0;
             this.is_cantilever = 0;
             this.wing_area = 0;
-        } else if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+        } else if (IsAnyOrnithopter(this.acft_type)) {
             var can = this.CanAileron();
             this.aileron_sel = can.findIndex((element) => { return element; })
         }

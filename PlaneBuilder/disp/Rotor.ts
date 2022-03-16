@@ -38,6 +38,7 @@ class Rotor_HTML extends Display {
     private h_cost: HTMLTableCellElement;
     private h_area: HTMLTableCellElement;
     private h_rely: HTMLTableCellElement;
+    private h_strn: HTMLTableCellElement;
 
     constructor(r: Rotor) {
         super();
@@ -148,6 +149,7 @@ class Rotor_HTML extends Display {
         FlexDisplay(lu("Rotor Ideal Rotor Span"), this.heli_min, rotor_fs);
         this.heli_span = document.createElement("INPUT") as HTMLInputElement;
         FlexInput(lu("Rotor Span"), this.heli_span, rotor_fs);
+        this.heli_span.min = "";
         this.heli_span.onchange = () => { this.rotor.SetRotorSpan(this.heli_span.valueAsNumber); };
 
         this.heli_stagger = document.createElement("SELECT") as HTMLSelectElement;
@@ -207,11 +209,11 @@ class Rotor_HTML extends Display {
         var h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Rotor Area"));
         CreateTH(h2_row, lu("Stat Reliability"));
-        CreateTH(h2_row, "");
+        CreateTH(h2_row, lu("Reinforcement Aircraft Max Strain"));
         var c2_row = tbl_stat.insertRow();
         this.h_area = c2_row.insertCell();
         this.h_rely = c2_row.insertCell();
-        c2_row.insertCell();
+        this.h_strn = c2_row.insertCell();
     }
 
     private UpdateHelicopterStats() {
@@ -242,6 +244,10 @@ class Rotor_HTML extends Display {
         BlinkIfChanged(this.h_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.h_area, stats.wingarea.toString(), true);
         BlinkIfChanged(this.h_rely, stats.reliability.toString(), true);
+    }
+
+    public UpdateMaxStrain(strain: number) {
+        BlinkIfChanged(this.h_strn, strain.toString(), true);
     }
 
     public UpdateDisplay() {

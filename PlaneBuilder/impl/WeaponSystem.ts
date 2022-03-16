@@ -21,6 +21,7 @@ class WeaponSystem extends Part {
 
     private tractor: boolean;
     private pusher: boolean;
+    private heli: boolean;
     private spinner_t: boolean;
     private spinner_p: boolean;
     public has_cantilever: boolean;
@@ -466,6 +467,8 @@ class WeaponSystem extends Part {
                 directions[0] = false;
             if (this.pusher && !(this.spinner_p || (is_spinner && this.directions[1])))
                 directions[1] = false;
+            if (this.heli)
+                directions[2] = false;
         }
         return directions;
     }
@@ -483,6 +486,8 @@ class WeaponSystem extends Part {
                 if (num == 0 && this.tractor && !this.spinner_t)
                     num = 1;
                 if (num == 1 && this.pusher && !this.spinner_p)
+                    num = 3;
+                if (num == 2 && this.heli)
                     num = 3;
             }
         }
@@ -537,9 +542,10 @@ class WeaponSystem extends Part {
     }
 
     public SetTractorPusher(hasT: boolean, can_spinnerT: boolean, can_arty_spinnerT: boolean,
-        hasP: boolean, can_spinnerP: boolean, can_arty_spinnerP: boolean) {
+        hasP: boolean, can_spinnerP: boolean, can_arty_spinnerP: boolean, hasR: boolean) {
         this.tractor = hasT;
         this.pusher = hasP;
+        this.heli = hasR;
         this.spinner_t = can_arty_spinnerT;
         this.spinner_p = can_arty_spinnerP;
 
@@ -574,6 +580,12 @@ class WeaponSystem extends Part {
                     w.can_spinner = false;
                     w.can_arty_spinner = false;
                 }
+            }
+        } else if (this.directions[2] && this.heli) {
+            for (let w of this.weapons) {
+                w.can_synchronize = true;
+                w.can_spinner = false;
+                w.can_arty_spinner = false;
             }
         } else {
             for (let w of this.weapons) {
@@ -669,6 +681,12 @@ class WeaponSystem extends Part {
             this.SetAction(ActionType.STANDARD);
         }
         this.has_propeller = have;
+    }
+
+    public SetCanWing(can: boolean) {
+        for (let w of this.weapons) {
+            w.SetCanWing(can);
+        }
     }
 
     public GetAction() {

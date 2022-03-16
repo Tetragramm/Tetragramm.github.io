@@ -103,7 +103,7 @@ function InitHTML() {
         acft_builder.fromJSON(JSON.parse(JSON.stringify(acft_hangar.toJSON())));
         acft_builder.CalculateStats();
         stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
-        window.localStorage.aircraft = JSON.stringify(acft_builder.toJSON());
+        window.localStorage.setItem("aircraft", JSON.stringify(acft_builder.toJSON()));
         RefreshDisplay();
         BlinkNeutral(load_btn.parentElement);
     };
@@ -214,7 +214,7 @@ function InitHTML() {
 }
 
 function InitStats() {
-    let acft_data = window.localStorage.aircraft;
+    let acft_data = window.localStorage.getItem("aircraft");
     acft_builder = new Aircraft(parts_JSON, weapon_JSON, false);
     if (acft_data) {
         console.log("Used Saved Data");

@@ -5935,6 +5935,8 @@ class Wings extends Part {
             this.wing_stagger = 4;
         else if (this.wing_list.length <= 1)
             this.wing_stagger = 0;
+        w.dihedral = Math.min(w.dihedral, w.span - 1);
+        w.anhedral = Math.min(w.anhedral, w.span - 1 - w.dihedral);
         this.CalculateStats();
     }
     SetMiniWing(idx, w) {
@@ -6790,6 +6792,14 @@ class ControlSurfaces extends Part {
     GetRudderList() {
         return this.rudder_list;
     }
+    CanRudder() {
+        return this.can_rudder;
+    }
+    SetCanRudder(can) {
+        this.can_rudder = can;
+        if (!can)
+            this.rudder_sel = 0;
+    }
     GetRudder() {
         return this.rudder_sel;
     }
@@ -6799,6 +6809,14 @@ class ControlSurfaces extends Part {
     }
     GetElevatorList() {
         return this.elevator_list;
+    }
+    CanElevator() {
+        return this.can_elevator;
+    }
+    SetCanElevator(can) {
+        this.can_elevator = can;
+        if (!can)
+            this.elevator_sel = 0;
     }
     GetElevator() {
         return this.elevator_sel;
@@ -9907,7 +9925,6 @@ class Weapons extends Part {
             { name: "Mechanical Action" },
             { name: "Gast Principle" },
             { name: "Rotary_Gun" },
-            { name: "Henry" },
         ];
         this.projectile_list = [
             { name: "Standard" },
@@ -10558,7 +10575,6 @@ class Rotor extends Part {
             this.stagger_sel = 0;
             this.rotor_count = 1;
             this.type = new_type;
-            this.VerifySizes();
             this.rotor_span = 0;
         }
     }
@@ -10601,12 +10617,10 @@ class Rotor extends Part {
     }
     SetBladeCount(idx) {
         this.blade_idx = idx;
-        this.VerifySizes();
         this.CalculateStats();
     }
     SetWingArea(num) {
         this.wing_area = num;
-        this.VerifySizes();
     }
     GetSizingSpan() {
         return this.sizing_span;
@@ -10614,7 +10628,6 @@ class Rotor extends Part {
     SetMP(mp) {
         if (mp != this.dryMP) {
             this.dryMP = mp;
-            this.VerifySizes();
             this.CalculateStats();
         }
     }
@@ -13750,7 +13763,9 @@ class ControlSurfaces_HTML extends Display {
         }
         this.aileron_select.selectedIndex = this.cs.GetAileron();
         this.rudder_select.selectedIndex = this.cs.GetRudder();
+        this.rudder_select.disabled = !this.cs.CanRudder();
         this.elevator_select.selectedIndex = this.cs.GetElevator();
+        this.elevator_select.disabled = !this.cs.CanElevator();
         this.flaps_select.selectedIndex = this.cs.GetFlaps();
         this.slats_select.selectedIndex = this.cs.GetSlats();
         var drag = this.cs.GetDrag();
@@ -13860,6 +13875,7 @@ class Reinforcement_HTML extends Display {
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
         this.d_amax = c2_row.insertCell();
+        this.d_amax.className = "part_local";
     }
     UpdateDisplay() {
         this.cabane.selectedIndex = this.rf.GetCabane();
@@ -16021,9 +16037,27 @@ var FUEL_STATE;
     FUEL_STATE[FUEL_STATE["EMPTY"] = 4] = "EMPTY";
 })(FUEL_STATE || (FUEL_STATE = {}));
 class Altitude_HTML {
-    constructor() {
+    constructor(callback) {
         document.getElementById("lbl_altitude").textContent = lu("Altitude Section Title");
         this.tbl = document.getElementById("table_altitude");
+        this.fuel_state = document.getElementById("select_fuelstate");
+        let opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Full Fuel with Bombs");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Half Fuel with Bombs");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Full Fuel");
+        this.fuel_state.appendChild(opt);
+        opt = document.createElement("OPTION");
+        opt.textContent = lu("Derived Half Fuel");
+        this.fuel_state.appendChild(opt);
+        this.fuel_state.onchange = () => { callback(); };
+        this.fires = document.getElementById("input_fires");
+        this.fires.onchange = () => { callback(); };
+        this.oxidized = document.getElementById("input_oxidized");
+        this.oxidized.onchange = () => { callback(); };
         this.fRow = insertRow(this.tbl);
         CreateTH(this.fRow, lu("Altitude Altitude"));
         CreateTH(this.fRow, lu("Derived Boost"));
@@ -16042,7 +16076,7 @@ class Altitude_HTML {
         row.insertCell();
         this.rows.push(row);
     }
-    UpdateDisplay(acft, derived, fuelstate, fires) {
+    UpdateDisplay(acft, derived) {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
@@ -16052,7 +16086,7 @@ class Altitude_HTML {
         var RoC = 0;
         var Stall = 0;
         var Speed = 0;
-        switch (fuelstate) {
+        switch (this.fuel_state.selectedIndex) {
             case FUEL_STATE.FULLWBOMBS:
                 Boost = derived.BoostFullwBombs;
                 RoC = derived.RateOfClimbwBombs;
@@ -16085,12 +16119,15 @@ class Altitude_HTML {
                 PowerReduction = acft.GetMinIAF() - af;
             }
             else {
-                SpeedIncrease = Math.min(af - acft.GetMinIAF(), acft.GetMaxIAF() - acft.GetMinIAF());
-                if (af > acft.GetMaxIAF()) {
-                    PowerReduction = af - acft.GetMaxIAF();
+                let maxIAF = acft.GetMaxIAF();
+                if (this.oxidized.checked)
+                    maxIAF += 3;
+                SpeedIncrease = Math.min(af - acft.GetMinIAF(), maxIAF - acft.GetMinIAF());
+                if (af > maxIAF) {
+                    PowerReduction = af - maxIAF;
                 }
             }
-            if (fires)
+            if (this.fires.checked)
                 PowerReduction = 0;
             if (this.rows.length <= af) {
                 this.AddRow(af);
@@ -16401,6 +16438,8 @@ class Aircraft {
         this.controlsurfaces.SetBoomTail(this.frames.GetUseBoom());
         this.controlsurfaces.SetSpan(this.wings.GetSpan());
         this.controlsurfaces.SetAcftType(this.aircraft_type);
+        this.controlsurfaces.SetCanElevator(this.stabilizers.GetHStabCount() > 0);
+        this.controlsurfaces.SetCanRudder(this.stabilizers.GetVStabCount() > 0);
         stats = stats.Add(this.controlsurfaces.PartStats());
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
         this.reinforcements.SetTandem(this.wings.GetTandem());

@@ -336,7 +336,8 @@ class Engine extends Part {
         var can = [...Array(elist_temp.length).fill(true)];
         if (this.is_internal) {
             for (let i = 0; i < elist_temp.length; i++) {
-                if (elist_temp.get(i).engine_type == ENGINE_TYPE.PULSEJET)
+                if (elist_temp.get(i).engine_type == ENGINE_TYPE.PULSEJET
+                    || (elist_temp.get(i).engine_type == ENGINE_TYPE.TURBOMACHINERY && (elist_temp.get(i).type == 1 || elist_temp.get(i).type == 2))) //If Turbofan or Turboprop
                     can[i] = false;
             }
         }
@@ -350,6 +351,8 @@ class Engine extends Part {
             this.cooling_count = 2 * this.etype_stats.stats.cooling;
         else
             this.cooling_count = this.etype_stats.stats.cooling;
+        if (this.radiator_index < 0)
+            this.radiator_index = 0;
         this.PulseJetCheck();
         this.VerifyCowl(this.cowl_sel);
         this.CalculateStats();
@@ -525,7 +528,7 @@ class Engine extends Part {
     }
 
     public CanUsePushPull() {
-        return !(this.is_generator || this.GetIsJet() || this.is_internal);
+        return !(this.is_generator || this.GetIsJet() || this.is_internal || this.mount_list[this.mount_sel].helicopter);
     }
 
     public SetUsePushPull(use: boolean) {
@@ -554,7 +557,7 @@ class Engine extends Part {
     }
 
     public CanUseExtendedDriveshaft() {
-        return !((this.GetNumPropellers() == 0) || this.is_internal || this.GetGenerator());
+        return !((this.GetNumPropellers() == 0) || this.is_internal || this.GetGenerator() || this.mount_list[this.mount_sel].helicopter);
     }
 
     public SetUseExtendedDriveshaft(use: boolean) {
@@ -805,7 +808,7 @@ class Engine extends Part {
     }
 
     public GetAlternatorEnabled() {
-        return !this.GetIsPulsejet() && !this.is_generator;
+        return !this.GetIsPulsejet() && !this.is_generator && this.etype_inputs.engine_type != ENGINE_TYPE.ELECTRIC;
     }
 
     public GetAlternator() {
@@ -953,11 +956,18 @@ class Engine extends Part {
         }
     }
 
+    private ElectricCheck() {
+        if (this.etype_inputs.engine_type == ENGINE_TYPE.ELECTRIC) {
+            this.has_alternator = false;
+        }
+    }
+
     public PartStats(): Stats {
         this.VerifyMount();
         this.VerifyCooling();
         this.PulseJetCheck();
         this.TurbineCheck();
+        this.ElectricCheck();
         if (!this.CanUseExtendedDriveshaft()) {
             this.use_ds = false;
         }
@@ -971,6 +981,15 @@ class Engine extends Part {
 
         if (this.etype_stats.oiltank)
             stats.mass += 1;
+
+        var torque = this.etype_stats.torque;
+        if (this.mount_list[this.mount_sel].helicopter) {
+            if (this.IsRotary())
+                torque = Math.floor(1.0e-6 + torque / 2);
+            else
+                torque = 0;
+        }
+
 
         if (this.torque_to_struct)
             stats.structure -= this.etype_stats.torque;
@@ -1071,6 +1090,7 @@ class Engine extends Part {
         }
 
 
+        stats.pitchspeed = 0;
         //Reliability is a part local issue.
         stats.reliability = 0;
 

@@ -313,12 +313,12 @@ class Aircraft {
         stats = stats.Add(this.passengers.PartStats());
 
         this.engines.SetTailMods(this.frames.GetFarmanOrBoom(), this.wings.GetSwept() && this.stabilizers.GetVOutboard(), this.stabilizers.GetCanard());
-        this.engines.SetInternal(this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER || this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER);
+        this.engines.SetInternal(this.aircraft_type == AIRCRAFT_TYPE.HELICOPTER || IsAnyOrnithopter(this.aircraft_type));
         this.engines.SetMetalArea(this.wings.GetMetalArea());
         this.engines.HaveParasol(this.wings.GetParasol());
         stats = stats.Add(this.engines.PartStats());
 
-        this.propeller.SetNumPropeller(this.engines.GetNumPropellers(), this.engines.GetEngineType());
+        this.propeller.SetEngineTypes(this.engines.GetEngineTypes());
         this.propeller.SetAcftType(this.aircraft_type);
         stats = stats.Add(this.propeller.PartStats());
 
@@ -332,11 +332,17 @@ class Aircraft {
         this.weapons.SetPusherInfo(this.engines.GetPusherSpinner());
         this.weapons.cant_type = this.reinforcements.GetCantileverType();
         this.weapons.SetHavePropeller(this.engines.GetNumPropellers() > 0);
+        this.weapons.SetCanWing(!IsAnyOrnithopter(this.aircraft_type));
         stats = stats.Add(this.weapons.PartStats());
         //Cargo makes sections
         stats = stats.Add(this.cargo.PartStats());
 
         //If there are wings...
+        if (this.aircraft_type == AIRCRAFT_TYPE.AUTOGYRO) {
+            this.wings.SetRotorSpan(this.rotor.GetRotorSpan());
+        } else {
+            this.wings.SetRotorSpan(0);
+        }
         stats = stats.Add(this.wings.PartStats());
         this.rotor.SetWingArea(stats.wingarea);
         //If there is a rotor...
@@ -366,7 +372,6 @@ class Aircraft {
             stats.power = Math.floor(1.0e-6 + 0.9 * stats.power);
         }
 
-        this.accessories.SetAcftPower(stats.power);
         this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
         this.accessories.SetSkinArmor(this.frames.GetArmor());
         this.accessories.SetVitalParts(this.VitalComponentList().length);
@@ -377,8 +382,7 @@ class Aircraft {
         this.frames.SetRequiredSections(stats.reqsections);
         this.frames.SetHasTractorNacelles(this.engines.GetHasTractorNacelles());
         this.frames.SetIsTandem(this.wings.GetTandem());
-        let fstats = this.frames.PartStats()
-        stats = stats.Add(fstats);
+        stats = stats.Add(this.frames.PartStats());
 
         //Depends on Lifting area.
         this.stabilizers.SetEngineCount(this.engines.GetNumberOfEngines());
@@ -392,6 +396,7 @@ class Aircraft {
 
         //Treated Paper needs to apply near to last
         this.wings.SetAircraftMass(stats.mass);
+        this.wings.SetAcftType(this.aircraft_type);
         stats.mass += this.wings.GetPaperMass();
         //Because treated paper brings mass down.
         stats.mass = Math.max(1, stats.mass);
@@ -446,7 +451,11 @@ class Aircraft {
                 });
             }
 
-            if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
+            if (IsAnyOrnithopter(this.aircraft_type)) {
+                stats.upkeep += 1;
+            }
+
+            if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
                 stats.reliability -= 2;
             }
 
@@ -475,7 +484,7 @@ class Aircraft {
                 this.DisplayCallback();
 
             if (this.use_storage)
-                window.localStorage.aircraft = JSON.stringify(this);
+                window.localStorage.setItem("aircraft", JSON.stringify(this));
         }
     }
 
@@ -567,12 +576,7 @@ class Aircraft {
         HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
         HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
 
-        var MaxStrain = 1 / 0;
-        if (this.wings.GetWingList().length > 0 || this.wings.GetMiniWingList().length > 0) {
-            MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
-        } else {
-            MaxStrain = Math.min(this.stats.structure + this.stats.maxstrain, this.stats.structure);
-        }
+        var MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         //And store the results so they can be displayed
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;
@@ -667,10 +671,10 @@ class Aircraft {
         }
 
         //Ornithopter Stuff
-        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER) {
-            HandlingEmpty += this.stats.power;
-            HandlingFull += this.stats.power;
-            HandlingFullwBombs += this.stats.power;
+        if (IsAnyOrnithopter(this.aircraft_type)) {
+            HandlingEmpty += 5;
+            HandlingFull += 5;
+            HandlingFullwBombs += 5;
             if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Stall") }) == -1) {
                 this.stats.warnings.push({
                     source: lu("Ornithopter Stall"), warning: lu("Ornithopter Stall Warning"),
@@ -678,6 +682,34 @@ class Aircraft {
                 });
             }
             Overspeed = MaxStrain;
+        }
+
+        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
+            HandlingEmpty += 5;
+            HandlingFull += 5;
+            HandlingFullwBombs += 5;
+            Overspeed = Infinity;
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Flutterer Attack") }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Ornithopter Flutterer Attack"), warning: lu("Ornithopter Flutterer Attack Warning"),
+                    color: WARNING_COLOR.WHITE,
+                });
+            }
+        }
+
+        if (this.aircraft_type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Boost") }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Ornithopter Buzzer Boost"), warning: lu("Ornithopter Buzzer Boost Warning"),
+                    color: WARNING_COLOR.WHITE,
+                });
+            }
+            if (this.stats.warnings.findIndex((value) => { return value.source == lu("Ornithopter Buzzer Stall") }) == -1) {
+                this.stats.warnings.push({
+                    source: lu("Ornithopter Buzzer Stall"), warning: lu("Ornithopter Buzzer Stall Warning"),
+                    color: WARNING_COLOR.WHITE,
+                });
+            }
         }
 
         return {

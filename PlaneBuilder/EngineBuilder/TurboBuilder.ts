@@ -166,6 +166,16 @@ class TurboBuilder {
         return ei;
     }
 
+    private GetPitchSpeed() {
+        if (this.bypass_ratio >= 8)
+            return 1;
+        if (this.bypass_ratio >= 3.5)
+            return 1.1;
+        if (this.bypass_ratio >= 1)
+            return 1.2;
+        return 1.3;
+    }
+
     public EngineStats() {
         var estats = new EngineStats();
 
@@ -183,7 +193,12 @@ class TurboBuilder {
         estats.stats.cost = this.CalcCost();
         estats.overspeed = 100;
         estats.altitude = 59;
-        estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
+        if (this.era_sel == 8) {
+            estats.stats.era.push({ name: estats.name, era: lu(num2era(-1)) });
+        } else {
+            estats.stats.era.push({ name: estats.name, era: lu(num2era(5)) });
+        }
+        estats.stats.pitchspeed = this.GetPitchSpeed();
         estats.rarity = this.rarity;
 
         return estats;

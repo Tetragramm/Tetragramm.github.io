@@ -50,6 +50,7 @@ class Weapon extends Part {
     public has_cantilever: boolean;
     private action: ActionType;
     private turret: boolean;
+    private canwing: boolean;
 
     constructor(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
         super();
@@ -139,12 +140,19 @@ class Weapon extends Part {
         }
     }
 
+    public SetCanWing(can: boolean) {
+        this.canwing = can;
+        if (this.wing && !can) {
+            this.wing = false;
+        }
+    }
+
     public GetWing() {
         return this.wing;
     }
 
     public CanWing() {
-        return this.weapon_type.size <= 16;
+        return this.weapon_type.size <= 16 && this.canwing;
     }
 
     public SetWing(use: boolean) {

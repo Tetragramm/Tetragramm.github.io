@@ -27,7 +27,6 @@ class Accessories extends Part {
     private cont_list: { name: string, max_mass_stress: number, max_total_stress: number, stats: Stats }[];
     private cont_sel: number;
 
-    private acft_power: number;
     private acft_rad: boolean;
     private skin_armour: number;
     private vital_parts: number;
@@ -36,7 +35,6 @@ class Accessories extends Part {
         super();
 
         this.armour_coverage = [...Array(8).fill(0)];
-        this.acft_power = 0;
         this.acft_rad = false;
         this.skin_armour = 0;
 
@@ -327,10 +325,6 @@ class Accessories extends Part {
         this.CalculateStats();
     }
 
-    public SetAcftPower(pwr: number) {
-        this.acft_power = pwr;
-    }
-
     public SetAcftRadiator(have: boolean) {
         this.acft_rad = have;
     }
@@ -393,13 +387,18 @@ class Accessories extends Part {
     }
 
     public SetCanCutouts(wing: boolean, frame: boolean) {
-        this.can_visi[0] = wing;
-        this.can_visi[1] = frame;
-        if (!wing) {
-            this.visi_sel[0] = false;
-        }
-        if (!frame) {
-            this.visi_sel[1] = false;
+        for (let i = 0; i < this.visi_list.length; i++) {
+            let can = true;
+            switch (this.visi_list[i].name) {
+                case "Wing Cutouts":
+                    can = wing;
+                    break;
+                case "Hull Cutouts":
+                    can = frame;
+                    break;
+            }
+            this.can_visi[i] = can;
+            if (!can) this.visi_sel[i] = false;
         }
     }
 

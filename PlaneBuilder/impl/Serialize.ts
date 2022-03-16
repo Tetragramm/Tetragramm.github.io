@@ -75,6 +75,12 @@ class Deserialize {
         this.array = arr;
         this.view = new DataView(this.array);
         this.offset = 0;
+        this.version = parseFloat(this.GetString());
+        this.Reset();
+    }
+
+    public Reset() {
+        this.offset = 0;
     }
 
     private Check() {
@@ -139,6 +145,11 @@ class Deserialize {
         var flt = this.view.getFloat32(this.offset, false);
         this.offset += 4;
         return flt;
+    }
+
+    public CheckLastNum() {
+        var num = this.view.getInt16(this.array.byteLength - 2, false);
+        return num;
     }
 }
 

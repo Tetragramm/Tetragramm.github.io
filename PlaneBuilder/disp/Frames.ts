@@ -337,7 +337,7 @@ class Frames_HTML extends Display {
             fsec.int.disabled = false;
 
         fsec.lb.checked = sec.lifting_body;
-        fsec.lb.disabled = !this.frames.PossibleMonocoque(i);
+        fsec.lb.disabled = !this.frames.PossibleLiftingBody(i);
     }
 
     private CreateTailSection(i: number, sec: {
@@ -423,6 +423,6 @@ class Frames_HTML extends Display {
         tsec.mono.disabled = !this.frames.PossibleTailMonocoque(i);
 
         tsec.lb.checked = sec.lifting_body;
-        tsec.lb.disabled = !this.frames.PossibleTailMonocoque(i);
+        tsec.lb.disabled = !this.frames.PossibleTailLiftingBody(i);
     }
 }

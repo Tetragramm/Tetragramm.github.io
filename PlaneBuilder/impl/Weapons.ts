@@ -37,6 +37,7 @@ class Weapons extends Part {
     public pusher_spinner_count: number;
     public pusher_arty_spinner_count: number;
     public cant_type: number;
+    private isheli: boolean;
 
     constructor(js: JSON) {
         super();
@@ -94,6 +95,7 @@ class Weapons extends Part {
 
         this.weapon_sets = [];
         this.brace_count = 0;
+        this.isheli = false;
     }
 
     public toJSON() {
@@ -364,6 +366,12 @@ class Weapons extends Part {
         }
     }
 
+    public SetCanWing(can: boolean) {
+        for (let ws of this.weapon_sets) {
+            ws.SetCanWing(can);
+        }
+    }
+
     public SetStickyGuns(num: number) {
         for (let ws of this.weapon_sets) {
             ws.SetStickyGuns(num);
@@ -402,6 +410,10 @@ class Weapons extends Part {
 
     public SetNumberOfCockpits(num: number) {
         this.cockpit_count = num;
+    }
+
+    public SetHeli(value: boolean) {
+        this.isheli = value;
     }
 
     public PartStats() {
@@ -460,7 +472,7 @@ class Weapons extends Part {
 
         for (let ws of this.weapon_sets) {
             ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.CanArtyTractorSpinner(),
-                this.has_pusher, this.CanPusherSpinner(), this.CanArtyPusherSpinner());
+                this.has_pusher, this.CanPusherSpinner(), this.CanArtyPusherSpinner(), this.isheli);
             ws.has_cantilever = this.cant_type > 0;
             stats = stats.Add(ws.PartStats());
         }

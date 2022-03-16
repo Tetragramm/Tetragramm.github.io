@@ -1,12 +1,6 @@
 /// <reference path="./Part.ts" />
 /// <reference path="./Stats.ts" />
 
-enum AIRCRAFT_TYPE {
-    AIRPLANE,
-    HELICOPTER,
-    AUTOGYRO,
-    ORNITHOPTER,
-}
 enum ROTOR_BLADE_COUNT {
     Two = 2,
     Three = 3,
@@ -78,6 +72,9 @@ class Rotor extends Part {
         if (json_version > 11.55) {
             this.blade_idx = js["blade_idx"];
         }
+        if (json_version < 12.45) {
+            this.rotor_span = 0;
+        }
     }
 
     public serialize(s: Serialize) {
@@ -105,6 +102,9 @@ class Rotor extends Part {
         if (d.version > 11.55) {
             this.blade_idx = d.GetNum();
         }
+        if (d.version < 12.45) {
+            this.rotor_span = 0;
+        }
     }
 
     public SetCantileverList(cant_list: { name: string, limited: boolean, stats: Stats }[]) {
@@ -131,8 +131,7 @@ class Rotor extends Part {
             this.stagger_sel = 0;
             this.rotor_count = 1;
             this.type = new_type;
-            this.VerifySizes();
-            this.rotor_span = this.sizing_span;
+            this.rotor_span = 0;
         }
     }
 
@@ -167,9 +166,7 @@ class Rotor extends Part {
     }
 
     public SetRotorSpan(num: number) {
-        if (num < 2)
-            num = 2;
-        this.rotor_span = num;
+        this.rotor_span = Math.floor(1.0e-6 + num);
         this.CalculateStats();
     }
 
@@ -183,13 +180,11 @@ class Rotor extends Part {
 
     public SetBladeCount(idx: number) {
         this.blade_idx = idx;
-        this.VerifySizes();
         this.CalculateStats();
     }
 
     public SetWingArea(num: number) {
         this.wing_area = num;
-        this.VerifySizes();
     }
 
     public GetSizingSpan() {
@@ -199,27 +194,30 @@ class Rotor extends Part {
     public SetMP(mp: number) {
         if (mp != this.dryMP) {
             this.dryMP = mp;
-            this.VerifySizes();
             this.CalculateStats();
         }
     }
 
     private GetRotorStrain() {
         var area = this.GetRotorArea();
-        return this.rotor_count * Math.max(1, 2 * this.rotor_span + area - 10);
+        return this.rotor_count * Math.max(1, 2 * (this.sizing_span + this.rotor_span) + area - 10);
     }
 
     public GetRotorArea() {
-        return (Math.PI / 9) * this.rotor_span * this.rotor_span;
+        return (Math.PI / 9) * (this.sizing_span + this.rotor_span) * (this.sizing_span + this.rotor_span);
+    }
+
+    public GetIdealRotorArea() {
+        return (Math.PI / 9) * (this.sizing_span) * (this.sizing_span);
     }
 
     public GetRotorDrag() {
         if (this.type == AIRCRAFT_TYPE.HELICOPTER || this.type == AIRCRAFT_TYPE.AUTOGYRO) {
             var area = this.GetRotorArea();
             if (this.rotor_count == 1) {
-                return Math.floor(1.0e-6 + 6 * area * area / (this.rotor_span * this.rotor_span));
+                return Math.floor(1.0e-6 + 6 * area * area / ((this.sizing_span + this.rotor_span) * (this.sizing_span + this.rotor_span)));
             } else {
-                return Math.floor(1.0e-6 + 0.75 * this.rotor_count * Math.floor(1.0e-6 + 6 * area * area / (this.rotor_span * this.rotor_span)));
+                return Math.floor(1.0e-6 + 0.75 * this.rotor_count * Math.floor(1.0e-6 + 6 * area * area / ((this.sizing_span + this.rotor_span) * (this.sizing_span + this.rotor_span))));
             }
         }
         return 0;
@@ -304,7 +302,7 @@ class Rotor extends Part {
         } else if (this.type == AIRCRAFT_TYPE.AUTOGYRO) {
             this.rotor_count = 1;
             this.sizing_span = Math.ceil(-1.0e-6 + Math.sqrt((0.6 * this.wing_area) / (Math.PI / 8)));
-            this.rotor_span = Math.max(this.rotor_span, this.sizing_span);
+            this.rotor_span = Math.max(this.rotor_span, 2 - this.sizing_span);
             this.stagger_sel = 0;
         } else if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             this.rotor_count = Math.max(1, this.rotor_count);
@@ -316,7 +314,7 @@ class Rotor extends Part {
                 this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
             }
             this.sizing_span = Math.min(100, this.sizing_span);
-            this.rotor_span = Math.max(this.rotor_span, Math.floor(1.0e-6 + this.sizing_span / 2));
+            this.rotor_span = Math.max(this.rotor_span, -Math.floor(1.0e-6 + this.sizing_span / 2));
         }
     }
 
@@ -365,7 +363,7 @@ class Rotor extends Part {
         stats = stats.Add(this.stagger_list[this.stagger_sel].stats.Clone());
 
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
-            stats.reliability = 2 * Math.min(0, this.rotor_span - this.sizing_span);
+            stats.reliability = 2 * Math.min(0, this.rotor_span);
             stats = stats.Add(this.blade_list[this.blade_idx].stats);
         }
 

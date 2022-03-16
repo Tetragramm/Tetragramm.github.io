@@ -30,7 +30,7 @@ const init = () => {
                 }
 
                 //Parts bit
-                let acft_data = window.localStorage.aircraft;
+                let acft_data = window.localStorage.getItem("aircraft");
 
                 //Engine bit
                 var nameliststr = window.localStorage.getItem("engines_names");

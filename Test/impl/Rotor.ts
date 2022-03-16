@@ -131,7 +131,6 @@ class Rotor extends Part {
             this.stagger_sel = 0;
             this.rotor_count = 1;
             this.type = new_type;
-            this.VerifySizes();
             this.rotor_span = 0;
         }
     }
@@ -181,13 +180,11 @@ class Rotor extends Part {
 
     public SetBladeCount(idx: number) {
         this.blade_idx = idx;
-        this.VerifySizes();
         this.CalculateStats();
     }
 
     public SetWingArea(num: number) {
         this.wing_area = num;
-        this.VerifySizes();
     }
 
     public GetSizingSpan() {
@@ -197,7 +194,6 @@ class Rotor extends Part {
     public SetMP(mp: number) {
         if (mp != this.dryMP) {
             this.dryMP = mp;
-            this.VerifySizes();
             this.CalculateStats();
         }
     }
