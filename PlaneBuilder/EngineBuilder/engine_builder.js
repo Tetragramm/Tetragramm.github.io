@@ -7067,6 +7067,8 @@ class Propeller extends Part {
                     E = Math.min(E, this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy);
                     break;
                 case DRIVE_TYPE.PULSEJET:
+                    E = Math.min(E, 5);
+                    break;
                 case DRIVE_TYPE.TURBINE:
                     E = Math.min(E, 9);
                     break;
@@ -7094,6 +7096,8 @@ class Propeller extends Part {
                     T = Math.min(T, this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn);
                     break;
                 case DRIVE_TYPE.PULSEJET:
+                    T = Math.min(T, 7);
+                    break;
                 case DRIVE_TYPE.TURBINE:
                     T = Math.min(T, 4);
                     break;
