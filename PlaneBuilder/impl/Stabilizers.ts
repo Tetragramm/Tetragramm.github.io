@@ -143,7 +143,7 @@ class Stabilizers extends Part {
         return lst;
     }
 
-    public GetIsVTail(){
+    public GetIsVTail() {
         return this.hstab_list[this.hstab_sel].is_vtail;
     }
 
@@ -372,10 +372,10 @@ class Stabilizers extends Part {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
             var drag = 0;
             if (this.is_heli) {
-                drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
+                drag = Math.floor(1.0e-6 + this.wing_drag / 16 * this.vstab_list[this.vstab_sel].dragfactor);
                 stats.drag += Math.max(Math.ceil(1 * this.hstab_list[this.hstab_sel].dragfactor), drag);
             } else {
-                drag = Math.floor(1.0e-6 + this.wing_drag / 16 * this.vstab_list[this.vstab_sel].dragfactor);
+                drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.vstab_list[this.vstab_sel].dragfactor);
                 stats.drag += Math.max(1, drag);
             }
         }
