@@ -5868,7 +5868,7 @@ class Engine extends Part {
         return this.torque_to_struct;
     }
     CanTorqueToStruct() {
-        return this.use_pp && this.etype_stats.torque > 0;
+        return this.use_pp && this.etype_stats.torque > 0 && this.mount_list[this.mount_sel].mount_type != "pod";
     }
     UpdateReliability(num) {
         this.total_reliability = this.etype_stats.stats.reliability;
