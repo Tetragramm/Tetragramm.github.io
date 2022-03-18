@@ -143,7 +143,7 @@ class Stabilizers extends Part {
         return lst;
     }
 
-    public GetIsVTail(){
+    public GetIsVTail() {
         return this.hstab_list[this.hstab_sel].is_vtail;
     }
 

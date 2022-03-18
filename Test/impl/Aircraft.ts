@@ -253,7 +253,6 @@ class Aircraft {
     public deserialize(d: Deserialize) {
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
-        console.log(d.version);
         this.name = d.GetString();
         this.era.deserialize(d);
         this.cockpits.deserialize(d);
@@ -577,8 +576,7 @@ class Aircraft {
         HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
         HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
 
-        var MaxStrain = 1 / 0;
-        MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+        var MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         //And store the results so they can be displayed
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;

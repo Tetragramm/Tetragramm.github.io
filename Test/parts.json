@@ -295,7 +295,7 @@
                 "location": "fuselage",
                 "reqED": true,
                 "powerfactor": 1,
-                "helicopter": true,
+                "helicopter": false,
                 "pushpull": false,
                 "turbine": false
             },
@@ -346,7 +346,7 @@
                 "dragfactor": 0,
                 "location": "pod",
                 "powerfactor": 0.9,
-                "helicopter": true,
+                "helicopter": false,
                 "pushpull": true,
                 "turbine": false
             },

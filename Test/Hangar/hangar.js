@@ -4499,6 +4499,8 @@ class Propeller extends Part {
                     E = Math.min(E, this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy);
                     break;
                 case DRIVE_TYPE.PULSEJET:
+                    E = Math.min(E, 5);
+                    break;
                 case DRIVE_TYPE.TURBINE:
                     E = Math.min(E, 9);
                     break;
@@ -4526,6 +4528,8 @@ class Propeller extends Part {
                     T = Math.min(T, this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn);
                     break;
                 case DRIVE_TYPE.PULSEJET:
+                    T = Math.min(T, 7);
+                    break;
                 case DRIVE_TYPE.TURBINE:
                     T = Math.min(T, 4);
                     break;
@@ -10703,7 +10707,6 @@ class Aircraft {
     deserialize(d) {
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
-        console.log(d.version);
         this.name = d.GetString();
         this.era.deserialize(d);
         this.cockpits.deserialize(d);
@@ -10987,8 +10990,7 @@ class Aircraft {
         HandlingEmpty = Math.floor(1.0e-6 + HandlingEmpty - 5 * this.used.sluggish);
         HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
         HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
-        var MaxStrain = 1 / 0;
-        MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+        var MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
         //And store the results so they can be displayed
         this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
         MaxStrain += this.optimization.final_ms;

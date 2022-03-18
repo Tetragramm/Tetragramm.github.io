@@ -253,7 +253,6 @@ class Aircraft {
     public deserialize(d: Deserialize) {
         this.freeze_calculation = true;
         d.version = parseFloat(d.GetString());
-        console.log(d.version);
         this.name = d.GetString();
         this.era.deserialize(d);
         this.cockpits.deserialize(d);
