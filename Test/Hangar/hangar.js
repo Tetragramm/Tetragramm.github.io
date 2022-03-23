@@ -10004,6 +10004,13 @@ class Weapons extends Part {
         }
         //Weapon braces cost 1/3.  Should always be multiple of 3
         stats.cost += this.brace_count / 3;
+        if (this.brace_count > 0) {
+            stats.warnings.push({
+                source: lu("Weapons Braces"),
+                warning: lu("Weapons Braces Warning"),
+                color: WARNING_COLOR.WHITE,
+            });
+        }
         //Wing-tip weight: -1 control for every 5 mass
         stats.control -= Math.floor(1.0e-6 + this.GetWingWeight() / 5);
         return stats;
