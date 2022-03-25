@@ -191,6 +191,14 @@ class Reinforcement extends Part {
         return this.cant_count;
     }
 
+    public GetTotalCantilevers() {
+        var sum = 0;
+        for (let i = 0; i < this.cant_count.length; i++){
+            sum += this.cant_count[i];
+        }
+        return sum;
+    }
+
     public GetIsCantilever() {
         var count = 0;
         for (let c of this.cant_count)

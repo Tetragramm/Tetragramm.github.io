@@ -253,6 +253,7 @@ class ControlSurfaces extends Part {
         } else if (IsAnyOrnithopter(this.acft_type)) {
             var can = this.CanAileron();
             this.aileron_sel = can.findIndex((element) => { return element; })
+            this.is_cantilever = 0;
         }
     }
 
@@ -281,6 +282,7 @@ class ControlSurfaces extends Part {
             stats.maxstrain -= this.span;
             if (this.is_cantilever) {
                 stats.cost += 2 * this.is_cantilever;
+                stats.era.push({ name: lu("Cantilever Wing Warping"), era: "Last Hurrah" });
             }
             if (this.is_boom) {
                 stats.pitchstab -= 2;

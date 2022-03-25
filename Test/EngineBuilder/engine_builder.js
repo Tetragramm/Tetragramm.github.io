@@ -9134,6 +9134,7 @@ class ControlSurfaces extends Part {
         else if (IsAnyOrnithopter(this.acft_type)) {
             var can = this.CanAileron();
             this.aileron_sel = can.findIndex((element) => { return element; });
+            this.is_cantilever = 0;
         }
     }
     SetBoomTail(has) {
@@ -9157,6 +9158,7 @@ class ControlSurfaces extends Part {
             stats.maxstrain -= this.span;
             if (this.is_cantilever) {
                 stats.cost += 2 * this.is_cantilever;
+                stats.era.push({ name: lu("Cantilever Wing Warping"), era: "Last Hurrah" });
             }
             if (this.is_boom) {
                 stats.pitchstab -= 2;
@@ -9332,6 +9334,13 @@ class Reinforcement extends Part {
     }
     GetCantileverCount() {
         return this.cant_count;
+    }
+    GetTotalCantilevers() {
+        var sum = 0;
+        for (let i = 0; i < this.cant_count.length; i++) {
+            sum += this.cant_count[i];
+        }
+        return sum;
     }
     GetIsCantilever() {
         var count = 0;
@@ -12942,6 +12951,12 @@ class Aircraft {
         this.controlsurfaces.SetCanElevator(this.stabilizers.GetHStabCount() > 0);
         this.controlsurfaces.SetCanRudder(this.stabilizers.GetVStabCount() > 0);
         this.controlsurfaces.SetIsVTail(this.stabilizers.GetIsVTail());
+        if (this.aircraft_type == AIRCRAFT_TYPE.AIRPLANE) {
+            this.controlsurfaces.SetNumCantilever(this.reinforcements.GetTotalCantilevers());
+        }
+        else {
+            this.controlsurfaces.SetNumCantilever(0);
+        }
         stats = stats.Add(this.controlsurfaces.PartStats());
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
         this.reinforcements.SetTandem(this.wings.GetTandem());

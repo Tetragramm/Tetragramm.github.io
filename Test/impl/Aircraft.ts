@@ -357,6 +357,11 @@ class Aircraft {
         this.controlsurfaces.SetCanElevator(this.stabilizers.GetHStabCount() > 0);
         this.controlsurfaces.SetCanRudder(this.stabilizers.GetVStabCount() > 0);
         this.controlsurfaces.SetIsVTail(this.stabilizers.GetIsVTail());
+        if (this.aircraft_type == AIRCRAFT_TYPE.AIRPLANE) {
+            this.controlsurfaces.SetNumCantilever(this.reinforcements.GetTotalCantilevers());
+        } else {
+            this.controlsurfaces.SetNumCantilever(0);
+        }
         stats = stats.Add(this.controlsurfaces.PartStats());
 
         this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
