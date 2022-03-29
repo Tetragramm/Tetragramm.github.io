@@ -274,7 +274,7 @@ class Wings extends Part {
             var count = this.DeckCountFull();
             for (let i = this.wing_list.length - 1; i >= 0; i--) {
                 let w = this.wing_list[i];
-                if (count[w.deck] > 1) {
+                if (count[w.deck] > 1 && this.deck_list[w.deck].limited) {
                     count[w.deck]--;
                     this.wing_list.splice(i, 1);
                 }
