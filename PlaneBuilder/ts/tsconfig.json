@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "ESNext",
+        "outDir": "../",
+    },
+    "exclude": [
+        "./EngineBuilder",
+        "./WeaponDisplay",
+        "./Standalone",
+        "./Hangar",
+        "./Helicopter"
+    ],
+    "include": [
+        ".",
+        "./disp",
+        "./impl"
+    ]
+}

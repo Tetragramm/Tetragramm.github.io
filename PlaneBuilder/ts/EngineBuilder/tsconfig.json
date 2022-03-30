@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "target": "ES6",
+        "module": "ESNext",
+        "outDir": "../..",
+    },
+    "exclude": [
+        "../WeaponDisplay"
+    ],
+    "include": [
+        ".",
+        "../impl"
+    ]
+}
