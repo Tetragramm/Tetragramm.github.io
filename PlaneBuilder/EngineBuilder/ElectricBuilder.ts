@@ -1,7 +1,7 @@
-/// <reference path="../impl/EngineStats.ts" />
-/// <reference path="../impl/EngineList.ts" />
+// <reference path="../impl/EngineStats.ts" />
+// <reference path="../impl/EngineList.ts" />
 
-class ElectricBuilder {
+export class ElectricBuilder {
     readonly EraTable:
         { name: string, draw: number, drawfactor: number, massfactor: number, reliability: number, costfactor: number, overspeed: number }[] = [
             { name: "Pioneer", draw: 3, drawfactor: 2 / 5, massfactor: 2 / 5, reliability: -1, costfactor: 1 / 2.5, overspeed: 20, },
@@ -41,61 +41,61 @@ class ElectricBuilder {
     }
 
     private EraMass() {
-        var Era = this.EraTable[this.era_sel];
+        const Era = this.EraTable[this.era_sel];
 
-        var EraMass = Math.floor(1.0e-6 + Era.massfactor * this.power);
+        const EraMass = Math.floor(1.0e-6 + Era.massfactor * this.power);
         return EraMass;
     }
 
     private CalcMass() {
-        var Winding = this.Winding[this.winding_sel];
+        const Winding = this.Winding[this.winding_sel];
 
-        var Mass = Math.max(0, Math.floor(1.0e-6 + this.EraMass() + Winding.mass));
+        const Mass = Math.max(0, Math.floor(1.0e-6 + this.EraMass() + Winding.mass));
         return Mass;
     }
 
     private CalcDrag() {
-        var RawDrag = this.power / 10;
-        var WindingDrag = this.Winding[this.winding_sel].drag;
+        const RawDrag = this.power / 10;
+        const WindingDrag = this.Winding[this.winding_sel].drag;
 
         return Math.max(1, Math.floor(1.0e-6 + 1 + RawDrag + this.chonk + WindingDrag));
     }
 
     private CalcOverspeed() {
-        var ChonkSpeed = this.chonk / 2;
-        var QualitySpeed = 7.5 * (this.quality_fudge - 1);
+        const ChonkSpeed = this.chonk / 2;
+        const QualitySpeed = 7.5 * (this.quality_fudge - 1);
         return Math.ceil(-1.0e-6 + this.EraTable[this.era_sel].overspeed - ChonkSpeed + QualitySpeed);
     }
 
     private CalcDraw() {
-        var Era = this.EraTable[this.era_sel];
-        var Winding = this.Winding[this.winding_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Winding = this.Winding[this.winding_sel];
 
-        var era_draw = Era.draw + Math.ceil(-1.0e-6 + this.power * Era.drawfactor);
+        const era_draw = Era.draw + Math.ceil(-1.0e-6 + this.power * Era.drawfactor);
         return Math.ceil(-1.0e-6 + era_draw * Winding.drawmod);
     }
 
     private CalcReliability() {
-        var Era = this.EraTable[this.era_sel];
-        var Winding = this.Winding[this.winding_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Winding = this.Winding[this.winding_sel];
 
-        var power_rely = this.power / 10;
-        var quality_rely = 5 * (this.quality_fudge - 1);
+        const power_rely = this.power / 10;
+        const quality_rely = 5 * (this.quality_fudge - 1);
 
         return Math.trunc(1.0e-6 + Era.reliability + this.chonk - power_rely + quality_rely) + Winding.reliabilty;
     }
 
     private CalcTorque() {
-        var Torque = 1 + this.EraMass() / 10 + this.chonk / 4;
+        const Torque = 1 + this.EraMass() / 10 + this.chonk / 4;
         return Math.max(1, Math.floor(1.0e-6 + Torque));
     }
 
     private CalcCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Winding = this.Winding[this.winding_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Winding = this.Winding[this.winding_sel];
 
-        var era_cost = Era.costfactor * this.power;
-        var base_cost = Math.ceil(-1.0e-6 + era_cost * Math.max(0.5, this.quality_fudge));
+        const era_cost = Era.costfactor * this.power;
+        const base_cost = Math.ceil(-1.0e-6 + era_cost * Math.max(0.5, this.quality_fudge));
         return Math.ceil(-1.0e-6 + base_cost * Winding.costfactor);
     }
 
@@ -112,7 +112,7 @@ class ElectricBuilder {
     }
 
     public EngineStats() {
-        var estats = new EngineStats();
+        const estats = new EngineStats();
         estats.name = this.name;
 
         this.VerifyValues();
@@ -137,7 +137,7 @@ class ElectricBuilder {
     }
 
     public EngineInputs() {
-        var ei = new EngineInputs();
+        const ei = new EngineInputs();
         ei.engine_type = ENGINE_TYPE.ELECTRIC;
         ei.name = this.name;
         ei.power = this.power;

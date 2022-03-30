@@ -1,5 +1,8 @@
-/// <reference path="../impl/EngineStats.ts" />
-/// <reference path="../impl/EngineList.ts" />
+import { EngineStats } from "../impl/EngineStats.ts";
+import { EngineList } from "../impl/EngineList.ts";
+import { ENGINE_RARITY } from "../impl/EngineInputs.ts";
+import { lu } from "../impl/Localization";
+import { num2era } from "../impl/Stats";
 
 enum CompressorEnum {
     NONE,
@@ -7,7 +10,7 @@ enum CompressorEnum {
     SUPERCHARGER,
     TURBOCHARGER,
 }
-class EngineBuilder {
+export class EngineBuilder {
     readonly EraTable: { name: string, materials: number, cost: number, maxRPM: number, powerdiv: number, fuelfactor: number }[] = [
         { name: "Pioneer", materials: 3, cost: 0.5, maxRPM: 30, powerdiv: 8, fuelfactor: 10 },
         { name: "WWI", materials: 2, cost: 1, maxRPM: 35, powerdiv: 7, fuelfactor: 8 },
@@ -75,7 +78,7 @@ class EngineBuilder {
     }
 
     public CanUpgrade() {
-        var can_upg = [...Array(this.Upgrades.length).fill(true)];
+        const can_upg = [...Array(this.Upgrades.length).fill(true)];
         can_upg[0] = false;
         if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE) {
             can_upg[0] = false;
@@ -86,7 +89,7 @@ class EngineBuilder {
     }
 
     private UpgradePower() {
-        var power = 1;
+        const power = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 power += this.Upgrades[i].powerfactor;
@@ -98,30 +101,30 @@ class EngineBuilder {
     }
 
     private RPM() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Cool = this.CoolingTable[this.cool_sel];
         return (Era.maxRPM - Cool.RPMoff) * (this.compression_ratio / 10);
     }
 
     public GearedRPM() {
-        var GearedRPM = this.RPM() * this.rpm_boost;
+        const GearedRPM = this.RPM() * this.rpm_boost;
         return GearedRPM;
     }
 
     private CalcPower() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Cool = this.CoolingTable[this.cool_sel];
 
         //Calculate Force
-        var EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
-        var RawForce = EngineForce * this.UpgradePower();
+        const EngineForce = this.engine_displacement * this.compression_ratio * Cool.forcefactor;
+        const RawForce = EngineForce * this.UpgradePower();
         //Output Force
-        var OutputForce = RawForce * (this.GearedRPM() / 10);
+        const OutputForce = RawForce * (this.GearedRPM() / 10);
         return Math.floor(1.0e-6 + OutputForce / Era.powerdiv);
     }
 
     private UpgradeMass() {
-        var mass = 1;
+        const mass = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 mass += this.Upgrades[i].massfactor;
@@ -130,19 +133,19 @@ class EngineBuilder {
     }
 
     private CalcMass() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Cool = this.CoolingTable[this.cool_sel];
 
-        var CylMass = this.engine_displacement ** 2 * this.compression_ratio / 1000;
-        var CrankMass = (this.engine_displacement * this.num_rows) / 10 + 1;
-        var PistMass = this.engine_displacement / 5;
+        const CylMass = this.engine_displacement ** 2 * this.compression_ratio / 1000;
+        const CrankMass = (this.engine_displacement * this.num_rows) / 10 + 1;
+        const PistMass = this.engine_displacement / 5;
 
-        var Mass = Math.floor(1.0e-6 + (CylMass + CrankMass + PistMass) * this.UpgradeMass() * this.material_fudge * Cool.massfactor);
+        const Mass = Math.floor(1.0e-6 + (CylMass + CrankMass + PistMass) * this.UpgradeMass() * this.material_fudge * Cool.massfactor);
         return Mass;
     }
 
     private UpgradeDrag() {
-        var drag = 1;
+        const drag = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 drag += this.Upgrades[i].dragfactor;
@@ -169,7 +172,7 @@ class EngineBuilder {
     }
 
     private CalcDrag() {
-        var RawDrag = 3 + (this.engine_displacement / this.num_rows) / 3;
+        const RawDrag = 3 + (this.engine_displacement / this.num_rows) / 3;
         return Math.floor(1.0e-6 + RawDrag * this.CoolDrag() * this.UpgradeDrag());
     }
 
@@ -192,7 +195,7 @@ class EngineBuilder {
     // }
 
     private CoolBurnout() {
-        var EraBurnout = this.EraTable[this.era_sel].materials / 2;
+        const EraBurnout = this.EraTable[this.era_sel].materials / 2;
         switch (this.CoolingTable[this.cool_sel].name) {
             case "Liquid Cooled":
                 return 2;
@@ -211,15 +214,15 @@ class EngineBuilder {
     }
 
     private MaterialModifier() {
-        var EraBurnout = this.EraTable[this.era_sel].materials;
-        var num_cyl = this.num_cyl_per_row * this.num_rows;
-        var CylinderBurnout = this.engine_displacement / num_cyl * (this.compression_ratio ** 2) * EraBurnout;
-        var GearingBurnout = this.rpm_boost * CylinderBurnout * this.CoolBurnout();
+        const EraBurnout = this.EraTable[this.era_sel].materials;
+        const num_cyl = this.num_cyl_per_row * this.num_rows;
+        const CylinderBurnout = this.engine_displacement / num_cyl * (this.compression_ratio ** 2) * EraBurnout;
+        const GearingBurnout = this.rpm_boost * CylinderBurnout * this.CoolBurnout();
         return GearingBurnout * this.rpm_boost;
     }
 
     // private CalcReliability() {
-    //     var Reliability = 6 - this.MaterialModifier() * this.CoolReliability() / 25;
+    //     const Reliability = 6 - this.MaterialModifier() * this.CoolReliability() / 25;
     //     return Math.trunc(Reliability);
     // }
 
@@ -242,7 +245,7 @@ class EngineBuilder {
     }
 
     private UpgradeFuel() {
-        var fuel = 1;
+        const fuel = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 fuel += this.Upgrades[i].fuelfactor;
@@ -251,12 +254,12 @@ class EngineBuilder {
     }
 
     private CalcFuelConsumption() {
-        var FuelConsumption = this.engine_displacement * this.RPM() / 100;
+        const FuelConsumption = this.engine_displacement * this.RPM() / 100;
         return Math.floor(1.0e-6 + FuelConsumption * this.UpgradeFuel());
     }
 
     private CalcAltitude() {
-        var alt = 0;
+        const alt = 0;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 alt += this.Upgrades[i].idealalt;
@@ -278,7 +281,7 @@ class EngineBuilder {
     }
 
     private UpgradeCost() {
-        var cost = 0;
+        const cost = 0;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 cost += this.Upgrades[i].costfactor;
@@ -287,14 +290,14 @@ class EngineBuilder {
     }
 
     private CalcCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Cool = this.CoolingTable[this.cool_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Cool = this.CoolingTable[this.cool_sel];
 
-        var Quality = Math.max(1, this.quality_fudge);
+        const Quality = Math.max(1, this.quality_fudge);
 
-        var EngineForce = this.engine_displacement * this.compression_ratio / 10;
-        var Cost = (this.UpgradeCost() + EngineForce);
-        var PlusBSandEra = Quality * Era.cost * Cost;
+        const EngineForce = this.engine_displacement * this.compression_ratio / 10;
+        const Cost = (this.UpgradeCost() + EngineForce);
+        const PlusBSandEra = Quality * Era.cost * Cost;
         if (Cool.radiator > 0) {
             PlusBSandEra *= 1.4;
         }
@@ -344,7 +347,7 @@ class EngineBuilder {
     }
 
     public EngineStats() {
-        var estats = new EngineStats();
+        const estats = new EngineStats();
         estats.name = this.name;
 
         this.VerifyValues();
@@ -384,7 +387,7 @@ class EngineBuilder {
                 estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
                 estats.stats.drag += this.min_IAF / 10;
                 estats.stats.cost += 1 + Math.floor(1.0e-6 + estats.stats.power / 50);
-                var extra = this.compressor_count - 1;
+                const extra = this.compressor_count - 1;
                 estats.altitude = 29 + 10 * 2 * extra;
                 estats.stats.reliability -= extra;
                 estats.stats.mass += extra;
@@ -397,7 +400,7 @@ class EngineBuilder {
                 estats.stats.mass = Math.floor(1.0e-6 + 1.2 * estats.stats.mass);
                 estats.stats.drag += 2 * (this.min_IAF / 10);
                 estats.stats.cost += 1 + Math.floor(1.0e-6 + estats.stats.power / 50);
-                var extra = this.compressor_count - 1;
+                const extra = this.compressor_count - 1;
                 estats.altitude = 49 + 10 * 2 * extra;
                 estats.stats.reliability -= extra;
                 estats.stats.mass += extra;
@@ -415,7 +418,7 @@ class EngineBuilder {
     }
 
     public EngineInputs() {
-        var ei = new EngineInputs();
+        const ei = new EngineInputs();
         ei.engine_type = ENGINE_TYPE.PROPELLER;
         ei.RPM_boost = this.rpm_boost;
         ei.compression = this.compression_ratio;

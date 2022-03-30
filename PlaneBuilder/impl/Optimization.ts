@@ -1,7 +1,7 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part.ts";
+import { Stats } from "./Stats.ts";
 
-class Optimization extends Part {
+export class Optimization extends Part {
     private free_dots: number;
     private cost: number;
     private bleed: number;
@@ -87,7 +87,7 @@ class Optimization extends Part {
     }
 
     public ReduceDots() {
-        var diff = -this.GetUnassignedCount();
+        const diff = -this.GetUnassignedCount();
         if (diff > 0) {
             let d = Math.min(diff, this.drag);
             d = Math.max(d, 0);
@@ -267,7 +267,7 @@ class Optimization extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
 
         stats.cost = Math.floor(1.0e-6 + -(this.cost * this.acft_stats.cost / 10));
         stats.liftbleed = Math.floor(1.0e-6 + - this.bleed * 3);
@@ -284,7 +284,7 @@ class Optimization extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

@@ -1,7 +1,7 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
 
-enum SynchronizationType {
+export enum SynchronizationType {
     NONE = -1,
     INTERRUPT,
     SYNCH,
@@ -10,14 +10,14 @@ enum SynchronizationType {
     NO_INTERFERENCE,
     ENUM_MAX
 }
-enum ProjectileType {
+export enum ProjectileType {
     BULLETS,
     HEATRAY,
     PNEUMATIC,
     ENUM_MAX,
     GYROJETS,
 }
-enum ActionType {
+export enum ActionType {
     STANDARD,
     MECHANICAL,
     GAST,
@@ -31,7 +31,7 @@ type WeaponType = {
     rapid: boolean, synched: boolean, shells: boolean,
     can_action: boolean, can_projectile: boolean, deflection: number,
 };
-class Weapon extends Part {
+export class Weapon extends Part {
     private weapon_type: WeaponType
     private fixed: boolean;
     private wing: boolean;
@@ -52,7 +52,7 @@ class Weapon extends Part {
     private turret: boolean;
     private canwing: boolean;
 
-    constructor(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType, fixed: boolean = false) {
+    constructor(weapon_type: WeaponType, action: ActionType, projectile: ProjectileType, fixed = false) {
         super();
         this.weapon_type = weapon_type;
         this.fixed = fixed;
@@ -208,7 +208,7 @@ class Weapon extends Part {
     }
 
     public CanSynchronization() {
-        var lst = [];
+        const lst = [];
         for (let i = -1; i < SynchronizationType.ENUM_MAX; i++) {
             lst.push(this.CanSynch(i));
         }
@@ -313,7 +313,7 @@ class Weapon extends Part {
     }
 
     private ResolveSynch() {
-        var use = this.synchronization;
+        const use = this.synchronization;
         this.synchronization = SynchronizationType.ENUM_MAX;
         if (!this.CanSynch(use)) {
             for (let i = -1; i < SynchronizationType.ENUM_MAX; i++) {
@@ -354,8 +354,8 @@ class Weapon extends Part {
 
     public GetJam() {
         if (this.weapon_type.rapid) {
-            var jams = this.weapon_type.jam.split('/');
-            var out = [parseInt(jams[0]), parseInt(jams[1])];
+            const jams = this.weapon_type.jam.split('/');
+            const out = [parseInt(jams[0]), parseInt(jams[1])];
             if (this.synchronization == SynchronizationType.INTERRUPT) {
                 out[0]++;
                 out[1]++;
@@ -367,7 +367,7 @@ class Weapon extends Part {
             return out;
         }
         else {
-            var ret = parseInt(this.weapon_type.jam)
+            const ret = parseInt(this.weapon_type.jam)
             if (this.synchronization == SynchronizationType.INTERRUPT) {
                 ret += 1;
             }
@@ -391,7 +391,7 @@ class Weapon extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
 
         this.ResolveSynch();
 
@@ -400,7 +400,7 @@ class Weapon extends Part {
         if (this.weapon_type.size == 16)
             this.covered = this.fixed;
 
-        var size = 0;
+        const size = 0;
         for (let i = 0; i < this.w_count; i++) {
             stats = stats.Add(this.weapon_type.stats);
 
@@ -409,7 +409,7 @@ class Weapon extends Part {
 
         //Covered Cost
         if (this.covered) {
-            var cost = 0;
+            const cost = 0;
             if (this.weapon_type.size <= 1) {
                 cost = 0;
             } else if (this.weapon_type.size <= 2) {
@@ -503,7 +503,7 @@ class Weapon extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

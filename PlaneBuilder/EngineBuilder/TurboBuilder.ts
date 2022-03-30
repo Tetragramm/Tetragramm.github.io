@@ -50,47 +50,47 @@ class TurboBuilder {
     }
 
     private TempMass() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Type = this.TypeTable[this.type_sel];
 
-        var tmass = Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
+        const tmass = Math.log2(this.compression_ratio) * Math.PI * Math.pow(this.diameter / 2, 2) * 1.75 * 361.75 / (1 + this.bypass_ratio / 3) * Type.massfactor;
         return 0.75 * tmass;
     }
 
     private CalcMass() {
-        var tmass = this.TempMass();
+        const tmass = this.TempMass();
         //Turbofan fit.  Using list from jet-engines.net and an excel curve to align them.
         if (this.type_sel == 1) {
             tmass = tmass * (0.4833 * Math.log(this.compression_ratio) - 0.3168);
         }
-        var mass = tmass / 25 + 95.684 * this.flow_adjustment
+        const mass = tmass / 25 + 95.684 * this.flow_adjustment
         //Turboprop fit.  Using list from jet-engines.net and an excel curve to align them.
         //Because turboprops have too much variation, some end up negative. So needs to be done here.
         if (this.type_sel == 2 || this.type_sel == 3) {
-            var x = 0.5 - this.flow_adjustment;
+            const x = 0.5 - this.flow_adjustment;
             mass = Math.abs(mass) * (19.74 * Math.pow(x, 3) - 11.462 * x * x + 1.0666 * x + 0.4333);
         }
         return Math.max(1, Math.floor(1.0e-6 + mass));
     }
 
     private CalcDrag() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Type = this.TypeTable[this.type_sel];
 
         return Math.floor(1.0e-6 + 5 * Math.PI * Math.pow(this.diameter / 2.0, 2));
     }
 
     private CalcReliability() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Type = this.TypeTable[this.type_sel];
 
-        var Reliability = - Math.log2(this.compression_ratio) - 20 * this.flow_adjustment;
+        const Reliability = - Math.log2(this.compression_ratio) - 20 * this.flow_adjustment;
         return Math.trunc(Reliability + 1);
     }
 
     private CalcStages() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Type = this.TypeTable[this.type_sel];
         const M = 0.0;
         const a0 = 340.3;
         const Pa = 108.9; //Ambient Pressure
@@ -101,21 +101,21 @@ class TurboBuilder {
         const area = Math.PI * Math.pow(this.diameter / 2, 2);
         const net_efficiency = 0.8 + (Era.efficiency + Type.efficiency) / 20.0 + this.flow_adjustment;
 
-        var P3 = Pa * this.compression_ratio;
-        var T3 = Ta * Math.pow(P3 / Pa, (y - 1) / y);
+        const P3 = Pa * this.compression_ratio;
+        const T3 = Ta * Math.pow(P3 / Pa, (y - 1) / y);
 
-        var Tr = 1 + (y - 1) / 2 * M * M;
-        var Ty = Era.max_temp / Ta;
-        var Tc = Math.pow(this.compression_ratio, 1 - 1 / y);
-        var ST11 = a0 * (Math.sqrt((2 * Tr) / (y - 1) * (Ty / (Tr * Tc) - 1) * (Tc - 1) + Ty / (Tr * Tc) * M * M) - M) * net_efficiency / 1000;
-        var Tcp = Math.pow(fan_pressure_ratio, 1 - 1 / y);
-        var ST13 = a0 * (Math.sqrt(2 / (y - 1) * (Tr * Tcp - 1)) - M) * net_efficiency / 1000;
-        var f = (Cp * Ta / this.fuel_heat_value) * (Era.max_temp / Ta - T3 / Ta);
-        var ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
-        var TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
+        const Tr = 1 + (y - 1) / 2 * M * M;
+        const Ty = Era.max_temp / Ta;
+        const Tc = Math.pow(this.compression_ratio, 1 - 1 / y);
+        const ST11 = a0 * (Math.sqrt((2 * Tr) / (y - 1) * (Ty / (Tr * Tc) - 1) * (Tc - 1) + Ty / (Tr * Tc) * M * M) - M) * net_efficiency / 1000;
+        const Tcp = Math.pow(fan_pressure_ratio, 1 - 1 / y);
+        const ST13 = a0 * (Math.sqrt(2 / (y - 1) * (Tr * Tcp - 1)) - M) * net_efficiency / 1000;
+        const f = (Cp * Ta / this.fuel_heat_value) * (Era.max_temp / Ta - T3 / Ta);
+        const ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
+        const TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
 
-        var C2 = Pa * area * this.MFP(1) / ((1 + f));
-        var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
+        const C2 = Pa * area * this.MFP(1) / ((1 + f));
+        const mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
         if (!isFinite(ST) || !isFinite(mc2) || !isFinite(TSFC11) || ST < 0 || mc2 < 0 || TSFC11 < 0) {
             ST = 0;
             mc2 = 0;
@@ -131,8 +131,8 @@ class TurboBuilder {
     }
 
     private CalcCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Type = this.TypeTable[this.type_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Type = this.TypeTable[this.type_sel];
 
         return Math.floor(1.0e-6 + this.TempMass() * 0.5 * (1 + this.flow_adjustment) * Era.costfactor * Type.costfactor) + 1;
     }
@@ -151,7 +151,7 @@ class TurboBuilder {
     }
 
     public EngineInputs() {
-        var ei = new EngineInputs();
+        const ei = new EngineInputs();
 
         ei.name = this.name;
         ei.engine_type = ENGINE_TYPE.TURBOMACHINERY;
@@ -177,10 +177,10 @@ class TurboBuilder {
     }
 
     public EngineStats() {
-        var estats = new EngineStats();
+        const estats = new EngineStats();
 
         this.VerifyValues();
-        var tf = this.CalcStages();
+        const tf = this.CalcStages();
         this.kN = tf.thrust;
         this.tsfc = tf.fuel / tf.thrust;
         estats.name = this.name;

@@ -1,7 +1,7 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
 
-class Frames extends Part {
+export class Frames extends Part {
     private frame_list: {
         name: string, stats: Stats,
         basestruct: number, basecost: number,
@@ -35,7 +35,7 @@ class Frames extends Part {
     constructor(js: JSON) {
         super();
         this.frame_list = [];
-        for (let elem of js["frames"]) {
+        for (const elem of js["frames"]) {
             this.frame_list.push({
                 name: elem["name"],
                 stats: new Stats(elem),
@@ -47,7 +47,7 @@ class Frames extends Part {
 
         this.sel_skin = 0;
         this.skin_list = [];
-        for (let elem of js["skin"]) {
+        for (const elem of js["skin"]) {
             this.skin_list.push({
                 name: elem["name"],
                 stats: new Stats(elem),
@@ -64,7 +64,7 @@ class Frames extends Part {
         this.has_tractor_nacelles = false;
         this.sel_tail = 2;
         this.tail_list = [];
-        for (let elem of js["tail"]) {
+        for (const elem of js["tail"]) {
             this.tail_list.push({
                 name: elem["name"],
                 stats: new Stats(elem)
@@ -93,7 +93,7 @@ class Frames extends Part {
 
     public fromJSON(js: JSON, json_version: number) {
         this.section_list = [];
-        for (let elem of js["sections"]) {
+        for (const elem of js["sections"]) {
             this.section_list.push({
                 frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
@@ -103,7 +103,7 @@ class Frames extends Part {
                 this.sel_skin = elem["skin"];
         }
         this.tail_section_list = [];
-        for (let elem of js["tail_sections"]) {
+        for (const elem of js["tail_sections"]) {
             this.tail_section_list.push({
                 frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
@@ -124,7 +124,7 @@ class Frames extends Part {
     public serialize(s: Serialize) {
         s.PushNum(this.section_list.length);
         for (let i = 0; i < this.section_list.length; i++) {
-            var sec = this.section_list[i];
+            const sec = this.section_list[i];
             s.PushNum(sec.frame);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
@@ -133,7 +133,7 @@ class Frames extends Part {
         }
         s.PushNum(this.tail_section_list.length);
         for (let i = 0; i < this.tail_section_list.length; i++) {
-            var sec = this.tail_section_list[i];
+            const sec = this.tail_section_list[i];
             s.PushNum(sec.frame);
             s.PushBool(sec.geodesic);
             s.PushBool(sec.monocoque);
@@ -148,7 +148,7 @@ class Frames extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        var slen = d.GetNum();
+        const slen = d.GetNum();
         this.section_list = [];
         for (let i = 0; i < slen; i++) {
             let sec = {
@@ -164,7 +164,7 @@ class Frames extends Part {
             sec.internal_bracing = d.GetBool();
             this.section_list.push(sec);
         }
-        var tlen = d.GetNum();
+        const tlen = d.GetNum();
         this.tail_section_list = [];
         for (let i = 0; i < tlen; i++) {
             let sec = {
@@ -189,8 +189,8 @@ class Frames extends Part {
     }
 
     public DuplicateSection(num: number, count: number = 1) {
-        var sec = this.section_list[num];
-        var new_section = {
+        const sec = this.section_list[num];
+        const new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
@@ -204,8 +204,8 @@ class Frames extends Part {
     }
 
     private DuplicateTailSection(num: number, count: number = 1) {
-        var sec = this.tail_section_list[num];
-        var new_section = {
+        const sec = this.tail_section_list[num];
+        const new_section = {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
@@ -282,8 +282,8 @@ class Frames extends Part {
     }
 
     private CountSections() {
-        var count = 0;
-        for (let elem of this.section_list) {
+        let count = 0;
+        for (const elem of this.section_list) {
             if (!elem.internal_bracing)
                 count++;
         }
@@ -295,8 +295,8 @@ class Frames extends Part {
     }
 
     private CountInternalBracing() {
-        var count = 0;
-        for (let elem of this.section_list) {
+        const count = 0;
+        for (const elem of this.section_list) {
             if (elem.internal_bracing)
                 count++;
         }
@@ -304,17 +304,17 @@ class Frames extends Part {
     }
 
     private BaseType() {
-        var hist = [...Array(this.frame_list.length).fill(0)];
-        for (let elem of this.section_list) {
+        const hist = [...Array(this.frame_list.length).fill(0)];
+        for (const elem of this.section_list) {
             if (!elem.internal_bracing)
                 hist[elem.frame]++;
         }
-        for (let elem of this.tail_section_list) {
+        for (const elem of this.tail_section_list) {
             if (!elem.internal_bracing)
                 hist[elem.frame]++;
         }
-        var max_index = 0;
-        var max = 0;
+        const max_index = 0;
+        const max = 0;
         for (let i = hist.length - 1; i >= 0; i--) {
             if (hist[i] > max) {
                 max = hist[i];
@@ -391,7 +391,7 @@ class Frames extends Part {
     }
 
     public PossibleInternalBracing(convert_sec_to_brace: boolean = false) {
-        var allowed = this.CountSections();
+        const allowed = this.CountSections();
         if (!this.farman)
             allowed += this.tail_section_list.length;
         if (convert_sec_to_brace)
@@ -435,7 +435,7 @@ class Frames extends Part {
         frame: number, geodesic: boolean, monocoque: boolean,
         lifting_body: boolean, internal_bracing: boolean
     }): Stats {
-        var stats = new Stats();
+        const stats = new Stats();
         stats = stats.Add(this.frame_list[sec.frame].stats);
         if (sec.geodesic) {
             stats.structure *= 1.5;
@@ -462,7 +462,7 @@ class Frames extends Part {
         frame: number, geodesic: boolean, monocoque: boolean,
         lifting_body: boolean, internal_bracing: boolean
     }): Stats {
-        var stats = new Stats();
+        const stats = new Stats();
         stats = stats.Add(this.frame_list[sec.frame].stats);
         if (sec.geodesic) {
             stats.structure *= 1.5;
@@ -486,8 +486,8 @@ class Frames extends Part {
     }
 
     private CountMainLiftingBody() {
-        var count = 0;
-        for (let s of this.section_list) {
+        const count = 0;
+        for (const s of this.section_list) {
             if (s.lifting_body)
                 count++;
         }
@@ -495,8 +495,8 @@ class Frames extends Part {
     }
 
     private CountTailLiftingBody() {
-        var count = 0;
-        for (let s of this.tail_section_list) {
+        const count = 0;
+        for (const s of this.tail_section_list) {
             if (s.lifting_body)
                 count++;
         }
@@ -538,7 +538,7 @@ class Frames extends Part {
         if (use && this.boom)
             this.boom = false;
         if (this.farman) {
-            for (let sec of this.tail_section_list) {
+            for (const sec of this.tail_section_list) {
                 sec.monocoque = false;
                 sec.lifting_body = false;
             }
@@ -609,11 +609,11 @@ class Frames extends Part {
     }
 
     public CanFlyingWing() {
-        for (let s of this.section_list) {
+        for (const s of this.section_list) {
             if (s.lifting_body)
                 return true;
         }
-        for (let s of this.tail_section_list) {
+        for (const s of this.tail_section_list) {
             if (s.lifting_body)
                 return true;
         }
@@ -638,12 +638,12 @@ class Frames extends Part {
     }
 
     public SetAllFrame(num: number) {
-        for (let s of this.section_list) {
+        for (const s of this.section_list) {
             s.frame = num;
             if (!this.frame_list[num].geodesic)
                 s.geodesic = false;
         }
-        for (let s of this.tail_section_list) {
+        for (const s of this.tail_section_list) {
             s.frame = num;
             if (!this.frame_list[num].geodesic)
                 s.geodesic = false;
@@ -653,7 +653,7 @@ class Frames extends Part {
 
     public SetAllSkin(num: number) {
         this.sel_skin = num;
-        for (let s of this.section_list) {
+        for (const s of this.section_list) {
             if (!s.internal_bracing) {
                 if (!this.skin_list[num].monocoque) {
                     s.monocoque = false;
@@ -661,7 +661,7 @@ class Frames extends Part {
                 }
             }
         }
-        for (let s of this.tail_section_list) {
+        for (const s of this.tail_section_list) {
             if (!s.internal_bracing) {
                 if (!this.skin_list[num].monocoque) {
                     s.monocoque = false;
@@ -706,20 +706,20 @@ class Frames extends Part {
         if (!this.CanFlyingWing())
             this.flying_wing = false;
 
-        var stats = new Stats();
-        var base_type = this.BaseType();
+        const stats = new Stats();
+        const base_type = this.BaseType();
         stats.structure = this.frame_list[base_type].basestruct;
         stats.cost = this.frame_list[base_type].basecost;
 
-        var is_clinker = this.skin_list[this.sel_skin].monocoque_structure < 0;
+        const is_clinker = this.skin_list[this.sel_skin].monocoque_structure < 0;
 
-        for (let sec of this.section_list) {
+        for (const sec of this.section_list) {
             stats = stats.Add(this.SectionStats(sec));
             is_clinker = is_clinker && (sec.internal_bracing || sec.monocoque);
         }
 
-        var tail_stats = new Stats();
-        for (let sec of this.tail_section_list) {
+        const tail_stats = new Stats();
+        for (const sec of this.tail_section_list) {
             tail_stats = tail_stats.Add(this.TailSectionStats(sec));
             if (!this.farman) {
                 is_clinker = is_clinker && (sec.internal_bracing || sec.monocoque);
@@ -754,7 +754,7 @@ class Frames extends Part {
         }
 
         //Lifting Body and Flying Wing
-        var lb_count = this.CountLiftingBody();
+        const lb_count = this.CountLiftingBody();
         stats.cost += lb_count;
         if (this.flying_wing) {
             stats.liftbleed += 5;
@@ -781,7 +781,7 @@ class Frames extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

@@ -1,6 +1,6 @@
-/// <reference path="./Part.ts" />
+import { Part } from "./Part";
 
-class Used extends Part {
+export class Used extends Part {
     public burnt_out: number;
     public ragged: number;
     public hefty: number;
@@ -23,7 +23,7 @@ class Used extends Part {
     }
 
     public GetEnabled() {
-        var total = Math.abs(this.burnt_out) +
+        const total = Math.abs(this.burnt_out) +
             Math.abs(this.ragged) +
             Math.abs(this.hefty) +
             Math.abs(this.sticky_guns) +
@@ -136,7 +136,7 @@ class Used extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

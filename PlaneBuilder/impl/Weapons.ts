@@ -1,9 +1,9 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
-/// <reference path="./WeaponSystem.ts" />
-/// <reference path="./Weapon.ts" />
+import { Part } from "./Part.ts";
+import { Stats, era2numHh } from "./Stats.ts";
+import { WeaponSystem } from "./WeaponSystem.ts";
+import { Weapon } from "./Weapon.ts";
 
-class Weapons extends Part {
+export class Weapons extends Part {
     private weapon_sets: WeaponSystem[];
     private weapon_list: {
         name: string, abrv: string, era: string, size: number, stats: Stats,
@@ -43,8 +43,8 @@ class Weapons extends Part {
         super();
 
         this.weapon_list = [];
-        for (let elem of js["weapons"]) {
-            var weap = {
+        for (const elem of js["weapons"]) {
+            const weap = {
                 name: elem["name"],
                 abrv: elem["abrv"],
                 era: elem["era"],
@@ -66,8 +66,8 @@ class Weapons extends Part {
             this.weapon_list.push(weap);
         }
 
-        var pred = (a, b): number => {
-            var cvt2num = (l, r) => {
+        const pred = (a, b): number => {
+            const cvt2num = (l, r) => {
                 if (l < r)
                     return -1;
                 if (r < l)
@@ -86,7 +86,7 @@ class Weapons extends Part {
 
         this.wl_permute = Array.from(Array(this.weapon_list.length).keys())
             .sort((a, b) => { return pred(this.weapon_list[a], this.weapon_list[b]); });
-        var p2 = [];
+        const p2 = [];
         for (let i = 0; i < this.wl_permute.length; i++) {
             p2.push(this.wl_permute.findIndex((value) => { return value == i; }));
         }
@@ -99,8 +99,8 @@ class Weapons extends Part {
     }
 
     public toJSON() {
-        var lst = [];
-        for (let ws of this.weapon_sets) {
+        const lst = [];
+        for (const ws of this.weapon_sets) {
             lst.push(ws.toJSON());
         }
         return {
@@ -111,9 +111,9 @@ class Weapons extends Part {
 
     public fromJSON(js: JSON, json_version: number) {
         this.weapon_sets = [];
-        var lst = js["weapon_systems"];
-        for (let wsj of lst) {
-            var ws = new WeaponSystem(this.weapon_list, this.wl_permute);
+        const lst = js["weapon_systems"];
+        for (const wsj of lst) {
+            const ws = new WeaponSystem(this.weapon_list, this.wl_permute);
             ws.SetCalculateStats(this.CalculateStats);
             ws.fromJSON(wsj, json_version);
             this.weapon_sets.push(ws);
@@ -125,7 +125,7 @@ class Weapons extends Part {
 
     public serialize(s: Serialize) {
         s.PushNum(this.weapon_sets.length);
-        for (let ws of this.weapon_sets) {
+        for (const ws of this.weapon_sets) {
             ws.serialize(s);
         }
         s.PushNum(this.brace_count);
@@ -133,9 +133,9 @@ class Weapons extends Part {
 
     public deserialize(d: Deserialize) {
         this.weapon_sets = [];
-        var wlen = d.GetNum();
+        const wlen = d.GetNum();
         for (let i = 0; i < wlen; i++) {
-            var ws = new WeaponSystem(this.weapon_list, this.wl_permute);
+            const ws = new WeaponSystem(this.weapon_list, this.wl_permute);
             ws.SetCalculateStats(this.CalculateStats);
             ws.deserialize(d);
             this.weapon_sets.push(ws);
@@ -161,7 +161,7 @@ class Weapons extends Part {
             num = 0;
         num = Math.floor(1.0e-6 + num);
         while (num > this.weapon_sets.length) {
-            var w = new WeaponSystem(this.weapon_list, this.wl_permute);
+            const w = new WeaponSystem(this.weapon_list, this.wl_permute);
             w.SetCalculateStats(this.CalculateStats);
             this.weapon_sets.push(w);
         }
@@ -176,11 +176,11 @@ class Weapons extends Part {
     }
 
     private CountTractorSpinner() {
-        var count = 0;
-        for (let ws of this.weapon_sets) {
+        const count = 0;
+        for (const ws of this.weapon_sets) {
             if (ws.GetDirection()[0]) {
-                var wlist = ws.GetWeapons();
-                for (let w of wlist) {
+                const wlist = ws.GetWeapons();
+                for (const w of wlist) {
                     if (w.GetSynchronization() == SynchronizationType.SPINNER)
                         count++;
                 }
@@ -190,11 +190,11 @@ class Weapons extends Part {
     }
 
     private CountArtyTractorSpinner() {
-        var count = 0;
-        for (let ws of this.weapon_sets) {
+        const count = 0;
+        for (const ws of this.weapon_sets) {
             if (ws.GetDirection()[0]) {
-                var wlist = ws.GetWeapons();
-                for (let w of wlist) {
+                const wlist = ws.GetWeapons();
+                for (const w of wlist) {
                     if (w.GetArty() && w.GetSynchronization() == SynchronizationType.SPINNER)
                         count++;
                 }
@@ -204,11 +204,11 @@ class Weapons extends Part {
     }
 
     private CountPusherSpinner() {
-        var count = 0;
-        for (let ws of this.weapon_sets) {
+        const count = 0;
+        for (const ws of this.weapon_sets) {
             if (ws.GetDirection()[1]) {
-                var wlist = ws.GetWeapons();
-                for (let w of wlist) {
+                const wlist = ws.GetWeapons();
+                for (const w of wlist) {
                     if (w.GetSynchronization() == SynchronizationType.SPINNER)
                         count++;
                 }
@@ -218,11 +218,11 @@ class Weapons extends Part {
     }
 
     private CountArtyPusherSpinner() {
-        var count = 0;
-        for (let ws of this.weapon_sets) {
+        const count = 0;
+        for (const ws of this.weapon_sets) {
             if (ws.GetDirection()[1]) {
-                var wlist = ws.GetWeapons();
-                for (let w of wlist) {
+                const wlist = ws.GetWeapons();
+                for (const w of wlist) {
                     if (w.GetArty() && w.GetSynchronization() == SynchronizationType.SPINNER)
                         count++;
                 }
@@ -232,10 +232,10 @@ class Weapons extends Part {
     }
 
     private CleanFreelyAccessible() {
-        var has_fa = Array(this.cockpit_count).fill(false);
-        for (let ws of this.weapon_sets) {
-            let seat = ws.GetSeat();
-            for (let w of ws.GetWeapons()) {
+        const has_fa = Array(this.cockpit_count).fill(false);
+        for (const ws of this.weapon_sets) {
+            const seat = ws.GetSeat();
+            for (const w of ws.GetWeapons()) {
                 if (w.GetFreeAccessible() && has_fa[seat]) {
                     w.SetFreeAccessible(false);
                 } else if (w.GetFreeAccessible()) {
@@ -244,9 +244,9 @@ class Weapons extends Part {
             }
         }
 
-        for (let ws of this.weapon_sets) {
-            let seat = ws.GetSeat();
-            for (let w of ws.GetWeapons()) {
+        for (const ws of this.weapon_sets) {
+            const seat = ws.GetSeat();
+            for (const w of ws.GetWeapons()) {
                 if ((has_fa[seat] && !w.GetFreeAccessible()) || w.GetWing()) {
                     w.can_free_accessible = false;
                 } else {
@@ -259,8 +259,8 @@ class Weapons extends Part {
     private RemoveOneTractorSpinner() {
         for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
             if (this.weapon_sets[i].GetDirection()[0]) {
-                var wlist = this.weapon_sets[i].GetWeapons();
-                for (let j = wlist.length - 1; j >= 0; j--) {
+                const wlist = this.weapon_sets[i].GetWeapons();
+                for (const j = wlist.length - 1; j >= 0; j--) {
                     if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER) {
                         wlist[j].SetSynchronization(SynchronizationType.INTERRUPT);
                         return;
@@ -273,8 +273,8 @@ class Weapons extends Part {
     private RemoveOneArtyTractorSpinner() {
         for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
             if (this.weapon_sets[i].GetDirection()[0]) {
-                var wlist = this.weapon_sets[i].GetWeapons();
-                for (let j = wlist.length - 1; j >= 0; j--) {
+                const wlist = this.weapon_sets[i].GetWeapons();
+                for (const j = wlist.length - 1; j >= 0; j--) {
                     if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER && wlist[j].GetArty()) {
                         this.weapon_sets[i].SetDirection(3, true);
                         return;
@@ -287,8 +287,8 @@ class Weapons extends Part {
     private RemoveOnePusherSpinner() {
         for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
             if (this.weapon_sets[i].GetDirection()[1]) {
-                var wlist = this.weapon_sets[i].GetWeapons();
-                for (let j = wlist.length - 1; j >= 0; j--) {
+                const wlist = this.weapon_sets[i].GetWeapons();
+                for (const j = wlist.length - 1; j >= 0; j--) {
                     if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER) {
                         wlist[j].SetSynchronization(SynchronizationType.INTERRUPT);
                         return;
@@ -301,8 +301,8 @@ class Weapons extends Part {
     private RemoveOneArtyPusherSpinner() {
         for (let i = this.weapon_sets.length - 1; i >= 0; i--) {
             if (this.weapon_sets[i].GetDirection()[1]) {
-                var wlist = this.weapon_sets[i].GetWeapons();
-                for (let j = wlist.length - 1; j >= 0; j--) {
+                const wlist = this.weapon_sets[i].GetWeapons();
+                for (const j = wlist.length - 1; j >= 0; j--) {
                     if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER && wlist[j].GetArty()) {
                         this.weapon_sets[i].SetDirection(3, true);
                         return;
@@ -361,33 +361,33 @@ class Weapons extends Part {
     }
 
     public SetHavePropeller(have: boolean) {
-        for (let ws of this.weapon_sets) {
+        for (const ws of this.weapon_sets) {
             ws.SetHavePropeller(have);
         }
     }
 
     public SetCanWing(can: boolean) {
-        for (let ws of this.weapon_sets) {
+        for (const ws of this.weapon_sets) {
             ws.SetCanWing(can);
         }
     }
 
     public SetStickyGuns(num: number) {
-        for (let ws of this.weapon_sets) {
+        for (const ws of this.weapon_sets) {
             ws.SetStickyGuns(num);
         }
     }
 
     private GetWingWeight() {
-        var sum = 0;
-        for (let w of this.weapon_sets) {
+        const sum = 0;
+        for (const w of this.weapon_sets) {
             sum += w.GetWingWeight();
         }
         return sum;
     }
 
     public GetSeatList() {
-        var lst = [];
+        const lst = [];
         for (let i = 0; i < this.cockpit_count; i++) {
             lst.push(lu("Seat #", i + 1));
         }
@@ -395,8 +395,8 @@ class Weapons extends Part {
     }
 
     public GetArmedSeats() {
-        var lst = Array(this.cockpit_count).fill(false);
-        for (let ws of this.weapon_sets) {
+        const lst = Array(this.cockpit_count).fill(false);
+        for (const ws of this.weapon_sets) {
             lst[ws.GetSeat()] = true;
         }
         return lst;
@@ -404,7 +404,7 @@ class Weapons extends Part {
 
     public SetCalculateStats(callback: () => void) {
         this.CalculateStats = callback;
-        for (let set of this.weapon_sets)
+        for (const set of this.weapon_sets)
             set.SetCalculateStats(callback);
     }
 
@@ -417,7 +417,7 @@ class Weapons extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
 
         //Update Freely Accessible state.
         // while (this.CountFreelyAccessible() > this.cockpit_count) {
@@ -438,7 +438,7 @@ class Weapons extends Part {
         }
 
         //Wing reinforcement. Do this so it gets included in parts display.
-        var wing_size = 0;
+        const wing_size = 0;
         if (this.cant_type == 0)
             wing_size = 4;
         else if (this.cant_type == 1)
@@ -447,11 +447,11 @@ class Weapons extends Part {
             wing_size = 16;
 
         //Create list of every weapon size and a ref to the weapon
-        var slist = [];
-        for (let ws of this.weapon_sets) {
-            for (let w of ws.GetWeapons()) {
+        const slist = [];
+        for (const ws of this.weapon_sets) {
+            for (const w of ws.GetWeapons()) {
                 w.wing_reinforcement = false;
-                var s = { s: 0, w: w };
+                const s = { s: 0, w: w };
                 if (w.GetWing()) {
                     s.s = (w.GetCount() * this.weapon_list[ws.GetWeaponSelected()].size);
                     slist.push(s);
@@ -461,7 +461,7 @@ class Weapons extends Part {
 
         //Sort by size to we reinforce as few weapons as possible
         slist.sort(function (a, b) { return a.s - b.s; });
-        for (let s of slist) {
+        for (const s of slist) {
             if (wing_size >= 0) {
                 wing_size -= s.s;
             }
@@ -470,7 +470,7 @@ class Weapons extends Part {
             }
         }
 
-        for (let ws of this.weapon_sets) {
+        for (const ws of this.weapon_sets) {
             ws.SetTractorPusher(this.has_tractor, this.CanTractorSpinner(), this.CanArtyTractorSpinner(),
                 this.has_pusher, this.CanPusherSpinner(), this.CanArtyPusherSpinner(), this.isheli);
             ws.has_cantilever = this.cant_type > 0;
@@ -494,13 +494,13 @@ class Weapons extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         for (let i = 0; i < this.weapon_sets.length; i++) {
-            let set = this.weapon_sets[i];
+            const set = this.weapon_sets[i];
             if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) {
-                let charges = set.GetHRCharges();
+                const charges = set.GetHRCharges();
                 //Negate the values for display
-                for (let c = 0; c < charges.length; c++)
+                for (const c = 0; c < charges.length; c++)
                     charges[c] *= -1;
 
                 value.equipment.push({

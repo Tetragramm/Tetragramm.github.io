@@ -1,7 +1,7 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part, AIRCRAFT_TYPE } from "./Part";
+import { Stats } from "./Stats";
 
-class Propeller extends Part {
+export class Propeller extends Part {
     private prop_list: { name: string, stats: Stats, energy: number, turn: number }[];
     private upg_list: { name: string, stats: Stats, energy: number, turn: number }[];
     private idx_prop: number;
@@ -15,7 +15,7 @@ class Propeller extends Part {
 
         this.idx_prop = 2;
         this.prop_list = [];
-        for (let elem of json["props"]) {
+        for (const elem of json["props"]) {
             this.prop_list.push({
                 name: elem["name"], stats: new Stats(elem),
                 energy: elem["energy"], turn: elem["turn"],
@@ -24,7 +24,7 @@ class Propeller extends Part {
 
         this.idx_upg = 0;
         this.upg_list = [];
-        for (let elem of json["upgrades"]) {
+        for (const elem of json["upgrades"]) {
             this.upg_list.push({
                 name: elem["name"], stats: new Stats(elem),
                 energy: elem["energy"], turn: elem["turn"],
@@ -106,8 +106,8 @@ class Propeller extends Part {
     }
 
     public GetNumPropellers() {
-        var num_propellers = 0;
-        for (let e of this.engines) {
+        const num_propellers = 0;
+        for (const e of this.engines) {
             if (e.type == DRIVE_TYPE.PROPELLER) {
                 num_propellers += e.num;
             }
@@ -127,8 +127,8 @@ class Propeller extends Part {
         if (this.engines.length == 0)
             return 2.5;
 
-        var E = 999;
-        for (let e of this.engines) {
+        const E = 999;
+        for (const e of this.engines) {
             switch (e.type) {
                 case DRIVE_TYPE.PROPELLER:
                     E = Math.min(E, this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy);
@@ -158,8 +158,8 @@ class Propeller extends Part {
         if (this.engines.length == 0)
             return 6;
 
-        var T = 999;
-        for (let e of this.engines) {
+        const T = 999;
+        for (const e of this.engines) {
             switch (e.type) {
                 case DRIVE_TYPE.PROPELLER:
                     T = Math.min(T, this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn);
@@ -182,7 +182,7 @@ class Propeller extends Part {
     }
 
     public PartStats(): Stats {
-        var stats = new Stats();
+        const stats = new Stats();
         if (this.GetNumPropellers() != 0) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.GetNumPropellers()));
             stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.GetNumPropellers()));
@@ -207,7 +207,7 @@ class Propeller extends Part {
         } else {
             stats.pitchboost = 999;
             stats.pitchspeed = 999;
-            for (let e of this.engines) {
+            for (const e of this.engines) {
                 switch (e.type) {
                     case DRIVE_TYPE.PROPELLER:
                         stats.pitchboost = Math.min(stats.pitchboost, this.prop_list[this.idx_prop].stats.pitchboost + this.upg_list[this.idx_upg].stats.pitchboost);

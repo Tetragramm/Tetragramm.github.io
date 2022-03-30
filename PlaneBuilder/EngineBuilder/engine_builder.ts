@@ -7,17 +7,17 @@
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
-    var ep = sp.get("engine");
-    var lang = sp.get("lang");
+    const ep = sp.get("engine");
+    const lang = sp.get("lang");
 
-    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/engines.json'];
-    var proms = jsons.map(d => fetch(d));
+    const jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/engines.json'];
+    const proms = jsons.map(d => fetch(d));
     Promise.all(proms)
         .then(ps => Promise.all(ps.map(p => p.json())))
         .then(
             resp => {
-                var string_JSON = resp[0];
-                var engine_JSON = resp[1];
+                const string_JSON = resp[0];
+                const engine_JSON = resp[1];
                 //Strings bit
                 local = new Localization(string_JSON);
                 if (lang) {
@@ -27,8 +27,8 @@ const init = () => {
                 }
 
                 //Engine Bit
-                var nameliststr = window.localStorage.getItem("engines_names");
-                var namelist: string[] = [];
+                const nameliststr = window.localStorage.getItem("engines_names");
+                const namelist: string[] = [];
                 if (nameliststr) {
                     namelist = JSON.parse(nameliststr) as string[];
                     for (let n of namelist) {
@@ -59,10 +59,10 @@ const init = () => {
 
     if (ep != null) {
         try {
-            var str = LZString.decompressFromEncodedURIComponent(ep);
-            var arr = _stringToArrayBuffer(str);
-            var des = new Deserialize(arr);
-            var num = engine_list.get("Custom").deserializeEngine(des);
+            const str = LZString.decompressFromEncodedURIComponent(ep);
+            const arr = _stringToArrayBuffer(str);
+            const des = new Deserialize(arr);
+            const num = engine_list.get("Custom").deserializeEngine(des);
             ebuild.SelectEngine(num);
         } catch { console.log("Compressed Engine Parameter Failed."); }
     }
@@ -70,10 +70,10 @@ const init = () => {
 }
 window.onload = init;
 
-var ebuild: EngineBuilder_HTML;
-var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
-var local: Localization;
-var enable_anim = false;
+const ebuild: EngineBuilder_HTML;
+const engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
+const local: Localization;
+const enable_anim = false;
 
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
@@ -205,34 +205,34 @@ class EngineBuilder_HTML {
         this.turbobuilder = new TurboBuilder();
         this.electricbuilder = new ElectricBuilder();
 
-        var etbl = document.getElementById("table_engine") as HTMLTableElement;
-        var erow = etbl.insertRow();
+        const etbl = document.getElementById("table_engine") as HTMLTableElement;
+        const erow = etbl.insertRow();
         this.InitEngineInputs(erow.insertCell());
         this.InitEngineUpgrades(erow.insertCell());
         this.InitEngineOutputs(erow.insertCell());
         this.UpdateEngine();
 
-        var ptbl = document.getElementById("table_pulsejet") as HTMLTableElement;
-        var prow = ptbl.insertRow();
+        const ptbl = document.getElementById("table_pulsejet") as HTMLTableElement;
+        const prow = ptbl.insertRow();
         this.InitPulsejetInputs(prow.insertCell());
         this.InitPulsejetOutputs(prow.insertCell());
         this.UpdatePulsejet();
 
-        var ptbl = document.getElementById("table_turbox") as HTMLTableElement;
-        var prow = ptbl.insertRow();
+        const ptbl = document.getElementById("table_turbox") as HTMLTableElement;
+        const prow = ptbl.insertRow();
         this.InitTurboXInputs(prow.insertCell());
         this.td_desc = prow.insertCell();
         this.InitTurboXOutputs(prow.insertCell());
         this.UpdateTurboX();
 
-        var ptbl = document.getElementById("table_electric") as HTMLTableElement;
-        var prow = ptbl.insertRow();
+        const ptbl = document.getElementById("table_electric") as HTMLTableElement;
+        const prow = ptbl.insertRow();
         this.InitElectricInputs(prow.insertCell());
         this.InitElectricOutputs(prow.insertCell());
         this.UpdateElectric();
 
-        var mtbl = document.getElementById("table_manual") as HTMLTableElement;
-        var mrow = mtbl.insertRow();
+        const mtbl = document.getElementById("table_manual") as HTMLTableElement;
+        const mrow = mtbl.insertRow();
         this.InitManual(mrow.insertCell());
         this.InitListManagement(mrow.insertCell());
     }
@@ -259,7 +259,7 @@ class EngineBuilder_HTML {
             this.e_cool.add(opt);
         }
 
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexText("Name", this.e_name, fs);
         FlexSelect("Era", this.e_sera, fs);
         FlexSelect("Engine Type", this.e_cool, fs);
@@ -300,7 +300,7 @@ class EngineBuilder_HTML {
     }
 
     private InitEngineUpgrades(cell: HTMLTableCellElement) {
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
 
         this.e_ctyp = document.createElement("SELECT") as HTMLSelectElement;
         for (let e of this.enginebuilder.CompressorTable) {
@@ -348,7 +348,7 @@ class EngineBuilder_HTML {
         this.ed_cost = document.createElement("LABEL") as HTMLLabelElement;
         this.ed_oilt = document.createElement("LABEL") as HTMLLabelElement;
         this.ed_grpm = document.createElement("LABEL") as HTMLLabelElement;
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexDisplay("Name", this.ed_name, fs);
         FlexDisplay("Power", this.ed_powr, fs);
         FlexDisplay("Mass", this.ed_mass, fs);
@@ -366,7 +366,7 @@ class EngineBuilder_HTML {
 
     private UpdateEngine() {
         //Update and enfoce values before updating displayed values.
-        var estats = this.enginebuilder.EngineStats();
+        const estats = this.enginebuilder.EngineStats();
 
         this.e_name.value = this.enginebuilder.name;
         this.e_sera.selectedIndex = this.enginebuilder.era_sel;
@@ -385,7 +385,7 @@ class EngineBuilder_HTML {
         this.e_ccnt.valueAsNumber = this.enginebuilder.compressor_count;
         this.e_mIA.valueAsNumber = this.enginebuilder.min_IAF;
 
-        var can_upg = this.enginebuilder.CanUpgrade();
+        const can_upg = this.enginebuilder.CanUpgrade();
         for (let i = 0; i < this.e_upgs.length; i++) {
             this.e_upgs[i].disabled = !can_upg[i + 1];//NOTE: Asperator Boot depricated, so start from 1.
         }
@@ -398,8 +398,8 @@ class EngineBuilder_HTML {
         BlinkIfChanged(this.ed_cool, estats.stats.cooling.toString(), false);
         BlinkIfChanged(this.ed_ospd, estats.overspeed.toString(), true);
         BlinkIfChanged(this.ed_fuel, estats.stats.fuelconsumption.toString(), false);
-        var b = this.enginebuilder.min_IAF;
-        var t = this.enginebuilder.min_IAF + estats.altitude;
+        const b = this.enginebuilder.min_IAF;
+        const t = this.enginebuilder.min_IAF + estats.altitude;
         BlinkIfChanged(this.ed_malt, b.toString() + "-" + t.toString());
         BlinkIfChanged(this.ed_torq, estats.torque.toString(), false);
         BlinkIfChanged(this.ed_cost, estats.stats.cost.toString(), false);
@@ -427,7 +427,7 @@ class EngineBuilder_HTML {
             this.p_sera.add(opt);
         }
 
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexInput("Desired Power", this.p_powr, fs);
         FlexSelect("Engine Type", this.p_type, fs);
         FlexSelect("Era", this.p_sera, fs);
@@ -455,7 +455,7 @@ class EngineBuilder_HTML {
         this.pd_cost = document.createElement("LABEL") as HTMLLabelElement;
         this.pd_malt = document.createElement("LABEL") as HTMLLabelElement;
         this.pd_dcst = document.createElement("LABEL") as HTMLLabelElement;
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexDisplay("Name", this.pd_name, fs);
         FlexDisplay("Power", this.pd_powr, fs);
         FlexDisplay("Mass", this.pd_mass, fs);
@@ -475,7 +475,7 @@ class EngineBuilder_HTML {
         this.p_bqul.valueAsNumber = this.pulsejetbuilder.build_quality;
         this.p_strt.checked = this.pulsejetbuilder.starter;
 
-        var estats = this.pulsejetbuilder.EngineStats();
+        const estats = this.pulsejetbuilder.EngineStats();
         BlinkIfChanged(this.pd_name, estats.name);
         BlinkIfChanged(this.pd_powr, estats.stats.power.toString());
         BlinkIfChanged(this.pd_mass, estats.stats.mass.toString());
@@ -498,7 +498,7 @@ class EngineBuilder_HTML {
         this.t_bypr = document.createElement("INPUT") as HTMLInputElement;
         this.t_aftb = document.createElement("INPUT") as HTMLInputElement;
 
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexText("Name", this.t_name, fs);
         FlexSelect("Era", this.t_era, fs);
         FlexSelect("Type", this.t_type, fs);
@@ -546,7 +546,7 @@ class EngineBuilder_HTML {
         this.td_fuel = document.createElement("LABEL") as HTMLLabelElement;
         this.td_cost = document.createElement("LABEL") as HTMLLabelElement;
         this.td_malt = document.createElement("LABEL") as HTMLLabelElement;
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexDisplay("Name", this.td_name, fs);
         FlexDisplay("Power", this.td_powr, fs);
         FlexDisplay("Mass", this.td_mass, fs);
@@ -574,7 +574,7 @@ class EngineBuilder_HTML {
             this.t_bypr.disabled = false;
         }
 
-        var estats = this.turbobuilder.EngineStats();
+        const estats = this.turbobuilder.EngineStats();
         BlinkIfChanged(this.td_name, estats.name);
         BlinkIfChanged(this.td_powr, estats.stats.power.toString());
         BlinkIfChanged(this.td_mass, estats.stats.mass.toString());
@@ -654,7 +654,7 @@ class EngineBuilder_HTML {
         this.el_size = document.createElement("INPUT") as HTMLInputElement;
         this.el_qual = document.createElement("INPUT") as HTMLInputElement;
 
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexText("Name", this.el_name, fs);
         FlexSelect("Era", this.el_era, fs);
         FlexSelect("Winding", this.el_wind, fs);
@@ -695,7 +695,7 @@ class EngineBuilder_HTML {
         this.eld_draw = document.createElement("LABEL") as HTMLLabelElement;
         this.eld_over = document.createElement("LABEL") as HTMLLabelElement;
         this.eld_cost = document.createElement("LABEL") as HTMLLabelElement;
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         FlexDisplay("Name", this.eld_name, fs);
         FlexDisplay("Power", this.eld_powr, fs);
         FlexDisplay("Mass", this.eld_mass, fs);
@@ -715,7 +715,7 @@ class EngineBuilder_HTML {
         this.el_qual.valueAsNumber = this.electricbuilder.quality_fudge;
 
 
-        var estats = this.electricbuilder.EngineStats();
+        const estats = this.electricbuilder.EngineStats();
         BlinkIfChanged(this.eld_name, estats.name);
         BlinkIfChanged(this.eld_powr, estats.stats.power.toString());
         BlinkIfChanged(this.eld_mass, estats.stats.mass.toString());
@@ -758,7 +758,7 @@ class EngineBuilder_HTML {
         this.m_pulsejet.disabled = true;
         this.m_turbo.disabled = true;
 
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         //Set up the individual stat input boxes
         FlexText("Name", this.m_name, fs);
         FlexInput("Power", this.m_pwr, fs);
@@ -776,7 +776,7 @@ class EngineBuilder_HTML {
         FlexCheckbox("Pulsejet", this.m_pulsejet, fs);
         FlexCheckbox("Turbocharger", this.m_turbo, fs);
 
-        var trigger = () => { this.UpdateManual(); };
+        const trigger = () => { this.UpdateManual(); };
         this.m_name.onchange = trigger;
         this.m_pwr.onchange = trigger;
         this.m_mass.onchange = trigger;
@@ -823,7 +823,7 @@ class EngineBuilder_HTML {
             }
         }
         this.m_add_eb.onclick = () => {
-            var inputs = this.enginebuilder.EngineInputs();
+            const inputs = this.enginebuilder.EngineInputs();
             if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
@@ -833,7 +833,7 @@ class EngineBuilder_HTML {
             }
         }
         this.m_add_pj.onclick = () => {
-            var inputs = this.pulsejetbuilder.EngineInputs();
+            const inputs = this.pulsejetbuilder.EngineInputs();
             if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
@@ -843,7 +843,7 @@ class EngineBuilder_HTML {
             }
         }
         this.m_add_tb.onclick = () => {
-            var inputs = this.turbobuilder.EngineInputs();
+            const inputs = this.turbobuilder.EngineInputs();
             if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
@@ -853,7 +853,7 @@ class EngineBuilder_HTML {
             }
         }
         this.m_add_el.onclick = () => {
-            var inputs = this.electricbuilder.EngineInputs();
+            const inputs = this.electricbuilder.EngineInputs();
             if (inputs.name != "Default" && !engine_list.get(this.list_idx).constant) {
                 engine_list.get(this.list_idx).push(inputs);
                 this.UpdateList();
@@ -869,12 +869,12 @@ class EngineBuilder_HTML {
         this.m_load.onchange = (evt) => {
             if (this.m_load.files.length == 0)
                 return;
-            var file = this.m_load.files[0];
-            var reader = new FileReader();
+            const file = this.m_load.files[0];
+            const reader = new FileReader();
             reader.onloadend = () => {
                 try {
-                    var str = JSON.parse(reader.result as string);
-                    var newelist = new EngineList(str["name"]);
+                    const str = JSON.parse(reader.result as string);
+                    const newelist = new EngineList(str["name"]);
                     newelist.fromJSON(str);
                     if (engine_list.has(newelist.name) && engine_list.get(newelist.name).constant) {
                         BlinkBad(this.m_load.parentElement);
@@ -889,7 +889,7 @@ class EngineBuilder_HTML {
             this.m_load.value = "";
         };
         this.m_list_create.onclick = () => {
-            var nlist = this.m_list_input.value;
+            const nlist = this.m_list_input.value;
             nlist = nlist.trim();
             nlist = nlist.replace(/\s+/g, ' ');
             if (nlist != "") {
@@ -912,7 +912,7 @@ class EngineBuilder_HTML {
                     engine_list.delete(this.list_idx);
                     window.localStorage.removeItem("engines." + this.list_idx);
                     let namelist = JSON.parse(window.localStorage.getItem("engines_names"));
-                    var idx = -1;
+                    const idx = -1;
                     for (let i = 0; i < namelist.length; i++) {
                         if (namelist[i] == this.list_idx)
                             idx = i;
@@ -944,7 +944,7 @@ class EngineBuilder_HTML {
                     cost: estats.stats.cost,
                 });
             }
-            var json2csv = new JSON2CSV();
+            const json2csv = new JSON2CSV();
             download(json2csv.convert(output, { separator: ',', flatten: true, output_csvjson_variant: false }), this.list_idx + ".csv", "csv");
         }
 
@@ -959,8 +959,8 @@ class EngineBuilder_HTML {
         // CreateButton("Add From Electric Builder", this.m_add_el, cell);
         CreateButton("Delete Engine", this.m_delete, cell);
 
-        var span = document.createElement("SPAN") as HTMLSpanElement;
-        var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
+        const span = document.createElement("SPAN") as HTMLSpanElement;
+        const txtSpan = document.createElement("LABEL") as HTMLLabelElement;
         this.m_list_create.hidden = true;
         this.m_list_create.id = GenerateID();
         txtSpan.htmlFor = this.m_list_create.id;
@@ -980,7 +980,7 @@ class EngineBuilder_HTML {
     }
 
     public UpdateList() {
-        var l_idx = this.m_list_select.selectedIndex;
+        const l_idx = this.m_list_select.selectedIndex;
         while (this.m_list_select.options.length > 0) {
             this.m_list_select.options.remove(this.m_list_select.options.length - 1);
         }
@@ -993,7 +993,7 @@ class EngineBuilder_HTML {
         }
         this.m_list_select.selectedIndex = l_idx;
 
-        var idx = this.m_select.selectedIndex;
+        const idx = this.m_select.selectedIndex;
         while (this.m_select.options.length > 0) {
             this.m_select.options.remove(this.m_select.options.length - 1);
         }
@@ -1009,7 +1009,7 @@ class EngineBuilder_HTML {
     }
 
     private UpdateManual() {
-        var e_stats = new EngineStats();
+        const e_stats = new EngineStats();
         e_stats.name = this.m_name.value;
         e_stats.stats.power = this.m_pwr.valueAsNumber;
         e_stats.stats.mass = this.m_mass.valueAsNumber;
@@ -1031,7 +1031,7 @@ class EngineBuilder_HTML {
     }
 
     private SetValues(e_input: EngineInputs) {
-        var e_stats = e_input.PartStats();
+        const e_stats = e_input.PartStats();
         switch (e_input.engine_type) {
             case ENGINE_TYPE.PROPELLER: {
                 this.enginebuilder.name = e_input.name;

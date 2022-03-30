@@ -1,15 +1,15 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
 
-class Era extends Part {
+export class Era extends Part {
     private vals: { name: string, maxbomb: number, cant_lift: number, stats: Stats }[];
     private selected: number;
     constructor(js: JSON) {
         super();
         this.selected = 0;
         this.vals = [];
-        for (let elem of js["options"]) {
-            var opt = {
+        for (const elem of js["options"]) {
+            const opt = {
                 name: elem["name"], maxbomb: elem["maxbomb"],
                 cant_lift: elem["cant_lift"], stats: new Stats(elem),
             };
@@ -70,7 +70,7 @@ class Era extends Part {
     }
 
     public PartStats(): Stats {
-        var s = new Stats();
+        const s = new Stats();
         s = s.Add(this.vals[this.selected].stats);
         return s;
     }

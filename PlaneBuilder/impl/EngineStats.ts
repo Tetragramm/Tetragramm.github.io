@@ -1,6 +1,8 @@
-/// <reference path="./Stats.ts" />
-/// <reference path="./Serialize.ts"/>
-/// <reference path="./EngineInputs.ts"/>
+import { Stats } from "./Stats";
+import { Serialize } from "./Serialize";
+import { EngineInputs, ENGINE_RARITY } from "./EngineInputs";
+
+
 
 enum DRIVE_TYPE {
     PROPELLER,
@@ -8,14 +10,14 @@ enum DRIVE_TYPE {
     PULSEJET,
 }
 
-class EngineStats {
-    public name: string = "Default";
-    public overspeed: number = 0;
-    public altitude: number = 0;
-    public torque: number = 0;
-    public rumble: number = 0;
-    public oiltank: boolean = false;
-    public pulsejet: boolean = false;
+export class EngineStats {
+    public name = "Default";
+    public overspeed = 0;
+    public altitude = 0;
+    public torque = 0;
+    public rumble = 0;
+    public oiltank = false;
+    public pulsejet = false;
     public stats: Stats = new Stats();
     public rarity: ENGINE_RARITY = ENGINE_RARITY.CUSTOM;
 
@@ -39,7 +41,7 @@ class EngineStats {
         };
     }
 
-    public fromJSON(js: JSON, json_version: number = 9999) {
+    public fromJSON(js: JSON, json_version = 9999) {
         if (js["name"])
             this.name = js["name"];
         if (js["overspeed"])
@@ -86,7 +88,7 @@ class EngineStats {
     }
 
     public Clone(): EngineStats {
-        var c = new EngineStats();
+        const c = new EngineStats();
         c.fromJSON(JSON.parse(JSON.stringify(this.toJSON())));
         return c;
     }

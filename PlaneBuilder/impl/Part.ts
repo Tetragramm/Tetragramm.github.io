@@ -1,7 +1,7 @@
-/// <reference path="./Stats.ts" />
+import { Stats } from "Stats";
 
 
-enum AIRCRAFT_TYPE {
+export enum AIRCRAFT_TYPE {
     AIRPLANE,
     HELICOPTER,
     AUTOGYRO,
@@ -9,12 +9,12 @@ enum AIRCRAFT_TYPE {
     ORNITHOPTER_FLUTTER,
     ORNITHOPTER_BUZZER,
 }
-function IsAnyOrnithopter(type: AIRCRAFT_TYPE){
+export function IsAnyOrnithopter(type: AIRCRAFT_TYPE){
     return type == AIRCRAFT_TYPE.ORNITHOPTER_BASIC
     || type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER
     || type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER;
 }
-abstract class Part {
+export abstract class Part {
     abstract PartStats(): Stats;
     abstract GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] };
     protected FormatEquipment(equipment: { source: string, charge: string }[], name: string, charge: number): { source: string, charge: string }[] {
@@ -39,9 +39,9 @@ function MergeElectrics(
     a: { storage: number, equipment: { source: string, charge: string }[] },
     b: { storage: number, equipment: { source: string, charge: string }[] }): { storage: number, equipment: { source: string, charge: string }[] } {
 
-    for (let bi = 0; bi < b.equipment.length; bi++) {
+    for (const bi = 0; bi < b.equipment.length; bi++) {
         let merge = false;
-        for (let ai = 0; ai < a.equipment.length; ai++) {
+        for (const ai = 0; ai < a.equipment.length; ai++) {
             if (a.equipment[ai].source == b.equipment[bi].source && !isNaN(parseInt(a.equipment[ai].charge))) {
                 a.equipment[ai].charge = (parseInt(a.equipment[ai].charge) + parseInt(b.equipment[bi].charge)).toString();
                 merge = true;

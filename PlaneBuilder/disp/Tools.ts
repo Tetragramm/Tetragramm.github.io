@@ -350,7 +350,7 @@ function _arrayBufferToString(buffer: ArrayBuffer) {
     return binary;
 }
 
-function _stringToArrayBuffer(str: string) {
+export function _stringToArrayBuffer(str: string) {
     var bytes = new Uint8Array(str.length);
     for (let i = 0; i < str.length; i++) {
         bytes[i] = str.charCodeAt(i);
@@ -365,7 +365,7 @@ const loadJSON = (path, callback) => {
     // Replace 'my_data' with the path to your file
     xobj.onreadystatechange = () => {
         if (xobj.readyState === 4 && xobj.status === 200) {
-            // Required use of an anonymous callback 
+            // Required use of an anonymous callback
             // as .open() will NOT return a value but simply returns undefined in asynchronous mode
             callback(xobj.responseText);
         }

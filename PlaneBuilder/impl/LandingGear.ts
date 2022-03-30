@@ -1,7 +1,8 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { BoolArr } from "./Serialize";
 
-class LandingGear extends Part {
+export class LandingGear extends Part {
     private gear_list: { name: string, stats: Stats, DpLMP: number, SpLMP: number, can_retract: boolean }[];
     private gear_sel: number;
     private retract: boolean;
@@ -17,7 +18,7 @@ class LandingGear extends Part {
         this.gear_list = [];
         this.gear_sel = 0;
         this.retract = false;
-        for (let elem of js["gear"]) {
+        for (const elem of js["gear"]) {
             this.gear_list.push({
                 name: elem["name"],
                 stats: new Stats(elem),
@@ -28,7 +29,7 @@ class LandingGear extends Part {
         }
 
         this.extra_list = [];
-        for (let elem of js["extras"]) {
+        for (const elem of js["extras"]) {
             this.extra_list.push({
                 name: elem["name"],
                 stats: new Stats(elem),
@@ -79,9 +80,9 @@ class LandingGear extends Part {
     }
 
     public CanGear() {
-        var count = [...Array(this.gear_list.length).fill(true)];
+        const count = [...Array(this.gear_list.length).fill(true)];
         for (let i = 0; i < this.gear_list.length; i++) {
-            let g = this.gear_list[i];
+            const g = this.gear_list[i];
             if (g.name == "Boat Hull" && !this.can_boat)
                 count[i] = false;
         }
@@ -153,13 +154,13 @@ class LandingGear extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
         if (!this.CanGear()[this.gear_sel])
             this.gear_sel = 0;
 
         //Do this first, so we can add the Zepplin Hook to the mass
         //TODO: This is a hack, and it is terrible. Separate hook?
-        var tempMass = this.loadedMass;
+        const tempMass = this.loadedMass;
         for (let i = 0; i < this.extra_list.length; i++) {
             if (this.extra_sel[i]) {
                 stats = stats.Add(this.extra_list[i].stats);
@@ -169,7 +170,7 @@ class LandingGear extends Part {
         }
 
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
-        var pdrag = this.gear_list[this.gear_sel].DpLMP * Math.floor(1.0e-6 + tempMass / 5);
+        const pdrag = this.gear_list[this.gear_sel].DpLMP * Math.floor(1.0e-6 + tempMass / 5);
 
         //Retractable gear with Boat Hull adds normal hull drag,
         // plus the mass and cost of normal retrctable gear
@@ -212,7 +213,7 @@ class LandingGear extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

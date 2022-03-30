@@ -1,7 +1,8 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { NumArr } from "./Serialize";
 
-class Fuel extends Part {
+export class Fuel extends Part {
     private tank_stats: {
         name: string, stats: Stats,
         internal: boolean, cantilever: boolean
@@ -17,7 +18,7 @@ class Fuel extends Part {
 
         this.tank_stats = [];
         this.tank_count = [];
-        for (let elem of js["tanks"]) {
+        for (const elem of js["tanks"]) {
             this.tank_stats.push({
                 name: elem["name"], stats: new Stats(elem),
                 internal: elem["internal"], cantilever: elem["cantilever"]
@@ -63,8 +64,8 @@ class Fuel extends Part {
     }
 
     public GetTankEnabled() {
-        var lst = [];
-        for (let e of this.tank_stats) {
+        const lst = [];
+        for (const e of this.tank_stats) {
             if (!this.is_cantilever && e.cantilever)
                 lst.push(false);
             else
@@ -107,18 +108,18 @@ class Fuel extends Part {
     private VerifyOK() {
         if (this.wing_area != -1) {
             //Count cantilever dependent tanks.
-            var ccount = 0;
+            const ccount = 0;
             for (let i = 0; i < this.tank_count.length; i++) {
                 if (this.tank_stats[i].cantilever)
                     ccount += this.tank_count[i];
             }
             //How many can you have?
-            var allowed = Math.floor(1.0e-6 + this.wing_area / 10);
+            const allowed = Math.floor(1.0e-6 + this.wing_area / 10);
             if (!this.is_cantilever)
                 allowed = 0;
             //Do you have more than the allowed?
-            var diff = ccount - allowed;
-            var mod = diff > 0;
+            const diff = ccount - allowed;
+            const mod = diff > 0;
             //Loop over and reduce by one until you don't.
             while (diff > 0) {
                 for (let i = this.tank_count.length - 1; i >= 0; i--) {
@@ -141,7 +142,7 @@ class Fuel extends Part {
     }
 
     public GetSealingEnabled() {
-        var internal_count = 0;
+        const internal_count = 0;
         for (let i = 0; i < this.tank_count.length; i++) {
             if (this.tank_stats[i].internal)
                 internal_count += this.tank_count[i];
@@ -172,8 +173,8 @@ class Fuel extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
-        var internal_count = 0;
+        const stats = new Stats();
+        const internal_count = 0;
         for (let i = 0; i < this.tank_count.length; i++) {
             let ts = this.tank_stats[i].stats.Clone();
             ts = ts.Multiply(this.tank_count[i]);
@@ -213,7 +214,7 @@ class Fuel extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

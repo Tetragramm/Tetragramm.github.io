@@ -1,7 +1,8 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part.ts";
+import { Stats } from "./Stats.ts";
+import { NumArr, BoolArr } from "./Serialize";
 
-class Accessories extends Part {
+export class Accessories extends Part {
     private armour_coverage: number[];
     //Electrical
     private electric_list: {
@@ -39,7 +40,7 @@ class Accessories extends Part {
         this.skin_armour = 0;
 
         this.electric_list = [];
-        for (let elem of js["electrical"]) {
+        for (const elem of js["electrical"]) {
             this.electric_list.push({
                 name: elem["name"], stats: new Stats(elem),
                 cp10s: elem["cp10s"], storage: elem["storage"],
@@ -49,38 +50,38 @@ class Accessories extends Part {
 
         this.radio_list = [];
         this.radio_sel = 0;
-        for (let elem of js["radios"]) {
+        for (const elem of js["radios"]) {
             this.radio_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
 
         this.recon_list = [];
-        for (let elem of js["recon"]) {
+        for (const elem of js["recon"]) {
             this.recon_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.recon_sel = Array(this.recon_list.length).fill(0);
 
         this.visi_list = [];
-        for (let elem of js["visibility"]) {
+        for (const elem of js["visibility"]) {
             this.visi_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.visi_sel = [...Array(this.visi_list.length).fill(false)];
         this.can_visi = [...Array(this.visi_list.length).fill(true)];
 
         this.clim_list = [];
-        for (let elem of js["climate"]) {
+        for (const elem of js["climate"]) {
             this.clim_list.push({ name: elem["name"], stats: new Stats(elem), req_radiator: elem["req_radiator"] });
         }
         this.clim_sel = [...Array(this.clim_list.length).fill(false)];
 
         this.auto_list = [];
         this.auto_sel = 0;
-        for (let elem of js["autopilots"]) {
+        for (const elem of js["autopilots"]) {
             this.auto_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
 
         this.cont_list = [];
         this.cont_sel = 0;
-        for (let elem of js["control"]) {
+        for (const elem of js["control"]) {
             this.cont_list.push({ name: elem["name"], max_mass_stress: elem["max_mass_stress"], max_total_stress: elem["max_total_stress"], stats: new Stats(elem) });
         }
     }
@@ -179,13 +180,13 @@ class Accessories extends Part {
     }
 
     public GetEffectiveCoverage() {
-        var arr = [];
-        var vital_adj = Math.max(0, Math.floor((this.vital_parts - 8) / 2));
+        const arr = [];
+        const vital_adj = Math.max(0, Math.floor((this.vital_parts - 8) / 2));
         for (let i = 0; i < this.armour_coverage.length; i++) {
             arr.push(Math.max(0, this.armour_coverage[i]));
         }
-        var sum = 0;
-        for (let r = this.armour_coverage.length - 1; r >= 0; r--) {
+        const sum = 0;
+        for (const r = this.armour_coverage.length - 1; r >= 0; r--) {
             sum += arr[r];
             arr[r] = sum - vital_adj;
         }
@@ -202,7 +203,7 @@ class Accessories extends Part {
     }
 
     private NormalizeCoverage() {
-        var coverage = -8 + Math.min(0, -Math.floor(1.0e-6 + (this.vital_parts - 8) / 2));
+        const coverage = -8 + Math.min(0, -Math.floor(1.0e-6 + (this.vital_parts - 8) / 2));
         for (let i = this.armour_coverage.length - 1; i >= 0; i--) {
             if (i == 1) {
                 coverage += this.skin_armour;
@@ -284,8 +285,8 @@ class Accessories extends Part {
     }
 
     public GetClimateEnable() {
-        var can = [];
-        for (let c of this.clim_list) {
+        const can = [];
+        for (const c of this.clim_list) {
             if (!this.acft_rad && c.req_radiator)
                 can.push(false);
             else
@@ -330,7 +331,7 @@ class Accessories extends Part {
     }
 
     public IsElectrics() {
-        for (let e of this.electrical_count) {
+        for (const e of this.electrical_count) {
             if (e > 0)
                 return true;
         }
@@ -379,7 +380,7 @@ class Accessories extends Part {
     }
 
     public GetWindmill() {
-        var production = 0;
+        const production = 0;
         for (let i = 0; i < this.electrical_count.length; i++) {
             production += this.electric_list[i].cp10s * this.electrical_count[i];
         }
@@ -403,15 +404,15 @@ class Accessories extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
 
         this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
-        var armour_str = "";
+        const armour_str = "";
         //Armour
-        var eff_armour = this.GetEffectiveCoverage();
+        const eff_armour = this.GetEffectiveCoverage();
         for (let i = 0; i < this.armour_coverage.length; i++) {
             let AP = i + 1;
-            var count = this.armour_coverage[i];
+            const count = this.armour_coverage[i];
             if (AP == 2) {
                 count -= this.skin_armour;
             }
@@ -476,8 +477,8 @@ class Accessories extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        var battery_storage = 0;
-        var equipment: { source: string, charge: string }[] = [];
+        const battery_storage = 0;
+        const equipment: { source: string, charge: string }[] = [];
         for (let i = 0; i < this.electric_list.length; i++) {
             let item = this.electric_list[i];
             let count = this.electrical_count[i];

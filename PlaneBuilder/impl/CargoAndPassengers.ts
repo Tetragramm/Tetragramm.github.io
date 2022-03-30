@@ -1,14 +1,14 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part.ts";
+import { Stats } from "./Stats.ts";
 
-class CargoAndPassengers extends Part {
+export class CargoAndPassengers extends Part {
     private cargo_list: { name: string, stats: Stats }[];
     private cargo_sel: number;
 
     constructor(js: JSON) {
         super();
         this.cargo_list = [];
-        for (let elem of js["spaces"]) {
+        for (const elem of js["spaces"]) {
             this.cargo_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.cargo_sel = 0;
@@ -50,7 +50,7 @@ class CargoAndPassengers extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
         stats = stats.Add(this.cargo_list[this.cargo_sel].stats);
 
         stats.bomb_mass += stats.reqsections * 3;
@@ -63,8 +63,8 @@ class CargoAndPassengers extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        var battery_storage = 0;
-        var equipment: { source: string, charge: string }[] = [];
+        const battery_storage = 0;
+        const equipment: { source: string, charge: string }[] = [];
 
         return { storage: battery_storage, equipment: equipment };
     }

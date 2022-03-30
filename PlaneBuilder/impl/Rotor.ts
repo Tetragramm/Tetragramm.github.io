@@ -1,5 +1,5 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part, AIRCRAFT_TYPE } from "./Part";
+import { Stats } from "./Stats";
 
 enum ROTOR_BLADE_COUNT {
     Two = 2,
@@ -7,7 +7,8 @@ enum ROTOR_BLADE_COUNT {
     Four = 4,
     Five = 5,
 }
-class Rotor extends Part {
+
+export class Rotor extends Part {
     private type: AIRCRAFT_TYPE;
     private rotor_count: number;
     private rotor_span: number;
@@ -37,11 +38,11 @@ class Rotor extends Part {
         this.accessory = false;
         this.blade_idx = 0;
         this.blade_list = [];
-        for (let elem of js["blade_count"]) {
+        for (const elem of js["blade_count"]) {
             this.blade_list.push({ name: elem["name"], rotor_bleed: elem["rotor_bleed"], sizing: elem["sizing"], stats: new Stats(elem) })
         }
         this.stagger_list = [];
-        for (let elem of js["arrangement"]) {
+        for (const elem of js["arrangement"]) {
             this.stagger_list.push({ name: elem["name"], count: elem["count"], powerfactor: elem["powerfactor"], blades: elem["blades"], stats: new Stats(elem) })
         }
     }
@@ -199,7 +200,7 @@ class Rotor extends Part {
     }
 
     private GetRotorStrain() {
-        var area = this.GetRotorArea();
+        const area = this.GetRotorArea();
         return this.rotor_count * Math.max(1, 2 * (this.sizing_span + this.rotor_span) + area - 10);
     }
 
@@ -213,7 +214,7 @@ class Rotor extends Part {
 
     public GetRotorDrag() {
         if (this.type == AIRCRAFT_TYPE.HELICOPTER || this.type == AIRCRAFT_TYPE.AUTOGYRO) {
-            var area = this.GetRotorArea();
+            const area = this.GetRotorArea();
             if (this.rotor_count == 1) {
                 return Math.floor(1.0e-6 + 6 * area * area / ((this.sizing_span + this.rotor_span) * (this.sizing_span + this.rotor_span)));
             } else {
@@ -279,7 +280,7 @@ class Rotor extends Part {
     }
 
     public CanStagger() {
-        var can = [];
+        const can = [];
         for (let i = 0; i < this.stagger_list.length; i++) {
             if (this.rotor_count == 1 && this.stagger_list[i].count == 1) {
                 can.push(true);
@@ -347,14 +348,14 @@ class Rotor extends Part {
         this.VerifySizes();
         this.VerifyStagger();
 
-        var stats = new Stats();
-        var area = this.GetRotorArea();
+        const stats = new Stats();
+        const area = this.GetRotorArea();
         stats.wingarea += Math.floor(1.0e-6 + area);
         stats.drag = this.GetRotorDrag();
 
-        var strain = this.GetRotorStrain();
-        var ts = this.cant_list[this.cant_idx].stats.Clone();
-        var count = Math.ceil(-1.0e-6 + strain / ts.maxstrain);
+        const strain = this.GetRotorStrain();
+        const ts = this.cant_list[this.cant_idx].stats.Clone();
+        const count = Math.ceil(-1.0e-6 + strain / ts.maxstrain);
         ts = ts.Multiply(count);
         ts.maxstrain = 0;
         ts.toughness = 0;

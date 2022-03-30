@@ -1,7 +1,8 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part, AIRCRAFT_TYPE } from "./Part";
+import { Stats } from "./Stats";
+import { NumArr } from "./Serialize";
 
-class Reinforcement extends Part {
+export class Reinforcement extends Part {
     private ext_wood_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, ornith: boolean, stats: Stats }[];
     private ext_steel_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, ornith: boolean, stats: Stats }[];
     private ext_cabane_list: { name: string, tension: number, stats: Stats }[];
@@ -28,7 +29,7 @@ class Reinforcement extends Part {
         super();
 
         this.ext_wood_list = [];
-        for (let elem of js["external_wood"]) {
+        for (const elem of js["external_wood"]) {
             this.ext_wood_list.push({
                 name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], ornith: elem["ornith"], stats: new Stats(elem)
             });
@@ -36,19 +37,19 @@ class Reinforcement extends Part {
         this.ext_wood_count = [...Array(this.ext_wood_list.length).fill(0)];
 
         this.ext_steel_list = [];
-        for (let elem of js["external_steel"]) {
+        for (const elem of js["external_steel"]) {
             this.ext_steel_list.push({ name: elem["name"], tension: elem["tension"], config: elem["config"], first: elem["first"], small_sqp: elem["small_sqp"], ornith: elem["ornith"], stats: new Stats(elem) });
         }
         this.ext_steel_count = [...Array(this.ext_steel_list.length).fill(0)];
 
         this.ext_cabane_list = [];
-        for (let elem of js["cabane"]) {
+        for (const elem of js["cabane"]) {
             this.ext_cabane_list.push({ name: elem["name"], tension: elem["tension"], stats: new Stats(elem) });
         }
         this.cabane_sel = 0;
 
         this.cant_list = [];
-        for (let elem of js["cantilever"]) {
+        for (const elem of js["cantilever"]) {
             this.cant_list.push({ name: elem["name"], limited: elem["limited"], stats: new Stats(elem) });
         }
         this.cant_count = [...Array(this.cant_list.length).fill(0)];
@@ -134,7 +135,7 @@ class Reinforcement extends Part {
     }
 
     public CanExternalWood() {
-        var can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
+        const can = [...Array(this.ext_wood_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_wood_list.length; i++) {
             if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
                 can[i] = this.ext_wood_list[i].ornith;
@@ -161,7 +162,7 @@ class Reinforcement extends Part {
     }
 
     public CanExternalSteel() {
-        var can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
+        const can = [...Array(this.ext_steel_list.length).fill(this.can_external)];
         for (let i = 0; i < this.ext_steel_list.length; i++) {
             if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
                 can[i] = this.ext_steel_list[i].ornith;
@@ -192,7 +193,7 @@ class Reinforcement extends Part {
     }
 
     public GetTotalCantilevers() {
-        var sum = 0;
+        const sum = 0;
         for (let i = 0; i < this.cant_count.length; i++){
             sum += this.cant_count[i];
         }
@@ -200,8 +201,8 @@ class Reinforcement extends Part {
     }
 
     public GetIsCantilever() {
-        var count = 0;
-        for (let c of this.cant_count)
+        const count = 0;
+        for (const c of this.cant_count)
             count += c;
         return count > 0;
     }
@@ -215,9 +216,9 @@ class Reinforcement extends Part {
     }
 
     private ImplSCC(idx: number, count: number) {
-        var diff = count - this.cant_count[idx];
+        const diff = count - this.cant_count[idx];
         if (this.cant_list[idx].limited && count > 0) {
-            var total_structure = this.TotalStructure();
+            const total_structure = this.TotalStructure();
             for (let i = 0; i < this.cant_list.length; i++) {
                 if (this.cant_list[i].limited) {
                     total_structure -= 5 * this.cant_count[i] * this.cant_list[i].stats.mass;
@@ -255,9 +256,9 @@ class Reinforcement extends Part {
     }
 
     public SetAcftStructure(struct: number) {
-        var oldstruct = this.acft_structure;
+        const oldstruct = this.acft_structure;
         this.acft_structure = struct;
-        var recalc = false;
+        const recalc = false;
         if (oldstruct > this.acft_structure) {
             for (let i = this.cant_list.length - 1; i >= 0; i--)
                 recalc = recalc || this.ImplSCC(i, this.cant_count[i]);
@@ -268,8 +269,8 @@ class Reinforcement extends Part {
     }
 
     private TotalStructure() {
-        var struct_count = this.ext_cabane_list[this.cabane_sel].stats.structure;
-        var first = false;
+        const struct_count = this.ext_cabane_list[this.cabane_sel].stats.structure;
+        const first = false;
         for (let i = 0; i < this.ext_wood_list.length; i++) {
             struct_count += this.ext_wood_count[i] * this.ext_wood_list[i].stats.structure;
             struct_count += this.ext_steel_count[i] * this.ext_steel_list[i].stats.structure;
@@ -282,8 +283,8 @@ class Reinforcement extends Part {
     }
 
     public GetCantileverType() {
-        var wood_count = this.cant_count[0] + this.cant_count[4];
-        var metal_count = this.cant_count[1] + this.cant_count[2] + this.cant_count[3];
+        const wood_count = this.cant_count[0] + this.cant_count[4];
+        const metal_count = this.cant_count[1] + this.cant_count[2] + this.cant_count[3];
         if (metal_count > 0)
             return 2;
         else if (wood_count > 0)
@@ -310,11 +311,11 @@ class Reinforcement extends Part {
     }
 
     public CanWingBlade() {
-        for (let c of this.ext_wood_count) {
+        for (const c of this.ext_wood_count) {
             if (c > 0)
                 return false;
         }
-        for (let c of this.ext_steel_count) {
+        for (const c of this.ext_steel_count) {
             if (c > 0)
                 return false;
         }
@@ -341,12 +342,12 @@ class Reinforcement extends Part {
         if (type == AIRCRAFT_TYPE.ORNITHOPTER_BUZZER) {
             this.can_external = false;
         }
-        var can_wood = this.CanExternalWood();
+        const can_wood = this.CanExternalWood();
         for (let i = 0; i < this.ext_wood_count.length; i++) {
             if (!can_wood[i])
                 this.ext_wood_count[i] = 0;
         }
-        var can_steel = this.CanExternalSteel();
+        const can_steel = this.CanExternalSteel();
         for (let i = 0; i < this.ext_steel_count.length; i++) {
             if (!can_steel[i])
                 this.ext_steel_count[i] = 0;
@@ -373,7 +374,7 @@ class Reinforcement extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
 
         switch (this.acft_type) {
             case AIRCRAFT_TYPE.AIRPLANE:
@@ -387,7 +388,7 @@ class Reinforcement extends Part {
                 break;
         }
 
-        var tension_multiple = 1.0;
+        const tension_multiple = 1.0;
         if (this.is_monoplane)
             tension_multiple = 0.6;
         else if (this.is_tandem)
@@ -415,9 +416,9 @@ class Reinforcement extends Part {
             this.wires = false;
         }
 
-        var tension = 0;
-        var strut_count = 0;
-        var has_valid_first = false;
+        const tension = 0;
+        const strut_count = 0;
+        const has_valid_first = false;
         //Wood Struts
         for (let i = 0; i < this.ext_wood_list.length; i++) {
             strut_count += this.ext_wood_count[i];
@@ -462,7 +463,7 @@ class Reinforcement extends Part {
         }
 
         //Cabane Strut
-        let ts = this.ext_cabane_list[this.cabane_sel].stats.Clone();
+        const ts = this.ext_cabane_list[this.cabane_sel].stats.Clone();
         stats = stats.Add(ts);
         tension += tension_multiple * this.ext_cabane_list[this.cabane_sel].tension;
         if (this.cabane_sel > 0)
@@ -473,8 +474,8 @@ class Reinforcement extends Part {
             stats.drag += 3 * strut_count;
         }
 
-        var use_cant = false;
-        var cant_strain = 0;
+        const use_cant = false;
+        const cant_strain = 0;
         for (let i = 0; i < this.cant_list.length; i++) {
             if (this.cant_count[i] > 0) {
                 use_cant = true;
@@ -508,7 +509,7 @@ class Reinforcement extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

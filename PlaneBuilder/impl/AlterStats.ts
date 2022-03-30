@@ -1,26 +1,26 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part.ts";
+import { Stats } from "./Stats.ts";
 
-class AlterStats extends Part {
+export class AlterStats extends Part {
     public custom_parts: { name: string, stats: Stats, qty: number }[];
 
     constructor() {
         super();
-        var cp_json = JSON.parse(window.localStorage.getItem('CustomParts'));
+        let cp_json = JSON.parse(window.localStorage.getItem('CustomParts'));
         if (!cp_json) {
             cp_json = [];
             window.localStorage.setItem('CustomParts', JSON.stringify([]));
         }
         this.custom_parts = [];
-        for (let elem of cp_json) {
+        for (const elem of cp_json) {
             this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: 0 });
         }
     }
 
     public toJSON() {
-        var plist = [];
-        var plist_save = [];
-        for (let p of this.custom_parts) {
+        const plist = [];
+        const plist_save = [];
+        for (const p of this.custom_parts) {
             plist_save.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
             if (p.qty > 0)
                 plist.push({ name: p.name, stats: p.stats.toJSON(), qty: p.qty });
@@ -32,12 +32,12 @@ class AlterStats extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
-        for (let p of this.custom_parts) {
+        for (const p of this.custom_parts) {
             p.qty = 0;
         }
 
-        for (let elem of js["part_list"]) {
-            var idx = this.custom_parts.findIndex((value) => { return value.name == elem["name"]; });
+        for (const elem of js["part_list"]) {
+            const idx = this.custom_parts.findIndex((value) => { return value.name == elem["name"]; });
             if (idx == -1) {
                 this.custom_parts.push({ name: elem["name"], stats: new Stats(elem["stats"]), qty: elem["qty"] });
             } else {
@@ -47,13 +47,13 @@ class AlterStats extends Part {
     }
 
     public serialize(s: Serialize) {
-        var plist = [];
-        for (let p of this.custom_parts) {
+        const plist = [];
+        for (const p of this.custom_parts) {
             if (p.qty > 0)
                 plist.push({ name: p.name, stats: p.stats, qty: p.qty });
         }
         s.PushNum(plist.length);
-        for (let p of plist) {
+        for (const p of plist) {
             s.PushString(p.name);
             p.stats.serialize(s);
             s.PushNum(p.qty);
@@ -62,17 +62,17 @@ class AlterStats extends Part {
 
     public deserialize(d: Deserialize) {
 
-        for (let p of this.custom_parts) {
+        for (const p of this.custom_parts) {
             p.qty = 0;
         }
 
-        var pcount = d.GetNum();
+        const pcount = d.GetNum();
         for (let i = 0; i < pcount; i++) {
-            let name = d.GetString();
-            let stats = new Stats();
+            const name = d.GetString();
+            const stats = new Stats();
             stats.deserialize(d);
-            let qty = d.GetNum();
-            var idx = this.custom_parts.findIndex((value) => { return value.name == name; });
+            const qty = d.GetNum();
+            const idx = this.custom_parts.findIndex((value) => { return value.name == name; });
             if (idx == -1) {
                 idx = this.custom_parts.length;
                 this.custom_parts.push({ name: name, stats: stats, qty: qty });
@@ -83,14 +83,14 @@ class AlterStats extends Part {
     }
 
     public ClearAll() {
-        for (let p of this.custom_parts) {
+        for (const p of this.custom_parts) {
             p.qty = 0;
         }
     }
 
 
     public AddPart(name: string, stats: Stats) {
-        var sumstats = 0;
+        const sumstats = 0;
         sumstats += Math.abs(stats.drag);
         sumstats += Math.abs(stats.mass);
         sumstats += Math.abs(stats.wetmass);
@@ -118,7 +118,7 @@ class AlterStats extends Part {
             return;
         }
 
-        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        const idx = this.custom_parts.findIndex((item) => { return item.name == name; });
         if (idx != -1) {
             this.custom_parts[idx].stats = stats;
         } else {
@@ -129,7 +129,7 @@ class AlterStats extends Part {
     }
 
     public RemovePart(name: string) {
-        var idx = this.custom_parts.findIndex((item) => { return item.name == name; });
+        const idx = this.custom_parts.findIndex((item) => { return item.name == name; });
         if (idx != -1) {
             this.custom_parts.splice(idx, 1);
         }
@@ -146,8 +146,8 @@ class AlterStats extends Part {
     }
 
     public PartStats(): Stats {
-        var stats = new Stats();
-        for (let part of this.custom_parts) {
+        const stats = new Stats();
+        for (const part of this.custom_parts) {
             if (part.qty > 0) {
                 let pstats = part.stats.Clone();
                 pstats = pstats.Multiply(part.qty);
@@ -158,10 +158,10 @@ class AlterStats extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        var battery_storage = 0;
-        var equipment: { source: string, charge: string }[] = [];
+        const battery_storage = 0;
+        const equipment: { source: string, charge: string }[] = [];
 
-        for (let part of this.custom_parts) {
+        for (const part of this.custom_parts) {
             if (part.qty > 0) {
                 equipment = this.FormatEquipment(equipment, part.name, part.stats.charge);
             }

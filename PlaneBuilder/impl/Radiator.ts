@@ -1,7 +1,7 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
 
-class Radiator extends Part {
+export class Radiator extends Part {
     private type_list: { name: string, stats: Stats, dragpercool: number }[];
     private idx_type: number;
     private mount_list: { name: string, stats: Stats }[];
@@ -76,7 +76,7 @@ class Radiator extends Part {
     }
 
     public CanType() {
-        var can = [...Array(this.type_list.length).fill(true)];
+        const can = [...Array(this.type_list.length).fill(true)];
         for (let i = 0; i < this.type_list.length; i++) {
             if (this.type_list[i].name == "Evaporation" && this.metal_area < this.engine_count * 5)
                 can[i] = false;
@@ -100,7 +100,7 @@ class Radiator extends Part {
     }
 
     public CanMount() {
-        var can = [...Array(this.mount_list.length).fill(true)];
+        const can = [...Array(this.mount_list.length).fill(true)];
         for (let i = 0; i < this.mount_list.length; i++) {
             if (this.mount_list[i].name == "High Offset" && !this.has_parasol)
                 can[i] = false;
@@ -161,7 +161,7 @@ class Radiator extends Part {
     public PartStats(): Stats {
         this.VerifyHarden();
 
-        var stats = new Stats();
+        const stats = new Stats();
         stats.mass = 3;
         stats = stats.Add(this.type_list[this.idx_type].stats);
         stats = stats.Add(this.mount_list[this.idx_mount].stats);
@@ -181,7 +181,7 @@ class Radiator extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

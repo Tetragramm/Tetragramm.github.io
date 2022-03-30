@@ -36,14 +36,14 @@ class PulsejetBuilder {
     }
 
     private TempMass() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Valve = this.ValveTable[this.valve_sel];
 
-        var StarterMass = 0;
+        const StarterMass = 0;
         if (this.starter)
             StarterMass = 1;
 
-        var Mass = (this.technical_power / Era.mass) * Valve.scale + StarterMass;
+        const Mass = (this.technical_power / Era.mass) * Valve.scale + StarterMass;
         return Mass;
     }
 
@@ -52,35 +52,35 @@ class PulsejetBuilder {
     }
 
     private CalcDrag() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Valve = this.ValveTable[this.valve_sel];
 
-        var Drag = (this.technical_power / Era.drag) * Valve.scale + 1;
+        const Drag = (this.technical_power / Era.drag) * Valve.scale + 1;
         return Math.floor(1.0e-6 + this.TempMass() + Drag + 1);
     }
 
     private CalcReliability() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Valve = this.ValveTable[this.valve_sel];
 
-        var Reliability = this.technical_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
+        const Reliability = this.technical_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
         return Math.trunc(-Reliability);
     }
 
     private CalcFuelConsumption() {
-        var Era = this.EraTable[this.era_sel];
+        const Era = this.EraTable[this.era_sel];
         return Math.floor(1.0e-6 + this.technical_power * Era.fuel);
     }
 
     private CalcRumble() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Valve = this.ValveTable[this.valve_sel];
 
         return Math.floor(1.0e-6 + this.technical_power * Valve.rumble / (2 * Era.vibe));
     }
 
     private CalcCost() {
-        var Era = this.EraTable[this.era_sel];
+        const Era = this.EraTable[this.era_sel];
 
         return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
     }
@@ -96,21 +96,21 @@ class PulsejetBuilder {
     }
 
     public DesignCost() {
-        var Era = this.EraTable[this.era_sel];
-        var Valve = this.ValveTable[this.valve_sel];
+        const Era = this.EraTable[this.era_sel];
+        const Valve = this.ValveTable[this.valve_sel];
 
-        var StarterCost = 0;
+        const StarterCost = 0;
         if (this.starter)
             StarterCost = 3;
 
-        var Cost = this.technical_power * Era.cost / Valve.designcost;
+        const Cost = this.technical_power * Era.cost / Valve.designcost;
         return Math.floor(1.0e-6 + 1 + this.build_quality * (Cost + StarterCost));
     }
 
     public EngineInputs() {
-        var ei = new EngineInputs();
+        const ei = new EngineInputs();
 
-        var valved = "";
+        const valved = "";
         if (this.valve_sel == 0)
             valved = "V";
         ei.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
@@ -126,11 +126,11 @@ class PulsejetBuilder {
     }
 
     public EngineStats() {
-        var estats = new EngineStats();
+        const estats = new EngineStats();
 
         this.VerifyValues();
 
-        var valved = "";
+        const valved = "";
         if (this.valve_sel == 0)
             valved = "V";
 

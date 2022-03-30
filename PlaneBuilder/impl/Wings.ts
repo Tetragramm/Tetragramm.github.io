@@ -1,5 +1,5 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part, AIRCRAFT_TYPE } from "./Part.ts";
+import { Stats } from "./Stats.ts";
 
 type WingType_OLD = {
     surface: number, area: number, span: number,
@@ -17,7 +17,7 @@ enum WING_DECK {
     LOW,
     GEAR,
 };
-class Wings extends Part {
+export class Wings extends Part {
     //Possible selections
     private wing_list: WingType[];
     private mini_wing_list: WingType[];
@@ -50,7 +50,7 @@ class Wings extends Part {
         super();
 
         this.skin_list = [];
-        for (let elem of js["surface"]) {
+        for (const elem of js["surface"]) {
             this.skin_list.push({
                 name: elem["name"], flammable: elem["flammable"],
                 stats: new Stats(elem), strainfactor: elem["strainfactor"],
@@ -60,7 +60,7 @@ class Wings extends Part {
         }
 
         this.stagger_list = [];
-        for (let elem of js["stagger"]) {
+        for (const elem of js["stagger"]) {
             this.stagger_list.push({
                 name: elem["name"], inline: elem["inline"],
                 wing_count: elem["wing_count"], hstab: elem["hstab"], stats: new Stats(elem),
@@ -68,14 +68,14 @@ class Wings extends Part {
         }
 
         this.deck_list = [];
-        for (let elem of js["decks"]) {
+        for (const elem of js["decks"]) {
             this.deck_list.push({
                 name: elem["name"], limited: elem["limited"], stats: new Stats(elem),
             });
         }
 
         this.long_list = [];
-        for (let elem of js["largest"]) {
+        for (const elem of js["largest"]) {
             this.long_list.push({ dragfactor: elem["dragfactor"], stats: new Stats(elem), });
         }
 
@@ -103,9 +103,9 @@ class Wings extends Part {
             this.wing_list = js["wing_list"];
             this.mini_wing_list = js["mini_wing_list"];
         } else {
-            var wl = js["wing_list"];
+            const wl = js["wing_list"];
             this.wing_list = this.OldtoNew(wl);
-            var mwl = js["mini_wing_list"];
+            const mwl = js["mini_wing_list"];
             this.mini_wing_list = this.OldtoNew(mwl);
         }
         this.wing_stagger = js["wing_stagger"];
@@ -114,8 +114,8 @@ class Wings extends Part {
     }
 
     private OldtoNew(wtl: WingType_OLD[]): WingType[] {
-        var list = [] as WingType[];
-        for (let wt of wtl) {
+        const list = [] as WingType[];
+        for (const wt of wtl) {
             list.push({
                 surface: wt.surface, area: wt.area, span: wt.span, anhedral: wt.anhedral,
                 dihedral: wt.dihedral, gull: false, deck: wt.deck
@@ -127,7 +127,7 @@ class Wings extends Part {
     public serialize(s: Serialize) {
         s.PushNum(this.wing_list.length);
         for (let i = 0; i < this.wing_list.length; i++) {
-            var w = this.wing_list[i];
+            const w = this.wing_list[i];
             s.PushNum(w.surface);
             s.PushNum(w.area);
             s.PushNum(w.span);
@@ -138,7 +138,7 @@ class Wings extends Part {
         }
         s.PushNum(this.mini_wing_list.length);
         for (let i = 0; i < this.mini_wing_list.length; i++) {
-            var w = this.mini_wing_list[i];
+            const w = this.mini_wing_list[i];
             s.PushNum(w.surface);
             s.PushNum(w.area);
             s.PushNum(w.span);
@@ -153,10 +153,10 @@ class Wings extends Part {
     }
 
     public deserialize(d: Deserialize) {
-        var wlen = d.GetNum();
+        const wlen = d.GetNum();
         this.wing_list = [];
         for (let i = 0; i < wlen; i++) {
-            let wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
+            const wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
             wing.surface = d.GetNum();
             wing.area = d.GetNum();
             wing.span = d.GetNum();
@@ -172,10 +172,10 @@ class Wings extends Part {
             wing.deck = d.GetNum();
             this.wing_list.push(wing);
         }
-        var mlen = d.GetNum();
+        const mlen = d.GetNum();
         this.mini_wing_list = [];
         for (let i = 0; i < mlen; i++) {
-            let wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
+            const wing = { surface: 0, area: 0, span: 0, anhedral: 0, dihedral: 0, gull: false, deck: 0 };
             wing.surface = d.GetNum();
             wing.area = d.GetNum();
             wing.span = d.GetNum();
@@ -221,23 +221,23 @@ class Wings extends Part {
     }
 
     private DeckCountFull() {
-        var count = [...Array(this.deck_list.length).fill(0)];
-        for (let w of this.wing_list) {
+        const count = [...Array(this.deck_list.length).fill(0)];
+        for (const w of this.wing_list) {
             count[w.deck]++;
         }
         return count;
     }
 
     private DeckCountMini() {
-        var count = [...Array(this.deck_list.length).fill(0)];
-        for (let w of this.mini_wing_list) {
+        const count = [...Array(this.deck_list.length).fill(0)];
+        for (const w of this.mini_wing_list) {
             count[w.deck]++;
         }
         return count;
     }
 
     public CanStagger() {
-        var can = [...Array(this.stagger_list.length).fill(false)];
+        const can = [...Array(this.stagger_list.length).fill(false)];
         if (this.acft_type == AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER) {
             if (this.wing_list.length > 1)
                 can[1] = true;
@@ -271,9 +271,9 @@ class Wings extends Part {
             this.wing_list.pop();
         }
         if (!this.stagger_list[index].inline) {
-            var count = this.DeckCountFull();
+            const count = this.DeckCountFull();
             for (let i = this.wing_list.length - 1; i >= 0; i--) {
-                let w = this.wing_list[i];
+                const w = this.wing_list[i];
                 if (count[w.deck] > 1 && this.deck_list[w.deck].limited) {
                     count[w.deck]--;
                     this.wing_list.splice(i, 1);
@@ -304,12 +304,12 @@ class Wings extends Part {
                 return false;
 
             //Limited numbers of each deck
-            var full_count = this.DeckCountFull();
+            const full_count = this.DeckCountFull();
             if (full_count[deck] == WING_DECK.SHOULDER && this.deck_list[deck].limited)
                 return false
         }
 
-        var mini_count = this.DeckCountMini();
+        const mini_count = this.DeckCountMini();
         if (mini_count[deck] != 0)
             return false;
 
@@ -317,32 +317,32 @@ class Wings extends Part {
     }
 
     public CanAddMiniWing(deck: number) {
-        var full_count = this.DeckCountFull();
-        var mini_count = this.DeckCountMini();
+        const full_count = this.DeckCountFull();
+        const mini_count = this.DeckCountMini();
         if (full_count[deck] != 0 || mini_count[deck] != 0)
             return false;
         return true;
     }
 
     public CanMoveFullWing(idx: number, deck: number) {
-        var w = this.wing_list[idx];
+        const w = this.wing_list[idx];
         this.wing_list.splice(idx, 1);
-        var can = this.CanAddFullWing(deck);
+        const can = this.CanAddFullWing(deck);
         this.wing_list.splice(idx, 0, w);
         return can;
     }
 
     public CanMoveMiniWing(idx: number, deck: number) {
-        var w = this.mini_wing_list[idx];
+        const w = this.mini_wing_list[idx];
         this.mini_wing_list.splice(idx, 1);
-        var can = this.CanAddMiniWing(deck);
+        const can = this.CanAddMiniWing(deck);
         this.mini_wing_list.splice(idx, 0, w);
         return can;
     }
 
     public GetWingHeight() {
-        var max = 0;
-        for (let w of this.wing_list)
+        const max = 0;
+        for (const w of this.wing_list)
             max = Math.max(max, 4 - w.deck);
         return max;
     }
@@ -448,7 +448,7 @@ class Wings extends Part {
     }
 
     private HasNonGullDeck(deck: number) {
-        for (let w of this.wing_list) {
+        for (const w of this.wing_list) {
             if (w.deck == deck && !w.gull)//If we have shoulder...
                 return true;
         }
@@ -469,11 +469,11 @@ class Wings extends Part {
     }
 
     public IsFlammable() {
-        for (let w of this.wing_list) {
+        for (const w of this.wing_list) {
             if (this.skin_list[w.surface].flammable)
                 return true;
         }
-        for (let w of this.mini_wing_list) {
+        for (const w of this.mini_wing_list) {
             if (this.skin_list[w.surface].flammable)
                 return true;
         }
@@ -489,38 +489,38 @@ class Wings extends Part {
     }
 
     public GetSpan() {
-        var longest_span = 0;
-        for (let w of this.wing_list) {
+        const longest_span = 0;
+        for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
+            const wspan = w.span;
             longest_span = Math.max(longest_span, wspan);
         }
-        for (let w of this.mini_wing_list) {
+        for (const w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
+            const wspan = w.span;
             longest_span = Math.max(longest_span, wspan);
         }
         return longest_span;
     }
 
     public GetArea() {
-        var area = 0;
-        for (let w of this.wing_list) {
+        const area = 0;
+        for (const w of this.wing_list) {
             area += w.area;
         }
-        for (let w of this.mini_wing_list) {
+        for (const w of this.mini_wing_list) {
             area += w.area;
         }
         return area;
     }
 
     public GetParasol() {
-        for (let w of this.wing_list) {
+        for (const w of this.wing_list) {
             if (w.deck == WING_DECK.PARASOL) {
                 return true;
             }
         }
-        for (let w of this.mini_wing_list) {
+        for (const w of this.mini_wing_list) {
             if (w.deck == WING_DECK.PARASOL) {
                 return true;
             }
@@ -529,12 +529,12 @@ class Wings extends Part {
     }
 
     public GetMetalArea() {
-        var area = 0;
-        for (let w of this.wing_list) {
+        const area = 0;
+        for (const w of this.wing_list) {
             if (this.skin_list[w.surface].metal)
                 area += w.area;
         }
-        for (let w of this.mini_wing_list) {
+        for (const w of this.mini_wing_list) {
             if (this.skin_list[w.surface].metal)
                 area += w.area;
         }
@@ -542,20 +542,20 @@ class Wings extends Part {
     }
 
     public GetWingDrag() {
-        var drag = 0;
-        var deck_count = this.DeckCountFull();
-        var longest_span = 0;
-        var longest_drag = 0;
-        for (let w of this.wing_list) {
+        const drag = 0;
+        const deck_count = this.DeckCountFull();
+        const longest_span = 0;
+        const longest_drag = 0;
+        for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
-            let warea = w.area;
+            const wspan = w.span;
+            const warea = w.area;
             longest_span = Math.max(longest_span, wspan);
 
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
 
-            var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
+            const wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
@@ -564,21 +564,22 @@ class Wings extends Part {
             }
             wdrag = Math.floor(1.0e-6 + wdrag);
             if (longest_span == wspan)
-                longest_drag = longest_drag;
+              // @ts-ignore
+              longest_drag = longest_drag;
             drag += wdrag;
         }
-        for (let w of this.mini_wing_list) {
+        for (const w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
-            let wspan = w.span;
+            const wspan = w.span;
 
             //Drag is modified by area, span
-            var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
+            const wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             wdrag = Math.floor(1.0e-6 + wdrag);
             drag += wdrag;
         }
         //Sesquiplanes!
-        var sesp = this.GetIsSesquiplane();
+        const sesp = this.GetIsSesquiplane();
         if ((sesp.is || this.GetMonoplane()) && sesp.deck != -1) {
             drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
         }
@@ -586,11 +587,11 @@ class Wings extends Part {
     }
 
     public GetIsFlammable(): boolean {
-        for (let s of this.wing_list) {
+        for (const s of this.wing_list) {
             if (this.skin_list[s.surface].flammable)
                 return true;
         }
-        for (let s of this.mini_wing_list) {
+        for (const s of this.mini_wing_list) {
             if (this.skin_list[s.surface].flammable)
                 return true;
         }
@@ -602,15 +603,15 @@ class Wings extends Part {
     }
 
     public GetPaperMass(): number {
-        var paper = 0;
-        for (let w of this.wing_list) {
-            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+        const paper = 0;
+        for (const w of this.wing_list) {
+            const wStats = this.skin_list[w.surface].stats.Multiply(w.area);
             wStats.Round();
             if (wStats.mass < 0)
                 paper += wStats.mass;
         }
-        for (let w of this.mini_wing_list) {
-            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+        for (const w of this.mini_wing_list) {
+            const wStats = this.skin_list[w.surface].stats.Multiply(w.area);
             wStats.Round();
             if (wStats.mass < 0)
                 paper += wStats.mass;
@@ -620,13 +621,13 @@ class Wings extends Part {
     }
 
     public GetIsSesquiplane(): { is: boolean, deck: number, super_small: boolean } {
-        var biggest_area = 0;
-        var biggest_deck = -1;
-        var biggest_span = 0;
-        var smallest_area = 1e100;
-        var smallest_span = 0;
+        const biggest_area = 0;
+        const biggest_deck = -1;
+        const biggest_span = 0;
+        const smallest_area = 1e100;
+        const smallest_span = 0;
 
-        for (let w of this.wing_list) {
+        for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             if (w.area > biggest_area) {
                 biggest_area = w.area;
@@ -641,18 +642,18 @@ class Wings extends Part {
             }
         }
 
-        var is = biggest_area >= 2 * smallest_area;
+        const is = biggest_area >= 2 * smallest_area;
         is = is && !this.GetMonoplane() && !this.GetTandem();
 
         if (is) {
-            var ss = 0.75 * biggest_span >= smallest_span;
+            const ss = 0.75 * biggest_span >= smallest_span;
             return { is: is, deck: biggest_deck, super_small: ss };
         }
         return { is: false, deck: biggest_deck, super_small: false };
     }
 
     private HasPolishWing(): boolean {
-        for (let w of this.wing_list) {
+        for (const w of this.wing_list) {
             if (w.deck == WING_DECK.PARASOL && w.gull == true) {
                 return true;
             }
@@ -661,8 +662,8 @@ class Wings extends Part {
     }
 
     public HasInvertedGull(): number {
-        var ret = -1;
-        for (let w of this.wing_list) {
+        const ret = -1;
+        for (const w of this.wing_list) {
             if (w.gull && w.deck > WING_DECK.SHOULDER) {
                 ret = Math.max(ret, w.deck);
             }
@@ -671,8 +672,8 @@ class Wings extends Part {
     }
 
     public CanCutout(): boolean {
-        let vcount = 0;
-        for (let w of this.wing_list) {
+        const vcount = 0;
+        for (const w of this.wing_list) {
             if (this.skin_list[w.surface].transparent) {
                 vcount += 1;
             }
@@ -686,16 +687,16 @@ class Wings extends Part {
         if (!this.CanSwept())
             this.is_swept = false;
 
-        var stats = new Stats();
+        const stats = new Stats();
 
-        var have_wing = false;
-        var deck_count = this.DeckCountFull();
-        var have_mini_wing = false;
-        var longest_span = this.rotor_span;
-        var longest_drag = 0;
-        var celluloid_count = 0;
+        const have_wing = false;
+        const deck_count = this.DeckCountFull();
+        const have_mini_wing = false;
+        const longest_span = this.rotor_span;
+        const longest_drag = 0;
+        const celluloid_count = 0;
 
-        for (let w of this.wing_list) {
+        for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             longest_span = Math.max(longest_span, w.span);
 
@@ -708,7 +709,7 @@ class Wings extends Part {
                 stats.visibility -= 1;
             }
 
-            var wStats = new Stats();
+            const wStats = new Stats();
 
             //Actual stats
             wStats = wStats.Add(this.skin_list[w.surface].stats.Multiply(w.area));
@@ -727,13 +728,13 @@ class Wings extends Part {
             }
 
             //Drag is modified by area, span, and the leading wing
-            let wspan = w.span;
+            const wspan = w.span;
             //Gull Drag modifies wing area
-            let warea = w.area;
+            const warea = w.area;
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
 
-            var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
+            const wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wStats.drag = wStats.drag + wdrag;
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
@@ -761,7 +762,7 @@ class Wings extends Part {
                 wStats.mass = 0;
             stats = stats.Add(wStats);
         }
-        for (let w of this.mini_wing_list) {
+        for (const w of this.mini_wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             longest_span = Math.max(longest_span, w.span);
 
@@ -774,12 +775,12 @@ class Wings extends Part {
             }
 
             //Actual stats
-            var wStats = this.skin_list[w.surface].stats.Multiply(w.area);
+            const wStats = this.skin_list[w.surface].stats.Multiply(w.area);
             wStats.wingarea = w.area;
             wStats.maxstrain += Math.min(0, -(2 * w.span + w.area - 10));
             wStats.maxstrain *= this.skin_list[w.surface].strainfactor;
             //Drag is modified by area, span
-            let wspan = w.span;
+            const wspan = w.span;
             wStats.drag = Math.max(1, wStats.drag + 6 * w.area * w.area / (wspan * wspan));
             wStats.drag = Math.max(1, wStats.drag * this.skin_list[w.surface].dragfactor);
 
@@ -798,7 +799,7 @@ class Wings extends Part {
         stats.latstab += Math.min(0, longest_span - 8);
 
         //Sesquiplanes!
-        var sesp = this.GetIsSesquiplane();
+        const sesp = this.GetIsSesquiplane();
         if ((sesp.is || this.GetMonoplane()) && sesp.deck != -1) {
             stats = stats.Add(this.long_list[sesp.deck].stats);
             stats.drag -= Math.floor(1.0e-6 + (1 - this.long_list[sesp.deck].dragfactor) * longest_drag);
@@ -811,7 +812,7 @@ class Wings extends Part {
 
         //Inline Wing Shadowing
         if (this.stagger_list[this.wing_stagger].inline) {
-            for (let count of deck_count) {
+            for (const count of deck_count) {
                 if (count > 1) {
                     stats.liftbleed += (count - 1) * 3;
                 }
@@ -851,7 +852,7 @@ class Wings extends Part {
 
         //Closed Wing effects
         if (this.is_closed) {
-            var pairs = Math.floor(1.0e-6 + this.wing_list.length / 2.0);
+            const pairs = Math.floor(1.0e-6 + this.wing_list.length / 2.0);
             stats.mass += 1 * pairs;
             stats.control -= 5 * pairs;
             stats.maxstrain += 20 * pairs;
@@ -870,12 +871,12 @@ class Wings extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
 
-        var total_charge = 0;
-        var source = "";
-        for (let wing of this.wing_list) {
-            let skin = this.skin_list[wing.surface];
+        const total_charge = 0;
+        const source = "";
+        for (const wing of this.wing_list) {
+            const skin = this.skin_list[wing.surface];
             if (skin.stats.charge != 0) {
                 source = lu(skin.name);
                 total_charge += skin.stats.charge * wing.area;

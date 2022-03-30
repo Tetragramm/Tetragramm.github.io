@@ -1,8 +1,8 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
-/// <reference path="./Cockpit.ts" />
+import { Part } from "./Part.ts";
+import { Stats } from "./Stats.ts";
+import { Cockpit } from "./Cockpit.ts";
 
-class Cockpits extends Part {
+export class Cockpits extends Part {
     private positions: Cockpit[];
     private types: { name: string, exposed: boolean, stats: Stats }[];
     private upgrades: { name: string, stats: Stats }[];
@@ -15,33 +15,33 @@ class Cockpits extends Part {
 
         this.types = [];
         //Add all the cockpit types
-        for (let elem of js["options"]) {
+        for (const elem of js["options"]) {
             let opt = { name: elem["name"], exposed: elem["exposed"], stats: new Stats(elem) };
             this.types.push(opt);
         }
         this.upgrades = [];
         //Add all the upgrades
-        for (let elem of js["upgrades"]) {
+        for (const elem of js["upgrades"]) {
             let upg = { name: elem["name"], stats: new Stats(elem) };
             this.upgrades.push(upg);
         }
         this.safety = [];
         //Add all the safety
-        for (let elem of js["safety"]) {
+        for (const elem of js["safety"]) {
             let sft = { name: elem["name"], stats: new Stats(elem) };
             this.safety.push(sft);
         }
         this.gunsights = [];
         //Add all the gunsights
-        for (let elem of js["gunsights"]) {
+        for (const elem of js["gunsights"]) {
             let gun = { name: elem["name"], attack: elem["attack"], stats: new Stats(elem) };
             this.gunsights.push(gun);
         }
     }
 
     public toJSON() {
-        var lst = [];
-        for (let cp of this.positions) {
+        const lst = [];
+        for (const cp of this.positions) {
             lst.push(cp.toJSON());
         }
         return { positions: lst };
@@ -49,7 +49,7 @@ class Cockpits extends Part {
 
     public fromJSON(js: JSON, json_version: number) {
         this.positions = [];
-        for (let elem of js["positions"]) {
+        for (const elem of js["positions"]) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
             cp.SetSeatIndex(this.positions.length);
             cp.fromJSON(elem, json_version);
@@ -61,13 +61,13 @@ class Cockpits extends Part {
 
     public serialize(s: Serialize) {
         s.PushNum(this.positions.length);
-        for (let cp of this.positions) {
+        for (const cp of this.positions) {
             cp.serialize(s);
         }
     }
 
     public deserialize(d: Deserialize) {
-        var len = d.GetNum();
+        const len = d.GetNum();
         this.positions = [];
         for (let i = 0; i < len; i++) {
             let cp = new Cockpit(this.types, this.upgrades, this.safety, this.gunsights);
@@ -79,40 +79,40 @@ class Cockpits extends Part {
     }
 
     public GetAttackList() {
-        var lst = [];
-        for (let c of this.positions) {
+        const lst = [];
+        for (const c of this.positions) {
             lst.push(c.GetAttack());
         }
         return lst;
     }
 
     public GetVisibilityList() {
-        var lst = [];
-        for (let p of this.positions) {
+        const lst = [];
+        for (const p of this.positions) {
             lst.push(p.GetVisibility());
         }
         return lst;
     }
 
     public GetStressList() {
-        var lst = [];
-        for (let p of this.positions) {
+        const lst = [];
+        for (const p of this.positions) {
             lst.push(p.GetFlightStress());
         }
         return lst;
     }
 
     public GetEscapeList() {
-        var lst = [];
-        for (let p of this.positions) {
+        const lst = [];
+        for (const p of this.positions) {
             lst.push(p.GetEscape());
         }
         return lst;
     }
 
     public GetCrashList() {
-        var lst = [];
-        for (let p of this.positions) {
+        const lst = [];
+        for (const p of this.positions) {
             lst.push(p.GetCrash());
         }
         return lst;
@@ -125,7 +125,7 @@ class Cockpits extends Part {
         while (this.positions.length > num) {
             this.positions.pop();
         }
-        var js = null;
+        const js = null;
         if (this.positions.length > 0) {
             js = JSON.stringify(this.positions[this.positions.length - 1].toJSON());
         }
@@ -149,13 +149,13 @@ class Cockpits extends Part {
     }
 
     public SetHasRotary(has: boolean) {
-        for (let c of this.positions) {
+        for (const c of this.positions) {
             c.SetHasRotary(has);
         }
     }
 
     public IsElectrics() {
-        for (let c of this.positions) {
+        for (const c of this.positions) {
             if (c.IsElectrics())
                 return true;
         }
@@ -163,14 +163,14 @@ class Cockpits extends Part {
     }
 
     public PartStats(): Stats {
-        var s = new Stats();
+        const s = new Stats();
         let warningmap = new Map();
         for (let i = 0; i < this.positions.length; i++) {
             let cp = this.positions[i];
             let cps = cp.PartStats();
             s = s.Add(cps);
             // We want to merge all the warnings for different seats so we don't end up with a pile of warnings.
-            for (let w of cps.warnings) {
+            for (const w of cps.warnings) {
                 let exist = warningmap.get(w.source);
                 if (exist) {
                     exist.push(i + 1);
@@ -181,7 +181,7 @@ class Cockpits extends Part {
             }
         }
 
-        for (let w of s.warnings) {
+        for (const w of s.warnings) {
             w.source = lu("Seats #", StringFmt.Join(",", warningmap.get(w.source))) + " " + w.source;
         }
 
@@ -202,12 +202,12 @@ class Cockpits extends Part {
 
     public UpdateCrewStats(escape: number, controlstress: number, rumblestress: number, visibility: number, crash: number) {
         let copilots = 0;
-        for (let cp of this.positions) {
+        for (const cp of this.positions) {
             if (cp.IsCopilot()) {
                 copilots += 1;
             }
         }
-        for (let cp of this.positions) {
+        for (const cp of this.positions) {
             cp.CrewUpdate(escape, controlstress, rumblestress, copilots, visibility, crash);
         }
     }
@@ -219,7 +219,7 @@ class Cockpits extends Part {
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
         let value = { storage: 0, equipment: [] };
 
-        for (let c of this.positions) {
+        for (const c of this.positions) {
             value = MergeElectrics(value, c.GetElectrics());
         }
 

@@ -1,7 +1,8 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part, AIRCRAFT_TYPE } from "./Part.ts";
+import { Stats } from "./Stats.ts";
+import { BoolArr } from "./Serialize";
 
-class ControlSurfaces extends Part {
+export class ControlSurfaces extends Part {
     private aileron_list: { name: string, warping: boolean, stats: Stats }[];
     private aileron_sel: number;
     private rudder_list: { name: string, stats: Stats }[];
@@ -15,11 +16,11 @@ class ControlSurfaces extends Part {
     private drag_list: { name: string, stats: Stats }[];
     private drag_sel: boolean[];
 
-    private span: number = 0;
-    private is_cantilever: number = 0;
-    private wing_area: number = 0;
-    private mp: number = 0;
-    private is_boom: boolean = false;
+    private span = 0;
+    private is_cantilever = 0;
+    private wing_area = 0;
+    private mp = 0;
+    private is_boom = false;
     private acft_type: AIRCRAFT_TYPE = AIRCRAFT_TYPE.AIRPLANE;
     private can_rudder: boolean;
     private can_elevator: boolean;
@@ -28,36 +29,36 @@ class ControlSurfaces extends Part {
         super();
         this.aileron_sel = 0;
         this.aileron_list = [];
-        for (let elem of js["ailerons"]) {
+        for (const elem of js["ailerons"]) {
             this.aileron_list.push({ name: elem["name"], warping: elem["warping"], stats: new Stats(elem) });
         }
 
         this.rudder_sel = 0;
         this.rudder_list = [];
-        for (let elem of js["rudders"]) {
+        for (const elem of js["rudders"]) {
             this.rudder_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
 
         this.elevator_sel = 0;
         this.elevator_list = [];
-        for (let elem of js["elevators"]) {
+        for (const elem of js["elevators"]) {
             this.elevator_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
 
         this.flaps_sel = 0;
         this.flaps_list = [];
-        for (let elem of js["flaps"]) {
+        for (const elem of js["flaps"]) {
             this.flaps_list.push({ name: elem["name"], costfactor: elem["costfactor"], stats: new Stats(elem) });
         }
 
         this.slats_sel = 0;
         this.slats_list = [];
-        for (let elem of js["slats"]) {
+        for (const elem of js["slats"]) {
             this.slats_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
 
         this.drag_list = [];
-        for (let elem of js["drag_inducers"]) {
+        for (const elem of js["drag_inducers"]) {
             this.drag_list.push({ name: elem["name"], stats: new Stats(elem) });
         }
         this.drag_sel = [...Array(this.drag_list.length).fill(false)];
@@ -106,16 +107,16 @@ class ControlSurfaces extends Part {
     }
 
     public CanAileron() {
-        var can = [];
+        const can = [];
         if (!IsAnyOrnithopter(this.acft_type)) {
-            for (let a of this.aileron_list) {
+            for (const a of this.aileron_list) {
                 if (a.warping && this.wing_area == 0)
                     can.push(false)
                 else
                     can.push(true);
             }
         } else { //Is Ornithopter
-            for (let a of this.aileron_list) {
+            for (const a of this.aileron_list) {
                 can.push(a.warping);
             }
         }
@@ -251,7 +252,7 @@ class ControlSurfaces extends Part {
             this.is_cantilever = 0;
             this.wing_area = 0;
         } else if (IsAnyOrnithopter(this.acft_type)) {
-            var can = this.CanAileron();
+            const can = this.CanAileron();
             this.aileron_sel = can.findIndex((element) => { return element; })
             this.is_cantilever = 0;
         }
@@ -272,7 +273,7 @@ class ControlSurfaces extends Part {
     }
 
     public PartStats() {
-        var stats = new Stats();
+        const stats = new Stats();
         if (this.aileron_list[this.aileron_sel].warping && this.wing_area == 0) {
             this.aileron_sel = 0;
         }
@@ -307,7 +308,7 @@ class ControlSurfaces extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        let value = { storage: 0, equipment: [] };
+        const value = { storage: 0, equipment: [] };
         return value;
     }
 }

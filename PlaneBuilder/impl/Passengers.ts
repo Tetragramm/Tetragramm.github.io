@@ -1,7 +1,7 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
 
-class Passengers extends Part {
+export class Passengers extends Part {
     private seats: number;
     private beds: number;
     private connected: boolean;
@@ -77,7 +77,7 @@ class Passengers extends Part {
     }
 
     public PartStats(): Stats {
-        var stats = new Stats();
+        const stats = new Stats();
         stats.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
         if (this.seats + this.beds > 0 && this.connected) {
             stats.mass = 1;

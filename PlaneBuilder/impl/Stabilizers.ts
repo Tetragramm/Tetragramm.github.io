@@ -1,7 +1,7 @@
-/// <reference path="./Part.ts" />
-/// <reference path="./Stats.ts" />
+import { Part } from "./Part";
+import { Stats } from "./Stats";
 
-class Stabilizers extends Part {
+export class Stabilizers extends Part {
     private have_tail: boolean;
     private is_tandem: boolean;
     private is_swept: boolean;
@@ -34,7 +34,7 @@ class Stabilizers extends Part {
         this.hstab_sel = 0;
         this.hstab_count = 1;
         this.hstab_list = [];
-        for (let elem of js["hstab"]) {
+        for (const elem of js["hstab"]) {
             this.hstab_list.push({
                 name: elem["name"],
                 is_canard: elem["is_canard"],
@@ -49,7 +49,7 @@ class Stabilizers extends Part {
         this.vstab_sel = 0;
         this.vstab_count = 1;
         this.vstab_list = [];
-        for (let elem of js["vstab"]) {
+        for (const elem of js["vstab"]) {
             this.vstab_list.push({
                 name: elem["name"],
                 increment: elem["increment"],
@@ -122,7 +122,7 @@ class Stabilizers extends Part {
     }
 
     public GetHValidList() {
-        var lst = [];
+        const lst = [];
         if (this.is_heli) {
             lst = Array(this.hstab_list.length).fill(false);
             if (this.have_tail)
@@ -130,7 +130,7 @@ class Stabilizers extends Part {
             else
                 lst[1] = true;
         } else {
-            for (let t of this.hstab_list) {
+            for (const t of this.hstab_list) {
                 if ((t.name == "The Wings" || t.name == "Outboard")
                     && !(this.is_tandem || this.is_swept))
                     lst.push(false);
@@ -184,12 +184,12 @@ class Stabilizers extends Part {
     }
 
     public GetVValidList() {
-        var lst = [];
+        const lst = [];
         if (this.is_heli) {
             lst = Array(this.vstab_list.length).fill(false);
             lst[0] = true;
         } else {
-            for (let t of this.vstab_list) {
+            for (const t of this.vstab_list) {
                 if (t.name == "Outboard" && !this.CanVOutboard())
                     lst.push(false);
                 else if (t.is_tail && !this.have_tail)
@@ -288,11 +288,11 @@ class Stabilizers extends Part {
     public SetHaveTail(use: boolean) {
         this.have_tail = use;
         if (!use) {
-            var hvalid = this.GetHValidList();
+            const hvalid = this.GetHValidList();
             if (!hvalid[this.hstab_sel]) {
                 this.hstab_sel = 2;
             }
-            var vvalid = this.GetVValidList();
+            const vvalid = this.GetVValidList();
             if (!vvalid[this.vstab_sel]) {
                 if (!vvalid[1]) //If it was outboard, set it to canard so we can have outboard vstab.
                     this.hstab_sel = 2;
@@ -332,7 +332,7 @@ class Stabilizers extends Part {
 
     public wing_drag: number;
     public PartStats() {
-        var hvalid = this.GetHValidList();
+        const hvalid = this.GetHValidList();
         if (!hvalid[this.hstab_sel]) {
             this.hstab_sel = 0;
             if (!hvalid[this.hstab_sel]) {
@@ -340,7 +340,7 @@ class Stabilizers extends Part {
                 this.hstab_count = 0;
             }
         }
-        var vvalid = this.GetVValidList();
+        const vvalid = this.GetVValidList();
         if (!vvalid[this.vstab_sel]) {
             this.vstab_sel = 0;
             if (!vvalid[this.vstab_sel]) {
@@ -349,11 +349,11 @@ class Stabilizers extends Part {
             }
         }
 
-        var stats = new Stats();
+        const stats = new Stats();
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
-            var drag = 0;
+            const drag = 0;
             if (this.is_heli) {
                 drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.hstab_list[this.hstab_sel].dragfactor);
                 stats.drag += Math.max(Math.ceil(1 * this.hstab_list[this.hstab_sel].dragfactor), drag);
@@ -370,7 +370,7 @@ class Stabilizers extends Part {
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
-            var drag = 0;
+            const drag = 0;
             if (this.is_heli) {
                 drag = Math.floor(1.0e-6 + this.wing_drag / 16 * this.vstab_list[this.vstab_sel].dragfactor);
                 stats.drag += Math.max(Math.ceil(1 * this.hstab_list[this.hstab_sel].dragfactor), drag);
@@ -388,12 +388,12 @@ class Stabilizers extends Part {
 
         //Pairs of stabilizers
         if (this.vstab_sel >= 0 && this.vstab_list[this.vstab_sel].increment != 0) {
-            var leftovers = Math.max(0, this.hstab_count - 1);
-            var es_pairs = Math.min(this.engine_count - 1, this.vstab_count - 1);
+            const leftovers = Math.max(0, this.hstab_count - 1);
+            const es_pairs = Math.min(this.engine_count - 1, this.vstab_count - 1);
             leftovers += Math.max(0, this.vstab_count - 1 - es_pairs);
             stats.control += 3 * es_pairs + leftovers;
         } else {
-            var es_pairs = Math.max(0, Math.min(this.engine_count - 1, this.hstab_count - 1));
+            const es_pairs = Math.max(0, Math.min(this.engine_count - 1, this.hstab_count - 1));
             leftovers = Math.max(0, this.hstab_count - 1 - es_pairs);
             stats.control += 3 * es_pairs + leftovers;
         }

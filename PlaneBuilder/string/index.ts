@@ -10,11 +10,11 @@
 
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-class StringFmt {
+export class StringFmt {
     private static readonly regexNumber = /{(\d+(:\w*)?)}/g;
     private static readonly regexObject = /{(\w+(:\w*)?)}/g;
 
-    public static Empty: string = '';
+    public static Empty = '';
 
     public static IsNullOrWhiteSpace(value: string): boolean {
         try {
@@ -30,15 +30,15 @@ class StringFmt {
         }
     }
 
-    public static Join(delimiter: string, ...args: (string | object | Array<any>)[]): string {
+    public static Join(delimiter: string, ...args: (string | Record<string, unknown> | Array<any>)[]): string {
         try {
-            let firstArg = args[0];
+            const firstArg = args[0];
             if (Array.isArray(firstArg) || firstArg instanceof Array) {
                 let tempString = StringFmt.Empty;
-                let count = 0;
+                const count = 0;
 
                 for (let i = 0; i < firstArg.length; i++) {
-                    let current = firstArg[i];
+                    const current = firstArg[i];
                     if (i < firstArg.length - 1) {
                         tempString += current + delimiter;
                     }
@@ -51,14 +51,14 @@ class StringFmt {
             }
             else if (typeof firstArg === 'object') {
                 let tempString = StringFmt.Empty;
-                let objectArg = firstArg;
-                let keys = Object.keys(firstArg); //get all Properties of the Object as Array
+                const objectArg = firstArg;
+                const keys = Object.keys(firstArg); //get all Properties of the Object as Array
                 keys.forEach(element => { tempString += (<any>objectArg)[element] + delimiter; });
                 tempString = tempString.slice(0, tempString.length - delimiter.length); //remove last delimiter
                 return tempString;
             }
 
-            let stringArray = <string[]>args;
+            const stringArray = <string[]>args;
 
             return StringFmt.join(delimiter, ...stringArray);
         }
@@ -86,9 +86,9 @@ class StringFmt {
         }
     }
 
-    private static format(regex: any, format: string, args: any, parseByObject: boolean = false): string {
+    private static format(regex: any, format: string, args: any, parseByObject = false): string {
         return format.replace(regex, function (match, x) { //0
-            let s = match.split(':');
+            const s = match.split(':');
             if (s.length > 1) {
                 x = s[0].replace('{', '');
                 match = s[1].replace('}', ''); //U
@@ -142,24 +142,24 @@ class StringFmt {
             case 'n': {//Tausender Trennzeichen
                 if (typeof (arg) !== "string")
                     arg = arg.toString();
-                let replacedString = arg.replace(/,/g, '.');
+                const replacedString = arg.replace(/,/g, '.');
                 if (isNaN(parseFloat(replacedString)) || replacedString.length <= 3) {
                     break;
                 }
 
-                let numberparts = replacedString.split(/[^0-9]+/g);
+                const numberparts = replacedString.split(/[^0-9]+/g);
                 let parts = numberparts;
 
                 if (numberparts.length > 1) {
                     parts = [StringFmt.join('', ...(numberparts.splice(0, numberparts.length - 1))), numberparts[numberparts.length - 1]];
                 }
 
-                let integer = parts[0];
+                const integer = parts[0];
 
-                var mod = integer.length % 3;
-                var output = (mod > 0 ? (integer.substring(0, mod)) : StringFmt.Empty);
-                var firstGroup = output;
-                var remainingGroups = integer.substring(mod).match(/.{3}/g);
+                const mod = integer.length % 3;
+                let output = (mod > 0 ? (integer.substring(0, mod)) : StringFmt.Empty);
+                const firstGroup = output;
+                const remainingGroups = integer.substring(mod).match(/.{3}/g);
                 output = output + '.' + StringFmt.Join('.', remainingGroups);
                 arg = output + (parts.length > 1 ? ',' + parts[1] : '');
                 return arg;
@@ -182,23 +182,22 @@ class StringFmt {
         return arg;
     }
 
-    private static decimalToHexString(value: string, upperCase: boolean = false) {
+    private static decimalToHexString(value: string, upperCase = false) {
         const parsed = parseFloat(value as string);
         const hexNumber = parsed.toString(16);
         return upperCase ? hexNumber.toLocaleUpperCase() : hexNumber;
     }
 
     private static getDisplayDateFromString(input: string): string {
-        let splitted: string[];
-        splitted = input.split('-');
+        const splitted: string[] = input.split('-');
 
         if (splitted.length <= 1) {
             return input;
         }
 
-        let day = splitted[splitted.length - 1];
-        let month = splitted[splitted.length - 2];
-        let year = splitted[splitted.length - 3];
+        const day = splitted[splitted.length - 1];
+        const month = splitted[splitted.length - 2];
+        const year = splitted[splitted.length - 3];
         day = day.split('T')[0];
         day = day.split(' ')[0];
 
@@ -206,20 +205,20 @@ class StringFmt {
     }
 
     private static getSortableDateFromString(input: string): string {
-        let splitted = input.replace(',', '').split('.');
+        const splitted = input.replace(',', '').split('.');
         if (splitted.length <= 1) {
             return input;
         }
 
-        let times = splitted[splitted.length - 1].split(' ');
+        const times = splitted[splitted.length - 1].split(' ');
         let time = StringFmt.Empty;
         if (times.length > 1) {
             time = times[times.length - 1];
         }
 
-        let year = splitted[splitted.length - 1].split(' ')[0];
-        let month = splitted[splitted.length - 2];
-        let day = splitted[splitted.length - 3];
+        const year = splitted[splitted.length - 1].split(' ')[0];
+        const month = splitted[splitted.length - 2];
+        const day = splitted[splitted.length - 3];
         let result = `${year}-${month}-${day}`
 
         if (!StringFmt.IsNullOrWhiteSpace(time) && time.length > 1) {
@@ -233,8 +232,8 @@ class StringFmt {
     }
 
     private static formatNumber(input: number, formatTemplate: string): string {
-        let count = formatTemplate.length;
-        let stringValue = input.toString();
+        const count = formatTemplate.length;
+        const stringValue = input.toString();
         if (count <= stringValue.length) {
             return stringValue;
         }
@@ -253,7 +252,7 @@ class StringFmt {
                 continue;
             }
 
-            let arg = "" + args[i];
+            const arg = "" + args[i];
             temp += arg;
             for (let i2 = i + 1; i2 < args.length; i2++) {
                 if (StringFmt.IsNullOrWhiteSpace(args[i2])) {
