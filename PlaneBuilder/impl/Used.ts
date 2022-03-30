@@ -1,4 +1,6 @@
 import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Used extends Part {
     public burnt_out: number;

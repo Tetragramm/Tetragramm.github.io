@@ -1,7 +1,7 @@
 var internal_id = 0;
 
 // Function to download data to a file
-function download(data, filename, type) {
+export function download(data, filename, type) {
     var file = new Blob([data], { type: type });
     var a = document.createElement("a"),
         url = URL.createObjectURL(file);
@@ -15,7 +15,7 @@ function download(data, filename, type) {
     }, 0);
 }
 
-function copyStringToClipboard(str) {
+export function copyStringToClipboard(str) {
     // Create new element
     var el = document.createElement('textarea');
     // Set value (string to be copied)
@@ -33,13 +33,13 @@ function copyStringToClipboard(str) {
     document.body.removeChild(el);
 }
 
-function GenerateID() {
+export function GenerateID() {
     internal_id++;
     return "internal_id_" + internal_id.toString();
 }
 
-type FlexSection = { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement };
-function CreateFlexSection(elem: HTMLElement): FlexSection {
+export type FlexSection = { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement };
+export function CreateFlexSection(elem: HTMLElement): FlexSection {
     var fs = {
         div0: document.createElement("DIV"), div1: document.createElement("DIV"),
         div2: document.createElement("DIV")
@@ -53,21 +53,21 @@ function CreateFlexSection(elem: HTMLElement): FlexSection {
     return fs;
 }
 
-function CreateTH(row: HTMLElement, content: string) {
+export function CreateTH(row: HTMLElement, content: string) {
     var th = document.createElement("TH") as HTMLTableHeaderCellElement;
     th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
 
-function CreateTD(row: HTMLElement, content: string) {
+export function CreateTD(row: HTMLElement, content: string) {
     var th = document.createElement("TD") as HTMLTableCellElement;
     th.innerHTML = content;
     row.appendChild(th);
     return th;
 }
 
-function CreateInput(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
+export function CreateInput(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
     var span = document.createElement("SPAN") as HTMLSpanElement;
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.id = GenerateID();
@@ -86,7 +86,7 @@ function CreateInput(txt: string, elem: HTMLInputElement, table: HTMLElement, br
         table.appendChild(document.createElement("BR"));
 }
 
-function FlexInput(txt: string, inp: HTMLInputElement, fs: FlexSection) {
+export function FlexInput(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
@@ -104,7 +104,7 @@ function FlexInput(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     fs.div2.appendChild(inp);
 }
 
-function FlexText(txt: string, inp: HTMLInputElement, fs: FlexSection) {
+export function FlexText(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
@@ -120,7 +120,7 @@ function FlexText(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     fs.div2.appendChild(inp);
 }
 
-function FlexDisplay(txt: string, inp: HTMLLabelElement, fs: FlexSection) {
+export function FlexDisplay(txt: string, inp: HTMLLabelElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
@@ -134,7 +134,7 @@ function FlexDisplay(txt: string, inp: HTMLLabelElement, fs: FlexSection) {
     fs.div2.appendChild(inp);
 }
 
-function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection) {
+export function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     sel.id = GenerateID();
     lbl.htmlFor = sel.id;
@@ -148,7 +148,7 @@ function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection) {
     fs.div2.appendChild(sel);
 }
 
-function CreateCheckbox(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
+export function CreateCheckbox(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
     var span = document.createElement("SPAN") as HTMLSpanElement;
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.id = GenerateID();
@@ -164,7 +164,7 @@ function CreateCheckbox(txt: string, elem: HTMLInputElement, table: HTMLElement,
         table.appendChild(document.createElement("BR"));
 }
 
-function CreateSelect(txt: string, elem: HTMLSelectElement, table: HTMLElement, br = true) {
+export function CreateSelect(txt: string, elem: HTMLSelectElement, table: HTMLElement, br = true) {
     var span = document.createElement("SPAN") as HTMLSpanElement;
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.id = GenerateID();
@@ -179,7 +179,7 @@ function CreateSelect(txt: string, elem: HTMLSelectElement, table: HTMLElement, 
         table.appendChild(document.createElement("BR"));
 }
 
-function CreateText(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
+export function CreateText(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {
     var span = document.createElement("SPAN") as HTMLSpanElement;
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     elem.id = GenerateID();
@@ -196,7 +196,7 @@ function CreateText(txt: string, elem: HTMLInputElement, table: HTMLElement, br 
         table.appendChild(document.createElement("BR"));
 }
 
-function CreateButton(txt: string, elem: HTMLButtonElement, table: HTMLElement, br = true) {
+export function CreateButton(txt: string, elem: HTMLButtonElement, table: HTMLElement, br = true) {
     var span = document.createElement("SPAN") as HTMLSpanElement;
     var txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.hidden = true;
@@ -218,7 +218,7 @@ function CreateButton(txt: string, elem: HTMLButtonElement, table: HTMLElement, 
 
 }
 
-function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
+export function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     inp.id = GenerateID();
     lbl.htmlFor = inp.id;
@@ -240,7 +240,7 @@ function FlexCheckbox(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     return lbl;
 }
 
-function FlexLabel(txt: string, div1: HTMLDivElement) {
+export function FlexLabel(txt: string, div1: HTMLDivElement) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
@@ -250,7 +250,7 @@ function FlexLabel(txt: string, div1: HTMLDivElement) {
     return lbl;
 }
 
-function FlexLabels(txtL: string, txtR: string, fs: FlexSection) {
+export function FlexLabels(txtL: string, txtR: string, fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     lbl.style.marginLeft = "0.25em";
     lbl.style.marginRight = "0.5em";
@@ -267,7 +267,7 @@ function FlexLabels(txtL: string, txtR: string, fs: FlexSection) {
     return [lbl, lbl2];
 }
 
-function FlexSpace(fs: FlexSection) {
+export function FlexSpace(fs: FlexSection) {
     var lbl = document.createElement("LABEL") as HTMLLabelElement;
     lbl.textContent = " ";
     lbl.classList.add("flex-item");
@@ -278,19 +278,19 @@ function FlexSpace(fs: FlexSection) {
     fs.div2.appendChild(lbl2);
 }
 
-function insertRow(frag: DocumentFragment | HTMLElement) {
+export function insertRow(frag: DocumentFragment | HTMLElement) {
     var row = document.createElement("TR") as HTMLTableRowElement;
     frag.append(row);
     return row;
 }
 
-function insertCell(frag: DocumentFragment | HTMLElement) {
+export function insertCell(frag: DocumentFragment | HTMLElement) {
     var cell = document.createElement("TD") as HTMLTableCellElement;
     frag.append(cell);
     return cell;
 }
 
-function BlinkBad(elem: HTMLElement) {
+export function BlinkBad(elem: HTMLElement) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
@@ -298,7 +298,7 @@ function BlinkBad(elem: HTMLElement) {
     elem.classList.toggle("changed_b");
 }
 
-function BlinkGood(elem: HTMLElement) {
+export function BlinkGood(elem: HTMLElement) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
@@ -306,7 +306,7 @@ function BlinkGood(elem: HTMLElement) {
     elem.classList.toggle("changed_g");
 }
 
-function BlinkNeutral(elem: HTMLElement) {
+export function BlinkNeutral(elem: HTMLElement) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
@@ -314,13 +314,18 @@ function BlinkNeutral(elem: HTMLElement) {
     elem.classList.toggle("changed_n");
 }
 
-function BlinkNone(elem: HTMLElement) {
+export function BlinkNone(elem: HTMLElement) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
 }
 
-function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
+var enable_anim = false;
+export function SetAnimationEnabled(enable: boolean) {
+    enable_anim = enable;
+}
+
+export function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
     if (enable_anim) {
         if (elem.textContent != str) {
             if (positive_good == null) {
@@ -340,11 +345,11 @@ function BlinkIfChanged(elem: HTMLElement, str: string, positive_good = null) {
     elem.textContent = str;
 }
 
-function _arrayBufferToString(buffer: ArrayBuffer) {
+export function _arrayBufferToString(buffer: ArrayBuffer) {
     var binary = '';
     var bytes = new Uint8Array(buffer);
     var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
         binary += String.fromCharCode(bytes[i]);
     }
     return binary;
@@ -358,7 +363,7 @@ export function _stringToArrayBuffer(str: string) {
     return bytes.buffer;
 }
 
-const loadJSON = (path, callback) => {
+export const loadJSON = (path, callback) => {
     let xobj = new XMLHttpRequest();
     xobj.overrideMimeType("application/json");
     xobj.open('GET', path, true);

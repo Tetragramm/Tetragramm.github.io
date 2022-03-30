@@ -36,7 +36,7 @@
 *
 */
 
-class JSON2CSV {
+export class JSON2CSV {
     private errorMissingSeparator = 'Missing separator option.';
     private errorEmpty = 'JSON is empty.';
     private errorEmptyHeader = 'Could not detect header. Ensure first row contains your column headers.';

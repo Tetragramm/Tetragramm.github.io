@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Accessories.ts" />
+import { Accessories } from "../impl/Accessories";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect } from "./Tools";
 
-class Accessories_HTML extends Display {
+export class Accessories_HTML extends Display {
     private acc: Accessories;
     //Armour
     private a_AP: HTMLInputElement[];

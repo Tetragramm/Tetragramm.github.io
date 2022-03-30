@@ -1,5 +1,6 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Optimization extends Part {
     private free_dots: number;
@@ -87,7 +88,7 @@ export class Optimization extends Part {
     }
 
     public ReduceDots() {
-        const diff = -this.GetUnassignedCount();
+        var diff = -this.GetUnassignedCount();
         if (diff > 0) {
             let d = Math.min(diff, this.drag);
             d = Math.max(d, 0);

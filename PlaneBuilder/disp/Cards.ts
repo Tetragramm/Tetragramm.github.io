@@ -1,9 +1,12 @@
-enum ENGINE_TEXT {
+import { StringFmt } from "../string/index";
+import { lu } from "../impl/Localization";
+
+export enum ENGINE_TEXT {
     SINGLE,
     PUSHER,
     PULLER,
 };
-class Cards {
+export class Cards {
     private dash_canvas: HTMLCanvasElement;
     private dash_image: HTMLImageElement;
     private weap_canvas: HTMLCanvasElement;

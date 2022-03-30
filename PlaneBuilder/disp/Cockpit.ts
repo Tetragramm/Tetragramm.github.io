@@ -1,7 +1,9 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Cockpit.ts" />
+import { Cockpit } from "../impl/Cockpit";
+import { lu } from "../impl/Localization";
+import { insertCell, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput } from "./Tools";
+import { StringFmt } from "../string/index";
 
-class Cockpit_HTML extends Display {
+export class Cockpit_HTML extends Display {
     private row: HTMLTableRowElement;
     private cockpit: Cockpit;
     private sel_type: HTMLSelectElement;

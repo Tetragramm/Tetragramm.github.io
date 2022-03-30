@@ -1,11 +1,11 @@
-import { EngineBuilder } from  "../EngineBuilder/EngineBuilder.ts";
-import { PulsejetBuilder } from  "../EngineBuilder/PulsejetBuilder.ts";
-import { TurboBuilder } from  "../EngineBuilder/TurboBuilder.ts";
-import { ElectricBuilder } from  "../EngineBuilder/ElectricBuilder.ts";
 
-import { BoolArr } from "./Serialize";
+import { Serialize, Deserialize, BoolArr } from "./Serialize";
+import { EngineBuilder } from "../EngineBuilder/EngineBuilder";
+import { PulsejetBuilder } from "../EngineBuilder/PulsejetBuilder";
+import { TurboBuilder } from "../EngineBuilder/TurboBuilder";
+import { ElectricBuilder } from "../EngineBuilder/ElectricBuilder";
 
-enum ENGINE_TYPE {
+export enum ENGINE_TYPE {
   PROPELLER,
   PULSEJET,
   TURBOMACHINERY,
@@ -152,7 +152,7 @@ export class EngineInputs {
         };
       }
       default:
-      throw "EngineInputs.toJSON: Oh dear, you have a new engine type.";
+        throw "EngineInputs.toJSON: Oh dear, you have a new engine type.";
     }
   }
 
@@ -199,7 +199,7 @@ export class EngineInputs {
         break;
       }
       default:
-      throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
+        throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
     }
     if (js["rarity"]) {
       this.rarity = js["rarity"];
@@ -252,7 +252,7 @@ export class EngineInputs {
         break;
       }
       default:
-      throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
+        throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
     }
 
     s.PushNum(this.rarity);
@@ -301,7 +301,7 @@ export class EngineInputs {
         break;
       }
       default:
-      throw "EngineInputs.deserialize: Oh dear, you have a new engine type.";
+        throw "EngineInputs.deserialize: Oh dear, you have a new engine type.";
     }
 
     if (d.version > 12.35) {
@@ -370,7 +370,7 @@ export class EngineInputs {
         return stats;
       }
       default:
-      throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
+        throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
     }
   }
 

@@ -1,5 +1,8 @@
 import { Part } from "./Part";
-import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization"
+import { Stats, WARNING_COLOR } from "./Stats";
+
 
 export enum SynchronizationType {
     NONE = -1,
@@ -367,7 +370,7 @@ export class Weapon extends Part {
             return out;
         }
         else {
-            const ret = parseInt(this.weapon_type.jam)
+            var ret = parseInt(this.weapon_type.jam)
             if (this.synchronization == SynchronizationType.INTERRUPT) {
                 ret += 1;
             }
@@ -391,7 +394,7 @@ export class Weapon extends Part {
     }
 
     public PartStats() {
-        const stats = new Stats();
+        var stats = new Stats();
 
         this.ResolveSynch();
 
@@ -400,7 +403,7 @@ export class Weapon extends Part {
         if (this.weapon_type.size == 16)
             this.covered = this.fixed;
 
-        const size = 0;
+        var size = 0;
         for (let i = 0; i < this.w_count; i++) {
             stats = stats.Add(this.weapon_type.stats);
 
@@ -409,7 +412,7 @@ export class Weapon extends Part {
 
         //Covered Cost
         if (this.covered) {
-            const cost = 0;
+            var cost = 0;
             if (this.weapon_type.size <= 1) {
                 cost = 0;
             } else if (this.weapon_type.size <= 2) {

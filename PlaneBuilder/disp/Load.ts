@@ -1,9 +1,10 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Fuel.ts" />
-/// <reference path="../impl/Munitions.ts" />
-/// <reference path="../impl/CargoAndPassengers.ts" />
+import { Fuel } from "../impl/Fuel";
+import { Munitions } from "../impl/Munitions";
+import { CargoAndPassengers } from "../impl/CargoAndPassengers";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput } from "./Tools";
 
-class Load_HTML extends Display {
+export class Load_HTML extends Display {
     private fuel: Fuel;
     private boom: Munitions;
     private cargo: CargoAndPassengers

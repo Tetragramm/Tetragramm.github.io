@@ -1,9 +1,10 @@
-/// <reference path="./Display.ts" />
-/// <reference path="./Engine.ts" />
-/// <reference path="./Radiator.ts" />
-/// <reference path="../impl/Engines.ts" />
+import { Engines } from "../impl/Engines";
+import { Engine_HTML } from "./Engine";
+import { Radiator_HTML } from "./Radiator";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH } from "./Tools";
 
-class Engines_HTML extends Display {
+export class Engines_HTML extends Display {
     private eng: Engines;
     private engines: Engine_HTML[];
     private radiators: Radiator_HTML[];

@@ -1,8 +1,10 @@
-/// <reference path="../impl/EngineStats.ts" />
-/// <reference path="../impl/EngineList.ts" />
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs";
+import { lu } from "../impl/Localization";
+import { num2era } from "../impl/Stats";
 
 
-class TurboBuilder {
+export class TurboBuilder {
     public name: string;
     public era_sel: number; //Era
     public type_sel: number;
@@ -58,12 +60,12 @@ class TurboBuilder {
     }
 
     private CalcMass() {
-        const tmass = this.TempMass();
+        var tmass = this.TempMass();
         //Turbofan fit.  Using list from jet-engines.net and an excel curve to align them.
         if (this.type_sel == 1) {
             tmass = tmass * (0.4833 * Math.log(this.compression_ratio) - 0.3168);
         }
-        const mass = tmass / 25 + 95.684 * this.flow_adjustment
+        var mass = tmass / 25 + 95.684 * this.flow_adjustment
         //Turboprop fit.  Using list from jet-engines.net and an excel curve to align them.
         //Because turboprops have too much variation, some end up negative. So needs to be done here.
         if (this.type_sel == 2 || this.type_sel == 3) {
@@ -111,11 +113,11 @@ class TurboBuilder {
         const Tcp = Math.pow(fan_pressure_ratio, 1 - 1 / y);
         const ST13 = a0 * (Math.sqrt(2 / (y - 1) * (Tr * Tcp - 1)) - M) * net_efficiency / 1000;
         const f = (Cp * Ta / this.fuel_heat_value) * (Era.max_temp / Ta - T3 / Ta);
-        const ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
-        const TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
+        var ST = ST11 / (1 + this.bypass_ratio) + this.bypass_ratio * ST13 / (1 + this.bypass_ratio);
+        var TSFC11 = f / ((1 + this.bypass_ratio) * ST) * 1000;
 
         const C2 = Pa * area * this.MFP(1) / ((1 + f));
-        const mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
+        var mc2 = this.compression_ratio * C2 * Math.sqrt(1 / Era.max_temp) * net_efficiency;
         if (!isFinite(ST) || !isFinite(mc2) || !isFinite(TSFC11) || ST < 0 || mc2 < 0 || TSFC11 < 0) {
             ST = 0;
             mc2 = 0;

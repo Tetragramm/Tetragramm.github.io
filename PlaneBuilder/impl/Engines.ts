@@ -1,8 +1,11 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
-import { EngineStats } from "./EngineStats.ts";
-import { Engine } from "./Engine.ts";
-import { Radiator } from "./Radiator.ts";
+import { Part, MergeElectrics } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
+import { Engine } from "./Engine";
+import { DRIVE_TYPE } from "./EngineStats";
+import { Radiator } from "./Radiator";
+import { StringFmt } from "../string/index";
 
 export class Engines extends Part {
   private engines: Engine[];
@@ -23,9 +26,9 @@ export class Engines extends Part {
     for (const elem of js["mounts"]) {
       const mount = { name: elem["name"], stats: new Stats(elem), strainfactor: elem["strainfactor"], dragfactor: elem["dragfactor"], mount_type: elem["location"], powerfactor: elem["powerfactor"], reqED: false, reqTail: false, helicopter: elem["helicopter"], turbine: elem["turbine"], };
       if (elem["reqED"])
-      mount.reqED = true;
+        mount.reqED = true;
       if (elem["reqTail"])
-      mount.reqTail = true;
+        mount.reqTail = true;
       this.mount_list.push(mount);
     }
 
@@ -137,13 +140,13 @@ export class Engines extends Part {
   public GetHasOilTank() {
     for (const e of this.engines) {
       if (e.GetCurrentStats().oiltank)
-      return true;
+        return true;
     }
     return false;
   }
 
   public GetReliabilityList() {
-    const lst = [];
+    var lst = [];
     for (const e of this.engines) {
       lst.push(e.GetReliability());
     }
@@ -151,7 +154,7 @@ export class Engines extends Part {
   }
 
   public GetMinIAF() {
-    const m = 0;
+    var m = 0;
     for (const e of this.engines) {
       m = Math.max(m, e.GetMinIAF());
     }
@@ -159,7 +162,7 @@ export class Engines extends Part {
   }
 
   public GetMaxIAF() {
-    const m = 100;
+    var m = 100;
     for (const e of this.engines) {
       m = Math.min(m, e.GetMaxIAF());
     }
@@ -167,7 +170,7 @@ export class Engines extends Part {
   }
 
   public GetMinAltitude() {
-    const m = 0;
+    var m = 0;
     for (const e of this.engines) {
       m = Math.max(m, e.GetMinAltitude());
     }
@@ -175,7 +178,7 @@ export class Engines extends Part {
   }
 
   public GetMaxAltitude() {
-    const m = 1000;
+    var m = 1000;
     for (const e of this.engines) {
       m = Math.min(m, e.GetMaxAltitude());
     }
@@ -184,13 +187,13 @@ export class Engines extends Part {
 
   public SetNumberOfEngines(num: number) {
     if (num != num || num < 0)
-    num = 0;
+      num = 0;
     num = Math.floor(1.0e-6 + num);
     num = Math.min(20, num);
     while (this.engines.length > num) {
       this.engines.pop();
     }
-    const js = null;
+    var js = null;
     if (this.engines.length > 0) {
       js = JSON.stringify(this.engines[this.engines.length - 1].toJSON());
     }
@@ -198,7 +201,7 @@ export class Engines extends Part {
       const en = new Engine(this.mount_list, this.cowl_list);
       en.SetCalculateStats(this.CalculateStats);
       if (js)
-      en.fromJSON(JSON.parse(js), 1000);
+        en.fromJSON(JSON.parse(js), 1000);
       this.engines.push(en);
       en.SetNumRadiators(this.GetNumberOfRadiators());
     }
@@ -206,10 +209,10 @@ export class Engines extends Part {
   }
 
   public GetNumberOfEngines(): number {
-    const count = 0;
+    var count = 0;
     for (const e of this.engines) {
       if (!e.GetGenerator())
-      count++;
+        count++;
     }
     return count;
   }
@@ -228,7 +231,7 @@ export class Engines extends Part {
 
   public SetNumberOfRadiators(num: number) {
     if (num != num || num < 0)
-    num = 0;
+      num = 0;
     num = Math.floor(1.0e-6 + num);
     while (this.radiators.length > num) {
       this.radiators.pop();
@@ -246,9 +249,9 @@ export class Engines extends Part {
 
   public GetNumberOfRadiators(): number {
     if (this.radiators.length == 0 && this.NeedCooling())
-    this.SetNumberOfRadiators(1);
+      this.SetNumberOfRadiators(1);
     else if (this.radiators.length > 0 && !this.NeedCooling())
-    this.SetNumberOfRadiators(0);
+      this.SetNumberOfRadiators(0);
 
     return this.radiators.length;
   }
@@ -281,7 +284,7 @@ export class Engines extends Part {
   }
 
   public GetNumPropellers() {
-    const count = 0;
+    var count = 0;
     for (const e of this.engines) {
       count += e.GetNumPropellers();
     }
@@ -291,21 +294,21 @@ export class Engines extends Part {
   public GetOverspeed() {
     let os = 100;
     for (const e of this.engines)
-    os = Math.min(os, e.GetOverspeed());
+      os = Math.min(os, e.GetOverspeed());
     return os;
   }
 
   public GetRumble() {
-    const r = 0;
+    var r = 0;
     for (const e of this.engines)
-    r += e.GetRumble();
+      r += e.GetRumble();
     return r;
   }
 
   public GetMaxRumble() {
-    let r = 0;
+    var r = 0;
     for (const e of this.engines)
-    r = Math.max(r, e.GetRumble());
+      r = Math.max(r, e.GetRumble());
     return r;
   }
 
@@ -316,9 +319,9 @@ export class Engines extends Part {
       if (t.has) {
         ret.have = true;
         if (t.spinner[0])
-        ret.spin_count++;
+          ret.spin_count++;
         if (t.spinner[1])
-        ret.arty_spin_count++;
+          ret.arty_spin_count++;
       }
     }
     return ret;
@@ -331,9 +334,9 @@ export class Engines extends Part {
       if (t.has) {
         ret.have = true;
         if (t.spinner[0])
-        ret.spin_count++;
+          ret.spin_count++;
         if (t.spinner[1])
-        ret.arty_spin_count++;
+          ret.arty_spin_count++;
       }
     }
     return ret;
@@ -342,7 +345,7 @@ export class Engines extends Part {
   public IsElectrics() {
     for (const e of this.engines) {
       if (e.IsElectrics())
-      return true;
+        return true;
     }
     return false;
   }
@@ -361,20 +364,20 @@ export class Engines extends Part {
 
   public SetTailMods(forb: boolean, swr: boolean, canard: boolean) {
     for (const e of this.engines)
-    e.SetTailMods(forb, swr, canard);
+      e.SetTailMods(forb, swr, canard);
   }
 
   public GetEngineHeight() {
-    const min = 2;
+    var min = 2;
     for (const e of this.engines)
-    min = Math.min(min, e.GetEngineHeight());
+      min = Math.min(min, e.GetEngineHeight());
     return min;
   }
 
   public HasTractorRotary() {
     for (const e of this.engines) {
       if (e.IsTractorRotary())
-      return true;
+        return true;
     }
     return false;
   }
@@ -394,7 +397,7 @@ export class Engines extends Part {
   public HasPulsejet() {
     for (const e of this.engines) {
       if (e.GetIsPulsejet())
-      return true;
+        return true;
     }
     return false;
   }
@@ -402,7 +405,7 @@ export class Engines extends Part {
   public HasTurbineNoProp() {
     for (const e of this.engines) {
       if (e.GetIsTurbine() && e.GetNumPropellers() == 0)
-      return true;
+        return true;
     }
     return false;
   }
@@ -410,13 +413,13 @@ export class Engines extends Part {
   public HasDiesel() {
     for (const e of this.engines) {
       if (e.IsDiesel())
-      return true;
+        return true;
     }
     return false;
   }
 
   public GetEngineTypes() {
-    const lst = [];
+    var lst = [];
     for (const en of this.engines) {
       if (en.GetNumPropellers() > 0) {
         lst.push({ type: DRIVE_TYPE.PROPELLER, num: en.GetNumPropellers() });
@@ -432,16 +435,16 @@ export class Engines extends Part {
   public GetIsFlammable(): boolean {
     for (const r of this.radiators) {
       if (r.GetIsFlammable())
-      return true;
+        return true;
     }
     return false;
   }
 
   public PartStats(): Stats {
-    const stats = new Stats();
+    var stats = new Stats();
     const needCool = new Array(this.GetNumberOfRadiators()).fill(null).map(() => ({ cool: 0, count: 0 }));
-    const ecost = 0;
-    const pitchspeedmin = 100;
+    var ecost = 0;
+    var pitchspeedmin = 100;
     //Engine stuff
     for (const en of this.engines) {
       const enstats = en.PartStats();
@@ -457,7 +460,7 @@ export class Engines extends Part {
     }
 
     if (pitchspeedmin < 100)
-    stats.pitchspeed = pitchspeedmin;
+      stats.pitchspeed = pitchspeedmin;
 
     //Upkeep calc only uses engine costs
     stats.upkeep = Math.floor(1.0e-6 + Math.min(stats.upkeep, ecost));
@@ -491,7 +494,7 @@ export class Engines extends Part {
 
     //Asymmetric planes
     if (this.is_asymmetric)
-    stats.latstab -= 3;
+      stats.latstab -= 3;
 
     if (this.HasPulsejet()) {
       stats.warnings.push({
@@ -512,7 +515,7 @@ export class Engines extends Part {
       });
     }
 
-    const rotationT = 0;
+    var rotationT = 0;
     for (const e of this.engines) {
       if (e.IsRotary()) {
         if (e.GetUsePushPull() && e.GetTorqueToStruct()) {
@@ -552,7 +555,7 @@ export class Engines extends Part {
     let has = 0;
     for (const en of this.engines) {
       if (en.GetIsTractorNacelle())
-      has++;
+        has++;
     }
     return has > 1;
   }
@@ -560,7 +563,7 @@ export class Engines extends Part {
   public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
     let value = { storage: 0, equipment: [] };
 
-    for (const e = 0; e < this.engines.length; e++) {
+    for (let e = 0; e < this.engines.length; e++) {
       const s = this.engines[e].PartStats();
       if (s.charge != 0) {
         value.equipment.push({

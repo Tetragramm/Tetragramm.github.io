@@ -1,5 +1,6 @@
 import { Part } from "./Part";
 import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Stabilizers extends Part {
     private have_tail: boolean;
@@ -122,7 +123,7 @@ export class Stabilizers extends Part {
     }
 
     public GetHValidList() {
-        const lst = [];
+        var lst = [];
         if (this.is_heli) {
             lst = Array(this.hstab_list.length).fill(false);
             if (this.have_tail)
@@ -184,7 +185,7 @@ export class Stabilizers extends Part {
     }
 
     public GetVValidList() {
-        const lst = [];
+        var lst = [];
         if (this.is_heli) {
             lst = Array(this.vstab_list.length).fill(false);
             lst[0] = true;
@@ -349,11 +350,11 @@ export class Stabilizers extends Part {
             }
         }
 
-        const stats = new Stats();
+        var stats = new Stats();
         //HSTAB
         if (this.hstab_count > 0) {
             stats = stats.Add(this.hstab_list[this.hstab_sel].stats);
-            const drag = 0;
+            var drag = 0;
             if (this.is_heli) {
                 drag = Math.floor(1.0e-6 + this.wing_drag / 8 * this.hstab_list[this.hstab_sel].dragfactor);
                 stats.drag += Math.max(Math.ceil(1 * this.hstab_list[this.hstab_sel].dragfactor), drag);
@@ -370,7 +371,7 @@ export class Stabilizers extends Part {
         //VSTAB
         if (this.vstab_count > 0) {
             stats = stats.Add(this.vstab_list[this.vstab_sel].stats);
-            const drag = 0;
+            var drag = 0;
             if (this.is_heli) {
                 drag = Math.floor(1.0e-6 + this.wing_drag / 16 * this.vstab_list[this.vstab_sel].dragfactor);
                 stats.drag += Math.max(Math.ceil(1 * this.hstab_list[this.hstab_sel].dragfactor), drag);
@@ -388,7 +389,7 @@ export class Stabilizers extends Part {
 
         //Pairs of stabilizers
         if (this.vstab_sel >= 0 && this.vstab_list[this.vstab_sel].increment != 0) {
-            const leftovers = Math.max(0, this.hstab_count - 1);
+            var leftovers = Math.max(0, this.hstab_count - 1);
             const es_pairs = Math.min(this.engine_count - 1, this.vstab_count - 1);
             leftovers += Math.max(0, this.vstab_count - 1 - es_pairs);
             stats.control += 3 * es_pairs + leftovers;

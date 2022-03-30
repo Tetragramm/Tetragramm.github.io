@@ -1,25 +1,41 @@
-/// <reference path="./Display.ts" />
-/// <reference path="./Era.ts" />
-/// <reference path="./Cockpits.ts" />
-/// <reference path="./Passengers.ts" />
-/// <reference path="./Engines.ts" />
-/// <reference path="./Propeller.ts" />
-/// <reference path="./Frames.ts" />
-/// <reference path="./Wings.ts" />
-/// <reference path="./Stabilizers.ts" />
-/// <reference path="./ControlSurfaces.ts" />
-/// <reference path="./Reinforcement.ts" />
-/// <reference path="./Load.ts" />
-/// <reference path="./LandingGear.ts" />
-/// <reference path="./Accessories.ts" />
-/// <reference path="./Optimization.ts" />
-/// <reference path="./Weapons.ts" />
-/// <reference path="./Derived.ts" />
-/// <reference path="./Altitude.ts" />
-/// <reference path="../impl/Aircraft.ts" />
-/// <reference path="./Cards.ts"/>
+import { Era_HTML } from "./Era";
+import { Cockpits_HTML } from "./Cockpits";
+import { Passengers_HTML } from "./Passengers";
+import { Engines_HTML } from "./Engines";
+import { Propeller_HTML } from "./Propeller";
+import { Frames_HTML } from "./Frames";
+import { Wings_HTML } from "./Wings";
+import { Stabilizers_HTML } from "./Stabilizers";
+import { ControlSurfaces_HTML } from "./ControlSurfaces";
+import { Reinforcement_HTML } from "./Reinforcement";
+import { Load_HTML } from "./Load";
+import { LandingGear_HTML } from "./LandingGear";
+import { Accessories_HTML } from "./Accessories";
+import { Optimization_HTML } from "./Optimization";
+import { Weapons_HTML, WeaponString, WeaponTags, WeaponName } from "./Weapons";
+import { Used_HTML } from "./Used";
+import { Rotor_HTML } from "./Rotor";
+import { Derived_HTML } from "./Derived";
+import { AlterStats_HTML } from "./AlterStats";
+import { Altitude_HTML } from "./Altitude";
+import { Cards, ENGINE_TEXT } from "./Cards";
 
-class Aircraft_HTML extends Display {
+import { Aircraft, DerivedStats } from "../impl/Aircraft";
+import { WeaponSystem } from "../impl/WeaponSystem";
+import { Radiator } from "../impl/Radiator";
+import { GetEngineLists } from "../impl/EngineList";
+import { Serialize } from "../impl/Serialize";
+import { Stats } from "../impl/Stats";
+import { AIRCRAFT_TYPE } from "../impl/Part";
+import { Engine } from "../impl/Engine";
+
+
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH, BlinkBad, BlinkIfChanged, _arrayBufferToString, _stringToArrayBuffer, download, copyStringToClipboard } from "./Tools";
+import { StringFmt } from "../string/index";
+import { LZString } from "../lz/lz-string";
+
+export class Aircraft_HTML extends Display {
     private acft: Aircraft;
     private era: Era_HTML;
     private cockpits: Cockpits_HTML;
@@ -69,11 +85,16 @@ class Aircraft_HTML extends Display {
 
     private cards: Cards;
 
+    private parts_JSON: JSON;
+    private weapons_JSON: JSON;
 
-    constructor(js: JSON, aircraft: Aircraft) {
+
+    constructor(aircraft: Aircraft, parts_JSON: JSON, weapons_JSON: JSON) {
         super();
 
         this.acft = aircraft;
+        this.parts_JSON = parts_JSON;
+        this.weapons_JSON = weapons_JSON;
         this.era = new Era_HTML(this.acft.GetEra());
         this.cockpits = new Cockpits_HTML(aircraft.GetCockpits());
         this.passengers = new Passengers_HTML(aircraft.GetPassengers());
@@ -307,7 +328,7 @@ class Aircraft_HTML extends Display {
         if (estats.pulsejet) {
             this.cards.eng_data.notes.push(lu("Pulsejet"));
             if (e.GetSelectedList() != "") {
-                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
+                var inputs = GetEngineLists().get(e.GetSelectedList()).get_name(estats.name);
                 if (inputs.power > 0 && inputs.starter) {
                     this.cards.eng_data.notes.push(lu("Starter"));
                 }
@@ -322,7 +343,7 @@ class Aircraft_HTML extends Display {
             }
 
             if (e.GetSelectedList() != "") {
-                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
+                var inputs = GetEngineLists().get(e.GetSelectedList()).get_name(estats.name);
 
                 this.cards.eng_data.min_IAF = inputs.min_IdealAlt;
                 if (inputs.upgrades[1]) {
@@ -347,7 +368,7 @@ class Aircraft_HTML extends Display {
         reader.onloadend = () => {
             try {
                 var str = JSON.parse(reader.result as string);
-                var acft = new Aircraft(parts_JSON, weapon_JSON, false);
+                var acft = new Aircraft(this.parts_JSON, this.weapons_JSON, false);
                 if (acft.fromJSON(str)) {
                     str = JSON.parse(reader.result as string);
                     console.log(str);
@@ -499,7 +520,7 @@ class Aircraft_HTML extends Display {
     private LoadText(text_area: HTMLInputElement) {
         try {
             var str = JSON.parse(text_area.value);
-            var acft = new Aircraft(parts_JSON, weapon_JSON, false);
+            var acft = new Aircraft(this.parts_JSON, this.weapons_JSON, false);
             if (acft.fromJSON(str)) {
                 this.acft.fromJSON(str);
                 this.derived.SetName(this.acft.name);
@@ -722,7 +743,7 @@ class Aircraft_HTML extends Display {
             var notes = [];
             if (estats.pulsejet) {
                 notes.push(lu("Pulsejet"));
-                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
+                var inputs = GetEngineLists().get(e.GetSelectedList()).get_name(estats.name);
                 if (inputs.power > 0 && inputs.starter) {
                     notes.push(lu("Starter"));
                 }
@@ -735,7 +756,7 @@ class Aircraft_HTML extends Display {
                     notes.push(lu("Turns Left"));
                 }
 
-                var inputs = engine_list.get(e.GetSelectedList()).get_name(estats.name);
+                var inputs = GetEngineLists().get(e.GetSelectedList()).get_name(estats.name);
                 if (inputs.upgrades[1]) {
                     notes.push(lu("War Emergency Power"));
                 } else if (inputs.compressor_count > 0 && inputs.compressor_type == 1) {

@@ -1,5 +1,6 @@
 import { Part } from "./Part";
 import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Radiator extends Part {
     private type_list: { name: string, stats: Stats, dragpercool: number }[];
@@ -161,7 +162,7 @@ export class Radiator extends Part {
     public PartStats(): Stats {
         this.VerifyHarden();
 
-        const stats = new Stats();
+        var stats = new Stats();
         stats.mass = 3;
         stats = stats.Add(this.type_list[this.idx_type].stats);
         stats = stats.Add(this.mount_list[this.idx_mount].stats);

@@ -1,4 +1,7 @@
-/// <reference path="./Display.ts" />
+import { Aircraft, DerivedStats } from "../impl/Aircraft";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH } from "./Tools";
+import { StringFmt } from "../string/index";
 
 enum FUEL_STATE {
     FULLWBOMBS = 0,
@@ -7,7 +10,7 @@ enum FUEL_STATE {
     HALF = 3,
     EMPTY = 4,
 }
-class Altitude_HTML {
+export class Altitude_HTML {
     private tbl: HTMLTableElement;
     private fRow: HTMLTableRowElement;
     private rows: HTMLTableRowElement[];

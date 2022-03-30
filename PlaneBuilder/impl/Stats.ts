@@ -1,4 +1,5 @@
 import { lu } from "./Localization";
+import { Serialize, Deserialize } from "./Serialize";
 
 export enum WARNING_COLOR {
   WHITE,
@@ -80,65 +81,65 @@ export class Stats {
 
   public fromJSON(js: JSON, json_version: number) {
     if (js["liftbleed"])
-    this.liftbleed = js["liftbleed"];
+      this.liftbleed = js["liftbleed"];
     if (js["wetmass"])
-    this.wetmass = js["wetmass"];
+      this.wetmass = js["wetmass"];
     if (js["mass"])
-    this.mass = js["mass"];
+      this.mass = js["mass"];
     if (js["drag"])
-    this.drag = js["drag"];
+      this.drag = js["drag"];
     if (js["control"])
-    this.control = js["control"];
+      this.control = js["control"];
     if (js["cost"])
-    this.cost = js["cost"];
+      this.cost = js["cost"];
     if (js["reqsections"])
-    this.reqsections = js["reqsections"];
+      this.reqsections = js["reqsections"];
     if (js["visibility"])
-    this.visibility = js["visibility"];
+      this.visibility = js["visibility"];
     if (js["flightstress"])
-    this.flightstress = js["flightstress"];
+      this.flightstress = js["flightstress"];
     if (js["escape"])
-    this.escape = js["escape"];
+      this.escape = js["escape"];
     if (js["pitchstab"])
-    this.pitchstab = js["pitchstab"];
+      this.pitchstab = js["pitchstab"];
     if (js["latstab"])
-    this.latstab = js["latstab"];
+      this.latstab = js["latstab"];
     if (js["cooling"])
-    this.cooling = js["cooling"];
+      this.cooling = js["cooling"];
     if (js["reliability"])
-    this.reliability = js["reliability"];
+      this.reliability = js["reliability"];
     if (js["power"])
-    this.power = js["power"];
+      this.power = js["power"];
     if (js["fuelconsumption"])
-    this.fuelconsumption = js["fuelconsumption"];
+      this.fuelconsumption = js["fuelconsumption"];
     if (js["maxstrain"])
-    this.maxstrain = js["maxstrain"];
+      this.maxstrain = js["maxstrain"];
     if (js["structure"])
-    this.structure = js["structure"];
+      this.structure = js["structure"];
     if (js["pitchspeed"])
-    this.pitchspeed = js["pitchspeed"];
+      this.pitchspeed = js["pitchspeed"];
     if (js["pitchboost"])
-    this.pitchboost = js["pitchboost"];
+      this.pitchboost = js["pitchboost"];
     if (js["wingarea"])
-    this.wingarea = js["wingarea"];
+      this.wingarea = js["wingarea"];
     if (js["toughness"])
-    this.toughness = js["toughness"];
+      this.toughness = js["toughness"];
     if (js["upkeep"])
-    this.upkeep = js["upkeep"];
+      this.upkeep = js["upkeep"];
     if (js["crashsafety"])
-    this.crashsafety = js["crashsafety"];
+      this.crashsafety = js["crashsafety"];
     if (js["bomb_mass"])
-    this.bomb_mass = js["bomb_mass"];
+      this.bomb_mass = js["bomb_mass"];
     if (js["fuel"])
-    this.fuel = js["fuel"];
+      this.fuel = js["fuel"];
     if (js["charge"])
-    this.charge = js["charge"];
+      this.charge = js["charge"];
     if (js["warning"])
-    this.warnings.push({
-      source: lu(js["name"]),
-      warning: lu(js["warning"]),
-      color: WARNING_COLOR.WHITE,
-    });
+      this.warnings.push({
+        source: lu(js["name"]),
+        warning: lu(js["warning"]),
+        color: WARNING_COLOR.WHITE,
+      });
     if (js["warnings"]) {
       const warnings = js["warnings"];
       const newwarn = [];
@@ -299,10 +300,10 @@ export class Stats {
       let dup = false;
       for (const w2 of this.warnings) {
         if (w.source == w2.source && w.warning == w2.warning)
-        dup = true;
+          dup = true;
       }
       if (!dup)
-      newList.push({ source: w.source, warning: w.warning, color: w.color });
+        newList.push({ source: w.source, warning: w.warning, color: w.color });
     }
     return newList;
   }
@@ -317,10 +318,10 @@ export class Stats {
       let dup = false;
       for (const w2 of this.era) {
         if (w.name == w2.name && w.era == w2.era)
-        dup = true;
+          dup = true;
       }
       if (!dup)
-      newList.push({ name: w.name, era: w.era });
+        newList.push({ name: w.name, era: w.era });
     }
     return newList;
   }
@@ -362,32 +363,32 @@ export class Stats {
 
   public Equal(other: Stats) {
     return this.liftbleed == other.liftbleed
-    && this.wetmass == other.wetmass
-    && this.mass == other.mass
-    && this.drag == other.drag
-    && this.control == other.control
-    && this.cost == other.cost
-    && this.reqsections == other.reqsections
-    && this.visibility == other.visibility
-    && this.flightstress == other.flightstress
-    && this.escape == other.escape
-    && this.pitchstab == other.pitchstab
-    && this.latstab == other.latstab
-    && this.cooling == other.cooling
-    && this.reliability == other.reliability
-    && this.power == other.power
-    && this.fuelconsumption == other.fuelconsumption
-    && this.maxstrain == other.maxstrain
-    && this.structure == other.structure
-    && this.pitchspeed == other.pitchspeed
-    && this.pitchboost == other.pitchboost
-    && this.wingarea == other.wingarea
-    && this.toughness == other.toughness
-    && this.upkeep == other.upkeep
-    && this.crashsafety == other.crashsafety
-    && this.bomb_mass == other.bomb_mass
-    && this.fuel == other.fuel
-    && this.charge == other.charge;
+      && this.wetmass == other.wetmass
+      && this.mass == other.mass
+      && this.drag == other.drag
+      && this.control == other.control
+      && this.cost == other.cost
+      && this.reqsections == other.reqsections
+      && this.visibility == other.visibility
+      && this.flightstress == other.flightstress
+      && this.escape == other.escape
+      && this.pitchstab == other.pitchstab
+      && this.latstab == other.latstab
+      && this.cooling == other.cooling
+      && this.reliability == other.reliability
+      && this.power == other.power
+      && this.fuelconsumption == other.fuelconsumption
+      && this.maxstrain == other.maxstrain
+      && this.structure == other.structure
+      && this.pitchspeed == other.pitchspeed
+      && this.pitchboost == other.pitchboost
+      && this.wingarea == other.wingarea
+      && this.toughness == other.toughness
+      && this.upkeep == other.upkeep
+      && this.crashsafety == other.crashsafety
+      && this.bomb_mass == other.bomb_mass
+      && this.fuel == other.fuel
+      && this.charge == other.charge;
 
   }
   private rtz(num: number) {
@@ -433,57 +434,57 @@ export class Stats {
 export const era2numHh = (era: string): number => {
   switch (era) {
     case "Pioneer":
-    return 0;
+      return 0;
     case "WWI":
-    return 1;
+      return 1;
     case "Roaring 20s":
-    return 2;
+      return 2;
     case "Coming Storm":
-    return 3;
+      return 3;
     case "WWII":
-    return 4;
+      return 4;
     case "Last Hurrah":
-    return 5;
+      return 5;
     case "Himmilgard":
-    return 6;
+      return 6;
   }
 };
 
-const era2numHl = (era: string): number => {
+export const era2numHl = (era: string): number => {
   switch (era) {
     case "Pioneer":
-    return 0;
+      return 0;
     case "WWI":
-    return 1;
+      return 1;
     case "Roaring 20s":
-    return 2;
+      return 2;
     case "Coming Storm":
-    return 3;
+      return 3;
     case "WWII":
-    return 4;
+      return 4;
     case "Last Hurrah":
-    return 5;
+      return 5;
     case "Himmilgard":
-    return -1;
+      return -1;
   }
 };
 
 export const num2era = (era: number): string => {
   switch (era) {
     case 0:
-    return "Pioneer";
+      return "Pioneer";
     case 1:
-    return "WWI";
+      return "WWI";
     case 2:
-    return "Roaring 20s";
+      return "Roaring 20s";
     case 3:
-    return "Coming Storm";
+      return "Coming Storm";
     case 4:
-    return "WWII";
+      return "WWII";
     case 5:
-    return "Last Hurrah";
+      return "Last Hurrah";
     case 6:
     case -1:
-    return "Himmilgard";
+      return "Himmilgard";
   }
 };

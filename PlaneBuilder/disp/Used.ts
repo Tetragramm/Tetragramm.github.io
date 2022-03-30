@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Used.ts" />
+import { Used } from "../impl/Used";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateInput, CreateTH } from "./Tools";
 
-class Used_HTML extends Display {
+export class Used_HTML extends Display {
     private used: Used;
     private burnt_out: HTMLInputElement;
     private ragged: HTMLInputElement;

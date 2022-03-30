@@ -1,8 +1,8 @@
-import { EngineStats } from "../impl/EngineStats.ts";
-import { EngineList } from "../impl/EngineList.ts";
-import { ENGINE_RARITY } from "../impl/EngineInputs.ts";
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs";
 import { lu } from "../impl/Localization";
-import { num2era } from "../impl/Stats";
+import { WARNING_COLOR, num2era } from "../impl/Stats";
+import { BoolArr } from "../impl/Serialize";
 
 enum CompressorEnum {
     NONE,
@@ -89,7 +89,7 @@ export class EngineBuilder {
     }
 
     private UpgradePower() {
-        const power = 1;
+        var power = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 power += this.Upgrades[i].powerfactor;
@@ -124,7 +124,7 @@ export class EngineBuilder {
     }
 
     private UpgradeMass() {
-        const mass = 1;
+        var mass = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 mass += this.Upgrades[i].massfactor;
@@ -145,7 +145,7 @@ export class EngineBuilder {
     }
 
     private UpgradeDrag() {
-        const drag = 1;
+        var drag = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 drag += this.Upgrades[i].dragfactor;
@@ -245,7 +245,7 @@ export class EngineBuilder {
     }
 
     private UpgradeFuel() {
-        const fuel = 1;
+        var fuel = 1;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 fuel += this.Upgrades[i].fuelfactor;
@@ -259,7 +259,7 @@ export class EngineBuilder {
     }
 
     private CalcAltitude() {
-        const alt = 0;
+        var alt = 0;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 alt += this.Upgrades[i].idealalt;
@@ -281,7 +281,7 @@ export class EngineBuilder {
     }
 
     private UpgradeCost() {
-        const cost = 0;
+        var cost = 0;
         for (let i = 0; i < this.upg_sel.length; i++) {
             if (this.upg_sel[i])
                 cost += this.Upgrades[i].costfactor;
@@ -297,7 +297,7 @@ export class EngineBuilder {
 
         const EngineForce = this.engine_displacement * this.compression_ratio / 10;
         const Cost = (this.UpgradeCost() + EngineForce);
-        const PlusBSandEra = Quality * Era.cost * Cost;
+        var PlusBSandEra = Quality * Era.cost * Cost;
         if (Cool.radiator > 0) {
             PlusBSandEra *= 1.4;
         }

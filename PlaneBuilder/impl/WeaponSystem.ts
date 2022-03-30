@@ -1,5 +1,7 @@
 import { Part } from "./Part";
-import { Stats } from "./Stats";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
 import { Weapon } from "./Weapon";
 import { ActionType, SynchronizationType, ProjectileType } from "./Weapon";
 import { BoolArr } from "./Serialize";
@@ -443,7 +445,7 @@ export class WeaponSystem extends Part {
                 w.SetFixed(this.fixed);
             }
             if (use) {
-                const good = false;
+                var good = false;
                 for (let i = 0; i < this.directions.length; i++) {
                     if (this.directions[i] && good)
                         this.directions[i] = false;
@@ -502,7 +504,7 @@ export class WeaponSystem extends Part {
     }
 
     public GetWeaponCount() {
-        const count = 0;
+        var count = 0;
         for (const w of this.weapons) {
             count += w.GetCount();
         }
@@ -601,8 +603,8 @@ export class WeaponSystem extends Part {
     public GetHits() {
         const hits = this.final_weapon.hits;
         if (hits != 0) {
-            const centerline = 0;
-            const wings = 0;
+            var centerline = 0;
+            var wings = 0;
             for (const w of this.weapons) {
                 if (w.GetWing() && (w.GetFixed() || this.GetDirectionCount() <= 2)) {
                     wings += w.GetCount() * hits;
@@ -620,13 +622,13 @@ export class WeaponSystem extends Part {
             if (this.IsLightningArc()) {
                 return [0, 0, 0, 0];
             } else if (this.final_weapon.ammo == 0) { //Fliergerflammenwerfer
-                const count = 0;
+                var count = 0;
                 for (const w of this.weapons) {
                     count += w.GetCount();
                 }
                 return [3 * count, 0, 0, 0];
             } else { //Scatterguns
-                const count = 0;
+                var count = 0;
                 for (const w of this.weapons) {
                     count += w.GetCount();
                 }
@@ -648,7 +650,7 @@ export class WeaponSystem extends Part {
 
     public GetJam() {
         if (this.final_weapon.rapid) {
-            const jams = [0, 0];
+            var jams = [0, 0];
             for (const w of this.weapons) {
                 const t = w.GetJam();
                 jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
@@ -657,7 +659,7 @@ export class WeaponSystem extends Part {
             return jams[0].toString() + "/" + jams[1].toString();
         }
         else {
-            const jam = 0;
+            var jam = 0;
             for (const w of this.weapons) {
                 jam = Math.max(jam, (w.GetJam() as number) + this.sticky_guns);
             }
@@ -755,13 +757,13 @@ export class WeaponSystem extends Part {
         if (this.IsLightningArc()) { //Special Case for Lightning Gun
             return [3];
         }
-        const count = 0;
+        var count = 0;
         for (const w of this.weapons) {
             count += w.GetCount();
         }
         if (this.final_weapon.hits > 0) {
             //Calc charges / shot.
-            const ammo = this.weapon_list[this.weapon_type].stats.cost;
+            var ammo = this.weapon_list[this.weapon_type].stats.cost;
             if (this.action_sel == ActionType.ROTARY)
                 ammo *= 2;
 
@@ -799,7 +801,7 @@ export class WeaponSystem extends Part {
     }
 
     public GetWingWeight() {
-        const sum = 0;
+        var sum = 0;
         for (const w of this.weapons) {
             if (w.GetWing()) {
                 sum += w.PartStats().mass;
@@ -809,7 +811,7 @@ export class WeaponSystem extends Part {
     }
 
     public GetDirectionCount() {
-        const count = 0;
+        var count = 0;
         for (const d of this.directions) {
             if (d)
                 count++;
@@ -850,14 +852,14 @@ export class WeaponSystem extends Part {
     }
 
     public PartStats() {
-        const stats = new Stats();
+        var stats = new Stats();
 
-        const dircount = 0;
+        var dircount = 0;
         for (const d of this.directions)
             if (d)
                 dircount++;
 
-        const count = 0;
+        var count = 0;
         for (const w of this.weapons) {
             w.has_cantilever = this.has_cantilever;
             w.SetTurret(this.GetDirectionCount() > 2);

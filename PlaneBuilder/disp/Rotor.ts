@@ -1,7 +1,9 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Rotor.ts" />
+import { AIRCRAFT_TYPE } from "../impl/Part";
+import { Rotor } from "../impl/Rotor";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect } from "./Tools";
 
-class Rotor_HTML extends Display {
+export class Rotor_HTML extends Display {
     private rotor: Rotor;
 
     private div: HTMLDivElement;

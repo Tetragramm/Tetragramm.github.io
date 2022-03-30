@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/LandingGear.ts" />
+import { LandingGear } from "../impl/LandingGear";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect } from "./Tools";
 
-class LandingGear_HTML extends Display {
+export class LandingGear_HTML extends Display {
     private gear: LandingGear;
     private sel: HTMLSelectElement;
     private retract: HTMLInputElement;

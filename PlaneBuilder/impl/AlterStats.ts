@@ -1,5 +1,6 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class AlterStats extends Part {
     public custom_parts: { name: string, stats: Stats, qty: number }[];
@@ -72,7 +73,7 @@ export class AlterStats extends Part {
             const stats = new Stats();
             stats.deserialize(d);
             const qty = d.GetNum();
-            const idx = this.custom_parts.findIndex((value) => { return value.name == name; });
+            var idx = this.custom_parts.findIndex((value) => { return value.name == name; });
             if (idx == -1) {
                 idx = this.custom_parts.length;
                 this.custom_parts.push({ name: name, stats: stats, qty: qty });
@@ -90,7 +91,7 @@ export class AlterStats extends Part {
 
 
     public AddPart(name: string, stats: Stats) {
-        const sumstats = 0;
+        var sumstats = 0;
         sumstats += Math.abs(stats.drag);
         sumstats += Math.abs(stats.mass);
         sumstats += Math.abs(stats.wetmass);
@@ -146,7 +147,7 @@ export class AlterStats extends Part {
     }
 
     public PartStats(): Stats {
-        const stats = new Stats();
+        var stats = new Stats();
         for (const part of this.custom_parts) {
             if (part.qty > 0) {
                 let pstats = part.stats.Clone();
@@ -159,7 +160,7 @@ export class AlterStats extends Part {
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
         const battery_storage = 0;
-        const equipment: { source: string, charge: string }[] = [];
+        var equipment: { source: string, charge: string }[] = [];
 
         for (const part of this.custom_parts) {
             if (part.qty > 0) {

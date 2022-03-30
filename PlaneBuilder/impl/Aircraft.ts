@@ -1,32 +1,30 @@
 import { AlterStats } from "./AlterStats";
-import { Stats, WARNING_COLOR } from "./Stats.ts";
-import { EngineList } from "./EngineList.ts";
-import { Era } from "./Era.ts";
-import { Cockpits } from "./Cockpits.ts";
-import { Passengers } from "./Passengers.ts";
-import { Engines } from "./Engines.ts";
-import { Propeller } from "./Propeller.ts";
-import { Frames } from "./Frames.ts";
-import { Wings } from "./Wings.ts";
-import { Stabilizers } from "./Stabilizers.ts";
-import { ControlSurfaces } from "./ControlSurfaces.ts";
-import { Reinforcement } from "./Reinforcement.ts";
-import { Fuel } from "./Fuel.ts";
-import { Munitions } from "./Munitions.ts";
-import { CargoAndPassengers } from "./CargoAndPassengers.ts";
-import { LandingGear } from "./LandingGear.ts";
-import { Accessories } from "./Accessories.ts";
-import { Optimization } from "./Optimization.ts";
-import { Weapons } from "./Weapons.ts";
-import { Used } from "./Used.ts";
-import { Rotor } from "./Rotor.ts";
-import { Serialize, NumArr, BoolArr } from "./Serialize";
-import { IsAnyOrnithopter } from "./Part";
-
+import { Stats, WARNING_COLOR } from "./Stats";
+import { EngineList } from "./EngineList";
+import { Era } from "./Era";
+import { Cockpits } from "./Cockpits";
+import { Passengers } from "./Passengers";
+import { Engines } from "./Engines";
+import { Propeller } from "./Propeller";
+import { Frames } from "./Frames";
+import { Wings } from "./Wings";
+import { Stabilizers } from "./Stabilizers";
+import { ControlSurfaces } from "./ControlSurfaces";
+import { Reinforcement } from "./Reinforcement";
+import { Fuel } from "./Fuel";
+import { Munitions } from "./Munitions";
+import { CargoAndPassengers } from "./CargoAndPassengers";
+import { LandingGear } from "./LandingGear";
+import { Accessories } from "./Accessories";
+import { Optimization } from "./Optimization";
+import { Weapons } from "./Weapons";
+import { Used } from "./Used";
+import { Rotor } from "./Rotor";
+import { AIRCRAFT_TYPE, IsAnyOrnithopter, MergeElectrics } from "./Part";
+import { Serialize, Deserialize } from "./Serialize";
 import { lu } from "./Localization";
-import { AIRCRAFT_TYPE } from "./Part";
 
-type DerivedStats = {
+export type DerivedStats = {
   DryMP: number;
   WetMP: number;
   WetMPwBombs: number;
@@ -95,8 +93,8 @@ export class Aircraft {
   private reset_json = String.raw`{"version":"11.3","name":"Basic Biplane","aircraft_type":0,"era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.9,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false]},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"use_variable":false},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":0},{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"info_sel":[false,false],"visi_sel":[false,false,false],"clim_sel":[false,false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1}],"ammo":1,"action":0,"projectile":0,"repeating":false}],"brace_count":0},"used":{"enabled":false,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0},"rotor":{"type":0,"rotor_count":0,"rotor_span":0,"rotor_mat":0,"is_tandem":false,"accessory":false}}`;
 
   constructor(
-    js: Record<string, unknown>,
-    weapon_json: Record<string, unknown>,
+    js: JSON,
+    weapon_json: JSON,
     storage: boolean
   ) {
     this.freeze_calculation = true;
@@ -314,7 +312,7 @@ export class Aircraft {
       return;
     }
     this.updated_stats = false;
-    const stats = new Stats();
+    var stats = new Stats();
     stats = stats.Add(this.era.PartStats());
     stats = stats.Add(this.cockpits.PartStats());
     stats = stats.Add(this.passengers.PartStats());
@@ -494,10 +492,10 @@ export class Aircraft {
       }
 
       if (this.DisplayCallback && !this.freeze_calculation)
-      this.DisplayCallback();
+        this.DisplayCallback();
 
       if (this.use_storage)
-      window.localStorage.setItem("aircraft", JSON.stringify(this));
+        window.localStorage.setItem("aircraft", JSON.stringify(this));
     }
   }
 
@@ -525,7 +523,7 @@ export class Aircraft {
     let StallSpeedFull = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea)));
     let StallSpeedFullwBombs = Math.max(Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea)));
 
-    const Overspeed = this.engines.GetOverspeed();
+    var Overspeed = this.engines.GetOverspeed();
     const BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
     const BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
     const BoostFullwBombs = Math.floor(1.0e-6 + this.stats.power / WetMPwBombs);
@@ -547,11 +545,11 @@ export class Aircraft {
     MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * (1 - 0.1 * this.used.ragged));
     MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * (1 - 0.1 * this.used.ragged));
 
-    const Stability = this.stats.pitchstab + this.stats.latstab;
+    var Stability = this.stats.pitchstab + this.stats.latstab;
     if (this.stats.pitchstab > 0 && this.stats.latstab > 0)
-    Stability += 2;
+      Stability += 2;
     else if (this.stats.pitchstab < 0 && this.stats.latstab < 0)
-    Stability -= 2;
+      Stability -= 2;
 
     let HandlingEmpty = 100 + this.stats.control - DryMP;
     if (Stability > 10 || Stability < -10) {
@@ -563,23 +561,23 @@ export class Aircraft {
         });
       }
     } else if (Stability == 10)
-    HandlingEmpty -= 4;
+      HandlingEmpty -= 4;
     else if (Stability > 6)
-    HandlingEmpty -= 3;
+      HandlingEmpty -= 3;
     else if (Stability > 3)
-    HandlingEmpty -= 2;
+      HandlingEmpty -= 2;
     else if (Stability > 0)
-    HandlingEmpty -= 1;
+      HandlingEmpty -= 1;
     else if (Stability == 0)
-    HandlingEmpty += 0;
+      HandlingEmpty += 0;
     else if (Stability > -4)
-    HandlingEmpty += 1;
+      HandlingEmpty += 1;
     else if (Stability > -7)
-    HandlingEmpty += 2;
+      HandlingEmpty += 2;
     else if (Stability > -10)
-    HandlingEmpty += 3;
+      HandlingEmpty += 3;
     else if (Stability == -10)
-    HandlingEmpty += 4;
+      HandlingEmpty += 4;
 
     let HandlingFull = HandlingEmpty + DryMP - WetMP;
     let HandlingFullwBombs = HandlingEmpty + DryMP - WetMPwBombs;
@@ -658,9 +656,9 @@ export class Aircraft {
 
     let ControlStress = 1;
     if (Stability > 3 || Stability < -3)
-    ControlStress++;
+      ControlStress++;
     //Flight Stress from Rumble.
-    const RumbleStress = 0;
+    var RumbleStress = 0;
     ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
     const MaxStress = this.accessories.GetMaxTotalStress();
     ControlStress = Math.min(MaxStress, ControlStress);
@@ -983,25 +981,25 @@ export class Aircraft {
     value = MergeElectrics(value, this.used.GetElectrics());
 
     value.equipment = value.equipment.sort((a, b) => {
-      const ac = parseInt(a.charge);
+      var ac = parseInt(a.charge);
       if (a.charge == "-")
-      ac = 0;
-      const bc = parseInt(b.charge);
+        ac = 0;
+      var bc = parseInt(b.charge);
       if (b.charge == "-")
-      bc = 0;
+        bc = 0;
       if (isNaN(ac) && isNaN(bc))
-      return 0;
+        return 0;
       if (isNaN(ac))
-      return -1;
+        return -1;
       if (isNaN(bc))
-      return 1;
+        return 1;
       return bc - ac;
     });
 
     value = MergeElectrics(this.engines.GetElectrics(), value);
     value = MergeElectrics(value, this.weapons.GetElectrics());
 
-    const have_generation = false;
+    var have_generation = false;
     //Add + symbols
     for (const eq of value.equipment) {
       const chg = parseInt(eq.charge);
@@ -1015,12 +1013,12 @@ export class Aircraft {
       && value.storage <= 0
       && !have_generation
       && this.stats.warnings.findIndex((value) => { return value.source == lu("Insufficient Charge") }) == -1) {
-        this.stats.warnings.push({
-          source: lu("Insufficient Charge"), warning: lu("Insufficient Charge Warning"),
-          color: WARNING_COLOR.RED,
-        });
-      }
-
-      return value;
+      this.stats.warnings.push({
+        source: lu("Insufficient Charge"), warning: lu("Insufficient Charge Warning"),
+        color: WARNING_COLOR.RED,
+      });
     }
+
+    return value;
   }
+}

@@ -1,6 +1,7 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
-import { BoolArr } from "./Serialize";
+import { Part } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize, BoolArr } from "./Serialize";
+import { lu } from "./Localization";
 
 export class Cockpit extends Part {
   private stats: Stats;
@@ -60,9 +61,9 @@ export class Cockpit extends Part {
     this.selected_safety = BoolArr(js["safety"], this.selected_safety.length);
     this.selected_gunsights = BoolArr(js["sights"], this.selected_gunsights.length);
     if (this.IsPrimary())
-    this.selected_upgrades[0] = false;
+      this.selected_upgrades[0] = false;
     if (json_version > 10.35)
-    this.bombsight = js["bombsight"];
+      this.bombsight = js["bombsight"];
   }
 
   public serialize(s: Serialize) {
@@ -79,9 +80,9 @@ export class Cockpit extends Part {
     this.selected_safety = d.GetBoolArr(this.selected_safety.length);
     this.selected_gunsights = d.GetBoolArr(this.selected_gunsights.length);
     if (this.IsPrimary())
-    this.selected_upgrades[0] = false;
+      this.selected_upgrades[0] = false;
     if (d.version > 10.35)
-    this.bombsight = d.GetNum();
+      this.bombsight = d.GetNum();
   }
 
   public GetTypeList() {
@@ -106,7 +107,7 @@ export class Cockpit extends Part {
 
   public SetType(index: number) {
     if (index >= this.types.length)
-    throw "Selected type is not in range of actual types.";
+      throw "Selected type is not in range of actual types.";
     this.selected_type = index;
     this.CalculateStats();
   }
@@ -117,7 +118,7 @@ export class Cockpit extends Part {
 
   public SetUpgrade(index: number, state: boolean) {
     if (index >= this.upgrades.length)
-    throw "Selected type is not in range of actual upgrades.";
+      throw "Selected type is not in range of actual upgrades.";
     this.selected_upgrades[index] = state;
     this.CalculateStats();
   }
@@ -134,7 +135,7 @@ export class Cockpit extends Part {
 
   public SetSafety(index: number, state: boolean) {
     if (index >= this.safety.length)
-    throw "Selected type is not in range of actual safties.";
+      throw "Selected type is not in range of actual safties.";
     this.selected_safety[index] = state;
     this.CalculateStats();
   }
@@ -145,14 +146,14 @@ export class Cockpit extends Part {
 
   public SetGunsight(index: number, state: boolean) {
     if (index >= this.safety.length)
-    throw "Selected type is not in range of actual gunsights.";
+      throw "Selected type is not in range of actual gunsights.";
     this.selected_gunsights[index] = state;
     this.CalculateStats();
   }
 
   public GetVisibility() {
     if (this.types[this.selected_type].stats.visibility < -10)
-    return -1 / 0;
+      return -1 / 0;
     return this.total_visibility;
   }
 
@@ -169,7 +170,7 @@ export class Cockpit extends Part {
   }
 
   public GetAttack() {
-    const mx = 0;
+    var mx = 0;
     for (let i = 0; i < this.gunsights.length; i++) {
       if (this.selected_gunsights[i]) {
         mx = Math.max(mx, this.gunsights[i].attack);
@@ -196,7 +197,7 @@ export class Cockpit extends Part {
 
   private IsOpen() {
     return this.types[this.selected_type].name == "Open"
-    || this.types[this.selected_type].name == "Windscreen";
+      || this.types[this.selected_type].name == "Windscreen";
   }
 
   public GetBombsightQuality() {
@@ -205,15 +206,15 @@ export class Cockpit extends Part {
 
   public SetBombsightQuality(num: number) {
     if (num != num)
-    num = 0;
+      num = 0;
     if (num == this.bombsight - 1)
-    num = this.bombsight - 3;
+      num = this.bombsight - 3;
     if (num == this.bombsight + 1)
-    num = this.bombsight + 3;
+      num = this.bombsight + 3;
     if (num < 2)
-    num = 0;
+      num = 0;
     if (num > 0)
-    num = num - (num % 3) + 1;
+      num = num - (num % 3) + 1;
     this.bombsight = num;
     this.CalculateStats();
   }
@@ -258,21 +259,21 @@ export class Cockpit extends Part {
 
     for (let i = 0; i < this.selected_upgrades.length; i++) {
       if (this.selected_upgrades[i])
-      stats = stats.Add(this.upgrades[i].stats);
+        stats = stats.Add(this.upgrades[i].stats);
     }
 
     const can = this.CanSafety();
     for (let i = 0; i < this.selected_safety.length; i++) {
       if (!can[i])
-      this.selected_safety[i] = false;
+        this.selected_safety[i] = false;
 
       if (this.selected_safety[i])
-      stats = stats.Add(this.safety[i].stats);
+        stats = stats.Add(this.safety[i].stats);
     }
 
     for (let i = 0; i < this.selected_gunsights.length; i++) {
       if (this.selected_gunsights[i])
-      stats = stats.Add(this.gunsights[i].stats);
+        stats = stats.Add(this.gunsights[i].stats);
     }
 
     if (this.bombsight > 0) {
@@ -334,7 +335,7 @@ export class Cockpit extends Part {
 
   public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
     const battery_storage = 0;
-    const equipment: { source: string, charge: string }[] = [];
+    var equipment: { source: string, charge: string }[] = [];
 
     for (let i = 0; i < this.upgrades.length; i++) {
       if (this.selected_upgrades[i]) {

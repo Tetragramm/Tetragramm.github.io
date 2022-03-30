@@ -1,5 +1,7 @@
 import { Part, AIRCRAFT_TYPE } from "./Part";
-import { Stats } from "./Stats";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
 
 enum ROTOR_BLADE_COUNT {
     Two = 2,
@@ -348,13 +350,13 @@ export class Rotor extends Part {
         this.VerifySizes();
         this.VerifyStagger();
 
-        const stats = new Stats();
+        var stats = new Stats();
         const area = this.GetRotorArea();
         stats.wingarea += Math.floor(1.0e-6 + area);
         stats.drag = this.GetRotorDrag();
 
         const strain = this.GetRotorStrain();
-        const ts = this.cant_list[this.cant_idx].stats.Clone();
+        var ts = this.cant_list[this.cant_idx].stats.Clone();
         const count = Math.ceil(-1.0e-6 + strain / ts.maxstrain);
         ts = ts.Multiply(count);
         ts.maxstrain = 0;

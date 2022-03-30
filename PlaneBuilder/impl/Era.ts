@@ -1,5 +1,6 @@
 import { Part } from "./Part";
 import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Era extends Part {
     private vals: { name: string, maxbomb: number, cant_lift: number, stats: Stats }[];
@@ -70,7 +71,7 @@ export class Era extends Part {
     }
 
     public PartStats(): Stats {
-        const s = new Stats();
+        var s = new Stats();
         s = s.Add(this.vals[this.selected].stats);
         return s;
     }

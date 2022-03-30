@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Stabilizers.ts" />
+import { Stabilizers } from "../impl/Stabilizers";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateInput, CreateTH, BlinkIfChanged } from "./Tools";
 
-class Stabilizers_HTML extends Display {
+export class Stabilizers_HTML extends Display {
     private stab: Stabilizers;
     private h_type: HTMLSelectElement;
     private h_count: HTMLInputElement;

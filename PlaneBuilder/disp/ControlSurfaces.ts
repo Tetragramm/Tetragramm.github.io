@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/ControlSurfaces.ts" />
+import { ControlSurfaces } from "../impl/ControlSurfaces";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect } from "./Tools";
 
-class ControlSurfaces_HTML extends Display {
+export class ControlSurfaces_HTML extends Display {
     private cs: ControlSurfaces;
     private aileron_select: HTMLSelectElement;
     private rudder_select: HTMLSelectElement;

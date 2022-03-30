@@ -1,4 +1,12 @@
-class Derived_HTML {
+import { Aircraft, DerivedStats } from "../impl/Aircraft";
+import { Stats, WARNING_COLOR, era2numHl } from "../impl/Stats";
+import { WING_DECK } from "../impl/Wings";
+import { WeaponString } from "./Weapons";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, FlexLabels } from "./Tools";
+import { StringFmt } from "../string/index";
+
+export class Derived_HTML {
     private tbl: HTMLTableElement;
     private name_inp: HTMLInputElement;
     private cost_cell: HTMLTableCellElement;

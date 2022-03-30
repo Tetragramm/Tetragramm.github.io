@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Passengers.ts" />
+import { Passengers } from "../impl/Passengers";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox } from "./Tools";
 
-class Passengers_HTML extends Display {
+export class Passengers_HTML extends Display {
     private pass: Passengers;
     private connect: HTMLInputElement;
     private mass: HTMLTableCellElement;

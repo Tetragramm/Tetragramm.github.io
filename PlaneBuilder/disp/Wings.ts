@@ -1,5 +1,6 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Wings.ts" />
+import { Wings, WingType } from "../impl/Wings"
+import { lu } from "../impl/Localization";
+import { insertRow, CreateCheckbox, CreateInput, CreateTH, BlinkIfChanged } from "./Tools";
 
 type WingHTMLType = {
     span: HTMLSpanElement,
@@ -8,7 +9,7 @@ type WingHTMLType = {
     gull: HTMLInputElement, dihedral: HTMLInputElement,
     anhedral: HTMLInputElement, br: HTMLBRElement
 };
-class Wings_HTML extends Display {
+export class Wings_HTML extends Display {
     private wings: Wings;
     private stagger: HTMLSelectElement;
     private closed: HTMLInputElement;

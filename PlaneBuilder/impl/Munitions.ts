@@ -1,5 +1,6 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Munitions extends Part {
   private bomb_count: number;
@@ -68,7 +69,7 @@ export class Munitions extends Part {
   }
 
   public GetInternalBombCount() {
-    const ibc = 10 * this.internal_bay_count;
+    var ibc = 10 * this.internal_bay_count;
     if (this.bomb_count > 0 && this.internal_bay_count > 0) {
       if (this.internal_bay_1) {
         //Double Internal Count
@@ -83,7 +84,7 @@ export class Munitions extends Part {
   }
 
   public GetMaxBombSize() {
-    const sz = 0;
+    var sz = 0;
     const ibc = this.GetInternalBombCount();
     if (this.bomb_count > 0 && this.internal_bay_count > 0) {
       if (this.internal_bay_1) {
@@ -103,7 +104,7 @@ export class Munitions extends Part {
 
   public SetRocketCount(count: number) {
     if (count != count || count < 0)
-    count = 0;
+      count = 0;
     count = Math.floor(1.0e-6 + count);
     this.rocket_count = count;
     this.LimitMass();
@@ -112,7 +113,7 @@ export class Munitions extends Part {
 
   public SetBombCount(count: number) {
     if (count != count || count < 0)
-    count = 0;
+      count = 0;
     count = Math.floor(1.0e-6 + count);
     this.bomb_count = count;
     this.LimitMass();
@@ -133,7 +134,7 @@ export class Munitions extends Part {
 
   public SetBayCount(count: number) {
     if (count != count || count < 0)
-    count = 0;
+      count = 0;
     count = Math.floor(1.0e-6 + count);
     this.internal_bay_count = count;
     this.CalculateStats();
@@ -150,12 +151,12 @@ export class Munitions extends Part {
   }
 
   private LimitMass() {
-    const reduce = false;
+    var reduce = false;
     const allowed_internal = Math.min(this.GetInternalBombCount(), Math.floor(1.0e-6 + 3 * this.acft_struct * this.maxbomb));
-    const ib = 0;
-    const ir = 0;
-    const eb = 0;
-    const er = 0;
+    var ib = 0;
+    var ir = 0;
+    var eb = 0;
+    var er = 0;
     if (this.bomb_count > allowed_internal) {
       ib = allowed_internal;
     } else {
@@ -200,13 +201,13 @@ export class Munitions extends Part {
       //Parasol and Shoulder do nothing
       case 2: //Mid
       case 3: //Low
-      this.gull_factor = 1.1;
-      break;
+        this.gull_factor = 1.1;
+        break;
       case 4: //Gear
-      this.gull_factor = 1.2;
-      break;
+        this.gull_factor = 1.2;
+        break;
       default:
-      this.gull_factor = 1;
+        this.gull_factor = 1;
     }
     if (this.LimitMass()) {
       this.CalculateStats();
@@ -243,7 +244,7 @@ export class Munitions extends Part {
 
     //Because it is load, it rounds up to the nearest 5 mass.
     if ((stats.bomb_mass % 5) > 0)
-    stats.bomb_mass += 5 - (stats.bomb_mass % 5);
+      stats.bomb_mass += 5 - (stats.bomb_mass % 5);
 
     return stats;
   }

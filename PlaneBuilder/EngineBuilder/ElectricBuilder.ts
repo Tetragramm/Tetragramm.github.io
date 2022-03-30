@@ -1,5 +1,7 @@
-// <reference path="../impl/EngineStats.ts" />
-// <reference path="../impl/EngineList.ts" />
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs";
+import { lu } from "../impl/Localization";
+import { num2era } from "../impl/Stats";
 
 export class ElectricBuilder {
     readonly EraTable:
@@ -112,7 +114,7 @@ export class ElectricBuilder {
     }
 
     public EngineStats() {
-        const estats = new EngineStats();
+        var estats = new EngineStats();
         estats.name = this.name;
 
         this.VerifyValues();
@@ -137,7 +139,7 @@ export class ElectricBuilder {
     }
 
     public EngineInputs() {
-        const ei = new EngineInputs();
+        var ei = new EngineInputs();
         ei.engine_type = ENGINE_TYPE.ELECTRIC;
         ei.name = this.name;
         ei.power = this.power;

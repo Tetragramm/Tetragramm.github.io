@@ -1,4 +1,5 @@
-/// <reference path="../disp/Tools.ts" />
+import { lu, localization } from "../impl/Localization";
+import { CreateTD, CreateTH } from "../disp/Tools"
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -14,11 +15,11 @@ const init = () => {
                 var weapon_JSON = resp[1];
 
                 //Strings bit
-                local = new Localization(string_JSON);
+                localization.LoadLanguages(string_JSON);
                 if (lang) {
-                    local.SetLanguages(lang);
+                    localization.SetCurrentLanguage(lang);
                 } else if (window.localStorage.language) {
-                    local.SetLanguages(window.localStorage.language);
+                    localization.SetCurrentLanguage(window.localStorage.language);
                 }
                 var tbl = document.getElementById("table_weap") as HTMLTableElement;
 
@@ -159,6 +160,3 @@ const init = () => {
             });
 }
 window.onload = init;
-var enable_anim = false;
-
-var local: Localization;

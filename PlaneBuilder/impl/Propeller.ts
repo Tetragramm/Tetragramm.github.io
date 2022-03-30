@@ -1,5 +1,7 @@
 import { Part, AIRCRAFT_TYPE } from "./Part";
 import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { DRIVE_TYPE } from "./EngineStats";
 
 export class Propeller extends Part {
     private prop_list: { name: string, stats: Stats, energy: number, turn: number }[];
@@ -106,7 +108,7 @@ export class Propeller extends Part {
     }
 
     public GetNumPropellers() {
-        const num_propellers = 0;
+        var num_propellers = 0;
         for (const e of this.engines) {
             if (e.type == DRIVE_TYPE.PROPELLER) {
                 num_propellers += e.num;
@@ -127,7 +129,7 @@ export class Propeller extends Part {
         if (this.engines.length == 0)
             return 2.5;
 
-        const E = 999;
+        var E = 999;
         for (const e of this.engines) {
             switch (e.type) {
                 case DRIVE_TYPE.PROPELLER:
@@ -158,7 +160,7 @@ export class Propeller extends Part {
         if (this.engines.length == 0)
             return 6;
 
-        const T = 999;
+        var T = 999;
         for (const e of this.engines) {
             switch (e.type) {
                 case DRIVE_TYPE.PROPELLER:
@@ -182,7 +184,7 @@ export class Propeller extends Part {
     }
 
     public PartStats(): Stats {
-        const stats = new Stats();
+        var stats = new Stats();
         if (this.GetNumPropellers() != 0) {
             stats = stats.Add(this.prop_list[this.idx_prop].stats.Multiply(this.GetNumPropellers()));
             stats = stats.Add(this.upg_list[this.idx_upg].stats.Multiply(this.GetNumPropellers()));

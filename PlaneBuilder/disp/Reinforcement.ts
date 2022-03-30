@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Reinforcement.ts" />
+import { Reinforcement } from "../impl/Reinforcement";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexLabel, FlexSelect } from "./Tools";
 
-class Reinforcement_HTML extends Display {
+export class Reinforcement_HTML extends Display {
     private rf: Reinforcement;
     private ext_wood_inp: HTMLInputElement[];
     private ext_steel_inp: HTMLInputElement[];

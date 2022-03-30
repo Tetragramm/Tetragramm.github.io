@@ -1,10 +1,10 @@
 import { Stats } from "./Stats";
-import { Serialize } from "./Serialize";
-import { EngineInputs, ENGINE_RARITY } from "./EngineInputs";
+import { Serialize, Deserialize, NumArr } from "./Serialize";
+import { ENGINE_RARITY } from "./EngineInputs";
 
 
 
-enum DRIVE_TYPE {
+export enum DRIVE_TYPE {
     PROPELLER,
     TURBINE,
     PULSEJET,

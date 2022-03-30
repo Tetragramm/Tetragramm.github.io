@@ -1,6 +1,9 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
-import { Cockpit } from "./Cockpit.ts";
+import { Part, MergeElectrics } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
+import { Cockpit } from "./Cockpit";
+import { StringFmt } from "../string/index";
 
 export class Cockpits extends Part {
     private positions: Cockpit[];
@@ -125,7 +128,7 @@ export class Cockpits extends Part {
         while (this.positions.length > num) {
             this.positions.pop();
         }
-        const js = null;
+        var js = null;
         if (this.positions.length > 0) {
             js = JSON.stringify(this.positions[this.positions.length - 1].toJSON());
         }
@@ -163,7 +166,7 @@ export class Cockpits extends Part {
     }
 
     public PartStats(): Stats {
-        const s = new Stats();
+        var s = new Stats();
         let warningmap = new Map();
         for (let i = 0; i < this.positions.length; i++) {
             let cp = this.positions[i];

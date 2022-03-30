@@ -1,8 +1,9 @@
-/// <reference path="../impl/EngineStats.ts" />
-/// <reference path="../impl/EngineList.ts" />
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs";
+import { lu } from "../impl/Localization";
+import { num2era } from "../impl/Stats";
 
-
-class PulsejetBuilder {
+export class PulsejetBuilder {
     public desired_power: number;
     public valve_sel: number;
     public era_sel: number;
@@ -39,7 +40,7 @@ class PulsejetBuilder {
         const Era = this.EraTable[this.era_sel];
         const Valve = this.ValveTable[this.valve_sel];
 
-        const StarterMass = 0;
+        var StarterMass = 0;
         if (this.starter)
             StarterMass = 1;
 
@@ -99,7 +100,7 @@ class PulsejetBuilder {
         const Era = this.EraTable[this.era_sel];
         const Valve = this.ValveTable[this.valve_sel];
 
-        const StarterCost = 0;
+        var StarterCost = 0;
         if (this.starter)
             StarterCost = 3;
 
@@ -110,7 +111,7 @@ class PulsejetBuilder {
     public EngineInputs() {
         const ei = new EngineInputs();
 
-        const valved = "";
+        var valved = "";
         if (this.valve_sel == 0)
             valved = "V";
         ei.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
@@ -130,7 +131,7 @@ class PulsejetBuilder {
 
         this.VerifyValues();
 
-        const valved = "";
+        var valved = "";
         if (this.valve_sel == 0)
             valved = "V";
 

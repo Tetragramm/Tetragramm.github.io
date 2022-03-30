@@ -1,6 +1,9 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
+import { Part } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
 import { NumArr, BoolArr } from "./Serialize";
+import { StringFmt } from "../string/index";
 
 export class Accessories extends Part {
     private armour_coverage: number[];
@@ -185,8 +188,8 @@ export class Accessories extends Part {
         for (let i = 0; i < this.armour_coverage.length; i++) {
             arr.push(Math.max(0, this.armour_coverage[i]));
         }
-        const sum = 0;
-        for (const r = this.armour_coverage.length - 1; r >= 0; r--) {
+        var sum = 0;
+        for (let r = this.armour_coverage.length - 1; r >= 0; r--) {
             sum += arr[r];
             arr[r] = sum - vital_adj;
         }
@@ -203,7 +206,7 @@ export class Accessories extends Part {
     }
 
     private NormalizeCoverage() {
-        const coverage = -8 + Math.min(0, -Math.floor(1.0e-6 + (this.vital_parts - 8) / 2));
+        var coverage = -8 + Math.min(0, -Math.floor(1.0e-6 + (this.vital_parts - 8) / 2));
         for (let i = this.armour_coverage.length - 1; i >= 0; i--) {
             if (i == 1) {
                 coverage += this.skin_armour;
@@ -380,7 +383,7 @@ export class Accessories extends Part {
     }
 
     public GetWindmill() {
-        const production = 0;
+        var production = 0;
         for (let i = 0; i < this.electrical_count.length; i++) {
             production += this.electric_list[i].cp10s * this.electrical_count[i];
         }
@@ -404,15 +407,15 @@ export class Accessories extends Part {
     }
 
     public PartStats() {
-        const stats = new Stats();
+        var stats = new Stats();
 
         this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
-        const armour_str = "";
+        var armour_str = "";
         //Armour
         const eff_armour = this.GetEffectiveCoverage();
         for (let i = 0; i < this.armour_coverage.length; i++) {
             let AP = i + 1;
-            const count = this.armour_coverage[i];
+            var count = this.armour_coverage[i];
             if (AP == 2) {
                 count -= this.skin_armour;
             }
@@ -477,8 +480,8 @@ export class Accessories extends Part {
     }
 
     public GetElectrics(): { storage: number, equipment: { source: string, charge: string }[] } {
-        const battery_storage = 0;
-        const equipment: { source: string, charge: string }[] = [];
+        var battery_storage = 0;
+        var equipment: { source: string, charge: string }[] = [];
         for (let i = 0; i < this.electric_list.length; i++) {
             let item = this.electric_list[i];
             let count = this.electrical_count[i];

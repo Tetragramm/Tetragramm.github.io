@@ -1,10 +1,11 @@
-/// <reference path="../impl/Aircraft.ts" />
-/// <reference path="../disp/Tools.ts" />
-/// <reference path="../disp/Derived.ts" />
-/// <reference path="../lz/lz-string.ts" />
-/// <reference path="../string/index.ts" />
-/// <reference path="../scroll/scroll.ts" />
-/// <reference path="../JSON2CSV/json2csv.ts" />
+import { lu, localization } from "../impl/Localization";
+import { SetEngineLists } from "../impl/EngineList";
+import { Aircraft } from "../impl/Aircraft";
+import { Serialize, Deserialize } from "../impl/Serialize";
+import { Derived_HTML } from "../disp/Derived";
+import { BlinkBad, BlinkNeutral, _arrayBufferToString, _stringToArrayBuffer, download } from "../disp/Tools";
+import { LZString } from "../lz/lz-string";
+import { JSON2CSV } from "../JSON2CSV/json2csv";
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -21,39 +22,16 @@ const init = () => {
                 engine_JSON = resp[2];
                 weapon_JSON = resp[3];
                 //Strings bit
-                local = new Localization(string_JSON);
+                localization.LoadLanguages(string_JSON);
                 if (lang) {
-                    local.SetLanguages(lang);
+                    localization.SetCurrentLanguage(lang);
                 } else if (window.localStorage.language) {
-                    local.SetLanguages(window.localStorage.language);
+                    localization.SetCurrentLanguage(window.localStorage.language);
                 }
 
                 //Engine bit
                 var nameliststr = window.localStorage.getItem("engines_names");
-                var namelist = [];
-                if (nameliststr) {
-                    namelist = JSON.parse(nameliststr);
-                    for (let n of namelist) {
-                        n = n.trim();
-                        n = n.replace(/\s+/g, ' ');
-                        if (n != "") {
-                            engine_list.set(n, new EngineList(n));
-                        }
-                    }
-                }
-
-
-                for (let el of engine_JSON["lists"]) {
-                    if (!engine_list.has(el["name"]))
-                        engine_list.set(el["name"], new EngineList(el["name"]));
-                    if (el["name"] != "Custom") {
-                        engine_list.get(el["name"]).fromJSON(el, true);
-                        engine_list.get(el["name"]).SetConstant();
-                    } else {
-                        engine_list.get(el["name"]).fromJSON(el, false);
-                    }
-                }
-
+                SetEngineLists(engine_JSON, nameliststr);
                 InitHTML();
                 InitStats();
                 LoadFromHangar(0);
@@ -62,8 +40,6 @@ const init = () => {
 };
 window.addEventListener("DOMContentLoaded", init);
 
-var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
-var local: Localization;
 var acft_builder: Aircraft;
 var stats_builder: Derived_HTML;
 var acft_hangar: Aircraft;
@@ -74,14 +50,9 @@ var select_hangar: HTMLSelectElement;
 var select_acft: HTMLSelectElement;
 var chosen_hangar: string;
 
-var list_create: HTMLButtonElement;
-var list_delete: HTMLButtonElement;
-var list_input: HTMLInputElement;
-
 var parts_JSON: JSON;
 var engine_JSON: JSON;
 var weapon_JSON: JSON;
-var enable_anim = false;
 
 function InitHTML() {
     chosen_hangar = "Default";

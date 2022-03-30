@@ -1,5 +1,9 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Weapons.ts" />
+import { Weapons, ProjectileType, ActionType } from "../impl/Weapons";
+import { WeaponSystem } from "../impl/WeaponSystem";
+import { Stats } from "../impl/Stats";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace } from "./Tools";
+import { StringFmt } from "../string/index";
 
 type WType = {
     span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement,
@@ -20,7 +24,7 @@ type WSetType = {
     weaps: WType[], stats: WStatType, repeating: HTMLInputElement,
     seat: HTMLSelectElement,
 };
-class Weapons_HTML extends Display {
+export class Weapons_HTML extends Display {
     private weap: Weapons;
 
     private tbl: HTMLTableElement;
@@ -335,7 +339,7 @@ class Weapons_HTML extends Display {
     }
 }
 
-function WeaponName(w: WeaponSystem, wlist: {
+export function WeaponName(w: WeaponSystem, wlist: {
     name: string,
     abrv: string, era: string,
     size: number, stats: Stats,
@@ -380,7 +384,7 @@ function WeaponName(w: WeaponSystem, wlist: {
     return name;
 }
 
-function WeaponTags(w: WeaponSystem) {
+export function WeaponTags(w: WeaponSystem) {
     var tags = [lu("Weapon Tag Jam", w.GetJam())];
     let fweap = w.GetFinalWeapon();
 
@@ -418,7 +422,7 @@ function WeaponTags(w: WeaponSystem) {
     return tags;
 }
 
-function WeaponString(w: WeaponSystem,
+export function WeaponString(w: WeaponSystem,
     wlist: {
         name: string,
         abrv: string, era: string,

@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Radiator.ts" />
+import { Radiator } from "../impl/Radiator";
+import { lu } from "../impl/Localization";
+import { CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox } from "./Tools";
 
-class Radiator_HTML extends Display {
+export class Radiator_HTML extends Display {
     private radiator: Radiator;
     private type_select: HTMLSelectElement;
     private mount_select: HTMLSelectElement;

@@ -1,6 +1,7 @@
-import { Part, AIRCRAFT_TYPE } from "./Part.ts";
-import { Stats } from "./Stats.ts";
-import { BoolArr } from "./Serialize";
+import { Part, AIRCRAFT_TYPE, IsAnyOrnithopter } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize, BoolArr } from "./Serialize";
+import { lu } from "./Localization";
 
 export class ControlSurfaces extends Part {
     private aileron_list: { name: string, warping: boolean, stats: Stats }[];
@@ -273,7 +274,7 @@ export class ControlSurfaces extends Part {
     }
 
     public PartStats() {
-        const stats = new Stats();
+        var stats = new Stats();
         if (this.aileron_list[this.aileron_sel].warping && this.wing_area == 0) {
             this.aileron_sel = 0;
         }

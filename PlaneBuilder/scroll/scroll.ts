@@ -28,7 +28,7 @@ interface Options {
   scrollIntoView?: (element: Element) => void;
 }
 
-function scrollToFragment(options: Options = {}) {
+export function scrollToFragment(options: Options = {}) {
   unmount();
 
   getElement = options.getElement || getElementById;

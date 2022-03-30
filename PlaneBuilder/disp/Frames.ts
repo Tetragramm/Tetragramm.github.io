@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Frames.ts" />
+import { Frames } from "../impl/Frames";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateCheckbox, CreateTH, BlinkIfChanged } from "./Tools";
 
-class Frames_HTML extends Display {
+export class Frames_HTML extends Display {
     private frames: Frames;
     private c_frame: HTMLTableCellElement;
     private c_skin: HTMLTableCellElement;

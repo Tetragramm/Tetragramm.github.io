@@ -1,9 +1,18 @@
-/// <reference path="../disp/Tools.ts" />
-/// <reference path="./EngineBuilder.ts" />
-/// <reference path="./PulsejetBuilder.ts" />
-/// <reference path="../lz/lz-string.ts" />
-/// <reference path="../string/index.ts" />
-/// <reference path="../JSON2CSV/json2csv.ts" />
+import { GetEngineLists, SetEngineLists } from "../impl/EngineList";
+import { localization } from "../impl/Localization";
+import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled, CreateFlexSection, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect, FlexText, BlinkGood, BlinkBad, BlinkIfChanged, download, CreateButton, CreateSelect, GenerateID } from "../disp/Tools";
+import { Deserialize } from "../impl/Serialize";
+import { EngineList } from "../impl/EngineList";
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE } from "../impl/EngineInputs";
+import { LZString } from "../lz/lz-string";
+import { StringFmt } from "../string/index";
+import { JSON2CSV } from "../JSON2CSV/json2csv"
+
+import { PulsejetBuilder } from "./PulsejetBuilder";
+import { EngineBuilder } from "./EngineBuilder";
+import { TurboBuilder } from "./TurboBuilder";
+import { ElectricBuilder } from "./ElectricBuilder";
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
@@ -19,37 +28,16 @@ const init = () => {
                 const string_JSON = resp[0];
                 const engine_JSON = resp[1];
                 //Strings bit
-                local = new Localization(string_JSON);
+                localization.LoadLanguages(string_JSON);
                 if (lang) {
-                    local.SetLanguages(lang);
+                    localization.SetCurrentLanguage(lang);
                 } else if (window.localStorage.language) {
-                    local.SetLanguages(window.localStorage.language);
+                    localization.SetCurrentLanguage(window.localStorage.language);
                 }
 
                 //Engine Bit
                 const nameliststr = window.localStorage.getItem("engines_names");
-                const namelist: string[] = [];
-                if (nameliststr) {
-                    namelist = JSON.parse(nameliststr) as string[];
-                    for (let n of namelist) {
-                        n = n.trim();
-                        n = n.replace(/\s+/g, ' ');
-                        if (n != "") {
-                            engine_list.set(n, new EngineList(n));
-                        }
-                    }
-                }
-
-                for (let el of engine_JSON["lists"]) {
-                    if (!engine_list.has(el["name"]))
-                        engine_list.set(el["name"], new EngineList(el["name"]));
-                    if (el["name"] != "Custom") {
-                        engine_list.get(el["name"]).fromJSON(el, true);
-                        engine_list.get(el["name"]).SetConstant();
-                    } else {
-                        engine_list.get(el["name"]).fromJSON(el, false);
-                    }
-                }
+                SetEngineLists(engine_JSON, nameliststr);
 
 
                 ebuild = new EngineBuilder_HTML();
@@ -62,18 +50,15 @@ const init = () => {
             const str = LZString.decompressFromEncodedURIComponent(ep);
             const arr = _stringToArrayBuffer(str);
             const des = new Deserialize(arr);
-            const num = engine_list.get("Custom").deserializeEngine(des);
+            const num = GetEngineLists().get("Custom").deserializeEngine(des);
             ebuild.SelectEngine(num);
         } catch { console.log("Compressed Engine Parameter Failed."); }
     }
-    enable_anim = true;
+    SetAnimationEnabled(true);
 }
 window.onload = init;
 
-const ebuild: EngineBuilder_HTML;
-const engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
-const local: Localization;
-const enable_anim = false;
+var ebuild: EngineBuilder_HTML;
 
 class EngineBuilder_HTML {
     private pulsejetbuilder: PulsejetBuilder;
@@ -218,17 +203,17 @@ class EngineBuilder_HTML {
         this.InitPulsejetOutputs(prow.insertCell());
         this.UpdatePulsejet();
 
-        const ptbl = document.getElementById("table_turbox") as HTMLTableElement;
-        const prow = ptbl.insertRow();
-        this.InitTurboXInputs(prow.insertCell());
-        this.td_desc = prow.insertCell();
-        this.InitTurboXOutputs(prow.insertCell());
+        const ttbl = document.getElementById("table_turbox") as HTMLTableElement;
+        const trow = ttbl.insertRow();
+        this.InitTurboXInputs(trow.insertCell());
+        this.td_desc = trow.insertCell();
+        this.InitTurboXOutputs(trow.insertCell());
         this.UpdateTurboX();
 
-        const ptbl = document.getElementById("table_electric") as HTMLTableElement;
-        const prow = ptbl.insertRow();
-        this.InitElectricInputs(prow.insertCell());
-        this.InitElectricOutputs(prow.insertCell());
+        const eltbl = document.getElementById("table_electric") as HTMLTableElement;
+        const elrow = eltbl.insertRow();
+        this.InitElectricInputs(elrow.insertCell());
+        this.InitElectricOutputs(elrow.insertCell());
         this.UpdateElectric();
 
         const mtbl = document.getElementById("table_manual") as HTMLTableElement;
@@ -795,6 +780,7 @@ class EngineBuilder_HTML {
     }
 
     private InitListManagement(cell: HTMLTableCellElement) {
+        const engine_list = GetEngineLists();
         this.list_idx = "Custom";
         this.m_list_select = document.createElement("SELECT") as HTMLSelectElement;
         this.m_select = document.createElement("SELECT") as HTMLSelectElement;
@@ -889,7 +875,7 @@ class EngineBuilder_HTML {
             this.m_load.value = "";
         };
         this.m_list_create.onclick = () => {
-            const nlist = this.m_list_input.value;
+            let nlist = this.m_list_input.value;
             nlist = nlist.trim();
             nlist = nlist.replace(/\s+/g, ' ');
             if (nlist != "") {
@@ -912,7 +898,7 @@ class EngineBuilder_HTML {
                     engine_list.delete(this.list_idx);
                     window.localStorage.removeItem("engines." + this.list_idx);
                     let namelist = JSON.parse(window.localStorage.getItem("engines_names"));
-                    const idx = -1;
+                    var idx = -1;
                     for (let i = 0; i < namelist.length; i++) {
                         if (namelist[i] == this.list_idx)
                             idx = i;
@@ -980,7 +966,8 @@ class EngineBuilder_HTML {
     }
 
     public UpdateList() {
-        const l_idx = this.m_list_select.selectedIndex;
+        const engine_list = GetEngineLists();
+        var l_idx = this.m_list_select.selectedIndex;
         while (this.m_list_select.options.length > 0) {
             this.m_list_select.options.remove(this.m_list_select.options.length - 1);
         }
@@ -993,7 +980,7 @@ class EngineBuilder_HTML {
         }
         this.m_list_select.selectedIndex = l_idx;
 
-        const idx = this.m_select.selectedIndex;
+        var idx = this.m_select.selectedIndex;
         while (this.m_select.options.length > 0) {
             this.m_select.options.remove(this.m_select.options.length - 1);
         }
@@ -1106,6 +1093,6 @@ class EngineBuilder_HTML {
     }
 
     public SelectEngine(num: number) {
-        this.SetValues(engine_list.get(this.list_idx).get(num));
+        this.SetValues(GetEngineLists().get(this.list_idx).get(num));
     }
 }

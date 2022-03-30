@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Era.ts" />
+import { Era } from "../impl/Era";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH, BlinkIfChanged } from "./Tools";
 
-class Era_HTML extends Display {
+export class Era_HTML extends Display {
     private model: Era;
     private select: HTMLSelectElement;
     private bleed: HTMLTableCellElement;

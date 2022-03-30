@@ -1,7 +1,10 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/AlterStats.ts" />
+import { AlterStats } from "../impl/AlterStats";
+import { Stats, WARNING_COLOR } from "../impl/Stats";
+import { lu } from "../impl/Localization";
+import { CreateButton, CreateText, FlexSection, CreateFlexSection, FlexInput, FlexText } from "./Tools";
+import { StringFmt } from "../string/index";
 
-class AlterStats_HTML extends Display {
+export class AlterStats_HTML extends Display {
     private alter: AlterStats;
     private add_cell: HTMLTableCellElement;
     private add_fs: FlexSection;
@@ -47,7 +50,7 @@ class AlterStats_HTML extends Display {
         super();
         this.alter = alter;
 
-        let tbl = window.getElementById("alter_table") as HTMLTableElement;
+        let tbl = document.getElementById("alter_table") as HTMLTableElement;
         let row = tbl.insertRow();
         this.add_cell = row.insertCell();
         this.edit_cell = row.insertCell();

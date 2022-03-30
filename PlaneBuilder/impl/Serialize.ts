@@ -1,4 +1,4 @@
-class Serialize {
+export class Serialize {
   private array: ArrayBuffer;
   private view: DataView;
   private offset: number;

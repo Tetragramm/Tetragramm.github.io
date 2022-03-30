@@ -1,7 +1,8 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Optimization.ts" />
+import { Optimization } from "../impl/Optimization";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH, BlinkIfChanged } from "./Tools";
 
-class Optimization_HTML extends Display {
+export class Optimization_HTML extends Display {
     private opt: Optimization;
     private free_inp: HTMLInputElement;
     private cost_cbx: HTMLInputElement[];

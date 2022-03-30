@@ -1,7 +1,7 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Propeller.ts" />
+import { Propeller } from "../impl/Propeller";
+import { lu } from "../impl/Localization";
 
-class Propeller_HTML extends Display {
+export class Propeller_HTML extends Display {
     private prop: Propeller;
     private select_prop: HTMLSelectElement;
     private select_upgrade: HTMLSelectElement;

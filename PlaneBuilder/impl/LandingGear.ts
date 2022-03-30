@@ -1,6 +1,7 @@
 import { Part } from "./Part";
 import { Stats } from "./Stats";
-import { BoolArr } from "./Serialize";
+import { Serialize, Deserialize, BoolArr } from "./Serialize";
+import { lu } from "./Localization";
 
 export class LandingGear extends Part {
     private gear_list: { name: string, stats: Stats, DpLMP: number, SpLMP: number, can_retract: boolean }[];
@@ -154,13 +155,13 @@ export class LandingGear extends Part {
     }
 
     public PartStats() {
-        const stats = new Stats();
+        var stats = new Stats();
         if (!this.CanGear()[this.gear_sel])
             this.gear_sel = 0;
 
         //Do this first, so we can add the Zepplin Hook to the mass
         //TODO: This is a hack, and it is terrible. Separate hook?
-        const tempMass = this.loadedMass;
+        var tempMass = this.loadedMass;
         for (let i = 0; i < this.extra_list.length; i++) {
             if (this.extra_sel[i]) {
                 stats = stats.Add(this.extra_list[i].stats);
@@ -170,7 +171,7 @@ export class LandingGear extends Part {
         }
 
         stats = stats.Add(this.gear_list[this.gear_sel].stats);
-        const pdrag = this.gear_list[this.gear_sel].DpLMP * Math.floor(1.0e-6 + tempMass / 5);
+        var pdrag = this.gear_list[this.gear_sel].DpLMP * Math.floor(1.0e-6 + tempMass / 5);
 
         //Retractable gear with Boat Hull adds normal hull drag,
         // plus the mass and cost of normal retrctable gear

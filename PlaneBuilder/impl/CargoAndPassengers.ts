@@ -1,5 +1,6 @@
-import { Part } from "./Part.ts";
-import { Stats } from "./Stats.ts";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class CargoAndPassengers extends Part {
     private cargo_list: { name: string, stats: Stats }[];
@@ -50,7 +51,7 @@ export class CargoAndPassengers extends Part {
     }
 
     public PartStats() {
-        const stats = new Stats();
+        var stats = new Stats();
         stats = stats.Add(this.cargo_list[this.cargo_sel].stats);
 
         stats.bomb_mass += stats.reqsections * 3;

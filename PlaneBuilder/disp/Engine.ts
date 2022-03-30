@@ -1,7 +1,10 @@
-/// <reference path="./Display.ts" />
-/// <reference path="../impl/Engine.ts" />
+import { Engine, } from "../impl/Engine";
+import { ENGINE_RARITY } from "../impl/EngineInputs";
+import { GetEngineLists } from "../impl/EngineList";
+import { lu } from "../impl/Localization";
+import { CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect } from "./Tools";
 
-class Engine_HTML extends Display {
+export class Engine_HTML extends Display {
     private engine: Engine;
     private e_list_select: HTMLSelectElement;
     private e_select: HTMLSelectElement;
@@ -117,7 +120,7 @@ class Engine_HTML extends Display {
         this.e_list_select.required = true;
         tcell.appendChild(this.e_list_select);
         tcell.appendChild(document.createElement("BR"));
-        for (let key of engine_list.keys()) {
+        for (let key of GetEngineLists().keys()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = key;
             this.e_list_select.add(opt);
@@ -128,6 +131,7 @@ class Engine_HTML extends Display {
         this.e_select.required = true;
         tcell.appendChild(this.e_select);
         tcell.appendChild(document.createElement("BR"));
+        const engine_list = GetEngineLists();
         for (let i = 0; i < engine_list.get("Custom").length; i++) {
             let eng = engine_list.get("Custom").get(i);
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -363,6 +367,7 @@ class Engine_HTML extends Display {
             this.e_list_select.selectedIndex = sel_list;
 
             var can_idx = this.engine.CanSelectIndex();
+            var engine_list = GetEngineLists();
             for (let i = 0; i < engine_list.get(list_idx).length; i++) {
                 let eng = engine_list.get(list_idx).get(i);
                 let opt = document.createElement("OPTION") as HTMLOptionElement;

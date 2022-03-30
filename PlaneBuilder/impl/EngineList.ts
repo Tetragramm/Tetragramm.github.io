@@ -1,7 +1,6 @@
-import { Stats } from "./Stats.ts";
-import { EngineStats } from "./EngineStats.ts";
+import { Deserialize } from "./Serialize";
+import { EngineStats } from "./EngineStats";
 import { EngineInputs } from "./EngineInputs";
-import engine_JSON from "../engines.json";
 
 export class EngineList {
   private list: EngineInputs[];
@@ -13,7 +12,7 @@ export class EngineList {
     this.list = [];
     const ejson = window.localStorage.getItem("engines." + this.name);
     if (ejson != null)
-    this.fromJSON(JSON.parse(ejson));
+      this.fromJSON(JSON.parse(ejson));
 
     const nameliststr = window.localStorage.getItem("engines_names");
     let namelist = [];
@@ -28,7 +27,7 @@ export class EngineList {
       }
     }
     if (!hasname)
-    namelist.push(name);
+      namelist.push(name);
     window.localStorage.setItem("engines_names", JSON.stringify(namelist));
   }
 
@@ -42,7 +41,7 @@ export class EngineList {
 
   public fromJSON(js: JSON, force = false) {
     if (js["name"])
-    this.name = js["name"];
+      this.name = js["name"];
 
     if (force) {
       this.list = [];
@@ -88,7 +87,7 @@ export class EngineList {
 
   public get(i: number) {
     if (i < 0 || i >= this.length)
-    return new EngineInputs();
+      return new EngineInputs();
     return this.list[i];
   }
 
@@ -99,7 +98,7 @@ export class EngineList {
 
   public get_stats(i: number) {
     if (i < 0 || i >= this.length)
-    return new EngineStats();
+      return new EngineStats();
     return this.list[i].PartStats();
   }
 
@@ -111,7 +110,7 @@ export class EngineList {
   public find(es: EngineInputs) {
     for (let i = 0; i < this.length; i++) {
       if (es.Equal(this.list[i]))
-      return i;
+        return i;
     }
     return -1;
   }
@@ -119,7 +118,7 @@ export class EngineList {
   public find_name(n: string) {
     for (let i = 0; i < this.length; i++) {
       if (this.list[i].name == n)
-      return i;
+        return i;
     }
     return -1;
   }
@@ -155,11 +154,51 @@ export class EngineList {
   }
 }
 
+var engine_JSON: JSON;
+var engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
+
+//TODO: Make sure Global Variable sets.
+export function SetEngineLists(el: JSON, nameliststr: string) {
+  engine_JSON = el;
+
+  var namelist = [];
+  if (nameliststr) {
+    namelist = JSON.parse(nameliststr);
+    for (let n of namelist) {
+      n = n.trim();
+      n = n.replace(/\s+/g, ' ');
+      if (n != "") {
+        engine_list.set(n, new EngineList(n));
+      }
+    }
+  }
+
+
+  for (let el of engine_JSON["lists"]) {
+    if (!engine_list.has(el["name"]))
+      engine_list.set(el["name"], new EngineList(el["name"]));
+    if (el["name"] != "Custom") {
+      engine_list.get(el["name"]).fromJSON(el, true);
+      engine_list.get(el["name"]).SetConstant();
+    } else {
+      engine_list.get(el["name"]).fromJSON(el, false);
+    }
+  }
+}
+
+export function GetEngineLists() {
+  return engine_list;
+}
+
+export function GetEngineJSON() {
+  return engine_JSON;
+}
+
 export function SearchAllEngineLists(n: string) {
   const engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
   for (const el of engine_JSON["lists"]) {
     if (!engine_list.has(el["name"]))
-    engine_list.set(el["name"], new EngineList(el["name"]));
+      engine_list.set(el["name"], new EngineList(el["name"]));
     if (el["name"] != "Custom") {
       engine_list.get(el["name"]).fromJSON(el, true);
       engine_list.get(el["name"]).SetConstant();

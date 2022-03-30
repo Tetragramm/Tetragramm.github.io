@@ -1,8 +1,9 @@
-/// <reference path="./Display.ts" />
-/// <reference path="./Cockpit.ts" />
-/// <reference path="../impl/Cockpits.ts" />
+import { Cockpits } from "../impl/Cockpits";
+import { Cockpit_HTML } from "./Cockpit";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH } from "./Tools";
 
-class Cockpits_HTML extends Display {
+export class Cockpits_HTML extends Display {
     private tbl: HTMLTableElement;
     private counter: HTMLInputElement;
     private positions: Cockpit_HTML[];

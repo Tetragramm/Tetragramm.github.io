@@ -1,11 +1,13 @@
 import { StringFmt } from "../string/index";
-import strings_JSON from "../strings.json";
 
 class Localization {
   private languages: JSON;
   private lang = "en";
-  constructor(js: Record<string, unknown>) {
-    this.languages = js;
+  constructor() {
+  }
+
+  public LoadLanguages(lang: JSON) {
+    this.languages = lang;
   }
 
   public GetLanguages() {
@@ -16,7 +18,7 @@ class Localization {
     return lang;
   }
 
-  public SetLanguages(lang: string) {
+  public SetCurrentLanguage(lang: string) {
     if (this.languages[lang]) {
       this.lang = lang;
     }
@@ -35,8 +37,8 @@ class Localization {
 }
 
 
+export var localization = new Localization();
 
 export function lu(s: string, ...args: any[]): string {
-  const local = new Localization(strings_JSON);
-  return StringFmt.Format(local.e(s), ...args);
+  return StringFmt.Format(localization.e(s), ...args);
 }

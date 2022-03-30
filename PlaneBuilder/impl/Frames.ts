@@ -1,5 +1,7 @@
 import { Part } from "./Part";
-import { Stats } from "./Stats";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
 
 export class Frames extends Part {
     private frame_list: {
@@ -295,7 +297,7 @@ export class Frames extends Part {
     }
 
     private CountInternalBracing() {
-        const count = 0;
+        var count = 0;
         for (const elem of this.section_list) {
             if (elem.internal_bracing)
                 count++;
@@ -313,8 +315,8 @@ export class Frames extends Part {
             if (!elem.internal_bracing)
                 hist[elem.frame]++;
         }
-        const max_index = 0;
-        const max = 0;
+        var max_index = 0;
+        var max = 0;
         for (let i = hist.length - 1; i >= 0; i--) {
             if (hist[i] > max) {
                 max = hist[i];
@@ -391,7 +393,7 @@ export class Frames extends Part {
     }
 
     public PossibleInternalBracing(convert_sec_to_brace: boolean = false) {
-        const allowed = this.CountSections();
+        var allowed = this.CountSections();
         if (!this.farman)
             allowed += this.tail_section_list.length;
         if (convert_sec_to_brace)
@@ -435,7 +437,7 @@ export class Frames extends Part {
         frame: number, geodesic: boolean, monocoque: boolean,
         lifting_body: boolean, internal_bracing: boolean
     }): Stats {
-        const stats = new Stats();
+        var stats = new Stats();
         stats = stats.Add(this.frame_list[sec.frame].stats);
         if (sec.geodesic) {
             stats.structure *= 1.5;
@@ -462,7 +464,7 @@ export class Frames extends Part {
         frame: number, geodesic: boolean, monocoque: boolean,
         lifting_body: boolean, internal_bracing: boolean
     }): Stats {
-        const stats = new Stats();
+        var stats = new Stats();
         stats = stats.Add(this.frame_list[sec.frame].stats);
         if (sec.geodesic) {
             stats.structure *= 1.5;
@@ -486,7 +488,7 @@ export class Frames extends Part {
     }
 
     private CountMainLiftingBody() {
-        const count = 0;
+        var count = 0;
         for (const s of this.section_list) {
             if (s.lifting_body)
                 count++;
@@ -495,7 +497,7 @@ export class Frames extends Part {
     }
 
     private CountTailLiftingBody() {
-        const count = 0;
+        var count = 0;
         for (const s of this.tail_section_list) {
             if (s.lifting_body)
                 count++;
@@ -706,19 +708,19 @@ export class Frames extends Part {
         if (!this.CanFlyingWing())
             this.flying_wing = false;
 
-        const stats = new Stats();
+        var stats = new Stats();
         const base_type = this.BaseType();
         stats.structure = this.frame_list[base_type].basestruct;
         stats.cost = this.frame_list[base_type].basecost;
 
-        const is_clinker = this.skin_list[this.sel_skin].monocoque_structure < 0;
+        var is_clinker = this.skin_list[this.sel_skin].monocoque_structure < 0;
 
         for (const sec of this.section_list) {
             stats = stats.Add(this.SectionStats(sec));
             is_clinker = is_clinker && (sec.internal_bracing || sec.monocoque);
         }
 
-        const tail_stats = new Stats();
+        var tail_stats = new Stats();
         for (const sec of this.tail_section_list) {
             tail_stats = tail_stats.Add(this.TailSectionStats(sec));
             if (!this.farman) {
