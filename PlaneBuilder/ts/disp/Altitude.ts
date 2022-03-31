@@ -56,7 +56,7 @@ export class Altitude_HTML {
     }
 
     private AddRow(af: number) {
-        var row = document.createElement("TR") as HTMLTableRowElement;
+        const row = document.createElement("TR") as HTMLTableRowElement;
         let af_cell = row.insertCell();
         af_cell.textContent = StringFmt.Format("{0}-{1}", af * 10, af * 10 + 9);
         row.insertCell();
@@ -70,13 +70,13 @@ export class Altitude_HTML {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
-        var fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
         fragment.appendChild(this.fRow);
 
-        var Boost = 0;
-        var RoC = 0;
-        var Stall = 0;
-        var Speed = 0;
+        const Boost = 0;
+        const RoC = 0;
+        const Stall = 0;
+        const Speed = 0;
         switch (this.fuel_state.selectedIndex) {
             case FUEL_STATE.FULLWBOMBS:
                 Boost = derived.BoostFullwBombs;
@@ -105,8 +105,8 @@ export class Altitude_HTML {
         }
 
         for (let af = 0; af < 100; af++) {
-            var PowerReduction = 0;
-            var SpeedIncrease = 0;
+            const PowerReduction = 0;
+            const SpeedIncrease = 0;
             if (af < acft.GetMinIAF()) {
                 PowerReduction = acft.GetMinIAF() - af;
             } else {
@@ -125,17 +125,17 @@ export class Altitude_HTML {
             if (this.rows.length <= af) {
                 this.AddRow(af);
             }
-            var row = this.rows[af];
+            const row = this.rows[af];
 
-            var adjBoost = 0;
+            const adjBoost = 0;
             if (PowerReduction > 0) {
                 adjBoost = Math.max(1, Boost - 1);
             } else {
                 adjBoost = Boost;
             }
-            var adjRoC = Math.max(1, RoC - PowerReduction);
-            var adjStall = Math.max(1, Stall + af);
-            var adjSpeed = Math.max(1, Speed + SpeedIncrease - PowerReduction);
+            const adjRoC = Math.max(1, RoC - PowerReduction);
+            const adjStall = Math.max(1, Stall + af);
+            const adjSpeed = Math.max(1, Speed + SpeedIncrease - PowerReduction);
 
             row.children[1].textContent = adjBoost.toString();
             row.children[2].textContent = adjRoC.toString();
@@ -144,7 +144,7 @@ export class Altitude_HTML {
             fragment.appendChild(row);
             if (adjStall > adjSpeed) {
                 while (this.rows.length > af) {
-                    var r = this.rows.pop();
+                    const r = this.rows.pop();
                 }
                 break;
             }

@@ -33,34 +33,34 @@ export class Cockpit_HTML extends Display {
         this.sft_chbxs = [];
         this.gun_chbxs = [];
 
-        var fragment = document.createDocumentFragment();
-        var option = insertCell(fragment);
-        var upgrades = insertCell(fragment);
-        var safety = insertCell(fragment);
-        var gunsights = insertCell(fragment);
-        var stat_cell = insertCell(fragment);
-        var tbl = document.createElement("TABLE") as HTMLTableElement;
-        var h1_row = tbl.insertRow();
+        const fragment = document.createDocumentFragment();
+        const option = insertCell(fragment);
+        const upgrades = insertCell(fragment);
+        const safety = insertCell(fragment);
+        const gunsights = insertCell(fragment);
+        const stat_cell = insertCell(fragment);
+        const tbl = document.createElement("TABLE") as HTMLTableElement;
+        const h1_row = tbl.insertRow();
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl.insertRow();
+        const c1_row = tbl.insertRow();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
-        var h2_row = tbl.insertRow();
+        const h2_row = tbl.insertRow();
         CreateTH(h2_row, lu("Stat Control"));
         CreateTH(h2_row, lu("Stat Required Sections"));
         CreateTH(h2_row, "");
-        var c2_row = tbl.insertRow();
+        const c2_row = tbl.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_rseq = c2_row.insertCell();
         c2_row.insertCell();
-        var h3_row = tbl.insertRow();
+        const h3_row = tbl.insertRow();
         CreateTH(h3_row, lu("Stat Flight Stress"));
         CreateTH(h3_row, lu("Stat Escape"));
         CreateTH(h3_row, lu("Stat Visibility"));
-        var c3_row = tbl.insertRow();
+        const c3_row = tbl.insertRow();
         this.d_strs = c3_row.insertCell();
         this.d_escp = c3_row.insertCell();
         this.d_visi = c3_row.insertCell();
@@ -84,10 +84,10 @@ export class Cockpit_HTML extends Display {
         }
         option.appendChild(this.sel_type);
 
-        var fs = CreateFlexSection(upgrades);
+        const fs = CreateFlexSection(upgrades);
         //Add all the upgrades as checkboxes
-        var upglst = cp.GetUpgradeList();
-        var can = cp.CanUpgrades();
+        const upglst = cp.GetUpgradeList();
+        const can = cp.CanUpgrades();
         for (let i = 0; i < upglst.length; i++) {
             let upg = document.createElement("INPUT") as HTMLInputElement;
             if (can[i]) {
@@ -97,9 +97,9 @@ export class Cockpit_HTML extends Display {
             this.upg_chbxs.push(upg);
         }
 
-        var fs = CreateFlexSection(safety);
+        const fs = CreateFlexSection(safety);
         //Add all the safties as checkboxes
-        var sft_index = 0;
+        const sft_index = 0;
         for (let elem of cp.GetSafetyList()) {
             let sft = document.createElement("INPUT") as HTMLInputElement;
             FlexCheckbox(lu(elem.name), sft, fs);
@@ -109,9 +109,9 @@ export class Cockpit_HTML extends Display {
             this.sft_chbxs.push(sft);
         }
 
-        var fs = CreateFlexSection(gunsights);
+        const fs = CreateFlexSection(gunsights);
         //Add all the safties as checkboxes
-        var gun_index = 0;
+        const gun_index = 0;
         for (let elem of cp.GetGunsightList()) {
             let gun = document.createElement("INPUT") as HTMLInputElement;
             FlexCheckbox(lu(elem.name), gun, fs);
@@ -144,7 +144,7 @@ export class Cockpit_HTML extends Display {
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_cont, stats.control.toString(), true);
         BlinkIfChanged(this.d_rseq, stats.reqsections.toString(), false);
-        var fs = this.cockpit.GetFlightStress();
+        const fs = this.cockpit.GetFlightStress();
         if (fs[0] != fs[1]) {
             BlinkIfChanged(this.d_strs, StringFmt.Format("{0}", fs[0]));
         } else {
@@ -155,19 +155,19 @@ export class Cockpit_HTML extends Display {
 
         this.sel_type.selectedIndex = this.cockpit.GetType();
 
-        var upgs = this.cockpit.GetSelectedUpgrades();
+        const upgs = this.cockpit.GetSelectedUpgrades();
         for (let i = 0; i < this.upg_chbxs.length; i++) {
             this.upg_chbxs[i].checked = upgs[i];
         }
 
-        var sfty = this.cockpit.GetSelectedSafety();
+        const sfty = this.cockpit.GetSelectedSafety();
         let can = this.cockpit.CanSafety();
         for (let i = 0; i < this.sft_chbxs.length; i++) {
             this.sft_chbxs[i].checked = sfty[i];
             this.sft_chbxs[i].disabled = !can[i];
         }
 
-        var guns = this.cockpit.GetSelectedGunsights();
+        const guns = this.cockpit.GetSelectedGunsights();
         for (let i = 0; i < this.gun_chbxs.length; i++) {
             this.gun_chbxs[i].checked = guns[i];
         }

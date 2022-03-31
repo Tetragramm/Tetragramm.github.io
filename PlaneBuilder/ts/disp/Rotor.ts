@@ -53,8 +53,8 @@ export class Rotor_HTML extends Display {
         this.wing_div = document.getElementById("Wings") as HTMLDivElement;
         this.reinforce_div = document.getElementById("Reinforcements") as HTMLDivElement;
         this.control_div = document.getElementById("ControlSurfaces") as HTMLDivElement;
-        var tbl = document.getElementById("rotor_table") as HTMLTableElement;
-        var fragment = document.createDocumentFragment();
+        const tbl = document.getElementById("rotor_table") as HTMLTableElement;
+        const fragment = document.createDocumentFragment();
         this.InitAutogyro(fragment);
         this.InitHelicopter(fragment);
         tbl.appendChild(fragment);
@@ -68,16 +68,16 @@ export class Rotor_HTML extends Display {
         CreateTH(this.auto_header, lu("Rotor Stats"));
 
         this.auto_row = insertRow(fragment);
-        var rotor_cell = this.auto_row.insertCell();
-        var rotor_fs = CreateFlexSection(rotor_cell);
+        const rotor_cell = this.auto_row.insertCell();
+        const rotor_fs = CreateFlexSection(rotor_cell);
         this.auto_min = document.createElement("LABEL") as HTMLLabelElement;
         FlexDisplay(lu("Rotor Minimum Span"), this.auto_min, rotor_fs);
         this.auto_span = document.createElement("INPUT") as HTMLInputElement;
         FlexInput(lu("Rotor Span"), this.auto_span, rotor_fs);
         this.auto_span.onchange = () => { this.rotor.SetRotorSpan(this.auto_span.valueAsNumber); };
 
-        var mat_cell = this.auto_row.insertCell();
-        var mat_fs = CreateFlexSection(mat_cell);
+        const mat_cell = this.auto_row.insertCell();
+        const mat_fs = CreateFlexSection(mat_cell);
         this.auto_mat = document.createElement("SELECT") as HTMLSelectElement;
         FlexSelect(lu("Rotor Material"), this.auto_mat, mat_fs);
         for (let ctype of this.rotor.GetCantileverList()) {
@@ -87,8 +87,8 @@ export class Rotor_HTML extends Display {
         }
         this.auto_mat.onchange = () => { this.rotor.SetCantilever(this.auto_mat.selectedIndex); };
 
-        var acc_cell = this.auto_row.insertCell();
-        var acc_fs = CreateFlexSection(acc_cell);
+        const acc_cell = this.auto_row.insertCell();
+        const acc_fs = CreateFlexSection(acc_cell);
         this.auto_clutch = document.createElement("INPUT") as HTMLInputElement;
         FlexCheckbox(lu("Rotor Clutched Rotor"), this.auto_clutch, acc_fs);
         this.auto_clutch.onchange = () => { this.rotor.SetAccessory(this.auto_clutch.checked); };
@@ -98,22 +98,22 @@ export class Rotor_HTML extends Display {
 
     private InitAutogyroStats(stat_cell: HTMLTableCellElement) {
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE") as HTMLTableElement;
+        const tbl_stat = document.createElement("TABLE") as HTMLTableElement;
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.a_drag = c1_row.insertCell();
         this.a_mass = c1_row.insertCell();
         this.a_cost = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Rotor Area"));
         CreateTH(h2_row, "");
         CreateTH(h2_row, "");
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.a_area = c2_row.insertCell();
         c2_row.insertCell();
         c2_row.insertCell();
@@ -128,7 +128,7 @@ export class Rotor_HTML extends Display {
 
         this.auto_clutch.checked = this.rotor.GetAccessory();
 
-        var stats = this.rotor.PartStats();
+        const stats = this.rotor.PartStats();
         BlinkIfChanged(this.a_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.a_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.a_cost, stats.cost.toString(), false);
@@ -143,8 +143,8 @@ export class Rotor_HTML extends Display {
         CreateTH(this.heli_header, lu("Rotor Stats"));
 
         this.heli_row = insertRow(fragment);
-        var rotor_cell = this.heli_row.insertCell();
-        var rotor_fs = CreateFlexSection(rotor_cell);
+        const rotor_cell = this.heli_row.insertCell();
+        const rotor_fs = CreateFlexSection(rotor_cell);
         this.heli_count = document.createElement("INPUT") as HTMLInputElement;
         FlexInput(lu("Rotor Number of Rotors"), this.heli_count, rotor_fs);
         this.heli_count.onchange = () => { this.rotor.SetRotorCount(this.heli_count.valueAsNumber); };
@@ -157,7 +157,7 @@ export class Rotor_HTML extends Display {
 
         this.heli_stagger = document.createElement("SELECT") as HTMLSelectElement;
         FlexSelect(lu("Rotor Stagger"), this.heli_stagger, rotor_fs);
-        var staggers = this.rotor.GetStaggerList();
+        const staggers = this.rotor.GetStaggerList();
         for (let s of staggers) {
             let opt1 = document.createElement("OPTION") as HTMLOptionElement;
             opt1.text = lu(s.name);
@@ -167,7 +167,7 @@ export class Rotor_HTML extends Display {
 
         this.heli_blade_count = document.createElement("SELECT") as HTMLSelectElement;
         FlexSelect(lu("Rotor Blade Count"), this.heli_blade_count, rotor_fs);
-        var blade_list = this.rotor.GetBladeList();
+        const blade_list = this.rotor.GetBladeList();
         for (let b of blade_list) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.textContent = b.name;
@@ -176,8 +176,8 @@ export class Rotor_HTML extends Display {
         this.heli_blade_count.onchange = () => { this.rotor.SetBladeCount(this.heli_blade_count.selectedIndex); };
 
 
-        var mat_cell = this.heli_row.insertCell();
-        var mat_fs = CreateFlexSection(mat_cell);
+        const mat_cell = this.heli_row.insertCell();
+        const mat_fs = CreateFlexSection(mat_cell);
         this.heli_mat = document.createElement("SELECT") as HTMLSelectElement;
         FlexSelect(lu("Rotor Rotor Material"), this.heli_mat, mat_fs);
         for (let ctype of this.rotor.GetCantileverList()) {
@@ -187,8 +187,8 @@ export class Rotor_HTML extends Display {
         }
         this.heli_mat.onchange = () => { this.rotor.SetCantilever(this.heli_mat.selectedIndex); };
 
-        var acc_cell = this.heli_row.insertCell();
-        var acc_fs = CreateFlexSection(acc_cell);
+        const acc_cell = this.heli_row.insertCell();
+        const acc_fs = CreateFlexSection(acc_cell);
         this.heli_shafts = document.createElement("INPUT") as HTMLInputElement;
         FlexCheckbox(lu("Rotor Motor Cross-link"), this.heli_shafts, acc_fs);
         this.heli_shafts.onchange = () => { this.rotor.SetAccessory(this.heli_shafts.checked); };
@@ -198,22 +198,22 @@ export class Rotor_HTML extends Display {
 
     private InitHelicopterStats(stat_cell: HTMLTableCellElement) {
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE") as HTMLTableElement;
+        const tbl_stat = document.createElement("TABLE") as HTMLTableElement;
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.h_drag = c1_row.insertCell();
         this.h_mass = c1_row.insertCell();
         this.h_cost = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Rotor Area"));
         CreateTH(h2_row, lu("Stat Reliability"));
         CreateTH(h2_row, lu("Reinforcement Aircraft Max Strain"));
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.h_area = c2_row.insertCell();
         this.h_rely = c2_row.insertCell();
         this.h_strn = c2_row.insertCell();
@@ -228,7 +228,7 @@ export class Rotor_HTML extends Display {
 
         this.heli_min.innerText = "" + this.rotor.GetSizingSpan();
         this.heli_span.valueAsNumber = this.rotor.GetRotorSpan();
-        var can_stagger = this.rotor.CanStagger();
+        const can_stagger = this.rotor.CanStagger();
         for (let i = 0; i < can_stagger.length; i++) {
             this.heli_stagger.options[i].disabled = !can_stagger[i];
         }
@@ -241,7 +241,7 @@ export class Rotor_HTML extends Display {
 
         this.heli_blade_count.selectedIndex = this.rotor.GetBladeCountIdx();
 
-        var stats = this.rotor.PartStats();
+        const stats = this.rotor.PartStats();
         BlinkIfChanged(this.h_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.h_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.h_cost, stats.cost.toString(), false);

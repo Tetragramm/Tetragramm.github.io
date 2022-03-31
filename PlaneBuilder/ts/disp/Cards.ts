@@ -1,5 +1,5 @@
-import { StringFmt } from "../string/index.js";
-import { lu } from "../impl/Localization.js";
+import { StringFmt } from "../string/index.ts";
+import { lu } from "../impl/Localization.ts";
 
 export enum ENGINE_TEXT {
     SINGLE,
@@ -527,7 +527,7 @@ export class Cards {
                 0, 0, 0, 0, 0, false, false,
                 false, false, 0, null);
 
-            /// send event            
+            /// send event
             lnk.dispatchEvent(e);
         }
     }

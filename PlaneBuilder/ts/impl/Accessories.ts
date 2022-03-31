@@ -116,7 +116,7 @@ export class Accessories extends Part {
         }
         this.radio_sel = js["radio_sel"];
         if (json_version < 12.05) {
-            let old_info = BoolArr(js["info_sel"], 2);
+            const old_info = BoolArr(js["info_sel"], 2);
             this.recon_sel = Array(this.recon_list.length).fill(0);
             if (old_info[0])
                 this.recon_sel[1] = 1;
@@ -156,7 +156,7 @@ export class Accessories extends Part {
         }
         this.radio_sel = d.GetNum();
         if (d.version < 12.05) {
-            let old_info = d.GetBoolArr(2);
+            const old_info = d.GetBoolArr(2);
             this.recon_sel = Array(this.recon_list.length).fill(0);
             if (old_info[0])
                 this.recon_sel[1] = 1;
@@ -188,7 +188,7 @@ export class Accessories extends Part {
         for (let i = 0; i < this.armour_coverage.length; i++) {
             arr.push(Math.max(0, this.armour_coverage[i]));
         }
-        var sum = 0;
+        let sum = 0;
         for (let r = this.armour_coverage.length - 1; r >= 0; r--) {
             sum += arr[r];
             arr[r] = sum - vital_adj;
@@ -414,8 +414,8 @@ export class Accessories extends Part {
         //Armour
         const eff_armour = this.GetEffectiveCoverage();
         for (let i = 0; i < this.armour_coverage.length; i++) {
-            let AP = i + 1;
-            var count = this.armour_coverage[i];
+            const AP = i + 1;
+            const count = this.armour_coverage[i];
             if (AP == 2) {
                 count -= this.skin_armour;
             }
@@ -483,8 +483,8 @@ export class Accessories extends Part {
         var battery_storage = 0;
         var equipment: { source: string, charge: string }[] = [];
         for (let i = 0; i < this.electric_list.length; i++) {
-            let item = this.electric_list[i];
-            let count = this.electrical_count[i];
+            const item = this.electric_list[i];
+            const count = this.electrical_count[i];
             if (count > 0) {
                 battery_storage += item.storage * count;
                 if (item.cp10s > 0) {
@@ -501,19 +501,19 @@ export class Accessories extends Part {
             }
         }
 
-        let radio = this.radio_list[this.radio_sel];
+        const radio = this.radio_list[this.radio_sel];
         equipment = this.FormatEquipment(equipment, radio.name, radio.stats.charge);
 
         for (let i = 0; i < this.clim_list.length; i++) {
             if (this.clim_sel[i]) {
-                let item = this.clim_list[i];
+                const item = this.clim_list[i];
                 equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
             }
         }
 
         for (let i = 0; i < this.recon_list.length; i++) {
-            let item = this.recon_list[i];
-            let count = this.recon_sel[i];
+            const item = this.recon_list[i];
+            const count = this.recon_sel[i];
             if (count > 0) {
                 equipment = this.FormatEquipment(equipment, item.name, count * item.stats.charge);
             }
@@ -521,15 +521,15 @@ export class Accessories extends Part {
 
         for (let i = 0; i < this.visi_list.length; i++) {
             if (this.visi_sel[i]) {
-                let item = this.visi_list[i];
+                const item = this.visi_list[i];
                 equipment = this.FormatEquipment(equipment, item.name, item.stats.charge);
             }
         }
 
-        let autopilot = this.auto_list[this.auto_sel];
+        const autopilot = this.auto_list[this.auto_sel];
         equipment = this.FormatEquipment(equipment, autopilot.name, autopilot.stats.charge);
 
-        let controls = this.cont_list[this.cont_sel];
+        const controls = this.cont_list[this.cont_sel];
         equipment = this.FormatEquipment(equipment, controls.name, controls.stats.charge);
 
 

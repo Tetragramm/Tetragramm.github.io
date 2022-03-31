@@ -1,7 +1,7 @@
-import { Era } from "../impl/Era.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateTH, BlinkIfChanged } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Era } from "../impl/Era.ts";
+import { insertRow, CreateTH, BlinkIfChanged } from "./Tools.ts";
+import { Display } from "./Display.ts";
+import { lu } from "../impl/Localization";
 
 export class Era_HTML extends Display {
     private model: Era;
@@ -15,9 +15,9 @@ export class Era_HTML extends Display {
 
         (document.getElementById("lbl_era") as HTMLLabelElement).textContent = lu("Era Section Title");
 
-        var tbl = document.getElementById("table_era") as HTMLTableElement;
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const tbl = document.getElementById("table_era") as HTMLTableElement;
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Era Option"));
         CreateTH(row, lu("Stat Lift Bleed"));
         CreateTH(row, lu("Stat Cost"));
@@ -25,7 +25,7 @@ export class Era_HTML extends Display {
 
         row = insertRow(fragment);
 
-        var selcell = row.insertCell();
+        const selcell = row.insertCell();
         //Get used elements
         this.select = document.createElement("SELECT") as HTMLSelectElement;
         selcell.append(this.select);
@@ -40,7 +40,7 @@ export class Era_HTML extends Display {
         //For each element create an option,
         //    add it to the select
         for (let elem of this.model.GetEraOptions()) {
-            var opt = document.createElement("OPTION") as HTMLOptionElement;
+            const opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = lu(elem.name);
             this.select.add(opt);
         }
@@ -49,7 +49,7 @@ export class Era_HTML extends Display {
 
     public UpdateDisplay() {
         this.select.selectedIndex = this.model.GetSelected();
-        var stats = this.model.PartStats();
+        const stats = this.model.PartStats();
         BlinkIfChanged(this.bleed, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.cost, stats.cost.toString(), false);
         BlinkIfChanged(this.pstab, stats.pitchstab.toString(), false);

@@ -104,13 +104,13 @@ export class AlterStats_HTML extends Display {
         this.rely = document.createElement("INPUT") as HTMLInputElement;
         this.sprl = document.createElement("INPUT") as HTMLInputElement;
 
-        var fsabc = CreateFlexSection(this.edit_cell);
-        var fsab = CreateFlexSection(fsabc.div1);
+        const fsabc = CreateFlexSection(this.edit_cell);
+        const fsab = CreateFlexSection(fsabc.div1);
         FlexText(lu("Alter Part Name"), this.name, fsab);
 
-        var fs1 = CreateFlexSection(fsab.div1);
-        var fs2 = CreateFlexSection(fsab.div2);
-        var fs3 = CreateFlexSection(fsabc.div2);
+        const fs1 = CreateFlexSection(fsab.div1);
+        const fs2 = CreateFlexSection(fsab.div2);
+        const fs3 = CreateFlexSection(fsabc.div2);
 
         FlexInput("Cost", this.cost, fs3);
 
@@ -167,7 +167,7 @@ export class AlterStats_HTML extends Display {
         this.rely.min = "";
         this.sprl.size = 47;
 
-        var span = document.createElement("SPAN") as HTMLSpanElement;
+        const span = document.createElement("SPAN") as HTMLSpanElement;
         this.sel = document.createElement("SELECT") as HTMLSelectElement;
         span.appendChild(this.sel);
         this.sel.selectedIndex = -1;
@@ -243,7 +243,7 @@ export class AlterStats_HTML extends Display {
             this.visi.valueAsNumber = part.stats.visibility;
             this.escp.valueAsNumber = part.stats.escape;
             this.rely.valueAsNumber = part.stats.reliability;
-            var text = [];
+            const text = [];
             for (let warn of part.stats.warnings) {
                 text.push(warn.warning);
             }
@@ -285,7 +285,7 @@ export class AlterStats_HTML extends Display {
         while (this.sel.options.length) {
             this.sel.remove(this.sel.options.length - 1);
         }
-        var all_parts = this.alter.GetParts();
+        const all_parts = this.alter.GetParts();
         for (let p of all_parts) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.textContent = p.name;
@@ -296,7 +296,7 @@ export class AlterStats_HTML extends Display {
 
     public UpdateDisplay() {
         this.UpdateSelect();
-        var plist = this.alter.GetParts();
+        const plist = this.alter.GetParts();
         for (let i = 0; i < plist.length; i++) {
             if (this.add_list.length <= i) {
                 let item = {

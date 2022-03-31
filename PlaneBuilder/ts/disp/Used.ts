@@ -22,8 +22,8 @@ export class Used_HTML extends Display {
         (document.getElementById("lbl_used") as HTMLLabelElement).textContent = lu("Used Section Title");
 
         this.tbl = document.getElementById("tbl_used") as HTMLTableElement;
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Used Effect"));
         CreateTH(row, lu("Used Description"));
         CreateTH(row, lu("Used Penalties(+) <br/> Benefits(-)"));
@@ -41,10 +41,10 @@ export class Used_HTML extends Display {
         this.leaky = document.createElement("INPUT") as HTMLInputElement;
         this.sluggish = document.createElement("INPUT") as HTMLInputElement;
 
-        var row = insertRow(fragment);
+        const row = insertRow(fragment);
         row.insertCell().textContent = lu("Used Burnt Out");
         row.insertCell().textContent = lu("Used Burnt Out Description");
-        var cell = row.insertCell();
+        const cell = row.insertCell();
         CreateInput("", this.burnt_out, cell, false);
 
         row = insertRow(fragment);

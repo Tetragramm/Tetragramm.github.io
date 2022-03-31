@@ -17,9 +17,9 @@ export class Passengers_HTML extends Display {
 
         (document.getElementById("lbl_passengers") as HTMLLabelElement).textContent = lu("Passengers Section Title");
 
-        var tbl = document.getElementById("table_passengers") as HTMLTableElement;
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const tbl = document.getElementById("table_passengers") as HTMLTableElement;
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Passengers Number of Seats"));
         CreateTH(row, lu("Passengers Number of Beds"));
         CreateTH(row, lu("Passengers Upgrade"));
@@ -44,9 +44,9 @@ export class Passengers_HTML extends Display {
         this.nbeds.min = "0";
         row.insertCell().append(this.nbeds);
 
-        var upg_cell = row.insertCell();
+        const upg_cell = row.insertCell();
         this.connect = document.createElement("INPUT") as HTMLInputElement;
-        var fs = CreateFlexSection(upg_cell);
+        const fs = CreateFlexSection(upg_cell);
         FlexCheckbox(lu("Passengers Connectivity"), this.connect, fs);
 
         this.mass = row.insertCell();
@@ -66,7 +66,7 @@ export class Passengers_HTML extends Display {
     }
 
     public UpdateDisplay() {
-        var stats = this.pass.PartStats();
+        const stats = this.pass.PartStats();
         this.nseats.valueAsNumber = this.pass.GetSeats();
         this.nbeds.valueAsNumber = this.pass.GetBeds();
         this.connect.checked = this.pass.GetConnected();

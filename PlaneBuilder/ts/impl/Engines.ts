@@ -209,7 +209,7 @@ export class Engines extends Part {
   }
 
   public GetNumberOfEngines(): number {
-    var count = 0;
+    let count = 0;
     for (const e of this.engines) {
       if (!e.GetGenerator())
         count++;

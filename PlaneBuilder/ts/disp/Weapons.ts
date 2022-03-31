@@ -1,10 +1,10 @@
-import { Weapons, ProjectileType, ActionType } from "../impl/Weapons.js";
-import { WeaponSystem } from "../impl/WeaponSystem.js";
-import { Stats } from "../impl/Stats.js";
-import { lu } from "../impl/Localization.js";
+import { WeaponSystem } from "../impl/WeaponSystem.ts";
+import { Stats } from "../impl/Stats.ts";
 import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace } from "./Tools.js";
-import { StringFmt } from "../string/index.js";
-import { Display } from "./Display.js";
+import { StringFmt } from "../string/index.ts";
+import { Display } from "./Display.ts";
+import { Weapons, ActionType, ProjectileType } from "../impl/Weapon.ts";
+import { lu } from "../impl/Localization";
 
 type WType = {
     span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement,
@@ -48,7 +48,7 @@ export class Weapons_HTML extends Display {
         this.inp_w_brace.onchange = () => { this.weap.SetBraceCount(this.inp_w_brace.valueAsNumber); };
 
         this.tbl = document.getElementById("table_weapons") as HTMLTableElement;
-        var row = this.tbl.insertRow();
+        const row = this.tbl.insertRow();
         CreateTH(row, lu("Weapons Weapon Set"));
         CreateTH(row, lu("Weapons Weapons"));
         CreateTH(row, lu("Weapons Weapon Stats"));
@@ -56,12 +56,12 @@ export class Weapons_HTML extends Display {
     }
 
     private CreateWSetRow() {
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
-        var setcell = row.insertCell();
-        var fs = CreateFlexSection(setcell);
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
+        const setcell = row.insertCell();
+        const fs = CreateFlexSection(setcell);
 
-        var type = {
+        const type = {
             type: document.createElement("SELECT") as HTMLSelectElement,
             dirs: [],
             count: document.createElement("INPUT") as HTMLInputElement,
@@ -76,32 +76,32 @@ export class Weapons_HTML extends Display {
             seat: document.createElement("SELECT") as HTMLSelectElement,
         };
 
-        var wlist = this.weap.GetWeaponList();
-        for (let w of wlist) {
-            let opt = document.createElement("OPTION") as HTMLOptionElement;
+        const wlist = this.weap.GetWeaponList();
+        for (const w of wlist) {
+            const opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = lu(w.name) + " (" + lu(w.era) + ")";
             type.type.add(opt);
         }
         type.type.required = true;
 
-        var slist = this.weap.GetSeatList();
-        for (let s of slist) {
-            let opt = document.createElement("OPTION") as HTMLOptionElement;
+        const slist = this.weap.GetSeatList();
+        for (const s of slist) {
+            const opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = s;
             type.seat.add(opt);
         }
 
-        var alist = this.weap.GetActionList();
-        for (let a of alist) {
-            let opt = document.createElement("OPTION") as HTMLOptionElement;
+        const alist = this.weap.GetActionList();
+        for (const a of alist) {
+            const opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = lu(a.name);
             type.action.add(opt);
         }
         type.action.required = true;
 
-        var plist = this.weap.GetProjectileList();
-        for (let p of plist) {
-            let opt = document.createElement("OPTION") as HTMLOptionElement;
+        const plist = this.weap.GetProjectileList();
+        for (const p of plist) {
+            const opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = lu(p.name);
             type.projectile.add(opt);
         }
@@ -110,8 +110,8 @@ export class Weapons_HTML extends Display {
         FlexSelect(lu("Weapons Type"), type.type, fs);
         FlexSelect(lu("Seat Location"), type.seat, fs);
 
-        var lfs = CreateFlexSection(fs.div1);
-        var rfs = CreateFlexSection(fs.div2);
+        const lfs = CreateFlexSection(fs.div1);
+        const rfs = CreateFlexSection(fs.div2);
         FlexInput(lu("Weapons Number of Mounts"), type.count, lfs);
         FlexInput(lu("Weapons Ammunition"), type.ammo, rfs);
         FlexSelect(lu("Weapons Action"), type.action, lfs);
@@ -121,45 +121,45 @@ export class Weapons_HTML extends Display {
         FlexCheckbox(lu("Fixed"), type.fixed, lfs);
         FlexSpace(rfs);
 
-        var dirlist = this.weap.GetDirectionList();
+        const dirlist = this.weap.GetDirectionList();
         for (let i = 0; i < dirlist.length; i += 2) {
-            var dl = lu(dirlist[i]);
-            var cbx = document.createElement("INPUT") as HTMLInputElement;
+            const dl = lu(dirlist[i]);
+            const cbx = document.createElement("INPUT") as HTMLInputElement;
             FlexCheckbox(dl, cbx, lfs);
             type.dirs.push(cbx);
-            var dr = lu(dirlist[i + 1]);
+            const dr = lu(dirlist[i + 1]);
             cbx = document.createElement("INPUT") as HTMLInputElement;
             FlexCheckbox(dr, cbx, rfs);
             type.dirs.push(cbx);
         }
 
         type.wcell = row.insertCell();
-        var statcell = row.insertCell();
+        const statcell = row.insertCell();
         statcell.classList.toggle("inner_table");
-        var stable = document.createElement("TABLE") as HTMLTableElement;
+        const stable = document.createElement("TABLE") as HTMLTableElement;
         stable.classList.toggle("inner_table");
         statcell.appendChild(stable);
-        var h1_row = stable.insertRow();
+        const h1_row = stable.insertRow();
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = stable.insertRow();
+        const c1_row = stable.insertRow();
         type.stats.mass = c1_row.insertCell();
         type.stats.drag = c1_row.insertCell();
         type.stats.cost = c1_row.insertCell();
-        var h2_row = stable.insertRow();
+        const h2_row = stable.insertRow();
         CreateTH(h2_row, lu("Stat Required Sections"));
         CreateTH(h2_row, lu("Weapons Stat Mounting"));
         CreateTH(h2_row, lu("Weapons Stat Jam"));
-        var c2_row = stable.insertRow();
+        const c2_row = stable.insertRow();
         type.stats.sect = c2_row.insertCell();
         type.stats.mounting = c2_row.insertCell();
         type.stats.jams = c2_row.insertCell();
-        var h3_row = stable.insertRow();
+        const h3_row = stable.insertRow();
         CreateTH(h3_row, lu("Weapons Stat Hits"));
         CreateTH(h3_row, lu("Weapons Stat Damage"));
         type.stats.shots_header = CreateTH(h3_row, lu("Weapons Stat Shots"));
-        var c3_row = stable.insertRow();
+        const c3_row = stable.insertRow();
         type.stats.hits = c3_row.insertCell();
         type.stats.damg = c3_row.insertCell();
         type.stats.shots = c3_row.insertCell();
@@ -169,7 +169,7 @@ export class Weapons_HTML extends Display {
     }
 
     private CreateWRow(wcell: HTMLTableCellElement) {
-        var w = {
+        const w = {
             span: document.createElement("SPAN") as HTMLSpanElement,
             wing: document.createElement("INPUT") as HTMLInputElement,
             covered: document.createElement("INPUT") as HTMLInputElement,
@@ -186,9 +186,9 @@ export class Weapons_HTML extends Display {
         CreateSelect(lu("Weapons Synchronization"), w.synch, w.span, false);
         w.span.appendChild(document.createElement("HR"));
 
-        var slist = this.weap.GetSynchronizationList();
-        for (let s of slist) {
-            var opt = document.createElement("OPTION") as HTMLOptionElement;
+        const slist = this.weap.GetSynchronizationList();
+        for (const s of slist) {
+            const opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.text = lu(s);
             w.synch.add(opt);
         }
@@ -201,13 +201,13 @@ export class Weapons_HTML extends Display {
         disp.type.selectedIndex = set.GetWeaponSelected();
         disp.type.onchange = () => { set.SetWeaponSelected(disp.type.selectedIndex); };
 
-        var slist = this.weap.GetSeatList();
+        const slist = this.weap.GetSeatList();
         if (disp.seat.options.length != slist.length) {
             while (disp.seat.options.length > 0) {
                 disp.seat.options.remove(disp.seat.options.length - 1);
             }
-            for (let s of slist) {
-                let opt = document.createElement("OPTION") as HTMLOptionElement;
+            for (const s of slist) {
+                const opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = s;
                 disp.seat.add(opt);
             }
@@ -219,14 +219,14 @@ export class Weapons_HTML extends Display {
         disp.count.onchange = () => { set.SetMountingCount(disp.count.valueAsNumber); };
 
         disp.action.selectedIndex = set.GetAction();
-        var can_act = set.GetCanAction();
+        const can_act = set.GetCanAction();
         for (let i = 0; i < can_act.length; i++) {
             disp.action.options[i].disabled = !can_act[i];
         }
         disp.action.onchange = () => { set.SetAction(disp.action.selectedIndex); };
 
         disp.projectile.selectedIndex = set.GetProjectile();
-        var can_proj = set.GetCanProjectile();
+        const can_proj = set.GetCanProjectile();
         for (let i = 0; i < can_proj.length; i++) {
             disp.projectile.options[i].disabled = !can_proj[i];
         }
@@ -239,8 +239,8 @@ export class Weapons_HTML extends Display {
         disp.fixed.checked = set.GetFixed();
         disp.fixed.onchange = () => { set.SetFixed(disp.fixed.checked); };
 
-        var dirlist = set.GetDirection();
-        var candir = set.CanDirection();
+        const dirlist = set.GetDirection();
+        const candir = set.CanDirection();
         for (let i = 0; i < dirlist.length; i++) {
             disp.dirs[i].checked = dirlist[i];
             disp.dirs[i].onchange = () => { set.SetDirection(i, disp.dirs[i].checked); };
@@ -249,12 +249,12 @@ export class Weapons_HTML extends Display {
         disp.ammo.valueAsNumber = set.GetAmmo();
         disp.ammo.onchange = () => { set.SetAmmo(disp.ammo.valueAsNumber); };
 
-        var wlist = set.GetWeapons();
+        const wlist = set.GetWeapons();
         while (disp.weaps.length < wlist.length) {
             disp.weaps.push(this.CreateWRow(disp.wcell));
         }
         while (disp.weaps.length > wlist.length) {
-            var w = disp.weaps.pop();
+            const w = disp.weaps.pop();
             disp.wcell.removeChild(w.span);
         }
 
@@ -275,20 +275,20 @@ export class Weapons_HTML extends Display {
             disp.weaps[i].synch.selectedIndex = wlist[i].GetSynchronization() + 1;
             disp.weaps[i].synch.onchange = () => { wlist[i].SetSynchronization(disp.weaps[i].synch.selectedIndex - 1); };
             disp.weaps[i].synch.disabled = !wlist[i].can_synchronize;
-            var can = wlist[i].CanSynchronization();
+            const can = wlist[i].CanSynchronization();
             for (let j = 0; j < can.length; j++) {
                 disp.weaps[i].synch.options[j].disabled = !can[j];
             }
         }
 
-        var stats = set.PartStats();
+        const stats = set.PartStats();
         BlinkIfChanged(disp.stats.mass, stats.mass.toString(), false);
         BlinkIfChanged(disp.stats.drag, stats.drag.toString(), false);
         BlinkIfChanged(disp.stats.cost, stats.cost.toString(), false);
         BlinkIfChanged(disp.stats.sect, stats.reqsections.toString(), false);
 
-        var h = set.GetHits();
-        var hits = h[0].toString() + "/"
+        const h = set.GetHits();
+        const hits = h[0].toString() + "/"
             + h[1].toString() + "/"
             + h[2].toString() + "/"
             + h[3].toString();
@@ -304,7 +304,7 @@ export class Weapons_HTML extends Display {
         BlinkIfChanged(disp.stats.hits, hits);
         BlinkIfChanged(disp.stats.damg, set.GetDamage().toString());
         if (set.GetProjectile() == ProjectileType.HEATRAY || set.IsLightningArc()) { //Heat Rays or lightning guns
-            let chgs = set.GetHRCharges();
+            const chgs = set.GetHRCharges();
             disp.stats.shots_header.textContent = lu("Weapons Stat Charges");
             BlinkIfChanged(disp.stats.shots, StringFmt.Join("/", chgs));
         } else {
@@ -314,7 +314,7 @@ export class Weapons_HTML extends Display {
     }
 
     private UpdateWSets() {
-        var wsets = this.weap.GetWeaponSets();
+        const wsets = this.weap.GetWeaponSets();
         if (wsets.length == 0)
             this.tbl.style.display = "none";
         else
@@ -351,13 +351,13 @@ export function WeaponName(w: WeaponSystem, wlist: {
     shells: boolean, can_action: boolean,
     can_projectile: boolean, deflection: number,
 }[]): string {
-    var ds = w.GetDirection();
-    var dircount = 0;
-    for (let d of ds) {
+    const ds = w.GetDirection();
+    let dircount = 0;
+    for (const d of ds) {
         if (d)
             dircount++;
     }
-    var name = "";
+    let name = "";
     if (dircount == 1 && w.GetFixed())
         name += lu("Fixed") + " ";
     else if (dircount <= 2)
@@ -386,8 +386,8 @@ export function WeaponName(w: WeaponSystem, wlist: {
 }
 
 export function WeaponTags(w: WeaponSystem) {
-    var tags = [lu("Weapon Tag Jam", w.GetJam())];
-    let fweap = w.GetFinalWeapon();
+    const tags = [lu("Weapon Tag Jam", w.GetJam())];
+    const fweap = w.GetFinalWeapon();
 
     if (w.GetReload() > 0) {
         if (w.GetReload() == 1) {
@@ -437,18 +437,18 @@ export function WeaponString(w: WeaponSystem,
     }[],
     dlist: string[]) {
 
-    var wstring = "";
-    var ds = w.GetDirection();
-    var dirs = [];
+    const wstring = "";
+    const ds = w.GetDirection();
+    const dirs = [];
     for (let i = 0; i < dlist.length; i++) {
         if (ds[i])
             dirs.push(lu(dlist[i]));
     }
-    let hits = w.GetHits();
-    let tags = WeaponTags(w);
+    const hits = w.GetHits();
+    const tags = WeaponTags(w);
 
     if (w.GetProjectile() == ProjectileType.HEATRAY) {
-        let chgs = w.GetHRCharges();
+        const chgs = w.GetHRCharges();
         wstring += lu("Weapon Description Heat Ray",
             lu("Seat #", w.GetSeat() + 1),
             w.GetWeaponCount(),

@@ -63,30 +63,30 @@ export class Engine_HTML extends Display {
     constructor(eng: Engine, r: HTMLTableRowElement) {
         super();
         this.engine = eng;
-        var row = r;
+        const row = r;
         this.InitTypeSelect(row);
 
-        var option_cell = row.insertCell();
+        const option_cell = row.insertCell();
         option_cell.className = "inner_table";
-        var opt_table = document.createElement("TABLE") as HTMLTableElement;
+        const opt_table = document.createElement("TABLE") as HTMLTableElement;
         opt_table.className = "inner_table";
         CreateTH(opt_table.insertRow(), lu("Engine Cooling"));
         this.cool_cell = opt_table.insertRow().insertCell();
         CreateTH(opt_table.insertRow(), lu("Engine Mounting"));
-        var mount_cell = opt_table.insertRow().insertCell();
+        const mount_cell = opt_table.insertRow().insertCell();
         CreateTH(opt_table.insertRow(), lu("Engine Upgrades"));
-        var upg_cell = opt_table.insertRow().insertCell();
+        const upg_cell = opt_table.insertRow().insertCell();
         option_cell.appendChild(opt_table);
 
-        var option2_cell = row.insertCell();
+        const option2_cell = row.insertCell();
         option2_cell.className = "inner_table";
-        var opt2_table = document.createElement("TABLE") as HTMLTableElement;
+        const opt2_table = document.createElement("TABLE") as HTMLTableElement;
         opt2_table.className = "inner_table";
         CreateTH(opt2_table.insertRow(), lu("Engine Cowls"));
-        var cowl_cell = opt2_table.insertRow().insertCell();
+        const cowl_cell = opt2_table.insertRow().insertCell();
         option2_cell.appendChild(opt2_table);
         CreateTH(opt2_table.insertRow(), lu("Engine Electrical"));
-        var elec_cell = opt2_table.insertRow().insertCell();
+        const elec_cell = opt2_table.insertRow().insertCell();
 
 
 
@@ -115,7 +115,7 @@ export class Engine_HTML extends Display {
         this.cool_count = document.createElement("INPUT") as HTMLInputElement;
         this.cool_count.setAttribute("type", "number");
 
-        var tcell = row.insertCell(0);
+        const tcell = row.insertCell(0);
         //Set up the engine list select box.
         this.e_list_select = document.createElement("SELECT") as HTMLSelectElement;
         this.e_list_select.required = true;
@@ -140,7 +140,7 @@ export class Engine_HTML extends Display {
             this.e_select.add(opt);
         }
 
-        var fs = CreateFlexSection(tcell);
+        const fs = CreateFlexSection(tcell);
         //Set up the individual stat input boxes
         FlexDisplay(lu("Rarity"), this.e_rarity, fs);
         FlexDisplay(lu("Stat Power"), this.e_pwr, fs);
@@ -170,7 +170,7 @@ export class Engine_HTML extends Display {
     }
 
     private InitMountSelect(mount_cell: HTMLTableCellElement) {
-        var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
+        const txtSpan = document.createElement("SPAN") as HTMLSpanElement;
         txtSpan.textContent = lu("Engine Mounting Location");
         mount_cell.appendChild(txtSpan);
         mount_cell.appendChild(document.createElement("BR"));
@@ -188,7 +188,7 @@ export class Engine_HTML extends Display {
 
         this.pushpull_input = document.createElement("INPUT") as HTMLInputElement;
         this.torque_input = document.createElement("INPUT") as HTMLInputElement;
-        var fs = CreateFlexSection(mount_cell);
+        const fs = CreateFlexSection(mount_cell);
         this.pushpull_label = FlexCheckbox(" " + lu("Engine Push Pull"), this.pushpull_input, fs);
         FlexCheckbox(" " + lu("Engine Torque To Structure"), this.torque_input, fs);
         this.pushpull_input.checked = this.engine.GetUsePushPull();
@@ -202,7 +202,7 @@ export class Engine_HTML extends Display {
         this.op_input = document.createElement("INPUT") as HTMLInputElement;
         this.gp_input = document.createElement("INPUT") as HTMLInputElement;
         this.gpr_input = document.createElement("INPUT") as HTMLInputElement;
-        var fs = CreateFlexSection(upg_cell);
+        const fs = CreateFlexSection(upg_cell);
         FlexCheckbox(lu("Engine Extended Driveshafts"), this.ds_input, fs);
         FlexCheckbox(lu("Engine Outboard Propeller"), this.op_input, fs);
         FlexInput(lu("Engine Geared Propeller"), this.gp_input, fs);
@@ -215,7 +215,7 @@ export class Engine_HTML extends Display {
     }
 
     private InitElectricSelect(cell: HTMLTableCellElement) {
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         this.alternator_input = document.createElement("INPUT") as HTMLInputElement;
         this.generator_input = document.createElement("INPUT") as HTMLInputElement;
         FlexCheckbox(lu("Engine Alternator"), this.alternator_input, fs);
@@ -225,57 +225,57 @@ export class Engine_HTML extends Display {
     }
 
     private InitStatDisplay(row: HTMLTableRowElement) {
-        var stat_cell = row.insertCell();
+        const stat_cell = row.insertCell();
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE") as HTMLTableElement;
+        const tbl_stat = document.createElement("TABLE") as HTMLTableElement;
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Power"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Drag"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_powr = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Stat Reliability"));
         CreateTH(h2_row, lu("Stat Visibility"));
         CreateTH(h2_row, lu("Stat Overspeed"));
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.d_rely = c2_row.insertCell();
         this.d_rely.className = "part_local";
         this.d_visi = c2_row.insertCell();
         this.d_over = c2_row.insertCell();
-        var h3_row = tbl_stat.insertRow();
+        const h3_row = tbl_stat.insertRow();
         CreateTH(h3_row, lu("Stat Cost"));
         CreateTH(h3_row, lu("Stat Altitude"));
         CreateTH(h3_row, lu("Stat Fuel Consumption"));
-        var c3_row = tbl_stat.insertRow();
+        const c3_row = tbl_stat.insertRow();
         this.d_cost = c3_row.insertCell();
         this.d_alti = c3_row.insertCell();
         this.d_fuel = c3_row.insertCell();
-        var h4_row = tbl_stat.insertRow();
+        const h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, lu("Stat Pitch Stability"));
         CreateTH(h4_row, lu("Stat Lateral Stability"));
         CreateTH(h4_row, lu("Stat Raw Strain"));
-        var c4_row = tbl_stat.insertRow();
+        const c4_row = tbl_stat.insertRow();
         this.d_pstb = c4_row.insertCell();
         this.d_lstb = c4_row.insertCell();
         this.d_maxs = c4_row.insertCell();
-        var h5_row = tbl_stat.insertRow();
+        const h5_row = tbl_stat.insertRow();
         CreateTH(h5_row, lu("Stat Structure"));
         CreateTH(h5_row, lu("Stat Flight Stress"));
         CreateTH(h5_row, lu("Stat Required Sections"));
-        var c5_row = tbl_stat.insertRow();
+        const c5_row = tbl_stat.insertRow();
         this.d_strc = c5_row.insertCell();
         this.d_fstr = c5_row.insertCell();
         this.d_sect = c5_row.insertCell();
-        var h6_row = tbl_stat.insertRow();
+        const h6_row = tbl_stat.insertRow();
         CreateTH(h6_row, lu("Stat Charge"));
         CreateTH(h6_row, "");
         CreateTH(h6_row, "");
-        var c6_row = tbl_stat.insertRow();
+        const c6_row = tbl_stat.insertRow();
         this.d_chrg = c6_row.insertCell();
         c6_row.insertCell();
         c6_row.insertCell();
@@ -300,15 +300,15 @@ export class Engine_HTML extends Display {
 
         if (this.engine.IsRotary()) {
             this.e_cool.textContent = "0";
-            var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
+            const txtSpan = document.createElement("SPAN") as HTMLSpanElement;
             txtSpan.innerText = lu("Engine Rotary Cooling");
             this.cool_cell.appendChild(txtSpan);
         }
         else if (this.e_cool.textContent == "0") {
-            var txtSpan = document.createElement("SPAN") as HTMLSpanElement;
+            const txtSpan = document.createElement("SPAN") as HTMLSpanElement;
             txtSpan.textContent = lu("Engine Air-Cooled Engine.");
             this.cool_cell.appendChild(txtSpan);
-            var fs = CreateFlexSection(this.cool_cell);
+            const fs = CreateFlexSection(this.cool_cell);
             FlexCheckbox(lu("Engine Air Cooling Fan"), this.intake_fan, fs);
             this.intake_fan.disabled = !this.engine.CanIntakeFan();
         }
@@ -318,11 +318,11 @@ export class Engine_HTML extends Display {
                 this.cool_select.required = true;
             }
 
-            var fs = CreateFlexSection(this.cool_cell);
+            const fs = CreateFlexSection(this.cool_cell);
             FlexSelect(lu("Engine Select Radiator"), this.cool_select, fs);
             FlexInput(lu("Engine Cooling Amount"), this.cool_count, fs);
 
-            var numrad = this.engine.GetNumRadiators();
+            const numrad = this.engine.GetNumRadiators();
             while (this.cool_select.options.length > 0) {
                 this.cool_select.options.remove(this.cool_select.options.length - 1);
             }
@@ -349,11 +349,11 @@ export class Engine_HTML extends Display {
         while (this.e_select.options.length > 0) {
             this.e_select.options.remove(this.e_select.options.length - 1);
         }
-        var list_idx = this.engine.GetSelectedList();
+        const list_idx = this.engine.GetSelectedList();
         if (list_idx != "") {
 
-            var found_list = false;
-            var sel_list = 0;
+            const found_list = false;
+            const sel_list = 0;
             var engine_list = GetEngineLists();
             for (let key of engine_list.keys()) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -368,7 +368,7 @@ export class Engine_HTML extends Display {
             }
             this.e_list_select.selectedIndex = sel_list;
 
-            var can_idx = this.engine.CanSelectIndex();
+            const can_idx = this.engine.CanSelectIndex();
             for (let i = 0; i < engine_list.get(list_idx).length; i++) {
                 let eng = engine_list.get(list_idx).get(i);
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -390,7 +390,7 @@ export class Engine_HTML extends Display {
             this.e_select.add(opt);
             this.e_select.selectedIndex = 0;
         }
-        var e_stats = this.engine.GetCurrentStats();
+        const e_stats = this.engine.GetCurrentStats();
         switch (e_stats.rarity) {
             case ENGINE_RARITY.CUSTOM:
                 this.e_rarity.textContent = lu("Rarity Custom");
@@ -410,8 +410,8 @@ export class Engine_HTML extends Display {
                 break;
         }
 
-        var b = this.engine.GetMinAltitude();
-        var t = this.engine.GetMaxAltitude();
+        const b = this.engine.GetMinAltitude();
+        const t = this.engine.GetMaxAltitude();
         this.e_pwr.textContent = e_stats.stats.power.toString();
         this.e_mass.textContent = e_stats.stats.mass.toString();
         this.e_drag.textContent = e_stats.stats.drag.toString();
@@ -460,7 +460,7 @@ export class Engine_HTML extends Display {
         }
         else {
             this.mount_select.disabled = false;
-            var can_mount = this.engine.CanMountIndex();
+            const can_mount = this.engine.CanMountIndex();
             for (let i = 0; i < this.mount_select.options.length; i++) {
                 this.mount_select.options[i].disabled = !can_mount[i];
             }
@@ -470,7 +470,7 @@ export class Engine_HTML extends Display {
         }
 
         this.cowl_select.selectedIndex = this.engine.GetCowl();
-        var cowl_enable = this.engine.GetCowlEnabled();
+        const cowl_enable = this.engine.GetCowlEnabled();
         for (let i = 0; i < cowl_enable.length; i++) {
             this.cowl_select.options[i].disabled = !cowl_enable[i];
         }
@@ -480,7 +480,7 @@ export class Engine_HTML extends Display {
         this.alternator_input.checked = this.engine.GetAlternator();
         this.alternator_input.disabled = !this.engine.GetAlternatorEnabled();
 
-        var full_stats = this.engine.PartStats();
+        const full_stats = this.engine.PartStats();
         BlinkIfChanged(this.d_powr, full_stats.power.toString(), true);
         BlinkIfChanged(this.d_mass, full_stats.mass.toString(), false);
         BlinkIfChanged(this.d_drag, full_stats.drag.toString(), false);

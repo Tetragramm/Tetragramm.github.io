@@ -30,9 +30,9 @@ export class Reinforcement_HTML extends Display {
 
         (document.getElementById("lbl_reinforcements") as HTMLLabelElement).textContent = lu("Reinforcement Section Title");
 
-        var tbl = document.getElementById("tbl_reinforcements") as HTMLTableElement;
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const tbl = document.getElementById("tbl_reinforcements") as HTMLTableElement;
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Reinforcement External Reinforcements"));
         CreateTH(row, lu("Reinforcement Internal Reinforcements"));
         CreateTH(row, lu("Reinforcement Reinforcement Stats"));
@@ -45,11 +45,11 @@ export class Reinforcement_HTML extends Display {
     }
 
     private InitExternal(cell: HTMLTableCellElement) {
-        var fs = CreateFlexSection(cell);
-        var fsr = CreateFlexSection(fs.div2);
-        var fs_wood = CreateFlexSection(fsr.div1);
-        var fs_steel = CreateFlexSection(fsr.div2);
-        var lst = this.rf.GetExternalList();
+        const fs = CreateFlexSection(cell);
+        const fsr = CreateFlexSection(fs.div2);
+        const fs_wood = CreateFlexSection(fsr.div1);
+        const fs_steel = CreateFlexSection(fsr.div2);
+        const lst = this.rf.GetExternalList();
         for (let i = 0; i < lst.length; i++) {
             let elem = lst[i];
             let w_inp = document.createElement("INPUT") as HTMLInputElement;
@@ -80,8 +80,8 @@ export class Reinforcement_HTML extends Display {
     }
 
     private InitInternal(cell: HTMLTableCellElement) {
-        var fs = CreateFlexSection(cell);
-        var lst = this.rf.GetCantileverList();
+        const fs = CreateFlexSection(cell);
+        const lst = this.rf.GetCantileverList();
         for (let i = 0; i < lst.length; i++) {
             let elem = lst[i];
             let inp = document.createElement("INPUT") as HTMLInputElement;
@@ -97,22 +97,22 @@ export class Reinforcement_HTML extends Display {
 
     private InitStatDisplay(stat_cell: HTMLTableCellElement) {
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE") as HTMLTableElement;
+        const tbl_stat = document.createElement("TABLE") as HTMLTableElement;
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Stat Structure"));
         CreateTH(h2_row, lu("Stat Raw Strain"));
         CreateTH(h2_row, lu("Reinforcement Aircraft Max Strain"));
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_maxs = c2_row.insertCell();
         this.d_amax = c2_row.insertCell();
@@ -124,21 +124,21 @@ export class Reinforcement_HTML extends Display {
         this.cabane.selectedIndex = this.rf.GetCabane();
         this.wires.checked = this.rf.GetWires();
 
-        var w_count = this.rf.GetExternalWoodCount();
-        var w_can = this.rf.CanExternalWood();
+        const w_count = this.rf.GetExternalWoodCount();
+        const w_can = this.rf.CanExternalWood();
         for (let i = 0; i < w_count.length; i++) {
             this.ext_wood_inp[i].valueAsNumber = w_count[i];
             this.ext_wood_inp[i].disabled = !w_can[i];
         }
 
-        var s_count = this.rf.GetExternalSteelCount();
-        var s_can = this.rf.CanExternalWood();
+        const s_count = this.rf.GetExternalSteelCount();
+        const s_can = this.rf.CanExternalWood();
         for (let i = 0; i < s_count.length; i++) {
             this.ext_steel_inp[i].valueAsNumber = s_count[i];
             this.ext_steel_inp[i].disabled = !s_can[i];
         }
 
-        var c_count = this.rf.GetCantileverCount();
+        const c_count = this.rf.GetCantileverCount();
         for (let i = 0; i < c_count.length; i++) {
             this.cant_inp[i].valueAsNumber = c_count[i];
         }
@@ -146,7 +146,7 @@ export class Reinforcement_HTML extends Display {
         this.wing_blades.disabled = !this.rf.CanWingBlade();
         this.wing_blades.checked = this.rf.GetWingBlade();
 
-        var stats = this.rf.PartStats();
+        const stats = this.rf.PartStats();
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);

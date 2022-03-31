@@ -20,7 +20,7 @@ export class Radiator_HTML extends Display {
         super();
         this.radiator = rad;
 
-        var type_cell = row.insertCell();
+        const type_cell = row.insertCell();
         //Radiator Type
         this.type_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let elem of this.radiator.GetTypeList()) {
@@ -31,7 +31,7 @@ export class Radiator_HTML extends Display {
         this.type_select.onchange = () => { this.radiator.SetTypeIndex(this.type_select.selectedIndex); };
         type_cell.appendChild(this.type_select);
 
-        var mount_cell = row.insertCell();
+        const mount_cell = row.insertCell();
         //Radiator Mounting
         this.mount_select = document.createElement("SELECT") as HTMLSelectElement;
         for (let elem of this.radiator.GetMountList()) {
@@ -42,7 +42,7 @@ export class Radiator_HTML extends Display {
         this.mount_select.onchange = () => { this.radiator.SetMountIndex(this.mount_select.selectedIndex); };
         mount_cell.appendChild(this.mount_select);
 
-        var cool_cell = row.insertCell();
+        const cool_cell = row.insertCell();
         //Special Coolant
 
         this.coolant_select = document.createElement("SELECT") as HTMLSelectElement;
@@ -55,22 +55,22 @@ export class Radiator_HTML extends Display {
         cool_cell.appendChild(this.coolant_select);
         cool_cell.appendChild(document.createElement("BR"));
         this.harden_input = document.createElement("INPUT") as HTMLInputElement;
-        var fs = CreateFlexSection(cool_cell);
+        const fs = CreateFlexSection(cool_cell);
         FlexCheckbox(lu("Radiators Harden Radiator"), this.harden_input, fs);
         this.harden_input.onchange = () => { this.radiator.SetHarden(this.harden_input.checked); };
 
-        var stats_cell = row.insertCell();
-        var tbl = document.createElement("TABLE") as HTMLTableElement;
+        const stats_cell = row.insertCell();
+        const tbl = document.createElement("TABLE") as HTMLTableElement;
         stats_cell.className = "inner_table";
         tbl.className = "inner_table";
-        var h1_row = tbl.insertRow();
+        const h1_row = tbl.insertRow();
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Cost"));
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Reliability"));
         CreateTH(h1_row, lu("Stat Lateral Stability"));
         CreateTH(h1_row, lu("Derived Is Flammable Question"));
-        var c1_row = tbl.insertRow();
+        const c1_row = tbl.insertRow();
         this.c_mass = c1_row.insertCell();
         this.c_cost = c1_row.insertCell();
         this.c_drag = c1_row.insertCell();
@@ -85,19 +85,19 @@ export class Radiator_HTML extends Display {
     }
 
     public UpdateDisplay() {
-        var tcan = this.radiator.CanType();
+        const tcan = this.radiator.CanType();
         for (let i = 0; i < tcan.length; i++) {
             this.type_select.options[i].disabled = !tcan[i];
         }
         this.type_select.selectedIndex = this.radiator.GetTypeIndex();
         this.mount_select.selectedIndex = this.radiator.GetMountIndex();
-        var mcan = this.radiator.CanMount();
+        const mcan = this.radiator.CanMount();
         for (let i = 0; i < mcan.length; i++) {
             this.mount_select.options[i].disabled = !mcan[i];
         }
         this.coolant_select.selectedIndex = this.radiator.GetCoolantIndex();
         this.harden_input.checked = this.radiator.GetHarden();
-        var stats = this.radiator.PartStats();
+        const stats = this.radiator.PartStats();
         BlinkIfChanged(this.c_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.c_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.c_drag, stats.drag.toString(), false);

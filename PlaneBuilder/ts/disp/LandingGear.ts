@@ -21,9 +21,9 @@ export class LandingGear_HTML extends Display {
         this.gear = gear;
 
         (document.getElementById("lbl_landing_gear") as HTMLLabelElement).textContent = lu("Landing Gear Section Title");
-        var tbl = document.getElementById("tbl_gear") as HTMLTableElement;
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const tbl = document.getElementById("tbl_gear") as HTMLTableElement;
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Landing Gear Landing Gear"));
         CreateTH(row, lu("Landing Gear Extras"));
         CreateTH(row, lu("Landing Gear Gear Stats"));
@@ -36,8 +36,8 @@ export class LandingGear_HTML extends Display {
     }
 
     private InitGear(cell: HTMLTableCellElement) {
-        var lst = this.gear.GetGearList();
-        var fs = CreateFlexSection(cell);
+        const lst = this.gear.GetGearList();
+        const fs = CreateFlexSection(cell);
         this.sel = document.createElement("SELECT") as HTMLSelectElement;
         FlexSelect("Type", this.sel, fs);
         for (let i = 0; i < lst.length; i++) {
@@ -54,8 +54,8 @@ export class LandingGear_HTML extends Display {
 
     private InitExtras(cell: HTMLTableCellElement) {
         this.extras = [];
-        var lst = this.gear.GetExtraList();
-        var fs = CreateFlexSection(cell);
+        const lst = this.gear.GetExtraList();
+        const fs = CreateFlexSection(cell);
         for (let i = 0; i < lst.length; i++) {
             let cbx = document.createElement("INPUT") as HTMLInputElement;
             FlexCheckbox(lu(lst[i].name), cbx, fs);
@@ -66,22 +66,22 @@ export class LandingGear_HTML extends Display {
 
     private InitStats(stat_cell: HTMLTableCellElement) {
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE") as HTMLTableElement;
+        const tbl_stat = document.createElement("TABLE") as HTMLTableElement;
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Stat Structure"));
         CreateTH(h2_row, lu("Stat Crash Safety"));
         CreateTH(h2_row, "");
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_crsh = c2_row.insertCell();
         c2_row.insertCell();
@@ -89,19 +89,19 @@ export class LandingGear_HTML extends Display {
 
     public UpdateDisplay() {
         this.sel.selectedIndex = this.gear.GetGear();
-        var gcan = this.gear.CanGear();
+        const gcan = this.gear.CanGear();
         for (let i = 0; i < gcan.length; i++)
             this.sel.options[i].disabled = !gcan[i];
 
         this.retract.checked = this.gear.GetRetract();
         this.retract.disabled = !this.gear.CanRetract();
 
-        var lst = this.gear.GetExtraSelected();
+        const lst = this.gear.GetExtraSelected();
         for (let i = 0; i < lst.length; i++) {
             this.extras[i].checked = lst[i];
         }
 
-        var stats = this.gear.PartStats();
+        const stats = this.gear.PartStats();
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);

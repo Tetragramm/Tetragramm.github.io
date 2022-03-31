@@ -24,8 +24,8 @@ export class Engines_HTML extends Display {
         (document.getElementById("lbl_engines") as HTMLLabelElement).textContent = lu("Engines Section Title");
 
         this.tbl = document.getElementById("table_engine") as HTMLTableElement;
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Engines Engine Type"));
         CreateTH(row, lu("Engines Options"));
         CreateTH(row, lu("Engines Options 2"));
@@ -58,7 +58,7 @@ export class Engines_HTML extends Display {
     }
 
     public UpdateDisplay() {
-        var num = this.eng.GetNumberOfItems();
+        const num = this.eng.GetNumberOfItems();
         if (num == 0)
             this.tbl.style.display = "none";
         else
@@ -68,7 +68,7 @@ export class Engines_HTML extends Display {
             this.engines.pop();
             this.tbl.deleteRow(this.engines.length + 1);
         }
-        var fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
         while (this.engines.length < num) {
             let tst = this.eng.GetEngine(this.engines.length);
             let en = new Engine_HTML(tst, insertRow(fragment));
@@ -80,7 +80,7 @@ export class Engines_HTML extends Display {
             this.engines[i].UpdateEngine(this.eng.GetEngine(i));
         }
 
-        var rad = this.eng.GetNumberOfRadiators();
+        const rad = this.eng.GetNumberOfRadiators();
         this.num_radiators.valueAsNumber = rad;
         if (rad == 0) {
             this.tblR.style.display = "none";
