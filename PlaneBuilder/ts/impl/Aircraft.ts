@@ -1,6 +1,6 @@
 import { AlterStats } from "./AlterStats";
 import { Stats, WARNING_COLOR } from "./Stats";
-import { EngineList } from "./EngineList";
+import { EngineList, GetEngineLists } from "./EngineList";
 import { Era } from "./Era";
 import { Cockpits } from "./Cockpits";
 import { Passengers } from "./Passengers";
@@ -329,7 +329,7 @@ export class Aircraft {
                   notes.push(lu("Turns Left"));
               }
 
-              const engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
+              const engine_list = GetEngineLists();
               for (const el of engine_JSON["lists"]) {
                 if (!engine_list.has(el["name"]))
                 engine_list.set(el["name"], new EngineList(el["name"]));
@@ -585,7 +585,7 @@ export class Aircraft {
       return;
     }
     this.updated_stats = false;
-    var stats = new Stats();
+    let stats = new Stats();
     stats = stats.Add(this.era.PartStats());
     stats = stats.Add(this.cockpits.PartStats());
     stats = stats.Add(this.passengers.PartStats());
@@ -796,7 +796,7 @@ export class Aircraft {
     let StallSpeedFull = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea)));
     let StallSpeedFullwBombs = Math.max(Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea)));
 
-    var Overspeed = this.engines.GetOverspeed();
+    const Overspeed = this.engines.GetOverspeed();
     const BoostEmpty = Math.floor(1.0e-6 + this.stats.power / DryMP);
     const BoostFull = Math.floor(1.0e-6 + this.stats.power / WetMP);
     const BoostFullwBombs = Math.floor(1.0e-6 + this.stats.power / WetMPwBombs);
@@ -818,7 +818,7 @@ export class Aircraft {
     MaxSpeedFull = Math.floor(1.0e-6 + MaxSpeedFull * (1 - 0.1 * this.used.ragged));
     MaxSpeedwBombs = Math.floor(1.0e-6 + MaxSpeedwBombs * (1 - 0.1 * this.used.ragged));
 
-    var Stability = this.stats.pitchstab + this.stats.latstab;
+    let Stability = this.stats.pitchstab + this.stats.latstab;
     if (this.stats.pitchstab > 0 && this.stats.latstab > 0)
       Stability += 2;
     else if (this.stats.pitchstab < 0 && this.stats.latstab < 0)
@@ -931,7 +931,7 @@ export class Aircraft {
     if (Stability > 3 || Stability < -3)
       ControlStress++;
     //Flight Stress from Rumble.
-    var RumbleStress = 0;
+    let RumbleStress = 0;
     ControlStress += Math.min(this.accessories.GetMaxMassStress(), Math.floor(1.0e-6 + DryMP / 10));
     const MaxStress = this.accessories.GetMaxTotalStress();
     ControlStress = Math.min(MaxStress, ControlStress);
@@ -1254,10 +1254,10 @@ export class Aircraft {
     value = MergeElectrics(value, this.used.GetElectrics());
 
     value.equipment = value.equipment.sort((a, b) => {
-      var ac = parseInt(a.charge);
+      let ac = parseInt(a.charge);
       if (a.charge == "-")
         ac = 0;
-      var bc = parseInt(b.charge);
+      let bc = parseInt(b.charge);
       if (b.charge == "-")
         bc = 0;
       if (isNaN(ac) && isNaN(bc))
@@ -1272,7 +1272,7 @@ export class Aircraft {
     value = MergeElectrics(this.engines.GetElectrics(), value);
     value = MergeElectrics(value, this.weapons.GetElectrics());
 
-    var have_generation = false;
+    let have_generation = false;
     //Add + symbols
     for (const eq of value.equipment) {
       const chg = parseInt(eq.charge);

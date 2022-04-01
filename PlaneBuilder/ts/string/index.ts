@@ -195,7 +195,7 @@ export class StringFmt {
             return input;
         }
 
-        var day = splitted[splitted.length - 1];
+        let day = splitted[splitted.length - 1];
         const month = splitted[splitted.length - 2];
         const year = splitted[splitted.length - 3];
         day = day.split('T')[0];

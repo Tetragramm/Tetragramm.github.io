@@ -1,10 +1,9 @@
 import { StringFmt } from "../string/index";
+import string_JSON from "../../strings.json";
 
 class Localization {
   private languages: JSON;
   private lang = "en";
-  constructor() {
-  }
 
   public LoadLanguages(lang: JSON) {
     this.languages = lang;
@@ -36,8 +35,8 @@ class Localization {
   }
 }
 
-
-export var localization = new Localization();
+export const localization = new Localization();
+localization.LoadLanguages(string_JSON);
 
 export function lu(s: string, ...args: any[]): string {
   return StringFmt.Format(localization.e(s), ...args);
