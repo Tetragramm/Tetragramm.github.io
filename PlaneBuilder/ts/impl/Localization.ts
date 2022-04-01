@@ -1,4 +1,4 @@
-import { StringFmt } from "../string/index.js";
+import { StringFmt } from "../string/index";
 
 class Localization {
   private languages: JSON;

@@ -1,7 +1,7 @@
-import { ControlSurfaces } from "../impl/ControlSurfaces.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect } from "./Tools.js";
-import { Display } from "./Display.js";
+import { ControlSurfaces } from "../impl/ControlSurfaces";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect } from "./Tools";
+import { Display } from "./Display";
 
 export class ControlSurfaces_HTML extends Display {
     private cs: ControlSurfaces;

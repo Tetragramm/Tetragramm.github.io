@@ -1,6 +1,6 @@
-import { Deserialize } from "./Serialize.js";
-import { EngineStats } from "./EngineStats.js";
-import { EngineInputs } from "./EngineInputs.js";
+import { Deserialize } from "./Serialize";
+import { EngineStats } from "./EngineStats";
+import { EngineInputs } from "./EngineInputs";
 
 export class EngineList {
   private list: EngineInputs[];

@@ -1,9 +1,9 @@
-import { Fuel } from "../impl/Fuel.js";
-import { Munitions } from "../impl/Munitions.js";
-import { CargoAndPassengers } from "../impl/CargoAndPassengers.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Fuel } from "../impl/Fuel";
+import { Munitions } from "../impl/Munitions";
+import { CargoAndPassengers } from "../impl/CargoAndPassengers";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput } from "./Tools";
+import { Display } from "./Display";
 
 export class Load_HTML extends Display {
     private fuel: Fuel;

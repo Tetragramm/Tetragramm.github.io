@@ -1,5 +1,5 @@
-import { lu } from "./Localization.js";
-import { Serialize, Deserialize } from "./Serialize.js";
+import { lu } from "./Localization";
+import { Serialize, Deserialize } from "./Serialize";
 
 export enum WARNING_COLOR {
   WHITE,

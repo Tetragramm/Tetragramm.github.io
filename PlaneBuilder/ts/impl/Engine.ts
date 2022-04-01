@@ -1,9 +1,9 @@
-import { Part } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { EngineStats } from "./EngineStats.js";
-import { EngineList, SearchAllEngineLists, GetEngineLists } from "./EngineList.js";
-import { EngineInputs, ENGINE_TYPE } from "./EngineInputs.js";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { EngineStats } from "./EngineStats";
+import { EngineList, SearchAllEngineLists, GetEngineLists } from "./EngineList";
+import { EngineInputs, ENGINE_TYPE } from "./EngineInputs";
 
 
 export class Engine extends Part {

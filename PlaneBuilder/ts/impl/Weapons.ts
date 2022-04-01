@@ -1,12 +1,12 @@
-import { Part } from "./Part.js";
-import { Stats, era2numHh, WARNING_COLOR } from "./Stats.js";
-import { lu } from "./Localization.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { WeaponSystem } from "./WeaponSystem.js";
-import { SynchronizationType, ProjectileType } from "./Weapon.js";
-import { StringFmt } from "../string/index.js";
+import { Part } from "./Part";
+import { Stats, era2numHh, WARNING_COLOR } from "./Stats";
+import { lu } from "./Localization";
+import { Serialize, Deserialize } from "./Serialize";
+import { WeaponSystem } from "./WeaponSystem";
+import { SynchronizationType, ProjectileType } from "./Weapon";
+import { StringFmt } from "../string/index";
 
-export { ProjectileType, SynchronizationType, ActionType } from "./Weapon.js";
+export { ProjectileType, SynchronizationType, ActionType } from "./Weapon";
 
 export class Weapons extends Part {
     private weapon_sets: WeaponSystem[];

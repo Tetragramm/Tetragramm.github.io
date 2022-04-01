@@ -1,9 +1,9 @@
-import { Part, MergeElectrics } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { lu } from "./Localization.js";
-import { Cockpit } from "./Cockpit.js";
-import { StringFmt } from "../string/index.js";
+import { Part, MergeElectrics } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
+import { Cockpit } from "./Cockpit";
+import { StringFmt } from "../string/index";
 
 export class Cockpits extends Part {
     private positions: Cockpit[];

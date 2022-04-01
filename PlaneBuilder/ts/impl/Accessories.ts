@@ -1,9 +1,9 @@
-import { Part } from "./Part.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { lu } from "./Localization.js";
-import { NumArr, BoolArr } from "./Serialize.js";
-import { StringFmt } from "../string/index.js";
+import { Part } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
+import { NumArr, BoolArr } from "./Serialize";
+import { StringFmt } from "../string/index";
 
 export class Accessories extends Part {
     private armour_coverage: number[];

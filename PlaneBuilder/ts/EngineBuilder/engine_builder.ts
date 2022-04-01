@@ -1,18 +1,18 @@
-import { GetEngineLists, SetEngineLists } from "../impl/EngineList.js";
-import { localization } from "../impl/Localization.js";
-import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled, CreateFlexSection, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect, FlexText, BlinkGood, BlinkBad, BlinkIfChanged, download, CreateButton, CreateSelect, GenerateID } from "../disp/Tools.js";
-import { Deserialize } from "../impl/Serialize.js";
-import { EngineList } from "../impl/EngineList.js";
-import { EngineStats } from "../impl/EngineStats.js";
-import { EngineInputs, ENGINE_TYPE } from "../impl/EngineInputs.js";
-import { LZString } from "../lz/lz-string.js";
-import { StringFmt } from "../string/index.js";
-import { JSON2CSV } from "../JSON2CSV/json2csv.js";
+import { GetEngineLists, SetEngineLists } from "../impl/EngineList";
+import { localization } from "../impl/Localization";
+import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled, CreateFlexSection, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect, FlexText, BlinkGood, BlinkBad, BlinkIfChanged, download, CreateButton, CreateSelect, GenerateID } from "../disp/Tools";
+import { Deserialize } from "../impl/Serialize";
+import { EngineList } from "../impl/EngineList";
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE } from "../impl/EngineInputs";
+import { LZString } from "../lz/lz-string";
+import { StringFmt } from "../string/index";
+import { JSON2CSV } from "../JSON2CSV/json2csv";
 
-import { PulsejetBuilder } from "./PulsejetBuilder.js";
-import { EngineBuilder } from "./EngineBuilder.js";
-import { TurboBuilder } from "./TurboBuilder.js";
-import { ElectricBuilder } from "./ElectricBuilder.js";
+import { PulsejetBuilder } from "./PulsejetBuilder";
+import { EngineBuilder } from "./EngineBuilder";
+import { TurboBuilder } from "./TurboBuilder";
+import { ElectricBuilder } from "./ElectricBuilder";
 
 const init = () => {
     const sp = new URLSearchParams(location.search);

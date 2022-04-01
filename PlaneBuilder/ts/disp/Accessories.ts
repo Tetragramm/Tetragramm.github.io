@@ -1,7 +1,7 @@
-import { Accessories } from "../impl/Accessories.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Accessories } from "../impl/Accessories";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect } from "./Tools";
+import { Display } from "./Display";
 
 export class Accessories_HTML extends Display {
     private acc: Accessories;

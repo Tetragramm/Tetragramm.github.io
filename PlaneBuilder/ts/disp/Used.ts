@@ -1,7 +1,7 @@
-import { Used } from "../impl/Used.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateInput, CreateTH } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Used } from "../impl/Used";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateInput, CreateTH } from "./Tools";
+import { Display } from "./Display";
 
 export class Used_HTML extends Display {
     private used: Used;

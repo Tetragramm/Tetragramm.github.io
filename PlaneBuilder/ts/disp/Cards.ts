@@ -1,5 +1,5 @@
-import { StringFmt } from "../string/index.ts";
-import { lu } from "../impl/Localization.ts";
+import { StringFmt } from "../string/index";
+import { lu } from "../impl/Localization";
 
 export enum ENGINE_TEXT {
     SINGLE,

@@ -1,7 +1,7 @@
-import { Part, AIRCRAFT_TYPE, IsAnyOrnithopter } from "./Part.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
-import { Serialize, Deserialize, BoolArr } from "./Serialize.js";
-import { lu } from "./Localization.js";
+import { Part, AIRCRAFT_TYPE, IsAnyOrnithopter } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize, BoolArr } from "./Serialize";
+import { lu } from "./Localization";
 
 export class ControlSurfaces extends Part {
     private aileron_list: { name: string, warping: boolean, stats: Stats }[];

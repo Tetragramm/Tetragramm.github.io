@@ -1,9 +1,9 @@
-import { WeaponSystem } from "../impl/WeaponSystem.ts";
-import { Stats } from "../impl/Stats.ts";
-import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace } from "./Tools.js";
-import { StringFmt } from "../string/index.ts";
-import { Display } from "./Display.ts";
-import { Weapons, ActionType, ProjectileType } from "../impl/Weapon.ts";
+import { WeaponSystem } from "../impl/WeaponSystem";
+import { Stats } from "../impl/Stats";
+import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace } from "./Tools";
+import { StringFmt } from "../string/index";
+import { Display } from "./Display";
+import { Weapons, ActionType, ProjectileType } from "../impl/Weapon";
 import { lu } from "../impl/Localization";
 
 type WType = {

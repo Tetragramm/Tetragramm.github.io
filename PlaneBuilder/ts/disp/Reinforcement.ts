@@ -1,7 +1,7 @@
-import { Reinforcement } from "../impl/Reinforcement.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexLabel, FlexSelect } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Reinforcement } from "../impl/Reinforcement";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexLabel, FlexSelect } from "./Tools";
+import { Display } from "./Display";
 
 export class Reinforcement_HTML extends Display {
     private rf: Reinforcement;

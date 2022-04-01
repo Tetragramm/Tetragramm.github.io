@@ -1,9 +1,9 @@
-import { AlterStats } from "../impl/AlterStats.js";
-import { Stats, WARNING_COLOR } from "../impl/Stats.js";
-import { lu } from "../impl/Localization.js";
-import { CreateButton, CreateText, FlexSection, CreateFlexSection, FlexInput, FlexText } from "./Tools.js";
-import { StringFmt } from "../string/index.js";
-import { Display } from "./Display.js";
+import { AlterStats } from "../impl/AlterStats";
+import { Stats, WARNING_COLOR } from "../impl/Stats";
+import { lu } from "../impl/Localization";
+import { CreateButton, CreateText, FlexSection, CreateFlexSection, FlexInput, FlexText } from "./Tools";
+import { StringFmt } from "../string/index";
+import { Display } from "./Display";
 
 export class AlterStats_HTML extends Display {
     private alter: AlterStats;

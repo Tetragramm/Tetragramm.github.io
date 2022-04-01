@@ -1,7 +1,7 @@
-import { Frames } from "../impl/Frames.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateCheckbox, CreateTH, BlinkIfChanged } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Frames } from "../impl/Frames";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateCheckbox, CreateTH, BlinkIfChanged } from "./Tools";
+import { Display } from "./Display";
 
 export class Frames_HTML extends Display {
     private frames: Frames;

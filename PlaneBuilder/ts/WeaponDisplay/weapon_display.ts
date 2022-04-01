@@ -1,5 +1,5 @@
-import { lu, localization } from "../impl/Localization.js";
-import { CreateTD, CreateTH } from "../disp/Tools.js";
+import { lu, localization } from "../impl/Localization";
+import { CreateTD, CreateTH } from "../disp/Tools";
 
 const init = () => {
     const sp = new URLSearchParams(location.search);

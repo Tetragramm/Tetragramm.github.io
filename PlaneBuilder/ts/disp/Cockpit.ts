@@ -1,8 +1,8 @@
-import { Cockpit } from "../impl/Cockpit.js";
-import { lu } from "../impl/Localization.js";
-import { insertCell, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput } from "./Tools.js";
-import { StringFmt } from "../string/index.js";
-import { Display } from "./Display.js";
+import { Cockpit } from "../impl/Cockpit";
+import { lu } from "../impl/Localization";
+import { insertCell, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput } from "./Tools";
+import { StringFmt } from "../string/index";
+import { Display } from "./Display";
 
 export class Cockpit_HTML extends Display {
     private row: HTMLTableRowElement;

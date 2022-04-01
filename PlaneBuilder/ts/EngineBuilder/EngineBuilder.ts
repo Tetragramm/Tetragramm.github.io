@@ -1,8 +1,8 @@
-import { EngineStats } from "../impl/EngineStats.js";
-import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs.js";
-import { lu } from "../impl/Localization.js";
-import { WARNING_COLOR, num2era } from "../impl/Stats.js";
-import { BoolArr } from "../impl/Serialize.js";
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs";
+import { lu } from "../impl/Localization";
+import { WARNING_COLOR, num2era } from "../impl/Stats";
+import { BoolArr } from "../impl/Serialize";
 
 enum CompressorEnum {
     NONE,

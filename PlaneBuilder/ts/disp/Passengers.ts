@@ -1,7 +1,7 @@
-import { Passengers } from "../impl/Passengers.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Passengers } from "../impl/Passengers";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox } from "./Tools";
+import { Display } from "./Display";
 
 export class Passengers_HTML extends Display {
     private pass: Passengers;

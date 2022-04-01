@@ -1,7 +1,7 @@
-import { Stabilizers } from "../impl/Stabilizers.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateInput, CreateTH, BlinkIfChanged } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Stabilizers } from "../impl/Stabilizers";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateInput, CreateTH, BlinkIfChanged } from "./Tools";
+import { Display } from "./Display";
 
 export class Stabilizers_HTML extends Display {
     private stab: Stabilizers;

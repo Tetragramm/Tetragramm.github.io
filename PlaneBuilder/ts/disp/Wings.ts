@@ -1,7 +1,7 @@
 import { Wings, WingType } from "../impl/Wings"
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateCheckbox, CreateInput, CreateTH, BlinkIfChanged } from "./Tools.js";
-import { Display } from "./Display.js";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateCheckbox, CreateInput, CreateTH, BlinkIfChanged } from "./Tools";
+import { Display } from "./Display";
 
 type WingHTMLType = {
     span: HTMLSpanElement,

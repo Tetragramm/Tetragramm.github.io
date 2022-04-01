@@ -1,6 +1,6 @@
-import { Era } from "../impl/Era.ts";
-import { insertRow, CreateTH, BlinkIfChanged } from "./Tools.ts";
-import { Display } from "./Display.ts";
+import { Era } from "../impl/Era";
+import { insertRow, CreateTH, BlinkIfChanged } from "./Tools";
+import { Display } from "./Display";
 import { lu } from "../impl/Localization";
 
 export class Era_HTML extends Display {

@@ -1,5 +1,5 @@
-import { Stats } from "./Stats.js";
-import { lu } from "./Localization.js";
+import { Stats } from "./Stats";
+import { lu } from "./Localization";
 
 
 export enum AIRCRAFT_TYPE {

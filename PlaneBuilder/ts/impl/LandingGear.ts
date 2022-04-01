@@ -1,7 +1,7 @@
-import { Part } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize, BoolArr } from "./Serialize.js";
-import { lu } from "./Localization.js";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize, BoolArr } from "./Serialize";
+import { lu } from "./Localization";
 
 export class LandingGear extends Part {
     private gear_list: { name: string, stats: Stats, DpLMP: number, SpLMP: number, can_retract: boolean }[];

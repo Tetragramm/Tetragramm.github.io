@@ -1,7 +1,7 @@
-import { Aircraft, DerivedStats } from "../impl/Aircraft.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateTH } from "./Tools.js";
-import { StringFmt } from "../string/index.js";
+import { Aircraft, DerivedStats } from "../impl/Aircraft";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH } from "./Tools";
+import { StringFmt } from "../string/index";
 
 enum FUEL_STATE {
     FULLWBOMBS = 0,

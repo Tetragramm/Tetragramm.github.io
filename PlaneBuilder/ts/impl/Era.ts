@@ -1,6 +1,6 @@
-import { Part } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Era extends Part {
     private vals: { name: string, maxbomb: number, cant_lift: number, stats: Stats }[];
