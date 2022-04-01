@@ -9,9 +9,9 @@ export class Optimization_HTML extends Display {
         document.getElementById("lbl_num_opt").textContent = lu("Optimization Num Free Optimizations");
         this.free_inp = document.getElementById("num_opt");
         this.free_inp.onchange = () => { this.opt.SetFreeDots(this.free_inp.valueAsNumber); };
-        var tbl = document.getElementById("tbl_optimization");
-        var fragment = document.createDocumentFragment();
-        var row0 = insertRow(fragment);
+        const tbl = document.getElementById("tbl_optimization");
+        const fragment = document.createDocumentFragment();
+        const row0 = insertRow(fragment);
         CreateTH(row0, lu("Optimization Negative"));
         CreateTH(row0, lu("Optimization Effect"));
         CreateTH(row0, lu("Optimization Positive"));
@@ -20,7 +20,7 @@ export class Optimization_HTML extends Display {
         // < th > Effect < /th>
         // < th > Positive < /th>
         // < th > Optimization Stats < /th>
-        var row1 = insertRow(fragment);
+        const row1 = insertRow(fragment);
         this.cost_cbx = this.InitRow(row1, lu("Optimization Cost"), (num) => this.opt.SetCost(num));
         this.bleed_cbx = this.InitRow(insertRow(fragment), lu("Optimization Lift Bleed"), (num) => this.opt.SetBleed(num));
         this.escape_cbx = this.InitRow(insertRow(fragment), lu("Optimization Leg Room"), (num) => this.opt.SetEscape(num));
@@ -33,7 +33,7 @@ export class Optimization_HTML extends Display {
         tbl.appendChild(fragment);
     }
     InitRow(row, txt, call) {
-        var cbxs = [];
+        const cbxs = [];
         for (let i = 0; i < 6; i++) {
             cbxs.push(document.createElement("INPUT"));
             cbxs[i].setAttribute("type", "checkbox");
@@ -52,9 +52,9 @@ export class Optimization_HTML extends Display {
                         call(i - 3);
                 };
         }
-        var ncell = row.insertCell();
-        var ecell = row.insertCell();
-        var pcell = row.insertCell();
+        const ncell = row.insertCell();
+        const ecell = row.insertCell();
+        const pcell = row.insertCell();
         ncell.appendChild(cbxs[0]);
         ncell.appendChild(cbxs[1]);
         ncell.appendChild(cbxs[2]);
@@ -67,30 +67,30 @@ export class Optimization_HTML extends Display {
     InitStatDisplay(stat_cell) {
         stat_cell.rowSpan = 0;
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE");
+        const tbl_stat = document.createElement("TABLE");
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Cost"));
         CreateTH(h1_row, lu("Stat Lift Bleed"));
         CreateTH(h1_row, lu("Stat Escape"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_cost = c1_row.insertCell();
         this.d_lift = c1_row.insertCell();
         this.d_escp = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Stat Visibility"));
         CreateTH(h2_row, lu("Stat Mass"));
         CreateTH(h2_row, lu("Stat Toughness"));
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.d_visi = c2_row.insertCell();
         this.d_mass = c2_row.insertCell();
         this.d_tugh = c2_row.insertCell();
-        var h3_row = tbl_stat.insertRow();
+        const h3_row = tbl_stat.insertRow();
         CreateTH(h3_row, lu("Stat Max Strain"));
         CreateTH(h3_row, lu("Stat Reliability"));
         CreateTH(h3_row, lu("Stat Drag"));
-        var c3_row = tbl_stat.insertRow();
+        const c3_row = tbl_stat.insertRow();
         this.d_mstr = c3_row.insertCell();
         this.d_reli = c3_row.insertCell();
         this.d_drag = c3_row.insertCell();
@@ -135,7 +135,7 @@ export class Optimization_HTML extends Display {
         this.UpdateChecked(this.opt.GetReliabiilty(), this.reliability_cbx);
         this.UpdateChecked(this.opt.GetDrag(), this.drag_cbx);
         //Update Enabled
-        var can_dot = this.opt.GetUnassignedCount();
+        const can_dot = this.opt.GetUnassignedCount();
         this.UpdateEnabled(can_dot, this.cost_cbx);
         this.UpdateEnabled(can_dot, this.bleed_cbx);
         this.UpdateEnabled(can_dot, this.escape_cbx);
@@ -145,7 +145,7 @@ export class Optimization_HTML extends Display {
         this.UpdateEnabled(can_dot, this.reliability_cbx);
         this.UpdateEnabled(can_dot, this.drag_cbx);
         //Update Stats
-        var stats = this.opt.PartStats();
+        const stats = this.opt.PartStats();
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.d_lift, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.d_escp, stats.escape.toString(), true);

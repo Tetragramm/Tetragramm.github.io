@@ -382,7 +382,7 @@ export class WeaponSystem extends Part {
                 w.SetFixed(this.fixed);
             }
             if (use) {
-                var good = false;
+                let good = false;
                 for (let i = 0; i < this.directions.length; i++) {
                     if (this.directions[i] && good)
                         this.directions[i] = false;
@@ -433,7 +433,7 @@ export class WeaponSystem extends Part {
         return this.weapons.length;
     }
     GetWeaponCount() {
-        var count = 0;
+        let count = 0;
         for (const w of this.weapons) {
             count += w.GetCount();
         }
@@ -531,8 +531,8 @@ export class WeaponSystem extends Part {
     GetHits() {
         const hits = this.final_weapon.hits;
         if (hits != 0) {
-            var centerline = 0;
-            var wings = 0;
+            let centerline = 0;
+            let wings = 0;
             for (const w of this.weapons) {
                 if (w.GetWing() && (w.GetFixed() || this.GetDirectionCount() <= 2)) {
                     wings += w.GetCount() * hits;
@@ -553,14 +553,14 @@ export class WeaponSystem extends Part {
                 return [0, 0, 0, 0];
             }
             else if (this.final_weapon.ammo == 0) { //Fliergerflammenwerfer
-                var count = 0;
+                let count = 0;
                 for (const w of this.weapons) {
                     count += w.GetCount();
                 }
                 return [3 * count, 0, 0, 0];
             }
             else { //Scatterguns
-                var count = 0;
+                let count = 0;
                 for (const w of this.weapons) {
                     count += w.GetCount();
                 }
@@ -579,7 +579,7 @@ export class WeaponSystem extends Part {
     }
     GetJam() {
         if (this.final_weapon.rapid) {
-            var jams = [0, 0];
+            let jams = [0, 0];
             for (const w of this.weapons) {
                 const t = w.GetJam();
                 jams[0] = Math.max(jams[0], t[0] + this.sticky_guns);
@@ -588,7 +588,7 @@ export class WeaponSystem extends Part {
             return jams[0].toString() + "/" + jams[1].toString();
         }
         else {
-            var jam = 0;
+            let jam = 0;
             for (const w of this.weapons) {
                 jam = Math.max(jam, w.GetJam() + this.sticky_guns);
             }
@@ -672,13 +672,13 @@ export class WeaponSystem extends Part {
         if (this.IsLightningArc()) { //Special Case for Lightning Gun
             return [3];
         }
-        var count = 0;
+        let count = 0;
         for (const w of this.weapons) {
             count += w.GetCount();
         }
         if (this.final_weapon.hits > 0) {
             //Calc charges / shot.
-            var ammo = this.weapon_list[this.weapon_type].stats.cost;
+            let ammo = this.weapon_list[this.weapon_type].stats.cost;
             if (this.action_sel == ActionType.ROTARY)
                 ammo *= 2;
             if (this.final_weapon.rapid)
@@ -713,7 +713,7 @@ export class WeaponSystem extends Part {
         return this.final_weapon.reload;
     }
     GetWingWeight() {
-        var sum = 0;
+        let sum = 0;
         for (const w of this.weapons) {
             if (w.GetWing()) {
                 sum += w.PartStats().mass;
@@ -722,7 +722,7 @@ export class WeaponSystem extends Part {
         return sum;
     }
     GetDirectionCount() {
-        var count = 0;
+        let count = 0;
         for (const d of this.directions) {
             if (d)
                 count++;
@@ -758,11 +758,11 @@ export class WeaponSystem extends Part {
     }
     PartStats() {
         var stats = new Stats();
-        var dircount = 0;
+        let dircount = 0;
         for (const d of this.directions)
             if (d)
                 dircount++;
-        var count = 0;
+        let count = 0;
         for (const w of this.weapons) {
             w.has_cantilever = this.has_cantilever;
             w.SetTurret(this.GetDirectionCount() > 2);

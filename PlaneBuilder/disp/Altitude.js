@@ -40,7 +40,7 @@ export class Altitude_HTML {
         this.rows = [];
     }
     AddRow(af) {
-        var row = document.createElement("TR");
+        const row = document.createElement("TR");
         let af_cell = row.insertCell();
         af_cell.textContent = StringFmt.Format("{0}-{1}", af * 10, af * 10 + 9);
         row.insertCell();
@@ -53,7 +53,7 @@ export class Altitude_HTML {
         while (this.tbl.lastChild) {
             this.tbl.removeChild(this.tbl.lastChild);
         }
-        var fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
         fragment.appendChild(this.fRow);
         var Boost = 0;
         var RoC = 0;
@@ -105,7 +105,7 @@ export class Altitude_HTML {
             if (this.rows.length <= af) {
                 this.AddRow(af);
             }
-            var row = this.rows[af];
+            const row = this.rows[af];
             var adjBoost = 0;
             if (PowerReduction > 0) {
                 adjBoost = Math.max(1, Boost - 1);
@@ -113,9 +113,9 @@ export class Altitude_HTML {
             else {
                 adjBoost = Boost;
             }
-            var adjRoC = Math.max(1, RoC - PowerReduction);
-            var adjStall = Math.max(1, Stall + af);
-            var adjSpeed = Math.max(1, Speed + SpeedIncrease - PowerReduction);
+            const adjRoC = Math.max(1, RoC - PowerReduction);
+            const adjStall = Math.max(1, Stall + af);
+            const adjSpeed = Math.max(1, Speed + SpeedIncrease - PowerReduction);
             row.children[1].textContent = adjBoost.toString();
             row.children[2].textContent = adjRoC.toString();
             row.children[3].textContent = adjStall.toString();
@@ -123,7 +123,7 @@ export class Altitude_HTML {
             fragment.appendChild(row);
             if (adjStall > adjSpeed) {
                 while (this.rows.length > af) {
-                    var r = this.rows.pop();
+                    const r = this.rows.pop();
                 }
                 break;
             }

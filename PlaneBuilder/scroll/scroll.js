@@ -24,14 +24,14 @@ function startObserving() {
     if (!getLocation().hash)
         return;
     STOP_EVENTS.forEach(addStopListener);
-    documentObserver === null || documentObserver === void 0 ? void 0 : documentObserver.observe(document, OBSERVER_CONFIG);
+    documentObserver?.observe(document, OBSERVER_CONFIG);
     adjustScrollPosition();
     observeTimeout = setTimeout(stopObserving, OBSERVE_TIMEOUT_MS);
 }
 function stopObserving() {
     clearTimeout(observeTimeout);
     cancelAnimationFrame(throttleRequestId);
-    documentObserver === null || documentObserver === void 0 ? void 0 : documentObserver.disconnect();
+    documentObserver?.disconnect();
     STOP_EVENTS.forEach(removeStopListener);
 }
 function addStopListener(eventName) {

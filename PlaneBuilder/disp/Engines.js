@@ -40,7 +40,7 @@ export class Engines_HTML extends Display {
         this.is_asymmetric.checked = this.eng.GetAsymmetry();
     }
     UpdateDisplay() {
-        var num = this.eng.GetNumberOfItems();
+        const num = this.eng.GetNumberOfItems();
         if (num == 0)
             this.tbl.style.display = "none";
         else
@@ -60,7 +60,7 @@ export class Engines_HTML extends Display {
         for (let i = 0; i < num; i++) {
             this.engines[i].UpdateEngine(this.eng.GetEngine(i));
         }
-        var rad = this.eng.GetNumberOfRadiators();
+        const rad = this.eng.GetNumberOfRadiators();
         this.num_radiators.valueAsNumber = rad;
         if (rad == 0) {
             this.tblR.style.display = "none";

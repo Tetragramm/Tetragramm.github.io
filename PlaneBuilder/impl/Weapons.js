@@ -4,9 +4,10 @@ import { lu } from "./Localization.js";
 import { WeaponSystem } from "./WeaponSystem.js";
 import { SynchronizationType, ProjectileType } from "./Weapon.js";
 import { StringFmt } from "../string/index.js";
-export { ProjectileType, SynchronizationType, ActionType } from "./Weapon.js";
+import * as js from "../weapons.json";
+export { ProjectileType, SynchronizationType, ActionType } from "./Weapon";
 export class Weapons extends Part {
-    constructor(js) {
+    constructor() {
         super();
         this.direction_list = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
         this.synchronization_list = ["None", "Interruptor Gear", "Synchronization Gear", "Spinner Gun", "Deflector Plate", "No Interference"];
@@ -34,7 +35,7 @@ export class Weapons extends Part {
                 hits: elem["hits"],
                 ammo: elem["ammo"],
                 ap: elem["ap"],
-                jam: elem["jam"],
+                jam: elem["jam"].toString(),
                 reload: elem["reload"],
                 rapid: elem["rapid"],
                 synched: elem["synched"],

@@ -5,6 +5,7 @@ export var WARNING_COLOR;
     WARNING_COLOR[WARNING_COLOR["YELLOW"] = 1] = "YELLOW";
     WARNING_COLOR[WARNING_COLOR["RED"] = 2] = "RED";
 })(WARNING_COLOR || (WARNING_COLOR = {}));
+;
 export class Stats {
     constructor(js) {
         this.liftbleed = 0;

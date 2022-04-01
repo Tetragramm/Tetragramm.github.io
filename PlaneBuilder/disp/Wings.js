@@ -22,71 +22,71 @@ export class Wings_HTML extends Display {
         this.stagger.onchange = () => { this.wings.SetStagger(this.stagger.selectedIndex); };
         this.closed.onchange = () => { this.wings.SetClosed(this.closed.checked); };
         this.swept.onchange = () => { this.wings.SetSwept(this.swept.checked); };
-        var tbl = document.getElementById("wing_table");
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const tbl = document.getElementById("wing_table");
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Wings Wing Type"));
         CreateTH(row, lu("Wings Wing Options"));
         CreateTH(row, lu("Wings Wing Stats"));
-        var full_row = insertRow(fragment);
+        const full_row = insertRow(fragment);
         CreateTH(full_row, lu("Wings Full Wings"));
-        var mini_row = insertRow(fragment);
+        const mini_row = insertRow(fragment);
         CreateTH(mini_row, lu("Wings Miniature Wings"));
         this.full_cell = full_row.insertCell();
         this.mini_cell = mini_row.insertCell();
-        var stat_cell = full_row.insertCell();
+        const stat_cell = full_row.insertCell();
         stat_cell.rowSpan = 0;
         this.InitStatDisplay(stat_cell);
         tbl.appendChild(fragment);
     }
     InitStatDisplay(stat_cell) {
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE");
+        const tbl_stat = document.createElement("TABLE");
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Wing Area"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Drag"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_area = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Stat Control"));
         CreateTH(h2_row, lu("Stat Pitch Stability"));
         CreateTH(h2_row, lu("Stat Lateral Stability"));
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.d_cont = c2_row.insertCell();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
-        var h3_row = tbl_stat.insertRow();
+        const h3_row = tbl_stat.insertRow();
         CreateTH(h3_row, lu("Stat Raw Strain"));
         CreateTH(h3_row, lu("Stat Crash Safety"));
         CreateTH(h3_row, lu("Stat Lift Bleed"));
-        var c3_row = tbl_stat.insertRow();
+        const c3_row = tbl_stat.insertRow();
         this.d_maxs = c3_row.insertCell();
         this.d_crsh = c3_row.insertCell();
         this.d_lift = c3_row.insertCell();
-        var h4_row = tbl_stat.insertRow();
+        const h4_row = tbl_stat.insertRow();
         CreateTH(h4_row, lu("Stat Cost"));
         CreateTH(h4_row, lu("Stat Visibility"));
         CreateTH(h4_row, lu("Stat Charge"));
-        var c4_row = tbl_stat.insertRow();
+        const c4_row = tbl_stat.insertRow();
         this.d_cost = c4_row.insertCell();
         this.d_visi = c4_row.insertCell();
         this.d_chrg = c4_row.insertCell();
-        var h5_row = tbl_stat.insertRow();
+        const h5_row = tbl_stat.insertRow();
         CreateTH(h5_row, "");
         CreateTH(h5_row, lu("Wings Sesquiplane"));
         CreateTH(h5_row, lu("Derived Is Flammable Question"));
-        var c5_row = tbl_stat.insertRow();
+        const c5_row = tbl_stat.insertRow();
         c5_row.insertCell();
         this.d_sesq = c5_row.insertCell();
         this.d_flam = c5_row.insertCell();
     }
     UpdateDisplay() {
-        var cans = this.wings.CanStagger();
+        const cans = this.wings.CanStagger();
         for (let i = 0; i < cans.length; i++) {
             this.stagger.options[i].disabled = !cans[i];
         }
@@ -99,7 +99,7 @@ export class Wings_HTML extends Display {
             this.full_cell.removeChild(this.fw_add);
         if (this.mw_add)
             this.mini_cell.removeChild(this.mw_add);
-        var wl = this.wings.GetWingList();
+        const wl = this.wings.GetWingList();
         for (let i = 0; i < wl.length; i++) {
             if (this.fw_list.length == i)
                 this.AddFullWing();
@@ -108,7 +108,7 @@ export class Wings_HTML extends Display {
         while (this.fw_list.length > wl.length) {
             this.PopFullWing();
         }
-        var mwl = this.wings.GetMiniWingList();
+        const mwl = this.wings.GetMiniWingList();
         for (let i = 0; i < mwl.length; i++) {
             if (this.mw_list.length == i)
                 this.AddMiniWing();
@@ -119,7 +119,7 @@ export class Wings_HTML extends Display {
         }
         this.CreateFWAdd(wl.length);
         this.CreateMWAdd(mwl.length);
-        var stats = this.wings.PartStats();
+        const stats = this.wings.PartStats();
         BlinkIfChanged(this.d_area, stats.wingarea.toString(), true);
         BlinkIfChanged(this.d_mass, (stats.mass + this.wings.GetPaperMass()).toString(), false);
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
@@ -142,7 +142,7 @@ export class Wings_HTML extends Display {
             BlinkIfChanged(this.d_flam, lu("No"));
     }
     AddFullWing() {
-        var wing = {
+        const wing = {
             span: document.createElement("SPAN"),
             deck: document.createElement("SELECT"),
             skin: document.createElement("SELECT"),
@@ -154,8 +154,8 @@ export class Wings_HTML extends Display {
             br: document.createElement("BR")
         };
         wing.span.appendChild(wing.deck);
-        var dlist = this.wings.GetDeckList();
-        var none_opt = document.createElement("OPTION");
+        const dlist = this.wings.GetDeckList();
+        const none_opt = document.createElement("OPTION");
         none_opt.textContent = lu("Wings No Wing");
         wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
@@ -184,7 +184,7 @@ export class Wings_HTML extends Display {
         this.fw_list.push(wing);
     }
     PopFullWing() {
-        var wing = this.fw_list.pop();
+        const wing = this.fw_list.pop();
         this.full_cell.removeChild(wing.span);
         this.full_cell.removeChild(wing.br);
     }
@@ -243,7 +243,7 @@ export class Wings_HTML extends Display {
         ht.anhedral.valueAsNumber = wing.anhedral;
     }
     AddMiniWing() {
-        var wing = {
+        const wing = {
             span: document.createElement("SPAN"),
             deck: document.createElement("SELECT"),
             skin: document.createElement("SELECT"),
@@ -255,8 +255,8 @@ export class Wings_HTML extends Display {
             br: document.createElement("BR")
         };
         wing.span.appendChild(wing.deck);
-        var dlist = this.wings.GetDeckList();
-        var none_opt = document.createElement("OPTION");
+        const dlist = this.wings.GetDeckList();
+        const none_opt = document.createElement("OPTION");
         none_opt.textContent = lu("Wings No Wing");
         wing.deck.append(none_opt);
         for (let i = 0; i < dlist.length; i++) {
@@ -314,14 +314,14 @@ export class Wings_HTML extends Display {
         ht.wspan.valueAsNumber = wing.span;
     }
     PopMiniWing() {
-        var wing = this.mw_list.pop();
+        const wing = this.mw_list.pop();
         this.mini_cell.removeChild(wing.span);
         this.mini_cell.removeChild(wing.br);
     }
     CreateFWAdd(idx) {
         this.fw_add = document.createElement("SELECT");
-        var dlist = this.wings.GetDeckList();
-        var none_opt = document.createElement("OPTION");
+        const dlist = this.wings.GetDeckList();
+        const none_opt = document.createElement("OPTION");
         none_opt.textContent = lu("Wings No Wing");
         this.fw_add.append(none_opt);
         var can = false;
@@ -347,8 +347,8 @@ export class Wings_HTML extends Display {
     }
     CreateMWAdd(idx) {
         this.mw_add = document.createElement("SELECT");
-        var dlist = this.wings.GetDeckList();
-        var none_opt = document.createElement("OPTION");
+        const dlist = this.wings.GetDeckList();
+        const none_opt = document.createElement("OPTION");
         none_opt.textContent = lu("Wings No Wing");
         this.mw_add.append(none_opt);
         var can = false;

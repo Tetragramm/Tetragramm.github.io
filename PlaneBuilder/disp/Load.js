@@ -9,8 +9,8 @@ export class Load_HTML extends Display {
         this.cargo = cargo;
         this.fuel_list = [];
         document.getElementById("lbl_load").textContent = lu("Load Section Title");
-        var tbl = document.getElementById("tbl_load");
-        var fragment = document.createDocumentFragment();
+        const tbl = document.getElementById("tbl_load");
+        const fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
         CreateTH(row, lu("Load Fuel"));
         CreateTH(row, lu("Load Munitions"));
@@ -24,8 +24,8 @@ export class Load_HTML extends Display {
         tbl.appendChild(fragment);
     }
     InitFuel(cell) {
-        var lst = this.fuel.GetTankList();
-        var fs = CreateFlexSection(cell);
+        const lst = this.fuel.GetTankList();
+        const fs = CreateFlexSection(cell);
         for (let i = 0; i < lst.length; i++) {
             let inp = document.createElement("INPUT");
             FlexInput(lu(lst[i].name), inp, fs);
@@ -40,7 +40,7 @@ export class Load_HTML extends Display {
         this.extinguish.onchange = () => { this.fuel.SetExtinguisher(this.extinguish.checked); };
     }
     InitMunitions(cell) {
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         this.bombs = document.createElement("INPUT");
         FlexInput(lu("Load Bombs"), this.bombs, fs);
         this.bombs.onchange = () => { this.boom.SetBombCount(this.bombs.valueAsNumber); };
@@ -58,11 +58,11 @@ export class Load_HTML extends Display {
         this.bay2.onchange = () => { this.boom.SetUseBays(this.bay1.checked, this.bay2.checked); };
     }
     InitCargoAndPassengers(cell) {
-        // var fs = CreateFlexSection(cell);
+        // const fs = CreateFlexSection(cell);
         this.carg = document.createElement("SELECT");
         // FlexSelect(lu("Load Cargo"), this.carg, fs);
         cell.appendChild(this.carg);
-        var lst = this.cargo.GetSpaceList();
+        const lst = this.cargo.GetSpaceList();
         for (let l of lst) {
             let opt = document.createElement("OPTION");
             opt.text = lu(l.name);
@@ -72,14 +72,14 @@ export class Load_HTML extends Display {
     }
     InitStats(stat_cell) {
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE");
+        const tbl_stat = document.createElement("TABLE");
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Wet Mass"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_wmas = c1_row.insertCell();
@@ -91,11 +91,11 @@ export class Load_HTML extends Display {
         this.d_rsec = c2_row.insertCell();
         this.d_fuel = c2_row.insertCell();
         this.d_cost = c2_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, "");
         CreateTH(h2_row, lu("Derived Fuel Uses"));
         CreateTH(h2_row, "");
-        var c2_row = tbl_stat.insertRow();
+        c2_row = tbl_stat.insertRow();
         c2_row.insertCell();
         this.d_fuse = c2_row.insertCell();
         c2_row.insertCell();
@@ -108,8 +108,8 @@ export class Load_HTML extends Display {
         BlinkIfChanged(this.d_fuse, (value).toString(), false);
     }
     UpdateDisplay() {
-        var fl = this.fuel.GetTankCount();
-        var fe = this.fuel.GetTankEnabled();
+        const fl = this.fuel.GetTankCount();
+        const fe = this.fuel.GetTankEnabled();
         for (let i = 0; i < fl.length; i++) {
             this.fuel_list[i].valueAsNumber = fl[i];
             this.fuel_list[i].disabled = !fe[i];

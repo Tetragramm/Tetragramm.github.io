@@ -278,7 +278,7 @@ export class Wings extends Part {
         return can;
     }
     GetWingHeight() {
-        var max = 0;
+        let max = 0;
         for (const w of this.wing_list)
             max = Math.max(max, 4 - w.deck);
         return max;
@@ -399,7 +399,7 @@ export class Wings extends Part {
         return this.NeedHStab() || !this.is_swept;
     }
     GetSpan() {
-        var longest_span = 0;
+        let longest_span = 0;
         for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             const wspan = w.span;
@@ -413,7 +413,7 @@ export class Wings extends Part {
         return longest_span;
     }
     GetArea() {
-        var area = 0;
+        let area = 0;
         for (const w of this.wing_list) {
             area += w.area;
         }
@@ -436,7 +436,7 @@ export class Wings extends Part {
         return false;
     }
     GetMetalArea() {
-        var area = 0;
+        let area = 0;
         for (const w of this.wing_list) {
             if (this.skin_list[w.surface].metal)
                 area += w.area;
@@ -448,18 +448,18 @@ export class Wings extends Part {
         return area;
     }
     GetWingDrag() {
-        var drag = 0;
-        var deck_count = this.DeckCountFull();
-        var longest_span = 0;
-        var longest_drag = 0;
+        let drag = 0;
+        const deck_count = this.DeckCountFull();
+        let longest_span = 0;
+        let longest_drag = 0;
         for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             const wspan = w.span;
-            var warea = w.area;
+            let warea = w.area;
             longest_span = Math.max(longest_span, wspan);
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
-            var wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
+            let wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             //Inline wings
             if (this.stagger_list[this.wing_stagger].inline && deck_count[w.deck] > 1) {
@@ -476,7 +476,7 @@ export class Wings extends Part {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             const wspan = w.span;
             //Drag is modified by area, span
-            var wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
+            let wdrag = Math.max(1, 6 * w.area * w.area / (wspan * wspan));
             wdrag = Math.max(1, wdrag * this.skin_list[w.surface].dragfactor);
             wdrag = Math.floor(1.0e-6 + wdrag);
             drag += wdrag;
@@ -503,7 +503,7 @@ export class Wings extends Part {
         this.plane_mass = plane_mass;
     }
     GetPaperMass() {
-        var paper = 0;
+        let paper = 0;
         for (const w of this.wing_list) {
             const wStats = this.skin_list[w.surface].stats.Multiply(w.area);
             wStats.Round();
@@ -519,11 +519,11 @@ export class Wings extends Part {
         return Math.max(-Math.floor(1.0e-6 + 0.25 * this.plane_mass), paper);
     }
     GetIsSesquiplane() {
-        var biggest_area = 0;
-        var biggest_deck = -1;
-        var biggest_span = 0;
-        var smallest_area = 1e100;
-        var smallest_span = 0;
+        let biggest_area = 0;
+        let biggest_deck = -1;
+        let biggest_span = 0;
+        let smallest_area = 1e100;
+        let smallest_span = 0;
         for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             if (w.area > biggest_area) {
@@ -539,7 +539,7 @@ export class Wings extends Part {
                 smallest_span = w.span;
             }
         }
-        var is = biggest_area >= 2 * smallest_area;
+        let is = biggest_area >= 2 * smallest_area;
         is = is && !this.GetMonoplane() && !this.GetTandem();
         if (is) {
             const ss = 0.75 * biggest_span >= smallest_span;
@@ -556,7 +556,7 @@ export class Wings extends Part {
         return false;
     }
     HasInvertedGull() {
-        var ret = -1;
+        let ret = -1;
         for (const w of this.wing_list) {
             if (w.gull && w.deck > WING_DECK.SHOULDER) {
                 ret = Math.max(ret, w.deck);
@@ -565,7 +565,7 @@ export class Wings extends Part {
         return ret;
     }
     CanCutout() {
-        var vcount = 0;
+        let vcount = 0;
         for (const w of this.wing_list) {
             if (this.skin_list[w.surface].transparent) {
                 vcount += 1;
@@ -579,12 +579,12 @@ export class Wings extends Part {
         if (!this.CanSwept())
             this.is_swept = false;
         var stats = new Stats();
-        var have_wing = false;
+        let have_wing = false;
         const deck_count = this.DeckCountFull();
-        var have_mini_wing = false;
-        var longest_span = this.rotor_span;
-        var longest_drag = 0;
-        var celluloid_count = 0;
+        let have_mini_wing = false;
+        let longest_span = this.rotor_span;
+        let longest_drag = 0;
+        let celluloid_count = 0;
         for (const w of this.wing_list) {
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             longest_span = Math.max(longest_span, w.span);
@@ -596,7 +596,7 @@ export class Wings extends Part {
                 stats.liftbleed += 5;
                 stats.visibility -= 1;
             }
-            var wStats = new Stats();
+            let wStats = new Stats();
             //Actual stats
             wStats = wStats.Add(this.skin_list[w.surface].stats.Multiply(w.area));
             wStats.wingarea = w.area;
@@ -613,7 +613,7 @@ export class Wings extends Part {
             //Drag is modified by area, span, and the leading wing
             const wspan = w.span;
             //Gull Drag modifies wing area
-            var warea = w.area;
+            let warea = w.area;
             if (w.gull)
                 warea = Math.floor(1.0e-6 + 1.1 * warea);
             const wdrag = Math.max(1, 6 * warea * warea / (wspan * wspan));
@@ -733,8 +733,8 @@ export class Wings extends Part {
     }
     GetElectrics() {
         const value = { storage: 0, equipment: [] };
-        var total_charge = 0;
-        var source = "";
+        let total_charge = 0;
+        let source = "";
         for (const wing of this.wing_list) {
             const skin = this.skin_list[wing.surface];
             if (skin.stats.charge != 0) {

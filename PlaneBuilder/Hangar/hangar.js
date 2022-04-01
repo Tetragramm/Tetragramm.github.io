@@ -6,33 +6,22 @@ import { Derived_HTML } from "../disp/Derived.js";
 import { BlinkBad, BlinkNeutral, _arrayBufferToString, _stringToArrayBuffer, download } from "../disp/Tools.js";
 import { LZString } from "../lz/lz-string.js";
 import { JSON2CSV } from "../JSON2CSV/json2csv.js";
+import * as parts_JSON from "../parts.json";
 const init = () => {
     const sp = new URLSearchParams(location.search);
     var lang = sp.get("lang");
-    var jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/parts.json', '/PlaneBuilder/engines.json', '/PlaneBuilder/weapons.json'];
-    var proms = jsons.map(d => fetch(d));
-    Promise.all(proms)
-        .then(ps => Promise.all(ps.map(p => p.json())))
-        .then(resp => {
-        var string_JSON = resp[0];
-        parts_JSON = resp[1];
-        engine_JSON = resp[2];
-        weapon_JSON = resp[3];
-        //Strings bit
-        localization.LoadLanguages(string_JSON);
-        if (lang) {
-            localization.SetCurrentLanguage(lang);
-        }
-        else if (window.localStorage.language) {
-            localization.SetCurrentLanguage(window.localStorage.language);
-        }
-        //Engine bit
-        var nameliststr = window.localStorage.getItem("engines_names");
-        SetEngineLists(engine_JSON, nameliststr);
-        InitHTML();
-        InitStats();
-        LoadFromHangar(0);
-    });
+    if (lang) {
+        localization.SetCurrentLanguage(lang);
+    }
+    else if (window.localStorage.language) {
+        localization.SetCurrentLanguage(window.localStorage.language);
+    }
+    //Engine bit
+    var nameliststr = window.localStorage.getItem("engines_names");
+    SetEngineLists(nameliststr);
+    InitHTML();
+    InitStats();
+    LoadFromHangar(0);
 };
 window.addEventListener("DOMContentLoaded", init);
 var acft_builder;
@@ -43,9 +32,6 @@ var name_builder;
 var select_hangar;
 var select_acft;
 var chosen_hangar;
-var parts_JSON;
-var engine_JSON;
-var weapon_JSON;
 function InitHTML() {
     chosen_hangar = "Default";
     select_hangar = document.createElement("SELECT");
@@ -173,7 +159,7 @@ function InitHTML() {
 }
 function InitStats() {
     let acft_data = window.localStorage.getItem("aircraft");
-    acft_builder = new Aircraft(parts_JSON, weapon_JSON, false);
+    acft_builder = new Aircraft(parts_JSON, false);
     if (acft_data) {
         console.log("Used Saved Data");
         try {
@@ -188,7 +174,7 @@ function InitStats() {
     stats_builder = new Derived_HTML(document.getElementById("table_builder"));
     stats_builder.SetShowBombs(true);
     stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
-    acft_hangar = new Aircraft(parts_JSON, weapon_JSON, false);
+    acft_hangar = new Aircraft(parts_JSON, false);
     stats_hangar = new Derived_HTML(document.getElementById("table_hangar"));
     stats_hangar.SetShowBombs(true);
 }
@@ -328,7 +314,7 @@ function LoadJSON(input) {
     reader.onloadend = () => {
         try {
             var str = JSON.parse(reader.result);
-            var acft = new Aircraft(parts_JSON, weapon_JSON, false);
+            var acft = new Aircraft(parts_JSON, false);
             if (acft.fromJSON(str)) {
                 var idx = AddToHangar(acft);
                 LoadFromHangar(idx);

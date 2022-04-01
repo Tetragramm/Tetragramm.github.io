@@ -6,8 +6,8 @@ export class Accessories_HTML extends Display {
         super();
         this.acc = acc;
         document.getElementById("lbl_accessories").textContent = lu("Accessories Section Title");
-        var tbl = document.getElementById("tbl_accessories");
-        var fragment = document.createDocumentFragment();
+        const tbl = document.getElementById("tbl_accessories");
+        const fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
         CreateTH(row, lu("Accessories Climate"));
         CreateTH(row, lu("Accessories Armour Coverage"));
@@ -29,11 +29,11 @@ export class Accessories_HTML extends Display {
         tbl.appendChild(fragment);
     }
     InitArmour(cell) {
-        var fs = CreateFlexSection(cell);
-        var lfs = CreateFlexSection(fs.div1);
-        var rfs = CreateFlexSection(fs.div2);
+        const fs = CreateFlexSection(cell);
+        const lfs = CreateFlexSection(fs.div1);
+        const rfs = CreateFlexSection(fs.div2);
         this.a_AP = [];
-        var len = this.acc.GetArmourCoverage().length;
+        const len = this.acc.GetArmourCoverage().length;
         for (let i = 0; i < len; i++)
             this.a_AP.push(document.createElement("INPUT"));
         for (let i = 0; i < len / 2; i++) {
@@ -47,10 +47,10 @@ export class Accessories_HTML extends Display {
         }
     }
     InitElectrical(cell) {
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         this.radio = document.createElement("SELECT");
         FlexSelect(lu("Accessories Radio"), this.radio, fs);
-        var rlist = this.acc.GetRadioList();
+        const rlist = this.acc.GetRadioList();
         for (let i = 0; i < rlist.length; i++) {
             let opt = document.createElement("OPTION");
             opt.text = lu(rlist[i].name);
@@ -58,7 +58,7 @@ export class Accessories_HTML extends Display {
         }
         this.radio.onchange = () => { this.acc.SetRadioSel(this.radio.selectedIndex); };
         this.elect = [];
-        var elist = this.acc.GetElectricalList();
+        const elist = this.acc.GetElectricalList();
         for (let i = 0; i < elist.length; i++) {
             let inp = document.createElement("INPUT");
             FlexInput(lu(elist[i].name), inp, fs);
@@ -67,8 +67,8 @@ export class Accessories_HTML extends Display {
         }
     }
     InitInformation(cell) {
-        var fs = CreateFlexSection(cell);
-        var rlist = this.acc.GetReconList();
+        const fs = CreateFlexSection(cell);
+        const rlist = this.acc.GetReconList();
         this.recon = [];
         for (let i = 0; i < rlist.length; i++) {
             let inp = document.createElement("INPUT");
@@ -79,8 +79,8 @@ export class Accessories_HTML extends Display {
         }
     }
     InitVisibility(cell) {
-        var fs = CreateFlexSection(cell);
-        var vlist = this.acc.GetVisibilityList();
+        const fs = CreateFlexSection(cell);
+        const vlist = this.acc.GetVisibilityList();
         this.visi = [];
         for (let i = 0; i < vlist.length; i++) {
             let inp = document.createElement("INPUT");
@@ -90,8 +90,8 @@ export class Accessories_HTML extends Display {
         }
     }
     InitClimate(cell) {
-        var fs = CreateFlexSection(cell);
-        var clist = this.acc.GetClimateList();
+        const fs = CreateFlexSection(cell);
+        const clist = this.acc.GetClimateList();
         this.clim = [];
         for (let i = 0; i < clist.length; i++) {
             let inp = document.createElement("INPUT");
@@ -101,9 +101,9 @@ export class Accessories_HTML extends Display {
         }
     }
     InitControl(cell) {
-        var fs = CreateFlexSection(cell);
+        const fs = CreateFlexSection(cell);
         this.auto = document.createElement("SELECT");
-        var alist = this.acc.GetAutopilotList();
+        const alist = this.acc.GetAutopilotList();
         FlexSelect(lu("Accessories Autopilot"), this.auto, fs);
         for (let i = 0; i < alist.length; i++) {
             let opt = document.createElement("OPTION");
@@ -111,7 +111,7 @@ export class Accessories_HTML extends Display {
             this.auto.add(opt);
         }
         this.auto.onchange = () => { this.acc.SetAutopilotSel(this.auto.selectedIndex); };
-        var clist = this.acc.GetControlList();
+        const clist = this.acc.GetControlList();
         this.cont = document.createElement("SELECT");
         FlexSelect(lu("Accessories Control Aids"), this.cont, fs);
         for (let i = 0; i < clist.length; i++) {
@@ -124,63 +124,63 @@ export class Accessories_HTML extends Display {
     InitStats(stat_cell) {
         stat_cell.rowSpan = 3;
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE");
+        const tbl_stat = document.createElement("TABLE");
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_mass = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Stat Structure"));
         CreateTH(h2_row, lu("Stat Charge"));
         CreateTH(h2_row, lu("Stat Lift Bleed"));
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_chgh = c2_row.insertCell();
         this.d_lift = c2_row.insertCell();
-        var h3_row = tbl_stat.insertRow();
+        const h3_row = tbl_stat.insertRow();
         CreateTH(h3_row, lu("Stat Visibility"));
         CreateTH(h3_row, lu("Stat Flight Stress"));
         CreateTH(h3_row, lu("Stat Required Sections"));
-        var c3_row = tbl_stat.insertRow();
+        const c3_row = tbl_stat.insertRow();
         this.d_visi = c3_row.insertCell();
         this.d_strs = c3_row.insertCell();
         this.d_rsec = c3_row.insertCell();
     }
     UpdateDisplay() {
-        var AP = this.acc.GetArmourCoverage();
+        const AP = this.acc.GetArmourCoverage();
         for (let i = 0; i < AP.length; i++) {
             this.a_AP[i].valueAsNumber = AP[i];
         }
         this.radio.selectedIndex = this.acc.GetRadioSel();
-        var elist = this.acc.GetElectricalCount();
+        const elist = this.acc.GetElectricalCount();
         for (let i = 0; i < elist.length; i++) {
             this.elect[i].valueAsNumber = elist[i];
         }
-        var rlist = this.acc.GetReconSel();
+        const rlist = this.acc.GetReconSel();
         for (let i = 0; i < rlist.length; i++) {
             this.recon[i].valueAsNumber = rlist[i];
         }
-        var vlist = this.acc.GetVisibilitySel();
-        var cvlist = this.acc.GetCanVisibility();
+        const vlist = this.acc.GetVisibilitySel();
+        const cvlist = this.acc.GetCanVisibility();
         for (let i = 0; i < vlist.length; i++) {
             this.visi[i].checked = vlist[i];
             this.visi[i].disabled = !cvlist[i];
         }
-        var clist = this.acc.GetClimateSel();
-        var cenab = this.acc.GetClimateEnable();
+        const clist = this.acc.GetClimateSel();
+        const cenab = this.acc.GetClimateEnable();
         for (let i = 0; i < vlist.length; i++) {
             this.clim[i].checked = clist[i];
             this.clim[i].disabled = !cenab[i];
         }
         this.auto.selectedIndex = this.acc.GetAutopilotSel();
         this.cont.selectedIndex = this.acc.GetControlSel();
-        var stats = this.acc.PartStats();
+        const stats = this.acc.PartStats();
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);

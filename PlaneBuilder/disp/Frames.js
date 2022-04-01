@@ -10,7 +10,7 @@ export class Frames_HTML extends Display {
         //Translate Section title
         document.getElementById("lbl_frames").textContent = lu("Frames Frames and Covering");
         this.table = document.getElementById("table_frames");
-        var fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
         this.all_frame = document.createElement("SELECT");
         this.all_skin = document.createElement("SELECT");
@@ -25,46 +25,46 @@ export class Frames_HTML extends Display {
         this.c_stats = row.insertCell();
         this.c_stats.className = "inner_table";
         this.c_stats.rowSpan = 0;
-        var tbl = document.createElement("TABLE");
+        const tbl = document.createElement("TABLE");
         tbl.className = "inner_table";
-        var h1_row = tbl.insertRow();
+        const h1_row = tbl.insertRow();
         CreateTH(h1_row, lu("Stat Mass"));
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl.insertRow();
+        const c1_row = tbl.insertRow();
         this.d_mass = c1_row.insertCell();
         this.d_drag = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
-        var h2_row = tbl.insertRow();
+        const h2_row = tbl.insertRow();
         CreateTH(h2_row, lu("Stat Structure"));
         CreateTH(h2_row, lu("Stat Toughness"));
         CreateTH(h2_row, lu("Stat Visibility"));
-        var c2_row = tbl.insertRow();
+        const c2_row = tbl.insertRow();
         this.d_strc = c2_row.insertCell();
         this.d_tugh = c2_row.insertCell();
         this.d_visi = c2_row.insertCell();
-        var h3_row = tbl.insertRow();
+        const h3_row = tbl.insertRow();
         CreateTH(h3_row, lu("Stat Wing Area"));
         CreateTH(h3_row, lu("Derived Is Flammable Question"));
         CreateTH(h3_row, lu("Stat Pitch Stability"));
-        var c3_row = tbl.insertRow();
+        const c3_row = tbl.insertRow();
         this.d_area = c3_row.insertCell();
         this.d_flammable = c3_row.insertCell();
         this.d_pstb = c3_row.insertCell();
-        var h4_row = tbl.insertRow();
+        const h4_row = tbl.insertRow();
         CreateTH(h4_row, lu("Stat Raw Strain"));
         CreateTH(h4_row, lu("Stat Lift Bleed"));
         CreateTH(h4_row, "");
-        var c4_row = tbl.insertRow();
+        const c4_row = tbl.insertRow();
         this.d_strn = c4_row.insertCell();
         this.d_lift = c4_row.insertCell();
         c4_row.insertCell();
         this.c_stats.appendChild(tbl);
-        var row3 = insertRow(fragment);
+        const row3 = insertRow(fragment);
         CreateTH(row3, lu("Frames Tail Frame Type"));
         CreateTH(row3, lu("Frames Tail Skin Type"));
         CreateTH(row3, lu("Frames Tail Frame Options"));
-        var row4 = insertRow(fragment);
+        const row4 = insertRow(fragment);
         this.t_frame = row4.insertCell();
         this.t_skin = row4.insertCell();
         this.t_options = row4.insertCell();
@@ -77,7 +77,7 @@ export class Frames_HTML extends Display {
         this.t_boom = document.getElementById("tail_boom");
         document.getElementById("lbl_flying_wing").textContent = lu("Frames Flying Wing");
         this.t_fwing = document.getElementById("flying_wing");
-        var spar_list = this.frames.GetFrameList();
+        const spar_list = this.frames.GetFrameList();
         for (let spar of spar_list) {
             let opt = document.createElement("OPTION");
             opt.text = lu(spar.name);
@@ -87,7 +87,7 @@ export class Frames_HTML extends Display {
             this.all_frame.add(opt);
         }
         this.all_frame.onchange = () => { this.frames.SetAllFrame(this.all_frame.selectedIndex); };
-        var skin_list = this.frames.GetSkinList();
+        const skin_list = this.frames.GetSkinList();
         for (let skin of skin_list) {
             let opt = document.createElement("OPTION");
             opt.text = lu(skin.name);
@@ -106,12 +106,12 @@ export class Frames_HTML extends Display {
         this.table.appendChild(fragment);
     }
     UpdateDisplay() {
-        var fragment = document.createDocumentFragment();
+        const fragment = document.createDocumentFragment();
         while (this.table.children.length) {
             fragment.append(this.table.children[0]);
         }
-        var section_list = this.frames.GetSectionList();
-        var tail_section_list = this.frames.GetTailSectionList();
+        const section_list = this.frames.GetSectionList();
+        const tail_section_list = this.frames.GetTailSectionList();
         while (section_list.length > this.c_sec.length) {
             let i = this.c_sec.length;
             this.CreateSection(i, section_list[i]);
@@ -126,8 +126,8 @@ export class Frames_HTML extends Display {
         while (tail_section_list.length < this.t_sec.length) {
             this.RemoveTailSection();
         }
-        var skin_list = this.frames.GetSkinList();
-        var is_flammable = skin_list[this.frames.GetSkin()].flammable;
+        const skin_list = this.frames.GetSkinList();
+        const is_flammable = skin_list[this.frames.GetSkin()].flammable;
         for (let i = 0; i < section_list.length; i++) {
             let sec = section_list[i];
             this.UpdateSection(i, sec);
@@ -149,7 +149,7 @@ export class Frames_HTML extends Display {
             BlinkIfChanged(this.d_flammable, lu("Yes"));
         else
             BlinkIfChanged(this.d_flammable, lu("No"));
-        var stats = this.frames.PartStats();
+        const stats = this.frames.PartStats();
         BlinkIfChanged(this.d_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);
@@ -163,7 +163,7 @@ export class Frames_HTML extends Display {
         this.table.appendChild(fragment);
     }
     CreateSection(i, sec) {
-        var fsec = {
+        const fsec = {
             fspan: document.createElement("SPAN"),
             rem: document.createElement("BUTTON"),
             add: document.createElement("BUTTON"),
@@ -180,7 +180,7 @@ export class Frames_HTML extends Display {
         fsec.rem.onclick = () => { this.frames.DeleteSection(i); };
         fsec.add.textContent = "+";
         fsec.add.onclick = () => { this.frames.DuplicateSection(i); };
-        var frame_list = this.frames.GetFrameList();
+        const frame_list = this.frames.GetFrameList();
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION");
             opt.text = lu(ft.name);
@@ -208,16 +208,16 @@ export class Frames_HTML extends Display {
         this.UpdateSection(i, sec);
     }
     RemoveSection() {
-        var sec = this.c_sec.pop();
+        const sec = this.c_sec.pop();
         this.c_frame.removeChild(sec.fspan);
         this.c_skin.removeChild(sec.sspan);
         this.c_options.removeChild(sec.ospan);
     }
     UpdateSection(i, sec) {
-        var fsec = this.c_sec[i];
+        const fsec = this.c_sec[i];
         fsec.rem.disabled = !sec.internal_bracing && !this.frames.PossibleRemoveSections();
         fsec.add.disabled = sec.internal_bracing && !this.frames.PossibleInternalBracing();
-        var frame_list = this.frames.GetFrameList();
+        const frame_list = this.frames.GetFrameList();
         for (let j = 0; j < frame_list.length; j++) {
             let ft = frame_list[j];
             let opt = fsec.fsel.options[j];
@@ -233,7 +233,7 @@ export class Frames_HTML extends Display {
             fsec.ssel.textContent = lu("Frames No Skin");
         }
         else {
-            var skin_list = this.frames.GetSkinList();
+            const skin_list = this.frames.GetSkinList();
             fsec.ssel.textContent = lu(skin_list[this.frames.GetSkin()].name);
         }
         fsec.geo.checked = sec.geodesic;
@@ -249,7 +249,7 @@ export class Frames_HTML extends Display {
         fsec.lb.disabled = !this.frames.PossibleLiftingBody(i);
     }
     CreateTailSection(i, sec) {
-        var tsec = {
+        const tsec = {
             fspan: document.createElement("SPAN"),
             fsel: document.createElement("SELECT"),
             sspan: document.createElement("SPAN"),
@@ -259,7 +259,7 @@ export class Frames_HTML extends Display {
             mono: document.createElement("INPUT"),
             lb: document.createElement("INPUT"),
         };
-        var frame_list = this.frames.GetFrameList();
+        const frame_list = this.frames.GetFrameList();
         for (let ft of frame_list) {
             let opt = document.createElement("OPTION");
             opt.text = lu(ft.name);
@@ -283,14 +283,14 @@ export class Frames_HTML extends Display {
         this.UpdateTailSection(i, sec);
     }
     RemoveTailSection() {
-        var sec = this.t_sec.pop();
+        const sec = this.t_sec.pop();
         this.t_frame.removeChild(sec.fspan);
         this.t_skin.removeChild(sec.sspan);
         this.t_options.removeChild(sec.ospan);
     }
     UpdateTailSection(i, sec) {
-        var tsec = this.t_sec[i];
-        var frame_list = this.frames.GetFrameList();
+        const tsec = this.t_sec[i];
+        const frame_list = this.frames.GetFrameList();
         for (let j = 0; j < frame_list.length; j++) {
             let ft = frame_list[j];
             let opt = tsec.fsel.options[j];
@@ -302,7 +302,7 @@ export class Frames_HTML extends Display {
                 opt.disabled = true;
         }
         tsec.fsel.selectedIndex = sec.frame;
-        var skin_list = this.frames.GetSkinList();
+        const skin_list = this.frames.GetSkinList();
         var idx = this.frames.GetSkin();
         if (this.frames.GetUseFarman())
             idx = 0;

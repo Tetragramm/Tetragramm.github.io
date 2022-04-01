@@ -19,43 +19,13 @@
 		},
 		{
 			"type": "typescript",
-			"tsconfig": "ts/tsconfig.json",
+			"tsconfig": "./tsconfig.json",
 			"option": "watch",
 			"problemMatcher": [
 				"$tsc-watch"
 			],
 			"group": "build",
 			"label": "Watch Plane Builder",
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "ts/EngineBuilder/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Engine Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "ts/Hangar/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Hangar"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "ts/WeaponDisplay/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Weapon Display"
 		},
 		{
 			"label": "Watch All",
@@ -66,14 +36,11 @@
 			"dependsOn": [
 				"Local Server",
 				"Watch Plane Builder",
-				"Watch Engine Builder",
-				"Watch Hangar",
-				"Watch Weapon Display"
 			]
 		},
 		{
 			"type": "typescript",
-			"tsconfig": "ts/tsconfig.json",
+			"tsconfig": "./tsconfig.json",
 			"problemMatcher": [
 				"$tsc"
 			],
@@ -81,41 +48,11 @@
 			"label": "Build Plane Builder"
 		},
 		{
-			"type": "typescript",
-			"tsconfig": "ts/EngineBuilder/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Engine Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "ts/Hangar/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Hangar"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "ts/WeaponDisplay/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Weapon Display"
-		},
-		{
 			"label": "Build All",
 			"group": "build",
 			"dependsOn": [
 				"Local Server",
 				"Build Plane Builder",
-				"Build Engine Builder",
-				"Build Hangar",
-				"Build Weapon Display"
 			]
 		}
 	]

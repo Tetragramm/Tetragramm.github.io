@@ -9,8 +9,8 @@ export class Cockpits_HTML extends Display {
         document.getElementById("lbl_cockpits").textContent = lu("Cockpit Section Title");
         document.getElementById("lbl_num_cockpits").textContent = lu("Cockpit Num Cockpits");
         this.tbl = document.getElementById("table_cockpit");
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Cockpit Option"));
         CreateTH(row, lu("Cockpit Upgrade"));
         CreateTH(row, lu("Cockpit Safety Options"));
@@ -32,8 +32,8 @@ export class Cockpits_HTML extends Display {
         }
     }
     AddCockpit(num) {
-        var row = this.tbl.insertRow();
-        var cp = new Cockpit_HTML(row, this.cockpits.GetCockpit(num));
+        const row = this.tbl.insertRow();
+        const cp = new Cockpit_HTML(row, this.cockpits.GetCockpit(num));
         this.positions.push(cp);
     }
     RemoveCockpit() {

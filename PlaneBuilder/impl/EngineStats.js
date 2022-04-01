@@ -6,6 +6,7 @@ export var DRIVE_TYPE;
     DRIVE_TYPE[DRIVE_TYPE["TURBINE"] = 1] = "TURBINE";
     DRIVE_TYPE[DRIVE_TYPE["PULSEJET"] = 2] = "PULSEJET";
 })(DRIVE_TYPE || (DRIVE_TYPE = {}));
+;
 export class EngineStats {
     constructor(js) {
         this.name = "Default";

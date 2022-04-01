@@ -7,8 +7,8 @@ export class Used_HTML extends Display {
         this.used = used;
         document.getElementById("lbl_used").textContent = lu("Used Section Title");
         this.tbl = document.getElementById("tbl_used");
-        var fragment = document.createDocumentFragment();
-        var row = insertRow(fragment);
+        const fragment = document.createDocumentFragment();
+        const row = insertRow(fragment);
         CreateTH(row, lu("Used Effect"));
         CreateTH(row, lu("Used Description"));
         CreateTH(row, lu("Used Penalties(+) <br/> Benefits(-)"));

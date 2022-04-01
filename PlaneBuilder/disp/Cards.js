@@ -376,7 +376,7 @@ export class Cards {
         if (document.createEvent) {
             var e = document.createEvent("MouseEvents");
             e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            /// send event            
+            /// send event
             lnk.dispatchEvent(e);
         }
     }

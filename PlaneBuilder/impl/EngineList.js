@@ -1,5 +1,6 @@
 import { EngineStats } from "./EngineStats.js";
 import { EngineInputs } from "./EngineInputs.js";
+import * as engine_JSON from "../engines.json";
 export class EngineList {
     constructor(name) {
         this.constant = false;
@@ -133,23 +134,10 @@ export class EngineList {
         this.constant = true;
     }
 }
-var engine_JSON;
-var engine_list = new Map([["Custom", new EngineList("Custom")]]);
+const engine_list = new Map([["Custom", new EngineList("Custom")]]);
 //TODO: Make sure Global Variable sets.
-export function SetEngineLists(el, nameliststr) {
-    engine_JSON = el;
-    var namelist = [];
-    if (nameliststr) {
-        namelist = JSON.parse(nameliststr);
-        for (let n of namelist) {
-            n = n.trim();
-            n = n.replace(/\s+/g, ' ');
-            if (n != "") {
-                engine_list.set(n, new EngineList(n));
-            }
-        }
-    }
-    for (let el of engine_JSON["lists"]) {
+export function SetEngineLists(nameliststr) {
+    for (const el of engine_JSON["lists"]) {
         if (!engine_list.has(el["name"]))
             engine_list.set(el["name"], new EngineList(el["name"]));
         if (el["name"] != "Custom") {
@@ -168,18 +156,7 @@ export function GetEngineJSON() {
     return engine_JSON;
 }
 export function SearchAllEngineLists(n) {
-    const engine_list = new Map([["Custom", new EngineList("Custom")]]);
-    for (const el of engine_JSON["lists"]) {
-        if (!engine_list.has(el["name"]))
-            engine_list.set(el["name"], new EngineList(el["name"]));
-        if (el["name"] != "Custom") {
-            engine_list.get(el["name"]).fromJSON(el, true);
-            engine_list.get(el["name"]).SetConstant();
-        }
-        else {
-            engine_list.get(el["name"]).fromJSON(el, false);
-        }
-    }
+    const engine_list = GetEngineLists();
     for (const key of engine_list.keys()) {
         if (key != "Custom") {
             const elist = engine_list.get(key);

@@ -16,27 +16,17 @@ const init = () => {
     const sp = new URLSearchParams(location.search);
     const ep = sp.get("engine");
     const lang = sp.get("lang");
-    const jsons = ['/PlaneBuilder/strings.json', '/PlaneBuilder/engines.json'];
-    const proms = jsons.map(d => fetch(d));
-    Promise.all(proms)
-        .then(ps => Promise.all(ps.map(p => p.json())))
-        .then(resp => {
-        const string_JSON = resp[0];
-        const engine_JSON = resp[1];
-        //Strings bit
-        localization.LoadLanguages(string_JSON);
-        if (lang) {
-            localization.SetCurrentLanguage(lang);
-        }
-        else if (window.localStorage.language) {
-            localization.SetCurrentLanguage(window.localStorage.language);
-        }
-        //Engine Bit
-        const nameliststr = window.localStorage.getItem("engines_names");
-        SetEngineLists(engine_JSON, nameliststr);
-        ebuild = new EngineBuilder_HTML();
-        ebuild.UpdateList();
-    });
+    if (lang) {
+        localization.SetCurrentLanguage(lang);
+    }
+    else if (window.localStorage.language) {
+        localization.SetCurrentLanguage(window.localStorage.language);
+    }
+    //Engine Bit
+    const nameliststr = window.localStorage.getItem("engines_names");
+    SetEngineLists(nameliststr);
+    ebuild = new EngineBuilder_HTML();
+    ebuild.UpdateList();
     if (ep != null) {
         try {
             const str = LZString.decompressFromEncodedURIComponent(ep);
@@ -45,7 +35,7 @@ const init = () => {
             const num = GetEngineLists().get("Custom").deserializeEngine(des);
             ebuild.SelectEngine(num);
         }
-        catch (_a) {
+        catch {
             console.log("Compressed Engine Parameter Failed.");
         }
     }
@@ -681,7 +671,7 @@ class EngineBuilder_HTML {
                         BlinkGood(this.m_load.parentElement);
                     }
                 }
-                catch (_a) { }
+                catch { }
             };
             reader.readAsText(file);
             this.m_load.value = "";

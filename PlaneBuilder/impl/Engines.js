@@ -22,7 +22,7 @@ export class Engines extends Part {
         this.is_asymmetric = false;
         this.r_type_list = [];
         for (const elem of js["radiator-type"]) {
-            this.r_type_list.push({ name: elem["name"], stats: new Stats(elem), dragpercool: parseFloat(elem["dragpercool"]) });
+            this.r_type_list.push({ name: elem["name"], stats: new Stats(elem), dragpercool: elem["dragpercool"] });
         }
         this.r_mount_list = [];
         for (const elem of js["radiator-mount"]) {
@@ -176,7 +176,7 @@ export class Engines extends Part {
         this.CalculateStats();
     }
     GetNumberOfEngines() {
-        var count = 0;
+        let count = 0;
         for (const e of this.engines) {
             if (!e.GetGenerator())
                 count++;

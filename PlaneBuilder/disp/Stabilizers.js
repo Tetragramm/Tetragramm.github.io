@@ -6,15 +6,15 @@ export class Stabilizers_HTML extends Display {
         super();
         this.stab = s;
         document.getElementById("lbl_stab").textContent = lu("Stabilizers Section Title");
-        var tbl = document.getElementById("stab_table");
-        var fragment = document.createDocumentFragment();
+        const tbl = document.getElementById("stab_table");
+        const fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
         CreateTH(row, lu("Stabilizers Horizontal Stabilizers"));
         CreateTH(row, lu("Stabilizers Vertical Stabilizers"));
         CreateTH(row, lu("Stabilizers Stabilizer Stats"));
         row = insertRow(fragment);
-        var hcell = row.insertCell();
-        var vcell = row.insertCell();
+        const hcell = row.insertCell();
+        const vcell = row.insertCell();
         this.h_type = document.createElement("SELECT");
         this.h_count = document.createElement("INPUT");
         hcell.appendChild(this.h_type);
@@ -43,29 +43,29 @@ export class Stabilizers_HTML extends Display {
             opt.text = lu(elem.name);
             this.v_type.add(opt);
         }
-        var stat_cell = row.insertCell();
+        const stat_cell = row.insertCell();
         stat_cell.rowSpan = 0;
         this.InitStatDisplay(stat_cell);
         tbl.appendChild(fragment);
     }
     InitStatDisplay(stat_cell) {
         stat_cell.className = "inner_table";
-        var tbl_stat = document.createElement("TABLE");
+        const tbl_stat = document.createElement("TABLE");
         tbl_stat.className = "inner_table";
         stat_cell.appendChild(tbl_stat);
-        var h1_row = tbl_stat.insertRow();
+        const h1_row = tbl_stat.insertRow();
         CreateTH(h1_row, lu("Stat Drag"));
         CreateTH(h1_row, lu("Stat Control"));
         CreateTH(h1_row, lu("Stat Cost"));
-        var c1_row = tbl_stat.insertRow();
+        const c1_row = tbl_stat.insertRow();
         this.d_drag = c1_row.insertCell();
         this.d_cont = c1_row.insertCell();
         this.d_cost = c1_row.insertCell();
-        var h2_row = tbl_stat.insertRow();
+        const h2_row = tbl_stat.insertRow();
         CreateTH(h2_row, lu("Stat Pitch Stability"));
         CreateTH(h2_row, lu("Stat Lateral Stability"));
         CreateTH(h2_row, lu("Stat Lift Bleed"));
-        var c2_row = tbl_stat.insertRow();
+        const c2_row = tbl_stat.insertRow();
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         this.d_lift = c2_row.insertCell();
@@ -85,7 +85,7 @@ export class Stabilizers_HTML extends Display {
         this.h_count.step = this.stab.GetHStabIncrement().toString();
         this.v_count.valueAsNumber = this.stab.GetVStabCount();
         this.v_count.step = this.stab.GetVStabIncrement().toString();
-        var stats = this.stab.PartStats();
+        const stats = this.stab.PartStats();
         BlinkIfChanged(this.d_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.d_cont, stats.control.toString(), true);
         BlinkIfChanged(this.d_cost, stats.cost.toString(), false);

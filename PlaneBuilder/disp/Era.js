@@ -1,20 +1,20 @@
-import { lu } from "../impl/Localization.js";
 import { insertRow, CreateTH, BlinkIfChanged } from "./Tools.js";
 import { Display } from "./Display.js";
+import { lu } from "../impl/Localization.js";
 export class Era_HTML extends Display {
     constructor(m) {
         super();
         this.model = m;
         document.getElementById("lbl_era").textContent = lu("Era Section Title");
-        var tbl = document.getElementById("table_era");
-        var fragment = document.createDocumentFragment();
+        const tbl = document.getElementById("table_era");
+        const fragment = document.createDocumentFragment();
         var row = insertRow(fragment);
         CreateTH(row, lu("Era Option"));
         CreateTH(row, lu("Stat Lift Bleed"));
         CreateTH(row, lu("Stat Cost"));
         CreateTH(row, lu("Stat Pitch Stability"));
         row = insertRow(fragment);
-        var selcell = row.insertCell();
+        const selcell = row.insertCell();
         //Get used elements
         this.select = document.createElement("SELECT");
         selcell.append(this.select);
@@ -29,7 +29,7 @@ export class Era_HTML extends Display {
         //For each element create an option,
         //    add it to the select
         for (let elem of this.model.GetEraOptions()) {
-            var opt = document.createElement("OPTION");
+            const opt = document.createElement("OPTION");
             opt.text = lu(elem.name);
             this.select.add(opt);
         }
@@ -37,7 +37,7 @@ export class Era_HTML extends Display {
     }
     UpdateDisplay() {
         this.select.selectedIndex = this.model.GetSelected();
-        var stats = this.model.PartStats();
+        const stats = this.model.PartStats();
         BlinkIfChanged(this.bleed, stats.liftbleed.toString(), false);
         BlinkIfChanged(this.cost, stats.cost.toString(), false);
         BlinkIfChanged(this.pstab, stats.pitchstab.toString(), false);
