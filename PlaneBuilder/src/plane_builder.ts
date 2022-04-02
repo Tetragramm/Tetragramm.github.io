@@ -14,6 +14,8 @@ const init = () => {
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
     var lang = sp.get("lang");
+    var test = sp.get("test");
+
     //Strings bit
     if (lang) {
         localization.SetCurrentLanguage(lang);
@@ -21,7 +23,11 @@ const init = () => {
         localization.SetCurrentLanguage(window.localStorage.language);
     }
 
-    //Parts bit
+    if (test) {
+        test_published();
+    }
+
+
     let acft_data = window.localStorage.getItem("aircraft");
 
     //Engine bit
@@ -103,9 +109,6 @@ function SetScroll(ev) {
     }
 }
 
-// var parts_JSON: JSON;
-var engine_JSON: JSON;
-var weapon_JSON: JSON;
 var aircraft_model: Aircraft;
 var aircraft_display: Aircraft_HTML;
 
