@@ -8,41 +8,48 @@ The primary code is in the PlaneBuilder folder.  Other folders may exist for tem
 
 index.html just immediately redirects to PlaneBuilder/index.html.  Someday I may add a personal website here and change that, but for now, no.
 
-Inside /PlaneBuilder there are folders for code, for libraries, for resources, and a separate folder for each sub-page's code.  At some point I will rearrange the *.json files into their own folder and the main plane_builder.js into it's own folder, but for now they're top level.
+Inside /PlaneBuilder there are folders for each sub-page's code, and /src, which contains all the source code and json resources.
 
 - .vscode
   - vscode settings that define "tasks" that automate annoying console commands.
 - Cards
   - The printable blank cards that get automatically filled out.
-- disp
-  - The *.ts files that are used to create the main page's display.
 - EngineBuilder
-  - The *.ts files and compiled .js for the Engine Builder.
-  - Piston engines, Pulsejets, Turbines, and possibly soon electric engines.
+  - The compiled .js for the Engine Builder.
+  - Also the instructional guide on how to use it, in PDF form.
 - Hangar
   - A page for saving planes and comparing them to each other
-- Helicopter
-  - Now defunct. Redirects to the main page.  Will be removed eventually
-- impl
-  - The model code.  A bit of data saving and such has crept in, but it's _almost_ display and browser independent.
-- lz
-  - The Lz-string library, for compressing strings in the link creation.
 - page
   - Display resources, one image and the CSS files.
 - Rules
   - The Rules for the plane builder.  Converted from a .docx saved as a .rtf  TODO: check that in here
-- scroll
-  - The Scroll-to-fragment library.  How it jumps to the right portion of the page after loading.  Why is this hard enough it needs a library?
-- string
-  - The StringFmt library.  Useful things like Join and Fmt.
+- src
+  - disp
+    - The *.ts files that are used to create the main page's display.
+  - EngineBuilder
+    - The *.ts files for the Engine Builder.
+    - Piston engines, Pulsejets, Turbines, and prototype electric engines.
+  - impl
+    - The model code.  A bit of data saving and such has crept in, but it's _almost_ display and browser independent.
+  - lz
+    - The Lz-string library, for compressing strings in the link creation.
+  - scroll
+    - The Scroll-to-fragment library.  How it jumps to the right portion of the page after loading.  Why is this hard enough it needs a library?
+  - string
+    - The StringFmt library.  Useful things like Join and Fmt.
 - WeaponDisplay
   - A page that shows the stats of all the weapons, and associated code.
 
 ## How to use and edit
 
 For the easy way, you'll need vscode, python, and typescript installed, and the repository cloned.
+Added April, 2022: In addition, install webpack, webpack-cli and ts-loader.  If you are installing them globally, you will need to use your shell to call 
+`npm link webpack`
+`npm link typescript`
+`npm link ts-loader`
+In the end, you should have a folder named `node_modules` in your directory structure, at the same level as webpack.config.js, or higher.  Doing this from the root of the repo will create one folder for the PlaneBuilder, Test, and Helicopter folders, which is good.
 
-In vscode, open the /PlaneBuilder folder and you should see the above folders.  I have already set up a task to compile each individual page, and start a webserver to test with.  Hit Ctrl+Shift+B to execute the task.  Now, whenever you make changes, hit save, and typescript's watch will see the change and recompile.
+In vscode, open the /PlaneBuilder folder and you should see the folders described .  I have already set up a task to compile the typescript, and start a webserver to test with.  Hit Ctrl+Shift+B to execute the task.  Now, whenever you make changes, hit save, and webpacks's watch will see the change and recompile.  It does take a few seconds without any visible progress though.
 
 The webserver can be accessed from <localhost:8080>, via any browser.  If you are working on a specific "branch" you may need to append that folder name, eg. <localhost:8080/Test>
 
