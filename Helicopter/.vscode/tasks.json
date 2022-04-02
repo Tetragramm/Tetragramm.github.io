@@ -5,9 +5,7 @@
 			"type": "shell",
 			"command": "python",
 			"args": [
-				"-m",
-				"http.server",
-				"8080"
+				"./server.py"
 			],
 			"group": "build",
 			"presentation": {
@@ -20,14 +18,15 @@
 			"label": "Local Server"
 		},
 		{
-			"type": "typescript",
-			"tsconfig": "tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
+			"type": "shell",
+			"command": "webpack",
+			"args": [
+				"watch",
+				"-c",
+				"webpack.config.js"
 			],
 			"group": "build",
-			"label": "Watch Helicopter Builder"
+			"label": "Watch Plane Builder",
 		},
 		{
 			"label": "Watch All",
@@ -37,24 +36,26 @@
 			},
 			"dependsOn": [
 				"Local Server",
-				"Watch Helicopter Builder",
+				"Watch Plane Builder",
 			]
 		},
 		{
-			"type": "typescript",
-			"tsconfig": "tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
+			"type": "shell",
+			"command": "webpack",
+			"args": [
+				"watch",
+				"-c",
+				"webpack.config.js"
 			],
 			"group": "build",
-			"label": "Build Helicopter Builder"
+			"label": "Build Plane Builder"
 		},
 		{
 			"label": "Build All",
 			"group": "build",
 			"dependsOn": [
 				"Local Server",
-				"Build Helicopter Builder"
+				"Build Plane Builder",
 			]
 		}
 	]
