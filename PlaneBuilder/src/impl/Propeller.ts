@@ -1,7 +1,7 @@
-import { Part, AIRCRAFT_TYPE, Propellers_PS } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { DRIVE_TYPE } from "./EngineStats.js";
+import { Part, AIRCRAFT_TYPE, Propellers_PS } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { DRIVE_TYPE } from "./EngineStats";
 
 export class Propeller extends Part {
     private prop_list: { name: string, stats: Stats, energy: number, turn: number }[];

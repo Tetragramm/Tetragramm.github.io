@@ -1,7 +1,7 @@
-import { Era } from "../impl/Era.js";
-import { insertRow, CreateTH, BlinkIfChanged } from "./Tools.js";
-import { Display } from "./Display.js";
-import { lu } from "../impl/Localization.js";
+import { Era } from "../impl/Era";
+import { insertRow, CreateTH, BlinkIfChanged } from "./Tools";
+import { Display } from "./Display";
+import { lu } from "../impl/Localization";
 
 export class Era_HTML extends Display {
     private model: Era;

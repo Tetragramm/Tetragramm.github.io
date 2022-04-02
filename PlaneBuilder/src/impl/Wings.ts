@@ -1,7 +1,7 @@
-import { lu } from "./Localization.js";
-import { Part, AIRCRAFT_TYPE, Wings_PS } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
+import { lu } from "./Localization";
+import { Part, AIRCRAFT_TYPE, Wings_PS } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 type WingType_OLD = {
     surface: number, area: number, span: number,

@@ -1,8 +1,8 @@
-import { Cockpits } from "../impl/Cockpits.js";
-import { Cockpit_HTML } from "./Cockpit.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateTH } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Cockpits } from "../impl/Cockpits";
+import { Cockpit_HTML } from "./Cockpit";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH } from "./Tools";
+import { Display } from "./Display";
 
 export class Cockpits_HTML extends Display {
     private tbl: HTMLTableElement;

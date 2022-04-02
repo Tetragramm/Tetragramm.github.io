@@ -1,7 +1,7 @@
-import { EngineStats } from "../impl/EngineStats.js";
-import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs.js";
-import { lu } from "../impl/Localization.js";
-import { num2era } from "../impl/Stats.js";
+import { EngineStats } from "../impl/EngineStats";
+import { EngineInputs, ENGINE_TYPE, ENGINE_RARITY } from "../impl/EngineInputs";
+import { lu } from "../impl/Localization";
+import { num2era } from "../impl/Stats";
 
 export class ElectricBuilder {
     readonly EraTable:

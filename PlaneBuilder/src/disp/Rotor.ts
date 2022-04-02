@@ -1,8 +1,8 @@
-import { AIRCRAFT_TYPE } from "../impl/Part.js";
-import { Rotor } from "../impl/Rotor.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect } from "./Tools.js";
-import { Display } from "./Display.js";
+import { AIRCRAFT_TYPE } from "../impl/Part";
+import { Rotor } from "../impl/Rotor";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect } from "./Tools";
+import { Display } from "./Display";
 
 export class Rotor_HTML extends Display {
     private rotor: Rotor;

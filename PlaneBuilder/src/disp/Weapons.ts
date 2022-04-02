@@ -1,11 +1,11 @@
-import { WeaponSystem } from "../impl/WeaponSystem.js";
-import { Stats } from "../impl/Stats.js";
-import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace } from "./Tools.js";
-import { StringFmt } from "../string/index.js";
-import { Display } from "./Display.js";
-import { ActionType, ProjectileType } from "../impl/Weapon.js";
-import { Weapons } from "../impl/Weapons.js";
-import { lu } from "../impl/Localization.js";
+import { WeaponSystem } from "../impl/WeaponSystem";
+import { Stats } from "../impl/Stats";
+import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace } from "./Tools";
+import { StringFmt } from "../string/index";
+import { Display } from "./Display";
+import { ActionType, ProjectileType } from "../impl/Weapon";
+import { Weapons } from "../impl/Weapons";
+import { lu } from "../impl/Localization";
 
 type WType = {
     span: HTMLSpanElement, wing: HTMLInputElement, covered: HTMLInputElement,

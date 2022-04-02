@@ -1,8 +1,8 @@
-import { Serialize, Deserialize, BoolArr } from "./Serialize.js";
-import { EngineBuilder } from "../EngineBuilder/EngineBuilder.js";
-import { PulsejetBuilder } from "../EngineBuilder/PulsejetBuilder.js";
-import { TurboBuilder } from "../EngineBuilder/TurboBuilder.js";
-import { ElectricBuilder } from "../EngineBuilder/ElectricBuilder.js";
+import { Serialize, Deserialize, BoolArr } from "./Serialize";
+import { EngineBuilder } from "../EngineBuilder/EngineBuilder";
+import { PulsejetBuilder } from "../EngineBuilder/PulsejetBuilder";
+import { TurboBuilder } from "../EngineBuilder/TurboBuilder";
+import { ElectricBuilder } from "../EngineBuilder/ElectricBuilder";
 
 export enum ENGINE_TYPE {
   PROPELLER,

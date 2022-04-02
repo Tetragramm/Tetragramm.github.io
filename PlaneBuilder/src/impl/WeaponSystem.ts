@@ -1,10 +1,10 @@
 
-import { Part } from "./Part.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
-import { lu } from "./Localization.js";
-import { Weapon } from "./Weapon.js";
-import { ActionType, SynchronizationType, ProjectileType } from "./Weapon.js";
-import { BoolArr, Serialize, Deserialize } from "./Serialize.js";
+import { Part } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { lu } from "./Localization";
+import { Weapon } from "./Weapon";
+import { ActionType, SynchronizationType, ProjectileType } from "./Weapon";
+import { BoolArr, Serialize, Deserialize } from "./Serialize";
 
 export class WeaponSystem extends Part {
     private final_weapon: {

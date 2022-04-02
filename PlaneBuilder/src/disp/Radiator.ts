@@ -1,7 +1,7 @@
-import { Radiator } from "../impl/Radiator.js";
-import { lu } from "../impl/Localization.js";
-import { CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Radiator } from "../impl/Radiator";
+import { lu } from "../impl/Localization";
+import { CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox } from "./Tools";
+import { Display } from "./Display";
 
 export class Radiator_HTML extends Display {
     private radiator: Radiator;

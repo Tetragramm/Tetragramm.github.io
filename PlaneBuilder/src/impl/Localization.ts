@@ -1,4 +1,4 @@
-import { StringFmt } from "../string/index.js";
+import { StringFmt } from "../string/index";
 import * as string_JSON from "../strings.json";
 
 class Localization {

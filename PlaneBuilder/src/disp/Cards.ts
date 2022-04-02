@@ -1,5 +1,5 @@
-import { StringFmt } from "../string/index.js";
-import { lu } from "../impl/Localization.js";
+import { StringFmt } from "../string/index";
+import { lu } from "../impl/Localization";
 
 export enum ENGINE_TEXT {
     SINGLE,

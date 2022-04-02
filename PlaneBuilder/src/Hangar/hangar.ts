@@ -1,11 +1,11 @@
-import { lu, localization } from "../impl/Localization.js";
-import { SetEngineLists } from "../impl/EngineList.js";
-import { Aircraft } from "../impl/Aircraft.js";
-import { Serialize, Deserialize } from "../impl/Serialize.js";
-import { Derived_HTML } from "../disp/Derived.js";
-import { BlinkBad, BlinkNeutral, _arrayBufferToString, _stringToArrayBuffer, download } from "../disp/Tools.js";
-import { LZString } from "../lz/lz-string.js";
-import { JSON2CSV } from "../JSON2CSV/json2csv.js";
+import { lu, localization } from "../impl/Localization";
+import { SetEngineLists } from "../impl/EngineList";
+import { Aircraft } from "../impl/Aircraft";
+import { Serialize, Deserialize } from "../impl/Serialize";
+import { Derived_HTML } from "../disp/Derived";
+import { BlinkBad, BlinkNeutral, _arrayBufferToString, _stringToArrayBuffer, download } from "../disp/Tools";
+import { LZString } from "../lz/lz-string";
+import { JSON2CSV } from "../JSON2CSV/json2csv";
 
 import * as parts_JSON from "../parts.json";
 

@@ -1,7 +1,7 @@
-import { Part, AIRCRAFT_TYPE, Reinforcement_PS } from "./Part.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
-import { Serialize, Deserialize, NumArr } from "./Serialize.js";
-import { lu } from "./Localization.js";
+import { Part, AIRCRAFT_TYPE, Reinforcement_PS } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize, NumArr } from "./Serialize";
+import { lu } from "./Localization";
 
 export class Reinforcement extends Part {
     private ext_wood_list: { name: string, tension: number, config: boolean, first: boolean, small_sqp: boolean, ornith: boolean, stats: Stats }[];

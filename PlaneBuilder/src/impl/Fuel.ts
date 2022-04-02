@@ -1,7 +1,7 @@
-import { Fuel_PS, Part } from "./Part.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
-import { Serialize, Deserialize, NumArr } from "./Serialize.js";
-import { lu } from "./Localization.js";
+import { Fuel_PS, Part } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize, NumArr } from "./Serialize";
+import { lu } from "./Localization";
 
 export class Fuel extends Part {
     private tank_stats: {

@@ -1,9 +1,9 @@
-import { Engine, } from "../impl/Engine.js";
-import { ENGINE_RARITY } from "../impl/EngineInputs.js";
-import { GetEngineLists } from "../impl/EngineList.js";
-import { lu } from "../impl/Localization.js";
-import { CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Engine, } from "../impl/Engine";
+import { ENGINE_RARITY } from "../impl/EngineInputs";
+import { GetEngineLists } from "../impl/EngineList";
+import { lu } from "../impl/Localization";
+import { CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect } from "./Tools";
+import { Display } from "./Display";
 
 export class Engine_HTML extends Display {
     private engine: Engine;

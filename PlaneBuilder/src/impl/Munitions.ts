@@ -1,6 +1,6 @@
-import { Part } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Munitions extends Part {
   private bomb_count: number;

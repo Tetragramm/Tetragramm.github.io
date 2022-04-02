@@ -1,7 +1,7 @@
-import { Optimization } from "../impl/Optimization.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateTH, BlinkIfChanged } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Optimization } from "../impl/Optimization";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH, BlinkIfChanged } from "./Tools";
+import { Display } from "./Display";
 
 export class Optimization_HTML extends Display {
     private opt: Optimization;

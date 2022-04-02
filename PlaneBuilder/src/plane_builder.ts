@@ -1,12 +1,12 @@
-import { localization } from "./impl/Localization.js";
-import { SetEngineLists } from "./impl/EngineList.js";
-import { Aircraft } from "./impl/Aircraft.js";
-import { Aircraft_HTML } from "./disp/Aircraft.js";
-import { LZString } from "./lz/lz-string.js";
-import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled } from "./disp/Tools.js";
-import { Deserialize } from "./impl/Serialize.js";
-import { StringFmt } from "./string/index.js";
-import { scrollToFragment } from "./scroll/scroll.js";
+import { localization } from "./impl/Localization";
+import { SetEngineLists } from "./impl/EngineList";
+import { Aircraft } from "./impl/Aircraft";
+import { Aircraft_HTML } from "./disp/Aircraft";
+import { LZString } from "./lz/lz-string";
+import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled } from "./disp/Tools";
+import { Deserialize } from "./impl/Serialize";
+import { StringFmt } from "./string/index";
+import { scrollToFragment } from "./scroll/scroll";
 
 import * as parts_JSON from "./parts.json";
 

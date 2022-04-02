@@ -1,10 +1,10 @@
-import { Aircraft, DerivedStats } from "../impl/Aircraft.js";
-import { Stats, WARNING_COLOR, era2numHl } from "../impl/Stats.js";
-import { WING_DECK } from "../impl/Wings.js";
-import { WeaponString } from "./Weapons.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateFlexSection, CreateTH, FlexLabels } from "./Tools.js";
-import { StringFmt } from "../string/index.js";
+import { Aircraft, DerivedStats } from "../impl/Aircraft";
+import { Stats, WARNING_COLOR, era2numHl } from "../impl/Stats";
+import { WING_DECK } from "../impl/Wings";
+import { WeaponString } from "./Weapons";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateFlexSection, CreateTH, FlexLabels } from "./Tools";
+import { StringFmt } from "../string/index";
 
 export class Derived_HTML {
     private tbl: HTMLTableElement;

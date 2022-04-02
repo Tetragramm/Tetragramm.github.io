@@ -1,6 +1,6 @@
-import { Part } from "./Part.js";
-import { Stats } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
+import { Part } from "./Part";
+import { Stats } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
 
 export class Radiator extends Part {
     private type_list: { name: string, stats: Stats, dragpercool: number }[];

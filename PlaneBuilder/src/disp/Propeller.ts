@@ -1,6 +1,6 @@
-import { Propeller } from "../impl/Propeller.js";
-import { lu } from "../impl/Localization.js";
-import { Display } from "./Display.js";
+import { Propeller } from "../impl/Propeller";
+import { lu } from "../impl/Localization";
+import { Display } from "./Display";
 
 export class Propeller_HTML extends Display {
     private prop: Propeller;

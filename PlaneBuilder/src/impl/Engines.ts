@@ -1,11 +1,11 @@
-import { Part, MergeElectrics, Engines_PS } from "./Part.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { lu } from "./Localization.js";
-import { Engine } from "./Engine.js";
-import { DRIVE_TYPE } from "./EngineStats.js";
-import { Radiator } from "./Radiator.js";
-import { StringFmt } from "../string/index.js";
+import { Part, MergeElectrics, Engines_PS } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
+import { Engine } from "./Engine";
+import { DRIVE_TYPE } from "./EngineStats";
+import { Radiator } from "./Radiator";
+import { StringFmt } from "../string/index";
 
 export class Engines extends Part {
   private engines: Engine[];

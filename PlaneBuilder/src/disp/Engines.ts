@@ -1,9 +1,9 @@
-import { Engines } from "../impl/Engines.js";
-import { Engine_HTML } from "./Engine.js";
-import { Radiator_HTML } from "./Radiator.js";
-import { lu } from "../impl/Localization.js";
-import { insertRow, CreateTH } from "./Tools.js";
-import { Display } from "./Display.js";
+import { Engines } from "../impl/Engines";
+import { Engine_HTML } from "./Engine";
+import { Radiator_HTML } from "./Radiator";
+import { lu } from "../impl/Localization";
+import { insertRow, CreateTH } from "./Tools";
+import { Display } from "./Display";
 
 export class Engines_HTML extends Display {
     private eng: Engines;

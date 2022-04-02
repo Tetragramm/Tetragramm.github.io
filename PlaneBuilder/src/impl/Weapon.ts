@@ -1,7 +1,7 @@
-import { Part } from "./Part.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { lu } from "./Localization.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
+import { Part } from "./Part";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
+import { Stats, WARNING_COLOR } from "./Stats";
 
 
 export enum SynchronizationType {

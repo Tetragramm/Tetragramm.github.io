@@ -1,6 +1,6 @@
-import { Stats, Stats_PS } from "./Stats.js";
-import { Serialize, Deserialize, NumArr } from "./Serialize.js";
-import { ENGINE_RARITY } from "./EngineInputs.js";
+import { Stats, Stats_PS } from "./Stats";
+import { Serialize, Deserialize, NumArr } from "./Serialize";
+import { ENGINE_RARITY } from "./EngineInputs";
 
 
 

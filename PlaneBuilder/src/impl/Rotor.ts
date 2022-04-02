@@ -1,7 +1,7 @@
-import { Part, AIRCRAFT_TYPE, Rotor_PS } from "./Part.js";
-import { Stats, WARNING_COLOR } from "./Stats.js";
-import { Serialize, Deserialize } from "./Serialize.js";
-import { lu } from "./Localization.js";
+import { Part, AIRCRAFT_TYPE, Rotor_PS } from "./Part";
+import { Stats, WARNING_COLOR } from "./Stats";
+import { Serialize, Deserialize } from "./Serialize";
+import { lu } from "./Localization";
 
 enum ROTOR_BLADE_COUNT {
     Two = 2,
