@@ -5,9 +5,7 @@
 			"type": "shell",
 			"command": "python",
 			"args": [
-				"-m",
-				"http.server",
-				"8080"
+				"./server.py"
 			],
 			"group": "build",
 			"presentation": {
@@ -20,44 +18,15 @@
 			"label": "Local Server"
 		},
 		{
-			"type": "typescript",
-			"tsconfig": "tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
+			"type": "shell",
+			"command": "webpack",
+			"args": [
+				"watch",
+				"-c",
+				"webpack.config.js"
 			],
 			"group": "build",
-			"label": "Watch Plane Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "EngineBuilder/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Engine Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "Hangar/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Hangar"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "WeaponDisplay/tsconfig.json",
-			"option": "watch",
-			"problemMatcher": [
-				"$tsc-watch"
-			],
-			"group": "build",
-			"label": "Watch Weapon Display"
+			"label": "Watch Plane Builder",
 		},
 		{
 			"label": "Watch All",
@@ -68,46 +37,18 @@
 			"dependsOn": [
 				"Local Server",
 				"Watch Plane Builder",
-				"Watch Engine Builder",
-				"Watch Hangar",
-				"Watch Weapon Display"
 			]
 		},
 		{
-			"type": "typescript",
-			"tsconfig": "tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
+			"type": "shell",
+			"command": "webpack",
+			"args": [
+				"watch",
+				"-c",
+				"webpack.config.js"
 			],
 			"group": "build",
 			"label": "Build Plane Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "EngineBuilder/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Engine Builder"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "Hangar/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Hangar"
-		},
-		{
-			"type": "typescript",
-			"tsconfig": "WeaponDisplay/tsconfig.json",
-			"problemMatcher": [
-				"$tsc"
-			],
-			"group": "build",
-			"label": "Build Weapon Display"
 		},
 		{
 			"label": "Build All",
@@ -115,9 +56,6 @@
 			"dependsOn": [
 				"Local Server",
 				"Build Plane Builder",
-				"Build Engine Builder",
-				"Build Hangar",
-				"Build Weapon Display"
 			]
 		}
 	]

@@ -1,19 +1,14 @@
 {
     "compilerOptions": {
-        "target": "ES6",
-        "module": "system",
-        "outFile": "plane_builder.js"
+        "target": "ES2021",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "outDir": ".",
+        "rootDir": "./src",
     },
-    "exclude": [
-        "./EngineBuilder",
-        "./WeaponDisplay",
-        "./Standalone",
-        "./Hangar",
-        "./Helicopter"
-    ],
+    "exclude": [],
     "include": [
-        ".",
-        "./disp",
-        "./impl"
+        "./src",
     ]
 }

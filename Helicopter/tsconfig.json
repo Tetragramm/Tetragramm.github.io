@@ -1,11 +1,20 @@
 {
     "compilerOptions": {
-        "target": "ES6",
-        "module": "system",
-        "outFile": "helicopter_builder.js"
+        "target": "ES2021",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "outDir": ".",
+        "rootDir": "..",
     },
-    "exclude": [],
+    "exclude": [
+        "../Test/src/EngineBuilder/engine_builder.ts",
+        "../Test/src/Hangar/hangar.ts",
+        "../Test/src/WeaponDisplay/weapon_display.ts",
+        "../Test/src/plane_builder.ts",
+    ],
     "include": [
-        ".",
+        "./src",
+        "../Test/src",
     ]
 }
