@@ -4,7 +4,7 @@ import { StringFmt } from "../../Test/src/string";
 
 import { WeaponString } from "../../Test/src/disp/Weapons";
 import { DerivedStats } from "../../Test/src/impl/Aircraft";
-import { Stats, era2numHl } from "../../Test/src/impl/Stats";
+import { Stats, WARNING_COLOR, era2numHl } from "../../Test/src/impl/Stats";
 import { Helicopter } from "./Helicopter";
 
 export class Derived_Heli_HTML {
@@ -407,9 +407,22 @@ export class Derived_Heli_HTML {
         }
         this.weapon_cell.innerHTML = weaphtml;
 
+        stats.warnings.sort((a, b) => { return a.color - b.color });
         var warnhtml = "";
         for (let w of stats.warnings) {
-            warnhtml += w.source + ":  " + w.warning + "<br/>";
+            switch (w.color) {
+                case WARNING_COLOR.RED:
+                    warnhtml += "<div style=\"color:#FF0000;\">";
+                    break;
+                case WARNING_COLOR.YELLOW:
+                    warnhtml += "<div style=\"color:#FFFF00;\">";
+                    break;
+                case WARNING_COLOR.WHITE:
+                default:
+                    warnhtml += "<div style=\"color:var(--inp_txt_color);;\">";
+                    break;
+            }
+            warnhtml += w.source + ":  " + w.warning + "</div>";
         }
         this.warning_cell.innerHTML = warnhtml;
 

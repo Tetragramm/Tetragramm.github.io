@@ -411,6 +411,14 @@ export class EngineBuilder {
             }
         }
 
+        if (this.compressor_type == CompressorEnum.ALTITUDE_THROTTLE || this.upg_sel[1]) {
+            estats.stats.warnings.push({
+                source: lu("War Emergency Power"),
+                warning: lu("War Emergency Power Warning"),
+                color: WARNING_COLOR.WHITE,
+            });
+        }
+
         estats.stats.fuelconsumption = Math.max(1, estats.stats.fuelconsumption);
         estats.rarity = this.rarity;
 

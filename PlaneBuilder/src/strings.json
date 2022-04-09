@@ -379,6 +379,7 @@
         "Turns Left": "Turns Left",
         "War Emergency Power": "War Emergency Power",
         "War Emergency Power from altitudes 0-9": "War Emergency Power from altitudes 0-9",
+        "War Emergency Power Warning": "Take double RPM to exceed Max Speed when Boosting.",
         "Altitude Throttle": "Altitude Throttle",
         "Altitude Throttle Warning": "This engine has the WEP upgrade at Altitudes 0-9.",
         "Fixed": "Fixed",
@@ -777,6 +778,8 @@
         "Rarity Legendary": "Legendary",
         "Boost Warning": "Boost is 0 for some loads.  The plane cannot accelerate to take off.",
         "Insufficient Charge": "Insufficient Charge",
-        "Insufficient Charge Warning": "This aircraft has electrical systems with nothing to power them."
+        "Insufficient Charge Warning": "This aircraft has electrical systems with nothing to power them.",
+        "Low Mass Warning": "This aircraft is very low mass. If it is a custom airplane, be careful not to make it overpowered.",
+        "Low Drag Warning": "This aircraft is very low drag. If it is a custom airplane, be careful not to make it overpowered."
     }
 }

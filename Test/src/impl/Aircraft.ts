@@ -779,6 +779,24 @@ export class Aircraft {
     // const MaxSpeedFull = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (0.5 * DPFull * 9))));
     // const MaxSpeedwBombs = Math.floor(1.0e-6 + this.stats.pitchspeed * (Math.sqrt((2000 * this.stats.power) / (0.5 * DPwBombs * 9))));
 
+    //Warnings for limits.
+    if (this.stats.mass < 15) {
+      if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Mass") }) == -1) {
+        this.stats.warnings.push({
+          source: lu("Stat Mass"), warning: lu("Low Mass Warning"),
+          color: WARNING_COLOR.YELLOW,
+        });
+      }
+    }
+    if ((this.stats.drag + DryMP) < 35) {
+      if (this.stats.warnings.findIndex((value) => { return value.source == lu("Stat Drag") }) == -1) {
+        this.stats.warnings.push({
+          source: lu("Stat Drag"), warning: lu("Low Drag Warning"),
+          color: WARNING_COLOR.YELLOW,
+        });
+      }
+    }
+
     let StallSpeedEmpty = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * DryMP / Math.max(1, this.stats.wingarea)));
     let StallSpeedFull = Math.max(1, Math.floor(1.0e-6 + this.stats.liftbleed * WetMP / Math.max(1, this.stats.wingarea)));
     let StallSpeedFullwBombs = Math.max(Math.floor(1.0e-6 + this.stats.liftbleed * WetMPwBombs / Math.max(1, this.stats.wingarea)));
