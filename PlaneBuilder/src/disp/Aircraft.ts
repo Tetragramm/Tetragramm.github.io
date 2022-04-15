@@ -439,7 +439,7 @@ export class Aircraft_HTML extends Display {
             derived.Overspeed,
             this.acft.GetMinAltitude().toString() + "-" + this.acft.GetMaxAltitude().toString(),
             derived.FuelUses);
-        if (derived.TurnBleed == derived.TurnBleedwBombs) {
+        if (stats.bomb_mass == 0) {
             catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}\n\n",
                 StringFmt.Join("/", this.acft.GetVisibilityList()),
                 derived.Stabiilty,
