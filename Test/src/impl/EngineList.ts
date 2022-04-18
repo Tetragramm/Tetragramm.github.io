@@ -157,7 +157,6 @@ export class EngineList {
 
 const engine_list = new Map<string, EngineList>([["Custom", new EngineList("Custom")]]);
 
-//TODO: Make sure Global Variable sets.
 export function SetEngineLists(nameliststr: string) {
   for (const el of engine_JSON["lists"]) {
     if (!engine_list.has(el["name"]))
@@ -165,8 +164,24 @@ export function SetEngineLists(nameliststr: string) {
     if (el["name"] != "Custom") {
       engine_list.get(el["name"]).fromJSON(el, true);
       engine_list.get(el["name"]).SetConstant();
+      for (let idx = 0; idx < engine_list.get(el["name"]).length; idx++) {
+        const e = engine_list.get(el["name"]).get(idx);
+        engine_list.get("Custom").remove(e);
+      }
     } else {
       engine_list.get(el["name"]).fromJSON(el, false);
+    }
+  }
+
+  for (const name of JSON.parse(nameliststr)) {
+    console.log(name);
+    if (!engine_list.has(name))
+      engine_list.set(name, new EngineList(name));
+    if (name != "Custom") {
+      for (let idx = 0; idx < engine_list.get(name).length; idx++) {
+        const e = engine_list.get(name).get(idx);
+        engine_list.get("Custom").remove(e);
+      }
     }
   }
 }
