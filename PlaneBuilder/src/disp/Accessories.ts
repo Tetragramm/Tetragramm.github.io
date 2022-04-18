@@ -65,7 +65,7 @@ export class Accessories_HTML extends Display {
         const lfs = CreateFlexSection(fs.div1);
         const rfs = CreateFlexSection(fs.div2);
         this.a_AP = [];
-        const len = this.acc.GetArmourCoverage().length;
+        const len = this.acc.GetArmourCoverageForDisplay().length;
         for (let i = 0; i < len; i++)
             this.a_AP.push(document.createElement("INPUT") as HTMLInputElement);
 
@@ -197,7 +197,7 @@ export class Accessories_HTML extends Display {
 
 
     public UpdateDisplay() {
-        const AP = this.acc.GetArmourCoverage();
+        const AP = this.acc.GetArmourCoverageForDisplay();
         for (let i = 0; i < AP.length; i++) {
             this.a_AP[i].valueAsNumber = AP[i];
         }

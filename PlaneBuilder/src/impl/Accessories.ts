@@ -41,6 +41,7 @@ export class Accessories extends Part {
         this.armour_coverage = [...Array(8).fill(0)];
         this.acft_rad = false;
         this.skin_armour = 0;
+        this.vital_parts = 0;
 
         this.electric_list = [];
         for (const elem of js["electrical"]) {
@@ -107,6 +108,7 @@ export class Accessories extends Part {
         if (js["v"] == 2) {
             this.armour_coverage = js["armour_coverage"];
         }
+        this.skin_armour = 0;
         if (json_version < 11.85) {
             this.electrical_count = NumArr(js["electrical_count"], this.electrical_count.length + 1);
             this.electrical_count[0] += this.electrical_count[1];
@@ -147,6 +149,7 @@ export class Accessories extends Part {
 
     public deserialize(d: Deserialize) {
         this.armour_coverage = d.GetNumArr(this.armour_coverage.length);
+        this.skin_armour = 0;
         if (d.version < 11.85) {
             this.electrical_count = d.GetNumArr(this.electrical_count.length + 1);
             this.electrical_count[0] += this.electrical_count[1];
@@ -178,8 +181,13 @@ export class Accessories extends Part {
         return lu(this.radio_list[this.radio_sel].name);
     }
 
-    public GetArmourCoverage() {
-        return this.armour_coverage;
+    public GetArmourCoverageForDisplay() {
+        var arr = [];
+        for (let i = 0; i < this.armour_coverage.length; i++) {
+            arr.push(this.armour_coverage[i]);
+        }
+        arr[1] += this.skin_armour;
+        return arr;
     }
 
     public GetEffectiveCoverage() {
@@ -188,6 +196,7 @@ export class Accessories extends Part {
         for (let i = 0; i < this.armour_coverage.length; i++) {
             arr.push(Math.max(0, this.armour_coverage[i]));
         }
+        arr[1] += this.skin_armour;
         let sum = 0;
         for (let r = this.armour_coverage.length - 1; r >= 0; r--) {
             sum += arr[r];
@@ -200,17 +209,18 @@ export class Accessories extends Part {
         if (num != num || num < 0)
             num = 0;
         num = Math.floor(1.0e-6 + num);
-        this.armour_coverage[idx] = num;
+        if (idx != 1)
+            this.armour_coverage[idx] = num;
+        else
+            this.armour_coverage[idx] = num - this.skin_armour;
         this.NormalizeCoverage();
         this.CalculateStats();
     }
 
     private NormalizeCoverage() {
         var coverage = -8 + Math.min(0, -Math.floor(1.0e-6 + (this.vital_parts - 8) / 2));
+        coverage += this.skin_armour;
         for (let i = this.armour_coverage.length - 1; i >= 0; i--) {
-            if (i == 1) {
-                coverage += this.skin_armour;
-            }
             this.armour_coverage[i] = Math.max(0, Math.min(Math.abs(coverage), this.armour_coverage[i]));
             coverage += this.armour_coverage[i];
         }
@@ -354,10 +364,8 @@ export class Accessories extends Part {
     }
 
     public SetSkinArmor(num: number) {
-        if (num < this.skin_armour)
-            this.armour_coverage[1] += num - this.skin_armour;
         this.skin_armour = num;
-        this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
+        //Would normalize Coverage, but Vital Parts is always called next.
     }
 
     public SetVitalParts(num: number) {
@@ -409,16 +417,12 @@ export class Accessories extends Part {
     public PartStats() {
         var stats = new Stats();
 
-        this.armour_coverage[1] = Math.max(this.armour_coverage[1], this.skin_armour);
         var armour_str = "";
         //Armour
         const eff_armour = this.GetEffectiveCoverage();
         for (let i = 0; i < this.armour_coverage.length; i++) {
             const AP = i + 1;
             var count = this.armour_coverage[i];
-            if (AP == 2) {
-                count -= this.skin_armour;
-            }
 
             stats.mass += count * Math.pow(2, AP - 1);
             stats.cost += Math.floor(1.0e-6 + count * AP / 3);
