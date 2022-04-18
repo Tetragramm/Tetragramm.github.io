@@ -603,12 +603,16 @@ export class Aircraft {
     stats = stats.Add(this.cargo.PartStats());
 
     //If there are wings...
+
+    this.wings.SetAcftType(this.aircraft_type);
     if (this.aircraft_type == AIRCRAFT_TYPE.AUTOGYRO) {
       this.wings.SetRotorSpan(this.rotor.GetRotorSpan());
     } else {
       this.wings.SetRotorSpan(0);
     }
+    console.log([this.name, stats.maxstrain.toString()]);
     stats = stats.Add(this.wings.PartStats());
+
     this.rotor.SetWingArea(stats.wingarea);
     //If there is a rotor...
     if (this.aircraft_type == AIRCRAFT_TYPE.AUTOGYRO) {
@@ -630,12 +634,12 @@ export class Aircraft {
     }
     stats = stats.Add(this.controlsurfaces.PartStats());
 
+    this.reinforcements.SetAircraftType(this.aircraft_type);
     this.reinforcements.SetMonoplane(this.wings.GetMonoplane());
     this.reinforcements.SetTandem(this.wings.GetTandem());
     this.reinforcements.SetStaggered(this.wings.GetStaggered());
     this.reinforcements.SetCanUseExternal(this.wings.GetArea() > 0);
     this.reinforcements.SetSesquiplane(this.wings.GetIsSesquiplane());
-    this.reinforcements.SetAircraftType(this.aircraft_type);
     this.reinforcements.SetCantLift(this.era.GetCantLift());
     stats = stats.Add(this.reinforcements.PartStats());
 
@@ -667,7 +671,6 @@ export class Aircraft {
 
     //Treated Paper needs to apply near to last
     this.wings.SetAircraftMass(stats.mass);
-    this.wings.SetAcftType(this.aircraft_type);
     stats.mass += this.wings.GetPaperMass();
     //Because treated paper brings mass down.
     stats.mass = Math.max(1, stats.mass);

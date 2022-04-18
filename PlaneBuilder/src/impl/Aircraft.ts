@@ -603,6 +603,7 @@ export class Aircraft {
     stats = stats.Add(this.cargo.PartStats());
 
     //If there are wings...
+    this.wings.SetAcftType(this.aircraft_type);
     if (this.aircraft_type == AIRCRAFT_TYPE.AUTOGYRO) {
       this.wings.SetRotorSpan(this.rotor.GetRotorSpan());
     } else {
@@ -667,7 +668,6 @@ export class Aircraft {
 
     //Treated Paper needs to apply near to last
     this.wings.SetAircraftMass(stats.mass);
-    this.wings.SetAcftType(this.aircraft_type);
     stats.mass += this.wings.GetPaperMass();
     //Because treated paper brings mass down.
     stats.mass = Math.max(1, stats.mass);
