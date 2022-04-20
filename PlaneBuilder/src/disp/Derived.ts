@@ -1,5 +1,5 @@
 import { Aircraft, DerivedStats } from "../impl/Aircraft";
-import { Stats, WARNING_COLOR, era2numHl } from "../impl/Stats";
+import { Stats, Stress2Str, WARNING_COLOR, era2numHl } from "../impl/Stats";
 import { WING_DECK } from "../impl/Wings";
 import { WeaponString } from "./Weapons";
 import { lu } from "../impl/Localization";
@@ -346,7 +346,7 @@ export class Derived_HTML {
         this.crashsafety_cell.textContent = stats.crashsafety.toString();
 
         this.crew_cell.textContent = acft.GetCockpits().GetNumberOfCockpits().toString() + "/" + (acft.GetPassengers().GetSeats() + acft.GetPassengers().GetBeds()).toString();
-        this.flightstress_cell.textContent = this.Stress2Str(acft.GetStressList());
+        this.flightstress_cell.textContent = Stress2Str(acft.GetStressList());
         this.visibility_cell.textContent = StringFmt.Join(", ", acft.GetVisibilityList());
         this.attack_cell.textContent = StringFmt.Join(", ", acft.GetAttackList());
         this.communications_cell.textContent = acft.GetCommunicationName();
@@ -521,26 +521,5 @@ export class Derived_HTML {
 
     public SetShowBombs(set: boolean) {
         this.show_bombs = set;
-    }
-
-    private Stress2Str(arr: any[]) {
-        var str = "";
-        for (let i = 0; i < arr.length - 1; i++) {
-            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
-                str += arr[i][0].toString() + "(" + arr[i][1].toString() + "), ";
-            } else {
-                str += arr[i][0].toString() + ", ";
-            }
-        }
-        if (arr.length > 0) {
-            const i = arr.length - 1;
-            if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
-                str += arr[i][0].toString() + "(" + arr[i][1].toString() + ")";
-            } else {
-                str += arr[i][0].toString();
-            }
-        }
-
-        return str;
     }
 }

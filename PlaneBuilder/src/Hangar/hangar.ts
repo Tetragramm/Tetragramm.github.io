@@ -6,6 +6,8 @@ import { Derived_HTML } from "../disp/Derived";
 import { BlinkBad, BlinkNeutral, _arrayBufferToString, _stringToArrayBuffer, download } from "../disp/Tools";
 import { LZString } from "../lz/lz-string";
 import { JSON2CSV } from "../JSON2CSV/json2csv";
+import { StringFmt } from "../string";
+import { Stress2Str } from "../impl/Stats";
 
 import * as parts_JSON from "../parts.json";
 
@@ -155,9 +157,16 @@ function InitHTML() {
                 acft_hangar.CalculateStats();
             } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); acft_hangar.Reset(); }
 
+            let stats = acft_hangar.GetStats();
             let dstats = acft_hangar.GetDerivedStats();
             let entries = Object.entries<any>(dstats);
             entries.splice(0, 0, ["name", acft_hangar.name]);
+            entries.splice(1, 0, ["cost", stats.cost]);
+            entries.splice(2, 0, ["upkeep", stats.upkeep]);
+            entries.splice(3, 0, ["bomb_mass", stats.bomb_mass]);
+            entries.splice(4, 0, ["escape", StringFmt.Join("/", acft_hangar.GetEscapeList())]);
+            entries.splice(5, 0, ["crash", StringFmt.Join("/", acft_hangar.GetCrashList())]);
+            entries.splice(6, 0, ["stress", Stress2Str(acft_hangar.GetStressList())]);
             let dstatsn = Object.fromEntries(entries);
             DerivedStats.push(dstatsn);
         }

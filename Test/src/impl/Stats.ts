@@ -523,3 +523,24 @@ export const num2era = (era: number): string => {
       return "Himmilgard";
   }
 };
+
+export const Stress2Str = (arr: any[]): string => {
+  var str = "";
+  for (let i = 0; i < arr.length - 1; i++) {
+    if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+      str += arr[i][0].toString() + "(" + arr[i][1].toString() + "), ";
+    } else {
+      str += arr[i][0].toString() + ", ";
+    }
+  }
+  if (arr.length > 0) {
+    const i = arr.length - 1;
+    if (arr[i].length == 2 && arr[i][0] != arr[i][1]) {
+      str += arr[i][0].toString() + "(" + arr[i][1].toString() + ")";
+    } else {
+      str += arr[i][0].toString();
+    }
+  }
+
+  return str;
+};

@@ -1049,9 +1049,12 @@ export class Engine extends Part {
     }
 
     //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
-    if (this.cowl_sel != 0 &&
-      (this.mount_list[this.mount_sel].name == "Rear-Mounted Pusher" ||
-        this.mount_list[this.mount_sel].name == "Center-Mounted Pusher"
+    if ((this.cowl_list[this.cowl_sel].name != "No Cowling"
+      && this.cowl_list[this.cowl_sel].name != "Sealed Cowl")
+      &&
+      (this.mount_list[this.mount_sel].name == "Rear-Mounted Pusher"
+        || this.mount_list[this.mount_sel].name == "Center-Mounted Pusher"
+        || this.mount_list[this.mount_sel].name == "Center-Mounted Tractor"
         || this.mount_list[this.mount_sel].name == "Fuselage Push-Pull")) {
       stats.cost += 2;
     }
