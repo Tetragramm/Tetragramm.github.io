@@ -511,7 +511,7 @@ export class Weapons extends Part {
                     charges[c] *= -1;
 
                 value.equipment.push({
-                    source: lu("Vital Part Weapon Set", i, set.GetFinalWeapon().abrv),
+                    source: lu("Vital Part Weapon Set", i+1, set.GetFinalWeapon().abrv),
                     charge: StringFmt.Join('/', charges),
                 });
             }
