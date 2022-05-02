@@ -174,7 +174,6 @@ export function SetEngineLists(nameliststr: string) {
   }
 
   for (const name of JSON.parse(nameliststr)) {
-    console.log(name);
     if (!engine_list.has(name))
       engine_list.set(name, new EngineList(name));
     if (name != "Custom") {
