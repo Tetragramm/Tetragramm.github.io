@@ -789,7 +789,7 @@ export class WeaponSystem extends Part {
     }
 
     public GetShots() {
-        return Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo);
+        return Math.max(1, Math.floor(1.0e-6 + this.final_weapon.ammo * this.ammo));
     }
 
     public IsLightningArc() {
