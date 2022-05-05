@@ -19,6 +19,7 @@ export class Frames extends Part {
         lifting_body: boolean, internal_bracing: boolean
     }[];
     private required_sections: number;
+    private interal_bracing_count: number;
 
     private sel_skin: number;
     private tail_list: { name: string, stats: Stats }[];
@@ -78,6 +79,7 @@ export class Frames extends Part {
 
         this.section_list = [];
         this.tail_section_list = [];
+        this.interal_bracing_count = 0;
         this.SetRequiredSections(1);
     }
 
@@ -121,6 +123,7 @@ export class Frames extends Part {
         this.flying_wing = js["flying_wing"];
         if (json_version > 10.25)
             this.sel_skin = js["sel_skin"];
+        this.interal_bracing_count = this.CountInternalBracing();
     }
 
     public serialize(s: Serialize) {
@@ -188,6 +191,7 @@ export class Frames extends Part {
         this.flying_wing = d.GetBool();
         if (d.version > 10.25)
             this.sel_skin = d.GetNum();
+        this.interal_bracing_count = this.CountInternalBracing();
     }
 
     public DuplicateSection(num: number, count: number = 1) {
@@ -196,8 +200,10 @@ export class Frames extends Part {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
-        if (new_section.internal_bracing && this.CountSections() + this.tail_section_list.length == this.CountInternalBracing()) {
-            return;
+        if (new_section.internal_bracing) {
+            if (this.CountSections() + this.tail_section_list.length == this.interal_bracing_count)
+                return;
+            this.interal_bracing_count += count;
         }
         for (let i = 0; i < count; i++) {
             this.section_list.splice(num, 0, new_section);
@@ -211,7 +217,7 @@ export class Frames extends Part {
             frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
             lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
         };
-        if (new_section.internal_bracing && this.CountSections() == this.CountInternalBracing()) {
+        if (new_section.internal_bracing && this.CountSections() == this.interal_bracing_count) {
             return;
         }
         for (let i = 0; i < count; i++) {
@@ -224,10 +230,13 @@ export class Frames extends Part {
         if (this.required_sections == this.CountSections()
             && !this.section_list[num].internal_bracing)
             return;
+        if (this.section_list[num].internal_bracing)
+            this.interal_bracing_count--;
         this.section_list.splice(num, 1);
-        if (this.CountInternalBracing() > this.CountSections() + this.tail_section_list.length) {
+        if (this.interal_bracing_count > this.CountSections() + this.tail_section_list.length) {
             for (let i = this.section_list.length - 1; i >= 0; i--) {
                 if (this.section_list[i].internal_bracing) {
+                    this.interal_bracing_count--;
                     this.section_list.splice(i, 1);
                     break;
                 }
@@ -272,7 +281,7 @@ export class Frames extends Part {
             this.tail_section_list.pop();
         }
 
-        while (this.CountSections() + num < this.CountInternalBracing()) {
+        while (this.CountSections() + num < this.interal_bracing_count) {
             let idx = this.section_list.length - 1;
             for (; idx > 0; idx--) {
                 if (this.section_list[idx].internal_bracing)
@@ -284,12 +293,7 @@ export class Frames extends Part {
     }
 
     private CountSections() {
-        let count = 0;
-        for (const elem of this.section_list) {
-            if (!elem.internal_bracing)
-                count++;
-        }
-        return count;
+        return this.section_list.length - this.interal_bracing_count;
     }
 
     public GetNumFrames() {
@@ -398,7 +402,7 @@ export class Frames extends Part {
             allowed += this.tail_section_list.length;
         if (convert_sec_to_brace)
             allowed -= 1;
-        return this.CountInternalBracing() + 1 <= allowed;
+        return this.interal_bracing_count + 1 <= allowed;
     }
 
     public PossibleGeodesic(num: number) {
