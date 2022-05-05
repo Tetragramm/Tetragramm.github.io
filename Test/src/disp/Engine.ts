@@ -354,7 +354,7 @@ export class Engine_HTML extends Display {
 
             var found_list = false;
             var sel_list = 0;
-            var engine_list = GetEngineLists();
+            const engine_list = GetEngineLists();
             for (let key of engine_list.keys()) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = key;
@@ -378,6 +378,7 @@ export class Engine_HTML extends Display {
             }
             this.e_select.selectedIndex = this.engine.GetSelectedIndex();
         } else {
+            const engine_list = GetEngineLists();
             for (let key of engine_list.keys()) {
                 let opt = document.createElement("OPTION") as HTMLOptionElement;
                 opt.text = key;
