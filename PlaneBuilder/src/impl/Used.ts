@@ -24,7 +24,7 @@ export class Used extends Part {
         this.sluggish = 0;
     }
 
-    public GetEnabled() {
+    public IsDefault() {
         const total = Math.abs(this.burnt_out) +
             Math.abs(this.ragged) +
             Math.abs(this.hefty) +
@@ -33,7 +33,7 @@ export class Used extends Part {
             Math.abs(this.fragile) +
             Math.abs(this.leaky) +
             Math.abs(this.sluggish);
-        return total != 0;
+        return total == 0;
     }
 
     public SetEnabled(use: boolean) {

@@ -1,6 +1,6 @@
 import { Stabilizers } from "../impl/Stabilizers";
 import { lu } from "../impl/Localization";
-import { insertRow, CreateInput, CreateTH, BlinkIfChanged } from "./Tools";
+import { insertRow, CreateInput, CreateTH, BlinkIfChanged, toggleCollapse } from "./Tools";
 import { Display } from "./Display";
 
 export class Stabilizers_HTML extends Display {
@@ -96,6 +96,10 @@ export class Stabilizers_HTML extends Display {
         this.d_pstb = c2_row.insertCell();
         this.d_lstb = c2_row.insertCell();
         this.d_lift = c2_row.insertCell();
+    }
+
+    public SetCollapse() {
+        toggleCollapse("stabilizer_collapse", !this.stab.IsDefault());
     }
 
     public UpdateDisplay() {

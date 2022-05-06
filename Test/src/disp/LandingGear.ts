@@ -1,6 +1,6 @@
 import { LandingGear } from "../impl/LandingGear";
 import { lu } from "../impl/Localization";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect } from "./Tools";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect, toggleCollapse } from "./Tools";
 import { Display } from "./Display";
 
 export class LandingGear_HTML extends Display {
@@ -85,6 +85,10 @@ export class LandingGear_HTML extends Display {
         this.d_strc = c2_row.insertCell();
         this.d_crsh = c2_row.insertCell();
         c2_row.insertCell();
+    }
+
+    public SetCollapse() {
+        toggleCollapse("gear_collapse", !this.gear.IsDefault());
     }
 
     public UpdateDisplay() {

@@ -174,10 +174,11 @@ export class Aircraft_HTML extends Display {
         npc_button.onclick = () => { this.SaveNPC(); }
 
         const reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
-        reset_button.onclick = () => { this.acft.Reset(); this.derived.SetName(this.acft.name); this.acft.CalculateStats(); };
+        reset_button.onclick = () => { this.acft.Reset(); this.derived.SetName(this.acft.name); this.acft.CalculateStats(); this.SetCollapse(); };
 
         const cat_button = document.getElementById("acft_save_cat");
         cat_button.onclick = () => { this.CatalogStats(); }
+        this.SetCollapse();
     }
 
     private UpdateCard() {
@@ -358,6 +359,7 @@ export class Aircraft_HTML extends Display {
                     this.acft.fromJSON(str);
                     this.derived.SetName(this.acft.name);
                     this.acft.CalculateStats();
+                    this.SetCollapse();
                 }
 
             } catch (e) {
@@ -487,6 +489,7 @@ export class Aircraft_HTML extends Display {
                 this.acft.fromJSON(str);
                 this.derived.SetName(this.acft.name);
                 this.acft.CalculateStats();
+                this.SetCollapse();
             }
         } catch {
             BlinkBad(text_area.parentElement);
@@ -919,6 +922,16 @@ export class Aircraft_HTML extends Display {
 
         this.derived.UpdateDisplay(this.acft, stats, derived_stats);
         this.altitude.UpdateDisplay(this.acft, derived_stats);
+    }
+
+    private SetCollapse() {
+        this.alter.SetCollapse();
+        this.controlsurfaces.SetCollapse();
+        this.gear.SetCollapse();
+        this.optimization.SetCollapse();
+        this.passengers.SetCollapse();
+        this.stabilizers.SetCollapse();
+        this.used.SetCollapse();
     }
 
     public UpdateDisplay() {

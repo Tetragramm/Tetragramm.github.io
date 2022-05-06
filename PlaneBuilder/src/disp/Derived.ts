@@ -266,7 +266,7 @@ export class Derived_HTML {
 
 
         this.cost_cell.textContent = stats.cost.toString() + "þ ";
-        if (acft.GetUsed().GetEnabled()) {
+        if (!acft.GetUsed().IsDefault()) {
             this.cost_cell.textContent += " (" + Math.floor(1.0e-6 + stats.cost / 2).toString() + "þ " + lu("Price Word Used") + ")";
         }
         this.upkeep_cell.textContent = stats.upkeep.toString() + "þ";

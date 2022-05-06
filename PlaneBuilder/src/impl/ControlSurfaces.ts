@@ -103,6 +103,15 @@ export class ControlSurfaces extends Part {
         this.drag_sel = d.GetBoolArr(this.drag_sel.length);
     }
 
+    public IsDefault() {
+        return this.aileron_sel == 0
+            && this.rudder_sel == 0
+            && this.elevator_sel == 0
+            && this.flaps_sel == 0
+            && this.slats_sel == 0
+            && this.drag_sel.reduce((p, c) => { return p || c; }, false) == false; // If all are false, then it's default
+    }
+
     public GetAileronList() {
         return this.aileron_list;
     }

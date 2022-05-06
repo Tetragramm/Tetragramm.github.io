@@ -1,6 +1,6 @@
 import { Used } from "../impl/Used";
 import { lu } from "../impl/Localization";
-import { insertRow, CreateInput, CreateTH } from "./Tools";
+import { insertRow, CreateInput, CreateTH, toggleCollapse } from "./Tools";
 import { Display } from "./Display";
 
 export class Used_HTML extends Display {
@@ -113,6 +113,10 @@ export class Used_HTML extends Display {
         this.leaky.max = "1";
         this.sluggish.min = "-1";
         this.sluggish.max = "1";
+    }
+
+    public SetCollapse() {
+        toggleCollapse("used_collapse", !this.used.IsDefault());
     }
 
     public UpdateDisplay() {

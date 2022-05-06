@@ -1,6 +1,6 @@
 import { Optimization } from "../impl/Optimization";
 import { lu } from "../impl/Localization";
-import { insertRow, CreateTH, BlinkIfChanged } from "./Tools";
+import { insertRow, CreateTH, BlinkIfChanged, toggleCollapse } from "./Tools";
 import { Display } from "./Display";
 
 export class Optimization_HTML extends Display {
@@ -124,6 +124,10 @@ export class Optimization_HTML extends Display {
         this.d_mstr = c3_row.insertCell();
         this.d_reli = c3_row.insertCell();
         this.d_drag = c3_row.insertCell();
+    }
+
+    public SetCollapse() {
+        toggleCollapse("optimization_collapse", !this.opt.IsDefault());
     }
 
     private UpdateChecked(num: number, lst: HTMLInputElement[]) {

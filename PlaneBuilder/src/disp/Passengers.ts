@@ -1,6 +1,6 @@
 import { Passengers } from "../impl/Passengers";
 import { lu } from "../impl/Localization";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox } from "./Tools";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, toggleCollapse } from "./Tools";
 import { Display } from "./Display";
 
 export class Passengers_HTML extends Display {
@@ -63,6 +63,10 @@ export class Passengers_HTML extends Display {
             this.pass.SetConnected(this.connect.checked);
         }
         tbl.appendChild(fragment);
+    }
+
+    public SetCollapse() {
+        toggleCollapse("passenger_collapse", !this.pass.IsDefault());
     }
 
     public UpdateDisplay() {

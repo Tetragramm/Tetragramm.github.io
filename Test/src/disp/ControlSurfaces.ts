@@ -1,6 +1,6 @@
 import { ControlSurfaces } from "../impl/ControlSurfaces";
 import { lu } from "../impl/Localization";
-import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect } from "./Tools";
+import { insertRow, CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexSelect, toggleCollapse } from "./Tools";
 import { Display } from "./Display";
 
 export class ControlSurfaces_HTML extends Display {
@@ -131,6 +131,10 @@ export class ControlSurfaces_HTML extends Display {
         this.d_lift = c3_row.insertCell();
         this.d_crsh = c3_row.insertCell();
         this.d_none = c3_row.insertCell();
+    }
+
+    public SetCollapse() {
+        toggleCollapse("control_collapse", !this.cs.IsDefault());
     }
 
     public UpdateDisplay() {

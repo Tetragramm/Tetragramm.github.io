@@ -1,7 +1,7 @@
 import { AlterStats } from "../impl/AlterStats";
 import { Stats, WARNING_COLOR } from "../impl/Stats";
 import { lu } from "../impl/Localization";
-import { CreateButton, CreateText, FlexSection, CreateFlexSection, FlexInput, FlexText } from "./Tools";
+import { CreateButton, CreateText, FlexSection, CreateFlexSection, FlexInput, FlexText, toggleCollapse } from "./Tools";
 import { StringFmt } from "../string/index";
 import { Display } from "./Display";
 
@@ -292,6 +292,10 @@ export class AlterStats_HTML extends Display {
             this.sel.add(opt);
         }
         this.sel.selectedIndex = -1;
+    }
+
+    public SetCollapse() {
+        toggleCollapse("alter_collapse", !this.alter.IsDefault());
     }
 
     public UpdateDisplay() {

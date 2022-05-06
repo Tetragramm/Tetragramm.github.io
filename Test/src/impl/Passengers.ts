@@ -41,6 +41,12 @@ export class Passengers extends Part {
         this.connected = d.GetBool();
     }
 
+    public IsDefault() {
+        return this.seats == 0
+            && this.beds == 0
+            && !this.connected;
+    }
+
     public GetSeats() {
         return this.seats;
     }

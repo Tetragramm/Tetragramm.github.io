@@ -66,6 +66,12 @@ export class LandingGear extends Part {
         this.extra_sel = d.GetBoolArr(this.extra_sel.length);
     }
 
+    public IsDefault() {
+        return this.gear_sel == 0
+            && this.retract == false
+            && this.extra_sel.reduce((p, c) => { return p || c; }, false) == false; // If all are false, then it's default
+    }
+
     public GetGearName() {
         if (this.retract && this.gear_list[this.gear_sel].name == "Boat Hull") {
             return lu("Retractable Gear + Boat Hull");

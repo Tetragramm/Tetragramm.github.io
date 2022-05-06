@@ -81,6 +81,18 @@ export class Optimization extends Part {
         this.drag = d.GetNum();
     }
 
+    public IsDefault() {
+        return this.free_dots == 0
+            && this.cost == 0
+            && this.bleed == 0
+            && this.escape == 0
+            && this.mass == 0
+            && this.toughness == 0
+            && this.maxstrain == 0
+            && this.reliability == 0
+            && this.drag == 0;
+    }
+
     public GetUnassignedCount() {
         return this.free_dots - this.cost - this.bleed
             - this.escape - this.mass - this.toughness - this.maxstrain

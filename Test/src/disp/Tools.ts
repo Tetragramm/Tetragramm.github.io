@@ -378,3 +378,15 @@ export const loadJSON = (path, callback) => {
     };
     xobj.send(null);
 }
+
+export const toggleCollapse = (id, active) => {
+    var elem = document.getElementById(id) as HTMLElement;
+    elem.classList.toggle("active", active);
+    var content = elem.nextElementSibling as HTMLElement;
+    content = content.nextElementSibling as HTMLElement;
+    if (!active) {
+        content.style.maxHeight = "0px";
+    } else {
+        content.style.maxHeight = "inherit";
+    }
+}

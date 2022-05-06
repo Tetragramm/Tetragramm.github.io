@@ -83,6 +83,15 @@ export class AlterStats extends Part {
         }
     }
 
+    public IsDefault() {
+        for (const part of this.custom_parts) {
+            if (part.qty > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public ClearAll() {
         for (const p of this.custom_parts) {
             p.qty = 0;

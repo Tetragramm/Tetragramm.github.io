@@ -92,6 +92,13 @@ export class Stabilizers extends Part {
         this.vstab_count = d.GetNum();
     }
 
+    public IsDefault() {
+        return this.hstab_sel == 0
+            && this.hstab_count == 1
+            && this.vstab_sel == 0
+            && this.vstab_count == 1;
+    }
+
     public GetHStabList() {
         return this.hstab_list;
     }

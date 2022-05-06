@@ -37,7 +37,6 @@ const init = () => {
 
     //Weapons bit2
     aircraft_model = new Aircraft(parts_JSON, true);
-    aircraft_display = new Aircraft_HTML(aircraft_model, parts_JSON);
 
     var loaded = false;
     if (qp && !loaded) {
@@ -58,6 +57,7 @@ const init = () => {
         } catch { console.log("Saved Data Failed."); aircraft_model.Reset(); }
     }
 
+    aircraft_display = new Aircraft_HTML(aircraft_model, parts_JSON);
     aircraft_model.CalculateStats();
     SetAnimationEnabled(true);
 
