@@ -389,9 +389,11 @@ export class Frames extends Part {
             this.section_list[num].internal_bracing = true;
             this.section_list[num].monocoque = false;
             this.section_list[num].lifting_body = false;
+            this.interal_bracing_count++;
             this.CalculateStats();
         } else if (!use) {// If we're un-setting it.
             this.section_list[num].internal_bracing = false;
+            this.interal_bracing_count--;
             this.CalculateStats();
         }
     }
