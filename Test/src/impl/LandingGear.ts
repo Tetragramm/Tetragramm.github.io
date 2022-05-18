@@ -164,6 +164,8 @@ export class LandingGear extends Part {
         var stats = new Stats();
         if (!this.CanGear()[this.gear_sel])
             this.gear_sel = 0;
+        if (!this.CanRetract())
+            this.retract = false;
 
         //Do this first, so we can add the Zepplin Hook to the mass
         //TODO: This is a hack, and it is terrible. Separate hook?
