@@ -14,12 +14,12 @@ export class PulsejetBuilder {
     public rarity: ENGINE_RARITY;
 
     readonly EraTable: { name: string, cost: number, drag: number, mass: number, fuel: number, vibe: number, material: number }[] = [
-        { name: "Pioneer", cost: 1, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
-        { name: "WWI", cost: 0.75, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
-        { name: "Roaring 20s", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
-        { name: "Coming Storm", cost: 0.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
-        { name: "WWII", cost: 0.25, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
-        { name: "Last Hurrah", cost: 0.1, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
+        { name: "Pioneer", cost: 5, drag: 10, mass: 10, fuel: 4, vibe: 2.5, material: 2 },
+        { name: "WWI", cost: 3.5, drag: 25, mass: 24, fuel: 3, vibe: 3, material: 3 },
+        { name: "Roaring 20s", cost: 2.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
+        { name: "Coming Storm", cost: 2.5, drag: 30, mass: 50, fuel: 2, vibe: 4, material: 9 },
+        { name: "WWII", cost: 1.75, drag: 40, mass: 100, fuel: 1, vibe: 5, material: 24 },
+        { name: "Last Hurrah", cost: 1.5, drag: 50, mass: 150, fuel: 0.7, vibe: 6, material: 50 },
     ];
     readonly ValveTable: { name: string, scale: number, rumble: number, designcost: number, reliability: number }[] = [
         { name: "Valved", scale: 1, rumble: 1, designcost: 2, reliability: 1 },
@@ -137,8 +137,7 @@ export class PulsejetBuilder {
 
         estats.name = "Pulsejet P" + valved + "-" + this.desired_power.toString() + " (" + this.EraTable[this.era_sel].name + ")";
         estats.stats.power = this.desired_power;
-        // this.technical_power = Math.floor(1.0e-6 + this.desired_power * 4 / 3);
-        this.technical_power = this.desired_power;
+        this.technical_power = Math.floor(1.0e-6 + this.desired_power * 4 / 3);
         estats.stats.mass = this.CalcMass();
         estats.stats.drag = this.CalcDrag();
         estats.stats.reliability = this.CalcReliability();

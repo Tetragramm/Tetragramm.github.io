@@ -1084,6 +1084,8 @@ export class Engine extends Part {
       stats = stats.Add(this.mount_list[this.mount_sel].stats);
       stats.maxstrain -= Math.floor(1.0e-6 + this.mount_list[this.mount_sel].strainfactor * this.etype_stats.stats.mass);
       stats.drag += Math.floor(1.0e-6 + this.mount_list[this.mount_sel].dragfactor * this.etype_stats.stats.mass);
+    } else {
+      stats.mass += this.etype_stats.rumble;
     }
 
     // Power Generation
