@@ -98,21 +98,27 @@ export class Frames extends Part {
     public fromJSON(js: JSON, json_version: number) {
         this.section_list = [];
         for (const elem of js["sections"]) {
-            this.section_list.push({
+            var temp = {
                 frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
-            });
+            };
+            if (temp.monocoque && temp.lifting_body)
+                temp.monocoque = false;
+            this.section_list.push(temp);
             if (json_version < 10.25)
                 this.sel_skin = elem["skin"];
         }
         this.tail_section_list = [];
         for (const elem of js["tail_sections"]) {
-            this.tail_section_list.push({
+            var temp = {
                 frame: elem["frame"], geodesic: elem["geodesic"],
                 monocoque: elem["monocoque"], lifting_body: elem["lifting_body"],
                 internal_bracing: elem["internal_bracing"]
-            });
+            };
+            if (temp.monocoque && temp.lifting_body)
+                temp.monocoque = false;
+            this.tail_section_list.push(temp);
             if (json_version < 10.25)
                 this.sel_skin = elem["skin"];
         }
@@ -167,6 +173,8 @@ export class Frames extends Part {
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
             sec.internal_bracing = d.GetBool();
+            if (sec.monocoque && sec.lifting_body)
+                sec.monocoque = false;
             this.section_list.push(sec);
         }
         const tlen = d.GetNum();
@@ -183,6 +191,8 @@ export class Frames extends Part {
             sec.monocoque = d.GetBool();
             sec.lifting_body = d.GetBool();
             sec.internal_bracing = d.GetBool();
+            if (sec.monocoque && sec.lifting_body)
+                sec.monocoque = false;
             this.tail_section_list.push(sec);
         }
         this.sel_tail = d.GetNum();
