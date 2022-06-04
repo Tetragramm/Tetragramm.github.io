@@ -283,7 +283,7 @@ export class Weapons extends Part {
                 const wlist = this.weapon_sets[i].GetWeapons();
                 for (let j = wlist.length - 1; j >= 0; j--) {
                     if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER && wlist[j].GetArty()) {
-                        this.weapon_sets[i].SetDirection(3, true);
+                        wlist[j].SetSynchronization(SynchronizationType.NO_INTERFERENCE);
                         return;
                     }
                 }
@@ -311,7 +311,7 @@ export class Weapons extends Part {
                 const wlist = this.weapon_sets[i].GetWeapons();
                 for (let j = wlist.length - 1; j >= 0; j--) {
                     if (wlist[j].GetSynchronization() == SynchronizationType.SPINNER && wlist[j].GetArty()) {
-                        this.weapon_sets[i].SetDirection(3, true);
+                        wlist[j].SetSynchronization(SynchronizationType.NO_INTERFERENCE);
                         return;
                     }
                 }

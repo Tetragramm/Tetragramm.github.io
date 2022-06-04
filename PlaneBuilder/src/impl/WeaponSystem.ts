@@ -466,11 +466,6 @@ export class WeaponSystem extends Part {
 
         const directions = [...Array(this.directions.length).fill(true)];
         if (this.weapons[0].GetArty() && this.fixed && !this.weapons[0].GetWing()) {
-            const is_spinner = this.weapons[0].GetSynchronization() == SynchronizationType.SPINNER;
-            if (this.tractor && !(this.spinner_t || (is_spinner && this.directions[0])))
-                directions[0] = false;
-            if (this.pusher && !(this.spinner_p || (is_spinner && this.directions[1])))
-                directions[1] = false;
             if (this.heli)
                 directions[2] = false;
         }
@@ -487,10 +482,6 @@ export class WeaponSystem extends Part {
         if (this.fixed) {
             this.directions = [...Array(6).fill(false)];
             if (this.weapons[0].GetArty() && !this.weapons[0].GetWing()) {
-                if (num == 0 && this.tractor && !this.spinner_t)
-                    num = 1;
-                if (num == 1 && this.pusher && !this.spinner_p)
-                    num = 3;
                 if (num == 2 && this.heli)
                     num = 3;
             }
@@ -853,16 +844,12 @@ export class WeaponSystem extends Part {
 
     public PartStats() {
         var stats = new Stats();
-
-        let dircount = 0;
-        for (const d of this.directions)
-            if (d)
-                dircount++;
+        let dircount = this.GetDirectionCount();
 
         let count = 0;
         for (const w of this.weapons) {
             w.has_cantilever = this.has_cantilever;
-            w.SetTurret(this.GetDirectionCount() > 2);
+            w.SetTurret(dircount > 2);
             stats = stats.Add(w.PartStats());
 
             count += w.GetCount();

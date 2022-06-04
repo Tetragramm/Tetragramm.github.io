@@ -228,6 +228,9 @@ export class Weapon extends Part {
             }
 
             if (num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT || num == SynchronizationType.NO_INTERFERENCE) {
+                if ((num == SynchronizationType.NONE || num == SynchronizationType.DEFLECT) && this.GetArty()) {
+                    return false;
+                }
                 return true;
             } else {
                 return false;
@@ -493,7 +496,7 @@ export class Weapon extends Part {
             stats.warnings.push({
                 source: lu(this.weapon_type.name) + " " + lu("No Interference"),
                 warning: lu("No Interference Warning"),
-                color: WARNING_COLOR.WHITE,
+                color: WARNING_COLOR.YELLOW,
             });
         }
 
