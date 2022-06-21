@@ -296,7 +296,8 @@ export class Wings_HTML extends Display {
 
         ht.dihedral.onchange = () => {
             let w = { ...wing };
-            w.dihedral = ht.dihedral.valueAsNumber;
+            if (!isNaN(ht.dihedral.valueAsNumber))
+                w.dihedral = ht.dihedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
         ht.dihedral.max = (wing.span - wing.anhedral - 1).toString();
@@ -304,7 +305,8 @@ export class Wings_HTML extends Display {
 
         ht.anhedral.onchange = () => {
             let w = { ...wing };
-            w.anhedral = ht.anhedral.valueAsNumber;
+            if (!isNaN(ht.anhedral.valueAsNumber))
+                w.anhedral = ht.anhedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
         ht.anhedral.max = (wing.span - wing.dihedral - 1).toString();

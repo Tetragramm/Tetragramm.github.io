@@ -235,9 +235,11 @@ export class Wings_HTML extends Display {
 
         CreateInput(lu("Wings Dihedral"), wing.dihedral, wing.span, false);
         wing.dihedral.min = "0";
+        wing.dihedral.max = "1000000";
 
         CreateInput(lu("Wings Anhedral"), wing.anhedral, wing.span, false);
         wing.anhedral.min = "0";
+        wing.anhedral.max = "1000000";
 
         this.full_cell.appendChild(wing.span);
         this.full_cell.appendChild(wing.br);
@@ -296,7 +298,8 @@ export class Wings_HTML extends Display {
 
         ht.dihedral.onchange = () => {
             let w = { ...wing };
-            w.dihedral = ht.dihedral.valueAsNumber;
+            if (!isNaN(ht.dihedral.valueAsNumber))
+                w.dihedral = ht.dihedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
         ht.dihedral.max = (wing.span - wing.anhedral - 1).toString();
@@ -304,7 +307,8 @@ export class Wings_HTML extends Display {
 
         ht.anhedral.onchange = () => {
             let w = { ...wing };
-            w.anhedral = ht.anhedral.valueAsNumber;
+            if (!isNaN(ht.anhedral.valueAsNumber))
+                w.anhedral = ht.anhedral.valueAsNumber;
             this.wings.SetFullWing(idx, w);
         };
         ht.anhedral.max = (wing.span - wing.dihedral - 1).toString();
