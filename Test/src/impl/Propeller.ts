@@ -136,7 +136,8 @@ export class Propeller extends Part {
                     E = Math.min(E, this.prop_list[this.idx_prop].energy + this.upg_list[this.idx_upg].energy);
                     break;
                 case DRIVE_TYPE.PULSEJET:
-                    E = Math.min(E, 4);
+                    // E = Math.min(E, 4);
+                    E = Math.min(E, 5);
                     break;
                 case DRIVE_TYPE.TURBINE:
                     E = Math.min(E, 9);
@@ -167,7 +168,8 @@ export class Propeller extends Part {
                     T = Math.min(T, this.prop_list[this.idx_prop].turn + this.upg_list[this.idx_upg].turn);
                     break;
                 case DRIVE_TYPE.PULSEJET:
-                    T = Math.min(T, 5);
+                    // T = Math.min(T, 5);
+                    T = Math.min(T, 4);
                     break;
                 case DRIVE_TYPE.TURBINE:
                     T = Math.min(T, 4);
@@ -216,8 +218,10 @@ export class Propeller extends Part {
                         stats.pitchspeed = Math.min(stats.pitchspeed, this.prop_list[this.idx_prop].stats.pitchspeed + this.upg_list[this.idx_upg].stats.pitchspeed);
                         break;
                     case DRIVE_TYPE.PULSEJET:
-                        stats.pitchboost = Math.min(stats.pitchboost, 0.4);
-                        stats.pitchspeed = Math.min(stats.pitchspeed, 1.1);
+                        // stats.pitchboost = Math.min(stats.pitchboost, 0.4);
+                        // stats.pitchspeed = Math.min(stats.pitchspeed, 1.1);
+                        stats.pitchboost = Math.min(stats.pitchboost, 0.6);
+                        stats.pitchspeed = Math.min(stats.pitchspeed, 1.3);
                         break;
                     case DRIVE_TYPE.TURBINE:
                         stats.pitchboost = Math.min(stats.pitchboost, 0.2);
