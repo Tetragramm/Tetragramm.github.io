@@ -4,6 +4,7 @@ import { GetEngineLists } from "../impl/EngineList";
 import { lu } from "../impl/Localization";
 import { CreateFlexSection, CreateTH, BlinkIfChanged, FlexCheckbox, FlexDisplay, FlexInput, FlexSelect } from "./Tools";
 import { Display } from "./Display";
+import { StringFmt } from "../string";
 
 export class Engine_HTML extends Display {
     private engine: Engine;

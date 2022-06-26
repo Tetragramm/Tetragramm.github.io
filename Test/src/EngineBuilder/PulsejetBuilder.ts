@@ -149,6 +149,8 @@ export class PulsejetBuilder {
         estats.pulsejet = true;
         estats.stats.era.push({ name: estats.name, era: lu(num2era(this.era_sel)) });
         estats.rarity = this.rarity;
+        //DEBUG RUMBLE
+        estats.stats.mass += estats.rumble;
 
         return estats;
     }
