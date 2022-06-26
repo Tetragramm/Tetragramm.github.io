@@ -989,6 +989,9 @@ export class Engine extends Part {
     stats = stats.Add(this.etype_stats.stats);
 
     stats.upkeep = stats.power / 10;
+    if(this.GetIsPulsejet()){
+      stats.upkeep += 1;
+    }
 
     if (this.etype_stats.oiltank)
       stats.mass += 1;
