@@ -182,6 +182,19 @@ export class Weapons extends Part {
         return this.weapon_sets;
     }
 
+    public DuplicateSet(idx: number) {
+        const w = new WeaponSystem(this.weapon_list, this.wl_permute);
+        w.SetCalculateStats(this.CalculateStats);
+        w.fromJSON(JSON.parse(JSON.stringify(this.weapon_sets[idx].toJSON())), 99999);
+        this.weapon_sets.splice(idx, 0, w);
+        this.CalculateStats();
+    }
+
+    public RemoveSet(idx: number) {
+        this.weapon_sets.splice(idx, 1);
+        this.CalculateStats();
+    }
+
     private CountTractorSpinner() {
         var count = 0;
         for (const ws of this.weapon_sets) {

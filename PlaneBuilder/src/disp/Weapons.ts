@@ -1,6 +1,6 @@
 import { WeaponSystem } from "../impl/WeaponSystem";
 import { Stats } from "../impl/Stats";
-import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace } from "./Tools";
+import { insertRow, CreateCheckbox, CreateFlexSection, CreateInput, CreateSelect, CreateTH, BlinkIfChanged, FlexCheckbox, FlexInput, FlexSelect, FlexSpace, CreateTD } from "./Tools";
 import { StringFmt } from "../string/index";
 import { Display } from "./Display";
 import { ActionType, ProjectileType } from "../impl/Weapon";
@@ -19,6 +19,7 @@ type WStatType = {
     shots_header: HTMLTableHeaderCellElement,
 };
 type WSetType = {
+    plus: HTMLButtonElement, minus: HTMLButtonElement,
     type: HTMLSelectElement, dirs: HTMLInputElement[],
     count: HTMLInputElement, action: HTMLSelectElement,
     projectile: HTMLSelectElement, fixed: HTMLInputElement,
@@ -49,20 +50,22 @@ export class Weapons_HTML extends Display {
         this.inp_w_brace.onchange = () => { this.weap.SetBraceCount(this.inp_w_brace.valueAsNumber); };
 
         this.tbl = document.getElementById("table_weapons") as HTMLTableElement;
-        const row = this.tbl.insertRow();
-        CreateTH(row, lu("Weapons Weapon Set"));
-        CreateTH(row, lu("Weapons Weapons"));
-        CreateTH(row, lu("Weapons Weapon Stats"));
         this.wrow = [];
     }
 
     private CreateWSetRow() {
         const fragment = document.createDocumentFragment();
+        const rowh = this.tbl.insertRow();
+        const fheader = CreateTD(rowh, "");
+        const span = document.createElement("SPAN") as HTMLSpanElement;
+        CreateTH(rowh, lu("Weapons Weapons"));
+        CreateTH(rowh, lu("Weapons Weapon Stats"));
         const row = insertRow(fragment);
         const setcell = row.insertCell();
-        const fs = CreateFlexSection(setcell);
 
         const type = {
+            plus: document.createElement("BUTTON") as HTMLButtonElement,
+            minus: document.createElement("BUTTON") as HTMLButtonElement,
             type: document.createElement("SELECT") as HTMLSelectElement,
             dirs: [],
             count: document.createElement("INPUT") as HTMLInputElement,
@@ -108,6 +111,19 @@ export class Weapons_HTML extends Display {
         }
         type.projectile.required = true;
 
+        type.plus.textContent = "+";
+        type.minus.textContent = "-";
+        const fs = CreateFlexSection(setcell);
+        span.appendChild(type.minus);
+        span.appendChild(type.plus);
+        const th = CreateTH(span, lu("Weapons Weapon Set"));
+        th.style.border = "none";
+        th.style.width = "100%";
+        th.style.padding = "0";
+        span.style.display = "inline-flex";
+        span.style.width = "100%";
+        fheader.appendChild(span);
+        console.log(fheader.innerHTML)
         FlexSelect(lu("Weapons Type"), type.type, fs);
         FlexSelect(lu("Seat Location"), type.seat, fs);
 
@@ -326,10 +342,17 @@ export class Weapons_HTML extends Display {
             this.wrow.push(this.CreateWSetRow());
         }
         while (wsets.length < this.wrow.length) {
-            this.tbl.deleteRow(this.wrow.length);
+            this.tbl.deleteRow(2 * this.wrow.length - 1);
+            this.tbl.deleteRow(2 * this.wrow.length - 2);
             this.wrow.pop();
         }
         for (let i = 0; i < wsets.length; i++) {
+            this.wrow[i].plus.onclick = () => {
+                this.weap.DuplicateSet(i);
+            };
+            this.wrow[i].minus.onclick = () => {
+                this.weap.RemoveSet(i);
+            };
             this.UpdateWSet(wsets[i], this.wrow[i]);
         }
     }
