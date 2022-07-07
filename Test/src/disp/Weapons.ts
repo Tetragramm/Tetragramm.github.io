@@ -123,7 +123,6 @@ export class Weapons_HTML extends Display {
         span.style.display = "inline-flex";
         span.style.width = "100%";
         fheader.appendChild(span);
-        console.log(fheader.innerHTML)
         FlexSelect(lu("Weapons Type"), type.type, fs);
         FlexSelect(lu("Seat Location"), type.seat, fs);
 

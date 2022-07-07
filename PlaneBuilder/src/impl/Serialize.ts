@@ -148,6 +148,10 @@ export class Deserialize {
     const num = this.view.getInt16(this.array.byteLength - 2, false);
     return num;
   }
+
+  public GetRemaining(): number {
+    return this.array.byteLength - this.offset;
+  }
 }
 
 export function NumArr(arr: number[], tgt_length: number) {

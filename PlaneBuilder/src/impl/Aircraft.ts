@@ -540,7 +540,7 @@ export class Aircraft {
     if (d.version > 10.65) {
       this.used.deserialize(d);
     }
-    if (d.version > 11.05) {
+    if (d.version > 11.05 && d.GetRemaining() > 0) {
       this.rotor.deserialise(d);
       this.aircraft_type = d.GetNum();
       this.rotor.SetType(this.aircraft_type);
