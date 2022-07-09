@@ -169,7 +169,7 @@ export class Propeller extends Part {
                     break;
                 case DRIVE_TYPE.PULSEJET:
                     // T = Math.min(T, 5);
-                    T = Math.min(T, 4);
+                    T = Math.min(T, 3);
                     break;
                 case DRIVE_TYPE.TURBINE:
                     T = Math.min(T, 4);

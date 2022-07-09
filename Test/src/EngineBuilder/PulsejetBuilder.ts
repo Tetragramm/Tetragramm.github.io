@@ -151,6 +151,7 @@ export class PulsejetBuilder {
         estats.rarity = this.rarity;
         //DEBUG RUMBLE
         estats.stats.mass += estats.rumble;
+        estats.stats.drag += estats.stats.mass;
 
         return estats;
     }
