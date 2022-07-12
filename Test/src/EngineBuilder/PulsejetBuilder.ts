@@ -83,7 +83,7 @@ export class PulsejetBuilder {
     private CalcCost() {
         const Era = this.EraTable[this.era_sel];
 
-        return Math.floor(1.0e-6 + (this.TempMass() + this.CalcRumble()) * this.build_quality * Era.cost) + 1;
+        return Math.floor(1.0e-6 + (this.TempMass()) * this.build_quality * Era.cost) + 1 + this.CalcRumble();
     }
 
     private VerifyValues() {
