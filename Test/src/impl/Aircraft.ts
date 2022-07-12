@@ -942,7 +942,7 @@ export class Aircraft {
     ControlStress = Math.min(MaxStress, ControlStress);
 
     if (this.engines.GetMaxRumble() > 0) {
-      RumbleStress += Math.max(1, this.engines.GetMaxRumble());
+      RumbleStress += Math.max(1, 0.5 * this.engines.GetRumble());
       RumbleStress = Math.floor(1.0e-6 + RumbleStress);
     }
     if (MaxStress == 0) {

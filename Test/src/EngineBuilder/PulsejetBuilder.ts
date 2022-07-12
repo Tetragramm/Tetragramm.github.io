@@ -64,7 +64,7 @@ export class PulsejetBuilder {
         const Era = this.EraTable[this.era_sel];
         const Valve = this.ValveTable[this.valve_sel];
 
-        const Reliability = this.technical_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
+        const Reliability = this.desired_power / (Era.material * Valve.reliability * this.overall_quality) - 1;
         return Math.trunc(-Reliability);
     }
 
@@ -83,7 +83,7 @@ export class PulsejetBuilder {
     private CalcCost() {
         const Era = this.EraTable[this.era_sel];
 
-        return Math.floor(1.0e-6 + this.TempMass() * this.build_quality * Era.cost) + 1;
+        return Math.floor(1.0e-6 + (this.TempMass() + this.CalcRumble()) * this.build_quality * Era.cost) + 1;
     }
 
     private VerifyValues() {
