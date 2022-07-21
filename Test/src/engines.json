@@ -3028,6 +3028,29 @@
                         false
                     ],
                     "rarity": 3
+                },
+                {
+                    "name": "Rosevear Ankou B 180hp",
+                    "engine_type": 0,
+                    "type": 1,
+                    "era_sel": 1,
+                    "displacement": 12.9,
+                    "compression": 5.17,
+                    "cyl_per_row": 9,
+                    "rows": 1,
+                    "RPM_boost": 0.9,
+                    "material_fudge": 1.4,
+                    "quality_fudge": 0.9,
+                    "compressor_type": 2,
+                    "compressor_count": 2,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ],
+                    "rarity": 3
                 }
             ]
         },
@@ -3360,6 +3383,29 @@
                         false
                     ],
                     "rarity": 3
+                },
+                {
+                    "name": "Schreiber L.XIV 160hp",
+                    "engine_type": 0,
+                    "type": 2,
+                    "era_sel": 1,
+                    "displacement": 23.8,
+                    "compression": 3.87,
+                    "cyl_per_row": 7,
+                    "rows": 2,
+                    "RPM_boost": 1.2,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ],
+                    "rarity": 1
                 }
             ]
         }
