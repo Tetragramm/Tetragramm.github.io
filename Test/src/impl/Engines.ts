@@ -446,7 +446,14 @@ export class Engines extends Part {
     var ecost = 0;
     var pitchspeedmin = 100;
     //Engine stuff
-    for (const en of this.engines) {
+    var firstPulsejet = false;
+    for (let en of this.engines) {
+      if (!firstPulsejet && en.GetIsPulsejet()) {
+        firstPulsejet = true;
+        en.SetFirstPulsejet(true);
+      } else {
+        en.SetFirstPulsejet(false);
+      }
       const enstats = en.PartStats();
       stats = stats.Add(enstats);
       if (en.NeedCooling()) {

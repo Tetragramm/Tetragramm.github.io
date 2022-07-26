@@ -35,6 +35,7 @@ export class Engine extends Part {
   private is_internal: boolean;
 
   private total_reliability: number;
+  private is_first_pulsejet: boolean;
 
   constructor(
     ml: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean, helicopter: boolean, turbine: boolean }[],
@@ -973,6 +974,10 @@ export class Engine extends Part {
     }
   }
 
+  public SetFirstPulsejet(is: boolean) {
+    this.is_first_pulsejet = is;
+  }
+
   public PartStats(): Stats {
     this.VerifyMount();
     this.VerifyCooling();
@@ -989,7 +994,7 @@ export class Engine extends Part {
     stats = stats.Add(this.etype_stats.stats);
 
     stats.upkeep = stats.power / 10;
-    if(this.GetIsPulsejet()){
+    if (this.GetIsPulsejet()) {
       stats.upkeep += 1;
     }
 
@@ -1104,6 +1109,10 @@ export class Engine extends Part {
       if (this.use_pp) {
         stats.escape += 2;
       }
+    }
+
+    if (this.is_first_pulsejet) {
+      stats.cost += 5;
     }
 
 
