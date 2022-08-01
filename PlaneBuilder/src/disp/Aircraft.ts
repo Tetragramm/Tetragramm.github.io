@@ -23,6 +23,7 @@ import { Cards, ENGINE_TEXT } from "./Cards";
 
 import { Aircraft, DerivedStats } from "../impl/Aircraft";
 import { WeaponSystem } from "../impl/WeaponSystem";
+import { SynchronizationType } from "../impl/Weapon"
 import { Radiator } from "../impl/Radiator";
 import { GetEngineLists } from "../impl/EngineList";
 import { Serialize } from "../impl/Serialize";
@@ -473,7 +474,15 @@ export class Aircraft_HTML extends Display {
         const wsets = this.acft.GetWeapons().GetWeaponSets();
         for (let wi = 0; wi < wsets.length; wi++) {
             const w = wsets[wi];
-            catalog_stats += WeaponString(w, wlist, dlist) + "\n";
+            let wstring = WeaponString(w, wlist, dlist);
+            var synchstring = "fires";
+            for (let weap of w.GetWeapons()) {
+                if (weap.GetSynchronization() == SynchronizationType.INTERRUPT || weap.GetSynchronization() == SynchronizationType.SYNCH) {
+                    synchstring = "✣ fires";
+                }
+            }
+            wstring = wstring.replace("fires", synchstring)
+            catalog_stats += wstring + "\n";
         }
         for (let w of stats.warnings) {
             catalog_stats += w.source + ":  " + w.warning + "\n";
