@@ -140,9 +140,9 @@ export class LandingGear extends Part {
     public CanBoat(engine_height: number, wing_height: number) {
         if (engine_height == 2)
             this.can_boat = true;
-        else if (engine_height == 1 && wing_height >= 3)
+        else if (engine_height == 1 && wing_height >= 2)
             this.can_boat = true;
-        else if (engine_height == 0 && wing_height >= 4)
+        else if (engine_height == 0 && wing_height >= 3)
             this.can_boat = true;
         else
             this.can_boat = false;
