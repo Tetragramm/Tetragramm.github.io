@@ -38,25 +38,6 @@
 				"Local Server",
 				"Watch Plane Builder",
 			]
-		},
-		{
-			"type": "shell",
-			"command": "webpack",
-			"args": [
-				"watch",
-				"-c",
-				"webpack.config.js"
-			],
-			"group": "build",
-			"label": "Build Plane Builder"
-		},
-		{
-			"label": "Build All",
-			"group": "build",
-			"dependsOn": [
-				"Local Server",
-				"Build Plane Builder",
-			]
 		}
 	]
 }

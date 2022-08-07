@@ -1,5 +1,5 @@
-@import "w3.css";
-@import "reset.css";
+@import url("w3.css");
+@import url("reset.css");
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
 :root{
@@ -11,10 +11,32 @@
 	--lnk_color:#01b9d1;
 	--lnk_act_color:#72a0c1;
 	--prt_lcl_color:#004f98;
+	background-color: var(--bkg_color);
+	color: var(--inp_txt_color);
+	font-family: Open Sans, Helvetica, Arial, sans-serif;
+	margin-left: 1em;
 }
 
-html {
-	background-color: var(--bkg_color);
+li {
+	list-style: disc;
+	margin-left: 2em;
+}
+
+p {
+	margin:0.5em;
+}
+
+p+h1, p+h2, p+h3, table+h1, table+h2, table+h3 {
+	margin-top: 0.5em;
+}
+
+strong {
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+em {
+	font-style: italic;
 }
 
 .html_body {
@@ -51,16 +73,25 @@ html {
 
 h4 {
 	font-size: 1em;
+	font-weight: 200;
 }
 
 h3 {
 	font-size: 1.5em;
+	font-weight: 300;
 	margin-bottom: 0.25rem;
+	text-decoration: underline;
 }
 
 h2 {
 	font-size: 2em;
 	font-weight: 700;
+	border-bottom: .0625rem solid var(--inp_bdr_color);
+}
+
+h1 {
+	font-size: 2.5em;
+	font-weight: 900;
 	border-bottom: .0625rem solid var(--inp_bdr_color);
 }
 
