@@ -70,7 +70,7 @@ export class PulsejetBuilder {
 
     private CalcFuelConsumption() {
         const Era = this.EraTable[this.era_sel];
-        return Math.floor(1.0e-6 + this.technical_power * Era.fuel);
+        return Math.floor(1.0e-6 + 1.1 * this.technical_power * Era.fuel);
     }
 
     private CalcRumble() {
