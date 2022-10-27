@@ -331,7 +331,7 @@
         "Helicopter Stall Warning": "Travelling faster than 37 speed immediately suffers a Retreating Wing Stall.",
         "Rotor Span Warning": "Undersized rotors cause the engine to work harder and reduce reliability.",
         "Autogyro Stall": "Autogyro Stall",
-        "Autogyro Stall Warning": "An Autogyro cannot stall, it automatically trades Altitude for speed 1-1.  If it runs out of altitude before regaining control, it lands gently.  If the autogyro exceeds Max Speed or sustains negative Gs it suffers a more traditional stall.",
+        "Autogyro Stall Warning": "An Autogyro cannot stall, it automatically trades Altitude for speed 1-1.  If it runs out of altitude before regaining control, it lands gently.  If the autogyro exceeds speed 37 or sustains negative Gs it suffers a more traditional stall.",
         "Ornithopter Stall": "Ornithopter Flight",
         "Ornithopter Stall Warning": "In the event that the engine stops, double your Stall Speed and halve your Handling.",
         "Ornithopter Flutterer Attack": "Flutterer Attack",
