@@ -22,67 +22,67 @@ Here's a list of the Stats that matter for airplanes as you build.
 Input Stats
 
 \begin{itemize}
-    \item          Mass: Mass is how much stuff weighs. Keeping your mass low is a
-          priority, but engines get a lot bigger as they get more powerful, so
-          it matters less and less over time.
-    \item          Drag: Drag is how much stuff catches airflow, slowing the plane
-          down. Lower is better.
-    \item          Structure: Used to determine how tough an airplane is overall.
-          Structure is used as a cap for Maximum Strain and will eventually
-          relate to the Toughness stat. Higher is better.
-    \item          Stability: Used to determine how stable the aircraft is in
-          flight. It is divided into two stats, which will be synthesized at the
-          end to create the final Stability stat. Less or more is dependent on
-          what you want the aircraft to do.
+  \item          Mass: Mass is how much stuff weighs. Keeping your mass low is a
+        priority, but engines get a lot bigger as they get more powerful, so
+        it matters less and less over time.
+  \item          Drag: Drag is how much stuff catches airflow, slowing the plane
+        down. Lower is better.
+  \item          Structure: Used to determine how tough an airplane is overall.
+        Structure is used as a cap for Maximum Strain and will eventually
+        relate to the Toughness stat. Higher is better.
+  \item          Stability: Used to determine how stable the aircraft is in
+        flight. It is divided into two stats, which will be synthesized at the
+        end to create the final Stability stat. Less or more is dependent on
+        what you want the aircraft to do.
 
-          \begin{itemize}
-              \item                    Lateral Stability: Combines Yaw and Roll stability. Usually
-                    lower, especially on planes with high torque.
-              \item                    Pitch Stability: Usually the higher of the two, this stat is
-                    more easily changed.
-          \end{itemize}
+        \begin{itemize}
+          \item                    Lateral Stability: Combines Yaw and Roll stability. Usually
+                lower, especially on planes with high torque.
+          \item                    Pitch Stability: Usually the higher of the two, this stat is
+                more easily changed.
+        \end{itemize}
 \end{itemize}
 
 \begin{itemize}
-    \item          Control: How much control the aircraft has. More is better.
-    \item          Cost: How much money everything costs. More costs more.
-    \item          Sections: How physically large the aircraft's hull is. More
-          means a larger, heavier aircraft.
-    \item          Wing Area: How large a wing is. Larger induces more drag but
-          also lifts heavier planes.
-    \item          Wing Span: How long a wing is. Longer is more efficient for
-          drag and more stable, but more fragile and lowers Control.
-    \item          Lift Bleed: How efficient the wings are. Lower is better.
-    \item          Power: How much go the engine has.
+  \item          Control: How much control the aircraft has. More is better.
+  \item          Cost: How much money everything costs. More costs more.
+  \item          Sections: How physically large the aircraft's hull is. More
+        means a larger, heavier aircraft.
+  \item          Wing Area: How large a wing is. Larger induces more drag but
+        also lifts heavier planes.
+  \item          Wing Span: How long a wing is. Longer is more efficient for
+        drag and more stable, but more fragile and lowers Control.
+  \item          Lift Bleed: How efficient the wings are. Lower is better.
+  \item          Power: How much go the engine has.
 \end{itemize}
 
 Output Stats
 
 \begin{itemize}
-    \item          Top Speed: How fast the plane flies.
-    \item          Boost: How fast the plane accelerates.
-    \item          Dropoff: The point of speed at which your engine is more or
-          less efficient.
-    \item          Stall Speed: How slow the plane can go before it falls out of
-          the sky.
-    \item          Handling: How well the aircraft handles.
-    \item          Structural Integrity: How tough the plane is. Basically HP.
-          Divided into two stats.
-    \item          Maximum Strain: How much G-Forces the plane can take.
-    \item          Toughness: Excess health.
-    \item          Visibility: How hard it is to see out of the plane.
-    \item          Stability: How well the plane doesn't accidently flip over.
-    \item          Fuel Capacity: How much fuel the plane carries.
-    \item          Stress per Flight: How hard the plane is to fly for a while.
+  \item          Top Speed: How fast the plane flies.
+  \item          Boost: How fast the plane accelerates.
+  \item          Dropoff: The point of speed at which your engine is more or
+        less efficient.
+  \item          Stall Speed: How slow the plane can go before it falls out of
+        the sky.
+  \item          Handling: How well the aircraft handles.
+  \item          Structural Integrity: How tough the plane is. Basically HP.
+        Divided into two stats.
+  \item          Maximum Strain: How much G-Forces the plane can take.
+  \item          Toughness: Excess health.
+  \item          Visibility: How hard it is to see out of the plane.
+  \item          Stability: How well the plane doesn't accidently flip over.
+  \item          Fuel Capacity: How much fuel the plane carries.
+  \item          Stress per Flight: How hard the plane is to fly for a while.
 \end{itemize}
 
 Safety Stats
 
 \begin{itemize}
-    \item          Crash Safety: How safe it is to crash land.
-    \item          Escape: How easy it is to get out in a hurry.
-    \item          Upkeep: How much the aircraft costs per routine (standard game
-          only).
+  \item          Crash Safety: How safe it is to crash land.
+  \item          Escape: How easy it is to get out in a hurry.
+  \item          Upkeep: How much the aircraft costs per routine (standard game
+        only).
 \end{itemize}
 
 \subsection{Basics}
@@ -92,23 +92,23 @@ Planes are built out of components. We're going to build it one part at
 a time in the following order.
 
 \begin{itemize}
-    \item  \hyperref[_Era]{Era}: When is the plane from?
-    \item  \hyperref[_Crew]{Crew}: Defining who is inside the aircraft, and passengers.
-    \item  \hyperref[_Engines]{Engines}: Defining how the aircraft is powered and how it is cooled.
-    \item  \hyperref[_Frame_and_Covering]{Frames and Covering}: Putting an actual frame around everything.
-    \item  \hyperref[_Wings]{Wings}: Making it fly.
-    \item  \hyperref[_Stabilizers]{Stabilizers}: Keeping the plane steady.
-    \item  \hyperref[_Control_Surfaces]{Control Surfaces}: Steering the plane.
-    \item  \hyperref[_Reinforcement]{Reinforcement}: Making sure the aircraft stays together.
-    \item  \hyperref[_Weapons]{Weapons}: What the aircraft is armed with.
-    \item  \hyperref[_Load]{Load}: Fuel, Bombs, and Cargo.
-    \item  \hyperref[_Landing_Gear]{Landing Gear}: Where the plane meets the earth.
-    \item  \hyperref[_Upgrades]{Accessories}: Upgrades to make the plane better.
-    \item  \hyperref[_Propeller]{Propeller}: What type of propeller to put on the plane.
-    \item  \hyperref[_Optimization]{Optimizations}: Fine-tune the aircraft.
-    \item  \hyperref[_Final_Calculations]{Final Stats}: Putting it together into a profile you can use in game.
-    \item  \hyperref[_Used_Planes]{Used Planes}: Rules for buying planes used.
-    \item  \hyperref[_Altitude_Rules]{Altitude Effects}: What happens when you really high?
+  \item  \hyperref[_Era]{Era}: When is the plane from?
+  \item  \hyperref[_Crew]{Crew}: Defining who is inside the aircraft, and passengers.
+  \item  \hyperref[_Engines]{Engines}: Defining how the aircraft is powered and how it is cooled.
+  \item  \hyperref[_Frame_and_Covering]{Frames and Covering}: Putting an actual frame around everything.
+  \item  \hyperref[_Wings]{Wings}: Making it fly.
+  \item  \hyperref[_Stabilizers]{Stabilizers}: Keeping the plane steady.
+  \item  \hyperref[_Control_Surfaces]{Control Surfaces}: Steering the plane.
+  \item  \hyperref[_Reinforcement]{Reinforcement}: Making sure the aircraft stays together.
+  \item  \hyperref[_Weapons]{Weapons}: What the aircraft is armed with.
+  \item  \hyperref[_Load]{Load}: Fuel, Bombs, and Cargo.
+  \item  \hyperref[_Landing_Gear]{Landing Gear}: Where the plane meets the earth.
+  \item  \hyperref[_Upgrades]{Accessories}: Upgrades to make the plane better.
+  \item  \hyperref[_Propeller]{Propeller}: What type of propeller to put on the plane.
+  \item  \hyperref[_Optimization]{Optimizations}: Fine-tune the aircraft.
+  \item  \hyperref[_Final_Calculations]{Final Stats}: Putting it together into a profile you can use in game.
+  \item  \hyperref[_Used_Planes]{Used Planes}: Rules for buying planes used.
+  \item  \hyperref[_Altitude_Rules]{Altitude Effects}: What happens when you really high?
 \end{itemize}
 
 Your plane will generally need, at minimum, a pilot, an engine, and some
@@ -129,15 +129,15 @@ technically from 1944 and a Last Hurrah aircraft but the engine is a WW2
 one and the aerodynamics are mostly Coming Storm.
 
 \begin{tabular}{|l|l|l|l|l|l|l|}
-    \hline
-    Era          & Years               & Lift Bleed & Maximum Bomb Load & Cantilever Bonus & Cost
-    Adjustment   & Pitch Stability Mod                                                                 \\\hline
-    Pioneer      & 1903-1914           & 30         & 1/6 Structure     & +4               & -2þ  & +0 \\\hline
-    WW1          & 1915-1919           & 25         & 1/5 Structure     & +3               & 0þ   & +0 \\\hline
-    Roaring 20s  & 1920-1929           & 23         & 1/4 Structure     & +1               & +5þ  & +0 \\\hline
-    Coming Storm & 1930-1938           & 22         & 1/3 Structure     & 0                & +10þ & +2 \\\hline
-    WW2          & 1939-1943           & 20         & 1/3 Structure     & 0                & +15þ & +2 \\\hline
-    Last Hurrah  & 1944+               & 18         & 1/2 Structure     & 0                & +20þ & +2 \\\hline
+  \hline
+  Era          & Years               & Lift Bleed & Maximum Bomb Load & Cantilever Bonus & Cost
+  Adjustment   & Pitch Stability Mod                                                                 \\\hline
+  Pioneer      & 1903-1914           & 30         & 1/6 Structure     & +4               & -2þ  & +0 \\\hline
+  WW1          & 1915-1919           & 25         & 1/5 Structure     & +3               & 0þ   & +0 \\\hline
+  Roaring 20s  & 1920-1929           & 23         & 1/4 Structure     & +1               & +5þ  & +0 \\\hline
+  Coming Storm & 1930-1938           & 22         & 1/3 Structure     & 0                & +10þ & +2 \\\hline
+  WW2          & 1939-1943           & 20         & 1/3 Structure     & 0                & +15þ & +2 \\\hline
+  Last Hurrah  & 1944+               & 18         & 1/2 Structure     & 0                & +20þ & +2 \\\hline
 \end{tabular}
 
 Components of the aircraft are associated with an era, when they
@@ -166,38 +166,38 @@ Visibility, Flight Stress and Escape modifiers apply to each crew
 position individually.
 
 \begin{tabular}{|l|l|l|l|l|}
-    \hline
-    Type                                               & Description                             & Effects                    & Cost & Era \\\hline
-    Open                                               & The pilot is fully exposed to the air.  & +1 Mass, +3 Drag, +2
-    Escape, +1 Visibility                              & -                                       & Pioneer                                 \\\hline
-    Windscreen                                         & A piece of glass in front of the pilot. & +2 Mass, +1 Drag.
-    +2 Escape, +1 Visibility                           & 1þ                                      & Pioneer                                 \\\hline
-    Sealed                                             & There is no window or external view.    & +2 Mass, -3 Escape, -1
-    Flight Stress. This crewmember cannot see outside. & 1þ                                      & Pioneer                                 \\\hline
-    Narrow Canopy                                      & A frame with small windows.             & +3 Mass, -1 Visibility. -1
-    Flight Stress.                                     & 3þ                                      & WWI                                     \\\hline
-    Bubble Canopy                                      & A cockpit made from curved glass.       & +3 Mass, -3 Drag, -1
-    Flight Stress                                      & 8þ                                      & WWII                                    \\\hline
+  \hline
+  Type                                               & Description                             & Effects                    & Cost & Era \\\hline
+  Open                                               & The pilot is fully exposed to the air.  & +1 Mass, +3 Drag, +2
+  Escape, +1 Visibility                              & -                                       & Pioneer                                 \\\hline
+  Windscreen                                         & A piece of glass in front of the pilot. & +2 Mass, +1 Drag.
+  +2 Escape, +1 Visibility                           & 1þ                                      & Pioneer                                 \\\hline
+  Sealed                                             & There is no window or external view.    & +2 Mass, -3 Escape, -1
+  Flight Stress. This crewmember cannot see outside. & 1þ                                      & Pioneer                                 \\\hline
+  Narrow Canopy                                      & A frame with small windows.             & +3 Mass, -1 Visibility. -1
+  Flight Stress.                                     & 3þ                                      & WWI                                     \\\hline
+  Bubble Canopy                                      & A cockpit made from curved glass.       & +3 Mass, -3 Drag, -1
+  Flight Stress                                      & 8þ                                      & WWII                                    \\\hline
 \end{tabular}
 
 To each cockpit, you can add the following upgrades.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Upgrade                                          & Description                                                 & Cost    & Era         \\\hline
-    Co-Pilot Controls                                & Allows this seat to also control the aircraft. -2
-    Flight Stress for Pilots.                        & 1þ                                                          & Pioneer               \\\hline
-    Escape Hatch                                     & +1 Mass, +3 Escape                                          & 2þ      & Pioneer     \\\hline
-    Ejection Seat                                    & +2 Mass, +5 Escape                                          & 4þ      & Last Hurrah \\\hline
-    Connectivity                                     & Connects this cockpit to any other cockpit with the same
-    upgrade. +1 Mass.                                & -                                                           & Pioneer               \\\hline
-    Oxygen Mask                                      & The pilot ignores the effects of high altitude and negates
-    up to 2 G-Penalty. Requires 1 Charge Continuous. & 2þ                                                          & WWI                   \\\hline
-    Isolated                                         & A basket or box allowing unusual mounts (like in front of a
-    propeller) completely ignoring the usual system. +5 Drag, +1 Mass, +2
-    Visibility, -2 Escape, +1 Flight Stress.
+  \hline
+  Upgrade                                          & Description                                                 & Cost    & Era         \\\hline
+  Co-Pilot Controls                                & Allows this seat to also control the aircraft. -2
+  Flight Stress for Pilots.                        & 1þ                                                          & Pioneer               \\\hline
+  Escape Hatch                                     & +1 Mass, +3 Escape                                          & 2þ      & Pioneer     \\\hline
+  Ejection Seat                                    & +2 Mass, +5 Escape                                          & 4þ      & Last Hurrah \\\hline
+  Connectivity                                     & Connects this cockpit to any other cockpit with the same
+  upgrade. +1 Mass.                                & -                                                           & Pioneer               \\\hline
+  Oxygen Mask                                      & The pilot ignores the effects of high altitude and negates
+  up to 2 G-Penalty. Requires 1 Charge Continuous. & 2þ                                                          & WWI                   \\\hline
+  Isolated                                         & A basket or box allowing unusual mounts (like in front of a
+  propeller) completely ignoring the usual system. +5 Drag, +1 Mass, +2
+  Visibility, -2 Escape, +1 Flight Stress.
 
-    Take double Injury when you Go Down.             & 1þ                                                          & Pioneer               \\\hline
+  Take double Injury when you Go Down.             & 1þ                                                          & Pioneer               \\\hline
 \end{tabular}
 
 These cockpit options can represent different ideas depending on
@@ -211,18 +211,18 @@ gunner, for example.
 Try not to die! You need to buy these upgrades on a per-cockpit basis.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type                 & Effects                                                        & Cost        & Era          \\\hline
-    Padding              & Negate 1 Injury for this position when you Go Down.            & 1þ          &
-    Pioneer                                                                                                            \\\hline
-    Harness              & Negate 1 Injury for this position when you Go Down, -1 Escape.
-                         & 1þ                                                             & Pioneer                    \\\hline
-    Fast Release System  & +2 to Escape.                                                  & 1þ          & Coming Storm \\\hline
-    Roll Bar             & +2 Mass. Negate 1 Injury for this position when you Go Down.
-                         & -                                                              & WWI                        \\\hline
-    Flare Slot           & Allows flares to be fired out of a closed cockpit without
-    opening the cockpit. & 1þ                                                             & Roaring 20s                \\\hline
-    Basic Fan            & Requires the Electrics Vital Part.                             & -           & Pioneer      \\\hline
+  \hline
+  Type                 & Effects                                                        & Cost        & Era          \\\hline
+  Padding              & Negate 1 Injury for this position when you Go Down.            & 1þ          &
+  Pioneer                                                                                                            \\\hline
+  Harness              & Negate 1 Injury for this position when you Go Down, -1 Escape.
+                       & 1þ                                                             & Pioneer                    \\\hline
+  Fast Release System  & +2 to Escape.                                                  & 1þ          & Coming Storm \\\hline
+  Roll Bar             & +2 Mass. Negate 1 Injury for this position when you Go Down.
+                       & -                                                              & WWI                        \\\hline
+  Flare Slot           & Allows flares to be fired out of a closed cockpit without
+  opening the cockpit. & 1þ                                                             & Roaring 20s                \\\hline
+  Basic Fan            & Requires the Electrics Vital Part.                             & -           & Pioneer      \\\hline
 \end{tabular}
 
 \subsubsection{Gunsights}
@@ -236,15 +236,15 @@ Each gunsight you stuff in your cockpit gives -1 Visibility, so
 be sparing!
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type                                                  & Effects                                        & Cost & Era \\\hline
-    X1 Collimated Gunsight                                & +1 to Attack.                                  & 2þ   & WWI \\\hline
-    Telescopic Gunsight                                   & +2 to Attack if you Draw a Bead.               & 3þ   & WWI \\\hline
-    Illuminated Reflex Sight                              & +2 to Attack. Disabled when the Electrics
-    Vital Part is hit.                                    & 6þ                                             & WWI        \\\hline
-    Gyro Gunsight                                         & {+2 to Attack, and additional +2 if you Draw a
-    Bead. Disabled when the Electrics Vital Part is hit.} & {12þ}                                          &
-    {WWII}                                                                                                              \\\hline
+  \hline
+  Type                                                  & Effects                                        & Cost & Era \\\hline
+  X1 Collimated Gunsight                                & +1 to Attack.                                  & 2þ   & WWI \\\hline
+  Telescopic Gunsight                                   & +2 to Attack if you Draw a Bead.               & 3þ   & WWI \\\hline
+  Illuminated Reflex Sight                              & +2 to Attack. Disabled when the Electrics
+  Vital Part is hit.                                    & 6þ                                             & WWI        \\\hline
+  Gyro Gunsight                                         & {+2 to Attack, and additional +2 if you Draw a
+  Bead. Disabled when the Electrics Vital Part is hit.} & {12þ}                                          &
+  {WWII}                                                                                                              \\\hline
 \end{tabular}
 
 \subsubsection{Bombsights}
@@ -305,53 +305,53 @@ tail, using an extended driveshaft or farman tail to avoid imbalance.
 Hull engine mounts require a Frame Slot for each engine.
 
 \begin{tabular}{|l|l|}
-    \hline
-    Type                   & Description                                                   \\\hline
-    Tractor                & Normal.
+  \hline
+  Type                   & Description                                                   \\\hline
+  Tractor                & Normal.
 
-    Forward-firing fixed weapons will need sync gears/spinner mounts.
-    Turrets cannot fire forward.                                                           \\\hline
-    Center-Mounted Tractor & -2 Pitch Stability, +1 Visibility.
+  Forward-firing fixed weapons will need sync gears/spinner mounts.
+  Turrets cannot fire forward.                                                           \\\hline
+  Center-Mounted Tractor & -2 Pitch Stability, +1 Visibility.
 
-    Forward-firing fixed weapons will need Sync gears. Will require an
-    Extended Driveshaft.
+  Forward-firing fixed weapons will need Sync gears. Will require an
+  Extended Driveshaft.
 
-    With the space free at the front of the aircraft, you can mount a single
-    weapon that fires through the spinner.
+  With the space free at the front of the aircraft, you can mount a single
+  weapon that fires through the spinner.
 
-    (Represents P-39 style engine mounts.)                                                 \\\hline
-    Rear-Mounted
+  (Represents P-39 style engine mounts.)                                                 \\\hline
+  Rear-Mounted
 
-    Pusher                 & -4 Pitch Stability, +2 Visibility, -2 Escape.
+  Pusher                 & -4 Pitch Stability, +2 Visibility, -2 Escape.
 
-    Rearward-firing fixed weapons will need sync gears/spinner mounts.
-    Turrets cannot fire backward.
+  Rearward-firing fixed weapons will need sync gears/spinner mounts.
+  Turrets cannot fire backward.
 
-    (represents engines mounted at the rear of the aircraft)                               \\\hline
-    Center-Mounted Pusher  & -2 Pitch Stability. +2 Visibility, -2 Escape.
+  (represents engines mounted at the rear of the aircraft)                               \\\hline
+  Center-Mounted Pusher  & -2 Pitch Stability. +2 Visibility, -2 Escape.
 
-    Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders, or
-    Boom Tail.
+  Requires Extended Driveshaft, Farman Tail, Swept Wings w/ Rudders, or
+  Boom Tail.
 
-    Rearward-firing fixed weapons will need sync gears/spinner mounts.
-    Turrets cannot fire backward.
+  Rearward-firing fixed weapons will need sync gears/spinner mounts.
+  Turrets cannot fire backward.
 
-    (represents engines mounted in the center of the aircraft a la the
-    DH2)                                                                                   \\\hline
-    Pod                    & +5 Drag and -2 Visibility. Keeps the engine out of the way of
-    everything.                                                                            \\\hline
+  (represents engines mounted in the center of the aircraft a la the
+  DH2)                                                                                   \\\hline
+  Pod                    & +5 Drag and -2 Visibility. Keeps the engine out of the way of
+  everything.                                                                            \\\hline
 \end{tabular}
 
 \textbf{Wing Engine Mounts}
 
 \begin{tabular}{|l|l|}
-    \hline
-    Type             & Description                                            \\\hline
-    Nacelle (Inside) & Reduces Max Strain by half the mass of the engine. +1
-    Lift Bleed.                                                               \\\hline
-    Nacelle (Offset) & Adds Drag equal to the mass of the Engine.             \\\hline
-    Channel Tractor  & -1 Lift Bleed. Reduces Max Strain equal to the mass of
-    the engine.                                                               \\\hline
+  \hline
+  Type             & Description                                            \\\hline
+  Nacelle (Inside) & Reduces Max Strain by half the mass of the engine. +1
+  Lift Bleed.                                                               \\\hline
+  Nacelle (Offset) & Adds Drag equal to the mass of the Engine.             \\\hline
+  Channel Tractor  & -1 Lift Bleed. Reduces Max Strain equal to the mass of
+  the engine.                                                               \\\hline
 \end{tabular}
 
 If you wanted to, you could build a plane asymmetrical, with
@@ -393,14 +393,14 @@ apply the following modifiers.
 \textbf{Push-Pull Designs}
 
 \begin{tabular}{|l|l|}
-    \hline
-    Type                      & Description                                             \\\hline
-    Tractor + Pusher/Rearward & 90\% Engine Power. The -2 Pitch Stability
-    and -2 Escape from having a Pusher. Cowling costs +2 for the Pusher
-    engine as normal.                                                                   \\\hline
-    Nacelle/Nacelle           & 80\% Engine Power. Only apply the nacelle penalty for
-    one engine.                                                                         \\\hline
-    Tandem Pod                & 90\% Engine Power. Only apply the +5 Drag Penalty once. \\\hline
+  \hline
+  Type                      & Description                                             \\\hline
+  Tractor + Pusher/Rearward & 90\% Engine Power. The -2 Pitch Stability
+  and -2 Escape from having a Pusher. Cowling costs +2 for the Pusher
+  engine as normal.                                                                   \\\hline
+  Nacelle/Nacelle           & 80\% Engine Power. Only apply the nacelle penalty for
+  one engine.                                                                         \\\hline
+  Tandem Pod                & 90\% Engine Power. Only apply the +5 Drag Penalty once. \\\hline
 \end{tabular}
 
 \subsection{Engine Upgrades}
@@ -457,9 +457,9 @@ Reliability. You can add this as many times as you want.
 You can pay an additional 1þ to negate Reliability penalty from the
 geared prop only, 1-1. Available in the Roaring 20s era.
 
-\textbf{Note:} While technically you can gear a Rotary engine (and 
-there are a few historical examples), this is an abomination against 
-engineering and you should think twice, or a dozen times before doing it. 
+\textbf{Note:} While technically you can gear a Rotary engine (and
+there are a few historical examples), this is an abomination against
+engineering and you should think twice, or a dozen times before doing it.
 
 \subsubsection{Cowling}
 \label{_Cowling}
@@ -467,19 +467,19 @@ engineering and you should think twice, or a dozen times before doing it.
 Cowling can be applied to any air-cooled engine.
 
 \begin{tabular}{|l|l|l|l|l|}
-    \hline
-    Type                 & Description                                      & Engine Types & Cost    & Era     \\\hline
-    Basic Cowl           & 80\% Engine Drag, +1 Mass.                       & Air Cooled   & 1þ      & Pioneer \\\hline
-    Rotary Basic Cowl    & 40\% Engine Drag. +1 Mass.                       & Rotary       & 1þ      &
-    Pioneer                                                                                                    \\\hline
-    Closed Cowl          & 30\% Engine Drag. -1 Reliability, +1 Mass.       & Rotary       & 1þ      &
-    WWI                                                                                                        \\\hline
-    Foil Cowl            & 40\% Engine Drag. +3 Reliability, +2 Mass.       & Air Cooled +
-    Rotary               & 3þ                                               & Roaring 20s                      \\\hline
-    Adjustable Slat Cowl & 50\% Engine Drag. +2 Reliability, +2 Mass.       & Air
-    Cooled               & 2þ                                               & Coming Storm                     \\\hline
-    Sealed Cowl          & 50\% Engine Drag. +1 Mass per 3 Engine Drag (pre
-    reduction).          & Liquid Cooled                                    & 1þ           & Pioneer           \\\hline
+  \hline
+  Type                 & Description                                      & Engine Types & Cost    & Era     \\\hline
+  Basic Cowl           & 80\% Engine Drag, +1 Mass.                       & Air Cooled   & 1þ      & Pioneer \\\hline
+  Rotary Basic Cowl    & 40\% Engine Drag. +1 Mass.                       & Rotary       & 1þ      &
+  Pioneer                                                                                                    \\\hline
+  Closed Cowl          & 30\% Engine Drag. -1 Reliability, +1 Mass.       & Rotary       & 1þ      &
+  WWI                                                                                                        \\\hline
+  Foil Cowl            & 40\% Engine Drag. +3 Reliability, +2 Mass.       & Air Cooled +
+  Rotary               & 3þ                                               & Roaring 20s                      \\\hline
+  Adjustable Slat Cowl & 50\% Engine Drag. +2 Reliability, +2 Mass.       & Air
+  Cooled               & 2þ                                               & Coming Storm                     \\\hline
+  Sealed Cowl          & 50\% Engine Drag. +1 Mass per 3 Engine Drag (pre
+  reduction).          & Liquid Cooled                                    & 1þ           & Pioneer           \\\hline
 \end{tabular}
 
 Cowls are more difficult to apply to fuselage pusher aircraft,
@@ -491,7 +491,7 @@ of air over the engine, though it introduces an additional heavy
 spinning blade to the crankshaft.
 
 \begin{itemize}
-    \item          Air Cooling Fan: +6 Reliability, +3 Mass. Double Torque. 4þ
+  \item          Air Cooling Fan: +6 Reliability, +3 Mass. Double Torque. 4þ
 \end{itemize}
 
 \subsubsection{Turbocharger}
@@ -556,48 +556,48 @@ design like hoses or framework.
 \textbf{Radiator Type}
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    Type                & Description       & Era          \\\hline
-    Panel               & Default.          & Pioneer      \\\hline
-    Box                 & +2 Drag, -1 Mass. & Pioneer      \\\hline
-    Intake              & +2 Cooling +3þ.   & Roaring 20s  \\\hline
-    Evaporative Cooling & See Below.        & Coming Storm \\\hline
+  \hline
+  Type                & Description       & Era          \\\hline
+  Panel               & Default.          & Pioneer      \\\hline
+  Box                 & +2 Drag, -1 Mass. & Pioneer      \\\hline
+  Intake              & +2 Cooling +3þ.   & Roaring 20s  \\\hline
+  Evaporative Cooling & See Below.        & Coming Storm \\\hline
 \end{tabular}
 
 \textbf{Radiator Mount}
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    Location                                       & Description                                                      & Era     \\\hline
-    Low                                            & +1 Reliability. Force Cool Down when shot.                       & Pioneer \\\hline
-    Inline                                         & Default.                                                         & Pioneer \\\hline
-    High                                           & Bonus persists for 1 Cool Down after being shot. +1 Drag. If the
-    plane is an open cockpit, will spray the pilot with the radiator fluid!
-                                                   & Pioneer                                                                    \\\hline
-    High Offset                                    & Requires a Parasol Wing. As per High, but -1 Lateral
-    Stability, and the pilot is safe if ruptured.. & WWI                                                                        \\\hline
+  \hline
+  Location                                       & Description                                                      & Era     \\\hline
+  Low                                            & +1 Reliability. Force Cool Down when shot.                       & Pioneer \\\hline
+  Inline                                         & Default.                                                         & Pioneer \\\hline
+  High                                           & Bonus persists for 1 Cool Down after being shot. +1 Drag. If the
+  plane is an open cockpit, will spray the pilot with the radiator fluid!
+                                                 & Pioneer                                                                    \\\hline
+  High Offset                                    & Requires a Parasol Wing. As per High, but -1 Lateral
+  Stability, and the pilot is safe if ruptured.. & WWI                                                                        \\\hline
 \end{tabular}
 
 \textbf{Radiator Examples: }
 
 \emph{Panel radiators are any radiator design that air
-    ``passes over'', while Box radiators are
-    radiators designed for air to``pass
-    through''. In simplest terms, if it sticks out all ugly
-    like or is in the nose, it's a box, if
-    it's flat against a surface like a wing
-    or the skin it's a panel.}
+  ``passes over'', while Box radiators are
+  radiators designed for air to``pass
+  through''. In simplest terms, if it sticks out all ugly
+  like or is in the nose, it's a box, if
+  it's flat against a surface like a wing
+  or the skin it's a panel.}
 
 Intake radiators are specifically radiators built inside
 specialized housings designed to funnel air and reduce drag.
 
 \begin{itemize}
-    \item          The radiator on an Albatros D.II is a High Panel radiator.
-    \item          The radiator on the side of a Sopwith Dolphin or Albatros D.II
-          early is a Low Box radiator.
-    \item          The radiator on the nose of an SE5a or Fokker D.VII is an
-          Inline Box radiator.
-    \item          The radiator on a Spitfire or P-51 is a Low Intake radiator.
+  \item          The radiator on an Albatros D.II is a High Panel radiator.
+  \item          The radiator on the side of a Sopwith Dolphin or Albatros D.II
+        early is a Low Box radiator.
+  \item          The radiator on the nose of an SE5a or Fokker D.VII is an
+        Inline Box radiator.
+  \item          The radiator on a Spitfire or P-51 is a Low Intake radiator.
 \end{itemize}
 
 \textbf{Special Coolant}
@@ -619,35 +619,35 @@ damaged.~ If the liquid is marked with a *, you need a special hardened
 radiator for them (2 thaler to upgrade).
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Liquid       & Effects                                                      & Cost & Era         \\\hline
-    Water        &                                                              & -    & Pioneer     \\\hline
-    Salt Water*  & +1 Reliability (Free for Fishers)                            & 1þ   & Pioneer     \\\hline
-    Mineral Oil* & Absorbs 1 Miss to Cool Down. Flammable                       & 1þ   & Pioneer     \\\hline
-    Castor Oil   & As Mineral Oil, but +2 Stress if leaking                     & -    & Pioneer     \\\hline
-    Glycol       & +2 Reliability                                               & 2þ   & Roaring 20s \\\hline
-    Freon        & +4 Reliability. Take 1 Power Reduction while RPM is below 4. &
-    3þ           & Coming Storm                                                                      \\\hline
-    Ammonia      & As Freon, but causes 2 Injury when leaking                   & 2þ   & Pioneer     \\\hline
+  \hline
+  Liquid       & Effects                                                      & Cost & Era         \\\hline
+  Water        &                                                              & -    & Pioneer     \\\hline
+  Salt Water*  & +1 Reliability (Free for Fishers)                            & 1þ   & Pioneer     \\\hline
+  Mineral Oil* & Absorbs 1 Miss to Cool Down. Flammable                       & 1þ   & Pioneer     \\\hline
+  Castor Oil   & As Mineral Oil, but +2 Stress if leaking                     & -    & Pioneer     \\\hline
+  Glycol       & +2 Reliability                                               & 2þ   & Roaring 20s \\\hline
+  Freon        & +4 Reliability. Take 1 Power Reduction while RPM is below 4. &
+  3þ           & Coming Storm                                                                      \\\hline
+  Ammonia      & As Freon, but causes 2 Injury when leaking                   & 2þ   & Pioneer     \\\hline
 \end{tabular}
 \\
 \begin{tabular}{|l|}
-    \hline
-    Evaporative Cooling \\\hline
+  \hline
+  Evaporative Cooling \\\hline
 
-    An alternate way to cool a liquid cooled engine is evaporative cooling.
-    This requires a sufficiently large wing (at least 5 Area per engine)
-    with some sort of metal skin. Rather than running water to a radiator,
-    the water is sprayed as steam into a cavity in the wings to cool it,
-    where it is collected and fed back into the engine. This is more
-    streamlined, but is very fragile.
+  An alternate way to cool a liquid cooled engine is evaporative cooling.
+  This requires a sufficiently large wing (at least 5 Area per engine)
+  with some sort of metal skin. Rather than running water to a radiator,
+  the water is sprayed as steam into a cavity in the wings to cool it,
+  where it is collected and fed back into the engine. This is more
+  streamlined, but is very fragile.
 
-    Evaporative cooling only costs the +3 Mass you'd pay to get a radiator.
-    There's no Drag involved, you're just ready to go.
+  Evaporative cooling only costs the +3 Mass you'd pay to get a radiator.
+  There's no Drag involved, you're just ready to go.
 
-    The downside is that any attack with a Crit roll of 16+ will knock out
-    the radiator, in addition to any other damage done or other parts
-    damaged.            \\\hline
+  The downside is that any attack with a Crit roll of 16+ will knock out
+  the radiator, in addition to any other damage done or other parts
+  damaged.            \\\hline
 \end{tabular}
 
 \subsubsection{Pulsejets}
@@ -669,13 +669,13 @@ Jet engines are mounted in one of the following ways. Jet engines carry
 with them their own requirement in Frame Slots owing to their size.
 
 \begin{tabular}{|l|l|}
-    \hline
-    Type                     & Description                                                   \\\hline
-    Front Intake/Rear Burner & Default. Can mount up to 2 engines.                           \\\hline
-    Wing Pod                 & Reduces Max Strain by half the mass of the engine. +1 Lift
-    Bleed.                                                                                   \\\hline
-    Pod                      & +3 Drag and -1 Visibility. Keeps the engine out of the way of
-    everything.                                                                              \\\hline
+  \hline
+  Type                     & Description                                                   \\\hline
+  Front Intake/Rear Burner & Default. Can mount up to 2 engines.                           \\\hline
+  Wing Pod                 & Reduces Max Strain by half the mass of the engine. +1 Lift
+  Bleed.                                                                                   \\\hline
+  Pod                      & +3 Drag and -1 Visibility. Keeps the engine out of the way of
+  everything.                                                                              \\\hline
 \end{tabular}
 
 \subsection{Frame and Covering}
@@ -699,24 +699,24 @@ The P-51 is made of Aluminum Ribs.
 \includegraphics{Frame.png}
 
 \begin{tabular}{|l|l|l|l|l|l|}
-    \hline
-    Frame Material  & Base Effect                & Cost
+  \hline
+  Frame Material  & Base Effect                & Cost
 
-    Base            & Effect per Piece           & Cost
+  Base            & Effect per Piece           & Cost
 
-    Piece           & Era                                                                                 \\\hline
-    Wooden Spars    & 15 Structure               & -          & +1 Mass, +2 Structure  & -  & Pioneer     \\\hline
-    Steel Spars     & 25 Structure               & 1þ         & +1 Mass, +5 Structure  & 1þ &
-    Pioneer                                                                                               \\\hline
-    Aluminum Spars  & 20 Structure               & 2þ         & +½ Mass, +4 Structure  & 2þ & WWI         \\\hline
-    Wooden Ribs*    & 30 Structure               & 1þ         & +2 Mass, +5 Structure  & ½þ & WWI         \\\hline
-    Steel Ribs*     & 60 Structure               & 2þ         & +3 Mass, +12 Structure & 2þ & Roaring
-    20s                                                                                                   \\\hline
-    Aluminium Ribs* & 50 Structure               & 3þ         & +2 Mass, +8 Structure  & 3þ &
-    Roaring 20s                                                                                           \\\hline
-    Titanium        & -                          &            & +1 Mass, +10 Structure & 8þ & Last Hurrah \\\hline
-    Living Grove*   & 30 Structure, Free Repairs & 8þ         & +2 Mass, +4 Structure
-                    & -                          & Himmilgard                                             \\\hline
+  Piece           & Era                                                                                 \\\hline
+  Wooden Spars    & 15 Structure               & -          & +1 Mass, +2 Structure  & -  & Pioneer     \\\hline
+  Steel Spars     & 25 Structure               & 1þ         & +1 Mass, +5 Structure  & 1þ &
+  Pioneer                                                                                               \\\hline
+  Aluminum Spars  & 20 Structure               & 2þ         & +½ Mass, +4 Structure  & 2þ & WWI         \\\hline
+  Wooden Ribs*    & 30 Structure               & 1þ         & +2 Mass, +5 Structure  & ½þ & WWI         \\\hline
+  Steel Ribs*     & 60 Structure               & 2þ         & +3 Mass, +12 Structure & 2þ & Roaring
+  20s                                                                                                   \\\hline
+  Aluminium Ribs* & 50 Structure               & 3þ         & +2 Mass, +8 Structure  & 3þ &
+  Roaring 20s                                                                                           \\\hline
+  Titanium        & -                          &            & +1 Mass, +10 Structure & 8þ & Last Hurrah \\\hline
+  Living Grove*   & 30 Structure, Free Repairs & 8þ         & +2 Mass, +4 Structure
+                  & -                          & Himmilgard                                             \\\hline
 \end{tabular}
 
 Titanium is a special case and cannot be used for whole frames.
@@ -732,33 +732,33 @@ a covering from below. The entire skin of the aircraft must be the same,
 so choose the dominant type.
 
 \begin{tabular}{|l|l|l|l|l|}
-    \hline
-    Skin Material                & Effects                                                 & Cost       & Monocoque
+  \hline
+  Skin Material                & Effects                                                 & Cost       & Monocoque
 
-    Structure                    & Era                                                                                          \\\hline
-    Naked                        & + 1 Visibility per Piece, up to +3. 60\% Airframe Mass. & -          & -
-                                 & Pioneer                                                                                      \\\hline
-    Cloth Canvas                 & 50\% Airframe Drag                                      & -          & -           & Pioneer \\\hline
-    Transparent Celluloid        & {60\% Airframe Drag. + 1 Visibility per
-    Piece, up to +3. Flammable.} & {1þ}                                                    & {-}        &
-    {Pioneer}                                                                                                                   \\\hline
-    Treated Paper                & 50\% Airframe Drag. Flammable. 75\% Airframe Mass       & -          &
-    -                            & Pioneer                                                                                      \\\hline
-    Tense Silk                   & 50\% Airframe Drag. +1 Toughness per Piece              & 1þ         & -           &
-    Pioneer                                                                                                                     \\\hline
-    Dragon Skin                  & 50\% Airframe Drag. Plane gains 5 Coverage AP2 armour.  &
-    4þ                           & -                                                       & Himmilgard                         \\\hline
-    Molded Plywood               & 40\% Airframe Drag                                      & ½þ         & +3          & Pioneer \\\hline
-    Clinker Build                & 50\% Airframe Drag. Full Monocoque, adds flat +30
-    Structure.                   & -                                                       & -3         & Pioneer               \\\hline
-    Glass Reinforced Plastic     & 30\% Airframe Drag.                                     & 1þ         & +0          & Last
-    Hurrah                                                                                                                      \\\hline
-    Corrugated Duralumin         & 50\% Airframe Drag, +3 Toughness per Piece              & 1þ         &
-    +10                          & WWI                                                                                          \\\hline
-    Steel Sheet                  & 35\% Airframe Drag, +3 Toughness per Piece              & 1½þ        & +8          &
-    Roaring 20s                                                                                                                 \\\hline
-    Aluminum Sheet               & 35\% Airframe Drag, +2 Toughness per Piece. 75\%
-    Airframe Mass                & 2þ                                                      & +6         & Roaring 20s           \\\hline
+  Structure                    & Era                                                                                          \\\hline
+  Naked                        & + 1 Visibility per Piece, up to +3. 60\% Airframe Mass. & -          & -
+                               & Pioneer                                                                                      \\\hline
+  Cloth Canvas                 & 50\% Airframe Drag                                      & -          & -           & Pioneer \\\hline
+  Transparent Celluloid        & {60\% Airframe Drag. + 1 Visibility per
+  Piece, up to +3. Flammable.} & {1þ}                                                    & {-}        &
+  {Pioneer}                                                                                                                   \\\hline
+  Treated Paper                & 50\% Airframe Drag. Flammable. 75\% Airframe Mass       & -          &
+  -                            & Pioneer                                                                                      \\\hline
+  Tense Silk                   & 50\% Airframe Drag. +1 Toughness per Piece              & 1þ         & -           &
+  Pioneer                                                                                                                     \\\hline
+  Dragon Skin                  & 50\% Airframe Drag. Plane gains 5 Coverage AP2 armour.  &
+  4þ                           & -                                                       & Himmilgard                         \\\hline
+  Molded Plywood               & 40\% Airframe Drag                                      & ½þ         & +3          & Pioneer \\\hline
+  Clinker Build                & 50\% Airframe Drag. Full Monocoque, adds flat +30
+  Structure.                   & -                                                       & -3         & Pioneer               \\\hline
+  Glass Reinforced Plastic     & 30\% Airframe Drag.                                     & 1þ         & +0          & Last
+  Hurrah                                                                                                                      \\\hline
+  Corrugated Duralumin         & 50\% Airframe Drag, +3 Toughness per Piece              & 1þ         &
+  +10                          & WWI                                                                                          \\\hline
+  Steel Sheet                  & 35\% Airframe Drag, +3 Toughness per Piece              & 1½þ        & +8          &
+  Roaring 20s                                                                                                                 \\\hline
+  Aluminum Sheet               & 35\% Airframe Drag, +2 Toughness per Piece. 75\%
+  Airframe Mass                & 2þ                                                      & +6         & Roaring 20s           \\\hline
 \end{tabular}
 
 \subsubsection{Monocoque}
@@ -830,13 +830,13 @@ It if looks reasonable, you're Standard. Most large bombers and such
 will use Long.
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    Location & Additional Frame Sections & Plane Modifier                                          \\\hline
-    Tailless & +0                        & -4 Pitch Stability, cannot use traditional tailplane or
-    vertical stabilizer. +3 Visibility                                                             \\\hline
-    Stubby   & +1                        & -3 Pitch Stability.                                     \\\hline
-    Standard & +2                        & No change.                                              \\\hline
-    Long     & +3                        & +3 Pitch Stability.                                     \\\hline
+  \hline
+  Location & Additional Frame Sections & Plane Modifier                                          \\\hline
+  Tailless & +0                        & -4 Pitch Stability, cannot use traditional tailplane or
+  vertical stabilizer. +3 Visibility                                                             \\\hline
+  Stubby   & +1                        & -3 Pitch Stability.                                     \\\hline
+  Standard & +2                        & No change.                                              \\\hline
+  Long     & +3                        & +3 Pitch Stability.                                     \\\hline
 \end{tabular}
 
 Tail sections are as a rule empty. Tail sections aren't
@@ -897,9 +897,9 @@ Now, divide this area up into each wing plane your aircraft will have.
 Each wing added after the first gives\ldots{}
 
 \begin{itemize}
-    \item          +3 Control
-    \item          +5 Lift Bleed
-    \item          -1 Visibility
+  \item          +3 Control
+  \item          +5 Lift Bleed
+  \item          -1 Visibility
 \end{itemize}
 
 \subsubsection{Aspect Ratio}
@@ -934,8 +934,8 @@ but inflicts a -30 Strain Penalty.
 The longest wing on your aircraft will give the following modifier.
 
 \begin{itemize}
-    \item          8 - Wingspan = Control Modifier
-    \item          Every point of Wingspan less than 8: -1 Lateral Stability.
+  \item          8 - Wingspan = Control Modifier
+  \item          Every point of Wingspan less than 8: -1 Lateral Stability.
 \end{itemize}
 
 \subsubsection{Wing Decks}
@@ -955,16 +955,16 @@ relative to the fuselage and the centre of mass of the aircraft, which
 are usually but not always in the same place.
 
 \begin{itemize}
-    \item          A Parasol wing is on struts above the fuselage, like an
-          umbrella over the aircraft.
-    \item          A Shoulder wing (or High wing) attaches at the top of the
-          fuselage.
-    \item          A Mid wing attaches around the middle of the fuselage.
-    \item          A Low wing attaches at the bottom of the fuselage.
-    \item          A Gear wing is like an inverted Parasol wing, suspending the
-          fuselage in the air above the wing. Gear wings can also represent
-          small lift surfaces attached between the wheels of the landing gear
-          using the Miniature Wing rules.
+  \item          A Parasol wing is on struts above the fuselage, like an
+        umbrella over the aircraft.
+  \item          A Shoulder wing (or High wing) attaches at the top of the
+        fuselage.
+  \item          A Mid wing attaches around the middle of the fuselage.
+  \item          A Low wing attaches at the bottom of the fuselage.
+  \item          A Gear wing is like an inverted Parasol wing, suspending the
+        fuselage in the air above the wing. Gear wings can also represent
+        small lift surfaces attached between the wheels of the landing gear
+        using the Miniature Wing rules.
 \end{itemize}
 
 In some cases, like on the Macchi M.5 (the one Porco Rosso flew in the
@@ -979,17 +979,17 @@ applies for Monoplanes and Sesquiplanes to the wing with the largest
 Area.
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    Location   & Plane Modifier                                               & Largest Wing Modifier    \\\hline
-    Parasol    & +3 Pitch Stability, -10 Max Strain. -2 Lift Bleed. -1
-    Visibility & +1 Lateral Stability. -1 Control                                                        \\\hline
-    Shoulder   & +2 Pitch Stability. -1 Lift Bleed. -1 Visibility             & -1
-    Control                                                                                              \\\hline
-    Mid        & -                                                            & -10\% Drag for this wing \\\hline
-    Low        & -2 Pitch Stability. -1 Crash Safety. -1 Lift Bleed           & +2 Control,
-    -1 Lateral Stability                                                                                 \\\hline
-    Gear       & -3 Pitch Stability. -10 Max Strain, -1 Crash Safety. -2 Lift
-    Bleed.     & +3 Control -1 Lateral Stability                                                         \\\hline
+  \hline
+  Location   & Plane Modifier                                               & Largest Wing Modifier    \\\hline
+  Parasol    & +3 Pitch Stability, -10 Max Strain. -2 Lift Bleed. -1
+  Visibility & +1 Lateral Stability. -1 Control                                                        \\\hline
+  Shoulder   & +2 Pitch Stability. -1 Lift Bleed. -1 Visibility             & -1
+  Control                                                                                              \\\hline
+  Mid        & -                                                            & -10\% Drag for this wing \\\hline
+  Low        & -2 Pitch Stability. -1 Crash Safety. -1 Lift Bleed           & +2 Control,
+  -1 Lateral Stability                                                                                 \\\hline
+  Gear       & -3 Pitch Stability. -10 Max Strain, -1 Crash Safety. -2 Lift
+  Bleed.     & +3 Control -1 Lateral Stability                                                         \\\hline
 \end{tabular}
 
 \subsubsection{Wing Surface}
@@ -1000,22 +1000,22 @@ Remember, always round down to whole numbers!
 \textbf{Wing Surfaces}
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Skin Material                      & Plane Modifier                                       & Cost/10 Area & Era                       \\\hline
-    Cloth Canvas                       & -                                                    & -            & Pioneer                   \\\hline
-    Treated Paper                      & Makes the plane Flammable, -1 Mass per 4 Area, up to
-    25\% of the dry mass of the plane. & -                                                    & Pioneer                                  \\\hline
-    Tense Silk Layers                  & 90\% Strain Penalty                                  & 2þ           & Pioneer                   \\\hline
-    Plywood                            & 90\% Strain Penalty, 1 Mass/5A                       & 1þ           & Pioneer                   \\\hline
-    Aluminium Sheet                    & 80\% Drag                                            & 3þ           & Roaring 20s               \\\hline
-    Corrugated Duralumin               & 60\% Strain Penalty , 1 Mass/4A                      & 2þ           & WWI                       \\\hline
-    Thin Sheet Steel                   & 60\% Strain Penalty, 90\% Drag, 1 Mass/5A            & 3þ           &
-    Roaring 20s                                                                                                                          \\\hline
-    Grand Eagle Feather                & +1 Control per 5A                                    & 6þ           & Himmilgard                \\\hline
-    Solar Fiber                        & +1 Charge Gen per 5A                                 & 4þ           & Himmilgard or Last Hurrah \\\hline
-    Dragon Skin                        & 40\% Strain Penalty                                  & 8þ           & Himmilgard                \\\hline
-    Transparent Celluloid              & Makes the plane Flammable. +1 Visibility per
-    wing. -1 Toughness per 10 Area     & 1þ                                                   & Pioneer                                  \\\hline
+  \hline
+  Skin Material                      & Plane Modifier                                       & Cost/10 Area & Era                       \\\hline
+  Cloth Canvas                       & -                                                    & -            & Pioneer                   \\\hline
+  Treated Paper                      & Makes the plane Flammable, -1 Mass per 4 Area, up to
+  25\% of the dry mass of the plane. & -                                                    & Pioneer                                  \\\hline
+  Tense Silk Layers                  & 90\% Strain Penalty                                  & 2þ           & Pioneer                   \\\hline
+  Plywood                            & 90\% Strain Penalty, 1 Mass/5A                       & 1þ           & Pioneer                   \\\hline
+  Aluminium Sheet                    & 80\% Drag                                            & 3þ           & Roaring 20s               \\\hline
+  Corrugated Duralumin               & 60\% Strain Penalty , 1 Mass/4A                      & 2þ           & WWI                       \\\hline
+  Thin Sheet Steel                   & 60\% Strain Penalty, 90\% Drag, 1 Mass/5A            & 3þ           &
+  Roaring 20s                                                                                                                          \\\hline
+  Grand Eagle Feather                & +1 Control per 5A                                    & 6þ           & Himmilgard                \\\hline
+  Solar Fiber                        & +1 Charge Gen per 5A                                 & 4þ           & Himmilgard or Last Hurrah \\\hline
+  Dragon Skin                        & 40\% Strain Penalty                                  & 8þ           & Himmilgard                \\\hline
+  Transparent Celluloid              & Makes the plane Flammable. +1 Visibility per
+  wing. -1 Toughness per 10 Area     & 1þ                                                   & Pioneer                                  \\\hline
 \end{tabular}
 
 \subsubsection{Stagger \& Tandem Wing}
@@ -1026,14 +1026,14 @@ If you have multiple wing decks, you may stagger the wings.
 \textbf{Wing Stagger}
 
 \begin{tabular}{|l|l|}
-    \hline
-    Location         & Plane Modifier                                           \\\hline
-    Tandem           & Eliminates the need for Horizontal Stabilizers. +4 Pitch
-    Stability. Cannot be tailless.                                              \\\hline
-    Extreme Positive & +2 Pitch Stability, -2 Lift Bleed                        \\\hline
-    Positive         & +1 Pitch Stability, -1 Lift Bleed                        \\\hline
-    Negative         & -1 Pitch Stability, -1 Lift Bleed                        \\\hline
-    Extreme Negative & -2 Pitch Stability, -2 Lift Bleed                        \\\hline
+  \hline
+  Location         & Plane Modifier                                           \\\hline
+  Tandem           & Eliminates the need for Horizontal Stabilizers. +4 Pitch
+  Stability. Cannot be tailless.                                              \\\hline
+  Extreme Positive & +2 Pitch Stability, -2 Lift Bleed                        \\\hline
+  Positive         & +1 Pitch Stability, -1 Lift Bleed                        \\\hline
+  Negative         & -1 Pitch Stability, -1 Lift Bleed                        \\\hline
+  Extreme Negative & -2 Pitch Stability, -2 Lift Bleed                        \\\hline
 \end{tabular}
 
 \subsubsection{Closed Wing}
@@ -1082,21 +1082,21 @@ advantages, but come with structural complications.
 A Sesquiplane grants
 
 \begin{itemize}
-    \item          -2 Lift Bleed
-    \item          +2 Control
+  \item          -2 Lift Bleed
+  \item          +2 Control
 \end{itemize}
 
 However, one of the following penalties will apply.
 
 \begin{itemize}
-    \item          If the smallest wingspan is less than 75\% the span of the
-          largest wing, your plane generates 15\% less Tension, as you can't
-          brace the wings out at the tips.
-    \item          Otherwise, the plane is limited to the following external
-          reinforcements: V-Struts, Single Struts, W-Struts, Wing Truss, and
-          Wire Roots. It can still use any type of Cabane Strut, but the
-          narrower lower wing precludes twin spar support, limiting the types of
-          spars which can be used.
+  \item          If the smallest wingspan is less than 75\% the span of the
+        largest wing, your plane generates 15\% less Tension, as you can't
+        brace the wings out at the tips.
+  \item          Otherwise, the plane is limited to the following external
+        reinforcements: V-Struts, Single Struts, W-Struts, Wing Truss, and
+        Wire Roots. It can still use any type of Cabane Strut, but the
+        narrower lower wing precludes twin spar support, limiting the types of
+        spars which can be used.
 \end{itemize}
 
 \subsubsection{Wing Angle}
@@ -1124,23 +1124,23 @@ Any Gull Wing will generate drag as though it had +10\% area, but it
 comes with the following benefits:
 
 \begin{itemize}
-    \item          {A Parasol Wing can be turned into a }\emph{{Polish
-                      Wing}}{. This removes the -10 Max Strain and Visibility penalty.
-              Not available with Shoulder wings.}
-    \item          {Mid, Low, and Gear wings can be turned into an
-          }\emph{Inverted Gull Wing}{. This has the following
-              effects, better for lower wings.}
+  \item          {A Parasol Wing can be turned into a }\emph{{Polish
+              Wing}}{. This removes the -10 Max Strain and Visibility penalty.
+          Not available with Shoulder wings.}
+  \item          {Mid, Low, and Gear wings can be turned into an
+        }\emph{Inverted Gull Wing}{. This has the following
+          effects, better for lower wings.}
 
-          \begin{itemize}
-              \item                    For Low and Mid wings, this reduces the Drag and/or Mass cost
-                    of Landing Gear by 15\% (excluding Boat Hulls) and increases
-                    external bomb capacity by 10\%. Not available with non-gull Mid and
-                    Shoulder wings, respectively.
-              \item                    For Gear wings, this reduces the Drag and/or Mass cost of
-                    Landing Gear by 25\% (excluding Boat Hulls), eliminates the -10 Max
-                    Strain, gives +1 Crash Safety, and increases external bomb capacity
-                    by 20\%. Not available with a non-gull Low wing.
-          \end{itemize}
+        \begin{itemize}
+          \item                    For Low and Mid wings, this reduces the Drag and/or Mass cost
+                of Landing Gear by 15\% (excluding Boat Hulls) and increases
+                external bomb capacity by 10\%. Not available with non-gull Mid and
+                Shoulder wings, respectively.
+          \item                    For Gear wings, this reduces the Drag and/or Mass cost of
+                Landing Gear by 25\% (excluding Boat Hulls), eliminates the -10 Max
+                Strain, gives +1 Crash Safety, and increases external bomb capacity
+                by 20\%. Not available with a non-gull Low wing.
+        \end{itemize}
 \end{itemize}
 
 \subsubsection{Swept Wings}
@@ -1157,8 +1157,8 @@ Stabilizers.
 A plane takes a -1 Control penalty for the following:
 
 \begin{itemize}
-    \item          Every 5 Mass of Weapons in Wing Mounts.
-    \item          Every Wing Mounted fuel tank, internal or external.
+  \item          Every 5 Mass of Weapons in Wing Mounts.
+  \item          Every Wing Mounted fuel tank, internal or external.
 \end{itemize}
 
 \subsubsection{Special Wing Types}
@@ -1168,13 +1168,13 @@ There are a number of special wing types. These wing types can be
 combined with normal wings, but it will rarely be worth it.
 
 \begin{itemize}
-    \item          Autogyros use a rotating wing surface. They are very safe for
-          light aircraft.
-    \item          Helicopters power a rotating wing surface, allowing free
-          vertical and horizontal movement at the cost of low stability and
-          requiring a powerful engine.
-    \item          Ornithopters use an engine to power a flapping effect. This
-          creates supremely maneuverable but delicate and expensive craft.
+  \item          Autogyros use a rotating wing surface. They are very safe for
+        light aircraft.
+  \item          Helicopters power a rotating wing surface, allowing free
+        vertical and horizontal movement at the cost of low stability and
+        requiring a powerful engine.
+  \item          Ornithopters use an engine to power a flapping effect. This
+        creates supremely maneuverable but delicate and expensive craft.
 \end{itemize}
 
 Their rules will be detailed on their own pages once complete.
@@ -1197,10 +1197,10 @@ sort of motion and goes into the ground.
 Your Stabilizers cost Drag, representing them getting in the airstream.
 
 \begin{itemize}
-    \item          All your vertical stabilizers will add 1/8th the total Wing
-          Drag. (Minimum 1)
-    \item          All your horizontal stabilizers will add 1/4th the total Wing
-          Drag. (Minimum 1)
+  \item          All your vertical stabilizers will add 1/8th the total Wing
+        Drag. (Minimum 1)
+  \item          All your horizontal stabilizers will add 1/4th the total Wing
+        Drag. (Minimum 1)
 \end{itemize}
 
 The absence of a Vertical Stabilizer subtracts Lateral Stability equal
@@ -1221,18 +1221,18 @@ are\ldots{}
 \textbf{Horizontal Stabilizer}
 
 \begin{itemize}
-    \item          Tailplane: Default
-    \item          Canards (at the front): -3 Pitch Stability, Half Drag.
-    \item          Outboard (on the wing): Requires either swept wings or a tandem
-          wing. +1 Lateral Stability. Requires even number of stabilizers.
+  \item          Tailplane: Default
+  \item          Canards (at the front): -3 Pitch Stability, Half Drag.
+  \item          Outboard (on the wing): Requires either swept wings or a tandem
+        wing. +1 Lateral Stability. Requires even number of stabilizers.
 \end{itemize}
 
 \textbf{Vertical Stabilizer}
 
 \begin{itemize}
-    \item          Tail fin: Default.
-    \item          Outboard: Requires either swept wings, a tandem wing, or
-          canards. +1 Control. Requires even number of stabilizers.
+  \item          Tail fin: Default.
+  \item          Outboard: Requires either swept wings, a tandem wing, or
+        canards. +1 Control. Requires even number of stabilizers.
 \end{itemize}
 
 \subsubsection{Multiple Stabilizers}
@@ -1286,14 +1286,14 @@ Ailerons control your airplane's rotation. You must have these!
 \textbf{Ailerons}
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type                                             & Effects                                                & Cost    & Era     \\\hline
-    No Ailerons                                      & -15 Control, -1 Crash Safety                           & -2þ     & Pioneer \\\hline
-    Flap Ailerons                                    & Default                                                & -       & Pioneer \\\hline
-    Wing Warping                                     & -1 Drag. Get +1 to Dogfight! at 15 speed and below.
-    Reduce Max Strain equal to span of longest wing. & -                                                      & Pioneer           \\\hline
-    Spoilerons                                       & When you roll Dogfight!, take +1, but then reduce your
-    speed as if your Speed Factor was doubled.       & 2þ                                                     & WWII              \\\hline
+  \hline
+  Type                                             & Effects                                                & Cost    & Era     \\\hline
+  No Ailerons                                      & -15 Control, -1 Crash Safety                           & -2þ     & Pioneer \\\hline
+  Flap Ailerons                                    & Default                                                & -       & Pioneer \\\hline
+  Wing Warping                                     & -1 Drag. Get +1 to Dogfight! at 15 speed and below.
+  Reduce Max Strain equal to span of longest wing. & -                                                      & Pioneer           \\\hline
+  Spoilerons                                       & When you roll Dogfight!, take +1, but then reduce your
+  speed as if your Speed Factor was doubled.       & 2þ                                                     & WWII              \\\hline
 \end{tabular}
 
 Wing Warping becomes Last Hurrah era when the wing is reinforced
@@ -1308,10 +1308,10 @@ to keep the aircraft pointing in the right direction. There are two
 kinds available:
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type          & Effects                           & Cost & Era     \\\hline
-    Flap Rudder   & Default                           & -    & Pioneer \\\hline
-    Flying Rudder & -1 Lateral Stability. +3 Control. & -    & Pioneer \\\hline
+  \hline
+  Type          & Effects                           & Cost & Era     \\\hline
+  Flap Rudder   & Default                           & -    & Pioneer \\\hline
+  Flying Rudder & -1 Lateral Stability. +3 Control. & -    & Pioneer \\\hline
 \end{tabular}
 
 \subsubsection{Elevators}
@@ -1321,10 +1321,10 @@ Elevators keep your airplane's nose pointed up at the sky and not at the
 ground. There are two..
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type            & Effects                         & Cost & Era     \\\hline
-    Flap Elevator   & Default                         & -    & Pioneer \\\hline
-    Flying Elevator & -1 Pitch Stability. +2 Control. & -    & Pioneer \\\hline
+  \hline
+  Type            & Effects                         & Cost & Era     \\\hline
+  Flap Elevator   & Default                         & -    & Pioneer \\\hline
+  Flying Elevator & -1 Pitch Stability. +2 Control. & -    & Pioneer \\\hline
 \end{tabular}
 
 \subsubsection{Lift Aids}
@@ -1339,22 +1339,22 @@ You can only apply 1 type of each of these to an aircraft.
 \textbf{Flaps}
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type                        & Effects                                               & Cost        & Era          \\\hline
-    Basic Flaps                 & -3 Lift Bleed, -3 Control.                            & 1þ per 3MP  & WWI          \\\hline
-    Advanced Flaps              & -5 Lift Bleed.                                        & 2þ per 3MP  & Coming Storm \\\hline
-    Control Flaps               & -5 Lift Bleed, +3 Control                             & 1þ per MP   & WWII         \\\hline
-    Lift Dumpers                & +2 to Crash Safety. Activate for +1 to Dogfight, then
-    immediately induce a stall. & 1þ per MP                                             & Last Hurrah                \\\hline
+  \hline
+  Type                        & Effects                                               & Cost        & Era          \\\hline
+  Basic Flaps                 & -3 Lift Bleed, -3 Control.                            & 1þ per 3MP  & WWI          \\\hline
+  Advanced Flaps              & -5 Lift Bleed.                                        & 2þ per 3MP  & Coming Storm \\\hline
+  Control Flaps               & -5 Lift Bleed, +3 Control                             & 1þ per MP   & WWII         \\\hline
+  Lift Dumpers                & +2 to Crash Safety. Activate for +1 to Dogfight, then
+  immediately induce a stall. & 1þ per MP                                             & Last Hurrah                \\\hline
 \end{tabular}
 
 \textbf{Slats}
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type            & Effects                   & Cost & Era         \\\hline
-    Fixed Slots     & 5 Drag. -3 Lift Bleed     & 1þ   & Roaring 20s \\\hline
-    Automatic Slats & -1 Lift Bleed. +3 Control & 4þ   & WWII        \\\hline
+  \hline
+  Type            & Effects                   & Cost & Era         \\\hline
+  Fixed Slots     & 5 Drag. -3 Lift Bleed     & 1þ   & Roaring 20s \\\hline
+  Automatic Slats & -1 Lift Bleed. +3 Control & 4þ   & WWII        \\\hline
 \end{tabular}
 
 \subsubsection{Drag Inducers}
@@ -1369,14 +1369,14 @@ many jet fighters.
 \textbf{Drag Inducers}
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type                            & Effects                                                   & Cost        & Era \\\hline
-    Air Brake                       & When deployed, immediately bleed off Speed equal to Speed
-    Factor and gain +1 to Dogfight. & 3þ, 1 Mass                                                & WWII              \\\hline
-    Dive Brake                      & When deployed, steep dives trade altitude for speed 1-2
-    instead of 1-3.                 & 4þ, 2 Mass                                                & Pioneer           \\\hline
-    Drogue Chute                    & Gives +3 to Crash Safety. Can be activated as a one-use
-    Air Brake.                      & 3þ                                                        & Last Hurrah       \\\hline
+  \hline
+  Type                            & Effects                                                   & Cost        & Era \\\hline
+  Air Brake                       & When deployed, immediately bleed off Speed equal to Speed
+  Factor and gain +1 to Dogfight. & 3þ, 1 Mass                                                & WWII              \\\hline
+  Dive Brake                      & When deployed, steep dives trade altitude for speed 1-2
+  instead of 1-3.                 & 4þ, 2 Mass                                                & Pioneer           \\\hline
+  Drogue Chute                    & Gives +3 to Crash Safety. Can be activated as a one-use
+  Air Brake.                      & 3þ                                                        & Last Hurrah       \\\hline
 \end{tabular}
 
 \subsection{Reinforcements}
@@ -1397,23 +1397,23 @@ may take as many of any of these as you want: each taken represents a
 mirrored pair, creating a new bay.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Type                    & Effects                                                     & Cost    & Era     \\\hline
-    Parallel Struts         & +2 Drag, +1 Mass, +5 Structure, +5 Max Strain, +30
-    Tension.                & 1þ                                                          & Pioneer           \\\hline
-    N-Strut                 & +2 Drag, +1 Mass, +6 Structure, +8 Max Strain, +20 Tension. &
-    1þ                      & Pioneer                                                                         \\\hline
-    V-Strut                 & +1 Drag, +1 Mass, -5 Structure, +5 Max Strain, +30 Tension. &
-    1þ                      & Pioneer                                                                         \\\hline
-    I-Strut                 & +1 Drag, +1 Mass, +20 Max Strain, +15 Tension.              & 2þ      & WWI     \\\hline
-    W-Strut                 & +3 Drag, +1 Mass, +35 Max Strain.                           & 2þ      & WWI     \\\hline
-    Star Strut              & +6 Drag, +2 Mass, +10 Structure, +30 Max Strain.            & 2þ      &
-    WWI                                                                                                       \\\hline
-    Wing Truss              & +4 Drag, +40 Tension. Unaffected by wing configuration.     &
-    1þ                      & Pioneer                                                                         \\\hline
-    Single Strut            & +1 Drag, +1 Mass, +10 Max Strain.                           & 1þ      & Pioneer \\\hline
-    Wire Root               & +10 Tension. Cannot be a Cabane strut, nor count as your
-    first non-Cabane strut. & -                                                           & Pioneer           \\\hline
+  \hline
+  Type                    & Effects                                                     & Cost    & Era     \\\hline
+  Parallel Struts         & +2 Drag, +1 Mass, +5 Structure, +5 Max Strain, +30
+  Tension.                & 1þ                                                          & Pioneer           \\\hline
+  N-Strut                 & +2 Drag, +1 Mass, +6 Structure, +8 Max Strain, +20 Tension. &
+  1þ                      & Pioneer                                                                         \\\hline
+  V-Strut                 & +1 Drag, +1 Mass, -5 Structure, +5 Max Strain, +30 Tension. &
+  1þ                      & Pioneer                                                                         \\\hline
+  I-Strut                 & +1 Drag, +1 Mass, +20 Max Strain, +15 Tension.              & 2þ      & WWI     \\\hline
+  W-Strut                 & +3 Drag, +1 Mass, +35 Max Strain.                           & 2þ      & WWI     \\\hline
+  Star Strut              & +6 Drag, +2 Mass, +10 Structure, +30 Max Strain.            & 2þ      &
+  WWI                                                                                                       \\\hline
+  Wing Truss              & +4 Drag, +40 Tension. Unaffected by wing configuration.     &
+  1þ                      & Pioneer                                                                         \\\hline
+  Single Strut            & +1 Drag, +1 Mass, +10 Max Strain.                           & 1þ      & Pioneer \\\hline
+  Wire Root               & +10 Tension. Cannot be a Cabane strut, nor count as your
+  first non-Cabane strut. & -                                                           & Pioneer           \\\hline
 \end{tabular}
 
 You get 1 Cabane Strut on your aircraft: it can be your only
@@ -1439,10 +1439,10 @@ The configuration of your wings on Tension generation is
 multiplied as follows.
 
 \begin{itemize}
-    \item          Unstaggered Multiplane or Wingless: 100\%
-    \item          Staggered Plane: 90\%
-    \item          Tandem Plane: 80\%
-    \item          Monoplane: 60\%
+  \item          Unstaggered Multiplane or Wingless: 100\%
+  \item          Staggered Plane: 90\%
+  \item          Tandem Plane: 80\%
+  \item          Monoplane: 60\%
 \end{itemize}
 
 \subsubsection{Cantilever Wings}
@@ -1457,13 +1457,13 @@ You can add 1 Mass of Cantilever Spar per 5 Structure on the aircraft.
 It costs 5þ to include Cantilevers at all.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Cantilever Material & Effects Per Mass              & Cost Per Mass & Era         \\\hline
-    Birch               & +10 Max Strain, +2 Toughness. & 1þ            & WWI         \\\hline
-    Duralumin           & +15 Max Strain, +3 Toughness. & 2þ            & WWI         \\\hline
-    Steel               & +20 Max Strain, +5 Toughness. & 3þ            & WWI         \\\hline
-    Aluminium           & +25 Max Strain, +3 Toughness. & 4þ            & Roaring 20s \\\hline
-    Whalebone           & -3 Lift Bleed, +5 Max Strain. & 8þ            & Himmilgard  \\\hline
+  \hline
+  Cantilever Material & Effects Per Mass              & Cost Per Mass & Era         \\\hline
+  Birch               & +10 Max Strain, +2 Toughness. & 1þ            & WWI         \\\hline
+  Duralumin           & +15 Max Strain, +3 Toughness. & 2þ            & WWI         \\\hline
+  Steel               & +20 Max Strain, +5 Toughness. & 3þ            & WWI         \\\hline
+  Aluminium           & +25 Max Strain, +3 Toughness. & 4þ            & Roaring 20s \\\hline
+  Whalebone           & -3 Lift Bleed, +5 Max Strain. & 8þ            & Himmilgard  \\\hline
 \end{tabular}
 
 A Cantilever Wing is thicker than a regular wing, opening up the
@@ -1542,9 +1542,9 @@ Wing mounted weapons are restricted based on the strength of the wing's
 construction, as follows.
 
 \begin{itemize}
-    \item          No cantilevers: Max 2 Light weapons only.
-    \item          Wood or bone cantilevers: Max 2 Medium weapons only.
-    \item          Metal cantilevers: Max 2 Heavy weapons.
+  \item          No cantilevers: Max 2 Light weapons only.
+  \item          Wood or bone cantilevers: Max 2 Medium weapons only.
+  \item          Metal cantilevers: Max 2 Heavy weapons.
 \end{itemize}
 
 Mounting a weapon heavier than this on the wing will cost +2 Mass,
@@ -1579,13 +1579,13 @@ or it may just involve building aerodynamic fairings over it. The cost
 scales with weapon size, and costs are doubled for turrets.
 
 \begin{tabular}{|l|l|}
-    \hline
-    Weapon Size & Cost                                       \\\hline
-    Tiny        & Free                                       \\\hline
-    Light       & 1                                          \\\hline
-    Medium      & 2                                          \\\hline
-    Heavy       & 5                                          \\\hline
-    Artillery   & Automatically covered, unless in a turret. \\\hline
+  \hline
+  Weapon Size & Cost                                       \\\hline
+  Tiny        & Free                                       \\\hline
+  Light       & 1                                          \\\hline
+  Medium      & 2                                          \\\hline
+  Heavy       & 5                                          \\\hline
+  Artillery   & Automatically covered, unless in a turret. \\\hline
 \end{tabular}
 
 Wing mounted weapons cannot be covered unless you have cantilever
@@ -1629,26 +1629,26 @@ accessible, minimum 1.
 We divide the arcs of fire of a weapon into the following directions.
 
 \begin{itemize}
-    \item Forward
-    \item Rearward, Up, Down, Left, Right
+  \item Forward
+  \item Rearward, Up, Down, Left, Right
 \end{itemize}
 
 \textbf{Fixed}{ weapons fire in only one of these
-    directions because they are bolted directly to the aircraft's frame.
-    This direction will probably be Forward, unless you are doing something
-    very clever.}
+  directions because they are bolted directly to the aircraft's frame.
+  This direction will probably be Forward, unless you are doing something
+  very clever.}
 
 \textbf{Flexible }{weapons can be changed to fire in more
-    than one direction, having different settings for which direction they
-    face without being moved and fired at the same time. Flexible weapons
-    cost 1þ and that gives you two directions the weapon can be pointed.
-    They can be operated by the pilot.}
+  than one direction, having different settings for which direction they
+  face without being moved and fired at the same time. Flexible weapons
+  cost 1þ and that gives you two directions the weapon can be pointed.
+  They can be operated by the pilot.}
 
 \textbf{Turret}{ weapons are any weapon which is flexibly
-    mounted to a spot. They require a dedicated operator to aim. This costs
-    1þ to set up, and encompasses an entire system aimed by the gunner. Pick
-    more than two directions for the weapon to fire. Expanding a turret's
-    firing arc costs 1þ for 2 additional directions, then 1þ each.}
+  mounted to a spot. They require a dedicated operator to aim. This costs
+  1þ to set up, and encompasses an entire system aimed by the gunner. Pick
+  more than two directions for the weapon to fire. Expanding a turret's
+  firing arc costs 1þ for 2 additional directions, then 1þ each.}
 
 A Turret initially has the capacity for a single Light weapon (or
 two Tiny weapons). They can be upgraded to a Medium weapon for 1þ, a
@@ -1673,18 +1673,18 @@ Synchronization. To represent the different qualities of Synchronization
 options, we use the following options.
 
 \begin{itemize}
-    \item          An Interrupter Gear represents the early versions, and
-          increases weapon jam chance by 1. 2þ per gun. Available in the WWI
-          era.
-    \item          A Synchronization Gear represents more sophisticated systems.
-          3þ per gun. Available in the Roaring 20s era.
+  \item          An Interrupter Gear represents the early versions, and
+        increases weapon jam chance by 1. 2þ per gun. Available in the WWI
+        era.
+  \item          A Synchronization Gear represents more sophisticated systems.
+        3þ per gun. Available in the Roaring 20s era.
 \end{itemize}
 
 A Sync/Interrupter Gear can only be mounted on a weapon that allows it
 to be synchronized, and will only work if the weapon is also Fixed.
 
 If you are cheap, you can substitute for this with \textbf{Deflector
-    Plates}. These cost 1þ and will work, but it inflicts 1 Wear on your
+  Plates}. These cost 1þ and will work, but it inflicts 1 Wear on your
 engine every time you roll a natural 5 or less on the first Crit die!
 
 \subsubsection{Spinner Weapons}
@@ -1710,7 +1710,7 @@ The twin MG-08s on the Albatros D.III is expressed in Flying Circus
 as\ldots{}
 
 --- A \textbf{pair} of \textbf{uncovered
-    synced} MGs \textbf{fixed} to the
+  synced} MGs \textbf{fixed} to the
 \textbf{hull, accessible }to
 the pilot.
 
@@ -1745,7 +1745,7 @@ The engine-mounted cannon of the BF-109 is\ldots{}
 
 --- A \textbf{single covered }light cannon
 \textbf{fixed} forward\textbf{ through the
-    spinner, accessible }to the pilot.
+  spinner, accessible }to the pilot.
 
 The weapon has been made accessible through hydraulics.
 
@@ -1789,11 +1789,11 @@ per airplane.
 Want not to die? These will help.
 
 \begin{itemize}
-    \item          Remote Fire Extinguisher: Hold 1. Spend the hold to put out a
-          fire. 2 Mass, 3þ
-    \item          Self-Sealing Gas Tank: Applies to all internal fuel tanks. Fuel
-          leak penalty will apply only to the next Fuel Check. +1 Mass and +2þ
-          per tank.
+  \item          Remote Fire Extinguisher: Hold 1. Spend the hold to put out a
+        fire. 2 Mass, 3þ
+  \item          Self-Sealing Gas Tank: Applies to all internal fuel tanks. Fuel
+        leak penalty will apply only to the next Fuel Check. +1 Mass and +2þ
+        per tank.
 \end{itemize}
 
 \subsubsection{Bombs}
@@ -1833,10 +1833,10 @@ Structure WWI bomber could carry 20 bombs externally, or 60 internally,
 or a mix such as 30 internally and 10 externally.
 
 \begin{tabular}{|l|l|l|l|l|l|l|}
-    \hline
-    Era               & Pioneer       & WW1           & Roaring 20s   & Coming Storm & WW2 & Last Hurrah \\\hline
-    Maximum Bomb Load & 1/6 Structure & 1/5 Structure & 1/4 Structure & 1/3
-    Structure         & 1/3 Structure & 1/2 Structure                                                    \\\hline
+  \hline
+  Era               & Pioneer       & WW1           & Roaring 20s   & Coming Storm & WW2 & Last Hurrah \\\hline
+  Maximum Bomb Load & 1/6 Structure & 1/5 Structure & 1/4 Structure & 1/3
+  Structure         & 1/3 Structure & 1/2 Structure                                                    \\\hline
 \end{tabular}
 
 \subsubsection{Rockets}
@@ -1856,16 +1856,16 @@ density of the cargo and how well it stacks, so we just have a few
 different sizes of cargo spaces.
 
 \begin{itemize}
-    \item          A tiny space just costs 1 mass, and gives you a small locker
-          for personal stuff.
-    \item          A small space carries a trunk, barrel, or crate. It requires
-          one frame section.
-    \item          A medium space will fit a small vehicle like a motorcycle, car,
-          or zeppelin engine. It requires 3 frame sections.
-    \item          A large space will fit a scout or fighter aircraft with the
-          wings taken off. It requires 5 frame sections.
-    \item          A huge space will fit just about anything you can imagine. It
-          requires 10 frame sections.
+  \item          A tiny space just costs 1 mass, and gives you a small locker
+        for personal stuff.
+  \item          A small space carries a trunk, barrel, or crate. It requires
+        one frame section.
+  \item          A medium space will fit a small vehicle like a motorcycle, car,
+        or zeppelin engine. It requires 3 frame sections.
+  \item          A large space will fit a scout or fighter aircraft with the
+        wings taken off. It requires 5 frame sections.
+  \item          A huge space will fit just about anything you can imagine. It
+        requires 10 frame sections.
 \end{itemize}
 
 Each added frame section adds +3 Loaded Mass to the aircraft when you
@@ -1893,23 +1893,23 @@ We'll write these rules shortly.
 Underside Gears (Pick 1)
 
 \begin{itemize}
-    \item          Landing Gear: +1 Drag per Loaded MP
-    \item          Floats: +1 ½ Drag per Loaded MP.
-    \item          Hybrid Floats: +2 Drag per Loaded MP.
-    \item          Boat Hull: +5 Mass. +1 Drag and +1 Structure per Loaded MP.
-    \item          Landing Skid: When you land, roll Go Down and take -1 results.
+  \item          Landing Gear: +1 Drag per Loaded MP
+  \item          Floats: +1 ½ Drag per Loaded MP.
+  \item          Hybrid Floats: +2 Drag per Loaded MP.
+  \item          Boat Hull: +5 Mass. +1 Drag and +1 Structure per Loaded MP.
+  \item          Landing Skid: When you land, roll Go Down and take -1 results.
 \end{itemize}
 
 Extras
 
 \begin{itemize}
-    \item          Zeppelin Hook: +1 Mass, allows landing inside airships or large
-          planes.
+  \item          Zeppelin Hook: +1 Mass, allows landing inside airships or large
+        planes.
 \end{itemize}
 
 \begin{itemize}
-    \item          Carrier Hook: +1 Mass per 2 MP. Allows landing on carriers.
-    \item          Underwing Skid: +3 Drag, +2 Crash Safety
+  \item          Carrier Hook: +1 Mass per 2 MP. Allows landing on carriers.
+  \item          Underwing Skid: +3 Drag, +2 Crash Safety
 \end{itemize}
 
 Landing gear (except skids) can be made retractable, trading all the
@@ -1969,13 +1969,13 @@ Batteries charge up when you Cool Down if you have a windmill,
 alternator, or generator.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Name                                  & Effects                                                 & Cost    & Era         \\\hline
-    Windmill                              & +1 Drag, +1 Charges per 10 Speed.                       & 1þ      & Pioneer     \\\hline
-    Battery                               & +1 Mass, Stores 5 Charges.                              & 2þ      & Pioneer     \\\hline
-    High Quality Battery                  & Stores 5 Charges.                                       & 4þ      & Roaring 20s \\\hline
-    Alternator                            & +1 Mass, +1 Charge, and an additional +1 Charges per 10
-    Power of the engine it is applied to. & 2þ                                                      & Pioneer               \\\hline
+  \hline
+  Name                                  & Effects                                                 & Cost    & Era         \\\hline
+  Windmill                              & +1 Drag, +1 Charges per 10 Speed.                       & 1þ      & Pioneer     \\\hline
+  Battery                               & +1 Mass, Stores 5 Charges.                              & 2þ      & Pioneer     \\\hline
+  High Quality Battery                  & Stores 5 Charges.                                       & 4þ      & Roaring 20s \\\hline
+  Alternator                            & +1 Mass, +1 Charge, and an additional +1 Charges per 10
+  Power of the engine it is applied to. & 2þ                                                      & Pioneer               \\\hline
 \end{tabular}
 
 Electricity can power weapons and engines. They can also run the
@@ -1984,25 +1984,25 @@ lights, radio receivers, and fans never use charges, but require an
 electrical system.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Name                                & Effects                                              & Cost        & Era     \\\hline
-    Intercom System                     & Requires the Electrics Vital Part.                   & 1þ          & Pioneer \\\hline
-    Radio Receiver                      & +2 Mass, +2 Drag, Requires the Electrics Vital Part. &
-    3þ                                  & Pioneer                                                                      \\\hline
-    Radio Transmitter                   & +3 Mass, +3 Drag, -1 Charge.                         & 3þ          & WWI     \\\hline
-    Radio Transceiver                   & +5 Mass, +3 Drag, -1 Charge                          & 3þ          & WWI     \\\hline
-    High Quality Radio Receiver         & +1 Mass, +2 Drag, Requires the Electrics
-    Vital Part.                         & 6þ                                                   & Roaring 20s           \\\hline
-    High Quality Radio Transmitter      & +2 Mass, +3 Drag, -1 Charge.                         & 6þ          &
-    Roaring 20s                                                                                                        \\\hline
-    High Quality Radio Transceiver      & +3 Mass, +3 Drag, -1 Charge                          & 6þ          &
-    Roaring 20s                                                                                                        \\\hline
-    Whalebone Receiver                  & Requires the Electrics Vital Part. Can only talk to
-    the paired Whalebone Base Station.  & 5þ                                                   & Himmilgard            \\\hline
-    Whalebone Base Station              & +6 Mass, +1 Drag, -1 Charge.                         & 12þ         &
-    Himmilgard                                                                                                         \\\hline
-    High Quality Whalebone Base Station & +5 Mass, +1 Drag, -1 Charge.                         & 24þ
-                                        & Himmilgard                                                                   \\\hline
+  \hline
+  Name                                & Effects                                              & Cost        & Era     \\\hline
+  Intercom System                     & Requires the Electrics Vital Part.                   & 1þ          & Pioneer \\\hline
+  Radio Receiver                      & +2 Mass, +2 Drag, Requires the Electrics Vital Part. &
+  3þ                                  & Pioneer                                                                      \\\hline
+  Radio Transmitter                   & +3 Mass, +3 Drag, -1 Charge.                         & 3þ          & WWI     \\\hline
+  Radio Transceiver                   & +5 Mass, +3 Drag, -1 Charge                          & 3þ          & WWI     \\\hline
+  High Quality Radio Receiver         & +1 Mass, +2 Drag, Requires the Electrics
+  Vital Part.                         & 6þ                                                   & Roaring 20s           \\\hline
+  High Quality Radio Transmitter      & +2 Mass, +3 Drag, -1 Charge.                         & 6þ          &
+  Roaring 20s                                                                                                        \\\hline
+  High Quality Radio Transceiver      & +3 Mass, +3 Drag, -1 Charge                          & 6þ          &
+  Roaring 20s                                                                                                        \\\hline
+  Whalebone Receiver                  & Requires the Electrics Vital Part. Can only talk to
+  the paired Whalebone Base Station.  & 5þ                                                   & Himmilgard            \\\hline
+  Whalebone Base Station              & +6 Mass, +1 Drag, -1 Charge.                         & 12þ         &
+  Himmilgard                                                                                                         \\\hline
+  High Quality Whalebone Base Station & +5 Mass, +1 Drag, -1 Charge.                         & 24þ
+                                      & Himmilgard                                                                   \\\hline
 \end{tabular}
 
 \subsubsection{Information}
@@ -2011,11 +2011,11 @@ electrical system.
 Here's some ways to gather data.
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    Name                    & Effects                                        & Cost \\\hline
-    Integrated Recon Camera & Can take pictures downward. Capabilities scale
-    with era.               & 2þ                                                    \\\hline
-    Guncam                  & Confirms your kills for you.                   & 1þ   \\\hline
+  \hline
+  Name                    & Effects                                        & Cost \\\hline
+  Integrated Recon Camera & Can take pictures downward. Capabilities scale
+  with era.               & 2þ                                                    \\\hline
+  Guncam                  & Confirms your kills for you.                   & 1þ   \\\hline
 \end{tabular}
 
 \subsubsection{Visibility}
@@ -2024,14 +2024,14 @@ Here's some ways to gather data.
 See farther, better.
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    Name                          & Effects                                                  & Cost \\\hline
-    Wing Cutouts                  & +1 Visibility, +1 Lift Bleed. Cannot be used with capped
-    transparent celluloid wings.  & -                                                               \\\hline
-    Hull Cutouts                  & +1 Visibility, -5 Structure. Cannot be used with capped
-    transparent celluloid frames. & -                                                               \\\hline
-    Searchlight                   & Pick out targets at night. Requires the Electrics Vital
-    Part.                         & 1þ                                                              \\\hline
+  \hline
+  Name                          & Effects                                                  & Cost \\\hline
+  Wing Cutouts                  & +1 Visibility, +1 Lift Bleed. Cannot be used with capped
+  transparent celluloid wings.  & -                                                               \\\hline
+  Hull Cutouts                  & +1 Visibility, -5 Structure. Cannot be used with capped
+  transparent celluloid frames. & -                                                               \\\hline
+  Searchlight                   & Pick out targets at night. Requires the Electrics Vital
+  Part.                         & 1þ                                                              \\\hline
 \end{tabular}
 
 \subsubsection{Climate Control}
@@ -2043,12 +2043,12 @@ important to keep cool. These can mitigate Stress effects from adverse
 climate.
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    Name             & Effects                    & Cost \\\hline
-    Electric Heating & -1 Charge.                 & 1þ   \\\hline
-    Radiator Loop    & Requires a Radiator.       & 1þ   \\\hline
-    Basic Fan        & (Moved to Cockpit section) & -    \\\hline
-    Air Conditioning & -2 Charges                 & 4þ   \\\hline
+  \hline
+  Name             & Effects                    & Cost \\\hline
+  Electric Heating & -1 Charge.                 & 1þ   \\\hline
+  Radiator Loop    & Requires a Radiator.       & 1þ   \\\hline
+  Basic Fan        & (Moved to Cockpit section) & -    \\\hline
+  Air Conditioning & -2 Charges                 & 4þ   \\\hline
 \end{tabular}
 
 \subsubsection{Autopilots}
@@ -2060,20 +2060,20 @@ and some available in Flying Circus are rather fantastical.
 These will make your life easier.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Name                                                                 & Effects                                                   & Cost       & Era \\\hline
-    Gyroscopic                                                           & Gives +4 to Empty Seat rolls.                             & 3þ         & WWI \\\hline
-    Altitude Holding                                                     & +1 Mass, Allows the Empty Seat rule to be ignored.        &
-    5þ                                                                   & Coming Storm                                                                 \\\hline
-    Clockwork Programmable                                               & +1 Mass. Can be given a single simple order
-    such as climb, dive, turn, fly to location. Cannot Dogfight, fire
-    weapons, drop bombs, or land.                                        & 6þ                                                        & Himmilgard       \\\hline
-    Programmable                                                         & +1 Mass, -2 Charges. Can be given a single simple order
-    such as climb, dive, turn, fly to location. Cannot Dogfight, fire
-    weapons, drop bombs, or land.                                        & 6þ                                                        & WWII             \\\hline
-    Rattenhirn                                                           & +3 Mass, -3 Charges, Does the flying for you, being fully
-    automated. Players don't usually use these, they're for robo-planes. &
-    25þ                                                                  & Himmilgard or Last Hurrah                                                    \\\hline
+  \hline
+  Name                                                                 & Effects                                                   & Cost       & Era \\\hline
+  Gyroscopic                                                           & Gives +4 to Empty Seat rolls.                             & 3þ         & WWI \\\hline
+  Altitude Holding                                                     & +1 Mass, Allows the Empty Seat rule to be ignored.        &
+  5þ                                                                   & Coming Storm                                                                 \\\hline
+  Clockwork Programmable                                               & +1 Mass. Can be given a single simple order
+  such as climb, dive, turn, fly to location. Cannot Dogfight, fire
+  weapons, drop bombs, or land.                                        & 6þ                                                        & Himmilgard       \\\hline
+  Programmable                                                         & +1 Mass, -2 Charges. Can be given a single simple order
+  such as climb, dive, turn, fly to location. Cannot Dogfight, fire
+  weapons, drop bombs, or land.                                        & 6þ                                                        & WWII             \\\hline
+  Rattenhirn                                                           & +3 Mass, -3 Charges, Does the flying for you, being fully
+  automated. Players don't usually use these, they're for robo-planes. &
+  25þ                                                                  & Himmilgard or Last Hurrah                                                    \\\hline
 \end{tabular}
 
 \subsubsection{Control Systems}
@@ -2083,14 +2083,14 @@ Normally you control your plane by pulling directly on wires. This lets
 you do it better. Pick one. See Pilot Fatigue for the full rules.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Name               & Effects                                      & Cost & Era  \\\hline
-    Control Rods       & +1 Mass. Maximum Flight Stress from MP is 1. & 2þ   &
-    WWI                                                                             \\\hline
-    Hydraulic Assisted & +3 Mass, Eliminates Flight Stress from MP.   & 5þ   &
-    WWII                                                                            \\\hline
-    Fly by Wire        & +3 Mass. Eliminates all Flight Stress.       & 10þ  & Last
-    Hurrah                                                                          \\\hline
+  \hline
+  Name               & Effects                                      & Cost & Era  \\\hline
+  Control Rods       & +1 Mass. Maximum Flight Stress from MP is 1. & 2þ   &
+  WWI                                                                             \\\hline
+  Hydraulic Assisted & +3 Mass, Eliminates Flight Stress from MP.   & 5þ   &
+  WWII                                                                            \\\hline
+  Fly by Wire        & +3 Mass. Eliminates all Flight Stress.       & 10þ  & Last
+  Hurrah                                                                          \\\hline
 \end{tabular}
 
 \subsection{Propeller}
@@ -2100,13 +2100,13 @@ When you mount your propeller, it gains a Pitch. Note this down for
 later calculations.
 
 \begin{tabular}{|l|l|l|l|l|}
-    \hline
-    Propeller Mod & Pitch Speed Mod & Pitch Boost Mod & Energy & Turn \\\hline
-    High Power    & .8              & 0.9             & 1.5    & 8    \\\hline
-    Power         & .9              & 0.8             & 2      & 7    \\\hline
-    Default Pitch & 1               & 0.6             & 3      & 6    \\\hline
-    Speed         & 1.1             & 0.4             & 4      & 5    \\\hline
-    High Speed    & 1.2             & 0.3             & 4.5    & 4    \\\hline
+  \hline
+  Propeller Mod & Pitch Speed Mod & Pitch Boost Mod & Energy & Turn \\\hline
+  High Power    & .8              & 0.9             & 1.5    & 8    \\\hline
+  Power         & .9              & 0.8             & 2      & 7    \\\hline
+  Default Pitch & 1               & 0.6             & 3      & 6    \\\hline
+  Speed         & 1.1             & 0.4             & 4      & 5    \\\hline
+  High Speed    & 1.2             & 0.3             & 4.5    & 4    \\\hline
 \end{tabular}
 
 Each of these pitch values represents a unique propeller, with
@@ -2116,12 +2116,12 @@ always free, and can be built any way you choose.
 You can upgrade your propeller to one of the following instead.
 
 \begin{tabular}{|l|l|l|l|}
-    \hline
-    Name                  & Effects                                           & Cost Per Propeller & Era \\\hline
-    Manually Variable     & Allows blade pitch to be adjusted on the ground
-    without replacing it. & 2þ                                                & Pioneer                  \\\hline
-    Automatic Variable    & +1 Mass. +0.1 Pitch Speed, +0.1 Pitch Boost, +0.5
-    Energy, +1 Turn.      & 8þ                                                & Roaring 20s              \\\hline
+  \hline
+  Name                  & Effects                                           & Cost Per Propeller & Era \\\hline
+  Manually Variable     & Allows blade pitch to be adjusted on the ground
+  without replacing it. & 2þ                                                & Pioneer                  \\\hline
+  Automatic Variable    & +1 Mass. +0.1 Pitch Speed, +0.1 Pitch Boost, +0.5
+  Energy, +1 Turn.      & 8þ                                                & Roaring 20s              \\\hline
 \end{tabular}
 
 \subsubsection{Optimization}
@@ -2146,18 +2146,18 @@ Use your common sense here: more expensive is worse, more toughness or
 max strain is better!
 
 \begin{tabular}{|l|l|l|l|l|l|l|}
-    \hline
-    Negative    & \textbf{Effect} & Positive    &                                                           &             &             &             \\\hline
-    $ \square $ & $ \square $     & $ \square $ & Expense: +/- 10\% Cost                                    & $ \square $ & $ \square $ & $ \square $ \\\hline
-    $ \square $ & $ \square $     & $ \square $ & Lift Efficiency: +/- 3 Lift Bleed                         & $ \square $ & $ \square $ & $ \square $ \\\hline
-    $ \square $ & $ \square $     & $ \square $ & Leg Room: +/- 1 Escape, Visibility                        & $ \square $ & $ \square $ & $ \square $ \\\hline
-    $ \square $ & $ \square $     & $ \square $ & Mass: +/- 10\% Mass (not including bomb mass)             & $ \square $ & $ \square $ & $ \square $ \\\hline
-    $ \square $ & $ \square $     & $ \square $ & Redundancy: +/- 25\% Toughness                            & $ \square $ & $ \square $ & $ \square $ \\\hline
-    $ \square $ & $ \square $     & $ \square $ & Support: +/- 15\% Max Strain                              & $ \square $ & $ \square $ & $ \square $ \\\hline
+  \hline
+  Negative    & \textbf{Effect} & Positive    &                                                           &             &             &             \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Expense: +/- 10\% Cost                                    & $ \square $ & $ \square $ & $ \square $ \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Lift Efficiency: +/- 3 Lift Bleed                         & $ \square $ & $ \square $ & $ \square $ \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Leg Room: +/- 1 Escape, Visibility                        & $ \square $ & $ \square $ & $ \square $ \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Mass: +/- 10\% Mass (not including bomb mass)             & $ \square $ & $ \square $ & $ \square $ \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Redundancy: +/- 25\% Toughness                            & $ \square $ & $ \square $ & $ \square $ \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Support: +/- 15\% Max Strain                              & $ \square $ & $ \square $ & $ \square $ \\\hline
 
-    $ \square $ & $ \square $     & $ \square $ & Reliability: +/- 2 Reliability                            & $ \square $ & $ \square $ & $ \square $ \\\hline
-    $ \square $ & $ \square $     & $ \square $ & Streamlining: +/- 10\% Drag (not including fuel or bombs) &
-    $ \square $ & $ \square $     & $ \square $                                                                                                       \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Reliability: +/- 2 Reliability                            & $ \square $ & $ \square $ & $ \square $ \\\hline
+  $ \square $ & $ \square $     & $ \square $ & Streamlining: +/- 10\% Drag (not including fuel or bombs) &
+  $ \square $ & $ \square $     & $ \square $                                                                                                       \\\hline
 \end{tabular}
 
 \subsection{Final Calculations}
@@ -2225,10 +2225,10 @@ fly.
 Your Stability creates a Control modifier as follows.
 
 \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
-    \hline
-    Stability   & -10      & -7 to -9 & -4 to -6 & -1 to -3 & 0 & +1 to +3 & +4 to
-    +6          & +7 to +9 & +10                                                             \\\hline
-    Control Mod & +4       & +3       & +2       & +1       & 0 & -1       & -2    & -3 & -4 \\\hline
+  \hline
+  Stability   & -10      & -7 to -9 & -4 to -6 & -1 to -3 & 0 & +1 to +3 & +4 to
+  +6          & +7 to +9 & +10                                                             \\\hline
+  Control Mod & +4       & +3       & +2       & +1       & 0 & -1       & -2    & -3 & -4 \\\hline
 \end{tabular}
 
 A plane with more than 10 or less than -10 stability is unflyable
@@ -2266,10 +2266,10 @@ The default Stress per flight is 1. You gain +1 Stress for each
 of the factors which is true.
 
 \begin{itemize}
-    \item A Stability above 3 or below -3.
-    \item Every 10MP.
-    \item Per point of Rumble on the highest-rumble Engine.
-    \item A tractor rotary engine + open cockpit.
+  \item A Stability above 3 or below -3.
+  \item Every 10MP.
+  \item Per point of Rumble on the highest-rumble Engine.
+  \item A tractor rotary engine + an exposed cockpit.
 \end{itemize}
 
 Co-pilots can reduce stress from everything except Rumble and
@@ -2318,25 +2318,25 @@ If the aircraft has any fuel tanks at all, they collectively form
 one Vital Part.
 
 \begin{itemize}
-    \item Each Engine is a Vital Part.
-    \item Each Radiator is a Vital Part.
-    \item Each Oil Tank is a Vital Part.
-    \item Each Oil Cooler is a Vital Part.
-    \item Each Oil Pan is a Vital Part.
+  \item Each Engine is a Vital Part.
+  \item Each Radiator is a Vital Part.
+  \item Each Oil Tank is a Vital Part.
+  \item Each Oil Cooler is a Vital Part.
+  \item Each Oil Pan is a Vital Part.
 \end{itemize}
 
 \begin{tabular}{|l}
-    \hline
-    Double Plane           \\\hline
+  \hline
+  Double Plane           \\\hline
 
-    A cheap and easy way to make a heavy fighter is to glue two light
-    fighters together. Just add all their stats together and recalculate.
-    You can opt to remove the other cockpit to save 1 mass, but otherwise
-    they both function.
+  A cheap and easy way to make a heavy fighter is to glue two light
+  fighters together. Just add all their stats together and recalculate.
+  You can opt to remove the other cockpit to save 1 mass, but otherwise
+  they both function.
 
-    The resulting plane can then be modified on their own. Technically, you
-    could make a triple plane or more this way as well! But then it starts
-    to get a little silly. \\\hline
+  The resulting plane can then be modified on their own. Technically, you
+  could make a triple plane or more this way as well! But then it starts
+  to get a little silly. \\\hline
 \end{tabular}
 
 \subsection{Home Engineering}
@@ -2378,18 +2378,18 @@ wrong with it! If a rule gives you multiple used penalties, they cannot
 be the same.
 
 \begin{tabular}{|l|l|l|}
-    \hline
-    d10 & Name        & Penalty                                              \\\hline
-    1   & Wreck       & Roll again, twice! If you get this again, ignore it. \\\hline
-    2   & Burnt Out   & Engines are at -1 Reliability                        \\\hline
-    3   & Ragged      & Reduce your Max Speed by 10\%                        \\\hline
-    4   & Hefty       & Increase your Stall Speed by 20\%                    \\\hline
-    5   & Sticky Guns & Increase the chance of guns jamming by 1             \\\hline
-    6   & Weak        & Cut the plane's Toughness in half                    \\\hline
-    7   & Fragile     & Reduce Max Strain by 20\%                            \\\hline
-    8   & Leaky       & Reduce Fuel by 20\%                                  \\\hline
-    9   & Sluggish    & Reduce your Handling by 5                            \\\hline
-    10  & Mint        & No penalty                                           \\\hline
+  \hline
+  d10 & Name        & Penalty                                              \\\hline
+  1   & Wreck       & Roll again, twice! If you get this again, ignore it. \\\hline
+  2   & Burnt Out   & Engines are at -1 Reliability                        \\\hline
+  3   & Ragged      & Reduce your Max Speed by 10\%                        \\\hline
+  4   & Hefty       & Increase your Stall Speed by 20\%                    \\\hline
+  5   & Sticky Guns & Increase the chance of guns jamming by 1             \\\hline
+  6   & Weak        & Cut the plane's Toughness in half                    \\\hline
+  7   & Fragile     & Reduce Max Strain by 20\%                            \\\hline
+  8   & Leaky       & Reduce Fuel by 20\%                                  \\\hline
+  9   & Sluggish    & Reduce your Handling by 5                            \\\hline
+  10  & Mint        & No penalty                                           \\\hline
 \end{tabular}
 
 It costs 5 thaler to restore a Used plane and remove the
