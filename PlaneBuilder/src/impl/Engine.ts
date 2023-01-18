@@ -539,7 +539,7 @@ export class Engine extends Part {
   }
 
   public CanUsePushPull() {
-    return !(this.is_generator || this.GetIsJet() || this.is_internal || this.mount_list[this.mount_sel].helicopter);
+    return !(this.is_generator || this.GetIsPulsejet() || this.is_internal || this.mount_list[this.mount_sel].helicopter);
   }
 
   public SetUsePushPull(use: boolean) {
