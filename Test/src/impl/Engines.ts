@@ -447,6 +447,7 @@ export class Engines extends Part {
     var pitchspeedmin = 100;
     //Engine stuff
     var firstPulsejet = false;
+    var finalvisibilitymod = this.engines.length * 100;
     for (let en of this.engines) {
       if (!firstPulsejet && en.GetIsPulsejet()) {
         firstPulsejet = true;
@@ -455,6 +456,7 @@ export class Engines extends Part {
         en.SetFirstPulsejet(false);
       }
       const enstats = en.PartStats();
+      finalvisibilitymod = Math.min(finalvisibilitymod, enstats.visibility);
       stats = stats.Add(enstats);
       if (en.NeedCooling()) {
         needCool[en.GetRadiator()].cool += en.GetCooling();
@@ -465,6 +467,7 @@ export class Engines extends Part {
         pitchspeedmin = Math.min(pitchspeedmin, enstats.pitchspeed);
       }
     }
+    stats.visibility = finalvisibilitymod;
 
     if (pitchspeedmin < 100)
       stats.pitchspeed = pitchspeedmin;
