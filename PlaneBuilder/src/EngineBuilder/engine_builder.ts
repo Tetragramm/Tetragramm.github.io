@@ -915,6 +915,7 @@ class EngineBuilder_HTML {
                     fuelconsumption: estats.stats.fuelconsumption,
                     overspeed: estats.overspeed,
                     cost: estats.stats.cost,
+                    rarity: estats.rarity,
                 });
             }
             const json2csv = new JSON2CSV();
