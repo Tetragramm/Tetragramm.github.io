@@ -220,7 +220,7 @@ export class Propeller extends Part {
                     case DRIVE_TYPE.PULSEJET:
                         // stats.pitchboost = Math.min(stats.pitchboost, 0.4);
                         // stats.pitchspeed = Math.min(stats.pitchspeed, 1.1);
-                        stats.pitchboost = Math.min(stats.pitchboost, 0.6);
+                        stats.pitchboost = Math.min(stats.pitchboost, 0.75);
                         stats.pitchspeed = Math.min(stats.pitchspeed, 1.3);
                         break;
                     case DRIVE_TYPE.TURBINE:
