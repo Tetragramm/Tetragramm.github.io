@@ -103,6 +103,7 @@ export function FlexInput(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     fs.div2.appendChild(inp);
+    return [lbl, inp]
 }
 
 export function FlexText(txt: string, inp: HTMLInputElement, fs: FlexSection) {
@@ -119,6 +120,7 @@ export function FlexText(txt: string, inp: HTMLInputElement, fs: FlexSection) {
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     fs.div2.appendChild(inp);
+    return [lbl, inp]
 }
 
 export function FlexDisplay(txt: string, inp: HTMLLabelElement, fs: FlexSection) {
@@ -133,6 +135,7 @@ export function FlexDisplay(txt: string, inp: HTMLLabelElement, fs: FlexSection)
     inp.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     fs.div2.appendChild(inp);
+    return [lbl, inp]
 }
 
 export function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection) {
@@ -147,6 +150,7 @@ export function FlexSelect(txt: string, sel: HTMLSelectElement, fs: FlexSection)
     sel.classList.add("flex-item");
     fs.div1.appendChild(lbl);
     fs.div2.appendChild(sel);
+    return [lbl, sel]
 }
 
 export function CreateCheckbox(txt: string, elem: HTMLInputElement, table: HTMLElement, br = true) {

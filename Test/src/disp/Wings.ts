@@ -235,9 +235,11 @@ export class Wings_HTML extends Display {
 
         CreateInput(lu("Wings Dihedral"), wing.dihedral, wing.span, false);
         wing.dihedral.min = "0";
+        wing.dihedral.max = "1000000";
 
         CreateInput(lu("Wings Anhedral"), wing.anhedral, wing.span, false);
         wing.anhedral.min = "0";
+        wing.anhedral.max = "1000000";
 
         this.full_cell.appendChild(wing.span);
         this.full_cell.appendChild(wing.br);

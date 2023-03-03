@@ -89,6 +89,11 @@ export class Passengers extends Part {
         stats.reqsections = 2 * Math.ceil(-1.0e-6 + (this.seats + 2 * this.beds) / 5);
         if (this.seats + this.beds > 0 && this.connected) {
             stats.mass = 1;
+            stats.warnings.push({
+                source: lu("Passengers Section Title"),
+                warning: lu("Passenger Connectivity Warning"),
+                color: WARNING_COLOR.WHITE,
+            });
         }
         stats.bomb_mass += this.seats + this.beds;
         //Because it is load, it rounds up to the nearest 5 mass.

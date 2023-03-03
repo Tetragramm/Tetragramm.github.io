@@ -18,7 +18,7 @@
         "Bubble Canopy": "Bubble Canopy",
         "Co-Pilot Controls": "Co-Pilot Controls",
         "Co-Pilot Warning": "Maximum stress reduction of {0}.",
-        "Bombadier Controls": "Bombadier Controls",
+        "Bombadier Controls": "Bombardier Controls",
         "Bombadier Controls Warning": "This seat has controls.",
         "Escape Hatch": "Escape Hatch",
         "Ejection Seat": "Ejection Seat",
@@ -752,7 +752,7 @@
         "Seat Location": "Choose Seat",
         "Radiators #": "Radiators # {0}",
         "Crew Pilot": "Pilot",
-        "Crew Bombadier": "Bombadier",
+        "Crew Bombadier": "Bombardier",
         "Crew Co-Pilot": "Co-Pilot",
         "Crew Gunner": "Gunner",
         "Crew Aircrew": "Aircrew",
@@ -780,6 +780,8 @@
         "Insufficient Charge": "Insufficient Charge",
         "Insufficient Charge Warning": "This aircraft has electrical systems with nothing to power them.",
         "Low Mass Warning": "This aircraft is very low mass. If it is a custom airplane, be careful not to make it overpowered.",
-        "Low Drag Warning": "This aircraft is very low drag. If it is a custom airplane, be careful not to make it overpowered."
+        "Low Drag Warning": "This aircraft is very low drag. If it is a custom airplane, be careful not to make it overpowered.",
+        "Connectivity Warning": "Can move between positions without Wingwalking.",
+        "Passenger Connectivity Warning": "Can reach the cockpit without Wingwalking."
     }
 }
