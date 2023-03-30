@@ -1939,6 +1939,29 @@
             "name": "Himmilgard Liquid Cooled",
             "engines": [
                 {
+                    "name": "Meier Bärenjunge 200hp",
+                    "engine_type": 0,
+                    "type": 0,
+                    "era_sel": 1,
+                    "displacement": 13.5,
+                    "compression": 5.4,
+                    "cyl_per_row": 1,
+                    "rows": 6,
+                    "RPM_boost": 0.86,
+                    "material_fudge": 0.8,
+                    "quality_fudge": 1.2,
+                    "compressor_type": 0,
+                    "compressor_count": 0,
+                    "min_IAF": 0,
+                    "upgrades": [
+                        false,
+                        false,
+                        false,
+                        false
+                    ],
+                    "rarity": 2
+                },
+                {
                     "name": "Bertha F1166 120hp",
                     "engine_type": 0,
                     "type": 0,
