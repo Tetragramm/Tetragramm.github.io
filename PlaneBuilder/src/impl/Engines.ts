@@ -446,8 +446,15 @@ export class Engines extends Part {
     var ecost = 0;
     var pitchspeedmin = 100;
     //Engine stuff
+    var firstPulsejet = false;
     var finalvisibilitymod = this.engines.length * 100;
-    for (const en of this.engines) {
+    for (let en of this.engines) {
+      if (!firstPulsejet && en.GetIsPulsejet()) {
+        firstPulsejet = true;
+        en.SetFirstPulsejet(true);
+      } else {
+        en.SetFirstPulsejet(false);
+      }
       const enstats = en.PartStats();
       finalvisibilitymod = Math.min(finalvisibilitymod, enstats.visibility);
       stats = stats.Add(enstats);

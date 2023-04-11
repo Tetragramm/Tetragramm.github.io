@@ -714,7 +714,9 @@ Mass.</td>
 </tbody>
 </table>
 <p>Cowls are more difficult to apply to fuselage pusher aircraft,
-requiring careful engineering for airflow. Increase the costs by +2.</p>
+requiring careful engineering for airflow. Increase the costs by +2. The
+exception is Sealed Cowl, since well, they’re sealed and there’s no
+airflow to be engineering.</p>
 <p>Additionally, an air cooling fan can be mounted inside the cowling of
 a non-rotary air-cooled engine. This can draw vast quantities of air
 over the engine, though it introduces an additional heavy spinning blade
@@ -946,10 +948,12 @@ damaged.</p></td>
 <p>Pulsejets are simply bolted somewhere onto the plane. We don’t
 particularly care where or in what configuration: we just know however
 it was done keeps it away from any working parts.</p>
+<p>Pulsejets cost 5þ and 1 upkeep simply for having one on your
+aircraft. They’re hard on airplanes.</p>
 <p>Pulsejets produce Rumble. Rumble causes stress to crew members equal
-to the largest source of Rumble. In addition, an aircraft requires a
-minimum structure of total Rumble * 10 to fly, or the vibrations shake
-the aircraft apart.</p>
+to half the total Rumble, or 3, whichever is lower. In addition, an
+aircraft requires a minimum structure of total Rumble * 10 to fly, or
+the vibrations shake the aircraft apart.</p>
 <h3 id="_Jet_Engines_\&amp;_Rockets">Jet Engines &amp; Rockets</h3>
 <p>Jet engines are mounted in one of the following ways. Jet engines
 carry with them their own requirement in Frame Slots owing to their
@@ -2770,7 +2774,8 @@ Stress.</td>
 </table>
 <h2 id="_Propeller">Propeller</h2>
 <p>When you mount your propeller, it gains a Pitch. Note this down for
-later calculations.</p>
+later calculations. If you use pulsejets, then you get numbers anyway,
+despite not having a propeller.</p>
 <table>
 <thead>
 <tr class="header">
@@ -2817,12 +2822,20 @@ later calculations.</p>
 <td style="text-align: left;">4.5</td>
 <td style="text-align: left;">4</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">Pulsejet</td>
+<td style="text-align: left;">1.3</td>
+<td style="text-align: left;">0.6</td>
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">2.5</td>
+</tr>
 </tbody>
 </table>
 <p>Each of these pitch values represents a unique propeller, with each
 propeller having a cost of 1þ. Your first propeller per engine is always
 free, and can be built any way you choose.</p>
-<p>You can upgrade your propeller to one of the following instead.</p>
+<p>You can upgrade your propeller (except Pulsejets, they don’t have
+actual propellers) to one of the following instead.</p>
 <table>
 <thead>
 <tr class="header">
@@ -3028,8 +3041,8 @@ human beings.</p>
 <p><strong>Energy Loss vs Turn Bleed</strong></p>
 <p>These two stats are how much speed you lose when you pull up, and how
 much speed you lose in a combat turn. It is affected by your Energy and
-Turn stats from your propeller pitch: all jets automatically have Energy
-5, Turn 7.</p>
+Turn stats from your propeller pitch. Pulsejets are in the same table
+despite not actually using propellers.</p>
 <p>Your Turn Bleed is</p>
 <p>Stall Speed (Half Fuel, No Bombs) Divided by Prop Pitch Turn.</p>
 <p>For balance reasons, round up, minimum 1.</p>
@@ -3044,7 +3057,7 @@ the factors which is true.</p>
 <ul>
 <li><p>A Stability above 3 or below -3.</p></li>
 <li><p>Every 10MP.</p></li>
-<li><p>Per point of Rumble on the highest-rumble Engine.</p></li>
+<li><p>Per point of Rumble (maximum 3).</p></li>
 <li><p>A tractor rotary engine + an exposed cockpit.</p></li>
 </ul>
 <p>Co-pilots can reduce stress from everything except Rumble and rotary

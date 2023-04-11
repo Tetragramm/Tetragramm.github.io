@@ -630,16 +630,6 @@
                     ]
                 },
                 {
-                    "name": "Pulsejet PV-15 (WWI)",
-                    "engine_type": 1,
-                    "type": 0,
-                    "era_sel": 1,
-                    "power": 15,
-                    "quality_cost": 1,
-                    "quality_rely": 1,
-                    "starter": false
-                },
-                {
                     "name": "Rolls-Royce Eagle III 250hp",
                     "engine_type": 0,
                     "type": 0,
@@ -1848,6 +1838,116 @@
         {
             "name": "Himmilgard Pulsejet",
             "engines": [
+                {
+                    "name": "Pulsejet PV-5 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 5,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-6 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 6,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-7 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 7,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-8 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 8,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-9 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 9,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-10 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 10,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-11 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 11,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-12 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 12,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-13 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 13,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
+                {
+                    "name": "Pulsejet PV-14 (WWI)",
+                    "engine_type": 1,
+                    "type": 0,
+                    "era_sel": 1,
+                    "power": 14,
+                    "quality_cost": 1,
+                    "quality_rely": 1,
+                    "starter": false,
+                    "rarity": 1
+                },
                 {
                     "name": "Pulsejet PV-15 (WWI)",
                     "engine_type": 1,

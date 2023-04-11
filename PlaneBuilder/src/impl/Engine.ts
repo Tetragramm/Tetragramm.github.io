@@ -35,6 +35,7 @@ export class Engine extends Part {
   private is_internal: boolean;
 
   private total_reliability: number;
+  private is_first_pulsejet: boolean;
 
   constructor(
     ml: { name: string, stats: Stats, strainfactor: number, dragfactor: number, mount_type: string, powerfactor: number, reqED: boolean, reqTail: boolean, helicopter: boolean, turbine: boolean }[],
@@ -539,7 +540,7 @@ export class Engine extends Part {
   }
 
   public CanUsePushPull() {
-    return !(this.is_generator || this.GetIsPulsejet() || this.is_internal || this.mount_list[this.mount_sel].helicopter);
+    return !(this.is_generator || this.GetIsJet() || this.is_internal || this.mount_list[this.mount_sel].helicopter);
   }
 
   public SetUsePushPull(use: boolean) {
@@ -973,6 +974,10 @@ export class Engine extends Part {
     }
   }
 
+  public SetFirstPulsejet(is: boolean) {
+    this.is_first_pulsejet = is;
+  }
+
   public PartStats(): Stats {
     this.VerifyMount();
     this.VerifyCooling();
@@ -989,6 +994,9 @@ export class Engine extends Part {
     stats = stats.Add(this.etype_stats.stats);
 
     stats.upkeep = stats.power / 10;
+    if (this.GetIsPulsejet()) {
+      stats.upkeep += 1;
+    }
 
     if (this.etype_stats.oiltank)
       stats.mass += 1;
@@ -1049,9 +1057,12 @@ export class Engine extends Part {
     }
 
     //If there is a cowl, and it's a pusher (or push-pull), add the engineering cost
-    if (this.cowl_sel != 0 &&
-      (this.mount_list[this.mount_sel].name == "Rear-Mounted Pusher" ||
-        this.mount_list[this.mount_sel].name == "Center-Mounted Pusher"
+    if ((this.cowl_list[this.cowl_sel].name != "No Cowling"
+      && this.cowl_list[this.cowl_sel].name != "Sealed Cowl")
+      &&
+      (this.mount_list[this.mount_sel].name == "Rear-Mounted Pusher"
+        || this.mount_list[this.mount_sel].name == "Center-Mounted Pusher"
+        || this.mount_list[this.mount_sel].name == "Center-Mounted Tractor"
         || this.mount_list[this.mount_sel].name == "Fuselage Push-Pull")) {
       stats.cost += 2;
     }
@@ -1098,6 +1109,10 @@ export class Engine extends Part {
       if (this.use_pp) {
         stats.escape += 2;
       }
+    }
+
+    if (this.is_first_pulsejet) {
+      stats.cost += 5;
     }
 
 
