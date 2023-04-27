@@ -412,9 +412,25 @@ export class Aircraft_HTML extends Display {
             derived.StallSpeedEmpty,
             0);
         catalog_stats += "},\n";
-        const vp = this.acft.VitalComponentList();
+        var vp = this.acft.VitalComponentList();
         var vp_filt = (part) => { return !part.includes(":"); }
-        catalog_stats += "Vital Parts = {" + StringFmt.Join(", ", this.acft.VitalComponentList().filter(vp_filt)) + "},\n";
+        vp = vp.filter(vp_filt)
+        var vp_map = new Map<string,number>();
+        for(let str of vp){
+            str = str.replace(/#.*/g, "").trim();
+            if(vp_map.has(str))
+                vp_map.set(str,vp_map.get(str)+1);
+            else
+                vp_map.set(str,1);
+        }
+        vp = []
+        for(let str of vp_map.keys()){
+            if(vp_map.get(str) == 1)
+                vp.push(str);
+            else
+                vp.push(str + " x" + vp_map.get(str).toString());
+        }
+        catalog_stats += "Vital Parts = {" + StringFmt.Join(", ", vp) + "},\n";
         var crew = [];
         for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
             crew.push(lu(this.acft.GetCockpits().GetCockpit(i).GetName()));
