@@ -413,19 +413,18 @@ export class Aircraft_HTML extends Display {
             0);
         catalog_stats += "},\n";
         var vp = this.acft.VitalComponentList();
-        var vp_filt = (part) => { return !part.includes(":"); }
-        vp = vp.filter(vp_filt)
-        var vp_map = new Map<string,number>();
-        for(let str of vp){
+        var vp_map = new Map<string, number>();
+        for (let str of vp) {
+            str = str.replace(/Weapon Set #.*/g, "Guns").trim();
             str = str.replace(/#.*/g, "").trim();
-            if(vp_map.has(str))
-                vp_map.set(str,vp_map.get(str)+1);
+            if (vp_map.has(str))
+                vp_map.set(str, vp_map.get(str) + 1);
             else
-                vp_map.set(str,1);
+                vp_map.set(str, 1);
         }
-        vp = []
-        for(let str of vp_map.keys()){
-            if(vp_map.get(str) == 1)
+        vp = [];
+        for (let str of vp_map.keys()) {
+            if (vp_map.get(str) == 1)
                 vp.push(str);
             else
                 vp.push(str + " x" + vp_map.get(str).toString());
