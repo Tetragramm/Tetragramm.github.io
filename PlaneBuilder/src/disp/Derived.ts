@@ -441,6 +441,8 @@ export class Derived_HTML {
             if (is_sesqui) {
                 if (num_wings == 2)
                     description += "Sesquiplane ";
+                else if (num_wings == 3)
+                    description += "Sestertiplane ";
                 else
                     description += "Sesqui-" + this.prefix(num_wings);
             } else if (acft.GetWings().GetTandem()) {
