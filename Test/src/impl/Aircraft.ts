@@ -865,7 +865,7 @@ export class Aircraft {
     HandlingFull = Math.floor(1.0e-6 + HandlingFull - 5 * this.used.sluggish);
     HandlingFullwBombs = Math.floor(1.0e-6 + HandlingFullwBombs - 5 * this.used.sluggish);
 
-    let MaxStrain = Math.min(this.stats.maxstrain - DryMP, this.stats.structure);
+    let MaxStrain = Math.min(this.stats.maxstrain, this.stats.structure) - DryMP;
     //And store the results so they can be displayed
     this.optimization.final_ms = Math.floor(1.0e-6 + this.optimization.GetMaxStrain() * 1.5 * MaxStrain / 10);
     MaxStrain += this.optimization.final_ms;

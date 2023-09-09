@@ -698,7 +698,11 @@ export class Wings extends Part {
         let longest_drag = 0;
         let celluloid_count = 0;
 
-        for (const w of this.wing_list) {
+        for (let w of this.wing_list) {
+            //Remove any Gull wings that can't be Gull
+            if (!this.CanGull(w.deck)) {
+                w.gull = false;
+            }
             //Longest span is span - (1/2 liftbleed of anhedral and dihedral)
             longest_span = Math.max(longest_span, w.span);
 

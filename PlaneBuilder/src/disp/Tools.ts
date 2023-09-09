@@ -201,7 +201,7 @@ export function CreateText(txt: string, elem: HTMLInputElement, table: HTMLEleme
         table.appendChild(document.createElement("BR"));
 }
 
-export function CreateButton(txt: string, elem: HTMLButtonElement, table: HTMLElement, br = true) {
+export function CreateButton(txt: string, elem: HTMLElement, table: HTMLElement, br = true) {
     const span = document.createElement("SPAN") as HTMLSpanElement;
     const txtSpan = document.createElement("LABEL") as HTMLLabelElement;
     elem.hidden = true;
