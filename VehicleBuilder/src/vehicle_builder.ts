@@ -1,5 +1,5 @@
 import { LZString } from "./lz/lz-string";
-import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled, CreateTH, CreateCheckbox, CreateSelect } from "./disp/Tools";
+import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled, CreateTH, CreateCheckbox, GenerateID } from "./disp/Tools";
 import { Deserialize } from "./impl/Serialize";
 import { StringFmt } from "./string/index";
 import { scrollToFragment } from "./scroll/scroll";
@@ -15,6 +15,12 @@ enum SizeEnum {
     Huge = "Huge"
 }
 
+enum WARNING_COLOR {
+    WHITE,
+    YELLOW,
+    RED,
+}
+
 class Stats {
     public cost = 0;
     public upkeep = 0;
@@ -27,6 +33,7 @@ class Stats {
     public fuel = 0;
     public stress = 0;
     public volume = 0;
+    public warnings: { source: string, warning: string, color: WARNING_COLOR }[] = [];
 
     constructor(obj?) {
         if (obj) {
@@ -115,12 +122,13 @@ const PowerplantType: { name: string, stress?: number, cost?: number, speed?: nu
         ], special: []
     },
     { name: "Petrol", powerplants: PowerplantSize, special: [] },
-    { name: "Supercharged Petrol", cost: 3, powerplants: PowerplantSize, special: ["Ignore high altitude penalties."] },
     { name: "Diesel", cost: 2, speed: -1, torque: 1, reliability: 1, powerplants: DoubleFuel, special: [] },
     { name: "Steam", cost: -2, speed: -2, torque: 2, stress: 1, reliability: 2, volume: 1, integrity: -5, powerplants: PowerplantSize, special: ["At 7 Wear, pushes Burn Out as the boiler explodes!"] },
-    { name: "Electric", cost: 3, speed: 1, torque: -1, handling: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Cannot Gun the Engine.", "Must recharge in town or with a generator."] },
     {
-        name: "Clockwork", cost: 2, integrity: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Does not burn at 7 Wear.", "On Check Engine, cannot choose to take Wear or shut down; this is replaced with \"Spend 1 Fuel Use\".", "Must recharge in town or with a generator."]
+        name: "Electric", cost: 3, speed: 1, torque: -1, handling: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Cannot Gun the Engine.", "Must recharge in town or with a generator.", "Can be Concealed with the engine on(when stationary)."]
+    },
+    {
+        name: "Clockwork", cost: 2, integrity: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Does not burn at 7 Wear.", "On Check Engine, cannot choose to take Wear or shut down; this is replaced with \"Spend 1 Fuel Use (repeatable)\".", "Must recharge in town or with a generator."]
     }
 ];
 const PropulsionType = [
@@ -135,7 +143,7 @@ const PropulsionType = [
     "Half-Walker",
     "Walker",
     "Skids",
-    "Skiis",
+    "Skis",
     "Boat Hull",
     "Amphibious",
     "Cable Car",
@@ -375,7 +383,7 @@ class WeaponMount {
                 stat.add(this.WeapStats(sidx));
             }
             if (closed && this.IsArty()) {
-                stat.cost += this.ArmourCost(armour) * (this.DirCount() - 1)
+                stat.cost += this.ArmourCost(armour);
                 if (this.directions[4])
                     stat.cost += 3;
             } else {
@@ -419,14 +427,20 @@ class WeaponMount {
     }
 
     private ArmourCost(armour: number[]): number {
-        let cost = 0;
-        // if (this.directions[0])
-        cost = Math.max(cost, armour[0]);
-        // if (this.directions[1] && this.directions[3])
-        cost = Math.max(cost, armour[1]);
-        // if (this.directions[2])
-        cost = Math.max(cost, armour[2]);
-        return cost;
+        let cost = [0];
+        if (this.directions[0])
+            cost.push(armour[0]);
+        if (this.directions[1])
+            cost.push(armour[1]);
+        if (this.directions[3])
+            cost.push(armour[1]);
+        if (this.directions[2])
+            cost.push(armour[2]);
+        cost.sort();
+        cost.pop();
+        let sum = 0;
+        cost.map((sum = 0, n => sum += n));
+        return sum;
     }
 }
 
@@ -546,7 +560,7 @@ class Vehicle {
                 if (this.GetVolume() > 4)
                     return false;
             case "Skids":
-            case "Skiis":
+            case "Skis":
             case "Boat Hull":
             case "Amphibious":
             case "Cable Car":
@@ -559,40 +573,31 @@ class Vehicle {
     }
     private ValidateLocomotion() {
         let volume = this.GetVolume();
-        let good = false;
-        while (good == false) {
-            switch (PropulsionType[this.propulsion_idx]) {
-                case "Monowheel":
-                case "Two-Wheeled":
-                    good = volume <= 1;
-                    break;
-                case "Three-Wheeled":
-                case "Four-Wheeled":
-                case "Six-Wheeled":
-                case "Half-Track":
-                case "Continuous Track":
-                case "Crawler":
-                case "Half-Walker":
-                case "Walker":
-                    good = volume <= 8
-                    break;
-                case "Skids":
-                case "Skiis":
-                    good = volume <= 6;
-                    break;
-                case "Boat Hull":
-                case "Amphibious":
-                case "Cable Car":
-                case "Sky-Line":
-                case "Dorandisch Earthline":
-                    good = true;
-                    break;
-                default:
-                    console.error("Unknonw Locomotion in ValidateLocomotion");
-            }
-            if (good == false) {
-                this.propulsion_idx += 1;
-            }
+        switch (PropulsionType[this.propulsion_idx]) {
+            case "Monowheel":
+            case "Two-Wheeled":
+                return volume <= 1;
+            case "Three-Wheeled":
+            case "Four-Wheeled":
+            case "Six-Wheeled":
+            case "Half-Track":
+            case "Continuous Track":
+            case "Crawler":
+            case "Half-Walker":
+            case "Walker":
+                return volume <= 8
+            case "Skids":
+            case "Skis":
+                return volume <= 6;
+            case "Boat Hull":
+            case "Amphibious":
+            case "Cable Car":
+            case "Sky-Line":
+            case "Dorandisch Earthline":
+                return true;
+            default:
+                console.error("Unknonw Locomotion in ValidateLocomotion");
+                return false;
         }
     }
     public SetArmourFront(amount: number) {
@@ -600,7 +605,7 @@ class Vehicle {
         amount = Math.max(0, amount);
         amount = Math.min(5, amount);
         this.armour_front = amount;
-        while (this.SumArmour() >= 10) {
+        while (this.SumArmour() > 10) {
             this.armour_front--;
         }
         this.ValidateArmour();
@@ -614,7 +619,7 @@ class Vehicle {
         amount = Math.max(0, amount);
         amount = Math.min(5, amount);
         this.armour_side = amount;
-        while (this.SumArmour() >= 10) {
+        while (this.SumArmour() > 10) {
             this.armour_side--;
         }
         this.ValidateArmour();
@@ -628,7 +633,7 @@ class Vehicle {
         amount = Math.max(0, amount);
         amount = Math.min(5, amount);
         this.armour_rear = amount;
-        while (this.SumArmour() >= 10) {
+        while (this.SumArmour() > 10) {
             this.armour_rear--;
         }
         this.ValidateArmour();
@@ -655,7 +660,7 @@ class Vehicle {
         let stat = new Stats();
         stat.volume += this.extra_fuel;
 
-        let armour_list = [this.armour_front, this.armour_rear, this.armour_side];
+        let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
         let is_enclosed = false;
         for (let idx = 0; idx < this.crew.length; idx++) {
             is_enclosed = is_enclosed || this.crew[idx].IsEnclosed();
@@ -677,7 +682,6 @@ class Vehicle {
         return stat.volume;
     }
     public CalculateStats() {
-        this.ValidateLocomotion();
         let armour_list = [this.armour_front, this.armour_rear, this.armour_side];
         if (!this.CanExtraFuel()) {
             this.extra_fuel = 0;
@@ -697,32 +701,44 @@ class Vehicle {
         this.extra_tiny = (stat.volume - Math.floor(stat.volume)) >= 0.45;
         stat.volume = Math.ceil(stat.volume);
 
-        stat.handling += Volume[stat.volume].handling;
-        stat.speed += Volume[stat.volume].speedmod;
-        stat.integrity += Volume[stat.volume].integrity;
 
+        if (!this.ValidateLocomotion()) {
+            stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Too much Volume for this locomotion type.", color: WARNING_COLOR.RED });
+        }
         if (PropulsionType[this.propulsion_idx] == "Amphibious") {
             stat.volume += 1;
             stat.cost += 1;
-            //Todo: Special
+            stat.warnings.push({ source: "Amphibious", warning: "Allows use on calm water at -1 Speed.", color: WARNING_COLOR.WHITE });
         }
 
         stat.volume += this.cargo[0] * 1;
         stat.volume += this.cargo[1] * 2;
         stat.volume += this.cargo[2] * 4;
         stat.volume += this.cargo[3] * 8;
+
         let volMaxHP = stat.volume;
         if (this.enlarged_engine) {
             stat.volume += 1;
             stat.reliability -= 1;
             volMaxHP += 2;
         }
-        volMaxHP = Math.max(Volume.length - 1);
+
+        stat.handling += Volume[Math.min(Volume.length - 1, stat.volume)].handling;
+        stat.speed += Volume[Math.min(Volume.length - 1, stat.volume)].speedmod;
+        stat.integrity += Volume[Math.min(Volume.length - 1, stat.volume)].integrity;
+
+        volMaxHP = Math.min(Volume.length - 1, volMaxHP);
         while (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {
             this.powerplant_size_idx -= 1;
         }
         stat.add(new Stats(PowerplantType[this.powerplant_idx]));
+        for (let text of PowerplantType[this.powerplant_idx].special) {
+            stat.warnings.push({ source: PowerplantType[this.powerplant_idx].name, warning: text, color: WARNING_COLOR.WHITE });
+        }
         stat.add(new Stats(PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx]));
+        for (let text of PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx].special) {
+            stat.warnings.push({ source: PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx].name, warning: text, color: WARNING_COLOR.WHITE });
+        }
         stat.fuel *= (this.extra_fuel + 1);
 
         let armour_total = this.SumArmour();
@@ -773,7 +789,7 @@ class Vehicle {
             stat.speed += 1;
             stat.reliability += 1;
             stat.stress += 1;
-            //Todo: Special
+            stat.warnings.push({ source: "Propeller", warning: "Double Injury on a Crash.", color: WARNING_COLOR.WHITE });
         }
 
         switch (PropulsionType[this.propulsion_idx]) {
@@ -791,8 +807,7 @@ class Vehicle {
                 stat.torque -= Math.floor(armour_total / 3);
                 break;
             case "Six-Wheeled":
-                stat.torque += 1;
-                stat.speed -= 1;
+                stat.handling -= 5;
                 stat.torque -= Math.floor(armour_total / 5);
                 break;
             case "Half-Track":
@@ -818,7 +833,6 @@ class Vehicle {
                 stat.torque = 3;
                 stat.speed = Math.min(stat.speed, 4);
                 stat.cost += 2;
-                //Todo:: Special
                 break;
             case "Walker":
                 stat.speed -= 3;
@@ -828,17 +842,18 @@ class Vehicle {
                 stat.torque = 5;
                 stat.speed = Math.min(stat.speed, 3);
                 stat.cost += 4;
-                //Todo: Special
+                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Gains the Gyro-Stabilized & Standing Tall special rules.", color: WARNING_COLOR.WHITE });
                 break;
             case "Skids":
-            case "Skiis":
+            case "Skis":
                 stat.speed -= 2;
                 stat.torque -= 2;
-                //Todo: Special
+                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "+3 Speed bonus on Snow & Ice.", color: WARNING_COLOR.WHITE });
                 break;
             case "Boat Hull":
                 stat.speed = Math.min(stat.speed, 4);
                 stat.cost += 1;
+                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Limited to Water.", color: WARNING_COLOR.WHITE });
                 break;
             case "Amphibious":
                 //Note: Done earlier
@@ -847,12 +862,12 @@ class Vehicle {
             case "Sky-Line":
                 stat.reliability += 4;
                 stat.speed += 1;
-                //Todo: Special
+                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Limited to cable lines.", color: WARNING_COLOR.WHITE });
                 break;
             case "Dorandisch Earthline":
                 stat.reliability += 6;
                 stat.speed += 3;
-                //Todo: Special
+                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Limited to ground rails.", color: WARNING_COLOR.WHITE });
                 break;
         }
 
@@ -958,6 +973,7 @@ class StatsDisp {
     private sze: HTMLTableCellElement;
     private crg: HTMLTableCellElement;
     private crw: HTMLTableElement;
+    private special: HTMLTableCellElement;
 
     constructor(veh: Vehicle) {
         this.vehicle = veh;
@@ -998,6 +1014,9 @@ class StatsDisp {
         this.sze.colSpan = 3;
         this.crg = r4.insertCell();
         this.crg.colSpan = 3;
+        var r5 = tbl.insertRow();
+        this.special = r5.insertCell();
+        this.special.colSpan = 6;
     }
 
     private CreateCrewTable() {
@@ -1057,7 +1076,7 @@ class StatsDisp {
         this.rel.textContent = final_stats.reliability.toString();
         this.ful.textContent = final_stats.fuel.toString();
         this.str.textContent = final_stats.stress.toString();
-        this.sze.textContent = Volume[Math.min(final_stats.volume, Volume.length - 1)].size.toString();
+        this.sze.textContent = Volume[Math.min(final_stats.volume, Volume.length - 1)].size.toString() + StringFmt.Format(" ({0} Volume)", final_stats.volume);
         let cargo = this.vehicle.GetCargo();
         let cstring = [];
         if (cargo[0] > 0) {
@@ -1079,6 +1098,25 @@ class StatsDisp {
             cstring.push("No Cargo Space");
         }
         this.crg.textContent = StringFmt.Join(", ", cstring);
+
+        final_stats.warnings.sort((a, b) => { return a.color - b.color });
+        var warnhtml = "";
+        for (let w of final_stats.warnings) {
+            switch (w.color) {
+                case WARNING_COLOR.RED:
+                    warnhtml += "<div style=\"color:#FF0000;\">";
+                    break;
+                case WARNING_COLOR.YELLOW:
+                    warnhtml += "<div style=\"color:#FFFF00;\">";
+                    break;
+                case WARNING_COLOR.WHITE:
+                default:
+                    warnhtml += "<div style=\"color:var(--inp_txt_color);;\">";
+                    break;
+            }
+            warnhtml += w.source + ":  " + w.warning + "</div>";
+        }
+        this.special.innerHTML = warnhtml;
 
         while (this.crw.rows.length > 1) {
             this.crw.deleteRow(1);
@@ -1250,7 +1288,7 @@ class MachineryDisp {
                     }
                     break;
                 case "Skids":
-                case "Skiis":
+                case "Skis":
                     if (volume > 6) {
                         opt.disabled = true;
                         continue;
@@ -1307,12 +1345,6 @@ class MachineryDisp {
 //     public has_loader: boolean;
 //     public is_loader: boolean;
 // }
-
-var internal_id = 0;
-function GenerateID() {
-    internal_id++;
-    return "internal_id_" + internal_id.toString();
-}
 
 function CreateLabel(txt: string, fore: HTMLElement): HTMLSpanElement {
     var span = document.createElement("SPAN") as HTMLSpanElement;
