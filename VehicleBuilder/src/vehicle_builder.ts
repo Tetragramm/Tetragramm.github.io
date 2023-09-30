@@ -28,29 +28,29 @@ class Stats {
     public stress = 0;
     public volume = 0;
 
-    constructor(obj?){
-        if(obj){
-            if(obj["cost"])
+    constructor(obj?) {
+        if (obj) {
+            if (obj["cost"])
                 this.cost = obj.cost;
-            if(obj["upkeep"])
+            if (obj["upkeep"])
                 this.upkeep = obj.upkeep;
-            if(obj["speed"])
+            if (obj["speed"])
                 this.speed = obj.speed;
-            if(obj["torque"])
+            if (obj["torque"])
                 this.torque = obj.torque;
-            if(obj["handling"])
+            if (obj["handling"])
                 this.handling = obj.handling;
-            if(obj["integrity"])
+            if (obj["integrity"])
                 this.integrity = obj.integrity;
-            if(obj["safety"])
+            if (obj["safety"])
                 this.safety = obj.safety;
-            if(obj["reliability"])
+            if (obj["reliability"])
                 this.reliability = obj.reliability;
-            if(obj["fuel"])
+            if (obj["fuel"])
                 this.fuel = obj.fuel;
-            if(obj["stress"])
+            if (obj["stress"])
                 this.stress = obj.stress;
-            if(obj["volume"])
+            if (obj["volume"])
                 this.volume = obj.volume;
         }
     }
@@ -144,6 +144,7 @@ const PropulsionType = [
 ];
 
 const Volume: { size: SizeEnum, handling: number, speedmod: number, maxHP: number, integrity: number }[] = [
+    { size: SizeEnum.None, handling: 0, speedmod: 0, maxHP: 0, integrity: 0 },
     { size: SizeEnum.Small, handling: 45, speedmod: 1, maxHP: 20, integrity: 6, },
     { size: SizeEnum.Medium, handling: 40, speedmod: 1, maxHP: 40, integrity: 8, },
     { size: SizeEnum.Medium, handling: 35, speedmod: 0, maxHP: 60, integrity: 10, },
@@ -181,7 +182,7 @@ class Weapon {
 }
 
 var WeaponList: Weapon[] = [
-    new Weapon({ name: "None", abbr: undefined, cost: undefined, loader:false }),
+    new Weapon({ name: "None", abbr: undefined, cost: undefined, loader: false }),
     new Weapon({ name: "Heavy Submachine Gun", abbr: "HSG", cost: 2, braced: true, loader: true }),
     new Weapon({ name: "Landflammenwerfer", abbr: "LFW", cost: 3 }),
     new Weapon({ name: "Static Gun", abbr: "Static Gun", cost: 4 }),
@@ -230,7 +231,7 @@ class Loader {
     public loop_left: boolean;
     public loop_right: boolean;
     public loop_back: boolean;
-    constructor( enc:boolean, coup:boolean, seal:boolean, front:boolean, left:boolean, right:boolean, rear:boolean){
+    constructor(enc: boolean, coup: boolean, seal: boolean, front: boolean, left: boolean, right: boolean, rear: boolean) {
         this.enclosed = enc;
         this.coupla = coup;
         this.sealed = seal;
@@ -247,11 +248,13 @@ class Crew {
     public sealed: boolean;
     public loop_front: boolean;
     public loop_left: boolean;
-    public loop_right:boolean;
+    public loop_right: boolean;
     public loop_back: boolean;
-    public loaders:Loader[];
+    public loaders: Loader[];
     public weapon_mount: WeaponMount;
-    constructor(disp: string, enc: boolean, coup: boolean, seal: boolean, lf: boolean, ll: boolean, lr: boolean, lb: boolean, ldrs:Loader[], weap: WeaponMount) {
+    public base_vis: number;
+    public base_escape: number;
+    constructor(disp: string, enc: boolean, coup: boolean, seal: boolean, lf: boolean, ll: boolean, lr: boolean, lb: boolean, ldrs: Loader[], weap: WeaponMount) {
         this.name_txt = disp;
         this.enclosed = enc;
         this.coupla = coup;
@@ -262,6 +265,46 @@ class Crew {
         this.loop_back = lb;
         this.loaders = ldrs;
         this.weapon_mount = weap;
+    }
+
+    public IsEnclosed(): boolean {
+        let is = false;
+        is = is || this.enclosed;
+        for (let idx = 0; idx < this.loaders.length; idx++) {
+            is = is || this.loaders[idx].enclosed;
+        }
+        return is;
+    }
+
+    public GetVisibility(l: number | undefined = undefined) {
+        let seat;
+        if (l == undefined) {
+            seat = this;
+        } else {
+            seat = this.loaders[l];
+        }
+        if (seat.enclosed) {
+            if (seat.coupla) {
+                return this.base_vis + 1;
+            }
+            return this.base_vis
+        }
+        return undefined;
+    }
+    public GetEscape(l: number | undefined = undefined) {
+        let seat;
+        if (l == undefined) {
+            seat = this;
+        } else {
+            seat = this.loaders[l];
+        }
+        if (seat.enclosed) {
+            if (seat.coupla) {
+                return this.base_escape + 1;
+            }
+            return this.base_escape
+        }
+        return undefined;
     }
 
     public CalcStats(armour: number[]): Stats {
@@ -276,6 +319,12 @@ class Crew {
 
         if (this.enclosed && this.coupla)
             stat.cost += 1;
+
+        for (let idx = 0; idx < this.loaders.length; idx++) {
+            stat.volume += 0.5;
+            if (this.loaders[idx].enclosed && this.loaders[idx].coupla)
+                stat.cost += 1;
+        }
 
         //TODO: Loopholes are done at vehicle level
         stat.add(this.weapon_mount.CalcStats(this.enclosed, armour));
@@ -300,8 +349,8 @@ class WeaponMount {
         this.directions = dir;
         this.secondary_idx = sec;
         this.shield = sh;
-        this.secondary_idx = this.secondary_idx.filter((value)=>{return value > 0});
-        if(this.main_idx == 0 && this.secondary_idx.length > 0){
+        this.secondary_idx = this.secondary_idx.filter((value) => { return value > 0 });
+        if (this.main_idx == 0 && this.secondary_idx.length > 0) {
             this.main_idx = this.secondary_idx[0]
             this.secondary_idx.splice(0, 1);
         }
@@ -320,7 +369,7 @@ class WeaponMount {
 
     public CalcStats(closed: boolean, armour: number[]): Stats {
         let stat = new Stats();
-        if(this.main_idx > 0){
+        if (this.main_idx > 0) {
             stat.add(this.WeapStats(this.main_idx));
             for (let sidx of this.secondary_idx) {
                 stat.add(this.WeapStats(sidx));
@@ -391,10 +440,12 @@ class Vehicle {
     private extra_fuel: number = 0;
     private extra_tiny: boolean = false;
     private enlarged_engine = false;
+    private propeller = false;
     private crew: Crew[] = [
         new Crew("Driver", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false)),
         new Crew("Commander", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false)),
     ];
+    private cargo = [0, 0, 0, 0];
 
     private ValidateArmour() {
         if (PowerplantType[this.powerplant_idx].name == "Wind Powered" && this.SumArmour() != 0) {
@@ -405,7 +456,7 @@ class Vehicle {
         this.armour_front = Math.min(5, this.armour_front);
         this.armour_side = Math.min(5, this.armour_side);
         this.armour_rear = Math.min(5, this.armour_rear);
-        while (this.SumArmour() >= 10) {
+        while (this.SumArmour() > 10) {
             if (this.armour_rear != 0) {
                 this.armour_rear--;
             } else if (this.armour_side != 0) {
@@ -417,6 +468,19 @@ class Vehicle {
     }
     private SumArmour(): number {
         return this.armour_front + this.armour_side + this.armour_rear;
+    }
+
+    public SetCargo(s: number, m: number, l: number, h: number) {
+        this.cargo = [s, m, l, h];
+        this.CalculateStats();
+    }
+
+    public GetCargo() {
+        let tiny = 0;
+        if (this.extra_tiny) {
+            tiny += 1;
+        }
+        return [tiny, ...this.cargo];
     }
 
     public SetPowerplant(idx: number) {
@@ -461,6 +525,75 @@ class Vehicle {
     }
     public GetPropulsion(): string {
         return PropulsionType[this.propulsion_idx];
+    }
+    public SetPropeller(has: boolean) {
+        this.propeller = has;
+        this.CalculateStats();
+    }
+    public CanPropeller() {
+        switch (PropulsionType[this.propulsion_idx]) {
+            case "Half-Track":
+            case "Continuous Track":
+            case "Crawler":
+            case "Half-Walker":
+            case "Walker":
+                return false;
+            case "Monowheel":
+            case "Two-Wheeled":
+            case "Three-Wheeled":
+            case "Four-Wheeled":
+            case "Six-Wheeled":
+                if (this.GetVolume() > 4)
+                    return false;
+            case "Skids":
+            case "Skiis":
+            case "Boat Hull":
+            case "Amphibious":
+            case "Cable Car":
+            case "Sky-Line":
+            case "Dorandisch Earthline":
+                if (PowerplantType[this.powerplant_idx].name == "Wind Powered")
+                    return false;
+        }
+        return true;
+    }
+    private ValidateLocomotion() {
+        let volume = this.GetVolume();
+        let good = false;
+        while (good == false) {
+            switch (PropulsionType[this.propulsion_idx]) {
+                case "Monowheel":
+                case "Two-Wheeled":
+                    good = volume <= 1;
+                    break;
+                case "Three-Wheeled":
+                case "Four-Wheeled":
+                case "Six-Wheeled":
+                case "Half-Track":
+                case "Continuous Track":
+                case "Crawler":
+                case "Half-Walker":
+                case "Walker":
+                    good = volume <= 8
+                    break;
+                case "Skids":
+                case "Skiis":
+                    good = volume <= 6;
+                    break;
+                case "Boat Hull":
+                case "Amphibious":
+                case "Cable Car":
+                case "Sky-Line":
+                case "Dorandisch Earthline":
+                    good = true;
+                    break;
+                default:
+                    console.error("Unknonw Locomotion in ValidateLocomotion");
+            }
+            if (good == false) {
+                this.propulsion_idx += 1;
+            }
+        }
     }
     public SetArmourFront(amount: number) {
         amount = Math.floor(1.0e-6 + amount);
@@ -517,7 +650,35 @@ class Vehicle {
     public GetExtraFuel(): number {
         return this.extra_fuel;
     }
+
+    public GetVolume(): number {
+        let stat = new Stats();
+        stat.volume += this.extra_fuel;
+
+        let armour_list = [this.armour_front, this.armour_rear, this.armour_side];
+        let is_enclosed = false;
+        for (let idx = 0; idx < this.crew.length; idx++) {
+            is_enclosed = is_enclosed || this.crew[idx].IsEnclosed();
+            stat.add(this.crew[idx].CalcStats(armour_list));
+        }
+        if (is_enclosed) {
+            stat.volume += 1;
+        }
+        if (PropulsionType[this.propulsion_idx] == "Amphibious") {
+            stat.volume += 1;
+        }
+        if (this.enlarged_engine) {
+            stat.volume += 1;
+        }
+        stat.volume += this.cargo[0] * 1;
+        stat.volume += this.cargo[1] * 2;
+        stat.volume += this.cargo[2] * 4;
+        stat.volume += this.cargo[3] * 8;
+        return stat.volume;
+    }
     public CalculateStats() {
+        this.ValidateLocomotion();
+        let armour_list = [this.armour_front, this.armour_rear, this.armour_side];
         if (!this.CanExtraFuel()) {
             this.extra_fuel = 0;
         }
@@ -526,74 +687,129 @@ class Vehicle {
         stat.torque = -1;
         stat.volume += this.extra_fuel;
         let is_enclosed = false;
-        for(let idx = 0; idx<this.crew.length; idx++){
-            let cstat = this.crew[idx].CalcStats([this.armour_front, this.armour_side, this.armour_rear]);
-            stat.add(cstat);
-            if(this.crew[idx].enclosed){
-                is_enclosed = true;
-            }
+        for (let idx = 0; idx < this.crew.length; idx++) {
+            is_enclosed = is_enclosed || this.crew[idx].IsEnclosed();
+            stat.add(this.crew[idx].CalcStats(armour_list));
         }
-        if(is_enclosed){
+        if (is_enclosed) {
             stat.volume += 1;
         }
-        this.extra_tiny = (stat.volume - Math.floor(stat.volume))>0.5;
+        this.extra_tiny = (stat.volume - Math.floor(stat.volume)) >= 0.45;
         stat.volume = Math.ceil(stat.volume);
-        
+
         stat.handling += Volume[stat.volume].handling;
         stat.speed += Volume[stat.volume].speedmod;
         stat.integrity += Volume[stat.volume].integrity;
 
-        if(PropulsionType[this.propulsion_idx] == "Amphibious"){
+        if (PropulsionType[this.propulsion_idx] == "Amphibious") {
             stat.volume += 1;
+            stat.cost += 1;
             //Todo: Special
         }
 
+        stat.volume += this.cargo[0] * 1;
+        stat.volume += this.cargo[1] * 2;
+        stat.volume += this.cargo[2] * 4;
+        stat.volume += this.cargo[3] * 8;
         let volMaxHP = stat.volume;
-        if(this.enlarged_engine){
+        if (this.enlarged_engine) {
             stat.volume += 1;
             stat.reliability -= 1;
-            volMaxHP +=2;
+            volMaxHP += 2;
         }
-        
-        while(PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP){
+        volMaxHP = Math.max(Volume.length - 1);
+        while (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {
             this.powerplant_size_idx -= 1;
         }
         stat.add(new Stats(PowerplantType[this.powerplant_idx]));
         stat.add(new Stats(PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx]));
-        stat.fuel *= (this.extra_fuel+1);
+        stat.fuel *= (this.extra_fuel + 1);
 
-        let armour_total = this.armour_front + this.armour_rear + this.armour_side;
-        switch(PropulsionType[this.propulsion_idx]){
+        let armour_total = this.SumArmour();
+        //Armour effects
+        stat.handling -= 2 * armour_total;
+        stat.safety += Math.floor((Math.max(...armour_list) + Math.min(...armour_list)) / 2);
+        armour_list.forEach((value) => {
+            if (value >= 3) {
+                stat.safety += 1;
+                stat.speed -= 1;
+                stat.torque -= 1;
+            }
+        });
+        if (armour_total > 0) {
+            stat.speed -= 1;
+            stat.torque -= 1;
+            stat.integrity += 2 + armour_total;
+            if (armour_total >= 5) {
+                stat.speed -= 1;
+                stat.torque -= 1;
+                if (armour_total >= 10) {
+                    stat.speed -= 1;
+                    stat.torque -= 1;
+                }
+            }
+        }
+        stat.reliability -= Math.floor(1.0e-6 + armour_total / 3.0);
+        let ve = 0;
+        if (armour_total >= 1) {
+            ve -= 1;
+            if (armour_total >= 4) {
+                ve -= 1;
+                if (armour_total >= 7) {
+                    ve -= 1;
+                    if (armour_total >= 10) {
+                        ve -= 1;
+                    }
+                }
+            }
+        }
+        for (let c of this.crew) {
+            c.base_vis = ve;
+            c.base_escape = ve;
+        }
+
+        if (this.propeller && this.CanPropeller()) {
+            stat.torque -= 2;
+            stat.speed += 1;
+            stat.reliability += 1;
+            stat.stress += 1;
+            //Todo: Special
+        }
+
+        switch (PropulsionType[this.propulsion_idx]) {
             case "Monowheel":
             case "Two-Wheeled":
                 stat.speed += 1;
                 stat.torque -= armour_total;
+                stat.cost -= 1;
                 break;
             case "Three-Wheeled":
             case "Four-Wheeled":
-                if(stat.volume >= 6){
+                if (stat.volume >= 6) {
                     stat.torque -= 1;
                 }
-                stat.torque -= Math.floor(armour_total/3);
+                stat.torque -= Math.floor(armour_total / 3);
                 break;
             case "Six-Wheeled":
                 stat.torque += 1;
                 stat.speed -= 1;
-                stat.torque -= Math.floor(armour_total/5);
+                stat.torque -= Math.floor(armour_total / 5);
                 break;
             case "Half-Track":
                 stat.torque += 2;
                 stat.speed -= 1;
+                stat.cost += 1;
                 break;
             case "Continuous Track":
                 stat.torque += 4;
                 stat.speed -= 2;
                 stat.handling -= 5;
-                if(Volume[stat.volume].size == "Large") {
+                if (Volume[stat.volume].size == "Large") {
                     stat.torque += 1;
                 } else if (Volume[stat.volume].size == "Huge") {
                     stat.torque += 2;
                 }
+                stat.cost += 2;
                 break;
             case "Crawler":
             case "Half-Walker":
@@ -601,6 +817,7 @@ class Vehicle {
                 stat.handling -= 5;
                 stat.torque = 3;
                 stat.speed = Math.min(stat.speed, 4);
+                stat.cost += 2;
                 //Todo:: Special
                 break;
             case "Walker":
@@ -610,6 +827,7 @@ class Vehicle {
                 stat.upkeep += 1;
                 stat.torque = 5;
                 stat.speed = Math.min(stat.speed, 3);
+                stat.cost += 4;
                 //Todo: Special
                 break;
             case "Skids":
@@ -620,6 +838,7 @@ class Vehicle {
                 break;
             case "Boat Hull":
                 stat.speed = Math.min(stat.speed, 4);
+                stat.cost += 1;
                 break;
             case "Amphibious":
                 //Note: Done earlier
@@ -636,6 +855,7 @@ class Vehicle {
                 //Todo: Special
                 break;
         }
+
         if (vehicle_display) {
             vehicle_display.UpdateDisplay(stat);
         }
@@ -652,30 +872,38 @@ class Vehicle {
         }
         this.CalculateStats();
     }
-    public SetLoader(idx:number, ldr_idx:number, ldr:Loader){
-        if(idx >= this.crew.length){
+    public DeleteCrew(idx: number) {
+        this.crew.splice(idx, 1);
+        this.CalculateStats();
+    }
+    public DuplicateCrew(idx: number) {
+        this.crew.splice(idx, 0, this.crew[idx]);
+        this.CalculateStats();
+    }
+    public SetLoader(idx: number, ldr_idx: number, ldr: Loader) {
+        if (idx >= this.crew.length) {
             console.error("SetLoader crew index out of range.");
         }
         let crew = this.crew[idx];
-        if(ldr_idx >= crew.loaders.length){
+        if (ldr_idx >= crew.loaders.length) {
             console.error("SetLoader loader index out of range.");
         } else {
             crew.loaders[ldr_idx] = ldr;
         }
         this.CalculateStats();
     }
-    public SetNumLoaders(idx:number, num: number){
-        if(idx >= this.crew.length){
+    public SetNumLoaders(idx: number, num: number) {
+        if (idx >= this.crew.length) {
             console.error("SetNumLoaders crew index out of range.");
         }
-        if(num <= 0){
+        if (num <= 0) {
             this.crew[idx].loaders = [];
         } else {
             num = Math.min(num, this.crew[idx].weapon_mount.GetNumLoaders());
-            while(this.crew[idx].loaders.length > num){
+            while (this.crew[idx].loaders.length > num) {
                 this.crew[idx].loaders.pop();
             }
-            while(this.crew[idx].loaders.length < num){
+            while (this.crew[idx].loaders.length < num) {
                 this.crew[idx].loaders.push(new Loader(false, false, false, false, false, false, false));
             }
         }
@@ -685,7 +913,7 @@ class Vehicle {
         return this.crew;
     }
     public SetWeapon(idx: number, mount: WeaponMount) {
-        if(idx >= this.crew.length){
+        if (idx >= this.crew.length) {
             console.error("SetWeapon crew index out of range.");
         }
         this.crew[idx].weapon_mount = mount;
@@ -818,19 +1046,39 @@ class StatsDisp {
     }
 
     public UpdateDisplay(final_stats: Stats) {
-        this.name_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">{1}þ</span></p>","Wandelburg Ausf. I", final_stats.cost);
+        this.name_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">{1}þ</span></p>", "Wandelburg Ausf. I", final_stats.cost);
         this.nick_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">Upkeep {1}þ</span></p>", "The First Tank", final_stats.upkeep);
         this.spd.textContent = final_stats.speed.toString();
         this.trq.textContent = final_stats.torque.toString();
         this.hnd.textContent = final_stats.handling.toString();
-        this.amr.textContent = StringFmt.Format("{0}\\{1}\\{2}",this.vehicle.GetArmourFront(), this.vehicle.GetArmourSide(), this.vehicle.GetArmourRear());
+        this.amr.textContent = StringFmt.Format("{0}\\{1}\\{2}", this.vehicle.GetArmourFront(), this.vehicle.GetArmourSide(), this.vehicle.GetArmourRear());
         this.int.textContent = final_stats.integrity.toString();
         this.sft.textContent = final_stats.safety.toString();
         this.rel.textContent = final_stats.reliability.toString();
         this.ful.textContent = final_stats.fuel.toString();
         this.str.textContent = final_stats.stress.toString();
-        this.sze.textContent = Volume[final_stats.volume].size.toString();
-        this.crg.textContent = StringFmt.Format("Final Volume is {0}", final_stats.volume);
+        this.sze.textContent = Volume[Math.min(final_stats.volume, Volume.length - 1)].size.toString();
+        let cargo = this.vehicle.GetCargo();
+        let cstring = [];
+        if (cargo[0] > 0) {
+            cstring.push(StringFmt.Format("{0} Tiny Cargo", cargo[0]));
+        }
+        if (cargo[1] > 0) {
+            cstring.push(StringFmt.Format("{0} Small Cargo", cargo[1]));
+        }
+        if (cargo[2] > 0) {
+            cstring.push(StringFmt.Format("{0} Medium Cargo", cargo[2]));
+        }
+        if (cargo[3] > 0) {
+            cstring.push(StringFmt.Format("{0} Large Cargo", cargo[3]));
+        }
+        if (cargo[4] > 0) {
+            cstring.push(StringFmt.Format("{0} Huge Cargo", cargo[4]));
+        }
+        if (cstring.length == 0) {
+            cstring.push("No Cargo Space");
+        }
+        this.crg.textContent = StringFmt.Join(", ", cstring);
 
         while (this.crw.rows.length > 1) {
             this.crw.deleteRow(1);
@@ -853,8 +1101,8 @@ class StatsDisp {
                 notes.push("Hatch");
             }
             //TODO: Vis & Escape
-            this.CrewLine(c.name_txt, enclosure, -1, 0, StringFmt.Join(", ", notes));
-            for (let l = 0; l<c.loaders.length; l++) {
+            this.CrewLine(c.name_txt, enclosure, c.GetVisibility(), c.GetEscape(), StringFmt.Join(", ", notes));
+            for (let l = 0; l < c.loaders.length; l++) {
                 let enclosure = "Exposed";
                 if (c.loaders[l].enclosed) {
                     enclosure = "Closed";
@@ -867,7 +1115,7 @@ class StatsDisp {
                     notes.push("Hatch");
                 }
                 //TODO: Vis & Escape
-                this.CrewLine("Loader", enclosure, -1, 0, StringFmt.Join(", ", notes), true);
+                this.CrewLine("Loader", enclosure, c.GetVisibility(l), c.GetEscape(l), StringFmt.Join(", ", notes), true);
             }
         }
 
@@ -890,6 +1138,12 @@ class MachineryDisp {
     private front_armour: HTMLInputElement;
     private side_armour: HTMLInputElement;
     private rear_armour: HTMLInputElement;
+    private prop_span: HTMLSpanElement;
+    private propeller: HTMLInputElement;
+    private s_cargo: HTMLInputElement;
+    private m_cargo: HTMLInputElement;
+    private l_cargo: HTMLInputElement;
+    private h_cargo: HTMLInputElement;
 
     constructor(veh: Vehicle) {
         this.vehicle = veh;
@@ -902,6 +1156,10 @@ class MachineryDisp {
             this.locomotion.append(opt);
         }
         this.locomotion.onchange = () => { this.vehicle.SetPropulsion(this.locomotion.selectedIndex); };
+
+        this.prop_span = document.getElementById("prop_span") as HTMLSpanElement;
+        this.propeller = document.getElementById("inp_prop") as HTMLInputElement;
+        this.propeller.onchange = () => { this.vehicle.SetPropeller(this.propeller.checked); };
 
         this.pp_type = document.getElementById("sel_pptype") as HTMLSelectElement;
         this.pp_type.onchange = () => { this.update_type = true; this.vehicle.SetPowerplant(this.pp_type.selectedIndex); };
@@ -935,6 +1193,23 @@ class MachineryDisp {
         this.rear_armour.min = "0";
         this.rear_armour.step = "1";
         this.rear_armour.onchange = () => { this.vehicle.SetArmourRear(this.rear_armour.valueAsNumber); };
+
+        this.s_cargo = document.getElementById("inp_scargo") as HTMLInputElement;
+        this.m_cargo = document.getElementById("inp_mcargo") as HTMLInputElement;
+        this.l_cargo = document.getElementById("inp_lcargo") as HTMLInputElement;
+        this.h_cargo = document.getElementById("inp_hcargo") as HTMLInputElement;
+        this.s_cargo.min = "0";
+        this.m_cargo.min = "0";
+        this.l_cargo.min = "0";
+        this.h_cargo.min = "0";
+        this.s_cargo.step = "1";
+        this.m_cargo.step = "1";
+        this.l_cargo.step = "1";
+        this.h_cargo.step = "1";
+        this.s_cargo.onchange = () => { this.vehicle.SetCargo(this.s_cargo.valueAsNumber, this.m_cargo.valueAsNumber, this.l_cargo.valueAsNumber, this.h_cargo.valueAsNumber); };
+        this.m_cargo.onchange = () => { this.vehicle.SetCargo(this.s_cargo.valueAsNumber, this.m_cargo.valueAsNumber, this.l_cargo.valueAsNumber, this.h_cargo.valueAsNumber); };
+        this.l_cargo.onchange = () => { this.vehicle.SetCargo(this.s_cargo.valueAsNumber, this.m_cargo.valueAsNumber, this.l_cargo.valueAsNumber, this.h_cargo.valueAsNumber); };
+        this.h_cargo.onchange = () => { this.vehicle.SetCargo(this.s_cargo.valueAsNumber, this.m_cargo.valueAsNumber, this.l_cargo.valueAsNumber, this.h_cargo.valueAsNumber); };
     }
 
     private SetSizeSel() {
@@ -950,8 +1225,57 @@ class MachineryDisp {
         }
     }
 
+    public UpdateLocomotion() {
+        let volume = this.vehicle.GetVolume();
+        for (let opt of this.locomotion.options) {
+            switch (opt.text) {
+                case "Monowheel":
+                case "Two-Wheeled":
+                    if (volume > 1) {
+                        opt.disabled = true;
+                        continue;
+                    }
+                    break;
+                case "Three-Wheeled":
+                case "Four-Wheeled":
+                case "Six-Wheeled":
+                case "Half-Track":
+                case "Continuous Track":
+                case "Crawler":
+                case "Half-Walker":
+                case "Walker":
+                    if (volume > 8) {
+                        opt.disabled = true;
+                        continue;
+                    }
+                    break;
+                case "Skids":
+                case "Skiis":
+                    if (volume > 6) {
+                        opt.disabled = true;
+                        continue;
+                    }
+                    break;
+                case "Boat Hull":
+                case "Amphibious":
+                case "Cable Car":
+                case "Sky-Line":
+                case "Dorandisch Earthline":
+                    break;
+                default:
+                    console.error("Unknonw Locomotion in MachineryDisp");
+            }
+            opt.disabled = false;
+        }
+    }
+
     public UpdateDisplay() {
         this.locomotion.selectedIndex = this.vehicle.GetPropulsionIdx();
+        if (this.vehicle.CanPropeller()) {
+            this.prop_span.hidden = false;
+        } else {
+            this.prop_span.hidden = true;
+        }
 
         this.pp_type.selectedIndex = this.vehicle.GetPowerplantIdx();
         if (this.update_type) {
@@ -964,6 +1288,13 @@ class MachineryDisp {
         this.front_armour.valueAsNumber = this.vehicle.GetArmourFront();
         this.side_armour.valueAsNumber = this.vehicle.GetArmourSide();
         this.rear_armour.valueAsNumber = this.vehicle.GetArmourRear();
+
+        let cargo = this.vehicle.GetCargo();
+        this.s_cargo.valueAsNumber = cargo[1];
+        this.m_cargo.valueAsNumber = cargo[2];
+        this.l_cargo.valueAsNumber = cargo[3];
+        this.h_cargo.valueAsNumber = cargo[4];
+        this.UpdateLocomotion();
     }
 }
 
@@ -998,18 +1329,23 @@ class CrewDisp {
     private vehicle: Vehicle;
     private crewdiv: HTMLDivElement;
     private datalist: HTMLDataListElement;
-    private crewline: { span: HTMLSpanElement, name_span: HTMLSpanElement, name: HTMLInputElement,
-         enc_span: HTMLSpanElement, enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
-          coupla: HTMLInputElement, seal_span: HTMLSpanElement, seal: HTMLInputElement,
-           load_span: HTMLSpanElement, has_loader: HTMLInputElement, loop_front: HTMLInputElement,
-            loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement, br: HTMLBRElement, 
-            loader:{span: HTMLSpanElement, enc_span: HTMLSpanElement,
-                 enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
-                  coupla: HTMLInputElement, seal_span: HTMLSpanElement,
-                   seal: HTMLInputElement, loop_front: HTMLInputElement,
-                    loop_left: HTMLInputElement, loop_right:HTMLInputElement, loop_back: HTMLInputElement,
-                     br: HTMLBRElement}[]
-                     }[] = [];
+    private crewline: {
+        span: HTMLSpanElement,
+        rem: HTMLButtonElement, add: HTMLButtonElement,
+        name_span: HTMLSpanElement, name: HTMLInputElement,
+        enc_span: HTMLSpanElement, enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
+        coupla: HTMLInputElement, seal_span: HTMLSpanElement, seal: HTMLInputElement,
+        load_span: HTMLSpanElement, has_loader: HTMLInputElement, loop_front: HTMLInputElement,
+        loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement, br: HTMLBRElement,
+        loader: {
+            span: HTMLSpanElement, enc_span: HTMLSpanElement,
+            enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
+            coupla: HTMLInputElement, seal_span: HTMLSpanElement,
+            seal: HTMLInputElement, loop_front: HTMLInputElement,
+            loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement,
+            br: HTMLBRElement
+        }[]
+    }[] = [];
     private lastline: HTMLSelectElement;
 
     constructor(veh: Vehicle) {
@@ -1064,12 +1400,12 @@ class CrewDisp {
             while (crew.loaders.length > line.loader.length) {
                 let loader_idx = line.loader.length;
                 let ldr = this.CreateLoader(idx, loader_idx);
-                if(line.loader.length == 0) {
-                line.br.insertAdjacentElement("afterend",ldr.span);
-                ldr.span.insertAdjacentElement("afterend",ldr.br);
+                if (line.loader.length == 0) {
+                    line.br.insertAdjacentElement("afterend", ldr.span);
+                    ldr.span.insertAdjacentElement("afterend", ldr.br);
                 } else {
-                    line.loader[line.loader.length-1].br.insertAdjacentElement("afterend",ldr.span);
-                    ldr.span.insertAdjacentElement("afterend",ldr.br);
+                    line.loader[line.loader.length - 1].br.insertAdjacentElement("afterend", ldr.span);
+                    ldr.span.insertAdjacentElement("afterend", ldr.br);
                 }
                 line.loader.push(ldr);
             }
@@ -1095,14 +1431,14 @@ class CrewDisp {
             line.loop_left.checked = crew.loop_left;
             line.loop_right.checked = crew.loop_right;
             line.loop_back.checked = crew.loop_back;
-            if(crew.weapon_mount.GetNumLoaders() == 0){
+            if (crew.weapon_mount.GetNumLoaders() == 0) {
                 line.has_loader.disabled = true;
             } else {
                 line.has_loader.disabled = false;
             }
             if (crew.weapon_mount.main_idx != 0) {
                 line.has_loader.valueAsNumber = crew.loaders.length;
-                for(let idx = 0; idx<crew.loaders.length; idx++){
+                for (let idx = 0; idx < crew.loaders.length; idx++) {
                     line.loader[idx].span.hidden = false;
                     line.loader[idx].br.hidden = false;
                     line.loader[idx].enclosed.checked = crew.loaders[idx].enclosed;
@@ -1126,8 +1462,8 @@ class CrewDisp {
         this.lastline.selectedIndex = 0;
     }
 
-    private CreateLoader(crew_idx:number, idx:number) {
-        let line = { 
+    private CreateLoader(crew_idx: number, idx: number) {
+        let line = {
             span: document.createElement("SPAN") as HTMLSpanElement,
             enc_span: undefined,
             enclosed: document.createElement("INPUT") as HTMLInputElement,
@@ -1141,7 +1477,7 @@ class CrewDisp {
             loop_back: document.createElement("INPUT") as HTMLInputElement,
             br: document.createElement("BR") as HTMLBRElement,
         };
-        
+
         line.enc_span = CreateLabel("\u00A0\u00A0Enclosed:", line.enclosed);
         line.coup_span = CreateLabel("\u00A0\u00A0Coupla/Hatch:", line.coupla);
         line.seal_span = CreateLabel("\u00A0Sealed:", line.seal);
@@ -1163,9 +1499,11 @@ class CrewDisp {
         line.loop_left.type = "checkbox";
         line.loop_right.type = "checkbox";
         line.loop_back.type = "checkbox";
-        let oc = () => { this.vehicle.SetLoader(crew_idx, idx, 
-            new Loader(line.enclosed.checked, line.coupla.checked, line.seal.checked, 
-                line.loop_front.checked, line.loop_left.checked,line.loop_right.checked,line.loop_back.checked));}; 
+        let oc = () => {
+            this.vehicle.SetLoader(crew_idx, idx,
+                new Loader(line.enclosed.checked, line.coupla.checked, line.seal.checked,
+                    line.loop_front.checked, line.loop_left.checked, line.loop_right.checked, line.loop_back.checked));
+        };
         line.enclosed.onchange = oc;
         line.coupla.onchange = oc;
         line.seal.onchange = oc;
@@ -1180,6 +1518,8 @@ class CrewDisp {
         let line = {
             span: document.createElement("SPAN") as HTMLSpanElement,
             name_span: undefined,
+            rem: document.createElement("BUTTON") as HTMLButtonElement,
+            add: document.createElement("BUTTON") as HTMLButtonElement,
             name: document.createElement("INPUT") as HTMLInputElement,
             enc_span: undefined,
             enclosed: document.createElement("INPUT") as HTMLInputElement,
@@ -1194,10 +1534,20 @@ class CrewDisp {
             load_span: undefined,
             has_loader: document.createElement("INPUT") as HTMLInputElement,
             br: document.createElement("BR") as HTMLBRElement,
-            loader:[]
+            loader: []
         };
-        line.name_span = CreateLabel("Name:", line.name);
+        line.name_span = CreateLabel("\u00A0\u00A0Name:", line.name);
         line.name.setAttribute("list", this.datalist.id);
+        line.rem.textContent = "-";
+        line.rem.onclick = () => { this.vehicle.DeleteCrew(idx); };
+        line.add.textContent = "+";
+        line.add.onclick = () => { this.vehicle.DuplicateCrew(idx); };
+        if (idx == 0) {
+            line.rem.disabled = true;
+            line.add.disabled = true;
+        }
+        line.name_span.insertAdjacentElement("afterbegin", line.add);
+        line.name_span.insertAdjacentElement("afterbegin", line.rem);
         line.enc_span = CreateLabel("\u00A0\u00A0Enclosed:", line.enclosed);
         line.coup_span = CreateLabel("\u00A0\u00A0Coupla/Hatch:", line.coupla);
         line.seal_span = CreateLabel("\u00A0\u00A0Sealed:", line.seal);
@@ -1223,9 +1573,11 @@ class CrewDisp {
         line.has_loader.type = "number";
         line.has_loader.step = "1";
         line.has_loader.min = "0";
-        let oc = () => { this.vehicle.SetCrew(idx, new Crew(line.name.value, line.enclosed.checked,
-             line.coupla.checked, line.seal.checked,
-             line.loop_front.checked, line.loop_left.checked, line.loop_right.checked, line.loop_back.checked, undefined, undefined)); };
+        let oc = () => {
+            this.vehicle.SetCrew(idx, new Crew(line.name.value, line.enclosed.checked,
+                line.coupla.checked, line.seal.checked,
+                line.loop_front.checked, line.loop_left.checked, line.loop_right.checked, line.loop_back.checked, undefined, undefined));
+        };
         let setnum = () => { this.vehicle.SetNumLoaders(idx, line.has_loader.valueAsNumber); };
         line.name.onchange = oc;
         line.enclosed.onchange = oc;
@@ -1245,9 +1597,11 @@ class CrewDisp {
 class WeaponDisp {
     private vehicle: Vehicle;
     private tbl: HTMLTableElement;
-    private wrows: { row: HTMLTableRowElement, crew: HTMLLabelElement, main: HTMLSelectElement,
-         f: HTMLInputElement, r: HTMLInputElement, b: HTMLInputElement, l: HTMLInputElement, u: HTMLInputElement,
-         sec_cell:HTMLTableCellElement, secondary: HTMLSelectElement[], pspan: HTMLSpanElement, shield: HTMLInputElement }[];
+    private wrows: {
+        row: HTMLTableRowElement, crew: HTMLLabelElement, main: HTMLSelectElement,
+        f: HTMLInputElement, r: HTMLInputElement, b: HTMLInputElement, l: HTMLInputElement, u: HTMLInputElement,
+        sec_cell: HTMLTableCellElement, secondary: HTMLSelectElement[], pspan: HTMLSpanElement, shield: HTMLInputElement
+    }[];
     constructor(veh: Vehicle) {
         this.vehicle = veh;
         this.tbl = document.getElementById("table_weapons") as HTMLTableElement;
@@ -1264,7 +1618,7 @@ class WeaponDisp {
         let clist = this.vehicle.GetCrewList();
         while (this.wrows.length > clist.length) {
             let wrow = this.wrows.pop();
-            this.tbl.removeChild(wrow.row);
+            this.tbl.deleteRow(this.tbl.rows.length - 1);
         }
         for (let idx = 0; idx < clist.length; idx++) {
             let citm = clist[idx];
@@ -1280,12 +1634,12 @@ class WeaponDisp {
             wrow.b.checked = witm.directions[2];
             wrow.l.checked = witm.directions[3];
             wrow.u.checked = witm.directions[4];
-            while(wrow.secondary.length > witm.secondary_idx.length+1){
+            while (wrow.secondary.length > witm.secondary_idx.length + 1) {
                 wrow.sec_cell.removeChild(this.wrows[idx].secondary.pop());
-                wrow.sec_cell.removeChild(wrow.sec_cell.children[wrow.sec_cell.children.length-1]);
+                wrow.sec_cell.removeChild(wrow.sec_cell.children[wrow.sec_cell.children.length - 1]);
             }
-            for(let idx2 = 0; idx2 < witm.secondary_idx.length; idx2++){
-                if(idx2 == wrow.secondary.length){
+            for (let idx2 = 0; idx2 < witm.secondary_idx.length; idx2++) {
+                if (idx2 == wrow.secondary.length) {
                     let newsec = this.CreateSecondary();
                     newsec.onchange = wrow.f.onchange;
                     wrow.sec_cell.append(newsec);
@@ -1294,7 +1648,7 @@ class WeaponDisp {
                 }
                 wrow.secondary[idx2].selectedIndex = witm.secondary_idx[idx2];
             }
-            if(wrow.secondary.length == witm.secondary_idx.length){
+            if (wrow.secondary.length == witm.secondary_idx.length) {
                 let newsec = this.CreateSecondary();
                 newsec.onchange = wrow.f.onchange;
                 wrow.sec_cell.append(newsec);
@@ -1303,7 +1657,7 @@ class WeaponDisp {
             }
             wrow.secondary[witm.secondary_idx.length].selectedIndex = 0;
             wrow.shield.checked = witm.shield;
-            if(witm.main_idx == 0){
+            if (witm.main_idx == 0) {
                 wrow.secondary[0].disabled = true;
                 wrow.f.disabled = true;
                 wrow.l.disabled = true;
@@ -1318,7 +1672,7 @@ class WeaponDisp {
                 wrow.r.disabled = false;
                 wrow.b.disabled = false;
                 wrow.u.disabled = false;
-                if(witm.IsArty()){
+                if (witm.IsArty()) {
                     wrow.shield.disabled = true;
                 } else {
                     wrow.shield.disabled = false;
@@ -1327,7 +1681,7 @@ class WeaponDisp {
         }
     }
 
-    private CreateSecondary(){
+    private CreateSecondary() {
         let sel = document.createElement("SELECT") as HTMLSelectElement;
         for (let w of WeaponList) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
@@ -1354,9 +1708,11 @@ class WeaponDisp {
             pspan: document.createElement("SPAN") as HTMLSpanElement,
             shield: document.createElement("INPUT") as HTMLInputElement,
         };
-        let oc = () => { this.vehicle.SetWeapon(idx, new WeaponMount(wrow.main.selectedIndex, 
-            [wrow.f.checked, wrow.r.checked, wrow.b.checked, wrow.l.checked, wrow.u.checked], 
-            wrow.secondary.map((value)=>{return value.selectedIndex;}), wrow.shield.checked))};
+        let oc = () => {
+            this.vehicle.SetWeapon(idx, new WeaponMount(wrow.main.selectedIndex,
+                [wrow.f.checked, wrow.r.checked, wrow.b.checked, wrow.l.checked, wrow.u.checked],
+                wrow.secondary.map((value) => { return value.selectedIndex; }), wrow.shield.checked))
+        };
         let cell0 = wrow.row.insertCell();
         cell0.append(wrow.crew);
         let cell1 = wrow.row.insertCell();
