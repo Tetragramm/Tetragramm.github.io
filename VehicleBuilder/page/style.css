@@ -1,0 +1,797 @@
+@import url("w3.css");
+@import url("reset.css");
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+:root {
+	--bkg_color: rgb(20, 40, 20);
+	--ftr_bkg_color: #565859;
+	--inp_bkg_color: #353B17;
+	--inp_txt_color: #c7c7c7;
+	--inp_bdr_color: #555555;
+	--lnk_color: #a3a329;
+	--lnk_act_color: #72c1a0;
+	--prt_lcl_color: #4b5320;
+	background-color: var(--bkg_color);
+	color: var(--inp_txt_color);
+	font-family: Open Sans, Helvetica, Arial, sans-serif;
+	margin-left: 1em;
+}
+
+li {
+	list-style: disc;
+	margin-left: 2em;
+}
+
+p {
+	margin: 0.5em;
+}
+
+p+h1,
+p+h2,
+p+h3,
+table+h1,
+table+h2,
+table+h3 {
+	margin-top: 0.5em;
+}
+
+strong {
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+em {
+	font-style: italic;
+}
+
+.html_body {
+	font-family: Open Sans, Helvetica, Arial, sans-serif;
+	line-height: 1.3333;
+	color: var(--inp_txt_color);
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+/* mobile first */
+.html_outer {
+	padding: .5rem;
+}
+
+@media (min-width: 60rem) {
+	.html_outer {
+		padding: 1rem;
+	}
+}
+
+.html_content {
+	background-color: var(--bkg_color);
+	flex: auto;
+}
+
+.html_footer {
+	background-color: var(--ftr_bkg_color);
+	display: flex;
+	font-size: .8rem;
+	color: #ffffff;
+}
+
+h4 {
+	font-size: 1em;
+	font-weight: 200;
+}
+
+h3 {
+	font-size: 1.5em;
+	font-weight: 300;
+	margin-bottom: 0.25rem;
+	text-decoration: underline;
+}
+
+h2 {
+	font-size: 2em;
+	font-weight: 700;
+	border-bottom: .0625rem solid var(--inp_bdr_color);
+}
+
+h1 {
+	font-size: 2.5em;
+	font-weight: 900;
+	border-bottom: .0625rem solid var(--inp_bdr_color);
+}
+
+a {
+	color: var(--lnk_color);
+	/* blue */
+	text-decoration: none;
+	cursor: pointer;
+}
+
+a:hover,
+a:active,
+a:focus {
+	color: var(--lnk_act_color);
+	/* sky blue */
+}
+
+table {
+	border-collapse: separate;
+	font-size: .8rem;
+	/* extra-wide tables, you can just scroll to see */
+	display: block;
+	overflow: auto;
+}
+
+th {
+	border-collapse: collapse;
+	border: 1px solid var(--inp_bdr_color);
+	font-weight: bold;
+	color: var(--lnk_color);
+	padding: .25rem;
+	text-align: center;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.lbl_action:hover,
+.lbl_action:active,
+.lbl_action:focus {
+	color: var(--lnk_act_color);
+	/* sky blue */
+}
+
+.lbl_action:active {
+	color: #ffffff;
+}
+
+.lbl_action {
+	color: var(--lnk_color);
+	/* blue */
+}
+
+.btn_th {
+	padding: 0.25rem;
+	font-size: 1rem;
+	margin: 0.25rem;
+}
+
+.thirdwidth {
+	width: 200px;
+}
+
+td {
+	border-collapse: collapse;
+	border-top: 1px solid var(--inp_bdr_color);
+	border-left: 1px solid var(--inp_bdr_color);
+	border-right: 1px solid var(--inp_bdr_color);
+	border-bottom: 1px solid var(--inp_bdr_color);
+	padding: .25rem;
+	margin-top: 0;
+	margin-bottom: 0;
+	max-width: 100%;
+	vertical-align: top;
+	text-align: center;
+}
+
+.borderless {
+	border: none;
+}
+
+.tl {
+	border-top: none;
+	border-left: none;
+}
+
+hr {
+	margin-top: 0.1em;
+	margin-bottom: 0.1em;
+	width: 600px;
+}
+
+span {
+	white-space: nowrap;
+}
+
+label {
+	border-collapse: collapse;
+	box-sizing: border-box;
+	height: 1.5em !important;
+	display: inline-block;
+	font-size: 1em;
+	border-color: #55555500;
+	border-style: solid;
+}
+
+select,
+input {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	padding: 0;
+	height: 1.5em !important;
+	background-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
+	border-color: var(--inp_bdr_color);
+	border-style: solid;
+	line-height: 1.5em;
+	font-size: 1em;
+	vertical-align: center;
+	border-width: 1px;
+}
+
+select {
+	padding-left: 0.1em;
+	padding-right: 1.5em;
+
+	background:
+		url("./Arrow.png"),
+		var(--inp_bkg_color);
+	background-position:
+		calc(100% - 0.25em) calc(0.5em),
+		0, 0;
+	background-size:
+		1em 0.5em,
+		100%, 100%;
+	background-repeat: no-repeat;
+	text-align: initial;
+	text-align-last: initial;
+	text-align: initial;
+	-ms-text-align-last: initial;
+	-moz-text-align-last: initial;
+}
+
+option {
+	text-align: initial;
+}
+
+input[type=text] {
+	width: auto;
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+
+input[type=number] {
+	width: 4em;
+	text-align: center;
+}
+
+input[disabled] {
+	background-color: #000000;
+	border-color: #000000;
+}
+
+input[type='checkbox'][disabled] {
+	width: 1em !important;
+	height: 1em !important;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	appearance: none;
+	background-color: #000000;
+	border-color: #000000;
+	color: #000000;
+	outline: 1px solid #000000;
+	box-shadow: none;
+	font-size: 1em;
+	text-align: left;
+	line-height: 0.75em;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
+	vertical-align: center;
+}
+
+/* Dashed border */
+hr.dashed {
+	border-top: 1px dashed var(--inp_bdr_color);
+	height: 0px;
+	margin: 0px;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+span {
+	height: 1.5em !important;
+	padding-top: 2px;
+}
+
+input[type='checkbox'] {
+	width: 1em !important;
+	height: 1em !important;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	appearance: none;
+	background-color: var(--inp_bkg_color);
+	border-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
+	outline: 1px solid var(--inp_bdr_color);
+	box-shadow: none;
+	font-size: 1em;
+	text-align: left;
+	line-height: 0.75em;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
+	vertical-align: top;
+}
+
+input[type='checkbox']:not(checked):after {
+	vertical-align: center;
+	content: '';
+	line-height: 0.75em;
+}
+
+input[type='checkbox']:checked:after {
+	vertical-align: center;
+	position: relative;
+	font-size: 0.75em;
+	line-height: 0.75em;
+	content: '\2713\0020';
+}
+
+select[disabled] {
+	background-color: #000000;
+	border-color: #000000;
+	/* color: #000000; */
+}
+
+button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	-o-appearance: none;
+	font-family: inherit;
+	font-size: 100%;
+	outline: none;
+	background-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
+	text-align: center;
+	text-decoration: none;
+	box-sizing: border-box;
+	height: 1.5em !important;
+	font-size: 1em;
+	border: 1px solid var(--inp_bdr_color);
+	vertical-align: top;
+}
+
+button[disabled] {
+	background-color: #000000;
+	border-color: #000000;
+	visibility: hidden;
+}
+
+/* Use for marking stats as local to a part. */
+.part_local {
+	background-color: var(--prt_lcl_color);
+	color: #ffffff;
+}
+
+.inner_table {
+	padding: 0px;
+	margin: 0px;
+	border: 1px solid var(--inp_bdr_color);
+	vertical-align: top;
+}
+
+.disp_cell {
+	max-width: 20em;
+}
+
+.green {
+	color: #009900;
+}
+
+.yellow {
+	color: #ffcc00;
+}
+
+.red {
+	color: #FF0000;
+}
+
+/* The actual popup (appears on top) */
+.tooltip .tooltiptext {
+	display: none;
+	position: absolute;
+	background-color: var(--inp_bkg_color);
+	color: var(--inp_txt_color);
+	text-align: left;
+	border-radius: 12px;
+	padding: 8px;
+	max-width: 200em;
+	width: max-content;
+	white-space: normal;
+	z-index: 1;
+}
+
+/* Toggle this class when clicking on the popup container (hide and show the popup) */
+.tooltip:hover .tooltiptext {
+	display: inline;
+	-webkit-animation: fadeIn 1s;
+	-moz-animation: fadeIn 1s;
+	-o-animation: fadeIn 1s;
+	animation: fadeIn 1s;
+}
+
+/* Add animation (fade in the popup) */
+@-webkit-keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@-moz-keyframes changed {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@-o-keyframes changed {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+/* Change Animations */
+@-webkit-keyframes changed {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-moz-keyframes changed {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-o-keyframes changed {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@keyframes changed {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-webkit-keyframes changedpl {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@-moz-keyframes changedpl {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@-o-keyframes changedpl {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@keyframes changedpl {
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+.changed_b {
+	-webkit-animation: changed 1s 1;
+	-moz-animation: changed 1s 1;
+	-o-animation: changed 1s 1;
+	animation: changed 1s 1;
+}
+
+.changed_b.part_local {
+	-webkit-animation: changedpl 1s 1;
+	-moz-animation: changedpl 1s 1;
+	-o-animation: changedpl 1s 1;
+	animation: changedpl 1s 1;
+}
+
+@-webkit-keyframes changed_g {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-moz-keyframes changed_g {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-o-keyframes changed_g {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@keyframes changed_g {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-webkit-keyframes changed_g_pl {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@-moz-keyframes changed_g_pl {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@-o-keyframes changed_g_pl {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@keyframes changed_g_pl {
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+.changed_g {
+	-webkit-animation: changed_g 1s 1;
+	-moz-animation: changed_g 1s 1;
+	-o-animation: changed_g 1s 1;
+	animation: changed_g 1s 1;
+}
+
+.changed_g.part_local {
+	-webkit-animation: changed_g_pl 1s 1;
+	-moz-animation: changed_g_pl 1s 1;
+	-o-animation: changed_g_pl 1s 1;
+	animation: changed_g_pl 1s 1;
+}
+
+@-webkit-keyframes changed_n {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-moz-keyframes changed_n {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-o-keyframes changed_n {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@keyframes changed_n {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
+}
+
+@-webkit-keyframes changed_n_pl {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@-moz-keyframes changed_n_pl {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@-o-keyframes changed_n_pl {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+@keyframes changed_n_pl {
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
+}
+
+.changed_n {
+	-webkit-animation: changed_n 1s 1;
+	-moz-animation: changed_n 1s 1;
+	-o-animation: changed_n 1s 1;
+	animation: changed_n 1s 1;
+}
+
+.changed_n.part_local {
+	-webkit-animation: changed_n_pl 1s 1;
+	-moz-animation: changed_n_pl 1s 1;
+	-o-animation: changed_n_pl 1s 1;
+	animation: changed_n_pl 1s 1;
+}
+
+.flex-container-o {
+	display: flex;
+	padding: 1px;
+}
+
+.flex-container-i {
+	white-space: nowrap;
+	display: grid;
+	grid-auto-columns: 1fr;
+	grid-auto-rows: auto;
+	row-gap: 1px;
+	justify-items: left;
+	vertical-align: middle;
+}
+
+.flex-item {
+	width: 100%;
+}
+
+.content {
+	max-height: inherit;
+	overflow: hidden;
+	transition: max-height 0.2s ease-in-out;
+}
+
+.collapsible {
+	max-width: max-content;
+}
+
+.collapsible::before {
+	content: '\02795';
+	/* Unicode character for "plus" sign (+) */
+	color: white;
+	float: left;
+	margin-right: 5px;
+}
+
+.active::before {
+	content: "\2796";
+	/* Unicode character for "minus" sign (-) */
+}
+
+.ER_Custom {
+	color: white;
+	background-color: black;
+}
+
+.ER_Rare {
+	color: white;
+	background-color: green;
+}
+
+.ER_Legendary {
+	color: black;
+	background-color: gold;
+}

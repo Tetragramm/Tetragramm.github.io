@@ -1,0 +1,43 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"./server.py"
+			],
+			"group": "build",
+			"presentation": {
+				"reveal": "always",
+				"panel": "new"
+			},
+			"options": {
+				"cwd": ".."
+			},
+			"label": "Local Server"
+		},
+		{
+			"type": "shell",
+			"command": "webpack",
+			"args": [
+				"watch",
+				"-c",
+				"webpack.config.js"
+			],
+			"group": "build",
+			"label": "Watch Plane Builder",
+		},
+		{
+			"label": "Watch All",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"dependsOn": [
+				"Local Server",
+				"Watch Plane Builder",
+			]
+		}
+	]
+}

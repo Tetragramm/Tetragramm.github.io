@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Chariots of Steel Vehicle Builder</title>
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="page/style.css" />
+	<script type="module" src="vehicle_builder.js"></script>
+</head>
+<!-- python -m http.server 8080 -->
+
+<body class="html_body" dir="ltr">
+	<div class="html_outer html_content">
+		<div>
+			<h2>
+				<a href="https://opensketch.itch.io/flying-circus">
+					Ohara Tankworks</a>
+			</h2>
+			<div>
+				<span>
+					<table>
+						<tr>
+							<th class="btn_th">
+								<label class="lbl_action" id="lbl_acft_save_top" for="acft_save">Save</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" id="lbl_acft_load_top" for="acft_load">Load</label>
+							</th>
+							<th class="btn_th" hidden>
+								<label class="lbl_action" for="acft_load_text2">Load Text</label> <input type="text"
+									id="acft_load_text2" class="skinny" />
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" id="lbl_acft_save_link_top" for="acft_save_link">Copy As
+									Link</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" id="lbl_acft_save_dash_top" for="acft_save_dash">Save
+									Dashboard</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" id="lbl_acft_interactive_dash_top"
+									for="acft_interactive_dash">Interactive
+									Dashboard</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" id="lbl_acft_save_npc_top" for="acft_save_npc">Save
+									NPC</label>
+							</th>
+							<th class="btn_th" hidden>
+								<label class="lbl_action" id="lbl_acft_save_cat_top" for="acft_save_cat">Save
+									Catalog</label>
+							</th>
+							<th class="btn_th">
+								<label class="lbl_action" id="lbl_acft_reset_top" for="acft_reset">Default
+									Aircraft</label>
+							</th>
+						</tr>
+					</table>
+				</span>
+				<span>Nothing actually works yet. AAhhhh!</span><br />
+				<br />
+				<br />
+				<div id="Fight">
+					<h3><label id="lbl_name" style="width: 600px">Vehicle Statistics</label></h3>
+					<hr />
+					<h4><label id="lbl_nickname" style="width: 600px">Nickname</label></h4>
+					<table id="tbl_derived"></table>
+					<h3><label>Crew</label></h3>
+					<table id="tbl_crew"></table>
+				</div>
+				<br />
+				<div id="Machinery">
+					<h3 class="collapsible active"><label id="lbl_mech">Machinery</label>
+					</h3>
+					<div class="content" id="div_mech">
+						<span>
+							<label for="sel_loco">Locomotion Type: </label><select id="sel_loco"></select>
+						</span>
+						<br />
+						<span>
+							<label for="sel_pptype">Powerplant Type: </label><select id="sel_pptype"></select>
+							<label for="sel_ppsize">Powerplant Size: </label><select id="sel_ppsize"></select>
+							<label for="inp_fuel">Extra Fuel: </label><input id="inp_fuel" type="number" />
+						</span>
+						<br />
+						<span>
+							Armour Thickness
+							<label for="inp_farm">Front: </label><input id="inp_farm" type="number" />
+							<label for="inp_sarm">Side: </label><input id="inp_sarm" type="number" />
+							<label for="inp_rarm">Rear: </label><input id="inp_rarm" type="number" />
+						</span>
+						<br />
+						<!-- <table style="width:100%" id="table_mech">
+						</table> -->
+					</div>
+				</div>
+				<br />
+				<div id="Crew">
+					<h3 class="collapsible active">
+						<label id="lbl_crew">Crew</label>
+					</h3>
+					<div class="content">
+						<div id="div_crew"></div>
+					</div>
+				</div>
+				<br />
+				<div id="Weapons">
+					<h3 class="collapsible active">
+						<label id="lbl_weapons">Weapons</label>
+					</h3>
+					<div class="content">
+						<table style="width:100%" id="table_weapons"></table>
+					</div>
+				</div>
+			</div>
+			<div id="Accessories">
+				<h3 class="collapsible active">
+					<label id="lbl_accessories">Additional Parts</label>
+				</h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Upgrades"><u>Rules</u></a>)</span>
+				</h4>
+				<div class="content">
+					<table id="tbl_accessories"></table>
+				</div>
+			</div>
+			<div id=" Stats">
+				<h3 id="alter_collapse" class="collapsible"><label id="lbl_custom">Custom Parts and
+						Alterations</label>
+					<br />
+				</h3>
+				<h4></h4>
+				<div class="content" style="max-height: 0px;">
+					<table id="alter_table"></table>
+				</div>
+			</div>
+		</div>
+		<br />
+		<br />
+		<span>
+			<table>
+				<tr>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_bot" for="acft_save">Save</label><button
+							hidden="true" id="acft_save">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_load_bot" for="acft_load">Load</label> <input
+							hidden="true" type="file" id="acft_load" />
+					</th>
+					<th class="btn_th" hidden>
+						<label class="lbl_action" for="acft_load_text">Load Text</label> <input type="text"
+							id="acft_load_text" class="skinny" />
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_link_bot" for="acft_save_link">Copy As
+							Link</label><button hidden="true" id="acft_save_link">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_dash_bot" for="acft_save_dash">Save
+							Dashboard</label><button hidden="true" id="acft_save_dash">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_interactive_dash_bot"
+							for="acft_interactive_dash">Interactive
+							Dashboard</label><button hidden="true" id="acft_interactive_dash">Interactive</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_npc_bot" for="acft_save_npc">Save
+							NPC</label><button hidden="true" id="acft_save_npc">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_cat_bot" for="acft_save_cat">Save
+							Catalog</label><button hidden="true" id="acft_save_cat">Save</button>
+					</th>
+					<th class="btn_th">
+						<label class="lbl_action" id="lbl_acft_reset_bot" for="acft_reset">Default
+							Aircraft</label><button hidden="true" id="acft_reset">Default Aircraft</button>
+					</th>
+				</tr>
+			</table>
+		</span>
+		<img id="dash_img" hidden="true" src='./Cards/Dashboard.png'></img>
+		<img id="weap_img" hidden="true" src='./Cards/Weapon.png'></img>
+		<img id="eng_img" hidden="true" src='./Cards/Engine.png'></img>
+		<img id="rad_img" hidden="true" src='./Cards/Radiator.png'></img>
+		<img id="npc_img" hidden="true" src='./Cards/NPC.png'></img>
+	</div>
+
+
+	<!-- python -m http.server 8080 -->
+	<footer class="html_outer html_footer" dir="ltr">
+		<div>
+			© Tetragramm
+		</div>
+	</footer>
+</body>
+
+</html>
