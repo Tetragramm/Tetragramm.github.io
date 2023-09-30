@@ -191,7 +191,12 @@ class Weapon {
 
 var WeaponList: Weapon[] = [
     new Weapon({ name: "None", abbr: undefined, cost: undefined, loader: false }),
+    new Weapon({ name: "Trench Gun", abbr: "TG", cost: 2 }),
+    new Weapon({ name: "Aircraft Shotgun", abbr: "ASG", cost: 2 }),
+    new Weapon({ name: "Converted Autorifle", abbr: "CAR", cost: 1 }),
+    new Weapon({ name: "Machine Carbine", abbr: "MC", cost: 5 }),
     new Weapon({ name: "Heavy Submachine Gun", abbr: "HSG", cost: 2, braced: true, loader: true }),
+    new Weapon({ name: "Firing Port Weapon", abbr: "FPW", cost: 2 }),
     new Weapon({ name: "Landflammenwerfer", abbr: "LFW", cost: 3 }),
     new Weapon({ name: "Static Gun", abbr: "Static Gun", cost: 4 }),
     new Weapon({ name: "Light Machine Gun", abbr: "LMG", cost: 2, loader: true, braced: true }),
@@ -291,6 +296,8 @@ class Crew {
         } else {
             seat = this.loaders[l];
         }
+        if (seat.sealed)
+            return undefined;
         if (seat.enclosed) {
             if (seat.coupla) {
                 return this.base_vis + 1;
@@ -306,6 +313,8 @@ class Crew {
         } else {
             seat = this.loaders[l];
         }
+        if (seat.sealed)
+            return undefined;
         if (seat.enclosed) {
             if (seat.coupla) {
                 return this.base_escape + 1;
@@ -313,6 +322,21 @@ class Crew {
             return this.base_escape
         }
         return undefined;
+    }
+
+    public GetLoopholes(): { f: number, l: number, r: number, b: number } {
+        let result = { f: 0, l: 0, r: 0, b: 0 };
+        for (let seat of [this, ...this.loaders]) {
+            if (seat.loop_front)
+                result.f += 1;
+            if (seat.loop_left)
+                result.l += 1;
+            if (seat.loop_right)
+                result.r += 1;
+            if (seat.loop_back)
+                result.b += 1;
+        }
+        return result;
     }
 
     public CalcStats(armour: number[]): Stats {
@@ -334,7 +358,6 @@ class Crew {
                 stat.cost += 1;
         }
 
-        //TODO: Loopholes are done at vehicle level
         stat.add(this.weapon_mount.CalcStats(this.enclosed, armour));
         return stat;
     }
@@ -399,8 +422,8 @@ class WeaponMount {
         let stat = new Stats();
         let w = WeaponList[idx];
         stat.cost += w.cost;
-        stat.volume = Math.ceil(w.heavy / 2.0);
         if (w.artillery && w.abbr != "ISC") {
+            stat.volume = Math.ceil(w.heavy / 2.0);
             stat.cost += 2;
             stat.integrity -= 3;
         }
@@ -453,7 +476,7 @@ class Vehicle {
     private armour_rear: number = 0;
     private extra_fuel: number = 0;
     private extra_tiny: boolean = false;
-    private enlarged_engine = false;
+    private enlarged_engine: number = 0;
     private propeller = false;
     private crew: Crew[] = [
         new Crew("Driver", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false)),
@@ -655,6 +678,13 @@ class Vehicle {
     public GetExtraFuel(): number {
         return this.extra_fuel;
     }
+    public SetEnlargeEngine(count: number) {
+        this.enlarged_engine = count;
+        this.CalculateStats();
+    }
+    public GetEnlargedEngine(): number {
+        return this.enlarged_engine;
+    }
 
     public GetVolume(): number {
         let stat = new Stats();
@@ -672,13 +702,14 @@ class Vehicle {
         if (PropulsionType[this.propulsion_idx] == "Amphibious") {
             stat.volume += 1;
         }
-        if (this.enlarged_engine) {
-            stat.volume += 1;
+        if (this.enlarged_engine > 0) {
+            stat.volume += this.enlarged_engine;
         }
         stat.volume += this.cargo[0] * 1;
         stat.volume += this.cargo[1] * 2;
         stat.volume += this.cargo[2] * 4;
         stat.volume += this.cargo[3] * 8;
+        stat.add(new Stats(PowerplantType[this.powerplant_idx]));
         return stat.volume;
     }
     public CalculateStats() {
@@ -697,9 +728,15 @@ class Vehicle {
         }
         if (is_enclosed) {
             stat.volume += 1;
+            if (this.SumArmour() > 0) {
+                stat.stress += 1;
+            }
         }
         this.extra_tiny = (stat.volume - Math.floor(stat.volume)) >= 0.45;
         stat.volume = Math.ceil(stat.volume);
+
+        //Loopholes
+        stat.cost += this.GetLoopholes();
 
 
         if (!this.ValidateLocomotion()) {
@@ -716,25 +753,30 @@ class Vehicle {
         stat.volume += this.cargo[2] * 4;
         stat.volume += this.cargo[3] * 8;
 
+
+        stat.add(new Stats(PowerplantType[this.powerplant_idx]));
+        for (let text of PowerplantType[this.powerplant_idx].special) {
+            stat.warnings.push({ source: PowerplantType[this.powerplant_idx].name, warning: text, color: WARNING_COLOR.WHITE });
+        }
+
+
         let volMaxHP = stat.volume;
         if (this.enlarged_engine) {
-            stat.volume += 1;
-            stat.reliability -= 1;
-            volMaxHP += 2;
+            stat.volume += this.enlarged_engine;
+            stat.reliability -= this.enlarged_engine;
+            volMaxHP += 2 * this.enlarged_engine;
         }
+        volMaxHP = Math.min(Volume.length - 1, volMaxHP);
 
         stat.handling += Volume[Math.min(Volume.length - 1, stat.volume)].handling;
         stat.speed += Volume[Math.min(Volume.length - 1, stat.volume)].speedmod;
         stat.integrity += Volume[Math.min(Volume.length - 1, stat.volume)].integrity;
 
-        volMaxHP = Math.min(Volume.length - 1, volMaxHP);
+        console.log([volMaxHP, Volume[volMaxHP], PowerplantSize[this.powerplant_size_idx].HP, this.GetVolume()])
         while (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {
             this.powerplant_size_idx -= 1;
         }
-        stat.add(new Stats(PowerplantType[this.powerplant_idx]));
-        for (let text of PowerplantType[this.powerplant_idx].special) {
-            stat.warnings.push({ source: PowerplantType[this.powerplant_idx].name, warning: text, color: WARNING_COLOR.WHITE });
-        }
+
         stat.add(new Stats(PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx]));
         for (let text of PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx].special) {
             stat.warnings.push({ source: PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx].name, warning: text, color: WARNING_COLOR.WHITE });
@@ -743,6 +785,7 @@ class Vehicle {
 
         let armour_total = this.SumArmour();
         //Armour effects
+        stat.cost += armour_total;
         stat.handling -= 2 * armour_total;
         stat.safety += Math.floor((Math.max(...armour_list) + Math.min(...armour_list)) / 2);
         armour_list.forEach((value) => {
@@ -892,7 +935,11 @@ class Vehicle {
         this.CalculateStats();
     }
     public DuplicateCrew(idx: number) {
-        this.crew.splice(idx, 0, this.crew[idx]);
+        let c = this.crew[idx];
+        let w = c.weapon_mount;
+        let dupw = new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield);
+        let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, structuredClone(c.loaders), dupw);
+        this.crew.splice(idx, 0, dup);
         this.CalculateStats();
     }
     public SetLoader(idx: number, ldr_idx: number, ldr: Loader) {
@@ -933,6 +980,47 @@ class Vehicle {
         }
         this.crew[idx].weapon_mount = mount;
         this.CalculateStats();
+    }
+    private GetLoopholes(): number {
+        let result = { f: 0, s: 0, b: 0 };
+        for (let c of this.crew) {
+            let r = c.GetLoopholes();
+            result.f += r.f;
+            result.s += r.l;
+            result.s += r.r;
+            result.b += r.b;
+        }
+        let cost = 0;
+        while (result.f > 4) {
+            result.f -= 4;
+            cost += this.armour_front;
+        }
+        while (result.s > 4) {
+            result.s -= 4;
+            cost += this.armour_side;
+        }
+        while (result.b > 4) {
+            result.b -= 4;
+            cost += this.armour_rear;
+        }
+        let lh = [
+            ...Array<number>(result.f).fill(this.armour_front),
+            ...Array<number>(result.s).fill(this.armour_side),
+            ...Array<number>(result.b).fill(this.armour_rear),
+        ];
+        lh.sort();
+        while (lh.length > 0) {
+            let gcost = lh.pop();
+            if (lh.length > 0)
+                lh.pop();
+            if (lh.length > 0)
+                lh.pop();
+            if (lh.length > 0)
+                lh.pop();
+            cost += gcost;
+        }
+
+        return cost;
     }
 }
 
@@ -1070,7 +1158,7 @@ class StatsDisp {
         this.spd.textContent = final_stats.speed.toString();
         this.trq.textContent = final_stats.torque.toString();
         this.hnd.textContent = final_stats.handling.toString();
-        this.amr.textContent = StringFmt.Format("{0}\\{1}\\{2}", this.vehicle.GetArmourFront(), this.vehicle.GetArmourSide(), this.vehicle.GetArmourRear());
+        this.amr.textContent = StringFmt.Format("{0}/{1}/{2}", this.vehicle.GetArmourFront(), this.vehicle.GetArmourSide(), this.vehicle.GetArmourRear());
         this.int.textContent = final_stats.integrity.toString();
         this.sft.textContent = final_stats.safety.toString();
         this.rel.textContent = final_stats.reliability.toString();
@@ -1172,6 +1260,7 @@ class MachineryDisp {
     private pp_size: HTMLSelectElement;
     private update_type: boolean = true;
     private pp_type: HTMLSelectElement;
+    private enlarged_engine: HTMLInputElement;
     private extra_fuel: HTMLInputElement;
     private front_armour: HTMLInputElement;
     private side_armour: HTMLInputElement;
@@ -1211,6 +1300,11 @@ class MachineryDisp {
         this.pp_size = document.getElementById("sel_ppsize") as HTMLSelectElement;
         this.pp_size.onchange = () => { this.vehicle.SetPowerplantSize(this.pp_size.selectedIndex); };
         this.SetSizeSel();
+
+        this.enlarged_engine = document.getElementById("inp_enlarge") as HTMLInputElement;
+        this.enlarged_engine.min = "0";
+        this.enlarged_engine.step = "1";
+        this.enlarged_engine.onchange = () => { this.vehicle.SetEnlargeEngine(this.enlarged_engine.valueAsNumber); };
 
         this.extra_fuel = document.getElementById("inp_fuel") as HTMLInputElement;
         this.extra_fuel.min = "0";
@@ -1257,8 +1351,8 @@ class MachineryDisp {
         }
         for (let pps of this.vehicle.GetPowerplantSizeList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
-            opt.value = pps.name;
-            opt.text = pps.name;
+            opt.value = StringFmt.Format("{0}HP {1}", pps.HP, pps.name);
+            opt.text = StringFmt.Format("{0}HP {1}", pps.HP, pps.name);
             this.pp_size.append(opt);
         }
     }
@@ -1321,6 +1415,7 @@ class MachineryDisp {
         }
         this.pp_size.selectedIndex = this.vehicle.GetPowerplantSizeIdx();
 
+        this.enlarged_engine.valueAsNumber = this.vehicle.GetEnlargedEngine();
         this.extra_fuel.disabled = !this.vehicle.CanExtraFuel();
         this.extra_fuel.valueAsNumber = this.vehicle.GetExtraFuel();
         this.front_armour.valueAsNumber = this.vehicle.GetArmourFront();
@@ -1704,11 +1799,7 @@ class WeaponDisp {
                 wrow.r.disabled = false;
                 wrow.b.disabled = false;
                 wrow.u.disabled = false;
-                if (witm.IsArty()) {
-                    wrow.shield.disabled = true;
-                } else {
-                    wrow.shield.disabled = false;
-                }
+                wrow.shield.disabled = false;
             }
         }
     }
