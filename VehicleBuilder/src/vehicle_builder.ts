@@ -1,5 +1,5 @@
 import { LZString } from "./lz/lz-string";
-import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled, CreateTH, CreateCheckbox, GenerateID } from "./disp/Tools";
+import { _stringToArrayBuffer, _arrayBufferToString, SetAnimationEnabled, CreateTH, CreateCheckbox, GenerateID, CreateInput } from "./disp/Tools";
 import { Deserialize } from "./impl/Serialize";
 import { StringFmt } from "./string/index";
 import { scrollToFragment } from "./scroll/scroll";
@@ -313,8 +313,6 @@ class Crew {
         } else {
             seat = this.loaders[l];
         }
-        if (seat.sealed)
-            return undefined;
         if (seat.enclosed) {
             if (seat.coupla) {
                 return this.base_escape + 1;
@@ -368,6 +366,7 @@ class WeaponMount {
     public directions: boolean[];
     public secondary_idx: number[];
     public shield: boolean;
+    public rocket_count: number;
 
     // wrow.f.checked = witm.directions[0];
     // wrow.r.checked = witm.directions[1];
@@ -375,7 +374,7 @@ class WeaponMount {
     // wrow.l.checked = witm.directions[3];
     // wrow.u.checked = witm.directions[4];
 
-    constructor(m: number, dir: boolean[], sec: number[], sh: boolean) {
+    constructor(m: number, dir: boolean[], sec: number[], sh: boolean, rc: number) {
         this.main_idx = m;
         this.directions = dir;
         this.secondary_idx = sec;
@@ -385,6 +384,7 @@ class WeaponMount {
             this.main_idx = this.secondary_idx[0]
             this.secondary_idx.splice(0, 1);
         }
+        this.rocket_count = rc;
     }
 
     public GetNumLoaders() {
@@ -407,10 +407,10 @@ class WeaponMount {
             }
             if (closed && this.IsArty()) {
                 stat.cost += this.ArmourCost(armour);
-                if (this.directions[4])
+                if (this.directions[4] && WeaponList[this.main_idx].abbr != "FLAK")
                     stat.cost += 3;
             } else {
-                stat.cost += this.DirCount() - 1;
+                stat.cost += this.NonArtyDirCost();
             }
             if (this.shield)
                 stat.cost += 3;
@@ -418,12 +418,30 @@ class WeaponMount {
         return stat;
     }
 
+    private NonArtyDirCost(): number {
+        let horiz = this.directions.slice(0, 4);
+        let sum = 0;
+        horiz.map((sum = 0, n => { if (n) { sum += 1; } }));
+        let cost = 0;
+        if (sum > 1) {
+            cost += 1;
+        }
+        if (this.directions[4])
+            cost += 1;
+        return cost;
+    }
+
     private WeapStats(idx: number): Stats {
         let stat = new Stats();
         let w = WeaponList[idx];
         stat.cost += w.cost;
-        if (w.artillery && w.abbr != "ISC") {
+        if (w.artillery && w.abbr != "ISC" && w.abbr != "RAR") {
             stat.volume = Math.ceil(w.heavy / 2.0);
+            stat.cost += 2;
+            stat.integrity -= 3;
+        } else if (w.abbr == "RAR") {
+            stat.cost += (this.rocket_count - 1) * w.cost; //One is already applied
+            stat.volume = Math.ceil(w.heavy * this.rocket_count / 2.0);
             stat.cost += 2;
             stat.integrity -= 3;
         }
@@ -438,15 +456,6 @@ class WeaponMount {
                 return true;
         }
         return false;
-    }
-
-    private DirCount(): number {
-        let count = 0;
-        for (let i = 0; i < this.directions.length; i++) {
-            if (this.directions[i])
-                count++;
-        }
-        return count;
     }
 
     private ArmourCost(armour: number[]): number {
@@ -479,8 +488,8 @@ class Vehicle {
     private enlarged_engine: number = 0;
     private propeller = false;
     private crew: Crew[] = [
-        new Crew("Driver", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false)),
-        new Crew("Commander", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false)),
+        new Crew("Driver", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false, 0)),
+        new Crew("Commander", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false, 0)),
     ];
     private cargo = [0, 0, 0, 0];
 
@@ -713,7 +722,7 @@ class Vehicle {
         return stat.volume;
     }
     public CalculateStats() {
-        let armour_list = [this.armour_front, this.armour_rear, this.armour_side];
+        let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
         if (!this.CanExtraFuel()) {
             this.extra_fuel = 0;
         }
@@ -772,7 +781,6 @@ class Vehicle {
         stat.speed += Volume[Math.min(Volume.length - 1, stat.volume)].speedmod;
         stat.integrity += Volume[Math.min(Volume.length - 1, stat.volume)].integrity;
 
-        console.log([volMaxHP, Volume[volMaxHP], PowerplantSize[this.powerplant_size_idx].HP, this.GetVolume()])
         while (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {
             this.powerplant_size_idx -= 1;
         }
@@ -937,7 +945,7 @@ class Vehicle {
     public DuplicateCrew(idx: number) {
         let c = this.crew[idx];
         let w = c.weapon_mount;
-        let dupw = new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield);
+        let dupw = new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield, w.rocket_count);
         let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, structuredClone(c.loaders), dupw);
         this.crew.splice(idx, 0, dup);
         this.CalculateStats();
@@ -1499,7 +1507,7 @@ class CrewDisp {
             this.vehicle.SetCrew(this.vehicle.GetCrewList().length, new Crew(
                 this.lastline.options[this.lastline.selectedIndex].text,
                 false, false, false, false, false, false, false, [],
-                new WeaponMount(0, [false, false, false, false, false], [], false)));
+                new WeaponMount(0, [true, false, false, false, false], [], false, 0)));
         };
     }
 
@@ -1725,7 +1733,7 @@ class WeaponDisp {
     private vehicle: Vehicle;
     private tbl: HTMLTableElement;
     private wrows: {
-        row: HTMLTableRowElement, crew: HTMLLabelElement, main: HTMLSelectElement,
+        row: HTMLTableRowElement, crew: HTMLLabelElement, main: HTMLSelectElement, rocket_span: HTMLSpanElement, rocket_count: HTMLInputElement,
         f: HTMLInputElement, r: HTMLInputElement, b: HTMLInputElement, l: HTMLInputElement, u: HTMLInputElement,
         sec_cell: HTMLTableCellElement, secondary: HTMLSelectElement[], pspan: HTMLSpanElement, shield: HTMLInputElement
     }[];
@@ -1756,6 +1764,8 @@ class WeaponDisp {
             let wrow = this.wrows[idx];
             wrow.crew.textContent = citm.name_txt;
             wrow.main.selectedIndex = witm.main_idx;
+            wrow.rocket_span.hidden = WeaponList[witm.main_idx].name != "Rocket Artillery Rail";
+            wrow.rocket_count.valueAsNumber = witm.rocket_count;
             wrow.f.checked = witm.directions[0];
             wrow.r.checked = witm.directions[1];
             wrow.b.checked = witm.directions[2];
@@ -1810,6 +1820,9 @@ class WeaponDisp {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.value = w.name;
             opt.text = w.name;
+            if (w.name == "Rocket Artillery Rail") {
+                opt.disabled = true;
+            }
             sel.append(opt);
         }
         sel.selectedIndex = 0;
@@ -1821,6 +1834,8 @@ class WeaponDisp {
             row: this.tbl.insertRow(),
             crew: document.createElement("LABEL") as HTMLLabelElement,
             main: document.createElement("SELECT") as HTMLSelectElement,
+            rocket_span: document.createElement("SPAN") as HTMLSpanElement,
+            rocket_count: document.createElement("INPUT") as HTMLInputElement,
             f: document.createElement("INPUT") as HTMLInputElement,
             r: document.createElement("INPUT") as HTMLInputElement,
             b: document.createElement("INPUT") as HTMLInputElement,
@@ -1834,12 +1849,14 @@ class WeaponDisp {
         let oc = () => {
             this.vehicle.SetWeapon(idx, new WeaponMount(wrow.main.selectedIndex,
                 [wrow.f.checked, wrow.r.checked, wrow.b.checked, wrow.l.checked, wrow.u.checked],
-                wrow.secondary.map((value) => { return value.selectedIndex; }), wrow.shield.checked))
+                wrow.secondary.map((value) => { return value.selectedIndex; }), wrow.shield.checked, wrow.rocket_count.valueAsNumber))
         };
         let cell0 = wrow.row.insertCell();
         cell0.append(wrow.crew);
         let cell1 = wrow.row.insertCell();
         cell1.append(wrow.main);
+        cell1.append(document.createElement("BR"));
+        cell1.append(wrow.rocket_span);
         for (let w of WeaponList) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.value = w.name;
@@ -1852,7 +1869,11 @@ class WeaponDisp {
         CreateCheckbox("Right", wrow.r, cell2, true);
         CreateCheckbox("Backward", wrow.b, cell2, true);
         CreateCheckbox("Upward", wrow.u, cell2, false);
+        CreateInput("Rocket Count: ", wrow.rocket_count, wrow.rocket_span);
+        wrow.rocket_count.min = "1";
+        wrow.rocket_count.step = "1";
         wrow.main.onchange = oc;
+        wrow.rocket_count.onchange = oc;
         wrow.f.onchange = oc;
         wrow.r.onchange = oc;
         wrow.b.onchange = oc;
