@@ -122,6 +122,10 @@ export class WeaponMount {
 
     private ArtyDirCost(idx: number, armour: number[]): number {
         let cost = this.ArmourCost(armour);
+        let horiz = this.directions.slice(0, 4);
+        let sum = 0;
+        horiz.map((sum = 0, n => { if (n) { sum += 1; } }));
+        cost += Math.max(sum - 1, 0);
         if (this.directions[4] && WeaponList[idx].abbr != "FLAK")
             cost += 3;
         return cost;

@@ -123,6 +123,13 @@ export class Crew {
     }
 
     public CalcStats(armour: number[]): Stats {
+        if (armour[0] + armour[1] + armour[2] == 0) {
+            this.coupla = false;
+            for (let l of this.loaders) {
+                l.coupla = false;
+            }
+        }
+
         let stat = new Stats();
         if (this.name_txt == CrewType[7].name) {
             stat.volume += 0.25;
