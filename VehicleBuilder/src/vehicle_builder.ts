@@ -78,10 +78,10 @@ class Stats {
 }
 
 var PowerplantSize: { HP: number, name: string, speed: number, fuel: number, upkeep: number, reliability: number, cost: number, special: string[] }[] = [
-    { HP: 10, name: "Motorcycle", speed: 3, fuel: 15, upkeep: 0, reliability: 2, cost: -1, special: ["Gains 3 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
-    { HP: 20, name: "Sedan", speed: 4, fuel: 13, upkeep: 0, reliability: 2, cost: 0, special: ["Gains 3 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
-    { HP: 40, name: "Sports Car", speed: 5, fuel: 12, upkeep: 0, reliability: 1, cost: 1, special: ["Gains 3 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
-    { HP: 60, name: "Truck", speed: 6, fuel: 11, upkeep: 0, reliability: 1, cost: 2, special: ["Gains 3 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
+    { HP: 10, name: "Motorcycle", speed: 3, fuel: 15, upkeep: 0, reliability: 2, cost: -1, special: ["Gains 2 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
+    { HP: 20, name: "Sedan", speed: 4, fuel: 13, upkeep: 0, reliability: 2, cost: 0, special: ["Gains 2 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
+    { HP: 40, name: "Sports Car", speed: 5, fuel: 12, upkeep: 0, reliability: 1, cost: 1, special: ["Gains 2 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
+    { HP: 60, name: "Truck", speed: 6, fuel: 11, upkeep: 0, reliability: 1, cost: 2, special: ["Gains 2 Fuel Uses instead of 1 when refuelling from jerry cans and other sources."] },
     { HP: 80, name: "Tankette", speed: 7, fuel: 10, upkeep: 1, reliability: 0, cost: 3, special: [] },
     { HP: 100, name: "Cable Train", speed: 8, fuel: 9, upkeep: 1, reliability: 0, cost: 4, special: [] },
     { HP: 120, name: "Light Tank", speed: 9, fuel: 8, upkeep: 1, reliability: -1, cost: 5, special: [] },
@@ -101,7 +101,7 @@ for (let p of PowerplantSize) {
 
 const PowerplantType: { name: string, stress?: number, cost?: number, speed?: number, torque?: number, reliability?: number, volume?: number, integrity?: number, handling?: number, special: string[], powerplants: { HP: number, name: string, speed?: number, cost?: number, fuel?: number, reliability?: number, upkeep?: number, special: string[] }[] }[] = [
     {
-        name: "Human Powered", stress: 1, powerplants: [
+        name: "Human Powered", stress: 1, integrity: 5, powerplants: [
             { HP: 0, name: "Humans", speed: 1, cost: -2, special: ["Requires 1 human per volume.", "\"Engine\" takes Injury where they would normally take Wear.", "Reliability modifier is equal to the Higest Attribute."] }
         ], special: []
     },
@@ -264,10 +264,10 @@ class Crew {
     public loop_right: boolean;
     public loop_back: boolean;
     public loaders: Loader[];
-    public weapon_mount: WeaponMount;
+    public weapon_mounts: WeaponMount[];
     public base_vis: number;
     public base_escape: number;
-    constructor(disp: string, enc: boolean, coup: boolean, seal: boolean, lf: boolean, ll: boolean, lr: boolean, lb: boolean, ldrs: Loader[], weap: WeaponMount) {
+    constructor(disp: string, enc: boolean, coup: boolean, seal: boolean, lf: boolean, ll: boolean, lr: boolean, lb: boolean, ldrs: Loader[], weaps: WeaponMount[]) {
         this.name_txt = disp;
         this.enclosed = enc;
         this.coupla = coup;
@@ -277,7 +277,7 @@ class Crew {
         this.loop_right = lr;
         this.loop_back = lb;
         this.loaders = ldrs;
-        this.weapon_mount = weap;
+        this.weapon_mounts = weaps;
     }
 
     public IsEnclosed(): boolean {
@@ -305,6 +305,13 @@ class Crew {
             return this.base_vis
         }
         return undefined;
+    }
+    public GetNumLoaders() {
+        let num = 0;
+        for (let w of this.weapon_mounts) {
+            num += w.GetNumLoaders();
+        }
+        return num;
     }
     public GetEscape(l: number | undefined = undefined) {
         let seat;
@@ -356,7 +363,9 @@ class Crew {
                 stat.cost += 1;
         }
 
-        stat.add(this.weapon_mount.CalcStats(this.enclosed, armour));
+        for (let w of this.weapon_mounts) {
+            stat.add(w.CalcStats(this.enclosed, armour));
+        }
         return stat;
     }
 }
@@ -404,6 +413,7 @@ class WeaponMount {
             stat.add(this.WeapStats(this.main_idx));
             for (let sidx of this.secondary_idx) {
                 stat.add(this.WeapStats(sidx));
+                stat.cost += 3;
             }
             if (closed && this.IsArty()) {
                 stat.cost += this.ArmourCost(armour);
@@ -488,8 +498,8 @@ class Vehicle {
     private enlarged_engine: number = 0;
     private propeller = false;
     private crew: Crew[] = [
-        new Crew("Driver", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false, 0)),
-        new Crew("Commander", true, true, false, false, false, false, false, [], new WeaponMount(0, [true, false, false, false, false], [], false, 0)),
+        new Crew("Driver", true, true, false, false, false, false, false, [], []),
+        new Crew("Commander", true, true, false, false, false, false, false, [], [new WeaponMount(0, [true, false, false, false, false], [], false, 0)]),
     ];
     private cargo = [0, 0, 0, 0];
 
@@ -512,7 +522,7 @@ class Vehicle {
             }
         }
     }
-    private SumArmour(): number {
+    public SumArmour(): number {
         return this.armour_front + this.armour_side + this.armour_rear;
     }
 
@@ -931,7 +941,7 @@ class Vehicle {
             this.crew.push(crew);
         } else if (idx >= 0 && idx < this.crew.length) {
             crew.loaders = this.crew[idx].loaders;
-            crew.weapon_mount = this.crew[idx].weapon_mount;
+            crew.weapon_mounts = this.crew[idx].weapon_mounts;
             this.crew[idx] = crew;
         } else {
             console.error("SetCrew index out of range.");
@@ -944,9 +954,11 @@ class Vehicle {
     }
     public DuplicateCrew(idx: number) {
         let c = this.crew[idx];
-        let w = c.weapon_mount;
-        let dupw = new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield, w.rocket_count);
-        let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, structuredClone(c.loaders), dupw);
+        let dupws = [];
+        for (let w of c.weapon_mounts) {
+            dupws.push(new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield, w.rocket_count));
+        }
+        let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, structuredClone(c.loaders), dupws);
         this.crew.splice(idx, 0, dup);
         this.CalculateStats();
     }
@@ -969,7 +981,7 @@ class Vehicle {
         if (num <= 0) {
             this.crew[idx].loaders = [];
         } else {
-            num = Math.min(num, this.crew[idx].weapon_mount.GetNumLoaders());
+            num = Math.min(num, this.crew[idx].GetNumLoaders());
             while (this.crew[idx].loaders.length > num) {
                 this.crew[idx].loaders.pop();
             }
@@ -979,15 +991,46 @@ class Vehicle {
         }
         this.CalculateStats();
     }
+    public SetNumWeapons(idx: number, num: number) {
+        console.log("Calling SetNumWeapons " + idx.toString() + "  " + num.toString())
+        if (idx >= this.crew.length) {
+            console.error("SetNumWeapons crew index out of range.");
+        }
+        if (num <= 0) {
+            this.crew[idx].weapon_mounts = [];
+        } else {
+            while (this.crew[idx].weapon_mounts.length > num) {
+                this.crew[idx].weapon_mounts.pop();
+            }
+            while (this.crew[idx].weapon_mounts.length < num) {
+                this.crew[idx].weapon_mounts.push(new WeaponMount(0, [true, false, false, false, false], [], false, 1));
+            }
+        }
+        this.CalculateStats();
+    }
     public GetCrewList(): Crew[] {
         return this.crew;
     }
-    public SetWeapon(idx: number, mount: WeaponMount) {
-        if (idx >= this.crew.length) {
-            console.error("SetWeapon crew index out of range.");
+    public GetNumWeapons(): number {
+        let num = 0;
+        for (let c of this.crew) {
+            num += c.weapon_mounts.length;
         }
-        this.crew[idx].weapon_mount = mount;
-        this.CalculateStats();
+        return num;
+    }
+    public SetWeapon(idx: number, mount: WeaponMount) {
+        let midx = 0;
+        for (let cidx = 0; cidx < this.crew.length; ++cidx) {
+            for (let widx = 0; widx < this.crew[cidx].weapon_mounts.length; widx++) {
+                if (idx == midx) {
+                    this.crew[cidx].weapon_mounts[widx] = mount;
+                    this.CalculateStats();
+                    return;
+                }
+                midx++;
+            }
+        }
+        console.error("Index not found");
     }
     private GetLoopholes(): number {
         let result = { f: 0, s: 0, b: 0 };
@@ -1471,7 +1514,8 @@ class CrewDisp {
         enc_span: HTMLSpanElement, enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
         coupla: HTMLInputElement, seal_span: HTMLSpanElement, seal: HTMLInputElement,
         load_span: HTMLSpanElement, has_loader: HTMLInputElement, loop_front: HTMLInputElement,
-        loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement, br: HTMLBRElement,
+        loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement,
+        num_mounts: HTMLInputElement, br: HTMLBRElement,
         loader: {
             span: HTMLSpanElement, enc_span: HTMLSpanElement,
             enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
@@ -1506,8 +1550,7 @@ class CrewDisp {
         this.lastline.onchange = () => {
             this.vehicle.SetCrew(this.vehicle.GetCrewList().length, new Crew(
                 this.lastline.options[this.lastline.selectedIndex].text,
-                false, false, false, false, false, false, false, [],
-                new WeaponMount(0, [true, false, false, false, false], [], false, 0)));
+                false, false, false, false, false, false, false, [], []));
         };
     }
 
@@ -1553,25 +1596,30 @@ class CrewDisp {
             line.name_span.hidden = false;
             line.name.value = crew.name_txt;
             line.enclosed.checked = crew.enclosed;
-            if (crew.enclosed) {
+            if (crew.enclosed && this.vehicle.SumArmour() > 0) {
                 line.coup_span.hidden = false;
-                line.seal_span.hidden = false;
                 line.coupla.checked = crew.coupla;
-                line.seal.checked = crew.sealed;
             } else {
                 line.coup_span.hidden = true;
+            }
+            if (crew.enclosed) {
+                line.seal_span.hidden = false;
+                line.seal.checked = crew.sealed;
+            } else {
                 line.seal_span.hidden = true;
             }
             line.loop_front.checked = crew.loop_front;
             line.loop_left.checked = crew.loop_left;
             line.loop_right.checked = crew.loop_right;
             line.loop_back.checked = crew.loop_back;
-            if (crew.weapon_mount.GetNumLoaders() == 0) {
+            line.num_mounts.valueAsNumber = crew.weapon_mounts.length;
+            if (crew.GetNumLoaders() == 0) {
                 line.has_loader.disabled = true;
             } else {
                 line.has_loader.disabled = false;
             }
-            if (crew.weapon_mount.main_idx != 0) {
+            if (crew.weapon_mounts.length != 0) {
+                line.load_span.hidden = false;
                 line.has_loader.valueAsNumber = crew.loaders.length;
                 for (let idx = 0; idx < crew.loaders.length; idx++) {
                     line.loader[idx].span.hidden = false;
@@ -1591,6 +1639,8 @@ class CrewDisp {
                         line.loader[idx].seal_span.hidden = true;
                     }
                 }
+            } else {
+                line.load_span.hidden = true;
             }
         }
         this.crewdiv.append(this.lastline);
@@ -1666,6 +1716,7 @@ class CrewDisp {
             loop_left: document.createElement("INPUT") as HTMLInputElement,
             loop_right: document.createElement("INPUT") as HTMLInputElement,
             loop_back: document.createElement("INPUT") as HTMLInputElement,
+            num_mounts: document.createElement("INPUT") as HTMLInputElement,
             load_span: undefined,
             has_loader: document.createElement("INPUT") as HTMLInputElement,
             br: document.createElement("BR") as HTMLBRElement,
@@ -1686,6 +1737,7 @@ class CrewDisp {
         line.enc_span = CreateLabel("\u00A0\u00A0Enclosed:", line.enclosed);
         line.coup_span = CreateLabel("\u00A0\u00A0Coupla/Hatch:", line.coupla);
         line.seal_span = CreateLabel("\u00A0\u00A0Sealed:", line.seal);
+        let mount_span = CreateLabel("\u00A0\u00A0Number Weapons Mounts:", line.num_mounts);
         line.load_span = CreateLabel("\u00A0\u00A0Loader:", line.has_loader);
         let loop_span = CreateLabel("\u00A0\u00A0Loopholes F/L/R/B:", line.loop_front);
         loop_span.append(line.loop_left);
@@ -1696,6 +1748,7 @@ class CrewDisp {
         line.span.append(line.coup_span);
         line.span.append(line.seal_span);
         line.span.append(loop_span);
+        line.span.append(mount_span);
         line.span.append(line.load_span);
         line.name.type = "text";
         line.enclosed.type = "checkbox";
@@ -1705,6 +1758,9 @@ class CrewDisp {
         line.loop_left.type = "checkbox";
         line.loop_right.type = "checkbox";
         line.loop_back.type = "checkbox";
+        line.num_mounts.type = "number";
+        line.num_mounts.min = "0";
+        line.num_mounts.step = "1";
         line.has_loader.type = "number";
         line.has_loader.step = "1";
         line.has_loader.min = "0";
@@ -1714,6 +1770,7 @@ class CrewDisp {
                 line.loop_front.checked, line.loop_left.checked, line.loop_right.checked, line.loop_back.checked, undefined, undefined));
         };
         let setnum = () => { this.vehicle.SetNumLoaders(idx, line.has_loader.valueAsNumber); };
+        let setwep = () => { this.vehicle.SetNumWeapons(idx, line.num_mounts.valueAsNumber); };
         line.name.onchange = oc;
         line.enclosed.onchange = oc;
         line.coupla.onchange = oc;
@@ -1722,6 +1779,7 @@ class CrewDisp {
         line.loop_left.onchange = oc;
         line.loop_right.onchange = oc;
         line.loop_back.onchange = oc;
+        line.num_mounts.onchange = setwep;
         line.has_loader.onchange = setnum;
         this.crewdiv.append(line.span);
         this.crewdiv.append(line.br);
@@ -1744,72 +1802,78 @@ class WeaponDisp {
         CreateTH(header, "Crew Position");
         CreateTH(header, "Main Weapon");
         CreateTH(header, "Firing Arcs");
-        CreateTH(header, "Secondary Weapons");
+        CreateTH(header, "Co-Ax Weapons");
         CreateTH(header, "Accessories");
         this.wrows = [];
     }
 
     public UpdateDisplay() {
         let clist = this.vehicle.GetCrewList();
-        while (this.wrows.length > clist.length) {
+        let wcount = this.vehicle.GetNumWeapons();
+        let widx = 0;
+        while (this.wrows.length > wcount) {
             let wrow = this.wrows.pop();
             this.tbl.deleteRow(this.tbl.rows.length - 1);
         }
-        for (let idx = 0; idx < clist.length; idx++) {
-            let citm = clist[idx];
-            let witm = citm.weapon_mount;
-            if (idx >= this.wrows.length) {
-                this.CreateRow(this.wrows.length);
-            }
-            let wrow = this.wrows[idx];
-            wrow.crew.textContent = citm.name_txt;
-            wrow.main.selectedIndex = witm.main_idx;
-            wrow.rocket_span.hidden = WeaponList[witm.main_idx].name != "Rocket Artillery Rail";
-            wrow.rocket_count.valueAsNumber = witm.rocket_count;
-            wrow.f.checked = witm.directions[0];
-            wrow.r.checked = witm.directions[1];
-            wrow.b.checked = witm.directions[2];
-            wrow.l.checked = witm.directions[3];
-            wrow.u.checked = witm.directions[4];
-            while (wrow.secondary.length > witm.secondary_idx.length + 1) {
-                wrow.sec_cell.removeChild(this.wrows[idx].secondary.pop());
-                wrow.sec_cell.removeChild(wrow.sec_cell.children[wrow.sec_cell.children.length - 1]);
-            }
-            for (let idx2 = 0; idx2 < witm.secondary_idx.length; idx2++) {
-                if (idx2 == wrow.secondary.length) {
+        for (let cidx = 0; cidx < clist.length; cidx++) {
+            let citm = clist[cidx];
+            let mount_idx = 0;
+            for (let witm of citm.weapon_mounts) {
+                mount_idx += 1;
+                if (widx >= this.wrows.length) {
+                    this.CreateRow(this.wrows.length);
+                }
+                let wrow = this.wrows[widx];
+                wrow.crew.textContent = citm.name_txt + " Mount " + mount_idx.toString();
+                wrow.main.selectedIndex = witm.main_idx;
+                wrow.rocket_span.hidden = WeaponList[witm.main_idx].name != "Rocket Artillery Rail";
+                wrow.rocket_count.valueAsNumber = witm.rocket_count;
+                wrow.f.checked = witm.directions[0];
+                wrow.r.checked = witm.directions[1];
+                wrow.b.checked = witm.directions[2];
+                wrow.l.checked = witm.directions[3];
+                wrow.u.checked = witm.directions[4];
+                while (wrow.secondary.length > witm.secondary_idx.length + 1) {
+                    wrow.sec_cell.removeChild(this.wrows[widx].secondary.pop());
+                    wrow.sec_cell.removeChild(wrow.sec_cell.children[wrow.sec_cell.children.length - 1]);
+                }
+                for (let idx2 = 0; idx2 < witm.secondary_idx.length; idx2++) {
+                    if (idx2 == wrow.secondary.length) {
+                        let newsec = this.CreateSecondary();
+                        newsec.onchange = wrow.f.onchange;
+                        wrow.sec_cell.append(newsec);
+                        wrow.sec_cell.append(document.createElement("BR"));
+                        wrow.secondary.push(newsec);
+                    }
+                    wrow.secondary[idx2].selectedIndex = witm.secondary_idx[idx2];
+                }
+                if (wrow.secondary.length == witm.secondary_idx.length) {
                     let newsec = this.CreateSecondary();
                     newsec.onchange = wrow.f.onchange;
                     wrow.sec_cell.append(newsec);
                     wrow.sec_cell.append(document.createElement("BR"));
                     wrow.secondary.push(newsec);
                 }
-                wrow.secondary[idx2].selectedIndex = witm.secondary_idx[idx2];
-            }
-            if (wrow.secondary.length == witm.secondary_idx.length) {
-                let newsec = this.CreateSecondary();
-                newsec.onchange = wrow.f.onchange;
-                wrow.sec_cell.append(newsec);
-                wrow.sec_cell.append(document.createElement("BR"));
-                wrow.secondary.push(newsec);
-            }
-            wrow.secondary[witm.secondary_idx.length].selectedIndex = 0;
-            wrow.shield.checked = witm.shield;
-            if (witm.main_idx == 0) {
-                wrow.secondary[0].disabled = true;
-                wrow.f.disabled = true;
-                wrow.l.disabled = true;
-                wrow.r.disabled = true;
-                wrow.b.disabled = true;
-                wrow.u.disabled = true;
-                wrow.shield.disabled = true;
-            } else {
-                wrow.secondary[0].disabled = false;
-                wrow.f.disabled = false;
-                wrow.l.disabled = false;
-                wrow.r.disabled = false;
-                wrow.b.disabled = false;
-                wrow.u.disabled = false;
-                wrow.shield.disabled = false;
+                wrow.secondary[witm.secondary_idx.length].selectedIndex = 0;
+                wrow.shield.checked = witm.shield;
+                if (witm.main_idx == 0) {
+                    wrow.secondary[0].disabled = true;
+                    wrow.f.disabled = true;
+                    wrow.l.disabled = true;
+                    wrow.r.disabled = true;
+                    wrow.b.disabled = true;
+                    wrow.u.disabled = true;
+                    wrow.shield.disabled = true;
+                } else {
+                    wrow.secondary[0].disabled = false;
+                    wrow.f.disabled = false;
+                    wrow.l.disabled = false;
+                    wrow.r.disabled = false;
+                    wrow.b.disabled = false;
+                    wrow.u.disabled = false;
+                    wrow.shield.disabled = false;
+                }
+                widx += 1;
             }
         }
     }
