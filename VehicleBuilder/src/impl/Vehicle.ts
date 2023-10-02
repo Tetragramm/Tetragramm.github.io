@@ -232,10 +232,15 @@ export class Vehicle {
 
         let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
         let is_enclosed = false;
+        let cramped = 0;
         for (let idx = 0; idx < this.crew.length; idx++) {
             is_enclosed = is_enclosed || this.crew[idx].IsEnclosed();
             stat.add(this.crew[idx].CalcStats(armour_list));
+            if (this.crew[idx].IsCramped())
+                cramped += 0.25;
         }
+        stat.volume += Math.ceil(-1.0e-6 + cramped);
+        stat.volume = Math.ceil(-1.0e-6 + stat.volume);
         if (is_enclosed) {
             stat.volume += 1;
         }
@@ -262,9 +267,12 @@ export class Vehicle {
         stat.torque = -1;
         stat.volume += this.extra_fuel;
         let is_enclosed = false;
+        let cramped_volume = 0;
         for (let idx = 0; idx < this.crew.length; idx++) {
             is_enclosed = is_enclosed || this.crew[idx].IsEnclosed();
             stat.add(this.crew[idx].CalcStats(armour_list));
+            if (this.crew[idx].IsCramped())
+                cramped_volume += 0.25;
         }
         if (is_enclosed) {
             stat.volume += 1;
@@ -273,6 +281,7 @@ export class Vehicle {
             }
         }
         this.extra_tiny = (stat.volume - Math.floor(stat.volume)) >= 0.45;
+        stat.volume += cramped_volume;
         stat.volume = Math.ceil(stat.volume);
 
         //Loopholes

@@ -122,6 +122,10 @@ export class Crew {
         return result;
     }
 
+    public IsCramped(): boolean {
+        return this.name_txt == CrewType[7].name;
+    }
+
     public CalcStats(armour: number[]): Stats {
         if (armour[0] + armour[1] + armour[2] == 0) {
             this.coupla = false;
@@ -132,7 +136,7 @@ export class Crew {
 
         let stat = new Stats();
         if (this.name_txt == CrewType[7].name) {
-            stat.volume += 0.25;
+            stat.volume += 0;
         } else if (this.name_txt == CrewType[8].name) {
             stat.volume += 1;
         } else {
