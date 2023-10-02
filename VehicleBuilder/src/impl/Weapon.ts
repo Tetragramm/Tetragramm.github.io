@@ -102,9 +102,10 @@ export class WeaponMount {
         let stat = new Stats();
         if (this.main_idx > 0) {
             stat.add(this.WeapStats(this.main_idx));
-            stat.cost += this.NonArtyDirCost();
             if (closed && WeaponList[this.main_idx].artillery && WeaponList[this.main_idx].abbr != "ISC") {
                 stat.cost += this.ArtyDirCost(this.main_idx, armour);
+            } else {
+                stat.cost += this.NonArtyDirCost();
             }
             for (let sidx of this.secondary_idx) {
                 stat.add(this.WeapStats(sidx));
