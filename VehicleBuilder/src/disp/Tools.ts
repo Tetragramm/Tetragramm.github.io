@@ -390,3 +390,14 @@ export const toggleCollapse = (id, active) => {
         content.style.maxHeight = "inherit";
     }
 }
+
+export function CreateLabel(txt: string, fore: HTMLElement): HTMLSpanElement {
+    var span = document.createElement("SPAN") as HTMLSpanElement;
+    var lbl = document.createElement("LABEL") as HTMLLabelElement;
+    lbl.textContent = txt;
+    fore.id = GenerateID();
+    lbl.htmlFor = fore.id;
+    span.append(lbl);
+    span.append(fore);
+    return span;
+}
