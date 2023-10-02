@@ -128,7 +128,7 @@ export class WeaponMount {
         horiz.map((sum = 0, n => { if (n) { sum += 1; } }));
         cost += Math.max(sum - 1, 0);
         if (this.directions[4] && WeaponList[idx].abbr != "FLAK")
-            cost += 3;
+            cost += 3 + armour[1];
         return cost;
     }
 
