@@ -103,17 +103,23 @@ export class WeaponMount {
         if (this.main_idx > 0) {
             stat.add(this.WeapStats(this.main_idx));
             if (closed && WeaponList[this.main_idx].artillery && WeaponList[this.main_idx].abbr != "ISC") {
-                stat.cost += this.ArtyDirCost(this.main_idx, armour);
+                if (closed)
+                    stat.cost += this.ArtyDirCost(this.main_idx, armour);
+                else
+                    stat.cost += this.ArtyDirCost(this.main_idx, [0, 0, 0]);
             } else {
-                stat.cost += this.ArtyDirCost(this.main_idx, [0, 0, 0]);
+                stat.cost += this.NonArtyDirCost();
             }
             for (let sidx of this.secondary_idx) {
                 stat.add(this.WeapStats(sidx));
                 stat.cost += 3;
                 if (closed && WeaponList[sidx].artillery && WeaponList[sidx].abbr != "ISC") {
-                    stat.cost += this.ArtyDirCost(sidx, armour);
+                    if (closed)
+                        stat.cost += this.ArtyDirCost(sidx, armour);
+                    else
+                        stat.cost += this.ArtyDirCost(sidx, [0, 0, 0]);
                 } else {
-                    stat.cost += this.ArtyDirCost(sidx, [0, 0, 0]);
+                    stat.cost += this.NonArtyDirCost();
                 }
             }
             if (this.shield)
