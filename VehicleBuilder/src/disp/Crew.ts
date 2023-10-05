@@ -65,10 +65,10 @@ export class CrewDisp {
             let line = this.crewline.pop();
             line.span.remove();
             line.br.remove();
-            // for(let ldr of line.loader){
-            //     ldr.span.remove();
-            //     ldr.br.remove();
-            // }
+            for (let ldr of line.loader) {
+                ldr.span.remove();
+                ldr.br.remove();
+            }
         }
 
         for (let idx = 0; idx < list.length; idx++) {

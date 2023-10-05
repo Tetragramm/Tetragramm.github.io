@@ -479,7 +479,9 @@ export class Vehicle {
         this.CalculateStats();
     }
     public DeleteCrew(idx: number) {
+        console.log(this.crew);
         this.crew.splice(idx, 1);
+        console.log(this.crew);
         this.CalculateStats();
     }
     public DuplicateCrew(idx: number) {
