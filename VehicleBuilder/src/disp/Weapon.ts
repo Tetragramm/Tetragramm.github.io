@@ -1,7 +1,7 @@
-import { CreateTH, CreateCheckbox, CreateInput } from "./Tools";
+import { CreateTH, CreateCheckbox, CreateInput, CreateSelect } from "./Tools";
 
 import { Vehicle } from "../impl/Vehicle";
-import { WeaponList, WeaponMount } from "../impl/Weapon";
+import { GunsightList, WeaponList, WeaponMount } from "../impl/Weapon";
 
 
 export class WeaponDisp {
@@ -10,7 +10,8 @@ export class WeaponDisp {
     private wrows: {
         row: HTMLTableRowElement, crew: HTMLLabelElement, main: HTMLSelectElement, rocket_span: HTMLSpanElement, rocket_count: HTMLInputElement,
         f: HTMLInputElement, r: HTMLInputElement, b: HTMLInputElement, l: HTMLInputElement, u: HTMLInputElement,
-        sec_cell: HTMLTableCellElement, secondary: HTMLSelectElement[], pspan: HTMLSpanElement, shield: HTMLInputElement
+        sec_cell: HTMLTableCellElement, secondary: HTMLSelectElement[], shield: HTMLInputElement,
+        gunsight: HTMLSelectElement,
     }[];
     constructor(veh: Vehicle) {
         this.vehicle = veh;
@@ -73,6 +74,7 @@ export class WeaponDisp {
                 }
                 wrow.secondary[witm.secondary_idx.length].selectedIndex = 0;
                 wrow.shield.checked = witm.shield;
+                wrow.gunsight.selectedIndex = witm.gunsight;
                 if (witm.main_idx == 0) {
                     wrow.secondary[0].disabled = true;
                     wrow.f.disabled = true;
@@ -81,6 +83,7 @@ export class WeaponDisp {
                     wrow.b.disabled = true;
                     wrow.u.disabled = true;
                     wrow.shield.disabled = true;
+                    wrow.gunsight.disabled = true;
                 } else {
                     wrow.secondary[0].disabled = false;
                     wrow.f.disabled = false;
@@ -89,6 +92,7 @@ export class WeaponDisp {
                     wrow.b.disabled = false;
                     wrow.u.disabled = false;
                     wrow.shield.disabled = false;
+                    wrow.gunsight.disabled = false;
                 }
                 widx += 1;
             }
@@ -124,13 +128,13 @@ export class WeaponDisp {
             u: document.createElement("INPUT") as HTMLInputElement,
             sec_cell: undefined,
             secondary: [],
-            pspan: document.createElement("SPAN") as HTMLSpanElement,
             shield: document.createElement("INPUT") as HTMLInputElement,
+            gunsight: document.createElement("SELECT") as HTMLSelectElement,
         };
         let oc = () => {
             this.vehicle.SetWeapon(idx, new WeaponMount(wrow.main.selectedIndex,
                 [wrow.f.checked, wrow.r.checked, wrow.b.checked, wrow.l.checked, wrow.u.checked],
-                wrow.secondary.map((value) => { return value.selectedIndex; }), wrow.shield.checked, wrow.rocket_count.valueAsNumber))
+                wrow.secondary.map((value) => { return value.selectedIndex; }), wrow.shield.checked, wrow.gunsight.selectedIndex, wrow.rocket_count.valueAsNumber))
         };
         let cell0 = wrow.row.insertCell();
         cell0.append(wrow.crew);
@@ -143,6 +147,12 @@ export class WeaponDisp {
             opt.value = w.name;
             opt.text = w.name;
             wrow.main.append(opt);
+        }
+        for (let g of GunsightList) {
+            let opt = document.createElement("OPTION") as HTMLOptionElement;
+            opt.value = g;
+            opt.text = g;
+            wrow.gunsight.append(opt);
         }
         let cell2 = wrow.row.insertCell();
         CreateCheckbox("Forward", wrow.f, cell2, true);
@@ -162,9 +172,10 @@ export class WeaponDisp {
         wrow.u.onchange = oc;
         wrow.sec_cell = wrow.row.insertCell();
         let cell4 = wrow.row.insertCell();
-        cell4.append(wrow.pspan);
-        CreateCheckbox("Gun Shield", wrow.shield, wrow.pspan, false);
+        CreateCheckbox("Gun Shield", wrow.shield, cell4, true);
+        CreateSelect("Gunsight: ", wrow.gunsight, cell4);
         wrow.shield.onchange = oc;
+        wrow.gunsight.onchange = oc;
         this.wrows.push(wrow);
 
     }

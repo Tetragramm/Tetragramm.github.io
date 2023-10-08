@@ -114,7 +114,11 @@ export class StatsDisp {
         this.name_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">{1}þ</span></p>", "Wandelburg Ausf. I", final_stats.cost);
         this.nick_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">Upkeep {1}þ</span></p>", "The First Tank", final_stats.upkeep);
         this.spd.textContent = final_stats.speed.toString();
-        this.trq.textContent = final_stats.torque.toString();
+        if (final_stats.walker_torque) {
+            this.trq.textContent = StringFmt.Format("+{0}/{1}", final_stats.walker_torque, final_stats.torque);
+        } else {
+            this.trq.textContent = final_stats.torque.toString();
+        }
         this.hnd.textContent = final_stats.handling.toString();
         this.amr.textContent = StringFmt.Format("{0}/{1}/{2}", this.vehicle.GetArmourFront(), this.vehicle.GetArmourSide(), this.vehicle.GetArmourRear());
         this.int.textContent = final_stats.integrity.toString();

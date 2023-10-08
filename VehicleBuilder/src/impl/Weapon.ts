@@ -1,4 +1,4 @@
-import { Stats } from "./Stats";
+import { Stats, WARNING_COLOR } from "./Stats";
 
 class Weapon {
     public name: string;
@@ -28,6 +28,7 @@ class Weapon {
 
 export var WeaponList: Weapon[] = [
     new Weapon({ name: "None", abbr: undefined, cost: undefined, loader: false }),
+    new Weapon({ name: "Searchlight", abbr: "SL", cost: 1 }),
     new Weapon({ name: "Trench Gun", abbr: "TG", cost: 2 }),
     new Weapon({ name: "Aircraft Shotgun", abbr: "ASG", cost: 2 }),
     new Weapon({ name: "Converted Autorifle", abbr: "CAR", cost: 1 }),
@@ -61,11 +62,18 @@ export var WeaponList: Weapon[] = [
     new Weapon({ name: "Other Weapon", abbr: "Other", cost: undefined }),
 ]
 
+export var GunsightList: string[] = [
+    "None",
+    "Lead Gunsight",
+    "Binocular Gunsight",
+];
+
 export class WeaponMount {
     public main_idx: number;
     public directions: boolean[];
     public secondary_idx: number[];
     public shield: boolean;
+    public gunsight: number;
     public rocket_count: number;
 
     // wrow.f.checked = witm.directions[0];
@@ -74,7 +82,7 @@ export class WeaponMount {
     // wrow.l.checked = witm.directions[3];
     // wrow.u.checked = witm.directions[4];
 
-    constructor(m: number, dir: boolean[], sec: number[], sh: boolean, rc: number) {
+    constructor(m: number, dir: boolean[], sec: number[], sh: boolean, gs: number, rc: number) {
         this.main_idx = m;
         this.directions = dir;
         this.secondary_idx = sec;
@@ -84,6 +92,7 @@ export class WeaponMount {
             this.main_idx = this.secondary_idx[0]
             this.secondary_idx.splice(0, 1);
         }
+        this.gunsight = gs;
         this.rocket_count = rc;
     }
 
@@ -124,6 +133,13 @@ export class WeaponMount {
             }
             if (this.shield)
                 stat.cost += 3;
+            if (this.gunsight == 1) {
+                stat.cost += 5;
+                stat.warnings.push({ source: GunsightList[this.gunsight], warning: "When Stationary, reduces Deflection Shot attack penalty by 2 for this weapon mount. Cannot give a bonus.", color: WARNING_COLOR.WHITE });
+            } else if (this.gunsight == 2) {
+                stat.cost += 5;
+                stat.warnings.push({ source: GunsightList[this.gunsight], warning: "When Stationary, reduces Range Band attack penalty by 2 for this weapon mount. Cannot give a bonus.", color: WARNING_COLOR.WHITE });
+            }
         }
         return stat;
     }

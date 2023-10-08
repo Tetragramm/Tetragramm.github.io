@@ -1,6 +1,7 @@
 import { WeaponMount } from "./Weapon";
 import { WARNING_COLOR, PowerplantType, PowerplantSize, PropulsionType, Stats, Volume } from "./Stats";
 import { Loader, Crew } from "./Crew";
+import { Accessories } from "./Accessories";
 
 export class Vehicle {
     private powerplant_idx: number = 3;
@@ -13,12 +14,14 @@ export class Vehicle {
     private extra_tiny: boolean = false;
     private enlarged_engine: number = 0;
     private propeller = false;
+    private turret_hull = false;
     private DisplayCallback: (stat: Stats) => void;
     private crew: Crew[] = [
         new Crew("Driver", true, true, false, false, false, false, false, [], []),
-        new Crew("Commander", true, true, false, false, false, false, false, [], [new WeaponMount(0, [true, false, false, false, false], [], false, 0)]),
+        new Crew("Commander", true, true, false, false, false, false, false, [], [new WeaponMount(0, [true, false, false, false, false], [], false, 0, 0)]),
     ];
     private cargo = [0, 0, 0, 0];
+    private accessories = new Accessories();
 
     public SetDisplayCallback(callback: (stat: Stats) => void) {
         this.DisplayCallback = callback;
@@ -257,6 +260,7 @@ export class Vehicle {
         stat.add(new Stats(PowerplantType[this.powerplant_idx]));
         return stat.volume;
     }
+
     public CalculateStats() {
         let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
         if (!this.CanExtraFuel()) {
@@ -321,8 +325,8 @@ export class Vehicle {
         stat.speed += Volume[Math.min(Volume.length - 1, stat.volume)].speedmod;
         stat.integrity += Volume[Math.min(Volume.length - 1, stat.volume)].integrity;
 
-        while (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {
-            this.powerplant_size_idx -= 1;
+        if (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {
+            stat.warnings.push({ source: "Powerplant Size", warning: "Powerplant is too large for this vehicle. Add Volume, expand the engine compartment, or reduce the engine size.", color: WARNING_COLOR.RED });
         }
 
         stat.add(new Stats(PowerplantType[this.powerplant_idx].powerplants[this.powerplant_size_idx]));
@@ -370,6 +374,7 @@ export class Vehicle {
                 }
             }
         }
+        ve += this.accessories.GetEscapeMod();
         for (let c of this.crew) {
             c.base_vis = ve;
             c.base_escape = ve;
@@ -381,6 +386,13 @@ export class Vehicle {
             stat.reliability += 1;
             stat.stress += 1;
             stat.warnings.push({ source: "Propeller", warning: "Double Injury on a Crash.", color: WARNING_COLOR.WHITE });
+        }
+
+        if (this.turret_hull && this.CanTurretHull()) {
+            stat.cost += 10;
+            stat.warnings.push({
+                source: "Turret Hull", warning: "Gains the Gyro-Stabilized rule, and does not take the Tank Battle! penalty for single-arc weapons.", color: WARNING_COLOR.WHITE
+            });
         }
 
         switch (PropulsionType[this.propulsion_idx]) {
@@ -421,19 +433,21 @@ export class Vehicle {
             case "Half-Walker":
                 stat.speed -= 2;
                 stat.handling -= 5;
-                stat.torque = 3;
+                stat.walker_torque = 3;
                 stat.speed = Math.min(stat.speed, 4);
                 stat.cost += 2;
+                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Gains the High Ground Pressure special rule.", color: WARNING_COLOR.WHITE });
                 break;
             case "Walker":
                 stat.speed -= 3;
                 stat.reliability -= 1;
                 stat.handling += 5;
                 stat.upkeep += 1;
-                stat.torque = 5;
+                stat.torque -= 1;
+                stat.walker_torque = 5;
                 stat.speed = Math.min(stat.speed, 3);
                 stat.cost += 4;
-                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Gains the Gyro-Stabilized & Standing Tall special rules.", color: WARNING_COLOR.WHITE });
+                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Gains the High Ground Pressure & Standing Tall special rules.", color: WARNING_COLOR.WHITE });
                 break;
             case "Skids":
             case "Skis":
@@ -461,6 +475,7 @@ export class Vehicle {
                 stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Limited to ground rails.", color: WARNING_COLOR.WHITE });
                 break;
         }
+        stat = this.accessories.CalcStats(is_enclosed, stat);
 
         if (this.DisplayCallback) {
             this.DisplayCallback(stat);
@@ -488,7 +503,7 @@ export class Vehicle {
         let c = this.crew[idx];
         let dupws = [];
         for (let w of c.weapon_mounts) {
-            dupws.push(new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield, w.rocket_count));
+            dupws.push(new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield, w.gunsight, w.rocket_count));
         }
         let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, structuredClone(c.loaders), dupws);
         this.crew.splice(idx, 0, dup);
@@ -535,7 +550,7 @@ export class Vehicle {
                 this.crew[idx].weapon_mounts.pop();
             }
             while (this.crew[idx].weapon_mounts.length < num) {
-                this.crew[idx].weapon_mounts.push(new WeaponMount(0, [true, false, false, false, false], [], false, 1));
+                this.crew[idx].weapon_mounts.push(new WeaponMount(0, [true, false, false, false, false], [], false, 0, 1));
             }
         }
         this.CalculateStats();
@@ -605,4 +620,19 @@ export class Vehicle {
 
         return cost;
     }
+
+    public GetAccessories(): Accessories {
+        return this.accessories;
+    }
+
+    public CanTurretHull(): boolean {
+        return PropulsionType[this.propulsion_idx] == "Walker";
+    }
+
+    public SetTurretHull(has: boolean) {
+        this.turret_hull = has;
+        this.CalculateStats();
+    }
+
+
 }

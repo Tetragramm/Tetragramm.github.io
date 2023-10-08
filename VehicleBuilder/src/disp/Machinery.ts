@@ -15,6 +15,8 @@ export class MachineryDisp {
     private rear_armour: HTMLInputElement;
     private prop_span: HTMLSpanElement;
     private propeller: HTMLInputElement;
+    private turret_span: HTMLSpanElement;
+    private turret: HTMLInputElement;
     private s_cargo: HTMLInputElement;
     private m_cargo: HTMLInputElement;
     private l_cargo: HTMLInputElement;
@@ -35,6 +37,10 @@ export class MachineryDisp {
         this.prop_span = document.getElementById("prop_span") as HTMLSpanElement;
         this.propeller = document.getElementById("inp_prop") as HTMLInputElement;
         this.propeller.onchange = () => { this.vehicle.SetPropeller(this.propeller.checked); };
+
+        this.turret_span = document.getElementById("turret_span") as HTMLSpanElement;
+        this.turret = document.getElementById("inp_turret") as HTMLInputElement;
+        this.turret.onchange = () => { this.vehicle.SetTurretHull(this.turret.checked); };
 
         this.pp_type = document.getElementById("sel_pptype") as HTMLSelectElement;
         this.pp_type.onchange = () => { this.update_type = true; this.vehicle.SetPowerplant(this.pp_type.selectedIndex); };
@@ -155,6 +161,12 @@ export class MachineryDisp {
             this.prop_span.hidden = false;
         } else {
             this.prop_span.hidden = true;
+        }
+
+        if (this.vehicle.CanTurretHull()) {
+            this.turret_span.hidden = false;
+        } else {
+            this.turret_span.hidden = true;
         }
 
         this.pp_type.selectedIndex = this.vehicle.GetPowerplantIdx();

@@ -26,6 +26,7 @@ export class Stats {
     public stress = 0;
     public volume = 0;
     public warnings: { source: string, warning: string, color: WARNING_COLOR }[] = [];
+    public walker_torque = 0;
 
     constructor(obj?) {
         if (obj) {
@@ -115,7 +116,7 @@ export const PowerplantType: { name: string, stress?: number, cost?: number, spe
     },
     { name: "Petrol", powerplants: PowerplantSize, special: [] },
     { name: "Diesel", cost: 2, speed: -1, torque: 1, reliability: 1, powerplants: DoubleFuel, special: [] },
-    { name: "Steam", cost: -2, speed: -2, torque: 2, stress: 1, reliability: 2, volume: 1, integrity: -5, powerplants: PowerplantSize, special: ["At 7 Wear, pushes Burn Out as the boiler explodes!"] },
+    { name: "Steam", cost: -2, speed: -2, torque: 2, stress: 1, reliability: 2, volume: 1, integrity: -5, powerplants: HalfFuel, special: ["At 7 Wear, pushes Burn Out as the boiler explodes!", "1 Capacity of coal is 3 Fuel Uses."] },
     {
         name: "Electric", cost: 3, speed: 1, torque: -1, handling: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Cannot Gun the Engine.", "Must recharge in town or with a generator.", "Can be Concealed with the engine on(when stationary)."]
     },
