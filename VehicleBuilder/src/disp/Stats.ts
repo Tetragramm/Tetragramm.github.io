@@ -111,8 +111,10 @@ export class StatsDisp {
     }
 
     public UpdateDisplay(final_stats: Stats) {
-        this.name_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">{1}þ</span></p>", "Wandelburg Ausf. I", final_stats.cost);
-        this.nick_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">Upkeep {1}þ</span></p>", "The First Tank", final_stats.upkeep);
+        let origoffset = document.getElementById("lbl_mech").offsetTop;
+
+        this.name_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">{1}þ</span></p>", this.vehicle.name, final_stats.cost);
+        this.nick_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">Upkeep {1}þ</span></p>", this.vehicle.nickname, final_stats.upkeep);
         this.spd.textContent = final_stats.speed.toString();
         if (final_stats.walker_torque) {
             this.trq.textContent = StringFmt.Format("+{0}/{1}", final_stats.walker_torque, final_stats.torque);
@@ -181,13 +183,10 @@ export class StatsDisp {
                 }
             }
             let notes = [];
-            // TODO: New Notes
-            // if (c.weapon_idx >= 0) {
-            //     notes.push(StringFmt.Format("Weapon Set {0}", c.weapon_idx));
-            // }
             if (c.enclosed && c.coupla) {
                 notes.push("Hatch");
             }
+            notes.push(c.WeaponString());
             //TODO: Vis & Escape
             this.CrewLine(c.name_txt, enclosure, c.GetVisibility(), c.GetEscape(), StringFmt.Join(", ", notes));
             for (let l = 0; l < c.loaders.length; l++) {
@@ -205,6 +204,9 @@ export class StatsDisp {
                 //TODO: Vis & Escape
                 this.CrewLine("Loader", enclosure, c.GetVisibility(l), c.GetEscape(l), StringFmt.Join(", ", notes), true);
             }
+
+            let newoffset = document.getElementById("lbl_mech").offsetTop;
+            document.body.scrollBy(0, newoffset - origoffset);
         }
 
         // this.CrewLine("Driver", "Closed", -1, -1, "Hatch", false);

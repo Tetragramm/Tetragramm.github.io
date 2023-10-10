@@ -3,24 +3,44 @@ import { MachineryDisp } from "./Machinery";
 import { CrewDisp } from "./Crew";
 import { WeaponDisp } from "./Weapon";
 import { AccessoriesDisp } from "./Accessories";
+import { copyStringToClipboard, _arrayBufferToString, _stringToArrayBuffer, download } from "./Tools";
+import { LZString } from "../lz/lz-string";
 
 import { Vehicle } from "../impl/Vehicle";
 import { Stats } from "../impl/Stats";
+import { Serialize } from "../impl/Serialize";
+import { Cards } from "./Cards";
 
 export class VehDisp {
+    private vehicle: Vehicle;
     private stats: StatsDisp;
     private armour: MachineryDisp;
     private crew: CrewDisp;
     private weps: WeaponDisp;
     private accessories: AccessoriesDisp;
+    private cards: Cards;
 
     constructor(veh: Vehicle) {
+        this.vehicle = veh;
         veh.SetDisplayCallback((stats: Stats) => { this.UpdateDisplay(stats); });
         this.stats = new StatsDisp(veh);
         this.armour = new MachineryDisp(veh);
         this.crew = new CrewDisp(veh);
         this.weps = new WeaponDisp(veh);
         this.accessories = new AccessoriesDisp(veh);
+
+        const link_button = document.getElementById("acft_save_link") as HTMLButtonElement;
+        link_button.onclick = () => { this.SaveLink(); };
+
+        this.cards = new Cards();
+        const dash_button = document.getElementById("acft_save_dash") as HTMLButtonElement;
+        dash_button.onclick = () => { this.cards.SaveDash(this.vehicle); };
+
+        const reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
+        reset_button.onclick = () => { this.vehicle.Reset(); this.vehicle.CalculateStats(); };
+
+        const cat_button = document.getElementById("acft_save_cat");
+        // cat_button.onclick = () => { this.CatalogStats(); }
     }
 
     public UpdateDisplay(final_stats: Stats) {
@@ -29,5 +49,19 @@ export class VehDisp {
         this.crew.UpdateDisplay();
         this.weps.UpdateDisplay();
         this.accessories.UpdateDisplay();
+    }
+
+    private MakeLink() {
+        const ser = new Serialize();
+        this.vehicle.Serialize(ser);
+        const arr = ser.FinalArray();
+        const str2 = _arrayBufferToString(arr);
+        const txt2 = LZString.compressToEncodedURIComponent(str2);
+        const link = (location.protocol + "//" + location.host + location.pathname + "?tank=" + txt2);
+        return link;
+    }
+
+    private SaveLink() {
+        copyStringToClipboard(this.MakeLink());
     }
 }

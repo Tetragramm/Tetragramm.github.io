@@ -1,12 +1,18 @@
 import { WeaponMount } from "./Weapon";
-import { WARNING_COLOR, PowerplantType, PowerplantSize, PropulsionType, Stats, Volume } from "./Stats";
+import { WARNING_COLOR, PowerplantType, PowerplantSize, PropulsionType as LocomotionType, Stats, Volume } from "./Stats";
 import { Loader, Crew } from "./Crew";
 import { Accessories } from "./Accessories";
+import { Deserialize, Serialize } from "./Serialize";
+import { _arrayBufferToString } from "../disp/Tools";
+import { LZString } from "../lz/lz-string";
 
 export class Vehicle {
-    private powerplant_idx: number = 3;
+    public version = 1;
+    public name = "Sample Vehicle";
+    public nickname = "It Only Gets Worse.";
+    private powerplant_idx: number = 2;
     private powerplant_size_idx: number = 1;
-    private propulsion_idx: number = 3;
+    private locomotion_idx: number = 3;
     private armour_front: number = 0;
     private armour_side: number = 0;
     private armour_rear: number = 0;
@@ -22,6 +28,57 @@ export class Vehicle {
     ];
     private cargo = [0, 0, 0, 0];
     private accessories = new Accessories();
+
+
+    public Serialize(s: Serialize) {
+        s.PushString(this.version.toString());
+        s.PushString(this.name);
+        s.PushString(this.nickname);
+        s.PushNum(this.powerplant_idx);
+        s.PushNum(this.powerplant_size_idx);
+        s.PushNum(this.locomotion_idx);
+        s.PushNum(this.armour_front);
+        s.PushNum(this.armour_side);
+        s.PushNum(this.armour_rear);
+        s.PushNum(this.extra_fuel);
+        s.PushNum(this.enlarged_engine);
+        s.PushBool(this.propeller);
+        s.PushBool(this.turret_hull);
+        s.PushNum(this.crew.length);
+        for (let c of this.crew) {
+            c.Serialize(s);
+        }
+        s.PushNum(this.cargo[0]);
+        s.PushNum(this.cargo[1]);
+        s.PushNum(this.cargo[2]);
+        s.PushNum(this.cargo[3]);
+        this.accessories.Serialize(s);
+    }
+
+    public Deserialize(d: Deserialize) {
+        d.version = parseFloat(d.GetString());
+        this.name = d.GetString();
+        this.nickname = d.GetString();
+        this.powerplant_idx = d.GetNum();
+        this.powerplant_size_idx = d.GetNum();
+        this.locomotion_idx = d.GetNum();
+        this.armour_front = d.GetNum();
+        this.armour_side = d.GetNum();
+        this.armour_rear = d.GetNum();
+        this.extra_fuel = d.GetNum();
+        this.enlarged_engine = d.GetNum();
+        this.propeller = d.GetBool();
+        this.turret_hull = d.GetBool();
+        let num_crew = d.GetNum();
+        this.crew = [];
+        for (let cidx = 0; cidx < num_crew; cidx++) {
+            let c = new Crew("", false, false, false, false, false, false, false, [], []);
+            c.Deserialize(d);
+            this.crew.push(c);
+        }
+        this.cargo = [d.GetNum(), d.GetNum(), d.GetNum(), d.GetNum()];
+        this.accessories.Deserialize(d);
+    }
 
     public SetDisplayCallback(callback: (stat: Stats) => void) {
         this.DisplayCallback = callback;
@@ -94,24 +151,24 @@ export class Vehicle {
         return PowerplantType[this.powerplant_idx].powerplants;
     }
     public GetPropulsionList(): string[] {
-        return PropulsionType;
+        return LocomotionType;
     }
     public SetPropulsion(idx: number) {
-        this.propulsion_idx = idx;
+        this.locomotion_idx = idx;
         this.CalculateStats();
     }
     public GetPropulsionIdx(): number {
-        return this.propulsion_idx;
+        return this.locomotion_idx;
     }
     public GetPropulsion(): string {
-        return PropulsionType[this.propulsion_idx];
+        return LocomotionType[this.locomotion_idx];
     }
     public SetPropeller(has: boolean) {
         this.propeller = has;
         this.CalculateStats();
     }
     public CanPropeller() {
-        switch (PropulsionType[this.propulsion_idx]) {
+        switch (LocomotionType[this.locomotion_idx]) {
             case "Half-Track":
             case "Continuous Track":
             case "Crawler":
@@ -139,7 +196,7 @@ export class Vehicle {
     }
     private ValidateLocomotion() {
         let volume = this.GetVolume();
-        switch (PropulsionType[this.propulsion_idx]) {
+        switch (LocomotionType[this.locomotion_idx]) {
             case "Monowheel":
             case "Two-Wheeled":
                 return volume <= 1;
@@ -247,7 +304,7 @@ export class Vehicle {
         if (is_enclosed) {
             stat.volume += 1;
         }
-        if (PropulsionType[this.propulsion_idx] == "Amphibious") {
+        if (LocomotionType[this.locomotion_idx] == "Amphibious") {
             stat.volume += 1;
         }
         if (this.enlarged_engine > 0) {
@@ -261,7 +318,7 @@ export class Vehicle {
         return stat.volume;
     }
 
-    public CalculateStats() {
+    public CalculateStats(): Stats {
         let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
         if (!this.CanExtraFuel()) {
             this.extra_fuel = 0;
@@ -293,9 +350,9 @@ export class Vehicle {
 
 
         if (!this.ValidateLocomotion()) {
-            stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Too much Volume for this locomotion type.", color: WARNING_COLOR.RED });
+            stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Too much Volume for this locomotion type.", color: WARNING_COLOR.RED });
         }
-        if (PropulsionType[this.propulsion_idx] == "Amphibious") {
+        if (LocomotionType[this.locomotion_idx] == "Amphibious") {
             stat.volume += 1;
             stat.cost += 1;
             stat.warnings.push({ source: "Amphibious", warning: "Allows use on calm water at -1 Speed.", color: WARNING_COLOR.WHITE });
@@ -374,10 +431,9 @@ export class Vehicle {
                 }
             }
         }
-        ve += this.accessories.GetEscapeMod();
         for (let c of this.crew) {
             c.base_vis = ve;
-            c.base_escape = ve;
+            c.base_escape = ve + this.accessories.GetEscapeMod();
         }
 
         if (this.propeller && this.CanPropeller()) {
@@ -395,7 +451,7 @@ export class Vehicle {
             });
         }
 
-        switch (PropulsionType[this.propulsion_idx]) {
+        switch (LocomotionType[this.locomotion_idx]) {
             case "Monowheel":
             case "Two-Wheeled":
                 stat.speed += 1;
@@ -422,9 +478,9 @@ export class Vehicle {
                 stat.torque += 4;
                 stat.speed -= 2;
                 stat.handling -= 5;
-                if (Volume[stat.volume].size == "Large") {
+                if (Volume[Math.min(Volume.length - 1, stat.volume)].size == "Large") {
                     stat.torque += 1;
-                } else if (Volume[stat.volume].size == "Huge") {
+                } else if (Volume[Math.min(Volume.length - 1, stat.volume)].size == "Huge") {
                     stat.torque += 2;
                 }
                 stat.cost += 2;
@@ -436,7 +492,7 @@ export class Vehicle {
                 stat.walker_torque = 3;
                 stat.speed = Math.min(stat.speed, 4);
                 stat.cost += 2;
-                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Gains the High Ground Pressure special rule.", color: WARNING_COLOR.WHITE });
+                stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Gains the High Ground Pressure special rule.", color: WARNING_COLOR.WHITE });
                 break;
             case "Walker":
                 stat.speed -= 3;
@@ -447,18 +503,18 @@ export class Vehicle {
                 stat.walker_torque = 5;
                 stat.speed = Math.min(stat.speed, 3);
                 stat.cost += 4;
-                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Gains the High Ground Pressure & Standing Tall special rules.", color: WARNING_COLOR.WHITE });
+                stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Gains the High Ground Pressure & Standing Tall special rules.", color: WARNING_COLOR.WHITE });
                 break;
             case "Skids":
             case "Skis":
                 stat.speed -= 2;
                 stat.torque -= 2;
-                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "+3 Speed bonus on Snow & Ice.", color: WARNING_COLOR.WHITE });
+                stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "+3 Speed bonus on Snow & Ice.", color: WARNING_COLOR.WHITE });
                 break;
             case "Boat Hull":
                 stat.speed = Math.min(stat.speed, 4);
                 stat.cost += 1;
-                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Limited to Water.", color: WARNING_COLOR.WHITE });
+                stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Limited to Water.", color: WARNING_COLOR.WHITE });
                 break;
             case "Amphibious":
                 //Note: Done earlier
@@ -467,12 +523,12 @@ export class Vehicle {
             case "Sky-Line":
                 stat.reliability += 4;
                 stat.speed += 1;
-                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Limited to cable lines.", color: WARNING_COLOR.WHITE });
+                stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Limited to cable lines.", color: WARNING_COLOR.WHITE });
                 break;
             case "Dorandisch Earthline":
                 stat.reliability += 6;
                 stat.speed += 3;
-                stat.warnings.push({ source: PropulsionType[this.propulsion_idx], warning: "Limited to ground rails.", color: WARNING_COLOR.WHITE });
+                stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Limited to ground rails.", color: WARNING_COLOR.WHITE });
                 break;
         }
         stat = this.accessories.CalcStats(is_enclosed, stat);
@@ -480,6 +536,14 @@ export class Vehicle {
         if (this.DisplayCallback) {
             this.DisplayCallback(stat);
         }
+
+        let ser = new Serialize();
+        this.Serialize(ser);
+        const arr = ser.FinalArray();
+        const str2 = _arrayBufferToString(arr);
+        const txt2 = LZString.compressToEncodedURIComponent(str2);
+        window.localStorage.setItem("tank", txt2);
+        return stat;
     }
     public SetCrew(idx: number, crew: Crew) {
         if (idx == this.crew.length) {
@@ -494,18 +558,20 @@ export class Vehicle {
         this.CalculateStats();
     }
     public DeleteCrew(idx: number) {
-        console.log(this.crew);
         this.crew.splice(idx, 1);
-        console.log(this.crew);
         this.CalculateStats();
     }
     public DuplicateCrew(idx: number) {
         let c = this.crew[idx];
+        let dupls = [];
+        for (let l of c.loaders) {
+            dupls.push(new Loader(l.enclosed, l.coupla, l.sealed, l.loop_front, l.loop_left, l.loop_right, l.loop_back));
+        }
         let dupws = [];
         for (let w of c.weapon_mounts) {
             dupws.push(new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield, w.gunsight, w.rocket_count));
         }
-        let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, structuredClone(c.loaders), dupws);
+        let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, dupls, dupws);
         this.crew.splice(idx, 0, dup);
         this.CalculateStats();
     }
@@ -539,7 +605,6 @@ export class Vehicle {
         this.CalculateStats();
     }
     public SetNumWeapons(idx: number, num: number) {
-        console.log("Calling SetNumWeapons " + idx.toString() + "  " + num.toString())
         if (idx >= this.crew.length) {
             console.error("SetNumWeapons crew index out of range.");
         }
@@ -626,7 +691,7 @@ export class Vehicle {
     }
 
     public CanTurretHull(): boolean {
-        return PropulsionType[this.propulsion_idx] == "Walker";
+        return LocomotionType[this.locomotion_idx] == "Walker";
     }
 
     public SetTurretHull(has: boolean) {
@@ -634,5 +699,26 @@ export class Vehicle {
         this.CalculateStats();
     }
 
-
+    public Reset() {
+        this.name = "Sample Vehicle";
+        this.nickname = "It Only Gets Worse.";
+        this.powerplant_idx = 2;
+        this.powerplant_size_idx = 1;
+        this.locomotion_idx = 3;
+        this.armour_front = 0;
+        this.armour_side = 0;
+        this.armour_rear = 0;
+        this.extra_fuel = 0;
+        this.extra_tiny = false;
+        this.enlarged_engine = 0;
+        this.propeller = false;
+        this.turret_hull = false;
+        this.crew = [
+            new Crew("Driver", true, true, false, false, false, false, false, [], []),
+            new Crew("Commander", true, true, false, false, false, false, false, [], [new WeaponMount(0, [true, false, false, false, false], [], false, 0, 0)]),
+        ];
+        this.cargo = [0, 0, 0, 0];
+        this.accessories.Reset();
+        this.CalculateStats();
+    }
 }

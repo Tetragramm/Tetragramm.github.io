@@ -8,11 +8,38 @@ import { scrollToFragment } from "./scroll/scroll";
 
 const init = () => {
     const sp = new URLSearchParams(location.search);
-    var qp = sp.get("json");
+    var qp = sp.get("tank");
     var test = sp.get("test");
 
     //Weapons bit2
     vehicle_model = new Vehicle();
+
+    let tank_data = window.localStorage.getItem("tank");
+
+    var loaded = false;
+    if (qp && !loaded) {
+        console.log("Used Query Parameter");
+        try {
+            var str = LZString.decompressFromEncodedURIComponent(qp);
+            var arr = _stringToArrayBuffer(str);
+            var des = new Deserialize(arr);
+            console.log(des.version);
+            vehicle_model.Deserialize(des);
+            loaded = true;
+        } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); vehicle_model.Reset(); }
+    }
+    if (tank_data && !loaded) {
+        console.log("Used Saved Data");
+        try {
+            var str = LZString.decompressFromEncodedURIComponent(tank_data);
+            var arr = _stringToArrayBuffer(str);
+            var des = new Deserialize(arr);
+            console.log(des.version);
+            vehicle_model.Deserialize(des);
+            loaded = true;
+        } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); vehicle_model.Reset(); }
+    }
+
     vehicle_display = new VehDisp(vehicle_model);
     vehicle_model.CalculateStats();
 

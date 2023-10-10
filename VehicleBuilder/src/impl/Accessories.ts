@@ -1,3 +1,4 @@
+import { Serialize, Deserialize } from "./Serialize";
 import { Stats, WARNING_COLOR } from "./Stats";
 
 export class Accessories {
@@ -15,6 +16,54 @@ export class Accessories {
     public camouflage: boolean;
     public steering_trailer: boolean;
     public is_enclosed: boolean;
+
+    public Serialize(s: Serialize) {
+        s.PushBool(this.extra_armour);
+        s.PushBool(this.wooden_armour);
+        s.PushBool(this.cruise_control);
+        s.PushBool(this.intercom);
+        s.PushBool(this.wireless);
+        s.PushBool(this.temp_control);
+        s.PushBool(this.gas_filters);
+        s.PushBool(this.dozer_blades);
+        s.PushBool(this.wire_cutters);
+        s.PushBool(this.clockwerk_missile);
+        s.PushBool(this.smokescreen);
+        s.PushBool(this.camouflage);
+        s.PushBool(this.steering_trailer);
+    }
+
+    public Deserialize(d: Deserialize) {
+        this.extra_armour = d.GetBool();
+        this.wooden_armour = d.GetBool();
+        this.cruise_control = d.GetBool();
+        this.intercom = d.GetBool();
+        this.wireless = d.GetBool();
+        this.temp_control = d.GetBool();
+        this.gas_filters = d.GetBool();
+        this.dozer_blades = d.GetBool();
+        this.wire_cutters = d.GetBool();
+        this.clockwerk_missile = d.GetBool();
+        this.smokescreen = d.GetBool();
+        this.camouflage = d.GetBool();
+        this.steering_trailer = d.GetBool();
+    }
+
+    public Reset() {
+        this.extra_armour = false;
+        this.wooden_armour = false;
+        this.cruise_control = false;
+        this.intercom = false;
+        this.wireless = false;
+        this.temp_control = false;
+        this.gas_filters = false;
+        this.dozer_blades = false;
+        this.wire_cutters = false;
+        this.clockwerk_missile = false;
+        this.smokescreen = false;
+        this.camouflage = false;
+        this.steering_trailer = false;
+    }
 
     public GetEscapeMod() {
         let mod = 0;

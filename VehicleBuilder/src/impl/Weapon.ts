@@ -1,3 +1,5 @@
+import { StringFmt } from "../string";
+import { Deserialize, Serialize } from "./Serialize";
 import { Stats, WARNING_COLOR } from "./Stats";
 
 class Weapon {
@@ -94,6 +96,24 @@ export class WeaponMount {
         }
         this.gunsight = gs;
         this.rocket_count = rc;
+    }
+
+    public Serialize(s: Serialize) {
+        s.PushNum(this.main_idx);
+        s.PushBoolArr(this.directions);
+        s.PushNumArr(this.secondary_idx);
+        s.PushBool(this.shield);
+        s.PushNum(this.gunsight);
+        s.PushNum(this.rocket_count);
+    }
+
+    public Deserialize(d: Deserialize) {
+        this.main_idx = d.GetNum();
+        this.directions = d.GetBoolArr(5);
+        this.secondary_idx = d.GetNumArr(0);
+        this.shield = d.GetBool();
+        this.gunsight = d.GetNum();
+        this.rocket_count = d.GetNum();
     }
 
     public GetNumLoaders() {
@@ -210,5 +230,62 @@ export class WeaponMount {
         let sum = 0;
         cost.map((sum = 0, n => sum += n));
         return sum;
+    }
+
+    public WeaponString(): String {
+        if (this.main_idx == 0)
+            return "";
+
+        let wcount = Array(WeaponList.length).fill(0);
+        wcount[this.main_idx]++;
+        for (let s of this.secondary_idx) {
+            wcount[s]++;
+        }
+        let wstr;
+        if (WeaponList[this.main_idx].abbr == "RAR") {
+            wstr = StringFmt.Format("{0}x {1}", this.rocket_count, WeaponList[this.main_idx].abbr);
+        } else {
+            if (wcount[this.main_idx] == 1)
+                wstr = WeaponList[this.main_idx].abbr;
+            else
+                wstr = StringFmt.Format("{0}x {1}", wcount[this.main_idx], WeaponList[this.main_idx].abbr);
+        }
+        wcount[this.main_idx] = 0;
+        let wcoax = false;
+        for (let widx = wcount.length - 1; widx > 0; widx--) {
+            if (wcount[widx] > 0) {
+                wstr += " +Co-Ax ";
+                if (wcount[widx] == 1)
+                    wstr += WeaponList[widx].abbr;
+                else
+                    wstr += StringFmt.Format("{0}x {1}", wcount[widx], WeaponList[widx].abbr);
+            }
+        }
+        let directions = [];
+        if (this.directions[0] && this.directions[1] && this.directions[2] && this.directions[3]) {
+            directions.push("All Horizontal");
+        } else {
+            if (this.directions[0])
+                directions.push("Fore");
+            if (this.directions[1])
+                directions.push("Right");
+            if (this.directions[2])
+                directions.push("Rear");
+            if (this.directions[3])
+                directions.push("Left");
+        }
+        if (this.directions[4]) {
+            directions.push("Up");
+        }
+
+        let accessories = [];
+        if (this.shield)
+            accessories.push("Gun Shield");
+        if (this.gunsight != 0)
+            accessories.push(GunsightList[this.gunsight]);
+
+        let temp = [StringFmt.Format("{0} ({1})", wstr, StringFmt.Join(", ", directions)), StringFmt.Join(", ", accessories)];
+        temp = temp.filter((value) => { return value.length != 0; });
+        return StringFmt.Join(", ", temp);
     }
 }
