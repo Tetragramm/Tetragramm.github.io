@@ -39,7 +39,6 @@ export class CrewDisp {
         }
         this.datalist.id = "Crew_DataList";
         this.crewdiv.append(this.datalist);
-        this.crewdiv.append(document.createElement("BR"));
         this.lastline = document.createElement("SELECT") as HTMLSelectElement;
         for (let n of CrewType) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;

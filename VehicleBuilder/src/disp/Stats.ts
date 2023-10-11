@@ -20,11 +20,17 @@ export class StatsDisp {
     private crg: HTMLTableCellElement;
     private crw: HTMLTableElement;
     private special: HTMLTableCellElement;
+    private name_inp: HTMLInputElement;
+    private nick_inp: HTMLInputElement;
 
     constructor(veh: Vehicle) {
         this.vehicle = veh;
         this.name_lbl = document.getElementById("lbl_name") as HTMLLabelElement;
         this.nick_lbl = document.getElementById("lbl_nickname") as HTMLLabelElement;
+        this.name_inp = document.getElementById("inp_name") as HTMLInputElement;
+        this.nick_inp = document.getElementById("inp_nick") as HTMLInputElement;
+        this.name_inp.onchange = () => { this.vehicle.name = this.name_inp.value; this.vehicle.CalculateStats(); }
+        this.nick_inp.onchange = () => { this.vehicle.nickname = this.nick_inp.value; this.vehicle.CalculateStats(); }
         this.CreateStatTable();
         this.CreateCrewTable();
     }
@@ -111,8 +117,8 @@ export class StatsDisp {
     }
 
     public UpdateDisplay(final_stats: Stats) {
-        let origoffset = document.getElementById("lbl_mech").offsetTop;
-
+        this.name_inp.value = this.vehicle.name;
+        this.nick_inp.value = this.vehicle.nickname;
         this.name_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">{1}þ</span></p>", this.vehicle.name, final_stats.cost);
         this.nick_lbl.innerHTML = StringFmt.Format("<p><span style=\"float:left;\">{0}</span> <span style=\"float:right\">Upkeep {1}þ</span></p>", this.vehicle.nickname, final_stats.upkeep);
         this.spd.textContent = final_stats.speed.toString();
@@ -204,9 +210,6 @@ export class StatsDisp {
                 //TODO: Vis & Escape
                 this.CrewLine("Loader", enclosure, c.GetVisibility(l), c.GetEscape(l), StringFmt.Join(", ", notes), true);
             }
-
-            let newoffset = document.getElementById("lbl_mech").offsetTop;
-            document.body.scrollBy(0, newoffset - origoffset);
         }
 
         // this.CrewLine("Driver", "Closed", -1, -1, "Hatch", false);

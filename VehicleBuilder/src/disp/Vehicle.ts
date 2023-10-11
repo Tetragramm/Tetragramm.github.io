@@ -44,11 +44,17 @@ export class VehDisp {
     }
 
     public UpdateDisplay(final_stats: Stats) {
+
+        let origoffset = document.getElementById("lbl_mech").getBoundingClientRect().top;
+
         this.stats.UpdateDisplay(final_stats);
         this.armour.UpdateDisplay();
         this.crew.UpdateDisplay();
         this.weps.UpdateDisplay();
         this.accessories.UpdateDisplay();
+
+        let newoffset = document.getElementById("lbl_mech").getBoundingClientRect().top;
+        window.scrollBy(0, newoffset - origoffset);
     }
 
     private MakeLink() {
