@@ -61,7 +61,7 @@ export var WeaponList: Weapon[] = [
     new Weapon({ name: "Light Howitzer", abbr: "Light Howitzer", cost: 8, artillery: true, heavy: 4 }),
     new Weapon({ name: "Medium Howitzer", abbr: "Medium Howitzer", cost: 12, artillery: true, heavy: 5 }),
     new Weapon({ name: "Siege Cannon", abbr: "Siege Cannon", cost: 16, artillery: true, heavy: 6 }),
-    new Weapon({ name: "Other Weapon", abbr: "Other", cost: undefined }),
+    new Weapon({ name: "Other Weapon", abbr: "Other", cost: 0, loader: true }),
 ]
 
 export var GunsightList: string[] = [
