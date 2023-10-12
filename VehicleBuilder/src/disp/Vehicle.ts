@@ -3,7 +3,7 @@ import { MachineryDisp } from "./Machinery";
 import { CrewDisp } from "./Crew";
 import { WeaponDisp } from "./Weapon";
 import { AccessoriesDisp } from "./Accessories";
-import { copyStringToClipboard, _arrayBufferToString, _stringToArrayBuffer, download } from "./Tools";
+import { _arrayBufferToString, _stringToArrayBuffer, download } from "./Tools";
 import { LZString } from "../lz/lz-string";
 
 import { Vehicle } from "../impl/Vehicle";
@@ -68,6 +68,6 @@ export class VehDisp {
     }
 
     private SaveLink() {
-        copyStringToClipboard(this.MakeLink());
+        navigator.clipboard.writeText(this.MakeLink());
     }
 }
