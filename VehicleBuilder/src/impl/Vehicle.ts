@@ -502,7 +502,7 @@ export class Vehicle {
                 stat.torque -= 1;
                 stat.walker_torque = 5;
                 stat.speed = Math.min(stat.speed, 3);
-                stat.cost += 4;
+                stat.cost += 2;
                 stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Gains the High Ground Pressure & Standing Tall special rules.", color: WARNING_COLOR.WHITE });
                 break;
             case "Skids":

@@ -121,7 +121,7 @@ export const PowerplantType: { name: string, stress?: number, cost?: number, spe
         name: "Electric", cost: 3, speed: 1, torque: -1, handling: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Cannot Gun the Engine.", "Must recharge in town or with a generator.", "Can be Concealed with the engine on(when stationary)."]
     },
     {
-        name: "Clockwork", cost: 2, integrity: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Does not burn at 7 Wear.", "On Check Engine, cannot choose to take Wear or shut down; this is replaced with \"Spend 1 Fuel Use (repeatable)\".", "Must recharge in town or with a generator."]
+        name: "Clockwork", cost: 2, integrity: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Cannot Gun the Engine", "Does not burn at 7 Wear.", "On Check Engine, cannot choose to take Wear or shut down; this is replaced with \"Spend 1 Fuel Use (repeatable)\".", "Must recharge in town or with a generator."]
     }
 ];
 export const PropulsionType = [
