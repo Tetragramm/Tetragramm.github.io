@@ -1,7 +1,7 @@
 import { CreateTH, CreateCheckbox, CreateInput, CreateSelect } from "./Tools";
 
 import { Vehicle } from "../impl/Vehicle";
-import { GunsightList, WeaponList, WeaponMount } from "../impl/Weapon";
+import { GunsightList, GetWeaponList, WeaponMount, Weapon } from "../impl/Weapon";
 
 
 export class WeaponDisp {
@@ -26,6 +26,7 @@ export class WeaponDisp {
     }
 
     public UpdateDisplay() {
+        let WeaponList = GetWeaponList();
         let clist = this.vehicle.GetCrewList();
         let wcount = this.vehicle.GetNumWeapons();
         let widx = 0;
@@ -42,6 +43,13 @@ export class WeaponDisp {
                     this.CreateRow(this.wrows.length);
                 }
                 let wrow = this.wrows[widx];
+
+                //Update Weapon Lists
+                this.SetOpts(wrow.main, WeaponList);
+                for (let s of wrow.secondary) {
+                    this.SetOpts(s, WeaponList);
+                }
+
                 wrow.crew.textContent = citm.name_txt + " Mount " + mount_idx.toString();
                 wrow.main.selectedIndex = witm.main_idx;
                 wrow.rocket_span.hidden = WeaponList[witm.main_idx].name != "Rocket Artillery Rail";
@@ -99,9 +107,26 @@ export class WeaponDisp {
         }
     }
 
+    private SetOpts(sel: HTMLSelectElement, WeaponList: Weapon[]) {
+        for (let widx = 0; widx < WeaponList.length; widx++) {
+            if (widx < sel.options.length) {
+                sel.options[widx].text = WeaponList[widx].name;
+                sel.options[widx].value = WeaponList[widx].name;
+            } else {
+                let opt = document.createElement("OPTION") as HTMLOptionElement;
+                opt.text = WeaponList[widx].name;
+                opt.value = WeaponList[widx].name;
+                sel.options.add(opt);
+            }
+        }
+        while (sel.options.length > WeaponList.length) {
+            sel.options.remove(sel.options.length - 1);
+        }
+    }
+
     private CreateSecondary() {
         let sel = document.createElement("SELECT") as HTMLSelectElement;
-        for (let w of WeaponList) {
+        for (let w of GetWeaponList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.value = w.name;
             opt.text = w.name;
@@ -142,7 +167,7 @@ export class WeaponDisp {
         cell1.append(wrow.main);
         cell1.append(document.createElement("BR"));
         cell1.append(wrow.rocket_span);
-        for (let w of WeaponList) {
+        for (let w of GetWeaponList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.value = w.name;
             opt.text = w.name;

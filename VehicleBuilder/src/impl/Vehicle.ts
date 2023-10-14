@@ -1,13 +1,14 @@
-import { WeaponMount } from "./Weapon";
+import { BaseWeaponList, SetWeaponList, WeaponMount } from "./Weapon";
 import { WARNING_COLOR, PowerplantType, PowerplantSize, PropulsionType as LocomotionType, Stats, Volume } from "./Stats";
 import { Loader, Crew } from "./Crew";
 import { Accessories } from "./Accessories";
+import { Custom } from "./Custom";
 import { Deserialize, Serialize } from "./Serialize";
 import { _arrayBufferToString } from "../disp/Tools";
 import { LZString } from "../lz/lz-string";
 
 export class Vehicle {
-    public version = 1;
+    public version = 2;
     public name = "Sample Vehicle";
     public nickname = "It Only Gets Worse.";
     private powerplant_idx: number = 2;
@@ -28,6 +29,7 @@ export class Vehicle {
     ];
     private cargo = [0, 0, 0, 0];
     private accessories = new Accessories();
+    private custom = new Custom();
 
 
     public Serialize(s: Serialize) {
@@ -53,6 +55,7 @@ export class Vehicle {
         s.PushNum(this.cargo[2]);
         s.PushNum(this.cargo[3]);
         this.accessories.Serialize(s);
+        this.custom.Serialize(s);
     }
 
     public Deserialize(d: Deserialize) {
@@ -78,6 +81,8 @@ export class Vehicle {
         }
         this.cargo = [d.GetNum(), d.GetNum(), d.GetNum(), d.GetNum()];
         this.accessories.Deserialize(d);
+        if (d.version > 1)
+            this.custom.Deserialize(d);
     }
 
     public SetDisplayCallback(callback: (stat: Stats) => void) {
@@ -300,6 +305,9 @@ export class Vehicle {
                 cramped += 0.25;
         }
         stat.volume += Math.ceil(-1.0e-6 + cramped);
+        for (let part of this.custom.GetParts()) {
+            stat.volume += part.stats.volume;
+        }
         stat.volume = Math.ceil(-1.0e-6 + stat.volume);
         if (is_enclosed) {
             stat.volume += 1;
@@ -319,6 +327,7 @@ export class Vehicle {
     }
 
     public CalculateStats(): Stats {
+        SetWeaponList(this.custom.GetWeapons());
         let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
         if (!this.CanExtraFuel()) {
             this.extra_fuel = 0;
@@ -327,6 +336,7 @@ export class Vehicle {
         stat.cost = 3;
         stat.torque = -1;
         stat.volume += this.extra_fuel;
+
         let is_enclosed = false;
         let cramped_volume = 0;
         for (let idx = 0; idx < this.crew.length; idx++) {
@@ -343,6 +353,11 @@ export class Vehicle {
         }
         this.extra_tiny = (stat.volume - Math.floor(stat.volume)) >= 0.45;
         stat.volume += cramped_volume;
+
+        for (let part of this.custom.GetParts()) {
+            stat.add(part.stats);
+        }
+
         stat.volume = Math.ceil(stat.volume);
 
         //Loopholes
@@ -719,6 +734,11 @@ export class Vehicle {
         ];
         this.cargo = [0, 0, 0, 0];
         this.accessories.Reset();
+        this.custom.Reset();
         this.CalculateStats();
+    }
+
+    public GetCustom(): Custom {
+        return this.custom;
     }
 }

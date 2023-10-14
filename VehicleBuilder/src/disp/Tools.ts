@@ -22,7 +22,7 @@ export function GenerateID() {
 }
 
 export type FlexSection = { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement };
-export function CreateFlexSection(elem: HTMLElement): FlexSection {
+export function CreateFlexSection(elem?: HTMLElement): FlexSection {
     const fs = {
         div0: document.createElement("DIV"), div1: document.createElement("DIV"),
         div2: document.createElement("DIV")
@@ -32,7 +32,8 @@ export function CreateFlexSection(elem: HTMLElement): FlexSection {
     fs.div2.classList.add("flex-container-i");
     fs.div0.appendChild(fs.div1);
     fs.div0.appendChild(fs.div2);
-    elem.appendChild(fs.div0);
+    if (elem)
+        elem.appendChild(fs.div0);
     return fs;
 }
 

@@ -1,3 +1,5 @@
+import { Deserialize, Serialize } from "./Serialize";
+
 enum SizeEnum {
     None = "None",
     Tiny = "Tiny",
@@ -52,6 +54,8 @@ export class Stats {
                 this.stress = obj.stress;
             if (obj["volume"])
                 this.volume = obj.volume;
+            if (obj["warnings"])
+                this.warnings = obj.warnings;
         }
     }
 
@@ -67,6 +71,53 @@ export class Stats {
         this.fuel += other.fuel;
         this.stress += other.stress;
         this.volume += other.volume;
+        for (let ow of other.warnings) {
+            this.warnings.push(ow);
+        }
+    }
+
+    public Serialize(s: Serialize) {
+        s.PushNum(this.cost);
+        s.PushNum(this.upkeep);
+        s.PushNum(this.speed);
+        s.PushNum(this.torque);
+        s.PushNum(this.handling);
+        s.PushNum(this.integrity);
+        s.PushNum(this.safety);
+        s.PushNum(this.reliability);
+        s.PushNum(this.fuel);
+        s.PushNum(this.stress);
+        s.PushNum(this.volume);
+        s.PushNum(this.walker_torque);
+        s.PushNum(this.warnings.length);
+        for (let w of this.warnings) {
+            s.PushString(w.source);
+            s.PushString(w.warning);
+            s.PushNum(w.color.valueOf());
+        }
+    }
+
+    public Deserialize(d: Deserialize) {
+        this.cost = d.GetNum();
+        this.upkeep = d.GetNum();
+        this.speed = d.GetNum();
+        this.torque = d.GetNum();
+        this.handling = d.GetNum();
+        this.integrity = d.GetNum();
+        this.safety = d.GetNum();
+        this.reliability = d.GetNum();
+        this.fuel = d.GetNum();
+        this.stress = d.GetNum();
+        this.volume = d.GetNum();
+        this.walker_torque = d.GetNum();
+        let wlen = d.GetNum();
+        this.warnings = [];
+        for (let widx = 0; widx < wlen; widx++) {
+            let source = d.GetString();
+            let warning = d.GetString();
+            let color = d.GetNum();
+            this.warnings.push({ source: source, warning: warning, color: color });
+        }
     }
 }
 

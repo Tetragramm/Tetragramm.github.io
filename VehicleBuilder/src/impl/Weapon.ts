@@ -2,55 +2,68 @@ import { StringFmt } from "../string";
 import { Deserialize, Serialize } from "./Serialize";
 import { Stats, WARNING_COLOR } from "./Stats";
 
-class Weapon {
+export class Weapon {
     public name: string;
     public abbr: string;
     public cost: number;
     public loader: boolean;
-    public braced: boolean;
     public heavy: number;
     public artillery: boolean;
-    public indirect: boolean;
 
-    constructor(js: { name: string, abbr: string, cost: number, loader?: boolean, braced?: boolean, heavy?: number, artillery?: boolean, indirect?: boolean }) {
+    constructor(js: { name: string, abbr: string, cost: number, loader?: boolean, heavy?: number, artillery?: boolean }) {
         this.name = js.name;
         this.abbr = js.abbr;
         this.cost = js.cost;
         this.loader = js.loader ?? false;
-        this.braced = js.braced ?? false;
         this.heavy = js.heavy ?? 0;
         this.artillery = js.artillery ?? false;
         if (this.artillery) {
             this.loader = true;
-            this.braced = true;
         }
-        this.indirect = js.indirect ?? false;
+    }
+
+    public Serialize(s: Serialize) {
+        s.PushString(this.name);
+        s.PushString(this.abbr);
+        s.PushNum(this.cost);
+        s.PushBool(this.loader);
+        s.PushNum(this.heavy);
+        s.PushBool(this.artillery);
+    }
+
+    public Deserialize(d: Deserialize) {
+        this.name = d.GetString();
+        this.abbr = d.GetString();
+        this.cost = d.GetNum();
+        this.loader = d.GetBool();
+        this.heavy = d.GetNum();
+        this.artillery = d.GetBool();
     }
 }
 
-export var WeaponList: Weapon[] = [
+export var BaseWeaponList: Weapon[] = [
     new Weapon({ name: "None", abbr: undefined, cost: undefined, loader: false }),
     new Weapon({ name: "Searchlight", abbr: "SL", cost: 1 }),
     new Weapon({ name: "Trench Gun", abbr: "TG", cost: 2 }),
     new Weapon({ name: "Aircraft Shotgun", abbr: "ASG", cost: 2 }),
     new Weapon({ name: "Converted Autorifle", abbr: "CAR", cost: 1 }),
     new Weapon({ name: "Machine Carbine", abbr: "MC", cost: 5 }),
-    new Weapon({ name: "Heavy Submachine Gun", abbr: "HSG", cost: 2, braced: true, loader: true }),
+    new Weapon({ name: "Heavy Submachine Gun", abbr: "HSG", cost: 2, loader: true }),
     new Weapon({ name: "Firing Port Weapon", abbr: "FPW", cost: 2 }),
     new Weapon({ name: "Landflammenwerfer", abbr: "LFW", cost: 3 }),
     new Weapon({ name: "Static Gun", abbr: "Static Gun", cost: 4 }),
-    new Weapon({ name: "Light Machine Gun", abbr: "LMG", cost: 2, loader: true, braced: true }),
-    new Weapon({ name: "Water-Cooled Machine Gun", abbr: "WMG", cost: 3, loader: true, braced: true, heavy: 2 }),
-    new Weapon({ name: "Automatic Rifle", abbr: "AR", cost: 3, loader: true, braced: true }),
-    new Weapon({ name: "Hailstorm Shotgun", abbr: "HSS", cost: 4, loader: true, braced: true, heavy: 3 }),
-    new Weapon({ name: "Rotary Machine Gun", abbr: "RMG", cost: 5, loader: true, braced: true, heavy: 2 }),
-    new Weapon({ name: "PuF Machine Gun", abbr: "PMG", cost: 5, loader: true, braced: true, heavy: 3 }),
-    new Weapon({ name: "Anti-Tank Rifle", abbr: "ATR", cost: 4, loader: false, braced: true }),
-    new Weapon({ name: "Coilgun Rifle", abbr: "Coilgun Rifle", cost: 10, loader: false, braced: true }),
-    new Weapon({ name: "Trench Mortar", abbr: "TM", cost: 1, loader: true, braced: true, indirect: true }),
-    new Weapon({ name: "Repeater Cannon", abbr: "RPC", cost: 6, loader: true, braced: true, heavy: 3 }),
+    new Weapon({ name: "Light Machine Gun", abbr: "LMG", cost: 2, loader: true }),
+    new Weapon({ name: "Water-Cooled Machine Gun", abbr: "WMG", cost: 3, loader: true, heavy: 2 }),
+    new Weapon({ name: "Automatic Rifle", abbr: "AR", cost: 3, loader: true }),
+    new Weapon({ name: "Hailstorm Shotgun", abbr: "HSS", cost: 4, loader: true, heavy: 3 }),
+    new Weapon({ name: "Rotary Machine Gun", abbr: "RMG", cost: 5, loader: true, heavy: 2 }),
+    new Weapon({ name: "PuF Machine Gun", abbr: "PMG", cost: 5, loader: true, heavy: 3 }),
+    new Weapon({ name: "Anti-Tank Rifle", abbr: "ATR", cost: 4, loader: false }),
+    new Weapon({ name: "Coilgun Rifle", abbr: "Coilgun Rifle", cost: 10, loader: false }),
+    new Weapon({ name: "Trench Mortar", abbr: "TM", cost: 1, loader: true }),
+    new Weapon({ name: "Repeater Cannon", abbr: "RPC", cost: 6, loader: true, heavy: 3 }),
     new Weapon({ name: "Infantry Support Cannon", abbr: "ISC", cost: 6, heavy: 2, artillery: true }),
-    new Weapon({ name: "Recoilless Cannon", abbr: "RRC", cost: 5, loader: true, braced: true, heavy: 2 }),
+    new Weapon({ name: "Recoilless Cannon", abbr: "RRC", cost: 5, loader: true, heavy: 2 }),
     new Weapon({ name: "Pom-Pom Gun", abbr: "POM", cost: 10, artillery: true, heavy: 3 }),
     new Weapon({ name: "Flak Cannon", abbr: "FLAK", cost: 5, artillery: true, heavy: 3 }),
     new Weapon({ name: "Field Cannon", abbr: "FC", cost: 8, artillery: true, heavy: 3 }),
@@ -61,8 +74,17 @@ export var WeaponList: Weapon[] = [
     new Weapon({ name: "Light Howitzer", abbr: "Light Howitzer", cost: 8, artillery: true, heavy: 4 }),
     new Weapon({ name: "Medium Howitzer", abbr: "Medium Howitzer", cost: 12, artillery: true, heavy: 5 }),
     new Weapon({ name: "Siege Cannon", abbr: "Siege Cannon", cost: 16, artillery: true, heavy: 6 }),
-    new Weapon({ name: "Other Weapon", abbr: "Other", cost: 0, loader: true }),
 ]
+
+var WeaponList: Weapon[] = [...BaseWeaponList];
+
+export function SetWeaponList(w: Weapon[]) {
+    WeaponList = [...BaseWeaponList, ...w];
+}
+
+export function GetWeaponList(): Weapon[] {
+    return WeaponList;
+}
 
 export var GunsightList: string[] = [
     "None",
@@ -117,6 +139,7 @@ export class WeaponMount {
     }
 
     public GetNumLoaders() {
+        this.main_idx = Math.min(WeaponList.length - 1, this.main_idx);
         let count = 0;
         if (WeaponList[this.main_idx].loader)
             count++;
@@ -128,6 +151,12 @@ export class WeaponMount {
     }
 
     public CalcStats(closed: boolean, armour: number[]): Stats {
+
+        this.main_idx = Math.min(WeaponList.length - 1, this.main_idx);
+        for (let sidx = 0; sidx < this.secondary_idx.length; sidx++) {
+            this.secondary_idx[sidx] = Math.min(WeaponList.length - 1, this.secondary_idx[sidx]);
+        }
+
         let stat = new Stats();
         if (this.main_idx > 0) {
             stat.add(this.WeapStats(this.main_idx));
@@ -206,6 +235,7 @@ export class WeaponMount {
     }
 
     public IsArty(): boolean {
+        this.main_idx = Math.min(WeaponList.length - 1, this.main_idx);
         if (WeaponList[this.main_idx].artillery && WeaponList[this.main_idx].abbr != "ISC")
             return true;
         for (let sidx of this.secondary_idx) {
@@ -233,6 +263,7 @@ export class WeaponMount {
     }
 
     public WeaponString(): String {
+        this.main_idx = Math.min(WeaponList.length - 1, this.main_idx);
         if (this.main_idx == 0)
             return "";
 

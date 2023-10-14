@@ -3,13 +3,15 @@ import { MachineryDisp } from "./Machinery";
 import { CrewDisp } from "./Crew";
 import { WeaponDisp } from "./Weapon";
 import { AccessoriesDisp } from "./Accessories";
+import { CustomDisp } from "./Custom";
+import { Cards } from "./Cards";
+
 import { _arrayBufferToString, _stringToArrayBuffer, download } from "./Tools";
 import { LZString } from "../lz/lz-string";
 
 import { Vehicle } from "../impl/Vehicle";
 import { Stats } from "../impl/Stats";
 import { Serialize } from "../impl/Serialize";
-import { Cards } from "./Cards";
 
 export class VehDisp {
     private vehicle: Vehicle;
@@ -18,6 +20,7 @@ export class VehDisp {
     private crew: CrewDisp;
     private weps: WeaponDisp;
     private accessories: AccessoriesDisp;
+    private custom: CustomDisp;
     private cards: Cards;
 
     constructor(veh: Vehicle) {
@@ -28,6 +31,7 @@ export class VehDisp {
         this.crew = new CrewDisp(veh);
         this.weps = new WeaponDisp(veh);
         this.accessories = new AccessoriesDisp(veh);
+        this.custom = new CustomDisp(veh);
 
         const link_button = document.getElementById("acft_save_link") as HTMLButtonElement;
         link_button.onclick = () => { this.SaveLink(); };
@@ -52,6 +56,7 @@ export class VehDisp {
         this.crew.UpdateDisplay();
         this.weps.UpdateDisplay();
         this.accessories.UpdateDisplay();
+        this.custom.UpdateDisplay();
 
         let newoffset = document.getElementById("lbl_mech").getBoundingClientRect().top;
         window.scrollBy(0, newoffset - origoffset);
