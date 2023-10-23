@@ -189,7 +189,6 @@ export const PropulsionType = [
     "Skids",
     "Skis",
     "Boat Hull",
-    "Amphibious",
     "Cable Car",
     "Sky-Line",
     "Dorandisch Earthline",

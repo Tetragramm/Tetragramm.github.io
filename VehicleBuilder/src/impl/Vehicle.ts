@@ -8,7 +8,7 @@ import { _arrayBufferToString } from "../disp/Tools";
 import { LZString } from "../lz/lz-string";
 
 export class Vehicle {
-    public version = 2;
+    public version = 3;
     public name = "Sample Vehicle";
     public nickname = "It Only Gets Worse.";
     private powerplant_idx: number = 2;
@@ -22,6 +22,7 @@ export class Vehicle {
     private enlarged_engine: number = 0;
     private propeller = false;
     private turret_hull = false;
+    private amphibious = false;
     private DisplayCallback: (stat: Stats) => void;
     private crew: Crew[] = [
         new Crew("Driver", true, true, false, false, false, false, false, [], []),
@@ -56,6 +57,7 @@ export class Vehicle {
         s.PushNum(this.cargo[3]);
         this.accessories.Serialize(s);
         this.custom.Serialize(s);
+        s.PushBool(this.amphibious);
     }
 
     public Deserialize(d: Deserialize) {
@@ -81,8 +83,21 @@ export class Vehicle {
         }
         this.cargo = [d.GetNum(), d.GetNum(), d.GetNum(), d.GetNum()];
         this.accessories.Deserialize(d);
-        if (d.version > 1)
+        if (d.version > 1) {
             this.custom.Deserialize(d);
+        } else {
+            this.custom.Reset();
+        }
+        if (d.version <= 2) {
+            this.amphibious = false;
+            if (this.locomotion_idx >= 13) {
+                console.log("Reducing loco index from " + this.locomotion_idx.toString());
+                this.locomotion_idx--;
+            }
+            console.log("Not loco index from " + this.locomotion_idx.toString());
+        } else {
+            this.amphibious = d.GetBool();
+        }
     }
 
     public SetDisplayCallback(callback: (stat: Stats) => void) {
@@ -190,7 +205,6 @@ export class Vehicle {
             case "Skids":
             case "Skis":
             case "Boat Hull":
-            case "Amphibious":
             case "Cable Car":
             case "Sky-Line":
             case "Dorandisch Earthline":
@@ -218,13 +232,12 @@ export class Vehicle {
             case "Skis":
                 return volume <= 6;
             case "Boat Hull":
-            case "Amphibious":
             case "Cable Car":
             case "Sky-Line":
             case "Dorandisch Earthline":
                 return true;
             default:
-                console.error("Unknonw Locomotion in ValidateLocomotion");
+                console.error("Unknonw Locomotion in ValidateLocomotion: " + this.locomotion_idx);
                 return false;
         }
     }
@@ -312,7 +325,7 @@ export class Vehicle {
         if (is_enclosed) {
             stat.volume += 1;
         }
-        if (LocomotionType[this.locomotion_idx] == "Amphibious") {
+        if (this.amphibious) {
             stat.volume += 1;
         }
         if (this.enlarged_engine > 0) {
@@ -367,7 +380,7 @@ export class Vehicle {
         if (!this.ValidateLocomotion()) {
             stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Too much Volume for this locomotion type.", color: WARNING_COLOR.RED });
         }
-        if (LocomotionType[this.locomotion_idx] == "Amphibious") {
+        if (this.amphibious) {
             stat.volume += 1;
             stat.cost += 1;
             stat.warnings.push({ source: "Amphibious", warning: "Allows use on calm water at -1 Speed.", color: WARNING_COLOR.WHITE });
@@ -530,9 +543,6 @@ export class Vehicle {
                 stat.speed = Math.min(stat.speed, 4);
                 stat.cost += 1;
                 stat.warnings.push({ source: LocomotionType[this.locomotion_idx], warning: "Limited to Water.", color: WARNING_COLOR.WHITE });
-                break;
-            case "Amphibious":
-                //Note: Done earlier
                 break;
             case "Cable Car":
             case "Sky-Line":
@@ -740,5 +750,20 @@ export class Vehicle {
 
     public GetCustom(): Custom {
         return this.custom;
+    }
+
+    public SetAmphibious(is: boolean) {
+        this.amphibious = is;
+    }
+
+    public CanAmphibious(): boolean {
+        switch (LocomotionType[this.locomotion_idx]) {
+            case "Sky-Line":
+            case "Dorandisch Earthline":
+            case "Boat Hull":
+                return false;
+            default:
+                return true;
+        }
     }
 }

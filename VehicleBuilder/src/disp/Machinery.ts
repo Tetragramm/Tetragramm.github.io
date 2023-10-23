@@ -15,6 +15,8 @@ export class MachineryDisp {
     private rear_armour: HTMLInputElement;
     private prop_span: HTMLSpanElement;
     private propeller: HTMLInputElement;
+    private amph_span: HTMLSpanElement;
+    private amphibious: HTMLInputElement;
     private turret_span: HTMLSpanElement;
     private turret: HTMLInputElement;
     private s_cargo: HTMLInputElement;
@@ -37,6 +39,10 @@ export class MachineryDisp {
         this.prop_span = document.getElementById("prop_span") as HTMLSpanElement;
         this.propeller = document.getElementById("inp_prop") as HTMLInputElement;
         this.propeller.onchange = () => { this.vehicle.SetPropeller(this.propeller.checked); };
+
+        this.amph_span = document.getElementById("amph_span") as HTMLSpanElement;
+        this.amphibious = document.getElementById("inp_amph") as HTMLInputElement;
+        this.amphibious.onchange = () => { this.vehicle.SetAmphibious(this.amphibious.checked); };
 
         this.turret_span = document.getElementById("turret_span") as HTMLSpanElement;
         this.turret = document.getElementById("inp_turret") as HTMLInputElement;
@@ -143,7 +149,6 @@ export class MachineryDisp {
                     }
                     break;
                 case "Boat Hull":
-                case "Amphibious":
                 case "Cable Car":
                 case "Sky-Line":
                 case "Dorandisch Earthline":
@@ -157,17 +162,10 @@ export class MachineryDisp {
 
     public UpdateDisplay() {
         this.locomotion.selectedIndex = this.vehicle.GetPropulsionIdx();
-        if (this.vehicle.CanPropeller()) {
-            this.prop_span.hidden = false;
-        } else {
-            this.prop_span.hidden = true;
-        }
 
-        if (this.vehicle.CanTurretHull()) {
-            this.turret_span.hidden = false;
-        } else {
-            this.turret_span.hidden = true;
-        }
+        this.amph_span.hidden = !this.vehicle.CanAmphibious();
+        this.prop_span.hidden = !this.vehicle.CanPropeller();
+        this.turret_span.hidden = !this.vehicle.CanTurretHull();
 
         this.pp_type.selectedIndex = this.vehicle.GetPowerplantIdx();
         if (this.update_type) {
