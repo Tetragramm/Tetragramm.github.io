@@ -189,7 +189,7 @@ export class StatsDisp {
                 }
             }
             let notes = [];
-            if (c.enclosed && c.coupla) {
+            if (c.enclosed && c.cupola) {
                 notes.push("Hatch");
             }
             notes.push(c.WeaponString());
@@ -204,7 +204,7 @@ export class StatsDisp {
                     }
                 }
                 let notes = [];
-                if (c.loaders[l].enclosed && c.loaders[l].coupla) {
+                if (c.loaders[l].enclosed && c.loaders[l].cupola) {
                     notes.push("Hatch");
                 }
                 //TODO: Vis & Escape

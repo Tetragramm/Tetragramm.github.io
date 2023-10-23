@@ -62,7 +62,7 @@ export class Cards {
                 context.fillText((c.GetVisibility() ?? "-").toString(), 935, 600 + 55 * idx, 100);
                 context.fillText((c.GetEscape() ?? "-").toString(), 1015, 600 + 55 * idx, 100);
                 let notes = [];
-                if (c.enclosed && c.coupla) {
+                if (c.enclosed && c.cupola) {
                     notes.push("Hatch");
                 }
                 if (c.WeaponString() != "")
@@ -89,7 +89,7 @@ export class Cards {
                     context.fillText((c.GetVisibility(lidx) ?? "-").toString(), 935, 600 + 55 * idx, 100);
                     context.fillText((c.GetEscape(lidx) ?? "-").toString(), 1015, 600 + 55 * idx, 100);
                     let notes = [];
-                    if (l.enclosed && l.coupla) {
+                    if (l.enclosed && l.cupola) {
                         notes.push("Hatch");
                     }
 

@@ -17,7 +17,7 @@ export const CrewType: { name: string }[] = [
 
 export class Loader {
     public enclosed: boolean;
-    public coupla: boolean;
+    public cupola: boolean;
     public sealed: boolean;
     public loop_front: boolean;
     public loop_left: boolean;
@@ -25,7 +25,7 @@ export class Loader {
     public loop_back: boolean;
     constructor(enc: boolean, coup: boolean, seal: boolean, front: boolean, left: boolean, right: boolean, rear: boolean) {
         this.enclosed = enc;
-        this.coupla = coup;
+        this.cupola = coup;
         this.sealed = seal;
         this.loop_front = front;
         this.loop_left = left;
@@ -35,7 +35,7 @@ export class Loader {
 
     public Serialize(s: Serialize) {
         s.PushBool(this.enclosed);
-        s.PushBool(this.coupla);
+        s.PushBool(this.cupola);
         s.PushBool(this.sealed);
         s.PushBool(this.loop_front);
         s.PushBool(this.loop_left);
@@ -45,7 +45,7 @@ export class Loader {
 
     public Deserialize(d: Deserialize) {
         this.enclosed = d.GetBool();
-        this.coupla = d.GetBool();
+        this.cupola = d.GetBool();
         this.sealed = d.GetBool();
         this.loop_front = d.GetBool();
         this.loop_left = d.GetBool();
@@ -57,7 +57,7 @@ export class Loader {
 export class Crew {
     public name_txt: string;
     public enclosed: boolean;
-    public coupla: boolean;
+    public cupola: boolean;
     public sealed: boolean;
     public loop_front: boolean;
     public loop_left: boolean;
@@ -70,7 +70,7 @@ export class Crew {
     constructor(disp: string, enc: boolean, coup: boolean, seal: boolean, lf: boolean, ll: boolean, lr: boolean, lb: boolean, ldrs: Loader[], weaps: WeaponMount[]) {
         this.name_txt = disp;
         this.enclosed = enc;
-        this.coupla = coup;
+        this.cupola = coup;
         this.sealed = seal;
         this.loop_front = lf;
         this.loop_left = ll;
@@ -83,7 +83,7 @@ export class Crew {
     public Serialize(s: Serialize) {
         s.PushString(this.name_txt);
         s.PushBool(this.enclosed);
-        s.PushBool(this.coupla);
+        s.PushBool(this.cupola);
         s.PushBool(this.sealed);
         s.PushBool(this.loop_front);
         s.PushBool(this.loop_left);
@@ -102,7 +102,7 @@ export class Crew {
     public Deserialize(d: Deserialize) {
         this.name_txt = d.GetString();
         this.enclosed = d.GetBool();
-        this.coupla = d.GetBool();
+        this.cupola = d.GetBool();
         this.sealed = d.GetBool();
         this.loop_front = d.GetBool();
         this.loop_left = d.GetBool();
@@ -143,8 +143,11 @@ export class Crew {
         if (seat.sealed)
             return undefined;
         if (seat.enclosed) {
-            if (seat.coupla) {
+            if (seat.cupola) {
                 return this.base_vis + 1;
+            }
+            if (this.IsCramped()) {
+                return this.base_vis - 1;
             }
             return this.base_vis
         }
@@ -165,8 +168,11 @@ export class Crew {
             seat = this.loaders[l];
         }
         if (seat.enclosed) {
-            if (seat.coupla) {
+            if (seat.cupola) {
                 return this.base_escape + 1;
+            }
+            if (this.IsCramped()) {
+                return this.base_escape - 1;
             }
             return this.base_escape
         }
@@ -205,9 +211,9 @@ export class Crew {
             this.loaders.pop();
         }
         if (armour[0] + armour[1] + armour[2] == 0) {
-            this.coupla = false;
+            this.cupola = false;
             for (let l of this.loaders) {
-                l.coupla = false;
+                l.cupola = false;
             }
         }
 
@@ -220,12 +226,12 @@ export class Crew {
             stat.volume += 0.5;
         }
 
-        if (this.enclosed && this.coupla)
+        if (this.enclosed && this.cupola)
             stat.cost += 1;
 
         for (let idx = 0; idx < this.loaders.length; idx++) {
             stat.volume += 0.5;
-            if (this.loaders[idx].enclosed && this.loaders[idx].coupla)
+            if (this.loaders[idx].enclosed && this.loaders[idx].cupola)
                 stat.cost += 1;
         }
 

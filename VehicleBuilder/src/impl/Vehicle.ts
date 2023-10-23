@@ -580,13 +580,13 @@ export class Vehicle {
         let c = this.crew[idx];
         let dupls = [];
         for (let l of c.loaders) {
-            dupls.push(new Loader(l.enclosed, l.coupla, l.sealed, l.loop_front, l.loop_left, l.loop_right, l.loop_back));
+            dupls.push(new Loader(l.enclosed, l.cupola, l.sealed, l.loop_front, l.loop_left, l.loop_right, l.loop_back));
         }
         let dupws = [];
         for (let w of c.weapon_mounts) {
             dupws.push(new WeaponMount(w.main_idx, structuredClone(w.directions), structuredClone(w.secondary_idx), w.shield, w.gunsight, w.rocket_count));
         }
-        let dup = new Crew(c.name_txt, c.enclosed, c.coupla, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, dupls, dupws);
+        let dup = new Crew(c.name_txt, c.enclosed, c.cupola, c.sealed, c.loop_front, c.loop_left, c.loop_right, c.loop_back, dupls, dupws);
         this.crew.splice(idx, 0, dup);
         this.CalculateStats();
     }

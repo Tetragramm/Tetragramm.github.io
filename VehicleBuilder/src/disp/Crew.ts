@@ -12,14 +12,14 @@ export class CrewDisp {
         rem: HTMLButtonElement, add: HTMLButtonElement,
         name_span: HTMLSpanElement, name: HTMLInputElement,
         enc_span: HTMLSpanElement, enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
-        coupla: HTMLInputElement, seal_span: HTMLSpanElement, seal: HTMLInputElement,
+        cupola: HTMLInputElement, seal_span: HTMLSpanElement, seal: HTMLInputElement,
         load_span: HTMLSpanElement, has_loader: HTMLInputElement, loop_front: HTMLInputElement,
         loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement,
         num_mounts: HTMLInputElement, br: HTMLBRElement,
         loader: {
             span: HTMLSpanElement, enc_span: HTMLSpanElement,
             enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
-            coupla: HTMLInputElement, seal_span: HTMLSpanElement,
+            cupola: HTMLInputElement, seal_span: HTMLSpanElement,
             seal: HTMLInputElement, loop_front: HTMLInputElement,
             loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement,
             br: HTMLBRElement
@@ -97,7 +97,7 @@ export class CrewDisp {
             line.enclosed.checked = crew.enclosed;
             if (crew.enclosed && this.vehicle.SumArmour() > 0) {
                 line.coup_span.hidden = false;
-                line.coupla.checked = crew.coupla;
+                line.cupola.checked = crew.cupola;
             } else {
                 line.coup_span.hidden = true;
             }
@@ -127,7 +127,7 @@ export class CrewDisp {
                     if (crew.loaders[idx].enclosed) {
                         line.loader[idx].coup_span.hidden = false;
                         line.loader[idx].seal_span.hidden = false;
-                        line.loader[idx].coupla.checked = crew.loaders[idx].coupla;
+                        line.loader[idx].cupola.checked = crew.loaders[idx].cupola;
                         line.loader[idx].seal.checked = crew.loaders[idx].sealed;
                         line.loader[idx].loop_front.checked = crew.loaders[idx].loop_front;
                         line.loader[idx].loop_left.checked = crew.loaders[idx].loop_left;
@@ -152,7 +152,7 @@ export class CrewDisp {
             enc_span: undefined,
             enclosed: document.createElement("INPUT") as HTMLInputElement,
             coup_span: undefined,
-            coupla: document.createElement("INPUT") as HTMLInputElement,
+            cupola: document.createElement("INPUT") as HTMLInputElement,
             seal_span: undefined,
             seal: document.createElement("INPUT") as HTMLInputElement,
             loop_front: document.createElement("INPUT") as HTMLInputElement,
@@ -163,7 +163,7 @@ export class CrewDisp {
         };
 
         line.enc_span = CreateLabel("\u00A0\u00A0Enclosed:", line.enclosed);
-        line.coup_span = CreateLabel("\u00A0\u00A0Coupla/Hatch:", line.coupla);
+        line.coup_span = CreateLabel("\u00A0\u00A0Cupola/Hatch:", line.cupola);
         line.seal_span = CreateLabel("\u00A0Sealed:", line.seal);
         let name = document.createElement("LABEL") as HTMLLabelElement;
         name.innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;Loader&nbsp;";
@@ -177,7 +177,7 @@ export class CrewDisp {
         line.span.append(line.seal_span);
         line.span.append(loop_span);
         line.enclosed.type = "checkbox";
-        line.coupla.type = "checkbox";
+        line.cupola.type = "checkbox";
         line.seal.type = "checkbox";
         line.loop_front.type = "checkbox";
         line.loop_left.type = "checkbox";
@@ -185,11 +185,11 @@ export class CrewDisp {
         line.loop_back.type = "checkbox";
         let oc = () => {
             this.vehicle.SetLoader(crew_idx, idx,
-                new Loader(line.enclosed.checked, line.coupla.checked, line.seal.checked,
+                new Loader(line.enclosed.checked, line.cupola.checked, line.seal.checked,
                     line.loop_front.checked, line.loop_left.checked, line.loop_right.checked, line.loop_back.checked));
         };
         line.enclosed.onchange = oc;
-        line.coupla.onchange = oc;
+        line.cupola.onchange = oc;
         line.seal.onchange = oc;
         line.loop_front.onchange = oc;
         line.loop_left.onchange = oc;
@@ -208,7 +208,7 @@ export class CrewDisp {
             enc_span: undefined,
             enclosed: document.createElement("INPUT") as HTMLInputElement,
             coup_span: undefined,
-            coupla: document.createElement("INPUT") as HTMLInputElement,
+            cupola: document.createElement("INPUT") as HTMLInputElement,
             seal_span: undefined,
             seal: document.createElement("INPUT") as HTMLInputElement,
             loop_front: document.createElement("INPUT") as HTMLInputElement,
@@ -234,7 +234,7 @@ export class CrewDisp {
         line.name_span.insertAdjacentElement("afterbegin", line.add);
         line.name_span.insertAdjacentElement("afterbegin", line.rem);
         line.enc_span = CreateLabel("\u00A0\u00A0Enclosed:", line.enclosed);
-        line.coup_span = CreateLabel("\u00A0\u00A0Coupla/Hatch:", line.coupla);
+        line.coup_span = CreateLabel("\u00A0\u00A0Cupola/Hatch:", line.cupola);
         line.seal_span = CreateLabel("\u00A0\u00A0Sealed:", line.seal);
         let mount_span = CreateLabel("\u00A0\u00A0Number Weapons Mounts:", line.num_mounts);
         line.load_span = CreateLabel("\u00A0\u00A0Loader:", line.has_loader);
@@ -251,7 +251,7 @@ export class CrewDisp {
         line.span.append(line.load_span);
         line.name.type = "text";
         line.enclosed.type = "checkbox";
-        line.coupla.type = "checkbox";
+        line.cupola.type = "checkbox";
         line.seal.type = "checkbox";
         line.loop_front.type = "checkbox";
         line.loop_left.type = "checkbox";
@@ -265,14 +265,14 @@ export class CrewDisp {
         line.has_loader.min = "0";
         let oc = () => {
             this.vehicle.SetCrew(idx, new Crew(line.name.value, line.enclosed.checked,
-                line.coupla.checked, line.seal.checked,
+                line.cupola.checked, line.seal.checked,
                 line.loop_front.checked, line.loop_left.checked, line.loop_right.checked, line.loop_back.checked, undefined, undefined));
         };
         let setnum = () => { this.vehicle.SetNumLoaders(idx, line.has_loader.valueAsNumber); };
         let setwep = () => { this.vehicle.SetNumWeapons(idx, line.num_mounts.valueAsNumber); };
         line.name.onchange = oc;
         line.enclosed.onchange = oc;
-        line.coupla.onchange = oc;
+        line.cupola.onchange = oc;
         line.seal.onchange = oc;
         line.loop_front.onchange = oc;
         line.loop_left.onchange = oc;
