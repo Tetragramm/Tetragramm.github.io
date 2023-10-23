@@ -132,12 +132,12 @@ export var PowerplantSize: { HP: number, name: string, speed: number, fuel: numb
     { HP: 150, name: "Medium Tank", speed: 10, fuel: 6, upkeep: 2, reliability: -1, cost: 6, special: [] },
     { HP: 180, name: "Aircraft", speed: 11, fuel: 4, upkeep: 2, reliability: -2, cost: 8, special: [] },
 ];
-var DoubleFuel: { HP: number, name: string, speed: number, fuel: number, upkeep: number, reliability: number, cost: number, special: string[] }[] = [];
+var DieselFuel: { HP: number, name: string, speed: number, fuel: number, upkeep: number, reliability: number, cost: number, special: string[] }[] = [];
 var HalfFuel: { HP: number, name: string, speed: number, fuel: number, upkeep: number, reliability: number, cost: number, special: string[] }[] = [];
 for (let p of PowerplantSize) {
     let p2 = structuredClone(p);
-    p2.fuel *= 2;
-    DoubleFuel.push(p2);
+    p2.fuel = Math.floor(1.0e-6 + 1.5 * p2.fuel);
+    DieselFuel.push(p2);
     let p3 = structuredClone(p);
     p3.fuel = Math.floor(p3.fuel / 2);
     HalfFuel.push(p3);
@@ -166,7 +166,7 @@ export const PowerplantType: { name: string, stress?: number, cost?: number, spe
         ], special: []
     },
     { name: "Petrol", powerplants: PowerplantSize, special: [] },
-    { name: "Diesel", cost: 2, speed: -1, torque: 1, reliability: 1, powerplants: DoubleFuel, special: [] },
+    { name: "Diesel", cost: 2, speed: -1, torque: 1, reliability: 1, powerplants: DieselFuel, special: [] },
     { name: "Steam", cost: -2, speed: -2, torque: 2, stress: 1, reliability: 2, volume: 1, integrity: -5, powerplants: HalfFuel, special: ["At 7 Wear, pushes Burn Out as the boiler explodes!", "1 Capacity of coal is 3 Fuel Uses."] },
     {
         name: "Electric", cost: 3, speed: 1, torque: -1, handling: 5, powerplants: HalfFuel, special: ["Auto-pass Crank Start.", "Cannot Gun the Engine.", "Must recharge in town or with a generator.", "Can be Concealed with the engine on(when stationary)."]
