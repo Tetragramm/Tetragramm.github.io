@@ -754,6 +754,7 @@ export class Vehicle {
 
     public SetAmphibious(is: boolean) {
         this.amphibious = is;
+        this.CalculateStats();
     }
 
     public CanAmphibious(): boolean {
