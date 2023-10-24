@@ -119,7 +119,6 @@ table {
 	font-size: .8rem;
 	/* extra-wide tables, you can just scroll to see */
 	display: block;
-	overflow: auto;
 }
 
 th {
@@ -760,7 +759,8 @@ button[disabled] {
 
 .content {
 	max-height: inherit;
-	overflow: hidden;
+	overflow-x: auto;
+	overflow-y: hidden;
 	transition: max-height 0.2s ease-in-out;
 }
 
