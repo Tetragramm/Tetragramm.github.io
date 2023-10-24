@@ -223,7 +223,6 @@ export class WeaponMount {
         stat.cost += w.cost;
         if (w.artillery && w.abbr != "ISC" && w.abbr != "RAR") {
             stat.volume = Math.ceil(w.heavy / 2.0);
-            stat.cost += 2;
             stat.integrity -= 3;
         } else if (w.abbr == "RAR") {
             stat.cost += (this.rocket_count - 1) * w.cost; //One is already applied

@@ -166,6 +166,9 @@ export class MachineryDisp {
         this.amph_span.hidden = !this.vehicle.CanAmphibious();
         this.prop_span.hidden = !this.vehicle.CanPropeller();
         this.turret_span.hidden = !this.vehicle.CanTurretHull();
+        this.amphibious.checked = this.vehicle.GetAmphibious();
+        this.propeller.checked = this.vehicle.GetPropeller();
+        this.turret.checked = this.vehicle.GetTurretHull();
 
         this.pp_type.selectedIndex = this.vehicle.GetPowerplantIdx();
         if (this.update_type) {

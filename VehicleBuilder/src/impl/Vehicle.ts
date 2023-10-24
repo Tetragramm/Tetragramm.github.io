@@ -221,16 +221,16 @@ export class Vehicle {
                 return volume <= 1;
             case "Three-Wheeled":
             case "Four-Wheeled":
-            case "Six-Wheeled":
             case "Half-Track":
-            case "Continuous Track":
-            case "Crawler":
-            case "Half-Walker":
             case "Walker":
                 return volume <= 8
             case "Skids":
             case "Skis":
                 return volume <= 6;
+            case "Six-Wheeled":
+            case "Continuous Track":
+            case "Crawler":
+            case "Half-Walker":
             case "Boat Hull":
             case "Cable Car":
             case "Sky-Line":
@@ -339,12 +339,25 @@ export class Vehicle {
         return stat.volume;
     }
 
-    public CalculateStats(): Stats {
-        SetWeaponList(this.custom.GetWeapons());
-        let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
+    private VerifyCans() {
         if (!this.CanExtraFuel()) {
             this.extra_fuel = 0;
         }
+        if (!this.CanAmphibious()) {
+            this.amphibious = false;
+        }
+        if (!this.CanPropeller()) {
+            this.propeller = false;
+        }
+        if (!this.CanTurretHull()) {
+            this.turret_hull = false;
+        }
+    }
+
+    public CalculateStats(): Stats {
+        SetWeaponList(this.custom.GetWeapons());
+        let armour_list = [this.armour_front, this.armour_side, this.armour_rear];
+        this.VerifyCans();
         let stat = new Stats();
         stat.cost = 3;
         stat.torque = -1;
@@ -365,7 +378,7 @@ export class Vehicle {
             }
         }
         this.extra_tiny = (stat.volume - Math.floor(stat.volume)) >= 0.45;
-        stat.volume += cramped_volume;
+        stat.volume += Math.ceil(-1.0e-6 + cramped_volume);
 
         for (let part of this.custom.GetParts()) {
             stat.add(part.stats);
@@ -409,6 +422,10 @@ export class Vehicle {
         stat.handling += Volume[Math.min(Volume.length - 1, stat.volume)].handling;
         stat.speed += Volume[Math.min(Volume.length - 1, stat.volume)].speedmod;
         stat.integrity += Volume[Math.min(Volume.length - 1, stat.volume)].integrity;
+        if (stat.volume > 8) {
+            stat.handling -= 5 * (stat.volume - 8);
+            stat.integrity += 2 * (stat.volume - 8);
+        }
 
         if (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {
             stat.warnings.push({ source: "Powerplant Size", warning: "Powerplant is too large for this vehicle. Add Volume, expand the engine compartment, or reduce the engine size.", color: WARNING_COLOR.RED });
@@ -423,7 +440,7 @@ export class Vehicle {
         let armour_total = this.SumArmour();
         //Armour effects
         stat.cost += armour_total;
-        stat.handling -= 2 * armour_total;
+        stat.handling -= armour_total;
         stat.safety += Math.floor((Math.max(...armour_list) + Math.min(...armour_list)) / 2);
         armour_list.forEach((value) => {
             if (value >= 3) {
@@ -766,5 +783,17 @@ export class Vehicle {
             default:
                 return true;
         }
+    }
+
+    public GetAmphibious(): boolean {
+        return this.amphibious;
+    }
+
+    public GetPropeller(): boolean {
+        return this.propeller;
+    }
+
+    public GetTurretHull(): boolean {
+        return this.turret_hull;
     }
 }
