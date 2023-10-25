@@ -236,7 +236,7 @@ export class CrewDisp {
         line.enc_span = CreateLabel("\u00A0\u00A0Enclosed:", line.enclosed);
         line.coup_span = CreateLabel("\u00A0\u00A0Hatch:", line.cupola);
         line.seal_span = CreateLabel("\u00A0\u00A0Sealed:", line.seal);
-        let mount_span = CreateLabel("\u00A0\u00A0#Weapons Mounts:", line.num_mounts);
+        let mount_span = CreateLabel("\u00A0\u00A0#Weapon Mounts:", line.num_mounts);
         line.load_span = CreateLabel("\u00A0\u00A0#Loaders:", line.has_loader);
         let loop_span = CreateLabel("\u00A0\u00A0Loopholes F/L/R/B:", line.loop_front);
         loop_span.append(line.loop_left);
