@@ -118,45 +118,8 @@ export class MachineryDisp {
     }
 
     public UpdateLocomotion() {
-        let volume = this.vehicle.GetVolume();
-        for (let opt of this.locomotion.options) {
-            switch (opt.text) {
-                case "Monowheel":
-                case "Two-Wheeled":
-                    if (volume > 1) {
-                        opt.disabled = true;
-                        continue;
-                    }
-                    break;
-                case "Three-Wheeled":
-                case "Four-Wheeled":
-                case "Six-Wheeled":
-                case "Half-Track":
-                case "Continuous Track":
-                case "Crawler":
-                case "Half-Walker":
-                case "Walker":
-                    if (volume > 8) {
-                        opt.disabled = true;
-                        continue;
-                    }
-                    break;
-                case "Skids":
-                case "Skis":
-                    if (volume > 6) {
-                        opt.disabled = true;
-                        continue;
-                    }
-                    break;
-                case "Boat Hull":
-                case "Cable Car":
-                case "Sky-Line":
-                case "Dorandisch Earthline":
-                    break;
-                default:
-                    console.error("Unknonw Locomotion in MachineryDisp");
-            }
-            opt.disabled = false;
+        for (let idx = 0; idx < this.locomotion.options.length; idx++) {
+            this.locomotion.options[idx].disabled = !this.vehicle.CanLocomotion(idx);
         }
     }
 

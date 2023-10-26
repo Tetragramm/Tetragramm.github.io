@@ -187,6 +187,34 @@ export class Vehicle {
         this.propeller = has;
         this.CalculateStats();
     }
+    public CanLocomotion(idx: number) {
+        let volume = this.GetVolume();
+        switch (LocomotionType[idx]) {
+            case "Monowheel":
+            case "Two-Wheeled":
+                return volume <= 1;
+            case "Three-Wheeled":
+            case "Four-Wheeled":
+            case "Half-Track":
+            case "Walker":
+                return volume <= 8
+            case "Skids":
+            case "Skis":
+                return volume <= 6;
+            case "Six-Wheeled":
+            case "Continuous Track":
+            case "Crawler":
+            case "Half-Walker":
+            case "Boat Hull":
+            case "Cable Car":
+            case "Sky-Line":
+            case "Dorandisch Earthline":
+                return true;
+            default:
+                console.error("Unknonw Locomotion in ValidateLocomotion: " + this.locomotion_idx);
+                return false;
+        }
+    }
     public CanPropeller() {
         switch (LocomotionType[this.locomotion_idx]) {
             case "Half-Track":
@@ -214,32 +242,7 @@ export class Vehicle {
         return true;
     }
     private ValidateLocomotion() {
-        let volume = this.GetVolume();
-        switch (LocomotionType[this.locomotion_idx]) {
-            case "Monowheel":
-            case "Two-Wheeled":
-                return volume <= 1;
-            case "Three-Wheeled":
-            case "Four-Wheeled":
-            case "Half-Track":
-            case "Walker":
-                return volume <= 8
-            case "Skids":
-            case "Skis":
-                return volume <= 6;
-            case "Six-Wheeled":
-            case "Continuous Track":
-            case "Crawler":
-            case "Half-Walker":
-            case "Boat Hull":
-            case "Cable Car":
-            case "Sky-Line":
-            case "Dorandisch Earthline":
-                return true;
-            default:
-                console.error("Unknonw Locomotion in ValidateLocomotion: " + this.locomotion_idx);
-                return false;
-        }
+        return this.CanLocomotion(this.locomotion_idx);
     }
     public SetArmourFront(amount: number) {
         amount = Math.floor(1.0e-6 + amount);
@@ -419,8 +422,9 @@ export class Vehicle {
         }
         volMaxHP = Math.min(Volume.length - 1, volMaxHP);
 
+        if (PowerplantType[this.powerplant_idx].name != "Wind Powered")
+            stat.speed += Volume[Math.min(Volume.length - 1, stat.volume)].speedmod;
         stat.handling += Volume[Math.min(Volume.length - 1, stat.volume)].handling;
-        stat.speed += Volume[Math.min(Volume.length - 1, stat.volume)].speedmod;
         stat.integrity += Volume[Math.min(Volume.length - 1, stat.volume)].integrity;
         if (stat.volume > 8) {
             stat.handling -= 5 * (stat.volume - 8);
