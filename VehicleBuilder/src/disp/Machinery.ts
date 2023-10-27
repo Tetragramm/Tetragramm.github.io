@@ -6,7 +6,6 @@ export class MachineryDisp {
     private vehicle: Vehicle;
     private locomotion: HTMLSelectElement;
     private pp_size: HTMLSelectElement;
-    private update_type: boolean = true;
     private pp_type: HTMLSelectElement;
     private enlarged_engine: HTMLInputElement;
     private extra_fuel: HTMLInputElement;
@@ -49,7 +48,7 @@ export class MachineryDisp {
         this.turret.onchange = () => { this.vehicle.SetTurretHull(this.turret.checked); };
 
         this.pp_type = document.getElementById("sel_pptype") as HTMLSelectElement;
-        this.pp_type.onchange = () => { this.update_type = true; this.vehicle.SetPowerplant(this.pp_type.selectedIndex); };
+        this.pp_type.onchange = () => { this.vehicle.SetPowerplant(this.pp_type.selectedIndex); };
         for (let pp of this.vehicle.GetPowerplantList()) {
             let opt = document.createElement("OPTION") as HTMLOptionElement;
             opt.value = pp.name;
@@ -105,7 +104,6 @@ export class MachineryDisp {
     }
 
     private SetSizeSel() {
-        this.update_type = false;
         while (this.pp_size.options.length) {
             this.pp_size.options.remove(0);
         }
@@ -134,9 +132,7 @@ export class MachineryDisp {
         this.turret.checked = this.vehicle.GetTurretHull();
 
         this.pp_type.selectedIndex = this.vehicle.GetPowerplantIdx();
-        if (this.update_type) {
-            this.SetSizeSel();
-        }
+        this.SetSizeSel();
         this.pp_size.selectedIndex = this.vehicle.GetPowerplantSizeIdx();
 
         this.enlarged_engine.valueAsNumber = this.vehicle.GetEnlargedEngine();
