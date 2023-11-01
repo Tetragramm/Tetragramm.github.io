@@ -182,6 +182,8 @@ export class Crew {
     public GetLoopholes(): { f: number, l: number, r: number, b: number } {
         let result = { f: 0, l: 0, r: 0, b: 0 };
         for (let seat of [this, ...this.loaders]) {
+            if (!seat.enclosed)
+                continue;
             if (seat.loop_front)
                 result.f += 1;
             if (seat.loop_left)

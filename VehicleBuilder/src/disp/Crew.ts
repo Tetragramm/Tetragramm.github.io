@@ -13,14 +13,14 @@ export class CrewDisp {
         name_span: HTMLSpanElement, name: HTMLInputElement,
         enc_span: HTMLSpanElement, enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
         cupola: HTMLInputElement, seal_span: HTMLSpanElement, seal: HTMLInputElement,
-        load_span: HTMLSpanElement, has_loader: HTMLInputElement, loop_front: HTMLInputElement,
+        load_span: HTMLSpanElement, has_loader: HTMLInputElement, loop_span: HTMLSpanElement, loop_front: HTMLInputElement,
         loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement,
         num_mounts: HTMLInputElement, br: HTMLBRElement,
         loader: {
             span: HTMLSpanElement, enc_span: HTMLSpanElement,
             enclosed: HTMLInputElement, coup_span: HTMLSpanElement,
             cupola: HTMLInputElement, seal_span: HTMLSpanElement,
-            seal: HTMLInputElement, loop_front: HTMLInputElement,
+            seal: HTMLInputElement, loop_span: HTMLSpanElement, loop_front: HTMLInputElement,
             loop_left: HTMLInputElement, loop_right: HTMLInputElement, loop_back: HTMLInputElement,
             br: HTMLBRElement
         }[]
@@ -103,9 +103,11 @@ export class CrewDisp {
             }
             if (crew.enclosed) {
                 line.seal_span.hidden = false;
+                line.loop_span.hidden = false;
                 line.seal.checked = crew.sealed;
             } else {
                 line.seal_span.hidden = true;
+                line.loop_span.hidden = true;
             }
             line.loop_front.checked = crew.loop_front;
             line.loop_left.checked = crew.loop_left;
@@ -127,6 +129,7 @@ export class CrewDisp {
                     if (crew.loaders[idx].enclosed) {
                         line.loader[idx].coup_span.hidden = false;
                         line.loader[idx].seal_span.hidden = false;
+                        line.loader[idx].loop_span.hidden = false;
                         line.loader[idx].cupola.checked = crew.loaders[idx].cupola;
                         line.loader[idx].seal.checked = crew.loaders[idx].sealed;
                         line.loader[idx].loop_front.checked = crew.loaders[idx].loop_front;
@@ -136,6 +139,7 @@ export class CrewDisp {
                     } else {
                         line.loader[idx].coup_span.hidden = true;
                         line.loader[idx].seal_span.hidden = true;
+                        line.loader[idx].loop_span.hidden = true;
                     }
                 }
             } else {
@@ -155,6 +159,7 @@ export class CrewDisp {
             cupola: document.createElement("INPUT") as HTMLInputElement,
             seal_span: undefined,
             seal: document.createElement("INPUT") as HTMLInputElement,
+            loop_span: document.createElement("SPAN") as HTMLSpanElement,
             loop_front: document.createElement("INPUT") as HTMLInputElement,
             loop_left: document.createElement("INPUT") as HTMLInputElement,
             loop_right: document.createElement("INPUT") as HTMLInputElement,
@@ -175,7 +180,8 @@ export class CrewDisp {
         line.span.append(line.enc_span);
         line.span.append(line.coup_span);
         line.span.append(line.seal_span);
-        line.span.append(loop_span);
+        line.loop_span.append(loop_span);
+        line.span.append(line.loop_span);
         line.enclosed.type = "checkbox";
         line.cupola.type = "checkbox";
         line.seal.type = "checkbox";
@@ -211,6 +217,7 @@ export class CrewDisp {
             cupola: document.createElement("INPUT") as HTMLInputElement,
             seal_span: undefined,
             seal: document.createElement("INPUT") as HTMLInputElement,
+            loop_span: document.createElement("SPAN") as HTMLSpanElement,
             loop_front: document.createElement("INPUT") as HTMLInputElement,
             loop_left: document.createElement("INPUT") as HTMLInputElement,
             loop_right: document.createElement("INPUT") as HTMLInputElement,
@@ -246,7 +253,8 @@ export class CrewDisp {
         line.span.append(line.enc_span);
         line.span.append(line.coup_span);
         line.span.append(line.seal_span);
-        line.span.append(loop_span);
+        line.loop_span.append(loop_span);
+        line.span.append(line.loop_span);
         line.span.append(mount_span);
         line.span.append(line.load_span);
         line.name.type = "text";
