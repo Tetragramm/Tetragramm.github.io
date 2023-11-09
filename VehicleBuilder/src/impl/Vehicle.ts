@@ -330,6 +330,7 @@ export class Vehicle {
         }
         if (this.amphibious) {
             stat.volume += 1;
+            stat.torque -= 1;
         }
         if (this.enlarged_engine > 0) {
             stat.volume += this.enlarged_engine;
@@ -516,7 +517,9 @@ export class Vehicle {
                 break;
             case "Six-Wheeled":
                 stat.handling -= 5;
-                stat.torque -= Math.floor(armour_total / 5);
+                if (armour_total >= 6) {
+                    stat.torque -= 1;
+                }
                 break;
             case "Half-Track":
                 stat.torque += 2;
@@ -548,7 +551,7 @@ export class Vehicle {
                 stat.reliability -= 1;
                 stat.handling += 5;
                 stat.upkeep += 1;
-                stat.torque -= 1;
+                stat.torque += 1;
                 stat.walker_torque = 5;
                 stat.speed = Math.min(stat.speed, 3);
                 stat.cost += 2;
