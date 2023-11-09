@@ -330,7 +330,6 @@ export class Vehicle {
         }
         if (this.amphibious) {
             stat.volume += 1;
-            stat.torque -= 1;
         }
         if (this.enlarged_engine > 0) {
             stat.volume += this.enlarged_engine;
@@ -400,6 +399,7 @@ export class Vehicle {
         if (this.amphibious) {
             stat.volume += 1;
             stat.cost += 1;
+            stat.torque -= 1;
             stat.warnings.push({ source: "Amphibious", warning: "Allows use on calm water at -1 Speed.", color: WARNING_COLOR.WHITE });
         }
 
