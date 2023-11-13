@@ -767,6 +767,7 @@ export class Vehicle {
             new Crew("Commander", true, true, false, false, false, false, false, [], [new WeaponMount(0, [true, false, false, false, false], [], false, 0, 0)]),
         ];
         this.cargo = [0, 0, 0, 0];
+        this.amphibious = false;
         this.accessories.Reset();
         this.custom.Reset();
         this.CalculateStats();
