@@ -541,6 +541,7 @@ export class Vehicle {
             case "Half-Walker":
                 stat.speed -= 2;
                 stat.handling -= 5;
+                stat.torque += 1;
                 stat.walker_torque = 3;
                 stat.speed = Math.min(stat.speed, 4);
                 stat.cost += 2;
