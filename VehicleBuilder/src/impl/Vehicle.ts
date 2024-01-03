@@ -430,6 +430,8 @@ export class Vehicle {
         if (stat.volume > 8) {
             stat.handling -= 5 * (stat.volume - 8);
             stat.integrity += 2 * (stat.volume - 8);
+            stat.speed -= Math.floor(1.0e-6 + 0.5 * (stat.volume - 8));
+            // stat.speed = Math.max(0, stat.speed);
         }
 
         if (PowerplantSize[this.powerplant_size_idx].HP > Volume[volMaxHP].maxHP) {

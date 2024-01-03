@@ -75,4 +75,20 @@ export class VehDisp {
     private SaveLink() {
         navigator.clipboard.writeText(this.MakeLink());
     }
+
+    private MakeCatalog() {
+        let str = `\\FCVehicleOnePage[Name = {0}, Price = {1},
+    Nickname = {2}, Upkeep = {3},
+    Speed = {4}, Torque = {5}, Handling = {6},
+    Armour = {6}, Integrity = {7}, Safety = {8},
+    Reliability = {9}, Fuel Uses = {10}, Stress = {11},
+    Size = {12}, Cargo = {13},
+    Crew = {
+        {14}
+    },
+    Image = Default.png
+]{
+#Flavor Text Goes Here
+}`;
+    }
 }
