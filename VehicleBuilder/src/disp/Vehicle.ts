@@ -10,8 +10,9 @@ import { _arrayBufferToString, _stringToArrayBuffer, download } from "./Tools";
 import { LZString } from "../lz/lz-string";
 
 import { Vehicle } from "../impl/Vehicle";
-import { Stats } from "../impl/Stats";
+import { Stats, Volume } from "../impl/Stats";
 import { Serialize } from "../impl/Serialize";
+import { StringFmt } from "../string";
 
 export class VehDisp {
     private vehicle: Vehicle;
@@ -90,5 +91,53 @@ export class VehDisp {
 ]{
 #Flavor Text Goes Here
 }`;
+        let final_stats = this.vehicle.CalculateStats();
+        let torque_str;
+        if (final_stats.walker_torque) {
+            torque_str = StringFmt.Format("+{0}/{1}", final_stats.walker_torque, final_stats.torque);
+        } else {
+            torque_str = final_stats.torque.toString();
+        }
+
+        let cargo = this.vehicle.GetCargo();
+        let cstring = [];
+        if (cargo[0] > 0) {
+            cstring.push(StringFmt.Format("{0} Tiny Cargo", cargo[0]));
+        }
+        if (cargo[1] > 0) {
+            cstring.push(StringFmt.Format("{0} Small Cargo", cargo[1]));
+        }
+        if (cargo[2] > 0) {
+            cstring.push(StringFmt.Format("{0} Medium Cargo", cargo[2]));
+        }
+        if (cargo[3] > 0) {
+            cstring.push(StringFmt.Format("{0} Large Cargo", cargo[3]));
+        }
+        if (cargo[4] > 0) {
+            cstring.push(StringFmt.Format("{0} Huge Cargo", cargo[4]));
+        }
+        if (cstring.length == 0) {
+            cstring.push("No Cargo Space");
+        }
+
+        let crew_string = "";
+
+        str = StringFmt.Format(str, this.vehicle.name,
+            final_stats.cost,
+            this.vehicle.nickname,
+            final_stats.upkeep,
+            final_stats.speed,
+            torque_str,
+            final_stats.handling,
+            StringFmt.Format("{0}/{1}/{2}", this.vehicle.GetArmourFront(), this.vehicle.GetArmourSide(), this.vehicle.GetArmourRear()),
+            final_stats.integrity,
+            final_stats.safety,
+            final_stats.reliability,
+            final_stats.fuel,
+            final_stats.stress,
+            Volume[Math.min(final_stats.volume, Volume.length - 1)].size.toString() + StringFmt.Format(" ({0} Volume)", final_stats.volume),
+            StringFmt.Join(", ", cstring),
+            crew_string
+        )
     }
 }

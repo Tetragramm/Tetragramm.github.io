@@ -150,7 +150,7 @@ export class Accessories {
         if (this.steering_trailer) {
             stats.cost += 6;
             stats.warnings.push({
-                source: "Steering Trailer", warning: "At Speed 2 or less, +5 Handling, +2 Torque. You may negate an 11-15 on Cross Obstacle by cutting the trailer loose and leaving it behind.", color: WARNING_COLOR.WHITE
+                source: "Steering Trailer", warning: "At Speed 2 or less, +5 Handling, +2 Torque (max 4). You may negate an 11-15 on Cross Obstacle by cutting the trailer loose and leaving it behind.", color: WARNING_COLOR.WHITE
             });
         }
         return stats;
