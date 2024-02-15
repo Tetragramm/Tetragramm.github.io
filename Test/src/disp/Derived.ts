@@ -477,6 +477,7 @@ export class Derived_HTML {
 ║ Empty Fuel      ║ 0     ║ 101      ║ 0             ║ 5           ║ 0         ║
 ╚═════════════════╩═══════╩══════════╩═══════════════╩═════════════╩═══════════╝`;
         document.querySelector('meta[property="og:description"]').setAttribute("content", _desc);
+        document.querySelector('meta[name="description"]').setAttribute("content", _desc);
         console.log(_desc);
         console.log(document.querySelector('meta[property="og:description"]').getAttribute("content"));
     }
