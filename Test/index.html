@@ -8,38 +8,6 @@
 	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="page/style.css" />
 	<script type="module" src="plane_builder.js"></script>
-
-	<meta name="description" content="This is an aircraft!
-	<table><tr><th>Speed</th><th>Stall</th></tr><tr><td>100</td><td>10</td></tr></table>
-	
-	|Speed|Stall|
-	|----|----|
-	|100|10|" />
-	<meta name="twitter:card" content="summary" />
-	<meta property="og:title" content="Aircraft Builder" />
-	<meta property="og:description" content="This is an aircraft!
-	<table><tr><th>Speed</th><th>Stall</th></tr><tr><td>100</td><td>10</td></tr></table>
-	
-	|Speed|Stall|
-	|----|----|
-	|100|10|
-	" />
-	<script>
-		const t = new URLSearchParams(location.search);
-		var e = t.get("json");
-		let _desc = String.raw`╔═════════════════╦═══════╦══════════╦═══════════════╦═════════════╦═══════════╗
-║ Mass Variations ║ Boost ║ Handling ║ Rate of Climb ║ Stall Speed ║ Top Speed ║
-╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
-║ Full Fuel       ║ 2     ║ 100      ║ 5             ║ 6           ║ 14        ║
-╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
-║ Half Fuel       ║ 2     ║ 100      ║ 5             ║ 5           ║ 14        ║
-╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
-║ Empty Fuel      ║ 0     ║ 101      ║ 0             ║ 5           ║ 0         ║
-╚═════════════════╩═══════╩══════════╩═══════════════╩═════════════╩═══════════╝`;
-		_desc = e + "\n" + _desc;
-		document.querySelector('meta[property="og:description"]').setAttribute("content", _desc);
-		document.querySelector('meta[name="description"]').setAttribute("content", _desc);
-	</script>
 </head>
 
 <!-- python -m http.server 8080 -->
