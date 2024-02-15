@@ -467,19 +467,19 @@ export class Derived_HTML {
         }
         this.desc_cell.textContent = description;
 
-        let _desc = String.raw`╔═════════════════╦═══════╦══════════╦═══════════════╦═════════════╦═══════════╗
-║ Mass Variations ║ Boost ║ Handling ║ Rate of Climb ║ Stall Speed ║ Top Speed ║
-╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
-║ Full Fuel       ║ 2     ║ 100      ║ 5             ║ 6           ║ 14        ║
-╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
-║ Half Fuel       ║ 2     ║ 100      ║ 5             ║ 5           ║ 14        ║
-╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
-║ Empty Fuel      ║ 0     ║ 101      ║ 0             ║ 5           ║ 0         ║
-╚═════════════════╩═══════╩══════════╩═══════════════╩═════════════╩═══════════╝`;
-        document.querySelector('meta[property="og:description"]').setAttribute("content", _desc);
-        document.querySelector('meta[name="description"]').setAttribute("content", _desc);
-        console.log(_desc);
-        console.log(document.querySelector('meta[property="og:description"]').getAttribute("content"));
+        //         let _desc = String.raw`╔═════════════════╦═══════╦══════════╦═══════════════╦═════════════╦═══════════╗
+        // ║ Mass Variations ║ Boost ║ Handling ║ Rate of Climb ║ Stall Speed ║ Top Speed ║
+        // ╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
+        // ║ Full Fuel       ║ 2     ║ 100      ║ 5             ║ 6           ║ 14        ║
+        // ╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
+        // ║ Half Fuel       ║ 2     ║ 100      ║ 5             ║ 5           ║ 14        ║
+        // ╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
+        // ║ Empty Fuel      ║ 0     ║ 101      ║ 0             ║ 5           ║ 0         ║
+        // ╚═════════════════╩═══════╩══════════╩═══════════════╩═════════════╩═══════════╝`;
+        //         document.querySelector('meta[property="og:description"]').setAttribute("content", _desc);
+        //         document.querySelector('meta[name="description"]').setAttribute("content", _desc);
+        //         console.log(_desc);
+        //         console.log(document.querySelector('meta[property="og:description"]').getAttribute("content"));
     }
 
     private prefix(num_wings: number): string {
