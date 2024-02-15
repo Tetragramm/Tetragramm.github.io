@@ -193,7 +193,6 @@ export class StatsDisp {
                 notes.push("Hatch");
             }
             notes.push(c.WeaponString());
-            //TODO: Vis & Escape
             this.CrewLine(c.name_txt, enclosure, c.GetVisibility(), c.GetEscape(), StringFmt.Join(", ", notes));
             for (let l = 0; l < c.loaders.length; l++) {
                 let enclosure = "Exposed";
@@ -207,16 +206,8 @@ export class StatsDisp {
                 if (c.loaders[l].enclosed && c.loaders[l].cupola) {
                     notes.push("Hatch");
                 }
-                //TODO: Vis & Escape
                 this.CrewLine("Loader", enclosure, c.GetVisibility(l), c.GetEscape(l), StringFmt.Join(", ", notes), true);
             }
         }
-
-        // this.CrewLine("Driver", "Closed", -1, -1, "Hatch", false);
-        // this.CrewLine("Commander", "Closed", -1, -1, "Hatch", false);
-        // this.CrewLine("Gunner", "Closed", -2, -3, "*F. Cannon (Fore)", false);
-        // this.CrewLine("Loader", "Closed", -2, -3, "", true);
-        // this.CrewLine("x6 MG Crew", "Closed", -3, -3, "x1 WMG each\n(x2 Left, x2 Right, x2 Rear)", false);
-        // this.CrewLine("Mechanic", "Sealed", undefined, -2, "Engine Access", false);
     }
 }

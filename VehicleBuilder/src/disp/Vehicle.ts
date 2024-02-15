@@ -6,13 +6,14 @@ import { AccessoriesDisp } from "./Accessories";
 import { CustomDisp } from "./Custom";
 import { Cards } from "./Cards";
 
-import { _arrayBufferToString, _stringToArrayBuffer, download } from "./Tools";
+import { CreateLabel, _arrayBufferToString, _stringToArrayBuffer, download } from "./Tools";
 import { LZString } from "../lz/lz-string";
 
 import { Vehicle } from "../impl/Vehicle";
 import { Stats, Volume } from "../impl/Stats";
-import { Serialize } from "../impl/Serialize";
+import { Serialize, Deserialize } from "../impl/Serialize";
 import { StringFmt } from "../string";
+import { Crew } from "../impl/Crew";
 
 export class VehDisp {
     private vehicle: Vehicle;
@@ -45,7 +46,7 @@ export class VehDisp {
         reset_button.onclick = () => { this.vehicle.Reset(); this.vehicle.CalculateStats(); };
 
         const cat_button = document.getElementById("acft_save_cat");
-        // cat_button.onclick = () => { this.CatalogStats(); }
+        cat_button.onclick = () => { this.CatalogStats(); }
     }
 
     public UpdateDisplay(final_stats: Stats) {
@@ -77,15 +78,15 @@ export class VehDisp {
         navigator.clipboard.writeText(this.MakeLink());
     }
 
-    private MakeCatalog() {
+    private CatalogStats() {
         let str = `\\FCVehicleOnePage[Name = {0}, Price = {1},
     Nickname = {2}, Upkeep = {3},
     Speed = {4}, Torque = {5}, Handling = {6},
-    Armour = {6}, Integrity = {7}, Safety = {8},
-    Reliability = {9}, Fuel Uses = {10}, Stress = {11},
-    Size = {12}, Cargo = {13},
+    Armour = {7}, Integrity = {8}, Safety = {9},
+    Reliability = {10}, Fuel Uses = {11}, Stress = {12},
+    Size = {13}, Cargo = {14},
     Crew = {
-        {14}
+{15}
     },
     Image = Default.png
 ]{
@@ -121,6 +122,131 @@ export class VehDisp {
         }
 
         let crew_string = "";
+        var tempcrewlist = this.vehicle.GetCrewList();
+        var crewlist = [];
+        for (let c of tempcrewlist) {
+            let s = new Serialize();
+            c.Serialize(s);
+            let arr = s.FinalArray();
+            let nc = new Crew("", false, false, false, false, false, false, false, [], []);
+            let d = new Deserialize(arr);
+            nc.Deserialize(d);
+            nc.base_escape = c.base_escape;
+            nc.base_vis = c.base_vis;
+            crewlist.push(nc);
+        }
+
+        while (crewlist.length > 0) {
+            let vis = crewlist[0].GetVisibility();
+            let esc = crewlist[0].GetEscape();
+            let next_crew = crewlist.splice(0, 1);
+            console.log(StringFmt.Format("This Crew is {0} {1} {2} {3} {4}", next_crew[0].name_txt, next_crew[0].enclosed, next_crew[0].sealed, next_crew[0].cupola, next_crew[0].loaders));
+
+            for (let i = 0; i < crewlist.length; i++) {
+                let loaders_equal = crewlist[i].loaders.length == next_crew[0].loaders.length &&
+                    (next_crew[0].loaders.length == 0
+                        || crewlist[i].loaders.every((element, index) => {
+                            element.enclosed == next_crew[0].loaders[index].enclosed
+                                && element.sealed == next_crew[0].loaders[index].sealed
+                                && element.cupola == next_crew[0].loaders[index].cupola
+                        }));
+                console.log(StringFmt.Format("Matching Crew is {0} {1} {2} {3} {4} {5} {6}", i, crewlist[i].name_txt, crewlist[i].enclosed, crewlist[i].sealed, crewlist[i].cupola, crewlist[i].loaders, loaders_equal));
+                if (crewlist[i].name_txt == next_crew[0].name_txt
+                    && crewlist[i].enclosed == next_crew[0].enclosed
+                    && crewlist[i].sealed == next_crew[0].sealed
+                    && crewlist[i].cupola == next_crew[0].cupola
+                    && loaders_equal) {
+                    next_crew.splice(next_crew.length, 0, ...crewlist.splice(i, 1));
+                    i--;
+                }
+            }
+
+
+            let crew_line = "";
+
+            let enclosure = "Exposed";
+            if (next_crew[0].enclosed) {
+                enclosure = "Closed";
+                if (next_crew[0].sealed) {
+                    enclosure = "Sealed"
+                }
+            }
+
+            let notes = [];
+            if (next_crew[0].hatch) {
+                notes.push("Hatch");
+            }
+            notes.push(next_crew[0].WeaponString());
+            if (next_crew.length == 1) {
+                crew_line = StringFmt.Format("        {0} & {1} & {2} & {3} & {4} \\\\\n",
+                    next_crew[0].name_txt,
+                    enclosure,
+                    (vis ?? "-").toString(),
+                    (esc ?? "-").toString(),
+                    StringFmt.Join(",", notes)
+                );
+            } else {
+                //Make Weapon String
+                crew_line = StringFmt.Format("        {5}x {0} & {1} & {2} & {3} & {4} \\\\\n",
+                    next_crew[0].name_txt,
+                    enclosure,
+                    (vis ?? "-").toString(),
+                    (esc ?? "-").toString(),
+                    StringFmt.Join(",", notes),
+                    next_crew.length
+                );
+            }
+            //Driver & Closed & 0 & 1 & Hatch \\
+            while (next_crew[0].loaders.length > 0) {
+                let vis = next_crew[0].GetVisibility(0);
+                let esc = next_crew[0].GetEscape(0);
+                let next_loader = next_crew[0].loaders.splice(0, 1);
+                for (let i = 0; i < next_crew[0].loaders.length; i++) {
+                    if (next_crew[0].loaders[i].enclosed == next_loader[0].enclosed
+                        && next_crew[0].loaders[i].sealed == next_loader[0].sealed
+                        && next_crew[0].loaders[i].cupola == next_loader[0].cupola) {
+                        next_loader.splice(next_loader.length, 0, ...(next_crew[0].loaders.splice(i, 1)));
+                        i--;
+                    }
+                }
+
+                let loader_line = "";
+
+                let enclosure = "Exposed";
+                if (next_crew[0].enclosed) {
+                    enclosure = "Closed";
+                    if (next_crew[0].sealed) {
+                        enclosure = "Sealed"
+                    }
+                }
+
+                let lhatch = "";
+                if (next_loader[0].hatch) {
+                    lhatch = "Hatch";
+                }
+                if (next_loader.length == 1) {
+                    loader_line = StringFmt.Format("        \\quad{}{0} & {1} & {2} & {3} & {4} \\\\\n",
+                        "Loader",
+                        enclosure,
+                        (vis ?? "-").toString(),
+                        (esc ?? "-").toString(),
+                        lhatch
+                    );
+                } else {
+                    //Make Weapon String
+                    loader_line = StringFmt.Format("        \\quad{}{5}x {0} & {1} & {2} & {3} & {4} \\\\\n",
+                        "Loader",
+                        enclosure,
+                        (vis ?? "-").toString(),
+                        (esc ?? "-").toString(),
+                        lhatch,
+                        next_loader.length
+                    );
+                }
+                crew_line = crew_line + loader_line;
+            }
+            crew_string = crew_string + crew_line;
+        }
 
         str = StringFmt.Format(str, this.vehicle.name,
             final_stats.cost,
@@ -138,6 +264,8 @@ export class VehDisp {
             Volume[Math.min(final_stats.volume, Volume.length - 1)].size.toString() + StringFmt.Format(" ({0} Volume)", final_stats.volume),
             StringFmt.Join(", ", cstring),
             crew_string
-        )
+        );
+
+        download(str, this.vehicle.name + "_" + this.vehicle.version + ".txt", "txt");
     }
 }
