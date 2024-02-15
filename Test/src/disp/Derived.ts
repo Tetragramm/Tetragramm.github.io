@@ -5,6 +5,7 @@ import { WeaponString } from "./Weapons";
 import { lu } from "../impl/Localization";
 import { insertRow, CreateFlexSection, CreateTH, FlexLabels } from "./Tools";
 import { StringFmt } from "../string/index";
+import { } from "../html-to-text/src/html-to-text"
 
 export class Derived_HTML {
     private tbl: HTMLTableElement;
@@ -69,6 +70,8 @@ export class Derived_HTML {
     private desc_cell: HTMLTableCellElement;
 
     private show_bombs: boolean;
+
+
 
     constructor(tbl: HTMLTableElement) {
         const fragment = document.createDocumentFragment();
@@ -463,6 +466,17 @@ export class Derived_HTML {
             description += "Falling Rock ";
         }
         this.desc_cell.textContent = description;
+
+        let _desc = String.raw`╔═════════════════╦═══════╦══════════╦═══════════════╦═════════════╦═══════════╗
+║ Mass Variations ║ Boost ║ Handling ║ Rate of Climb ║ Stall Speed ║ Top Speed ║
+╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
+║ Full Fuel       ║ 2     ║ 100      ║ 5             ║ 6           ║ 14        ║
+╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
+║ Half Fuel       ║ 2     ║ 100      ║ 5             ║ 5           ║ 14        ║
+╠═════════════════╬═══════╬══════════╬═══════════════╬═════════════╬═══════════╣
+║ Empty Fuel      ║ 0     ║ 101      ║ 0             ║ 5           ║ 0         ║
+╚═════════════════╩═══════╩══════════╩═══════════════╩═════════════╩═══════════╝`;
+        document.querySelector('meta[name="description"]').setAttribute("content", _desc);
     }
 
     private prefix(num_wings: number): string {
