@@ -447,7 +447,7 @@ export class Engines extends Part {
     var pitchspeedmin = 100;
     //Engine stuff
     var firstPulsejet = false;
-    var finalvisibilitymod = this.engines.length * 100;
+    var finalvisibilitymod = 2;
     for (let en of this.engines) {
       if (!firstPulsejet && en.GetIsPulsejet()) {
         firstPulsejet = true;

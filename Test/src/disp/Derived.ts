@@ -5,7 +5,6 @@ import { WeaponString } from "./Weapons";
 import { lu } from "../impl/Localization";
 import { insertRow, CreateFlexSection, CreateTH, FlexLabels } from "./Tools";
 import { StringFmt } from "../string/index";
-import { } from "../html-to-text/src/html-to-text"
 
 export class Derived_HTML {
     private tbl: HTMLTableElement;
