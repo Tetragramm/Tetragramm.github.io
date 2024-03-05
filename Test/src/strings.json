@@ -782,6 +782,7 @@
         "Low Mass Warning": "This aircraft is very low mass. If it is a custom airplane, be careful not to make it overpowered.",
         "Low Drag Warning": "This aircraft is very low drag. If it is a custom airplane, be careful not to make it overpowered.",
         "Connectivity Warning": "Can move between positions without Wingwalking.",
-        "Passenger Connectivity Warning": "Can reach the cockpit without Wingwalking."
+        "Passenger Connectivity Warning": "Can reach the cockpit without Wingwalking.",
+        "Rotor Thickness": "Rotor Thickness"
     }
 }

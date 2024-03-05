@@ -1,5 +1,5 @@
 {
-    "version": "12.5",
+    "version": "12.6",
     "era": {
         "options": [
             {
@@ -210,7 +210,9 @@
                 "era": "WWI",
                 "visibility": -1,
                 "attack": 1,
-                "cost": 2
+                "cost": 2,
+                "warning": "X1 Collimated Gunsight Warning",
+                "charge": 0
             },
             {
                 "name": "Telescopic Gunsight",
@@ -218,7 +220,8 @@
                 "visibility": -1,
                 "attack": 0,
                 "cost": 3,
-                "warning": "Gunsight Warning"
+                "warning": "Telescopic Gunsight Warning",
+                "charge": 0
             },
             {
                 "name": "Illuminated Reflex Sight",
@@ -226,7 +229,8 @@
                 "visibility": -1,
                 "attack": 2,
                 "charge": 1.0e-9,
-                "cost": 6
+                "cost": 6,
+                "warning": "Illuminated Reflex Sight Warning"
             },
             {
                 "name": "Gyro Gunsight",
@@ -235,7 +239,7 @@
                 "attack": 2,
                 "charge": 1.0e-9,
                 "cost": 12,
-                "warning": "Gunsight Warning"
+                "warning": "Gyro Gunsight Warning"
             }
         ]
     },
