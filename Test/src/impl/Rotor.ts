@@ -141,7 +141,7 @@ export class Rotor extends Part {
         if (num < 0) {
             num = 0;
         }
-        this.rotor_thickness = num;
+        this.rotor_thickness = Math.floor(1.0e-6 + num);
         this.CalculateStats();
     }
 
