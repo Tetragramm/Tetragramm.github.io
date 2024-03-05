@@ -117,6 +117,8 @@ export class Rotor extends Part {
         }
         if (d.version < 12.55) {
             this.rotor_thickness = 0;
+        } else {
+            this.rotor_thickness = d.GetNum();
         }
     }
 
