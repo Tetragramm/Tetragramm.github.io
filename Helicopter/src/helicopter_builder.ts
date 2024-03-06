@@ -84,6 +84,7 @@ const init = () => {
             }
         });
     }
+    helicopter_display.SetCollapse();
 }
 window.addEventListener("DOMContentLoaded", init);
 

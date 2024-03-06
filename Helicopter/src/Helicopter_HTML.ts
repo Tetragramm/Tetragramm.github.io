@@ -169,12 +169,13 @@ export class Helicopter_HTML extends Display {
         (document.getElementById("lbl_acft_reset_top") as HTMLLabelElement).textContent = lu("Aircraft Button Default Aircraft");
         (document.getElementById("lbl_acft_reset_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Default Aircraft");
         var reset_button = document.getElementById("acft_reset") as HTMLButtonElement;
-        reset_button.onclick = () => { this.heli.Reset(); this.derived.SetName(this.heli.name); this.heli.CalculateStats(); };
+        reset_button.onclick = () => { this.heli.Reset(); this.derived.SetName(this.heli.name); this.heli.CalculateStats(); this.SetCollapse(); };
 
         (document.getElementById("lbl_acft_save_cat_top") as HTMLLabelElement).textContent = lu("Aircraft Button Save Catalog");
         (document.getElementById("lbl_acft_save_cat_bot") as HTMLLabelElement).textContent = lu("Aircraft Button Save Catalog");
         var cat_button = document.getElementById("acft_save_cat");
         cat_button.onclick = () => { this.CatalogStats(); }
+        this.SetCollapse();
     }
 
     private UpdateCard() {
@@ -355,6 +356,7 @@ export class Helicopter_HTML extends Display {
                     this.heli.fromJSON(str);
                     this.derived.SetName(this.heli.name);
                     this.heli.CalculateStats();
+                    this.SetCollapse();
                 }
 
             } catch (e) {
@@ -505,6 +507,7 @@ export class Helicopter_HTML extends Display {
                 this.heli.fromJSON(str);
                 this.derived.SetName(this.heli.name);
                 this.heli.CalculateStats();
+                this.SetCollapse();
             }
         } catch {
             BlinkBad(text_area.parentElement);
@@ -516,6 +519,15 @@ export class Helicopter_HTML extends Display {
     private SaveJSON() {
         this.heli.name = this.derived.GetName();
         download(JSON.stringify(this.heli.toJSON()), this.heli.name + "_" + this.heli.GetVersion() + ".json", "json");
+    }
+
+    public SetCollapse() {
+        this.alter.SetCollapse();
+        this.gear.SetCollapse();
+        this.optimization.SetCollapse();
+        this.passengers.SetCollapse();
+        this.stabilizers.SetCollapse();
+        this.used.SetCollapse();
     }
 
     private MakeLink() {
