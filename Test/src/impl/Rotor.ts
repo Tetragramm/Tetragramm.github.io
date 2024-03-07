@@ -83,6 +83,8 @@ export class Rotor extends Part {
         }
         if (json_version < 12.55) {
             this.rotor_thickness = 0;
+        } else {
+            this.rotor_thickness = js["rotor_thickness"];
         }
         this.dryMP = -1;
     }
