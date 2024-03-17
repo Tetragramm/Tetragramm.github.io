@@ -1053,6 +1053,7 @@ export class Engine extends Part {
       stats.maxstrain *= 2;
       stats.upkeep *= 2;
       stats.reqsections *= 2;
+      stats.charge *= 2;
       stats.power = Math.floor(1.0e-6 + this.mount_list[this.mount_sel].powerfactor * stats.power);
     }
 

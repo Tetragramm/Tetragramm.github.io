@@ -31,6 +31,7 @@ import { lu } from "../../Test/src/impl/Localization";
 import { StringFmt } from "../../Test/src/string";
 import { LZString } from "../../Test/src/lz/lz-string";
 import { GetEngineLists } from "../../Test/src/impl/EngineList";
+import { SynchronizationType } from "../../Test/src/impl/Weapon";
 
 export class Helicopter_HTML extends Display {
     private heli: Helicopter;
@@ -390,112 +391,150 @@ export class Helicopter_HTML extends Display {
 
     private CatalogStats() {
         this.heli.name = this.derived.GetName();
-        var stats = this.heli.GetStats();
-        var derived = this.heli.GetDerivedStats();
-        var catalog_stats = this.MakeLink() + "\n";
-        catalog_stats += this.heli.name + "\n";
-        catalog_stats += "Insert Nickname Here\n";
-        catalog_stats += StringFmt.Format("{0}þ New, {1}þ Used\n", stats.cost, Math.floor(1.0e-6 + stats.cost / 2));
-        catalog_stats += StringFmt.Format("{0}þ Upkeep\n\n", stats.upkeep);
+        const stats = this.heli.GetStats();
+        const derived = this.heli.GetDerivedStats();
+
+        var catalog_stats = "\\FCPlane[Nickname=\\FrameDefault{Not Set}, %Box Text = {}, Image = {},\n";
+        catalog_stats += StringFmt.Format("Name={{0}}, Price={1}, Used={2}, Upkeep={3},\n", this.heli.name, stats.cost, Math.floor(1.0e-6 + stats.cost / 2), stats.upkeep);
+        catalog_stats += "Stats = {\n";
         if (stats.bomb_mass > 0) {
-            catalog_stats += StringFmt.Format("Full Load\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+            catalog_stats += StringFmt.Format("Full Load & {0} & {1} & {2} & {3} & {4} \\\\\n",
                 derived.BoostFullwBombs,
                 derived.HandlingFullwBombs,
                 derived.RateOfClimbwBombs,
                 derived.StallSpeedFullwBombs,
                 derived.MaxSpeedwBombs);
-            catalog_stats += StringFmt.Format("½, Bombs\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+            catalog_stats += "\\nicefrac{1}{2}" + StringFmt.Format(", Bombs & {0} & {1} & {2} & {3} & {4}\\\\\n",
                 Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2),
                 Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2),
                 Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2),
                 Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2),
                 Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2));
         }
-        catalog_stats += StringFmt.Format("Full Fuel\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+        catalog_stats += StringFmt.Format("Full Fuel & {0} & {1} & {2} & {3} & {4}\\\\\n",
             derived.BoostFull,
             derived.HandlingFull,
             derived.RateOfClimbFull,
             derived.StallSpeedFull,
             derived.MaxSpeedFull);
-        catalog_stats += StringFmt.Format("Half Fuel\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+        catalog_stats += StringFmt.Format("Half Fuel & {0} & {1} & {2} & {3} & {4}\\\\\n",
             Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2),
             Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2),
             Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2),
             Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2),
             Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2));
-        catalog_stats += StringFmt.Format("Empty\t\t{0}\t{1}\t{2}\t{3}\t{4}\n",
+        catalog_stats += StringFmt.Format("Empty & {0} & {1} & {2} & {3} & {4}\\\\\n",
             "-",
             derived.HandlingEmpty,
             "-",
             derived.StallSpeedEmpty,
             0);
-        catalog_stats += "\nVital Parts\n";
-        catalog_stats += StringFmt.Join(", ", this.heli.VitalComponentList());
-        catalog_stats += "\n\n";
-        catalog_stats += StringFmt.Format("Dropoff {0}, Reliability {1}, Overspeed {2}, Ideal Alt. {3}, Fuel {4}\n\n",
+        catalog_stats += "},\n";
+        var vp = this.heli.VitalComponentList();
+        var vp_map = new Map<string, number>();
+        for (let str of vp) {
+            str = str.replace(/Weapon Set #.*/g, "Guns").trim();
+            str = str.replace(/#.*/g, "").trim();
+            if (vp_map.has(str))
+                vp_map.set(str, vp_map.get(str) + 1);
+            else
+                vp_map.set(str, 1);
+        }
+        vp = [];
+        for (let str of vp_map.keys()) {
+            if (vp_map.get(str) == 1)
+                vp.push(str);
+            else
+                vp.push(str + " x" + vp_map.get(str).toString());
+        }
+        catalog_stats += "Vital Parts = {" + StringFmt.Join(", ", vp) + "},\n";
+        var crew = [];
+        for (let i = 0; i < this.heli.GetCockpits().GetNumberOfCockpits(); i++) {
+            crew.push(lu(this.heli.GetCockpits().GetCockpit(i).GetName()));
+        }
+        catalog_stats += "Crew = {" + StringFmt.Join(", ", crew) + "},\n";
+        catalog_stats += "Propulsion = {" + StringFmt.Format("Dropoff {0}, Reliability {1}, Overspeed {2}, Ideal Alt. {3}, Fuel {4}",
             derived.Dropoff,
             StringFmt.Join("/", this.heli.GetReliabilityList()),
             derived.Overspeed,
             this.heli.GetMinAltitude().toString() + "-" + this.heli.GetMaxAltitude().toString(),
-            derived.FuelUses);
-        if (derived.TurnBleed == derived.TurnBleedwBombs) {
-            catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}\n\n",
+            derived.FuelUses) + "},\n";
+
+
+        catalog_stats += "Aerodynamics = {";
+        if (stats.bomb_mass == 0) {
+            catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}",
                 StringFmt.Join("/", this.heli.GetVisibilityList()),
                 derived.Stabiilty,
                 derived.EnergyLoss,
                 derived.TurnBleed);
         } else {
-            catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3} ({4})\n\n",
+            catalog_stats += StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3} ({4})",
                 StringFmt.Join("/", this.heli.GetVisibilityList()),
                 derived.Stabiilty,
                 derived.EnergyLoss,
                 derived.TurnBleed,
                 derived.TurnBleedwBombs);
         }
-        catalog_stats += StringFmt.Format("Toughness {0}, Max Strain {1}, Escape {2}, Crash Safety {3}, Flight Stress {4}\n\n",
+        catalog_stats += "},\nSurvivability = {";
+        catalog_stats += StringFmt.Format("Toughness {0}, Max Strain {1}, Escape {2}, Crash Safety {3}, Flight Stress {4}",
             derived.Toughness,
             derived.MaxStrain,
             StringFmt.Join("/", this.heli.GetEscapeList()),
             StringFmt.Join("/", this.heli.GetCrashList()),
-            this.Stress2Str(this.heli.GetStressList()));
+            this.Stress2Str(this.heli.GetStressList())) + "},\n";
 
-        var wlist = this.heli.GetWeapons().GetWeaponList();
-        var dlist = this.heli.GetWeapons().GetDirectionList();
-        var bombs = this.heli.GetMunitions().GetBombCount();
-        var rockets = this.heli.GetMunitions().GetRocketCount();
+        catalog_stats += "Armament = {";
+        const wlist = this.heli.GetWeapons().GetWeaponList();
+        const dlist = this.heli.GetWeapons().GetDirectionList();
+        const bombs = this.heli.GetMunitions().GetBombCount();
+        const rockets = this.heli.GetMunitions().GetRocketCount();
         var internal = this.heli.GetMunitions().GetInternalBombCount();
         if (bombs > 0) {
-            var int_bomb = Math.min(bombs, internal);
-            var ext_bomb = Math.max(0, bombs - int_bomb);
+            const int_bomb = Math.min(bombs, internal);
+            const ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0)
                 catalog_stats += lu(" Bomb Mass Internally.", int_bomb);
             if (ext_bomb > 0)
                 catalog_stats += lu(" Bomb Mass Externally.", ext_bomb);
             if (int_bomb > 0) {
-                var mib = Math.min(int_bomb, this.heli.GetMunitions().GetMaxBombSize());
+                const mib = Math.min(int_bomb, this.heli.GetMunitions().GetMaxBombSize());
                 catalog_stats += (lu("Largest Internal Bomb", mib.toString()));
             }
             internal -= int_bomb;
-            catalog_stats += "\n";
+            catalog_stats += "\\\\\n";
         }
         if (rockets > 0) {
-            var int_rock = Math.min(rockets, internal);
-            var ext_rock = Math.max(0, rockets - int_rock);
+            const int_rock = Math.min(rockets, internal);
+            const ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0)
                 catalog_stats += lu(" Rocket Mass Internally.", int_rock);
             if (ext_rock > 0)
                 catalog_stats += lu(" Rocket Mass Externally.", ext_rock);
-            catalog_stats += "\n";
+            catalog_stats += "\\\\\n";
         }
 
-        var wsets = this.heli.GetWeapons().GetWeaponSets();
+        const wsets = this.heli.GetWeapons().GetWeaponSets();
         for (let wi = 0; wi < wsets.length; wi++) {
-            var w = wsets[wi];
-            catalog_stats += WeaponString(w, wlist, dlist) + "\n";
+            const w = wsets[wi];
+            let wstring = WeaponString(w, wlist, dlist);
+            var synchstring = "fires";
+            for (let weap of w.GetWeapons()) {
+                if (weap.GetSynchronization() == SynchronizationType.INTERRUPT || weap.GetSynchronization() == SynchronizationType.SYNCH) {
+                    synchstring = "✣ fires";
+                }
+            }
+            wstring = wstring.replace("fires", synchstring)
+            catalog_stats += wstring + "\\\\\n";
         }
         for (let w of stats.warnings) {
-            catalog_stats += w.source + ":  " + w.warning + "\n";
+            catalog_stats += w.source + ":  " + w.warning + "\\\\\n";
         }
+
+        catalog_stats += "},\nLink = {" + this.MakeLink() + "}\n]{\n\n\n}";
+
+        catalog_stats = catalog_stats.replaceAll("#", "\\#");
+
         download(catalog_stats, this.heli.name + "_" + this.heli.GetVersion() + ".txt", "txt");
     }
 
