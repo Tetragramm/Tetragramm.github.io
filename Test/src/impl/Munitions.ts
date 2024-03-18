@@ -178,13 +178,15 @@ export class Munitions extends Part {
         eb--;
       }
     }
-    if (this.bomb_count > ib + eb) {
+    let ibeb = Math.max(0, ib + eb);
+    if (this.bomb_count > ibeb) {
       reduce = true;
-      this.bomb_count = ib + eb;
+      this.bomb_count = ibeb;
     }
-    if (this.rocket_count > ir + er) {
+    let irer = Math.max(0, ir + er);
+    if (this.rocket_count > irer) {
       reduce = true;
-      this.rocket_count = ir + er;
+      this.rocket_count = irer;
     }
     return reduce;
   }
