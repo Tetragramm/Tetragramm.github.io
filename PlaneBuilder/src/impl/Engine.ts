@@ -984,6 +984,9 @@ export class Engine extends Part {
     this.PulseJetCheck();
     this.TurbineCheck();
     this.ElectricCheck();
+    if (!this.CanUsePushPull()) {
+      this.use_pp = false;
+    }
     if (!this.CanUseExtendedDriveshaft()) {
       this.use_ds = false;
     }
