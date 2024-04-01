@@ -886,10 +886,9 @@ export class Wings extends Part {
             if (skin.stats.charge != 0) {
                 source = lu(skin.name);
                 total_charge += skin.stats.charge * wing.area;
+                total_charge = Math.floor(1.0e-6 + total_charge);
             }
         }
-
-        total_charge = Math.floor(1.0e-6 + total_charge);
 
         if (total_charge != 0) {
             value.equipment.push({
