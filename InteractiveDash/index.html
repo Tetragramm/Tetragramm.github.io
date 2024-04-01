@@ -377,9 +377,10 @@
 			data-bind="value: wear, event: {change: $parent.persistState}"></input>
 		<input type="number" class="number reliability"
 			data-bind="value: reliability, event: {change: $parent.persistState}"></input>
-		<span class="ideal_altitide_0">0 - </span>
-		<input type="number" class="number ideal_altitide"
-			data-bind="value: ideal_altitide, event: {change: $parent.persistState}"></input>
+		<span class="ideal_altitide_0"></span>
+		<input class="text ideal_altitide"
+			data-bind="value: ideal_altitide, event: {change: $parent.persistState}"
+			placeholder="0 - 29"></input>
 		<input type="number" class="number overspeed"
 			data-bind="value: overspeed, event: {change: $parent.persistState}"></input>
 		<input class="text engine_notes" data-bind="value: notes, event: {change: $parent.persistState}"

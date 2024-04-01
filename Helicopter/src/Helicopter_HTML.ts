@@ -614,7 +614,7 @@ export class Helicopter_HTML extends Display {
     }
 
     private SaveInteractive() {
-        var link = ("https://tetragramm.github.io/InteractiveDash/index.html?json=" + btoa(this.InteractiveDash()));
+        const link = (location.protocol + "//" + location.host + "/InteractiveDash/index.html?json=" + btoa(this.InteractiveDash()));
         window.open(link, "_blank");
     }
 
@@ -766,7 +766,7 @@ export class Helicopter_HTML extends Display {
                 "rpm": 0,
                 "wear": 0,
                 "reliability": e.GetReliability(),
-                "ideal_altitide": e.GetMaxAltitude(),
+                "ideal_altitide": StringFmt.Format("{0}-{1}",e.GetMinAltitude(),e.GetMaxAltitude()),
                 "overspeed": e.GetOverspeed(),
                 "notes": "",
             };
