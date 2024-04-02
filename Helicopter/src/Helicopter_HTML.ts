@@ -52,8 +52,6 @@ export class Helicopter_HTML extends Display {
     private derived: Derived_Heli_HTML;
     private alter: AlterStats_HTML;
 
-    private acft_type: HTMLSelectElement;
-
     //Stats Display
     private d_lift: HTMLTableCellElement;
     private d_drag: HTMLTableCellElement;
@@ -101,21 +99,6 @@ export class Helicopter_HTML extends Display {
         this.used = new Used_HTML(heli.GetUsed());
         this.rotor = new Rotor_HTML(heli.GetRotor());
         this.alter = new AlterStats_HTML(heli.GetAlter());
-
-        (document.getElementById("lbl_acft_type") as HTMLLabelElement).textContent = lu("Aircraft Type Section Title");
-        this.acft_type = document.getElementById("acft_type") as HTMLSelectElement;
-        let idx = 0;
-        for (let type in AIRCRAFT_TYPE) {
-            if (isNaN(Number(type))) {
-                let opt = document.createElement("OPTION") as HTMLOptionElement;
-                opt.text = lu(type);
-                this.acft_type.add(opt);
-            }
-        }
-        this.acft_type.selectedIndex = 1;
-        this.acft_type.onchange = () => {
-            this.acft_type.selectedIndex = 1;
-        };
 
         (document.getElementById("lbl_stats") as HTMLLabelElement).textContent = lu("Aircraft Stats Section Title");
         var tbl = document.getElementById("tbl_stats") as HTMLTableElement;
@@ -766,7 +749,7 @@ export class Helicopter_HTML extends Display {
                 "rpm": 0,
                 "wear": 0,
                 "reliability": e.GetReliability(),
-                "ideal_altitide": StringFmt.Format("{0}-{1}",e.GetMinAltitude(),e.GetMaxAltitude()),
+                "ideal_altitide": StringFmt.Format("{0}-{1}", e.GetMinAltitude(), e.GetMaxAltitude()),
                 "overspeed": e.GetOverspeed(),
                 "notes": "",
             };
@@ -994,7 +977,6 @@ export class Helicopter_HTML extends Display {
         var derived_stats = this.heli.GetDerivedStats();
 
         let idx = this.heli.GetAircraftType();
-        this.acft_type.selectedIndex = idx;
         this.era.UpdateDisplay();
         this.cockpits.UpdateDisplay();
         this.passengers.UpdateDisplay();
