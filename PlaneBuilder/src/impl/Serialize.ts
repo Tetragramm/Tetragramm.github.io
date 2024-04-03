@@ -28,9 +28,10 @@ export class Serialize {
   }
 
   public PushString(str: string) {
-    this.PushNum(str.length);
-    for (let i = 0; i < str.length; i++) {
-      this.view.setUint8(this.offset, str.charCodeAt(i));
+    var encoded = new TextEncoder().encode(str);
+    this.PushNum(encoded.length);
+    for (let i = 0; i < encoded.length; i++) {
+      this.view.setUint8(this.offset, encoded[i]);
       this.offset++;
     }
     this.Check();
@@ -102,13 +103,12 @@ export class Deserialize {
   public GetString(): string {
     this.Check();
     const len = this.GetNum();
-    const arr = [];
+    const arr = new Uint8Array(len);
     for (let i = 0; i < len; i++) {
-      const char = this.view.getUint8(this.offset);
-      arr.push(char);
+      arr[i] = this.view.getUint8(this.offset);
       this.offset += 1;
     }
-    return String.fromCharCode(...arr);
+    return new TextDecoder().decode(arr);
   }
 
   public GetNumArr(tgt_length: number): Array<number> {
