@@ -871,7 +871,7 @@ export class Engine extends Part {
   }
 
   private GetSpinner() {
-    if (this.gp_count > 0 && !this.GetGenerator() && !this.outboard_prop) {
+    if (this.gp_count > 0 && !this.GetGenerator()) {
       if (this.use_ds &&
         (this.mount_list[this.mount_sel].name == "Center-Mounted Tractor"
           || this.mount_list[this.mount_sel].name == "Center-Mounted Pusher"
