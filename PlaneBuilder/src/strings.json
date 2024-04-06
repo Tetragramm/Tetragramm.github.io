@@ -339,7 +339,7 @@
         "Ornithopter Buzzer Boost": "Buzzer Boost",
         "Ornithopter Buzzer Boost Warning": "Can boost above top speed. Every time you boost, take +2 Energy Loss forward.",
         "Ornithopter Buzzer Stall": "Buzzer Stall",
-        "Ornithopter Buzzer Stall Warning": "Can spend 1 RPM to avoid a Stall.  Spend 1 when you drop below Stall, and 1 every turn you start below Stall.",
+        "Ornithopter Buzzer Stall Warning": "Can take 1 RPM to avoid a Stall.  Take 1 when you drop below Stall, and 1 every turn you start below Stall.",
         "Rumble Warning": "Rumble requires a minimum structure of Rumble*10 to fly.",
         "Stability Warning": "Stability must be between -10 and +10 to be flyable by a human.",
         "Max Strain Warning": "A Max Strain of less than 10 means the plane falls apart on the ground.",
@@ -782,6 +782,7 @@
         "Low Mass Warning": "This aircraft is very low mass. If it is a custom airplane, be careful not to make it overpowered.",
         "Low Drag Warning": "This aircraft is very low drag. If it is a custom airplane, be careful not to make it overpowered.",
         "Connectivity Warning": "Can move between positions without Wingwalking.",
-        "Passenger Connectivity Warning": "Can reach the cockpit without Wingwalking."
+        "Passenger Connectivity Warning": "Can reach the cockpit without Wingwalking.",
+        "Rotor Thickness": "Rotor Thickness"
     }
 }

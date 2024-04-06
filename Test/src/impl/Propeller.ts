@@ -216,8 +216,6 @@ export class Propeller extends Part {
                         stats.pitchspeed = Math.min(stats.pitchspeed, this.prop_list[this.idx_prop].stats.pitchspeed + this.upg_list[this.idx_upg].stats.pitchspeed);
                         break;
                     case DRIVE_TYPE.PULSEJET:
-                        // stats.pitchboost = Math.min(stats.pitchboost, 0.4);
-                        // stats.pitchspeed = Math.min(stats.pitchspeed, 1.1);
                         stats.pitchboost = Math.min(stats.pitchboost, 0.6);
                         stats.pitchspeed = Math.min(stats.pitchspeed, 1.3);
                         break;

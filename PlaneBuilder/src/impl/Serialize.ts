@@ -103,12 +103,15 @@ export class Deserialize {
   public GetString(): string {
     this.Check();
     const len = this.GetNum();
-    const arr = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      arr[i] = this.view.getUint8(this.offset);
-      this.offset += 1;
-    }
-    return new TextDecoder().decode(arr);
+    const arr = new Uint8Array(this.view.buffer, this.offset, len);
+    this.offset += len;
+    let enc: string;
+    if (this.version < 12.65)
+      enc = 'windows-1252';
+    else
+      enc = 'utf-8';
+    let str = new TextDecoder(enc).decode(arr);
+    return str;
   }
 
   public GetNumArr(tgt_length: number): Array<number> {

@@ -26,6 +26,7 @@ export class Rotor extends Part {
 
     private cant_idx: number;
     private cant_list: { name: string, limited: boolean, stats: Stats }[];
+    private rotor_thickness: number;
 
     constructor(js: Rotor_PS) {
         super();
@@ -34,9 +35,10 @@ export class Rotor extends Part {
         this.rotor_span = 0;
         this.wing_area = 0;
         this.stagger_sel = 0;
-        this.dryMP = 0;
+        this.dryMP = -1;
         this.sizing_span = 0;
         this.cant_idx = 0;
+        this.rotor_thickness = 0;
         this.accessory = false;
         this.blade_idx = 0;
         this.blade_list = [];
@@ -58,6 +60,7 @@ export class Rotor extends Part {
             stagger_sel: this.stagger_sel,
             accessory: this.accessory,
             blade_idx: this.blade_idx,
+            rotor_thickness: this.rotor_thickness,
         };
     }
 
@@ -78,6 +81,12 @@ export class Rotor extends Part {
         if (json_version < 12.45) {
             this.rotor_span = 0;
         }
+        if (json_version < 12.55) {
+            this.rotor_thickness = 0;
+        } else {
+            this.rotor_thickness = js["rotor_thickness"];
+        }
+        this.dryMP = -1;
     }
 
     public serialize(s: Serialize) {
@@ -88,6 +97,7 @@ export class Rotor extends Part {
         s.PushNum(this.stagger_sel);
         s.PushBool(this.accessory);
         s.PushNum(this.blade_idx);
+        s.PushNum(this.rotor_thickness);
     }
 
     public deserialise(d: Deserialize) {
@@ -108,6 +118,12 @@ export class Rotor extends Part {
         if (d.version < 12.45) {
             this.rotor_span = 0;
         }
+        if (d.version < 12.55) {
+            this.rotor_thickness = 0;
+        } else {
+            this.rotor_thickness = d.GetNum();
+        }
+        this.dryMP = -1;
     }
 
     public SetCantileverList(cant_list: { name: string, limited: boolean, stats: Stats }[]) {
@@ -125,6 +141,18 @@ export class Rotor extends Part {
 
     public GetCantilever() {
         return this.cant_idx;
+    }
+
+    public SetRotorThickness(num: number) {
+        if (num < 0) {
+            num = 0;
+        }
+        this.rotor_thickness = Math.floor(1.0e-6 + num);
+        this.CalculateStats();
+    }
+
+    public GetRotorThickness() {
+        return this.rotor_thickness;
     }
 
     public SetType(new_type: AIRCRAFT_TYPE) {
@@ -311,13 +339,17 @@ export class Rotor extends Part {
             this.rotor_count = Math.max(1, this.rotor_count);
             if (this.rotor_count > 1 && this.rotor_count % 2 == 1)
                 this.rotor_count = this.rotor_count - 1;
-            if (this.rotor_count == 1) {
-                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 5 * this.blade_list[this.blade_idx].sizing);
+            if (this.dryMP != -1) {
+                if (this.rotor_count == 1) {
+                    this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 5 * this.blade_list[this.blade_idx].sizing);
+                } else {
+                    this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
+                }
+                this.sizing_span = Math.min(100, this.sizing_span);
+                this.rotor_span = Math.max(this.rotor_span, -Math.floor(1.0e-6 + this.sizing_span / 2));
             } else {
-                this.sizing_span = Math.ceil(-1.0e-6 + Math.pow(this.dryMP, 1 / 2.5) * 4 * this.blade_list[this.blade_idx].sizing);
+                this.sizing_span = 10;
             }
-            this.sizing_span = Math.min(100, this.sizing_span);
-            this.rotor_span = Math.max(this.rotor_span, -Math.floor(1.0e-6 + this.sizing_span / 2));
         }
     }
 
@@ -368,6 +400,8 @@ export class Rotor extends Part {
         if (this.type == AIRCRAFT_TYPE.HELICOPTER) {
             stats.reliability = 2 * Math.min(0, this.rotor_span);
             stats = stats.Add(this.blade_list[this.blade_idx].stats);
+            stats.power -= this.rotor_thickness;
+            stats.maxstrain += 10 * this.rotor_thickness;
         }
 
         if (this.accessory) {

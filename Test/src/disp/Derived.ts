@@ -70,8 +70,6 @@ export class Derived_HTML {
 
     private show_bombs: boolean;
 
-
-
     constructor(tbl: HTMLTableElement) {
         const fragment = document.createDocumentFragment();
         const row0 = insertRow(fragment);

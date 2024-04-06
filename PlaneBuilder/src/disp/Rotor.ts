@@ -32,6 +32,7 @@ export class Rotor_HTML extends Display {
     private heli_span: HTMLInputElement;
     private heli_stagger: HTMLSelectElement;
     private heli_blade_count: HTMLSelectElement;
+    private heli_blade_thickness: HTMLInputElement;
     private heli_mat: HTMLSelectElement;
     private heli_shafts: HTMLInputElement;
 
@@ -42,6 +43,7 @@ export class Rotor_HTML extends Display {
     private h_area: HTMLTableCellElement;
     private h_rely: HTMLTableCellElement;
     private h_strn: HTMLTableCellElement;
+    private h_powr: HTMLTableCellElement;
 
     constructor(r: Rotor) {
         super();
@@ -187,6 +189,10 @@ export class Rotor_HTML extends Display {
         }
         this.heli_mat.onchange = () => { this.rotor.SetCantilever(this.heli_mat.selectedIndex); };
 
+        this.heli_blade_thickness = document.createElement("INPUT") as HTMLInputElement;
+        FlexInput(lu("Rotor Thickness"), this.heli_blade_thickness, mat_fs);
+        this.heli_blade_thickness.onchange = () => { this.rotor.SetRotorThickness(this.heli_blade_thickness.valueAsNumber); };
+
         const acc_cell = this.heli_row.insertCell();
         const acc_fs = CreateFlexSection(acc_cell);
         this.heli_shafts = document.createElement("INPUT") as HTMLInputElement;
@@ -217,6 +223,14 @@ export class Rotor_HTML extends Display {
         this.h_area = c2_row.insertCell();
         this.h_rely = c2_row.insertCell();
         this.h_strn = c2_row.insertCell();
+        const h3_row = tbl_stat.insertRow();
+        CreateTH(h3_row, "");
+        CreateTH(h3_row, lu("Power"));
+        CreateTH(h3_row, "");
+        const c3_row = tbl_stat.insertRow();
+        c3_row.insertCell();
+        this.h_powr = c3_row.insertCell();
+        c3_row.insertCell();
     }
 
     private UpdateHelicopterStats() {
@@ -241,12 +255,15 @@ export class Rotor_HTML extends Display {
 
         this.heli_blade_count.selectedIndex = this.rotor.GetBladeCountIdx();
 
+        this.heli_blade_thickness.valueAsNumber = this.rotor.GetRotorThickness();
+
         const stats = this.rotor.PartStats();
         BlinkIfChanged(this.h_drag, stats.drag.toString(), false);
         BlinkIfChanged(this.h_mass, stats.mass.toString(), false);
         BlinkIfChanged(this.h_cost, stats.cost.toString(), false);
         BlinkIfChanged(this.h_area, stats.wingarea.toString(), true);
         BlinkIfChanged(this.h_rely, stats.reliability.toString(), true);
+        BlinkIfChanged(this.h_powr, stats.power.toString(), true);
     }
 
     public UpdateMaxStrain(strain: number) {

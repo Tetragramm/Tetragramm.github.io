@@ -890,7 +890,6 @@ export class Wings extends Part {
             }
         }
 
-
         if (total_charge != 0) {
             value.equipment.push({
                 source: source,
