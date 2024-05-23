@@ -646,7 +646,6 @@ export class Aircraft {
 
     this.accessories.SetAcftRadiator(this.engines.GetNumberOfRadiators() > 0);
     this.accessories.SetSkinArmor(this.frames.GetArmor());
-    this.accessories.SetVitalParts(this.VitalComponentList().length);
     this.accessories.SetCanCutouts(this.wings.CanCutout(), this.frames.CanCutout());
     stats = stats.Add(this.accessories.PartStats());
 
@@ -735,6 +734,7 @@ export class Aircraft {
       this.reinforcements.SetAcftStructure(stats.structure);
       this.fuel.SetArea(this.wings.GetArea());
       this.fuel.SetCantilever(this.reinforcements.GetIsCantilever());
+      this.accessories.SetVitalParts(this.VitalComponentList().length);
       this.munitions.SetAcftParameters(stats.structure, this.era.GetMaxBomb(), this.wings.HasInvertedGull());
 
       //Airplanes always cost 1
@@ -923,7 +923,7 @@ export class Aircraft {
     if (!isFinite(FuelUses)) {
       FuelUses = 0;
     }
-    if (FuelUses < 6) {
+    if (FuelUses < 6 && this.stats.fuelconsumption != 0) {
       if (this.stats.warnings.findIndex((value) => { return value.source == lu("Derived Fuel Uses") }) == -1) {
         this.stats.warnings.push({
           source: lu("Derived Fuel Uses"), warning: lu("Fuel Uses Warning"),

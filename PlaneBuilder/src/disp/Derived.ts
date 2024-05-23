@@ -515,7 +515,6 @@ export class Derived_HTML {
     }
 
     public GetName() {
-        console.log("Acft name is :" + this.name_inp.value);
         return this.name_inp.value;
     }
     public SetName(name: string) {

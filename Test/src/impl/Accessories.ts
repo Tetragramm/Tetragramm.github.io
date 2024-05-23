@@ -41,7 +41,7 @@ export class Accessories extends Part {
         this.armour_coverage = [...Array(8).fill(0)];
         this.acft_rad = false;
         this.skin_armour = 0;
-        this.vital_parts = 0;
+        this.vital_parts = 99;
 
         this.electric_list = [];
         for (const elem of js["electrical"]) {
@@ -105,6 +105,7 @@ export class Accessories extends Part {
     }
 
     public fromJSON(js: JSON, json_version: number) {
+        this.vital_parts = 99;
         if (js["v"] == 2) {
             this.armour_coverage = js["armour_coverage"];
         }
@@ -148,6 +149,7 @@ export class Accessories extends Part {
     }
 
     public deserialize(d: Deserialize) {
+        this.vital_parts = 99;
         this.armour_coverage = d.GetNumArr(this.armour_coverage.length);
         this.skin_armour = 0;
         if (d.version < 11.85) {
