@@ -367,12 +367,15 @@ export class Accessories extends Part {
 
     public SetSkinArmor(num: number) {
         this.skin_armour = num;
-        //Would normalize Coverage, but Vital Parts is always called next.
+        this.NormalizeCoverage();
     }
 
     public SetVitalParts(num: number) {
+        let oldvp = this.vital_parts;
         this.vital_parts = num;
         this.NormalizeCoverage();
+        if (oldvp != this.vital_parts)
+            this.CalculateStats();
     }
 
     public GetMaxMassStress() {
