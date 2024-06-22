@@ -128,7 +128,7 @@ export class Altitude_HTML {
             const row = this.rows[af];
 
             var adjBoost = 0;
-            if (PowerReduction > 0) {
+            if (PowerReduction > 0 && Boost != 0) {
                 adjBoost = Math.max(1, Boost - 1);
             } else {
                 adjBoost = Boost;
