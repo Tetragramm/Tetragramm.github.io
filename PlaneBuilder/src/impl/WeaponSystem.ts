@@ -401,7 +401,9 @@ export class WeaponSystem extends Part {
             this.weapons[0].SetSynchronization(SynchronizationType.NONE);
         }
 
-        this.CalculateStats();
+        //This does CalculateStats and also ensure that the number of mounts is accurate.
+        //That only matters when switching to PR for the moment, but future proof.
+        this.SetMountingCount(this.weapons.length);
     }
 
     public CanRepeating() {
