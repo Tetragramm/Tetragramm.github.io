@@ -420,8 +420,10 @@ export class Wings extends Part {
         else if (this.wing_list.length <= 1)
             this.wing_stagger = 0;
 
-        w.dihedral = Math.min(w.dihedral, w.span - 1);
-        w.anhedral = Math.min(w.anhedral, w.span - 1 - w.dihedral);
+        w.dihedral = Math.floor(1.0e-6 + w.dihedral);
+        w.anhedral = Math.floor(1.0e-6 + w.anhedral);
+        w.dihedral = Math.max(0, Math.min(w.dihedral, w.span - 1));
+        w.anhedral = Math.max(0, Math.min(w.anhedral, w.span - 1 - w.dihedral));
 
         this.CalculateStats();
     }
