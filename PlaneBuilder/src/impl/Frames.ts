@@ -206,16 +206,16 @@ export class Frames extends Part {
 
     public DuplicateSection(num: number, count: number = 1) {
         const sec = this.section_list[num];
-        const new_section = {
-            frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
-            lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
-        };
-        if (new_section.internal_bracing) {
-            if (this.CountSections() + this.tail_section_list.length == this.interal_bracing_count)
-                return;
-            this.interal_bracing_count += count;
-        }
         for (let i = 0; i < count; i++) {
+            const new_section = {
+                frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
+                lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
+            };
+            if (new_section.internal_bracing) {
+                if (this.CountSections() + this.tail_section_list.length == this.interal_bracing_count)
+                    return;
+                this.interal_bracing_count += count;
+            }
             this.section_list.splice(num, 0, new_section);
         }
         this.CalculateStats();
@@ -223,14 +223,14 @@ export class Frames extends Part {
 
     private DuplicateTailSection(num: number, count: number = 1) {
         const sec = this.tail_section_list[num];
-        const new_section = {
-            frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
-            lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
-        };
-        if (new_section.internal_bracing && this.CountSections() == this.interal_bracing_count) {
-            return;
-        }
         for (let i = 0; i < count; i++) {
+            const new_section = {
+                frame: sec.frame, geodesic: sec.geodesic, monocoque: sec.monocoque,
+                lifting_body: sec.lifting_body, internal_bracing: sec.internal_bracing
+            };
+            if (new_section.internal_bracing && this.CountSections() == this.interal_bracing_count) {
+                return;
+            }
             this.tail_section_list.splice(num, 0, new_section);
         }
         this.CalculateStats();
