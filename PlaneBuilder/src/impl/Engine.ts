@@ -961,9 +961,13 @@ export class Engine extends Part {
   }
 
   private VerifyCooling() {
-    if (this.NeedCooling() && this.radiator_index < 0) {
-      this.radiator_index = 0;
-    } else if (!this.NeedCooling()) {
+    if (this.NeedCooling()) {
+      this.cooling_count = Math.max(1, this.cooling_count);
+      if (this.radiator_index < 0) {
+        this.radiator_index = 0;
+      }
+    } else {
+      this.cooling_count = 0;
       this.radiator_index = -1;
     }
   }
