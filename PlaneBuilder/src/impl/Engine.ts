@@ -530,7 +530,8 @@ export class Engine extends Part {
     this.mount_sel = num;
     if (this.mount_list[this.mount_sel].reqED)
       this.SetUseExtendedDriveshaft(true);
-    this.CalculateStats();
+    else //because SetUseExtended calls CalculateStats
+      this.CalculateStats();
   }
 
   public GetMountIndex(): number {
@@ -798,7 +799,7 @@ export class Engine extends Part {
   }
 
   public GetGeneratorEnabled() {
-    return !(this.GetIsPulsejet() || this.use_pp);
+    return !(this.GetIsPulsejet() || this.use_pp || this.GetIsElectric());
   }
 
   public GetGenerator() {
@@ -815,12 +816,17 @@ export class Engine extends Part {
       this.gp_count = 0;
       this.gpr_count = 0;
       this.use_ds = false;
+      this.use_pp = false;
     }
     this.CalculateStats();
   }
 
+  public GetIsElectric() {
+    return this.etype_inputs.engine_type == ENGINE_TYPE.ELECTRIC;
+  }
+
   public GetAlternatorEnabled() {
-    return !this.GetIsPulsejet() && !this.is_generator && this.etype_inputs.engine_type != ENGINE_TYPE.ELECTRIC;
+    return !(this.GetIsPulsejet() || this.is_generator || this.GetIsElectric());
   }
 
   public GetAlternator() {
@@ -1060,6 +1066,7 @@ export class Engine extends Part {
       stats.maxstrain *= 2;
       stats.upkeep *= 2;
       stats.reqsections *= 2;
+      stats.charge *= 2;
       stats.power = Math.floor(1.0e-6 + this.mount_list[this.mount_sel].powerfactor * stats.power);
     }
 
@@ -1110,6 +1117,10 @@ export class Engine extends Part {
       stats.charge = Math.floor(1.0e-6 + stats.power / 10) + 1;
       stats.mass += 1;
       stats.cost += 2;
+      if (this.use_pp && this.mount_list[this.mount_sel].name == "Fuselage Push-Pull") {
+        stats.mass += 1;
+        stats.cost += 2;
+      }
     }
 
     if (this.outboard_prop) {

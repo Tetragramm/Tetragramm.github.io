@@ -362,7 +362,6 @@ function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLT
     while (tbl3.lastChild) {
         tbl3.removeChild(tbl3.lastChild);
     }
-    console.log(acft_builder.GetStats());
     for (let r = 0; r < tbl1.children.length; r++) {
         var row1 = tbl1.children[r];
         var row2 = tbl2.children[r];

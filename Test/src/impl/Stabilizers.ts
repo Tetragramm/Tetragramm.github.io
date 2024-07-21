@@ -125,8 +125,7 @@ export class Stabilizers extends Part {
         this.hstab_sel = num;
 
         this.SetHStabCount(this.hstab_count);
-
-        this.CalculateStats();
+        //SetHStabCount does CalculateStats
     }
 
     public GetHValidList() {
@@ -187,8 +186,7 @@ export class Stabilizers extends Part {
 
 
         this.SetVStabCount(this.vstab_count);
-
-        this.CalculateStats();
+        //SetVStabCount does CalculateStats
     }
 
     public GetVValidList() {

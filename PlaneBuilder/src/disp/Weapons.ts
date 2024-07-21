@@ -236,6 +236,7 @@ export class Weapons_HTML extends Display {
 
         disp.action.selectedIndex = set.GetAction();
         const can_act = set.GetCanAction();
+        can_act[3] = false;
         for (let i = 0; i < can_act.length; i++) {
             disp.action.options[i].disabled = !can_act[i];
         }

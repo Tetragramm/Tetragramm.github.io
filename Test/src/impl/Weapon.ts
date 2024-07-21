@@ -124,7 +124,7 @@ export class Weapon extends Part {
         if (this.weapon_type.size == 16) {
             this.w_count = 1;
         }
-        this.SetCount(this.w_count); //Triggers Calculate Stats
+        this.SetCount(this.w_count, false);
     }
 
     public GetFixed() {
@@ -139,7 +139,6 @@ export class Weapon extends Part {
                 this.fixed = false;
                 this.synchronization = SynchronizationType.NONE;
             }
-            this.CalculateStats();
         }
     }
 
@@ -286,7 +285,7 @@ export class Weapon extends Part {
         return this.w_count;
     }
 
-    public SetCount(use: number) {
+    public SetCount(use: number, calc_stats: boolean = true) {
         if (use != use) {
             use = 1;
         }
@@ -299,7 +298,8 @@ export class Weapon extends Part {
             use -= 1;
         }
         this.w_count = use;
-        this.CalculateStats();
+        if (calc_stats)
+            this.CalculateStats();
     }
 
     public CanRepeating() {

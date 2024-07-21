@@ -739,7 +739,7 @@ export class Aircraft_HTML extends Display {
                 "rpm": 0,
                 "wear": 0,
                 "reliability": e.GetReliability(),
-                "ideal_altitide": StringFmt.Format("{0}-{1}",e.GetMinAltitude(),e.GetMaxAltitude()),
+                "ideal_altitide": StringFmt.Format("{0}-{1}", e.GetMinAltitude(), e.GetMaxAltitude()),
                 "overspeed": e.GetOverspeed(),
                 "notes": "",
             };

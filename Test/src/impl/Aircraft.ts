@@ -71,6 +71,7 @@ export class Aircraft {
   private stats: Stats;
   private updated_stats: boolean;
   private freeze_calculation: boolean;
+  private recurrent_calculation_depth: number;
   private DisplayCallback: () => void;
   private aircraft_type: AIRCRAFT_TYPE;
   private era: Era;
@@ -100,6 +101,7 @@ export class Aircraft {
     js: PartStorage,
     storage: boolean
   ) {
+    this.recurrent_calculation_depth = 0;
     this.freeze_calculation = true;
     this.stats = new Stats();
     this.name = "Prototype Aircraft";
@@ -571,6 +573,7 @@ export class Aircraft {
     if (this.freeze_calculation) {
       return;
     }
+    this.recurrent_calculation_depth = this.recurrent_calculation_depth + 1;
     this.updated_stats = false;
     let stats = new Stats();
     stats = stats.Add(this.era.PartStats());
@@ -751,12 +754,13 @@ export class Aircraft {
         });
       }
 
-      if (this.DisplayCallback && !this.freeze_calculation)
-        this.DisplayCallback();
-
       if (this.use_storage)
         window.localStorage.setItem("test.aircraft", JSON.stringify(this));
     }
+
+    this.recurrent_calculation_depth = this.recurrent_calculation_depth - 1;
+    if (this.DisplayCallback && !this.freeze_calculation && this.recurrent_calculation_depth == 0)
+      this.DisplayCallback();
   }
 
   public GetDerivedStats(): DerivedStats {

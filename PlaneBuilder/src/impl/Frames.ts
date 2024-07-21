@@ -233,10 +233,9 @@ export class Frames extends Part {
             }
             this.tail_section_list.splice(num, 0, new_section);
         }
-        this.CalculateStats();
     }
 
-    public DeleteSection(num: number) {
+    public DeleteSection(num: number, calc = true) {
         if (this.required_sections == this.CountSections()
             && !this.section_list[num].internal_bracing)
             return;
@@ -252,7 +251,8 @@ export class Frames extends Part {
                 }
             }
         }
-        this.CalculateStats();
+        if (calc)
+            this.CalculateStats();
     }
 
     public SetRequiredSections(num: number) {
@@ -297,7 +297,7 @@ export class Frames extends Part {
                 if (this.section_list[idx].internal_bracing)
                     break;
             }
-            this.DeleteSection(idx);
+            this.DeleteSection(idx, false);
         }
         this.CalculateStats();
     }

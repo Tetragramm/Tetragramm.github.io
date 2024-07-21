@@ -577,7 +577,7 @@ export class Engines extends Part {
       const s = this.engines[e].PartStats();
       if (s.charge != 0) {
         value.equipment.push({
-          source: lu("Vital Part Engine", e),
+          source: lu("Vital Part Engine", e + 1),
           charge: s.charge.toString(),
         });
       }
