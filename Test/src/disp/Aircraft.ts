@@ -179,6 +179,9 @@ export class Aircraft_HTML extends Display {
 
         const cat_button = document.getElementById("acft_save_cat");
         cat_button.onclick = () => { this.CatalogStats(); }
+
+        const cat_json_button = document.getElementById("acft_save_cat_json");
+        cat_json_button.onclick = () => { this.CatalogJSON(); }
         this.SetCollapse();
     }
 
@@ -518,6 +521,169 @@ export class Aircraft_HTML extends Display {
         catalog_stats = catalog_stats.replaceAll("#", "\\#");
 
         download(catalog_stats, this.acft.name + "_" + this.acft.GetVersion() + ".txt", "txt");
+    }
+
+    private CatalogJSON() {
+        this.acft.name = this.derived.GetName();
+        const stats = this.acft.GetStats();
+        const derived = this.acft.GetDerivedStats();
+
+        let Stats = [];
+        if (stats.bomb_mass > 0) {
+            Stats.push({
+                Name: "Full Load",
+                Boost: derived.BoostFullwBombs,
+                Handling: derived.HandlingFullwBombs,
+                Climb: derived.RateOfClimbwBombs,
+                Stall: derived.StallSpeedFullwBombs,
+                Speed: derived.MaxSpeedwBombs
+            });
+            Stats.push({
+                Name: "1/2, Bombs",
+                Boost: Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFullwBombs) / 2),
+                Handling: Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFullwBombs) / 2),
+                Climb: Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2),
+                Stall: Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFullwBombs) / 2),
+                Speed: Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2)
+            });
+        }
+        Stats.push({
+            Name: "Full Fuel",
+            Boost: derived.BoostFull,
+            Handling: derived.HandlingFull,
+            Climb: derived.RateOfClimbFull,
+            Stall: derived.StallSpeedFull,
+            Speed: derived.MaxSpeedFull
+        });
+        Stats.push({
+            Name: "Half Fuel",
+            Boost: Math.floor(1.0e-6 + (derived.BoostEmpty + derived.BoostFull) / 2),
+            Handling: Math.floor(1.0e-6 + (derived.HandlingEmpty + derived.HandlingFull) / 2),
+            Climb: Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2),
+            Stall: Math.floor(1.0e-6 + (derived.StallSpeedEmpty + derived.StallSpeedFull) / 2),
+            Speed: Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2)
+        });
+        Stats.push({
+            Name: "Empty",
+            Boost: "-",
+            Handling: derived.HandlingEmpty,
+            Climb: "-",
+            Stall: derived.StallSpeedEmpty,
+            Speed: 0
+        });
+
+        let vp = this.acft.VitalComponentList();
+        let vp_map = new Map<string, number>();
+        for (let str of vp) {
+            str = str.replace(/Weapon Set #.*/g, "Guns").trim();
+            str = str.replace(/#.*/g, "").trim();
+            if (vp_map.has(str))
+                vp_map.set(str, vp_map.get(str) + 1);
+            else
+                vp_map.set(str, 1);
+        }
+        vp = [];
+        for (let str of vp_map.keys()) {
+            if (vp_map.get(str) == 1)
+                vp.push(str);
+            else
+                vp.push(str + " x" + vp_map.get(str).toString());
+        }
+        let crew = [];
+        for (let i = 0; i < this.acft.GetCockpits().GetNumberOfCockpits(); i++) {
+            crew.push(lu(this.acft.GetCockpits().GetCockpit(i).GetName()));
+        }
+
+        let Propulsion = StringFmt.Format("Dropoff {0}, Reliability {1}, Overspeed {2}, Ideal Alt. {3}, Fuel {4}",
+            derived.Dropoff,
+            StringFmt.Join("/", this.acft.GetReliabilityList()),
+            derived.Overspeed,
+            this.acft.GetMinAltitude().toString() + "-" + this.acft.GetMaxAltitude().toString(),
+            derived.FuelUses);
+        let Aerodynamics;
+        if (stats.bomb_mass == 0) {
+            Aerodynamics = StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3}",
+                StringFmt.Join("/", this.acft.GetVisibilityList()),
+                derived.Stabiilty,
+                derived.EnergyLoss,
+                derived.TurnBleed);
+        } else {
+            Aerodynamics = StringFmt.Format("Visibility {0}, Stability {1}, Energy Loss {2}, Turn Bleed {3} ({4})",
+                StringFmt.Join("/", this.acft.GetVisibilityList()),
+                derived.Stabiilty,
+                derived.EnergyLoss,
+                derived.TurnBleed,
+                derived.TurnBleedwBombs);
+        }
+        let Survivability = StringFmt.Format("Toughness {0}, Max Strain {1}, Escape {2}, Crash Safety {3}, Flight Stress {4}",
+            derived.Toughness,
+            derived.MaxStrain,
+            StringFmt.Join("/", this.acft.GetEscapeList()),
+            StringFmt.Join("/", this.acft.GetCrashList()),
+            Stress2Str(this.acft.GetStressList()));
+        let Armament = "";
+        const wlist = this.acft.GetWeapons().GetWeaponList();
+        const dlist = this.acft.GetWeapons().GetDirectionList();
+        const bombs = this.acft.GetMunitions().GetBombCount();
+        const rockets = this.acft.GetMunitions().GetRocketCount();
+        let internal = this.acft.GetMunitions().GetInternalBombCount();
+        if (bombs > 0) {
+            const int_bomb = Math.min(bombs, internal);
+            const ext_bomb = Math.max(0, bombs - int_bomb);
+            if (int_bomb > 0)
+                Armament += lu(" Bomb Mass Internally.", int_bomb);
+            if (ext_bomb > 0)
+                Armament += lu(" Bomb Mass Externally.", ext_bomb);
+            if (int_bomb > 0) {
+                const mib = Math.min(int_bomb, this.acft.GetMunitions().GetMaxBombSize());
+                Armament += (lu("Largest Internal Bomb", mib.toString()));
+            }
+            internal -= int_bomb;
+            Armament += "\n";
+        }
+        if (rockets > 0) {
+            const int_rock = Math.min(rockets, internal);
+            const ext_rock = Math.max(0, rockets - int_rock);
+            if (int_rock > 0)
+                Armament += lu(" Rocket Mass Internally.", int_rock);
+            if (ext_rock > 0)
+                Armament += lu(" Rocket Mass Externally.", ext_rock);
+            Armament += "\n";
+        }
+
+        const wsets = this.acft.GetWeapons().GetWeaponSets();
+        for (let wi = 0; wi < wsets.length; wi++) {
+            const w = wsets[wi];
+            let wstring = WeaponString(w, wlist, dlist);
+            var synchstring = "fires";
+            for (let weap of w.GetWeapons()) {
+                if (weap.GetSynchronization() == SynchronizationType.INTERRUPT || weap.GetSynchronization() == SynchronizationType.SYNCH) {
+                    synchstring = "✣ fires";
+                }
+            }
+            wstring = wstring.replace("fires", synchstring)
+            Armament += wstring + "\n";
+        }
+        for (let w of stats.warnings) {
+            Armament += w.source + ":  " + w.warning + "\n";
+        }
+
+        let output = {
+            Name: this.acft.name,
+            Price: stats.cost,
+            Used: Math.floor(1.0e-6 + stats.cost / 2),
+            Upkeep: stats.upkeep,
+            Stats: Stats,
+            "Vital Parts": StringFmt.Join(", ", vp),
+            Crew: StringFmt.Join(", ", crew),
+            Propulsion: Propulsion,
+            Aerodynamics: Aerodynamics,
+            Survivability: Survivability,
+            Armament: Armament,
+            Link: this.MakeLink()
+        }
+
+        download(JSON.stringify(output), this.acft.name + "_stats.json", "json");
     }
 
     private LoadText(text_area: HTMLInputElement) {
