@@ -2,15 +2,15 @@
 @import url("reset.css");
 @import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
 
-:root{
-	--bkg_color: rgb(20,20,60);
+:root {
+	--bkg_color: rgb(20, 20, 60);
 	--ftr_bkg_color: #00308F;
-	--inp_bkg_color:#383838;
-	--inp_txt_color:#c7c7c7;
+	--inp_bkg_color: #383838;
+	--inp_txt_color: #c7c7c7;
 	--inp_bdr_color: #555555;
-	--lnk_color:#01b9d1;
-	--lnk_act_color:#72a0c1;
-	--prt_lcl_color:#004f98;
+	--lnk_color: #01b9d1;
+	--lnk_act_color: #72a0c1;
+	--prt_lcl_color: #004f98;
 	background-color: var(--bkg_color);
 	color: var(--inp_txt_color);
 	font-family: Open Sans, Helvetica, Arial, sans-serif;
@@ -23,10 +23,15 @@ li {
 }
 
 p {
-	margin:0.5em;
+	margin: 0.5em;
 }
 
-p+h1, p+h2, p+h3, table+h1, table+h2, table+h3 {
+p+h1,
+p+h2,
+p+h3,
+table+h1,
+table+h2,
+table+h3 {
 	margin-top: 0.5em;
 }
 
@@ -80,7 +85,6 @@ h3 {
 	font-size: 1.5em;
 	font-weight: 300;
 	margin-bottom: 0.25rem;
-	text-decoration: underline;
 }
 
 h2 {
@@ -96,7 +100,8 @@ h1 {
 }
 
 a {
-	color: var(--lnk_color); /* blue */
+	color: var(--lnk_color);
+	/* blue */
 	text-decoration: none;
 	cursor: pointer;
 }
@@ -104,7 +109,8 @@ a {
 a:hover,
 a:active,
 a:focus {
-	color: var(--lnk_act_color); /* sky blue */
+	color: var(--lnk_act_color);
+	/* sky blue */
 }
 
 table {
@@ -121,21 +127,24 @@ th {
 	color: var(--lnk_color);
 	padding: .25rem;
 	text-align: center;
-	margin-top:0;
-	margin-bottom:0;
+	margin-top: 0;
+	margin-bottom: 0;
 }
 
 .lbl_action:hover,
 .lbl_action:active,
 .lbl_action:focus {
-	color: var(--lnk_act_color); /* sky blue */
+	color: var(--lnk_act_color);
+	/* sky blue */
 }
 
 .lbl_action:active {
 	color: #ffffff;
 }
-.lbl_action{
-	color: var(--lnk_color); /* blue */
+
+.lbl_action {
+	color: var(--lnk_color);
+	/* blue */
 }
 
 .btn_th {
@@ -147,8 +156,8 @@ th {
 td {
 	border: 1px solid var(--inp_bdr_color);
 	padding: .25rem;
-	margin-top:0;
-	margin-bottom:0;
+	margin-top: 0;
+	margin-bottom: 0;
 	max-width: 100%;
 	vertical-align: top;
 }
@@ -161,20 +170,21 @@ label {
 	border-collapse: collapse;
 	box-sizing: border-box;
 	height: 1.5em !important;
-	display:inline-block;
+	display: inline-block;
 	font-size: 1em;
 	border-color: #55555500;
 	border-style: solid;
 }
 
-select, input {
+select,
+input {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
 	box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-	padding:0;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	padding: 0;
 	height: 1.5em !important;
 	background-color: var(--inp_bkg_color);
 	color: var(--inp_txt_color);
@@ -195,31 +205,31 @@ select {
 		var(--inp_bkg_color);
 	background-position:
 		calc(100% - 0.25em) calc(0.5em),
-		0,0;
+		0, 0;
 	background-size:
 		1em 0.5em,
 		100%, 100%;
 	background-repeat: no-repeat;
 	text-align: initial;
-    text-align-last: initial;
-    text-align: initial;
-    -ms-text-align-last: initial;
-    -moz-text-align-last: initial;
+	text-align-last: initial;
+	text-align: initial;
+	-ms-text-align-last: initial;
+	-moz-text-align-last: initial;
 }
 
 option {
-    text-align:initial;
+	text-align: initial;
 }
 
 input[type=text] {
-	width: auto; 
+	width: auto;
 	box-sizing: border-box;
-	-webkit-box-sizing:border-box;
+	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 }
 
 input[type=number] {
-	width:4em;
+	width: 4em;
 	text-align: center;
 }
 
@@ -228,13 +238,13 @@ input[disabled] {
 	border-color: #000000;
 }
 
-input[type='checkbox'][disabled]{
+input[type='checkbox'][disabled] {
 	width: 1em !important;
 	height: 1em !important;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
-	appearance:none;
+	appearance: none;
 	background-color: #000000;
 	border-color: #000000;
 	color: #000000;
@@ -250,25 +260,25 @@ input[type='checkbox'][disabled]{
 
 /* Dashed border */
 hr.dashed {
-  border-top: 1px dashed var(--inp_bdr_color);
-  height: 0px;
-  margin: 0px;
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+	border-top: 1px dashed var(--inp_bdr_color);
+	height: 0px;
+	margin: 0px;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 }
 
 span {
 	height: 1.5em !important;
-	padding-top:2px;
+	padding-top: 2px;
 }
 
-input[type='checkbox']{
+input[type='checkbox'] {
 	width: 1em !important;
 	height: 1em !important;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
-	appearance:none;
+	appearance: none;
 	background-color: var(--inp_bkg_color);
 	border-color: var(--inp_bkg_color);
 	color: var(--inp_txt_color);
@@ -302,7 +312,7 @@ select[disabled] {
 	/* color: #000000; */
 }
 
-button{
+button {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-o-appearance: none;
@@ -316,7 +326,7 @@ button{
 	box-sizing: border-box;
 	height: 1.5em !important;
 	font-size: 1em;
-	border:1px solid var(--inp_bdr_color);
+	border: 1px solid var(--inp_bdr_color);
 	vertical-align: top;
 }
 
@@ -344,15 +354,15 @@ button[disabled] {
 }
 
 .green {
-	color:#009900;
+	color: #009900;
 }
 
 .yellow {
-	color:#ffcc00;
+	color: #ffcc00;
 }
 
 .red {
-	color:#FF0000;
+	color: #FF0000;
 }
 
 /* The actual popup (appears on top) */
@@ -365,7 +375,7 @@ button[disabled] {
 	border-radius: 12px;
 	padding: 8px;
 	max-width: 200em;
-	width:max-content;
+	width: max-content;
 	white-space: normal;
 	z-index: 1;
 }
@@ -381,64 +391,124 @@ button[disabled] {
 
 /* Add animation (fade in the popup) */
 @-webkit-keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity: 1;}
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
 @-moz-keyframes changed {
-  from {opacity: 0;}
-  to {opacity:1 ;}
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
 @-o-keyframes changed {
-  from {opacity: 0;}
-  to {opacity:1 ;}
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
 @keyframes fadeIn {
-  from {opacity: 0;}
-  to {opacity:1 ;}
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
 }
 
 /* Change Animations */
 @-webkit-keyframes changed {
-	from {background-color: #FF0000;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-moz-keyframes changed {
-	from {background-color: #FF0000;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-o-keyframes changed {
-	from {background-color: #FF0000;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @keyframes changed {
-	from {background-color: #FF0000;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-webkit-keyframes changedpl {
-	from {background-color: #FF0000;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @-moz-keyframes changedpl {
-	from {background-color: #FF0000;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @-o-keyframes changedpl {
-	from {background-color: #FF0000;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @keyframes changedpl {
-	from {background-color: #FF0000;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FF0000;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 .changed_b {
@@ -456,43 +526,83 @@ button[disabled] {
 }
 
 @-webkit-keyframes changed_g {
-	from {background-color: #009900;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-moz-keyframes changed_g {
-	from {background-color: #009900;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-o-keyframes changed_g {
-	from {background-color: #009900;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @keyframes changed_g {
-	from {background-color: #009900;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-webkit-keyframes changed_g_pl {
-	from {background-color: #009900;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @-moz-keyframes changed_g_pl {
-	from {background-color: #009900;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @-o-keyframes changed_g_pl {
-	from {background-color: #009900;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @keyframes changed_g_pl {
-	from {background-color: #009900;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #009900;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 .changed_g {
@@ -510,43 +620,83 @@ button[disabled] {
 }
 
 @-webkit-keyframes changed_n {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-moz-keyframes changed_n {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-o-keyframes changed_n {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @keyframes changed_n {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--bkg_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--bkg_color);
+	}
 }
 
 @-webkit-keyframes changed_n_pl {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @-moz-keyframes changed_n_pl {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @-o-keyframes changed_n_pl {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 @keyframes changed_n_pl {
-	from {background-color: #FFFFFF;}
-	to {background-color: var(--prt_lcl_color);}
+	from {
+		background-color: #FFFFFF;
+	}
+
+	to {
+		background-color: var(--prt_lcl_color);
+	}
 }
 
 .changed_n {
@@ -583,7 +733,7 @@ button[disabled] {
 }
 
 .content {
-	max-height:inherit;
+	max-height: inherit;
 	overflow: hidden;
 	transition: max-height 0.2s ease-in-out;
 }
@@ -593,27 +743,29 @@ button[disabled] {
 }
 
 .collapsible::before {
-	content: '\02795'; /* Unicode character for "plus" sign (+) */
+	content: '\02795';
+	/* Unicode character for "plus" sign (+) */
 	color: white;
 	float: left;
 	margin-right: 5px;
 }
 
 .active::before {
-	content: "\2796"; /* Unicode character for "minus" sign (-) */
+	content: "\2796";
+	/* Unicode character for "minus" sign (-) */
 }
 
 .ER_Custom {
-	color:white;
+	color: white;
 	background-color: black;
 }
 
 .ER_Rare {
-	color:white;
+	color: white;
 	background-color: green;
 }
 
-.ER_Legendary{
-	color:black;
+.ER_Legendary {
+	color: black;
 	background-color: gold;
 }
