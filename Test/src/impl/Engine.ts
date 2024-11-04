@@ -394,7 +394,7 @@ export class Engine extends Part {
     if (this.NeedCooling()) {
       this.cooling_count = Math.max(1, this.cooling_count);
     }
-    this.cooling_count = Math.min(this.etype_stats.stats.cooling, this.cooling_count);
+    this.cooling_count = Math.min(this.GetMaxCooling(), this.cooling_count);
     this.CalculateStats();
   }
 
