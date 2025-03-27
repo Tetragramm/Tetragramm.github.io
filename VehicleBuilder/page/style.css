@@ -757,6 +757,13 @@ button[disabled] {
 	width: 100%;
 }
 
+select.flex-item {
+	min-width: max-content;
+	/* Ensure content is visible */
+	box-sizing: border-box;
+	/* Include padding and border in width calculation */
+}
+
 .content {
 	max-height: inherit;
 	overflow-x: auto;
