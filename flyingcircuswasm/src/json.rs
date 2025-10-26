@@ -14,6 +14,10 @@ pub fn jsarr<'a>(js: &'a serde_json::Value, key: &str) -> &'a Vec<serde_json::Va
     js.get(key).unwrap().as_array().unwrap()
 }
 
+pub fn jsarr_opt<'a>(js: &'a serde_json::Value, key: &str) -> Option<&'a Vec<serde_json::Value>> {
+    js.get(key).and_then(|v| v.as_array())
+}
+
 pub fn vstr(js: &serde_json::Value) -> String {
     js.as_str().unwrap().to_owned()
 }

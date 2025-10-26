@@ -1,4 +1,6 @@
-use crate::disp::{Select, SelectOpt};
+use ui_core::*;
+use ui_macro::*;
+
 use crate::json::*;
 use crate::part::{ElectricsMessage, Part};
 use crate::serialization::{JSSerializable, Serializable};
@@ -11,13 +13,11 @@ pub struct EraVal {
     pub stats: Stats,
 }
 
+#[derive(UIBindings)]
 pub struct Era {
     vals: Vec<EraVal>,
+    #[ui(select, source = "vals")]
     pub selected_era: usize,
-}
-
-pub struct EraOptions {
-    selected_era: Select,
 }
 
 impl Era {
@@ -25,23 +25,6 @@ impl Era {
         Era {
             vals,
             selected_era: 0,
-        }
-    }
-
-    pub fn get_options(&self) -> EraOptions {
-        EraOptions {
-            selected_era: Select {
-                enabled: true,
-                options: self
-                    .vals
-                    .iter()
-                    .map(|x| SelectOpt {
-                        name: x.name.clone(),
-                        enabled: true,
-                    })
-                    .collect(),
-                selected: self.selected_era,
-            },
         }
     }
 

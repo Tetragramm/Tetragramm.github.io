@@ -1,0 +1,25 @@
+# Auto detect text files and normalize line endings to LF in the repository
+* text=auto
+
+# Explicitly declare text files you want to always be normalized and converted to LF
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.py text eol=lf
+*.rs text eol=lf
+*.toml text eol=lf
+*.tex text eol=lf
+*.typ text eol=lf
+
+# Denote all files that are truly binary and should not be modified
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.wasm binary

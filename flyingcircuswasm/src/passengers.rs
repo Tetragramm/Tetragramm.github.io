@@ -1,7 +1,9 @@
 use serde_json::Map;
 
+use ui_core::*;
+use ui_macro::*;
+
 use crate::{
-    disp::{Check, Number},
     json::{jsbool, jsnum},
     lu,
     part::{ElectricsMessage, Part},
@@ -9,16 +11,14 @@ use crate::{
     stats::{rtz, Stats, Warning},
 };
 
+#[derive(UIBindings)]
 pub struct Passengers {
+    #[ui(number, name = "seats")]
     seats: i16,
+    #[ui(number, name = "beds")]
     beds: i16,
+    #[ui(check, name = "connected", enabled_fn = "is_connected_enabled")]
     connected: bool,
-}
-
-pub struct PassengersOpt {
-    seats: Number,
-    beds: Number,
-    connected: Check,
 }
 
 impl Passengers {
@@ -28,6 +28,11 @@ impl Passengers {
             beds: 0,
             connected: false,
         }
+    }
+
+    /// From TypeScript PossibleConnection(): enabled when seats + beds > 0
+    fn is_connected_enabled(&self) -> bool {
+        self.seats + self.beds > 0
     }
 }
 

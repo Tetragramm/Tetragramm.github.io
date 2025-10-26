@@ -24,4 +24,5 @@ pub struct Check {
 pub trait UIBindings {
     type OptionsType;
     fn create_ui_options(&self) -> Self::OptionsType;
+    fn receive_ui_selections(&mut self, options: Self::OptionsType);
 }

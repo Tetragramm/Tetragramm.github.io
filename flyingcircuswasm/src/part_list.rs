@@ -1,8 +1,9 @@
 use crate::{
     cockpits::{CockpitType, GunsightType, SafetyType, UpgradeType},
-    engines::{Cowl, Mount, MountType, RadiatorCoolant, RadiatorMount, RadiatorType},
+    engines::{Cowl, Mount, MountType},
     era::EraVal,
     lu,
+    radiator::{RadiatorCoolant, RadiatorMount, RadiatorType},
     stats::{Era, Stats, Warning, WarningLevel, ERA},
 };
 
@@ -934,7 +935,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Panel");
                 RadiatorType {
                     name: name.clone(),
-                    drag_per_cool: 0.5,
+                    dragpercool: 0.5,
                     stats: Stats {
                         eras: vec![Era {
                             name: name.clone(),
@@ -948,7 +949,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Box");
                 RadiatorType {
                     name: name.clone(),
-                    drag_per_cool: 0.5,
+                    dragpercool: 0.5,
                     stats: Stats {
                         mass: -1.,
                         drag: 2.,
@@ -964,7 +965,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Intake");
                 RadiatorType {
                     name: name.clone(),
-                    drag_per_cool: 0.5,
+                    dragpercool: 0.5,
                     stats: Stats {
                         cost: 3.,
                         cooling: 2.,
@@ -980,7 +981,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Evaporation");
                 RadiatorType {
                     name: name.clone(),
-                    drag_per_cool: 0.,
+                    dragpercool: 0.,
                     stats: Stats {
                         eras: vec![Era {
                             name: name.clone(),
@@ -1074,7 +1075,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Water");
                 RadiatorCoolant {
                     name: name.clone(),
-                    hard: false,
+                    harden: false,
                     flammable: false,
                     stats: Stats {
                         eras: vec![Era {
@@ -1089,7 +1090,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Salt Water");
                 RadiatorCoolant {
                     name: name.clone(),
-                    hard: true,
+                    harden: true,
                     flammable: false,
                     stats: Stats {
                         cost: 1.,
@@ -1106,7 +1107,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Mineral Oil");
                 RadiatorCoolant {
                     name: name.clone(),
-                    hard: true,
+                    harden: true,
                     flammable: true,
                     stats: Stats {
                         cost: 1.,
@@ -1127,7 +1128,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Castor Oil");
                 RadiatorCoolant {
                     name: name.clone(),
-                    hard: false,
+                    harden: false,
                     flammable: true,
                     stats: Stats {
                         eras: vec![Era {
@@ -1147,7 +1148,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Glycol");
                 RadiatorCoolant {
                     name: name.clone(),
-                    hard: false,
+                    harden: false,
                     flammable: false,
                     stats: Stats {
                         cost: 2.,
@@ -1164,7 +1165,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Freon");
                 RadiatorCoolant {
                     name: name.clone(),
-                    hard: false,
+                    harden: false,
                     flammable: false,
                     stats: Stats {
                         cost: 3.,
@@ -1186,7 +1187,7 @@ pub fn get_part_list() -> PartList {
                 let name = lu!("Ammonia");
                 RadiatorCoolant {
                     name: name.clone(),
-                    hard: false,
+                    harden: false,
                     flammable: false,
                     stats: Stats {
                         cost: 2.,

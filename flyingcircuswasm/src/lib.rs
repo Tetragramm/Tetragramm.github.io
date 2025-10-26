@@ -3,18 +3,22 @@ use wasm_bindgen::prelude::*;
 mod aircraft;
 mod cockpit;
 mod cockpits;
-mod disp;
-// mod engine;
-// mod engines;
+mod electric_builder;
+mod engine;
+mod engine_list;
+mod engines;
 mod era;
 mod json;
 mod localization;
 mod part;
 mod part_list;
 mod passengers;
-// mod radiator;
+mod propeller_builder;
+mod pulsejet_builder;
+mod radiator;
 mod serialization;
 mod stats;
+mod turbo_builder;
 mod utils;
 
 #[wasm_bindgen]

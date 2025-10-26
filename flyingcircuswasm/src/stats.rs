@@ -1,9 +1,11 @@
 use itertools::{chain, Itertools};
 use std::str::FromStr;
 
+use serde_json::Map;
+
 use crate::json::*;
 use crate::lu;
-use crate::serialization::{Deserializer, Error, Serializable, Serializer};
+use crate::serialization::{Deserializer, Error, JSSerializable, Serializable, Serializer};
 
 #[derive(Clone, PartialEq, Eq, Hash, Copy)]
 pub enum WarningLevel {
@@ -457,3 +459,69 @@ impl PartialEq for Stats {
 }
 
 impl Eq for Stats {}
+
+impl JSSerializable for Stats {
+    fn from_json(&mut self, js: &serde_json::Value, _json_version: f64) {
+        self.liftbleed = jsnum(js, "liftbleed");
+        self.wetmass = jsnum(js, "wetmass");
+        self.mass = jsnum(js, "mass");
+        self.drag = jsnum(js, "drag");
+        self.control = jsnum(js, "control");
+        self.cost = jsnum(js, "cost");
+        self.reqsections = jsnum(js, "reqsections");
+        self.visibility = jsnum(js, "visibility");
+        self.flightstress = jsnum(js, "flightstress");
+        self.escape = jsnum(js, "escape");
+        self.pitchstab = jsnum(js, "pitchstab");
+        self.latstab = jsnum(js, "latstab");
+        self.cooling = jsnum(js, "cooling");
+        self.reliability = jsnum(js, "reliability");
+        self.power = jsnum(js, "power");
+        self.fuelconsumption = jsnum(js, "fuelconsumption");
+        self.maxstrain = jsnum(js, "maxstrain");
+        self.structure = jsnum(js, "structure");
+        self.pitchboost = jsnum(js, "pitchboost");
+        self.pitchspeed = jsnum(js, "pitchspeed");
+        self.wingarea = jsnum(js, "wingarea");
+        self.toughness = jsnum(js, "toughness");
+        self.upkeep = jsnum(js, "upkeep");
+        self.crashsafety = jsnum(js, "crashsafety");
+        self.bomb_mass = jsnum(js, "bomb_mass");
+        self.fuel = jsnum(js, "fuel");
+        self.charge = jsnum(js, "charge");
+        // TODO: Deserialize warnings and eras if needed
+    }
+
+    fn to_json(&self) -> serde_json::Value {
+        let mut map = Map::new();
+        map.insert("liftbleed".to_string(), self.liftbleed.into());
+        map.insert("wetmass".to_string(), self.wetmass.into());
+        map.insert("mass".to_string(), self.mass.into());
+        map.insert("drag".to_string(), self.drag.into());
+        map.insert("control".to_string(), self.control.into());
+        map.insert("cost".to_string(), self.cost.into());
+        map.insert("reqsections".to_string(), self.reqsections.into());
+        map.insert("visibility".to_string(), self.visibility.into());
+        map.insert("flightstress".to_string(), self.flightstress.into());
+        map.insert("escape".to_string(), self.escape.into());
+        map.insert("pitchstab".to_string(), self.pitchstab.into());
+        map.insert("latstab".to_string(), self.latstab.into());
+        map.insert("cooling".to_string(), self.cooling.into());
+        map.insert("reliability".to_string(), self.reliability.into());
+        map.insert("power".to_string(), self.power.into());
+        map.insert("fuelconsumption".to_string(), self.fuelconsumption.into());
+        map.insert("maxstrain".to_string(), self.maxstrain.into());
+        map.insert("structure".to_string(), self.structure.into());
+        map.insert("pitchboost".to_string(), self.pitchboost.into());
+        map.insert("pitchspeed".to_string(), self.pitchspeed.into());
+        map.insert("wingarea".to_string(), self.wingarea.into());
+        map.insert("toughness".to_string(), self.toughness.into());
+        map.insert("upkeep".to_string(), self.upkeep.into());
+        map.insert("crashsafety".to_string(), self.crashsafety.into());
+        map.insert("bomb_mass".to_string(), self.bomb_mass.into());
+        map.insert("fuel".to_string(), self.fuel.into());
+        map.insert("charge".to_string(), self.charge.into());
+        // TODO: Serialize warnings and eras if needed
+        serde_json::Value::Object(map)
+    }
+}
