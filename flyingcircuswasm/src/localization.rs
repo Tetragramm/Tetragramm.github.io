@@ -9,7 +9,14 @@ pub fn set_lang_map(v: serde_json::Value) {
 }
 
 pub fn localization_lookup<S: AsRef<str>>(key: S) -> String {
-    unsafe { jsstr(&LANG_MAP, key.as_ref()) }
+    unsafe {
+        // If LANG_MAP hasn't been initialized (is Null), return the key itself
+        // This allows tests to run without setting up localization
+        if LANG_MAP.is_null() {
+            return key.as_ref().to_string();
+        }
+        jsstr(&LANG_MAP, key.as_ref())
+    }
 }
 
 #[macro_export]

@@ -11,10 +11,30 @@ struct TypeData {
 }
 
 const TYPE_TABLE: [TypeData; 4] = [
-    TypeData { name: "Turbojet", efficiency: 0.0, mass_factor: 0.8, cost_factor: 1.0 },
-    TypeData { name: "Turbofan", efficiency: 0.0, mass_factor: 1.0, cost_factor: 1.0 },
-    TypeData { name: "Propfan", efficiency: -9.0, mass_factor: 0.8, cost_factor: 1.0 },
-    TypeData { name: "Turboprop", efficiency: -3.0, mass_factor: 0.8, cost_factor: 1.0 },
+    TypeData {
+        name: "Turbojet",
+        efficiency: 0.0,
+        mass_factor: 0.8,
+        cost_factor: 1.0,
+    },
+    TypeData {
+        name: "Turbofan",
+        efficiency: 0.0,
+        mass_factor: 1.0,
+        cost_factor: 1.0,
+    },
+    TypeData {
+        name: "Propfan",
+        efficiency: -9.0,
+        mass_factor: 0.8,
+        cost_factor: 1.0,
+    },
+    TypeData {
+        name: "Turboprop",
+        efficiency: -3.0,
+        mass_factor: 0.8,
+        cost_factor: 1.0,
+    },
 ];
 
 struct EraData {
@@ -25,15 +45,60 @@ struct EraData {
 }
 
 const ERA_TABLE: [EraData; 9] = [
-    EraData { name: "Gen 1 1945-1955", max_temp: 1100.0, efficiency: -2.0, cost_factor: 0.5 },
-    EraData { name: "Gen 1.5 1955-1965", max_temp: 1100.0, efficiency: -1.0, cost_factor: 0.6 },
-    EraData { name: "Gen 2 1965-1975", max_temp: 1400.0, efficiency: -1.0, cost_factor: 0.7 },
-    EraData { name: "Gen 2.5 1975-1985", max_temp: 1400.0, efficiency: 0.0, cost_factor: 0.8 },
-    EraData { name: "Gen 3 1985-1995", max_temp: 1800.0, efficiency: 0.0, cost_factor: 0.9 },
-    EraData { name: "Gen 3.5 1995-2005", max_temp: 1800.0, efficiency: 1.0, cost_factor: 1.0 },
-    EraData { name: "Gen 4 2005-2015", max_temp: 2000.0, efficiency: 1.0, cost_factor: 1.1 },
-    EraData { name: "Gen 4.5 2015-2025", max_temp: 2000.0, efficiency: 2.0, cost_factor: 1.2 },
-    EraData { name: "Gen 0 Himmilgard", max_temp: 800.0, efficiency: -10.0, cost_factor: 0.5 },
+    EraData {
+        name: "Gen 1 1945-1955",
+        max_temp: 1100.0,
+        efficiency: -2.0,
+        cost_factor: 0.5,
+    },
+    EraData {
+        name: "Gen 1.5 1955-1965",
+        max_temp: 1100.0,
+        efficiency: -1.0,
+        cost_factor: 0.6,
+    },
+    EraData {
+        name: "Gen 2 1965-1975",
+        max_temp: 1400.0,
+        efficiency: -1.0,
+        cost_factor: 0.7,
+    },
+    EraData {
+        name: "Gen 2.5 1975-1985",
+        max_temp: 1400.0,
+        efficiency: 0.0,
+        cost_factor: 0.8,
+    },
+    EraData {
+        name: "Gen 3 1985-1995",
+        max_temp: 1800.0,
+        efficiency: 0.0,
+        cost_factor: 0.9,
+    },
+    EraData {
+        name: "Gen 3.5 1995-2005",
+        max_temp: 1800.0,
+        efficiency: 1.0,
+        cost_factor: 1.0,
+    },
+    EraData {
+        name: "Gen 4 2005-2015",
+        max_temp: 2000.0,
+        efficiency: 1.0,
+        cost_factor: 1.1,
+    },
+    EraData {
+        name: "Gen 4.5 2015-2025",
+        max_temp: 2000.0,
+        efficiency: 2.0,
+        cost_factor: 1.2,
+    },
+    EraData {
+        name: "Gen 0 Himmilgard",
+        max_temp: 800.0,
+        efficiency: -10.0,
+        cost_factor: 0.5,
+    },
 ];
 
 pub struct TurboBuilder {
@@ -162,7 +227,9 @@ impl TurboBuilder {
         const FAN_PRESSURE_RATIO: f64 = 1.6;
 
         let area = std::f64::consts::PI * (self.diameter / 2.0).powi(2);
-        let net_efficiency = 0.8 + (era.efficiency + TYPE_TABLE[self.type_sel].efficiency) / 20.0 + self.flow_adjustment;
+        let net_efficiency = 0.8
+            + (era.efficiency + TYPE_TABLE[self.type_sel].efficiency) / 20.0
+            + self.flow_adjustment;
 
         let p3 = PA * self.compression_ratio;
         let t3 = TA * (p3 / PA).powf((Y - 1.0) / Y);
@@ -170,18 +237,31 @@ impl TurboBuilder {
         let tr = 1.0 + (Y - 1.0) / 2.0 * M * M;
         let ty = era.max_temp / TA;
         let tc = self.compression_ratio.powf(1.0 - 1.0 / Y);
-        let st11 = A0 * (((2.0 * tr) / (Y - 1.0) * (ty / (tr * tc) - 1.0) * (tc - 1.0) + ty / (tr * tc) * M * M).sqrt() - M) * net_efficiency / 1000.0;
+        let st11 = A0
+            * (((2.0 * tr) / (Y - 1.0) * (ty / (tr * tc) - 1.0) * (tc - 1.0)
+                + ty / (tr * tc) * M * M)
+                .sqrt()
+                - M)
+            * net_efficiency
+            / 1000.0;
         let tcp = FAN_PRESSURE_RATIO.powf(1.0 - 1.0 / Y);
         let st13 = A0 * ((2.0 / (Y - 1.0) * (tr * tcp - 1.0)).sqrt() - M) * net_efficiency / 1000.0;
         let f = (CP * TA / self.fuel_heat_value) * (era.max_temp / TA - t3 / TA);
-        let st = st11 / (1.0 + self.bypass_ratio) + self.bypass_ratio * st13 / (1.0 + self.bypass_ratio);
+        let st =
+            st11 / (1.0 + self.bypass_ratio) + self.bypass_ratio * st13 / (1.0 + self.bypass_ratio);
         let tsfc11 = f / ((1.0 + self.bypass_ratio) * st) * 1000.0;
 
         let c2 = PA * area * self.mfp(1.0) / (1.0 + f);
         let mc2 = self.compression_ratio * c2 * (1.0 / era.max_temp).sqrt() * net_efficiency;
 
         // Check for invalid values
-        if !st.is_finite() || !mc2.is_finite() || !tsfc11.is_finite() || st < 0.0 || mc2 < 0.0 || tsfc11 < 0.0 {
+        if !st.is_finite()
+            || !mc2.is_finite()
+            || !tsfc11.is_finite()
+            || st < 0.0
+            || mc2 < 0.0
+            || tsfc11 < 0.0
+        {
             return (0.0, 0.0);
         }
 
@@ -196,7 +276,13 @@ impl TurboBuilder {
         let era = &ERA_TABLE[self.era_sel];
         let type_data = &TYPE_TABLE[self.type_sel];
 
-        rtz(1.0e-6 + self.temp_mass() * 0.5 * (1.0 + self.flow_adjustment) * era.cost_factor * type_data.cost_factor) + 1.0
+        rtz(1.0e-6
+            + self.temp_mass()
+                * 0.5
+                * (1.0 + self.flow_adjustment)
+                * era.cost_factor
+                * type_data.cost_factor)
+            + 1.0
     }
 
     /// Get pitch speed based on bypass ratio
@@ -325,7 +411,20 @@ mod tests {
             ),
         ];
 
-        for (json_str, (exp_power, exp_mass, exp_drag, exp_cooling, exp_reliability, exp_fuel, exp_overspeed, exp_cost)) in test_cases {
+        for (
+            json_str,
+            (
+                exp_power,
+                exp_mass,
+                exp_drag,
+                exp_cooling,
+                exp_reliability,
+                exp_fuel,
+                exp_overspeed,
+                exp_cost,
+            ),
+        ) in test_cases
+        {
             let json: serde_json::Value = serde_json::from_str(json_str).unwrap();
             let mut inputs = EngineInputs::new();
             inputs.from_json(&json, 100.0);
@@ -347,16 +446,8 @@ mod tests {
                 "{}: Power mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.mass, exp_mass,
-                "{}: Mass mismatch",
-                engine_name
-            );
-            assert_eq!(
-                stats.stats.drag, exp_drag,
-                "{}: Drag mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.mass, exp_mass, "{}: Mass mismatch", engine_name);
+            assert_eq!(stats.stats.drag, exp_drag, "{}: Drag mismatch", engine_name);
             assert_eq!(
                 stats.stats.cooling, exp_cooling,
                 "{}: Cooling mismatch",
@@ -377,11 +468,7 @@ mod tests {
                 "{}: Overspeed mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.cost, exp_cost,
-                "{}: Cost mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.cost, exp_cost, "{}: Cost mismatch", engine_name);
         }
     }
 }

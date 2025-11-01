@@ -7,14 +7,14 @@ use crate::json::*;
 use crate::lu;
 use crate::serialization::{Deserializer, Error, JSSerializable, Serializable, Serializer};
 
-#[derive(Clone, PartialEq, Eq, Hash, Copy)]
+#[derive(Clone, PartialEq, Eq, Hash, Copy, Debug)]
 pub enum WarningLevel {
     White,
     Yellow,
     Red,
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Warning {
     pub name: String,
     pub warning: String,
@@ -25,7 +25,7 @@ fn merge_warnings(a: Vec<Warning>, b: Vec<Warning>) -> Vec<Warning> {
     v
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub enum ERA {
     Himmilgard,
     Pioneer,
@@ -70,7 +70,7 @@ impl FromStr for ERA {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub struct Era {
     pub name: String,
     pub era: ERA,
@@ -89,7 +89,7 @@ pub fn rtz(num: f64) -> f64 {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Stats {
     pub liftbleed: f64,
     pub wetmass: f64,
@@ -301,7 +301,7 @@ impl Stats {
         }
     }
 
-    pub fn round(mut self: Stats) {
+    pub fn round(self: &mut Self) {
         self.liftbleed = rtz(self.liftbleed);
         self.wetmass = rtz(self.wetmass);
         self.mass = rtz(self.mass);
@@ -489,7 +489,38 @@ impl JSSerializable for Stats {
         self.bomb_mass = jsnum(js, "bomb_mass");
         self.fuel = jsnum(js, "fuel");
         self.charge = jsnum(js, "charge");
-        // TODO: Deserialize warnings and eras if needed
+
+        // Deserialize warnings
+        if let Some(warnings_array) = js.get("warnings") {
+            if let Some(arr) = warnings_array.as_array() {
+                self.warnings = arr
+                    .iter()
+                    .map(|w| Warning {
+                        name: jsstr(w, "source"),
+                        warning: jsstr(w, "warning"),
+                        level: match w.get("color").and_then(|c| c.as_i64()).unwrap_or(0) {
+                            1 => WarningLevel::Yellow,
+                            2 => WarningLevel::Red,
+                            _ => WarningLevel::White,
+                        },
+                    })
+                    .collect();
+            }
+        }
+
+        // Deserialize eras
+        if let Some(eras_array) = js.get("eras") {
+            if let Some(arr) = eras_array.as_array() {
+                self.eras = arr
+                    .iter()
+                    .filter_map(|e| {
+                        let name = jsstr(e, "name");
+                        let era_str = jsstr(e, "era");
+                        ERA::from_str(&era_str).ok().map(|era| Era { name, era })
+                    })
+                    .collect();
+            }
+        }
     }
 
     fn to_json(&self) -> serde_json::Value {
@@ -521,7 +552,116 @@ impl JSSerializable for Stats {
         map.insert("bomb_mass".to_string(), self.bomb_mass.into());
         map.insert("fuel".to_string(), self.fuel.into());
         map.insert("charge".to_string(), self.charge.into());
-        // TODO: Serialize warnings and eras if needed
+
+        // Serialize warnings
+        if !self.warnings.is_empty() {
+            let warnings_array: Vec<serde_json::Value> = self
+                .warnings
+                .iter()
+                .map(|w| {
+                    let mut warning_map = Map::new();
+                    warning_map.insert("source".to_string(), w.name.clone().into());
+                    warning_map.insert("warning".to_string(), w.warning.clone().into());
+                    warning_map.insert(
+                        "color".to_string(),
+                        (match w.level {
+                            WarningLevel::White => 0,
+                            WarningLevel::Yellow => 1,
+                            WarningLevel::Red => 2,
+                        })
+                        .into(),
+                    );
+                    serde_json::Value::Object(warning_map)
+                })
+                .collect();
+            map.insert("warnings".to_string(), warnings_array.into());
+        }
+
+        // Serialize eras
+        if !self.eras.is_empty() {
+            let eras_array: Vec<serde_json::Value> = self
+                .eras
+                .iter()
+                .map(|e| {
+                    let mut era_map = Map::new();
+                    era_map.insert("name".to_string(), e.name.clone().into());
+                    era_map.insert("era".to_string(), e.era.to_string().into());
+                    serde_json::Value::Object(era_map)
+                })
+                .collect();
+            map.insert("eras".to_string(), eras_array.into());
+        }
+
         serde_json::Value::Object(map)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_warnings_eras_json_roundtrip() {
+        // Create a Stats object with warnings and eras
+        let mut stats = Stats::new();
+        stats.mass = 10.0;
+        stats.warnings = vec![
+            Warning {
+                name: "Test Warning 1".to_string(),
+                warning: "This is a test warning".to_string(),
+                level: WarningLevel::White,
+            },
+            Warning {
+                name: "Test Warning 2".to_string(),
+                warning: "This is a yellow warning".to_string(),
+                level: WarningLevel::Yellow,
+            },
+            Warning {
+                name: "Test Warning 3".to_string(),
+                warning: "This is a red warning".to_string(),
+                level: WarningLevel::Red,
+            },
+        ];
+        stats.eras = vec![
+            Era {
+                name: "Test Part 1".to_string(),
+                era: ERA::Pioneer,
+            },
+            Era {
+                name: "Test Part 2".to_string(),
+                era: ERA::WWI,
+            },
+        ];
+
+        // Serialize to JSON
+        let json = stats.to_json();
+        println!(
+            "Serialized JSON: {}",
+            serde_json::to_string_pretty(&json).unwrap()
+        );
+
+        // Deserialize from JSON
+        let mut stats2 = Stats::new();
+        stats2.from_json(&json, 12.7);
+
+        // Verify the values match
+        assert_eq!(stats.mass, stats2.mass);
+        assert_eq!(stats.warnings.len(), stats2.warnings.len());
+        assert_eq!(stats.eras.len(), stats2.eras.len());
+
+        // Check warnings
+        for (w1, w2) in stats.warnings.iter().zip(stats2.warnings.iter()) {
+            assert_eq!(w1.name, w2.name);
+            assert_eq!(w1.warning, w2.warning);
+            assert_eq!(w1.level, w2.level);
+        }
+
+        // Check eras
+        for (e1, e2) in stats.eras.iter().zip(stats2.eras.iter()) {
+            assert_eq!(e1.name, e2.name);
+            assert_eq!(e1.era, e2.era);
+        }
+
+        println!("✓ All warnings and eras serialized/deserialized correctly!");
     }
 }

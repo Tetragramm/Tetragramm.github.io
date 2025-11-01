@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::{Mutex, OnceLock};
 
-use crate::engine::{EngineInputs, EngineStats};
+use crate::engine::{EngineInputs, EngineRarity, EngineStats, TypedInputs};
 
 /// A list of engine inputs with a name
 pub struct EngineList {
@@ -119,14 +119,9 @@ impl EngineList {
 // Global engine list storage
 static ENGINE_LISTS: OnceLock<Mutex<HashMap<String, EngineList>>> = OnceLock::new();
 
-/// Initialize the global engine lists
-pub fn init_engine_lists() {
-    ENGINE_LISTS.get_or_init(|| {
-        let mut map = HashMap::new();
-        map.insert("Custom".to_string(), EngineList::new("Custom".to_string()));
-        Mutex::new(map)
-    });
-}
+// The init_engine_lists function is now generated - see generate_engine_lists.py
+// Run: python3 generate_engine_lists.py to regenerate from engines.json
+include!("engine_list_generated.rs");
 
 // Note: get_engine_list removed - EngineList doesn't implement Clone
 // Use search_all_engine_lists, get_engine, and add_custom_engine instead
@@ -182,7 +177,8 @@ pub fn get_engine(list_name: &str, engine_name: &str) -> Option<EngineInputs> {
     init_engine_lists();
     let lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
 
-    lists.get(list_name)
+    lists
+        .get(list_name)
         .and_then(|list| list.get_by_name(engine_name))
         .cloned()
 }

@@ -14,12 +14,60 @@ struct EraData {
 }
 
 const ERA_TABLE: [EraData; 6] = [
-    EraData { name: "Pioneer", cost: 5.0, drag: 10.0, mass: 10.0, fuel: 4.0, vibe: 2.5, material: 2.0 },
-    EraData { name: "WWI", cost: 3.5, drag: 25.0, mass: 24.0, fuel: 3.0, vibe: 3.0, material: 3.0 },
-    EraData { name: "Roaring 20s", cost: 2.5, drag: 30.0, mass: 50.0, fuel: 2.0, vibe: 4.0, material: 9.0 },
-    EraData { name: "Coming Storm", cost: 2.5, drag: 30.0, mass: 50.0, fuel: 2.0, vibe: 4.0, material: 9.0 },
-    EraData { name: "WWII", cost: 1.75, drag: 40.0, mass: 100.0, fuel: 1.0, vibe: 5.0, material: 24.0 },
-    EraData { name: "Last Hurrah", cost: 1.5, drag: 50.0, mass: 150.0, fuel: 0.7, vibe: 6.0, material: 50.0 },
+    EraData {
+        name: "Pioneer",
+        cost: 5.0,
+        drag: 10.0,
+        mass: 10.0,
+        fuel: 4.0,
+        vibe: 2.5,
+        material: 2.0,
+    },
+    EraData {
+        name: "WWI",
+        cost: 3.5,
+        drag: 25.0,
+        mass: 24.0,
+        fuel: 3.0,
+        vibe: 3.0,
+        material: 3.0,
+    },
+    EraData {
+        name: "Roaring 20s",
+        cost: 2.5,
+        drag: 30.0,
+        mass: 50.0,
+        fuel: 2.0,
+        vibe: 4.0,
+        material: 9.0,
+    },
+    EraData {
+        name: "Coming Storm",
+        cost: 2.5,
+        drag: 30.0,
+        mass: 50.0,
+        fuel: 2.0,
+        vibe: 4.0,
+        material: 9.0,
+    },
+    EraData {
+        name: "WWII",
+        cost: 1.75,
+        drag: 40.0,
+        mass: 100.0,
+        fuel: 1.0,
+        vibe: 5.0,
+        material: 24.0,
+    },
+    EraData {
+        name: "Last Hurrah",
+        cost: 1.5,
+        drag: 50.0,
+        mass: 150.0,
+        fuel: 0.7,
+        vibe: 6.0,
+        material: 50.0,
+    },
 ];
 
 struct ValveData {
@@ -31,8 +79,20 @@ struct ValveData {
 }
 
 const VALVE_TABLE: [ValveData; 2] = [
-    ValveData { name: "Valved", scale: 1.0, rumble: 1.0, design_cost: 2.0, reliability: 1.0 },
-    ValveData { name: "Valveless", scale: 1.1, rumble: 0.9, design_cost: 1.0, reliability: 3.0 },
+    ValveData {
+        name: "Valved",
+        scale: 1.0,
+        rumble: 1.0,
+        design_cost: 2.0,
+        reliability: 1.0,
+    },
+    ValveData {
+        name: "Valveless",
+        scale: 1.1,
+        rumble: 0.9,
+        design_cost: 1.0,
+        reliability: 3.0,
+    },
 ];
 
 pub struct PulsejetBuilder {
@@ -112,7 +172,9 @@ impl PulsejetBuilder {
         let era = &ERA_TABLE[self.era_sel];
         let valve = &VALVE_TABLE[self.valve_sel];
 
-        let reliability = self.desired_power as f32 / (era.material * valve.reliability * self.overall_quality) - 1.0;
+        let reliability = self.desired_power as f32
+            / (era.material * valve.reliability * self.overall_quality)
+            - 1.0;
         (-reliability).trunc() as i16
     }
 
@@ -134,7 +196,9 @@ impl PulsejetBuilder {
     fn calc_cost(&self) -> f32 {
         let era = &ERA_TABLE[self.era_sel];
 
-        rtz((1.0e-6 + self.temp_mass() * self.build_quality * era.cost) as f64) as f32 + 1.0 + self.calc_rumble() as f32
+        rtz((1.0e-6 + self.temp_mass() * self.build_quality * era.cost) as f64) as f32
+            + 1.0
+            + self.calc_rumble() as f32
     }
 
     /// Verify and clamp values
@@ -162,7 +226,10 @@ impl PulsejetBuilder {
     /// Generate engine name
     fn generate_name(&self) -> String {
         let valved = if self.valve_sel == 0 { "V" } else { "" };
-        format!("Pulsejet P{}-{} ({})", valved, self.desired_power, ERA_TABLE[self.era_sel].name)
+        format!(
+            "Pulsejet P{}-{} ({})",
+            valved, self.desired_power, ERA_TABLE[self.era_sel].name
+        )
     }
 
     /// Build EngineStats from current configuration
@@ -329,7 +396,20 @@ mod tests {
             ),
         ];
 
-        for (json_str, (exp_power, exp_mass, exp_drag, exp_cooling, exp_reliability, exp_fuel, exp_overspeed, exp_cost)) in test_cases {
+        for (
+            json_str,
+            (
+                exp_power,
+                exp_mass,
+                exp_drag,
+                exp_cooling,
+                exp_reliability,
+                exp_fuel,
+                exp_overspeed,
+                exp_cost,
+            ),
+        ) in test_cases
+        {
             let json: serde_json::Value = serde_json::from_str(json_str).unwrap();
             let mut inputs = EngineInputs::new();
             inputs.from_json(&json, 100.0);
@@ -350,16 +430,8 @@ mod tests {
                 "{}: Power mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.mass, exp_mass,
-                "{}: Mass mismatch",
-                engine_name
-            );
-            assert_eq!(
-                stats.stats.drag, exp_drag,
-                "{}: Drag mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.mass, exp_mass, "{}: Mass mismatch", engine_name);
+            assert_eq!(stats.stats.drag, exp_drag, "{}: Drag mismatch", engine_name);
             assert_eq!(
                 stats.stats.cooling, exp_cooling,
                 "{}: Cooling mismatch",
@@ -380,11 +452,7 @@ mod tests {
                 "{}: Overspeed mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.cost, exp_cost,
-                "{}: Cost mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.cost, exp_cost, "{}: Cost mismatch", engine_name);
         }
     }
 }

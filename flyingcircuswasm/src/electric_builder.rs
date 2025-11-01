@@ -14,12 +14,60 @@ struct EraData {
 }
 
 const ERA_TABLE: [EraData; 6] = [
-    EraData { name: "Pioneer", draw: 3, draw_factor: 2.0 / 5.0, mass_factor: 2.0 / 5.0, reliability: -1, cost_factor: 1.0 / 2.5, overspeed: 20 },
-    EraData { name: "WWI", draw: 1, draw_factor: 2.0 / 5.0, mass_factor: 1.0 / 3.0, reliability: 0, cost_factor: 1.0 / 2.25, overspeed: 25 },
-    EraData { name: "Roaring 20s", draw: 1, draw_factor: 2.0 / 7.0, mass_factor: 2.0 / 7.0, reliability: 1, cost_factor: 1.0 / 2.0, overspeed: 30 },
-    EraData { name: "Coming Storm", draw: 0, draw_factor: 2.0 / 7.0, mass_factor: 1.0 / 4.0, reliability: 2, cost_factor: 1.0 / 1.9, overspeed: 35 },
-    EraData { name: "WWII", draw: 0, draw_factor: 1.0 / 4.0, mass_factor: 1.0 / 5.0, reliability: 3, cost_factor: 1.0 / 1.8, overspeed: 40 },
-    EraData { name: "Last Hurrah", draw: 0, draw_factor: 1.0 / 5.0, mass_factor: 1.0 / 6.0, reliability: 4, cost_factor: 1.0 / 1.75, overspeed: 45 },
+    EraData {
+        name: "Pioneer",
+        draw: 3,
+        draw_factor: 2.0 / 5.0,
+        mass_factor: 2.0 / 5.0,
+        reliability: -1,
+        cost_factor: 1.0 / 2.5,
+        overspeed: 20,
+    },
+    EraData {
+        name: "WWI",
+        draw: 1,
+        draw_factor: 2.0 / 5.0,
+        mass_factor: 1.0 / 3.0,
+        reliability: 0,
+        cost_factor: 1.0 / 2.25,
+        overspeed: 25,
+    },
+    EraData {
+        name: "Roaring 20s",
+        draw: 1,
+        draw_factor: 2.0 / 7.0,
+        mass_factor: 2.0 / 7.0,
+        reliability: 1,
+        cost_factor: 1.0 / 2.0,
+        overspeed: 30,
+    },
+    EraData {
+        name: "Coming Storm",
+        draw: 0,
+        draw_factor: 2.0 / 7.0,
+        mass_factor: 1.0 / 4.0,
+        reliability: 2,
+        cost_factor: 1.0 / 1.9,
+        overspeed: 35,
+    },
+    EraData {
+        name: "WWII",
+        draw: 0,
+        draw_factor: 1.0 / 4.0,
+        mass_factor: 1.0 / 5.0,
+        reliability: 3,
+        cost_factor: 1.0 / 1.8,
+        overspeed: 40,
+    },
+    EraData {
+        name: "Last Hurrah",
+        draw: 0,
+        draw_factor: 1.0 / 5.0,
+        mass_factor: 1.0 / 6.0,
+        reliability: 4,
+        cost_factor: 1.0 / 1.75,
+        overspeed: 45,
+    },
 ];
 
 struct WindingData {
@@ -32,13 +80,62 @@ struct WindingData {
 }
 
 const WINDING_TABLE: [WindingData; 7] = [
-    WindingData { name: "Aluminum", draw_mod: 1.1, mass: -2, drag: 1, cost_factor: 1.0, reliability: 0 },
-    WindingData { name: "Copper", draw_mod: 1.0, mass: 0, drag: 0, cost_factor: 1.0, reliability: 0 },
-    WindingData { name: "Silver", draw_mod: 0.95, mass: 1, drag: 0, cost_factor: 1.1, reliability: 0 },
-    WindingData { name: "Electrum", draw_mod: 0.9, mass: 2, drag: 0, cost_factor: 1.3, reliability: 1 },
-    WindingData { name: "Platinum", draw_mod: 0.75, mass: 3, drag: 0, cost_factor: 2.0, reliability: 2 },
-    WindingData { name: "Screamer Sinew", draw_mod: 0.9, mass: 0, drag: 1, cost_factor: 1.75, reliability: 4 },
-    WindingData { name: "Lightning Sprite Ephemera", draw_mod: 0.5, mass: -2, drag: -2, cost_factor: 2.0, reliability: -3 },
+    WindingData {
+        name: "Aluminum",
+        draw_mod: 1.1,
+        mass: -2,
+        drag: 1,
+        cost_factor: 1.0,
+        reliability: 0,
+    },
+    WindingData {
+        name: "Copper",
+        draw_mod: 1.0,
+        mass: 0,
+        drag: 0,
+        cost_factor: 1.0,
+        reliability: 0,
+    },
+    WindingData {
+        name: "Silver",
+        draw_mod: 0.95,
+        mass: 1,
+        drag: 0,
+        cost_factor: 1.1,
+        reliability: 0,
+    },
+    WindingData {
+        name: "Electrum",
+        draw_mod: 0.9,
+        mass: 2,
+        drag: 0,
+        cost_factor: 1.3,
+        reliability: 1,
+    },
+    WindingData {
+        name: "Platinum",
+        draw_mod: 0.75,
+        mass: 3,
+        drag: 0,
+        cost_factor: 2.0,
+        reliability: 2,
+    },
+    WindingData {
+        name: "Screamer Sinew",
+        draw_mod: 0.9,
+        mass: 0,
+        drag: 1,
+        cost_factor: 1.75,
+        reliability: 4,
+    },
+    WindingData {
+        name: "Lightning Sprite Ephemera",
+        draw_mod: 0.5,
+        mass: -2,
+        drag: -2,
+        cost_factor: 2.0,
+        reliability: -3,
+    },
 ];
 
 pub struct ElectricBuilder {
@@ -96,7 +193,7 @@ impl ElectricBuilder {
     /// Calculate mass
     fn calc_mass(&self) -> f64 {
         let winding = &WINDING_TABLE[self.winding_sel];
-        (rtz(1.0e-6 + self.era_mass() + winding.mass as f64).max(0.0))
+        rtz(1.0e-6 + self.era_mass() + winding.mass as f64).max(0.0)
     }
 
     /// Calculate drag
@@ -111,7 +208,8 @@ impl ElectricBuilder {
     fn calc_overspeed(&self) -> i16 {
         let chonk_speed = self.chonk as f64 / 2.0;
         let quality_speed = 7.5 * (self.quality_fudge - 1.0);
-        (ERA_TABLE[self.era_sel].overspeed as f64 - chonk_speed + quality_speed - 1.0e-6).ceil() as i16
+        (ERA_TABLE[self.era_sel].overspeed as f64 - chonk_speed + quality_speed - 1.0e-6).ceil()
+            as i16
     }
 
     /// Calculate electrical draw
@@ -131,7 +229,8 @@ impl ElectricBuilder {
         let power_rely = self.power as f64 / 10.0;
         let quality_rely = 5.0 * (self.quality_fudge - 1.0);
 
-        (1.0e-6 + era.reliability as f64 + self.chonk as f64 - power_rely + quality_rely).trunc() as i16
+        (1.0e-6 + era.reliability as f64 + self.chonk as f64 - power_rely + quality_rely).trunc()
+            as i16
             + winding.reliability
     }
 
@@ -240,7 +339,20 @@ mod tests {
             ),
         ];
 
-        for (json_str, (exp_power, exp_mass, exp_drag, exp_cooling, exp_reliability, exp_fuel, exp_overspeed, exp_cost)) in test_cases {
+        for (
+            json_str,
+            (
+                exp_power,
+                exp_mass,
+                exp_drag,
+                exp_cooling,
+                exp_reliability,
+                exp_fuel,
+                exp_overspeed,
+                exp_cost,
+            ),
+        ) in test_cases
+        {
             let json: serde_json::Value = serde_json::from_str(json_str).unwrap();
             let mut inputs = EngineInputs::new();
             inputs.from_json(&json, 100.0);
@@ -263,16 +375,8 @@ mod tests {
                 "{}: Power mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.mass, exp_mass,
-                "{}: Mass mismatch",
-                engine_name
-            );
-            assert_eq!(
-                stats.stats.drag, exp_drag,
-                "{}: Drag mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.mass, exp_mass, "{}: Mass mismatch", engine_name);
+            assert_eq!(stats.stats.drag, exp_drag, "{}: Drag mismatch", engine_name);
             assert_eq!(
                 stats.stats.cooling, exp_cooling,
                 "{}: Cooling mismatch",
@@ -293,11 +397,7 @@ mod tests {
                 "{}: Overspeed mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.cost, exp_cost,
-                "{}: Cost mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.cost, exp_cost, "{}: Cost mismatch", engine_name);
         }
     }
 }

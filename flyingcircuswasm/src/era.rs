@@ -31,6 +31,18 @@ impl Era {
     pub fn set_state(&mut self, era: usize) {
         self.selected_era = era;
     }
+
+    pub fn get_cant_lift(&self) -> i16 {
+        self.vals[self.selected_era].cant_lift as i16
+    }
+
+    /// Get maximum bomb load ratio for the currently selected era
+    /// TypeScript: GetMaxBomb()
+    /// Returns the maxbomb value (ratio) for calculating bomb capacity
+    /// Values range from 0.1667 (Pioneer) to 0.5 (Last Hurrah)
+    pub fn get_max_bomb(&self) -> f64 {
+        self.vals[self.selected_era].maxbomb
+    }
 }
 
 impl Part for Era {

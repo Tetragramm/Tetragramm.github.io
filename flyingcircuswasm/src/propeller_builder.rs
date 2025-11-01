@@ -1,7 +1,7 @@
 use crate::{
     engine::{EngineInputs, EngineRarity, EngineStats, TypedInputs},
-    stats::{rtz, Era, Warning, WarningLevel, ERA},
     lu,
+    stats::{rtz, Era, Warning, WarningLevel, ERA},
 };
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -34,12 +34,54 @@ struct EraData {
 }
 
 const ERA_TABLE: [EraData; 6] = [
-    EraData { name: "Pioneer", materials: 3.0, cost: 0.5, max_rpm: 30.0, power_div: 8.0, fuel_factor: 10.0 },
-    EraData { name: "WWI", materials: 2.0, cost: 1.0, max_rpm: 35.0, power_div: 7.0, fuel_factor: 8.0 },
-    EraData { name: "Roaring 20s", materials: 1.5, cost: 2.0, max_rpm: 40.0, power_div: 6.8, fuel_factor: 6.0 },
-    EraData { name: "Coming Storm", materials: 1.35, cost: 2.25, max_rpm: 45.0, power_div: 6.6, fuel_factor: 5.0 },
-    EraData { name: "WWII", materials: 1.25, cost: 2.5, max_rpm: 50.0, power_div: 6.5, fuel_factor: 4.0 },
-    EraData { name: "Last Hurrah", materials: 1.0, cost: 3.0, max_rpm: 50.0, power_div: 6.2, fuel_factor: 2.0 },
+    EraData {
+        name: "Pioneer",
+        materials: 3.0,
+        cost: 0.5,
+        max_rpm: 30.0,
+        power_div: 8.0,
+        fuel_factor: 10.0,
+    },
+    EraData {
+        name: "WWI",
+        materials: 2.0,
+        cost: 1.0,
+        max_rpm: 35.0,
+        power_div: 7.0,
+        fuel_factor: 8.0,
+    },
+    EraData {
+        name: "Roaring 20s",
+        materials: 1.5,
+        cost: 2.0,
+        max_rpm: 40.0,
+        power_div: 6.8,
+        fuel_factor: 6.0,
+    },
+    EraData {
+        name: "Coming Storm",
+        materials: 1.35,
+        cost: 2.25,
+        max_rpm: 45.0,
+        power_div: 6.6,
+        fuel_factor: 5.0,
+    },
+    EraData {
+        name: "WWII",
+        materials: 1.25,
+        cost: 2.5,
+        max_rpm: 50.0,
+        power_div: 6.5,
+        fuel_factor: 4.0,
+    },
+    EraData {
+        name: "Last Hurrah",
+        materials: 1.0,
+        cost: 3.0,
+        max_rpm: 50.0,
+        power_div: 6.2,
+        fuel_factor: 2.0,
+    },
 ];
 
 struct CoolingData {
@@ -52,12 +94,54 @@ struct CoolingData {
 }
 
 const COOLING_TABLE: [CoolingData; 6] = [
-    CoolingData { name: "Liquid Cooled", force_factor: 1.2, rpm_off: 0.0, thrust_factor: 1.0, radiator: 1.0, mass_factor: 1.0 },
-    CoolingData { name: "Air Cooled", force_factor: 1.0, rpm_off: 0.0, thrust_factor: 1.0, radiator: 0.0, mass_factor: 1.0 },
-    CoolingData { name: "Rotary", force_factor: 1.0, rpm_off: 8.0, thrust_factor: 1.5, radiator: 0.0, mass_factor: 1.0 },
-    CoolingData { name: "Contrarotary", force_factor: 1.0, rpm_off: 8.0, thrust_factor: 1.25, radiator: 0.0, mass_factor: 1.0 },
-    CoolingData { name: "Semi-Radial", force_factor: 0.8, rpm_off: 0.0, thrust_factor: 1.0, radiator: 0.0, mass_factor: 1.0 },
-    CoolingData { name: "Liquid Radial", force_factor: 1.0, rpm_off: 0.0, thrust_factor: 1.0, radiator: 2.5, mass_factor: 1.3 },
+    CoolingData {
+        name: "Liquid Cooled",
+        force_factor: 1.2,
+        rpm_off: 0.0,
+        thrust_factor: 1.0,
+        radiator: 1.0,
+        mass_factor: 1.0,
+    },
+    CoolingData {
+        name: "Air Cooled",
+        force_factor: 1.0,
+        rpm_off: 0.0,
+        thrust_factor: 1.0,
+        radiator: 0.0,
+        mass_factor: 1.0,
+    },
+    CoolingData {
+        name: "Rotary",
+        force_factor: 1.0,
+        rpm_off: 8.0,
+        thrust_factor: 1.5,
+        radiator: 0.0,
+        mass_factor: 1.0,
+    },
+    CoolingData {
+        name: "Contrarotary",
+        force_factor: 1.0,
+        rpm_off: 8.0,
+        thrust_factor: 1.25,
+        radiator: 0.0,
+        mass_factor: 1.0,
+    },
+    CoolingData {
+        name: "Semi-Radial",
+        force_factor: 0.8,
+        rpm_off: 0.0,
+        thrust_factor: 1.0,
+        radiator: 0.0,
+        mass_factor: 1.0,
+    },
+    CoolingData {
+        name: "Liquid Radial",
+        force_factor: 1.0,
+        rpm_off: 0.0,
+        thrust_factor: 1.0,
+        radiator: 2.5,
+        mass_factor: 1.3,
+    },
 ];
 
 struct UpgradeData {
@@ -72,10 +156,46 @@ struct UpgradeData {
 }
 
 const UPGRADES: [UpgradeData; 4] = [
-    UpgradeData { name: "Asperator Boost", power_factor: 0.11, fuel_factor: 0.0, mass_factor: 0.0, drag_factor: 0.0, ideal_alt: -1, cost_factor: 3.0, req_section: false },
-    UpgradeData { name: "War Emergency Power", power_factor: 0.0, fuel_factor: 0.0, mass_factor: 0.0, drag_factor: 0.0, ideal_alt: 0, cost_factor: 5.0, req_section: false },
-    UpgradeData { name: "Fuel Injector", power_factor: 0.0, fuel_factor: -0.1, mass_factor: 0.0, drag_factor: 0.0, ideal_alt: 0, cost_factor: 2.0, req_section: false },
-    UpgradeData { name: "Diesel", power_factor: -0.2, fuel_factor: -0.5, mass_factor: 0.0, drag_factor: 0.0, ideal_alt: 0, cost_factor: 0.0, req_section: false },
+    UpgradeData {
+        name: "Asperator Boost",
+        power_factor: 0.11,
+        fuel_factor: 0.0,
+        mass_factor: 0.0,
+        drag_factor: 0.0,
+        ideal_alt: -1,
+        cost_factor: 3.0,
+        req_section: false,
+    },
+    UpgradeData {
+        name: "War Emergency Power",
+        power_factor: 0.0,
+        fuel_factor: 0.0,
+        mass_factor: 0.0,
+        drag_factor: 0.0,
+        ideal_alt: 0,
+        cost_factor: 5.0,
+        req_section: false,
+    },
+    UpgradeData {
+        name: "Fuel Injector",
+        power_factor: 0.0,
+        fuel_factor: -0.1,
+        mass_factor: 0.0,
+        drag_factor: 0.0,
+        ideal_alt: 0,
+        cost_factor: 2.0,
+        req_section: false,
+    },
+    UpgradeData {
+        name: "Diesel",
+        power_factor: -0.2,
+        fuel_factor: -0.5,
+        mass_factor: 0.0,
+        drag_factor: 0.0,
+        ideal_alt: 0,
+        cost_factor: 0.0,
+        req_section: false,
+    },
 ];
 
 pub struct PropellerBuilder {
@@ -229,7 +349,11 @@ impl PropellerBuilder {
         let crank_mass = (self.engine_displacement * self.num_rows as f32) / 10.0 + 1.0;
         let pist_mass = self.engine_displacement / 5.0;
 
-        rtz((1.0e-6 + (cyl_mass + crank_mass + pist_mass) * self.upgrade_mass() * self.material_fudge * cool.mass_factor) as f64) as f32
+        rtz((1.0e-6
+            + (cyl_mass + crank_mass + pist_mass)
+                * self.upgrade_mass()
+                * self.material_fudge
+                * cool.mass_factor) as f64) as f32
     }
 
     /// Calculate upgrade drag modifier
@@ -283,7 +407,8 @@ impl PropellerBuilder {
     fn material_modifier(&self) -> f32 {
         let era_burnout = ERA_TABLE[self.era_sel].materials;
         let num_cyl = self.num_cyl_per_row as f32 * self.num_rows as f32;
-        let cylinder_burnout = self.engine_displacement / num_cyl * self.compression_ratio.powi(2) * era_burnout;
+        let cylinder_burnout =
+            self.engine_displacement / num_cyl * self.compression_ratio.powi(2) * era_burnout;
         let gearing_burnout = self.rpm_boost * cylinder_burnout * self.cool_burnout();
         gearing_burnout * self.rpm_boost
     }
@@ -435,7 +560,10 @@ impl PropellerBuilder {
         estats.stats.power = self.calc_power() as f64;
         estats.stats.mass = self.calc_mass() as f64;
         estats.stats.drag = self.calc_drag() as f64;
-        estats.stats.reliability = rtz(1.0e-6 - 2.0 + self.era_sel as f64 + (self.quality_fudge + self.material_fudge - 2.0) as f64 * 10.0) as f64;
+        estats.stats.reliability = rtz(1.0e-6 - 2.0
+            + self.era_sel as f64
+            + (self.quality_fudge + self.material_fudge - 2.0) as f64 * 10.0)
+            as f64;
         estats.stats.cooling = self.calc_cooling() as f64;
         estats.oiltank = self.is_rotary();
         estats.overspeed = self.calc_overspeed();
@@ -473,7 +601,8 @@ impl PropellerBuilder {
             }
             CompressorType::Supercharger => {
                 estats.stats.power = rtz(1.0e-6 + 1.25 * estats.stats.power) as f64;
-                estats.stats.fuelconsumption = rtz(1.0e-6 + 1.25 * estats.stats.fuelconsumption) as f64;
+                estats.stats.fuelconsumption =
+                    rtz(1.0e-6 + 1.25 * estats.stats.fuelconsumption) as f64;
                 estats.stats.mass = rtz(1.0e-6 + 1.2 * estats.stats.mass) as f64;
                 estats.stats.drag += (self.min_iaf / 10) as f64;
                 estats.stats.cost += 1.0 + rtz(1.0e-6 + estats.stats.power / 50.0) as f64;
@@ -595,7 +724,20 @@ mod tests {
             ),
         ];
 
-        for (json_str, (exp_power, exp_mass, exp_drag, exp_cooling, exp_reliability, exp_fuel, exp_overspeed, exp_cost)) in test_cases {
+        for (
+            json_str,
+            (
+                exp_power,
+                exp_mass,
+                exp_drag,
+                exp_cooling,
+                exp_reliability,
+                exp_fuel,
+                exp_overspeed,
+                exp_cost,
+            ),
+        ) in test_cases
+        {
             let json: serde_json::Value = serde_json::from_str(json_str).unwrap();
             let mut inputs = EngineInputs::new();
             inputs.from_json(&json, 100.0);
@@ -612,16 +754,8 @@ mod tests {
                 "{}: Power mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.mass, exp_mass,
-                "{}: Mass mismatch",
-                engine_name
-            );
-            assert_eq!(
-                stats.stats.drag, exp_drag,
-                "{}: Drag mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.mass, exp_mass, "{}: Mass mismatch", engine_name);
+            assert_eq!(stats.stats.drag, exp_drag, "{}: Drag mismatch", engine_name);
             assert_eq!(
                 stats.stats.cooling, exp_cooling,
                 "{}: Cooling mismatch",
@@ -642,11 +776,7 @@ mod tests {
                 "{}: Overspeed mismatch",
                 engine_name
             );
-            assert_eq!(
-                stats.stats.cost, exp_cost,
-                "{}: Cost mismatch",
-                engine_name
-            );
+            assert_eq!(stats.stats.cost, exp_cost, "{}: Cost mismatch", engine_name);
         }
     }
 }
