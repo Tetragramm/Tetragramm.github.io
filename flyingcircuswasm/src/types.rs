@@ -47,14 +47,14 @@ impl AircraftType {
 /// Derived stats calculated from base aircraft stats
 /// TypeScript: DerivedStats type
 /// These are performance and handling characteristics calculated from base stats
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct DerivedStats {
-    pub dry_mp: i16,          // Dry Mass Points
-    pub wet_mp: i16,          // Wet Mass Points
-    pub wet_mp_w_bombs: i16,  // Wet MP with bombs
-    pub dp_empty: i16,        // Drag Points empty
-    pub dp_full: i16,         // Drag Points full
-    pub dp_w_bombs: i16,      // Drag Points with bombs
+    pub dry_mp: i16,         // Dry Mass Points
+    pub wet_mp: i16,         // Wet Mass Points
+    pub wet_mp_w_bombs: i16, // Wet MP with bombs
+    pub dp_empty: i16,       // Drag Points empty
+    pub dp_full: i16,        // Drag Points full
+    pub dp_w_bombs: i16,     // Drag Points with bombs
     pub max_speed_empty: i16,
     pub max_speed_full: i16,
     pub max_speed_w_bombs: i16,
@@ -66,7 +66,7 @@ pub struct DerivedStats {
     pub boost_full: i16,
     pub boost_full_w_bombs: i16,
     pub dropoff: i16,
-    pub stability: i16,  // Note: TypeScript has typo "Stabiilty"
+    pub stability: i16, // Note: TypeScript has typo "Stabiilty"
     pub handling_empty: i16,
     pub handling_full: i16,
     pub handling_full_w_bombs: i16,

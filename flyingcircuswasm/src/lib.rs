@@ -55,6 +55,7 @@ mod tests {
         part::Part,
         serialization::JSSerializable,
         stats::Stats,
+        types::DerivedStats,
     };
 
     // Note this useful idiom: importing names from outer (for mod tests) scope.
@@ -520,5 +521,43 @@ mod tests {
         let mut final_stats = Stats::new();
         final_stats.from_json(&final_stats_json, 12.7);
         assert_eq!(final_stats, acft.part_stats());
+
+        let true_ds = DerivedStats {
+            dry_mp: 3,
+            wet_mp: 4,
+            wet_mp_w_bombs: 4,
+            dp_empty: 9,
+            dp_full: 9,
+            dp_w_bombs: 9,
+            max_speed_empty: 14,
+            max_speed_full: 14,
+            max_speed_w_bombs: 14,
+            stall_speed_empty: 5,
+            stall_speed_full: 6,
+            stall_speed_full_w_bombs: 6,
+            overspeed: 18.,
+            boost_empty: 2,
+            boost_full: 2,
+            boost_full_w_bombs: 2,
+            dropoff: 8,
+            stability: -1,
+            handling_empty: 101,
+            handling_full: 100,
+            handling_full_w_bombs: 100,
+            max_strain: 34,
+            toughness: 8,
+            structure: 40,
+            energy_loss: 3,
+            energy_loss_w_bombs: 4,
+            turn_bleed: 1,
+            turn_bleed_w_bombs: 2,
+            fuel_uses: 12,
+            control_stress: 1,
+            rumble_stress: 0,
+            rate_of_climb_full: 5,
+            rate_of_climb_empty: 6,
+            rate_of_climb_w_bombs: 5,
+        };
+        assert_eq!(true_ds, acft.get_derived_stats());
     }
 }
