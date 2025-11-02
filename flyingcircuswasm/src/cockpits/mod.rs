@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::cockpit::Cockpit;
-use crate::lu;
 use crate::part::{merge_electrics, ElectricsMessage, Part};
 use crate::stats::{Stats, Warning};
 
@@ -139,7 +138,14 @@ impl Cockpits {
 
         // Update each cockpit with crew stress calculations
         for c in self.positions.iter_mut() {
-            c.crew_update(escape, controlstress, rumblestress, copilots, visibility, crash);
+            c.crew_update(
+                escape,
+                controlstress,
+                rumblestress,
+                copilots,
+                visibility,
+                crash,
+            );
         }
     }
 
@@ -147,7 +153,10 @@ impl Cockpits {
     /// TypeScript: GetStressList()
     /// Returns a vector of (non_copilot_stress, copilot_stress) tuples from all cockpits
     pub fn get_stress_list(&self) -> Vec<(i16, i16)> {
-        self.positions.iter().map(|p| p.get_flight_stress()).collect()
+        self.positions
+            .iter()
+            .map(|p| p.get_flight_stress())
+            .collect()
     }
 }
 
@@ -170,7 +179,7 @@ impl Part for Cockpits {
 
         for (w, seats) in warning_map {
             s.warnings.push(Warning {
-                name: lu!(
+                name: format!(
                     "Seats #{} {}",
                     seats
                         .iter()
@@ -178,7 +187,8 @@ impl Part for Cockpits {
                         .collect::<Vec<_>>()
                         .join(", "),
                     &w.name
-                ),
+                )
+                .to_string(),
                 warning: w.warning.clone(),
                 level: w.level,
             })

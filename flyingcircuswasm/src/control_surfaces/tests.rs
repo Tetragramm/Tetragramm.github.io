@@ -336,8 +336,6 @@ fn test_json_roundtrip() {
 
     let json = cs.to_json();
 
-    println!("{}", json);
-
     let mut cs2 = create_test_control_surfaces();
     cs2.from_json(&json, 12.7);
 

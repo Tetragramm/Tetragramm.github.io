@@ -25,9 +25,6 @@ impl JSSerializable for LandingGear {
             self.extra_sel.push(false);
         }
         self.extra_sel.truncate(self.extra_list.len());
-
-        // Verify configuration after loading
-        self.verify_all();
     }
 
     /// Save landing gear configuration to JSON

@@ -1,5 +1,4 @@
 use super::Engines;
-use crate::lu;
 use crate::part::{ElectricsMessage, Part};
 use crate::stats::{Era, Stats, Warning, WarningLevel, ERA};
 use std::collections::HashMap;
@@ -35,7 +34,7 @@ impl Part for Engines {
             if engine.need_cooling() {
                 let rad_idx = engine.radiator_index as usize;
                 if rad_idx < need_cool.len() {
-                    need_cool[rad_idx].0 += engine.etype_stats.stats.cooling;
+                    need_cool[rad_idx].0 += enstats.cooling;
                     need_cool[rad_idx].1 += 1;
                 }
             }
@@ -84,7 +83,7 @@ impl Part for Engines {
                     .map(|n| n.to_string())
                     .collect::<Vec<_>>()
                     .join(",");
-                w.name = format!("{} {}", lu!("Radiators #", rad_str), w.name);
+                w.name = format!("{} {}", t!("Radiators #", A = rad_str), w.name);
             }
         }
 
@@ -98,24 +97,24 @@ impl Part for Engines {
         // Add warnings for special engine types
         if self.has_pulsejet() {
             stats.warnings.push(Warning {
-                name: lu!("Pulsejets"),
-                warning: lu!("Pulsejet Boost Warning"),
+                name: t!("Pulsejets").to_string(),
+                warning: t!("Pulsejet Boost Warning").to_string(),
                 level: WarningLevel::White,
             });
         }
 
         if self.has_turbine_no_prop() {
             stats.warnings.push(Warning {
-                name: lu!("Turbine"),
-                warning: lu!("Turbine Boost Warning"),
+                name: t!("Turbine").to_string(),
+                warning: t!("Turbine Boost Warning").to_string(),
                 level: WarningLevel::White,
             });
         }
 
         if self.has_diesel() {
             stats.warnings.push(Warning {
-                name: lu!("Diesel"),
-                warning: lu!("Diesel Warning"),
+                name: t!("Diesel").to_string(),
+                warning: t!("Diesel Warning").to_string(),
                 level: WarningLevel::White,
             });
         }
@@ -138,14 +137,14 @@ impl Part for Engines {
 
         if rotation_t > 0 {
             stats.warnings.push(Warning {
-                name: lu!("Rotary"),
-                warning: lu!("Rotary Right Warning"),
+                name: t!("Rotary").to_string(),
+                warning: t!("Rotary Right Warning").to_string(),
                 level: WarningLevel::White,
             });
         } else if rotation_t < 0 {
             stats.warnings.push(Warning {
-                name: lu!("Rotary"),
-                warning: lu!("Rotary Left Warning"),
+                name: t!("Rotary").to_string(),
+                warning: t!("Rotary Left Warning").to_string(),
                 level: WarningLevel::White,
             });
         }

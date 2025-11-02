@@ -5,7 +5,6 @@ use ui_macro::*;
 
 use crate::{
     cockpits::{CockpitEntry, CockpitUpgradeEntry, GunsightEntry, SafetyEntry},
-    lu,
     part::{ElectricsMessage, Equipment, Part},
     stats::{rtz, Stats, Warning, WarningLevel},
 };
@@ -218,6 +217,22 @@ impl Cockpit {
         self.total_stress
     }
 
+    pub fn get_name(&self) -> String {
+        if self.is_primary() {
+            return "Crew Pilot".to_string();
+        }
+        if self.bombsight > 0 {
+            return "Crew Bombadier".to_string();
+        }
+        if self.is_copilot() {
+            return "Crew Co-Pilot".to_string();
+        }
+        if self.is_armed {
+            return "Crew Gunner".to_string();
+        }
+        return "Crew Aircrew".to_string();
+    }
+
     //TODO: On set, check CanSafety
 }
 
@@ -227,34 +242,34 @@ impl Part for Cockpit {
         s.reqsections += 1.0;
         s = s.add(&self.types[self.selected_type].stats);
 
-        let _ = zip(self.upgrades.iter(), &self.selected_upgrades).map(|(val, sel)| {
+        for (val, sel) in zip(self.upgrades.iter(), &self.selected_upgrades) {
             if *sel {
                 s = s.add(&val.stats);
             }
-        });
-        let _ = zip(self.safety.iter(), &self.selected_safety).map(|(val, sel)| {
+        }
+        for (val, sel) in zip(self.safety.iter(), &self.selected_safety) {
             if *sel {
                 s = s.add(&val.stats);
             }
-        });
-        let _ = zip(self.gunsights.iter(), &self.selected_gunsights).map(|(val, sel)| {
+        }
+        for (val, sel) in zip(self.gunsights.iter(), &self.selected_gunsights) {
             if *sel {
                 s = s.add(&val.stats);
             }
-        });
+        }
 
         if self.bombsight > 0 {
             s.cost += rtz(1.0e-6 + 2.0 + (self.bombsight - 4) as f64 / 3.0);
             s.warnings.push(Warning {
-                name: lu!("Bombsight"),
-                warning: lu!("Bombsight Warning", self.bombsight),
+                name: t!("Bombsight").to_string(),
+                warning: t!("Bombsight Warning", A = self.bombsight).to_string(),
                 level: WarningLevel::White,
             });
 
             if self.is_copilot() {
                 s.warnings.push(Warning {
-                    name: lu!("Bombadier Controls"),
-                    warning: lu!("Bombadier Controls Warning"),
+                    name: t!("Bombadier Controls").to_string(),
+                    warning: t!("Bombadier Controls Warning").to_string(),
                     level: WarningLevel::White,
                 })
             }
@@ -275,21 +290,21 @@ impl Part for Cockpit {
 
     fn get_electrics(&self) -> ElectricsMessage {
         let mut equip: Vec<Equipment> = Vec::new();
-        let _ = zip(self.upgrades.iter(), &self.selected_upgrades).map(|(val, sel)| {
+        for (val, sel) in zip(self.upgrades.iter(), &self.selected_upgrades) {
             if *sel {
                 equip.extend(format_equipment(&val.name, val.stats.charge));
             }
-        });
-        let _ = zip(self.safety.iter(), &self.selected_safety).map(|(val, sel)| {
+        }
+        for (val, sel) in zip(self.safety.iter(), &self.selected_safety) {
             if *sel {
                 equip.extend(format_equipment(&val.name, val.stats.charge));
             }
-        });
-        let _ = zip(self.gunsights.iter(), &self.selected_gunsights).map(|(val, sel)| {
+        }
+        for (val, sel) in zip(self.gunsights.iter(), &self.selected_gunsights) {
             if *sel {
                 equip.extend(format_equipment(&val.name, val.stats.charge));
             }
-        });
+        }
 
         ElectricsMessage {
             storage: 0,
@@ -302,12 +317,12 @@ fn format_equipment(name: &String, charge: f64) -> Vec<Equipment> {
     let mut equip: Vec<Equipment> = Vec::new();
     if charge.abs() > 0.5 {
         equip.push(Equipment {
-            source: lu!(name),
+            source: t!(name.as_str()).to_string(),
             charge: charge.to_string(),
         });
     } else if charge > 0.0 && charge < 1.0e-6 {
         equip.push(Equipment {
-            source: lu!(name),
+            source: t!(name.as_str()).to_string(),
             charge: "-".to_string(),
         });
     }

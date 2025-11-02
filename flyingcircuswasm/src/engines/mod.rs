@@ -88,7 +88,7 @@ impl Engines {
     pub fn get_number_engines(&self) -> usize {
         let mut count = 0;
         for e in &self.engines {
-            if !e.is_generator_enabled() {
+            if !e.get_generator() {
                 count += 1;
             }
         }

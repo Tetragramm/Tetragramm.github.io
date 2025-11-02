@@ -39,10 +39,9 @@ impl Serializable for Aircraft {
     fn deserialize(&mut self, d: &mut Deserializer) -> Result<(), Error> {
         // Deserialize version string (already read by Deserializer::new())
         // The version is accessible via d.version
-
+        let _ = d.get_string()?;
         // Deserialize name
         self.name = d.get_string()?;
-
         // Deserialize all sub-components
         self.era.deserialize(d)?;
         self.cockpits.deserialize(d)?;

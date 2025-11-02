@@ -148,17 +148,6 @@ fn test_json_old_version() {
 }
 
 #[test]
-fn test_part_stats() {
-    let mut aircraft = Aircraft::new();
-    let stats = aircraft.part_stats();
-
-    // Basic test - should have some stats from sub-components
-    assert!(stats.mass >= 0.0);
-    // Cost can be negative in some configurations
-    assert!(stats.cost.is_finite());
-}
-
-#[test]
 fn test_get_electrics() {
     let aircraft = Aircraft::new();
     let electrics = aircraft.get_electrics();

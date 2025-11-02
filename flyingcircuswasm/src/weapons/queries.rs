@@ -12,12 +12,12 @@ impl Weapons {
     /// TypeScript: GetDirectionList()
     pub fn get_direction_list(&self) -> Vec<String> {
         vec![
-            lu!("Forward"),
-            lu!("Rearward"),
-            lu!("Up"),
-            lu!("Down"),
-            lu!("Left"),
-            lu!("Right"),
+            t!("Forward").to_string(),
+            t!("Rearward").to_string(),
+            t!("Up").to_string(),
+            t!("Down").to_string(),
+            t!("Left").to_string(),
+            t!("Right").to_string(),
         ]
     }
 
@@ -25,12 +25,12 @@ impl Weapons {
     /// TypeScript: GetSynchronizationList()
     pub fn get_synchronization_list(&self) -> Vec<String> {
         vec![
-            lu!("None"),
-            lu!("Interruptor Gear"),
-            lu!("Synchronization Gear"),
-            lu!("Spinner Gun"),
-            lu!("Deflector Plate"),
-            lu!("No Interference"),
+            t!("None").to_string(),
+            t!("Interruptor Gear").to_string(),
+            t!("Synchronization Gear").to_string(),
+            t!("Spinner Gun").to_string(),
+            t!("Deflector Plate").to_string(),
+            t!("No Interference").to_string(),
         ]
     }
 
@@ -38,17 +38,21 @@ impl Weapons {
     /// TypeScript: GetActionList()
     pub fn get_action_list(&self) -> Vec<String> {
         vec![
-            lu!("Standard Action"),
-            lu!("Mechanical Action"),
-            lu!("Gast Principle"),
-            lu!("Rotary_Gun"),
+            t!("Standard Action").to_string(),
+            t!("Mechanical Action").to_string(),
+            t!("Gast Principle").to_string(),
+            t!("Rotary_Gun").to_string(),
         ]
     }
 
     /// Get projectile type names
     /// TypeScript: GetProjectileList()
     pub fn get_projectile_list(&self) -> Vec<String> {
-        vec![lu!("Standard"), lu!("Heat Ray"), lu!("Pneumatic")]
+        vec![
+            t!("Standard").to_string(),
+            t!("Heat Ray").to_string(),
+            t!("Pneumatic").to_string(),
+        ]
     }
 
     /// Get weapon systems
@@ -72,7 +76,7 @@ impl Weapons {
     /// TypeScript: GetSeatList()
     pub fn get_seat_list(&self) -> Vec<String> {
         (0..self.cockpit_count)
-            .map(|i| format!("{} {}", lu!("Seat #"), i + 1))
+            .map(|i| format!("{} {}", t!("Seat #"), i + 1).to_string())
             .collect()
     }
 

@@ -5,7 +5,7 @@ impl Part for Aircraft {
     fn part_stats(&mut self) -> Stats {
         let mut match_stats = Stats::new();
         let mut fixed_point = false;
-        while (!fixed_point) {
+        while !fixed_point {
             let mut s = Stats::new();
             s = s.add(&self.era.part_stats());
             s = s.add(&self.cockpits.part_stats());
@@ -28,7 +28,10 @@ impl Part for Aircraft {
             self.propeller.set_acft_type(self.aircraft_type);
             s = s.add(&self.propeller.part_stats());
 
+            //Fuel goes here, because it makes sections.
             s = s.add(&self.fuel.part_stats());
+            //Mutionions go here, because it makes sections.
+            s = s.add(&self.munitions.part_stats());
 
             self.weapons
                 .set_number_of_cockpits(self.cockpits.get_number_of_cockpits());
@@ -52,6 +55,9 @@ impl Part for Aircraft {
                 .set_have_propeller(self.engines.get_num_propellers() > 0);
             self.weapons.set_can_wing(!self.is_ornithopter());
             s = s.add(&self.weapons.part_stats());
+
+            //Cargo makes sections
+            s = s.add(&self.cargo.part_stats());
 
             self.wings.set_aircraft_type(self.aircraft_type);
             if self.aircraft_type == AircraftType::Autogyro {

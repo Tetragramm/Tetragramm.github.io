@@ -10,7 +10,6 @@ impl Serializable for EngineStats {
         self.rumble = d.get_num()?;
         self.oiltank = d.get_bool()?;
         self.pulsejet = d.get_bool()?;
-        self.stats.deserialize(d)?;
         if d.version > 12.35 {
             self.rarity = match d.get_num()? {
                 0 => EngineRarity::CUSTOM,
@@ -22,6 +21,7 @@ impl Serializable for EngineStats {
         } else {
             self.rarity = EngineRarity::CUSTOM;
         }
+        self.stats.deserialize(d)?;
         Ok(())
     }
 
@@ -87,12 +87,13 @@ impl Serializable for EngineInputs {
             v => return Err(Error::BadValue(v)),
         };
         if d.version > 12.35 {
-            self.rarity = match d.get_num()? {
+            let n = d.get_num()?;
+            self.rarity = match n {
                 0 => EngineRarity::CUSTOM,
                 1 => EngineRarity::COMMON,
                 2 => EngineRarity::RARE,
                 3 => EngineRarity::LEGENDARY,
-                v => return Err(Error::BadValue(v)),
+                n => return Err(Error::BadValue(n)),
             };
         } else {
             self.rarity = EngineRarity::CUSTOM;

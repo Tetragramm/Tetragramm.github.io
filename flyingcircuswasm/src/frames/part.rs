@@ -1,5 +1,4 @@
 use super::*;
-use crate::lu;
 use crate::part::{ElectricsMessage, Part};
 use crate::stats::{rtz, Warning, WarningLevel, ERA};
 
@@ -16,7 +15,7 @@ impl Frames {
             stats.structure *= 1.5;
             stats.cost *= 2.0;
             stats.eras.push(crate::stats::Era {
-                name: lu!("Geodesic"),
+                name: t!("Geodesic").to_string(),
                 era: ERA::ComingStorm,
             });
         }
@@ -56,7 +55,7 @@ impl Frames {
             stats.structure *= 1.5;
             stats.cost *= 2.0;
             stats.eras.push(crate::stats::Era {
-                name: lu!("Geodesic"),
+                name: t!("Geodesic").to_string(),
                 era: ERA::ComingStorm,
             });
         }
@@ -163,8 +162,8 @@ impl Part for Frames {
         if self.possible_remove_sections() && self.count_main_lifting_body() < self.count_sections()
         {
             stats.warnings.push(Warning {
-                name: lu!("Frame Count"),
-                warning: lu!("Frame Count Warning"),
+                name: t!("Frame Count").to_string(),
+                warning: t!("Frame Count Warning").to_string(),
                 level: WarningLevel::Yellow,
             });
         }
@@ -173,6 +172,8 @@ impl Part for Frames {
         stats.structure = rtz(stats.structure);
         stats.cost = rtz(stats.cost);
         stats.visibility = stats.visibility.min(3.0);
+
+        stats.round();
 
         stats
     }

@@ -1,5 +1,4 @@
 use super::*;
-use crate::localization::localization_lookup as lu;
 use crate::part::{ElectricsMessage, Part};
 use crate::stats::{Warning, WarningLevel};
 
@@ -147,8 +146,8 @@ impl Part for Reinforcements {
         } else if self.wing_blades {
             stats.mass *= 2.0;
             stats.warnings.push(Warning {
-                name: lu("Wing Blades"),
-                warning: lu("Wing Blades Warning"),
+                name: t!("Wing Blades").to_string(),
+                warning: t!("Wing Blades Warning").to_string(),
                 level: WarningLevel::White,
             });
         }

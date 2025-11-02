@@ -1,5 +1,4 @@
 use super::*;
-use crate::localization::localization_lookup as lu;
 use crate::part::{ElectricsMessage, Part};
 use crate::stats::{Warning, WarningLevel};
 
@@ -30,7 +29,7 @@ impl Part for Accessories {
 
         if !armour_str.is_empty() {
             stats.warnings.push(Warning {
-                name: lu("Armour"),
+                name: t!("Armour").to_string(),
                 warning: armour_str,
                 level: WarningLevel::White,
             });
@@ -89,6 +88,8 @@ impl Part for Accessories {
             stats = stats.add(&self.control_list[cont_idx].stats);
         }
 
+        stats.round();
+
         stats
     }
 
@@ -105,12 +106,12 @@ impl Part for Accessories {
 
                 if item.cp10s > 0.0 {
                     equipment.push(crate::part::Equipment {
-                        source: lu(&item.name),
+                        source: t!(&item.name).to_string(),
                         charge: format!("{:.0}", (count as f64 * item.cp10s).floor()),
                     });
                 } else if item.stats.charge != 0.0 {
                     equipment.push(crate::part::Equipment {
-                        source: lu(&item.name),
+                        source: t!(&item.name).to_string(),
                         charge: (count as f64 * item.stats.charge).to_string(),
                     });
                 }
@@ -121,7 +122,7 @@ impl Part for Accessories {
         let radio_idx = self.radio_sel as usize;
         if radio_idx < self.radio_list.len() && self.radio_list[radio_idx].stats.charge != 0.0 {
             equipment.push(crate::part::Equipment {
-                source: lu(&self.radio_list[radio_idx].name),
+                source: t!(&self.radio_list[radio_idx].name).to_string(),
                 charge: self.radio_list[radio_idx].stats.charge.to_string(),
             });
         }
@@ -133,7 +134,7 @@ impl Part for Accessories {
                 && self.climate_list[i].stats.charge != 0.0
             {
                 equipment.push(crate::part::Equipment {
-                    source: lu(&self.climate_list[i].name),
+                    source: t!(&self.climate_list[i].name).to_string(),
                     charge: self.climate_list[i].stats.charge.to_string(),
                 });
             }
@@ -145,7 +146,7 @@ impl Part for Accessories {
                 let charge = self.recon_sel[i] as f64 * self.recon_list[i].stats.charge;
                 if charge != 0.0 {
                     equipment.push(crate::part::Equipment {
-                        source: lu(&self.recon_list[i].name),
+                        source: t!(&self.recon_list[i].name).to_string(),
                         charge: charge.to_string(),
                     });
                 }
@@ -157,7 +158,7 @@ impl Part for Accessories {
             if self.visi_sel[i] && i < self.visi_list.len() && self.visi_list[i].stats.charge != 0.0
             {
                 equipment.push(crate::part::Equipment {
-                    source: lu(&self.visi_list[i].name),
+                    source: t!(&self.visi_list[i].name).to_string(),
                     charge: self.visi_list[i].stats.charge.to_string(),
                 });
             }
@@ -168,7 +169,7 @@ impl Part for Accessories {
         if auto_idx < self.autopilot_list.len() && self.autopilot_list[auto_idx].stats.charge != 0.0
         {
             equipment.push(crate::part::Equipment {
-                source: lu(&self.autopilot_list[auto_idx].name),
+                source: t!(&self.autopilot_list[auto_idx].name).to_string(),
                 charge: self.autopilot_list[auto_idx].stats.charge.to_string(),
             });
         }
@@ -177,7 +178,7 @@ impl Part for Accessories {
         let cont_idx = self.cont_sel as usize;
         if cont_idx < self.control_list.len() && self.control_list[cont_idx].stats.charge != 0.0 {
             equipment.push(crate::part::Equipment {
-                source: lu(&self.control_list[cont_idx].name),
+                source: t!(&self.control_list[cont_idx].name).to_string(),
                 charge: self.control_list[cont_idx].stats.charge.to_string(),
             });
         }

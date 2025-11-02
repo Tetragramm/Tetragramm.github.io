@@ -1,5 +1,4 @@
 use crate::{
-    lu,
     stats::{Era, Stats, Warning, WarningLevel, ERA},
     weapon::WeaponType,
 };
@@ -7,7 +6,7 @@ use crate::{
 pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
     let mut wlist = vec![
         {
-            let name = lu!("Submachine Gun");
+            let name = t!("Submachine Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -33,7 +32,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
                     }],
                     warnings: vec![Warning {
                         name: name.clone(),
-                        warning: lu!("SMG Warning"),
+                        warning: t!("SMG Warning").to_string(),
                         level: WarningLevel::White,
                     }],
                     ..Stats::new()
@@ -41,7 +40,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Scattergun");
+            let name = t!("Scattergun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "Pioneer".to_string(),
@@ -68,7 +67,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
                     }],
                     warnings: vec![Warning {
                         name: name.clone(),
-                        warning: lu!("Scattergun Warning"),
+                        warning: t!("Scattergun Warning").to_string(),
                         level: WarningLevel::White,
                     }],
                     ..Stats::new()
@@ -76,7 +75,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Light Machine Gun");
+            let name = t!("Light Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -106,7 +105,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Machine Gun");
+            let name = t!("Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -136,7 +135,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Balloon Gun");
+            let name = t!("Balloon Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -166,7 +165,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Enhanced Machine Gun");
+            let name = t!("Enhanced Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "Coming Storm".to_string(),
@@ -196,7 +195,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Enhanced Heavy Machine Gun");
+            let name = t!("Enhanced Heavy Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "Coming Storm".to_string(),
@@ -226,7 +225,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Punt Gun");
+            let name = t!("Punt Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "Pioneer".to_string(),
@@ -253,7 +252,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
                     }],
                     warnings: vec![Warning {
                         name: name.clone(),
-                        warning: lu!("Punt Gun Warning"),
+                        warning: t!("Punt Gun Warning").to_string(),
                         level: WarningLevel::White,
                     }],
                     ..Stats::new()
@@ -261,7 +260,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Light Repeating Cannon");
+            let name = t!("Light Repeating Cannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -291,7 +290,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Heavy Cannon");
+            let name = t!("Heavy Cannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -321,7 +320,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Light Machine Cannon");
+            let name = t!("Light Machine Cannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "Coming Storm".to_string(),
@@ -351,7 +350,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Heavy Machine Cannon");
+            let name = t!("Heavy Machine Cannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWII".to_string(),
@@ -381,7 +380,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Fliergerflammenwerfer");
+            let name = t!("Fliergerflammenwerfer").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -408,7 +407,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
                     }],
                     warnings: vec![Warning {
                         name: name.clone(),
-                        warning: lu!("Fliergerflammenwerfer Warning"),
+                        warning: t!("Fliergerflammenwerfer Warning").to_string(),
                         level: WarningLevel::White,
                     }],
                     ..Stats::new()
@@ -416,7 +415,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Recoilless Cannon");
+            let name = t!("Recoilless Cannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -446,7 +445,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Autocannon");
+            let name = t!("Autocannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWII".to_string(),
@@ -476,7 +475,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Battle Cannon");
+            let name = t!("Battle Cannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWII".to_string(),
@@ -506,7 +505,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Precision Rifle");
+            let name = t!("Precision Rifle").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -533,7 +532,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
                     }],
                     warnings: vec![Warning {
                         name: name.clone(),
-                        warning: lu!("Precision Rifle Warning"),
+                        warning: t!("Precision Rifle Warning").to_string(),
                         level: WarningLevel::White,
                     }],
                     ..Stats::new()
@@ -541,7 +540,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Lightning Arc");
+            let name = t!("Lightning Arc").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "Himmilgard".to_string(),
@@ -568,7 +567,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
                     }],
                     warnings: vec![Warning {
                         name: name.clone(),
-                        warning: lu!("Lightning Arc Warning"),
+                        warning: t!("Lightning Arc Warning").to_string(),
                         level: WarningLevel::White,
                     }],
                     ..Stats::new()
@@ -576,7 +575,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Harpoon Launcher");
+            let name = t!("Harpoon Launcher").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "Himmilgard".to_string(),
@@ -603,7 +602,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
                     }],
                     warnings: vec![Warning {
                         name: name.clone(),
-                        warning: lu!("Harpoon Launcher Warning"),
+                        warning: t!("Harpoon Launcher Warning").to_string(),
                         level: WarningLevel::White,
                     }],
                     ..Stats::new()
@@ -611,7 +610,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Heavy Machine Gun");
+            let name = t!("Heavy Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),
@@ -641,7 +640,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             }
         },
         {
-            let name = lu!("Heavy Repeating Cannon");
+            let name = t!("Heavy Repeating Cannon").to_string();
             WeaponType {
                 name: name.clone(),
                 era: "WWI".to_string(),

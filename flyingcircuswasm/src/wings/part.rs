@@ -107,6 +107,8 @@ impl Part for Wings {
                 wing_stats.mass = 0.0;
             }
 
+            wing_stats.round();
+
             stats = stats.add(&wing_stats);
         }
 

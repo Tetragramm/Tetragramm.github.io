@@ -2,7 +2,6 @@ use ui_core::{Number, UIBindings};
 
 use super::Cockpits;
 use crate::cockpit::CockpitOptions;
-use crate::lu;
 
 /// UI options for the Cockpits container - contains options for each cockpit position
 pub struct CockpitsOptions {
@@ -16,7 +15,7 @@ impl UIBindings for Cockpits {
     fn create_ui_options(&self) -> CockpitsOptions {
         CockpitsOptions {
             num_cockpits: Number {
-                name: lu!("Number of Cockpits"),
+                name: t!("Number of Cockpits").to_string(),
                 enabled: true,
                 value: self.get_number_of_cockpits(),
             },

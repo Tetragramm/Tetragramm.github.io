@@ -1,5 +1,4 @@
 use super::*;
-use crate::localization::localization_lookup as lu;
 use crate::part::{ElectricsMessage, Part};
 use crate::stats::{Era, Warning, WarningLevel};
 
@@ -31,7 +30,7 @@ impl Part for ControlSurfaces {
                 if self.num_cantilever > 0 {
                     stats.cost += 2.0 * self.num_cantilever as f64;
                     stats.eras.push(Era {
-                        name: lu("Cantilever Wing Warping"),
+                        name: t!("Cantilever Wing Warping").to_string(),
                         era: crate::stats::ERA::LastHurrah,
                     });
                 }
@@ -41,8 +40,8 @@ impl Part for ControlSurfaces {
                     stats.pitchstab -= 2.0;
                     stats.latstab -= 2.0;
                     stats.warnings.push(Warning {
-                        name: lu("Wing Warping"),
-                        warning: lu("Wing Warping Warning"),
+                        name: t!("Wing Warping").to_string(),
+                        warning: t!("Wing Warping Warning").to_string(),
                         level: WarningLevel::White,
                     });
                 }

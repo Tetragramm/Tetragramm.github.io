@@ -1,5 +1,6 @@
 use byteorder::{BigEndian, ReadBytesExt, WriteBytesExt};
 use encoding_rs::{Encoding, WINDOWS_1252};
+use lz_str;
 use std::io::{self, Cursor, Write};
 use std::string::FromUtf8Error;
 
@@ -99,6 +100,16 @@ impl Serializer {
     /// Consumes the Serializer and returns the underlying byte buffer.
     pub fn into_inner(self) -> Vec<u8> {
         self.buffer
+    }
+
+    /// Compresses the serialized data to an LZ-String compressed string.
+    /// Converts the byte buffer to Base64 and then compresses using LZ-String.
+    /// Returns the compressed string that can be transmitted or stored.
+    pub fn compress_to_lz_string(self) -> Result<String, Error> {
+        let s = str::from_utf8(&self.buffer).unwrap();
+        // Compress the bytes using LZ-String
+        let compressed = lz_str::compress_to_encoded_uri_component(s);
+        Ok(compressed)
     }
 }
 
@@ -238,6 +249,28 @@ impl<'a> Deserializer<'a> {
     /// Returns the number of bytes remaining to be read from the cursor's current position.
     pub fn get_remaining(&self) -> u64 {
         self.cursor.get_ref().len() as u64 - self.cursor.position()
+    }
+
+    /// Creates a Deserializer from an LZ-String compressed string.
+    /// Decompresses the LZ-String, decodes from Base64, and creates a Deserializer
+    /// to read the binary data.
+    pub fn from_lz_string(compressed: &str) -> Result<Deserializer, Error> {
+        // Decompress the LZ-String to get Base64 string
+        let u16_str =
+            lz_str::decompress_from_encoded_uri_component(compressed).ok_or_else(|| {
+                Error::Io(io::Error::new(
+                    io::ErrorKind::InvalidData,
+                    "Failed to decompress LZ string",
+                ))
+            })?;
+
+        let bytes: Vec<u8> = u16_str.iter().map(|x| *x as u8).collect();
+
+        // Create a temporary vector to hold the decompressed data
+        // We need to return a Deserializer with a lifetime tied to the data
+        // Since we own the data here, we use Box::leak to get a static lifetime
+        let leaked_data: &'static [u8] = Box::leak(bytes.into_boxed_slice());
+        Deserializer::new(leaked_data)
     }
 }
 

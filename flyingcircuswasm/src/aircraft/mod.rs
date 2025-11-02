@@ -133,41 +133,41 @@ impl Aircraft {
         let mut vital = Vec::new();
 
         // Always include controls as first entry
-        vital.push("Vital Part Controls".to_string());
+        vital.push(t!("Vital Part Controls").to_string());
 
         // Add cockpit seats
         for i in 0..self.cockpits.positions.len() {
-            vital.push(format!("Seat #{}", i + 1));
+            vital.push(t!("Seat #", A = i + 1).to_string());
         }
 
         // Add fuel tanks if aircraft uses fuel
         if self.stats.fuel > 0.0 {
-            vital.push("Vital Part Fuel Tanks".to_string());
+            vital.push(t!("Vital Part Fuel Tanks").to_string());
         }
 
         // Add engines and related components
         for i in 0..self.engines.engines.len() {
             let engine = &self.engines.engines[i];
             if engine.is_push_pull {
-                vital.push(format!("Vital Part Engine Pusher {}", i + 1));
+                vital.push(t!("Vital Part Engine Pusher", A = i + 1).to_string());
                 if engine.etype_stats.oiltank {
-                    vital.push(format!("Vital Part Oil Tank Pusher {}", i + 1));
+                    vital.push(t!("Vital Part Oil Tank Pusher", A = i + 1).to_string());
                 }
-                vital.push(format!("Vital Part Engine Puller {}", i + 1));
+                vital.push(t!("Vital Part Engine Puller", A = i + 1).to_string());
                 if engine.etype_stats.oiltank {
-                    vital.push(format!("Vital Part Oil Tank Puller {}", i + 1));
+                    vital.push(t!("Vital Part Oil Tank Puller", A = i + 1).to_string());
                 }
             } else {
-                vital.push(format!("Vital Part Engine {}", i + 1));
+                vital.push(t!("Vital Part Engine", A = i + 1).to_string());
                 if engine.etype_stats.oiltank {
-                    vital.push(format!("Vital Part Oil Tank {}", i + 1));
+                    vital.push(t!("Vital Part Oil Tank", A = i + 1).to_string());
                 }
             }
         }
 
         // Add radiators
         for i in 0..self.engines.radiators.len() {
-            vital.push(format!("Vital Part Radiator {}", i + 1));
+            vital.push(t!("Vital Part Radiator", A = i + 1).to_string());
         }
 
         vital

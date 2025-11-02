@@ -112,8 +112,8 @@ impl Part for Weapons {
         stats.cost += (self.brace_count as f64) / 3.0;
         if self.brace_count > 0 {
             stats.warnings.push(Warning {
-                name: lu!("Weapons Braces"),
-                warning: lu!("Weapons Braces Warning"),
+                name: t!("Weapons Braces").to_string(),
+                warning: t!("Weapons Braces Warning").to_string(),
                 level: WarningLevel::White,
             });
         }
@@ -140,7 +140,7 @@ impl Part for Weapons {
                 msg.equipment.push(Equipment {
                     source: format!(
                         "{} {} {}",
-                        lu!("Vital Part Weapon Set"),
+                        t!("Vital Part Weapon Set").to_string(),
                         i + 1,
                         set.get_final_weapon().name
                     ),

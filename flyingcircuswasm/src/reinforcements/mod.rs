@@ -1,4 +1,4 @@
-use crate::{aircraft::AircraftType, lu, stats::Stats};
+use crate::{aircraft::AircraftType, stats::Stats};
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;

@@ -1,5 +1,4 @@
 use super::*;
-use crate::localization::localization_lookup as lu;
 use crate::part::{ElectricsMessage, Part};
 use crate::stats::{Era, Warning, WarningLevel, ERA};
 
@@ -16,11 +15,7 @@ impl Part for Fuel {
             if count > 0 {
                 let mut tank_stats = self.tank_list[i].stats.clone();
                 // Multiply stats by count
-                tank_stats.mass *= count as f64;
-                tank_stats.cost *= count as f64;
-                tank_stats.drag *= count as f64;
-                tank_stats.wetmass *= count as f64;
-                tank_stats.reqsections *= count as f64;
+                tank_stats = tank_stats.multiply(count as f64);
 
                 stats = stats.add(&tank_stats);
 
@@ -38,12 +33,12 @@ impl Part for Fuel {
             stats.mass += internal_count as f64;
             stats.cost += 2.0 * internal_count as f64;
             stats.eras.push(Era {
-                name: lu("Self-Sealing Gas Tank"),
+                name: t!("Self-Sealing Gas Tank").to_string(),
                 era: ERA::Roaring20s,
             });
             stats.warnings.push(Warning {
-                name: lu("Self-Sealing Gas Tank"),
-                warning: lu("Self-Sealing Gas Tank Warning"),
+                name: t!("Self-Sealing Gas Tank").to_string(),
+                warning: t!("Self-Sealing Gas Tank Warning").to_string(),
                 level: WarningLevel::White,
             });
         }
@@ -53,12 +48,12 @@ impl Part for Fuel {
             stats.mass += 2.0;
             stats.cost += 3.0;
             stats.eras.push(Era {
-                name: lu("Remote Fire Extinguisher"),
+                name: t!("Remote Fire Extinguisher").to_string(),
                 era: ERA::WWII,
             });
             stats.warnings.push(Warning {
-                name: lu("Remote Fire Extinguisher"),
-                warning: lu("Remote Fire Extinguisher Warning"),
+                name: t!("Remote Fire Extinguisher").to_string(),
+                warning: t!("Remote Fire Extinguisher Warning").to_string(),
                 level: WarningLevel::White,
             });
         }

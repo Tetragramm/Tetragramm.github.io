@@ -8,9 +8,6 @@ impl Serializable for Stabilizers {
         self.vstab_sel = d.get_num()?;
         self.vstab_count = d.get_num()?;
 
-        // Validate after deserialization
-        self.verify();
-
         Ok(())
     }
 

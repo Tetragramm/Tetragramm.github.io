@@ -16,11 +16,11 @@ impl LandingGear {
         let gear_name = &self.gear_list[self.gear_sel].name;
 
         if self.retract && gear_name == "Boat Hull" {
-            lu!("Retractable Gear + Boat Hull")
+            t!("Retractable Gear + Boat Hull").to_string()
         } else if self.retract {
-            format!("{} {}", lu!("Retractable"), lu!(gear_name))
+            format!("{} {}", t!("Retractable"), t!(gear_name.as_str()))
         } else {
-            lu!(gear_name)
+            t!(gear_name.as_str()).to_string()
         }
     }
 
@@ -78,8 +78,6 @@ impl LandingGear {
 
     /// Check if this is a default configuration
     pub fn is_default(&self) -> bool {
-        self.gear_sel == 0
-            && !self.retract
-            && !self.extra_sel.iter().any(|&x| x)
+        self.gear_sel == 0 && !self.retract && !self.extra_sel.iter().any(|&x| x)
     }
 }

@@ -4,7 +4,6 @@ use std::str::FromStr;
 use serde_json::Map;
 
 use crate::json::*;
-use crate::lu;
 use crate::serialization::{Deserializer, Error, JSSerializable, Serializable, Serializer};
 
 #[derive(Clone, PartialEq, Eq, Hash, Copy, Debug)]
@@ -188,8 +187,8 @@ impl Stats {
             charge: jsnum(js, "charge"),
             warnings: if let Some(w) = js.get("warning") {
                 vec![Warning {
-                    name: lu!(jsstr(js, "name")),
-                    warning: lu!(vstr(w)),
+                    name: t!(jsstr(js, "name")).to_string(),
+                    warning: t!(vstr(w)).to_string(),
                     level: WarningLevel::White,
                 }]
             } else if let Some(ws) = js.get("warnings") {
@@ -197,8 +196,8 @@ impl Stats {
                     .unwrap()
                     .iter()
                     .map(|x| Warning {
-                        name: lu!(jsstr(js, "name")),
-                        warning: lu!(vstr(x)),
+                        name: t!(jsstr(js, "name")).to_string(),
+                        warning: t!(vstr(x)).to_string(),
                         level: WarningLevel::White,
                     })
                     .collect()
@@ -207,7 +206,7 @@ impl Stats {
             },
             eras: if let Some(e) = js.get("era") {
                 vec![Era {
-                    name: lu!(jsstr(js, "name")),
+                    name: t!(jsstr(js, "name")).to_string(),
                     era: ERA::from_str(&vstr(e)).unwrap(),
                 }]
             } else if let Some(es) = js.get("eras") {
@@ -215,7 +214,7 @@ impl Stats {
                     .unwrap()
                     .iter()
                     .map(|x| Era {
-                        name: lu!(jsstr(js, "name")),
+                        name: t!(jsstr(js, "name")).to_string(),
                         era: ERA::from_str(&vstr(x)).unwrap(),
                     })
                     .collect()
@@ -635,10 +634,6 @@ mod tests {
 
         // Serialize to JSON
         let json = stats.to_json();
-        println!(
-            "Serialized JSON: {}",
-            serde_json::to_string_pretty(&json).unwrap()
-        );
 
         // Deserialize from JSON
         let mut stats2 = Stats::new();
@@ -661,7 +656,5 @@ mod tests {
             assert_eq!(e1.name, e2.name);
             assert_eq!(e1.era, e2.era);
         }
-
-        println!("✓ All warnings and eras serialized/deserialized correctly!");
     }
 }

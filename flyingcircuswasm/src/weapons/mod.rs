@@ -1,4 +1,4 @@
-use crate::{lu, stats::Stats, weapon::WeaponType, weapon_system::WeaponSystem};
+use crate::{stats::Stats, weapon::WeaponType, weapon_system::WeaponSystem};
 use std::rc::Rc;
 
 // Sub-module declarations

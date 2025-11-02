@@ -1,12 +1,12 @@
 use super::*;
-use crate::types::DerivedStats;
+use crate::{part::Part, types::DerivedStats};
 
 impl Aircraft {
     /// Calculate derived stats from base stats
     /// TypeScript: GetDerivedStats()
     /// Returns performance characteristics like max speed, stall speed, handling, etc.
     pub fn get_derived_stats(&mut self) -> DerivedStats {
-        let mut stats = &mut self.stats;
+        let stats = &mut self.stats;
 
         // Calculate Mass Points
         let mut dry_mp = (stats.mass / 5.0).floor() as i16;
@@ -206,7 +206,7 @@ impl Aircraft {
 
         // Calculate Turn Bleed
         let mut turn_bleed = (-1.0e-6
-            + (1.0e-6 + (stall_speed_empty - stall_speed_full) as f64 / 2.0).floor()
+            + (1.0e-6 + (stall_speed_empty + stall_speed_full) as f64 / 2.0).floor()
                 / self.propeller.get_turn())
         .ceil() as i16;
 
@@ -302,7 +302,7 @@ impl Aircraft {
 
         // Calculate Rate of Climb
         let mut rate_of_climb_empty =
-            ((stats.power / dry_mp as f64) * (23.0 / stats.pitchspeed) / dp_empty as f64);
+            (stats.power / dry_mp as f64) * (23.0 / stats.pitchspeed) / dp_empty as f64;
         if !rate_of_climb_empty.is_finite() {
             rate_of_climb_empty = 0.0;
         }
@@ -421,5 +421,200 @@ impl Aircraft {
             rate_of_climb_empty,
             rate_of_climb_w_bombs,
         }
+    }
+
+    /// Generate catalog JSON for an aircraft
+    /// Based on TypeScript: CatalogJSON() in Aircraft.ts (lines 526-687)
+    /// Returns a serde_json::Value containing aircraft catalog information
+    pub fn catalog_json(&mut self) -> serde_json::Value {
+        use serde_json::json;
+        use std::collections::HashMap;
+
+        let stats = self.part_stats();
+        let derived = self.get_derived_stats();
+
+        // Build Stats array
+        let mut stats_array = Vec::new();
+
+        // Add "Full Load" stats if aircraft has bombs
+        if stats.bomb_mass > 0.0 {
+            stats_array.push(json!({
+                "Name": "Full Load",
+                "Boost": derived.boost_full_w_bombs,
+                "Handling": derived.handling_full_w_bombs,
+                "Climb": derived.rate_of_climb_w_bombs,
+                "Stall": derived.stall_speed_full_w_bombs,
+                "Speed": derived.max_speed_w_bombs
+            }));
+
+            stats_array.push(json!({
+            "Name": "1/2, Bombs",
+            "Boost": ((derived.boost_empty + derived.boost_full_w_bombs) as f64 / 2.0).floor() as i16,
+            "Handling": ((derived.handling_empty + derived.handling_full_w_bombs) as f64 / 2.0).floor() as i16,
+            "Climb": ((derived.rate_of_climb_empty + derived.rate_of_climb_w_bombs) as f64 / 2.0).floor() as i16,
+            "Stall": ((derived.stall_speed_empty + derived.stall_speed_full_w_bombs) as f64 / 2.0).floor() as i16,
+            "Speed": ((derived.max_speed_empty + derived.max_speed_w_bombs) as f64 / 2.0).floor() as i16
+        }));
+        }
+
+        // Add "Full Fuel" stats
+        stats_array.push(json!({
+            "Name": "Full Fuel",
+            "Boost": derived.boost_full,
+            "Handling": derived.handling_full,
+            "Climb": derived.rate_of_climb_full,
+            "Stall": derived.stall_speed_full,
+            "Speed": derived.max_speed_full
+        }));
+
+        // Add "Half Fuel" stats
+        stats_array.push(json!({
+        "Name": "Half Fuel",
+        "Boost": ((derived.boost_empty + derived.boost_full) as f64 / 2.0).floor() as i16,
+        "Handling": ((derived.handling_empty + derived.handling_full) as f64 / 2.0).floor() as i16,
+        "Climb": ((derived.rate_of_climb_empty + derived.rate_of_climb_full) as f64 / 2.0).floor() as i16,
+        "Stall": ((derived.stall_speed_empty + derived.stall_speed_full) as f64 / 2.0).floor() as i16,
+        "Speed": ((derived.max_speed_empty + derived.max_speed_full) as f64 / 2.0).floor() as i16
+    }));
+
+        // Add "Empty" stats
+        stats_array.push(json!({
+            "Name": "Empty",
+            "Boost": "-",
+            "Handling": derived.handling_empty,
+            "Climb": "-",
+            "Stall": derived.stall_speed_empty,
+            "Speed": 0
+        }));
+
+        // Process vital parts list
+        let vp = self.vital_component_list();
+        let mut vp_map: HashMap<String, i32> = HashMap::new();
+
+        for mut component in vp {
+            // Clean up weapon set names
+            if component.contains("Weapon Set #") {
+                component = component
+                    .replace(
+                        &component[component.find("Weapon Set #").unwrap()..],
+                        "Guns",
+                    )
+                    .trim()
+                    .to_string();
+            }
+            // Remove # and anything after it
+            if let Some(pos) = component.find('#') {
+                component = component[..pos].trim().to_string();
+            }
+
+            *vp_map.entry(component).or_insert(0) += 1;
+        }
+
+        let mut vital_parts = Vec::new();
+        for (component, count) in vp_map.iter() {
+            if *count == 1 {
+                vital_parts.push(component.clone());
+            } else {
+                vital_parts.push(format!("{} x{}", component, count));
+            }
+        }
+        let vital_parts_str = vital_parts.join(", ");
+
+        // Get crew list
+        let mut crew = Vec::new();
+        for i in 0..self.cockpits.positions.len() {
+            // Note: Would need localization here, but skipping for now
+            crew.push(t!(self.cockpits.positions[i].get_name()).to_string());
+        }
+        let crew_str = crew.join(", ");
+
+        // Build propulsion string
+        // Note: Would need reliability list and altitude range methods
+        let propulsion = format!(
+            "Dropoff {}, Overspeed {}, Fuel {}",
+            derived.dropoff, derived.overspeed as i16, derived.fuel_uses
+        );
+
+        // Build aerodynamics string
+        let aerodynamics = if stats.bomb_mass == 0.0 {
+            format!(
+                "Stability {}, Energy Loss {}, Turn Bleed {}",
+                derived.stability, derived.energy_loss, derived.turn_bleed
+            )
+        } else {
+            format!(
+                "Stability {}, Energy Loss {}, Turn Bleed {} ({})",
+                derived.stability,
+                derived.energy_loss,
+                derived.turn_bleed,
+                derived.turn_bleed_w_bombs
+            )
+        };
+
+        // Build survivability string
+        let survivability = format!(
+            "Toughness {}, Max Strain {}",
+            derived.toughness, derived.max_strain
+        );
+
+        // Build armament string (simplified - full implementation would need weapon systems)
+        let mut armament = String::new();
+
+        // Add bomb/rocket info if present
+        let bombs = self.munitions.get_bomb_count();
+        let rockets = self.munitions.get_rocket_count();
+        let mut internal = self.munitions.get_internal_bomb_count();
+
+        if bombs > 0 {
+            let int_bomb = bombs.min(internal);
+            let ext_bomb = (bombs - int_bomb).max(0);
+            if int_bomb > 0 {
+                armament.push_str(&t!(" Bomb Mass Internally.", A = int_bomb).to_string());
+            }
+            if ext_bomb > 0 {
+                armament.push_str(&t!(" Bomb Mass Externally.", A = ext_bomb).to_string());
+            }
+            if int_bomb > 0 {
+                armament.push_str(
+                    &t!(
+                        "Largest Internal Bomb",
+                        A = int_bomb.min(self.munitions.get_max_bomb_size())
+                    )
+                    .to_string(),
+                );
+            }
+            internal -= int_bomb;
+        }
+
+        if rockets > 0 {
+            let int_rock = rockets.min(internal);
+            let ext_rock = (rockets - int_rock).max(0);
+            if int_rock > 0 {
+                armament.push_str(&t!(" Rocket Mass Internally.", A = int_rock).to_string());
+            }
+            if ext_rock > 0 {
+                armament.push_str(&t!(" Rocket Mass Externally.", A = ext_rock).to_string());
+            }
+        }
+
+        // Add warnings
+        for warning in &stats.warnings {
+            armament.push_str(&format!("{}:  {}\n", warning.name, warning.warning));
+        }
+
+        // Build final output object
+        json!({
+            "Name": self.name,
+            "Price": stats.cost as i16,
+            "Used": (stats.cost / 2.0).floor() as i16,
+            "Upkeep": stats.upkeep as i16,
+            "Stats": stats_array,
+            "Vital Parts": vital_parts_str,
+            "Crew": crew_str,
+            "Propulsion": propulsion,
+            "Aerodynamics": aerodynamics,
+            "Survivability": survivability,
+            "Armament": armament
+        })
     }
 }

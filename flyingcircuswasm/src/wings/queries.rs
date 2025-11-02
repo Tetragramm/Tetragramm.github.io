@@ -338,31 +338,30 @@ impl Wings {
         let mut drag: i16 = 0;
         let deck_count = self.deck_count_full();
         let mut longest_span = 0;
-        let mut longest_drag = 0;
+        let mut longest_drag = 0.;
 
         for wing in &self.wing_list {
             let wspan = wing.span;
             longest_span = longest_span.max(wspan);
 
-            let mut warea = wing.area;
+            let mut warea = wing.area as f64;
             if wing.gull {
-                warea = ((1.1 * warea as f64).floor() as i16).max(warea);
+                warea = ((1.1 * warea).floor()).max(warea);
             }
 
-            let mut wdrag = (6 * warea * warea / (wspan * wspan)).max(1);
-            wdrag =
-                ((wdrag as f64 * self.skin_list[wing.surface].dragfactor).floor() as i16).max(1);
+            let mut wdrag: f64 = (6.0 * warea * warea / (wspan * wspan) as f64).max(1.0);
+            wdrag = ((wdrag * self.skin_list[wing.surface].dragfactor).floor()).max(1.0);
 
             // Inline wings get drag reduction
             if self.stagger_list[self.wing_stagger].inline && deck_count[wing.deck] > 1 {
-                wdrag = ((0.75 * wdrag as f64).floor() as i16).max(1);
+                wdrag = ((0.75 * wdrag).floor()).max(1.0);
             }
 
             if longest_span == wspan {
                 longest_drag = wdrag;
             }
 
-            drag += wdrag;
+            drag += wdrag as i16;
         }
 
         for wing in &self.mini_wing_list {
@@ -376,8 +375,8 @@ impl Wings {
         // Sesquiplane/monoplane bonus
         let sesp = self.get_is_sesquiplane();
         if (sesp.0 || self.get_monoplane()) && sesp.1 != -1 {
-            drag -= ((1.0 - self.long_list[sesp.1 as usize].dragfactor) * longest_drag as f64)
-                .floor() as i16;
+            drag -=
+                ((1.0 - self.long_list[sesp.1 as usize].dragfactor) * longest_drag).floor() as i16;
         }
 
         drag
@@ -432,11 +431,6 @@ impl Wings {
     /// Returns: (is_sesquiplane, biggest_deck, super_small)
     /// TypeScript: GetIsSesquiplane()
     pub fn get_is_sesquiplane(&self) -> (bool, i16, bool) {
-        // Need at least 2 wings for sesquiplane
-        if self.wing_list.len() < 2 {
-            return (false, -1, false);
-        }
-
         let mut biggest_area = 0;
         let mut biggest_deck = -1;
         let mut biggest_span = 0;

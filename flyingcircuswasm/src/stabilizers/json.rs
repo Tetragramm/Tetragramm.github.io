@@ -16,9 +16,6 @@ impl JSSerializable for Stabilizers {
         if let Some(val) = json["vstab_count"].as_i64() {
             self.vstab_count = val as i16;
         }
-
-        // Validate after loading from JSON
-        self.verify();
     }
 
     fn to_json(&self) -> serde_json::Value {

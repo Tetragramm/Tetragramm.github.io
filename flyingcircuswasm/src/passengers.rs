@@ -5,11 +5,12 @@ use ui_macro::*;
 
 use crate::{
     json::{jsbool, jsnum},
-    lu,
+
     part::{ElectricsMessage, Part},
     serialization::{JSSerializable, Serializable},
-    stats::{rtz, Stats, Warning},
+    stats::{Stats, Warning},
 };
+use rust_i18n::t;
 
 #[derive(UIBindings)]
 pub struct Passengers {
@@ -39,12 +40,12 @@ impl Passengers {
 impl Part for Passengers {
     fn part_stats(&mut self) -> crate::stats::Stats {
         let mut s = Stats::new();
-        s.reqsections = 2.0 * rtz(-1.0e-6 + (self.seats + 2 * self.beds) as f64 / 5.0);
+        s.reqsections = 2.0 * (-1.0e-6 + (self.seats + 2 * self.beds) as f64 / 5.0).ceil();
         if self.seats + self.beds > 0 && self.connected {
             s.mass = 1.;
             s.warnings.push(Warning {
-                name: lu!("Passengers Section Title"),
-                warning: lu!("Passenger Connectivity Warning"),
+                name: t!("Passengers Section Title").to_string(),
+                warning: t!("Passenger Connectivity Warning").to_string(),
                 level: crate::stats::WarningLevel::White,
             });
         }
@@ -56,8 +57,8 @@ impl Part for Passengers {
 
         if self.seats + self.beds > 0 {
             s.warnings.push(Warning {
-                name: lu!("Passengers Section Title"),
-                warning: lu!("Passengers Count", self.seats, self.beds),
+                name: t!("Passengers Section Title").to_string(),
+                warning: t!("Passengers Count", A = self.seats, B = self.beds).to_string(),
                 level: crate::stats::WarningLevel::White,
             });
         }

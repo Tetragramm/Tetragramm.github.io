@@ -75,21 +75,16 @@ impl Part for Stabilizers {
         stats.drag += (2 * ((self.hstab_count - 1).max(0) + (self.vstab_count - 1).max(0))) as f64;
 
         // Pairs of stabilizers (control bonus)
-        let _leftovers = if self.vstab_sel >= 0
-            && (self.vstab_sel as usize) < self.vstab_list.len()
-            && self.vstab_list[self.vstab_sel as usize].increment != 0
-        {
-            let es_pairs = (self.engine_count - 1).min(self.vstab_count - 1).max(0);
+        if self.vstab_sel >= 0 && self.vstab_list[self.vstab_sel as usize].increment != 0 {
             let mut leftovers = (self.hstab_count - 1).max(0);
+            let es_pairs = (self.engine_count - 1).min(self.vstab_count - 1);
             leftovers += (self.vstab_count - 1 - es_pairs).max(0);
             stats.control += (3 * es_pairs + leftovers) as f64;
-            leftovers
         } else {
-            let es_pairs = ((self.engine_count - 1).min(self.hstab_count - 1)).max(0);
+            let es_pairs = (self.engine_count - 1).min(self.hstab_count - 1).max(0);
             let leftovers = (self.hstab_count - 1 - es_pairs).max(0);
             stats.control += (3 * es_pairs + leftovers) as f64;
-            leftovers
-        };
+        }
 
         stats
     }

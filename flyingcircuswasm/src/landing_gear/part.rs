@@ -20,7 +20,7 @@ impl Part for LandingGear {
 
                 // Add mass per Loaded Mass Point (in 5kg increments)
                 let lmp = (temp_mass / 5.0 + 1e-6).floor();
-                stats.mass += self.extra_list[i].mplmp * lmp;
+                stats.mass += (self.extra_list[i].mplmp * lmp + 1.0e-6).floor();
             }
         }
 
@@ -73,6 +73,8 @@ impl Part for LandingGear {
 
         // Add structure per Loaded Mass Point
         stats.structure += self.gear_list[self.gear_sel].splmp * lmp;
+
+        stats.round();
 
         stats
     }

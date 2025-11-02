@@ -3,7 +3,7 @@ use std::{iter::zip, rc::Rc};
 use ui_core::*;
 use ui_macro::*;
 
-use crate::{lu, stats::Stats};
+use crate::{stats::Stats};
 
 mod json;
 mod part;

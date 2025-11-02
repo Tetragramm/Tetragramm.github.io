@@ -83,8 +83,10 @@ impl Engine {
     }
 
     pub fn can_use_extended_driveshaft(&self) -> bool {
-        self.mount_list[self.mount_sel].require_extended_driveshafts
-            && self.get_num_propellers() > 0
+        !((self.get_num_propellers() == 0)
+            || self.is_internal
+            || self.is_generator
+            || self.mount_list[self.mount_sel].helicopter)
     }
 
     pub fn can_outboard_prop(&self) -> bool {
@@ -151,6 +153,10 @@ impl Engine {
 
     pub fn is_generator_enabled(&self) -> bool {
         !self.get_is_pulsejet() && !self.get_is_turbine()
+    }
+
+    pub fn get_generator(&self) -> bool {
+        self.is_generator
     }
 
     pub fn is_alternator_enabled(&self) -> bool {

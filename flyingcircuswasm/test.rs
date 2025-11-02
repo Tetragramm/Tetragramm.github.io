@@ -6,7 +6,7 @@ mod cockpit {
     use crate::{
         cockpits::{CockpitType, GunsightType, SafetyType, UpgradeType},
         json::{jsboolarr, jsnum},
-        lu, part::{ElectricsMessage, Equipment, Part},
+part::{ElectricsMessage, Equipment, Part},
         serialization::{JSSerializable, Serializable},
         stats::{rtz, Stats, Warning, WarningLevel},
     };

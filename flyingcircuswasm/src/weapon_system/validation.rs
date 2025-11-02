@@ -38,8 +38,8 @@ impl WeaponSystem {
             ActionType::Mechanical => {
                 self.final_weapon.hits = wt.hits;
                 self.final_weapon.stats.warnings.push(Warning {
-                    name: lu!("Mechanical Action"),
-                    warning: lu!("Mechanical Action Warning"),
+                    name: t!("Mechanical Action").to_string(),
+                    warning: t!("Mechanical Action Warning").to_string(),
                     level: WarningLevel::White,
                 });
                 self.final_weapon.jam = "0/0".to_string();
@@ -47,7 +47,7 @@ impl WeaponSystem {
                 self.final_weapon.stats.cost += wt.stats.cost;
                 self.final_weapon.synched = true;
                 self.final_weapon.stats.eras.push(Era {
-                    name: lu!("Mechanical Action"),
+                    name: t!("Mechanical Action").to_string(),
                     era: ERA::WWI,
                 });
             }
@@ -58,7 +58,7 @@ impl WeaponSystem {
                 self.final_weapon.stats.cost += wt.stats.cost;
                 self.final_weapon.synched = false;
                 self.final_weapon.stats.eras.push(Era {
-                    name: lu!("Gast Principle"),
+                    name: t!("Gast Principle").to_string(),
                     era: ERA::WWI,
                 });
             }
@@ -82,7 +82,7 @@ impl WeaponSystem {
                 };
                 self.final_weapon.jam = format!("9999/{}", jam1);
                 self.final_weapon.stats.eras.push(Era {
-                    name: lu!("Rotary_Gun"),
+                    name: t!("Rotary_Gun").to_string(),
                     era: ERA::WWI,
                 });
             }
@@ -118,12 +118,12 @@ impl WeaponSystem {
                 self.final_weapon.deflection = 0;
                 self.final_weapon.ap = (self.final_weapon.ap - 1).max(0);
                 self.final_weapon.stats.warnings.push(Warning {
-                    name: lu!("Heat Ray"),
-                    warning: lu!("Heat Ray Warning"),
+                    name: t!("Heat Ray").to_string(),
+                    warning: t!("Heat Ray Warning").to_string(),
                     level: WarningLevel::White,
                 });
                 self.final_weapon.stats.eras.push(Era {
-                    name: lu!("Heat Ray"),
+                    name: t!("Heat Ray").to_string(),
                     era: ERA::Himmilgard,
                 });
             }
@@ -132,12 +132,12 @@ impl WeaponSystem {
                 self.final_weapon.shells = false;
                 self.final_weapon.damage -= 1.;
                 self.final_weapon.stats.warnings.push(Warning {
-                    name: lu!("Gyrojets"),
-                    warning: lu!("Gyrojets Warning"),
+                    name: t!("Gyrojets").to_string(),
+                    warning: t!("Gyrojets Warning").to_string(),
                     level: WarningLevel::White,
                 });
                 self.final_weapon.stats.eras.push(Era {
-                    name: lu!("Gyrojets"),
+                    name: t!("Gyrojets").to_string(),
                     era: ERA::Roaring20s,
                 });
             }
@@ -153,19 +153,19 @@ impl WeaponSystem {
                     };
                     self.final_weapon.jam = format!("{}/9999", jam0);
                     self.final_weapon.stats.warnings.push(Warning {
-                        name: lu!("Pneumatic"),
-                        warning: lu!("Pneumatic Warning 1"),
+                        name: t!("Pneumatic").to_string(),
+                        warning: t!("Pneumatic Warning 1").to_string(),
                         level: WarningLevel::White,
                     });
                     self.final_weapon.stats.eras.push(Era {
-                        name: lu!("Pneumatic"),
+                        name: t!("Pneumatic").to_string(),
                         era: ERA::Pioneer,
                     });
                 }
                 if self.final_weapon.hits > 0 {
                     self.final_weapon.stats.warnings.push(Warning {
-                        name: lu!("Pneumatic"),
-                        warning: lu!("Pneumatic Warning 2"),
+                        name: t!("Pneumatic").to_string(),
+                        warning: t!("Pneumatic Warning 2").to_string(),
                         level: WarningLevel::White,
                     });
                 }
@@ -181,7 +181,7 @@ impl WeaponSystem {
                 name: self.final_weapon.name.clone(),
                 warning: format!(
                     "{}{}",
-                    lu!("Deflection Warning"),
+                    t!("Deflection Warning").to_string(),
                     self.final_weapon.deflection
                 ),
                 level: WarningLevel::White,

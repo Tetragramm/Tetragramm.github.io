@@ -136,8 +136,18 @@ fn get_set_fn(attrs: &Vec<(Ident, Option<String>)>) -> Option<String> {
 }
 
 fn generate_selects(
-    selects: &Vec<(&syn::Ident, String, Option<String>, Option<String>, Option<String>)>,
-) -> (Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>) {
+    selects: &Vec<(
+        &syn::Ident,
+        String,
+        Option<String>,
+        Option<String>,
+        Option<String>,
+    )>,
+) -> (
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+) {
     // Build up the struct fields
     let mut struct_fields = Vec::new();
     let mut impl_fields = Vec::new();
@@ -207,7 +217,11 @@ fn generate_selects(
 
 fn generate_numbers(
     numbers: &Vec<(&syn::Ident, String, Option<String>, Option<String>)>,
-) -> (Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>) {
+) -> (
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+) {
     // Build up the struct fields
     let mut struct_fields = Vec::new();
     let mut impl_fields = Vec::new();
@@ -229,7 +243,7 @@ fn generate_numbers(
         // Add to impl
         impl_fields.push(quote! {
             #field_name: Number {
-                name: lu!(#name),
+                name: t!(#name).to_string(),
                 enabled: #enabled_call,
                 value: self.#field_name,
             }
@@ -254,7 +268,11 @@ fn generate_numbers(
 
 fn generate_checks(
     checks: &Vec<(&syn::Ident, String, Option<String>, Option<String>)>,
-) -> (Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>) {
+) -> (
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+) {
     // Build up the struct fields
     let mut struct_fields = Vec::new();
     let mut impl_fields = Vec::new();
@@ -276,7 +294,7 @@ fn generate_checks(
         // Add to impl
         impl_fields.push(quote! {
             #field_name: Check {
-                name: lu!(#name),
+                name: t!(#name).to_string(),
                 enabled: #enabled_call,
                 selected: self.#field_name,
             }
@@ -301,7 +319,11 @@ fn generate_checks(
 
 fn generate_number_lists(
     number_lists: &Vec<(&syn::Ident, String, Option<String>, Option<String>)>,
-) -> (Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>) {
+) -> (
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+) {
     // Build up the struct fields
     let mut struct_fields = Vec::new();
     let mut impl_fields = Vec::new();
@@ -365,7 +387,11 @@ fn generate_number_lists(
 
 fn generate_check_lists(
     check_lists: &Vec<(&syn::Ident, String, Option<String>, Option<String>)>,
-) -> (Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>, Vec<proc_macro2::TokenStream>) {
+) -> (
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+    Vec<proc_macro2::TokenStream>,
+) {
     // Build up the struct fields
     let mut struct_fields = Vec::new();
     let mut impl_fields = Vec::new();
@@ -442,7 +468,13 @@ pub fn ui_bindings_derive(input: TokenStream) -> TokenStream {
 
     // Find the source and selection fields
     //(field_name, source, enabled_fn, enabled_opt_fn, set_fn)
-    let mut selects: Vec<(&syn::Ident, String, Option<String>, Option<String>, Option<String>)> = Vec::new();
+    let mut selects: Vec<(
+        &syn::Ident,
+        String,
+        Option<String>,
+        Option<String>,
+        Option<String>,
+    )> = Vec::new();
     //(field_name, name, enabled_fn, set_fn)
     let mut numbers: Vec<(&syn::Ident, String, Option<String>, Option<String>)> = Vec::new();
     let mut checks: Vec<(&syn::Ident, String, Option<String>, Option<String>)> = Vec::new();

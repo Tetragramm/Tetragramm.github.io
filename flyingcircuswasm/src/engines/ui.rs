@@ -1,5 +1,4 @@
 use super::Engines;
-use crate::lu;
 use ui_core::*;
 
 /// UI options struct for Engines container
@@ -15,7 +14,7 @@ impl UIBindings for Engines {
     fn create_ui_options(&self) -> Self::OptionsType {
         EnginesOptions {
             is_asymmetric: Check {
-                name: lu!("is_asymmetric"),
+                name: t!("is_asymmetric").to_string(),
                 enabled: true,
                 selected: self.is_asymmetric,
             },

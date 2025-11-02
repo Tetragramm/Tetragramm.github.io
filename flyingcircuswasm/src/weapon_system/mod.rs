@@ -1,5 +1,4 @@
 use crate::{
-    lu,
     stats::Stats,
     weapon::{ActionType, ProjectileType, SynchronizationType, Weapon, WeaponType},
 };

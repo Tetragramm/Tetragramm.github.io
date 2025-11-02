@@ -42,9 +42,6 @@ impl Serializable for LandingGear {
         }
         self.extra_sel.truncate(self.extra_list.len());
 
-        // Verify configuration after deserialization
-        self.verify_all();
-
         Ok(())
     }
 }

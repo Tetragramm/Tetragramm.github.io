@@ -6,7 +6,7 @@ use crate::part::{ElectricsMessage, Part};
 use crate::serialization::{JSSerializable, Serializable};
 use crate::stats::Stats;
 
-pub struct EraVal {
+pub struct EraEntry {
     pub name: String,
     pub maxbomb: f64,
     pub cant_lift: i32,
@@ -15,13 +15,13 @@ pub struct EraVal {
 
 #[derive(UIBindings)]
 pub struct Era {
-    vals: Vec<EraVal>,
+    vals: Vec<EraEntry>,
     #[ui(select, source = "vals")]
     pub selected_era: usize,
 }
 
 impl Era {
-    pub fn new(vals: Vec<EraVal>) -> Era {
+    pub fn new(vals: Vec<EraEntry>) -> Era {
         Era {
             vals,
             selected_era: 0,

@@ -5,7 +5,6 @@ use ui_macro::*;
 
 use crate::{
     engines::{CowlEntry, MountEntry},
-    lu,
     stats::Stats,
 };
 

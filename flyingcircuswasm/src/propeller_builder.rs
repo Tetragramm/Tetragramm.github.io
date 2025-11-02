@@ -1,6 +1,5 @@
 use crate::{
     engine::{EngineInputs, EngineRarity, EngineStats, TypedInputs},
-    lu,
     stats::{rtz, Era, Warning, WarningLevel, ERA},
 };
 
@@ -594,8 +593,8 @@ impl PropellerBuilder {
                 estats.stats.cost += 3.0;
                 estats.altitude = 49;
                 estats.stats.warnings.push(Warning {
-                    name: lu!("Altitude Throttle"),
-                    warning: lu!("Altitude Throttle Warning"),
+                    name: t!("Altitude Throttle").to_string(),
+                    warning: t!("Altitude Throttle Warning").to_string(),
                     level: WarningLevel::White,
                 });
             }
@@ -633,8 +632,8 @@ impl PropellerBuilder {
         // Add War Emergency Power warning
         if self.compressor_type == CompressorType::AltitudeThrottle || self.upg_sel[1] {
             estats.stats.warnings.push(Warning {
-                name: lu!("War Emergency Power"),
-                warning: lu!("War Emergency Power Warning"),
+                name: t!("War Emergency Power").to_string(),
+                warning: t!("War Emergency Power Warning").to_string(),
                 level: WarningLevel::White,
             });
         }

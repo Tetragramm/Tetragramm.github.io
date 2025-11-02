@@ -1,5 +1,4 @@
 use super::*;
-use crate::localization::localization_lookup as lu;
 use crate::part::{ElectricsMessage, Part};
 use crate::stats::{Era, Warning, WarningLevel, ERA};
 
@@ -96,7 +95,7 @@ impl Part for Weapon {
                 }
 
                 stats.eras.push(Era {
-                    name: lu("Interruptor Gear"),
+                    name: t!("Interruptor Gear").to_string(),
                     era: ERA::WWI,
                 });
             }
@@ -108,7 +107,7 @@ impl Part for Weapon {
                         stats.cost += (self.w_count * 3) as f64;
                     }
                     stats.eras.push(Era {
-                        name: lu("Synchronization Gear"),
+                        name: t!("Synchronization Gear").to_string(),
                         era: ERA::Roaring20s,
                     });
                 }
@@ -119,16 +118,18 @@ impl Part for Weapon {
             SynchronizationType::Deflect => {
                 stats.cost += 1.0;
                 stats.warnings.push(Warning {
-                    name: lu(&self.weapon_type.name),
-                    warning: lu("Deflector Plate Warning"),
+                    name: t!(&self.weapon_type.name).to_string(),
+                    warning: t!("Deflector Plate Warning").to_string(),
                     level: WarningLevel::White,
                 });
             }
             SynchronizationType::NoInterference => {
                 if !self.is_lightning_arc() {
                     stats.warnings.push(Warning {
-                        name: format!("{} {}", lu(&self.weapon_type.name), lu("No Interference")),
-                        warning: lu("No Interference Warning"),
+                        name: format!("{} {}", t!(&self.weapon_type.name), t!("No Interference"))
+                            .to_string()
+                            .to_string(),
+                        warning: t!("No Interference Warning").to_string(),
                         level: WarningLevel::Yellow,
                     });
                 }
