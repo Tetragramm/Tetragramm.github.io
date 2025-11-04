@@ -18,7 +18,11 @@ impl LandingGear {
         if self.retract && gear_name == "Boat Hull" {
             t!("Retractable Gear + Boat Hull").to_string()
         } else if self.retract {
-            format!("{} {}", t!("Retractable"), t!(gear_name.as_str()))
+            format!(
+                "{} {}",
+                t!("Landing Gear Retractable"),
+                t!(gear_name.as_str())
+            )
         } else {
             t!(gear_name.as_str()).to_string()
         }

@@ -1,20 +1,20 @@
 _version: 2
-" Bomb Mass Externally.":
+"Bomb Mass Externally.":
   de: "%{A} Bombenmasse extern. "
   en: "%{A} Bomb Mass Externally. "
   es: "%{A} Masa de Bombas Externamente. "
   fr: "%{A} Masse de Bombes à l'extérieur. "
-" Bomb Mass Internally.":
+"Bomb Mass Internally.":
   de: "%{A} Bombenmasse intern. "
   en: "%{A} Bomb Mass Internally. "
   es: "%{A} Masa de Bombas Internamente. "
   fr: "%{A} Masse de Bombes à l'intérieur. "
-" Rocket Mass Externally.":
+"Rocket Mass Externally.":
   de: "%{A} Raketenmasse extern. "
   en: "%{A} Rocket Mass Externally. "
   es: "%{A} Masa de Cohetes Externamente. "
   fr: "%{A} Masse de Fusées à l'extérieur. "
-" Rocket Mass Internally.":
+"Rocket Mass Internally.":
   de: "%{A} Raketenmasse intern. "
   en: "%{A} Rocket Mass Internally. "
   es: "%{A} Masa de Cohetes Internamente. "
@@ -344,16 +344,11 @@ Bombsight:
   en: Bombsight
   es: Mira de Bombardeo
   fr: Viseur de Bombardement
-Bombsight Warning 1:
-  de: "Ziehe "
-  en: "Subtract "
-  es: "Restar "
-  fr: "Soustrayez "
-Bombsight Warning 2:
-  de: " von deiner Flughöhe ab, wenn du auf Bombardierung würfelst."
-  en: " from your Altitude when rolling for bombing."
-  es: " de tu Altitud al lanzar los dados para bombardear."
-  fr: " de votre Altitude lorsque vous lancez pour le bombardement."
+Bombsight Warning:
+  de: "Ziehe %{A} von deiner Flughöhe ab, wenn du auf Bombardierung würfelst."
+  en: "Subtract %{A} from your Altitude when rolling for bombing."
+  es: "Restar %{A} de tu Altitud al lanzar los dados para bombardear."
+  fr: "Soustrayez %{A} de votre Altitude lorsque vous lancez pour le bombardement."
 Boost Warning:
   de: Boost ist 0 bei einigen Zuladungen. Das Flugzeug kann nicht beschleunigen, um abzuheben.
   en: Boost is 0 for some loads.  The plane cannot accelerate to take off.
@@ -3904,3 +3899,28 @@ Zeppelin Hook Warning:
   en: Allows landing inside airships or large planes.
   es: Permite aterrizar dentro de dirigibles o aviones grandes.
   fr: Permet d'atterrir à l'intérieur de dirigeables ou de grands avions.
+One:
+  de: Eins
+  en: One
+  es: Uno
+  fr: Un
+Two:
+  de: Zwei
+  en: Two
+  es: Dos
+  fr: Deux
+Three:
+  de: Drei
+  en: Three
+  es: Tres
+  fr: Trois
+Four:
+  de: Vier
+  en: Four
+  es: Cuatro
+  fr: Quatre
+Five:
+  de: Fünf
+  en: Five
+  es: Cinco
+  fr: Cinq

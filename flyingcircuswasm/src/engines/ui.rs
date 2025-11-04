@@ -14,7 +14,7 @@ impl UIBindings for Engines {
     fn create_ui_options(&self) -> Self::OptionsType {
         EnginesOptions {
             is_asymmetric: Check {
-                name: t!("is_asymmetric").to_string(),
+                name: t!("Engines Asymmetric Plane").to_string(),
                 enabled: true,
                 selected: self.is_asymmetric,
             },

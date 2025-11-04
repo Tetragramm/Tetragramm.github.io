@@ -15,7 +15,7 @@ impl UIBindings for Cockpits {
     fn create_ui_options(&self) -> CockpitsOptions {
         CockpitsOptions {
             num_cockpits: Number {
-                name: t!("Number of Cockpits").to_string(),
+                name: t!("Cockpit Num Cockpits").to_string(),
                 enabled: true,
                 value: self.get_number_of_cockpits(),
             },

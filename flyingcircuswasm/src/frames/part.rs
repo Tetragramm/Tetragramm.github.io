@@ -15,7 +15,7 @@ impl Frames {
             stats.structure *= 1.5;
             stats.cost *= 2.0;
             stats.eras.push(crate::stats::Era {
-                name: t!("Geodesic").to_string(),
+                name: t!("Frames Geodesic").to_string(),
                 era: ERA::ComingStorm,
             });
         }
@@ -55,7 +55,7 @@ impl Frames {
             stats.structure *= 1.5;
             stats.cost *= 2.0;
             stats.eras.push(crate::stats::Era {
-                name: t!("Geodesic").to_string(),
+                name: t!("Frames Geodesic").to_string(),
                 era: ERA::ComingStorm,
             });
         }

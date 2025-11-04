@@ -115,36 +115,45 @@ fn format_weapon_string(
 
     // Jam tag
     let jam = ws.get_jam();
-    tags.push(format!("Jam {}", jam));
+    tags.push(t!("Weapon Tag Jam", A = jam).to_string());
 
     // Reload tag
     let reload = ws.get_reload();
-    tags.push(format!("Reload {}", reload));
+    tags.push(t!("Weapon Tag Reload", A = reload).to_string());
 
     // Rapid Fire tag
     if ws.get_final_weapon().rapid {
-        tags.push("Rapid Fire".to_string());
+        tags.push(t!("Weapon Tag Rapid Fire").to_string());
     }
 
     // AP tag
     let ap = ws.get_final_weapon().ap;
     if ap > 0 {
-        tags.push(format!("AP {}", ap));
+        tags.push(t!("Weapon Tag AP", A = ap).to_string());
     }
 
     // Accessibility tag
     if ws.get_is_fully_accessible() {
-        tags.push("Fully Accessible".to_string());
+        tags.push(t!("Weapon Tag Fully Accessible").to_string());
     } else if ws.get_is_partly_accessible() {
-        tags.push("Partly Accessible".to_string());
+        tags.push(t!("Weapon Tag Partly Accessible").to_string());
     }
 
     let tags_str = tags.join(", ");
 
-    format!(
-        "Seat #{}: {}x {} fires [{}] for {} damage with {} hits with {} ammunition. [{}]",
-        seat, count, weapon_name, directions_str, damage, hits_str, ammunition, tags_str
+    let seatnum = t!("Seat #", A = seat).to_string();
+    t!(
+        "Weapon Description",
+        A = seatnum,
+        B = count,
+        C = weapon_name,
+        D = directions_str,
+        E = damage,
+        F = hits_str,
+        G = ammunition,
+        H = tags_str
     )
+    .to_string()
 }
 
 impl Aircraft {
@@ -188,12 +197,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Stat Mass")
+                .find(|w| w.name == t!("Stat Mass").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Stat Mass".to_string(),
-                    warning: "Low Mass Warning".to_string(),
+                    name: t!("Stat Mass").to_string(),
+                    warning: t!("Low Mass Warning").to_string(),
                     level: crate::stats::WarningLevel::Yellow, // WARNING_COLOR::YELLOW
                 });
             }
@@ -203,12 +212,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Stat Drag")
+                .find(|w| w.name == t!("Stat Drag").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Stat Drag".to_string(),
-                    warning: "Low Drag Warning".to_string(),
+                    name: t!("Stat Drag").to_string(),
+                    warning: t!("Low Drag Warning").to_string(),
                     level: crate::stats::WarningLevel::Yellow, // WARNING_COLOR::YELLOW
                 });
             }
@@ -238,12 +247,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Derived Boost")
+                .find(|w| w.name == t!("Derived Boost").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Derived Boost".to_string(),
-                    warning: "Boost Warning".to_string(),
+                    name: t!("Derived Boost").to_string(),
+                    warning: t!("Boost Warning").to_string(),
                     level: crate::stats::WarningLevel::Red, // WARNING_COLOR::RED
                 });
             }
@@ -275,12 +284,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Derived Stability")
+                .find(|w| w.name == t!("Derived Stability").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Derived Stability".to_string(),
-                    warning: "Stability Warning".to_string(),
+                    name: t!("Derived Stability").to_string(),
+                    warning: t!("Stability Warning").to_string(),
                     level: crate::stats::WarningLevel::Red, // WARNING_COLOR::RED
                 });
             }
@@ -326,12 +335,12 @@ impl Aircraft {
             && stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Stat Max Strain")
+                .find(|w| w.name == t!("Stat Max Strain").to_string())
                 .is_none()
         {
             stats.warnings.push(crate::stats::Warning {
-                name: "Stat Max Strain".to_string(),
-                warning: "Max Strain Warning".to_string(),
+                name: t!("Stat Max Strain").to_string(),
+                warning: t!("Max Strain Warning").to_string(),
                 level: crate::stats::WarningLevel::Red, // WARNING_COLOR::RED
             });
         }
@@ -390,12 +399,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Stall Speed")
+                .find(|w| w.name == t!("Stall Speed").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Stall Speed".to_string(),
-                    warning: "Stall Speed Warning".to_string(),
+                    name: t!("Stall Speed").to_string(),
+                    warning: t!("Stall Speed Warning").to_string(),
                     level: crate::stats::WarningLevel::Red, // WARNING_COLOR::RED
                 });
             }
@@ -414,12 +423,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Derived Fuel Uses")
+                .find(|w| w.name == t!("Derived Fuel Uses").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Derived Fuel Uses".to_string(),
-                    warning: "Fuel Uses Warning".to_string(),
+                    name: t!("Derived Fuel Uses").to_string(),
+                    warning: t!("Fuel Uses Warning").to_string(),
                     level: crate::stats::WarningLevel::Yellow, // WARNING_COLOR::YELLOW
                 });
             }
@@ -473,12 +482,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Ornithopter Stall")
+                .find(|w| w.name == t!("Ornithopter Stall").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Ornithopter Stall".to_string(),
-                    warning: "Ornithopter Stall Warning".to_string(),
+                    name: t!("Ornithopter Stall").to_string(),
+                    warning: t!("Ornithopter Stall Warning").to_string(),
                     level: crate::stats::WarningLevel::White, // WARNING_COLOR::WHITE
                 });
             }
@@ -493,12 +502,12 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Ornithopter Flutterer Attack")
+                .find(|w| w.name == t!("Ornithopter Flutterer Attack").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Ornithopter Flutterer Attack".to_string(),
-                    warning: "Ornithopter Flutterer Attack Warning".to_string(),
+                    name: t!("Ornithopter Flutterer Attack").to_string(),
+                    warning: t!("Ornithopter Flutterer Attack Warning").to_string(),
                     level: crate::stats::WarningLevel::White, // WARNING_COLOR::WHITE
                 });
             }
@@ -508,24 +517,24 @@ impl Aircraft {
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Ornithopter Buzzer Boost")
+                .find(|w| w.name == t!("Ornithopter Buzzer Boost").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Ornithopter Buzzer Boost".to_string(),
-                    warning: "Ornithopter Buzzer Boost Warning".to_string(),
+                    name: t!("Ornithopter Buzzer Boost").to_string(),
+                    warning: t!("Ornithopter Buzzer Boost Warning").to_string(),
                     level: crate::stats::WarningLevel::White, // WARNING_COLOR::WHITE
                 });
             }
             if stats
                 .warnings
                 .iter()
-                .find(|w| w.name == "Ornithopter Buzzer Stall")
+                .find(|w| w.name == t!("Ornithopter Buzzer Stall").to_string())
                 .is_none()
             {
                 stats.warnings.push(crate::stats::Warning {
-                    name: "Ornithopter Buzzer Stall".to_string(),
-                    warning: "Ornithopter Buzzer Stall Warning".to_string(),
+                    name: t!("Ornithopter Buzzer Stall").to_string(),
+                    warning: t!("Ornithopter Buzzer Stall Warning").to_string(),
                     level: crate::stats::WarningLevel::White, // WARNING_COLOR::WHITE
                 });
             }
@@ -758,10 +767,10 @@ impl Aircraft {
             let int_bomb = bombs.min(internal);
             let ext_bomb = (bombs - int_bomb).max(0);
             if int_bomb > 0 {
-                armament.push_str(&t!(" Bomb Mass Internally.", A = int_bomb).to_string());
+                armament.push_str(&t!("Bomb Mass Internally.", A = int_bomb).to_string());
             }
             if ext_bomb > 0 {
-                armament.push_str(&t!(" Bomb Mass Externally.", A = ext_bomb).to_string());
+                armament.push_str(&t!("Bomb Mass Externally.", A = ext_bomb).to_string());
             }
             if int_bomb > 0 {
                 armament.push_str(
@@ -780,10 +789,10 @@ impl Aircraft {
             let int_rock = rockets.min(internal);
             let ext_rock = (rockets - int_rock).max(0);
             if int_rock > 0 {
-                armament.push_str(&t!(" Rocket Mass Internally.", A = int_rock).to_string());
+                armament.push_str(&t!("Rocket Mass Internally.", A = int_rock).to_string());
             }
             if ext_rock > 0 {
-                armament.push_str(&t!(" Rocket Mass Externally.", A = ext_rock).to_string());
+                armament.push_str(&t!("Rocket Mass Externally.", A = ext_rock).to_string());
             }
         }
 

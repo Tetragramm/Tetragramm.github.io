@@ -65,35 +65,35 @@ impl Part for Rotor {
         // Add warnings
         if self.aircraft_type == AircraftType::Helicopter {
             stats.warnings.push(Warning {
-                name: "Helicopter Landing".to_string(),
-                warning: "Helicopters may immediately land without a landing check.".to_string(),
+                name: t!("Helicopter Landing").to_string(),
+                warning: t!("Helicopter Landing Warning").to_string(),
                 level: WarningLevel::White,
             });
 
             stats.warnings.push(Warning {
-                name: "Helicopter Descent".to_string(),
-                warning: "Helicopters may descend without a Handling check.".to_string(),
+                name: t!("Helicopter Descent").to_string(),
+                warning: t!("Helicopter Descent Warning").to_string(),
                 level: WarningLevel::White,
             });
 
             stats.warnings.push(Warning {
-                name: "Helicopter Stall".to_string(),
-                warning: "Helicopters may not Stall or lose Boost.".to_string(),
+                name: t!("Helicopter Stall").to_string(),
+                warning: t!("Helicopter Stall Warning").to_string(),
                 level: WarningLevel::White,
             });
 
             // Warning for negative rotor span
             if stats.reliability < 0.0 {
                 stats.warnings.push(Warning {
-                    name: "Rotor Span".to_string(),
-                    warning: "Negative rotor span reduces reliability.".to_string(),
+                    name: t!("Rotor Span").to_string(),
+                    warning: t!("Rotor Span Warning").to_string(),
                     level: WarningLevel::Yellow,
                 });
             }
         } else if self.aircraft_type == AircraftType::Autogyro {
             stats.warnings.push(Warning {
-                name: "Autogyro Stall".to_string(),
-                warning: "Autogyros may not Stall.".to_string(),
+                name: t!("Autogyro Stall").to_string(),
+                warning: t!("Autogyro Stall Warning").to_string(),
                 level: WarningLevel::White,
             });
         }

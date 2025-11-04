@@ -283,11 +283,8 @@ impl Part for Cockpit {
         if self.bombsight > 0 {
             s.cost += rtz(1.0e-6 + 2.0 + (self.bombsight - 4) as f64 / 3.0);
             s.warnings.push(Warning {
-                name: "Bombsight".to_string(),
-                warning: format!(
-                    "Subtract {} from your Altitude when rolling for bombing.",
-                    self.bombsight
-                ),
+                name: t!("Bombsight").to_string(),
+                warning: t!("Bombsight Warning", A = self.bombsight).to_string(),
                 level: WarningLevel::White,
             });
 

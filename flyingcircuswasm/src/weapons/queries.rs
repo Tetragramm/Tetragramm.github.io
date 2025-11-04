@@ -76,7 +76,7 @@ impl Weapons {
     /// TypeScript: GetSeatList()
     pub fn get_seat_list(&self) -> Vec<String> {
         (0..self.cockpit_count)
-            .map(|i| format!("{} {}", t!("Seat #"), i + 1).to_string())
+            .map(|i| t!("Seat #", A = i + 1).to_string())
             .collect()
     }
 

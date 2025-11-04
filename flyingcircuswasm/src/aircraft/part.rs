@@ -205,8 +205,8 @@ impl Part for Aircraft {
                 .is_none()
         {
             self.stats.warnings.push(crate::stats::Warning {
-                name: "Co-Pilot Controls".to_string(),
-                warning: format!("Maximum stress reduction of {}.", stress_reduction),
+                name: t!("Co-Pilot Controls").to_string(),
+                warning: t!("Co-Pilot Warning", A = stress_reduction).to_string(),
                 level: crate::stats::WarningLevel::White, // WARNING_COLOR::YELLOW
             });
         }
