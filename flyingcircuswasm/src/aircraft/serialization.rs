@@ -1,5 +1,8 @@
 use super::*;
-use crate::serialization::{Deserializer, Error, Serializable, Serializer};
+use crate::{
+    part_list,
+    serialization::{Deserializer, Error, Serializable, Serializer},
+};
 
 impl Serializable for Aircraft {
     fn serialize(&self, s: &mut Serializer) -> Result<(), Error> {
@@ -7,6 +10,7 @@ impl Serializable for Aircraft {
         // before calling serialize(). Deserializer::new() will read it.
 
         // Serialize name and all sub-components
+        s.push_string(&self.version)?;
         s.push_string(&self.name)?;
 
         self.era.serialize(s)?;

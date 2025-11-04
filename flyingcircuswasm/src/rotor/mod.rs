@@ -22,8 +22,8 @@ pub use setters::*;
 #[derive(Clone)]
 pub struct BladeEntry {
     pub name: String,
-    pub sizing: f64,        // Sizing factor for rotor calculations
-    pub rotor_bleed: i16,   // Helicopter-specific bleed
+    pub sizing: f64,      // Sizing factor for rotor calculations
+    pub rotor_bleed: i16, // Helicopter-specific bleed
     pub stats: Stats,
 }
 
@@ -31,9 +31,9 @@ pub struct BladeEntry {
 #[derive(Clone)]
 pub struct ArrangementEntry {
     pub name: String,
-    pub count: usize,        // Number of rotors (1, 2, or 3)
-    pub powerfactor: f64,    // Power multiplication factor
-    pub blades: i16,         // Additional blade effects
+    pub count: usize,     // Number of rotors (1, 2, or 3)
+    pub powerfactor: f64, // Power multiplication factor
+    pub blades: i16,      // Additional blade effects
     pub stats: Stats,
 }
 
@@ -68,10 +68,10 @@ pub struct Rotor {
 
     // External state (set by Aircraft)
     wing_area: i16,
-    dry_mass_power: f64,  // dryMP - used for auto-sizing
-    sizing_span: i16,     // Calculated sizing span
+    dry_mass_power: f64, // dryMP - used for auto-sizing
+    sizing_span: i16,    // Calculated sizing span
     engine_count: usize,
 
     // Configuration
-    accessory: bool,      // Accessory rotor system
+    accessory: bool, // Accessory rotor system
 }

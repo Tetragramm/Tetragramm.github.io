@@ -13,12 +13,16 @@ crate-type = [
 rust-i18n = "3"
 itertools = "0.14.0"
 serde_json = "1.0.140"
-# Add wasm-bindgen dependency
-wasm-bindgen = "0.2.100"
 byteorder = "1.5"
 encoding_rs = "0.8"
-formatx = "0.2.4"
 lz-str = "0.2.1"
 ui_core = { path = "./ui_core" }
 ui_macro = { path = "./ui_macro" }
+utf16string = "0.2.0"
+wasm-minimal-protocol = "0.1.0"
+
+[dev-dependencies]
 assert-json-diff = "2.0.2"
+
+[profile.release]
+lto = true

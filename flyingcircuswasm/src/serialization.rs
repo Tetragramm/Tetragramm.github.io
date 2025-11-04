@@ -3,6 +3,7 @@ use encoding_rs::{Encoding, WINDOWS_1252};
 use lz_str;
 use std::io::{self, Cursor, Write};
 use std::string::FromUtf8Error;
+use utf16string::{Utf16Error, WStr, BE};
 
 // --- Custom Error Type for better error handling ---
 #[derive(Debug)]
@@ -15,6 +16,7 @@ pub enum Error {
     ArrayTooLong(usize),
     /// Represents when a value does not match later serialization needs (ie: engine_type)
     BadValue(i16),
+    Utf16(Utf16Error),
 }
 
 impl From<io::Error> for Error {
@@ -26,6 +28,11 @@ impl From<io::Error> for Error {
 impl From<FromUtf8Error> for Error {
     fn from(err: FromUtf8Error) -> Self {
         Error::Utf8(err)
+    }
+}
+impl From<Utf16Error> for Error {
+    fn from(err: Utf16Error) -> Self {
+        Error::Utf16(err)
     }
 }
 
@@ -103,12 +110,16 @@ impl Serializer {
     }
 
     /// Compresses the serialized data to an LZ-String compressed string.
-    /// Converts the byte buffer to Base64 and then compresses using LZ-String.
+    /// Converts the byte buffer to a str and then compresses using LZ-String.
     /// Returns the compressed string that can be transmitted or stored.
     pub fn compress_to_lz_string(self) -> Result<String, Error> {
-        let s = str::from_utf8(&self.buffer).unwrap();
+        let s: String = self
+            .buffer
+            .iter()
+            .map(|b| char::from_u32(*b as u32).unwrap())
+            .collect();
         // Compress the bytes using LZ-String
-        let compressed = lz_str::compress_to_encoded_uri_component(s);
+        let compressed = lz_str::compress_to_encoded_uri_component(s.as_str());
         Ok(compressed)
     }
 }
@@ -140,7 +151,6 @@ impl<'a> Deserializer<'a> {
         // Temporarily read the version string. We assume the version string itself is always UTF-8.
         let version_str = Self::read_string_from_cursor(&mut initial_cursor, None)?;
         let version = version_str.parse::<f32>().unwrap_or(0.0);
-
         Ok(Deserializer {
             // The main cursor starts at the beginning for subsequent reads.
             cursor: Cursor::new(data),
@@ -252,7 +262,7 @@ impl<'a> Deserializer<'a> {
     }
 
     /// Creates a Deserializer from an LZ-String compressed string.
-    /// Decompresses the LZ-String, decodes from Base64, and creates a Deserializer
+    /// Decompresses the LZ-String and creates a Deserializer
     /// to read the binary data.
     pub fn from_lz_string(compressed: &str) -> Result<Deserializer, Error> {
         // Decompress the LZ-String to get Base64 string
@@ -265,7 +275,6 @@ impl<'a> Deserializer<'a> {
             })?;
 
         let bytes: Vec<u8> = u16_str.iter().map(|x| *x as u8).collect();
-
         // Create a temporary vector to hold the decompressed data
         // We need to return a Deserializer with a lifetime tied to the data
         // Since we own the data here, we use Box::leak to get a static lifetime

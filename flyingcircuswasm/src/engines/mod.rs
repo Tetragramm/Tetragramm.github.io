@@ -345,4 +345,33 @@ impl Engines {
             engine.update_reliability(aircraft_reliability);
         }
     }
+
+    /// Get reliability list from all engines
+    /// TypeScript: GetReliabilityList()
+    /// Returns list of reliability strings from each engine
+    pub fn get_reliability_list(&self) -> Vec<String> {
+        self.engines.iter().map(|e| e.get_reliability()).collect()
+    }
+
+    /// Get minimum altitude across all engines
+    /// TypeScript: GetMinAltitude()
+    /// Returns the maximum of all engine minimum altitudes (most restrictive)
+    pub fn get_min_altitude(&self) -> i16 {
+        let mut m = 0;
+        for e in &self.engines {
+            m = m.max(e.get_min_altitude());
+        }
+        m
+    }
+
+    /// Get maximum altitude across all engines
+    /// TypeScript: GetMaxAltitude()
+    /// Returns the minimum of all engine maximum altitudes (most restrictive)
+    pub fn get_max_altitude(&self) -> i16 {
+        let mut m = 1000;
+        for e in &self.engines {
+            m = m.min(e.get_max_altitude());
+        }
+        m
+    }
 }

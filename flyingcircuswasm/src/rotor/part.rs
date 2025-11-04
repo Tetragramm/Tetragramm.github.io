@@ -66,8 +66,7 @@ impl Part for Rotor {
         if self.aircraft_type == AircraftType::Helicopter {
             stats.warnings.push(Warning {
                 name: "Helicopter Landing".to_string(),
-                warning: "Helicopters may immediately land without a landing check."
-                    .to_string(),
+                warning: "Helicopters may immediately land without a landing check.".to_string(),
                 level: WarningLevel::White,
             });
 

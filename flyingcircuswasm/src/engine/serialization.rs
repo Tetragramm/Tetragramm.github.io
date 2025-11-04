@@ -33,7 +33,6 @@ impl Serializable for EngineStats {
         s.push_num(self.rumble)?;
         s.push_bool(self.oiltank)?;
         s.push_bool(self.pulsejet)?;
-        self.stats.serialize(s)?;
         let rarity_val = match self.rarity {
             EngineRarity::CUSTOM => 0,
             EngineRarity::COMMON => 1,
@@ -41,6 +40,8 @@ impl Serializable for EngineStats {
             EngineRarity::LEGENDARY => 3,
         };
         s.push_num(rarity_val)?;
+        self.stats.serialize(s)?;
+
         Ok(())
     }
 }

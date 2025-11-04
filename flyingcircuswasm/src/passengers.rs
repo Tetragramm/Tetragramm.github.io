@@ -5,7 +5,6 @@ use ui_macro::*;
 
 use crate::{
     json::{jsbool, jsnum},
-
     part::{ElectricsMessage, Part},
     serialization::{JSSerializable, Serializable},
     stats::{Stats, Warning},

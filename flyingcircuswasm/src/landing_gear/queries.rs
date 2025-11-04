@@ -80,4 +80,11 @@ impl LandingGear {
     pub fn is_default(&self) -> bool {
         self.gear_sel == 0 && !self.retract && !self.extra_sel.iter().any(|&x| x)
     }
+
+    /// Check if landing gear is a vital part
+    /// TypeScript: IsVital()
+    /// Landing gear is always considered vital
+    pub fn is_vital(&self) -> bool {
+        true
+    }
 }

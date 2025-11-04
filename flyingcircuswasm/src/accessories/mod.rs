@@ -1,4 +1,4 @@
-use crate::{stats::Stats};
+use crate::stats::Stats;
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;
@@ -89,11 +89,7 @@ pub struct Accessories {
     pub(super) control_list: Rc<Vec<ControlEntry>>,
 
     // Armour coverage array (8 positions for different AP levels)
-    #[ui(
-        array,
-        name = "armour_coverage",
-        set_fn = "set_armour_coverage"
-    )]
+    #[ui(array, name = "armour_coverage", set_fn = "set_armour_coverage")]
     pub(super) armour_coverage: Vec<i16>,
 
     // Electrical equipment counts
@@ -106,11 +102,7 @@ pub struct Accessories {
     pub(super) electrical_count: Vec<i16>,
 
     // Radio selection
-    #[ui(
-        number,
-        name = "radio_sel",
-        set_fn = "set_radio_sel"
-    )]
+    #[ui(number, name = "radio_sel", set_fn = "set_radio_sel")]
     pub(super) radio_sel: i16,
 
     // Reconnaissance equipment counts
@@ -141,19 +133,11 @@ pub struct Accessories {
     pub(super) clim_sel: Vec<bool>,
 
     // Autopilot selection
-    #[ui(
-        number,
-        name = "auto_sel",
-        set_fn = "set_auto_sel"
-    )]
+    #[ui(number, name = "auto_sel", set_fn = "set_auto_sel")]
     pub(super) auto_sel: i16,
 
     // Control system selection
-    #[ui(
-        number,
-        name = "cont_sel",
-        set_fn = "set_cont_sel"
-    )]
+    #[ui(number, name = "cont_sel", set_fn = "set_cont_sel")]
     pub(super) cont_sel: i16,
 
     // Aircraft state (not serialized, updated from parent)

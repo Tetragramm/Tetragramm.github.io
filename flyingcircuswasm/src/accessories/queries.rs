@@ -183,7 +183,8 @@ impl Accessories {
 
         // Check autopilot
         let auto_idx = self.auto_sel as usize;
-        if auto_idx < self.autopilot_list.len() && self.autopilot_list[auto_idx].stats.charge != 0.0 {
+        if auto_idx < self.autopilot_list.len() && self.autopilot_list[auto_idx].stats.charge != 0.0
+        {
             return true;
         }
 

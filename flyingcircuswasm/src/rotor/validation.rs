@@ -18,10 +18,10 @@ impl Rotor {
 
                 // Auto-size based on wing area: sizing_span = sqrt((0.6 * wing_area) / (PI / 8))
                 if self.wing_area > 0 {
-                    self.sizing_span =
-                        ((0.6 * self.wing_area as f64) / (std::f64::consts::PI / 8.0))
-                            .sqrt()
-                            .ceil() as i16;
+                    self.sizing_span = ((0.6 * self.wing_area as f64)
+                        / (std::f64::consts::PI / 8.0))
+                        .sqrt()
+                        .ceil() as i16;
                 } else {
                     self.sizing_span = 10; // Default
                 }
@@ -44,19 +44,23 @@ impl Rotor {
 
                     if self.rotor_count == 1 {
                         // Single rotor: sizing = MP^(1/2.5) * 5 * blade_sizing
-                        self.sizing_span = (self.dry_mass_power.powf(1.0 / 2.5) * 5.0 * blade_sizing)
-                            .ceil() as i16;
+                        self.sizing_span =
+                            (self.dry_mass_power.powf(1.0 / 2.5) * 5.0 * blade_sizing).ceil()
+                                as i16;
                     } else {
                         // Multiple rotors: sizing = MP^(1/2.5) * 4 * blade_sizing
-                        self.sizing_span = (self.dry_mass_power.powf(1.0 / 2.5) * 4.0 * blade_sizing)
-                            .ceil() as i16;
+                        self.sizing_span =
+                            (self.dry_mass_power.powf(1.0 / 2.5) * 4.0 * blade_sizing).ceil()
+                                as i16;
                     }
 
                     // Cap at 100
                     self.sizing_span = self.sizing_span.min(100);
 
                     // Ensure rotor_span is at least -sizing_span/2
-                    self.rotor_span = self.rotor_span.max(-(self.sizing_span as f64 / 2.0).floor() as i16);
+                    self.rotor_span = self
+                        .rotor_span
+                        .max(-(self.sizing_span as f64 / 2.0).floor() as i16);
                 } else {
                     // Default sizing if MP not set
                     self.sizing_span = 10;

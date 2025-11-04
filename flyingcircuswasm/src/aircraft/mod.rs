@@ -1,7 +1,7 @@
 use crate::{
     accessories::Accessories, alter::Alter, cargo::Cargo, cockpits::Cockpits,
     control_surfaces::ControlSurfaces, engines::Engines, era::Era, frames::Frames, fuel::Fuel,
-    landing_gear::LandingGear, munitions::Munitions, optimization::Optimization,
+    landing_gear::LandingGear, munitions::Munitions, optimization::Optimization, part::Part,
     part_list::get_part_list, passengers::Passengers, propeller::Propeller,
     reinforcements::Reinforcements, rotor::Rotor, stabilizers::Stabilizers, stats::Stats,
     used::Used, weapon_list::get_weapon_list, weapons::Weapons, wings::Wings,
@@ -21,6 +21,7 @@ pub use crate::types::AircraftType;
 
 /// Main Aircraft struct
 pub struct Aircraft {
+    pub version: String,
     pub name: String,
     pub stats: Stats,
     pub aircraft_type: AircraftType,
@@ -51,6 +52,7 @@ impl Aircraft {
         let part_list = get_part_list();
         let (wlist, wl_permute) = get_weapon_list();
         Aircraft {
+            version: part_list.version,
             name: "Prototype Aircraft".to_string(),
             stats: Stats::new(),
             aircraft_type: AircraftType::Airplane,
@@ -153,14 +155,32 @@ impl Aircraft {
                 if engine.etype_stats.oiltank {
                     vital.push(t!("Vital Part Oil Tank Pusher", A = i + 1).to_string());
                 }
+                if engine.get_has_oil_cooler() {
+                    vital.push(t!("Vital Part Oil Cooler Pusher", A = i + 1).to_string());
+                }
+                if engine.get_has_oil_pan() {
+                    vital.push(t!("Vital Part Oil Pan Pusher", A = i + 1).to_string());
+                }
                 vital.push(t!("Vital Part Engine Puller", A = i + 1).to_string());
                 if engine.etype_stats.oiltank {
                     vital.push(t!("Vital Part Oil Tank Puller", A = i + 1).to_string());
+                }
+                if engine.get_has_oil_cooler() {
+                    vital.push(t!("Vital Part Oil Cooler Puller", A = i + 1).to_string());
+                }
+                if engine.get_has_oil_pan() {
+                    vital.push(t!("Vital Part Oil Pan Puller", A = i + 1).to_string());
                 }
             } else {
                 vital.push(t!("Vital Part Engine", A = i + 1).to_string());
                 if engine.etype_stats.oiltank {
                     vital.push(t!("Vital Part Oil Tank", A = i + 1).to_string());
+                }
+                if engine.get_has_oil_cooler() {
+                    vital.push(t!("Vital Part Oil Cooler", A = i + 1).to_string());
+                }
+                if engine.get_has_oil_pan() {
+                    vital.push(t!("Vital Part Oil Pan", A = i + 1).to_string());
                 }
             }
         }
@@ -170,6 +190,37 @@ impl Aircraft {
             vital.push(t!("Vital Part Radiator", A = i + 1).to_string());
         }
 
+        // Add electrics if present
+        if self.is_electrics() {
+            vital.push(t!("Vital Part Electrics").to_string());
+        }
+
+        // Add weapon sets
+        let weapon_list = self.weapons.get_weapon_list();
+        for i in 0..self.weapons.get_weapon_sets().len() {
+            let ws = &self.weapons.get_weapon_sets()[i];
+            let weapon_abrv = &weapon_list[ws.get_weapon_selected()].abrv;
+            vital.push(t!("Vital Part Weapon Set", A = i + 1, B = weapon_abrv).to_string());
+        }
+
+        // Add landing gear if vital
+        if self.gear.is_vital() {
+            vital.push(t!("Vital Part Landing Gear").to_string());
+        }
+
+        // Add tail rotor for helicopters
+        if self.rotor.get_tail_rotor() {
+            vital.push(t!("Vital Part Tail Rotor").to_string());
+        }
+
         vital
+    }
+
+    /// Check if aircraft has any electrical systems
+    /// TypeScript: IsElectrics()
+    /// Returns true if engines, accessories, or cockpits have electrical equipment
+    pub fn is_electrics(&self) -> bool {
+        let em = self.get_electrics();
+        em.storage > 0 || !em.equipment.is_empty()
     }
 }

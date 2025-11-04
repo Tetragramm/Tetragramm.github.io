@@ -7,6 +7,7 @@ use crate::stats::Stats;
 fn create_test_weapon_type() -> WeaponType {
     WeaponType {
         name: "Test Machine Gun".to_string(),
+        abrv: "TMG".to_string(),
         era: "WWI".to_string(),
         size: 2,
         stats: Stats {

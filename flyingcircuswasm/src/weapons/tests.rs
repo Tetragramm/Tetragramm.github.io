@@ -11,6 +11,7 @@ mod tests {
         vec![
             WeaponType {
                 name: "Test MG".to_string(),
+                abrv: "TMG".to_string(),
                 era: "WWI".to_string(),
                 size: 4,
                 stats: Stats::new(),
@@ -29,6 +30,7 @@ mod tests {
             },
             WeaponType {
                 name: "Precision Rifle".to_string(),
+                abrv: "PR".to_string(),
                 era: "WWI".to_string(),
                 size: 8,
                 stats: Stats::new(),

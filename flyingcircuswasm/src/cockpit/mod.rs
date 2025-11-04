@@ -40,6 +40,7 @@ pub struct Cockpit {
     total_stress: (i16, i16),
     total_escape: i16,
     total_visibility: i16,
+    total_crash: i16,
     seat_index: usize,
     #[ui(
         number,
@@ -72,6 +73,7 @@ impl Cockpit {
             total_stress: (0, 0),
             total_escape: 0,
             total_visibility: 0,
+            total_crash: 0,
             seat_index: 0,
             bombsight: 0,
             has_rotary: false,
@@ -205,9 +207,7 @@ impl Cockpit {
 
         self.total_stress = (ncp_stress, cp_stress);
         self.total_visibility = self.this_stats.visibility as i16 + visibility;
-        // Store crash safety for later retrieval if needed
-        // Note: This is calculated in derived_stats but kept here for consistency
-        let _crash_total = self.this_stats.crashsafety as i16 + crash;
+        self.total_crash = self.this_stats.crashsafety as i16 + crash;
     }
 
     /// Get the flight stress values for this cockpit
@@ -215,6 +215,28 @@ impl Cockpit {
     /// Returns a tuple of (non_copilot_stress, copilot_stress)
     pub fn get_flight_stress(&self) -> (i16, i16) {
         self.total_stress
+    }
+
+    /// Get the visibility value for this cockpit
+    /// TypeScript: GetVisibility()
+    pub fn get_visibility(&self) -> i16 {
+        // If visibility is less than -10, return -infinity (but we'll use i16::MIN)
+        if self.types[self.selected_type].stats.visibility < -10.0 {
+            return i16::MIN;
+        }
+        self.total_visibility
+    }
+
+    /// Get the escape value for this cockpit
+    /// TypeScript: GetEscape()
+    pub fn get_escape(&self) -> i16 {
+        self.total_escape
+    }
+
+    /// Get the crash safety value for this cockpit
+    /// TypeScript: GetCrash()
+    pub fn get_crash(&self) -> i16 {
+        self.total_crash
     }
 
     pub fn get_name(&self) -> String {
@@ -261,8 +283,11 @@ impl Part for Cockpit {
         if self.bombsight > 0 {
             s.cost += rtz(1.0e-6 + 2.0 + (self.bombsight - 4) as f64 / 3.0);
             s.warnings.push(Warning {
-                name: t!("Bombsight").to_string(),
-                warning: t!("Bombsight Warning", A = self.bombsight).to_string(),
+                name: "Bombsight".to_string(),
+                warning: format!(
+                    "Subtract {} from your Altitude when rolling for bombing.",
+                    self.bombsight
+                ),
                 level: WarningLevel::White,
             });
 

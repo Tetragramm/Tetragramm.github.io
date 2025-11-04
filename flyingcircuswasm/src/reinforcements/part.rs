@@ -113,8 +113,7 @@ impl Part for Reinforcements {
         let cabane_idx = self.cabane_sel as usize;
         if cabane_idx < self.cabane_list.len() {
             stats = stats.add(&self.cabane_list[cabane_idx].stats);
-            tension +=
-                tension_multiple * self.cabane_list[cabane_idx].tension as f64;
+            tension += tension_multiple * self.cabane_list[cabane_idx].tension as f64;
 
             if self.cabane_sel > 0 {
                 strut_count += 1;
@@ -132,11 +131,7 @@ impl Part for Reinforcements {
         for i in 0..self.cant_list.len() {
             if self.cant_count[i] > 0 {
                 use_cant = true;
-                stats = stats.add(
-                    &self.cant_list[i]
-                        .stats
-                        .multiply(self.cant_count[i] as f64),
-                );
+                stats = stats.add(&self.cant_list[i].stats.multiply(self.cant_count[i] as f64));
             }
         }
 

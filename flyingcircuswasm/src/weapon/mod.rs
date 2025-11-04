@@ -67,6 +67,7 @@ pub enum ActionType {
 #[derive(Clone)]
 pub struct WeaponType {
     pub name: String,
+    pub abrv: String,
     pub era: String,
     pub size: i16,
     pub stats: Stats,

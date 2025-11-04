@@ -158,6 +158,24 @@ impl Cockpits {
             .map(|p| p.get_flight_stress())
             .collect()
     }
+
+    /// Get visibility values from all cockpit positions
+    /// TypeScript: GetVisibilityList()
+    pub fn get_visibility_list(&self) -> Vec<i16> {
+        self.positions.iter().map(|p| p.get_visibility()).collect()
+    }
+
+    /// Get escape values from all cockpit positions
+    /// TypeScript: GetEscapeList()
+    pub fn get_escape_list(&self) -> Vec<i16> {
+        self.positions.iter().map(|p| p.get_escape()).collect()
+    }
+
+    /// Get crash safety values from all cockpit positions
+    /// TypeScript: GetCrashList()
+    pub fn get_crash_list(&self) -> Vec<i16> {
+        self.positions.iter().map(|p| p.get_crash()).collect()
+    }
 }
 
 impl Part for Cockpits {
@@ -180,12 +198,12 @@ impl Part for Cockpits {
         for (w, seats) in warning_map {
             s.warnings.push(Warning {
                 name: format!(
-                    "Seats #{} {}",
+                    "Seats # {} {}",
                     seats
                         .iter()
                         .map(|x| x.to_string())
                         .collect::<Vec<_>>()
-                        .join(", "),
+                        .join(","),
                     &w.name
                 )
                 .to_string(),

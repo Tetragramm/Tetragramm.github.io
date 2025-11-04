@@ -9,6 +9,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Submachine Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "SMG".to_string(),
                 era: "WWI".to_string(),
                 size: 1,
                 damage: 1.,
@@ -43,6 +44,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Scattergun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "SG".to_string(),
                 era: "Pioneer".to_string(),
                 size: 2,
                 damage: 0.5,
@@ -78,6 +80,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Light Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "LMG".to_string(),
                 era: "WWI".to_string(),
                 size: 2,
                 damage: 2.,
@@ -108,6 +111,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "MG".to_string(),
                 era: "WWI".to_string(),
                 size: 4,
                 damage: 2.,
@@ -138,6 +142,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Balloon Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "BMG".to_string(),
                 era: "WWI".to_string(),
                 size: 4,
                 damage: 2.,
@@ -168,6 +173,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Enhanced Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "EMG".to_string(),
                 era: "Coming Storm".to_string(),
                 size: 2,
                 damage: 2.,
@@ -198,6 +204,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Enhanced Heavy Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "EHMG".to_string(),
                 era: "Coming Storm".to_string(),
                 size: 4,
                 damage: 4.,
@@ -228,6 +235,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Punt Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "PG".to_string(),
                 era: "Pioneer".to_string(),
                 size: 8,
                 damage: 0.5,
@@ -263,6 +271,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Light Repeating Cannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "LRC".to_string(),
                 era: "WWI".to_string(),
                 size: 8,
                 damage: 8.,
@@ -293,6 +302,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Heavy Cannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "HC".to_string(),
                 era: "WWI".to_string(),
                 size: 8,
                 damage: 16.,
@@ -323,6 +333,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Light Machine Cannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "LMC".to_string(),
                 era: "Coming Storm".to_string(),
                 size: 8,
                 damage: 8.,
@@ -353,6 +364,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Heavy Machine Cannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "HMC".to_string(),
                 era: "WWII".to_string(),
                 size: 8,
                 damage: 12.,
@@ -383,6 +395,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Fliergerflammenwerfer").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "FFW".to_string(),
                 era: "WWI".to_string(),
                 size: 8,
                 damage: 0.5,
@@ -418,6 +431,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Recoilless Cannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "RC".to_string(),
                 era: "WWI".to_string(),
                 size: 16,
                 damage: 30.,
@@ -448,6 +462,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Autocannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "AC".to_string(),
                 era: "WWII".to_string(),
                 size: 16,
                 damage: 24.,
@@ -478,6 +493,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Battle Cannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "BC".to_string(),
                 era: "WWII".to_string(),
                 size: 16,
                 damage: 24.,
@@ -508,6 +524,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Precision Rifle").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "PR".to_string(),
                 era: "WWI".to_string(),
                 size: 2,
                 damage: 5.,
@@ -543,6 +560,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Lightning Arc").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "LA".to_string(),
                 era: "Himmilgard".to_string(),
                 size: 16,
                 damage: 0.,
@@ -578,6 +596,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Harpoon Launcher").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "HL".to_string(),
                 era: "Himmilgard".to_string(),
                 size: 4,
                 damage: 4.,
@@ -613,6 +632,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Heavy Machine Gun").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "HMG".to_string(),
                 era: "WWI".to_string(),
                 size: 4,
                 damage: 4.,
@@ -643,6 +663,7 @@ pub fn get_weapon_list() -> (Vec<WeaponType>, Vec<usize>) {
             let name = t!("Heavy Repeating Cannon").to_string();
             WeaponType {
                 name: name.clone(),
+                abrv: "HRC".to_string(),
                 era: "WWI".to_string(),
                 size: 16,
                 damage: 16.,

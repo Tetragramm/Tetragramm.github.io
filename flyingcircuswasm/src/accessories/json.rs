@@ -52,7 +52,11 @@ impl JSSerializable for Accessories {
         // Deserialize recon selections (with version check)
         if json_version < 12.05 {
             if let Some(arr) = js["info_sel"].as_array() {
-                let old_info: Vec<bool> = arr.iter().take(2).map(|v| v.as_bool().unwrap_or(false)).collect();
+                let old_info: Vec<bool> = arr
+                    .iter()
+                    .take(2)
+                    .map(|v| v.as_bool().unwrap_or(false))
+                    .collect();
                 self.recon_sel = vec![0; self.recon_list.len()];
                 if old_info.get(0).copied().unwrap_or(false) && self.recon_sel.len() > 1 {
                     self.recon_sel[1] = 1;

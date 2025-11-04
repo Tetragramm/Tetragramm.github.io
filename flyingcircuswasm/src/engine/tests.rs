@@ -348,7 +348,11 @@ mod tests {
 
         // Test generator height (should be 5)
         engine.is_generator = true;
-        assert_eq!(engine.get_engine_height(), 5, "Generator should have height 5");
+        assert_eq!(
+            engine.get_engine_height(),
+            5,
+            "Generator should have height 5"
+        );
 
         // Test non-generator
         engine.is_generator = false;
@@ -356,17 +360,29 @@ mod tests {
         // Test pulsejet (should be 2)
         engine.mount_sel = 0;
         engine.etype_stats.pulsejet = true;
-        assert_eq!(engine.get_engine_height(), 2, "Pulsejet should have height 2");
+        assert_eq!(
+            engine.get_engine_height(),
+            2,
+            "Pulsejet should have height 2"
+        );
         engine.etype_stats.pulsejet = false;
 
         // Test internal (should be 2)
         engine.is_internal = true;
-        assert_eq!(engine.get_engine_height(), 2, "Internal engine should have height 2");
+        assert_eq!(
+            engine.get_engine_height(),
+            2,
+            "Internal engine should have height 2"
+        );
         engine.is_internal = false;
 
         // Test outboard prop (should be 2)
         engine.outboard_prop = true;
-        assert_eq!(engine.get_engine_height(), 2, "Outboard prop should have height 2");
+        assert_eq!(
+            engine.get_engine_height(),
+            2,
+            "Outboard prop should have height 2"
+        );
         engine.outboard_prop = false;
 
         // Test default mount (Tractor in this case) - should return -1 or valid height

@@ -21,7 +21,8 @@ impl Part for Optimization {
         stats.mass = (-(self.mass as f64 * self.acft_stats.mass / 10.0) + 1e-6).floor();
 
         // Toughness optimization: increases toughness by 25% of aircraft toughness per dot
-        stats.toughness = ((self.toughness as f64 * self.acft_stats.toughness / 4.0) + 1e-6).floor();
+        stats.toughness =
+            ((self.toughness as f64 * self.acft_stats.toughness / 4.0) + 1e-6).floor();
 
         // Maxstrain optimization gets applied later in derived stats
         // stats.maxstrain = ((self.maxstrain as f64 * 1.5 * self.acft_stats.maxstrain / 10.0) + 1e-6).floor();

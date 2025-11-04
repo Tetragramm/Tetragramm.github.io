@@ -14,14 +14,8 @@ impl JSSerializable for Alter {
         if let Some(part_list) = json.get("part_list") {
             if let Some(parts) = part_list.as_array() {
                 for part_json in parts {
-                    let name = part_json
-                        .get("name")
-                        .map(|v| vstr(v))
-                        .unwrap_or_default();
-                    let qty = part_json
-                        .get("qty")
-                        .and_then(|v| v.as_i64())
-                        .unwrap_or(0) as i16;
+                    let name = part_json.get("name").map(|v| vstr(v)).unwrap_or_default();
+                    let qty = part_json.get("qty").and_then(|v| v.as_i64()).unwrap_or(0) as i16;
 
                     // Find existing part or add new
                     let idx = self.custom_parts.iter().position(|p| p.name == name);
@@ -36,11 +30,7 @@ impl JSSerializable for Alter {
                         if let Some(stats_json) = part_json.get("stats") {
                             stats.from_json(stats_json, _version);
                         }
-                        self.custom_parts.push(CustomPart {
-                            name,
-                            stats,
-                            qty,
-                        });
+                        self.custom_parts.push(CustomPart { name, stats, qty });
                     }
                 }
             }

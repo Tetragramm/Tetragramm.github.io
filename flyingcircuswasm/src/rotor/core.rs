@@ -2,10 +2,7 @@ use super::*;
 
 impl Rotor {
     /// Creates a new Rotor instance with provided reference lists
-    pub fn new(
-        blade_list: Vec<BladeEntry>,
-        arrangement_list: Vec<ArrangementEntry>,
-    ) -> Rotor {
+    pub fn new(blade_list: Vec<BladeEntry>, arrangement_list: Vec<ArrangementEntry>) -> Rotor {
         // Create default cantilever list (will be set by reinforcements module)
         let default_cant = vec![CantileverEntry {
             name: "Wood".to_string(),

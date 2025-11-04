@@ -286,16 +286,71 @@ impl Engine {
 
         // Subtract cooling deficit if engine needs cooling
         if self.need_cooling() {
-            let cooling_deficit = (self.etype_stats.stats.cooling as i16) - self.cooling_count;
+            let max_cool = if self.is_push_pull {
+                2 * self.etype_stats.stats.cooling as i16
+            } else {
+                self.etype_stats.stats.cooling as i16
+            };
+            let cooling_deficit = max_cool - self.cooling_count;
             self.total_reliability -= cooling_deficit;
         }
 
         // Add intake fan bonus (if turbine with intake fan upgrade)
-        if self.get_is_turbine() && self.intake_fan {
+        if self.intake_fan {
             self.total_reliability += 6;
         }
 
         // Add aircraft and radiator bonus
         self.total_reliability += bonus_reliability;
+    }
+
+    /// Get engine reliability as a string
+    /// TypeScript: GetReliability()
+    /// Returns reliability value, potentially with dual values for push-pull or outboard props
+    pub fn get_reliability(&self) -> String {
+        if self.is_push_pull {
+            if self.outboard_prop {
+                format!("{}/{}", self.total_reliability, self.total_reliability - 2)
+            } else {
+                format!("{}/{}", self.total_reliability, self.total_reliability)
+            }
+        } else {
+            if self.outboard_prop {
+                format!("{}", self.total_reliability - 2)
+            } else {
+                format!("{}", self.total_reliability)
+            }
+        }
+    }
+
+    /// Get minimum altitude for this engine
+    /// TypeScript: GetMinAltitude()
+    pub fn get_min_altitude(&self) -> i16 {
+        // Get min_ideal_alt from TypedInputs if it's a propeller engine
+        if let TypedInputs::Propeller { min_ideal_alt, .. } = &self.etype_inputs.inputs {
+            *min_ideal_alt
+        } else {
+            0
+        }
+    }
+
+    /// Get maximum altitude for this engine
+    /// TypeScript: GetMaxAltitude()
+    pub fn get_max_altitude(&self) -> i16 {
+        self.get_min_altitude() + self.etype_stats.altitude
+    }
+
+    /// Check if this engine has an oil cooler
+    /// TypeScript: GetHasOilCooler()
+    /// Returns true if engine requires cooling (liquid-cooled)
+    pub fn get_has_oil_cooler(&self) -> bool {
+        self.etype_stats.stats.cooling > 0.0
+    }
+
+    /// Check if this engine has an oil pan
+    /// TypeScript: GetHasOilPan()
+    /// Returns true if engine is air-cooled (has oil pan)
+    pub fn get_has_oil_pan(&self) -> bool {
+        self.is_air_cooled()
     }
 }

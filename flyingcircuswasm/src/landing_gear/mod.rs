@@ -1,4 +1,4 @@
-use crate::{stats::Stats};
+use crate::stats::Stats;
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;
@@ -25,8 +25,8 @@ pub use setters::*;
 pub struct GearEntry {
     pub name: String,
     pub stats: Stats,
-    pub dplmp: f64,  // Drag per Loaded Mass Point
-    pub splmp: f64,  // Structure per Loaded Mass Point
+    pub dplmp: f64, // Drag per Loaded Mass Point
+    pub splmp: f64, // Structure per Loaded Mass Point
     pub can_retract: bool,
 }
 
@@ -35,7 +35,7 @@ pub struct GearEntry {
 pub struct ExtraEntry {
     pub name: String,
     pub stats: Stats,
-    pub mplmp: f64,  // Mass per Loaded Mass Point
+    pub mplmp: f64, // Mass per Loaded Mass Point
 }
 
 /// Main LandingGear struct
@@ -75,7 +75,7 @@ pub struct LandingGear {
     extra_sel: Vec<bool>,
 
     // External configuration (set by other modules)
-    pub can_boat: bool,        // Can use boat hull (based on engine/wing height)
-    pub gull_deck: i16,        // Gull wing deck position (0=none, 1=shoulder, 2=mid, 3=low, 4=gear)
-    pub loaded_mass: f64,      // Aircraft loaded mass (for calculations)
+    pub can_boat: bool,   // Can use boat hull (based on engine/wing height)
+    pub gull_deck: i16,   // Gull wing deck position (0=none, 1=shoulder, 2=mid, 3=low, 4=gear)
+    pub loaded_mass: f64, // Aircraft loaded mass (for calculations)
 }

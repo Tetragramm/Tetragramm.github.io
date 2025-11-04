@@ -272,7 +272,7 @@ fn test_part_stats_boat_hull_retract() {
     gear.set_retract(true);
     let stats = gear.part_stats();
     assert_eq!(stats.drag, 42.0); // Boat hull drag remains
-    // Normal gear: 2.0 dplmp * 10 = 20, divided by 2 = 10
+                                  // Normal gear: 2.0 dplmp * 10 = 20, divided by 2 = 10
     assert_eq!(stats.mass, 15.0); // 5 (boat hull) + 10 (retract)
     assert_eq!(stats.cost, 15.0); // 5 (boat hull) + 10 (retract)
 }

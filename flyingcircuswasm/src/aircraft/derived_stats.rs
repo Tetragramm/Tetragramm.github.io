@@ -1,5 +1,151 @@
 use super::*;
-use crate::{part::Part, types::DerivedStats};
+use crate::{
+    part::Part,
+    serialization::{Serializable, Serializer},
+    types::DerivedStats,
+    weapon_system::WeaponSystem,
+};
+
+/// Helper function to format stress list similar to TypeScript Stress2Str
+/// Takes a list of (base_stress, reduction) tuples and formats them as strings
+fn stress2str(arr: &[(i16, i16)]) -> String {
+    if arr.is_empty() {
+        return String::new();
+    }
+
+    let mut parts: Vec<String> = Vec::new();
+    for &(base, reduction) in arr {
+        if base != reduction {
+            parts.push(format!("{}({})", base, reduction));
+        } else {
+            parts.push(format!("{}", base));
+        }
+    }
+    parts.join(", ")
+}
+
+/// Format weapon name with mount type and modifiers
+/// Similar to TypeScript WeaponName()
+fn format_weapon_name(ws: &WeaponSystem, weapon_list: &[crate::weapon::WeaponType]) -> String {
+    use crate::weapon::{ActionType, ProjectileType};
+
+    let mut name = String::new();
+
+    // Determine mount type based on direction count and fixed status
+    let direction_count = ws.get_direction_count();
+    if direction_count == 1 && ws.get_fixed() {
+        name.push_str(&t!("Fixed").to_string());
+        name.push(' ');
+    } else if direction_count <= 2 {
+        name.push_str(&t!("Flexible").to_string());
+        name.push(' ');
+    } else {
+        name.push_str(&t!("Turreted").to_string());
+        name.push(' ');
+    }
+
+    // Add action modifier
+    match ws.get_action() {
+        ActionType::Mechanical => {
+            name.push_str(&t!("Weapon Tag Mechanical Action").to_string());
+            name.push(' ');
+        }
+        ActionType::Gast => {
+            name.push_str(&t!("Weapon Tag Gast Principle").to_string());
+            name.push(' ');
+        }
+        ActionType::Rotary => {
+            name.push_str(&t!("Weapon Tag Rotary").to_string());
+            name.push(' ');
+        }
+        ActionType::Standard => {} // No modifier
+    }
+
+    // Add projectile modifier
+    match ws.get_projectile() {
+        ProjectileType::Heatray => {
+            name.push_str(&t!("Weapon Tag Heat Ray").to_string());
+            name.push(' ');
+        }
+        ProjectileType::Gyrojets => {
+            name.push_str(&t!("Weapon Tag Gyrojet").to_string());
+            name.push(' ');
+        }
+        ProjectileType::Pneumatic => {
+            name.push_str(&t!("Weapon Tag Pneumatic").to_string());
+            name.push(' ');
+        }
+        ProjectileType::Bullets => {} // No modifier
+    }
+
+    // Add weapon abbreviation (not full name)
+    name.push_str(&weapon_list[ws.get_weapon_selected()].abrv);
+
+    name
+}
+
+/// Format a weapon system for catalog display
+/// Similar to TypeScript WeaponString()
+fn format_weapon_string(
+    ws: &WeaponSystem,
+    weapon_list: &[crate::weapon::WeaponType],
+    direction_list: &[&str],
+) -> String {
+    let seat = ws.get_seat() + 1; // Convert 0-indexed to 1-indexed
+    let count = ws.get_weapon_count();
+    let weapon_name = format_weapon_name(ws, weapon_list);
+
+    // Get enabled directions
+    let dirs = ws.get_direction();
+    let mut direction_names = Vec::new();
+    for (i, &enabled) in dirs.iter().enumerate() {
+        if enabled && i < direction_list.len() {
+            direction_names.push(t!(direction_list[i]).to_string());
+        }
+    }
+    let directions_str = direction_names.join(" ");
+
+    let damage = ws.get_damage();
+    let hits = ws.get_hits();
+    let hits_str = format!("{}/{}/{}/{}", hits[0], hits[1], hits[2], hits[3]);
+    let ammunition = ws.get_shots();
+
+    // Build tags
+    let mut tags = Vec::new();
+
+    // Jam tag
+    let jam = ws.get_jam();
+    tags.push(format!("Jam {}", jam));
+
+    // Reload tag
+    let reload = ws.get_reload();
+    tags.push(format!("Reload {}", reload));
+
+    // Rapid Fire tag
+    if ws.get_final_weapon().rapid {
+        tags.push("Rapid Fire".to_string());
+    }
+
+    // AP tag
+    let ap = ws.get_final_weapon().ap;
+    if ap > 0 {
+        tags.push(format!("AP {}", ap));
+    }
+
+    // Accessibility tag
+    if ws.get_is_fully_accessible() {
+        tags.push("Fully Accessible".to_string());
+    } else if ws.get_is_partly_accessible() {
+        tags.push("Partly Accessible".to_string());
+    }
+
+    let tags_str = tags.join(", ");
+
+    format!(
+        "Seat #{}: {}x {} fires [{}] for {} damage with {} hits with {} ammunition. [{}]",
+        seat, count, weapon_name, directions_str, damage, hits_str, ammunition, tags_str
+    )
+}
 
 impl Aircraft {
     /// Calculate derived stats from base stats
@@ -488,7 +634,9 @@ impl Aircraft {
         }));
 
         // Process vital parts list
+        // Use Vec to preserve insertion order (matches TypeScript behavior)
         let vp = self.vital_component_list();
+        let mut vp_order = Vec::new(); // Track order of first appearance
         let mut vp_map: HashMap<String, i32> = HashMap::new();
 
         for mut component in vp {
@@ -507,13 +655,19 @@ impl Aircraft {
                 component = component[..pos].trim().to_string();
             }
 
+            // Track order of first appearance
+            if !vp_map.contains_key(&component) {
+                vp_order.push(component.clone());
+            }
             *vp_map.entry(component).or_insert(0) += 1;
         }
 
+        // Build final list in order of first appearance
         let mut vital_parts = Vec::new();
-        for (component, count) in vp_map.iter() {
-            if *count == 1 {
-                vital_parts.push(component.clone());
+        for component in vp_order {
+            let count = vp_map[&component];
+            if count == 1 {
+                vital_parts.push(component);
             } else {
                 vital_parts.push(format!("{} x{}", component, count));
             }
@@ -529,21 +683,37 @@ impl Aircraft {
         let crew_str = crew.join(", ");
 
         // Build propulsion string
-        // Note: Would need reliability list and altitude range methods
+        let reliability_str = self.engines.get_reliability_list().join("/");
+        let min_alt = self.engines.get_min_altitude();
+        let max_alt = self.engines.get_max_altitude();
         let propulsion = format!(
-            "Dropoff {}, Overspeed {}, Fuel {}",
-            derived.dropoff, derived.overspeed as i16, derived.fuel_uses
+            "Dropoff {}, Reliability {}, Overspeed {}, Ideal Alt. {}-{}, Fuel {}",
+            derived.dropoff,
+            reliability_str,
+            derived.overspeed as i16,
+            min_alt,
+            max_alt,
+            derived.fuel_uses
         );
 
         // Build aerodynamics string
+        let visibility_list: Vec<String> = self
+            .cockpits
+            .get_visibility_list()
+            .iter()
+            .map(|v| v.to_string())
+            .collect();
+        let visibility_str = visibility_list.join("/");
+
         let aerodynamics = if stats.bomb_mass == 0.0 {
             format!(
-                "Stability {}, Energy Loss {}, Turn Bleed {}",
-                derived.stability, derived.energy_loss, derived.turn_bleed
+                "Visibility {}, Stability {}, Energy Loss {}, Turn Bleed {}",
+                visibility_str, derived.stability, derived.energy_loss, derived.turn_bleed
             )
         } else {
             format!(
-                "Stability {}, Energy Loss {}, Turn Bleed {} ({})",
+                "Visibility {}, Stability {}, Energy Loss {}, Turn Bleed {} ({})",
+                visibility_str,
                 derived.stability,
                 derived.energy_loss,
                 derived.turn_bleed,
@@ -552,9 +722,28 @@ impl Aircraft {
         };
 
         // Build survivability string
+        let escape_list: Vec<String> = self
+            .cockpits
+            .get_escape_list()
+            .iter()
+            .map(|e| e.to_string())
+            .collect();
+        let crash_list: Vec<String> = self
+            .cockpits
+            .get_crash_list()
+            .iter()
+            .map(|c| c.to_string())
+            .collect();
+        let stress_list = self.cockpits.get_stress_list();
+        let stress_str = stress2str(&stress_list);
+
         let survivability = format!(
-            "Toughness {}, Max Strain {}",
-            derived.toughness, derived.max_strain
+            "Toughness {}, Max Strain {}, Escape {}, Crash Safety {}, Flight Stress {}",
+            derived.toughness,
+            derived.max_strain,
+            escape_list.join("/"),
+            crash_list.join("/"),
+            stress_str
         );
 
         // Build armament string (simplified - full implementation would need weapon systems)
@@ -584,6 +773,7 @@ impl Aircraft {
                 );
             }
             internal -= int_bomb;
+            armament.push_str("\n");
         }
 
         if rockets > 0 {
@@ -597,10 +787,27 @@ impl Aircraft {
             }
         }
 
+        // Add weapon system descriptions
+        let direction_list = ["Forward", "Rearward", "Up", "Down", "Left", "Right"];
+        let weapon_sets = self.weapons.get_weapon_sets();
+        let weapon_list = self.weapons.get_weapon_list();
+        for ws in weapon_sets {
+            let weapon_str = format_weapon_string(ws, weapon_list, &direction_list);
+            armament.push_str(&weapon_str);
+            armament.push_str("\n");
+        }
+
         // Add warnings
         for warning in &stats.warnings {
             armament.push_str(&format!("{}:  {}\n", warning.name, warning.warning));
         }
+
+        // Generate Link (serialization URL)
+        // Similar to TypeScript MakeLink() - serialize aircraft and compress to LZ-String
+        let link = match self.serialize_to_link() {
+            Ok(url) => url,
+            Err(_) => String::new(), // Return empty string on error
+        };
 
         // Build final output object
         json!({
@@ -614,7 +821,24 @@ impl Aircraft {
             "Propulsion": propulsion,
             "Aerodynamics": aerodynamics,
             "Survivability": survivability,
-            "Armament": armament
+            "Armament": armament,
+            "Link": link
         })
+    }
+
+    /// Serialize the aircraft to a URL-safe LZ-String format
+    /// TypeScript: MakeLink()
+    /// Returns a URL with the compressed aircraft data
+    fn serialize_to_link(&self) -> Result<String, crate::serialization::Error> {
+        let mut serializer = Serializer::new();
+        self.serialize(&mut serializer)?;
+        let compressed = serializer.compress_to_lz_string()?;
+
+        // Build the URL - using a placeholder domain for now
+        // In the TypeScript code, this uses the actual deployment URL
+        Ok(format!(
+            "http://tetragramm.github.io/Test/index.html?json={}",
+            compressed
+        ))
     }
 }

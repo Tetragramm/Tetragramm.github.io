@@ -24,7 +24,7 @@ use crate::{
 use rust_i18n::t;
 
 pub struct PartList {
-    pub version: f64,
+    pub version: String,
     pub era: Vec<EraEntry>,
 
     pub cockpit_type: Vec<CockpitEntry>,
@@ -77,7 +77,7 @@ pub struct PartList {
 
 pub fn get_part_list() -> PartList {
     PartList {
-        version: 12.7,
+        version: "12.7".to_string(),
         era: vec![
             {
                 let name = t!("Pioneer");

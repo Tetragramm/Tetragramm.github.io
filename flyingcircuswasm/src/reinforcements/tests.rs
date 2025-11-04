@@ -28,17 +28,15 @@ fn create_test_ext_wood_list() -> Vec<ExternalWoodEntry> {
 
 /// Create test external steel list
 fn create_test_ext_steel_list() -> Vec<ExternalSteelEntry> {
-    vec![
-        ExternalSteelEntry {
-            name: "Steel Parallel Struts".to_string(),
-            tension: 15,
-            config: true,
-            first: true,
-            small_sqp: false,
-            ornith: false,
-            stats: Stats::new(),
-        },
-    ]
+    vec![ExternalSteelEntry {
+        name: "Steel Parallel Struts".to_string(),
+        tension: 15,
+        config: true,
+        first: true,
+        small_sqp: false,
+        ornith: false,
+        stats: Stats::new(),
+    }]
 }
 
 /// Create test cabane list
