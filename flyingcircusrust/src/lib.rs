@@ -4392,6 +4392,7 @@ mod weapon_list;
 mod weapon_system;
 mod weapons;
 mod wings;
+pub use ui_core::UIBindings;
 
 #[cfg(test)]
 mod tests {

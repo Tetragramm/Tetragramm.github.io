@@ -1,8 +1,10 @@
-use wasm_bindgen::prelude::*;
 use flyingcircusrust::aircraft::Aircraft;
-use flyingcircusrust::serialization::{Deserializer, Serializer};
+use flyingcircusrust::part::Part;
+use flyingcircusrust::serialization::{Deserializer, Serializable, Serializer};
 use flyingcircusrust::types::DerivedStats;
-use ui_core::UIBindings;
+use flyingcircusrust::UIBindings;
+use rust_i18n::t;
+use wasm_bindgen::prelude::*;
 
 // Set up panic hook for better error messages in console
 #[wasm_bindgen(start)]
@@ -81,14 +83,14 @@ impl AircraftWasm {
     pub fn set_era_bindings(&mut self, js_options: JsValue) {
         if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
             self.inner.era.receive_ui_selections(options);
-            self.inner.calculate_stats();
+            self.inner.part_stats();
         }
     }
 
     /// Calculate all aircraft statistics
     #[wasm_bindgen(js_name = calculateStats)]
     pub fn calculate_stats(&mut self) {
-        self.inner.calculate_stats();
+        self.inner.part_stats();
     }
 
     /// Get derived stats (performance characteristics)
@@ -115,7 +117,7 @@ impl AircraftWasm {
     /// Deserialize aircraft from bytes
     #[wasm_bindgen(js_name = deserialize)]
     pub fn deserialize(data: &[u8]) -> Result<AircraftWasm, JsValue> {
-        let mut d = Deserializer::new(data);
+        let mut d = Deserializer::new(data).map_err(|| JSValue::from_str("Failed to Deserialize."));
         let mut aircraft = Aircraft::new();
         aircraft
             .deserialize(&mut d)
@@ -158,7 +160,7 @@ impl AircraftWasm {
     pub fn set_cockpits_bindings(&mut self, js_options: JsValue) {
         if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
             self.inner.cockpits.receive_ui_selections(options);
-            self.inner.calculate_stats();
+            self.inner.part_stats();
         }
     }
 }
