@@ -9,9 +9,20 @@ import { Deserialize } from "./impl/Serialize";
 import { StringFmt } from "./string/index";
 import { scrollToFragment } from "./scroll/scroll";
 
+// WASM Integration
+import { wasmApp } from "./wasm_init";
+
 import * as parts_JSON from "./parts.json";
 
-const init = () => {
+const init = async () => {
+    // Try to initialize WASM first
+    // This will handle Era component if WASM is available
+    try {
+        await wasmApp.initialize();
+        console.log("[PlaneBuilder] WASM initialized successfully");
+    } catch (e) {
+        console.log("[PlaneBuilder] WASM not available, using TypeScript mode", e);
+    }
     const sp = new URLSearchParams(location.search);
     var qp = sp.get("json");
     var lang = sp.get("lang");
@@ -57,9 +68,17 @@ const init = () => {
         } catch { console.log("Saved Data Failed."); aircraft_model.Reset(); }
     }
 
-    aircraft_display = new Aircraft_HTML(aircraft_model, parts_JSON);
-    aircraft_model.CalculateStats();
-    SetAnimationEnabled(true);
+    // Only initialize TypeScript Aircraft if WASM didn't handle it
+    // For now, we'll run both side-by-side for other components
+    if (!wasmApp.isInitialized()) {
+        aircraft_display = new Aircraft_HTML(aircraft_model, parts_JSON);
+        aircraft_model.CalculateStats();
+        SetAnimationEnabled(true);
+    } else {
+        // WASM is handling Era, but we still need TypeScript for other components
+        // TODO: Gradually migrate other components to WASM
+        console.log("[PlaneBuilder] Using WASM for Era, TypeScript for other components");
+    }
 
     window.addEventListener("load", () => {
         scrollToFragment();
