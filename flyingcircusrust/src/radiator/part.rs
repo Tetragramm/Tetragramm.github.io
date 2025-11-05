@@ -1,6 +1,6 @@
 use super::Radiator;
 use crate::part::{ElectricsMessage, Part};
-use crate::stats::{rtz, Stats};
+use crate::stats::Stats;
 
 impl Part for Radiator {
     fn part_stats(&mut self) -> Stats {

@@ -1,7 +1,5 @@
 use std::rc::Rc;
 
-use ui_core::*;
-
 use crate::{
     engine::Engine,
     propeller::{DriveType, EngineInfo},
@@ -179,17 +177,17 @@ impl Engines {
             if en.get_num_propellers() > 0 {
                 lst.push(EngineInfo {
                     drive_type: DriveType::Propeller,
-                    num: en.get_num_propellers(),
+                    num: en.get_num_propellers() as f32,
                 });
             } else if en.get_is_pulsejet() {
                 lst.push(EngineInfo {
                     drive_type: DriveType::Pulsejet,
-                    num: 0,
+                    num: 0.0,
                 });
             } else if en.get_is_turbine() {
                 lst.push(EngineInfo {
                     drive_type: DriveType::Turbine,
-                    num: en.etype_stats.stats.pitchspeed as i16,
+                    num: en.etype_stats.stats.pitchspeed,
                 });
             }
         }

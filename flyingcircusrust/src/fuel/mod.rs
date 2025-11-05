@@ -16,9 +16,6 @@ mod validation;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 /// Tank type entry with stats and properties
 #[derive(Clone)]

@@ -3,7 +3,7 @@ use encoding_rs::{Encoding, WINDOWS_1252};
 use lz_str;
 use std::io::{self, Cursor, Write};
 use std::string::FromUtf8Error;
-use utf16string::{Utf16Error, WStr, BE};
+use utf16string::Utf16Error;
 
 // --- Custom Error Type for better error handling ---
 #[derive(Debug)]

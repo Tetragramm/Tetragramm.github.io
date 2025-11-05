@@ -1,6 +1,5 @@
 use super::*;
-use crate::engines::{CowlEntry, MountEntry, MountType};
-use crate::serialization::JSSerializable;
+use crate::engines::{CowlEntry, MountEntry};
 use crate::stats::Stats;
 use std::rc::Rc;
 

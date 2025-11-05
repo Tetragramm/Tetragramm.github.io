@@ -4,7 +4,7 @@ mod tests {
     use crate::stats::Stats;
     use crate::weapon::WeaponType;
     use crate::weapons::Weapons;
-    use std::rc::Rc;
+    
 
     // Helper to create a test weapon list
     fn create_test_weapon_list() -> Vec<WeaponType> {

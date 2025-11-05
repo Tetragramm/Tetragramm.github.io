@@ -12,7 +12,6 @@ mod ui;
 #[cfg(test)]
 mod tests;
 
-pub use ui::CockpitsOptions;
 
 pub struct CockpitEntry {
     pub name: String,
@@ -106,7 +105,7 @@ impl Cockpits {
     }
 
     pub fn set_has_rotary(&mut self, has: bool) {
-        for mut c in self.positions.iter_mut() {
+        for c in self.positions.iter_mut() {
             c.set_has_rotary(has);
         }
     }

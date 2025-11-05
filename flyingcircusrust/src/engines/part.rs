@@ -1,6 +1,6 @@
 use super::Engines;
 use crate::part::{ElectricsMessage, Part};
-use crate::stats::{Era, Stats, Warning, WarningLevel, ERA};
+use crate::stats::{Stats, Warning, WarningLevel};
 use std::collections::HashMap;
 
 impl Part for Engines {

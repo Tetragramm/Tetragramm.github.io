@@ -15,9 +15,6 @@ mod setters;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 /// Cargo space entry with stats
 #[derive(Clone)]

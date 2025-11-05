@@ -1,6 +1,5 @@
 use crate::part::ElectricsMessage;
 use crate::part::Part;
-use crate::serialization::{JSSerializable, Serializable};
 use crate::stats::Stats;
 
 mod json;

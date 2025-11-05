@@ -219,12 +219,126 @@ impl JSSerializable for EngineInputs {
     }
 }
 
+impl Engine {
+    fn old_json(&mut self, js: &serde_json::Value, json_version: f32) -> EngineInputs {
+        let stats = jsobj(js, "selected_stats");
+        self.etype_stats.from_json(&stats, json_version);
+
+        let mut e_inputs = EngineInputs::new();
+
+        let pulsejet = jsbool(&stats, "pulsejet");
+
+        if pulsejet {
+            if let Some(input_pj) = stats.get("input_pj") {
+                // Pulsejet engine
+                e_inputs.name = self.etype_stats.name.clone();
+                e_inputs.etype = jsnum(input_pj, "type") as i16;
+                e_inputs.era_sel = jsnum(input_pj, "era_sel") as i16;
+                e_inputs.inputs = TypedInputs::Pulsejet {
+                    power: jsnum(input_pj, "power") as i16,
+                    quality_cost: jsnum(input_pj, "quality_cost") as f32,
+                    quality_reliability: jsnum(input_pj, "quality_rely") as f32,
+                    starter: jsbool(input_pj, "starter"),
+                };
+            }
+        } else if let Some(input_eb) = stats.get("input_eb") {
+            // Propeller engine
+            e_inputs.name = self.etype_stats.name.clone();
+            e_inputs.etype = jsnum(input_eb, "type") as i16;
+            e_inputs.era_sel = jsnum(input_eb, "era_sel") as i16;
+
+            let mut upgrades = crate::json::jsboolarr(input_eb, "upgrades");
+            let mut compressor_type = jsnum(input_eb, "compressor_type") as i16;
+            let mut compressor_count = jsnum(input_eb, "compressor_count") as i16;
+            let mut min_ideal_alt = jsnum(input_eb, "min_IAF") as i16;
+
+            // Handle old upgrade format (6 upgrades instead of 4)
+            if upgrades.len() == 6 {
+                // Altitude conversion for old format
+                self.etype_stats.altitude = self.etype_stats.altitude * 10 - 1;
+
+                if upgrades[0] {
+                    compressor_type = 2;
+                    compressor_count = 1;
+                }
+                if upgrades[1] {
+                    compressor_type = 3;
+                    compressor_count = 1;
+                }
+                // Remove first 2 elements to keep last 4
+                upgrades = upgrades[2..].to_vec();
+            } else {
+                // Newer version with separate compressor fields
+                compressor_type = jsnum(input_eb, "compressor_type") as i16;
+                compressor_count = jsnum(input_eb, "compressor_count") as i16;
+                min_ideal_alt = jsnum(input_eb, "min_IAF") as i16;
+            }
+
+            e_inputs.inputs = TypedInputs::Propeller {
+                displacement: jsnum(input_eb, "displacement") as f32,
+                compression: jsnum(input_eb, "compression") as f32,
+                cyl_per_row: jsnum(input_eb, "cyl_per_row") as i16,
+                rows: jsnum(input_eb, "rows") as i16,
+                rpm_boost: jsnum(input_eb, "RPM_boost") as f32,
+                material_fudge: jsnum(input_eb, "material_fudge") as f32,
+                quality_fudge: jsnum(input_eb, "quality_fudge") as f32,
+                compressor_type,
+                compressor_count,
+                min_ideal_alt,
+                upgrades,
+            };
+        } else {
+            // Very old version with no input data
+            self.etype_stats.altitude = self.etype_stats.altitude * 10 - 1;
+        }
+
+        e_inputs
+    }
+}
+
 impl JSSerializable for Engine {
     fn from_json(&mut self, js: &serde_json::Value, json_version: f32) {
-        self.etype_stats
-            .from_json(jsobj(js, "selected_stats"), json_version);
-        self.etype_inputs
-            .from_json(jsobj(js, "selected_inputs"), json_version);
+        if json_version <= 10.55 {
+            // Old JSON format - extract inputs from stats via old_json
+            let e_inputs = self.old_json(js, json_version);
+
+            if e_inputs.name != "Default" {
+                let list_key = crate::engine_list::search_all_engine_lists(&self.etype_stats.name);
+                if !list_key.is_empty() {
+                    self.elist_key = list_key;
+                } else {
+                    let _ = crate::engine_list::add_custom_engine(e_inputs.clone());
+                    self.elist_key = "Custom".to_string();
+                }
+                self.etype_inputs =
+                    crate::engine_list::get_engine(&self.elist_key, &self.etype_stats.name)
+                        .unwrap_or(self.etype_inputs.clone());
+                self.etype_stats = self.etype_inputs.part_stats();
+            }
+
+            self.etype_inputs = e_inputs;
+        } else {
+            // New JSON format - use selected_inputs
+            let stats_obj = jsobj(js, "selected_stats");
+            self.etype_stats.from_json(&stats_obj, json_version);
+            self.etype_inputs
+                .from_json(jsobj(js, "selected_inputs"), json_version);
+
+            // Find the engine list key
+            let list_key = crate::engine_list::search_all_engine_lists(&self.etype_stats.name);
+            if !list_key.is_empty() {
+                self.elist_key = list_key;
+            } else {
+                // Not found in any list, add to Custom
+                self.elist_key = "Custom".to_string();
+                if self.etype_inputs.name != "Default" {
+                    let _ = crate::engine_list::add_custom_engine(self.etype_inputs.clone());
+                }
+            }
+            self.etype_inputs = crate::engine_list::get_engine(&self.elist_key, &self.etype_stats.name)
+                .unwrap_or(self.etype_inputs.clone());
+            self.etype_stats = self.etype_inputs.part_stats();
+        }
 
         self.cooling_count = jsnum(js, "cooling_count") as i16;
         self.radiator_index = jsnum(js, "radiator_index") as i16;

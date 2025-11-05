@@ -26,7 +26,7 @@ impl Propeller {
         let mut num_propellers = 0;
         for e in &self.engines {
             if e.drive_type == DriveType::Propeller {
-                num_propellers += e.num;
+                num_propellers += e.num as i16;
             }
         }
         num_propellers

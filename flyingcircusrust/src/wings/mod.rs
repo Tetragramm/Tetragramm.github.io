@@ -14,9 +14,6 @@ mod validation;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 /// Wing deck positions (height)
 #[derive(Debug, Clone, Copy, PartialEq)]

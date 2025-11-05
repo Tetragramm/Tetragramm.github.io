@@ -3,7 +3,6 @@ use crate::{
     weapon::{ActionType, ProjectileType, SynchronizationType, Weapon, WeaponType},
 };
 use std::rc::Rc;
-use ui_core::*;
 
 // Sub-module declarations
 mod core;
@@ -18,9 +17,6 @@ mod validation;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 /// WeaponSystem struct
 /// Manages a collection of weapons with shared configuration

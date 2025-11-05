@@ -17,9 +17,6 @@ mod setters;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 // Re-export AircraftType from shared types module
 pub use crate::types::AircraftType;
@@ -47,7 +44,7 @@ impl From<i16> for DriveType {
 #[derive(Clone)]
 pub struct EngineInfo {
     pub drive_type: DriveType,
-    pub num: i16,
+    pub num: f32,
 }
 
 /// Propeller type entry with stats and performance characteristics

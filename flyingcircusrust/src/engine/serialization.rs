@@ -1,5 +1,8 @@
 use super::{Engine, EngineInputs, EngineRarity, EngineStats, TypedInputs};
-use crate::serialization::{Error, Serializable};
+use crate::{
+    engine_list,
+    serialization::{Error, Serializable},
+};
 
 impl Serializable for EngineStats {
     fn deserialize(&mut self, d: &mut crate::serialization::Deserializer) -> Result<(), Error> {
@@ -312,6 +315,9 @@ impl Serializable for Engine {
                     let _ = crate::engine_list::add_custom_engine(self.etype_inputs.clone());
                 }
             }
+            self.etype_inputs = engine_list::get_engine(&self.elist_key, &self.etype_stats.name)
+                .unwrap_or(self.etype_inputs.clone());
+            self.etype_stats = self.etype_inputs.part_stats();
         } else {
             // Old deserialization (version <= 10.55)
             let e_inputs = self.old_deserialize(d)?;
@@ -324,6 +330,10 @@ impl Serializable for Engine {
                     let _ = crate::engine_list::add_custom_engine(e_inputs.clone());
                     self.elist_key = "Custom".to_string();
                 }
+                self.etype_inputs =
+                    engine_list::get_engine(&self.elist_key, &self.etype_stats.name)
+                        .unwrap_or(self.etype_inputs.clone());
+                self.etype_stats = self.etype_inputs.part_stats();
             }
 
             self.etype_inputs = e_inputs;

@@ -237,7 +237,7 @@ impl Part for Wings {
     /// Get electrics contribution (solar panel wings)
     /// TypeScript: GetElectrics()
     fn get_electrics(&self) -> ElectricsMessage {
-        let mut storage = 0;
+        let storage = 0;
         let mut equipment = Vec::new();
 
         let mut total_charge: f32 = 0.0;

@@ -1,8 +1,7 @@
 use super::*;
 use crate::part::Part;
 use crate::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
-use crate::stats::{Stats, ERA};
-use std::rc::Rc;
+use crate::stats::Stats;
 
 /// Create test frame list
 fn create_test_frame_list() -> Vec<FrameEntry> {

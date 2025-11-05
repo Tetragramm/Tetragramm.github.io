@@ -15,12 +15,6 @@ mod setters;
 mod tests;
 
 // Re-export struct methods
-pub use core::*;
-pub use json::*;
-pub use part::*;
-pub use queries::*;
-pub use serialization::*;
-pub use setters::*;
 
 /// Aileron option with warping flag
 #[derive(Debug, Clone)]

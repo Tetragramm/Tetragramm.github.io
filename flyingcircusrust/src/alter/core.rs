@@ -1,4 +1,4 @@
-use super::{Alter, CustomPart};
+use super::Alter;
 
 impl Alter {
     /// Internal: Calculate sum of absolute values of all stats

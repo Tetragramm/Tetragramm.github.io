@@ -15,9 +15,6 @@ mod validation;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 /// Main Optimization struct
 /// Manages aircraft optimization using "free dots" that can be allocated

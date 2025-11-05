@@ -1,8 +1,5 @@
 use super::*;
-use crate::{
-    part_list,
-    serialization::{Deserializer, Error, Serializable, Serializer},
-};
+use crate::serialization::{Deserializer, Error, Serializable, Serializer};
 
 impl Serializable for Aircraft {
     fn serialize(&self, s: &mut Serializer) -> Result<(), Error> {

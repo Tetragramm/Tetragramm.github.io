@@ -16,9 +16,6 @@ mod validation;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 /// Synchronization type for weapons firing through propeller arc
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]

@@ -85,9 +85,9 @@ impl Serializable for Passengers {
         &self,
         s: &mut crate::serialization::Serializer,
     ) -> Result<(), crate::serialization::Error> {
-        s.push_num(self.seats);
-        s.push_num(self.beds);
-        s.push_bool(self.connected);
+        s.push_num(self.seats)?;
+        s.push_num(self.beds)?;
+        s.push_bool(self.connected)?;
         Ok(())
     }
 }

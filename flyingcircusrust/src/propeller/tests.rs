@@ -1,7 +1,6 @@
 use super::*;
 use crate::part::Part;
 use crate::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
-use std::rc::Rc;
 
 /// Create test propeller list for testing
 fn create_test_prop_list() -> Vec<PropellerEntry> {
@@ -102,11 +101,11 @@ fn test_get_num_propellers() {
     propeller.set_engine_types(vec![
         EngineInfo {
             drive_type: DriveType::Propeller,
-            num: 2,
+            num: 2.,
         },
         EngineInfo {
             drive_type: DriveType::Propeller,
-            num: 1,
+            num: 1.,
         },
     ]);
     assert_eq!(propeller.get_num_propellers(), 3);
@@ -115,11 +114,11 @@ fn test_get_num_propellers() {
     propeller.set_engine_types(vec![
         EngineInfo {
             drive_type: DriveType::Propeller,
-            num: 2,
+            num: 2.,
         },
         EngineInfo {
             drive_type: DriveType::Turbine,
-            num: 1,
+            num: 1.,
         },
     ]);
     assert_eq!(propeller.get_num_propellers(), 2);
@@ -145,7 +144,7 @@ fn test_get_energy() {
     propeller.set_upgrade_index(0); // None: 0.0
     propeller.set_engine_types(vec![EngineInfo {
         drive_type: DriveType::Propeller,
-        num: 1,
+        num: 1.,
     }]);
     assert_eq!(propeller.get_energy(), 3.5);
 
@@ -170,7 +169,7 @@ fn test_get_turn() {
     propeller.set_upgrade_index(0); // None: 0.0
     propeller.set_engine_types(vec![EngineInfo {
         drive_type: DriveType::Propeller,
-        num: 1,
+        num: 1.,
     }]);
     assert_eq!(propeller.get_turn(), 7.0);
 }
@@ -256,7 +255,7 @@ fn test_part_stats() {
     // Set up propeller engines
     propeller.set_engine_types(vec![EngineInfo {
         drive_type: DriveType::Propeller,
-        num: 2,
+        num: 2.,
     }]);
 
     let stats = propeller.part_stats();

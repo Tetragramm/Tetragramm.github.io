@@ -1,15 +1,11 @@
 // use wasm_bindgen::prelude::*;
 #[macro_use]
 extern crate std;
-use crate::{
-    serialization::{JSSerializable, Serializable},
-    stats::Stats,
-};
 
 #[macro_use]
 extern crate rust_i18n;
 // rust_i18n::i18n!("locales", fallback = "en", minify_key = true);
-use rust_i18n::{Backend, BackendExt, CowStr, MinifyKey};
+use rust_i18n::Backend;
 use std::{borrow::Cow, sync};
 /// I18n backend instance
 ///
@@ -4391,7 +4387,6 @@ pub mod stats;
 mod turbo_builder;
 pub mod types;
 mod used;
-mod utils;
 mod weapon;
 mod weapon_list;
 mod weapon_system;
@@ -5168,7 +5163,8 @@ mod tests {
             "KZ-2 Mangusten",
             "Rebuilt LM \"Viper\"",
             "Libelle T.87",
-            "Mauss Z-95 Phönix"
+            "Mauss Z-95 Phönix",
+            "Lockheed P-80C"
             ],
             "acft": [
             "AAEAjATAdALMDwAVAFgUwDaoE4AIDSA9gEZYCGOAsgCLACAdDAYMC68M2yyPZ5-QOgAhbABdk5AGJgYANhk4AO0Ww4wADgAMyAA7AAGMAC4vBmwAwwAMCsAkCd42A-wF-gAJGABkez98sBwlhiktJyisq46lq6lgDqsQCSwEKi4jhSsvJKKlE6fACCusAAAgApAF4Ah0wA-ADOAMwNNQBmba1tJiB8wHZ+vDxWnABArNbWgxNjpsCjUyzzs2zMoywAcL2+AOCbnNYLPf5++yx9rIP29Gf9bACgvvT73Rc3e2wAEK-T9juvJ0NfViORznJaWeiMF4MWiDQarXirSEzaEo4HIw6Ar5AA",
@@ -5257,7 +5253,8 @@ mod tests {
             "AAEAjATAdArMBwBpAWgWggAgLIEMB2A5gK4DOALgKZ7ACAwAQMEwGBNsvtsifus9+duPTnQCoAZQDGACwBOFAJYAjCrIwAZKAA0AkgDUMYAGwAGaQAdgABGABcYHzq1OAKGAAINgEhhwgP8Av9bAAMi+4RFMYlJyiipqmroGxmaWAMAA6hk6wBIy8sqqGtr6hqYWbIw0AIIAfQBm9QACAO4AdQAowADgDAD8AJkDAFl96gAzALN9AAHhQmxOfn4RjMJroJFbTBur7HQbADDAPuEA0Cc8aWzX+4uRt0w+Ttt0p9vsAKARdE7cLzwFkwgUxHh4Pjdwr0og92GCIetgGk6MwATCaC8Xrt2GtWBjaL9nItlkS7qSER8gA",
             "AAEAjATAdArMBIAlApgIwK4EsA2AXABADICy+ARAGqYAOyATmcAIDPBsBgbXH3XIvA1vABC9XAAsAhvgBiYACwA2RfjAB2AAzjqwABjAAuIJbcAMMADAXAJCCBACAD-AP+ABEYAGQ7P32xYiYlKyCsqqmtqWAOpRAJIIonQS0nJKKupaOtxMAIJZAAIAKQBeAIes7AD8AGa1NXUAAT782cD2XABAflwsJrxdbFZWfcNco2xdVtxTndwA4MCTwACwwLYD-pbAANBtAjMti6wsG3Yza6zdm7ZXvACgvn2gl7f73O2vW3YLt+fnAk8BI5HD1Fix2IDjn0mMCjnZIZ8-EA",
             "AAEAjATAdArMAwAZAlgIwKYBtPoAQBUoAOAdmAEAKqAwYO+4WhukZtqgDACUALAewB2AQ1wBZPgBc+AJ1RCArrgBakXGDAAGHgAdgAFGABcYAGA6lKg1oAIegHB27AP9PgAaGAAERz9-ng3PzCYpIycooqEGqaOqYA6nEAkgG8giLiUrIKyqrqWrp0AEAUAIIFAAIABfQAkBQA-IgAMwCz9QABdB0+rAwWLsDF7ENsI2b+fcwWg-TTEzP0tCO2DlP0K6OzW-4jjuN0dZN+wIfHzACgvnOsc2fM+8C2d3QPzKtnD693A-6UJpTUW5UcjTcgDXZrZ5Q4BAA",
-            "AAEAjATAdArMCIBZAhgVwM7oAQC0C0AnDFgAoAWAbwHYCWAHsAIBPADAwAYMNz57zyG7N+PZgDQASgHt0AUwBus5ACcsAQSoBrKaiwAhLGAAcABjIAHYAGxgYEW34AoYAAgeASHtfmAJGBivQKChf2k5RRV1LR19Q1MLNgB1RIBJUJkFJVUNbV0DYzNLEMY1ADkAM3KAAQBS8wAS4E9GAH5K8paAZoBmbrbK4AAgIYF+dmAAf4mRYRZZnnGHYPth5dWQ9a5PQIA4JpFF9ZDjwMX95ZFtniPAgFAg5kFQEYuvM7duJ+D2G+4AcFebEYwjOgPszFYzA482Ks1m6xhMLByyAA"
+            "AAEAjATAdArMCIBZAhgVwM7oAQC0C0AnDFgAoAWAbwHYCWAHsAIBPADAwAYMNz57zyG7N+PZgDQASgHt0AUwBus5ACcsAQSoBrKaiwAhLGAAcABjIAHYAGxgYEW34AoYAAgeASHtfmAJGBivQKChf2k5RRV1LR19Q1MLNgB1RIBJUJkFJVUNbV0DYzNLEMY1ADkAM3KAAQBS8wAS4E9GAH5K8paAZoBmbrbK4AAgIYF+dmAAf4mRYRZZnnGHYPth5dWQ9a5PQIA4JpFF9ZDjwMX95ZFtniPAgFAg5kFQEYuvM7duJ+D2G+4AcFebEYwjOgPszFYzA482Ks1m6xhMLByyAA",
+            "AAEAjATAdA7MBwAZA9gYwNYAsCm2AmABAAoC0AHAAwDCowAgLQGDAuvDNssic-3AAIAQQA2wgJYBnZADsCAKQDMCkoJIKArMDzAA3Lx4BSdqwCf+8wAPgAGP0B+AGUAzJ+f0MhoyTPlKVazQBoRABDCQAXAgAJAFcAJziQzAERcSlZRWVVDWAAIDYAXsQAGYBZuwBigHWAKAABazLObl4Af9bgAEg3XnyWZgBQTiG2EdYxhgngKcnOBlZAvm4ANGAAGB4AYHN5vh58-O3Wbp7eE9Ph3jG2biO8zgBiNwY74AAIC7ZXzgBwT+BXt9-jwGIxQbtWAxcgwYe1QDCGHC+rwIcD-kA"
         ]}"#
         ).unwrap();
         let output: serde_json::Value = serde_json::from_str(r#"
@@ -5348,7 +5345,8 @@ mod tests {
             {"name":"KZ-2 Mangusten","cost":26,"upkeep":1,"bomb_mass":10,"escape":"2/2","crash":"-1/-1","stress":"3, 1","DryMP":6,"WetMP":7,"WetMPwBombs":9,"DPEmpty":15,"DPFull":15,"DPwBombs":16,"MaxSpeedEmpty":15,"MaxSpeedFull":15,"MaxSpeedwBombs":14,"StallSpeedEmpty":6,"StallSpeedFull":7,"StallSpeedFullwBombs":10,"Overspeed":16,"BoostEmpty":2,"BoostFull":2,"BoostFullwBombs":1,"Dropoff":9,"Stabiilty":-4,"HandlingEmpty":98,"HandlingFull":97,"HandlingFullwBombs":95,"MaxStrain":24,"Toughness":8,"Structure":42,"EnergyLoss":5,"EnergyLosswBombs":6,"TurnBleed":1,"TurnBleedwBombs":2,"FuelUses":6,"ControlStress":2,"RumbleStress":0,"RateOfClimbFull":3,"RateOfClimbEmpty":4,"RateOfClimbwBombs":2},
             {"name":"Rebuilt LM \"Viper\"","cost":19,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"-1","stress":"2","DryMP":5,"WetMP":6,"WetMPwBombs":6,"DPEmpty":14,"DPFull":14,"DPwBombs":14,"MaxSpeedEmpty":16,"MaxSpeedFull":16,"MaxSpeedwBombs":16,"StallSpeedEmpty":6,"StallSpeedFull":7,"StallSpeedFullwBombs":7,"Overspeed":24,"BoostEmpty":3,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":9,"Stabiilty":-5,"HandlingEmpty":101,"HandlingFull":100,"HandlingFullwBombs":100,"MaxStrain":27,"Toughness":8,"Structure":41,"EnergyLoss":5,"EnergyLosswBombs":6,"TurnBleed":1,"TurnBleedwBombs":2,"FuelUses":6,"ControlStress":2,"RumbleStress":0,"RateOfClimbFull":4,"RateOfClimbEmpty":5,"RateOfClimbwBombs":4},
             {"name":"Libelle T.87","cost":23,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"0","stress":"1","DryMP":3,"WetMP":4,"WetMPwBombs":4,"DPEmpty":7,"DPFull":7,"DPwBombs":7,"MaxSpeedEmpty":18,"MaxSpeedFull":18,"MaxSpeedwBombs":18,"StallSpeedEmpty":5,"StallSpeedFull":7,"StallSpeedFullwBombs":7,"Overspeed":20,"BoostEmpty":3,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":10,"Stabiilty":-2,"HandlingEmpty":104,"HandlingFull":103,"HandlingFullwBombs":103,"MaxStrain":18,"Toughness":6,"Structure":30,"EnergyLoss":3,"EnergyLosswBombs":4,"TurnBleed":1,"TurnBleedwBombs":2,"FuelUses":7,"ControlStress":1,"RumbleStress":0,"RateOfClimbFull":9,"RateOfClimbEmpty":12,"RateOfClimbwBombs":9},
-            {"name":"Mauss Z-95 Phönix","cost":44,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"-1","stress":"0","DryMP":7,"WetMP":9,"WetMPwBombs":9,"DPEmpty":13,"DPFull":13,"DPwBombs":13,"MaxSpeedEmpty":19,"MaxSpeedFull":19,"MaxSpeedwBombs":19,"StallSpeedEmpty":8,"StallSpeedFull":10,"StallSpeedFullwBombs":10,"Overspeed":40,"BoostEmpty":2,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":7,"Stabiilty":2,"HandlingEmpty":98,"HandlingFull":96,"HandlingFullwBombs":96,"MaxStrain":31,"Toughness":15,"Structure":37,"EnergyLoss":4,"EnergyLosswBombs":5,"TurnBleed":2,"TurnBleedwBombs":3,"FuelUses":11,"ControlStress":1,"RumbleStress":0,"RateOfClimbFull":3,"RateOfClimbEmpty":4,"RateOfClimbwBombs":3}
+            {"name":"Mauss Z-95 Phönix","cost":44,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"-1","stress":"0","DryMP":7,"WetMP":9,"WetMPwBombs":9,"DPEmpty":13,"DPFull":13,"DPwBombs":13,"MaxSpeedEmpty":19,"MaxSpeedFull":19,"MaxSpeedwBombs":19,"StallSpeedEmpty":8,"StallSpeedFull":10,"StallSpeedFullwBombs":10,"Overspeed":40,"BoostEmpty":2,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":7,"Stabiilty":2,"HandlingEmpty":98,"HandlingFull":96,"HandlingFullwBombs":96,"MaxStrain":31,"Toughness":15,"Structure":37,"EnergyLoss":4,"EnergyLosswBombs":5,"TurnBleed":2,"TurnBleedwBombs":3,"FuelUses":11,"ControlStress":1,"RumbleStress":0,"RateOfClimbFull":3,"RateOfClimbEmpty":4,"RateOfClimbwBombs":3},
+            {"name": "Lockheed P-80C","cost": 405,"upkeep": 22,"bomb_mass": 35,"escape": "0","crash": "-1","stress": "2","DryMP": 19,"WetMP": 24,"WetMPwBombs": 31,"DPEmpty": 11,"DPFull": 11,"DPwBombs": 18,"MaxSpeedEmpty": 87,"MaxSpeedFull": 87,"MaxSpeedwBombs": 68,"StallSpeedEmpty": 11,"StallSpeedFull": 14,"StallSpeedFullwBombs": 18,"Overspeed": 100,"BoostEmpty": 11,"BoostFull": 9,"BoostFullwBombs": 7,"Dropoff": 17,"Stabiilty": -6,"HandlingEmpty": 82,"HandlingFull": 77,"HandlingFullwBombs": 70,"MaxStrain": 70,"Toughness": 44,"Structure": 106,"EnergyLoss": 2,"EnergyLosswBombs": 3,"TurnBleed": 3,"TurnBleedwBombs": 4,"FuelUses": 4,"ControlStress": 3,"RumbleStress": 0,"RateOfClimbFull": 15,"RateOfClimbEmpty": 18,"RateOfClimbwBombs": 7}
         ]"#).unwrap();
         for (inp_name, inp_lz, out) in izip!(
             input["names"].as_array().unwrap(),
@@ -5364,7 +5362,11 @@ mod tests {
             assert_eq!(AircraftType::Airplane, acft.aircraft_type);
             println!("Name = {}", acft.name);
             println!("{}", inp_lz.as_str().unwrap());
-            let mut final_stats = acft.part_stats();
+            let final_stats = acft.part_stats();
+            if acft.name == "Lockheed P-80C" {
+                assert_eq!(224., final_stats.power);
+            }
+            println!("{:?}", final_stats);
             assert_eq!(out["cost"].as_f64().unwrap() as f32, final_stats.cost);
             assert_eq!(out["upkeep"].as_f64().unwrap() as f32, final_stats.upkeep);
             assert_eq!(

@@ -1,5 +1,4 @@
 use super::*;
-use crate::aircraft::AircraftType;
 use crate::part::Part;
 use crate::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
 use crate::stats::Stats;

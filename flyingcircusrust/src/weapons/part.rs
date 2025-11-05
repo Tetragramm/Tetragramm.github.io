@@ -36,7 +36,6 @@ impl Part for Weapons {
         // Create list of every weapon size and a ref to the weapon
         struct WeaponSize {
             total: i16,
-            count: i16,
             sz: i16,
             ws_idx: usize,
             w_idx: usize,
@@ -60,7 +59,6 @@ impl Part for Weapons {
                     let total = count * sz;
                     slist.push(WeaponSize {
                         total,
-                        count,
                         sz,
                         ws_idx,
                         w_idx,

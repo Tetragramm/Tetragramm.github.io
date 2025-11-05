@@ -16,13 +16,6 @@ mod validation;
 mod tests;
 
 // Re-export struct methods
-pub use core::*;
-pub use json::*;
-pub use part::*;
-pub use queries::*;
-pub use serialization::*;
-pub use setters::*;
-pub use validation::*;
 
 /// External wood strut option
 #[derive(Debug, Clone)]

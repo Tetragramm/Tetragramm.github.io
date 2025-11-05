@@ -13,9 +13,6 @@ mod setters;
 mod tests;
 
 // Re-export public API
-pub use core::*;
-pub use queries::*;
-pub use setters::*;
 
 /// Frame type entry with stats and properties
 #[derive(Clone)]
