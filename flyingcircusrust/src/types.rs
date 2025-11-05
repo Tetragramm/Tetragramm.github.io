@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 /// Shared type definitions used across multiple modules
 
 /// Aircraft type enum matching TypeScript AIRCRAFT_TYPE
@@ -47,7 +49,7 @@ impl AircraftType {
 /// Derived stats calculated from base aircraft stats
 /// TypeScript: DerivedStats type
 /// These are performance and handling characteristics calculated from base stats
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize, Deserialize)]
 pub struct DerivedStats {
     pub dry_mp: i16,         // Dry Mass Points
     pub wet_mp: i16,         // Wet Mass Points

@@ -1,4 +1,5 @@
 use itertools::{chain, Itertools};
+use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 use serde_json::Map;
@@ -6,14 +7,14 @@ use serde_json::Map;
 use crate::json::*;
 use crate::serialization::{Deserializer, Error, JSSerializable, Serializable, Serializer};
 
-#[derive(Clone, PartialEq, Eq, Hash, Copy, Debug)]
+#[derive(Clone, PartialEq, Eq, Hash, Copy, Debug, Serialize, Deserialize)]
 pub enum WarningLevel {
     White,
     Yellow,
     Red,
 }
 
-#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub struct Warning {
     pub name: String,
     pub warning: String,
@@ -24,7 +25,7 @@ fn merge_warnings(a: Vec<Warning>, b: Vec<Warning>) -> Vec<Warning> {
     v
 }
 
-#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub enum ERA {
     Himmilgard,
     Pioneer,
@@ -69,7 +70,7 @@ impl FromStr for ERA {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+#[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
 pub struct Era {
     pub name: String,
     pub era: ERA,
@@ -88,7 +89,7 @@ pub fn rtz(num: f32) -> f32 {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Stats {
     pub liftbleed: f32,
     pub wetmass: f32,

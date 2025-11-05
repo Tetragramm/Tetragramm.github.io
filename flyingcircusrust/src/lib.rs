@@ -4394,6 +4394,28 @@ mod weapons;
 mod wings;
 pub use ui_core::UIBindings;
 
+pub fn get_available_languages() -> Vec<String> {
+    rust_i18n::available_locales!()
+        .iter()
+        .map(|s| s.to_string())
+        .collect()
+}
+
+/// Set the current locale
+pub fn set_locale(locale: &str) {
+    rust_i18n::set_locale(locale);
+}
+
+/// Get current locale
+pub fn get_locale() -> String {
+    rust_i18n::locale().to_string()
+}
+
+/// Translate a single key
+pub fn translate(key: &str) -> String {
+    t!(key).into()
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{

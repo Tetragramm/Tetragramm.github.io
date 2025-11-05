@@ -116,6 +116,7 @@ dependencies = [
  "itertools 0.14.0",
  "lz-str",
  "rust-i18n",
+ "serde",
  "serde_json",
  "ui_core",
  "ui_macro",
@@ -514,6 +515,9 @@ dependencies = [
 [[package]]
 name = "ui_core"
 version = "0.1.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "ui_macro"
@@ -521,6 +525,7 @@ version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
+ "serde",
  "syn",
  "ui_core",
 ]

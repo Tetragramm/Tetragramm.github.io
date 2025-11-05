@@ -23,28 +23,25 @@ impl Localization {
     /// Get list of available languages
     #[wasm_bindgen(js_name = getAvailableLanguages)]
     pub fn get_available_languages() -> Vec<String> {
-        flyingcircusrust::_rust_i18n_available_locales()
-            .into_iter()
-            .map(|s| s.to_string())
-            .collect()
+        flyingcircusrust::get_available_languages()
     }
 
     /// Set the current locale
     #[wasm_bindgen(js_name = setLocale)]
     pub fn set_locale(locale: &str) {
-        rust_i18n::set_locale(locale);
+        flyingcircusrust::set_locale(locale);
     }
 
     /// Get current locale
     #[wasm_bindgen(js_name = getLocale)]
     pub fn get_locale() -> String {
-        rust_i18n::locale().to_string()
+        flyingcircusrust::get_locale()
     }
 
     /// Translate a single key
     #[wasm_bindgen(js_name = translate)]
     pub fn translate(key: &str) -> String {
-        flyingcircusrust::_rust_i18n_translate(rust_i18n::locale(), key).to_string()
+        flyingcircusrust::translate(key)
     }
 }
 
@@ -100,7 +97,7 @@ impl AircraftWasm {
 
     /// Get derived stats (performance characteristics)
     #[wasm_bindgen(js_name = getDerivedStats)]
-    pub fn get_derived_stats(&self) -> JsValue {
+    pub fn get_derived_stats(&mut self) -> JsValue {
         let stats = self.inner.get_derived_stats();
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
@@ -113,16 +110,17 @@ impl AircraftWasm {
 
     /// Serialize aircraft to bytes
     #[wasm_bindgen(js_name = serialize)]
-    pub fn serialize(&self) -> Vec<u8> {
+    pub fn serialize(&self) -> String {
         let mut s = Serializer::new();
         self.inner.serialize(&mut s).unwrap();
-        s.get_bytes().to_vec()
+        s.compress_to_lz_string().unwrap()
     }
 
     /// Deserialize aircraft from bytes
     #[wasm_bindgen(js_name = deserialize)]
     pub fn deserialize(data: &[u8]) -> Result<AircraftWasm, JsValue> {
-        let mut d = Deserializer::new(data).map_err(|_| JsValue::from_str("Failed to Deserialize"));
+        let mut d =
+            Deserializer::new(data).map_err(|_| JsValue::from_str("Failed to Deserialize"))?;
         let mut aircraft = Aircraft::new();
         aircraft
             .deserialize(&mut d)
