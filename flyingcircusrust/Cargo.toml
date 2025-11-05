@@ -1,5 +1,5 @@
 [package]
-name = "flyingcircuswasm"
+name = "flyingcircusrust"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,14 +10,18 @@ crate-type = [
 ] # Compile to dynamic system library and Rust library format
 
 [dependencies]
-flyingcircusrust = { path = "../flyingcircusrust" }
 rust-i18n = "3"
-wasm-minimal-protocol = "0.1.0"
+itertools = "0.14.0"
+serde_json = { version = "1.0.140", features = ["preserve_order"] }
+byteorder = "1.5"
+encoding_rs = "0.8"
+lz-str = "0.2.1"
+ui_core = { path = "./ui_core" }
+ui_macro = { path = "./ui_macro" }
+utf16string = "0.2.0"
 
 [dev-dependencies]
 assert-json-diff = "2.0.2"
-itertools = "0.14.0"
-serde_json = { version = "1.0.140", features = ["preserve_order"] }
 
 [profile.release]
 lto = true
