@@ -147,6 +147,8 @@ export class CockpitsUI {
             (selectedIndex) => {
                 cockpitOptions.selected_type.selected = selectedIndex;
                 this.bridge.setCockpitsBindings(allBindings);
+                // Re-render to update enabled states
+                this.render();
             }
         );
         cell.appendChild(typeSelect);
@@ -165,6 +167,8 @@ export class CockpitsUI {
                 (idx, checked) => {
                     cockpitOptions.selected_upgrades[idx].selected = checked;
                     this.bridge.setCockpitsBindings(allBindings);
+                    // Re-render to update enabled states
+                    this.render();
                 }
             );
             cell.appendChild(upgradesList);
@@ -183,6 +187,8 @@ export class CockpitsUI {
                 (idx, checked) => {
                     cockpitOptions.selected_safety[idx].selected = checked;
                     this.bridge.setCockpitsBindings(allBindings);
+                    // Re-render to update enabled states
+                    this.render();
                 }
             );
             cell.appendChild(safetyList);
@@ -201,6 +207,8 @@ export class CockpitsUI {
                 (idx, checked) => {
                     cockpitOptions.selected_gunsights[idx].selected = checked;
                     this.bridge.setCockpitsBindings(allBindings);
+                    // Re-render to update enabled states
+                    this.render();
                 }
             );
             cell.appendChild(gunsightsList);
@@ -218,6 +226,8 @@ export class CockpitsUI {
             (newValue) => {
                 cockpitOptions.bombsight.value = newValue;
                 this.bridge.setCockpitsBindings(allBindings);
+                // Re-render to update enabled states
+                this.render();
             },
             0,   // min
             20,  // max

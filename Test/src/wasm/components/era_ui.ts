@@ -72,6 +72,9 @@ export class EraUI {
                 // Send back to Rust
                 this.bridge.setEraBindings(eraBindings);
 
+                // Re-render to update any dependent states
+                this.render();
+
                 console.log(`[EraUI] Era changed to index ${selectedIndex}`);
             }
         );
