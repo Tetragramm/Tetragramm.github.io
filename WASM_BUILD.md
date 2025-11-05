@@ -58,6 +58,8 @@ Then open: http://localhost:8080/Test/
 
 ### What to Test
 
+#### Era Component
+
 1. **Initial Load**
    - Page loads without errors
    - Era dropdown appears with English names (default)
@@ -88,9 +90,58 @@ Then open: http://localhost:8080/Test/
      [WasmApp] Aircraft bridge initialized
      [WasmApp] Language selector created
      [WasmApp] Era UI created
+     [WasmApp] Cockpits UI created
      [WasmApp] Initialization complete!
      [PlaneBuilder] WASM initialized successfully
      ```
+
+#### Cockpits Component
+
+1. **Number of Cockpits**
+   - Default shows 1 cockpit
+   - Change to 3 → See 3 cockpit sections appear
+   - Change back to 1 → Extra cockpits disappear
+   - Number control enforces min=1, max=20
+
+2. **Cockpit Type Selection**
+   - Each cockpit has type dropdown
+   - Options show in English (default): "Open", "Enclosed", etc.
+   - Changing type updates stats
+   - Console logs changes
+
+3. **Upgrades (Checkboxes)**
+   - Each cockpit shows upgrade checkboxes
+   - Check "Co-Pilot Controls" → Stats update
+   - Uncheck → Stats update
+   - All checkboxes work independently per cockpit
+
+4. **Safety Options (Checkboxes)**
+   - Shows safety option checkboxes: "Harness", "Parachute", etc.
+   - Checking/unchecking updates stats
+   - Each cockpit maintains independent safety settings
+
+5. **Gunsights (Checkboxes)**
+   - Shows gunsight checkboxes
+   - Can select multiple gunsights
+   - Stats update correctly
+
+6. **Bombsight Quality (Number)**
+   - Number input for bombsight quality
+   - Min=0, Max=20, Step=1
+   - Changing value updates stats
+
+7. **Language Switching**
+   - Switch to German
+   - **Expected**: All cockpit labels update
+   - **Expected**: Cockpit type names update (e.g., "Open" → "Offen")
+   - **Expected**: Upgrade/safety/gunsight names update
+   - Section title "Cockpits" → German equivalent
+
+8. **Multiple Cockpits + Language Switch**
+   - Set 3 cockpits
+   - Switch language
+   - **Expected**: All 3 cockpits update with German strings
+   - **Expected**: Each cockpit maintains its settings
 
 ### What Should Happen
 

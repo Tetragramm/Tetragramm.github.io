@@ -22,6 +22,32 @@ export interface EraOptions {
     selected_era: SelectBinding;
 }
 
+// Binding types used by UIBindings
+export interface CheckBinding {
+    name: string;
+    enabled: boolean;
+    selected: boolean;
+}
+
+export interface NumberBinding {
+    name: string;
+    enabled: boolean;
+    value: number;
+}
+
+export interface CockpitOptions {
+    selected_type: SelectBinding;
+    selected_upgrades: CheckBinding[];
+    selected_safety: CheckBinding[];
+    selected_gunsights: CheckBinding[];
+    bombsight: NumberBinding;
+}
+
+export interface CockpitsOptions {
+    num_cockpits: NumberBinding;
+    positions: CockpitOptions[];
+}
+
 export interface DerivedStats {
     dry_mp: number;
     wet_mp: number;
@@ -65,6 +91,8 @@ export interface AircraftWasmAPI {
     setName(name: string): void;
     getEraBindings(): any;
     setEraBindings(bindings: any): void;
+    getCockpitsBindings(): any;
+    setCockpitsBindings(bindings: any): void;
     calculateStats(): void;
     getDerivedStats(): DerivedStats;
     getStats(): any;
@@ -143,6 +171,23 @@ export class AircraftBridge {
     setEraBindings(bindings: EraOptions): void {
         this.ensureInitialized();
         this.wasm!.setEraBindings(bindings);
+    }
+
+    /**
+     * Get Cockpits UI bindings (includes localized strings from Rust)
+     */
+    getCockpitsBindings(): CockpitsOptions {
+        this.ensureInitialized();
+        return this.wasm!.getCockpitsBindings();
+    }
+
+    /**
+     * Update Cockpits from UI bindings
+     * Automatically recalculates stats
+     */
+    setCockpitsBindings(bindings: CockpitsOptions): void {
+        this.ensureInitialized();
+        this.wasm!.setCockpitsBindings(bindings);
     }
 
     /**

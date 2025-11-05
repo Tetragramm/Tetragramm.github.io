@@ -5,20 +5,12 @@
  * Supports: Select, Number, Check, NumberList, CheckList
  */
 
-import { AircraftBridge, SelectBinding } from './aircraft_bridge';
+import { AircraftBridge, SelectBinding, NumberBinding as NumBinding, CheckBinding as ChkBinding } from './aircraft_bridge';
 import { localization } from './localization';
 
-export interface NumberBinding {
-    name: string;
-    enabled: boolean;
-    value: number;
-}
-
-export interface CheckBinding {
-    name: string;
-    enabled: boolean;
-    selected: boolean;
-}
+// Re-export types from aircraft_bridge for convenience
+export type NumberBinding = NumBinding;
+export type CheckBinding = ChkBinding;
 
 /**
  * Generic renderer for UIBindings
