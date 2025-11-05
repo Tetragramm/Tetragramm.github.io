@@ -15,7 +15,7 @@ export class CockpitsUI {
     private sectionElement: HTMLElement | null = null;
 
     constructor(
-        private bridge: AircraftBridge,
+        private getBridge: () => AircraftBridge | null,
         containerId: string,
         private onUpdate?: () => void
     ) {
@@ -24,6 +24,12 @@ export class CockpitsUI {
             throw new Error(`Container element '${containerId}' not found`);
         }
         this.container = container;
+
+        // Get the initial bridge for renderer
+        const bridge = this.getBridge();
+        if (!bridge) {
+            throw new Error('Bridge not available during CockpitsUI construction');
+        }
 
         // Create renderer with stats update callback
         this.renderer = new BindingRenderer(bridge, () => {
@@ -45,13 +51,15 @@ export class CockpitsUI {
         // Clear existing content
         this.container.innerHTML = '';
 
-        if (!this.bridge.isInitialized()) {
+        // Get current bridge (may be new after language change)
+        const bridge = this.getBridge();
+        if (!bridge || !bridge.isInitialized()) {
             console.warn('[CockpitsUI] Bridge not initialized, skipping render');
             return;
         }
 
         // Get Cockpits bindings from Rust (includes localized strings)
-        const cockpitsBindings = this.bridge.getCockpitsBindings();
+        const cockpitsBindings = bridge.getCockpitsBindings();
 
         // Create main content container
         const contentDiv = document.createElement('div');
@@ -63,7 +71,7 @@ export class CockpitsUI {
             cockpitsBindings.num_cockpits,
             (newValue) => {
                 cockpitsBindings.num_cockpits.value = newValue;
-                this.bridge.setCockpitsBindings(cockpitsBindings);
+                bridge.setCockpitsBindings(cockpitsBindings);
                 // Re-render to show new cockpits
                 this.render();
             },
@@ -80,7 +88,7 @@ export class CockpitsUI {
         table.id = 'table_cockpit';
 
         cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
-            const cockpitSection = this.renderCockpit(cockpitOptions, idx, cockpitsBindings);
+            const cockpitSection = this.renderCockpit(cockpitOptions, idx, cockpitsBindings, bridge);
             table.appendChild(cockpitSection);
         });
 
@@ -123,7 +131,8 @@ export class CockpitsUI {
     private renderCockpit(
         cockpitOptions: CockpitOptions,
         index: number,
-        allBindings: CockpitsOptions
+        allBindings: CockpitsOptions,
+        bridge: AircraftBridge
     ): HTMLElement {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
@@ -146,7 +155,7 @@ export class CockpitsUI {
             cockpitOptions.selected_type,
             (selectedIndex) => {
                 cockpitOptions.selected_type.selected = selectedIndex;
-                this.bridge.setCockpitsBindings(allBindings);
+                bridge.setCockpitsBindings(allBindings);
                 // Re-render to update enabled states
                 this.render();
             }
@@ -166,7 +175,7 @@ export class CockpitsUI {
                 cockpitOptions.selected_upgrades,
                 (idx, checked) => {
                     cockpitOptions.selected_upgrades[idx].selected = checked;
-                    this.bridge.setCockpitsBindings(allBindings);
+                    bridge.setCockpitsBindings(allBindings);
                     // Re-render to update enabled states
                     this.render();
                 }
@@ -186,7 +195,7 @@ export class CockpitsUI {
                 cockpitOptions.selected_safety,
                 (idx, checked) => {
                     cockpitOptions.selected_safety[idx].selected = checked;
-                    this.bridge.setCockpitsBindings(allBindings);
+                    bridge.setCockpitsBindings(allBindings);
                     // Re-render to update enabled states
                     this.render();
                 }
@@ -206,7 +215,7 @@ export class CockpitsUI {
                 cockpitOptions.selected_gunsights,
                 (idx, checked) => {
                     cockpitOptions.selected_gunsights[idx].selected = checked;
-                    this.bridge.setCockpitsBindings(allBindings);
+                    bridge.setCockpitsBindings(allBindings);
                     // Re-render to update enabled states
                     this.render();
                 }
@@ -225,7 +234,7 @@ export class CockpitsUI {
             cockpitOptions.bombsight,
             (newValue) => {
                 cockpitOptions.bombsight.value = newValue;
-                this.bridge.setCockpitsBindings(allBindings);
+                bridge.setCockpitsBindings(allBindings);
                 // Re-render to update enabled states
                 this.render();
             },

@@ -15,7 +15,7 @@ export class EraUI {
     private sectionElement: HTMLElement | null = null;
 
     constructor(
-        private bridge: AircraftBridge,
+        private getBridge: () => AircraftBridge | null,
         containerId: string,
         private onUpdate?: () => void
     ) {
@@ -24,6 +24,12 @@ export class EraUI {
             throw new Error(`Container element '${containerId}' not found`);
         }
         this.container = container;
+
+        // Get the initial bridge for renderer
+        const bridge = this.getBridge();
+        if (!bridge) {
+            throw new Error('Bridge not available during EraUI construction');
+        }
 
         // Create renderer with stats update callback
         this.renderer = new BindingRenderer(bridge, () => {
@@ -45,13 +51,15 @@ export class EraUI {
         // Clear existing content
         this.container.innerHTML = '';
 
-        if (!this.bridge.isInitialized()) {
+        // Get current bridge (may be new after language change)
+        const bridge = this.getBridge();
+        if (!bridge || !bridge.isInitialized()) {
             console.warn('[EraUI] Bridge not initialized, skipping render');
             return;
         }
 
         // Get Era bindings from Rust (includes localized strings)
-        const eraBindings = this.bridge.getEraBindings();
+        const eraBindings = bridge.getEraBindings();
 
         // Create table for Era selection
         const table = document.createElement('table');
@@ -70,7 +78,7 @@ export class EraUI {
                 eraBindings.selected_era.selected = selectedIndex;
 
                 // Send back to Rust
-                this.bridge.setEraBindings(eraBindings);
+                bridge.setEraBindings(eraBindings);
 
                 // Re-render to update any dependent states
                 this.render();
