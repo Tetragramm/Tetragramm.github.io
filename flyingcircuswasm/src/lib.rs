@@ -145,4 +145,20 @@ impl AircraftWasm {
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
         Ok(AircraftWasm { inner: aircraft })
     }
+
+    /// Get Cockpits UI bindings (includes localized strings)
+    #[wasm_bindgen(js_name = getCockpitsBindings)]
+    pub fn get_cockpits_bindings(&self) -> JsValue {
+        let options = self.inner.cockpits.create_ui_options();
+        serde_wasm_bindgen::to_value(&options).unwrap()
+    }
+
+    /// Update Cockpits from UI bindings
+    #[wasm_bindgen(js_name = setCockpitsBindings)]
+    pub fn set_cockpits_bindings(&mut self, js_options: JsValue) {
+        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+            self.inner.cockpits.receive_ui_selections(options);
+            self.inner.calculate_stats();
+        }
+    }
 }
