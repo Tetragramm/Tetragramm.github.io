@@ -125,9 +125,9 @@ impl AircraftWasm {
 
     /// Deserialize aircraft from bytes
     #[wasm_bindgen(js_name = deserialize)]
-    pub fn deserialize(data: &[u8]) -> Result<AircraftWasm, JsValue> {
-        let mut d =
-            Deserializer::new(data).map_err(|_| JsValue::from_str("Failed to Deserialize"))?;
+    pub fn deserialize(data: &str) -> Result<AircraftWasm, JsValue> {
+        let mut d = Deserializer::from_lz_string(data)
+            .map_err(|_| JsValue::from_str("Failed to Deserialize"))?;
         let mut aircraft = Aircraft::new();
         aircraft
             .deserialize(&mut d)
