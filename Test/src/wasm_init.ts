@@ -123,8 +123,8 @@ export class WasmApplication {
             // For bundler target, the default export is the init function
             // We need to wrap it to match our expected interface
             return {
-                default: wasmModule.default,
-                init: wasmModule.default, // The initialization function
+                default: wasmModule.init_panic_hook,
+                init: wasmModule.init_panic_hook, // The initialization function
                 AircraftWasm: wasmModule.AircraftWasm,
                 Localization: wasmModule.Localization
             };
