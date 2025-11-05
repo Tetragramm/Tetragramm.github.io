@@ -7,6 +7,9 @@ module.exports = {
         hangar: './src/Hangar/hangar.ts',
         engine_builder: './src/EngineBuilder/engine_builder.ts'
     },
+    experiments: {
+        asyncWebAssembly: true,
+    },
     module: {
         rules: [
             {
