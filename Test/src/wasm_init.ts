@@ -38,6 +38,15 @@ export class WasmApplication {
                 return;
             }
 
+            // Initialize WASM (this loads the .wasm binary)
+            // The init function is the default export from wasm-pack
+            const initWasm = wasmModule.default || wasmModule.init;
+            if (typeof initWasm !== 'function') {
+                throw new Error('WASM init function not found. Expected wasmModule.default to be a function.');
+            }
+            await initWasm();
+            console.log('[WasmApp] WASM binary loaded');
+
             // Initialize localization with WASM backend
             localization.initializeWasm(wasmModule.Localization);
             console.log('[WasmApp] Localization initialized');
@@ -51,9 +60,10 @@ export class WasmApplication {
             }
 
             // Create aircraft bridge
+            // Note: We already called initWasm() above, so we pass a no-op function
             this.bridge = new AircraftBridge();
             await this.bridge.initialize(
-                wasmModule.default,
+                async () => { /* Already initialized */ },
                 wasmModule.AircraftWasm
             );
             console.log('[WasmApp] Aircraft bridge initialized');
@@ -64,7 +74,7 @@ export class WasmApplication {
                 try {
                     const loadedBridge = await AircraftBridge.deserializeFromLZString(
                         jsonParam,
-                        wasmModule.default,
+                        async () => { /* Already initialized */ },
                         wasmModule.AircraftWasm
                     );
                     this.bridge = loadedBridge;
@@ -105,8 +115,19 @@ export class WasmApplication {
     private async loadWasmModule(): Promise<WasmModule | null> {
         try {
             // Try to import the WASM module
+            // wasm-pack with --target bundler exports:
+            // - default: initialization function
+            // - named exports: classes and functions
             const wasmModule = await import('../pkg/flyingcircuswasm');
-            return wasmModule;
+
+            // For bundler target, the default export is the init function
+            // We need to wrap it to match our expected interface
+            return {
+                default: wasmModule.default,
+                init: wasmModule.default, // The initialization function
+                AircraftWasm: wasmModule.AircraftWasm,
+                Localization: wasmModule.Localization
+            };
         } catch (e) {
             console.warn('[WasmApp] WASM module not found (not yet built):', e);
             return null;
