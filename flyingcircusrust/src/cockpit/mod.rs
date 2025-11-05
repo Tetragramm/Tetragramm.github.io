@@ -44,7 +44,7 @@ pub struct Cockpit {
     seat_index: usize,
     #[ui(
         number,
-        name = "bombsight",
+        name = "Bombsight",
         enabled_fn,
         set_fn = "set_bombsight_quality"
     )]
