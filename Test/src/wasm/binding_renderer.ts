@@ -231,4 +231,82 @@ export class BindingRenderer {
 
         return container;
     }
+
+    /**
+     * Render a stats table
+     * @param stats Stats object from Rust
+     * @param statConfig Configuration for which stats to display and how
+     * @param derivedStats Optional derived stats for the component
+     * @returns HTML table element with stats
+     */
+    renderStatsTable(
+        stats: any,
+        statConfig: StatDisplayConfig[],
+        derivedStats?: any
+    ): HTMLElement {
+        const table = document.createElement('table');
+        table.className = 'inner_table';
+
+        // Group stats into rows of 3
+        const statsPerRow = 3;
+        for (let i = 0; i < statConfig.length; i += statsPerRow) {
+            const rowStats = statConfig.slice(i, Math.min(i + statsPerRow, statConfig.length));
+
+            // Header row
+            const headerRow = table.insertRow();
+            rowStats.forEach(config => {
+                const th = document.createElement('th');
+                th.textContent = localization.translate(config.label);
+                headerRow.appendChild(th);
+            });
+
+            // Value row
+            const valueRow = table.insertRow();
+            rowStats.forEach(config => {
+                const td = valueRow.insertCell();
+
+                // Get the value from stats or derivedStats
+                let value = stats[config.key];
+                if (value === undefined && derivedStats) {
+                    value = derivedStats[config.key];
+                }
+
+                // Handle special cases (like flight stress range)
+                if (config.key === 'flightstress' && derivedStats) {
+                    const min = derivedStats.flight_stress_min;
+                    const max = derivedStats.flight_stress_max;
+                    if (min !== max) {
+                        value = `${min}-${max}`;
+                    } else {
+                        value = min.toString();
+                    }
+                } else {
+                    value = value?.toString() || '0';
+                }
+
+                td.textContent = value;
+
+                // Apply derived stat styling if applicable
+                if (config.isDerived) {
+                    td.className = 'part_local';
+                }
+            });
+        }
+
+        return table;
+    }
+}
+
+/**
+ * Configuration for displaying a single stat
+ */
+export interface StatDisplayConfig {
+    /** Key in the Stats object */
+    key: string;
+    /** Label to display (localization key) */
+    label: string;
+    /** Whether positive change is good (true), bad (false), or neutral (undefined) */
+    positiveIsGood?: boolean;
+    /** Whether this is a derived stat (gets special background) */
+    isDerived?: boolean;
 }

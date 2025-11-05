@@ -173,4 +173,36 @@ impl AircraftWasm {
             self.inner.part_stats();
         }
     }
+
+    /// Get stats for a specific cockpit
+    #[wasm_bindgen(js_name = getCockpitStats)]
+    pub fn get_cockpit_stats(&mut self, index: usize) -> JsValue {
+        if index < self.inner.cockpits.positions.len() {
+            let stats = self.inner.cockpits.positions[index].part_stats();
+            serde_wasm_bindgen::to_value(&stats).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
+
+    /// Get derived stats for a specific cockpit (flight stress, escape, visibility)
+    #[wasm_bindgen(js_name = getCockpitDerivedStats)]
+    pub fn get_cockpit_derived_stats(&self, index: usize) -> JsValue {
+        if index < self.inner.cockpits.positions.len() {
+            let cockpit = &self.inner.cockpits.positions[index];
+            let flight_stress = cockpit.get_flight_stress();
+            let escape = cockpit.get_escape();
+            let visibility = cockpit.get_visibility();
+
+            let result = serde_json::json!({
+                "flight_stress_min": flight_stress.0,
+                "flight_stress_max": flight_stress.1,
+                "escape": escape,
+                "visibility": visibility
+            });
+            serde_wasm_bindgen::to_value(&result).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
 }

@@ -6,8 +6,21 @@
  */
 
 import { AircraftBridge, CockpitsOptions, CockpitOptions } from '../aircraft_bridge';
-import { BindingRenderer, NumberBinding, CheckBinding } from '../binding_renderer';
+import { BindingRenderer, NumberBinding, CheckBinding, StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
+
+// Cockpit stats configuration
+const COCKPIT_STATS: StatDisplayConfig[] = [
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'control', label: 'Stat Control', positiveIsGood: true },
+    { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
+    { key: '', label: '', positiveIsGood: undefined }, // Empty cell for layout
+    { key: 'flightstress', label: 'Stat Flight Stress', positiveIsGood: false, isDerived: true },
+    { key: 'escape', label: 'Stat Escape', positiveIsGood: true, isDerived: true },
+    { key: 'visibility', label: 'Stat Visibility', positiveIsGood: true, isDerived: true }
+];
 
 export class CockpitsUI {
     private container: HTMLElement;
@@ -101,7 +114,8 @@ export class CockpitsUI {
             localization.translate('Cockpit Option'),
             localization.translate('Cockpit Upgrade'),
             localization.translate('Cockpit Safety Options'),
-            localization.translate('Cockpit Gunsights')
+            localization.translate('Cockpit Gunsights'),
+            localization.translate('Cockpit Stats')
         ];
         headers.forEach(headerText => {
             const th = document.createElement('th');
@@ -225,6 +239,15 @@ export class CockpitsUI {
             }, 0, 20, 1);
         gunsightsCell.appendChild(gunsightsFlex);
         row.appendChild(gunsightsCell);
+
+        // Column 5: Stats (using stats renderer)
+        const statsCell = document.createElement('td');
+        statsCell.className = 'inner_table';
+        const stats = bridge.getCockpitStats(index);
+        const derivedStats = bridge.getCockpitDerivedStats(index);
+        const statsTable = this.renderer.renderStatsTable(stats, COCKPIT_STATS, derivedStats);
+        statsCell.appendChild(statsTable);
+        row.appendChild(statsCell);
 
         return row;
     }

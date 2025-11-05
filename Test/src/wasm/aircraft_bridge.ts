@@ -48,6 +48,25 @@ export interface CockpitsOptions {
     positions: CockpitOptions[];
 }
 
+export interface Stats {
+    mass: number;
+    drag: number;
+    cost: number;
+    control: number;
+    reqsections: number;
+    flightstress: number;
+    escape: number;
+    visibility: number;
+    [key: string]: any; // Allow other stat properties
+}
+
+export interface CockpitDerivedStats {
+    flight_stress_min: number;
+    flight_stress_max: number;
+    escape: number;
+    visibility: number;
+}
+
 export interface DerivedStats {
     dry_mp: number;
     wet_mp: number;
@@ -93,6 +112,8 @@ export interface AircraftWasmAPI {
     setEraBindings(bindings: any): void;
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
+    getCockpitStats(index: number): any;
+    getCockpitDerivedStats(index: number): any;
     calculateStats(): void;
     getDerivedStats(): DerivedStats;
     getStats(): any;
@@ -188,6 +209,22 @@ export class AircraftBridge {
     setCockpitsBindings(bindings: CockpitsOptions): void {
         this.ensureInitialized();
         this.wasm!.setCockpitsBindings(bindings);
+    }
+
+    /**
+     * Get stats for a specific cockpit
+     */
+    getCockpitStats(index: number): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getCockpitStats(index);
+    }
+
+    /**
+     * Get derived stats for a specific cockpit (flight stress, escape, visibility)
+     */
+    getCockpitDerivedStats(index: number): CockpitDerivedStats {
+        this.ensureInitialized();
+        return this.wasm!.getCockpitDerivedStats(index);
     }
 
     /**
