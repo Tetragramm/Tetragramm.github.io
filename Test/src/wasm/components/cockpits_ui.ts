@@ -65,8 +65,21 @@ export class CockpitsUI {
         const contentDiv = document.createElement('div');
         contentDiv.className = 'content';
 
-        // Number of cockpits control
-        const numCockpitsRow = document.createElement('h4');
+        // Number of cockpits control (using table layout for consistency)
+        const controlTable = document.createElement('table');
+        controlTable.style.width = 'auto';
+        controlTable.style.borderCollapse = 'collapse';
+        controlTable.style.marginBottom = '10px';
+
+        const numCockpitsRow = document.createElement('tr');
+        const numCockpitsLabelCell = document.createElement('td');
+        numCockpitsLabelCell.style.textAlign = 'left';
+        numCockpitsLabelCell.style.paddingRight = '10px';
+        numCockpitsLabelCell.style.verticalAlign = 'middle';
+
+        const numCockpitsInputCell = document.createElement('td');
+        numCockpitsInputCell.style.textAlign = 'right';
+        numCockpitsInputCell.style.verticalAlign = 'middle';
         const numCockpitsControl = this.renderer.renderNumber(
             cockpitsBindings.num_cockpits,
             (newValue) => {
@@ -79,8 +92,12 @@ export class CockpitsUI {
             20, // max
             1   // step
         );
-        numCockpitsRow.appendChild(numCockpitsControl);
-        contentDiv.appendChild(numCockpitsRow);
+        numCockpitsInputCell.appendChild(numCockpitsControl);
+
+        numCockpitsRow.appendChild(numCockpitsLabelCell);
+        numCockpitsRow.appendChild(numCockpitsInputCell);
+        controlTable.appendChild(numCockpitsRow);
+        contentDiv.appendChild(controlTable);
 
         // Render each cockpit position
         const table = document.createElement('table');
@@ -142,15 +159,28 @@ export class CockpitsUI {
 
         // Cockpit header
         const header = document.createElement('h4');
-        header.textContent = `${localization.translate('Seat #')} ${index + 1}`;
+        header.textContent = localization.translateWithParam('Seat #', index + 1);
         header.style.marginTop = '0';
         cell.appendChild(header);
 
-        // Cockpit type selection
-        const typeLabel = document.createElement('strong');
-        typeLabel.textContent = localization.translate('Cockpit Option') + ': ';
-        cell.appendChild(typeLabel);
+        // Create inner table for aligned layout
+        const innerTable = document.createElement('table');
+        innerTable.style.width = 'auto'; // Only as wide as needed
+        innerTable.style.borderCollapse = 'collapse';
 
+        // Cockpit type selection
+        const typeRow = document.createElement('tr');
+        const typeLabelCell = document.createElement('td');
+        typeLabelCell.style.textAlign = 'left';
+        typeLabelCell.style.paddingRight = '10px';
+        typeLabelCell.style.verticalAlign = 'middle';
+        const typeLabel = document.createElement('strong');
+        typeLabel.textContent = localization.translate('Cockpit Option') + ':';
+        typeLabelCell.appendChild(typeLabel);
+
+        const typeInputCell = document.createElement('td');
+        typeInputCell.style.textAlign = 'right';
+        typeInputCell.style.verticalAlign = 'middle';
         const typeSelect = this.renderer.renderSelect(
             cockpitOptions.selected_type,
             (selectedIndex) => {
@@ -160,17 +190,26 @@ export class CockpitsUI {
                 this.render();
             }
         );
-        cell.appendChild(typeSelect);
-        cell.appendChild(document.createElement('br'));
-        cell.appendChild(document.createElement('br'));
+        typeInputCell.appendChild(typeSelect);
+
+        typeRow.appendChild(typeLabelCell);
+        typeRow.appendChild(typeInputCell);
+        innerTable.appendChild(typeRow);
 
         // Upgrades section
         if (cockpitOptions.selected_upgrades.length > 0) {
+            const upgradesRow = document.createElement('tr');
+            const upgradesLabelCell = document.createElement('td');
+            upgradesLabelCell.style.textAlign = 'left';
+            upgradesLabelCell.style.paddingRight = '10px';
+            upgradesLabelCell.style.verticalAlign = 'top';
             const upgradesLabel = document.createElement('strong');
             upgradesLabel.textContent = localization.translate('Cockpit Upgrade') + ':';
-            cell.appendChild(upgradesLabel);
-            cell.appendChild(document.createElement('br'));
+            upgradesLabelCell.appendChild(upgradesLabel);
 
+            const upgradesInputCell = document.createElement('td');
+            upgradesInputCell.style.textAlign = 'right';
+            upgradesInputCell.style.verticalAlign = 'top';
             const upgradesList = this.renderer.renderCheckList(
                 cockpitOptions.selected_upgrades,
                 (idx, checked) => {
@@ -180,17 +219,27 @@ export class CockpitsUI {
                     this.render();
                 }
             );
-            cell.appendChild(upgradesList);
-            cell.appendChild(document.createElement('br'));
+            upgradesInputCell.appendChild(upgradesList);
+
+            upgradesRow.appendChild(upgradesLabelCell);
+            upgradesRow.appendChild(upgradesInputCell);
+            innerTable.appendChild(upgradesRow);
         }
 
         // Safety options section
         if (cockpitOptions.selected_safety.length > 0) {
+            const safetyRow = document.createElement('tr');
+            const safetyLabelCell = document.createElement('td');
+            safetyLabelCell.style.textAlign = 'left';
+            safetyLabelCell.style.paddingRight = '10px';
+            safetyLabelCell.style.verticalAlign = 'top';
             const safetyLabel = document.createElement('strong');
             safetyLabel.textContent = localization.translate('Cockpit Safety Options') + ':';
-            cell.appendChild(safetyLabel);
-            cell.appendChild(document.createElement('br'));
+            safetyLabelCell.appendChild(safetyLabel);
 
+            const safetyInputCell = document.createElement('td');
+            safetyInputCell.style.textAlign = 'right';
+            safetyInputCell.style.verticalAlign = 'top';
             const safetyList = this.renderer.renderCheckList(
                 cockpitOptions.selected_safety,
                 (idx, checked) => {
@@ -200,17 +249,27 @@ export class CockpitsUI {
                     this.render();
                 }
             );
-            cell.appendChild(safetyList);
-            cell.appendChild(document.createElement('br'));
+            safetyInputCell.appendChild(safetyList);
+
+            safetyRow.appendChild(safetyLabelCell);
+            safetyRow.appendChild(safetyInputCell);
+            innerTable.appendChild(safetyRow);
         }
 
         // Gunsights section
         if (cockpitOptions.selected_gunsights.length > 0) {
+            const gunsightsRow = document.createElement('tr');
+            const gunsightsLabelCell = document.createElement('td');
+            gunsightsLabelCell.style.textAlign = 'left';
+            gunsightsLabelCell.style.paddingRight = '10px';
+            gunsightsLabelCell.style.verticalAlign = 'top';
             const gunsightsLabel = document.createElement('strong');
             gunsightsLabel.textContent = localization.translate('Cockpit Gunsights') + ':';
-            cell.appendChild(gunsightsLabel);
-            cell.appendChild(document.createElement('br'));
+            gunsightsLabelCell.appendChild(gunsightsLabel);
 
+            const gunsightsInputCell = document.createElement('td');
+            gunsightsInputCell.style.textAlign = 'right';
+            gunsightsInputCell.style.verticalAlign = 'top';
             const gunsightsList = this.renderer.renderCheckList(
                 cockpitOptions.selected_gunsights,
                 (idx, checked) => {
@@ -220,16 +279,26 @@ export class CockpitsUI {
                     this.render();
                 }
             );
-            cell.appendChild(gunsightsList);
-            cell.appendChild(document.createElement('br'));
+            gunsightsInputCell.appendChild(gunsightsList);
+
+            gunsightsRow.appendChild(gunsightsLabelCell);
+            gunsightsRow.appendChild(gunsightsInputCell);
+            innerTable.appendChild(gunsightsRow);
         }
 
         // Bombsight section
+        const bombsightRow = document.createElement('tr');
+        const bombsightLabelCell = document.createElement('td');
+        bombsightLabelCell.style.textAlign = 'left';
+        bombsightLabelCell.style.paddingRight = '10px';
+        bombsightLabelCell.style.verticalAlign = 'middle';
         const bombsightLabel = document.createElement('strong');
         bombsightLabel.textContent = localization.translate('Cockpit Bombsight') + ':';
-        cell.appendChild(bombsightLabel);
-        cell.appendChild(document.createElement('br'));
+        bombsightLabelCell.appendChild(bombsightLabel);
 
+        const bombsightInputCell = document.createElement('td');
+        bombsightInputCell.style.textAlign = 'right';
+        bombsightInputCell.style.verticalAlign = 'middle';
         const bombsightControl = this.renderer.renderNumber(
             cockpitOptions.bombsight,
             (newValue) => {
@@ -242,7 +311,14 @@ export class CockpitsUI {
             20,  // max
             1    // step
         );
-        cell.appendChild(bombsightControl);
+        bombsightInputCell.appendChild(bombsightControl);
+
+        bombsightRow.appendChild(bombsightLabelCell);
+        bombsightRow.appendChild(bombsightInputCell);
+        innerTable.appendChild(bombsightRow);
+
+        // Add the inner table to the cell
+        cell.appendChild(innerTable);
 
         row.appendChild(cell);
         return row;

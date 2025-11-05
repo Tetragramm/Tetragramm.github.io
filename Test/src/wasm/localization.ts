@@ -11,6 +11,7 @@ export interface LocalizationAPI {
     getLocale(): string;
     setLocale(locale: string): void;
     translate(key: string): string;
+    translateWithParam(key: string, value: string): string;
 }
 
 // Singleton pattern for localization management
@@ -88,6 +89,19 @@ export class LocalizationManager {
         }
         // Fallback: return the key itself if WASM not loaded
         return key;
+    }
+
+    /**
+     * Translate a key with parameter interpolation
+     * The translation string should contain %{A} which will be replaced with the value
+     */
+    translateWithParam(key: string, value: string | number): string {
+        const strValue = String(value);
+        if (this.wasmLocalization) {
+            return this.wasmLocalization.translateWithParam(key, strValue);
+        }
+        // Fallback: return key with value appended if WASM not loaded
+        return `${key} ${strValue}`;
     }
 
     /**

@@ -4416,6 +4416,13 @@ pub fn translate(key: &str) -> String {
     t!(key).into()
 }
 
+/// Translate a key with a single parameter substitution
+/// The translation string should contain %{A} which will be replaced with the value
+pub fn translate_with_param(key: &str, value: &str) -> String {
+    let translated = t!(key).to_string();
+    translated.replace("%{A}", value)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::{

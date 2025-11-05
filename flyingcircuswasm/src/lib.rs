@@ -43,6 +43,13 @@ impl Localization {
     pub fn translate(key: &str) -> String {
         flyingcircusrust::translate(key)
     }
+
+    /// Translate a key with one parameter substitution
+    /// The translation string should contain %{A} which will be replaced with the value
+    #[wasm_bindgen(js_name = translateWithParam)]
+    pub fn translate_with_param(key: &str, value: &str) -> String {
+        flyingcircusrust::translate_with_param(key, value)
+    }
 }
 
 /// Main Aircraft wrapper for WASM
