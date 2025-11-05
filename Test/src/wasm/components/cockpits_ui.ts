@@ -198,120 +198,166 @@ export class CockpitsUI {
 
         // Upgrades section
         if (cockpitOptions.selected_upgrades.length > 0) {
-            const upgradesRow = document.createElement('tr');
-            const upgradesLabelCell = document.createElement('td');
-            upgradesLabelCell.style.textAlign = 'left';
-            upgradesLabelCell.style.paddingRight = '10px';
-            upgradesLabelCell.style.verticalAlign = 'top';
-            const upgradesLabel = document.createElement('strong');
-            upgradesLabel.textContent = localization.translate('Cockpit Upgrade') + ':';
-            upgradesLabelCell.appendChild(upgradesLabel);
+            // Section header
+            const upgradesHeaderRow = document.createElement('tr');
+            const upgradesHeader = document.createElement('th');
+            upgradesHeader.colSpan = 2;
+            upgradesHeader.style.textAlign = 'center';
+            upgradesHeader.style.textDecoration = 'underline';
+            upgradesHeader.textContent = localization.translate('Cockpit Upgrade');
+            upgradesHeaderRow.appendChild(upgradesHeader);
+            innerTable.appendChild(upgradesHeaderRow);
 
-            const upgradesInputCell = document.createElement('td');
-            upgradesInputCell.style.textAlign = 'right';
-            upgradesInputCell.style.verticalAlign = 'top';
-            const upgradesList = this.renderer.renderCheckList(
-                cockpitOptions.selected_upgrades,
-                (idx, checked) => {
-                    cockpitOptions.selected_upgrades[idx].selected = checked;
+            // Individual upgrade rows
+            cockpitOptions.selected_upgrades.forEach((upgrade, idx) => {
+                const upgradeRow = document.createElement('tr');
+
+                const labelCell = document.createElement('td');
+                labelCell.style.textAlign = 'left';
+                labelCell.style.paddingRight = '10px';
+                labelCell.style.verticalAlign = 'middle';
+                labelCell.textContent = upgrade.name + ':';
+
+                const inputCell = document.createElement('td');
+                inputCell.style.textAlign = 'right';
+                inputCell.style.verticalAlign = 'middle';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = upgrade.selected;
+                checkbox.disabled = !upgrade.enabled;
+                checkbox.addEventListener('change', () => {
+                    cockpitOptions.selected_upgrades[idx].selected = checkbox.checked;
                     bridge.setCockpitsBindings(allBindings);
-                    // Re-render to update enabled states
                     this.render();
-                }
-            );
-            upgradesInputCell.appendChild(upgradesList);
+                });
+                inputCell.appendChild(checkbox);
 
-            upgradesRow.appendChild(upgradesLabelCell);
-            upgradesRow.appendChild(upgradesInputCell);
-            innerTable.appendChild(upgradesRow);
+                upgradeRow.appendChild(labelCell);
+                upgradeRow.appendChild(inputCell);
+                innerTable.appendChild(upgradeRow);
+            });
         }
 
         // Safety options section
         if (cockpitOptions.selected_safety.length > 0) {
-            const safetyRow = document.createElement('tr');
-            const safetyLabelCell = document.createElement('td');
-            safetyLabelCell.style.textAlign = 'left';
-            safetyLabelCell.style.paddingRight = '10px';
-            safetyLabelCell.style.verticalAlign = 'top';
-            const safetyLabel = document.createElement('strong');
-            safetyLabel.textContent = localization.translate('Cockpit Safety Options') + ':';
-            safetyLabelCell.appendChild(safetyLabel);
+            // Section header
+            const safetyHeaderRow = document.createElement('tr');
+            const safetyHeader = document.createElement('th');
+            safetyHeader.colSpan = 2;
+            safetyHeader.style.textAlign = 'center';
+            safetyHeader.style.textDecoration = 'underline';
+            safetyHeader.textContent = localization.translate('Cockpit Safety Options');
+            safetyHeaderRow.appendChild(safetyHeader);
+            innerTable.appendChild(safetyHeaderRow);
 
-            const safetyInputCell = document.createElement('td');
-            safetyInputCell.style.textAlign = 'right';
-            safetyInputCell.style.verticalAlign = 'top';
-            const safetyList = this.renderer.renderCheckList(
-                cockpitOptions.selected_safety,
-                (idx, checked) => {
-                    cockpitOptions.selected_safety[idx].selected = checked;
+            // Individual safety rows
+            cockpitOptions.selected_safety.forEach((safety, idx) => {
+                const safetyRow = document.createElement('tr');
+
+                const labelCell = document.createElement('td');
+                labelCell.style.textAlign = 'left';
+                labelCell.style.paddingRight = '10px';
+                labelCell.style.verticalAlign = 'middle';
+                labelCell.textContent = safety.name + ':';
+
+                const inputCell = document.createElement('td');
+                inputCell.style.textAlign = 'right';
+                inputCell.style.verticalAlign = 'middle';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = safety.selected;
+                checkbox.disabled = !safety.enabled;
+                checkbox.addEventListener('change', () => {
+                    cockpitOptions.selected_safety[idx].selected = checkbox.checked;
                     bridge.setCockpitsBindings(allBindings);
-                    // Re-render to update enabled states
                     this.render();
-                }
-            );
-            safetyInputCell.appendChild(safetyList);
+                });
+                inputCell.appendChild(checkbox);
 
-            safetyRow.appendChild(safetyLabelCell);
-            safetyRow.appendChild(safetyInputCell);
-            innerTable.appendChild(safetyRow);
+                safetyRow.appendChild(labelCell);
+                safetyRow.appendChild(inputCell);
+                innerTable.appendChild(safetyRow);
+            });
         }
 
         // Gunsights section
         if (cockpitOptions.selected_gunsights.length > 0) {
-            const gunsightsRow = document.createElement('tr');
-            const gunsightsLabelCell = document.createElement('td');
-            gunsightsLabelCell.style.textAlign = 'left';
-            gunsightsLabelCell.style.paddingRight = '10px';
-            gunsightsLabelCell.style.verticalAlign = 'top';
-            const gunsightsLabel = document.createElement('strong');
-            gunsightsLabel.textContent = localization.translate('Cockpit Gunsights') + ':';
-            gunsightsLabelCell.appendChild(gunsightsLabel);
+            // Section header
+            const gunsightsHeaderRow = document.createElement('tr');
+            const gunsightsHeader = document.createElement('th');
+            gunsightsHeader.colSpan = 2;
+            gunsightsHeader.style.textAlign = 'center';
+            gunsightsHeader.style.textDecoration = 'underline';
+            gunsightsHeader.textContent = localization.translate('Cockpit Gunsights');
+            gunsightsHeaderRow.appendChild(gunsightsHeader);
+            innerTable.appendChild(gunsightsHeaderRow);
 
-            const gunsightsInputCell = document.createElement('td');
-            gunsightsInputCell.style.textAlign = 'right';
-            gunsightsInputCell.style.verticalAlign = 'top';
-            const gunsightsList = this.renderer.renderCheckList(
-                cockpitOptions.selected_gunsights,
-                (idx, checked) => {
-                    cockpitOptions.selected_gunsights[idx].selected = checked;
+            // Individual gunsight rows
+            cockpitOptions.selected_gunsights.forEach((gunsight, idx) => {
+                const gunsightRow = document.createElement('tr');
+
+                const labelCell = document.createElement('td');
+                labelCell.style.textAlign = 'left';
+                labelCell.style.paddingRight = '10px';
+                labelCell.style.verticalAlign = 'middle';
+                labelCell.textContent = gunsight.name + ':';
+
+                const inputCell = document.createElement('td');
+                inputCell.style.textAlign = 'right';
+                inputCell.style.verticalAlign = 'middle';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = gunsight.selected;
+                checkbox.disabled = !gunsight.enabled;
+                checkbox.addEventListener('change', () => {
+                    cockpitOptions.selected_gunsights[idx].selected = checkbox.checked;
                     bridge.setCockpitsBindings(allBindings);
-                    // Re-render to update enabled states
                     this.render();
-                }
-            );
-            gunsightsInputCell.appendChild(gunsightsList);
+                });
+                inputCell.appendChild(checkbox);
 
-            gunsightsRow.appendChild(gunsightsLabelCell);
-            gunsightsRow.appendChild(gunsightsInputCell);
-            innerTable.appendChild(gunsightsRow);
+                gunsightRow.appendChild(labelCell);
+                gunsightRow.appendChild(inputCell);
+                innerTable.appendChild(gunsightRow);
+            });
         }
 
         // Bombsight section
+        const bombsightHeaderRow = document.createElement('tr');
+        const bombsightHeader = document.createElement('th');
+        bombsightHeader.colSpan = 2;
+        bombsightHeader.style.textAlign = 'center';
+        bombsightHeader.style.textDecoration = 'underline';
+        bombsightHeader.textContent = localization.translate('Cockpit Bombsight');
+        bombsightHeaderRow.appendChild(bombsightHeader);
+        innerTable.appendChild(bombsightHeaderRow);
+
         const bombsightRow = document.createElement('tr');
         const bombsightLabelCell = document.createElement('td');
         bombsightLabelCell.style.textAlign = 'left';
         bombsightLabelCell.style.paddingRight = '10px';
         bombsightLabelCell.style.verticalAlign = 'middle';
-        const bombsightLabel = document.createElement('strong');
-        bombsightLabel.textContent = localization.translate('Cockpit Bombsight') + ':';
-        bombsightLabelCell.appendChild(bombsightLabel);
+        bombsightLabelCell.textContent = cockpitOptions.bombsight.name + ':';
 
         const bombsightInputCell = document.createElement('td');
         bombsightInputCell.style.textAlign = 'right';
         bombsightInputCell.style.verticalAlign = 'middle';
-        const bombsightControl = this.renderer.renderNumber(
-            cockpitOptions.bombsight,
-            (newValue) => {
+        const bombsightInput = document.createElement('input');
+        bombsightInput.type = 'number';
+        bombsightInput.value = cockpitOptions.bombsight.value.toString();
+        bombsightInput.disabled = !cockpitOptions.bombsight.enabled;
+        bombsightInput.min = '0';
+        bombsightInput.max = '20';
+        bombsightInput.step = '1';
+        bombsightInput.addEventListener('change', () => {
+            const newValue = parseFloat(bombsightInput.value);
+            if (!isNaN(newValue)) {
                 cockpitOptions.bombsight.value = newValue;
                 bridge.setCockpitsBindings(allBindings);
-                // Re-render to update enabled states
                 this.render();
-            },
-            0,   // min
-            20,  // max
-            1    // step
-        );
-        bombsightInputCell.appendChild(bombsightControl);
+            }
+        });
+        bombsightInputCell.appendChild(bombsightInput);
 
         bombsightRow.appendChild(bombsightLabelCell);
         bombsightRow.appendChild(bombsightInputCell);
