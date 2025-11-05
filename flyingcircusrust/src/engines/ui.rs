@@ -1,7 +1,9 @@
 use super::Engines;
+use serde::{Deserialize, Serialize};
 use ui_core::*;
 
 /// UI options struct for Engines container
+#[derive(Serialize, Deserialize)]
 pub struct EnginesOptions {
     pub is_asymmetric: Check,
     pub num_engines: usize,

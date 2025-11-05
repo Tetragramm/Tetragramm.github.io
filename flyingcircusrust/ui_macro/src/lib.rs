@@ -570,6 +570,7 @@ pub fn ui_bindings_derive(input: TokenStream) -> TokenStream {
 
     // Generate the final code
     let expanded = quote! {
+        #[derive(serde::Serialize, serde::Deserialize)]
         pub struct #options_struct_ident {
             #(#struct_fields,)*
         }

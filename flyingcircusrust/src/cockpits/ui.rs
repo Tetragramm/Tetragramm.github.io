@@ -1,9 +1,11 @@
+use serde::{Deserialize, Serialize};
 use ui_core::{Number, UIBindings};
 
 use super::Cockpits;
 use crate::cockpit::CockpitOptions;
 
 /// UI options for the Cockpits container - contains options for each cockpit position
+#[derive(Serialize, Deserialize)]
 pub struct CockpitsOptions {
     pub num_cockpits: Number,
     pub positions: Vec<CockpitOptions>,

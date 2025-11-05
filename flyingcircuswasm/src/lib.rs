@@ -13,6 +13,8 @@ pub fn init_panic_hook() {
 }
 
 /// Localization API for managing translations
+///
+/// This is a pass-through wrapper for the localization functions in flyingcircusrust
 #[wasm_bindgen]
 pub struct Localization;
 
@@ -21,7 +23,10 @@ impl Localization {
     /// Get list of available languages
     #[wasm_bindgen(js_name = getAvailableLanguages)]
     pub fn get_available_languages() -> Vec<String> {
-        vec!["en".to_string(), "de".to_string()]
+        flyingcircusrust::_rust_i18n_available_locales()
+            .into_iter()
+            .map(|s| s.to_string())
+            .collect()
     }
 
     /// Set the current locale
@@ -39,7 +44,7 @@ impl Localization {
     /// Translate a single key
     #[wasm_bindgen(js_name = translate)]
     pub fn translate(key: &str) -> String {
-        t!(key).to_string()
+        flyingcircusrust::_rust_i18n_translate(rust_i18n::locale(), key).to_string()
     }
 }
 
@@ -117,7 +122,7 @@ impl AircraftWasm {
     /// Deserialize aircraft from bytes
     #[wasm_bindgen(js_name = deserialize)]
     pub fn deserialize(data: &[u8]) -> Result<AircraftWasm, JsValue> {
-        let mut d = Deserializer::new(data).map_err(|| JSValue::from_str("Failed to Deserialize."));
+        let mut d = Deserializer::new(data).map_err(|_| JsValue::from_str("Failed to Deserialize"));
         let mut aircraft = Aircraft::new();
         aircraft
             .deserialize(&mut d)
