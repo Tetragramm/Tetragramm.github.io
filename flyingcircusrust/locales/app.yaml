@@ -545,10 +545,10 @@ Cockpit Gunsights:
   es: Miras
   fr: Viseurs
 Cockpit Num Cockpits:
-  de: "Anzahl Cockpits:"
-  en: "Number of Cockpits:"
-  es: "Número de Cabinas:"
-  fr: "Nombre de Cockpits :"
+  de: "Anzahl Cockpits"
+  en: "Number of Cockpits"
+  es: "Número de Cabinas"
+  fr: "Nombre de Cockpits"
 Cockpit Option:
   de: Option
   en: Option
@@ -1045,10 +1045,10 @@ Engine Upgrades:
   es: Mejoras
   fr: Améliorations
 Engines Asymmetric Plane:
-  de: "Asymmetrisches Flugzeug:"
-  en: "Asymmetric Plane:"
-  es: "Avión Asimétrico:"
-  fr: "Avion Asymétrique :"
+  de: "Asymmetrisches Flugzeug"
+  en: "Asymmetric Plane"
+  es: "Avión Asimétrico"
+  fr: "Avion Asymétrique"
 Engines Engine Stats:
   de: "Motor-Werte"
   en: Engine Stats
@@ -1060,15 +1060,15 @@ Engines Engine Type:
   es: Tipo de Motor
   fr: Type de Moteur
 Engines Num Engines:
-  de: "Anzahl Motoren:"
-  en: "Number of Engines:"
-  es: "Número de Motores:"
-  fr: "Nombre de Moteurs :"
+  de: "Anzahl Motoren"
+  en: "Number of Engines"
+  es: "Número de Motores"
+  fr: "Nombre de Moteurs "
 Engines Num Radiators:
-  de: "Anzahl Kühler:"
-  en: "Number of Radiators:"
-  es: "Número de Radiadores:"
-  fr: "Nombre de Radiateurs :"
+  de: "Anzahl Kühler"
+  en: "Number of Radiators"
+  es: "Número de Radiadores"
+  fr: "Nombre de Radiateurs"
 Engines Options:
   de: Optionen
   en: Options
@@ -1290,15 +1290,15 @@ Frames Skin Type:
   es: Tipo de Piel
   fr: Type de Revêtement
 Frames Tail Boom:
-  de: "Heckausleger:"
-  en: "Boom Tail:"
-  es: "Cola de Pluma:"
-  fr: "Queue Poutre :"
+  de: "Heckausleger"
+  en: "Boom Tail"
+  es: "Cola de Pluma"
+  fr: "Queue Poutre"
 Frames Tail Farman:
-  de: "Farman-Heck:"
-  en: "Farman Tail:"
-  es: "Cola Farman:"
-  fr: "Queue Farman :"
+  de: "Farman-Heck"
+  en: "Farman Tail"
+  es: "Cola Farman"
+  fr: "Queue Farman"
 Frames Tail Frame Options:
   de: "Heck-Struktur-Optionen"
   en: Tail Frame Options
@@ -1320,10 +1320,10 @@ Frames Tail Skin Type:
   es: Tipo de Piel de Cola
   fr: Type de Revêtement de Queue
 Frames Tail Type:
-  de: "Hecklänge:"
-  en: "Tail Length:"
-  es: "Longitud de Cola:"
-  fr: "Longueur de Queue :"
+  de: "Hecklänge"
+  en: "Tail Length"
+  es: "Longitud de Cola"
+  fr: "Longueur de Queue"
 Freon:
   de: Freon
   en: Freon
@@ -2050,10 +2050,10 @@ Optimization Negative:
   es: Negativo
   fr: Négatif
 Optimization Num Free Optimizations:
-  de: "Anzahl freier Optimierungen:"
-  en: "Number of Free Optimizations:"
-  es: "Número de Optimizaciones Gratuitas:"
-  fr: "Nombre d'Optimisations Gratuites :"
+  de: "Anzahl freier Optimierungen"
+  en: "Number of Free Optimizations"
+  es: "Número de Optimizaciones Gratuitas"
+  fr: "Nombre d'Optimisations Gratuites"
 Optimization Optimization Stats:
   de: "Optimierungs-Werte"
   en: Optimization Stats
@@ -2250,15 +2250,15 @@ Programmable Warning:
   es: "Puede hacer cualquier cosa menos Dogfight!, disparar armas, lanzar bombas o aterrizar."
   fr: "Peut faire tout sauf Dogfight!, tirer avec des armes, larguer des bombes, ou faire des atterrissages."
 Propeller Propeller Pitch:
-  de: "Propellerblattneigung:"
-  en: "Propeller Pitch:"
-  es: "Paso de Hélice:"
-  fr: "Pas de l'Hélice :"
-"Propeller Propeller Upgrades:":
-  de: "Propeller-Upgrades:"
-  en: "Propeller Upgrades:"
-  es: "Mejoras de Hélice:"
-  fr: "Améliorations de l'Hélice :"
+  de: "Propellerblattneigung"
+  en: "Propeller Pitch"
+  es: "Paso de Hélice"
+  fr: "Pas de l'Hélice"
+"Propeller Propeller Upgrades":
+  de: "Propeller-Upgrades"
+  en: "Propeller Upgrades"
+  es: "Mejoras de Hélice"
+  fr: "Améliorations de l'Hélice"
 Propeller Section Title:
   de: Propeller
   en: Propeller
@@ -3600,15 +3600,15 @@ Weapons Number of Mounts:
   es: Número de Montajes
   fr: Nombre de Montages
 Weapons Number of Weapon Braces:
-  de: "Anzahl Waffenhalterungen:"
-  en: "Number of Weapon Braces:"
-  es: "Número de Soportes de Armas:"
-  fr: "Nombre d'Supports d'Armes :"
+  de: "Anzahl Waffenhalterungen"
+  en: "Number of Weapon Braces"
+  es: "Número de Soportes de Armas"
+  fr: "Nombre d'Supports d'Armes"
 Weapons Number of Weapon Sets:
-  de: "Anzahl Waffensätze:"
-  en: "Number of Weapon Sets:"
-  es: "Número de Sets de Armas:"
-  fr: "Nombre d'Ensembles d'Armes :"
+  de: "Anzahl Waffensätze"
+  en: "Number of Weapon Sets"
+  es: "Número de Sets de Armas"
+  fr: "Nombre d'Ensembles d'Armes"
 Weapons Projectile:
   de: Projektil
   en: Projectile
@@ -3790,10 +3790,10 @@ Wings Area:
   es: Área
   fr: Surface
 Wings Closed Wing:
-  de: "Geschlossener Flügel:"
-  en: "Closed Wing:"
-  es: "Ala Cerrada:"
-  fr: "Aile Fermée :"
+  de: "Geschlossener Flügel"
+  en: "Closed Wing"
+  es: "Ala Cerrada"
+  fr: "Aile Fermée"
 Wings Dihedral:
   de: "V-Stellung (positiv)"
   en: Dihedral
@@ -3835,20 +3835,20 @@ Wings Span:
   es: Envergadura
   fr: Envergure
 Wings Swept Wing:
-  de: "Pfeilflügel:"
-  en: "Swept Wings:"
-  es: "Alas en Flecha:"
-  fr: "Ailes en Flèche :"
+  de: "Pfeilflügel"
+  en: "Swept Wings"
+  es: "Alas en Flecha"
+  fr: "Ailes en Flèche"
 Wings Wing Options:
   de: "Flügel-Optionen"
   en: Wing Options
   es: Opciones de Ala
   fr: Options d'Aile
 Wings Wing Stagger:
-  de: "Flügelstaffelung:"
-  en: "Wing Stagger:"
-  es: "Decalaje de Ala:"
-  fr: "Décalage des Ailes :"
+  de: "Flügelstaffelung"
+  en: "Wing Stagger"
+  es: "Decalaje de Ala"
+  fr: "Décalage des Ailes"
 Wings Wing Stats:
   de: "Flügel-Werte"
   en: Wing Stats
