@@ -65,48 +65,56 @@ export class CockpitsUI {
         const contentDiv = document.createElement('div');
         contentDiv.className = 'content';
 
-        // Number of cockpits control (using table layout for consistency)
-        const controlTable = document.createElement('table');
-        controlTable.style.width = 'auto';
-        controlTable.style.borderCollapse = 'collapse';
-        controlTable.style.marginBottom = '10px';
-
-        const numCockpitsRow = document.createElement('tr');
-        const numCockpitsLabelCell = document.createElement('td');
-        numCockpitsLabelCell.style.textAlign = 'left';
-        numCockpitsLabelCell.style.paddingRight = '10px';
-        numCockpitsLabelCell.style.verticalAlign = 'middle';
-
-        const numCockpitsInputCell = document.createElement('td');
-        numCockpitsInputCell.style.textAlign = 'right';
-        numCockpitsInputCell.style.verticalAlign = 'middle';
-        const numCockpitsControl = this.renderer.renderNumber(
-            cockpitsBindings.num_cockpits,
-            (newValue) => {
+        // Number of cockpits control (simple row above table)
+        const controlDiv = document.createElement('div');
+        controlDiv.style.marginBottom = '10px';
+        const numCockpitsLabel = document.createElement('span');
+        numCockpitsLabel.textContent = cockpitsBindings.num_cockpits.name + ': ';
+        numCockpitsLabel.style.marginRight = '10px';
+        const numCockpitsInput = document.createElement('input');
+        numCockpitsInput.type = 'number';
+        numCockpitsInput.value = cockpitsBindings.num_cockpits.value.toString();
+        numCockpitsInput.disabled = !cockpitsBindings.num_cockpits.enabled;
+        numCockpitsInput.min = '1';
+        numCockpitsInput.max = '20';
+        numCockpitsInput.step = '1';
+        numCockpitsInput.addEventListener('change', () => {
+            const newValue = parseFloat(numCockpitsInput.value);
+            if (!isNaN(newValue)) {
                 cockpitsBindings.num_cockpits.value = newValue;
                 bridge.setCockpitsBindings(cockpitsBindings);
-                // Re-render to show new cockpits
                 this.render();
-            },
-            1,  // min
-            20, // max
-            1   // step
-        );
-        numCockpitsInputCell.appendChild(numCockpitsControl);
+            }
+        });
+        controlDiv.appendChild(numCockpitsLabel);
+        controlDiv.appendChild(numCockpitsInput);
+        contentDiv.appendChild(controlDiv);
 
-        numCockpitsRow.appendChild(numCockpitsLabelCell);
-        numCockpitsRow.appendChild(numCockpitsInputCell);
-        controlTable.appendChild(numCockpitsRow);
-        contentDiv.appendChild(controlTable);
-
-        // Render each cockpit position
+        // Create main table for cockpits
         const table = document.createElement('table');
         table.style.width = '100%';
         table.id = 'table_cockpit';
 
+        // Create header row
+        const headerRow = document.createElement('tr');
+        const headers = [
+            localization.translate('Cockpit Option'),
+            localization.translate('Cockpit Upgrade'),
+            localization.translate('Cockpit Safety Options'),
+            localization.translate('Cockpit Gunsights')
+        ];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            th.style.textAlign = 'center';
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        // Render each cockpit position as a table row
         cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
-            const cockpitSection = this.renderCockpit(cockpitOptions, idx, cockpitsBindings, bridge);
-            table.appendChild(cockpitSection);
+            const cockpitRow = this.renderCockpitRow(cockpitOptions, idx, cockpitsBindings, bridge);
+            table.appendChild(cockpitRow);
         });
 
         contentDiv.appendChild(table);
@@ -143,231 +151,168 @@ export class CockpitsUI {
     }
 
     /**
-     * Render a single cockpit
+     * Render a single cockpit as a table row with columns
      */
-    private renderCockpit(
+    private renderCockpitRow(
         cockpitOptions: CockpitOptions,
         index: number,
         allBindings: CockpitsOptions,
         bridge: AircraftBridge
-    ): HTMLElement {
+    ): HTMLTableRowElement {
         const row = document.createElement('tr');
-        const cell = document.createElement('td');
-        cell.style.border = '1px solid #ccc';
-        cell.style.padding = '10px';
-        cell.style.marginBottom = '10px';
 
-        // Cockpit header
-        const header = document.createElement('h4');
-        header.textContent = localization.translateWithParam('Seat #', index + 1);
-        header.style.marginTop = '0';
-        cell.appendChild(header);
-
-        // Create inner table for aligned layout
-        const innerTable = document.createElement('table');
-        innerTable.style.width = 'auto'; // Only as wide as needed
-        innerTable.style.borderCollapse = 'collapse';
-
-        // Cockpit type selection
-        const typeRow = document.createElement('tr');
-        const typeLabelCell = document.createElement('td');
-        typeLabelCell.style.textAlign = 'left';
-        typeLabelCell.style.paddingRight = '10px';
-        typeLabelCell.style.verticalAlign = 'middle';
-        const typeLabel = document.createElement('strong');
-        typeLabel.textContent = localization.translate('Cockpit Option') + ':';
-        typeLabelCell.appendChild(typeLabel);
-
-        const typeInputCell = document.createElement('td');
-        typeInputCell.style.textAlign = 'right';
-        typeInputCell.style.verticalAlign = 'middle';
-        const typeSelect = this.renderer.renderSelect(
-            cockpitOptions.selected_type,
-            (selectedIndex) => {
-                cockpitOptions.selected_type.selected = selectedIndex;
-                bridge.setCockpitsBindings(allBindings);
-                // Re-render to update enabled states
-                this.render();
-            }
-        );
-        typeInputCell.appendChild(typeSelect);
-
-        typeRow.appendChild(typeLabelCell);
-        typeRow.appendChild(typeInputCell);
-        innerTable.appendChild(typeRow);
-
-        // Upgrades section
-        if (cockpitOptions.selected_upgrades.length > 0) {
-            // Section header
-            const upgradesHeaderRow = document.createElement('tr');
-            const upgradesHeader = document.createElement('th');
-            upgradesHeader.colSpan = 2;
-            upgradesHeader.style.textAlign = 'center';
-            upgradesHeader.style.textDecoration = 'underline';
-            upgradesHeader.textContent = localization.translate('Cockpit Upgrade');
-            upgradesHeaderRow.appendChild(upgradesHeader);
-            innerTable.appendChild(upgradesHeaderRow);
-
-            // Individual upgrade rows
-            cockpitOptions.selected_upgrades.forEach((upgrade, idx) => {
-                const upgradeRow = document.createElement('tr');
-
-                const labelCell = document.createElement('td');
-                labelCell.style.textAlign = 'left';
-                labelCell.style.paddingRight = '10px';
-                labelCell.style.verticalAlign = 'middle';
-                labelCell.textContent = upgrade.name + ':';
-
-                const inputCell = document.createElement('td');
-                inputCell.style.textAlign = 'right';
-                inputCell.style.verticalAlign = 'middle';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = upgrade.selected;
-                checkbox.disabled = !upgrade.enabled;
-                checkbox.addEventListener('change', () => {
-                    cockpitOptions.selected_upgrades[idx].selected = checkbox.checked;
-                    bridge.setCockpitsBindings(allBindings);
-                    this.render();
-                });
-                inputCell.appendChild(checkbox);
-
-                upgradeRow.appendChild(labelCell);
-                upgradeRow.appendChild(inputCell);
-                innerTable.appendChild(upgradeRow);
-            });
-        }
-
-        // Safety options section
-        if (cockpitOptions.selected_safety.length > 0) {
-            // Section header
-            const safetyHeaderRow = document.createElement('tr');
-            const safetyHeader = document.createElement('th');
-            safetyHeader.colSpan = 2;
-            safetyHeader.style.textAlign = 'center';
-            safetyHeader.style.textDecoration = 'underline';
-            safetyHeader.textContent = localization.translate('Cockpit Safety Options');
-            safetyHeaderRow.appendChild(safetyHeader);
-            innerTable.appendChild(safetyHeaderRow);
-
-            // Individual safety rows
-            cockpitOptions.selected_safety.forEach((safety, idx) => {
-                const safetyRow = document.createElement('tr');
-
-                const labelCell = document.createElement('td');
-                labelCell.style.textAlign = 'left';
-                labelCell.style.paddingRight = '10px';
-                labelCell.style.verticalAlign = 'middle';
-                labelCell.textContent = safety.name + ':';
-
-                const inputCell = document.createElement('td');
-                inputCell.style.textAlign = 'right';
-                inputCell.style.verticalAlign = 'middle';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = safety.selected;
-                checkbox.disabled = !safety.enabled;
-                checkbox.addEventListener('change', () => {
-                    cockpitOptions.selected_safety[idx].selected = checkbox.checked;
-                    bridge.setCockpitsBindings(allBindings);
-                    this.render();
-                });
-                inputCell.appendChild(checkbox);
-
-                safetyRow.appendChild(labelCell);
-                safetyRow.appendChild(inputCell);
-                innerTable.appendChild(safetyRow);
-            });
-        }
-
-        // Gunsights section
-        if (cockpitOptions.selected_gunsights.length > 0) {
-            // Section header
-            const gunsightsHeaderRow = document.createElement('tr');
-            const gunsightsHeader = document.createElement('th');
-            gunsightsHeader.colSpan = 2;
-            gunsightsHeader.style.textAlign = 'center';
-            gunsightsHeader.style.textDecoration = 'underline';
-            gunsightsHeader.textContent = localization.translate('Cockpit Gunsights');
-            gunsightsHeaderRow.appendChild(gunsightsHeader);
-            innerTable.appendChild(gunsightsHeaderRow);
-
-            // Individual gunsight rows
-            cockpitOptions.selected_gunsights.forEach((gunsight, idx) => {
-                const gunsightRow = document.createElement('tr');
-
-                const labelCell = document.createElement('td');
-                labelCell.style.textAlign = 'left';
-                labelCell.style.paddingRight = '10px';
-                labelCell.style.verticalAlign = 'middle';
-                labelCell.textContent = gunsight.name + ':';
-
-                const inputCell = document.createElement('td');
-                inputCell.style.textAlign = 'right';
-                inputCell.style.verticalAlign = 'middle';
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.checked = gunsight.selected;
-                checkbox.disabled = !gunsight.enabled;
-                checkbox.addEventListener('change', () => {
-                    cockpitOptions.selected_gunsights[idx].selected = checkbox.checked;
-                    bridge.setCockpitsBindings(allBindings);
-                    this.render();
-                });
-                inputCell.appendChild(checkbox);
-
-                gunsightRow.appendChild(labelCell);
-                gunsightRow.appendChild(inputCell);
-                innerTable.appendChild(gunsightRow);
-            });
-        }
-
-        // Bombsight section
-        const bombsightHeaderRow = document.createElement('tr');
-        const bombsightHeader = document.createElement('th');
-        bombsightHeader.colSpan = 2;
-        bombsightHeader.style.textAlign = 'center';
-        bombsightHeader.style.textDecoration = 'underline';
-        bombsightHeader.textContent = localization.translate('Cockpit Bombsight');
-        bombsightHeaderRow.appendChild(bombsightHeader);
-        innerTable.appendChild(bombsightHeaderRow);
-
-        const bombsightRow = document.createElement('tr');
-        const bombsightLabelCell = document.createElement('td');
-        bombsightLabelCell.style.textAlign = 'left';
-        bombsightLabelCell.style.paddingRight = '10px';
-        bombsightLabelCell.style.verticalAlign = 'middle';
-        bombsightLabelCell.textContent = cockpitOptions.bombsight.name + ':';
-
-        const bombsightInputCell = document.createElement('td');
-        bombsightInputCell.style.textAlign = 'right';
-        bombsightInputCell.style.verticalAlign = 'middle';
-        const bombsightInput = document.createElement('input');
-        bombsightInput.type = 'number';
-        bombsightInput.value = cockpitOptions.bombsight.value.toString();
-        bombsightInput.disabled = !cockpitOptions.bombsight.enabled;
-        bombsightInput.min = '0';
-        bombsightInput.max = '20';
-        bombsightInput.step = '1';
-        bombsightInput.addEventListener('change', () => {
-            const newValue = parseFloat(bombsightInput.value);
-            if (!isNaN(newValue)) {
-                cockpitOptions.bombsight.value = newValue;
-                bridge.setCockpitsBindings(allBindings);
-                this.render();
-            }
+        // Column 1: Option (select box with no label)
+        const optionCell = document.createElement('td');
+        const typeSelect = document.createElement('select');
+        cockpitOptions.selected_type.options.forEach((opt, idx) => {
+            const option = document.createElement('option');
+            option.text = opt.name;
+            option.disabled = !opt.enabled;
+            typeSelect.add(option);
         });
-        bombsightInputCell.appendChild(bombsightInput);
+        typeSelect.selectedIndex = cockpitOptions.selected_type.selected;
+        typeSelect.disabled = !cockpitOptions.selected_type.enabled;
+        typeSelect.addEventListener('change', () => {
+            cockpitOptions.selected_type.selected = typeSelect.selectedIndex;
+            bridge.setCockpitsBindings(allBindings);
+            this.render();
+        });
+        optionCell.appendChild(typeSelect);
+        row.appendChild(optionCell);
 
-        bombsightRow.appendChild(bombsightLabelCell);
-        bombsightRow.appendChild(bombsightInputCell);
-        innerTable.appendChild(bombsightRow);
+        // Column 2: Upgrades (flex layout)
+        const upgradesCell = document.createElement('td');
+        const upgradesFlex = this.createFlexContainer();
+        cockpitOptions.selected_upgrades.forEach((upgrade, idx) => {
+            this.addFlexCheckbox(upgrade.name, upgrade.selected, upgrade.enabled, upgradesFlex, (checked) => {
+                cockpitOptions.selected_upgrades[idx].selected = checked;
+                bridge.setCockpitsBindings(allBindings);
+                this.render();
+            });
+        });
+        upgradesCell.appendChild(upgradesFlex);
+        row.appendChild(upgradesCell);
 
-        // Add the inner table to the cell
-        cell.appendChild(innerTable);
+        // Column 3: Safety Options (flex layout)
+        const safetyCell = document.createElement('td');
+        const safetyFlex = this.createFlexContainer();
+        cockpitOptions.selected_safety.forEach((safety, idx) => {
+            this.addFlexCheckbox(safety.name, safety.selected, safety.enabled, safetyFlex, (checked) => {
+                cockpitOptions.selected_safety[idx].selected = checked;
+                bridge.setCockpitsBindings(allBindings);
+                this.render();
+            });
+        });
+        safetyCell.appendChild(safetyFlex);
+        row.appendChild(safetyCell);
 
-        row.appendChild(cell);
+        // Column 4: Gunsights + Bombsight (flex layout)
+        const gunsightsCell = document.createElement('td');
+        const gunsightsFlex = this.createFlexContainer();
+        cockpitOptions.selected_gunsights.forEach((gunsight, idx) => {
+            this.addFlexCheckbox(gunsight.name, gunsight.selected, gunsight.enabled, gunsightsFlex, (checked) => {
+                cockpitOptions.selected_gunsights[idx].selected = checked;
+                bridge.setCockpitsBindings(allBindings);
+                this.render();
+            });
+        });
+        // Add bombsight as number input
+        this.addFlexNumberInput(cockpitOptions.bombsight.name, cockpitOptions.bombsight.value,
+            cockpitOptions.bombsight.enabled, gunsightsFlex, (value) => {
+                cockpitOptions.bombsight.value = value;
+                bridge.setCockpitsBindings(allBindings);
+                this.render();
+            }, 0, 20, 1);
+        gunsightsCell.appendChild(gunsightsFlex);
+        row.appendChild(gunsightsCell);
+
         return row;
+    }
+
+    /**
+     * Create a flex container similar to the original TypeScript implementation
+     */
+    private createFlexContainer(): HTMLElement {
+        const outer = document.createElement('div');
+        outer.className = 'flex-container-o';
+        const left = document.createElement('div');
+        left.className = 'flex-container-i';
+        const right = document.createElement('div');
+        right.className = 'flex-container-i';
+        outer.appendChild(left);
+        outer.appendChild(right);
+        return outer;
+    }
+
+    /**
+     * Add a checkbox with label to a flex container
+     */
+    private addFlexCheckbox(
+        label: string,
+        checked: boolean,
+        enabled: boolean,
+        flexContainer: HTMLElement,
+        onChange: (checked: boolean) => void
+    ): void {
+        const left = flexContainer.children[0] as HTMLElement;
+        const right = flexContainer.children[1] as HTMLElement;
+
+        const labelElem = document.createElement('label');
+        labelElem.textContent = label;
+        labelElem.className = 'flex-item';
+        labelElem.style.marginLeft = '0.25em';
+        labelElem.style.marginRight = '0.5em';
+        left.appendChild(labelElem);
+
+        const span = document.createElement('span');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = checked;
+        checkbox.disabled = !enabled;
+        checkbox.className = 'flex-item';
+        checkbox.addEventListener('change', () => onChange(checkbox.checked));
+        span.appendChild(checkbox);
+        right.appendChild(span);
+    }
+
+    /**
+     * Add a number input with label to a flex container
+     */
+    private addFlexNumberInput(
+        label: string,
+        value: number,
+        enabled: boolean,
+        flexContainer: HTMLElement,
+        onChange: (value: number) => void,
+        min?: number,
+        max?: number,
+        step?: number
+    ): void {
+        const left = flexContainer.children[0] as HTMLElement;
+        const right = flexContainer.children[1] as HTMLElement;
+
+        const labelElem = document.createElement('label');
+        labelElem.textContent = label;
+        labelElem.className = 'flex-item';
+        labelElem.style.marginLeft = '0.25em';
+        labelElem.style.marginRight = '0.5em';
+        left.appendChild(labelElem);
+
+        const span = document.createElement('span');
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = value.toString();
+        input.disabled = !enabled;
+        input.className = 'flex-item';
+        if (min !== undefined) input.min = min.toString();
+        if (max !== undefined) input.max = max.toString();
+        if (step !== undefined) input.step = step.toString();
+        input.addEventListener('change', () => {
+            const newValue = parseFloat(input.value);
+            if (!isNaN(newValue)) onChange(newValue);
+        });
+        span.appendChild(input);
+        right.appendChild(span);
     }
 
     /**
