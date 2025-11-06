@@ -241,6 +241,84 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get aileron list options
+    #[wasm_bindgen(js_name = getAileronList)]
+    pub fn get_aileron_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.control_surfaces.aileron_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
+    }
+
+    /// Get rudder list options
+    #[wasm_bindgen(js_name = getRudderList)]
+    pub fn get_rudder_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.control_surfaces.rudder_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
+    }
+
+    /// Get elevator list options
+    #[wasm_bindgen(js_name = getElevatorList)]
+    pub fn get_elevator_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.control_surfaces.elevator_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
+    }
+
+    /// Get flaps list options
+    #[wasm_bindgen(js_name = getFlapsList)]
+    pub fn get_flaps_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.control_surfaces.flaps_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
+    }
+
+    /// Get slats list options
+    #[wasm_bindgen(js_name = getSlatsList)]
+    pub fn get_slats_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.control_surfaces.slats_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
+    }
+
+    /// Get drag inducer list options
+    #[wasm_bindgen(js_name = getDragList)]
+    pub fn get_drag_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.control_surfaces.drag_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
+    }
+
     /// Get LandingGear UI bindings
     #[wasm_bindgen(js_name = getLandingGearBindings)]
     pub fn get_landing_gear_bindings(&self) -> JsValue {
@@ -354,6 +432,32 @@ impl AircraftWasm {
     pub fn get_stabilizers_stats(&mut self) -> JsValue {
         let stats = self.inner.stabilizers.part_stats();
         serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
+    /// Get horizontal stabilizer list options
+    #[wasm_bindgen(js_name = getHStabList)]
+    pub fn get_hstab_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.stabilizers.hstab_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
+    }
+
+    /// Get vertical stabilizer list options
+    #[wasm_bindgen(js_name = getVStabList)]
+    pub fn get_vstab_list(&self) -> JsValue {
+        let list: Vec<_> = self.inner.stabilizers.vstab_list.iter()
+            .map(|entry| {
+                serde_json::json!({
+                    "name": entry.name,
+                })
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&list).unwrap()
     }
 
     /// Get Engines UI bindings (container with asymmetric flag and counts)
