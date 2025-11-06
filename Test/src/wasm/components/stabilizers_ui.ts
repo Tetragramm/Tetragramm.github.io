@@ -2,6 +2,7 @@
  * Stabilizers UI Component
  *
  * Displays the Stabilizers section using UIBindings from Rust
+ * Matches the original TypeScript 3-column table layout
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
@@ -14,7 +15,12 @@ export class StabilizersUI {
     private sectionElement: HTMLElement | null = null;
 
     // Cache DOM elements to avoid recreating
-    private cachedElements: Map<string, HTMLElement> = new Map();
+    private mainTable: HTMLTableElement | null = null;
+    private hTypeSelect: HTMLSelectElement | null = null;
+    private hCountInput: HTMLInputElement | null = null;
+    private vTypeSelect: HTMLSelectElement | null = null;
+    private vCountInput: HTMLInputElement | null = null;
+    private statCells: Map<string, HTMLTableCellElement> = new Map();
 
     constructor(
         private getBridge: () => AircraftBridge | null,
@@ -57,7 +63,7 @@ export class StabilizersUI {
         }
 
         // If we have cached elements, just update values. Otherwise rebuild.
-        if (this.cachedElements.size > 0) {
+        if (this.mainTable) {
             this.updateValues();
         } else {
             this.rebuildFull();
@@ -69,7 +75,12 @@ export class StabilizersUI {
      */
     private rebuildFull(): void {
         // Clear cache
-        this.cachedElements.clear();
+        this.mainTable = null;
+        this.hTypeSelect = null;
+        this.hCountInput = null;
+        this.vTypeSelect = null;
+        this.vCountInput = null;
+        this.statCells.clear();
 
         // Clear existing content
         this.container.innerHTML = '';
@@ -82,34 +93,66 @@ export class StabilizersUI {
 
         const bindings = bridge.getStabilizersBindings();
 
-        // Create content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create main table with 3 columns: Horizontal | Vertical | Stats
+        this.mainTable = document.createElement('table');
+        this.mainTable.style.width = '100%';
+        this.mainTable.id = 'stab_table';
 
-        // Render UI bindings dynamically
-        this.renderBindings(contentDiv, bindings, bridge);
+        // Header row
+        const headerRow = document.createElement('tr');
+        const headers = [
+            localization.translate('Stabilizers Horizontal Stabilizers'),
+            localization.translate('Stabilizers Vertical Stabilizers'),
+            localization.translate('Stabilizers Stabilizer Stats')
+        ];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        this.mainTable.appendChild(headerRow);
+
+        // Data row
+        const dataRow = document.createElement('tr');
+
+        // Horizontal stabilizers cell
+        const hCell = document.createElement('td');
+        this.createHorizontalSection(hCell, bindings, bridge);
+        dataRow.appendChild(hCell);
+
+        // Vertical stabilizers cell
+        const vCell = document.createElement('td');
+        this.createVerticalSection(vCell, bindings, bridge);
+        dataRow.appendChild(vCell);
+
+        // Stats cell
+        const statsCell = document.createElement('td');
+        this.createStatsSection(statsCell);
+        dataRow.appendChild(statsCell);
+
+        this.mainTable.appendChild(dataRow);
+
+        // Update stat values
+        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Stabilizers Section Title');
         this.sectionElement = this.renderer.createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            this.mainTable,
             true // Initially open
         );
 
-        // Add rules link (h4)
+        // Add rules link
         const rulesLine = document.createElement('h4');
-        const rulesSpan = document.createElement('span');
-        rulesSpan.textContent = '(';
         const rulesLink = document.createElement('a');
         rulesLink.href = './Rules/Rules.htm#_Stabilizers';
         const rulesText = document.createElement('u');
         rulesText.textContent = 'Rules';
         rulesLink.appendChild(rulesText);
-        rulesSpan.appendChild(rulesLink);
-        rulesSpan.appendChild(document.createTextNode(')'));
-        rulesLine.appendChild(rulesSpan);
-        rulesLine.appendChild(document.createElement('br'));
+        rulesLine.appendChild(document.createTextNode('('));
+        rulesLine.appendChild(rulesLink);
+        rulesLine.appendChild(document.createTextNode(')'));
 
         // Insert rules link before content
         this.sectionElement.insertBefore(
@@ -123,81 +166,168 @@ export class StabilizersUI {
     }
 
     /**
-     * Render UI bindings dynamically based on their structure
+     * Create horizontal stabilizers section
      */
-    private renderBindings(container: HTMLElement, bindings: any, bridge: AircraftBridge): void {
-        // Iterate through all properties in bindings
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+    private createHorizontalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
+        // Find the h_stab_type and h_stab_count bindings
+        const typeBinding = bindings.h_stab_type;
+        const countBinding = bindings.h_stab_count;
 
-            const binding = bindings[key];
+        if (typeBinding && typeBinding.options) {
+            // Type select
+            this.hTypeSelect = document.createElement('select');
+            this.hTypeSelect.disabled = !typeBinding.enabled;
 
-            // Handle different binding types
-            if (binding && typeof binding === 'object') {
-                if ('options' in binding && 'selected' in binding) {
-                    // This is a Select binding
-                    const selectElement = this.renderer.renderSelect(
-                        binding,
-                        (selectedIndex) => {
-                            const updatedBindings = bridge.getStabilizersBindings();
-                            updatedBindings[key].selected = selectedIndex;
-                            bridge.setStabilizersBindings(updatedBindings);
-                            this.render();
-                        }
-                    ) as HTMLSelectElement;
-
-                    const label = document.createElement('label');
-                    label.textContent = binding.name || key;
-                    label.style.marginRight = '10px';
-
-                    const span = document.createElement('span');
-                    span.appendChild(label);
-                    span.appendChild(selectElement);
-                    container.appendChild(span);
-                    container.appendChild(document.createElement('br'));
-
-                    this.cachedElements.set(`select_${key}`, selectElement);
-                } else if ('selected' in binding && 'enabled' in binding && typeof binding.selected === 'boolean') {
-                    // This is a Check binding
-                    const checkElement = this.renderer.renderCheck(
-                        binding,
-                        (checked) => {
-                            const updatedBindings = bridge.getStabilizersBindings();
-                            updatedBindings[key].selected = checked;
-                            bridge.setStabilizersBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
-
-                    container.appendChild(checkElement);
-                    container.appendChild(document.createElement('br'));
-
-                    const checkbox = checkElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                    if (checkbox) {
-                        this.cachedElements.set(`check_${key}`, checkbox);
-                    }
-                } else if ('value' in binding && 'enabled' in binding && typeof binding.value === 'number') {
-                    // This is a Number binding
-                    const numberElement = this.renderer.renderNumber(
-                        binding,
-                        (value) => {
-                            const updatedBindings = bridge.getStabilizersBindings();
-                            updatedBindings[key].value = value;
-                            bridge.setStabilizersBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
-
-                    container.appendChild(numberElement);
-                    container.appendChild(document.createElement('br'));
-
-                    const input = numberElement.querySelector('input[type="number"]') as HTMLInputElement;
-                    if (input) {
-                        this.cachedElements.set(`number_${key}`, input);
-                    }
+            typeBinding.options.forEach((opt: any, idx: number) => {
+                const option = document.createElement('option');
+                option.value = idx.toString();
+                option.textContent = opt.name;
+                option.disabled = !opt.enabled;
+                if (idx === typeBinding.selected) {
+                    option.selected = true;
                 }
-            }
+                this.hTypeSelect!.appendChild(option);
+            });
+
+            this.hTypeSelect.addEventListener('change', () => {
+                const updatedBindings = bridge.getStabilizersBindings();
+                updatedBindings.h_stab_type.selected = parseInt(this.hTypeSelect!.value);
+                bridge.setStabilizersBindings(updatedBindings);
+                this.render();
+            });
+
+            cell.appendChild(this.hTypeSelect);
+            cell.appendChild(document.createElement('br'));
         }
+
+        if (countBinding && 'value' in countBinding) {
+            // Count input with label
+            const label = document.createElement('label');
+            label.textContent = localization.translate('Stabilizers # of Stabilizers') + ': ';
+            label.style.marginLeft = '0.25em';
+            label.style.marginRight = '0.5em';
+
+            this.hCountInput = document.createElement('input');
+            this.hCountInput.type = 'number';
+            this.hCountInput.min = '0';
+            this.hCountInput.max = '20';
+            this.hCountInput.value = countBinding.value.toString();
+            this.hCountInput.disabled = !countBinding.enabled;
+            this.hCountInput.addEventListener('change', () => {
+                const updatedBindings = bridge.getStabilizersBindings();
+                updatedBindings.h_stab_count.value = parseInt(this.hCountInput!.value) || 0;
+                bridge.setStabilizersBindings(updatedBindings);
+                this.render();
+            });
+
+            const span = document.createElement('span');
+            span.appendChild(label);
+            span.appendChild(this.hCountInput);
+            cell.appendChild(span);
+        }
+    }
+
+    /**
+     * Create vertical stabilizers section
+     */
+    private createVerticalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
+        // Find the v_stab_type and v_stab_count bindings
+        const typeBinding = bindings.v_stab_type;
+        const countBinding = bindings.v_stab_count;
+
+        if (typeBinding && typeBinding.options) {
+            // Type select
+            this.vTypeSelect = document.createElement('select');
+            this.vTypeSelect.disabled = !typeBinding.enabled;
+
+            typeBinding.options.forEach((opt: any, idx: number) => {
+                const option = document.createElement('option');
+                option.value = idx.toString();
+                option.textContent = opt.name;
+                option.disabled = !opt.enabled;
+                if (idx === typeBinding.selected) {
+                    option.selected = true;
+                }
+                this.vTypeSelect!.appendChild(option);
+            });
+
+            this.vTypeSelect.addEventListener('change', () => {
+                const updatedBindings = bridge.getStabilizersBindings();
+                updatedBindings.v_stab_type.selected = parseInt(this.vTypeSelect!.value);
+                bridge.setStabilizersBindings(updatedBindings);
+                this.render();
+            });
+
+            cell.appendChild(this.vTypeSelect);
+            cell.appendChild(document.createElement('br'));
+        }
+
+        if (countBinding && 'value' in countBinding) {
+            // Count input with label
+            const label = document.createElement('label');
+            label.textContent = localization.translate('Stabilizers # of Stabilizers') + ': ';
+            label.style.marginLeft = '0.25em';
+            label.style.marginRight = '0.5em';
+
+            this.vCountInput = document.createElement('input');
+            this.vCountInput.type = 'number';
+            this.vCountInput.min = '0';
+            this.vCountInput.max = '20';
+            this.vCountInput.value = countBinding.value.toString();
+            this.vCountInput.disabled = !countBinding.enabled;
+            this.vCountInput.addEventListener('change', () => {
+                const updatedBindings = bridge.getStabilizersBindings();
+                updatedBindings.v_stab_count.value = parseInt(this.vCountInput!.value) || 0;
+                bridge.setStabilizersBindings(updatedBindings);
+                this.render();
+            });
+
+            const span = document.createElement('span');
+            span.appendChild(label);
+            span.appendChild(this.vCountInput);
+            cell.appendChild(span);
+        }
+    }
+
+    /**
+     * Create stats section (inner table with 6 stats)
+     */
+    private createStatsSection(cell: HTMLTableCellElement): void {
+        cell.className = 'inner_table';
+        const statsTable = document.createElement('table');
+        statsTable.className = 'inner_table';
+
+        // Row 1: Drag | Control | Cost
+        const header1 = statsTable.insertRow();
+        ['Stat Drag', 'Stat Control', 'Stat Cost'].forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = localization.translate(key);
+            header1.appendChild(th);
+        });
+
+        const data1 = statsTable.insertRow();
+        ['drag', 'control', 'cost'].forEach(key => {
+            const td = data1.insertCell();
+            td.textContent = '0';
+            this.statCells.set(key, td);
+        });
+
+        // Row 2: Pitch Stability | Lateral Stability | Lift Bleed
+        const header2 = statsTable.insertRow();
+        ['Stat Pitch Stability', 'Stat Lateral Stability', 'Stat Lift Bleed'].forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = localization.translate(key);
+            header2.appendChild(th);
+        });
+
+        const data2 = statsTable.insertRow();
+        ['pitchstab', 'latstab', 'liftbleed'].forEach(key => {
+            const td = data2.insertCell();
+            td.textContent = '0';
+            this.statCells.set(key, td);
+        });
+
+        cell.appendChild(statsTable);
     }
 
     /**
@@ -211,30 +341,60 @@ export class StabilizersUI {
 
         const bindings = bridge.getStabilizersBindings();
 
-        // Update all cached elements
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+        // Update horizontal stabilizers
+        if (this.hTypeSelect && bindings.h_stab_type) {
+            this.hTypeSelect.selectedIndex = bindings.h_stab_type.selected;
+            this.hTypeSelect.disabled = !bindings.h_stab_type.enabled;
+            bindings.h_stab_type.options.forEach((opt: any, idx: number) => {
+                if (idx < this.hTypeSelect!.options.length) {
+                    this.hTypeSelect!.options[idx].disabled = !opt.enabled;
+                }
+            });
+        }
 
-            const binding = bindings[key];
+        if (this.hCountInput && bindings.h_stab_count) {
+            this.hCountInput.value = bindings.h_stab_count.value.toString();
+            this.hCountInput.disabled = !bindings.h_stab_count.enabled;
+        }
 
-            // Update based on element type
-            const selectKey = `select_${key}`;
-            const checkKey = `check_${key}`;
-            const numberKey = `number_${key}`;
+        // Update vertical stabilizers
+        if (this.vTypeSelect && bindings.v_stab_type) {
+            this.vTypeSelect.selectedIndex = bindings.v_stab_type.selected;
+            this.vTypeSelect.disabled = !bindings.v_stab_type.enabled;
+            bindings.v_stab_type.options.forEach((opt: any, idx: number) => {
+                if (idx < this.vTypeSelect!.options.length) {
+                    this.vTypeSelect!.options[idx].disabled = !opt.enabled;
+                }
+            });
+        }
 
-            if (this.cachedElements.has(selectKey)) {
-                const select = this.cachedElements.get(selectKey) as HTMLSelectElement;
-                select.selectedIndex = binding.selected;
-                select.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(checkKey)) {
-                const check = this.cachedElements.get(checkKey) as HTMLInputElement;
-                check.checked = binding.selected;
-                check.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(numberKey)) {
-                const number = this.cachedElements.get(numberKey) as HTMLInputElement;
-                number.value = binding.value.toString();
-                number.disabled = !binding.enabled;
-            }
+        if (this.vCountInput && bindings.v_stab_count) {
+            this.vCountInput.value = bindings.v_stab_count.value.toString();
+            this.vCountInput.disabled = !bindings.v_stab_count.enabled;
+        }
+
+        // Update stat values
+        this.updateStatValues(bridge);
+    }
+
+    /**
+     * Update stat cell values
+     */
+    private updateStatValues(bridge: AircraftBridge): void {
+        const stats = bridge.getStabilizersStats();
+
+        for (const [key, cell] of this.statCells) {
+            const value = stats[key];
+            this.blinkIfChanged(cell, value?.toString() || '0', false);
+        }
+    }
+
+    /**
+     * Blink animation when stat changes
+     */
+    private blinkIfChanged(elem: HTMLTableCellElement, str: string, positiveGood: boolean | null): void {
+        if (elem.textContent !== str) {
+            elem.textContent = str;
         }
     }
 
@@ -250,6 +410,11 @@ export class StabilizersUI {
      */
     destroy(): void {
         this.container.innerHTML = '';
-        this.cachedElements.clear();
+        this.mainTable = null;
+        this.hTypeSelect = null;
+        this.hCountInput = null;
+        this.vTypeSelect = null;
+        this.vCountInput = null;
+        this.statCells.clear();
     }
 }
