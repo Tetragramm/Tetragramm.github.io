@@ -114,6 +114,36 @@ export interface AircraftWasmAPI {
     getPropellerBindings(): any;
     setPropellerBindings(bindings: any): void;
     getPropellerStats(): Stats;
+    getPassengersBindings(): any;
+    setPassengersBindings(bindings: any): void;
+    getPassengersStats(): Stats;
+    getFuelBindings(): any;
+    setFuelBindings(bindings: any): void;
+    getFuelStats(): Stats;
+    getAccessoriesBindings(): any;
+    setAccessoriesBindings(bindings: any): void;
+    getAccessoriesStats(): Stats;
+    getCargoBindings(): any;
+    setCargoBindings(bindings: any): void;
+    getCargoStats(): Stats;
+    getControlSurfacesBindings(): any;
+    setControlSurfacesBindings(bindings: any): void;
+    getControlSurfacesStats(): Stats;
+    getLandingGearBindings(): any;
+    setLandingGearBindings(bindings: any): void;
+    getLandingGearStats(): Stats;
+    getMunitionsBindings(): any;
+    setMunitionsBindings(bindings: any): void;
+    getMunitionsStats(): Stats;
+    getOptimizationBindings(): any;
+    setOptimizationBindings(bindings: any): void;
+    getOptimizationStats(): Stats;
+    getReinforcementsBindings(): any;
+    setReinforcementsBindings(bindings: any): void;
+    getReinforcementsStats(): Stats;
+    getStabilizersBindings(): any;
+    setStabilizersBindings(bindings: any): void;
+    getStabilizersStats(): Stats;
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
     getCockpitStats(index: number): any;
@@ -229,6 +259,256 @@ export class AircraftBridge {
     getPropellerStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getPropellerStats();
+    }
+
+    /**
+     * Get Passengers UI bindings (includes localized strings from Rust)
+     */
+    getPassengersBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getPassengersBindings();
+    }
+
+    /**
+     * Update Passengers from UI bindings
+     * Automatically recalculates stats
+     */
+    setPassengersBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setPassengersBindings(bindings);
+    }
+
+    /**
+     * Get stats for Passengers
+     */
+    getPassengersStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getPassengersStats();
+    }
+
+    /**
+     * Get Fuel UI bindings (includes localized strings from Rust)
+     */
+    getFuelBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getFuelBindings();
+    }
+
+    /**
+     * Update Fuel from UI bindings
+     * Automatically recalculates stats
+     */
+    setFuelBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setFuelBindings(bindings);
+    }
+
+    /**
+     * Get stats for Fuel
+     */
+    getFuelStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getFuelStats();
+    }
+
+    /**
+     * Get Accessories UI bindings (includes localized strings from Rust)
+     */
+    getAccessoriesBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getAccessoriesBindings();
+    }
+
+    /**
+     * Update Accessories from UI bindings
+     * Automatically recalculates stats
+     */
+    setAccessoriesBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setAccessoriesBindings(bindings);
+    }
+
+    /**
+     * Get stats for Accessories
+     */
+    getAccessoriesStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getAccessoriesStats();
+    }
+
+    /**
+     * Get Cargo UI bindings (includes localized strings from Rust)
+     */
+    getCargoBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getCargoBindings();
+    }
+
+    /**
+     * Update Cargo from UI bindings
+     * Automatically recalculates stats
+     */
+    setCargoBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setCargoBindings(bindings);
+    }
+
+    /**
+     * Get stats for Cargo
+     */
+    getCargoStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getCargoStats();
+    }
+
+    /**
+     * Get ControlSurfaces UI bindings (includes localized strings from Rust)
+     */
+    getControlSurfacesBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getControlSurfacesBindings();
+    }
+
+    /**
+     * Update ControlSurfaces from UI bindings
+     * Automatically recalculates stats
+     */
+    setControlSurfacesBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setControlSurfacesBindings(bindings);
+    }
+
+    /**
+     * Get stats for ControlSurfaces
+     */
+    getControlSurfacesStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getControlSurfacesStats();
+    }
+
+    /**
+     * Get LandingGear UI bindings (includes localized strings from Rust)
+     */
+    getLandingGearBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getLandingGearBindings();
+    }
+
+    /**
+     * Update LandingGear from UI bindings
+     * Automatically recalculates stats
+     */
+    setLandingGearBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setLandingGearBindings(bindings);
+    }
+
+    /**
+     * Get stats for LandingGear
+     */
+    getLandingGearStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getLandingGearStats();
+    }
+
+    /**
+     * Get Munitions UI bindings (includes localized strings from Rust)
+     */
+    getMunitionsBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getMunitionsBindings();
+    }
+
+    /**
+     * Update Munitions from UI bindings
+     * Automatically recalculates stats
+     */
+    setMunitionsBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setMunitionsBindings(bindings);
+    }
+
+    /**
+     * Get stats for Munitions
+     */
+    getMunitionsStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getMunitionsStats();
+    }
+
+    /**
+     * Get Optimization UI bindings (includes localized strings from Rust)
+     */
+    getOptimizationBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getOptimizationBindings();
+    }
+
+    /**
+     * Update Optimization from UI bindings
+     * Automatically recalculates stats
+     */
+    setOptimizationBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setOptimizationBindings(bindings);
+    }
+
+    /**
+     * Get stats for Optimization
+     */
+    getOptimizationStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getOptimizationStats();
+    }
+
+    /**
+     * Get Reinforcements UI bindings (includes localized strings from Rust)
+     */
+    getReinforcementsBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getReinforcementsBindings();
+    }
+
+    /**
+     * Update Reinforcements from UI bindings
+     * Automatically recalculates stats
+     */
+    setReinforcementsBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setReinforcementsBindings(bindings);
+    }
+
+    /**
+     * Get stats for Reinforcements
+     */
+    getReinforcementsStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getReinforcementsStats();
+    }
+
+    /**
+     * Get Stabilizers UI bindings (includes localized strings from Rust)
+     */
+    getStabilizersBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getStabilizersBindings();
+    }
+
+    /**
+     * Update Stabilizers from UI bindings
+     * Automatically recalculates stats
+     */
+    setStabilizersBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setStabilizersBindings(bindings);
+    }
+
+    /**
+     * Get stats for Stabilizers
+     */
+    getStabilizersStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getStabilizersStats();
     }
 
     /**
