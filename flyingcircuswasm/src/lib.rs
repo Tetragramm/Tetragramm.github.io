@@ -103,6 +103,29 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get Propeller UI bindings (includes localized strings)
+    #[wasm_bindgen(js_name = getPropellerBindings)]
+    pub fn get_propeller_bindings(&self) -> JsValue {
+        let options = self.inner.propeller.create_ui_options();
+        serde_wasm_bindgen::to_value(&options).unwrap()
+    }
+
+    /// Update Propeller from UI bindings
+    #[wasm_bindgen(js_name = setPropellerBindings)]
+    pub fn set_propeller_bindings(&mut self, js_options: JsValue) {
+        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+            self.inner.propeller.receive_ui_selections(options);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Get stats for the selected propeller
+    #[wasm_bindgen(js_name = getPropellerStats)]
+    pub fn get_propeller_stats(&mut self) -> JsValue {
+        let stats = self.inner.propeller.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
     /// Calculate all aircraft statistics
     #[wasm_bindgen(js_name = calculateStats)]
     pub fn calculate_stats(&mut self) {

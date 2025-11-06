@@ -111,6 +111,9 @@ export interface AircraftWasmAPI {
     getEraBindings(): any;
     setEraBindings(bindings: any): void;
     getEraStats(): Stats;
+    getPropellerBindings(): any;
+    setPropellerBindings(bindings: any): void;
+    getPropellerStats(): Stats;
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
     getCockpitStats(index: number): any;
@@ -201,6 +204,31 @@ export class AircraftBridge {
     getEraStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getEraStats();
+    }
+
+    /**
+     * Get Propeller UI bindings (includes localized strings from Rust)
+     */
+    getPropellerBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getPropellerBindings();
+    }
+
+    /**
+     * Update Propeller from UI bindings
+     * Automatically recalculates stats
+     */
+    setPropellerBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setPropellerBindings(bindings);
+    }
+
+    /**
+     * Get stats for the selected propeller
+     */
+    getPropellerStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getPropellerStats();
     }
 
     /**
