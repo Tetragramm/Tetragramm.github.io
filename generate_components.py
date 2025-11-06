@@ -19,7 +19,7 @@ COMPONENTS = [
     ("Accessories", "Accessories", "Accessories Section Title", True),
     ("Cargo", "Load", "Load Section Title", True),
     ("ControlSurfaces", "ControlSurfaces", "Control Surfaces Section Title", True),
-    ("LandingGear", "LandingGear", "Landing Gear Section Title", True),
+    ("LandingGear", "Landing_Gear", "Landing Gear Section Title", True),
     ("Munitions", "Load", "Load Section Title", True),
     ("Optimization", "Optimization", "Optimization Section Title", True),
     ("Reinforcements", "Reinforcements", "Reinforcements Section Title", True),

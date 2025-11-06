@@ -167,7 +167,7 @@ export class WasmApplication {
             console.log('[WasmApp] ControlSurfaces UI created');
 
             // Create LandingGear UI component
-            this.landingGearUI = new LandingGearUI(() => this.bridge, 'LandingGear', () => {
+            this.landingGearUI = new LandingGearUI(() => this.bridge, 'Landing_Gear', () => {
                 this.onStatsUpdate();
             });
             console.log('[WasmApp] LandingGear UI created');
