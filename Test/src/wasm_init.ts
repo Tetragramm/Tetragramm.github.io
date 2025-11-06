@@ -73,7 +73,9 @@ export class WasmApplication {
             console.log('[WasmApp] Aircraft bridge initialized');
 
             // Check for aircraft data in URL (for loading shared aircraft)
-            const jsonParam = urlParams.get('json');
+            let jsonParam = urlParams.get('json');
+            //Debug: Always start with known aircraft.
+            jsonParam = "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A";
             if (jsonParam && this.bridge) {
                 try {
                     const loadedBridge = await AircraftBridge.deserializeFromLZString(

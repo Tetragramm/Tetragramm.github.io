@@ -61,8 +61,8 @@ export interface Stats {
 }
 
 export interface CockpitDerivedStats {
-    flight_stress_min: number;
-    flight_stress_max: number;
+    flight_stress_norm: number;
+    flight_stress_cp: number;
     escape: number;
     visibility: number;
 }

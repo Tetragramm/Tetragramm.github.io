@@ -195,8 +195,8 @@ impl AircraftWasm {
             let visibility = cockpit.get_visibility();
 
             let result = serde_json::json!({
-                "flight_stress_min": flight_stress.0,
-                "flight_stress_max": flight_stress.1,
+                "flight_stress_norm": flight_stress.0,
+                "flight_stress_cp": flight_stress.1,
                 "escape": escape,
                 "visibility": visibility
             });

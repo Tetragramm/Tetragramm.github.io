@@ -268,22 +268,17 @@ export class BindingRenderer {
                 // Get the value from stats or derivedStats
                 let value = stats[config.key];
                 if (value === undefined && derivedStats) {
-                    value = derivedStats[config.key];
+                    value = derivedStats.get(config.key);
                 }
 
                 // Handle special cases (like flight stress range)
                 if (config.key === 'flightstress' && derivedStats) {
-                    const min = derivedStats.flight_stress_min;
-                    const max = derivedStats.flight_stress_max;
-                    if (min !== undefined && max !== undefined) {
-                        if (min !== max) {
-                            value = `${min}-${max}`;
-                        } else {
-                            value = min.toString();
-                        }
+                    const norm = derivedStats.get('flight_stress_norm');
+                    const cp = derivedStats.get('flight_stress_cp');
+                    if (norm != cp) {
+                        value = norm.toString() + " (" + cp.toString() + ")";
                     } else {
-                        // Fallback if derived stats not available yet
-                        value = value?.toString() || '0';
+                        value = norm.toString()
                     }
                 } else {
                     value = value?.toString() || '0';
