@@ -275,10 +275,15 @@ export class BindingRenderer {
                 if (config.key === 'flightstress' && derivedStats) {
                     const min = derivedStats.flight_stress_min;
                     const max = derivedStats.flight_stress_max;
-                    if (min !== max) {
-                        value = `${min}-${max}`;
+                    if (min !== undefined && max !== undefined) {
+                        if (min !== max) {
+                            value = `${min}-${max}`;
+                        } else {
+                            value = min.toString();
+                        }
                     } else {
-                        value = min.toString();
+                        // Fallback if derived stats not available yet
+                        value = value?.toString() || '0';
                     }
                 } else {
                     value = value?.toString() || '0';
