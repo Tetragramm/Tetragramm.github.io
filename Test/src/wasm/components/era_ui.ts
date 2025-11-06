@@ -14,6 +14,9 @@ export class EraUI {
     private renderer: BindingRenderer;
     private sectionElement: HTMLElement | null = null;
 
+    // Cache DOM elements to avoid recreating
+    private selectElement: HTMLSelectElement | null = null;
+
     constructor(
         private getBridge: () => AircraftBridge | null,
         containerId: string,
@@ -38,27 +41,46 @@ export class EraUI {
             }
         });
 
-        // Listen for locale changes and re-render
-        localization.onLocaleChange(() => this.render());
+        // Listen for locale changes and do full rebuild (text changes)
+        localization.onLocaleChange(() => this.rebuildFull());
 
         this.render();
     }
 
     /**
-     * Render the Era selection UI
+     * Render the Era selection UI - intelligently updates or rebuilds
      */
     render(): void {
-        // Clear existing content
-        this.container.innerHTML = '';
-
-        // Get current bridge (may be new after language change)
         const bridge = this.getBridge();
         if (!bridge || !bridge.isInitialized()) {
             console.warn('[EraUI] Bridge not initialized, skipping render');
             return;
         }
 
-        // Get Era bindings from Rust (includes localized strings)
+        // If we have cached elements, just update values. Otherwise rebuild.
+        if (this.selectElement) {
+            this.updateValues();
+        } else {
+            this.rebuildFull();
+        }
+    }
+
+    /**
+     * Full rebuild of the UI structure (used on first render or locale change)
+     */
+    private rebuildFull(): void {
+        // Clear cache
+        this.selectElement = null;
+
+        // Clear existing content
+        this.container.innerHTML = '';
+
+        const bridge = this.getBridge();
+        if (!bridge || !bridge.isInitialized()) {
+            console.warn('[EraUI] Bridge not initialized, skipping rebuild');
+            return;
+        }
+
         const eraBindings = bridge.getEraBindings();
 
         // Create table for Era selection
@@ -69,25 +91,25 @@ export class EraUI {
         const row = document.createElement('tr');
         const cell = document.createElement('td');
 
-        // Render the Era select dropdown
-        // The binding.options already have localized names from Rust
-        const selectElement = this.renderer.renderSelect(
+        // Render the Era select dropdown and cache it
+        this.selectElement = this.renderer.renderSelect(
             eraBindings.selected_era,
             (selectedIndex) => {
                 // Update the binding
-                eraBindings.selected_era.selected = selectedIndex;
+                const bindings = bridge.getEraBindings();
+                bindings.selected_era.selected = selectedIndex;
 
                 // Send back to Rust
-                bridge.setEraBindings(eraBindings);
+                bridge.setEraBindings(bindings);
 
                 // Re-render to update any dependent states
                 this.render();
 
                 console.log(`[EraUI] Era changed to index ${selectedIndex}`);
             }
-        );
+        ) as HTMLSelectElement;
 
-        cell.appendChild(selectElement);
+        cell.appendChild(this.selectElement);
         row.appendChild(cell);
         table.appendChild(row);
 
@@ -118,7 +140,30 @@ export class EraUI {
 
         this.container.appendChild(this.sectionElement);
 
-        console.log('[EraUI] Rendered with locale:', localization.getCurrentLocale());
+        console.log('[EraUI] Full rebuild complete');
+    }
+
+    /**
+     * Update values in existing DOM elements (fast path)
+     */
+    private updateValues(): void {
+        const bridge = this.getBridge();
+        if (!bridge || !bridge.isInitialized() || !this.selectElement) {
+            return;
+        }
+
+        const eraBindings = bridge.getEraBindings();
+
+        // Update select element
+        this.selectElement.selectedIndex = eraBindings.selected_era.selected;
+        this.selectElement.disabled = !eraBindings.selected_era.enabled;
+
+        // Update options' enabled state
+        eraBindings.selected_era.options.forEach((opt, idx) => {
+            if (idx < this.selectElement!.options.length) {
+                this.selectElement!.options[idx].disabled = !opt.enabled;
+            }
+        });
     }
 
     /**

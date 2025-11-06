@@ -22,10 +22,27 @@ const COCKPIT_STATS: StatDisplayConfig[] = [
     { key: 'visibility', label: 'Stat Visibility', positiveIsGood: true, isDerived: true }
 ];
 
+// Cache for cockpit row elements to avoid recreating DOM
+interface CockpitRowCache {
+    row: HTMLTableRowElement;
+    typeSelect: HTMLSelectElement;
+    upgradeChecks: HTMLInputElement[];
+    safetyChecks: HTMLInputElement[];
+    gunsightChecks: HTMLInputElement[];
+    bombsightInput: HTMLInputElement;
+    statsCell: HTMLTableCellElement;
+}
+
 export class CockpitsUI {
     private container: HTMLElement;
     private renderer: BindingRenderer;
     private sectionElement: HTMLElement | null = null;
+
+    // Cache DOM elements to avoid recreating
+    private cockpitRowCaches: CockpitRowCache[] = [];
+    private numCockpitsInput: HTMLInputElement | null = null;
+    private mainTable: HTMLTableElement | null = null;
+    private lastCockpitCount: number = 0;
 
     constructor(
         private getBridge: () => AircraftBridge | null,
@@ -51,28 +68,55 @@ export class CockpitsUI {
             }
         });
 
-        // Listen for locale changes and re-render
-        localization.onLocaleChange(() => this.render());
+        // Listen for locale changes and do full rebuild (text changes)
+        localization.onLocaleChange(() => this.rebuildFull());
 
         this.render();
     }
 
     /**
-     * Render the Cockpits UI
+     * Render the Cockpits UI - intelligently updates or rebuilds
      */
     render(): void {
-        // Clear existing content
-        this.container.innerHTML = '';
-
-        // Get current bridge (may be new after language change)
         const bridge = this.getBridge();
         if (!bridge || !bridge.isInitialized()) {
             console.warn('[CockpitsUI] Bridge not initialized, skipping render');
             return;
         }
 
-        // Get Cockpits bindings from Rust (includes localized strings)
         const cockpitsBindings = bridge.getCockpitsBindings();
+        const currentCount = cockpitsBindings.positions.length;
+
+        // Determine if we need a full rebuild or just value updates
+        const needsRebuild = currentCount !== this.lastCockpitCount || !this.mainTable;
+
+        if (needsRebuild) {
+            this.rebuildFull();
+        } else {
+            this.updateValues(cockpitsBindings, bridge);
+        }
+    }
+
+    /**
+     * Full rebuild of the UI structure (used when count changes or locale changes)
+     */
+    private rebuildFull(): void {
+        // Clear caches
+        this.cockpitRowCaches = [];
+        this.numCockpitsInput = null;
+        this.mainTable = null;
+
+        // Clear existing content
+        this.container.innerHTML = '';
+
+        const bridge = this.getBridge();
+        if (!bridge || !bridge.isInitialized()) {
+            console.warn('[CockpitsUI] Bridge not initialized, skipping rebuild');
+            return;
+        }
+
+        const cockpitsBindings = bridge.getCockpitsBindings();
+        this.lastCockpitCount = cockpitsBindings.positions.length;
 
         // Create main content container
         const contentDiv = document.createElement('div');
@@ -84,15 +128,15 @@ export class CockpitsUI {
         const numCockpitsLabel = document.createElement('span');
         numCockpitsLabel.textContent = cockpitsBindings.num_cockpits.name + ': ';
         numCockpitsLabel.style.marginRight = '10px';
-        const numCockpitsInput = document.createElement('input');
-        numCockpitsInput.type = 'number';
-        numCockpitsInput.value = cockpitsBindings.num_cockpits.value.toString();
-        numCockpitsInput.disabled = !cockpitsBindings.num_cockpits.enabled;
-        numCockpitsInput.min = '1';
-        numCockpitsInput.max = '20';
-        numCockpitsInput.step = '1';
-        numCockpitsInput.addEventListener('change', () => {
-            const newValue = parseFloat(numCockpitsInput.value);
+        this.numCockpitsInput = document.createElement('input');
+        this.numCockpitsInput.type = 'number';
+        this.numCockpitsInput.value = cockpitsBindings.num_cockpits.value.toString();
+        this.numCockpitsInput.disabled = !cockpitsBindings.num_cockpits.enabled;
+        this.numCockpitsInput.min = '1';
+        this.numCockpitsInput.max = '20';
+        this.numCockpitsInput.step = '1';
+        this.numCockpitsInput.addEventListener('change', () => {
+            const newValue = parseFloat(this.numCockpitsInput!.value);
             if (!isNaN(newValue)) {
                 cockpitsBindings.num_cockpits.value = newValue;
                 bridge.setCockpitsBindings(cockpitsBindings);
@@ -100,13 +144,13 @@ export class CockpitsUI {
             }
         });
         controlDiv.appendChild(numCockpitsLabel);
-        controlDiv.appendChild(numCockpitsInput);
+        controlDiv.appendChild(this.numCockpitsInput);
         contentDiv.appendChild(controlDiv);
 
         // Create main table for cockpits
-        const table = document.createElement('table');
-        table.style.width = '100%';
-        table.id = 'table_cockpit';
+        this.mainTable = document.createElement('table');
+        this.mainTable.style.width = '100%';
+        this.mainTable.id = 'table_cockpit';
 
         // Create header row
         const headerRow = document.createElement('tr');
@@ -123,15 +167,16 @@ export class CockpitsUI {
             th.style.textAlign = 'center';
             headerRow.appendChild(th);
         });
-        table.appendChild(headerRow);
+        this.mainTable.appendChild(headerRow);
 
-        // Render each cockpit position as a table row
+        // Build each cockpit row and cache references
         cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
-            const cockpitRow = this.renderCockpitRow(cockpitOptions, idx, cockpitsBindings, bridge);
-            table.appendChild(cockpitRow);
+            const cache = this.buildCockpitRow(cockpitOptions, idx, cockpitsBindings, bridge);
+            this.cockpitRowCaches.push(cache);
+            this.mainTable!.appendChild(cache.row);
         });
 
-        contentDiv.appendChild(table);
+        contentDiv.appendChild(this.mainTable);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Cockpit Section Title');
@@ -161,18 +206,36 @@ export class CockpitsUI {
 
         this.container.appendChild(this.sectionElement);
 
-        console.log('[CockpitsUI] Rendered with locale:', localization.getCurrentLocale());
+        console.log('[CockpitsUI] Full rebuild with', this.lastCockpitCount, 'cockpits');
     }
 
     /**
-     * Render a single cockpit as a table row with columns
+     * Update values in existing DOM elements (fast path)
      */
-    private renderCockpitRow(
+    private updateValues(cockpitsBindings: CockpitsOptions, bridge: AircraftBridge): void {
+        // Update number of cockpits input
+        if (this.numCockpitsInput) {
+            this.numCockpitsInput.value = cockpitsBindings.num_cockpits.value.toString();
+            this.numCockpitsInput.disabled = !cockpitsBindings.num_cockpits.enabled;
+        }
+
+        // Update each cockpit row
+        cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
+            if (idx < this.cockpitRowCaches.length) {
+                this.updateCockpitRow(this.cockpitRowCaches[idx], cockpitOptions, idx, bridge);
+            }
+        });
+    }
+
+    /**
+     * Build a single cockpit row and return cache of its elements
+     */
+    private buildCockpitRow(
         cockpitOptions: CockpitOptions,
         index: number,
         allBindings: CockpitsOptions,
         bridge: AircraftBridge
-    ): HTMLTableRowElement {
+    ): CockpitRowCache {
         const row = document.createElement('tr');
 
         // Column 1: Option (select box with no label)
@@ -187,8 +250,9 @@ export class CockpitsUI {
         typeSelect.selectedIndex = cockpitOptions.selected_type.selected;
         typeSelect.disabled = !cockpitOptions.selected_type.enabled;
         typeSelect.addEventListener('change', () => {
-            cockpitOptions.selected_type.selected = typeSelect.selectedIndex;
-            bridge.setCockpitsBindings(allBindings);
+            const bindings = bridge.getCockpitsBindings();
+            bindings.positions[index].selected_type.selected = typeSelect.selectedIndex;
+            bridge.setCockpitsBindings(bindings);
             this.render();
         });
         optionCell.appendChild(typeSelect);
@@ -197,12 +261,15 @@ export class CockpitsUI {
         // Column 2: Upgrades (flex layout)
         const upgradesCell = document.createElement('td');
         const upgradesFlex = this.createFlexContainer();
-        cockpitOptions.selected_upgrades.forEach((upgrade, idx) => {
-            this.addFlexCheckbox(upgrade.name, upgrade.selected, upgrade.enabled, upgradesFlex, (checked) => {
-                cockpitOptions.selected_upgrades[idx].selected = checked;
-                bridge.setCockpitsBindings(allBindings);
+        const upgradeChecks: HTMLInputElement[] = [];
+        cockpitOptions.selected_upgrades.forEach((upgrade, upgradeIdx) => {
+            const checkbox = this.addFlexCheckboxWithReturn(upgrade.name, upgrade.selected, upgrade.enabled, upgradesFlex, (checked) => {
+                const bindings = bridge.getCockpitsBindings();
+                bindings.positions[index].selected_upgrades[upgradeIdx].selected = checked;
+                bridge.setCockpitsBindings(bindings);
                 this.render();
             });
+            upgradeChecks.push(checkbox);
         });
         upgradesCell.appendChild(upgradesFlex);
         row.appendChild(upgradesCell);
@@ -210,12 +277,15 @@ export class CockpitsUI {
         // Column 3: Safety Options (flex layout)
         const safetyCell = document.createElement('td');
         const safetyFlex = this.createFlexContainer();
-        cockpitOptions.selected_safety.forEach((safety, idx) => {
-            this.addFlexCheckbox(safety.name, safety.selected, safety.enabled, safetyFlex, (checked) => {
-                cockpitOptions.selected_safety[idx].selected = checked;
-                bridge.setCockpitsBindings(allBindings);
+        const safetyChecks: HTMLInputElement[] = [];
+        cockpitOptions.selected_safety.forEach((safety, safetyIdx) => {
+            const checkbox = this.addFlexCheckboxWithReturn(safety.name, safety.selected, safety.enabled, safetyFlex, (checked) => {
+                const bindings = bridge.getCockpitsBindings();
+                bindings.positions[index].selected_safety[safetyIdx].selected = checked;
+                bridge.setCockpitsBindings(bindings);
                 this.render();
             });
+            safetyChecks.push(checkbox);
         });
         safetyCell.appendChild(safetyFlex);
         row.appendChild(safetyCell);
@@ -223,18 +293,22 @@ export class CockpitsUI {
         // Column 4: Gunsights + Bombsight (flex layout)
         const gunsightsCell = document.createElement('td');
         const gunsightsFlex = this.createFlexContainer();
-        cockpitOptions.selected_gunsights.forEach((gunsight, idx) => {
-            this.addFlexCheckbox(gunsight.name, gunsight.selected, gunsight.enabled, gunsightsFlex, (checked) => {
-                cockpitOptions.selected_gunsights[idx].selected = checked;
-                bridge.setCockpitsBindings(allBindings);
+        const gunsightChecks: HTMLInputElement[] = [];
+        cockpitOptions.selected_gunsights.forEach((gunsight, gunsightIdx) => {
+            const checkbox = this.addFlexCheckboxWithReturn(gunsight.name, gunsight.selected, gunsight.enabled, gunsightsFlex, (checked) => {
+                const bindings = bridge.getCockpitsBindings();
+                bindings.positions[index].selected_gunsights[gunsightIdx].selected = checked;
+                bridge.setCockpitsBindings(bindings);
                 this.render();
             });
+            gunsightChecks.push(checkbox);
         });
         // Add bombsight as number input
-        this.addFlexNumberInput(cockpitOptions.bombsight.name, cockpitOptions.bombsight.value,
+        const bombsightInput = this.addFlexNumberInputWithReturn(cockpitOptions.bombsight.name, cockpitOptions.bombsight.value,
             cockpitOptions.bombsight.enabled, gunsightsFlex, (value) => {
-                cockpitOptions.bombsight.value = value;
-                bridge.setCockpitsBindings(allBindings);
+                const bindings = bridge.getCockpitsBindings();
+                bindings.positions[index].bombsight.value = value;
+                bridge.setCockpitsBindings(bindings);
                 this.render();
             }, 0, 20, 1);
         gunsightsCell.appendChild(gunsightsFlex);
@@ -249,7 +323,70 @@ export class CockpitsUI {
         statsCell.appendChild(statsTable);
         row.appendChild(statsCell);
 
-        return row;
+        return {
+            row,
+            typeSelect,
+            upgradeChecks,
+            safetyChecks,
+            gunsightChecks,
+            bombsightInput,
+            statsCell
+        };
+    }
+
+    /**
+     * Update an existing cockpit row with new values (fast path - no DOM rebuild)
+     */
+    private updateCockpitRow(
+        cache: CockpitRowCache,
+        cockpitOptions: CockpitOptions,
+        index: number,
+        bridge: AircraftBridge
+    ): void {
+        // Update type select
+        cache.typeSelect.selectedIndex = cockpitOptions.selected_type.selected;
+        cache.typeSelect.disabled = !cockpitOptions.selected_type.enabled;
+        // Update select options' enabled state
+        cockpitOptions.selected_type.options.forEach((opt, idx) => {
+            if (idx < cache.typeSelect.options.length) {
+                cache.typeSelect.options[idx].disabled = !opt.enabled;
+            }
+        });
+
+        // Update upgrade checkboxes
+        cockpitOptions.selected_upgrades.forEach((upgrade, idx) => {
+            if (idx < cache.upgradeChecks.length) {
+                cache.upgradeChecks[idx].checked = upgrade.selected;
+                cache.upgradeChecks[idx].disabled = !upgrade.enabled;
+            }
+        });
+
+        // Update safety checkboxes
+        cockpitOptions.selected_safety.forEach((safety, idx) => {
+            if (idx < cache.safetyChecks.length) {
+                cache.safetyChecks[idx].checked = safety.selected;
+                cache.safetyChecks[idx].disabled = !safety.enabled;
+            }
+        });
+
+        // Update gunsight checkboxes
+        cockpitOptions.selected_gunsights.forEach((gunsight, idx) => {
+            if (idx < cache.gunsightChecks.length) {
+                cache.gunsightChecks[idx].checked = gunsight.selected;
+                cache.gunsightChecks[idx].disabled = !gunsight.enabled;
+            }
+        });
+
+        // Update bombsight input
+        cache.bombsightInput.value = cockpitOptions.bombsight.value.toString();
+        cache.bombsightInput.disabled = !cockpitOptions.bombsight.enabled;
+
+        // Update stats
+        cache.statsCell.innerHTML = '';
+        const stats = bridge.getCockpitStats(index);
+        const derivedStats = bridge.getCockpitDerivedStats(index);
+        const statsTable = this.renderer.renderStatsTable(stats, COCKPIT_STATS, derivedStats);
+        cache.statsCell.appendChild(statsTable);
     }
 
     /**
@@ -268,15 +405,15 @@ export class CockpitsUI {
     }
 
     /**
-     * Add a checkbox with label to a flex container
+     * Add a checkbox with label to a flex container and return the checkbox element
      */
-    private addFlexCheckbox(
+    private addFlexCheckboxWithReturn(
         label: string,
         checked: boolean,
         enabled: boolean,
         flexContainer: HTMLElement,
         onChange: (checked: boolean) => void
-    ): void {
+    ): HTMLInputElement {
         const left = flexContainer.children[0] as HTMLElement;
         const right = flexContainer.children[1] as HTMLElement;
 
@@ -296,12 +433,27 @@ export class CockpitsUI {
         checkbox.addEventListener('change', () => onChange(checkbox.checked));
         span.appendChild(checkbox);
         right.appendChild(span);
+
+        return checkbox;
     }
 
     /**
-     * Add a number input with label to a flex container
+     * Add a checkbox with label to a flex container (legacy version)
      */
-    private addFlexNumberInput(
+    private addFlexCheckbox(
+        label: string,
+        checked: boolean,
+        enabled: boolean,
+        flexContainer: HTMLElement,
+        onChange: (checked: boolean) => void
+    ): void {
+        this.addFlexCheckboxWithReturn(label, checked, enabled, flexContainer, onChange);
+    }
+
+    /**
+     * Add a number input with label to a flex container and return the input element
+     */
+    private addFlexNumberInputWithReturn(
         label: string,
         value: number,
         enabled: boolean,
@@ -310,7 +462,7 @@ export class CockpitsUI {
         min?: number,
         max?: number,
         step?: number
-    ): void {
+    ): HTMLInputElement {
         const left = flexContainer.children[0] as HTMLElement;
         const right = flexContainer.children[1] as HTMLElement;
 
@@ -336,6 +488,24 @@ export class CockpitsUI {
         });
         span.appendChild(input);
         right.appendChild(span);
+
+        return input;
+    }
+
+    /**
+     * Add a number input with label to a flex container (legacy version)
+     */
+    private addFlexNumberInput(
+        label: string,
+        value: number,
+        enabled: boolean,
+        flexContainer: HTMLElement,
+        onChange: (value: number) => void,
+        min?: number,
+        max?: number,
+        step?: number
+    ): void {
+        this.addFlexNumberInputWithReturn(label, value, enabled, flexContainer, onChange, min, max, step);
     }
 
     /**
