@@ -6,8 +6,15 @@
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { BindingRenderer } from '../binding_renderer';
+import { BindingRenderer, StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
+
+// Era stats configuration (matching original TypeScript: liftbleed, cost, pitchstab)
+const ERA_STATS: StatDisplayConfig[] = [
+    { key: 'liftbleed', label: 'Stat Lift Bleed', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'pitchstab', label: 'Stat Pitch Stability', positiveIsGood: true }
+];
 
 export class EraUI {
     private container: HTMLElement;
@@ -16,6 +23,7 @@ export class EraUI {
 
     // Cache DOM elements to avoid recreating
     private selectElement: HTMLSelectElement | null = null;
+    private statCells: HTMLTableCellElement[] = [];
 
     constructor(
         private getBridge: () => AircraftBridge | null,
@@ -71,6 +79,7 @@ export class EraUI {
     private rebuildFull(): void {
         // Clear cache
         this.selectElement = null;
+        this.statCells = [];
 
         // Clear existing content
         this.container.innerHTML = '';
@@ -83,15 +92,29 @@ export class EraUI {
 
         const eraBindings = bridge.getEraBindings();
 
-        // Create table for Era selection
+        // Create table for Era selection (matching original TypeScript layout)
         const table = document.createElement('table');
         table.style.width = '100%';
         table.id = 'table_era';
 
-        const row = document.createElement('tr');
-        const cell = document.createElement('td');
+        // Header row with Era Option and stat headers
+        const headerRow = document.createElement('tr');
+        const headers = [
+            localization.translate('Era Option'),
+            ...ERA_STATS.map(s => localization.translate(s.label))
+        ];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
 
-        // Render the Era select dropdown and cache it
+        // Data row with select and stat cells
+        const dataRow = document.createElement('tr');
+
+        // Era select cell
+        const selectCell = document.createElement('td');
         this.selectElement = this.renderer.renderSelect(
             eraBindings.selected_era,
             (selectedIndex) => {
@@ -108,10 +131,21 @@ export class EraUI {
                 console.log(`[EraUI] Era changed to index ${selectedIndex}`);
             }
         ) as HTMLSelectElement;
+        selectCell.appendChild(this.selectElement);
+        dataRow.appendChild(selectCell);
 
-        cell.appendChild(this.selectElement);
-        row.appendChild(cell);
-        table.appendChild(row);
+        // Add stat cells
+        ERA_STATS.forEach(() => {
+            const statCell = document.createElement('td');
+            statCell.textContent = '0'; // Initial value
+            this.statCells.push(statCell);
+            dataRow.appendChild(statCell);
+        });
+
+        table.appendChild(dataRow);
+
+        // Update stat values
+        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Era Section Title');
@@ -162,6 +196,22 @@ export class EraUI {
         eraBindings.selected_era.options.forEach((opt, idx) => {
             if (idx < this.selectElement!.options.length) {
                 this.selectElement!.options[idx].disabled = !opt.enabled;
+            }
+        });
+
+        // Update stat values
+        this.updateStatValues(bridge);
+    }
+
+    /**
+     * Update stat cell values
+     */
+    private updateStatValues(bridge: AircraftBridge): void {
+        const stats = bridge.getEraStats();
+        ERA_STATS.forEach((config, idx) => {
+            if (idx < this.statCells.length) {
+                const value = stats[config.key];
+                this.statCells[idx].textContent = value?.toString() || '0';
             }
         });
     }

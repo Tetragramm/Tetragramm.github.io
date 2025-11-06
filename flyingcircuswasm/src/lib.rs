@@ -96,6 +96,13 @@ impl AircraftWasm {
         }
     }
 
+    /// Get stats for the selected era
+    #[wasm_bindgen(js_name = getEraStats)]
+    pub fn get_era_stats(&mut self) -> JsValue {
+        let stats = self.inner.era.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
     /// Calculate all aircraft statistics
     #[wasm_bindgen(js_name = calculateStats)]
     pub fn calculate_stats(&mut self) {

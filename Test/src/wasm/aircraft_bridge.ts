@@ -110,6 +110,7 @@ export interface AircraftWasmAPI {
     setName(name: string): void;
     getEraBindings(): any;
     setEraBindings(bindings: any): void;
+    getEraStats(): Stats;
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
     getCockpitStats(index: number): any;
@@ -192,6 +193,14 @@ export class AircraftBridge {
     setEraBindings(bindings: EraOptions): void {
         this.ensureInitialized();
         this.wasm!.setEraBindings(bindings);
+    }
+
+    /**
+     * Get stats for the selected era
+     */
+    getEraStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getEraStats();
     }
 
     /**
