@@ -194,8 +194,8 @@ export class ControlSurfacesUI {
     private createControlSurfacesSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
         const flexContainer = this.createFlexSection();
 
-        // Expected order: ailerons, rudders, elevators, flaps, slats
-        const surfaces = ['ailerons', 'rudders', 'elevators', 'flaps', 'slats'];
+        // Expected order: aileron_sel, rudder_sel, elevator_sel, flaps_sel, slats_sel
+        const surfaces = ['aileron_sel', 'rudder_sel', 'elevator_sel', 'flaps_sel', 'slats_sel'];
         const labels = [
             'Control Surfaces Ailerons',
             'Control Surfaces Rudders',
@@ -242,11 +242,11 @@ export class ControlSurfacesUI {
             flexContainer.div2.appendChild(select);
 
             // Store references
-            if (surfaceKey === 'ailerons') this.aileronSelect = select;
-            else if (surfaceKey === 'rudders') this.rudderSelect = select;
-            else if (surfaceKey === 'elevators') this.elevatorSelect = select;
-            else if (surfaceKey === 'flaps') this.flapsSelect = select;
-            else if (surfaceKey === 'slats') this.slatsSelect = select;
+            if (surfaceKey === 'aileron_sel') this.aileronSelect = select;
+            else if (surfaceKey === 'rudder_sel') this.rudderSelect = select;
+            else if (surfaceKey === 'elevator_sel') this.elevatorSelect = select;
+            else if (surfaceKey === 'flaps_sel') this.flapsSelect = select;
+            else if (surfaceKey === 'slats_sel') this.slatsSelect = select;
         });
 
         cell.appendChild(flexContainer.div0);
@@ -258,24 +258,17 @@ export class ControlSurfacesUI {
     private createDragInducersSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
         const flexContainer = this.createFlexSection();
 
-        // Find all drag inducer checkboxes (check bindings)
-        const dragKeys: string[] = [];
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (binding && typeof binding === 'object' && 'selected' in binding &&
-                typeof binding.selected === 'boolean' && !['ailerons', 'rudders', 'elevators', 'flaps', 'slats'].includes(key)) {
-                dragKeys.push(key);
-            }
+        // Get the drag_sel array binding
+        const dragBinding = bindings.drag_sel;
+        if (!dragBinding || !dragBinding.options) {
+            cell.appendChild(flexContainer.div0);
+            return;
         }
 
         // Render drag inducer checkboxes
-        dragKeys.forEach(key => {
-            const binding = bindings[key];
-
+        dragBinding.options.forEach((opt: any, idx: number) => {
             const label = document.createElement('label');
-            label.textContent = binding.name;
+            label.textContent = opt.name;
             label.className = 'flex-item';
             label.style.marginLeft = '0.25em';
             label.style.marginRight = '0.5em';
@@ -285,11 +278,11 @@ export class ControlSurfacesUI {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.className = 'flex-item';
-            checkbox.checked = binding.selected;
-            checkbox.disabled = !binding.enabled;
+            checkbox.checked = dragBinding.selected[idx] || false;
+            checkbox.disabled = !opt.enabled;
             checkbox.addEventListener('change', () => {
                 const updatedBindings = bridge.getControlSurfacesBindings();
-                updatedBindings[key].selected = checkbox.checked;
+                updatedBindings.drag_sel.selected[idx] = checkbox.checked;
                 bridge.setControlSurfacesBindings(updatedBindings);
                 this.render();
             });
@@ -379,50 +372,46 @@ export class ControlSurfacesUI {
         const bindings = bridge.getControlSurfacesBindings();
 
         // Update control surface selects
-        if (this.aileronSelect && bindings.ailerons) {
-            this.aileronSelect.selectedIndex = bindings.ailerons.selected;
-            this.aileronSelect.disabled = !bindings.ailerons.enabled;
-            bindings.ailerons.options.forEach((opt: any, idx: number) => {
+        if (this.aileronSelect && bindings.aileron_sel) {
+            this.aileronSelect.selectedIndex = bindings.aileron_sel.selected;
+            this.aileronSelect.disabled = !bindings.aileron_sel.enabled;
+            bindings.aileron_sel.options.forEach((opt: any, idx: number) => {
                 if (idx < this.aileronSelect!.options.length) {
                     this.aileronSelect!.options[idx].disabled = !opt.enabled;
                 }
             });
         }
 
-        if (this.rudderSelect && bindings.rudders) {
-            this.rudderSelect.selectedIndex = bindings.rudders.selected;
-            this.rudderSelect.disabled = !bindings.rudders.enabled;
+        if (this.rudderSelect && bindings.rudder_sel) {
+            this.rudderSelect.selectedIndex = bindings.rudder_sel.selected;
+            this.rudderSelect.disabled = !bindings.rudder_sel.enabled;
         }
 
-        if (this.elevatorSelect && bindings.elevators) {
-            this.elevatorSelect.selectedIndex = bindings.elevators.selected;
-            this.elevatorSelect.disabled = !bindings.elevators.enabled;
+        if (this.elevatorSelect && bindings.elevator_sel) {
+            this.elevatorSelect.selectedIndex = bindings.elevator_sel.selected;
+            this.elevatorSelect.disabled = !bindings.elevator_sel.enabled;
         }
 
-        if (this.flapsSelect && bindings.flaps) {
-            this.flapsSelect.selectedIndex = bindings.flaps.selected;
-            this.flapsSelect.disabled = !bindings.flaps.enabled;
+        if (this.flapsSelect && bindings.flaps_sel) {
+            this.flapsSelect.selectedIndex = bindings.flaps_sel.selected;
+            this.flapsSelect.disabled = !bindings.flaps_sel.enabled;
         }
 
-        if (this.slatsSelect && bindings.slats) {
-            this.slatsSelect.selectedIndex = bindings.slats.selected;
-            this.slatsSelect.disabled = !bindings.slats.enabled;
+        if (this.slatsSelect && bindings.slats_sel) {
+            this.slatsSelect.selectedIndex = bindings.slats_sel.selected;
+            this.slatsSelect.disabled = !bindings.slats_sel.enabled;
         }
 
         // Update drag inducer checkboxes
-        let dragIdx = 0;
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (binding && typeof binding === 'object' && 'selected' in binding &&
-                typeof binding.selected === 'boolean' && !['ailerons', 'rudders', 'elevators', 'flaps', 'slats'].includes(key)) {
-                if (dragIdx < this.dragCheckboxes.length) {
-                    this.dragCheckboxes[dragIdx].checked = binding.selected;
-                    this.dragCheckboxes[dragIdx].disabled = !binding.enabled;
-                    dragIdx++;
+        if (bindings.drag_sel && bindings.drag_sel.selected) {
+            bindings.drag_sel.selected.forEach((checked: boolean, idx: number) => {
+                if (idx < this.dragCheckboxes.length) {
+                    this.dragCheckboxes[idx].checked = checked;
+                    if (bindings.drag_sel.options && bindings.drag_sel.options[idx]) {
+                        this.dragCheckboxes[idx].disabled = !bindings.drag_sel.options[idx].enabled;
+                    }
                 }
-            }
+            });
         }
 
         // Update stat values

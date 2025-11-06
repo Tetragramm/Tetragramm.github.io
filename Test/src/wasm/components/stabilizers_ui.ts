@@ -169,9 +169,9 @@ export class StabilizersUI {
      * Create horizontal stabilizers section
      */
     private createHorizontalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
-        // Find the h_stab_type and h_stab_count bindings
-        const typeBinding = bindings.h_stab_type;
-        const countBinding = bindings.h_stab_count;
+        // Find the hstab_sel and hstab_count bindings
+        const typeBinding = bindings.hstab_sel;
+        const countBinding = bindings.hstab_count;
 
         if (typeBinding && typeBinding.options) {
             // Type select
@@ -191,7 +191,7 @@ export class StabilizersUI {
 
             this.hTypeSelect.addEventListener('change', () => {
                 const updatedBindings = bridge.getStabilizersBindings();
-                updatedBindings.h_stab_type.selected = parseInt(this.hTypeSelect!.value);
+                updatedBindings.hstab_sel.selected = parseInt(this.hTypeSelect!.value);
                 bridge.setStabilizersBindings(updatedBindings);
                 this.render();
             });
@@ -215,7 +215,7 @@ export class StabilizersUI {
             this.hCountInput.disabled = !countBinding.enabled;
             this.hCountInput.addEventListener('change', () => {
                 const updatedBindings = bridge.getStabilizersBindings();
-                updatedBindings.h_stab_count.value = parseInt(this.hCountInput!.value) || 0;
+                updatedBindings.hstab_count.value = parseInt(this.hCountInput!.value) || 0;
                 bridge.setStabilizersBindings(updatedBindings);
                 this.render();
             });
@@ -231,9 +231,9 @@ export class StabilizersUI {
      * Create vertical stabilizers section
      */
     private createVerticalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
-        // Find the v_stab_type and v_stab_count bindings
-        const typeBinding = bindings.v_stab_type;
-        const countBinding = bindings.v_stab_count;
+        // Find the vstab_sel and vstab_count bindings
+        const typeBinding = bindings.vstab_sel;
+        const countBinding = bindings.vstab_count;
 
         if (typeBinding && typeBinding.options) {
             // Type select
@@ -253,7 +253,7 @@ export class StabilizersUI {
 
             this.vTypeSelect.addEventListener('change', () => {
                 const updatedBindings = bridge.getStabilizersBindings();
-                updatedBindings.v_stab_type.selected = parseInt(this.vTypeSelect!.value);
+                updatedBindings.vstab_sel.selected = parseInt(this.vTypeSelect!.value);
                 bridge.setStabilizersBindings(updatedBindings);
                 this.render();
             });
@@ -277,7 +277,7 @@ export class StabilizersUI {
             this.vCountInput.disabled = !countBinding.enabled;
             this.vCountInput.addEventListener('change', () => {
                 const updatedBindings = bridge.getStabilizersBindings();
-                updatedBindings.v_stab_count.value = parseInt(this.vCountInput!.value) || 0;
+                updatedBindings.vstab_count.value = parseInt(this.vCountInput!.value) || 0;
                 bridge.setStabilizersBindings(updatedBindings);
                 this.render();
             });
@@ -342,35 +342,35 @@ export class StabilizersUI {
         const bindings = bridge.getStabilizersBindings();
 
         // Update horizontal stabilizers
-        if (this.hTypeSelect && bindings.h_stab_type) {
-            this.hTypeSelect.selectedIndex = bindings.h_stab_type.selected;
-            this.hTypeSelect.disabled = !bindings.h_stab_type.enabled;
-            bindings.h_stab_type.options.forEach((opt: any, idx: number) => {
+        if (this.hTypeSelect && bindings.hstab_sel) {
+            this.hTypeSelect.selectedIndex = bindings.hstab_sel.selected;
+            this.hTypeSelect.disabled = !bindings.hstab_sel.enabled;
+            bindings.hstab_sel.options.forEach((opt: any, idx: number) => {
                 if (idx < this.hTypeSelect!.options.length) {
                     this.hTypeSelect!.options[idx].disabled = !opt.enabled;
                 }
             });
         }
 
-        if (this.hCountInput && bindings.h_stab_count) {
-            this.hCountInput.value = bindings.h_stab_count.value.toString();
-            this.hCountInput.disabled = !bindings.h_stab_count.enabled;
+        if (this.hCountInput && bindings.hstab_count) {
+            this.hCountInput.value = bindings.hstab_count.value.toString();
+            this.hCountInput.disabled = !bindings.hstab_count.enabled;
         }
 
         // Update vertical stabilizers
-        if (this.vTypeSelect && bindings.v_stab_type) {
-            this.vTypeSelect.selectedIndex = bindings.v_stab_type.selected;
-            this.vTypeSelect.disabled = !bindings.v_stab_type.enabled;
-            bindings.v_stab_type.options.forEach((opt: any, idx: number) => {
+        if (this.vTypeSelect && bindings.vstab_sel) {
+            this.vTypeSelect.selectedIndex = bindings.vstab_sel.selected;
+            this.vTypeSelect.disabled = !bindings.vstab_sel.enabled;
+            bindings.vstab_sel.options.forEach((opt: any, idx: number) => {
                 if (idx < this.vTypeSelect!.options.length) {
                     this.vTypeSelect!.options[idx].disabled = !opt.enabled;
                 }
             });
         }
 
-        if (this.vCountInput && bindings.v_stab_count) {
-            this.vCountInput.value = bindings.v_stab_count.value.toString();
-            this.vCountInput.disabled = !bindings.v_stab_count.enabled;
+        if (this.vCountInput && bindings.vstab_count) {
+            this.vCountInput.value = bindings.vstab_count.value.toString();
+            this.vCountInput.disabled = !bindings.vstab_count.enabled;
         }
 
         // Update stat values
