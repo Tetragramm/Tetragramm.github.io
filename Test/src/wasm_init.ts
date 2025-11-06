@@ -12,12 +12,10 @@ import { EraUI } from './wasm/components/era_ui';
 import { CockpitsUI } from './wasm/components/cockpits_ui';
 import { PropellerUI } from './wasm/components/propeller_ui';
 import { PassengersUI } from './wasm/components/passengers_ui';
-import { FuelUI } from './wasm/components/fuel_ui';
+import { LoadUI } from './wasm/components/load_ui';
 import { AccessoriesUI } from './wasm/components/accessories_ui';
-import { CargoUI } from './wasm/components/cargo_ui';
 import { ControlSurfacesUI } from './wasm/components/control_surfaces_ui';
 import { LandingGearUI } from './wasm/components/landing_gear_ui';
-import { MunitionsUI } from './wasm/components/munitions_ui';
 import { OptimizationUI } from './wasm/components/optimization_ui';
 import { ReinforcementsUI } from './wasm/components/reinforcements_ui';
 import { StabilizersUI } from './wasm/components/stabilizers_ui';
@@ -33,12 +31,10 @@ export class WasmApplication {
     private cockpitsUI: CockpitsUI | null = null;
     private propellerUI: PropellerUI | null = null;
     private passengersUI: PassengersUI | null = null;
-    private fuelUI: FuelUI | null = null;
+    private loadUI: LoadUI | null = null;
     private accessoriesUI: AccessoriesUI | null = null;
-    private cargoUI: CargoUI | null = null;
     private controlSurfacesUI: ControlSurfacesUI | null = null;
     private landingGearUI: LandingGearUI | null = null;
-    private munitionsUI: MunitionsUI | null = null;
     private optimizationUI: OptimizationUI | null = null;
     private reinforcementsUI: ReinforcementsUI | null = null;
     private stabilizersUI: StabilizersUI | null = null;
@@ -142,23 +138,17 @@ export class WasmApplication {
             });
             console.log('[WasmApp] Passengers UI created');
 
-            // Create Fuel UI component
-            this.fuelUI = new FuelUI(() => this.bridge, 'Load', () => {
+            // Create Load UI component (combines Fuel, Munitions, and Cargo)
+            this.loadUI = new LoadUI(() => this.bridge, 'Load', () => {
                 this.onStatsUpdate();
             });
-            console.log('[WasmApp] Fuel UI created');
+            console.log('[WasmApp] Load UI created');
 
             // Create Accessories UI component
             this.accessoriesUI = new AccessoriesUI(() => this.bridge, 'Accessories', () => {
                 this.onStatsUpdate();
             });
             console.log('[WasmApp] Accessories UI created');
-
-            // Create Cargo UI component
-            this.cargoUI = new CargoUI(() => this.bridge, 'Load', () => {
-                this.onStatsUpdate();
-            });
-            console.log('[WasmApp] Cargo UI created');
 
             // Create ControlSurfaces UI component
             this.controlSurfacesUI = new ControlSurfacesUI(() => this.bridge, 'ControlSurfaces', () => {
@@ -171,12 +161,6 @@ export class WasmApplication {
                 this.onStatsUpdate();
             });
             console.log('[WasmApp] LandingGear UI created');
-
-            // Create Munitions UI component
-            this.munitionsUI = new MunitionsUI(() => this.bridge, 'Load', () => {
-                this.onStatsUpdate();
-            });
-            console.log('[WasmApp] Munitions UI created');
 
             // Create Optimization UI component
             this.optimizationUI = new OptimizationUI(() => this.bridge, 'Optimization', () => {

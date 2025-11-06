@@ -2,6 +2,7 @@
  * Passengers UI Component
  *
  * Displays the Passengers section using UIBindings from Rust
+ * Matches the original TypeScript layout with table structure
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
@@ -14,7 +15,12 @@ export class PassengersUI {
     private sectionElement: HTMLElement | null = null;
 
     // Cache DOM elements to avoid recreating
-    private cachedElements: Map<string, HTMLElement> = new Map();
+    private mainTable: HTMLTableElement | null = null;
+    private seatsInput: HTMLInputElement | null = null;
+    private bedsInput: HTMLInputElement | null = null;
+    private connectCheckbox: HTMLInputElement | null = null;
+    private massCell: HTMLTableCellElement | null = null;
+    private reqsectionsCell: HTMLTableCellElement | null = null;
 
     constructor(
         private getBridge: () => AircraftBridge | null,
@@ -57,7 +63,7 @@ export class PassengersUI {
         }
 
         // If we have cached elements, just update values. Otherwise rebuild.
-        if (this.cachedElements.size > 0) {
+        if (this.mainTable) {
             this.updateValues();
         } else {
             this.rebuildFull();
@@ -69,7 +75,12 @@ export class PassengersUI {
      */
     private rebuildFull(): void {
         // Clear cache
-        this.cachedElements.clear();
+        this.mainTable = null;
+        this.seatsInput = null;
+        this.bedsInput = null;
+        this.connectCheckbox = null;
+        this.massCell = null;
+        this.reqsectionsCell = null;
 
         // Clear existing content
         this.container.innerHTML = '';
@@ -82,34 +93,130 @@ export class PassengersUI {
 
         const bindings = bridge.getPassengersBindings();
 
-        // Create content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create main table matching original layout
+        this.mainTable = document.createElement('table');
+        this.mainTable.style.width = '100%';
+        this.mainTable.id = 'table_passengers';
 
-        // Render UI bindings dynamically
-        this.renderBindings(contentDiv, bindings, bridge);
+        // Header row: Number of Seats | Number of Beds | Upgrade | Mass | Required Sections
+        const headerRow = document.createElement('tr');
+        const headers = [
+            localization.translate('Passengers Number of Seats'),
+            localization.translate('Passengers Number of Beds'),
+            localization.translate('Passengers Upgrade'),
+            localization.translate('Stat Mass'),
+            localization.translate('Stat Required Sections')
+        ];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        this.mainTable.appendChild(headerRow);
+
+        // Data row
+        const dataRow = document.createElement('tr');
+
+        // Seats input cell
+        const seatsCell = document.createElement('td');
+        this.seatsInput = document.createElement('input');
+        this.seatsInput.type = 'number';
+        this.seatsInput.min = '0';
+        this.seatsInput.value = bindings.seats.value.toString();
+        this.seatsInput.disabled = !bindings.seats.enabled;
+        this.seatsInput.addEventListener('change', () => {
+            const updatedBindings = bridge.getPassengersBindings();
+            updatedBindings.seats.value = parseInt(this.seatsInput!.value) || 0;
+            bridge.setPassengersBindings(updatedBindings);
+            this.render();
+            console.log(`[PassengersUI] Seats changed to ${this.seatsInput!.value}`);
+        });
+        seatsCell.appendChild(this.seatsInput);
+        dataRow.appendChild(seatsCell);
+
+        // Beds input cell
+        const bedsCell = document.createElement('td');
+        this.bedsInput = document.createElement('input');
+        this.bedsInput.type = 'number';
+        this.bedsInput.min = '0';
+        this.bedsInput.value = bindings.beds.value.toString();
+        this.bedsInput.disabled = !bindings.beds.enabled;
+        this.bedsInput.addEventListener('change', () => {
+            const updatedBindings = bridge.getPassengersBindings();
+            updatedBindings.beds.value = parseInt(this.bedsInput!.value) || 0;
+            bridge.setPassengersBindings(updatedBindings);
+            this.render();
+            console.log(`[PassengersUI] Beds changed to ${this.bedsInput!.value}`);
+        });
+        bedsCell.appendChild(this.bedsInput);
+        dataRow.appendChild(bedsCell);
+
+        // Upgrade cell with flex section for connectivity checkbox
+        const upgradeCell = document.createElement('td');
+        const flexContainer = this.createFlexSection();
+
+        // Create checkbox in flex layout
+        const connectLabel = document.createElement('label');
+        connectLabel.textContent = localization.translate('Passengers Connectivity');
+        connectLabel.className = 'flex-item';
+        connectLabel.style.marginLeft = '0.25em';
+        connectLabel.style.marginRight = '0.5em';
+        flexContainer.div1.appendChild(connectLabel);
+
+        const checkboxSpan = document.createElement('span');
+        this.connectCheckbox = document.createElement('input');
+        this.connectCheckbox.type = 'checkbox';
+        this.connectCheckbox.checked = bindings.connected.selected;
+        this.connectCheckbox.disabled = !bindings.connected.enabled;
+        this.connectCheckbox.addEventListener('change', () => {
+            const updatedBindings = bridge.getPassengersBindings();
+            updatedBindings.connected.selected = this.connectCheckbox!.checked;
+            bridge.setPassengersBindings(updatedBindings);
+            this.render();
+            console.log(`[PassengersUI] Connectivity changed to ${this.connectCheckbox!.checked}`);
+        });
+
+        const emptyLabel = document.createElement('label');
+        checkboxSpan.appendChild(emptyLabel);
+        checkboxSpan.appendChild(this.connectCheckbox);
+        flexContainer.div2.appendChild(checkboxSpan);
+
+        upgradeCell.appendChild(flexContainer.div0);
+        dataRow.appendChild(upgradeCell);
+
+        // Mass stat cell
+        this.massCell = document.createElement('td');
+        this.massCell.textContent = '0';
+        dataRow.appendChild(this.massCell);
+
+        // Required sections stat cell
+        this.reqsectionsCell = document.createElement('td');
+        this.reqsectionsCell.textContent = '0';
+        dataRow.appendChild(this.reqsectionsCell);
+
+        this.mainTable.appendChild(dataRow);
+
+        // Update stat values
+        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Passengers Section Title');
         this.sectionElement = this.renderer.createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            this.mainTable,
             true // Initially open
         );
 
         // Add rules link (h4)
         const rulesLine = document.createElement('h4');
-        const rulesSpan = document.createElement('span');
-        rulesSpan.textContent = '(';
         const rulesLink = document.createElement('a');
         rulesLink.href = './Rules/Rules.htm#_Passengers';
         const rulesText = document.createElement('u');
         rulesText.textContent = 'Rules';
         rulesLink.appendChild(rulesText);
-        rulesSpan.appendChild(rulesLink);
-        rulesSpan.appendChild(document.createTextNode(')'));
-        rulesLine.appendChild(rulesSpan);
-        rulesLine.appendChild(document.createElement('br'));
+        rulesLine.appendChild(document.createTextNode('('));
+        rulesLine.appendChild(rulesLink);
+        rulesLine.appendChild(document.createTextNode(')'));
 
         // Insert rules link before content
         this.sectionElement.insertBefore(
@@ -123,81 +230,22 @@ export class PassengersUI {
     }
 
     /**
-     * Render UI bindings dynamically based on their structure
+     * Create flex section matching original Tools.ts CreateFlexSection
      */
-    private renderBindings(container: HTMLElement, bindings: any, bridge: AircraftBridge): void {
-        // Iterate through all properties in bindings
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+    private createFlexSection(): { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement } {
+        const div0 = document.createElement('div');
+        div0.className = 'flex-container-o';
 
-            const binding = bindings[key];
+        const div1 = document.createElement('div');
+        div1.className = 'flex-container-i';
 
-            // Handle different binding types
-            if (binding && typeof binding === 'object') {
-                if ('options' in binding && 'selected' in binding) {
-                    // This is a Select binding
-                    const selectElement = this.renderer.renderSelect(
-                        binding,
-                        (selectedIndex) => {
-                            const updatedBindings = bridge.getPassengersBindings();
-                            updatedBindings[key].selected = selectedIndex;
-                            bridge.setPassengersBindings(updatedBindings);
-                            this.render();
-                        }
-                    ) as HTMLSelectElement;
+        const div2 = document.createElement('div');
+        div2.className = 'flex-container-i';
 
-                    const label = document.createElement('label');
-                    label.textContent = binding.name || key;
-                    label.style.marginRight = '10px';
+        div0.appendChild(div1);
+        div0.appendChild(div2);
 
-                    const span = document.createElement('span');
-                    span.appendChild(label);
-                    span.appendChild(selectElement);
-                    container.appendChild(span);
-                    container.appendChild(document.createElement('br'));
-
-                    this.cachedElements.set(`select_${key}`, selectElement);
-                } else if ('selected' in binding && 'enabled' in binding && typeof binding.selected === 'boolean') {
-                    // This is a Check binding
-                    const checkElement = this.renderer.renderCheck(
-                        binding,
-                        (checked) => {
-                            const updatedBindings = bridge.getPassengersBindings();
-                            updatedBindings[key].selected = checked;
-                            bridge.setPassengersBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
-
-                    container.appendChild(checkElement);
-                    container.appendChild(document.createElement('br'));
-
-                    const checkbox = checkElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                    if (checkbox) {
-                        this.cachedElements.set(`check_${key}`, checkbox);
-                    }
-                } else if ('value' in binding && 'enabled' in binding && typeof binding.value === 'number') {
-                    // This is a Number binding
-                    const numberElement = this.renderer.renderNumber(
-                        binding,
-                        (value) => {
-                            const updatedBindings = bridge.getPassengersBindings();
-                            updatedBindings[key].value = value;
-                            bridge.setPassengersBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
-
-                    container.appendChild(numberElement);
-                    container.appendChild(document.createElement('br'));
-
-                    const input = numberElement.querySelector('input[type="number"]') as HTMLInputElement;
-                    if (input) {
-                        this.cachedElements.set(`number_${key}`, input);
-                    }
-                }
-            }
-        }
+        return { div0, div1, div2 };
     }
 
     /**
@@ -211,30 +259,50 @@ export class PassengersUI {
 
         const bindings = bridge.getPassengersBindings();
 
-        // Update all cached elements
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+        // Update input values
+        if (this.seatsInput) {
+            this.seatsInput.value = bindings.seats.value.toString();
+            this.seatsInput.disabled = !bindings.seats.enabled;
+        }
 
-            const binding = bindings[key];
+        if (this.bedsInput) {
+            this.bedsInput.value = bindings.beds.value.toString();
+            this.bedsInput.disabled = !bindings.beds.enabled;
+        }
 
-            // Update based on element type
-            const selectKey = `select_${key}`;
-            const checkKey = `check_${key}`;
-            const numberKey = `number_${key}`;
+        if (this.connectCheckbox) {
+            this.connectCheckbox.checked = bindings.connected.selected;
+            this.connectCheckbox.disabled = !bindings.connected.enabled;
+        }
 
-            if (this.cachedElements.has(selectKey)) {
-                const select = this.cachedElements.get(selectKey) as HTMLSelectElement;
-                select.selectedIndex = binding.selected;
-                select.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(checkKey)) {
-                const check = this.cachedElements.get(checkKey) as HTMLInputElement;
-                check.checked = binding.selected;
-                check.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(numberKey)) {
-                const number = this.cachedElements.get(numberKey) as HTMLInputElement;
-                number.value = binding.value.toString();
-                number.disabled = !binding.enabled;
-            }
+        // Update stat values
+        this.updateStatValues(bridge);
+    }
+
+    /**
+     * Update stat cell values with blink effect
+     */
+    private updateStatValues(bridge: AircraftBridge): void {
+        const stats = bridge.getPassengersStats();
+
+        if (this.massCell) {
+            this.blinkIfChanged(this.massCell, stats.mass?.toString() || '0', false);
+        }
+
+        if (this.reqsectionsCell) {
+            this.blinkIfChanged(this.reqsectionsCell, stats.reqsections?.toString() || '0', false);
+        }
+    }
+
+    /**
+     * Blink animation when stat changes (matching original BlinkIfChanged)
+     * For now, just update the text. Animation could be added later.
+     */
+    private blinkIfChanged(elem: HTMLTableCellElement, str: string, positiveGood: boolean | null): void {
+        // TODO: Add blink animation classes if needed
+        // For now, just update the text
+        if (elem.textContent !== str) {
+            elem.textContent = str;
         }
     }
 
@@ -250,6 +318,11 @@ export class PassengersUI {
      */
     destroy(): void {
         this.container.innerHTML = '';
-        this.cachedElements.clear();
+        this.mainTable = null;
+        this.seatsInput = null;
+        this.bedsInput = null;
+        this.connectCheckbox = null;
+        this.massCell = null;
+        this.reqsectionsCell = null;
     }
 }
