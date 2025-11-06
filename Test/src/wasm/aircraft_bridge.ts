@@ -144,14 +144,6 @@ export interface AircraftWasmAPI {
     getStabilizersBindings(): any;
     setStabilizersBindings(bindings: any): void;
     getStabilizersStats(): Stats;
-    getHStabList(): any[];
-    getVStabList(): any[];
-    getAileronList(): any[];
-    getRudderList(): any[];
-    getElevatorList(): any[];
-    getFlapsList(): any[];
-    getSlatsList(): any[];
-    getDragList(): any[];
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
     getCockpitStats(index: number): any;
@@ -392,54 +384,6 @@ export class AircraftBridge {
     getControlSurfacesStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getControlSurfacesStats();
-    }
-
-    /**
-     * Get aileron list options
-     */
-    getAileronList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getAileronList();
-    }
-
-    /**
-     * Get rudder list options
-     */
-    getRudderList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getRudderList();
-    }
-
-    /**
-     * Get elevator list options
-     */
-    getElevatorList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getElevatorList();
-    }
-
-    /**
-     * Get flaps list options
-     */
-    getFlapsList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getFlapsList();
-    }
-
-    /**
-     * Get slats list options
-     */
-    getSlatsList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getSlatsList();
-    }
-
-    /**
-     * Get drag inducer list options
-     */
-    getDragList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getDragList();
     }
 
     /**

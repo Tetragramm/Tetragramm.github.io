@@ -385,21 +385,53 @@ export class ControlSurfacesUI {
         if (this.rudderSelect && bindings.rudder_sel) {
             this.rudderSelect.selectedIndex = bindings.rudder_sel.selected;
             this.rudderSelect.disabled = !bindings.rudder_sel.enabled;
+            // Update per-option enabled states if present
+            if (bindings.rudder_sel.options) {
+                bindings.rudder_sel.options.forEach((opt: any, idx: number) => {
+                    if (idx < this.rudderSelect!.options.length) {
+                        this.rudderSelect!.options[idx].disabled = !opt.enabled;
+                    }
+                });
+            }
         }
 
         if (this.elevatorSelect && bindings.elevator_sel) {
             this.elevatorSelect.selectedIndex = bindings.elevator_sel.selected;
             this.elevatorSelect.disabled = !bindings.elevator_sel.enabled;
+            // Update per-option enabled states if present
+            if (bindings.elevator_sel.options) {
+                bindings.elevator_sel.options.forEach((opt: any, idx: number) => {
+                    if (idx < this.elevatorSelect!.options.length) {
+                        this.elevatorSelect!.options[idx].disabled = !opt.enabled;
+                    }
+                });
+            }
         }
 
         if (this.flapsSelect && bindings.flaps_sel) {
             this.flapsSelect.selectedIndex = bindings.flaps_sel.selected;
             this.flapsSelect.disabled = !bindings.flaps_sel.enabled;
+            // Update per-option enabled states if present
+            if (bindings.flaps_sel.options) {
+                bindings.flaps_sel.options.forEach((opt: any, idx: number) => {
+                    if (idx < this.flapsSelect!.options.length) {
+                        this.flapsSelect!.options[idx].disabled = !opt.enabled;
+                    }
+                });
+            }
         }
 
         if (this.slatsSelect && bindings.slats_sel) {
             this.slatsSelect.selectedIndex = bindings.slats_sel.selected;
             this.slatsSelect.disabled = !bindings.slats_sel.enabled;
+            // Update per-option enabled states if present
+            if (bindings.slats_sel.options) {
+                bindings.slats_sel.options.forEach((opt: any, idx: number) => {
+                    if (idx < this.slatsSelect!.options.length) {
+                        this.slatsSelect!.options[idx].disabled = !opt.enabled;
+                    }
+                });
+            }
         }
 
         // Update drag inducer checkboxes

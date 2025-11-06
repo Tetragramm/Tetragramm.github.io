@@ -345,11 +345,14 @@ export class StabilizersUI {
         if (this.hTypeSelect && bindings.hstab_sel) {
             this.hTypeSelect.selectedIndex = bindings.hstab_sel.selected;
             this.hTypeSelect.disabled = !bindings.hstab_sel.enabled;
-            bindings.hstab_sel.options.forEach((opt: any, idx: number) => {
-                if (idx < this.hTypeSelect!.options.length) {
-                    this.hTypeSelect!.options[idx].disabled = !opt.enabled;
-                }
-            });
+            // Update per-option enabled states if present
+            if (bindings.hstab_sel.options) {
+                bindings.hstab_sel.options.forEach((opt: any, idx: number) => {
+                    if (idx < this.hTypeSelect!.options.length) {
+                        this.hTypeSelect!.options[idx].disabled = !opt.enabled;
+                    }
+                });
+            }
         }
 
         if (this.hCountInput && bindings.hstab_count) {
@@ -361,11 +364,14 @@ export class StabilizersUI {
         if (this.vTypeSelect && bindings.vstab_sel) {
             this.vTypeSelect.selectedIndex = bindings.vstab_sel.selected;
             this.vTypeSelect.disabled = !bindings.vstab_sel.enabled;
-            bindings.vstab_sel.options.forEach((opt: any, idx: number) => {
-                if (idx < this.vTypeSelect!.options.length) {
-                    this.vTypeSelect!.options[idx].disabled = !opt.enabled;
-                }
-            });
+            // Update per-option enabled states if present
+            if (bindings.vstab_sel.options) {
+                bindings.vstab_sel.options.forEach((opt: any, idx: number) => {
+                    if (idx < this.vTypeSelect!.options.length) {
+                        this.vTypeSelect!.options[idx].disabled = !opt.enabled;
+                    }
+                });
+            }
         }
 
         if (this.vCountInput && bindings.vstab_count) {
