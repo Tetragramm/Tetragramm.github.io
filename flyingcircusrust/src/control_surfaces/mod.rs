@@ -1,4 +1,5 @@
 use crate::{aircraft::AircraftType, stats::Stats};
+use std::iter::zip;
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;
@@ -72,53 +73,22 @@ pub struct ControlSurfaces {
     pub(super) drag_list: Rc<Vec<DragInducerEntry>>,
 
     // Selected indices
-    #[ui(
-        number,
-        name = "aileron_sel",
-        set_fn = "set_aileron",
-        enabled_fn = "is_aileron_enabled"
-    )]
-    pub(super) aileron_sel: i16,
+    #[ui(select, source = "aileron_list", enabled_opt_fn = "can_aileron")]
+    pub(super) aileron_sel: usize,
 
-    #[ui(
-        number,
-        name = "rudder_sel",
-        set_fn = "set_rudder",
-        enabled_fn = "is_rudder_enabled"
-    )]
-    pub(super) rudder_sel: i16,
+    #[ui(select, source = "rudder_list", enabled_fn = "can_rudder")]
+    pub(super) rudder_sel: usize,
 
-    #[ui(
-        number,
-        name = "elevator_sel",
-        set_fn = "set_elevator",
-        enabled_fn = "is_elevator_enabled"
-    )]
-    pub(super) elevator_sel: i16,
+    #[ui(select, source = "elevator_list", enabled_fn = "can_elevator")]
+    pub(super) elevator_sel: usize,
 
-    #[ui(
-        number,
-        name = "flaps_sel",
-        set_fn = "set_flaps",
-        enabled_fn = "is_flaps_enabled"
-    )]
-    pub(super) flaps_sel: i16,
+    #[ui(select, source = "flaps_list")]
+    pub(super) flaps_sel: usize,
 
-    #[ui(
-        number,
-        name = "slats_sel",
-        set_fn = "set_slats",
-        enabled_fn = "is_slats_enabled"
-    )]
-    pub(super) slats_sel: i16,
+    #[ui(select, source = "slats_list")]
+    pub(super) slats_sel: usize,
 
-    #[ui(
-        array,
-        source = "drag_list",
-        name = "drag_sel",
-        set_fn = "set_drag",
-        enabled_fn = "is_drag_enabled"
-    )]
+    #[ui(check_list, source = "drag_list")]
     pub(super) drag_sel: Vec<bool>,
 
     // Aircraft state (not serialized, updated from parent)

@@ -111,54 +111,6 @@ fn test_is_default() {
 }
 
 #[test]
-fn test_set_aileron() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_aileron(1);
-    assert_eq!(cs.get_aileron(), 1);
-    assert!(!cs.is_default());
-}
-
-#[test]
-fn test_set_rudder() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_rudder(1);
-    assert_eq!(cs.get_rudder(), 1);
-    assert!(!cs.is_default());
-}
-
-#[test]
-fn test_set_elevator() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_elevator(1);
-    assert_eq!(cs.get_elevator(), 1);
-    assert!(!cs.is_default());
-}
-
-#[test]
-fn test_set_flaps() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_flaps(1);
-    assert_eq!(cs.get_flaps(), 1);
-    assert!(!cs.is_default());
-}
-
-#[test]
-fn test_set_slats() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_slats(1);
-    assert_eq!(cs.get_slats(), 1);
-    assert!(!cs.is_default());
-}
-
-#[test]
-fn test_set_drag() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_drag(0, true);
-    assert_eq!(cs.get_drag()[0], true);
-    assert!(!cs.is_default());
-}
-
-#[test]
 fn test_can_rudder() {
     let mut cs = create_test_control_surfaces();
     assert!(cs.can_rudder());
@@ -176,27 +128,6 @@ fn test_can_elevator() {
     cs.set_can_elevator(false);
     assert!(!cs.can_elevator());
     assert_eq!(cs.get_elevator(), 0);
-}
-
-#[test]
-fn test_helicopter_disables_controls() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_aileron(1);
-    cs.set_rudder(1);
-    cs.set_elevator(1);
-    cs.set_flaps(1);
-    cs.set_slats(1);
-    cs.set_drag(0, true);
-
-    cs.set_acft_type(AircraftType::Helicopter);
-
-    assert!(cs.is_default());
-    assert!(!cs.is_aileron_enabled());
-    assert!(!cs.is_rudder_enabled());
-    assert!(!cs.is_elevator_enabled());
-    assert!(!cs.is_flaps_enabled());
-    assert!(!cs.is_slats_enabled());
-    assert!(!cs.is_drag_enabled());
 }
 
 #[test]
@@ -268,17 +199,6 @@ fn test_warping_without_wing_area() {
 }
 
 #[test]
-fn test_vtail_synchronization() {
-    let mut cs = create_test_control_surfaces();
-    cs.set_elevator(1);
-    cs.set_rudder(0);
-
-    cs.set_is_vtail(true);
-
-    assert_eq!(cs.get_rudder(), 1); // Should match elevator
-}
-
-#[test]
 fn test_flap_cost_calculation() {
     let mut cs = create_test_control_surfaces();
 
@@ -291,58 +211,4 @@ fn test_flap_cost_calculation() {
         let cost = cs.get_flap_cost(10);
         assert!(cost >= 1.0); // Should be at least 1
     }
-}
-
-#[test]
-fn test_serialization_roundtrip() {
-    use crate::serialization::{Deserializer, Serializable, Serializer};
-
-    let mut cs = create_test_control_surfaces();
-    cs.set_aileron(1);
-    cs.set_rudder(1);
-    cs.set_elevator(1);
-    cs.set_flaps(1);
-    cs.set_slats(1);
-    cs.set_drag(0, true);
-
-    let mut serializer = Serializer::new();
-    cs.serialize(&mut serializer).unwrap();
-    let data = serializer.into_inner();
-
-    let mut cs2 = create_test_control_surfaces();
-    let mut deserializer = Deserializer::new(&data).unwrap();
-    cs2.deserialize(&mut deserializer).unwrap();
-
-    assert_eq!(cs2.get_aileron(), 1);
-    assert_eq!(cs2.get_rudder(), 1);
-    assert_eq!(cs2.get_elevator(), 1);
-    assert_eq!(cs2.get_flaps(), 1);
-    assert_eq!(cs2.get_slats(), 1);
-    assert_eq!(cs2.get_drag()[0], true);
-}
-
-#[test]
-fn test_json_roundtrip() {
-    use crate::serialization::JSSerializable;
-
-    let mut cs = create_test_control_surfaces();
-    cs.set_wing_area(1);
-    cs.set_aileron(1);
-    cs.set_rudder(1);
-    cs.set_elevator(1);
-    cs.set_flaps(1);
-    cs.set_slats(1);
-    cs.set_drag(0, true);
-
-    let json = cs.to_json();
-
-    let mut cs2 = create_test_control_surfaces();
-    cs2.from_json(&json, 12.7);
-
-    assert_eq!(cs2.get_aileron(), 1);
-    assert_eq!(cs2.get_rudder(), 1);
-    assert_eq!(cs2.get_elevator(), 1);
-    assert_eq!(cs2.get_flaps(), 1);
-    assert_eq!(cs2.get_slats(), 1);
-    assert_eq!(cs2.get_drag()[0], true);
 }

@@ -221,7 +221,7 @@ impl AircraftWasm {
     /// Get ControlSurfaces UI bindings
     #[wasm_bindgen(js_name = getControlSurfacesBindings)]
     pub fn get_control_surfaces_bindings(&self) -> JsValue {
-        let options = self.inner.control_surfaces.create_ui_options();
+        let options = self.inner.controlsurfaces.create_ui_options();
         serde_wasm_bindgen::to_value(&options).unwrap()
     }
 
@@ -229,7 +229,7 @@ impl AircraftWasm {
     #[wasm_bindgen(js_name = setControlSurfacesBindings)]
     pub fn set_control_surfaces_bindings(&mut self, js_options: JsValue) {
         if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.control_surfaces.receive_ui_selections(options);
+            self.inner.controlsurfaces.receive_ui_selections(options);
             self.inner.part_stats();
         }
     }
@@ -237,92 +237,14 @@ impl AircraftWasm {
     /// Get stats for control surfaces
     #[wasm_bindgen(js_name = getControlSurfacesStats)]
     pub fn get_control_surfaces_stats(&mut self) -> JsValue {
-        let stats = self.inner.control_surfaces.part_stats();
+        let stats = self.inner.controlsurfaces.part_stats();
         serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get aileron list options
-    #[wasm_bindgen(js_name = getAileronList)]
-    pub fn get_aileron_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.control_surfaces.aileron_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
-    }
-
-    /// Get rudder list options
-    #[wasm_bindgen(js_name = getRudderList)]
-    pub fn get_rudder_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.control_surfaces.rudder_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
-    }
-
-    /// Get elevator list options
-    #[wasm_bindgen(js_name = getElevatorList)]
-    pub fn get_elevator_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.control_surfaces.elevator_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
-    }
-
-    /// Get flaps list options
-    #[wasm_bindgen(js_name = getFlapsList)]
-    pub fn get_flaps_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.control_surfaces.flaps_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
-    }
-
-    /// Get slats list options
-    #[wasm_bindgen(js_name = getSlatsList)]
-    pub fn get_slats_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.control_surfaces.slats_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
-    }
-
-    /// Get drag inducer list options
-    #[wasm_bindgen(js_name = getDragList)]
-    pub fn get_drag_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.control_surfaces.drag_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
     }
 
     /// Get LandingGear UI bindings
     #[wasm_bindgen(js_name = getLandingGearBindings)]
     pub fn get_landing_gear_bindings(&self) -> JsValue {
-        let options = self.inner.landing_gear.create_ui_options();
+        let options = self.inner.gear.create_ui_options();
         serde_wasm_bindgen::to_value(&options).unwrap()
     }
 
@@ -330,7 +252,7 @@ impl AircraftWasm {
     #[wasm_bindgen(js_name = setLandingGearBindings)]
     pub fn set_landing_gear_bindings(&mut self, js_options: JsValue) {
         if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.landing_gear.receive_ui_selections(options);
+            self.inner.gear.receive_ui_selections(options);
             self.inner.part_stats();
         }
     }
@@ -338,7 +260,7 @@ impl AircraftWasm {
     /// Get stats for landing gear
     #[wasm_bindgen(js_name = getLandingGearStats)]
     pub fn get_landing_gear_stats(&mut self) -> JsValue {
-        let stats = self.inner.landing_gear.part_stats();
+        let stats = self.inner.gear.part_stats();
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
@@ -432,32 +354,6 @@ impl AircraftWasm {
     pub fn get_stabilizers_stats(&mut self) -> JsValue {
         let stats = self.inner.stabilizers.part_stats();
         serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get horizontal stabilizer list options
-    #[wasm_bindgen(js_name = getHStabList)]
-    pub fn get_hstab_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.stabilizers.hstab_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
-    }
-
-    /// Get vertical stabilizer list options
-    #[wasm_bindgen(js_name = getVStabList)]
-    pub fn get_vstab_list(&self) -> JsValue {
-        let list: Vec<_> = self.inner.stabilizers.vstab_list.iter()
-            .map(|entry| {
-                serde_json::json!({
-                    "name": entry.name,
-                })
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&list).unwrap()
     }
 
     /// Get Engines UI bindings (container with asymmetric flag and counts)

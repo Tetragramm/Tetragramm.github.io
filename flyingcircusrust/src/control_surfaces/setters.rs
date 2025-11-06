@@ -1,49 +1,6 @@
 use super::*;
 
 impl ControlSurfaces {
-    /// Set aileron selection (UIBindings compatible - single parameter)
-    pub fn set_aileron(&mut self, sel: i16) {
-        if sel >= 0 && (sel as usize) < self.aileron_list.len() {
-            self.aileron_sel = sel;
-        }
-    }
-
-    /// Set rudder selection (UIBindings compatible - single parameter)
-    pub fn set_rudder(&mut self, sel: i16) {
-        if sel >= 0 && (sel as usize) < self.rudder_list.len() {
-            self.rudder_sel = sel;
-        }
-    }
-
-    /// Set elevator selection (UIBindings compatible - single parameter)
-    pub fn set_elevator(&mut self, sel: i16) {
-        if sel >= 0 && (sel as usize) < self.elevator_list.len() {
-            self.elevator_sel = sel;
-        }
-    }
-
-    /// Set flaps selection (UIBindings compatible - single parameter)
-    pub fn set_flaps(&mut self, sel: i16) {
-        if sel >= 0 && (sel as usize) < self.flaps_list.len() {
-            self.flaps_sel = sel;
-        }
-    }
-
-    /// Set slats selection (UIBindings compatible - single parameter)
-    pub fn set_slats(&mut self, sel: i16) {
-        if sel >= 0 && (sel as usize) < self.slats_list.len() {
-            self.slats_sel = sel;
-        }
-    }
-
-    /// Set drag inducer selection for specific index
-    /// Note: UIBindings array handling - this is called for each element
-    pub fn set_drag(&mut self, index: i16, value: bool) {
-        if index >= 0 && (index as usize) < self.drag_sel.len() {
-            self.drag_sel[index as usize] = value;
-        }
-    }
-
     /// Set whether rudder is available
     pub fn set_can_rudder(&mut self, can: bool) {
         self.can_rudder = can;
@@ -101,7 +58,7 @@ impl ControlSurfaces {
             // Ornithopters can only use warping ailerons
             let can = self.can_aileron();
             if let Some(index) = can.iter().position(|&x| x) {
-                self.aileron_sel = index as i16;
+                self.aileron_sel = index;
             }
             self.num_cantilever = 0;
         }

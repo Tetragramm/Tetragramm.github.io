@@ -27,19 +27,19 @@ impl JSSerializable for ControlSurfaces {
 
     fn from_json(&mut self, json: &Value, _version: f32) {
         if let Some(val) = json.get("aileron_sel") {
-            self.aileron_sel = val.as_i64().unwrap_or(0) as i16;
+            self.aileron_sel = val.as_i64().unwrap_or(0) as usize;
         }
         if let Some(val) = json.get("rudder_sel") {
-            self.rudder_sel = val.as_i64().unwrap_or(0) as i16;
+            self.rudder_sel = val.as_i64().unwrap_or(0) as usize;
         }
         if let Some(val) = json.get("elevator_sel") {
-            self.elevator_sel = val.as_i64().unwrap_or(0) as i16;
+            self.elevator_sel = val.as_i64().unwrap_or(0) as usize;
         }
         if let Some(val) = json.get("flaps_sel") {
-            self.flaps_sel = val.as_i64().unwrap_or(0) as i16;
+            self.flaps_sel = val.as_i64().unwrap_or(0) as usize;
         }
         if let Some(val) = json.get("slats_sel") {
-            self.slats_sel = val.as_i64().unwrap_or(0) as i16;
+            self.slats_sel = val.as_i64().unwrap_or(0) as usize;
         }
         if let Some(val) = json.get("drag_sel") {
             self.drag_sel = bool_arr(val, self.drag_list.len());
