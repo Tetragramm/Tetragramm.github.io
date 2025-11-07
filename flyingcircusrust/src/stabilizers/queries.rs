@@ -2,7 +2,7 @@ use super::Stabilizers;
 
 impl Stabilizers {
     /// Gets the horizontal stabilizer type index
-    pub fn get_hstab_type(&self) -> i16 {
+    pub fn get_hstab_type(&self) -> usize {
         self.hstab_sel
     }
 
@@ -12,7 +12,7 @@ impl Stabilizers {
     }
 
     /// Gets the vertical stabilizer type index
-    pub fn get_vstab_type(&self) -> i16 {
+    pub fn get_vstab_type(&self) -> usize {
         self.vstab_sel
     }
 
@@ -23,8 +23,8 @@ impl Stabilizers {
 
     /// Gets the horizontal stabilizer increment value
     pub fn get_hstab_increment(&self) -> i16 {
-        if self.hstab_sel >= 0 && (self.hstab_sel as usize) < self.hstab_list.len() {
-            self.hstab_list[self.hstab_sel as usize].increment
+        if self.hstab_sel < self.hstab_list.len() {
+            self.hstab_list[self.hstab_sel].increment
         } else {
             1
         }
@@ -32,8 +32,8 @@ impl Stabilizers {
 
     /// Gets the vertical stabilizer increment value
     pub fn get_vstab_increment(&self) -> i16 {
-        if self.vstab_sel >= 0 && (self.vstab_sel as usize) < self.vstab_list.len() {
-            self.vstab_list[self.vstab_sel as usize].increment
+        if self.vstab_sel < self.vstab_list.len() {
+            self.vstab_list[self.vstab_sel].increment
         } else {
             1
         }
@@ -41,8 +41,8 @@ impl Stabilizers {
 
     /// Returns whether the current horizontal stabilizer is a V-tail
     pub fn get_is_vtail(&self) -> bool {
-        if self.hstab_sel >= 0 && (self.hstab_sel as usize) < self.hstab_list.len() {
-            self.hstab_list[self.hstab_sel as usize].is_vtail
+        if self.hstab_sel < self.hstab_list.len() {
+            self.hstab_list[self.hstab_sel].is_vtail
         } else {
             false
         }
@@ -52,16 +52,15 @@ impl Stabilizers {
     pub fn can_v_outboard(&self) -> bool {
         self.is_swept
             || self.is_tandem
-            || (self.hstab_sel >= 0
-                && (self.hstab_sel as usize) < self.hstab_list.len()
-                && self.hstab_list[self.hstab_sel as usize].is_canard
+            || (self.hstab_sel < self.hstab_list.len()
+                && self.hstab_list[self.hstab_sel].is_canard
                 && self.hstab_count > 0)
     }
 
     /// Returns whether the current vertical stabilizer is outboard
     pub fn get_v_outboard(&self) -> bool {
-        if self.vstab_sel >= 0 && (self.vstab_sel as usize) < self.vstab_list.len() {
-            self.vstab_list[self.vstab_sel as usize].name == "Outboard"
+        if self.vstab_sel < self.vstab_list.len() {
+            self.vstab_list[self.vstab_sel].name == "Outboard"
         } else {
             false
         }
@@ -69,8 +68,8 @@ impl Stabilizers {
 
     /// Returns whether the current horizontal stabilizer is a canard
     pub fn get_canard(&self) -> bool {
-        if self.hstab_sel >= 0 && (self.hstab_sel as usize) < self.hstab_list.len() {
-            self.hstab_list[self.hstab_sel as usize].is_canard
+        if self.hstab_sel < self.hstab_list.len() {
+            self.hstab_list[self.hstab_sel].is_canard
         } else {
             false
         }

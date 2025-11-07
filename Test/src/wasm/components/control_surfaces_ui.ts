@@ -258,17 +258,17 @@ export class ControlSurfacesUI {
     private createDragInducersSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
         const flexContainer = this.createFlexSection();
 
-        // Get the drag_sel array binding
+        // Get the drag_sel check_list binding (flat array of {name, enabled, selected})
         const dragBinding = bindings.drag_sel;
-        if (!dragBinding || !dragBinding.options) {
+        if (!dragBinding || !Array.isArray(dragBinding)) {
             cell.appendChild(flexContainer.div0);
             return;
         }
 
         // Render drag inducer checkboxes
-        dragBinding.options.forEach((opt: any, idx: number) => {
+        dragBinding.forEach((item: any, idx: number) => {
             const label = document.createElement('label');
-            label.textContent = opt.name;
+            label.textContent = item.name;
             label.className = 'flex-item';
             label.style.marginLeft = '0.25em';
             label.style.marginRight = '0.5em';
@@ -278,11 +278,11 @@ export class ControlSurfacesUI {
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.className = 'flex-item';
-            checkbox.checked = dragBinding.selected[idx] || false;
-            checkbox.disabled = !opt.enabled;
+            checkbox.checked = item.selected || false;
+            checkbox.disabled = !item.enabled;
             checkbox.addEventListener('change', () => {
                 const updatedBindings = bridge.getControlSurfacesBindings();
-                updatedBindings.drag_sel.selected[idx] = checkbox.checked;
+                updatedBindings.drag_sel[idx].selected = checkbox.checked;
                 bridge.setControlSurfacesBindings(updatedBindings);
                 this.render();
             });
@@ -435,13 +435,11 @@ export class ControlSurfacesUI {
         }
 
         // Update drag inducer checkboxes
-        if (bindings.drag_sel && bindings.drag_sel.selected) {
-            bindings.drag_sel.selected.forEach((checked: boolean, idx: number) => {
+        if (bindings.drag_sel && Array.isArray(bindings.drag_sel)) {
+            bindings.drag_sel.forEach((item: any, idx: number) => {
                 if (idx < this.dragCheckboxes.length) {
-                    this.dragCheckboxes[idx].checked = checked;
-                    if (bindings.drag_sel.options && bindings.drag_sel.options[idx]) {
-                        this.dragCheckboxes[idx].disabled = !bindings.drag_sel.options[idx].enabled;
-                    }
+                    this.dragCheckboxes[idx].checked = item.selected;
+                    this.dragCheckboxes[idx].disabled = !item.enabled;
                 }
             });
         }

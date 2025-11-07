@@ -2,11 +2,10 @@ use super::Stabilizers;
 
 impl Stabilizers {
     /// Sets the horizontal stabilizer type
-    pub fn set_hstab_type(&mut self, num: i16) {
-        if num < 0 || num >= self.hstab_list.len() as i16 {
+    pub fn set_hstab_type(&mut self, num: usize) {
+        if num >= self.hstab_list.len() {
             return;
         }
-        let num = num as usize;
 
         // Check if "The Wings" option can be used
         if self.hstab_list[num].name == "The Wings" && !(self.is_tandem || self.is_swept) {
@@ -16,15 +15,14 @@ impl Stabilizers {
         // Handle V-tail transitions
         if self.hstab_list[num].is_vtail {
             self.set_vtail();
-        } else if self.hstab_sel >= 0
-            && (self.hstab_sel as usize) < self.hstab_list.len()
-            && self.hstab_list[self.hstab_sel as usize].is_vtail
+        } else if self.hstab_sel < self.hstab_list.len()
+            && self.hstab_list[self.hstab_sel].is_vtail
         {
             self.vstab_sel = 0;
             self.vstab_count = 1;
         }
 
-        self.hstab_sel = num as i16;
+        self.hstab_sel = num;
         self.set_hstab_count(self.hstab_count);
     }
 
@@ -36,8 +34,8 @@ impl Stabilizers {
         num = (num as f32 + 1.0e-6).floor() as i16;
         self.hstab_count = num;
 
-        if self.hstab_sel >= 0 && (self.hstab_sel as usize) < self.hstab_list.len() {
-            let increment = self.hstab_list[self.hstab_sel as usize].increment;
+        if self.hstab_sel < self.hstab_list.len() {
+            let increment = self.hstab_list[self.hstab_sel].increment;
             if increment != 0 {
                 while (self.hstab_count % increment) != 0 {
                     self.hstab_count += 1;
@@ -49,11 +47,10 @@ impl Stabilizers {
     }
 
     /// Sets the vertical stabilizer type
-    pub fn set_vstab_type(&mut self, num: i16) {
-        if num < 0 || num >= self.vstab_list.len() as i16 {
+    pub fn set_vstab_type(&mut self, num: usize) {
+        if num >= self.vstab_list.len() {
             return;
         }
-        let num = num as usize;
 
         // Check if "Outboard" option can be used
         if self.vstab_list[num].name == "Outboard" && !self.can_v_outboard() {
@@ -63,15 +60,14 @@ impl Stabilizers {
         // Handle V-tail transitions
         if self.vstab_list[num].is_vtail {
             self.set_vtail();
-        } else if self.vstab_sel >= 0
-            && (self.vstab_sel as usize) < self.vstab_list.len()
-            && self.vstab_list[self.vstab_sel as usize].is_vtail
+        } else if self.vstab_sel < self.vstab_list.len()
+            && self.vstab_list[self.vstab_sel].is_vtail
         {
             self.hstab_sel = 0;
             self.vstab_count = 1;
         }
 
-        self.vstab_sel = num as i16;
+        self.vstab_sel = num;
         self.set_vstab_count(self.vstab_count);
     }
 
@@ -83,8 +79,8 @@ impl Stabilizers {
         num = (num as f32 + 1.0e-6).floor() as i16;
         self.vstab_count = num;
 
-        if self.vstab_sel >= 0 && (self.vstab_sel as usize) < self.vstab_list.len() {
-            let increment = self.vstab_list[self.vstab_sel as usize].increment;
+        if self.vstab_sel < self.vstab_list.len() {
+            let increment = self.vstab_list[self.vstab_sel].increment;
             if increment != 0 {
                 while (self.vstab_count % increment) != 0 {
                     self.vstab_count += 1;
@@ -120,16 +116,14 @@ impl Stabilizers {
         self.have_tail = use_tail;
         if !use_tail {
             let hvalid = self.get_h_valid_list();
-            if self.hstab_sel >= 0
-                && (self.hstab_sel as usize) < hvalid.len()
-                && !hvalid[self.hstab_sel as usize]
+            if self.hstab_sel < hvalid.len()
+                && !hvalid[self.hstab_sel]
             {
                 self.hstab_sel = 2;
             }
             let vvalid = self.get_v_valid_list();
-            if self.vstab_sel >= 0
-                && (self.vstab_sel as usize) < vvalid.len()
-                && !vvalid[self.vstab_sel as usize]
+            if self.vstab_sel < vvalid.len()
+                && !vvalid[self.vstab_sel]
             {
                 if vvalid.len() > 1 && !vvalid[1] {
                     // If it was outboard, set it to canard so we can have outboard vstab
@@ -172,14 +166,14 @@ impl Stabilizers {
         // Find and set V-tail for horizontal stabilizer
         for i in 0..self.hstab_list.len() {
             if self.hstab_list[i].is_vtail {
-                self.hstab_sel = i as i16;
+                self.hstab_sel = i;
                 break;
             }
         }
         // Find and set V-tail for vertical stabilizer
         for i in 0..self.vstab_list.len() {
             if self.vstab_list[i].is_vtail {
-                self.vstab_sel = i as i16;
+                self.vstab_sel = i;
                 break;
             }
         }

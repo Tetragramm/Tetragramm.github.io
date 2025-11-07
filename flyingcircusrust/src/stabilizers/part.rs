@@ -18,7 +18,7 @@ impl Part for Stabilizers {
             && self.hstab_sel >= 0
             && (self.hstab_sel as usize) < self.hstab_list.len()
         {
-            let hstab = &self.hstab_list[self.hstab_sel as usize];
+            let hstab = &self.hstab_list[self.hstab_sel];
             stats = stats.add(&hstab.stats);
 
             let drag = if self.is_heli {
@@ -32,8 +32,8 @@ impl Part for Stabilizers {
                 calculated_drag.max(1)
             };
             stats.drag += drag as f32;
-        } else if self.hstab_sel >= 0 && (self.hstab_sel as usize) < self.hstab_list.len() {
-            let hstab = &self.hstab_list[self.hstab_sel as usize];
+        } else if self.hstab_sel < self.hstab_list.len() {
+            let hstab = &self.hstab_list[self.hstab_sel];
             if hstab.increment != 0 {
                 stats.pitchstab -= (self.lifting_area / 2.0 + 1.0e-6).floor();
                 stats.liftbleed += 5.0;
@@ -45,15 +45,15 @@ impl Part for Stabilizers {
             && self.vstab_sel >= 0
             && (self.vstab_sel as usize) < self.vstab_list.len()
         {
-            let vstab = &self.vstab_list[self.vstab_sel as usize];
+            let vstab = &self.vstab_list[self.vstab_sel];
             stats = stats.add(&vstab.stats);
 
             let drag = if self.is_heli {
                 let calculated_drag =
                     (self.wing_drag / 16.0 * vstab.dragfactor + 1.0e-6).floor() as i16;
                 let min_drag =
-                    if self.hstab_sel >= 0 && (self.hstab_sel as usize) < self.hstab_list.len() {
-                        (1.0 * self.hstab_list[self.hstab_sel as usize].dragfactor).ceil() as i16
+                    if self.hstab_sel < self.hstab_list.len() {
+                        (1.0 * self.hstab_list[self.hstab_sel].dragfactor).ceil() as i16
                     } else {
                         1
                     };
@@ -64,8 +64,8 @@ impl Part for Stabilizers {
                 calculated_drag.max(1)
             };
             stats.drag += drag as f32;
-        } else if self.vstab_sel >= 0 && (self.vstab_sel as usize) < self.vstab_list.len() {
-            let vstab = &self.vstab_list[self.vstab_sel as usize];
+        } else if self.vstab_sel < self.vstab_list.len() {
+            let vstab = &self.vstab_list[self.vstab_sel];
             if vstab.increment != 0 || (vstab.increment == 0 && self.hstab_count == 0) {
                 stats.latstab -= self.lifting_area.floor();
             }
@@ -75,7 +75,7 @@ impl Part for Stabilizers {
         stats.drag += (2 * ((self.hstab_count - 1).max(0) + (self.vstab_count - 1).max(0))) as f32;
 
         // Pairs of stabilizers (control bonus)
-        if self.vstab_sel >= 0 && self.vstab_list[self.vstab_sel as usize].increment != 0 {
+        if self.vstab_sel >= 0 && self.vstab_list[self.vstab_sel].increment != 0 {
             let mut leftovers = (self.hstab_count - 1).max(0);
             let es_pairs = (self.engine_count - 1).min(self.vstab_count - 1);
             leftovers += (self.vstab_count - 1 - es_pairs).max(0);

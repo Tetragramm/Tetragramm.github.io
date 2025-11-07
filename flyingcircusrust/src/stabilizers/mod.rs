@@ -43,13 +43,8 @@ pub struct Stabilizers {
     pub vstab_list: Rc<Vec<VStabEntry>>,
 
     // Horizontal stabilizer configuration
-    #[ui(
-        number,
-        name = "hstab_sel",
-        set_fn = "set_hstab_type",
-        enabled_fn = "is_hstab_enabled"
-    )]
-    hstab_sel: i16,
+    #[ui(select, source = "hstab_list", enabled_fn = "is_hstab_enabled", set_fn = "set_hstab_type")]
+    hstab_sel: usize,
 
     #[ui(
         number,
@@ -60,13 +55,8 @@ pub struct Stabilizers {
     hstab_count: i16,
 
     // Vertical stabilizer configuration
-    #[ui(
-        number,
-        name = "vstab_sel",
-        set_fn = "set_vstab_type",
-        enabled_fn = "is_vstab_enabled"
-    )]
-    vstab_sel: i16,
+    #[ui(select, source = "vstab_list", enabled_fn = "is_vstab_enabled", set_fn = "set_vstab_type")]
+    vstab_sel: usize,
 
     #[ui(
         number,

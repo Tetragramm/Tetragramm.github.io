@@ -5,13 +5,13 @@ use serde_json::json;
 impl JSSerializable for Stabilizers {
     fn from_json(&mut self, json: &serde_json::Value, _version: f32) {
         if let Some(val) = json["hstab_sel"].as_i64() {
-            self.hstab_sel = val as i16;
+            self.hstab_sel = val as usize;
         }
         if let Some(val) = json["hstab_count"].as_i64() {
             self.hstab_count = val as i16;
         }
         if let Some(val) = json["vstab_sel"].as_i64() {
-            self.vstab_sel = val as i16;
+            self.vstab_sel = val as usize;
         }
         if let Some(val) = json["vstab_count"].as_i64() {
             self.vstab_count = val as i16;
