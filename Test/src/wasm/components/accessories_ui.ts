@@ -2,116 +2,147 @@
  * Accessories UI Component
  *
  * Displays the Accessories section using UIBindings from Rust
+ * Includes armour, electrical, radio, reconnaissance, visibility, climate, autopilot, and control systems
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { BindingRenderer } from '../binding_renderer';
+import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
+import { BaseComponentUI } from '../base_component_ui';
+import {
+    createRulesLink,
+    createFlexSection,
+    updateSelectElement,
+    createFlexNumberInputs,
+    createFlexCheckboxes,
+    createSelectElement
+} from '../dom_utils';
 
-export class AccessoriesUI {
-    private container: HTMLElement;
-    private renderer: BindingRenderer;
-    private sectionElement: HTMLElement | null = null;
+// Cache interface for type safety
+interface AccessoriesCache {
+    // Armour coverage inputs (8 positions for different AP levels)
+    armourInputs: HTMLInputElement[];
 
-    // Cache DOM elements to avoid recreating
-    private cachedElements: Map<string, HTMLElement> = new Map();
+    // Electrical equipment inputs
+    electricalInputs: HTMLInputElement[];
 
-    constructor(
-        private getBridge: () => AircraftBridge | null,
-        containerId: string,
-        private onUpdate?: () => void
-    ) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            throw new Error(`Container element '${containerId}' not found`);
-        }
-        this.container = container;
+    // Radio select
+    radioSelect: HTMLSelectElement;
 
-        // Get the initial bridge for renderer
-        const bridge = this.getBridge();
-        if (!bridge) {
-            throw new Error('Bridge not available during AccessoriesUI construction');
-        }
+    // Reconnaissance inputs
+    reconInputs: HTMLInputElement[];
 
-        // Create renderer with stats update callback
-        this.renderer = new BindingRenderer(bridge, () => {
-            if (this.onUpdate) {
-                this.onUpdate();
-            }
-        });
+    // Visibility checkboxes
+    visiCheckboxes: HTMLInputElement[];
 
-        // Listen for locale changes and do full rebuild (text changes)
-        localization.onLocaleChange(() => this.rebuildFull());
+    // Climate control checkboxes
+    climCheckboxes: HTMLInputElement[];
 
-        this.render();
+    // Autopilot select
+    autopilotSelect: HTMLSelectElement;
+
+    // Control system select
+    controlSelect: HTMLSelectElement;
+
+    // Stat cells
+    statCells: Map<string, HTMLTableCellElement>;
+}
+
+export class AccessoriesUI extends BaseComponentUI {
+    private cache: AccessoriesCache = undefined;
+
+    protected shouldUpdate(): boolean {
+        return this.cache !== undefined;
     }
 
-    /**
-     * Render the Accessories UI - intelligently updates or rebuilds
-     */
-    render(): void {
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[AccessoriesUI] Bridge not initialized, skipping render');
-            return;
-        }
-
-        // If we have cached elements, just update values. Otherwise rebuild.
-        if (this.cachedElements.size > 0) {
-            this.updateValues();
-        } else {
-            this.rebuildFull();
-        }
+    protected clearCache(): void {
+        this.cache = undefined;
     }
 
     /**
      * Full rebuild of the UI structure (used on first render or locale change)
      */
-    private rebuildFull(): void {
-        // Clear cache
-        this.cachedElements.clear();
-
-        // Clear existing content
+    protected rebuildFull(): void {
+        this.clearCache();
         this.container.innerHTML = '';
 
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[AccessoriesUI] Bridge not initialized, skipping rebuild');
-            return;
-        }
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
 
         const bindings = bridge.getAccessoriesBindings();
 
-        // Create content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create main table with 4 columns: Armour | Electrical | Information | Stats
+        const mainTable = document.createElement('table');
+        mainTable.style.width = '100%';
+        mainTable.id = 'tbl_accessories';
 
-        // Render UI bindings dynamically
-        this.renderBindings(contentDiv, bindings, bridge);
+        // Header row
+        const headerRow = document.createElement('tr');
+        const headers = [
+            localization.translate('Accessories Armour'),
+            localization.translate('Accessories Electrical'),
+            localization.translate('Accessories Information'),
+            localization.translate('Accessories Accessories Stats')
+        ];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        mainTable.appendChild(headerRow);
+
+        // Data row
+        const dataRow = document.createElement('tr');
+
+        // Armour cell
+        const armourCell = document.createElement('td');
+        const armourInputs = this.createArmourSection(armourCell, bindings, bridge);
+        dataRow.appendChild(armourCell);
+
+        // Electrical cell (radio + electrical equipment)
+        const electricalCell = document.createElement('td');
+        const { radioSelect, electricalInputs } = this.createElectricalSection(electricalCell, bindings, bridge);
+        dataRow.appendChild(electricalCell);
+
+        // Information cell (recon, visibility, climate, autopilot, control)
+        const infoCell = document.createElement('td');
+        const { reconInputs, visiCheckboxes, climCheckboxes, autopilotSelect, controlSelect } =
+            this.createInformationSection(infoCell, bindings, bridge);
+        dataRow.appendChild(infoCell);
+
+        // Stats cell
+        const statsCell = document.createElement('td');
+        const statCells = this.createStatsSection(statsCell);
+        dataRow.appendChild(statsCell);
+
+        mainTable.appendChild(dataRow);
+
+        // Cache elements
+        this.cache = {
+            armourInputs,
+            electricalInputs,
+            radioSelect,
+            reconInputs,
+            visiCheckboxes,
+            climCheckboxes,
+            autopilotSelect,
+            controlSelect,
+            statCells
+        };
+
+        // Update stat values
+        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Accessories Section Title');
         this.sectionElement = this.renderer.createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            mainTable,
             true // Initially open
         );
 
-        // Add rules link (h4)
-        const rulesLine = document.createElement('h4');
-        const rulesSpan = document.createElement('span');
-        rulesSpan.textContent = '(';
-        const rulesLink = document.createElement('a');
-        rulesLink.href = './Rules/Rules.htm#_Accessories';
-        const rulesText = document.createElement('u');
-        rulesText.textContent = 'Rules';
-        rulesLink.appendChild(rulesText);
-        rulesSpan.appendChild(rulesLink);
-        rulesSpan.appendChild(document.createTextNode(')'));
-        rulesLine.appendChild(rulesSpan);
-        rulesLine.appendChild(document.createElement('br'));
-
-        // Insert rules link before content
+        // Add rules link using utility
+        const rulesLine = createRulesLink('_Accessories');
         this.sectionElement.insertBefore(
             rulesLine,
             this.sectionElement.children[1]
@@ -123,133 +154,373 @@ export class AccessoriesUI {
     }
 
     /**
-     * Render UI bindings dynamically based on their structure
+     * Create armour coverage section (8 number inputs for AP levels)
+     * Note: armour_coverage is not a UI binding, needs special handling
      */
-    private renderBindings(container: HTMLElement, bindings: any, bridge: AircraftBridge): void {
-        // Iterate through all properties in bindings
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+    private createArmourSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): HTMLInputElement[] {
+        const flexContainer = createFlexSection();
 
-            const binding = bindings[key];
+        // TODO: Need to determine how to get/set armour coverage
+        // For now, create placeholder inputs
+        const armourInputs: HTMLInputElement[] = [];
 
-            // Handle different binding types
-            if (binding && typeof binding === 'object') {
-                if ('options' in binding && 'selected' in binding) {
-                    // This is a Select binding
-                    const selectElement = this.renderer.renderSelect(
-                        binding,
-                        (selectedIndex) => {
-                            const updatedBindings = bridge.getAccessoriesBindings();
-                            updatedBindings[key].selected = selectedIndex;
-                            bridge.setAccessoriesBindings(updatedBindings);
-                            this.render();
-                        }
-                    ) as HTMLSelectElement;
+        // Create 8 inputs for armour coverage (AP levels 1-8)
+        for (let i = 0; i < 8; i++) {
+            const label = document.createElement('label');
+            label.textContent = `Thickness ${i + 1}`;
+            label.className = 'flex-item';
+            label.style.marginLeft = '0.25em';
+            label.style.marginRight = '0.5em';
 
-                    const label = document.createElement('label');
-                    label.textContent = binding.name || key;
-                    label.style.marginRight = '10px';
-
-                    const span = document.createElement('span');
-                    span.appendChild(label);
-                    span.appendChild(selectElement);
-                    container.appendChild(span);
-                    container.appendChild(document.createElement('br'));
-
-                    this.cachedElements.set(`select_${key}`, selectElement);
-                } else if ('selected' in binding && 'enabled' in binding && typeof binding.selected === 'boolean') {
-                    // This is a Check binding
-                    const checkElement = this.renderer.renderCheck(
-                        binding,
-                        (checked) => {
-                            const updatedBindings = bridge.getAccessoriesBindings();
-                            updatedBindings[key].selected = checked;
-                            bridge.setAccessoriesBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
-
-                    container.appendChild(checkElement);
-                    container.appendChild(document.createElement('br'));
-
-                    const checkbox = checkElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                    if (checkbox) {
-                        this.cachedElements.set(`check_${key}`, checkbox);
-                    }
-                } else if ('value' in binding && 'enabled' in binding && typeof binding.value === 'number') {
-                    // This is a Number binding
-                    const numberElement = this.renderer.renderNumber(
-                        binding,
-                        (value) => {
-                            const updatedBindings = bridge.getAccessoriesBindings();
-                            updatedBindings[key].value = value;
-                            bridge.setAccessoriesBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
-
-                    container.appendChild(numberElement);
-                    container.appendChild(document.createElement('br'));
-
-                    const input = numberElement.querySelector('input[type="number"]') as HTMLInputElement;
-                    if (input) {
-                        this.cachedElements.set(`number_${key}`, input);
-                    }
-                }
+            // Place labels in two columns
+            if (i < 4) {
+                flexContainer.div1.appendChild(label);
+            } else {
+                flexContainer.div1.appendChild(label);
             }
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '0';
+            input.max = '100';
+            input.step = '1';
+            input.className = 'flex-item';
+            input.value = '0';
+
+            const index = i; // Capture for closure
+            input.addEventListener('change', () => {
+                // TODO: Need bridge method to set armour coverage
+                console.warn('[AccessoriesUI] Armour coverage setter not yet implemented');
+                this.render();
+            });
+
+            if (i < 4) {
+                flexContainer.div2.appendChild(input);
+            } else {
+                flexContainer.div2.appendChild(input);
+            }
+
+            armourInputs.push(input);
         }
+
+        cell.appendChild(flexContainer.div0);
+        return armourInputs;
+    }
+
+    /**
+     * Create electrical section (radio select + electrical equipment counts)
+     */
+    private createElectricalSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): {
+        radioSelect: HTMLSelectElement;
+        electricalInputs: HTMLInputElement[];
+    } {
+        const flexContainer = createFlexSection();
+
+        // Radio select
+        const radioBinding = bindings.radio_sel;
+        const radioSelect = radioBinding ? createSelectElement(
+            radioBinding,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getAccessoriesBindings();
+                updatedBindings.radio_sel.selected = selectedIndex;
+                bridge.setAccessoriesBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        if (radioSelect) {
+            const radioLabel = document.createElement('label');
+            radioLabel.textContent = localization.translate('Accessories Radio');
+            radioLabel.style.marginRight = '10px';
+            cell.appendChild(radioLabel);
+            cell.appendChild(radioSelect);
+            cell.appendChild(document.createElement('br'));
+        }
+
+        // Electrical equipment counts
+        const electricalBinding = bindings.electrical_count;
+        const electricalInputs = electricalBinding && Array.isArray(electricalBinding)
+            ? createFlexNumberInputs(
+                flexContainer,
+                electricalBinding,
+                (idx) => (value) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.electrical_count[idx].value = value;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
+
+        cell.appendChild(flexContainer.div0);
+        return { radioSelect, electricalInputs };
+    }
+
+    /**
+     * Create information section (recon, visibility, climate, autopilot, control)
+     */
+    private createInformationSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): {
+        reconInputs: HTMLInputElement[];
+        visiCheckboxes: HTMLInputElement[];
+        climCheckboxes: HTMLInputElement[];
+        autopilotSelect: HTMLSelectElement;
+        controlSelect: HTMLSelectElement;
+    } {
+        const flexContainer = createFlexSection();
+
+        // Reconnaissance equipment counts
+        const reconBinding = bindings.recon_sel;
+        const reconInputs = reconBinding && Array.isArray(reconBinding)
+            ? createFlexNumberInputs(
+                flexContainer,
+                reconBinding,
+                (idx) => (value) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.recon_sel[idx].value = value;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
+
+        // Visibility equipment toggles
+        const visiBinding = bindings.visi_sel;
+        const visiCheckboxes = visiBinding && Array.isArray(visiBinding)
+            ? createFlexCheckboxes(
+                flexContainer,
+                visiBinding,
+                (idx) => (checked) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.visi_sel[idx].selected = checked;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
+
+        // Climate control toggles
+        const climBinding = bindings.clim_sel;
+        const climCheckboxes = climBinding && Array.isArray(climBinding)
+            ? createFlexCheckboxes(
+                flexContainer,
+                climBinding,
+                (idx) => (checked) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.clim_sel[idx].selected = checked;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
+
+        cell.appendChild(flexContainer.div0);
+
+        // Autopilot select (separate from flex container)
+        const autopilotBinding = bindings.auto_sel;
+        const autopilotSelect = autopilotBinding ? createSelectElement(
+            autopilotBinding,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getAccessoriesBindings();
+                updatedBindings.auto_sel.selected = selectedIndex;
+                bridge.setAccessoriesBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        if (autopilotSelect) {
+            const autopilotLabel = document.createElement('label');
+            autopilotLabel.textContent = localization.translate('Accessories Autopilot');
+            autopilotLabel.style.marginRight = '10px';
+            cell.appendChild(autopilotLabel);
+            cell.appendChild(autopilotSelect);
+            cell.appendChild(document.createElement('br'));
+        }
+
+        // Control system select (separate from flex container)
+        const controlBinding = bindings.cont_sel;
+        const controlSelect = controlBinding ? createSelectElement(
+            controlBinding,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getAccessoriesBindings();
+                updatedBindings.cont_sel.selected = selectedIndex;
+                bridge.setAccessoriesBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        if (controlSelect) {
+            const controlLabel = document.createElement('label');
+            controlLabel.textContent = localization.translate('Accessories Control System');
+            controlLabel.style.marginRight = '10px';
+            cell.appendChild(controlLabel);
+            cell.appendChild(controlSelect);
+            cell.appendChild(document.createElement('br'));
+        }
+
+        return { reconInputs, visiCheckboxes, climCheckboxes, autopilotSelect, controlSelect };
+    }
+
+    /**
+     * Create stats section (inner table with relevant stats)
+     */
+    private createStatsSection(cell: HTMLTableCellElement): Map<string, HTMLTableCellElement> {
+        cell.className = 'inner_table';
+        const statsTable = document.createElement('table');
+        statsTable.className = 'inner_table';
+
+        const statCells = new Map<string, HTMLTableCellElement>();
+
+        // Row 1: Mass | Cost | Req Sections
+        const header1 = statsTable.insertRow();
+        ['Stat Mass', 'Stat Cost', 'Stat Required Sections'].forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = localization.translate(key);
+            header1.appendChild(th);
+        });
+
+        const data1 = statsTable.insertRow();
+        ['mass', 'cost', 'reqsections'].forEach(key => {
+            const td = data1.insertCell();
+            td.textContent = '0';
+            statCells.set(key, td);
+        });
+
+        // Row 2: Visibility | Control | Reliability
+        const header2 = statsTable.insertRow();
+        ['Stat Visibility', 'Stat Control', 'Stat Reliability'].forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = localization.translate(key);
+            header2.appendChild(th);
+        });
+
+        const data2 = statsTable.insertRow();
+        ['visibility', 'control', 'reliability'].forEach(key => {
+            const td = data2.insertCell();
+            td.textContent = '0';
+            statCells.set(key, td);
+        });
+
+        // Row 3: Cooling | Charge | (empty)
+        const header3 = statsTable.insertRow();
+        const th3_1 = document.createElement('th');
+        th3_1.textContent = localization.translate('Stat Cooling');
+        header3.appendChild(th3_1);
+        const th3_2 = document.createElement('th');
+        th3_2.textContent = localization.translate('Stat Charge');
+        header3.appendChild(th3_2);
+        const th3_3 = document.createElement('th');
+        th3_3.textContent = ' ';
+        header3.appendChild(th3_3);
+
+        const data3 = statsTable.insertRow();
+        const td3_1 = data3.insertCell();
+        td3_1.textContent = '0';
+        statCells.set('cooling', td3_1);
+        const td3_2 = data3.insertCell();
+        td3_2.textContent = '0';
+        statCells.set('charge', td3_2);
+        data3.insertCell(); // empty cell
+
+        cell.appendChild(statsTable);
+        return statCells;
     }
 
     /**
      * Update values in existing DOM elements (fast path)
      */
-    private updateValues(): void {
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            return;
-        }
+    protected updateValues(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge || !this.cache) return;
 
         const bindings = bridge.getAccessoriesBindings();
 
-        // Update all cached elements
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+        // Update armour inputs
+        // TODO: Need bridge method to get armour coverage
 
-            const binding = bindings[key];
+        // Update electrical inputs
+        if (bindings.electrical_count && Array.isArray(bindings.electrical_count)) {
+            bindings.electrical_count.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.electricalInputs.length) {
+                    this.cache!.electricalInputs[idx].value = item.value.toString();
+                    this.cache!.electricalInputs[idx].disabled = !item.enabled;
+                }
+            });
+        }
 
-            // Update based on element type
-            const selectKey = `select_${key}`;
-            const checkKey = `check_${key}`;
-            const numberKey = `number_${key}`;
+        // Update radio select
+        if (this.cache.radioSelect && bindings.radio_sel) {
+            updateSelectElement(this.cache.radioSelect, bindings.radio_sel);
+        }
 
-            if (this.cachedElements.has(selectKey)) {
-                const select = this.cachedElements.get(selectKey) as HTMLSelectElement;
-                select.selectedIndex = binding.selected;
-                select.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(checkKey)) {
-                const check = this.cachedElements.get(checkKey) as HTMLInputElement;
-                check.checked = binding.selected;
-                check.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(numberKey)) {
-                const number = this.cachedElements.get(numberKey) as HTMLInputElement;
-                number.value = binding.value.toString();
-                number.disabled = !binding.enabled;
+        // Update recon inputs
+        if (bindings.recon_sel && Array.isArray(bindings.recon_sel)) {
+            bindings.recon_sel.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.reconInputs.length) {
+                    this.cache!.reconInputs[idx].value = item.value.toString();
+                    this.cache!.reconInputs[idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update visibility checkboxes
+        if (bindings.visi_sel && Array.isArray(bindings.visi_sel)) {
+            bindings.visi_sel.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.visiCheckboxes.length) {
+                    this.cache!.visiCheckboxes[idx].checked = item.selected;
+                    this.cache!.visiCheckboxes[idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update climate checkboxes
+        if (bindings.clim_sel && Array.isArray(bindings.clim_sel)) {
+            bindings.clim_sel.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.climCheckboxes.length) {
+                    this.cache!.climCheckboxes[idx].checked = item.selected;
+                    this.cache!.climCheckboxes[idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update autopilot select
+        if (this.cache.autopilotSelect && bindings.auto_sel) {
+            updateSelectElement(this.cache.autopilotSelect, bindings.auto_sel);
+        }
+
+        // Update control select
+        if (this.cache.controlSelect && bindings.cont_sel) {
+            updateSelectElement(this.cache.controlSelect, bindings.cont_sel);
+        }
+
+        // Update stat values
+        this.updateStatValues(bridge);
+    }
+
+    /**
+     * Update stat cell values
+     */
+    private updateStatValues(bridge: AircraftBridge): void {
+        if (!this.cache) return;
+
+        const stats = bridge.getAccessoriesStats();
+
+        for (const [key, cell] of this.cache.statCells) {
+            const value = stats[key];
+            if (cell.textContent !== (value?.toString() || '0')) {
+                cell.textContent = value?.toString() || '0';
             }
         }
-    }
-
-    /**
-     * Update the UI (e.g., when data changes externally)
-     */
-    update(): void {
-        this.render();
-    }
-
-    /**
-     * Destroy the component and clean up listeners
-     */
-    destroy(): void {
-        this.container.innerHTML = '';
-        this.cachedElements.clear();
     }
 }
