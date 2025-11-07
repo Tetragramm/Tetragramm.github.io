@@ -332,3 +332,31 @@ export function createFlexNumberInputs(
     });
     return numbers;
 }
+
+/**
+ * Create a select element in a flex section with label
+ * @param binding - The binding object with options and selected
+ * @param flexContainer - The flex container to add the select to
+ * @param onChange - Callback when selection changes, receives new selected index
+ * @param labelText - Optional label text (defaults to binding.name)
+ * @returns The created select element
+ */
+export function createFlexSelect(
+    binding: any,
+    flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
+    onChange: (selectedIndex: number) => void,
+    labelText?: string
+): HTMLSelectElement {
+    const label = document.createElement('label');
+    label.textContent = labelText || binding.name;
+    label.className = 'flex-item';
+    label.style.marginLeft = '0.25em';
+    label.style.marginRight = '0.5em';
+    flexContainer.div1.appendChild(label);
+
+    const select = createSelectElement(binding, onChange);
+    select.className = 'flex-item';
+    flexContainer.div2.appendChild(select);
+
+    return select;
+}

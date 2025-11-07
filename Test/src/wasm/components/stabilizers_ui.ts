@@ -13,7 +13,8 @@ import {
     createRulesLink,
     updateSelectElement,
     createFlexSection,
-    createFlexNumberInput
+    createFlexNumberInput,
+    createSelectElement
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -130,28 +131,16 @@ export class StabilizersUI extends BaseComponentUI {
         const typeBinding = bindings.hstab_sel;
         const countBinding = bindings.hstab_count;
 
-        // Type select (manual - no flex helper yet)
-        const hTypeSelect = document.createElement('select');
-        hTypeSelect.disabled = !typeBinding.enabled;
-
-        typeBinding.options.forEach((opt: any, idx: number) => {
-            const option = document.createElement('option');
-            option.value = idx.toString();
-            option.textContent = opt.name;
-            option.disabled = !opt.enabled;
-            if (idx === typeBinding.selected) {
-                option.selected = true;
+        // Type select using helper
+        const hTypeSelect = createSelectElement(
+            typeBinding,
+            (selectedIndex) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.hstab_sel.selected = selectedIndex;
+                bridge.setStabilizersBindings(bindings);
+                this.render();
             }
-            hTypeSelect.appendChild(option);
-        });
-
-        hTypeSelect.addEventListener('change', (event) => {
-            const target = event.target as HTMLSelectElement;
-            const bindings = bridge.getStabilizersBindings();
-            bindings.hstab_sel.selected = parseInt(target.value);
-            bridge.setStabilizersBindings(bindings);
-            this.render();
-        });
+        );
 
         cell.appendChild(hTypeSelect);
         cell.appendChild(document.createElement('br'));
@@ -191,28 +180,16 @@ export class StabilizersUI extends BaseComponentUI {
         const typeBinding = bindings.vstab_sel;
         const countBinding = bindings.vstab_count;
 
-        // Type select (manual - no flex helper yet)
-        const vTypeSelect = document.createElement('select');
-        vTypeSelect.disabled = !typeBinding.enabled;
-
-        typeBinding.options.forEach((opt: any, idx: number) => {
-            const option = document.createElement('option');
-            option.value = idx.toString();
-            option.textContent = opt.name;
-            option.disabled = !opt.enabled;
-            if (idx === typeBinding.selected) {
-                option.selected = true;
+        // Type select using helper
+        const vTypeSelect = createSelectElement(
+            typeBinding,
+            (selectedIndex) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.vstab_sel.selected = selectedIndex;
+                bridge.setStabilizersBindings(bindings);
+                this.render();
             }
-            vTypeSelect.appendChild(option);
-        });
-
-        vTypeSelect.addEventListener('change', (event) => {
-            const target = event.target as HTMLSelectElement;
-            const bindings = bridge.getStabilizersBindings();
-            bindings.vstab_sel.selected = parseInt(target.value);
-            bridge.setStabilizersBindings(bindings);
-            this.render();
-        });
+        );
 
         cell.appendChild(vTypeSelect);
         cell.appendChild(document.createElement('br'));

@@ -9,7 +9,13 @@ import { AircraftBridge, CockpitsOptions, CockpitOptions } from '../aircraft_bri
 import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, createFlexNumberInput, createFlexCell, createFlexCheckboxes } from '../dom_utils';
+import {
+    createRulesLink,
+    createFlexNumberInput,
+    createFlexCell,
+    createFlexCheckboxes,
+    createSelectElement
+} from '../dom_utils';
 
 // Cockpit stats configuration
 const COCKPIT_STATS: StatDisplayConfig[] = [
@@ -192,21 +198,15 @@ export class CockpitsUI extends BaseComponentUI {
 
         // Column 1: Option (select box with no label)
         const optionCell = document.createElement('td');
-        const typeSelect = document.createElement('select');
-        cockpitOptions.selected_type.options.forEach((opt, idx) => {
-            const option = document.createElement('option');
-            option.text = opt.name;
-            option.disabled = !opt.enabled;
-            typeSelect.add(option);
-        });
-        typeSelect.selectedIndex = cockpitOptions.selected_type.selected;
-        typeSelect.disabled = !cockpitOptions.selected_type.enabled;
-        typeSelect.addEventListener('change', () => {
-            const bindings = bridge.getCockpitsBindings();
-            bindings.positions[index].selected_type.selected = typeSelect.selectedIndex;
-            bridge.setCockpitsBindings(bindings);
-            this.render();
-        });
+        const typeSelect = createSelectElement(
+            cockpitOptions.selected_type,
+            (selectedIndex) => {
+                const bindings = bridge.getCockpitsBindings();
+                bindings.positions[index].selected_type.selected = selectedIndex;
+                bridge.setCockpitsBindings(bindings);
+                this.render();
+            }
+        );
         optionCell.appendChild(typeSelect);
         row.appendChild(optionCell);
 

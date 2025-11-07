@@ -15,7 +15,8 @@ import {
     updateSelectElement,
     createFlexCheckbox,
     createFlexNumberInput,
-    createFlexNumberInputs
+    createFlexNumberInputs,
+    createSelectElement
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -302,29 +303,16 @@ export class LoadUI extends BaseComponentUI {
             return undefined;
         }
 
-        // Create select element
-        const cargoSelect = document.createElement('select');
-        cargoSelect.disabled = !spaceBinding.enabled;
-
-        // Add options
-        spaceBinding.options.forEach((opt: any, idx: number) => {
-            const option = document.createElement('option');
-            option.value = idx.toString();
-            option.textContent = opt.name;
-            option.disabled = !opt.enabled;
-            if (idx === spaceBinding.selected) {
-                option.selected = true;
+        // Create select element using helper
+        const cargoSelect = createSelectElement(
+            spaceBinding,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getCargoBindings();
+                updatedBindings.space_sel.selected = selectedIndex;
+                bridge.setCargoBindings(updatedBindings);
+                this.render();
             }
-            cargoSelect.appendChild(option);
-        });
-
-        cargoSelect.addEventListener('change', (event) => {
-            const target = event.target as HTMLSelectElement;
-            const updatedBindings = bridge.getCargoBindings();
-            updatedBindings.space_sel.selected = parseInt(target.value);
-            bridge.setCargoBindings(updatedBindings);
-            this.render();
-        });
+        );
 
         cell.appendChild(cargoSelect);
         return cargoSelect;
