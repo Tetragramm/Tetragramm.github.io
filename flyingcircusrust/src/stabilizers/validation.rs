@@ -3,7 +3,7 @@ use super::Stabilizers;
 impl Stabilizers {
     /// Validates and corrects the horizontal stabilizer selection
     pub fn verify_hstab(&mut self) {
-        if self.hstab_sel >= self.hstab_list.len() as i16 {
+        if self.hstab_sel >= self.hstab_list.len() {
             self.hstab_sel = 0;
         }
 
@@ -25,7 +25,7 @@ impl Stabilizers {
 
     /// Validates and corrects the vertical stabilizer selection
     pub fn verify_vstab(&mut self) {
-        if self.vstab_sel >= self.vstab_list.len() as i16 {
+        if self.vstab_sel >= self.vstab_list.len() {
             self.vstab_sel = 0;
         }
 
