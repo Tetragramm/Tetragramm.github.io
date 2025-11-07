@@ -6,8 +6,10 @@
  */
 
 import { AircraftBridge, CockpitsOptions, CockpitOptions } from '../aircraft_bridge';
-import { BindingRenderer, NumberBinding, CheckBinding, StatDisplayConfig } from '../binding_renderer';
+import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
+import { BaseComponentUI } from '../base_component_ui';
+import { createRulesLink, createFlexSection } from '../dom_utils';
 
 // Cockpit stats configuration
 const COCKPIT_STATS: StatDisplayConfig[] = [
@@ -33,87 +35,39 @@ interface CockpitRowCache {
     statsCell: HTMLTableCellElement;
 }
 
-export class CockpitsUI {
-    private container: HTMLElement;
-    private renderer: BindingRenderer;
-    private sectionElement: HTMLElement | null = null;
-
+export class CockpitsUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
     private cockpitRowCaches: CockpitRowCache[] = [];
     private numCockpitsInput: HTMLInputElement | null = null;
     private mainTable: HTMLTableElement | null = null;
     private lastCockpitCount: number = 0;
 
-    constructor(
-        private getBridge: () => AircraftBridge | null,
-        containerId: string,
-        private onUpdate?: () => void
-    ) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            throw new Error(`Container element '${containerId}' not found`);
-        }
-        this.container = container;
-
-        // Get the initial bridge for renderer
-        const bridge = this.getBridge();
-        if (!bridge) {
-            throw new Error('Bridge not available during CockpitsUI construction');
-        }
-
-        // Create renderer with stats update callback
-        this.renderer = new BindingRenderer(bridge, () => {
-            if (this.onUpdate) {
-                this.onUpdate();
-            }
-        });
-
-        // Listen for locale changes and do full rebuild (text changes)
-        localization.onLocaleChange(() => this.rebuildFull());
-
-        this.render();
-    }
-
-    /**
-     * Render the Cockpits UI - intelligently updates or rebuilds
-     */
-    render(): void {
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[CockpitsUI] Bridge not initialized, skipping render');
-            return;
-        }
+    protected shouldUpdate(): boolean {
+        // Check if cockpit count changed - need rebuild if it did
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return false;
 
         const cockpitsBindings = bridge.getCockpitsBindings();
         const currentCount = cockpitsBindings.positions.length;
 
-        // Determine if we need a full rebuild or just value updates
-        const needsRebuild = currentCount !== this.lastCockpitCount || !this.mainTable;
+        return currentCount === this.lastCockpitCount && this.mainTable !== null;
+    }
 
-        if (needsRebuild) {
-            this.rebuildFull();
-        } else {
-            this.updateValues(cockpitsBindings, bridge);
-        }
+    protected clearCache(): void {
+        this.cockpitRowCaches = [];
+        this.numCockpitsInput = null;
+        this.mainTable = null;
     }
 
     /**
      * Full rebuild of the UI structure (used when count changes or locale changes)
      */
-    private rebuildFull(): void {
-        // Clear caches
-        this.cockpitRowCaches = [];
-        this.numCockpitsInput = null;
-        this.mainTable = null;
-
-        // Clear existing content
+    protected rebuildFull(): void {
+        this.clearCache();
         this.container.innerHTML = '';
 
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[CockpitsUI] Bridge not initialized, skipping rebuild');
-            return;
-        }
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
 
         const cockpitsBindings = bridge.getCockpitsBindings();
         this.lastCockpitCount = cockpitsBindings.positions.length;
@@ -186,19 +140,9 @@ export class CockpitsUI {
             true // Initially open
         );
 
-        // Add rules link (h4)
-        const rulesLine = document.createElement('h4');
-        const rulesLink = document.createElement('a');
-        rulesLink.href = './Rules/Rules.htm#_Crew';
-        const rulesText = document.createElement('u');
-        rulesText.textContent = 'Rules';
-        rulesLink.appendChild(rulesText);
-        rulesLine.appendChild(document.createTextNode('('));
-        rulesLine.appendChild(rulesLink);
-        rulesLine.appendChild(document.createTextNode(')'));
+        // Add rules link using utility function
+        const rulesLine = createRulesLink('_Crew');
         rulesLine.appendChild(document.createElement('br'));
-
-        // Insert rules link before content
         this.sectionElement.insertBefore(
             rulesLine,
             this.sectionElement.children[1]
@@ -212,7 +156,12 @@ export class CockpitsUI {
     /**
      * Update values in existing DOM elements (fast path)
      */
-    private updateValues(cockpitsBindings: CockpitsOptions, bridge: AircraftBridge): void {
+    protected updateValues(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const cockpitsBindings = bridge.getCockpitsBindings();
+
         // Update number of cockpits input
         if (this.numCockpitsInput) {
             this.numCockpitsInput.value = cockpitsBindings.num_cockpits.value.toString();
@@ -260,7 +209,7 @@ export class CockpitsUI {
 
         // Column 2: Upgrades (flex layout)
         const upgradesCell = document.createElement('td');
-        const upgradesFlex = this.createFlexContainer();
+        const upgradesFlex = createFlexSection();
         const upgradeChecks: HTMLInputElement[] = [];
         cockpitOptions.selected_upgrades.forEach((upgrade, upgradeIdx) => {
             const checkbox = this.addFlexCheckboxWithReturn(upgrade.name, upgrade.selected, upgrade.enabled, upgradesFlex, (checked) => {
@@ -271,12 +220,12 @@ export class CockpitsUI {
             });
             upgradeChecks.push(checkbox);
         });
-        upgradesCell.appendChild(upgradesFlex);
+        upgradesCell.appendChild(upgradesFlex.div0);
         row.appendChild(upgradesCell);
 
         // Column 3: Safety Options (flex layout)
         const safetyCell = document.createElement('td');
-        const safetyFlex = this.createFlexContainer();
+        const safetyFlex = createFlexSection();
         const safetyChecks: HTMLInputElement[] = [];
         cockpitOptions.selected_safety.forEach((safety, safetyIdx) => {
             const checkbox = this.addFlexCheckboxWithReturn(safety.name, safety.selected, safety.enabled, safetyFlex, (checked) => {
@@ -287,12 +236,12 @@ export class CockpitsUI {
             });
             safetyChecks.push(checkbox);
         });
-        safetyCell.appendChild(safetyFlex);
+        safetyCell.appendChild(safetyFlex.div0);
         row.appendChild(safetyCell);
 
         // Column 4: Gunsights + Bombsight (flex layout)
         const gunsightsCell = document.createElement('td');
-        const gunsightsFlex = this.createFlexContainer();
+        const gunsightsFlex = createFlexSection();
         const gunsightChecks: HTMLInputElement[] = [];
         cockpitOptions.selected_gunsights.forEach((gunsight, gunsightIdx) => {
             const checkbox = this.addFlexCheckboxWithReturn(gunsight.name, gunsight.selected, gunsight.enabled, gunsightsFlex, (checked) => {
@@ -311,7 +260,7 @@ export class CockpitsUI {
                 bridge.setCockpitsBindings(bindings);
                 this.render();
             }, 0, 20, 1);
-        gunsightsCell.appendChild(gunsightsFlex);
+        gunsightsCell.appendChild(gunsightsFlex.div0);
         row.appendChild(gunsightsCell);
 
         // Column 5: Stats (using stats renderer)
@@ -390,39 +339,21 @@ export class CockpitsUI {
     }
 
     /**
-     * Create a flex container similar to the original TypeScript implementation
-     */
-    private createFlexContainer(): HTMLElement {
-        const outer = document.createElement('div');
-        outer.className = 'flex-container-o';
-        const left = document.createElement('div');
-        left.className = 'flex-container-i';
-        const right = document.createElement('div');
-        right.className = 'flex-container-i';
-        outer.appendChild(left);
-        outer.appendChild(right);
-        return outer;
-    }
-
-    /**
      * Add a checkbox with label to a flex container and return the checkbox element
      */
     private addFlexCheckboxWithReturn(
         label: string,
         checked: boolean,
         enabled: boolean,
-        flexContainer: HTMLElement,
+        flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
         onChange: (checked: boolean) => void
     ): HTMLInputElement {
-        const left = flexContainer.children[0] as HTMLElement;
-        const right = flexContainer.children[1] as HTMLElement;
-
         const labelElem = document.createElement('label');
         labelElem.textContent = label;
         labelElem.className = 'flex-item';
         labelElem.style.marginLeft = '0.25em';
         labelElem.style.marginRight = '0.5em';
-        left.appendChild(labelElem);
+        flexContainer.div1.appendChild(labelElem);
 
         const span = document.createElement('span');
         const checkbox = document.createElement('input');
@@ -432,22 +363,9 @@ export class CockpitsUI {
         checkbox.className = 'flex-item';
         checkbox.addEventListener('change', () => onChange(checkbox.checked));
         span.appendChild(checkbox);
-        right.appendChild(span);
+        flexContainer.div2.appendChild(span);
 
         return checkbox;
-    }
-
-    /**
-     * Add a checkbox with label to a flex container (legacy version)
-     */
-    private addFlexCheckbox(
-        label: string,
-        checked: boolean,
-        enabled: boolean,
-        flexContainer: HTMLElement,
-        onChange: (checked: boolean) => void
-    ): void {
-        this.addFlexCheckboxWithReturn(label, checked, enabled, flexContainer, onChange);
     }
 
     /**
@@ -457,21 +375,18 @@ export class CockpitsUI {
         label: string,
         value: number,
         enabled: boolean,
-        flexContainer: HTMLElement,
+        flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
         onChange: (value: number) => void,
         min?: number,
         max?: number,
         step?: number
     ): HTMLInputElement {
-        const left = flexContainer.children[0] as HTMLElement;
-        const right = flexContainer.children[1] as HTMLElement;
-
         const labelElem = document.createElement('label');
         labelElem.textContent = label;
         labelElem.className = 'flex-item';
         labelElem.style.marginLeft = '0.25em';
         labelElem.style.marginRight = '0.5em';
-        left.appendChild(labelElem);
+        flexContainer.div1.appendChild(labelElem);
 
         const span = document.createElement('span');
         const input = document.createElement('input');
@@ -487,38 +402,8 @@ export class CockpitsUI {
             if (!isNaN(newValue)) onChange(newValue);
         });
         span.appendChild(input);
-        right.appendChild(span);
+        flexContainer.div2.appendChild(span);
 
         return input;
-    }
-
-    /**
-     * Add a number input with label to a flex container (legacy version)
-     */
-    private addFlexNumberInput(
-        label: string,
-        value: number,
-        enabled: boolean,
-        flexContainer: HTMLElement,
-        onChange: (value: number) => void,
-        min?: number,
-        max?: number,
-        step?: number
-    ): void {
-        this.addFlexNumberInputWithReturn(label, value, enabled, flexContainer, onChange, min, max, step);
-    }
-
-    /**
-     * Update the UI (e.g., when data changes externally)
-     */
-    update(): void {
-        this.render();
-    }
-
-    /**
-     * Destroy the component and clean up listeners
-     */
-    destroy(): void {
-        this.container.innerHTML = '';
     }
 }
