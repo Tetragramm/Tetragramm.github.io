@@ -6,95 +6,46 @@
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { BindingRenderer } from '../binding_renderer';
+import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
+import { BaseComponentUI } from '../base_component_ui';
+import { createRulesLink, createFlexSection, updateSelectElement } from '../dom_utils';
 
-export class LandingGearUI {
-    private container: HTMLElement;
-    private renderer: BindingRenderer;
-    private sectionElement: HTMLElement | null = null;
+// Cache interface for type safety
+interface LandingGearCache {
+    typeSelect: HTMLSelectElement;
+    retractCheckbox: HTMLInputElement;
+    extrasCheckboxes: HTMLInputElement[];
+    statCells: Map<string, HTMLTableCellElement>;
+}
 
-    // Cache DOM elements to avoid recreating
-    private mainTable: HTMLTableElement | null = null;
-    private typeSelect: HTMLSelectElement | null = null;
-    private retractCheckbox: HTMLInputElement | null = null;
-    private extrasCheckboxes: HTMLInputElement[] = [];
-    private statCells: Map<string, HTMLTableCellElement> = new Map();
+export class LandingGearUI extends BaseComponentUI {
+    private cache: LandingGearCache = undefined;
 
-    constructor(
-        private getBridge: () => AircraftBridge | null,
-        containerId: string,
-        private onUpdate?: () => void
-    ) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            throw new Error(`Container element '${containerId}' not found`);
-        }
-        this.container = container;
-
-        // Get the initial bridge for renderer
-        const bridge = this.getBridge();
-        if (!bridge) {
-            throw new Error('Bridge not available during LandingGearUI construction');
-        }
-
-        // Create renderer with stats update callback
-        this.renderer = new BindingRenderer(bridge, () => {
-            if (this.onUpdate) {
-                this.onUpdate();
-            }
-        });
-
-        // Listen for locale changes and do full rebuild (text changes)
-        localization.onLocaleChange(() => this.rebuildFull());
-
-        this.render();
+    protected shouldUpdate(): boolean {
+        return this.cache !== undefined;
     }
 
-    /**
-     * Render the LandingGear UI - intelligently updates or rebuilds
-     */
-    render(): void {
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[LandingGearUI] Bridge not initialized, skipping render');
-            return;
-        }
-
-        // If we have cached elements, just update values. Otherwise rebuild.
-        if (this.mainTable) {
-            this.updateValues();
-        } else {
-            this.rebuildFull();
-        }
+    protected clearCache(): void {
+        this.cache = undefined;
     }
 
     /**
      * Full rebuild of the UI structure (used on first render or locale change)
      */
-    private rebuildFull(): void {
-        // Clear cache
-        this.mainTable = null;
-        this.typeSelect = null;
-        this.retractCheckbox = null;
-        this.extrasCheckboxes = [];
-        this.statCells.clear();
-
-        // Clear existing content
+    protected rebuildFull(): void {
+        this.clearCache();
         this.container.innerHTML = '';
 
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[LandingGearUI] Bridge not initialized, skipping rebuild');
-            return;
-        }
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
 
         const bindings = bridge.getLandingGearBindings();
 
         // Create main table with 3 columns: Landing Gear | Extras | Stats
-        this.mainTable = document.createElement('table');
-        this.mainTable.style.width = '100%';
-        this.mainTable.id = 'tbl_gear';
+        const mainTable = document.createElement('table');
+        mainTable.style.width = '100%';
+        mainTable.id = 'tbl_gear';
 
         // Header row
         const headerRow = document.createElement('tr');
@@ -108,27 +59,34 @@ export class LandingGearUI {
             th.textContent = headerText;
             headerRow.appendChild(th);
         });
-        this.mainTable.appendChild(headerRow);
+        mainTable.appendChild(headerRow);
 
         // Data row
         const dataRow = document.createElement('tr');
 
         // Landing Gear cell (type select + retractable checkbox)
         const gearCell = document.createElement('td');
-        this.createGearSection(gearCell, bindings, bridge);
+        const gearCache = this.createGearSection(gearCell, bindings, bridge);
         dataRow.appendChild(gearCell);
 
         // Extras cell (list of checkboxes)
         const extrasCell = document.createElement('td');
-        this.createExtrasSection(extrasCell, bindings, bridge);
+        const extrasCheckboxes = this.createExtrasSection(extrasCell, bindings, bridge);
         dataRow.appendChild(extrasCell);
 
         // Stats cell
         const statsCell = document.createElement('td');
-        this.createStatsSection(statsCell);
+        const statCells = this.createStatsSection(statsCell);
         dataRow.appendChild(statsCell);
 
-        this.mainTable.appendChild(dataRow);
+        mainTable.appendChild(dataRow);
+
+        // Cache elements
+        this.cache = {
+            ...gearCache,
+            extrasCheckboxes,
+            statCells
+        };
 
         // Update stat values
         this.updateStatValues(bridge);
@@ -137,22 +95,12 @@ export class LandingGearUI {
         const sectionTitle = localization.translate('Landing Gear Section Title');
         this.sectionElement = this.renderer.createCollapsibleSection(
             sectionTitle,
-            this.mainTable,
+            mainTable,
             true // Initially open
         );
 
-        // Add rules link
-        const rulesLine = document.createElement('h4');
-        const rulesLink = document.createElement('a');
-        rulesLink.href = './Rules/Rules.htm#_Landing_Gear';
-        const rulesText = document.createElement('u');
-        rulesText.textContent = 'Rules';
-        rulesLink.appendChild(rulesText);
-        rulesLine.appendChild(document.createTextNode('('));
-        rulesLine.appendChild(rulesLink);
-        rulesLine.appendChild(document.createTextNode(')'));
-
-        // Insert rules link before content
+        // Add rules link using utility
+        const rulesLine = createRulesLink('_Landing_Gear');
         this.sectionElement.insertBefore(
             rulesLine,
             this.sectionElement.children[1]
@@ -164,29 +112,20 @@ export class LandingGearUI {
     }
 
     /**
-     * Create flex section matching original Tools.ts CreateFlexSection
-     */
-    private createFlexSection(): { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement } {
-        const div0 = document.createElement('div');
-        div0.className = 'flex-container-o';
-
-        const div1 = document.createElement('div');
-        div1.className = 'flex-container-i';
-
-        const div2 = document.createElement('div');
-        div2.className = 'flex-container-i';
-
-        div0.appendChild(div1);
-        div0.appendChild(div2);
-
-        return { div0, div1, div2 };
-    }
-
-    /**
      * Create landing gear section (type select + retractable checkbox)
      */
-    private createGearSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
-        const flexContainer = this.createFlexSection();
+    private createGearSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): {
+        typeSelect: HTMLSelectElement;
+        retractCheckbox: HTMLInputElement;
+    } {
+        const flexContainer = createFlexSection();
+
+        let typeSelect: HTMLSelectElement = undefined;
+        let retractCheckbox: HTMLInputElement = undefined;
 
         // Find gear_type and retractable bindings
         for (const key in bindings) {
@@ -202,9 +141,9 @@ export class LandingGearUI {
                 label.style.marginRight = '0.5em';
                 flexContainer.div1.appendChild(label);
 
-                this.typeSelect = document.createElement('select');
-                this.typeSelect.className = 'flex-item';
-                this.typeSelect.disabled = !binding.enabled;
+                typeSelect = document.createElement('select');
+                typeSelect.className = 'flex-item';
+                typeSelect.disabled = !binding.enabled;
 
                 binding.options.forEach((opt: any, idx: number) => {
                     const option = document.createElement('option');
@@ -214,17 +153,18 @@ export class LandingGearUI {
                     if (idx === binding.selected) {
                         option.selected = true;
                     }
-                    this.typeSelect!.appendChild(option);
+                    typeSelect!.appendChild(option);
                 });
 
-                this.typeSelect.addEventListener('change', () => {
+                typeSelect.addEventListener('change', (event) => {
+                    const target = event.target as HTMLSelectElement;
                     const updatedBindings = bridge.getLandingGearBindings();
-                    updatedBindings[key].selected = parseInt(this.typeSelect!.value);
+                    updatedBindings[key].selected = parseInt(target.value);
                     bridge.setLandingGearBindings(updatedBindings);
                     this.render();
                 });
 
-                flexContainer.div2.appendChild(this.typeSelect);
+                flexContainer.div2.appendChild(typeSelect);
             } else if (binding && typeof binding === 'object' && 'selected' in binding && typeof binding.selected === 'boolean') {
                 // Retractable checkbox
                 const label = document.createElement('label');
@@ -235,33 +175,41 @@ export class LandingGearUI {
                 flexContainer.div1.appendChild(label);
 
                 const checkboxSpan = document.createElement('span');
-                this.retractCheckbox = document.createElement('input');
-                this.retractCheckbox.type = 'checkbox';
-                this.retractCheckbox.className = 'flex-item';
-                this.retractCheckbox.checked = binding.selected;
-                this.retractCheckbox.disabled = !binding.enabled;
-                this.retractCheckbox.addEventListener('change', () => {
+                retractCheckbox = document.createElement('input');
+                retractCheckbox.type = 'checkbox';
+                retractCheckbox.className = 'flex-item';
+                retractCheckbox.checked = binding.selected;
+                retractCheckbox.disabled = !binding.enabled;
+                retractCheckbox.addEventListener('change', (event) => {
+                    const target = event.target as HTMLInputElement;
                     const updatedBindings = bridge.getLandingGearBindings();
-                    updatedBindings[key].selected = this.retractCheckbox!.checked;
+                    updatedBindings[key].selected = target.checked;
                     bridge.setLandingGearBindings(updatedBindings);
                     this.render();
                 });
 
                 const emptyLabel = document.createElement('label');
                 checkboxSpan.appendChild(emptyLabel);
-                checkboxSpan.appendChild(this.retractCheckbox);
+                checkboxSpan.appendChild(retractCheckbox);
                 flexContainer.div2.appendChild(checkboxSpan);
             }
         }
 
         cell.appendChild(flexContainer.div0);
+        return { typeSelect, retractCheckbox };
     }
 
     /**
      * Create extras section (list of checkboxes)
      */
-    private createExtrasSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
-        const flexContainer = this.createFlexSection();
+    private createExtrasSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): HTMLInputElement[] {
+        const flexContainer = createFlexSection();
+
+        const extrasCheckboxes: HTMLInputElement[] = [];
 
         // Find all checkbox bindings for extras
         const extraKeys: string[] = [];
@@ -292,9 +240,10 @@ export class LandingGearUI {
             checkbox.className = 'flex-item';
             checkbox.checked = binding.selected;
             checkbox.disabled = !binding.enabled;
-            checkbox.addEventListener('change', () => {
+            checkbox.addEventListener('change', (event) => {
+                const target = event.target as HTMLInputElement;
                 const updatedBindings = bridge.getLandingGearBindings();
-                updatedBindings[key].selected = checkbox.checked;
+                updatedBindings[key].selected = target.checked;
                 bridge.setLandingGearBindings(updatedBindings);
                 this.render();
             });
@@ -304,19 +253,22 @@ export class LandingGearUI {
             checkboxSpan.appendChild(checkbox);
             flexContainer.div2.appendChild(checkboxSpan);
 
-            this.extrasCheckboxes.push(checkbox);
+            extrasCheckboxes.push(checkbox);
         });
 
         cell.appendChild(flexContainer.div0);
+        return extrasCheckboxes;
     }
 
     /**
      * Create stats section (inner table with 5 stats)
      */
-    private createStatsSection(cell: HTMLTableCellElement): void {
+    private createStatsSection(cell: HTMLTableCellElement): Map<string, HTMLTableCellElement> {
         cell.className = 'inner_table';
         const statsTable = document.createElement('table');
         statsTable.className = 'inner_table';
+
+        const statCells = new Map<string, HTMLTableCellElement>();
 
         // Row 1: Drag | Mass | Cost
         const header1 = statsTable.insertRow();
@@ -330,7 +282,7 @@ export class LandingGearUI {
         ['drag', 'mass', 'cost'].forEach(key => {
             const td = data1.insertCell();
             td.textContent = '0';
-            this.statCells.set(key, td);
+            statCells.set(key, td);
         });
 
         // Row 2: Structure | Crash Safety | (empty)
@@ -348,23 +300,22 @@ export class LandingGearUI {
         const data2 = statsTable.insertRow();
         const td2_1 = data2.insertCell();
         td2_1.textContent = '0';
-        this.statCells.set('structure', td2_1);
+        statCells.set('structure', td2_1);
         const td2_2 = data2.insertCell();
         td2_2.textContent = '0';
-        this.statCells.set('crashsafety', td2_2);
+        statCells.set('crashsafety', td2_2);
         data2.insertCell(); // empty cell
 
         cell.appendChild(statsTable);
+        return statCells;
     }
 
     /**
      * Update values in existing DOM elements (fast path)
      */
-    private updateValues(): void {
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            return;
-        }
+    protected updateValues(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge || !this.cache) return;
 
         const bindings = bridge.getLandingGearBindings();
 
@@ -373,22 +324,16 @@ export class LandingGearUI {
             if (!bindings.hasOwnProperty(key)) continue;
             const binding = bindings[key];
 
-            if (binding && 'options' in binding && this.typeSelect) {
-                this.typeSelect.selectedIndex = binding.selected;
-                this.typeSelect.disabled = !binding.enabled;
-                binding.options.forEach((opt: any, idx: number) => {
-                    if (idx < this.typeSelect!.options.length) {
-                        this.typeSelect!.options[idx].disabled = !opt.enabled;
-                    }
-                });
+            if (binding && 'options' in binding) {
+                updateSelectElement(this.cache.typeSelect, binding);
                 break;
             }
         }
 
         // Update retractable checkbox
-        if (this.retractCheckbox && bindings.retractable) {
-            this.retractCheckbox.checked = bindings.retractable.selected;
-            this.retractCheckbox.disabled = !bindings.retractable.enabled;
+        if (this.cache.retractCheckbox && bindings.retractable) {
+            this.cache.retractCheckbox.checked = bindings.retractable.selected;
+            this.cache.retractCheckbox.disabled = !bindings.retractable.enabled;
         }
 
         // Update extras checkboxes
@@ -399,9 +344,9 @@ export class LandingGearUI {
 
             if (binding && typeof binding === 'object' && 'selected' in binding &&
                 typeof binding.selected === 'boolean' && key !== 'retractable') {
-                if (extrasIdx < this.extrasCheckboxes.length) {
-                    this.extrasCheckboxes[extrasIdx].checked = binding.selected;
-                    this.extrasCheckboxes[extrasIdx].disabled = !binding.enabled;
+                if (extrasIdx < this.cache.extrasCheckboxes.length) {
+                    this.cache.extrasCheckboxes[extrasIdx].checked = binding.selected;
+                    this.cache.extrasCheckboxes[extrasIdx].disabled = !binding.enabled;
                     extrasIdx++;
                 }
             }
@@ -415,39 +360,15 @@ export class LandingGearUI {
      * Update stat cell values
      */
     private updateStatValues(bridge: AircraftBridge): void {
+        if (!this.cache) return;
+
         const stats = bridge.getLandingGearStats();
 
-        for (const [key, cell] of this.statCells) {
+        for (const [key, cell] of this.cache.statCells) {
             const value = stats[key];
-            this.blinkIfChanged(cell, value?.toString() || '0', false);
+            if (cell.textContent !== (value?.toString() || '0')) {
+                cell.textContent = value?.toString() || '0';
+            }
         }
-    }
-
-    /**
-     * Blink animation when stat changes
-     */
-    private blinkIfChanged(elem: HTMLTableCellElement, str: string, positiveGood: boolean | null): void {
-        if (elem.textContent !== str) {
-            elem.textContent = str;
-        }
-    }
-
-    /**
-     * Update the UI (e.g., when data changes externally)
-     */
-    update(): void {
-        this.render();
-    }
-
-    /**
-     * Destroy the component and clean up listeners
-     */
-    destroy(): void {
-        this.container.innerHTML = '';
-        this.mainTable = null;
-        this.typeSelect = null;
-        this.retractCheckbox = null;
-        this.extrasCheckboxes = [];
-        this.statCells.clear();
     }
 }
