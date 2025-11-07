@@ -90,11 +90,13 @@ export class CockpitsUI extends BaseComponentUI {
         this.numCockpitsInput.min = '1';
         this.numCockpitsInput.max = '20';
         this.numCockpitsInput.step = '1';
-        this.numCockpitsInput.addEventListener('change', () => {
-            const newValue = parseFloat(this.numCockpitsInput!.value);
+        this.numCockpitsInput.addEventListener('change', (event) => {
+            const inputElement = event.target as HTMLInputElement;
+            const newValue = parseFloat(inputElement.value);
             if (!isNaN(newValue)) {
-                cockpitsBindings.num_cockpits.value = newValue;
-                bridge.setCockpitsBindings(cockpitsBindings);
+                const bindings = bridge.getCockpitsBindings(); // Get fresh bindings
+                bindings.num_cockpits.value = newValue;
+                bridge.setCockpitsBindings(bindings);
                 this.render();
             }
         });
