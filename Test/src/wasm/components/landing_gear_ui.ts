@@ -9,7 +9,12 @@ import { AircraftBridge } from '../aircraft_bridge';
 import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, createFlexSection, updateSelectElement } from '../dom_utils';
+import {
+    createRulesLink,
+    createFlexSection,
+    updateSelectElement,
+    createFlexCheckboxes
+} from '../dom_utils';
 
 // Cache interface for type safety
 interface LandingGearCache {
@@ -124,75 +129,74 @@ export class LandingGearUI extends BaseComponentUI {
     } {
         const flexContainer = createFlexSection();
 
+        // Explicitly handle gear_sel (gear type selector) and retract (retractable checkbox)
+        const gearBinding = bindings.gear_sel;
+        const retractBinding = bindings.retract;
+
+        // Gear type select
         let typeSelect: HTMLSelectElement = undefined;
+        if (gearBinding) {
+            const label = document.createElement('label');
+            label.textContent = 'Type';
+            label.className = 'flex-item';
+            label.style.marginLeft = '0.25em';
+            label.style.marginRight = '0.5em';
+            flexContainer.div1.appendChild(label);
+
+            typeSelect = document.createElement('select');
+            typeSelect.className = 'flex-item';
+            typeSelect.disabled = !gearBinding.enabled;
+
+            gearBinding.options.forEach((opt: any, idx: number) => {
+                const option = document.createElement('option');
+                option.value = idx.toString();
+                option.textContent = opt.name;
+                option.disabled = !opt.enabled;
+                if (idx === gearBinding.selected) {
+                    option.selected = true;
+                }
+                typeSelect!.appendChild(option);
+            });
+
+            typeSelect.addEventListener('change', (event) => {
+                const target = event.target as HTMLSelectElement;
+                const updatedBindings = bridge.getLandingGearBindings();
+                updatedBindings.gear_sel.selected = parseInt(target.value);
+                bridge.setLandingGearBindings(updatedBindings);
+                this.render();
+            });
+
+            flexContainer.div2.appendChild(typeSelect);
+        }
+
+        // Retractable checkbox
         let retractCheckbox: HTMLInputElement = undefined;
+        if (retractBinding) {
+            const label = document.createElement('label');
+            label.textContent = retractBinding.name;
+            label.className = 'flex-item';
+            label.style.marginLeft = '0.25em';
+            label.style.marginRight = '0.5em';
+            flexContainer.div1.appendChild(label);
 
-        // Find gear_type and retractable bindings
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
+            const checkboxSpan = document.createElement('span');
+            retractCheckbox = document.createElement('input');
+            retractCheckbox.type = 'checkbox';
+            retractCheckbox.className = 'flex-item';
+            retractCheckbox.checked = retractBinding.selected;
+            retractCheckbox.disabled = !retractBinding.enabled;
+            retractCheckbox.addEventListener('change', (event) => {
+                const target = event.target as HTMLInputElement;
+                const updatedBindings = bridge.getLandingGearBindings();
+                updatedBindings.retract.selected = target.checked;
+                bridge.setLandingGearBindings(updatedBindings);
+                this.render();
+            });
 
-            if (binding && typeof binding === 'object' && 'options' in binding && 'selected' in binding) {
-                // Type select
-                const label = document.createElement('label');
-                label.textContent = 'Type';
-                label.className = 'flex-item';
-                label.style.marginLeft = '0.25em';
-                label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
-
-                typeSelect = document.createElement('select');
-                typeSelect.className = 'flex-item';
-                typeSelect.disabled = !binding.enabled;
-
-                binding.options.forEach((opt: any, idx: number) => {
-                    const option = document.createElement('option');
-                    option.value = idx.toString();
-                    option.textContent = opt.name;
-                    option.disabled = !opt.enabled;
-                    if (idx === binding.selected) {
-                        option.selected = true;
-                    }
-                    typeSelect!.appendChild(option);
-                });
-
-                typeSelect.addEventListener('change', (event) => {
-                    const target = event.target as HTMLSelectElement;
-                    const updatedBindings = bridge.getLandingGearBindings();
-                    updatedBindings[key].selected = parseInt(target.value);
-                    bridge.setLandingGearBindings(updatedBindings);
-                    this.render();
-                });
-
-                flexContainer.div2.appendChild(typeSelect);
-            } else if (binding && typeof binding === 'object' && 'selected' in binding && typeof binding.selected === 'boolean') {
-                // Retractable checkbox
-                const label = document.createElement('label');
-                label.textContent = binding.name;
-                label.className = 'flex-item';
-                label.style.marginLeft = '0.25em';
-                label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
-
-                const checkboxSpan = document.createElement('span');
-                retractCheckbox = document.createElement('input');
-                retractCheckbox.type = 'checkbox';
-                retractCheckbox.className = 'flex-item';
-                retractCheckbox.checked = binding.selected;
-                retractCheckbox.disabled = !binding.enabled;
-                retractCheckbox.addEventListener('change', (event) => {
-                    const target = event.target as HTMLInputElement;
-                    const updatedBindings = bridge.getLandingGearBindings();
-                    updatedBindings[key].selected = target.checked;
-                    bridge.setLandingGearBindings(updatedBindings);
-                    this.render();
-                });
-
-                const emptyLabel = document.createElement('label');
-                checkboxSpan.appendChild(emptyLabel);
-                checkboxSpan.appendChild(retractCheckbox);
-                flexContainer.div2.appendChild(checkboxSpan);
-            }
+            const emptyLabel = document.createElement('label');
+            checkboxSpan.appendChild(emptyLabel);
+            checkboxSpan.appendChild(retractCheckbox);
+            flexContainer.div2.appendChild(checkboxSpan);
         }
 
         cell.appendChild(flexContainer.div0);
@@ -209,52 +213,25 @@ export class LandingGearUI extends BaseComponentUI {
     ): HTMLInputElement[] {
         const flexContainer = createFlexSection();
 
-        const extrasCheckboxes: HTMLInputElement[] = [];
+        // Explicitly handle extra_sel (array of checkbox bindings for extras)
+        const extraBinding = bindings.extra_sel;
 
-        // Find all checkbox bindings for extras
-        const extraKeys: string[] = [];
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (binding && typeof binding === 'object' && 'selected' in binding &&
-                typeof binding.selected === 'boolean' && key !== 'retractable') {
-                extraKeys.push(key);
-            }
+        if (!extraBinding || !Array.isArray(extraBinding)) {
+            cell.appendChild(flexContainer.div0);
+            return [];
         }
 
-        // Render extras checkboxes
-        extraKeys.forEach((key, idx) => {
-            const binding = bindings[key];
-
-            const label = document.createElement('label');
-            label.textContent = binding.name;
-            label.className = 'flex-item';
-            label.style.marginLeft = '0.25em';
-            label.style.marginRight = '0.5em';
-            flexContainer.div1.appendChild(label);
-
-            const checkboxSpan = document.createElement('span');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'flex-item';
-            checkbox.checked = binding.selected;
-            checkbox.disabled = !binding.enabled;
-            checkbox.addEventListener('change', (event) => {
-                const target = event.target as HTMLInputElement;
+        // Create checkboxes using helper
+        const extrasCheckboxes = createFlexCheckboxes(
+            flexContainer,
+            extraBinding,
+            (idx) => (checked) => {
                 const updatedBindings = bridge.getLandingGearBindings();
-                updatedBindings[key].selected = target.checked;
+                updatedBindings.extra_sel[idx].selected = checked;
                 bridge.setLandingGearBindings(updatedBindings);
                 this.render();
-            });
-
-            const emptyLabel = document.createElement('label');
-            checkboxSpan.appendChild(emptyLabel);
-            checkboxSpan.appendChild(checkbox);
-            flexContainer.div2.appendChild(checkboxSpan);
-
-            extrasCheckboxes.push(checkbox);
-        });
+            }
+        );
 
         cell.appendChild(flexContainer.div0);
         return extrasCheckboxes;
@@ -319,37 +296,25 @@ export class LandingGearUI extends BaseComponentUI {
 
         const bindings = bridge.getLandingGearBindings();
 
-        // Update type select
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (binding && 'options' in binding) {
-                updateSelectElement(this.cache.typeSelect, binding);
-                break;
-            }
+        // Update gear type select
+        if (this.cache.typeSelect && bindings.gear_sel) {
+            updateSelectElement(this.cache.typeSelect, bindings.gear_sel);
         }
 
         // Update retractable checkbox
-        if (this.cache.retractCheckbox && bindings.retractable) {
-            this.cache.retractCheckbox.checked = bindings.retractable.selected;
-            this.cache.retractCheckbox.disabled = !bindings.retractable.enabled;
+        if (this.cache.retractCheckbox && bindings.retract) {
+            this.cache.retractCheckbox.checked = bindings.retract.selected;
+            this.cache.retractCheckbox.disabled = !bindings.retract.enabled;
         }
 
         // Update extras checkboxes
-        let extrasIdx = 0;
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (binding && typeof binding === 'object' && 'selected' in binding &&
-                typeof binding.selected === 'boolean' && key !== 'retractable') {
-                if (extrasIdx < this.cache.extrasCheckboxes.length) {
-                    this.cache.extrasCheckboxes[extrasIdx].checked = binding.selected;
-                    this.cache.extrasCheckboxes[extrasIdx].disabled = !binding.enabled;
-                    extrasIdx++;
+        if (bindings.extra_sel && Array.isArray(bindings.extra_sel)) {
+            bindings.extra_sel.forEach((binding: any, idx: number) => {
+                if (idx < this.cache.extrasCheckboxes.length) {
+                    this.cache.extrasCheckboxes[idx].checked = binding.selected;
+                    this.cache.extrasCheckboxes[idx].disabled = !binding.enabled;
                 }
-            }
+            });
         }
 
         // Update stat values

@@ -9,7 +9,14 @@ import { AircraftBridge } from '../aircraft_bridge';
 import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, createFlexSection, updateSelectElement } from '../dom_utils';
+import {
+    createRulesLink,
+    createFlexSection,
+    updateSelectElement,
+    createFlexCheckbox,
+    createFlexNumberInput,
+    createFlexNumberInputs
+} from '../dom_utils';
 
 // Cache interface for type safety
 interface LoadCache {
@@ -147,101 +154,46 @@ export class LoadUI extends BaseComponentUI {
     } {
         const flexContainer = createFlexSection();
 
-        const fuelInputs: HTMLInputElement[] = [];
-        let sealCheckbox: HTMLInputElement = undefined;
-        let extinguisherCheckbox: HTMLInputElement = undefined;
+        // Explicitly handle tank_count (number array), self_sealing and fire_extinguisher (checkboxes)
+        const tankCountBinding = bindings.tank_count;
+        const sealBinding = bindings.self_sealing;
+        const extinguisherBinding = bindings.fire_extinguisher;
 
-        // Render fuel bindings dynamically
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (Array.isArray(binding)) {
-                // number_list binding (e.g., tank_count)
-                binding.forEach((item: any, idx: number) => {
-                    const label = document.createElement('label');
-                    label.textContent = item.name;
-                    label.className = 'flex-item';
-                    label.style.marginLeft = '0.25em';
-                    label.style.marginRight = '0.5em';
-                    flexContainer.div1.appendChild(label);
-
-                    const input = document.createElement('input');
-                    input.type = 'number';
-                    input.min = '0';
-                    input.className = 'flex-item';
-                    input.value = item.value.toString();
-                    input.disabled = !item.enabled;
-                    input.addEventListener('change', (event) => {
-                        const target = event.target as HTMLInputElement;
-                        const updatedBindings = bridge.getFuelBindings();
-                        updatedBindings[key][idx].value = parseInt(target.value) || 0;
-                        bridge.setFuelBindings(updatedBindings);
-                        this.render();
-                    });
-                    flexContainer.div2.appendChild(input);
-                    fuelInputs.push(input);
-                });
-            } else if (binding && typeof binding === 'object' && 'value' in binding && typeof binding.value === 'number') {
-                // Single number binding
-                const label = document.createElement('label');
-                label.textContent = binding.name;
-                label.className = 'flex-item';
-                label.style.marginLeft = '0.25em';
-                label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
-
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.min = '0';
-                input.className = 'flex-item';
-                input.value = binding.value.toString();
-                input.disabled = !binding.enabled;
-                input.addEventListener('change', (event) => {
-                    const target = event.target as HTMLInputElement;
-                    const updatedBindings = bridge.getFuelBindings();
-                    updatedBindings[key].value = parseInt(target.value) || 0;
-                    bridge.setFuelBindings(updatedBindings);
-                    this.render();
-                });
-                flexContainer.div2.appendChild(input);
-                fuelInputs.push(input);
-            } else if (binding && typeof binding === 'object' && 'selected' in binding && typeof binding.selected === 'boolean') {
-                // Checkbox binding
-                const label = document.createElement('label');
-                label.textContent = binding.name;
-                label.className = 'flex-item';
-                label.style.marginLeft = '0.25em';
-                label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
-
-                const checkboxSpan = document.createElement('span');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'flex-item';
-                checkbox.checked = binding.selected;
-                checkbox.disabled = !binding.enabled;
-                checkbox.addEventListener('change', (event) => {
-                    const target = event.target as HTMLInputElement;
-                    const updatedBindings = bridge.getFuelBindings();
-                    updatedBindings[key].selected = target.checked;
-                    bridge.setFuelBindings(updatedBindings);
-                    this.render();
-                });
-
-                const emptyLabel = document.createElement('label');
-                checkboxSpan.appendChild(emptyLabel);
-                checkboxSpan.appendChild(checkbox);
-                flexContainer.div2.appendChild(checkboxSpan);
-
-                // Store references
-                if (key === 'self_sealing') {
-                    sealCheckbox = checkbox;
-                } else if (key === 'fire_extinguisher') {
-                    extinguisherCheckbox = checkbox;
-                }
+        // Tank count inputs (array of number bindings)
+        const fuelInputs = createFlexNumberInputs(
+            flexContainer,
+            tankCountBinding || [],
+            (idx) => (value) => {
+                const updatedBindings = bridge.getFuelBindings();
+                updatedBindings.tank_count[idx].value = value;
+                bridge.setFuelBindings(updatedBindings);
+                this.render();
             }
-        }
+        );
+
+        // Self-sealing checkbox
+        const sealCheckbox = sealBinding ? createFlexCheckbox(
+            sealBinding,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getFuelBindings();
+                updatedBindings.self_sealing.selected = checked;
+                bridge.setFuelBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        // Fire extinguisher checkbox
+        const extinguisherCheckbox = extinguisherBinding ? createFlexCheckbox(
+            extinguisherBinding,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getFuelBindings();
+                updatedBindings.fire_extinguisher.selected = checked;
+                bridge.setFuelBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
 
         cell.appendChild(flexContainer.div0);
         return { fuelInputs, sealCheckbox, extinguisherCheckbox };
@@ -263,85 +215,73 @@ export class LoadUI extends BaseComponentUI {
     } {
         const flexContainer = createFlexSection();
 
-        let bombsInput: HTMLInputElement = undefined;
-        let rocketsInput: HTMLInputElement = undefined;
-        let bayCountInput: HTMLInputElement = undefined;
-        let bay1Checkbox: HTMLInputElement = undefined;
-        let bay2Checkbox: HTMLInputElement = undefined;
+        // Explicitly handle bomb_count, rocket_count, internal_bay_count (numbers)
+        // and internal_bay_1, internal_bay_2 (checkboxes)
+        const bombBinding = bindings.bomb_count;
+        const rocketBinding = bindings.rocket_count;
+        const bayCountBinding = bindings.internal_bay_count;
+        const bay1Binding = bindings.internal_bay_1;
+        const bay2Binding = bindings.internal_bay_2;
 
-        // Render munitions inputs dynamically
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (binding && typeof binding === 'object' && 'value' in binding && typeof binding.value === 'number') {
-                // Number binding
-                const label = document.createElement('label');
-                label.textContent = binding.name;
-                label.className = 'flex-item';
-                label.style.marginLeft = '0.25em';
-                label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
-
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.min = '0';
-                input.className = 'flex-item';
-                input.value = binding.value.toString();
-                input.disabled = !binding.enabled;
-                input.addEventListener('change', (event) => {
-                    const target = event.target as HTMLInputElement;
-                    const updatedBindings = bridge.getMunitionsBindings();
-                    updatedBindings[key].value = parseInt(target.value) || 0;
-                    bridge.setMunitionsBindings(updatedBindings);
-                    this.render();
-                });
-                flexContainer.div2.appendChild(input);
-
-                // Store references
-                if (key === 'bomb_count') {
-                    bombsInput = input;
-                } else if (key === 'rocket_count') {
-                    rocketsInput = input;
-                } else if (key === 'internal_bay_count') {
-                    bayCountInput = input;
-                }
-            } else if (binding && typeof binding === 'object' && 'selected' in binding && typeof binding.selected === 'boolean') {
-                // Checkbox binding
-                const label = document.createElement('label');
-                label.textContent = binding.name;
-                label.className = 'flex-item';
-                label.style.marginLeft = '0.25em';
-                label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
-
-                const checkboxSpan = document.createElement('span');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'flex-item';
-                checkbox.checked = binding.selected;
-                checkbox.disabled = !binding.enabled;
-                checkbox.addEventListener('change', (event) => {
-                    const target = event.target as HTMLInputElement;
-                    const updatedBindings = bridge.getMunitionsBindings();
-                    updatedBindings[key].selected = target.checked;
-                    bridge.setMunitionsBindings(updatedBindings);
-                    this.render();
-                });
-
-                const emptyLabel = document.createElement('label');
-                checkboxSpan.appendChild(emptyLabel);
-                checkboxSpan.appendChild(checkbox);
-                flexContainer.div2.appendChild(checkboxSpan);
-
-                // Store references
-                if (key === 'internal_bay_1') {
-                    bay1Checkbox = checkbox;
-                } else if (key === 'internal_bay_2') {
-                    bay2Checkbox = checkbox;
-                }
+        // Bomb count input
+        const bombsInput = bombBinding ? createFlexNumberInput(
+            bombBinding,
+            flexContainer,
+            (value) => {
+                const updatedBindings = bridge.getMunitionsBindings();
+                updatedBindings.bomb_count.value = value;
+                bridge.setMunitionsBindings(updatedBindings);
+                this.render();
             }
-        }
+        ) : undefined;
+
+        // Rocket count input
+        const rocketsInput = rocketBinding ? createFlexNumberInput(
+            rocketBinding,
+            flexContainer,
+            (value) => {
+                const updatedBindings = bridge.getMunitionsBindings();
+                updatedBindings.rocket_count.value = value;
+                bridge.setMunitionsBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        // Internal bay count input
+        const bayCountInput = bayCountBinding ? createFlexNumberInput(
+            bayCountBinding,
+            flexContainer,
+            (value) => {
+                const updatedBindings = bridge.getMunitionsBindings();
+                updatedBindings.internal_bay_count.value = value;
+                bridge.setMunitionsBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        // Internal bay 1 checkbox
+        const bay1Checkbox = bay1Binding ? createFlexCheckbox(
+            bay1Binding,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getMunitionsBindings();
+                updatedBindings.internal_bay_1.selected = checked;
+                bridge.setMunitionsBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        // Internal bay 2 checkbox
+        const bay2Checkbox = bay2Binding ? createFlexCheckbox(
+            bay2Binding,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getMunitionsBindings();
+                updatedBindings.internal_bay_2.selected = checked;
+                bridge.setMunitionsBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
 
         cell.appendChild(flexContainer.div0);
         return { bombsInput, rocketsInput, bayCountInput, bay1Checkbox, bay2Checkbox };
@@ -355,43 +295,38 @@ export class LoadUI extends BaseComponentUI {
         bindings: any,
         bridge: AircraftBridge
     ): HTMLSelectElement {
-        let cargoSelect: HTMLSelectElement = undefined;
+        // Explicitly handle space_sel (cargo space selector)
+        const spaceBinding = bindings.space_sel;
 
-        // Find the select binding
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
-            const binding = bindings[key];
-
-            if (binding && typeof binding === 'object' && 'options' in binding && 'selected' in binding) {
-                // This is a select binding
-                cargoSelect = document.createElement('select');
-                cargoSelect.disabled = !binding.enabled;
-
-                // Add options
-                binding.options.forEach((opt: any, idx: number) => {
-                    const option = document.createElement('option');
-                    option.value = idx.toString();
-                    option.textContent = opt.name;
-                    option.disabled = !opt.enabled;
-                    if (idx === binding.selected) {
-                        option.selected = true;
-                    }
-                    cargoSelect!.appendChild(option);
-                });
-
-                cargoSelect.addEventListener('change', (event) => {
-                    const target = event.target as HTMLSelectElement;
-                    const updatedBindings = bridge.getCargoBindings();
-                    updatedBindings[key].selected = parseInt(target.value);
-                    bridge.setCargoBindings(updatedBindings);
-                    this.render();
-                });
-
-                cell.appendChild(cargoSelect);
-                break;
-            }
+        if (!spaceBinding) {
+            return undefined;
         }
 
+        // Create select element
+        const cargoSelect = document.createElement('select');
+        cargoSelect.disabled = !spaceBinding.enabled;
+
+        // Add options
+        spaceBinding.options.forEach((opt: any, idx: number) => {
+            const option = document.createElement('option');
+            option.value = idx.toString();
+            option.textContent = opt.name;
+            option.disabled = !opt.enabled;
+            if (idx === spaceBinding.selected) {
+                option.selected = true;
+            }
+            cargoSelect.appendChild(option);
+        });
+
+        cargoSelect.addEventListener('change', (event) => {
+            const target = event.target as HTMLSelectElement;
+            const updatedBindings = bridge.getCargoBindings();
+            updatedBindings.space_sel.selected = parseInt(target.value);
+            bridge.setCargoBindings(updatedBindings);
+            this.render();
+        });
+
+        cell.appendChild(cargoSelect);
         return cargoSelect;
     }
 
@@ -531,16 +466,9 @@ export class LoadUI extends BaseComponentUI {
         }
 
         // Update cargo select
-        if (this.cache.cargoSelect) {
-            for (const key in cargoBindings) {
-                if (!cargoBindings.hasOwnProperty(key)) continue;
-                const binding = cargoBindings[key];
-                if (binding && 'selected' in binding) {
-                    this.cache.cargoSelect.selectedIndex = binding.selected;
-                    this.cache.cargoSelect.disabled = !binding.enabled;
-                    break;
-                }
-            }
+        if (this.cache.cargoSelect && cargoBindings.space_sel) {
+            this.cache.cargoSelect.selectedIndex = cargoBindings.space_sel.selected;
+            this.cache.cargoSelect.disabled = !cargoBindings.space_sel.enabled;
         }
 
         // Update stat values
