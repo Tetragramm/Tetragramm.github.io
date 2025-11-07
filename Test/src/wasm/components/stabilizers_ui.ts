@@ -21,14 +21,14 @@ interface StabilizersCache {
 }
 
 export class StabilizersUI extends BaseComponentUI {
-    private cache: StabilizersCache | null = null;
+    private cache: StabilizersCache = undefined;
 
     protected shouldUpdate(): boolean {
-        return this.cache !== null;
+        return this.cache !== undefined;
     }
 
     protected clearCache(): void {
-        this.cache = null;
+        this.cache = undefined;
     }
 
     /**

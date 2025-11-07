@@ -23,14 +23,14 @@ interface ControlSurfacesCache {
 }
 
 export class ControlSurfacesUI extends BaseComponentUI {
-    private cache: ControlSurfacesCache | null = null;
+    private cache: ControlSurfacesCache = undefined;
 
     protected shouldUpdate(): boolean {
-        return this.cache !== null;
+        return this.cache !== undefined;
     }
 
     protected clearCache(): void {
-        this.cache = null;
+        this.cache = undefined;
     }
 
     /**

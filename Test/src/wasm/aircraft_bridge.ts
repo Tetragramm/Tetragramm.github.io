@@ -596,6 +596,7 @@ export class AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.wasm = AircraftWasmClass.deserialize(data);
         bridge.initialized = true;
+        bridge.calculateStats();
         return bridge;
     }
 
@@ -611,6 +612,7 @@ export class AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.wasm = AircraftWasmClass.deserializeFromLZString(lzStr);
         bridge.initialized = true;
+        bridge.calculateStats();
         return bridge;
     }
 }
