@@ -242,7 +242,7 @@ export class WasmApplication {
             // Replace the bridge with the new one
             this.bridge = newBridge;
             console.log('[WasmApp] Aircraft reconstructed with new language');
-            this.render();
+            this.render(true);
 
             // Note: UI components will re-render automatically because they're registered
             // as locale change listeners in LocalizationManager
@@ -251,9 +251,9 @@ export class WasmApplication {
         }
     }
 
-    private render(): void {
-        this.eraUI.render();
-        this.cockpitsUI.render();
+    private render(forceFull: boolean = false): void {
+        this.eraUI.render(forceFull);
+        this.cockpitsUI.render(forceFull);
     }
 
     /**

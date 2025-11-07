@@ -116,7 +116,7 @@ export class CockpitsUI extends BaseComponentUI {
             localization.translate('Cockpit Upgrade'),
             localization.translate('Cockpit Safety Options'),
             localization.translate('Cockpit Gunsights'),
-            localization.translate('Cockpit Stats')
+            localization.translate('Cockpit Cockpit Stats')
         ];
         headers.forEach(headerText => {
             const th = document.createElement('th');

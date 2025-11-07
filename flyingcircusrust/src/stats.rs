@@ -39,13 +39,13 @@ pub enum ERA {
 impl ToString for ERA {
     fn to_string(&self) -> String {
         match self {
-            ERA::Himmilgard => t!("Himmilgard").to_string(),
-            ERA::Pioneer => t!("Pioneer").to_string(),
-            ERA::WWI => t!("WWI").to_string(),
-            ERA::Roaring20s => t!("Roaring 20s").to_string(),
-            ERA::ComingStorm => t!("Coming Storm").to_string(),
-            ERA::WWII => t!("WWII").to_string(),
-            ERA::LastHurrah => t!("Last Hurrah").to_string(),
+            ERA::Himmilgard => ("Himmilgard").to_string(),
+            ERA::Pioneer => ("Pioneer").to_string(),
+            ERA::WWI => ("WWI").to_string(),
+            ERA::Roaring20s => ("Roaring 20s").to_string(),
+            ERA::ComingStorm => ("Coming Storm").to_string(),
+            ERA::WWII => ("WWII").to_string(),
+            ERA::LastHurrah => ("Last Hurrah").to_string(),
         }
         .to_owned()
     }

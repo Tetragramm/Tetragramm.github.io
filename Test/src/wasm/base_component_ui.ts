@@ -51,7 +51,7 @@ export abstract class BaseComponentUI {
      * Checks if we have cached elements; if so, just update values
      * Otherwise, do a full rebuild
      */
-    render(): void {
+    render(forceFull: boolean = false): void {
         console.log(`[${this.constructor.name}] render() called`);
 
         const bridge = this.getBridge();
@@ -68,7 +68,7 @@ export abstract class BaseComponentUI {
         const shouldUpdate = this.shouldUpdate();
         console.log(`[${this.constructor.name}] shouldUpdate() returned:`, shouldUpdate);
 
-        if (shouldUpdate) {
+        if (shouldUpdate && !forceFull) {
             console.log(`[${this.constructor.name}] Calling updateValues()`);
             this.updateValues();
         } else {
