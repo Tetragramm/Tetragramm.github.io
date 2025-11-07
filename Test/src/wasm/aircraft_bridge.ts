@@ -512,22 +512,6 @@ export class AircraftBridge {
     }
 
     /**
-     * Get horizontal stabilizer list options
-     */
-    getHStabList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getHStabList();
-    }
-
-    /**
-     * Get vertical stabilizer list options
-     */
-    getVStabList(): any[] {
-        this.ensureInitialized();
-        return this.wasm!.getVStabList();
-    }
-
-    /**
      * Get Cockpits UI bindings (includes localized strings from Rust)
      */
     getCockpitsBindings(): CockpitsOptions {

@@ -16,7 +16,7 @@ impl Serializable for Reinforcements {
         s.push_bool(self.wires)?;
 
         // Serialize cabane selection
-        s.push_num(self.cabane_sel)?;
+        s.push_num(self.cabane_sel as i16)?;
 
         // Serialize wing blades flag (added in version 10.26+)
         s.push_bool(self.wing_blades)?;
@@ -38,7 +38,7 @@ impl Serializable for Reinforcements {
         self.wires = d.get_bool()?;
 
         // Deserialize cabane selection
-        self.cabane_sel = d.get_num()?;
+        self.cabane_sel = d.get_num()? as usize;
 
         // Deserialize wing blades flag (version check for backward compatibility)
         if d.version > 10.25 {

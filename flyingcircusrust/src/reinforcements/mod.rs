@@ -1,4 +1,5 @@
 use crate::{aircraft::AircraftType, stats::Stats};
+use std::iter::zip;
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;
@@ -68,18 +69,16 @@ pub struct Reinforcements {
 
     // Selection counts for external struts
     #[ui(
-        array,
+        number_list,
         source = "ext_wood_list",
-        name = "ext_wood_count",
         set_fn = "set_ext_wood_count",
         enabled_fn = "is_ext_wood_enabled"
     )]
     pub(super) ext_wood_count: Vec<i16>,
 
     #[ui(
-        array,
+        number_list,
         source = "ext_steel_list",
-        name = "ext_steel_count",
         set_fn = "set_ext_steel_count",
         enabled_fn = "is_ext_steel_enabled"
     )]
@@ -87,9 +86,8 @@ pub struct Reinforcements {
 
     // Cantilever configuration
     #[ui(
-        array,
+        number_list,
         source = "cant_list",
-        name = "cant_count",
         set_fn = "set_cant_count",
         enabled_fn = "is_cant_enabled"
     )]
@@ -105,12 +103,12 @@ pub struct Reinforcements {
     pub(super) wires: bool,
 
     #[ui(
-        number,
-        name = "cabane_sel",
+        select,
+        source = "cabane_list",
         set_fn = "set_cabane",
         enabled_fn = "is_cabane_enabled"
     )]
-    pub(super) cabane_sel: i16,
+    pub(super) cabane_sel: usize,
 
     #[ui(
         check,

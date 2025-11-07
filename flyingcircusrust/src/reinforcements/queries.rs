@@ -46,16 +46,6 @@ impl Reinforcements {
         self.total_cantilevers() > 0
     }
 
-    /// Get whether wires are enabled
-    pub fn wires(&self) -> bool {
-        self.wires
-    }
-
-    /// Get selected cabane strut index
-    pub fn cabane_sel(&self) -> i16 {
-        self.cabane_sel
-    }
-
     /// Get whether wing blades are enabled
     pub fn wing_blades(&self) -> bool {
         self.wing_blades

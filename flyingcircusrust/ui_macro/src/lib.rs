@@ -88,8 +88,8 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{
-    parse_macro_input, punctuated::Punctuated, spanned::Spanned, Attribute, Data, DeriveInput,
-    Expr, Fields, Ident, Lit, Meta, Token,
+    Attribute, Data, DeriveInput, Expr, Fields, Ident, Lit, Meta, Token, parse_macro_input,
+    punctuated::Punctuated, spanned::Spanned,
 };
 
 fn get_attr_value(attrs: &Vec<(Ident, Option<String>)>, name: &str) -> Option<String> {
@@ -161,40 +161,67 @@ fn generate_selects(
         });
 
         let source_ident = syn::Ident::new(source_name, field_name.span());
-        let enabled_call = if let Some(func) = enabled_fn {
-            let enabled_ident = syn::Ident::new(func, field_name.span());
-            quote! { self.#enabled_ident() }
-        } else {
-            quote! { true }
-        };
+
         if let Some(func) = enabled_opt_fn {
             let enabled_ident = syn::Ident::new(&func, field_name.span());
-            // Add to impl
+            let enabled_fn_ident = if let Some(func) = enabled_fn {
+                let enabled_fn_ident = syn::Ident::new(func, field_name.span());
+                quote! { let enabled_val = self.#enabled_fn_ident(); }
+            } else {
+                quote! { let enabled_val = true; }
+            };
+            // Add to impl - materialize enabled_opts to Vec to avoid borrow conflicts
             impl_fields.push(quote! {
-                #field_name: Select {
-                    enabled: #enabled_call,
-                    options: zip(self.#source_ident.iter(), self.#enabled_ident().iter()).map(|(item, enab)| {
-                        SelectOpt {
-                            name: item.name.clone(),
-                            enabled: *enab,
-                        }
-                    }).collect(),
-                    selected: self.#field_name,
+                #field_name: {
+                    #enabled_fn_ident
+                    let enabled_opts_vec: Vec<_> = self.#enabled_ident().iter().cloned().collect();
+                    Select {
+                        enabled: enabled_val,
+                        options: zip(self.#source_ident.iter(), enabled_opts_vec.iter()).map(|(item, enab)| {
+                            SelectOpt {
+                                name: item.name.clone(),
+                                enabled: *enab,
+                            }
+                        }).collect(),
+                        selected: self.#field_name,
+                    }
                 }
             });
         } else {
+            let enabled_call = if let Some(func) = enabled_fn {
+                let enabled_ident = syn::Ident::new(func, field_name.span());
+                quote! {
+                    {
+                        let enabled_val = self.#enabled_ident();
+                        Select {
+                            enabled: enabled_val,
+                            options: self.#source_ident.iter().map(|item| {
+                                SelectOpt {
+                                    name: item.name.clone(),
+                                    enabled: true,
+                                }
+                            }).collect(),
+                            selected: self.#field_name,
+                        }
+                    }
+                }
+            } else {
+                quote! {
+                    Select {
+                        enabled: true,
+                        options: self.#source_ident.iter().map(|item| {
+                            SelectOpt {
+                                name: item.name.clone(),
+                                enabled: true,
+                            }
+                        }).collect(),
+                        selected: self.#field_name,
+                    }
+                }
+            };
             // Add to impl
             impl_fields.push(quote! {
-                #field_name: Select {
-                    enabled: #enabled_call,
-                    options: self.#source_ident.iter().map(|item| {
-                        SelectOpt {
-                            name: item.name.clone(),
-                            enabled: true,
-                        }
-                    }).collect(),
-                    selected: self.#field_name,
-                }
+                #field_name: #enabled_call
             });
         };
 
@@ -341,16 +368,20 @@ fn generate_number_lists(
         // Add to impl
         if let Some(func) = enabled_fn {
             let enabled_ident = syn::Ident::new(func, field_name.span());
+            // Materialize enabled list to Vec to avoid borrow conflicts
             impl_fields.push(quote! {
-                #field_name: zip(
-                    zip(self.#source_ident.iter(), self.#field_name.iter()),
-                    self.#enabled_ident().iter()
-                ).map(|((item, value), enabled)| Number {
-                    name: item.name.clone(),
-                    enabled: *enabled,
-                    value: *value,
-                })
-                .collect()
+                #field_name: {
+                    let enabled_vec: Vec<_> = self.#enabled_ident().iter().cloned().collect();
+                    zip(
+                        zip(self.#source_ident.iter(), self.#field_name.iter()),
+                        enabled_vec.iter()
+                    ).map(|((item, value), enabled)| Number {
+                        name: item.name.clone(),
+                        enabled: *enabled,
+                        value: *value,
+                    })
+                    .collect()
+                }
             });
         } else {
             impl_fields.push(quote! {
@@ -367,10 +398,15 @@ fn generate_number_lists(
         // Generate receive_ui_selections code
         if let Some(func) = set_fn {
             let set_ident = syn::Ident::new(&func, field_name.span());
+            // Materialize both iterators to avoid holding borrows when calling setter
             receive_fields.push(quote! {
-                for (i, (old_val, new_val)) in zip(self.#field_name.iter(), options.#field_name.iter().map(|n| n.value)).enumerate() {
-                    if *old_val != new_val {
-                        self.#set_ident(i, new_val);
+                {
+                    let old_values: Vec<_> = self.#field_name.iter().copied().collect();
+                    let new_values: Vec<_> = options.#field_name.iter().map(|n| n.value).collect();
+                    for (i, (old_val, new_val)) in old_values.iter().zip(new_values.iter()).enumerate() {
+                        if *old_val != *new_val {
+                            self.#set_ident(i, *new_val);
+                        }
                     }
                 }
             });
@@ -409,16 +445,20 @@ fn generate_check_lists(
         // Add to impl
         if let Some(func) = enabled_fn {
             let enabled_ident = syn::Ident::new(func, field_name.span());
+            // Materialize enabled list to Vec to avoid borrow conflicts
             impl_fields.push(quote! {
-                #field_name: zip(
-                    zip(self.#source_ident.iter(), self.#field_name.iter()),
-                    self.#enabled_ident().iter()
-                ).map(|((item, selected), enabled)| Check {
-                    name: item.name.clone(),
-                    enabled: *enabled,
-                    selected: *selected,
-                })
-                .collect()
+                #field_name: {
+                    let enabled_vec: Vec<_> = self.#enabled_ident().iter().cloned().collect();
+                    zip(
+                        zip(self.#source_ident.iter(), self.#field_name.iter()),
+                        enabled_vec.iter()
+                    ).map(|((item, selected), enabled)| Check {
+                        name: item.name.clone(),
+                        enabled: *enabled,
+                        selected: *selected,
+                    })
+                    .collect()
+                }
             });
         } else {
             impl_fields.push(quote! {
@@ -435,10 +475,15 @@ fn generate_check_lists(
         // Generate receive_ui_selections code
         if let Some(func) = set_fn {
             let set_ident = syn::Ident::new(&func, field_name.span());
+            // Materialize both iterators to avoid holding borrows when calling setter
             receive_fields.push(quote! {
-                for (i, (old_val, new_val)) in zip(self.#field_name.iter(), options.#field_name.iter().map(|c| c.selected)).enumerate() {
-                    if *old_val != new_val {
-                        self.#set_ident(i, new_val);
+                {
+                    let old_values: Vec<_> = self.#field_name.iter().copied().collect();
+                    let new_values: Vec<_> = options.#field_name.iter().map(|c| c.selected).collect();
+                    for (i, (old_val, new_val)) in old_values.iter().zip(new_values.iter()).enumerate() {
+                        if *old_val != *new_val {
+                            self.#set_ident(i, *new_val);
+                        }
                     }
                 }
             });
@@ -489,47 +534,64 @@ pub fn ui_bindings_derive(input: TokenStream) -> TokenStream {
             let field_name_str = field_name.to_string();
             match attrs[0].0.to_string().as_ref() {
                 "select" => {
+                    let source = get_attr_value(&attrs, "source").unwrap_or_else(|| {
+                        panic!("Field '{}': 'select' requires 'source' attribute", field_name)
+                    });
                     selects.push((
                         field_name,
-                        get_attr_value(&attrs, "source").unwrap(),
+                        source,
                         get_enabled_fn(&attrs, &field_name_str),
                         get_enabled_opt_fn(&attrs, &field_name_str),
                         get_set_fn(&attrs),
                     ));
                 }
                 "number" => {
+                    let name = get_attr_value(&attrs, "name").unwrap_or_else(|| {
+                        panic!("Field '{}': 'number' requires 'name' attribute", field_name)
+                    });
                     numbers.push((
                         field_name,
-                        get_attr_value(&attrs, "name").unwrap(),
+                        name,
                         get_enabled_fn(&attrs, &field_name_str),
                         get_set_fn(&attrs),
                     ));
                 }
                 "check" => {
+                    let name = get_attr_value(&attrs, "name").unwrap_or_else(|| {
+                        panic!("Field '{}': 'check' requires 'name' attribute", field_name)
+                    });
                     checks.push((
                         field_name,
-                        get_attr_value(&attrs, "name").unwrap(),
+                        name,
                         get_enabled_fn(&attrs, &field_name_str),
                         get_set_fn(&attrs),
                     ));
                 }
                 "number_list" => {
+                    let source = get_attr_value(&attrs, "source").unwrap_or_else(|| {
+                        panic!("Field '{}': 'number_list' requires 'source' attribute", field_name)
+                    });
                     number_lists.push((
                         field_name,
-                        get_attr_value(&attrs, "source").unwrap(),
+                        source,
                         get_enabled_fn(&attrs, &field_name_str),
                         get_set_fn(&attrs),
                     ));
                 }
                 "check_list" => {
+                    let source = get_attr_value(&attrs, "source").unwrap_or_else(|| {
+                        panic!("Field '{}': 'check_list' requires 'source' attribute", field_name)
+                    });
                     check_lists.push((
                         field_name,
-                        get_attr_value(&attrs, "source").unwrap(),
+                        source,
                         get_enabled_fn(&attrs, &field_name_str),
                         get_set_fn(&attrs),
                     ));
                 }
-                _ => {}
+                _ => {
+                    panic!("{} is not a valid ui macro type.", attrs[0].0.to_string())
+                }
             }
         }
     }

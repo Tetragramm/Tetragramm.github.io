@@ -2,8 +2,7 @@ use super::*;
 
 impl Reinforcements {
     /// Set external wood strut count for a specific type
-    pub fn set_ext_wood_count(&mut self, idx: i16, mut count: i16) {
-        let idx = idx as usize;
+    pub fn set_ext_wood_count(&mut self, idx: usize, mut count: i16) {
         if idx >= self.ext_wood_list.len() {
             return;
         }
@@ -16,8 +15,7 @@ impl Reinforcements {
     }
 
     /// Set external steel strut count for a specific type
-    pub fn set_ext_steel_count(&mut self, idx: i16, mut count: i16) {
-        let idx = idx as usize;
+    pub fn set_ext_steel_count(&mut self, idx: usize, mut count: i16) {
         if idx >= self.ext_steel_list.len() {
             return;
         }
@@ -30,8 +28,7 @@ impl Reinforcements {
     }
 
     /// Set cantilever count for a specific type with structure limit enforcement
-    pub fn set_cant_count(&mut self, idx: i16, mut count: i16) {
-        let idx = idx as usize;
+    pub fn set_cant_count(&mut self, idx: usize, mut count: i16) {
         if idx >= self.cant_list.len() {
             return;
         }
@@ -61,10 +58,9 @@ impl Reinforcements {
     }
 
     /// Set selected cabane strut type
-    pub fn set_cabane(&mut self, idx: i16) {
-        let idx = idx as usize;
+    pub fn set_cabane(&mut self, idx: usize) {
         if idx < self.cabane_list.len() {
-            self.cabane_sel = idx as i16;
+            self.cabane_sel = idx;
         }
     }
 

@@ -1,4 +1,5 @@
 use crate::stats::Stats;
+use std::iter::zip;
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;
@@ -83,56 +84,39 @@ pub struct Accessories {
     pub(super) control_list: Rc<Vec<ControlEntry>>,
 
     // Armour coverage array (8 positions for different AP levels)
-    #[ui(array, name = "armour_coverage", set_fn = "set_armour_coverage")]
     pub(super) armour_coverage: Vec<i16>,
 
     // Electrical equipment counts
     #[ui(
-        array,
+        number_list,
         source = "electrical_list",
-        name = "electrical_count",
         set_fn = "set_electrical_count"
     )]
     pub(super) electrical_count: Vec<i16>,
 
     // Radio selection
-    #[ui(number, name = "radio_sel", set_fn = "set_radio_sel")]
-    pub(super) radio_sel: i16,
+    #[ui(select, source = "radio_list", set_fn = "set_radio_sel")]
+    pub(super) radio_sel: usize,
 
     // Reconnaissance equipment counts
-    #[ui(
-        array,
-        source = "recon_list",
-        name = "recon_sel",
-        set_fn = "set_recon_sel"
-    )]
+    #[ui(number_list, source = "recon_list", set_fn = "set_recon_sel")]
     pub(super) recon_sel: Vec<i16>,
 
     // Visibility equipment toggles
-    #[ui(
-        array,
-        source = "visi_list",
-        name = "visi_sel",
-        set_fn = "set_visi_sel"
-    )]
+    #[ui(check_list, source = "visi_list", set_fn = "set_visi_sel")]
     pub(super) visi_sel: Vec<bool>,
 
     // Climate control toggles
-    #[ui(
-        array,
-        source = "climate_list",
-        name = "clim_sel",
-        set_fn = "set_clim_sel"
-    )]
+    #[ui(check_list, source = "climate_list", set_fn = "set_clim_sel")]
     pub(super) clim_sel: Vec<bool>,
 
     // Autopilot selection
-    #[ui(number, name = "auto_sel", set_fn = "set_auto_sel")]
-    pub(super) auto_sel: i16,
+    #[ui(select, source = "autopilot_list", set_fn = "set_auto_sel")]
+    pub(super) auto_sel: usize,
 
     // Control system selection
-    #[ui(number, name = "cont_sel", set_fn = "set_cont_sel")]
-    pub(super) cont_sel: i16,
+    #[ui(select, source = "control_list", set_fn = "set_cont_sel")]
+    pub(super) cont_sel: usize,
 
     // Aircraft state (not serialized, updated from parent)
     pub(super) has_radiator: bool,

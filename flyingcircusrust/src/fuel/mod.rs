@@ -1,4 +1,5 @@
 use crate::stats::Stats;
+use std::iter::zip;
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;
@@ -34,7 +35,7 @@ pub struct Fuel {
     tank_list: Rc<Vec<TankEntry>>,
 
     // Tank counts for each type
-    #[ui(array, source = "tank_list", enabled_fn, set_fn = "set_tank_count")]
+    #[ui(number_list, source = "tank_list", set_fn = "set_tank_count")]
     tank_count: Vec<i16>,
 
     // Self-sealing fuel tanks (adds mass and cost)

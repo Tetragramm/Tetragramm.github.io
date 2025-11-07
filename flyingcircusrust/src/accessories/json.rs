@@ -47,7 +47,7 @@ impl JSSerializable for Accessories {
         self.electrical_count.truncate(self.electrical_list.len());
 
         // Deserialize radio selection
-        self.radio_sel = js["radio_sel"].as_i64().unwrap_or(0) as i16;
+        self.radio_sel = js["radio_sel"].as_i64().unwrap_or(0) as usize;
 
         // Deserialize recon selections (with version check)
         if json_version < 12.05 {
@@ -107,10 +107,10 @@ impl JSSerializable for Accessories {
         }
 
         // Deserialize autopilot selection
-        self.auto_sel = js["auto_sel"].as_i64().unwrap_or(0) as i16;
+        self.auto_sel = js["auto_sel"].as_i64().unwrap_or(0) as usize;
 
         // Deserialize control selection
-        self.cont_sel = js["cont_sel"].as_i64().unwrap_or(0) as i16;
+        self.cont_sel = js["cont_sel"].as_i64().unwrap_or(0) as usize;
     }
 
     fn to_json(&self) -> serde_json::Value {

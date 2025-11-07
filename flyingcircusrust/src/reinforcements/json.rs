@@ -44,7 +44,7 @@ impl JSSerializable for Reinforcements {
         self.wires = js["wires"].as_bool().unwrap_or(false);
 
         // Deserialize cabane selection
-        self.cabane_sel = js["cabane_sel"].as_i64().unwrap_or(0) as i16;
+        self.cabane_sel = js["cabane_sel"].as_i64().unwrap_or(0) as usize;
 
         // Deserialize wing blades flag (with version check)
         if json_version > 10.25 {

@@ -10,7 +10,7 @@ impl Serializable for Accessories {
         s.push_num_arr(&self.electrical_count)?;
 
         // Serialize radio selection
-        s.push_num(self.radio_sel)?;
+        s.push_num(self.radio_sel as i16)?;
 
         // Serialize recon selections
         s.push_num_arr(&self.recon_sel)?;
@@ -22,10 +22,10 @@ impl Serializable for Accessories {
         s.push_bool_arr(&self.clim_sel)?;
 
         // Serialize autopilot selection
-        s.push_num(self.auto_sel)?;
+        s.push_num(self.auto_sel as i16)?;
 
         // Serialize control selection
-        s.push_num(self.cont_sel)?;
+        s.push_num(self.cont_sel as i16)?;
 
         Ok(())
     }
@@ -49,7 +49,7 @@ impl Serializable for Accessories {
         }
 
         // Deserialize radio selection
-        self.radio_sel = d.get_num()?;
+        self.radio_sel = d.get_num()? as usize;
 
         // Deserialize recon selections (with version compatibility)
         if d.version < 12.05 {
@@ -79,10 +79,10 @@ impl Serializable for Accessories {
         }
 
         // Deserialize autopilot selection
-        self.auto_sel = d.get_num()?;
+        self.auto_sel = d.get_num()? as usize;
 
         // Deserialize control selection
-        self.cont_sel = d.get_num()?;
+        self.cont_sel = d.get_num()? as usize;
 
         Ok(())
     }

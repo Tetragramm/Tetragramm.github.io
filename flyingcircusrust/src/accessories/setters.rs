@@ -2,8 +2,7 @@ use super::*;
 
 impl Accessories {
     /// Set armour coverage at specific AP level
-    pub fn set_armour_coverage(&mut self, idx: i16, mut count: i16) {
-        let idx = idx as usize;
+    pub fn set_armour_coverage(&mut self, idx: usize, mut count: i16) {
         if idx >= self.armour_coverage.len() {
             return;
         }
@@ -35,8 +34,7 @@ impl Accessories {
     }
 
     /// Set electrical equipment count for a specific type
-    pub fn set_electrical_count(&mut self, idx: i16, mut count: i16) {
-        let idx = idx as usize;
+    pub fn set_electrical_count(&mut self, idx: usize, mut count: i16) {
         if idx >= self.electrical_list.len() {
             return;
         }
@@ -51,16 +49,14 @@ impl Accessories {
     }
 
     /// Set selected radio communication system
-    pub fn set_radio_sel(&mut self, idx: i16) {
-        let idx = idx as usize;
+    pub fn set_radio_sel(&mut self, idx: usize) {
         if idx < self.radio_list.len() {
-            self.radio_sel = idx as i16;
+            self.radio_sel = idx;
         }
     }
 
     /// Set reconnaissance equipment count for a specific type
-    pub fn set_recon_sel(&mut self, idx: i16, mut count: i16) {
-        let idx = idx as usize;
+    pub fn set_recon_sel(&mut self, idx: usize, mut count: i16) {
         if idx >= self.recon_list.len() {
             return;
         }
@@ -73,8 +69,7 @@ impl Accessories {
     }
 
     /// Set visibility equipment toggle
-    pub fn set_visi_sel(&mut self, idx: i16, enabled: bool) {
-        let idx = idx as usize;
+    pub fn set_visi_sel(&mut self, idx: usize, enabled: bool) {
         if idx >= self.visi_list.len() {
             return;
         }
@@ -88,8 +83,7 @@ impl Accessories {
     }
 
     /// Set climate control equipment toggle
-    pub fn set_clim_sel(&mut self, idx: i16, enabled: bool) {
-        let idx = idx as usize;
+    pub fn set_clim_sel(&mut self, idx: usize, enabled: bool) {
         if idx >= self.climate_list.len() {
             return;
         }
@@ -98,18 +92,16 @@ impl Accessories {
     }
 
     /// Set selected autopilot system
-    pub fn set_auto_sel(&mut self, idx: i16) {
-        let idx = idx as usize;
+    pub fn set_auto_sel(&mut self, idx: usize) {
         if idx < self.autopilot_list.len() {
-            self.auto_sel = idx as i16;
+            self.auto_sel = idx;
         }
     }
 
     /// Set selected control system
-    pub fn set_cont_sel(&mut self, idx: i16) {
-        let idx = idx as usize;
+    pub fn set_cont_sel(&mut self, idx: usize) {
         if idx < self.control_list.len() {
-            self.cont_sel = idx as i16;
+            self.cont_sel = idx;
         }
     }
 

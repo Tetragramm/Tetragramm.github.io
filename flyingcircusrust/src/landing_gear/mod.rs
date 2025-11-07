@@ -1,4 +1,5 @@
 use crate::stats::Stats;
+use std::iter::zip;
 use std::rc::Rc;
 use ui_core::*;
 use ui_macro::UIBindings;
@@ -47,7 +48,6 @@ pub struct LandingGear {
     #[ui(
         select,
         source = "gear_list",
-        name = "gear_sel",
         enabled_fn = "is_gear_enabled",
         set_fn = "set_gear"
     )]
@@ -64,7 +64,7 @@ pub struct LandingGear {
 
     // Extra accessories selection (arresting hook, zeppelin hook, etc.)
     #[ui(
-        array,
+        check_list,
         source = "extra_list",
         enabled_fn = "is_extra_enabled",
         set_fn = "set_extra_selected"

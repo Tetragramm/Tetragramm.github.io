@@ -69,11 +69,6 @@ impl Accessories {
         &self.electrical_count
     }
 
-    /// Get selected radio index
-    pub fn radio_sel(&self) -> i16 {
-        self.radio_sel
-    }
-
     /// Get radio communication name
     pub fn communication_name(&self) -> String {
         let idx = self.radio_sel as usize;
@@ -82,16 +77,6 @@ impl Accessories {
         } else {
             String::new()
         }
-    }
-
-    /// Get reconnaissance selection counts
-    pub fn recon_sel(&self) -> &Vec<i16> {
-        &self.recon_sel
-    }
-
-    /// Get visibility equipment toggles
-    pub fn visi_sel(&self) -> &Vec<bool> {
-        &self.visi_sel
     }
 
     /// Get which visibility items can be used
@@ -122,16 +107,6 @@ impl Accessories {
             .iter()
             .map(|item| !item.req_radiator || self.has_radiator)
             .collect()
-    }
-
-    /// Get selected autopilot index
-    pub fn auto_sel(&self) -> i16 {
-        self.auto_sel
-    }
-
-    /// Get selected control system index
-    pub fn cont_sel(&self) -> i16 {
-        self.cont_sel
     }
 
     /// Get max mass stress from selected control system

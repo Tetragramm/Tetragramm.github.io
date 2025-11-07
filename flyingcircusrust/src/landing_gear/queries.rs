@@ -76,8 +76,8 @@ impl LandingGear {
     }
 
     /// Check if extra selection is enabled (always true for UI)
-    pub fn is_extra_enabled(&self) -> bool {
-        true
+    pub fn is_extra_enabled(&self) -> Vec<bool> {
+        vec![true; self.extra_sel.len()]
     }
 
     /// Check if this is a default configuration
