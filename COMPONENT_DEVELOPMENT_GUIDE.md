@@ -801,7 +801,35 @@ this.input.addEventListener('change', () => {
 
 ---
 
-### 3. Cache Only What You Update
+### 3. Use `undefined` for Uninitialized Cache
+
+```typescript
+// ✅ GOOD - Use undefined for "not initialized yet"
+private cache: YourCache = undefined;
+
+protected shouldUpdate(): boolean {
+    return this.cache !== undefined;
+}
+
+protected clearCache(): void {
+    this.cache = undefined;
+}
+
+// ❌ BAD - Using null is inconsistent with TypeScript conventions
+private cache: YourCache | null = null;
+
+protected shouldUpdate(): boolean {
+    return this.cache !== null;  // Works but less idiomatic
+}
+```
+
+**Why**: In TypeScript, `undefined` is the conventional choice for "not set yet" values. It's also what you get naturally from uninitialized class properties. Using `undefined` consistently avoids subtle bugs when comparing values.
+
+**Important**: This is a critical pattern. Using `null` instead of `undefined` for cache state can cause issues with TypeScript's strict null checks and is less conventional.
+
+---
+
+### 4. Cache Only What You Update
 
 ```typescript
 // ✅ GOOD - Cache elements you'll update
@@ -809,21 +837,21 @@ private cache: {
     select: HTMLSelectElement;
     input: HTMLInputElement;
     statCells: HTMLTableCellElement[];
-} | null = null;
+} = undefined;
 
 // ❌ BAD - Caching static elements wastes memory
 private cache: {
     table: HTMLTableElement;
     headerRow: HTMLTableRowElement;
     // ... static elements
-} | null = null;
+} = undefined;
 ```
 
 **Why**: Cache is for `updateValues()` fast path. Static elements don't need caching.
 
 ---
 
-### 4. Validate Bridge Before Use
+### 5. Validate Bridge Before Use
 
 ```typescript
 // ✅ GOOD
@@ -838,7 +866,7 @@ const bridge = this.getBridge()!;  // Unsafe!
 
 ---
 
-### 5. Use Type-Safe Cache Interfaces
+### 6. Use Type-Safe Cache Interfaces
 
 ```typescript
 // ✅ GOOD
@@ -847,19 +875,19 @@ interface YourCache {
     inputs: HTMLInputElement[];
 }
 
-private cache: YourCache | null = null;
+private cache: YourCache = undefined;
 
 // Now TypeScript helps you:
 this.cache.select.value  // ✓ Type-safe
 
 // ❌ BAD - Untyped
-private cache: any = null;
+private cache: any = undefined;
 this.cache.anythingGoes  // No type checking
 ```
 
 ---
 
-### 6. Separate Building from Caching
+### 7. Separate Building from Caching
 
 ```typescript
 // ✅ GOOD - Clear responsibilities
@@ -885,7 +913,7 @@ private buildRow(item: Item, index: number): HTMLTableRowElement {
 
 ---
 
-### 7. Use Consistent Naming
+### 8. Use Consistent Naming
 
 **For bindings getter/setter**:
 - `bridge.getYourComponentBindings()`
@@ -899,6 +927,78 @@ private buildRow(item: Item, index: number): HTMLTableRowElement {
 - Section title: `'YourComponent Section Title'`
 - Stats: `'Stat YourStatName'`
 - Options: `'YourComponent Option'`
+
+---
+
+## Common Pitfalls and Bugs
+
+### Pitfall 1: Forgetting to Register Component in Global Render
+
+**Bug**: Component doesn't update when other components change aircraft state.
+
+**Cause**: In `wasm_init.ts`, the `render()` method must include ALL components:
+
+```typescript
+// wasm_init.ts
+private render(forceFull: boolean = false): void {
+    this.eraUI.render(forceFull);
+    this.cockpitsUI.render(forceFull);
+    this.stabilizersUI.render(forceFull);        // ✅ Must include!
+    this.controlSurfacesUI.render(forceFull);    // ✅ Must include!
+    // ... ALL components
+}
+```
+
+**Fix**: When you create a new component, add it to the global render method.
+
+---
+
+### Pitfall 2: Missing calculateStats() After Deserialization
+
+**Bug**: Stats show as 0 or incorrect values after loading saved aircraft.
+
+**Cause**: The bridge's deserialization methods weren't calling `calculateStats()`:
+
+```typescript
+// ❌ BAD - Stats will be wrong
+static deserialize(data: Uint8Array): AircraftBridge {
+    const bridge = new AircraftBridge();
+    bridge.wasm = AircraftWasmClass.deserialize(data);
+    bridge.initialized = true;
+    return bridge;  // Stats not calculated!
+}
+
+// ✅ GOOD - Stats calculated
+static deserialize(data: Uint8Array): AircraftBridge {
+    const bridge = new AircraftBridge();
+    bridge.wasm = AircraftWasmClass.deserialize(data);
+    bridge.initialized = true;
+    bridge.calculateStats();  // ✅ Calculate stats!
+    return bridge;
+}
+```
+
+**Fix**: Always call `calculateStats()` after deserializing or loading aircraft data.
+
+---
+
+### Pitfall 3: Using `null` Instead of `undefined` for Cache
+
+**Bug**: Inconsistent behavior with TypeScript's strict null checks.
+
+**Cause**: Using `null` for uninitialized cache is less idiomatic in TypeScript.
+
+```typescript
+// ❌ AVOID - Less conventional
+private cache: YourCache | null = null;
+if (this.cache !== null) { ... }
+
+// ✅ PREFER - TypeScript convention
+private cache: YourCache = undefined;
+if (this.cache !== undefined) { ... }
+```
+
+**Fix**: Use `undefined` consistently for "not initialized yet" state. See Best Practice #3.
 
 ---
 
@@ -930,14 +1030,14 @@ interface ExampleCache {
 }
 
 export class ExampleUI extends BaseComponentUI {
-    private cache: ExampleCache | null = null;
+    private cache: ExampleCache = undefined;
 
     protected shouldUpdate(): boolean {
-        return this.cache !== null;
+        return this.cache !== undefined;
     }
 
     protected clearCache(): void {
-        this.cache = null;
+        this.cache = undefined;
     }
 
     protected rebuildFull(): void {
