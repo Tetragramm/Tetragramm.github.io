@@ -9,7 +9,12 @@ import { AircraftBridge } from '../aircraft_bridge';
 import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, updateSelectElement } from '../dom_utils';
+import {
+    createRulesLink,
+    updateSelectElement,
+    createFlexSection,
+    createFlexNumberInput
+} from '../dom_utils';
 
 // Cache interface for type safety
 interface StabilizersCache {
@@ -125,7 +130,7 @@ export class StabilizersUI extends BaseComponentUI {
         const typeBinding = bindings.hstab_sel;
         const countBinding = bindings.hstab_count;
 
-        // Type select
+        // Type select (manual - no flex helper yet)
         const hTypeSelect = document.createElement('select');
         hTypeSelect.disabled = !typeBinding.enabled;
 
@@ -151,30 +156,26 @@ export class StabilizersUI extends BaseComponentUI {
         cell.appendChild(hTypeSelect);
         cell.appendChild(document.createElement('br'));
 
-        // Count input with label
-        const label = document.createElement('label');
-        label.textContent = localization.translate('Stabilizers # of Stabilizers') + ': ';
-        label.style.marginLeft = '0.25em';
-        label.style.marginRight = '0.5em';
+        // Count input using flex helper
+        const flexContainer = createFlexSection();
 
-        const hCountInput = document.createElement('input');
-        hCountInput.type = 'number';
-        hCountInput.min = '0';
-        hCountInput.max = '20';
-        hCountInput.value = countBinding.value.toString();
-        hCountInput.disabled = !countBinding.enabled;
-        hCountInput.addEventListener('change', (event) => {
-            const target = event.target as HTMLInputElement;
-            const bindings = bridge.getStabilizersBindings();
-            bindings.hstab_count.value = parseInt(target.value) || 0;
-            bridge.setStabilizersBindings(bindings);
-            this.render();
-        });
+        // Override the binding name with translated label
+        const countBindingWithLabel = { ...countBinding, name: localization.translate('Stabilizers # of Stabilizers') };
 
-        const span = document.createElement('span');
-        span.appendChild(label);
-        span.appendChild(hCountInput);
-        cell.appendChild(span);
+        const hCountInput = createFlexNumberInput(
+            countBindingWithLabel,
+            flexContainer,
+            (value) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.hstab_count.value = value;
+                bridge.setStabilizersBindings(bindings);
+                this.render();
+            },
+            '0',
+            '20'
+        );
+
+        cell.appendChild(flexContainer.div0);
 
         return { hTypeSelect, hCountInput };
     }
@@ -190,7 +191,7 @@ export class StabilizersUI extends BaseComponentUI {
         const typeBinding = bindings.vstab_sel;
         const countBinding = bindings.vstab_count;
 
-        // Type select
+        // Type select (manual - no flex helper yet)
         const vTypeSelect = document.createElement('select');
         vTypeSelect.disabled = !typeBinding.enabled;
 
@@ -216,30 +217,26 @@ export class StabilizersUI extends BaseComponentUI {
         cell.appendChild(vTypeSelect);
         cell.appendChild(document.createElement('br'));
 
-        // Count input with label
-        const label = document.createElement('label');
-        label.textContent = localization.translate('Stabilizers # of Stabilizers') + ': ';
-        label.style.marginLeft = '0.25em';
-        label.style.marginRight = '0.5em';
+        // Count input using flex helper
+        const flexContainer = createFlexSection();
 
-        const vCountInput = document.createElement('input');
-        vCountInput.type = 'number';
-        vCountInput.min = '0';
-        vCountInput.max = '20';
-        vCountInput.value = countBinding.value.toString();
-        vCountInput.disabled = !countBinding.enabled;
-        vCountInput.addEventListener('change', (event) => {
-            const target = event.target as HTMLInputElement;
-            const bindings = bridge.getStabilizersBindings();
-            bindings.vstab_count.value = parseInt(target.value) || 0;
-            bridge.setStabilizersBindings(bindings);
-            this.render();
-        });
+        // Override the binding name with translated label
+        const countBindingWithLabel = { ...countBinding, name: localization.translate('Stabilizers # of Stabilizers') };
 
-        const span = document.createElement('span');
-        span.appendChild(label);
-        span.appendChild(vCountInput);
-        cell.appendChild(span);
+        const vCountInput = createFlexNumberInput(
+            countBindingWithLabel,
+            flexContainer,
+            (value) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.vstab_count.value = value;
+                bridge.setStabilizersBindings(bindings);
+                this.render();
+            },
+            '0',
+            '20'
+        );
+
+        cell.appendChild(flexContainer.div0);
 
         return { vTypeSelect, vCountInput };
     }

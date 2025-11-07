@@ -13,6 +13,7 @@ import {
     createRulesLink,
     createFlexSection,
     updateSelectElement,
+    createFlexCheckbox,
     createFlexCheckboxes
 } from '../dom_utils';
 
@@ -169,35 +170,17 @@ export class LandingGearUI extends BaseComponentUI {
             flexContainer.div2.appendChild(typeSelect);
         }
 
-        // Retractable checkbox
-        let retractCheckbox: HTMLInputElement = undefined;
-        if (retractBinding) {
-            const label = document.createElement('label');
-            label.textContent = retractBinding.name;
-            label.className = 'flex-item';
-            label.style.marginLeft = '0.25em';
-            label.style.marginRight = '0.5em';
-            flexContainer.div1.appendChild(label);
-
-            const checkboxSpan = document.createElement('span');
-            retractCheckbox = document.createElement('input');
-            retractCheckbox.type = 'checkbox';
-            retractCheckbox.className = 'flex-item';
-            retractCheckbox.checked = retractBinding.selected;
-            retractCheckbox.disabled = !retractBinding.enabled;
-            retractCheckbox.addEventListener('change', (event) => {
-                const target = event.target as HTMLInputElement;
+        // Retractable checkbox using helper
+        const retractCheckbox = retractBinding ? createFlexCheckbox(
+            retractBinding,
+            flexContainer,
+            (checked) => {
                 const updatedBindings = bridge.getLandingGearBindings();
-                updatedBindings.retract.selected = target.checked;
+                updatedBindings.retract.selected = checked;
                 bridge.setLandingGearBindings(updatedBindings);
                 this.render();
-            });
-
-            const emptyLabel = document.createElement('label');
-            checkboxSpan.appendChild(emptyLabel);
-            checkboxSpan.appendChild(retractCheckbox);
-            flexContainer.div2.appendChild(checkboxSpan);
-        }
+            }
+        ) : undefined;
 
         cell.appendChild(flexContainer.div0);
         return { typeSelect, retractCheckbox };

@@ -9,7 +9,12 @@ import { AircraftBridge } from '../aircraft_bridge';
 import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, createFlexSection, updateSelectElement } from '../dom_utils';
+import {
+    createRulesLink,
+    createFlexSection,
+    updateSelectElement,
+    createFlexCheckboxes
+} from '../dom_utils';
 
 // Cache interface for type safety
 interface ControlSurfacesCache {
@@ -210,38 +215,17 @@ export class ControlSurfacesUI extends BaseComponentUI {
             return [];
         }
 
-        const checkboxes: HTMLInputElement[] = [];
-
-        // Render drag inducer checkboxes
-        dragBinding.forEach((item: any, idx: number) => {
-            const label = document.createElement('label');
-            label.textContent = item.name;
-            label.className = 'flex-item';
-            label.style.marginLeft = '0.25em';
-            label.style.marginRight = '0.5em';
-            flexContainer.div1.appendChild(label);
-
-            const checkboxSpan = document.createElement('span');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'flex-item';
-            checkbox.checked = item.selected || false;
-            checkbox.disabled = !item.enabled;
-            checkbox.addEventListener('change', (event) => {
-                const target = event.target as HTMLInputElement;
+        // Use createFlexCheckboxes helper
+        const checkboxes = createFlexCheckboxes(
+            flexContainer,
+            dragBinding,
+            (idx) => (checked) => {
                 const bindings = bridge.getControlSurfacesBindings();
-                bindings.drag_sel[idx].selected = target.checked;
+                bindings.drag_sel[idx].selected = checked;
                 bridge.setControlSurfacesBindings(bindings);
                 this.render();
-            });
-
-            const emptyLabel = document.createElement('label');
-            checkboxSpan.appendChild(emptyLabel);
-            checkboxSpan.appendChild(checkbox);
-            flexContainer.div2.appendChild(checkboxSpan);
-
-            checkboxes.push(checkbox);
-        });
+            }
+        );
 
         cell.appendChild(flexContainer.div0);
         return checkboxes;
