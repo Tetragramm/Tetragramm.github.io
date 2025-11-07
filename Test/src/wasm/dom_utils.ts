@@ -312,3 +312,23 @@ export function createFlexCheckboxes(
     });
     return checkboxes;
 }
+
+/**
+ * Create checkboxes in a flex section from binding array
+ * @param flex - The flex container to add checkboxes to
+ * @param bindingArray - Array of checkbox bindings
+ * @param createCallback - Function that returns callback for a specific index
+ * @returns Array of created checkbox elements
+ */
+export function createFlexNumberInputs(
+    flex: ReturnType<typeof createFlexSection>,
+    bindingArray: any[],
+    createCallback: (index: number) => (value: number) => void
+): HTMLInputElement[] {
+    const numbers: HTMLInputElement[] = [];
+    bindingArray.forEach((binding, idx) => {
+        const number = createFlexNumberInput(binding, flex, createCallback(idx));
+        numbers.push(number);
+    });
+    return numbers;
+}
