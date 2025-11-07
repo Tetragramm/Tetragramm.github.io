@@ -216,13 +216,38 @@ export class LoadUI {
     private createFuelSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
         const flexContainer = this.createFlexSection();
 
-        // Render fuel tank inputs dynamically
+        // Render fuel bindings dynamically
         for (const key in bindings) {
             if (!bindings.hasOwnProperty(key)) continue;
             const binding = bindings[key];
 
-            if (binding && typeof binding === 'object' && 'value' in binding && typeof binding.value === 'number') {
-                // Number binding (fuel tanks)
+            if (Array.isArray(binding)) {
+                // number_list binding (e.g., tank_count)
+                binding.forEach((item: any, idx: number) => {
+                    const label = document.createElement('label');
+                    label.textContent = item.name;
+                    label.className = 'flex-item';
+                    label.style.marginLeft = '0.25em';
+                    label.style.marginRight = '0.5em';
+                    flexContainer.div1.appendChild(label);
+
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.min = '0';
+                    input.className = 'flex-item';
+                    input.value = item.value.toString();
+                    input.disabled = !item.enabled;
+                    input.addEventListener('change', () => {
+                        const updatedBindings = bridge.getFuelBindings();
+                        updatedBindings[key][idx].value = parseInt(input.value) || 0;
+                        bridge.setFuelBindings(updatedBindings);
+                        this.render();
+                    });
+                    flexContainer.div2.appendChild(input);
+                    this.fuelInputs.push(input);
+                });
+            } else if (binding && typeof binding === 'object' && 'value' in binding && typeof binding.value === 'number') {
+                // Single number binding
                 const label = document.createElement('label');
                 label.textContent = binding.name;
                 label.className = 'flex-item';
@@ -274,7 +299,7 @@ export class LoadUI {
                 // Store references
                 if (key === 'self_sealing') {
                     this.sealCheckbox = checkbox;
-                } else if (key === 'extinguisher') {
+                } else if (key === 'fire_extinguisher') {
                     this.extinguisherCheckbox = checkbox;
                 }
             }
@@ -482,7 +507,17 @@ export class LoadUI {
             if (!fuelBindings.hasOwnProperty(key)) continue;
             const binding = fuelBindings[key];
 
-            if (binding && typeof binding === 'object' && 'value' in binding) {
+            if (Array.isArray(binding)) {
+                // number_list binding (e.g., tank_count)
+                binding.forEach((item: any) => {
+                    if (fuelIdx < this.fuelInputs.length) {
+                        this.fuelInputs[fuelIdx].value = item.value.toString();
+                        this.fuelInputs[fuelIdx].disabled = !item.enabled;
+                        fuelIdx++;
+                    }
+                });
+            } else if (binding && typeof binding === 'object' && 'value' in binding) {
+                // Single number binding
                 if (fuelIdx < this.fuelInputs.length) {
                     this.fuelInputs[fuelIdx].value = binding.value.toString();
                     this.fuelInputs[fuelIdx].disabled = !binding.enabled;
@@ -497,34 +532,34 @@ export class LoadUI {
         }
 
         if (this.extinguisherCheckbox) {
-            this.extinguisherCheckbox.checked = fuelBindings.extinguisher?.selected || false;
-            this.extinguisherCheckbox.disabled = !fuelBindings.extinguisher?.enabled;
+            this.extinguisherCheckbox.checked = fuelBindings.fire_extinguisher?.selected || false;
+            this.extinguisherCheckbox.disabled = !fuelBindings.fire_extinguisher?.enabled;
         }
 
         // Update munitions inputs
         if (this.bombsInput) {
-            this.bombsInput.value = munitionsBindings.bombs?.value?.toString() || '0';
-            this.bombsInput.disabled = !munitionsBindings.bombs?.enabled;
+            this.bombsInput.value = munitionsBindings.bomb_count?.value?.toString() || '0';
+            this.bombsInput.disabled = !munitionsBindings.bomb_count?.enabled;
         }
 
         if (this.rocketsInput) {
-            this.rocketsInput.value = munitionsBindings.rockets?.value?.toString() || '0';
-            this.rocketsInput.disabled = !munitionsBindings.rockets?.enabled;
+            this.rocketsInput.value = munitionsBindings.rocket_count?.value?.toString() || '0';
+            this.rocketsInput.disabled = !munitionsBindings.rocket_count?.enabled;
         }
 
         if (this.bayCountInput) {
-            this.bayCountInput.value = munitionsBindings.bay_count?.value?.toString() || '0';
-            this.bayCountInput.disabled = !munitionsBindings.bay_count?.enabled;
+            this.bayCountInput.value = munitionsBindings.internal_bay_count?.value?.toString() || '0';
+            this.bayCountInput.disabled = !munitionsBindings.internal_bay_count?.enabled;
         }
 
         if (this.bay1Checkbox) {
-            this.bay1Checkbox.checked = munitionsBindings.widen_bay_1?.selected || false;
-            this.bay1Checkbox.disabled = !munitionsBindings.widen_bay_1?.enabled;
+            this.bay1Checkbox.checked = munitionsBindings.internal_bay_1?.selected || false;
+            this.bay1Checkbox.disabled = !munitionsBindings.internal_bay_1?.enabled;
         }
 
         if (this.bay2Checkbox) {
-            this.bay2Checkbox.checked = munitionsBindings.widen_bay_2?.selected || false;
-            this.bay2Checkbox.disabled = !munitionsBindings.widen_bay_2?.enabled;
+            this.bay2Checkbox.checked = munitionsBindings.internal_bay_2?.selected || false;
+            this.bay2Checkbox.disabled = !munitionsBindings.internal_bay_2?.enabled;
         }
 
         // Update cargo select

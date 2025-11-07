@@ -41,14 +41,14 @@ pub struct Fuel {
     // Self-sealing fuel tanks (adds mass and cost)
     #[ui(
         check,
-        name = "self_sealing",
+        name = "Load Self-Sealing Gas Tank",
         enabled_fn = "get_sealing_enabled",
         set_fn = "set_self_sealing"
     )]
     self_sealing: bool,
 
     // Fire extinguisher system
-    #[ui(check, name = "fire_extinguisher", set_fn = "set_extinguisher")]
+    #[ui(check, name = "Load Remote Fire Extinguisher", set_fn = "set_extinguisher")]
     fire_extinguisher: bool,
 
     // Wing configuration (set externally by wings)
