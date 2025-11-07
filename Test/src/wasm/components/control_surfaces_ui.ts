@@ -13,7 +13,8 @@ import {
     createRulesLink,
     createFlexSection,
     updateSelectElement,
-    createFlexCheckboxes
+    createFlexCheckboxes,
+    createFlexSelect
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -151,39 +152,18 @@ export class ControlSurfacesUI extends BaseComponentUI {
             const binding = bindings[surfaceKey];
             if (!binding || !binding.options) return;
 
-            // Create label
-            const label = document.createElement('label');
-            label.textContent = localization.translate(labels[idx]);
-            label.className = 'flex-item';
-            label.style.marginLeft = '0.25em';
-            label.style.marginRight = '0.5em';
-            flexContainer.div1.appendChild(label);
-
-            // Create select
-            const select = document.createElement('select');
-            select.className = 'flex-item';
-            select.disabled = !binding.enabled;
-
-            binding.options.forEach((opt: any, optIdx: number) => {
-                const option = document.createElement('option');
-                option.value = optIdx.toString();
-                option.textContent = opt.name;
-                option.disabled = !opt.enabled;
-                if (optIdx === binding.selected) {
-                    option.selected = true;
-                }
-                select.appendChild(option);
-            });
-
-            select.addEventListener('change', (event) => {
-                const target = event.target as HTMLSelectElement;
-                const bindings = bridge.getControlSurfacesBindings();
-                bindings[surfaceKey].selected = parseInt(target.value);
-                bridge.setControlSurfacesBindings(bindings);
-                this.render();
-            });
-
-            flexContainer.div2.appendChild(select);
+            // Create select using helper
+            const select = createFlexSelect(
+                binding,
+                flexContainer,
+                (selectedIndex) => {
+                    const bindings = bridge.getControlSurfacesBindings();
+                    bindings[surfaceKey].selected = selectedIndex;
+                    bridge.setControlSurfacesBindings(bindings);
+                    this.render();
+                },
+                localization.translate(labels[idx])
+            );
             selects.push(select);
         });
 

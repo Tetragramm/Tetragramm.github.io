@@ -14,7 +14,8 @@ import {
     createFlexSection,
     updateSelectElement,
     createFlexCheckbox,
-    createFlexCheckboxes
+    createFlexCheckboxes,
+    createFlexSelect
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -134,41 +135,18 @@ export class LandingGearUI extends BaseComponentUI {
         const gearBinding = bindings.gear_sel;
         const retractBinding = bindings.retract;
 
-        // Gear type select
-        let typeSelect: HTMLSelectElement = undefined;
-        if (gearBinding) {
-            const label = document.createElement('label');
-            label.textContent = 'Type';
-            label.className = 'flex-item';
-            label.style.marginLeft = '0.25em';
-            label.style.marginRight = '0.5em';
-            flexContainer.div1.appendChild(label);
-
-            typeSelect = document.createElement('select');
-            typeSelect.className = 'flex-item';
-            typeSelect.disabled = !gearBinding.enabled;
-
-            gearBinding.options.forEach((opt: any, idx: number) => {
-                const option = document.createElement('option');
-                option.value = idx.toString();
-                option.textContent = opt.name;
-                option.disabled = !opt.enabled;
-                if (idx === gearBinding.selected) {
-                    option.selected = true;
-                }
-                typeSelect!.appendChild(option);
-            });
-
-            typeSelect.addEventListener('change', (event) => {
-                const target = event.target as HTMLSelectElement;
+        // Gear type select using helper
+        const typeSelect = gearBinding ? createFlexSelect(
+            gearBinding,
+            flexContainer,
+            (selectedIndex) => {
                 const updatedBindings = bridge.getLandingGearBindings();
-                updatedBindings.gear_sel.selected = parseInt(target.value);
+                updatedBindings.gear_sel.selected = selectedIndex;
                 bridge.setLandingGearBindings(updatedBindings);
                 this.render();
-            });
-
-            flexContainer.div2.appendChild(typeSelect);
-        }
+            },
+            'Type'
+        ) : undefined;
 
         // Retractable checkbox using helper
         const retractCheckbox = retractBinding ? createFlexCheckbox(
