@@ -9,7 +9,7 @@ import { AircraftBridge, CockpitsOptions, CockpitOptions } from '../aircraft_bri
 import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, createFlexSection, createFlexCheckbox, createFlexNumberInput } from '../dom_utils';
+import { createRulesLink, createFlexNumberInput, createFlexCell, createFlexCheckboxes } from '../dom_utils';
 
 // Cockpit stats configuration
 const COCKPIT_STATS: StatDisplayConfig[] = [
@@ -211,58 +211,57 @@ export class CockpitsUI extends BaseComponentUI {
         row.appendChild(optionCell);
 
         // Column 2: Upgrades (flex layout)
-        const upgradesCell = document.createElement('td');
-        const upgradesFlex = createFlexSection();
-        const upgradeChecks: HTMLInputElement[] = [];
-        cockpitOptions.selected_upgrades.forEach((upgrade, upgradeIdx) => {
-            const checkbox = createFlexCheckbox(upgrade, upgradesFlex, (checked) => {
+        const { cell: upgradesCell, flex: upgradesFlex } = createFlexCell();
+        const upgradeChecks = createFlexCheckboxes(
+            upgradesFlex,
+            cockpitOptions.selected_upgrades,
+            (idx) => (checked) => {
                 const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].selected_upgrades[upgradeIdx].selected = checked;
+                bindings.positions[index].selected_upgrades[idx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
                 this.render();
-            });
-            upgradeChecks.push(checkbox);
-        });
-        upgradesCell.appendChild(upgradesFlex.div0);
+            }
+        );
         row.appendChild(upgradesCell);
 
         // Column 3: Safety Options (flex layout)
-        const safetyCell = document.createElement('td');
-        const safetyFlex = createFlexSection();
-        const safetyChecks: HTMLInputElement[] = [];
-        cockpitOptions.selected_safety.forEach((safety, safetyIdx) => {
-            const checkbox = createFlexCheckbox(safety, safetyFlex, (checked) => {
+        const { cell: safetyCell, flex: safetyFlex } = createFlexCell();
+        const safetyChecks = createFlexCheckboxes(
+            safetyFlex,
+            cockpitOptions.selected_safety,
+            (idx) => (checked) => {
                 const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].selected_safety[safetyIdx].selected = checked;
+                bindings.positions[index].selected_safety[idx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
                 this.render();
-            });
-            safetyChecks.push(checkbox);
-        });
-        safetyCell.appendChild(safetyFlex.div0);
+            }
+        );
         row.appendChild(safetyCell);
 
         // Column 4: Gunsights + Bombsight (flex layout)
-        const gunsightsCell = document.createElement('td');
-        const gunsightsFlex = createFlexSection();
-        const gunsightChecks: HTMLInputElement[] = [];
-        cockpitOptions.selected_gunsights.forEach((gunsight, gunsightIdx) => {
-            const checkbox = createFlexCheckbox(gunsight, gunsightsFlex, (checked) => {
+        const { cell: gunsightsCell, flex: gunsightsFlex } = createFlexCell();
+        const gunsightChecks = createFlexCheckboxes(
+            gunsightsFlex,
+            cockpitOptions.selected_gunsights,
+            (idx) => (checked) => {
                 const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].selected_gunsights[gunsightIdx].selected = checked;
+                bindings.positions[index].selected_gunsights[idx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
                 this.render();
-            });
-            gunsightChecks.push(checkbox);
-        });
+            }
+        );
         // Add bombsight as number input
-        const bombsightInput = createFlexNumberInput(cockpitOptions.bombsight, gunsightsFlex, (value) => {
-            const bindings = bridge.getCockpitsBindings();
-            bindings.positions[index].bombsight.value = value;
-            bridge.setCockpitsBindings(bindings);
-            this.render();
-        }, '0', '20', '1');
-        gunsightsCell.appendChild(gunsightsFlex.div0);
+        const bombsightInput = createFlexNumberInput(
+            cockpitOptions.bombsight,
+            gunsightsFlex,
+            (value) => {
+                const bindings = bridge.getCockpitsBindings();
+                bindings.positions[index].bombsight.value = value;
+                bridge.setCockpitsBindings(bindings);
+                this.render();
+            },
+            '0', '20', '1'
+        );
         row.appendChild(gunsightsCell);
 
         // Column 5: Stats (using stats renderer)

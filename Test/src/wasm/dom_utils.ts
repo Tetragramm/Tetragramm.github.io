@@ -277,3 +277,38 @@ export function updateStatCells(
         blinkIfChanged(cell, value?.toString() || '0', null);
     }
 }
+
+/**
+ * Create a table cell with flex section ready for building custom layouts
+ * The flex container is pre-appended to the cell for convenience
+ * @returns Object with cell and flex container
+ */
+export function createFlexCell(): {
+    cell: HTMLTableCellElement;
+    flex: ReturnType<typeof createFlexSection>;
+} {
+    const cell = document.createElement('td');
+    const flex = createFlexSection();
+    cell.appendChild(flex.div0);
+    return { cell, flex };
+}
+
+/**
+ * Create checkboxes in a flex section from binding array
+ * @param flex - The flex container to add checkboxes to
+ * @param bindingArray - Array of checkbox bindings
+ * @param createCallback - Function that returns callback for a specific index
+ * @returns Array of created checkbox elements
+ */
+export function createFlexCheckboxes(
+    flex: ReturnType<typeof createFlexSection>,
+    bindingArray: any[],
+    createCallback: (index: number) => (checked: boolean) => void
+): HTMLInputElement[] {
+    const checkboxes: HTMLInputElement[] = [];
+    bindingArray.forEach((binding, idx) => {
+        const checkbox = createFlexCheckbox(binding, flex, createCallback(idx));
+        checkboxes.push(checkbox);
+    });
+    return checkboxes;
+}
