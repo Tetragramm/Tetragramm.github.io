@@ -38,8 +38,8 @@ interface CockpitRowCache {
 export class CockpitsUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
     private cockpitRowCaches: CockpitRowCache[] = [];
-    private numCockpitsInput: HTMLInputElement | null = null;
-    private mainTable: HTMLTableElement | null = null;
+    private numCockpitsInput: HTMLInputElement = undefined;
+    private mainTable: HTMLTableElement = undefined;
     private lastCockpitCount: number = 0;
 
     protected shouldUpdate(): boolean {
@@ -47,16 +47,17 @@ export class CockpitsUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return false;
 
+        console.log("[CockpitsUI] numCockpitsInput is " + this.numCockpitsInput)
         const cockpitsBindings = bridge.getCockpitsBindings();
         const currentCount = cockpitsBindings.positions.length;
 
-        return currentCount === this.lastCockpitCount && this.mainTable !== null;
+        return currentCount === this.lastCockpitCount && this.mainTable !== undefined;
     }
 
     protected clearCache(): void {
         this.cockpitRowCaches = [];
-        this.numCockpitsInput = null;
-        this.mainTable = null;
+        this.numCockpitsInput = undefined;
+        this.mainTable = undefined;
     }
 
     /**

@@ -20,15 +20,16 @@ const ERA_STATS: StatDisplayConfig[] = [
 
 export class EraUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
-    private selectElement: HTMLSelectElement | null = null;
+    private selectElement: HTMLSelectElement = undefined;
     private statCells: HTMLTableCellElement[] = [];
 
     protected shouldUpdate(): boolean {
-        return this.selectElement !== null;
+        console.log("[EraUI] selectElement is " + this.selectElement);
+        return this.selectElement !== undefined;
     }
 
     protected clearCache(): void {
-        this.selectElement = null;
+        this.selectElement = undefined;
         this.statCells = [];
     }
 

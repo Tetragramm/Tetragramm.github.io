@@ -4,7 +4,7 @@
  * Shared functions for creating common DOM elements to reduce duplication
  */
 
-import { localization } from '../localization';
+import { localization } from './localization';
 
 /**
  * Create flex section matching original Tools.ts CreateFlexSection
