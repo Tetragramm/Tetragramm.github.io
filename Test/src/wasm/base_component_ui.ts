@@ -52,15 +52,27 @@ export abstract class BaseComponentUI {
      * Otherwise, do a full rebuild
      */
     render(): void {
+        console.log(`[${this.constructor.name}] render() called`);
+
         const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
+        if (!bridge) {
+            console.warn(`[${this.constructor.name}] Bridge is null, skipping render`);
+            return;
+        }
+
+        if (!bridge.isInitialized()) {
             console.warn(`[${this.constructor.name}] Bridge not initialized, skipping render`);
             return;
         }
 
-        if (this.shouldUpdate()) {
+        const shouldUpdate = this.shouldUpdate();
+        console.log(`[${this.constructor.name}] shouldUpdate() returned:`, shouldUpdate);
+
+        if (shouldUpdate) {
+            console.log(`[${this.constructor.name}] Calling updateValues()`);
             this.updateValues();
         } else {
+            console.log(`[${this.constructor.name}] Calling rebuildFull()`);
             this.rebuildFull();
         }
     }
