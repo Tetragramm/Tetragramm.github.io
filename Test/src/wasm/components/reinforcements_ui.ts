@@ -2,6 +2,7 @@
  * Reinforcements UI Component
  *
  * Displays the Reinforcements section using UIBindings from Rust
+ * Matches the original TypeScript 3-column table layout
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
@@ -14,7 +15,14 @@ export class ReinforcementsUI {
     private sectionElement: HTMLElement | null = null;
 
     // Cache DOM elements to avoid recreating
-    private cachedElements: Map<string, HTMLElement> = new Map();
+    private mainTable: HTMLTableElement | null = null;
+    private extWoodInputs: HTMLInputElement[] = [];
+    private extSteelInputs: HTMLInputElement[] = [];
+    private cantInputs: HTMLInputElement[] = [];
+    private wiresCheckbox: HTMLInputElement | null = null;
+    private cabaneSelect: HTMLSelectElement | null = null;
+    private wingBladesCheckbox: HTMLInputElement | null = null;
+    private statCells: Map<string, HTMLTableCellElement> = new Map();
 
     constructor(
         private getBridge: () => AircraftBridge | null,
@@ -57,7 +65,7 @@ export class ReinforcementsUI {
         }
 
         // If we have cached elements, just update values. Otherwise rebuild.
-        if (this.cachedElements.size > 0) {
+        if (this.mainTable) {
             this.updateValues();
         } else {
             this.rebuildFull();
@@ -69,7 +77,14 @@ export class ReinforcementsUI {
      */
     private rebuildFull(): void {
         // Clear cache
-        this.cachedElements.clear();
+        this.mainTable = null;
+        this.extWoodInputs = [];
+        this.extSteelInputs = [];
+        this.cantInputs = [];
+        this.wiresCheckbox = null;
+        this.cabaneSelect = null;
+        this.wingBladesCheckbox = null;
+        this.statCells.clear();
 
         // Clear existing content
         this.container.innerHTML = '';
@@ -82,34 +97,66 @@ export class ReinforcementsUI {
 
         const bindings = bridge.getReinforcementsBindings();
 
-        // Create content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create main table with 3 columns: External | Internal | Stats
+        this.mainTable = document.createElement('table');
+        this.mainTable.style.width = '100%';
+        this.mainTable.id = 'tbl_reinforcements';
 
-        // Render UI bindings dynamically
-        this.renderBindings(contentDiv, bindings, bridge);
+        // Header row
+        const headerRow = document.createElement('tr');
+        const headers = [
+            localization.translate('Reinforcement External Reinforcements'),
+            localization.translate('Reinforcement Internal Reinforcements'),
+            localization.translate('Reinforcement Reinforcement Stats')
+        ];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        this.mainTable.appendChild(headerRow);
+
+        // Data row
+        const dataRow = document.createElement('tr');
+
+        // External reinforcements cell
+        const externalCell = document.createElement('td');
+        this.createExternalSection(externalCell, bindings, bridge);
+        dataRow.appendChild(externalCell);
+
+        // Internal reinforcements cell
+        const internalCell = document.createElement('td');
+        this.createInternalSection(internalCell, bindings, bridge);
+        dataRow.appendChild(internalCell);
+
+        // Stats cell
+        const statsCell = document.createElement('td');
+        this.createStatsSection(statsCell);
+        dataRow.appendChild(statsCell);
+
+        this.mainTable.appendChild(dataRow);
+
+        // Update stat values
+        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
-        const sectionTitle = localization.translate('Reinforcements Section Title');
+        const sectionTitle = localization.translate('Reinforcement Section Title');
         this.sectionElement = this.renderer.createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            this.mainTable,
             true // Initially open
         );
 
-        // Add rules link (h4)
+        // Add rules link
         const rulesLine = document.createElement('h4');
-        const rulesSpan = document.createElement('span');
-        rulesSpan.textContent = '(';
         const rulesLink = document.createElement('a');
         rulesLink.href = './Rules/Rules.htm#_Reinforcements';
         const rulesText = document.createElement('u');
         rulesText.textContent = 'Rules';
         rulesLink.appendChild(rulesText);
-        rulesSpan.appendChild(rulesLink);
-        rulesSpan.appendChild(document.createTextNode(')'));
-        rulesLine.appendChild(rulesSpan);
-        rulesLine.appendChild(document.createElement('br'));
+        rulesLine.appendChild(document.createTextNode('('));
+        rulesLine.appendChild(rulesLink);
+        rulesLine.appendChild(document.createTextNode(')'));
 
         // Insert rules link before content
         this.sectionElement.insertBefore(
@@ -123,81 +170,292 @@ export class ReinforcementsUI {
     }
 
     /**
-     * Render UI bindings dynamically based on their structure
+     * Create flex section matching original Tools.ts CreateFlexSection
      */
-    private renderBindings(container: HTMLElement, bindings: any, bridge: AircraftBridge): void {
-        // Iterate through all properties in bindings
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+    private createFlexSection(): { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement } {
+        const div0 = document.createElement('div');
+        div0.className = 'flex-container-o';
 
-            const binding = bindings[key];
+        const div1 = document.createElement('div');
+        div1.className = 'flex-container-i';
 
-            // Handle different binding types
-            if (binding && typeof binding === 'object') {
-                if ('options' in binding && 'selected' in binding) {
-                    // This is a Select binding
-                    const selectElement = this.renderer.renderSelect(
-                        binding,
-                        (selectedIndex) => {
-                            const updatedBindings = bridge.getReinforcementsBindings();
-                            updatedBindings[key].selected = selectedIndex;
-                            bridge.setReinforcementsBindings(updatedBindings);
-                            this.render();
-                        }
-                    ) as HTMLSelectElement;
+        const div2 = document.createElement('div');
+        div2.className = 'flex-container-i';
 
-                    const label = document.createElement('label');
-                    label.textContent = binding.name || key;
-                    label.style.marginRight = '10px';
+        div0.appendChild(div1);
+        div0.appendChild(div2);
 
-                    const span = document.createElement('span');
-                    span.appendChild(label);
-                    span.appendChild(selectElement);
-                    container.appendChild(span);
-                    container.appendChild(document.createElement('br'));
+        return { div0, div1, div2 };
+    }
 
-                    this.cachedElements.set(`select_${key}`, selectElement);
-                } else if ('selected' in binding && 'enabled' in binding && typeof binding.selected === 'boolean') {
-                    // This is a Check binding
-                    const checkElement = this.renderer.renderCheck(
-                        binding,
-                        (checked) => {
-                            const updatedBindings = bridge.getReinforcementsBindings();
-                            updatedBindings[key].selected = checked;
-                            bridge.setReinforcementsBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
+    /**
+     * Create external reinforcements section
+     */
+    private createExternalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
+        const flexContainer = this.createFlexSection();
 
-                    container.appendChild(checkElement);
-                    container.appendChild(document.createElement('br'));
+        // Create nested flex containers for wood/steel columns
+        const fsrDiv = document.createElement('div');
+        fsrDiv.className = 'flex-container-o';
+        const fsr1 = document.createElement('div');
+        fsr1.className = 'flex-container-i';
+        const fsr2 = document.createElement('div');
+        fsr2.className = 'flex-container-i';
+        fsrDiv.appendChild(fsr1);
+        fsrDiv.appendChild(fsr2);
+        flexContainer.div2.appendChild(fsrDiv);
 
-                    const checkbox = checkElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
-                    if (checkbox) {
-                        this.cachedElements.set(`check_${key}`, checkbox);
-                    }
-                } else if ('value' in binding && 'enabled' in binding && typeof binding.value === 'number') {
-                    // This is a Number binding
-                    const numberElement = this.renderer.renderNumber(
-                        binding,
-                        (value) => {
-                            const updatedBindings = bridge.getReinforcementsBindings();
-                            updatedBindings[key].value = value;
-                            bridge.setReinforcementsBindings(updatedBindings);
-                            this.render();
-                        }
-                    );
+        const fsWood = this.createFlexSection();
+        const fsSteel = this.createFlexSection();
+        fsr1.appendChild(fsWood.div0);
+        fsr2.appendChild(fsSteel.div0);
 
-                    container.appendChild(numberElement);
-                    container.appendChild(document.createElement('br'));
+        // External wood/steel reinforcements (number_list bindings)
+        const extWoodBinding = bindings.ext_wood_count;
+        const extSteelBinding = bindings.ext_steel_count;
 
-                    const input = numberElement.querySelector('input[type="number"]') as HTMLInputElement;
-                    if (input) {
-                        this.cachedElements.set(`number_${key}`, input);
-                    }
-                }
+        if (extWoodBinding && Array.isArray(extWoodBinding) && extSteelBinding && Array.isArray(extSteelBinding)) {
+            for (let i = 0; i < extWoodBinding.length; i++) {
+                const woodItem = extWoodBinding[i];
+                const steelItem = extSteelBinding[i];
+
+                // Label for the reinforcement type
+                const label = document.createElement('label');
+                label.textContent = woodItem.name;
+                label.className = 'flex-item';
+                label.style.marginLeft = '0.25em';
+                label.style.marginRight = '0.5em';
+                flexContainer.div1.appendChild(label);
+
+                // Wood count input
+                const woodLabel = document.createElement('label');
+                woodLabel.textContent = localization.translate('Reinforcement Wood');
+                woodLabel.className = 'flex-item';
+                woodLabel.style.marginLeft = '0.25em';
+                woodLabel.style.marginRight = '0.5em';
+                fsWood.div1.appendChild(woodLabel);
+
+                const woodInput = document.createElement('input');
+                woodInput.type = 'number';
+                woodInput.min = '0';
+                woodInput.className = 'flex-item';
+                woodInput.value = woodItem.value.toString();
+                woodInput.disabled = !woodItem.enabled;
+                woodInput.addEventListener('change', () => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.ext_wood_count[i].value = parseInt(woodInput.value) || 0;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.render();
+                });
+                fsWood.div2.appendChild(woodInput);
+                this.extWoodInputs.push(woodInput);
+
+                // Steel count input
+                const steelLabel = document.createElement('label');
+                steelLabel.textContent = localization.translate('Reinforcement Steel');
+                steelLabel.className = 'flex-item';
+                steelLabel.style.marginLeft = '0.25em';
+                steelLabel.style.marginRight = '0.5em';
+                fsSteel.div1.appendChild(steelLabel);
+
+                const steelInput = document.createElement('input');
+                steelInput.type = 'number';
+                steelInput.min = '0';
+                steelInput.className = 'flex-item';
+                steelInput.value = steelItem.value.toString();
+                steelInput.disabled = !steelItem.enabled;
+                steelInput.addEventListener('change', () => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.ext_steel_count[i].value = parseInt(steelInput.value) || 0;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.render();
+                });
+                fsSteel.div2.appendChild(steelInput);
+                this.extSteelInputs.push(steelInput);
             }
         }
+
+        // Cabane select
+        const cabaneBinding = bindings.cabane_sel;
+        if (cabaneBinding && cabaneBinding.options) {
+            const cabaneLabel = document.createElement('label');
+            cabaneLabel.textContent = localization.translate('Reinforcement Cabane');
+            cabaneLabel.className = 'flex-item';
+            cabaneLabel.style.marginLeft = '0.25em';
+            cabaneLabel.style.marginRight = '0.5em';
+            flexContainer.div1.appendChild(cabaneLabel);
+
+            this.cabaneSelect = document.createElement('select');
+            this.cabaneSelect.className = 'flex-item';
+            this.cabaneSelect.disabled = !cabaneBinding.enabled;
+
+            cabaneBinding.options.forEach((opt: any, idx: number) => {
+                const option = document.createElement('option');
+                option.value = idx.toString();
+                option.textContent = opt.name;
+                option.disabled = !opt.enabled;
+                if (idx === cabaneBinding.selected) {
+                    option.selected = true;
+                }
+                this.cabaneSelect!.appendChild(option);
+            });
+
+            this.cabaneSelect.addEventListener('change', () => {
+                const updatedBindings = bridge.getReinforcementsBindings();
+                updatedBindings.cabane_sel.selected = parseInt(this.cabaneSelect!.value);
+                bridge.setReinforcementsBindings(updatedBindings);
+                this.render();
+            });
+
+            flexContainer.div2.appendChild(this.cabaneSelect);
+        }
+
+        // Wires checkbox
+        const wiresBinding = bindings.wires;
+        if (wiresBinding) {
+            const wiresLabel = document.createElement('label');
+            wiresLabel.textContent = localization.translate('Reinforcement Wires');
+            wiresLabel.className = 'flex-item';
+            wiresLabel.style.marginLeft = '0.25em';
+            wiresLabel.style.marginRight = '0.5em';
+            flexContainer.div1.appendChild(wiresLabel);
+
+            const checkboxSpan = document.createElement('span');
+            checkboxSpan.className = 'flex-item';
+
+            this.wiresCheckbox = document.createElement('input');
+            this.wiresCheckbox.type = 'checkbox';
+            this.wiresCheckbox.checked = wiresBinding.selected;
+            this.wiresCheckbox.disabled = !wiresBinding.enabled;
+            this.wiresCheckbox.addEventListener('change', () => {
+                const updatedBindings = bridge.getReinforcementsBindings();
+                updatedBindings.wires.selected = this.wiresCheckbox!.checked;
+                bridge.setReinforcementsBindings(updatedBindings);
+                this.render();
+            });
+
+            const emptyLabel = document.createElement('label');
+            checkboxSpan.appendChild(emptyLabel);
+            checkboxSpan.appendChild(this.wiresCheckbox);
+            flexContainer.div2.appendChild(checkboxSpan);
+        }
+
+        cell.appendChild(flexContainer.div0);
+    }
+
+    /**
+     * Create internal reinforcements section
+     */
+    private createInternalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
+        const flexContainer = this.createFlexSection();
+
+        // Cantilever reinforcements (number_list binding)
+        const cantBinding = bindings.cant_count;
+        if (cantBinding && Array.isArray(cantBinding)) {
+            cantBinding.forEach((item: any, idx: number) => {
+                const label = document.createElement('label');
+                label.textContent = item.name;
+                label.className = 'flex-item';
+                label.style.marginLeft = '0.25em';
+                label.style.marginRight = '0.5em';
+                flexContainer.div1.appendChild(label);
+
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.min = '0';
+                input.className = 'flex-item';
+                input.value = item.value.toString();
+                input.disabled = !item.enabled;
+                input.addEventListener('change', () => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.cant_count[idx].value = parseInt(input.value) || 0;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.render();
+                });
+
+                flexContainer.div2.appendChild(input);
+                this.cantInputs.push(input);
+            });
+        }
+
+        // Wing blades checkbox
+        const wingBladesBinding = bindings.wing_blades;
+        if (wingBladesBinding) {
+            const wingLabel = document.createElement('label');
+            wingLabel.textContent = localization.translate('Reinforcement Wing Blades');
+            wingLabel.className = 'flex-item';
+            wingLabel.style.marginLeft = '0.25em';
+            wingLabel.style.marginRight = '0.5em';
+            flexContainer.div1.appendChild(wingLabel);
+
+            const checkboxSpan = document.createElement('span');
+            checkboxSpan.className = 'flex-item';
+
+            this.wingBladesCheckbox = document.createElement('input');
+            this.wingBladesCheckbox.type = 'checkbox';
+            this.wingBladesCheckbox.checked = wingBladesBinding.selected;
+            this.wingBladesCheckbox.disabled = !wingBladesBinding.enabled;
+            this.wingBladesCheckbox.addEventListener('change', () => {
+                const updatedBindings = bridge.getReinforcementsBindings();
+                updatedBindings.wing_blades.selected = this.wingBladesCheckbox!.checked;
+                bridge.setReinforcementsBindings(updatedBindings);
+                this.render();
+            });
+
+            const emptyLabel = document.createElement('label');
+            checkboxSpan.appendChild(emptyLabel);
+            checkboxSpan.appendChild(this.wingBladesCheckbox);
+            flexContainer.div2.appendChild(checkboxSpan);
+        }
+
+        cell.appendChild(flexContainer.div0);
+    }
+
+    /**
+     * Create stats section (inner table with 6 stats)
+     */
+    private createStatsSection(cell: HTMLTableCellElement): void {
+        cell.className = 'inner_table';
+        const statsTable = document.createElement('table');
+        statsTable.className = 'inner_table';
+
+        // Row 1: Drag | Mass | Cost
+        const header1 = statsTable.insertRow();
+        ['Stat Drag', 'Stat Mass', 'Stat Cost'].forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = localization.translate(key);
+            header1.appendChild(th);
+        });
+
+        const data1 = statsTable.insertRow();
+        ['drag', 'mass', 'cost'].forEach(key => {
+            const td = data1.insertCell();
+            td.textContent = '0';
+            this.statCells.set(key, td);
+        });
+
+        // Row 2: Structure | Raw Strain | Aircraft Max Strain
+        const header2 = statsTable.insertRow();
+        ['Stat Structure', 'Stat Raw Strain', 'Reinforcement Aircraft Max Strain'].forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = localization.translate(key);
+            header2.appendChild(th);
+        });
+
+        const data2 = statsTable.insertRow();
+        ['structure', 'maxstrain'].forEach(key => {
+            const td = data2.insertCell();
+            td.textContent = '0';
+            this.statCells.set(key, td);
+        });
+
+        // Aircraft max strain (special class)
+        const amaxTd = data2.insertCell();
+        amaxTd.textContent = '0';
+        amaxTd.className = 'part_local';
+        this.statCells.set('amax', amaxTd);
+
+        cell.appendChild(statsTable);
     }
 
     /**
@@ -211,30 +469,83 @@ export class ReinforcementsUI {
 
         const bindings = bridge.getReinforcementsBindings();
 
-        // Update all cached elements
-        for (const key in bindings) {
-            if (!bindings.hasOwnProperty(key)) continue;
+        // Update external wood counts
+        if (bindings.ext_wood_count && Array.isArray(bindings.ext_wood_count)) {
+            bindings.ext_wood_count.forEach((item: any, idx: number) => {
+                if (idx < this.extWoodInputs.length) {
+                    this.extWoodInputs[idx].value = item.value.toString();
+                    this.extWoodInputs[idx].disabled = !item.enabled;
+                }
+            });
+        }
 
-            const binding = bindings[key];
+        // Update external steel counts
+        if (bindings.ext_steel_count && Array.isArray(bindings.ext_steel_count)) {
+            bindings.ext_steel_count.forEach((item: any, idx: number) => {
+                if (idx < this.extSteelInputs.length) {
+                    this.extSteelInputs[idx].value = item.value.toString();
+                    this.extSteelInputs[idx].disabled = !item.enabled;
+                }
+            });
+        }
 
-            // Update based on element type
-            const selectKey = `select_${key}`;
-            const checkKey = `check_${key}`;
-            const numberKey = `number_${key}`;
+        // Update cantilever counts
+        if (bindings.cant_count && Array.isArray(bindings.cant_count)) {
+            bindings.cant_count.forEach((item: any, idx: number) => {
+                if (idx < this.cantInputs.length) {
+                    this.cantInputs[idx].value = item.value.toString();
+                    this.cantInputs[idx].disabled = !item.enabled;
+                }
+            });
+        }
 
-            if (this.cachedElements.has(selectKey)) {
-                const select = this.cachedElements.get(selectKey) as HTMLSelectElement;
-                select.selectedIndex = binding.selected;
-                select.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(checkKey)) {
-                const check = this.cachedElements.get(checkKey) as HTMLInputElement;
-                check.checked = binding.selected;
-                check.disabled = !binding.enabled;
-            } else if (this.cachedElements.has(numberKey)) {
-                const number = this.cachedElements.get(numberKey) as HTMLInputElement;
-                number.value = binding.value.toString();
-                number.disabled = !binding.enabled;
+        // Update cabane select
+        if (this.cabaneSelect && bindings.cabane_sel) {
+            this.cabaneSelect.selectedIndex = bindings.cabane_sel.selected;
+            this.cabaneSelect.disabled = !bindings.cabane_sel.enabled;
+            if (bindings.cabane_sel.options) {
+                bindings.cabane_sel.options.forEach((opt: any, idx: number) => {
+                    if (idx < this.cabaneSelect!.options.length) {
+                        this.cabaneSelect!.options[idx].disabled = !opt.enabled;
+                    }
+                });
             }
+        }
+
+        // Update wires checkbox
+        if (this.wiresCheckbox && bindings.wires) {
+            this.wiresCheckbox.checked = bindings.wires.selected;
+            this.wiresCheckbox.disabled = !bindings.wires.enabled;
+        }
+
+        // Update wing blades checkbox
+        if (this.wingBladesCheckbox && bindings.wing_blades) {
+            this.wingBladesCheckbox.checked = bindings.wing_blades.selected;
+            this.wingBladesCheckbox.disabled = !bindings.wing_blades.enabled;
+        }
+
+        // Update stat values
+        this.updateStatValues(bridge);
+    }
+
+    /**
+     * Update stat cell values
+     */
+    private updateStatValues(bridge: AircraftBridge): void {
+        const stats = bridge.getReinforcementsStats();
+
+        for (const [key, cell] of this.statCells) {
+            const value = stats[key];
+            this.blinkIfChanged(cell, value?.toString() || '0', false);
+        }
+    }
+
+    /**
+     * Blink animation when stat changes
+     */
+    private blinkIfChanged(elem: HTMLTableCellElement, str: string, positiveGood: boolean | null): void {
+        if (elem.textContent !== str) {
+            elem.textContent = str;
         }
     }
 
@@ -250,6 +561,13 @@ export class ReinforcementsUI {
      */
     destroy(): void {
         this.container.innerHTML = '';
-        this.cachedElements.clear();
+        this.mainTable = null;
+        this.extWoodInputs = [];
+        this.extSteelInputs = [];
+        this.cantInputs = [];
+        this.wiresCheckbox = null;
+        this.cabaneSelect = null;
+        this.wingBladesCheckbox = null;
+        this.statCells.clear();
     }
 }
