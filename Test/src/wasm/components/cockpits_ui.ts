@@ -9,7 +9,7 @@ import { AircraftBridge, CockpitsOptions, CockpitOptions } from '../aircraft_bri
 import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, createFlexSection } from '../dom_utils';
+import { createRulesLink, createFlexSection, createFlexCheckbox, createFlexNumberInput } from '../dom_utils';
 
 // Cockpit stats configuration
 const COCKPIT_STATS: StatDisplayConfig[] = [
@@ -212,7 +212,7 @@ export class CockpitsUI extends BaseComponentUI {
         const upgradesFlex = createFlexSection();
         const upgradeChecks: HTMLInputElement[] = [];
         cockpitOptions.selected_upgrades.forEach((upgrade, upgradeIdx) => {
-            const checkbox = this.addFlexCheckboxWithReturn(upgrade.name, upgrade.selected, upgrade.enabled, upgradesFlex, (checked) => {
+            const checkbox = createFlexCheckbox(upgrade, upgradesFlex, (checked) => {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].selected_upgrades[upgradeIdx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
@@ -228,7 +228,7 @@ export class CockpitsUI extends BaseComponentUI {
         const safetyFlex = createFlexSection();
         const safetyChecks: HTMLInputElement[] = [];
         cockpitOptions.selected_safety.forEach((safety, safetyIdx) => {
-            const checkbox = this.addFlexCheckboxWithReturn(safety.name, safety.selected, safety.enabled, safetyFlex, (checked) => {
+            const checkbox = createFlexCheckbox(safety, safetyFlex, (checked) => {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].selected_safety[safetyIdx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
@@ -244,7 +244,7 @@ export class CockpitsUI extends BaseComponentUI {
         const gunsightsFlex = createFlexSection();
         const gunsightChecks: HTMLInputElement[] = [];
         cockpitOptions.selected_gunsights.forEach((gunsight, gunsightIdx) => {
-            const checkbox = this.addFlexCheckboxWithReturn(gunsight.name, gunsight.selected, gunsight.enabled, gunsightsFlex, (checked) => {
+            const checkbox = createFlexCheckbox(gunsight, gunsightsFlex, (checked) => {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].selected_gunsights[gunsightIdx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
@@ -253,13 +253,12 @@ export class CockpitsUI extends BaseComponentUI {
             gunsightChecks.push(checkbox);
         });
         // Add bombsight as number input
-        const bombsightInput = this.addFlexNumberInputWithReturn(cockpitOptions.bombsight.name, cockpitOptions.bombsight.value,
-            cockpitOptions.bombsight.enabled, gunsightsFlex, (value) => {
-                const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].bombsight.value = value;
-                bridge.setCockpitsBindings(bindings);
-                this.render();
-            }, 0, 20, 1);
+        const bombsightInput = createFlexNumberInput(cockpitOptions.bombsight, gunsightsFlex, (value) => {
+            const bindings = bridge.getCockpitsBindings();
+            bindings.positions[index].bombsight.value = value;
+            bridge.setCockpitsBindings(bindings);
+            this.render();
+        }, '0', '20', '1');
         gunsightsCell.appendChild(gunsightsFlex.div0);
         row.appendChild(gunsightsCell);
 
@@ -336,74 +335,5 @@ export class CockpitsUI extends BaseComponentUI {
         const derivedStats = bridge.getCockpitDerivedStats(index);
         const statsTable = this.renderer.renderStatsTable(stats, COCKPIT_STATS, derivedStats);
         cache.statsCell.appendChild(statsTable);
-    }
-
-    /**
-     * Add a checkbox with label to a flex container and return the checkbox element
-     */
-    private addFlexCheckboxWithReturn(
-        label: string,
-        checked: boolean,
-        enabled: boolean,
-        flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
-        onChange: (checked: boolean) => void
-    ): HTMLInputElement {
-        const labelElem = document.createElement('label');
-        labelElem.textContent = label;
-        labelElem.className = 'flex-item';
-        labelElem.style.marginLeft = '0.25em';
-        labelElem.style.marginRight = '0.5em';
-        flexContainer.div1.appendChild(labelElem);
-
-        const span = document.createElement('span');
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = checked;
-        checkbox.disabled = !enabled;
-        checkbox.className = 'flex-item';
-        checkbox.addEventListener('change', () => onChange(checkbox.checked));
-        span.appendChild(checkbox);
-        flexContainer.div2.appendChild(span);
-
-        return checkbox;
-    }
-
-    /**
-     * Add a number input with label to a flex container and return the input element
-     */
-    private addFlexNumberInputWithReturn(
-        label: string,
-        value: number,
-        enabled: boolean,
-        flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
-        onChange: (value: number) => void,
-        min?: number,
-        max?: number,
-        step?: number
-    ): HTMLInputElement {
-        const labelElem = document.createElement('label');
-        labelElem.textContent = label;
-        labelElem.className = 'flex-item';
-        labelElem.style.marginLeft = '0.25em';
-        labelElem.style.marginRight = '0.5em';
-        flexContainer.div1.appendChild(labelElem);
-
-        const span = document.createElement('span');
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.value = value.toString();
-        input.disabled = !enabled;
-        input.className = 'flex-item';
-        if (min !== undefined) input.min = min.toString();
-        if (max !== undefined) input.max = max.toString();
-        if (step !== undefined) input.step = step.toString();
-        input.addEventListener('change', () => {
-            const newValue = parseFloat(input.value);
-            if (!isNaN(newValue)) onChange(newValue);
-        });
-        span.appendChild(input);
-        flexContainer.div2.appendChild(span);
-
-        return input;
     }
 }

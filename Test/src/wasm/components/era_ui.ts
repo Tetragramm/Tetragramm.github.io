@@ -40,7 +40,12 @@ export class EraUI extends BaseComponentUI {
         this.container.innerHTML = '';
 
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge) return;
+        if (!bridge) {
+            console.error('[EraUI] rebuildFull: Bridge not available');
+            return;
+        }
+
+        console.log('[EraUI] rebuildFull: Starting rebuild');
 
         const eraBindings = bridge.getEraBindings();
 
