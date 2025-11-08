@@ -2,106 +2,78 @@
  * Reinforcements UI Component
  *
  * Displays the Reinforcements section using UIBindings from Rust
- * Matches the original TypeScript 3-column table layout
+ * Includes external reinforcements (wood/steel, cabane, wires) and internal (cantilever, wing blades)
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { BindingRenderer } from '../binding_renderer';
-import { createCollapsibleSection } from '../dom_utils';
 import { localization } from '../localization';
+import { BaseComponentUI } from '../base_component_ui';
+import {
+    createRulesLink,
+    createFlexSection,
+    updateSelectElement,
+    createFlexNumberInputs,
+    createFlexCheckbox,
+    createSelectElement,
+    createStatsTable,
+    createCollapsibleSection,
+    updateStatsTable,
+    StatDisplayConfig
+} from '../dom_utils';
 
-export class ReinforcementsUI {
-    private container: HTMLElement;
-    private renderer: BindingRenderer;
-    private sectionElement: HTMLElement | null = null;
+// Cache interface for type safety
+interface ReinforcementsCache {
+    // External reinforcements
+    extWoodInputs: HTMLInputElement[];
+    extSteelInputs: HTMLInputElement[];
+    cabaneSelect: HTMLSelectElement;
+    wiresCheckbox: HTMLInputElement;
 
-    // Cache DOM elements to avoid recreating
-    private mainTable: HTMLTableElement | null = null;
-    private extWoodInputs: HTMLInputElement[] = [];
-    private extSteelInputs: HTMLInputElement[] = [];
-    private cantInputs: HTMLInputElement[] = [];
-    private wiresCheckbox: HTMLInputElement | null = null;
-    private cabaneSelect: HTMLSelectElement | null = null;
-    private wingBladesCheckbox: HTMLInputElement | null = null;
-    private statCells: Map<string, HTMLTableCellElement> = new Map();
+    // Internal reinforcements
+    cantInputs: HTMLInputElement[];
+    wingBladesCheckbox: HTMLInputElement;
 
-    constructor(
-        private getBridge: () => AircraftBridge | null,
-        containerId: string,
-        private onUpdate?: () => void
-    ) {
-        const container = document.getElementById(containerId);
-        if (!container) {
-            throw new Error(`Container element '${containerId}' not found`);
-        }
-        this.container = container;
+    // Stats table
+    statsTable: HTMLTableElement;
+}
 
-        // Get the initial bridge for renderer
-        const bridge = this.getBridge();
-        if (!bridge) {
-            throw new Error('Bridge not available during ReinforcementsUI construction');
-        }
+// Reinforcements stats configuration
+const REINFORCEMENTS_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'structure', label: 'Stat Structure', positiveIsGood: true },
+    { key: 'maxstrain', label: 'Stat Raw Strain', positiveIsGood: true },
+    { key: 'amax', label: 'Reinforcement Aircraft Max Strain', positiveIsGood: true, isDerived: true },
+];
 
-        // Create renderer with stats update callback
-        this.renderer = new BindingRenderer(bridge, () => {
-            if (this.onUpdate) {
-                this.onUpdate();
-            }
-        });
+export class ReinforcementsUI extends BaseComponentUI {
+    private cache: ReinforcementsCache = undefined;
 
-        // Listen for locale changes and do full rebuild (text changes)
-        localization.onLocaleChange(() => this.rebuildFull());
-
-        this.render();
+    protected shouldUpdate(): boolean {
+        return this.cache !== undefined;
     }
 
-    /**
-     * Render the Reinforcements UI - intelligently updates or rebuilds
-     */
-    render(): void {
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[ReinforcementsUI] Bridge not initialized, skipping render');
-            return;
-        }
-
-        // If we have cached elements, just update values. Otherwise rebuild.
-        if (this.mainTable) {
-            this.updateValues();
-        } else {
-            this.rebuildFull();
-        }
+    protected clearCache(): void {
+        this.cache = undefined;
     }
 
     /**
      * Full rebuild of the UI structure (used on first render or locale change)
      */
-    private rebuildFull(): void {
-        // Clear cache
-        this.mainTable = null;
-        this.extWoodInputs = [];
-        this.extSteelInputs = [];
-        this.cantInputs = [];
-        this.wiresCheckbox = null;
-        this.cabaneSelect = null;
-        this.wingBladesCheckbox = null;
-        this.statCells.clear();
-
-        // Clear existing content
+    protected rebuildFull(): void {
+        this.clearCache();
         this.container.innerHTML = '';
 
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            console.warn('[ReinforcementsUI] Bridge not initialized, skipping rebuild');
-            return;
-        }
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
 
         const bindings = bridge.getReinforcementsBindings();
 
         // Create main table with 3 columns: External | Internal | Stats
-        this.mainTable = document.createElement('table');
-        this.mainTable.style.width = '100%';
-        this.mainTable.id = 'tbl_reinforcements';
+        const mainTable = document.createElement('table');
+        mainTable.style.width = '100%';
+        mainTable.id = 'tbl_reinforcements';
 
         // Header row
         const headerRow = document.createElement('tr');
@@ -115,51 +87,49 @@ export class ReinforcementsUI {
             th.textContent = headerText;
             headerRow.appendChild(th);
         });
-        this.mainTable.appendChild(headerRow);
+        mainTable.appendChild(headerRow);
 
         // Data row
         const dataRow = document.createElement('tr');
 
         // External reinforcements cell
         const externalCell = document.createElement('td');
-        this.createExternalSection(externalCell, bindings, bridge);
+        const externalCache = this.createExternalSection(externalCell, bindings, bridge);
         dataRow.appendChild(externalCell);
 
         // Internal reinforcements cell
         const internalCell = document.createElement('td');
-        this.createInternalSection(internalCell, bindings, bridge);
+        const internalCache = this.createInternalSection(internalCell, bindings, bridge);
         dataRow.appendChild(internalCell);
 
         // Stats cell
         const statsCell = document.createElement('td');
-        this.createStatsSection(statsCell);
+        const stats = bridge.getReinforcementsStats();
+        const derivedStats = new Map<string, number>();
+        derivedStats.set('amax', stats.maxstrain); // Aircraft max strain is same as maxstrain for display
+        const statsTable = createStatsTable(stats, REINFORCEMENTS_STATS, derivedStats);
+        statsCell.appendChild(statsTable);
         dataRow.appendChild(statsCell);
 
-        this.mainTable.appendChild(dataRow);
+        mainTable.appendChild(dataRow);
 
-        // Update stat values
-        this.updateStatValues(bridge);
+        // Cache elements
+        this.cache = {
+            ...externalCache,
+            ...internalCache,
+            statsTable
+        };
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Reinforcement Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            this.mainTable,
+            mainTable,
             true // Initially open
         );
 
-        // Add rules link
-        const rulesLine = document.createElement('h4');
-        const rulesLink = document.createElement('a');
-        rulesLink.href = './Rules/Rules.htm#_Reinforcements';
-        const rulesText = document.createElement('u');
-        rulesText.textContent = 'Rules';
-        rulesLink.appendChild(rulesText);
-        rulesLine.appendChild(document.createTextNode('('));
-        rulesLine.appendChild(rulesLink);
-        rulesLine.appendChild(document.createTextNode(')'));
-
-        // Insert rules link before content
+        // Add rules link using utility
+        const rulesLine = createRulesLink('_Reinforcements');
         this.sectionElement.insertBefore(
             rulesLine,
             this.sectionElement.children[1]
@@ -171,29 +141,19 @@ export class ReinforcementsUI {
     }
 
     /**
-     * Create flex section matching original Tools.ts CreateFlexSection
+     * Create external reinforcements section (wood/steel counts, cabane, wires)
      */
-    private createFlexSection(): { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement } {
-        const div0 = document.createElement('div');
-        div0.className = 'flex-container-o';
-
-        const div1 = document.createElement('div');
-        div1.className = 'flex-container-i';
-
-        const div2 = document.createElement('div');
-        div2.className = 'flex-container-i';
-
-        div0.appendChild(div1);
-        div0.appendChild(div2);
-
-        return { div0, div1, div2 };
-    }
-
-    /**
-     * Create external reinforcements section
-     */
-    private createExternalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
-        const flexContainer = this.createFlexSection();
+    private createExternalSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): {
+        extWoodInputs: HTMLInputElement[];
+        extSteelInputs: HTMLInputElement[];
+        cabaneSelect: HTMLSelectElement;
+        wiresCheckbox: HTMLInputElement;
+    } {
+        const mainFlex = createFlexSection();
 
         // Create nested flex containers for wood/steel columns
         const fsrDiv = document.createElement('div');
@@ -204,10 +164,10 @@ export class ReinforcementsUI {
         fsr2.className = 'flex-container-i';
         fsrDiv.appendChild(fsr1);
         fsrDiv.appendChild(fsr2);
-        flexContainer.div2.appendChild(fsrDiv);
+        mainFlex.div2.appendChild(fsrDiv);
 
-        const fsWood = this.createFlexSection();
-        const fsSteel = this.createFlexSection();
+        const fsWood = createFlexSection();
+        const fsSteel = createFlexSection();
         fsr1.appendChild(fsWood.div0);
         fsr2.appendChild(fsSteel.div0);
 
@@ -215,18 +175,21 @@ export class ReinforcementsUI {
         const extWoodBinding = bindings.ext_wood_count;
         const extSteelBinding = bindings.ext_steel_count;
 
+        const extWoodInputs: HTMLInputElement[] = [];
+        const extSteelInputs: HTMLInputElement[] = [];
+
         if (extWoodBinding && Array.isArray(extWoodBinding) && extSteelBinding && Array.isArray(extSteelBinding)) {
             for (let i = 0; i < extWoodBinding.length; i++) {
                 const woodItem = extWoodBinding[i];
                 const steelItem = extSteelBinding[i];
 
-                // Label for the reinforcement type
+                // Label for the reinforcement type (on main flex left column)
                 const label = document.createElement('label');
                 label.textContent = woodItem.name;
                 label.className = 'flex-item';
                 label.style.marginLeft = '0.25em';
                 label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
+                mainFlex.div1.appendChild(label);
 
                 // Wood count input
                 const woodLabel = document.createElement('label');
@@ -242,14 +205,17 @@ export class ReinforcementsUI {
                 woodInput.className = 'flex-item';
                 woodInput.value = woodItem.value.toString();
                 woodInput.disabled = !woodItem.enabled;
+
+                const woodIndex = i; // Capture for closure
                 woodInput.addEventListener('change', () => {
                     const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.ext_wood_count[i].value = parseInt(woodInput.value) || 0;
+                    updatedBindings.ext_wood_count[woodIndex].value = parseInt(woodInput.value) || 0;
                     bridge.setReinforcementsBindings(updatedBindings);
                     this.render();
                 });
+
                 fsWood.div2.appendChild(woodInput);
-                this.extWoodInputs.push(woodInput);
+                extWoodInputs.push(woodInput);
 
                 // Steel count input
                 const steelLabel = document.createElement('label');
@@ -265,122 +231,113 @@ export class ReinforcementsUI {
                 steelInput.className = 'flex-item';
                 steelInput.value = steelItem.value.toString();
                 steelInput.disabled = !steelItem.enabled;
+
+                const steelIndex = i; // Capture for closure
                 steelInput.addEventListener('change', () => {
                     const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.ext_steel_count[i].value = parseInt(steelInput.value) || 0;
+                    updatedBindings.ext_steel_count[steelIndex].value = parseInt(steelInput.value) || 0;
                     bridge.setReinforcementsBindings(updatedBindings);
                     this.render();
                 });
+
                 fsSteel.div2.appendChild(steelInput);
-                this.extSteelInputs.push(steelInput);
+                extSteelInputs.push(steelInput);
             }
         }
 
         // Cabane select
         const cabaneBinding = bindings.cabane_sel;
-        if (cabaneBinding && cabaneBinding.options) {
+        const cabaneSelect = cabaneBinding ? createSelectElement(
+            cabaneBinding,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getReinforcementsBindings();
+                updatedBindings.cabane_sel.selected = selectedIndex;
+                bridge.setReinforcementsBindings(updatedBindings);
+                this.render();
+            }
+        ) : undefined;
+
+        if (cabaneSelect) {
             const cabaneLabel = document.createElement('label');
             cabaneLabel.textContent = localization.translate('Reinforcement Cabane');
             cabaneLabel.className = 'flex-item';
             cabaneLabel.style.marginLeft = '0.25em';
             cabaneLabel.style.marginRight = '0.5em';
-            flexContainer.div1.appendChild(cabaneLabel);
+            mainFlex.div1.appendChild(cabaneLabel);
 
-            this.cabaneSelect = document.createElement('select');
-            this.cabaneSelect.className = 'flex-item';
-            this.cabaneSelect.disabled = !cabaneBinding.enabled;
-
-            cabaneBinding.options.forEach((opt: any, idx: number) => {
-                const option = document.createElement('option');
-                option.value = idx.toString();
-                option.textContent = opt.name;
-                option.disabled = !opt.enabled;
-                if (idx === cabaneBinding.selected) {
-                    option.selected = true;
-                }
-                this.cabaneSelect!.appendChild(option);
-            });
-
-            this.cabaneSelect.addEventListener('change', () => {
-                const updatedBindings = bridge.getReinforcementsBindings();
-                updatedBindings.cabane_sel.selected = parseInt(this.cabaneSelect!.value);
-                bridge.setReinforcementsBindings(updatedBindings);
-                this.render();
-            });
-
-            flexContainer.div2.appendChild(this.cabaneSelect);
+            cabaneSelect.className = 'flex-item';
+            mainFlex.div2.appendChild(cabaneSelect);
         }
 
-        // Wires checkbox
+        // Wires checkbox - need custom layout for empty label
         const wiresBinding = bindings.wires;
+        let wiresCheckbox: HTMLInputElement = undefined;
+
         if (wiresBinding) {
             const wiresLabel = document.createElement('label');
             wiresLabel.textContent = localization.translate('Reinforcement Wires');
             wiresLabel.className = 'flex-item';
             wiresLabel.style.marginLeft = '0.25em';
             wiresLabel.style.marginRight = '0.5em';
-            flexContainer.div1.appendChild(wiresLabel);
+            mainFlex.div1.appendChild(wiresLabel);
 
             const checkboxSpan = document.createElement('span');
             checkboxSpan.className = 'flex-item';
 
-            this.wiresCheckbox = document.createElement('input');
-            this.wiresCheckbox.type = 'checkbox';
-            this.wiresCheckbox.checked = wiresBinding.selected;
-            this.wiresCheckbox.disabled = !wiresBinding.enabled;
-            this.wiresCheckbox.addEventListener('change', () => {
+            wiresCheckbox = document.createElement('input');
+            wiresCheckbox.type = 'checkbox';
+            wiresCheckbox.checked = wiresBinding.selected;
+            wiresCheckbox.disabled = !wiresBinding.enabled;
+            wiresCheckbox.addEventListener('change', () => {
                 const updatedBindings = bridge.getReinforcementsBindings();
-                updatedBindings.wires.selected = this.wiresCheckbox!.checked;
+                updatedBindings.wires.selected = wiresCheckbox.checked;
                 bridge.setReinforcementsBindings(updatedBindings);
                 this.render();
             });
 
             const emptyLabel = document.createElement('label');
             checkboxSpan.appendChild(emptyLabel);
-            checkboxSpan.appendChild(this.wiresCheckbox);
-            flexContainer.div2.appendChild(checkboxSpan);
+            checkboxSpan.appendChild(wiresCheckbox);
+            mainFlex.div2.appendChild(checkboxSpan);
         }
 
-        cell.appendChild(flexContainer.div0);
+        cell.appendChild(mainFlex.div0);
+
+        return { extWoodInputs, extSteelInputs, cabaneSelect, wiresCheckbox };
     }
 
     /**
-     * Create internal reinforcements section
+     * Create internal reinforcements section (cantilever counts, wing blades)
      */
-    private createInternalSection(cell: HTMLTableCellElement, bindings: any, bridge: AircraftBridge): void {
-        const flexContainer = this.createFlexSection();
+    private createInternalSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): {
+        cantInputs: HTMLInputElement[];
+        wingBladesCheckbox: HTMLInputElement;
+    } {
+        const flexContainer = createFlexSection();
 
         // Cantilever reinforcements (number_list binding)
         const cantBinding = bindings.cant_count;
-        if (cantBinding && Array.isArray(cantBinding)) {
-            cantBinding.forEach((item: any, idx: number) => {
-                const label = document.createElement('label');
-                label.textContent = item.name;
-                label.className = 'flex-item';
-                label.style.marginLeft = '0.25em';
-                label.style.marginRight = '0.5em';
-                flexContainer.div1.appendChild(label);
-
-                const input = document.createElement('input');
-                input.type = 'number';
-                input.min = '0';
-                input.className = 'flex-item';
-                input.value = item.value.toString();
-                input.disabled = !item.enabled;
-                input.addEventListener('change', () => {
+        const cantInputs = cantBinding && Array.isArray(cantBinding)
+            ? createFlexNumberInputs(
+                flexContainer,
+                cantBinding,
+                (idx) => (value) => {
                     const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.cant_count[idx].value = parseInt(input.value) || 0;
+                    updatedBindings.cant_count[idx].value = value;
                     bridge.setReinforcementsBindings(updatedBindings);
                     this.render();
-                });
+                }
+            )
+            : [];
 
-                flexContainer.div2.appendChild(input);
-                this.cantInputs.push(input);
-            });
-        }
-
-        // Wing blades checkbox
+        // Wing blades checkbox - need custom layout for empty label
         const wingBladesBinding = bindings.wing_blades;
+        let wingBladesCheckbox: HTMLInputElement = undefined;
+
         if (wingBladesBinding) {
             const wingLabel = document.createElement('label');
             wingLabel.textContent = localization.translate('Reinforcement Wing Blades');
@@ -392,90 +349,43 @@ export class ReinforcementsUI {
             const checkboxSpan = document.createElement('span');
             checkboxSpan.className = 'flex-item';
 
-            this.wingBladesCheckbox = document.createElement('input');
-            this.wingBladesCheckbox.type = 'checkbox';
-            this.wingBladesCheckbox.checked = wingBladesBinding.selected;
-            this.wingBladesCheckbox.disabled = !wingBladesBinding.enabled;
-            this.wingBladesCheckbox.addEventListener('change', () => {
+            wingBladesCheckbox = document.createElement('input');
+            wingBladesCheckbox.type = 'checkbox';
+            wingBladesCheckbox.checked = wingBladesBinding.selected;
+            wingBladesCheckbox.disabled = !wingBladesBinding.enabled;
+            wingBladesCheckbox.addEventListener('change', () => {
                 const updatedBindings = bridge.getReinforcementsBindings();
-                updatedBindings.wing_blades.selected = this.wingBladesCheckbox!.checked;
+                updatedBindings.wing_blades.selected = wingBladesCheckbox.checked;
                 bridge.setReinforcementsBindings(updatedBindings);
                 this.render();
             });
 
             const emptyLabel = document.createElement('label');
             checkboxSpan.appendChild(emptyLabel);
-            checkboxSpan.appendChild(this.wingBladesCheckbox);
+            checkboxSpan.appendChild(wingBladesCheckbox);
             flexContainer.div2.appendChild(checkboxSpan);
         }
 
         cell.appendChild(flexContainer.div0);
-    }
 
-    /**
-     * Create stats section (inner table with 6 stats)
-     */
-    private createStatsSection(cell: HTMLTableCellElement): void {
-        cell.className = 'inner_table';
-        const statsTable = document.createElement('table');
-        statsTable.className = 'inner_table';
-
-        // Row 1: Drag | Mass | Cost
-        const header1 = statsTable.insertRow();
-        ['Stat Drag', 'Stat Mass', 'Stat Cost'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header1.appendChild(th);
-        });
-
-        const data1 = statsTable.insertRow();
-        ['drag', 'mass', 'cost'].forEach(key => {
-            const td = data1.insertCell();
-            td.textContent = '0';
-            this.statCells.set(key, td);
-        });
-
-        // Row 2: Structure | Raw Strain | Aircraft Max Strain
-        const header2 = statsTable.insertRow();
-        ['Stat Structure', 'Stat Raw Strain', 'Reinforcement Aircraft Max Strain'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header2.appendChild(th);
-        });
-
-        const data2 = statsTable.insertRow();
-        ['structure', 'maxstrain'].forEach(key => {
-            const td = data2.insertCell();
-            td.textContent = '0';
-            this.statCells.set(key, td);
-        });
-
-        // Aircraft max strain (special class)
-        const amaxTd = data2.insertCell();
-        amaxTd.textContent = '0';
-        amaxTd.className = 'part_local';
-        this.statCells.set('amax', amaxTd);
-
-        cell.appendChild(statsTable);
+        return { cantInputs, wingBladesCheckbox };
     }
 
     /**
      * Update values in existing DOM elements (fast path)
      */
-    private updateValues(): void {
-        const bridge = this.getBridge();
-        if (!bridge || !bridge.isInitialized()) {
-            return;
-        }
+    protected updateValues(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge || !this.cache) return;
 
         const bindings = bridge.getReinforcementsBindings();
 
         // Update external wood counts
         if (bindings.ext_wood_count && Array.isArray(bindings.ext_wood_count)) {
             bindings.ext_wood_count.forEach((item: any, idx: number) => {
-                if (idx < this.extWoodInputs.length) {
-                    this.extWoodInputs[idx].value = item.value.toString();
-                    this.extWoodInputs[idx].disabled = !item.enabled;
+                if (idx < this.cache!.extWoodInputs.length) {
+                    this.cache!.extWoodInputs[idx].value = item.value.toString();
+                    this.cache!.extWoodInputs[idx].disabled = !item.enabled;
                 }
             });
         }
@@ -483,9 +393,9 @@ export class ReinforcementsUI {
         // Update external steel counts
         if (bindings.ext_steel_count && Array.isArray(bindings.ext_steel_count)) {
             bindings.ext_steel_count.forEach((item: any, idx: number) => {
-                if (idx < this.extSteelInputs.length) {
-                    this.extSteelInputs[idx].value = item.value.toString();
-                    this.extSteelInputs[idx].disabled = !item.enabled;
+                if (idx < this.cache!.extSteelInputs.length) {
+                    this.cache!.extSteelInputs[idx].value = item.value.toString();
+                    this.cache!.extSteelInputs[idx].disabled = !item.enabled;
                 }
             });
         }
@@ -493,82 +403,34 @@ export class ReinforcementsUI {
         // Update cantilever counts
         if (bindings.cant_count && Array.isArray(bindings.cant_count)) {
             bindings.cant_count.forEach((item: any, idx: number) => {
-                if (idx < this.cantInputs.length) {
-                    this.cantInputs[idx].value = item.value.toString();
-                    this.cantInputs[idx].disabled = !item.enabled;
+                if (idx < this.cache!.cantInputs.length) {
+                    this.cache!.cantInputs[idx].value = item.value.toString();
+                    this.cache!.cantInputs[idx].disabled = !item.enabled;
                 }
             });
         }
 
         // Update cabane select
-        if (this.cabaneSelect && bindings.cabane_sel) {
-            this.cabaneSelect.selectedIndex = bindings.cabane_sel.selected;
-            this.cabaneSelect.disabled = !bindings.cabane_sel.enabled;
-            if (bindings.cabane_sel.options) {
-                bindings.cabane_sel.options.forEach((opt: any, idx: number) => {
-                    if (idx < this.cabaneSelect!.options.length) {
-                        this.cabaneSelect!.options[idx].disabled = !opt.enabled;
-                    }
-                });
-            }
+        if (this.cache.cabaneSelect && bindings.cabane_sel) {
+            updateSelectElement(this.cache.cabaneSelect, bindings.cabane_sel);
         }
 
         // Update wires checkbox
-        if (this.wiresCheckbox && bindings.wires) {
-            this.wiresCheckbox.checked = bindings.wires.selected;
-            this.wiresCheckbox.disabled = !bindings.wires.enabled;
+        if (this.cache.wiresCheckbox && bindings.wires) {
+            this.cache.wiresCheckbox.checked = bindings.wires.selected;
+            this.cache.wiresCheckbox.disabled = !bindings.wires.enabled;
         }
 
         // Update wing blades checkbox
-        if (this.wingBladesCheckbox && bindings.wing_blades) {
-            this.wingBladesCheckbox.checked = bindings.wing_blades.selected;
-            this.wingBladesCheckbox.disabled = !bindings.wing_blades.enabled;
+        if (this.cache.wingBladesCheckbox && bindings.wing_blades) {
+            this.cache.wingBladesCheckbox.checked = bindings.wing_blades.selected;
+            this.cache.wingBladesCheckbox.disabled = !bindings.wing_blades.enabled;
         }
 
-        // Update stat values
-        this.updateStatValues(bridge);
-    }
-
-    /**
-     * Update stat cell values
-     */
-    private updateStatValues(bridge: AircraftBridge): void {
+        // Update stats table
         const stats = bridge.getReinforcementsStats();
-
-        for (const [key, cell] of this.statCells) {
-            const value = stats[key];
-            this.blinkIfChanged(cell, value?.toString() || '0', false);
-        }
-    }
-
-    /**
-     * Blink animation when stat changes
-     */
-    private blinkIfChanged(elem: HTMLTableCellElement, str: string, positiveGood: boolean | null): void {
-        if (elem.textContent !== str) {
-            elem.textContent = str;
-        }
-    }
-
-    /**
-     * Update the UI (e.g., when data changes externally)
-     */
-    update(): void {
-        this.render();
-    }
-
-    /**
-     * Destroy the component and clean up listeners
-     */
-    destroy(): void {
-        this.container.innerHTML = '';
-        this.mainTable = null;
-        this.extWoodInputs = [];
-        this.extSteelInputs = [];
-        this.cantInputs = [];
-        this.wiresCheckbox = null;
-        this.cabaneSelect = null;
-        this.wingBladesCheckbox = null;
-        this.statCells.clear();
+        const derivedStats = new Map<string, number>();
+        derivedStats.set('amax', stats.maxstrain); // Aircraft max strain
+        updateStatsTable(this.cache.statsTable, stats, REINFORCEMENTS_STATS, derivedStats);
     }
 }
