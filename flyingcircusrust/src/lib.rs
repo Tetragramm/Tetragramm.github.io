@@ -4017,7 +4017,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Stat Toughness", "Robustesse"),
 				("Stat Upkeep", "Entretien"),
 				("Stat Visibility", "Visibilité"),
-				("Stat Wet Mass", "Masse Totale"),
+				("Stat Wet Mass", "Masse Charge"),
 				("Stat Wing Area", "Surface Ailaire"),
 				("Steel", "Acier"),
 				("Steel I-Strut", "Mât en I en Acier"),

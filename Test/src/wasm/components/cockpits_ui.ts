@@ -29,8 +29,8 @@ const COCKPIT_STATS: StatDisplayConfig[] = [
     { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
     { key: '', label: '', positiveIsGood: undefined }, // Empty cell for layout
     { key: 'flightstress', label: 'Stat Flight Stress', positiveIsGood: false, isDerived: true },
-    { key: 'escape', label: 'Stat Escape', positiveIsGood: true, isDerived: true },
-    { key: 'visibility', label: 'Stat Visibility', positiveIsGood: true, isDerived: true }
+    { key: 'pos_escape', label: 'Stat Escape', positiveIsGood: true, isDerived: true },
+    { key: 'pos_visibility', label: 'Stat Visibility', positiveIsGood: true, isDerived: true }
 ];
 
 // Cache for cockpit row elements to avoid recreating DOM

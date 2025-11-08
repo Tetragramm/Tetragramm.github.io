@@ -96,10 +96,11 @@ export class LandingGearUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
+        statsCell.className = "inner_table";
         const stats = bridge.getLandingGearStats();
         const statsTable = createStatsTable(stats, GEAR_STATS);
-        statsTable.appendChild(statsCell);
-
+        statsCell.appendChild(statsTable);
+        UIRow.appendChild(statsCell);
         mainTable.appendChild(UIRow);
 
         // Cache elements

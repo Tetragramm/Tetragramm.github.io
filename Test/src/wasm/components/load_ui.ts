@@ -28,10 +28,11 @@ const LOAD_STATS: StatDisplayConfig[] = [
     { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
     { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
     { key: 'wetmass', label: 'Stat Wet Mass', positiveIsGood: false },
+    { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
     { key: 'fuel', label: 'Stat Fuel', positiveIsGood: true },
     { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
     { key: '', label: '', positiveIsGood: undefined },
-    { key: 'fuel_uses', label: 'Stat Fuel Uses', positiveIsGood: true },
+    { key: 'fuel_uses', label: 'Derived Fuel Uses', positiveIsGood: true, isDerived: true },
     { key: '', label: '', positiveIsGood: undefined },
 ];
 
@@ -121,13 +122,15 @@ export class LoadUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
+        statsCell.className = "inner_table";
         // Get all three component stats and combine them
         const fuelStats = bridge.getFuelStats();
         const munitionsStats = bridge.getMunitionsStats();
         const cargoStats = bridge.getCargoStats();
         const stats = addStats(fuelStats, munitionsStats, cargoStats);
         const derived = bridge.getDerivedStats();
-        const statsTable = createStatsTable(stats, LOAD_STATS);
+        const statsTable = createStatsTable(stats, LOAD_STATS, derived);
+        statsCell.append(statsTable);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
@@ -338,69 +341,6 @@ export class LoadUI extends BaseComponentUI {
     }
 
     /**
-     * Create stats section (inner table with 7 stats)
-     */
-    private createStatsSection(cell: HTMLTableCellElement): Map<string, HTMLTableCellElement> {
-        cell.className = 'inner_table';
-        const statsTable = document.createElement('table');
-        statsTable.className = 'inner_table';
-
-        const statCells = new Map<string, HTMLTableCellElement>();
-
-        // Row 1: Drag | Mass | Wet Mass
-        const header1 = statsTable.insertRow();
-        ['Stat Drag', 'Stat Mass', 'Stat Wet Mass'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header1.appendChild(th);
-        });
-
-        const data1 = statsTable.insertRow();
-        ['drag', 'mass', 'wetmass'].forEach(key => {
-            const td = data1.insertCell();
-            td.textContent = '0';
-            statCells.set(key, td);
-        });
-
-        // Row 2: Required Sections | Fuel | Cost
-        const header2 = statsTable.insertRow();
-        ['Stat Required Sections', 'Stat Fuel', 'Stat Cost'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header2.appendChild(th);
-        });
-
-        const data2 = statsTable.insertRow();
-        ['reqsections', 'fuel', 'cost'].forEach(key => {
-            const td = data2.insertCell();
-            td.textContent = '0';
-            statCells.set(key, td);
-        });
-
-        // Row 3: Empty | Fuel Uses | Empty (derived stat)
-        const header3 = statsTable.insertRow();
-        const th3_1 = document.createElement('th');
-        th3_1.textContent = '';
-        header3.appendChild(th3_1);
-        const th3_2 = document.createElement('th');
-        th3_2.textContent = localization.translate('Derived Fuel Uses');
-        header3.appendChild(th3_2);
-        const th3_3 = document.createElement('th');
-        th3_3.textContent = '';
-        header3.appendChild(th3_3);
-
-        const data3 = statsTable.insertRow();
-        data3.insertCell(); // empty
-        const fuelUsesCell = data3.insertCell();
-        fuelUsesCell.textContent = '0';
-        statCells.set('fueluseage', fuelUsesCell);
-        data3.insertCell(); // empty
-
-        cell.appendChild(statsTable);
-        return statCells;
-    }
-
-    /**
      * Update values in existing DOM elements (fast path)
      */
     protected updateValues(): void {
@@ -484,6 +424,7 @@ export class LoadUI extends BaseComponentUI {
         const munitionsStats = bridge.getMunitionsStats();
         const cargoStats = bridge.getCargoStats();
         const stats = addStats(fuelStats, munitionsStats, cargoStats);
-        updateStatsTable(this.cache.statsTable, stats, LOAD_STATS);
+        const derived = bridge.getDerivedStats();
+        updateStatsTable(this.cache.statsTable, stats, LOAD_STATS, derived);
     }
 }

@@ -128,8 +128,10 @@ export class AccessoriesUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
+        statsCell.className = "inner_table";
         const stats = bridge.getAccessoriesStats();
         const statsTable = createStatsTable(stats, ACCESSORIES_STATS);
+        statsCell.append(statsTable);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);

@@ -256,6 +256,10 @@ export class WasmApplication {
         this.cockpitsUI.render(forceFull);
         this.stabilizersUI.render(forceFull);
         this.controlSurfacesUI.render(forceFull);
+        this.reinforcementsUI.render(forceFull);
+        this.loadUI.render(forceFull);
+        this.landingGearUI.render(forceFull);
+        this.accessoriesUI.render(forceFull);
     }
 
     /**

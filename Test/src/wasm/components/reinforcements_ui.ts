@@ -44,7 +44,7 @@ const REINFORCEMENTS_STATS: StatDisplayConfig[] = [
     { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
     { key: 'structure', label: 'Stat Structure', positiveIsGood: true },
     { key: 'maxstrain', label: 'Stat Raw Strain', positiveIsGood: true },
-    { key: 'amax', label: 'Reinforcement Aircraft Max Strain', positiveIsGood: true, isDerived: true },
+    { key: 'max_strain', label: 'Reinforcement Aircraft Max Strain', positiveIsGood: true, isDerived: true },
 ];
 
 export class ReinforcementsUI extends BaseComponentUI {
@@ -104,9 +104,9 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
+        statsCell.className = 'inner_table';
         const stats = bridge.getReinforcementsStats();
-        const derivedStats = new Map<string, number>();
-        derivedStats.set('amax', stats.maxstrain); // Aircraft max strain is same as maxstrain for display
+        const derivedStats = bridge.getDerivedStats();
         const statsTable = createStatsTable(stats, REINFORCEMENTS_STATS, derivedStats);
         statsCell.appendChild(statsTable);
         dataRow.appendChild(statsCell);
@@ -429,8 +429,7 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         // Update stats table
         const stats = bridge.getReinforcementsStats();
-        const derivedStats = new Map<string, number>();
-        derivedStats.set('amax', stats.maxstrain); // Aircraft max strain
+        const derivedStats = bridge.getDerivedStats();
         updateStatsTable(this.cache.statsTable, stats, REINFORCEMENTS_STATS, derivedStats);
     }
 }

@@ -223,23 +223,24 @@ export function createStatsTable(
             const td = valueRow.insertCell();
 
             // Get the value from stats or derivedStats
-            let value = stats[config.key];
-            if (value === undefined && derivedStats) {
-                value = derivedStats.get(config.key);
+            let value = undefined;
+            if (config.isDerived === undefined || !config.isDerived) {
+                value = stats[config.key];
+            } else {
+                value = derivedStats[config.key];
+                // Handle special cases (like flight stress range)
+                if (config.key === 'flightstress') {
+                    const norm = derivedStats["flight_stress_norm"];
+                    const cp = derivedStats['flight_stress_cp'];
+                    if (norm != cp) {
+                        value = norm.toString() + " (" + cp.toString() + ")";
+                    } else {
+                        value = norm.toString()
+                    }
+                }
             }
 
-            // Handle special cases (like flight stress range)
-            if (config.key === 'flightstress' && derivedStats) {
-                const norm = derivedStats.get('flight_stress_norm');
-                const cp = derivedStats.get('flight_stress_cp');
-                if (norm != cp) {
-                    value = norm.toString() + " (" + cp.toString() + ")";
-                } else {
-                    value = norm.toString()
-                }
-            } else {
-                value = value?.toString() || '0';
-            }
+            value = value?.toString() || '';
 
             td.textContent = value;
 
@@ -278,23 +279,26 @@ export function updateStatsTable(
             const td = valueRow.cells[j];
 
             // Get the value from stats or derivedStats
-            let value = stats[config.key];
-            if (value === undefined && derivedStats) {
-                value = derivedStats.get(config.key);
+            let value = undefined;
+            if (config.isDerived === undefined || !config.isDerived) {
+                value = stats[config.key];
+            } else {
+                value = derivedStats[config.key];
+                // Handle special cases (like flight stress range)
+                if (config.key === 'flightstress') {
+                    const norm = derivedStats["flight_stress_norm"];
+                    const cp = derivedStats['flight_stress_cp'];
+                    if (norm != cp) {
+                        value = norm.toString() + " (" + cp.toString() + ")";
+                    } else {
+                        value = norm.toString()
+                    }
+                }
             }
 
-            // Handle special cases (like flight stress range)
-            if (config.key === 'flightstress' && derivedStats) {
-                const norm = derivedStats.get('flight_stress_norm');
-                const cp = derivedStats.get('flight_stress_cp');
-                if (norm != cp) {
-                    value = norm.toString() + " (" + cp.toString() + ")";
-                } else {
-                    value = norm.toString()
-                }
-            } else {
-                value = value?.toString() || '0';
-            }
+            value = value?.toString() || '';
+
+            td.textContent = value;
 
             // Apply derived stat styling if applicable
             if (config.isDerived) {

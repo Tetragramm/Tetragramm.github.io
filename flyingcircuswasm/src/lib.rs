@@ -4,12 +4,21 @@ use flyingcircusrust::serialization::{Deserializer, Serializable, Serializer};
 use flyingcircusrust::types::DerivedStats;
 use flyingcircusrust::UIBindings;
 use rust_i18n::t;
+use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
 // Set up panic hook for better error messages in console
 #[wasm_bindgen(start)]
 pub fn init_panic_hook() {
     console_error_panic_hook::set_once();
+}
+
+#[derive(Serialize)]
+struct CockpitDerived {
+    flight_stress_norm: i16,
+    flight_stress_cp: i16,
+    pos_escape: i16,
+    pos_visibility: i16,
 }
 
 /// Localization API for managing translations
@@ -536,12 +545,12 @@ impl AircraftWasm {
             let escape = cockpit.get_escape();
             let visibility = cockpit.get_visibility();
 
-            let result = serde_json::json!({
-                "flight_stress_norm": flight_stress.0,
-                "flight_stress_cp": flight_stress.1,
-                "escape": escape,
-                "visibility": visibility
-            });
+            let result = CockpitDerived {
+                flight_stress_norm: flight_stress.0,
+                flight_stress_cp: flight_stress.1,
+                pos_escape: escape,
+                pos_visibility: visibility,
+            };
             serde_wasm_bindgen::to_value(&result).unwrap()
         } else {
             JsValue::NULL

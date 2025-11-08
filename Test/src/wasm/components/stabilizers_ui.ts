@@ -96,8 +96,10 @@ export class StabilizersUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
+        statsCell.className = "inner_table";
         let stats = bridge.getStabilizersStats();
-        const statsTable = createStatsTable(stats, STABILIZER_STATS)
+        const statsTable = createStatsTable(stats, STABILIZER_STATS);
+        statsCell.appendChild(statsTable);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);

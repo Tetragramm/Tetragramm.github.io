@@ -91,8 +91,8 @@ export class EraUI extends BaseComponentUI {
         const statCell = document.createElement("td") as HTMLTableCellElement;
         statCell.className = 'inner_table';
         const stats = bridge.getEraStats();
-        const statsTable = createStatsTable(stats, ERA_STATS);
-        statCell.appendChild(statsTable)
+        this.statsTable = createStatsTable(stats, ERA_STATS);
+        statCell.appendChild(this.statsTable)
         dataRow.appendChild(statCell);
 
         table.appendChild(dataRow);
