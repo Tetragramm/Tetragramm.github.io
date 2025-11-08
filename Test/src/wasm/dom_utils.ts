@@ -190,77 +190,67 @@ export function blinkIfChanged(elem: HTMLTableCellElement, newValue: string, pos
 }
 
 /**
- * Create a stats table with headers and data cells
- * @param headers - Array of translation keys for headers
- * @param dataKeys - Array of keys for the stat data
- * @returns Object with the table element and map of stat cells
+ * Create a stats table
+ * @param stats Stats object from Rust
+ * @param statConfig Configuration for which stats to display and how
+ * @param derivedStats Optional derived stats for the component
+ * @returns HTML table element with stats
  */
 export function createStatsTable(
-    headers: string[],
-    dataKeys: string[]
-): { table: HTMLTableElement, cells: Map<string, HTMLTableCellElement> } {
+    stats: any,
+    statConfig: StatDisplayConfig[],
+    derivedStats?: any
+): HTMLTableElement {
     const table = document.createElement('table');
     table.className = 'inner_table';
 
-    const statCells = new Map<string, HTMLTableCellElement>();
+    // Group stats into rows of 3
+    const statsPerRow = 3;
+    for (let i = 0; i < statConfig.length; i += statsPerRow) {
+        const rowStats = statConfig.slice(i, Math.min(i + statsPerRow, statConfig.length));
 
-    // Create header row
-    const headerRow = table.insertRow();
-    headers.forEach(key => {
-        const th = document.createElement('th');
-        th.textContent = localization.translate(key);
-        headerRow.appendChild(th);
-    });
-
-    // Create data row
-    const dataRow = table.insertRow();
-    dataKeys.forEach(key => {
-        const td = dataRow.insertCell();
-        td.textContent = '0';
-        statCells.set(key, td);
-    });
-
-    return { table, cells: statCells };
-}
-
-/**
- * Create a multi-row stats table (multiple header/data row pairs)
- * @param rows - Array of row configurations, each with headers and dataKeys
- * @returns Object with the table element and map of all stat cells
- */
-export function createMultiRowStatsTable(
-    rows: Array<{ headers: string[], dataKeys: string[], specialClasses?: Map<string, string> }>
-): { table: HTMLTableElement, cells: Map<string, HTMLTableCellElement> } {
-    const table = document.createElement('table');
-    table.className = 'inner_table';
-
-    const statCells = new Map<string, HTMLTableCellElement>();
-
-    rows.forEach(row => {
-        // Create header row
+        // Header row
         const headerRow = table.insertRow();
-        row.headers.forEach(key => {
+        rowStats.forEach(config => {
             const th = document.createElement('th');
-            th.textContent = localization.translate(key);
+            th.textContent = localization.translate(config.label);
             headerRow.appendChild(th);
         });
 
-        // Create data row
-        const dataRow = table.insertRow();
-        row.dataKeys.forEach(key => {
-            const td = dataRow.insertCell();
-            td.textContent = '0';
+        // Value row
+        const valueRow = table.insertRow();
+        rowStats.forEach(config => {
+            const td = valueRow.insertCell();
 
-            // Apply special class if specified
-            if (row.specialClasses && row.specialClasses.has(key)) {
-                td.className = row.specialClasses.get(key)!;
+            // Get the value from stats or derivedStats
+            let value = stats[config.key];
+            if (value === undefined && derivedStats) {
+                value = derivedStats.get(config.key);
             }
 
-            statCells.set(key, td);
-        });
-    });
+            // Handle special cases (like flight stress range)
+            if (config.key === 'flightstress' && derivedStats) {
+                const norm = derivedStats.get('flight_stress_norm');
+                const cp = derivedStats.get('flight_stress_cp');
+                if (norm != cp) {
+                    value = norm.toString() + " (" + cp.toString() + ")";
+                } else {
+                    value = norm.toString()
+                }
+            } else {
+                value = value?.toString() || '0';
+            }
 
-    return { table, cells: statCells };
+            td.textContent = value;
+
+            // Apply derived stat styling if applicable
+            if (config.isDerived) {
+                td.className = 'part_local';
+            }
+        });
+    }
+
+    return table;
 }
 
 /**
@@ -268,13 +258,50 @@ export function createMultiRowStatsTable(
  * @param statCells - Map of cell elements keyed by stat name
  * @param stats - Object containing stat values
  */
-export function updateStatCells(
-    statCells: Map<string, HTMLTableCellElement>,
-    stats: any
+export function updateStatsTable(
+    table: HTMLTableElement,
+    stats: any,
+    statConfig: StatDisplayConfig[],
+    derivedStats?: any
 ): void {
-    for (const [key, cell] of statCells) {
-        const value = stats[key];
-        blinkIfChanged(cell, value?.toString() || '0', null);
+    // Group stats into rows of 3
+    const statsPerRow = 3;
+    let row_idx = 1;
+    for (let i = 0; i < statConfig.length; i += statsPerRow) {
+        const rowStats = statConfig.slice(i, Math.min(i + statsPerRow, statConfig.length));
+
+        // Value row
+        const valueRow = table.rows[row_idx];
+        row_idx += 2;
+        for (let j = 0; j < statsPerRow; j++) {
+            const config = statConfig[i + j];
+            const td = valueRow.cells[j];
+
+            // Get the value from stats or derivedStats
+            let value = stats[config.key];
+            if (value === undefined && derivedStats) {
+                value = derivedStats.get(config.key);
+            }
+
+            // Handle special cases (like flight stress range)
+            if (config.key === 'flightstress' && derivedStats) {
+                const norm = derivedStats.get('flight_stress_norm');
+                const cp = derivedStats.get('flight_stress_cp');
+                if (norm != cp) {
+                    value = norm.toString() + " (" + cp.toString() + ")";
+                } else {
+                    value = norm.toString()
+                }
+            } else {
+                value = value?.toString() || '0';
+            }
+
+            // Apply derived stat styling if applicable
+            if (config.isDerived) {
+                td.className = 'part_local';
+            }
+            blinkIfChanged(td, value?.toString() || '0', null);
+        }
     }
 }
 
@@ -360,3 +387,53 @@ export function createFlexSelect(
 
     return select;
 }
+
+/**
+ * Create a collapsible section (like existing UI)
+ */
+export function createCollapsibleSection(
+    title: string,
+    content: HTMLElement,
+    initiallyOpen: boolean = true
+): HTMLElement {
+    const container = document.createElement('div');
+
+    // Header
+    const header = document.createElement('h3');
+    header.className = initiallyOpen ? 'collapsible active' : 'collapsible';
+    header.textContent = title;
+    header.style.cursor = 'pointer';
+
+    // Content
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'content';
+    contentDiv.style.maxHeight = initiallyOpen ? 'inherit' : '0px';
+    contentDiv.appendChild(content);
+
+    // Toggle functionality
+    header.addEventListener('click', () => {
+        const isActive = header.classList.toggle('active');
+        contentDiv.style.maxHeight = isActive ? 'inherit' : '0px';
+    });
+
+    container.appendChild(header);
+    container.appendChild(contentDiv);
+
+    return container;
+}
+
+
+/**
+ * Configuration for displaying a single stat
+ */
+export interface StatDisplayConfig {
+    /** Key in the Stats object */
+    key: string;
+    /** Label to display (localization key) */
+    label: string;
+    /** Whether positive change is good (true), bad (false), or neutral (undefined) */
+    positiveIsGood?: boolean;
+    /** Whether this is a derived stat (gets special background) */
+    isDerived?: boolean;
+}
+

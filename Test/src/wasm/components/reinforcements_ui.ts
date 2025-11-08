@@ -7,6 +7,7 @@
 
 import { AircraftBridge } from '../aircraft_bridge';
 import { BindingRenderer } from '../binding_renderer';
+import { createCollapsibleSection } from '../dom_utils';
 import { localization } from '../localization';
 
 export class ReinforcementsUI {
@@ -141,7 +142,7 @@ export class ReinforcementsUI {
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Reinforcement Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             this.mainTable,
             true // Initially open

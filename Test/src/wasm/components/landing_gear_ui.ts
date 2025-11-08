@@ -6,7 +6,6 @@
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
@@ -15,7 +14,11 @@ import {
     updateSelectElement,
     createFlexCheckbox,
     createFlexCheckboxes,
-    createFlexSelect
+    createFlexSelect,
+    createCollapsibleSection,
+    StatDisplayConfig,
+    createStatsTable,
+    updateStatsTable
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -23,8 +26,18 @@ interface LandingGearCache {
     typeSelect: HTMLSelectElement;
     retractCheckbox: HTMLInputElement;
     extrasCheckboxes: HTMLInputElement[];
-    statCells: Map<string, HTMLTableCellElement>;
+    statsTable: HTMLTableElement;
 }
+
+// Landing Gear stats configuration
+const GEAR_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'structure', label: 'Stat Structure', positiveIsGood: true },
+    { key: 'crashsafety', label: 'Stat Crash Safety', positiveIsGood: true },
+    { key: '', label: '', positiveIsGood: undefined },
+];
 
 export class LandingGearUI extends BaseComponentUI {
     private cache: LandingGearCache = undefined;
@@ -69,38 +82,36 @@ export class LandingGearUI extends BaseComponentUI {
         mainTable.appendChild(headerRow);
 
         // Data row
-        const dataRow = document.createElement('tr');
+        const UIRow = document.createElement('tr');
 
         // Landing Gear cell (type select + retractable checkbox)
         const gearCell = document.createElement('td');
         const gearCache = this.createGearSection(gearCell, bindings, bridge);
-        dataRow.appendChild(gearCell);
+        UIRow.appendChild(gearCell);
 
         // Extras cell (list of checkboxes)
         const extrasCell = document.createElement('td');
         const extrasCheckboxes = this.createExtrasSection(extrasCell, bindings, bridge);
-        dataRow.appendChild(extrasCell);
+        UIRow.appendChild(extrasCell);
 
         // Stats cell
         const statsCell = document.createElement('td');
-        const statCells = this.createStatsSection(statsCell);
-        dataRow.appendChild(statsCell);
+        const stats = bridge.getLandingGearStats();
+        const statsTable = createStatsTable(stats, GEAR_STATS);
+        statsTable.appendChild(statsCell);
 
-        mainTable.appendChild(dataRow);
+        mainTable.appendChild(UIRow);
 
         // Cache elements
         this.cache = {
             ...gearCache,
             extrasCheckboxes,
-            statCells
+            statsTable
         };
-
-        // Update stat values
-        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Landing Gear Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             mainTable,
             true // Initially open
@@ -279,22 +290,7 @@ export class LandingGearUI extends BaseComponentUI {
         }
 
         // Update stat values
-        this.updateStatValues(bridge);
-    }
-
-    /**
-     * Update stat cell values
-     */
-    private updateStatValues(bridge: AircraftBridge): void {
-        if (!this.cache) return;
-
         const stats = bridge.getLandingGearStats();
-
-        for (const [key, cell] of this.cache.statCells) {
-            const value = stats[key];
-            if (cell.textContent !== (value?.toString() || '0')) {
-                cell.textContent = value?.toString() || '0';
-            }
-        }
+        updateStatsTable(this.cache.statsTable, stats, GEAR_STATS);
     }
 }

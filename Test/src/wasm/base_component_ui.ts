@@ -6,12 +6,10 @@
  */
 
 import { AircraftBridge } from './aircraft_bridge';
-import { BindingRenderer } from './binding_renderer';
 import { localization } from './localization';
 
 export abstract class BaseComponentUI {
     protected container: HTMLElement;
-    protected renderer: BindingRenderer;
     protected sectionElement: HTMLElement | null = null;
 
     constructor(
@@ -31,13 +29,6 @@ export abstract class BaseComponentUI {
         if (!bridge) {
             throw new Error(`Bridge not available during ${this.constructor.name} construction`);
         }
-
-        // Create renderer with stats update callback
-        this.renderer = new BindingRenderer(bridge, () => {
-            if (this.onUpdate) {
-                this.onUpdate();
-            }
-        });
 
         // Listen for locale changes and do full rebuild
         localization.onLocaleChange(() => this.rebuildFull());

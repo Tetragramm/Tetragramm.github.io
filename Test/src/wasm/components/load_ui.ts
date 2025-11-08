@@ -5,8 +5,7 @@
  * Matches the original TypeScript 4-column table layout
  */
 
-import { AircraftBridge } from '../aircraft_bridge';
-import { StatDisplayConfig } from '../binding_renderer';
+import { addStats, AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
@@ -16,8 +15,25 @@ import {
     createFlexCheckbox,
     createFlexNumberInput,
     createFlexNumberInputs,
-    createSelectElement
+    createSelectElement,
+    createCollapsibleSection,
+    StatDisplayConfig,
+    createStatsTable,
+    updateStatsTable
 } from '../dom_utils';
+
+
+// Load stats configuration
+const LOAD_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'wetmass', label: 'Stat Wet Mass', positiveIsGood: false },
+    { key: 'fuel', label: 'Stat Fuel', positiveIsGood: true },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: '', label: '', positiveIsGood: undefined },
+    { key: 'fuel_uses', label: 'Stat Fuel Uses', positiveIsGood: true },
+    { key: '', label: '', positiveIsGood: undefined },
+];
 
 // Cache interface for type safety
 interface LoadCache {
@@ -37,7 +53,7 @@ interface LoadCache {
     cargoSelect: HTMLSelectElement;
 
     // Stat cells
-    statCells: Map<string, HTMLTableCellElement>;
+    statsTable: HTMLTableElement;
 }
 
 export class LoadUI extends BaseComponentUI {
@@ -105,7 +121,13 @@ export class LoadUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
-        const statCells = this.createStatsSection(statsCell);
+        // Get all three component stats and combine them
+        const fuelStats = bridge.getFuelStats();
+        const munitionsStats = bridge.getMunitionsStats();
+        const cargoStats = bridge.getCargoStats();
+        const stats = addStats(fuelStats, munitionsStats, cargoStats);
+        const derived = bridge.getDerivedStats();
+        const statsTable = createStatsTable(stats, LOAD_STATS);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
@@ -115,15 +137,12 @@ export class LoadUI extends BaseComponentUI {
             ...fuelCache,
             ...munitionsCache,
             cargoSelect,
-            statCells
+            statsTable
         };
-
-        // Update stat values
-        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Load Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             mainTable,
             true // Initially open
@@ -460,37 +479,11 @@ export class LoadUI extends BaseComponentUI {
         }
 
         // Update stat values
-        this.updateStatValues(bridge);
-    }
-
-    /**
-     * Update stat cell values
-     */
-    private updateStatValues(bridge: AircraftBridge): void {
-        if (!this.cache) return;
-
         // Get all three component stats and combine them
         const fuelStats = bridge.getFuelStats();
         const munitionsStats = bridge.getMunitionsStats();
         const cargoStats = bridge.getCargoStats();
-
-        // Combine stats (simple addition for now)
-        const combinedStats = {
-            drag: (fuelStats.drag || 0) + (munitionsStats.drag || 0) + (cargoStats.drag || 0),
-            mass: (fuelStats.mass || 0) + (munitionsStats.mass || 0) + (cargoStats.mass || 0),
-            wetmass: (fuelStats.wetmass || 0) + (munitionsStats.wetmass || 0) + (cargoStats.wetmass || 0),
-            reqsections: (fuelStats.reqsections || 0) + (munitionsStats.reqsections || 0) + (cargoStats.reqsections || 0),
-            fuel: (fuelStats.fuel || 0) + (munitionsStats.fuel || 0) + (cargoStats.fuel || 0),
-            cost: (fuelStats.cost || 0) + (munitionsStats.cost || 0) + (cargoStats.cost || 0),
-            fueluseage: fuelStats.fueluseage || 0  // Only from fuel
-        };
-
-        // Update stat cells
-        for (const [key, cell] of this.cache.statCells) {
-            const value = combinedStats[key as keyof typeof combinedStats];
-            if (cell.textContent !== (value?.toString() || '0')) {
-                cell.textContent = value?.toString() || '0';
-            }
-        }
+        const stats = addStats(fuelStats, munitionsStats, cargoStats);
+        updateStatsTable(this.cache.statsTable, stats, LOAD_STATS);
     }
 }

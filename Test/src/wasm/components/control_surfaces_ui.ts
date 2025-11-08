@@ -6,7 +6,6 @@
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
@@ -14,7 +13,11 @@ import {
     createFlexSection,
     updateSelectElement,
     createFlexCheckboxes,
-    createFlexSelect
+    createFlexSelect,
+    StatDisplayConfig,
+    createStatsTable,
+    createCollapsibleSection,
+    updateStatsTable
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -25,8 +28,21 @@ interface ControlSurfacesCache {
     flapsSelect: HTMLSelectElement;
     slatsSelect: HTMLSelectElement;
     dragCheckboxes: HTMLInputElement[];
-    statCells: Map<string, HTMLTableCellElement>;
+    statsTables: HTMLTableElement;
 }
+
+// Control Surfaces stats configuration
+const CONTROLS_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'control', label: 'Stat Control', positiveIsGood: true },
+    { key: 'pitchstab', label: 'Stat Pitch Stability', positiveIsGood: true },
+    { key: 'latstab', label: 'Stat Lateral Stability', positiveIsGood: true },
+    { key: 'liftbleed', label: 'Stat Lift Bleed', positiveIsGood: false },
+    { key: 'crashsafety', label: 'Stat Crash Safety', positiveIsGood: true },
+    { key: '', label: '', positiveIsGood: undefined },
+];
 
 export class ControlSurfacesUI extends BaseComponentUI {
     private cache: ControlSurfacesCache = undefined;
@@ -85,8 +101,9 @@ export class ControlSurfacesUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
-        const statCells = this.createStatsSection(statsCell);
-        dataRow.appendChild(statsCell);
+        const stats = bridge.getControlSurfacesStats();
+        const statsTables = createStatsTable(stats, CONTROLS_STATS);
+        dataRow.appendChild(statsTables);
 
         mainTable.appendChild(dataRow);
 
@@ -94,15 +111,12 @@ export class ControlSurfacesUI extends BaseComponentUI {
         this.cache = {
             ...surfaceSelects,
             dragCheckboxes,
-            statCells
+            statsTables
         };
-
-        // Update stat values
-        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Control Surfaces Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             mainTable,
             true // Initially open
@@ -303,22 +317,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
         }
 
         // Update stat values
-        this.updateStatValues(bridge);
-    }
-
-    /**
-     * Update stat cell values
-     */
-    private updateStatValues(bridge: AircraftBridge): void {
-        if (!this.cache) return;
-
         const stats = bridge.getControlSurfacesStats();
-
-        for (const [key, cell] of this.cache.statCells) {
-            const value = stats[key];
-            if (cell.textContent !== (value?.toString() || '0')) {
-                cell.textContent = value?.toString() || '0';
-            }
-        }
+        updateStatsTable(this.cache.statsTables, stats, CONTROLS_STATS);
     }
 }

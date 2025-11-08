@@ -6,7 +6,6 @@
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
@@ -15,7 +14,11 @@ import {
     updateSelectElement,
     createFlexNumberInputs,
     createFlexCheckboxes,
-    createSelectElement
+    createSelectElement,
+    createStatsTable,
+    createCollapsibleSection,
+    updateStatsTable,
+    StatDisplayConfig
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -45,8 +48,21 @@ interface AccessoriesCache {
     controlSelect: HTMLSelectElement;
 
     // Stat cells
-    statCells: Map<string, HTMLTableCellElement>;
+    statsTable: HTMLTableElement;
 }
+
+// Accessories stats configuration
+const ACCESSORIES_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'structure', label: 'Stat Structure', positiveIsGood: true },
+    { key: 'charge', label: 'Stat Charge', positiveIsGood: true },
+    { key: 'liftbleed', label: 'Stat Lift Bleed', positiveIsGood: false },
+    { key: 'visibility', label: 'Stat Visibility', positiveIsGood: true },
+    { key: 'flightstress', label: 'Stat Flight Stress', positiveIsGood: false },
+    { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
+];
 
 export class AccessoriesUI extends BaseComponentUI {
     private cache: AccessoriesCache = undefined;
@@ -112,7 +128,8 @@ export class AccessoriesUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
-        const statCells = this.createStatsSection(statsCell);
+        const stats = bridge.getAccessoriesStats();
+        const statsTable = createStatsTable(stats, ACCESSORIES_STATS);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
@@ -127,15 +144,12 @@ export class AccessoriesUI extends BaseComponentUI {
             climCheckboxes,
             autopilotSelect,
             controlSelect,
-            statCells
+            statsTable
         };
-
-        // Update stat values
-        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Accessories Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             mainTable,
             true // Initially open
@@ -373,71 +387,6 @@ export class AccessoriesUI extends BaseComponentUI {
     }
 
     /**
-     * Create stats section (inner table with relevant stats)
-     */
-    private createStatsSection(cell: HTMLTableCellElement): Map<string, HTMLTableCellElement> {
-        cell.className = 'inner_table';
-        const statsTable = document.createElement('table');
-        statsTable.className = 'inner_table';
-
-        const statCells = new Map<string, HTMLTableCellElement>();
-
-        // Row 1: Mass | Cost | Req Sections
-        const header1 = statsTable.insertRow();
-        ['Stat Mass', 'Stat Cost', 'Stat Required Sections'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header1.appendChild(th);
-        });
-
-        const data1 = statsTable.insertRow();
-        ['mass', 'cost', 'reqsections'].forEach(key => {
-            const td = data1.insertCell();
-            td.textContent = '0';
-            statCells.set(key, td);
-        });
-
-        // Row 2: Visibility | Control | Reliability
-        const header2 = statsTable.insertRow();
-        ['Stat Visibility', 'Stat Control', 'Stat Reliability'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header2.appendChild(th);
-        });
-
-        const data2 = statsTable.insertRow();
-        ['visibility', 'control', 'reliability'].forEach(key => {
-            const td = data2.insertCell();
-            td.textContent = '0';
-            statCells.set(key, td);
-        });
-
-        // Row 3: Cooling | Charge | (empty)
-        const header3 = statsTable.insertRow();
-        const th3_1 = document.createElement('th');
-        th3_1.textContent = localization.translate('Stat Cooling');
-        header3.appendChild(th3_1);
-        const th3_2 = document.createElement('th');
-        th3_2.textContent = localization.translate('Stat Charge');
-        header3.appendChild(th3_2);
-        const th3_3 = document.createElement('th');
-        th3_3.textContent = ' ';
-        header3.appendChild(th3_3);
-
-        const data3 = statsTable.insertRow();
-        const td3_1 = data3.insertCell();
-        td3_1.textContent = '0';
-        statCells.set('cooling', td3_1);
-        const td3_2 = data3.insertCell();
-        td3_2.textContent = '0';
-        statCells.set('charge', td3_2);
-        data3.insertCell(); // empty cell
-
-        cell.appendChild(statsTable);
-        return statCells;
-    }
-
-    /**
      * Update values in existing DOM elements (fast path)
      */
     protected updateValues(): void {
@@ -505,22 +454,7 @@ export class AccessoriesUI extends BaseComponentUI {
         }
 
         // Update stat values
-        this.updateStatValues(bridge);
-    }
-
-    /**
-     * Update stat cell values
-     */
-    private updateStatValues(bridge: AircraftBridge): void {
-        if (!this.cache) return;
-
         const stats = bridge.getAccessoriesStats();
-
-        for (const [key, cell] of this.cache.statCells) {
-            const value = stats[key];
-            if (cell.textContent !== (value?.toString() || '0')) {
-                cell.textContent = value?.toString() || '0';
-            }
-        }
+        updateStatsTable(this.cache.statsTable, stats, ACCESSORIES_STATS);
     }
 }

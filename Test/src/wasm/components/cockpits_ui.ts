@@ -6,7 +6,6 @@
  */
 
 import { AircraftBridge, CockpitsOptions, CockpitOptions } from '../aircraft_bridge';
-import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
@@ -14,7 +13,11 @@ import {
     createFlexNumberInput,
     createFlexCell,
     createFlexCheckboxes,
-    createSelectElement
+    createSelectElement,
+    createCollapsibleSection,
+    createStatsTable,
+    updateStatsTable,
+    StatDisplayConfig
 } from '../dom_utils';
 
 // Cockpit stats configuration
@@ -38,7 +41,7 @@ interface CockpitRowCache {
     safetyChecks: HTMLInputElement[];
     gunsightChecks: HTMLInputElement[];
     bombsightInput: HTMLInputElement;
-    statsCell: HTMLTableCellElement;
+    statsTable: HTMLTableElement;
 }
 
 export class CockpitsUI extends BaseComponentUI {
@@ -143,7 +146,7 @@ export class CockpitsUI extends BaseComponentUI {
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Cockpit Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             contentDiv,
             true // Initially open
@@ -269,7 +272,7 @@ export class CockpitsUI extends BaseComponentUI {
         statsCell.className = 'inner_table';
         const stats = bridge.getCockpitStats(index);
         const derivedStats = bridge.getCockpitDerivedStats(index);
-        const statsTable = this.renderer.renderStatsTable(stats, COCKPIT_STATS, derivedStats);
+        const statsTable = createStatsTable(stats, COCKPIT_STATS, derivedStats);
         statsCell.appendChild(statsTable);
         row.appendChild(statsCell);
 
@@ -280,7 +283,7 @@ export class CockpitsUI extends BaseComponentUI {
             safetyChecks,
             gunsightChecks,
             bombsightInput,
-            statsCell
+            statsTable
         };
     }
 
@@ -332,10 +335,8 @@ export class CockpitsUI extends BaseComponentUI {
         cache.bombsightInput.disabled = !cockpitOptions.bombsight.enabled;
 
         // Update stats
-        cache.statsCell.innerHTML = '';
         const stats = bridge.getCockpitStats(index);
         const derivedStats = bridge.getCockpitDerivedStats(index);
-        const statsTable = this.renderer.renderStatsTable(stats, COCKPIT_STATS, derivedStats);
-        cache.statsCell.appendChild(statsTable);
+        updateStatsTable(cache.statsTable, stats, COCKPIT_STATS, derivedStats);
     }
 }

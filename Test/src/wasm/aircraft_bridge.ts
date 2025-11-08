@@ -107,7 +107,7 @@ export interface DerivedStats {
 // Interface for the WASM AircraftWasm class
 export interface AircraftWasmAPI {
     getName(): string;
-    setName(name: string): void;
+    setName(name: string): void; fueluses
     getEraBindings(): any;
     setEraBindings(bindings: any): void;
     getEraStats(): Stats;
@@ -157,6 +157,76 @@ export interface AircraftWasmAPI {
 
 // Interface for initialization function
 export type WasmInit = () => Promise<void>;
+
+/**
+ * Adds together an arbitrary number of stats objects
+ * Verifies that any extra properties are numbers before adding
+ *
+ * @param stats - Variable number of Stats objects
+ * @returns A new Stats object with all properties summed
+ * @throws Error if any extra property is not a number
+ *
+ * @example
+ * const total = addStats(stat1, stat2, stat3);
+ */
+export function addStats(...statsList: Stats[]): Stats {
+    if (statsList.length === 0) {
+        return {
+            mass: 0,
+            drag: 0,
+            cost: 0,
+            control: 0,
+            reqsections: 0,
+            flightstress: 0,
+            escape: 0,
+            visibility: 0,
+        };
+    }
+
+    // Get all unique property keys from all stats objects
+    const allKeys = new Set<string>();
+    for (const stat of statsList) {
+        Object.keys(stat).forEach(key => allKeys.add(key));
+    }
+
+    // Sum up all numeric properties
+    const result: Stats = {
+        mass: 0,
+        drag: 0,
+        cost: 0,
+        control: 0,
+        reqsections: 0,
+        flightstress: 0,
+        escape: 0,
+        visibility: 0,
+    };
+
+    for (const key of allKeys) {
+        let sum = 0;
+        let isExtraProperty = !result.hasOwnProperty(key);
+
+        for (const stat of statsList) {
+            const value = stat[key];
+
+            // Only sum properties that exist in this object
+            if (value !== undefined && value !== null) {
+                // Verify extra properties are numbers
+                if (isExtraProperty && typeof value !== 'number') {
+                    continue;
+                }
+                if (typeof value === 'number') {
+                    sum += value;
+                }
+            }
+        }
+
+        if (typeof result[key] === 'number' || isExtraProperty) {
+            (result as any)[key] = sum;
+        }
+    }
+
+    return result;
+}
 
 /**
  * TypeScript bridge to Rust Aircraft WASM

@@ -6,10 +6,9 @@
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createRulesLink, updateSelectElement } from '../dom_utils';
+import { createCollapsibleSection, createRulesLink, createSelectElement, createStatsTable, StatDisplayConfig, updateSelectElement, updateStatsTable } from '../dom_utils';
 
 // Era stats configuration (matching original TypeScript: liftbleed, cost, pitchstab)
 const ERA_STATS: StatDisplayConfig[] = [
@@ -21,7 +20,7 @@ const ERA_STATS: StatDisplayConfig[] = [
 export class EraUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
     private selectElement: HTMLSelectElement = undefined;
-    private statCells: HTMLTableCellElement[] = [];
+    private statsTable: HTMLTableElement = undefined;
 
     protected shouldUpdate(): boolean {
         console.log("[EraUI] selectElement is " + this.selectElement);
@@ -30,7 +29,7 @@ export class EraUI extends BaseComponentUI {
 
     protected clearCache(): void {
         this.selectElement = undefined;
-        this.statCells = [];
+        this.statsTable = undefined;
     }
 
     /**
@@ -57,15 +56,12 @@ export class EraUI extends BaseComponentUI {
 
         // Header row with Era Option and stat headers
         const headerRow = document.createElement('tr');
-        const headers = [
-            localization.translate('Era Option'),
-            ...ERA_STATS.map(s => localization.translate(s.label))
-        ];
-        headers.forEach(headerText => {
-            const th = document.createElement('th');
-            th.textContent = headerText;
-            headerRow.appendChild(th);
-        });
+        const th = document.createElement('th');
+        th.textContent = localization.translate('Era Option');
+        headerRow.appendChild(th);
+        const th2 = document.createElement('th');
+        th2.textContent = localization.translate('Era Era Stats');
+        headerRow.appendChild(th2);
         table.appendChild(headerRow);
 
         // Data row with select and stat cells
@@ -73,8 +69,7 @@ export class EraUI extends BaseComponentUI {
 
         // Era select cell
         const selectCell = document.createElement('td');
-        this.selectElement = this.renderer.renderSelect(
-            eraBindings.selected_era,
+        this.selectElement = createSelectElement(eraBindings.selected_era,
             (selectedIndex) => {
                 // Update the binding
                 const bindings = bridge.getEraBindings();
@@ -88,26 +83,23 @@ export class EraUI extends BaseComponentUI {
 
                 console.log(`[EraUI] Era changed to index ${selectedIndex}`);
             }
-        ) as HTMLSelectElement;
+        );
         selectCell.appendChild(this.selectElement);
         dataRow.appendChild(selectCell);
 
         // Add stat cells
-        ERA_STATS.forEach(() => {
-            const statCell = document.createElement('td');
-            statCell.textContent = '0'; // Initial value
-            this.statCells.push(statCell);
-            dataRow.appendChild(statCell);
-        });
+        const statCell = document.createElement("td") as HTMLTableCellElement;
+        statCell.className = 'inner_table';
+        const stats = bridge.getEraStats();
+        const statsTable = createStatsTable(stats, ERA_STATS);
+        statCell.appendChild(statsTable)
+        dataRow.appendChild(statCell);
 
         table.appendChild(dataRow);
 
-        // Update stat values
-        this.updateStatValues(bridge);
-
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Era Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             table,
             true // Initially open
@@ -138,19 +130,7 @@ export class EraUI extends BaseComponentUI {
         updateSelectElement(this.selectElement, eraBindings.selected_era);
 
         // Update stat values
-        this.updateStatValues(bridge);
-    }
-
-    /**
-     * Update stat cell values
-     */
-    private updateStatValues(bridge: AircraftBridge): void {
         const stats = bridge.getEraStats();
-        ERA_STATS.forEach((config, idx) => {
-            if (idx < this.statCells.length) {
-                const value = stats[config.key];
-                this.statCells[idx].textContent = value?.toString() || '0';
-            }
-        });
+        updateStatsTable(this.statsTable, stats, ERA_STATS);
     }
 }

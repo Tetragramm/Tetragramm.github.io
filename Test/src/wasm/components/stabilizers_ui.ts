@@ -6,7 +6,6 @@
  */
 
 import { AircraftBridge } from '../aircraft_bridge';
-import { StatDisplayConfig } from '../binding_renderer';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
@@ -14,8 +13,22 @@ import {
     updateSelectElement,
     createFlexSection,
     createFlexNumberInput,
-    createSelectElement
+    createSelectElement,
+    createCollapsibleSection,
+    createStatsTable,
+    updateStatsTable,
+    StatDisplayConfig
 } from '../dom_utils';
+
+// Stabilizer stats configuration
+const STABILIZER_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'control', label: 'Stat Control', positiveIsGood: true },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'pitchstab', label: 'Stat Pitch Stability', positiveIsGood: true },
+    { key: 'latstab', label: 'Stat Lateral Stability', positiveIsGood: true },
+    { key: 'liftbleed', label: 'Stat Lift Bleed', positiveIsGood: true },
+];
 
 // Cache interface for type safety
 interface StabilizersCache {
@@ -23,7 +36,7 @@ interface StabilizersCache {
     hCountInput: HTMLInputElement;
     vTypeSelect: HTMLSelectElement;
     vCountInput: HTMLInputElement;
-    statCells: Map<string, HTMLTableCellElement>;
+    statsTable: HTMLTableElement;
 }
 
 export class StabilizersUI extends BaseComponentUI {
@@ -83,7 +96,8 @@ export class StabilizersUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
-        const statCells = this.createStatsSection(statsCell);
+        let stats = bridge.getStabilizersStats();
+        const statsTable = createStatsTable(stats, STABILIZER_STATS)
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
@@ -94,15 +108,12 @@ export class StabilizersUI extends BaseComponentUI {
             hCountInput,
             vTypeSelect,
             vCountInput,
-            statCells
+            statsTable
         };
-
-        // Update stat values
-        this.updateStatValues(bridge);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Stabilizers Section Title');
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             mainTable,
             true // Initially open
@@ -219,50 +230,6 @@ export class StabilizersUI extends BaseComponentUI {
     }
 
     /**
-     * Create stats section (inner table with 6 stats)
-     */
-    private createStatsSection(cell: HTMLTableCellElement): Map<string, HTMLTableCellElement> {
-        cell.className = 'inner_table';
-        const statsTable = document.createElement('table');
-        statsTable.className = 'inner_table';
-
-        const statCells = new Map<string, HTMLTableCellElement>();
-
-        // Row 1: Drag | Control | Cost
-        const header1 = statsTable.insertRow();
-        ['Stat Drag', 'Stat Control', 'Stat Cost'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header1.appendChild(th);
-        });
-
-        const data1 = statsTable.insertRow();
-        ['drag', 'control', 'cost'].forEach(key => {
-            const td = data1.insertCell();
-            td.textContent = '0';
-            statCells.set(key, td);
-        });
-
-        // Row 2: Pitch Stability | Lateral Stability | Lift Bleed
-        const header2 = statsTable.insertRow();
-        ['Stat Pitch Stability', 'Stat Lateral Stability', 'Stat Lift Bleed'].forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = localization.translate(key);
-            header2.appendChild(th);
-        });
-
-        const data2 = statsTable.insertRow();
-        ['pitchstab', 'latstab', 'liftbleed'].forEach(key => {
-            const td = data2.insertCell();
-            td.textContent = '0';
-            statCells.set(key, td);
-        });
-
-        cell.appendChild(statsTable);
-        return statCells;
-    }
-
-    /**
      * Update values in existing DOM elements (fast path)
      */
     protected updateValues(): void {
@@ -282,22 +249,7 @@ export class StabilizersUI extends BaseComponentUI {
         this.cache.vCountInput.disabled = !bindings.vstab_count.enabled;
 
         // Update stat values
-        this.updateStatValues(bridge);
-    }
-
-    /**
-     * Update stat cell values
-     */
-    private updateStatValues(bridge: AircraftBridge): void {
-        if (!this.cache) return;
-
         const stats = bridge.getStabilizersStats();
-
-        for (const [key, cell] of this.cache.statCells) {
-            const value = stats[key];
-            if (cell.textContent !== (value?.toString() || '0')) {
-                cell.textContent = value?.toString() || '0';
-            }
-        }
+        updateStatsTable(this.cache.statsTable, stats, STABILIZER_STATS);
     }
 }

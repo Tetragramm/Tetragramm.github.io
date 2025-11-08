@@ -7,6 +7,7 @@
 
 import { AircraftBridge } from '../aircraft_bridge';
 import { BindingRenderer } from '../binding_renderer';
+import { createCollapsibleSection } from '../dom_utils';
 import { localization } from '../localization';
 
 interface OptimizationRow {
@@ -176,7 +177,7 @@ export class OptimizationUI {
         contentDiv.appendChild(freeDiv);
         contentDiv.appendChild(this.mainTable);
 
-        this.sectionElement = this.renderer.createCollapsibleSection(
+        this.sectionElement = createCollapsibleSection(
             sectionTitle,
             contentDiv,
             true // Initially open
