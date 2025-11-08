@@ -111,11 +111,15 @@ protected rebuildFull(): void {
     const mainTable = document.createElement('table');
     // ... build UI sections
 
+    // Create stats table
+    const stats = bridge.getComponentStats();
+    const statsTable = createStatsTable(stats, COMPONENT_STATS);
+
     // Cache elements
-    this.cache = { /* DOM references */ };
+    this.cache = { /* DOM references */, statsTable };
 
     // Create collapsible section
-    this.sectionElement = this.renderer.createCollapsibleSection(title, mainTable, true);
+    this.sectionElement = createCollapsibleSection(title, mainTable, true);
 
     // Add rules link
     const rulesLine = createRulesLink('_Section_Name');
@@ -142,7 +146,9 @@ protected updateValues(): void {
     this.cache.someInput.value = bindings.some_value.value.toString();
     // ... update other elements
 
-    this.updateStatValues(bridge);
+    // Update stats table
+    const stats = bridge.getComponentStats();
+    updateStatsTable(this.cache.statsTable, stats, COMPONENT_STATS);
 }
 ```
 
@@ -155,7 +161,7 @@ interface ComponentCache {
     selectElement: HTMLSelectElement;
     numberInputs: HTMLInputElement[];
     checkboxes: HTMLInputElement[];
-    statCells: Map<string, HTMLTableCellElement>;
+    statsTable: HTMLTableElement;
 }
 
 export class ComponentUI extends BaseComponentUI {
@@ -347,6 +353,103 @@ Creates a table cell with a flex container pre-attached.
 const { cell, flex } = createFlexCell();
 // Add elements to flex.div1 and flex.div2
 row.appendChild(cell);
+```
+
+### Creating and Updating Stats Tables
+
+Stats tables use a consistent pattern across all components.
+
+#### `StatDisplayConfig` Interface
+
+Located in `dom_utils.ts`, defines how to display each stat:
+
+```typescript
+interface StatDisplayConfig {
+    key: string;              // Key in the Stats object
+    label: string;            // Localization key for the header
+    positiveIsGood?: boolean; // Whether positive change is good (for highlighting)
+    isDerived?: boolean;      // Whether this is a derived stat (special background)
+}
+```
+
+#### `createStatsTable()`
+
+Creates a stats table from a Stats object and configuration.
+
+**Signature:**
+```typescript
+createStatsTable(
+    stats: any,
+    statConfig: StatDisplayConfig[],
+    derivedStats?: any
+): HTMLTableElement
+```
+
+**Usage:**
+```typescript
+// Define stats configuration at top of component file
+const COMPONENT_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+];
+
+// In rebuildFull()
+const stats = bridge.getComponentStats();
+const statsTable = createStatsTable(stats, COMPONENT_STATS);
+statsCell.appendChild(statsTable);
+
+// Cache the table
+this.cache = { /* ... */, statsTable };
+```
+
+**What it does:**
+- Groups stats into rows of 3 columns
+- Creates alternating header/value rows
+- Translates header labels using localization
+- Applies `part_local` class to derived stats
+- Handles special cases (like flight stress range)
+
+#### `updateStatsTable()`
+
+Updates an existing stats table with new values.
+
+**Signature:**
+```typescript
+updateStatsTable(
+    table: HTMLTableElement,
+    stats: any,
+    statConfig: StatDisplayConfig[],
+    derivedStats?: any
+): void
+```
+
+**Usage:**
+```typescript
+// In updateValues()
+const stats = bridge.getComponentStats();
+updateStatsTable(this.cache.statsTable, stats, COMPONENT_STATS);
+```
+
+**Optimization:** Only updates cell content if the value changed, preventing unnecessary DOM operations.
+
+#### `createCollapsibleSection()`
+
+Creates a collapsible section with header and content.
+
+**Signature:**
+```typescript
+createCollapsibleSection(
+    title: string,
+    content: HTMLElement,
+    initiallyOpen: boolean
+): HTMLElement
+```
+
+**Usage:**
+```typescript
+const sectionTitle = localization.translate('Component Section Title');
+this.sectionElement = createCollapsibleSection(sectionTitle, mainTable, true);
 ```
 
 ### Other Utilities
@@ -652,85 +755,149 @@ if (this.cache.optionalCheckbox && bindings.field) {
 
 ### Stats Updates
 
-#### Creating Stats Table
+Stats tables are now handled consistently using helper functions from `dom_utils.ts`.
+
+#### StatDisplayConfig Interface
+
+Define which stats to display and how to display them:
 
 ```typescript
-private createStatsSection(cell: HTMLTableCellElement): Map<string, HTMLTableCellElement> {
-    cell.className = 'inner_table';
-    const statsTable = document.createElement('table');
-    statsTable.className = 'inner_table';
-
-    const statCells = new Map<string, HTMLTableCellElement>();
-
-    // Row 1: Headers and data cells
-    const header1 = statsTable.insertRow();
-    ['Stat Drag', 'Stat Mass', 'Stat Cost'].forEach(key => {
-        const th = document.createElement('th');
-        th.textContent = localization.translate(key);
-        header1.appendChild(th);
-    });
-
-    const data1 = statsTable.insertRow();
-    ['drag', 'mass', 'cost'].forEach(key => {
-        const td = data1.insertCell();
-        td.textContent = '0';
-        statCells.set(key, td);  // Cache by stat key
-    });
-
-    // More rows...
-
-    cell.appendChild(statsTable);
-    return statCells;
+interface StatDisplayConfig {
+    key: string;              // Key in the Stats object
+    label: string;            // Localization key for the label
+    positiveIsGood?: boolean; // Whether positive change is good (for future highlighting)
+    isDerived?: boolean;      // Whether this is a derived stat (gets special background)
 }
+```
+
+#### Component Stats Configuration
+
+Each component defines a constant array at the top of the file:
+
+```typescript
+// Stabilizer stats configuration
+const STABILIZER_STATS: StatDisplayConfig[] = [
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'control', label: 'Stat Control', positiveIsGood: true },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'pitchstab', label: 'Stat Pitch Stability', positiveIsGood: true },
+    { key: 'latstab', label: 'Stat Lateral Stability', positiveIsGood: true },
+    { key: 'liftbleed', label: 'Stat Lift Bleed', positiveIsGood: true },
+];
+```
+
+**Empty Cells:** Use an empty config to create empty cells for alignment:
+```typescript
+{ key: '', label: '', positiveIsGood: undefined }
+```
+
+**Table Layout:**
+- Stats are automatically grouped into rows of 3
+- Creates alternating header/value rows
+- Handles empty cells for alignment
+
+#### Creating Stats Table
+
+In `rebuildFull()`, use `createStatsTable()`:
+
+```typescript
+// Get stats from bridge
+const stats = bridge.getComponentStats();
+
+// Create table using helper
+const statsTable = createStatsTable(stats, COMPONENT_STATS);
+
+// Add to cell
+statsCell.appendChild(statsTable);
+
+// Cache the table element
+this.cache = {
+    // ... other elements
+    statsTable
+};
+```
+
+**Signature:**
+```typescript
+createStatsTable(
+    stats: any,                  // Stats object from Rust
+    statConfig: StatDisplayConfig[],  // Configuration array
+    derivedStats?: any          // Optional derived stats (for special cases)
+): HTMLTableElement
 ```
 
 #### Updating Stats
 
+In `updateValues()`, use `updateStatsTable()`:
+
 ```typescript
-private updateStatValues(bridge: AircraftBridge): void {
-    if (!this.cache) return;
+protected updateValues(): void {
+    const bridge = this.getBridgeIfInitialized();
+    if (!bridge || !this.cache) return;
 
+    // ... update other UI elements
+
+    // Update stats table
     const stats = bridge.getComponentStats();
-
-    for (const [key, cell] of this.cache.statCells) {
-        const value = stats[key];
-        if (cell.textContent !== (value?.toString() || '0')) {
-            cell.textContent = value?.toString() || '0';
-        }
-    }
+    updateStatsTable(this.cache.statsTable, stats, COMPONENT_STATS);
 }
 ```
 
-**Optimization:** Only update if value changed (prevents unnecessary DOM writes).
+**Signature:**
+```typescript
+updateStatsTable(
+    table: HTMLTableElement,    // Cached table element
+    stats: any,                 // Stats object from Rust
+    statConfig: StatDisplayConfig[],  // Same config used to create
+    derivedStats?: any          // Optional derived stats (for special cases)
+): void
+```
 
-### Multi-Component Stats (Load UI)
+**Optimization:** `updateStatsTable()` only updates cells if values changed, preventing unnecessary DOM writes.
 
-When a component combines multiple sub-components (Fuel + Munitions + Cargo):
+### Multi-Component Stats
+
+When a component combines multiple sub-components (e.g., Load UI = Fuel + Munitions + Cargo):
+
+#### Using addStats() Utility
 
 ```typescript
-private updateStatValues(bridge: AircraftBridge): void {
-    if (!this.cache) return;
+import { addStats } from '../aircraft_bridge';
+
+protected updateValues(): void {
+    const bridge = this.getBridgeIfInitialized();
+    if (!bridge || !this.cache) return;
 
     // Get stats from all sub-components
     const fuelStats = bridge.getFuelStats();
     const munitionsStats = bridge.getMunitionsStats();
     const cargoStats = bridge.getCargoStats();
 
-    // Combine stats (simple addition)
-    const combinedStats = {
-        drag: (fuelStats.drag || 0) + (munitionsStats.drag || 0) + (cargoStats.drag || 0),
-        mass: (fuelStats.mass || 0) + (munitionsStats.mass || 0) + (cargoStats.mass || 0),
-        // ... more stats
-    };
+    // Combine stats using helper
+    const combinedStats = addStats(fuelStats, munitionsStats, cargoStats);
 
-    // Update cells
-    for (const [key, cell] of this.cache.statCells) {
-        const value = combinedStats[key as keyof typeof combinedStats];
-        if (cell.textContent !== (value?.toString() || '0')) {
-            cell.textContent = value?.toString() || '0';
-        }
-    }
+    // Update table with combined stats
+    updateStatsTable(this.cache.statsTable, combinedStats, LOAD_STATS);
 }
+```
+
+**`addStats()` Signature:**
+```typescript
+addStats(...statsList: Stats[]): Stats
+```
+
+**What it does:**
+- Takes variable number of Stats objects
+- Returns new Stats object with all numeric properties summed
+- Verifies extra properties are numbers before adding
+- Handles missing/undefined properties gracefully
+
+**Example:**
+```typescript
+const stat1 = { drag: 5, mass: 10, cost: 100 };
+const stat2 = { drag: 3, mass: 7, cost: 50 };
+const combined = addStats(stat1, stat2);
+// Result: { drag: 8, mass: 17, cost: 150 }
 ```
 
 ### Localization
@@ -783,7 +950,7 @@ All components use collapsible sections:
 
 ```typescript
 const sectionTitle = localization.translate('Component Section Title');
-this.sectionElement = this.renderer.createCollapsibleSection(
+this.sectionElement = createCollapsibleSection(
     sectionTitle,
     contentElement,
     true  // initially open
@@ -797,6 +964,15 @@ this.sectionElement.insertBefore(
 );
 
 this.container.appendChild(this.sectionElement);
+```
+
+**Signature:**
+```typescript
+createCollapsibleSection(
+    title: string,           // Section title
+    content: HTMLElement,    // Content element
+    initiallyOpen: boolean   // Whether section starts expanded
+): HTMLElement
 ```
 
 ## Troubleshooting
@@ -906,7 +1082,12 @@ localization.onLocaleChange(() => this.rebuildFull());
 When creating a new component:
 
 - [ ] Extends `BaseComponentUI`
+- [ ] Defines stats configuration constant at top of file (if component has stats)
+  ```typescript
+  const COMPONENT_STATS: StatDisplayConfig[] = [ /* ... */ ];
+  ```
 - [ ] Defines cache interface with all element types
+  - [ ] Cache stores `statsTable: HTMLTableElement` (not Map of cells)
 - [ ] Implements `shouldUpdate()` (usually just `return this.cache !== undefined`)
 - [ ] Implements `clearCache()` (set cache to `undefined`)
 - [ ] Implements `rebuildFull()`:
@@ -915,27 +1096,32 @@ When creating a new component:
   - [ ] Creates table structure
   - [ ] Uses helper functions from `dom_utils`
   - [ ] Uses explicit binding keys (no blind loops)
-  - [ ] Caches all interactive elements
-  - [ ] Creates collapsible section with rules link
+  - [ ] Creates stats table with `createStatsTable(stats, COMPONENT_STATS)`
+  - [ ] Caches all interactive elements including `statsTable`
+  - [ ] Creates collapsible section with `createCollapsibleSection()`
+  - [ ] Adds rules link with `createRulesLink()`
 - [ ] Implements `updateValues()`:
   - [ ] Checks for cache and bridge
   - [ ] Updates all cached elements from fresh bindings
-  - [ ] Calls `updateStatValues()`
+  - [ ] Updates stats table with `updateStatsTable(cache.statsTable, stats, COMPONENT_STATS)`
 - [ ] Event handlers:
   - [ ] Get fresh bindings at start
   - [ ] Update bindings
   - [ ] Set bindings on bridge
   - [ ] Call `this.render()`
 - [ ] All user strings use `localization.translate()`
-- [ ] Imports needed helpers from `dom_utils`
+- [ ] Imports needed helpers from `dom_utils`:
+  - [ ] `createStatsTable`, `updateStatsTable`, `StatDisplayConfig` (if has stats)
+  - [ ] `createCollapsibleSection`
+  - [ ] `createFlexSection`, `createFlexNumberInput`, etc. (as needed)
 - [ ] TSDoc comments for public methods
+- [ ] No custom `createStatsSection()` or `updateStatValues()` methods
 
 ## Future Improvements
 
 ### Potential Helper Functions
 
-- `createMultiRowStatsTable()` - Simplify stats table creation
-- `createTable()` - Standardize table structure creation
+- `createTable()` - Standardize table structure creation with headers
 - `createFlexRadioButtons()` - For mutually exclusive options
 
 ### Binding Type Definitions
@@ -966,11 +1152,22 @@ Auto-generate TypeScript bridge methods from Rust annotations to ensure type saf
 
 ## Additional Resources
 
-- **Rust UI Macro Documentation**: See `ui_macro` crate
-- **Binding Renderer**: `binding_renderer.ts` for low-level rendering
-- **Aircraft Bridge**: `aircraft_bridge.ts` for WASM interface
-- **Example Components**: Study `load_ui.ts` (multi-section), `cockpits_ui.ts` (dynamic rows), `stabilizers_ui.ts` (simple layout)
+- **Rust UI Macro Documentation**: See `ui_macro` crate in `flyingcircusrust`
+- **DOM Utilities**: `dom_utils.ts` for all helper functions
+- **Aircraft Bridge**: `aircraft_bridge.ts` for WASM interface and `addStats()` utility
+- **Example Components**:
+  - `stabilizers_ui.ts` - Simple component with stats
+  - `load_ui.ts` - Multi-section component using `addStats()`
+  - `cockpits_ui.ts` - Dynamic rows based on data
+  - `accessories_ui.ts` - Complex multi-section component
 
 ## Version History
 
+- **v1.1** (2025-01-XX): Updated stats table handling to use consistent helper functions
+  - Moved `createCollapsibleSection` from BindingRenderer to dom_utils
+  - Added `createStatsTable()` and `updateStatsTable()` helper functions
+  - Added `StatDisplayConfig` interface for consistent stats configuration
+  - Added `addStats()` utility in aircraft_bridge for combining stats
+  - Removed BindingRenderer dependency from BaseComponentUI
+  - Updated all components to use new stats table pattern
 - **v1.0** (2025-01-XX): Initial guide created during Accessories component rewrite
