@@ -66,8 +66,6 @@ export class PassengersUI extends BaseComponentUI {
             localization.translate('Passengers Number of Seats'),
             localization.translate('Passengers Number of Beds'),
             localization.translate('Passengers Upgrade'),
-            localization.translate('Stat Mass'),
-            localization.translate('Stat Required Sections')
         ].forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
@@ -128,11 +126,12 @@ export class PassengersUI extends BaseComponentUI {
 
         // Stats cells - create stats table spanning 2 columns
         const statsCell = document.createElement('td');
-        statsCell.colSpan = 2;
+        statsCell.className = "inner_table";
+        statsCell.rowSpan = 2;
         const stats = bridge.getPassengersStats();
         const statsTable = createStatsTable(stats, PASSENGERS_STATS);
         statsCell.appendChild(statsTable);
-        dataRow.appendChild(statsCell);
+        headerRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
 
