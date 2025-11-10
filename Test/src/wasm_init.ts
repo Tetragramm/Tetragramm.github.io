@@ -275,8 +275,7 @@ export class WasmApplication {
         const derivedStats = this.bridge.getDerivedStats();
         console.log('[WasmApp] Stats updated:', derivedStats);
 
-        // TODO: Update stats display in UI
-        // For now, just log to console
+        this.render();
     }
 
     /**

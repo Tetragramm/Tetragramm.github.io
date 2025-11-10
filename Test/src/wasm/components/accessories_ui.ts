@@ -127,6 +127,7 @@ export class AccessoriesUI extends BaseComponentUI {
         // Stats cell
         const statsCell = document.createElement('td');
         statsCell.className = "inner_table";
+        statsCell.rowSpan = 3;
         const stats = bridge.getAccessoriesStats();
         const statsTable = createStatsTable(stats, ACCESSORIES_STATS);
         statsCell.append(statsTable);
@@ -210,52 +211,40 @@ export class AccessoriesUI extends BaseComponentUI {
         bridge: AircraftBridge
     ): HTMLInputElement[] {
         const flexContainer = createFlexSection();
+        const flexContainerL = createFlexSection();
+        const flexContainerR = createFlexSection();
+        flexContainer.div1.appendChild(flexContainerL.div0);
+        flexContainer.div2.appendChild(flexContainerR.div0);
 
-        // TODO: Need to determine how to get/set armour coverage
-        // For now, create placeholder inputs
-        const armourInputs: HTMLInputElement[] = [];
-
-        // Create 8 inputs for armour coverage (AP levels 1-8)
-        for (let i = 0; i < 8; i++) {
-            const label = document.createElement('label');
-            label.textContent = `Thickness ${i + 1}`;
-            label.className = 'flex-item';
-            label.style.marginLeft = '0.25em';
-            label.style.marginRight = '0.5em';
-
-            // Place labels in two columns
-            if (i < 4) {
-                flexContainer.div1.appendChild(label);
-            } else {
-                flexContainer.div1.appendChild(label);
-            }
-
-            const input = document.createElement('input');
-            input.type = 'number';
-            input.min = '0';
-            input.max = '100';
-            input.step = '1';
-            input.className = 'flex-item';
-            input.value = '0';
-
-            const index = i; // Capture for closure
-            input.addEventListener('change', () => {
-                // TODO: Need bridge method to set armour coverage
-                console.warn('[AccessoriesUI] Armour coverage setter not yet implemented');
-                this.render();
-            });
-
-            if (i < 4) {
-                flexContainer.div2.appendChild(input);
-            } else {
-                flexContainer.div2.appendChild(input);
-            }
-
-            armourInputs.push(input);
-        }
+        // Reconnaissance equipment counts
+        const armourBinding = bindings.armour_coverage;
+        const armourInputsL = armourBinding && Array.isArray(armourBinding)
+            ? createFlexNumberInputs(
+                flexContainerL,
+                armourBinding.slice(0, 4),
+                (idx) => (value) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.armour_coverage[idx].value = value;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
+        const armourInputsR = armourBinding && Array.isArray(armourBinding)
+            ? createFlexNumberInputs(
+                flexContainerR,
+                armourBinding.slice(4, 9),
+                (idx) => (value) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.armour_coverage[idx + 4].value = value;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
 
         cell.appendChild(flexContainer.div0);
-        return armourInputs;
+        return armourInputsL.concat(armourInputsR);
     }
 
     /**
@@ -466,7 +455,14 @@ export class AccessoriesUI extends BaseComponentUI {
         const bindings = bridge.getAccessoriesBindings();
 
         // Update armour inputs
-        // TODO: Need bridge method to get armour coverage
+        if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage)) {
+            bindings.armour_coverage.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.armourInputs.length) {
+                    this.cache!.armourInputs[idx].value = item.value.toString();
+                    this.cache!.armourInputs[idx].disabled = !item.enabled;
+                }
+            });
+        }
 
         // Update electrical inputs
         if (bindings.electrical_count && Array.isArray(bindings.electrical_count)) {

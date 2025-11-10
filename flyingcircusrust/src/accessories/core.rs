@@ -15,7 +15,12 @@ impl Accessories {
         let recon_sel = vec![0; recon_list.len()];
         let visi_sel = vec![false; visi_list.len()];
         let clim_sel = vec![false; climate_list.len()];
-        let armour_coverage = vec![0; 8];
+        let armour_list: Vec<ArmourEntry> = (1..9)
+            .map(|x| ArmourEntry {
+                name: t!("Thickness X", A = x).into(),
+            })
+            .collect();
+        let armour_coverage = vec![0; armour_list.len()];
 
         Accessories {
             electrical_list: Rc::new(electrical_list),
@@ -25,6 +30,7 @@ impl Accessories {
             climate_list: Rc::new(climate_list),
             autopilot_list: Rc::new(autopilot_list),
             control_list: Rc::new(control_list),
+            armour_list: armour_list,
             armour_coverage,
             electrical_count,
             radio_sel: 0,

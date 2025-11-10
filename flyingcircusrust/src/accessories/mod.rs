@@ -71,6 +71,12 @@ pub struct ControlEntry {
     pub stats: Stats,
 }
 
+/// Armour name
+#[derive(Debug, Clone)]
+pub struct ArmourEntry {
+    pub name: String,
+}
+
 /// Aircraft accessories system - armour, electrical, communications, visibility
 #[derive(UIBindings)]
 pub struct Accessories {
@@ -83,7 +89,10 @@ pub struct Accessories {
     pub(super) autopilot_list: Rc<Vec<AutopilotEntry>>,
     pub(super) control_list: Rc<Vec<ControlEntry>>,
 
+    armour_list: Vec<ArmourEntry>,
+
     // Armour coverage array (8 positions for different AP levels)
+    #[ui(number_list, source = "armour_list", set_fn = "set_armour_coverage")]
     pub(super) armour_coverage: Vec<i16>,
 
     // Electrical equipment counts
