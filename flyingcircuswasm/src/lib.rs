@@ -408,6 +408,29 @@ impl AircraftWasm {
         self.inner.part_stats();
     }
 
+    /// Get Wings UI bindings
+    #[wasm_bindgen(js_name = getWingsBindings)]
+    pub fn get_wings_bindings(&self) -> JsValue {
+        let options = self.inner.wings.create_ui_options();
+        serde_wasm_bindgen::to_value(&options).unwrap()
+    }
+
+    /// Update Wings from UI bindings
+    #[wasm_bindgen(js_name = setWingsBindings)]
+    pub fn set_wings_bindings(&mut self, js_options: JsValue) {
+        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+            self.inner.wings.receive_ui_selections(options);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Get stats for wings
+    #[wasm_bindgen(js_name = getWingsStats)]
+    pub fn get_wings_stats(&mut self) -> JsValue {
+        let stats = self.inner.wings.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
     /// Get Engines UI bindings (container with asymmetric flag and counts)
     #[wasm_bindgen(js_name = getEnginesBindings)]
     pub fn get_engines_bindings(&self) -> JsValue {

@@ -150,6 +150,9 @@ export interface AircraftWasmAPI {
     getFramesStats(): Stats;
     duplicateSection(index: number): void;
     deleteSection(index: number): void;
+    getWingsBindings(): any;
+    setWingsBindings(bindings: any): void;
+    getWingsStats(): Stats;
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
     getCockpitStats(index: number): any;
@@ -631,6 +634,31 @@ export class AircraftBridge {
     deleteSection(index: number): void {
         this.ensureInitialized();
         this.wasm!.deleteSection(index);
+    }
+
+    /**
+     * Get Wings UI bindings (includes localized strings from Rust)
+     */
+    getWingsBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getWingsBindings();
+    }
+
+    /**
+     * Update Wings from UI bindings
+     * Automatically recalculates stats
+     */
+    setWingsBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setWingsBindings(bindings);
+    }
+
+    /**
+     * Get stats for Wings
+     */
+    getWingsStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getWingsStats();
     }
 
     /**
