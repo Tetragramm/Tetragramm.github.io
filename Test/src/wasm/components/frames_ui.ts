@@ -196,8 +196,24 @@ export class FramesUI extends BaseComponentUI {
         const skinCell = document.createElement('td');
         dataRow.appendChild(skinCell);
 
-        // Options column (contains all section option checkboxes)
+        // Options column (contains 4 sub-columns for each checkbox type)
         const optionsCell = document.createElement('td');
+
+        // Create flex container with 4 columns for checkbox types
+        const optionsFlexContainer = createFlexSection();
+
+        // Create 4 separate divs for each checkbox type (geodesic, monocoque, internal bracing, lifting body)
+        const geodesicColumn = document.createElement('div');
+        const monocoqueColumn = document.createElement('div');
+        const internalBracingColumn = document.createElement('div');
+        const liftingBodyColumn = document.createElement('div');
+
+        optionsFlexContainer.div0.appendChild(geodesicColumn);
+        optionsFlexContainer.div0.appendChild(monocoqueColumn);
+        optionsFlexContainer.div0.appendChild(internalBracingColumn);
+        optionsFlexContainer.div0.appendChild(liftingBodyColumn);
+
+        optionsCell.appendChild(optionsFlexContainer.div0);
         dataRow.appendChild(optionsCell);
 
         // Stats column (spans all rows, contains stats table)
@@ -213,7 +229,16 @@ export class FramesUI extends BaseComponentUI {
         // Build section rows
         const sectionRows: SectionRowCache[] = [];
         for (let i = 0; i < bindings.sections.length; i++) {
-            const sectionCache = this.createSectionRow(bindings.sections[i], i, frameCell, skinCell, optionsCell);
+            const sectionCache = this.createSectionRow(
+                bindings.sections[i],
+                i,
+                frameCell,
+                skinCell,
+                geodesicColumn,
+                monocoqueColumn,
+                internalBracingColumn,
+                liftingBodyColumn
+            );
             sectionRows.push(sectionCache);
         }
 
@@ -259,7 +284,10 @@ export class FramesUI extends BaseComponentUI {
         index: number,
         frameCell: HTMLTableCellElement,
         skinCell: HTMLTableCellElement,
-        optionsCell: HTMLTableCellElement
+        geodesicColumn: HTMLDivElement,
+        monocoqueColumn: HTMLDivElement,
+        internalBracingColumn: HTMLDivElement,
+        liftingBodyColumn: HTMLDivElement
     ): SectionRowCache {
         // Frame span with +/- buttons and select
         const frameSpan = document.createElement('span');
@@ -301,15 +329,14 @@ export class FramesUI extends BaseComponentUI {
         skinSpan.appendChild(document.createElement('br'));
         skinCell.appendChild(skinSpan);
 
-        // Options span with checkboxes
-        const optionsSpan = document.createElement('span');
-        const flexContainer = createFlexSection();
+        // Create checkboxes and add each to its own column
 
-        // Update binding objects to have localized names
+        // Geodesic checkbox -> geodesicColumn
+        const geodesicSpan = document.createElement('span');
         const geodesicBinding = { ...sectionBindings.geodesic, name: localization.translate('Frames Geodesic') };
         const geodesicCheckbox = createFlexCheckbox(
             geodesicBinding,
-            flexContainer,
+            { div0: geodesicSpan },
             (checked) => {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].geodesic.selected = checked;
@@ -317,11 +344,14 @@ export class FramesUI extends BaseComponentUI {
                 this.render();
             }
         );
+        geodesicColumn.appendChild(geodesicSpan);
 
+        // Monocoque checkbox -> monocoqueColumn
+        const monocoqueSpan = document.createElement('span');
         const monocoqueBinding = { ...sectionBindings.monocoque, name: localization.translate('Frames Monocoque') };
         const monocoqueCheckbox = createFlexCheckbox(
             monocoqueBinding,
-            flexContainer,
+            { div0: monocoqueSpan },
             (checked) => {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].monocoque.selected = checked;
@@ -329,11 +359,14 @@ export class FramesUI extends BaseComponentUI {
                 this.render();
             }
         );
+        monocoqueColumn.appendChild(monocoqueSpan);
 
+        // Internal Bracing checkbox -> internalBracingColumn
+        const internalBracingSpan = document.createElement('span');
         const internalBracingBinding = { ...sectionBindings.internal_bracing, name: localization.translate('Frames Internal Bracing') };
         const internalBracingCheckbox = createFlexCheckbox(
             internalBracingBinding,
-            flexContainer,
+            { div0: internalBracingSpan },
             (checked) => {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].internal_bracing.selected = checked;
@@ -341,11 +374,14 @@ export class FramesUI extends BaseComponentUI {
                 this.render();
             }
         );
+        internalBracingColumn.appendChild(internalBracingSpan);
 
+        // Lifting Body checkbox -> liftingBodyColumn
+        const liftingBodySpan = document.createElement('span');
         const liftingBodyBinding = { ...sectionBindings.lifting_body, name: localization.translate('Frames Lifting Body') };
         const liftingBodyCheckbox = createFlexCheckbox(
             liftingBodyBinding,
-            flexContainer,
+            { div0: liftingBodySpan },
             (checked) => {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].lifting_body.selected = checked;
@@ -353,9 +389,7 @@ export class FramesUI extends BaseComponentUI {
                 this.render();
             }
         );
-
-        optionsSpan.appendChild(flexContainer.div0);
-        optionsCell.appendChild(optionsSpan);
+        liftingBodyColumn.appendChild(liftingBodySpan);
 
         return {
             row: null!, // Not using row for this layout
@@ -510,6 +544,20 @@ export class FramesUI extends BaseComponentUI {
             tailDataRow.appendChild(tailSkinCell);
 
             const tailOptionsCell = document.createElement('td');
+
+            // Create flex container with 3 columns for tail checkbox types
+            const tailOptionsFlexContainer = createFlexSection();
+
+            // Create 3 separate divs for each tail checkbox type (geodesic, monocoque, lifting body)
+            const tailGeodesicColumn = document.createElement('div');
+            const tailMonocoqueColumn = document.createElement('div');
+            const tailLiftingBodyColumn = document.createElement('div');
+
+            tailOptionsFlexContainer.div0.appendChild(tailGeodesicColumn);
+            tailOptionsFlexContainer.div0.appendChild(tailMonocoqueColumn);
+            tailOptionsFlexContainer.div0.appendChild(tailLiftingBodyColumn);
+
+            tailOptionsCell.appendChild(tailOptionsFlexContainer.div0);
             tailDataRow.appendChild(tailOptionsCell);
 
             tailTable.appendChild(tailDataRow);
@@ -523,7 +571,9 @@ export class FramesUI extends BaseComponentUI {
                     i,
                     tailFrameCell,
                     tailSkinCell,
-                    tailOptionsCell
+                    tailGeodesicColumn,
+                    tailMonocoqueColumn,
+                    tailLiftingBodyColumn
                 );
                 tailSectionRows.push(tailSectionCache);
             }
@@ -573,7 +623,9 @@ export class FramesUI extends BaseComponentUI {
         index: number,
         frameCell: HTMLTableCellElement,
         skinCell: HTMLTableCellElement,
-        optionsCell: HTMLTableCellElement
+        geodesicColumn: HTMLDivElement,
+        monocoqueColumn: HTMLDivElement,
+        liftingBodyColumn: HTMLDivElement
     ): TailSectionRowCache {
         // Frame span with select
         const frameSpan = document.createElement('span');
@@ -598,15 +650,14 @@ export class FramesUI extends BaseComponentUI {
         skinSpan.appendChild(document.createElement('br'));
         skinCell.appendChild(skinSpan);
 
-        // Options span with checkboxes
-        const optionsSpan = document.createElement('span');
-        const flexContainer = createFlexSection();
+        // Create checkboxes and add each to its own column
 
-        // Update binding objects to have localized names
+        // Geodesic checkbox -> geodesicColumn
+        const geodesicSpan = document.createElement('span');
         const geodesicBinding = { ...tailSectionBindings.geodesic, name: localization.translate('Frames Geodesic') };
         const geodesicCheckbox = createFlexCheckbox(
             geodesicBinding,
-            flexContainer,
+            { div0: geodesicSpan },
             (checked) => {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.tail_sections[index].geodesic.selected = checked;
@@ -614,11 +665,14 @@ export class FramesUI extends BaseComponentUI {
                 this.render();
             }
         );
+        geodesicColumn.appendChild(geodesicSpan);
 
+        // Monocoque checkbox -> monocoqueColumn
+        const monocoqueSpan = document.createElement('span');
         const monocoqueBinding = { ...tailSectionBindings.monocoque, name: localization.translate('Frames Monocoque') };
         const monocoqueCheckbox = createFlexCheckbox(
             monocoqueBinding,
-            flexContainer,
+            { div0: monocoqueSpan },
             (checked) => {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.tail_sections[index].monocoque.selected = checked;
@@ -626,11 +680,14 @@ export class FramesUI extends BaseComponentUI {
                 this.render();
             }
         );
+        monocoqueColumn.appendChild(monocoqueSpan);
 
+        // Lifting Body checkbox -> liftingBodyColumn
+        const liftingBodySpan = document.createElement('span');
         const liftingBodyBinding = { ...tailSectionBindings.lifting_body, name: localization.translate('Frames Lifting Body') };
         const liftingBodyCheckbox = createFlexCheckbox(
             liftingBodyBinding,
-            flexContainer,
+            { div0: liftingBodySpan },
             (checked) => {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.tail_sections[index].lifting_body.selected = checked;
@@ -638,9 +695,7 @@ export class FramesUI extends BaseComponentUI {
                 this.render();
             }
         );
-
-        optionsSpan.appendChild(flexContainer.div0);
-        optionsCell.appendChild(optionsSpan);
+        liftingBodyColumn.appendChild(liftingBodySpan);
 
         return {
             row: null!, // Not using row for this layout
