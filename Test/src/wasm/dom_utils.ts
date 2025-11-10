@@ -105,17 +105,17 @@ export function updateSelectElement(select: HTMLSelectElement, binding: any): vo
  */
 export function createFlexCheckbox(
     binding: any,
-    flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
+    flexContainer: { div1: HTMLElement, div2: HTMLElement },
     onChange: (checked: boolean) => void
 ): HTMLInputElement {
     const label = document.createElement('label');
     label.textContent = binding.name;
-    label.className = 'flex-item';
+    // label.className = 'flex-item';
     label.style.marginLeft = '0.25em';
     label.style.marginRight = '0.5em';
     flexContainer.div1.appendChild(label);
 
-    const checkboxSpan = document.createElement('span');
+    // const checkboxSpan = document.createElement('span');
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
     checkbox.className = 'flex-item';
@@ -125,10 +125,8 @@ export function createFlexCheckbox(
         onChange(checkbox.checked);
     });
 
-    const emptyLabel = document.createElement('label');
-    checkboxSpan.appendChild(emptyLabel);
-    checkboxSpan.appendChild(checkbox);
-    flexContainer.div2.appendChild(checkboxSpan);
+    // checkboxSpan.appendChild(checkbox);
+    flexContainer.div2.appendChild(checkbox);
 
     return checkbox;
 }
@@ -145,7 +143,7 @@ export function createFlexCheckbox(
  */
 export function createFlexNumberInput(
     binding: any,
-    flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
+    flexContainer: { div1: HTMLElement, div2: HTMLElement },
     onChange: (value: number) => void,
     min: string = '0',
     max?: string,
@@ -153,7 +151,7 @@ export function createFlexNumberInput(
 ): HTMLInputElement {
     const label = document.createElement('label');
     label.textContent = binding.name;
-    label.className = 'flex-item';
+    // label.className = 'flex-item';
     label.style.marginLeft = '0.25em';
     label.style.marginRight = '0.5em';
     flexContainer.div1.appendChild(label);
