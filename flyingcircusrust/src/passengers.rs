@@ -17,7 +17,11 @@ pub struct Passengers {
     seats: i16,
     #[ui(number, name = "beds")]
     beds: i16,
-    #[ui(check, name = "connected", enabled_fn = "is_connected_enabled")]
+    #[ui(
+        check,
+        name = "Passengers Connectivity",
+        enabled_fn = "is_connected_enabled"
+    )]
     connected: bool,
 }
 
