@@ -371,6 +371,43 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get Frames UI bindings
+    #[wasm_bindgen(js_name = getFramesBindings)]
+    pub fn get_frames_bindings(&self) -> JsValue {
+        let options = self.inner.frames.create_ui_options();
+        serde_wasm_bindgen::to_value(&options).unwrap()
+    }
+
+    /// Update Frames from UI bindings
+    #[wasm_bindgen(js_name = setFramesBindings)]
+    pub fn set_frames_bindings(&mut self, js_options: JsValue) {
+        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+            self.inner.frames.receive_ui_selections(options);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Get stats for frames
+    #[wasm_bindgen(js_name = getFramesStats)]
+    pub fn get_frames_stats(&mut self) -> JsValue {
+        let stats = self.inner.frames.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
+    /// Duplicate a section at the given index
+    #[wasm_bindgen(js_name = duplicateSection)]
+    pub fn duplicate_section(&mut self, index: usize) {
+        self.inner.frames.duplicate_section(index, 1);
+        self.inner.part_stats();
+    }
+
+    /// Delete a section at the given index
+    #[wasm_bindgen(js_name = deleteSection)]
+    pub fn delete_section(&mut self, index: usize) {
+        self.inner.frames.delete_section(index);
+        self.inner.part_stats();
+    }
+
     /// Get Engines UI bindings (container with asymmetric flag and counts)
     #[wasm_bindgen(js_name = getEnginesBindings)]
     pub fn get_engines_bindings(&self) -> JsValue {

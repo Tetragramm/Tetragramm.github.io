@@ -145,6 +145,11 @@ export interface AircraftWasmAPI {
     getStabilizersBindings(): any;
     setStabilizersBindings(bindings: any): void;
     getStabilizersStats(): Stats;
+    getFramesBindings(): any;
+    setFramesBindings(bindings: any): void;
+    getFramesStats(): Stats;
+    duplicateSection(index: number): void;
+    deleteSection(index: number): void;
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
     getCockpitStats(index: number): any;
@@ -585,6 +590,47 @@ export class AircraftBridge {
     getStabilizersStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getStabilizersStats();
+    }
+
+    /**
+     * Get Frames UI bindings (includes localized strings from Rust)
+     */
+    getFramesBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getFramesBindings();
+    }
+
+    /**
+     * Update Frames from UI bindings
+     * Automatically recalculates stats
+     */
+    setFramesBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setFramesBindings(bindings);
+    }
+
+    /**
+     * Get stats for Frames
+     */
+    getFramesStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getFramesStats();
+    }
+
+    /**
+     * Duplicate a cockpit section at the given index
+     */
+    duplicateSection(index: number): void {
+        this.ensureInitialized();
+        this.wasm!.duplicateSection(index);
+    }
+
+    /**
+     * Delete a cockpit section at the given index
+     */
+    deleteSection(index: number): void {
+        this.ensureInitialized();
+        this.wasm!.deleteSection(index);
     }
 
     /**

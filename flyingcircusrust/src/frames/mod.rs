@@ -8,6 +8,7 @@ mod part;
 mod queries;
 mod serialization;
 mod setters;
+mod ui;
 
 #[cfg(test)]
 mod tests;
