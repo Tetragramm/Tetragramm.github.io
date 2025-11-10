@@ -274,8 +274,8 @@ export function updateStatsTable(
         // Value row
         const valueRow = table.rows[row_idx];
         row_idx += 2;
-        for (let j = 0; j < statsPerRow; j++) {
-            const config = statConfig[i + j];
+        for (let j = 0; j < rowStats.length; j++) {
+            const config = rowStats[j];
             const td = valueRow.cells[j];
 
             // Get the value from stats or derivedStats

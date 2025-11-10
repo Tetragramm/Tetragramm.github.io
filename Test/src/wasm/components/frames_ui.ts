@@ -41,7 +41,7 @@ interface FramesCache {
     allSkinSelect: HTMLSelectElement;
     sectionRows: SectionRowCache[];
     statsTable: HTMLTableElement;
-    framesTableBody: HTMLElement; // Container for dynamic rows
+    framesTableBody: HTMLTableElement; // Container for dynamic rows
 
     // Tail section elements
     tailTypeSelect: HTMLSelectElement;
@@ -49,7 +49,6 @@ interface FramesCache {
     boomCheckbox: HTMLInputElement;
     flyingWingCheckbox: HTMLInputElement;
     tailSectionRows: TailSectionRowCache[];
-    tailTableBody: HTMLElement; // Container for dynamic tail rows
 }
 
 interface SectionRowCache {
@@ -107,7 +106,7 @@ export class FramesUI extends BaseComponentUI {
         this.container.appendChild(document.createElement('br'));
 
         // Build Tail section
-        this.tailSectionElement = this.createTailSection(bindings);
+        this.tailSectionElement = this.createTailSection(bindings, this.cache.framesTableBody);
         this.container.appendChild(this.tailSectionElement);
     }
 
@@ -233,7 +232,6 @@ export class FramesUI extends BaseComponentUI {
                 boomCheckbox: null!,
                 flyingWingCheckbox: null!,
                 tailSectionRows: [],
-                tailTableBody: null!,
             };
         } else {
             this.cache.allFrameSelect = allFrameSelect;
@@ -393,7 +391,7 @@ export class FramesUI extends BaseComponentUI {
     /**
      * Create the complete Tail section
      */
-    private createTailSection(bindings: any): HTMLElement {
+    private createTailSection(bindings: any, tailTable: HTMLTableElement): HTMLElement {
         const contentDiv = document.createElement('div');
 
         // Tail controls (h4 with selects and checkboxes)
@@ -486,8 +484,6 @@ export class FramesUI extends BaseComponentUI {
 
         // Tail sections table (if any tail sections exist)
         if (bindings.tail_sections && bindings.tail_sections.length > 0) {
-            const tailTable = document.createElement('table');
-
             // Header row
             const tailHeaderRow = document.createElement('tr');
             const tailFrameHeader = document.createElement('th');
@@ -541,7 +537,6 @@ export class FramesUI extends BaseComponentUI {
                 this.cache.boomCheckbox = boomCheckbox;
                 this.cache.flyingWingCheckbox = flyingWingCheckbox;
                 this.cache.tailSectionRows = tailSectionRows;
-                this.cache.tailTableBody = tailTable;
             }
         } else {
             // No tail sections, just store the controls
@@ -551,7 +546,6 @@ export class FramesUI extends BaseComponentUI {
                 this.cache.boomCheckbox = boomCheckbox;
                 this.cache.flyingWingCheckbox = flyingWingCheckbox;
                 this.cache.tailSectionRows = [];
-                this.cache.tailTableBody = null!;
             }
         }
 
