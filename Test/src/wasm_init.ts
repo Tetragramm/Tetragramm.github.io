@@ -260,6 +260,7 @@ export class WasmApplication {
         this.loadUI.render(forceFull);
         this.landingGearUI.render(forceFull);
         this.accessoriesUI.render(forceFull);
+        this.optimizationUI.render(forceFull);
     }
 
     /**

@@ -319,6 +319,12 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get number of available optimizations
+    #[wasm_bindgen(js_name=getOptimizationAvailable)]
+    pub fn get_optimization_available(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.inner.optimization.get_unassigned_count()).unwrap()
+    }
+
     /// Get Reinforcements UI bindings
     #[wasm_bindgen(js_name = getReinforcementsBindings)]
     pub fn get_reinforcements_bindings(&self) -> JsValue {

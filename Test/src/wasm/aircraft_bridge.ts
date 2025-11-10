@@ -138,6 +138,7 @@ export interface AircraftWasmAPI {
     getOptimizationBindings(): any;
     setOptimizationBindings(bindings: any): void;
     getOptimizationStats(): Stats;
+    getOptimizationAvailable(): number;
     getReinforcementsBindings(): any;
     setReinforcementsBindings(bindings: any): void;
     getReinforcementsStats(): Stats;
@@ -529,6 +530,11 @@ export class AircraftBridge {
     getOptimizationStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getOptimizationStats();
+    }
+
+    getOptimizationAvailable(): number {
+        this.ensureInitialized();
+        return this.wasm!.getOptimizationAvailable();
     }
 
     /**

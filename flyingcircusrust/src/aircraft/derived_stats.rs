@@ -325,7 +325,7 @@ impl Aircraft {
         // Calculate Max Strain
         let mut max_strain = (stats.maxstrain as i16 - dry_mp).min(stats.structure as i16);
         self.optimization.final_ms =
-            (self.optimization.get_maxstrain() as f32 * 1.5 * max_strain as f32 / 10.0).floor();
+            (self.optimization.maxstrain as f32 * 1.5 * max_strain as f32 / 10.0).floor();
         max_strain += self.optimization.final_ms as i16;
 
         // Apply used condition: Fragile

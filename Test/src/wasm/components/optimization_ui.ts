@@ -112,16 +112,18 @@ export class OptimizationUI extends BaseComponentUI {
         // Create optimization rows for all 8 optimization types
         const optimizationTypes = [
             { key: 'cost', label: 'Optimization Cost' },
-            { key: 'lift_bleed', label: 'Optimization Lift Bleed' },
-            { key: 'leg_room', label: 'Optimization Leg Room' },
+            { key: 'bleed', label: 'Optimization Lift Bleed' },
+            { key: 'escape', label: 'Optimization Leg Room' },
             { key: 'mass', label: 'Optimization Mass' },
             { key: 'toughness', label: 'Optimization Toughness' },
-            { key: 'max_strain', label: 'Optimization Max Strain' },
+            { key: 'maxstrain', label: 'Optimization Max Strain' },
             { key: 'reliability', label: 'Optimization Reliability' },
             { key: 'drag', label: 'Optimization Drag' }
         ];
 
         const optimizationRows: OptimizationRow[] = [];
+
+        console.log(bindings);
 
         optimizationTypes.forEach((opt, idx) => {
             const binding = bindings[opt.key];
@@ -171,6 +173,8 @@ export class OptimizationUI extends BaseComponentUI {
         );
 
         this.container.appendChild(this.sectionElement);
+
+        this.updateValues();
 
         console.log('[OptimizationUI] Full rebuild complete');
     }
@@ -272,7 +276,7 @@ export class OptimizationUI extends BaseComponentUI {
             this.updateChecked(value, row.checkboxes);
 
             // Update enabled state for positive checkboxes (only positive checkboxes can be limited by free dots)
-            this.updateEnabled(freeDots, row.checkboxes);
+            this.updateEnabled(row.checkboxes);
         });
 
         // Update stats table
@@ -315,13 +319,13 @@ export class OptimizationUI extends BaseComponentUI {
      * Update enabled state for positive checkboxes based on available free dots
      * Matches original UpdateEnabled logic
      */
-    private updateEnabled(freeDots: number, checkboxes: HTMLInputElement[]): void {
-        let free = 0;
-        for (let i = 3; i < checkboxes.length; i++) {
-            if (!checkboxes[i].checked) {
+    private updateEnabled(checkboxes: HTMLInputElement[]): void {
+        let free = this.getBridge().getOptimizationAvailable();
+        for (let i = 0; i < 3; i++) {
+            if (checkboxes[i + 3].checked) {
                 free++;
             }
-            checkboxes[i].disabled = free > freeDots;
+            checkboxes[i + 3].disabled = i + 1 > free;
         }
     }
 }
