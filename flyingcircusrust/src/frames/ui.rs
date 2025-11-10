@@ -312,27 +312,33 @@ impl Frames {
             return;
         }
 
-        let current_sec = &sec_list[idx];
+        // Extract all current values before dropping the immutable borrow
+        let current_frame = sec_list[idx].frame;
+        let current_geodesic = sec_list[idx].geodesic;
+        let current_monocoque = sec_list[idx].monocoque;
+        let current_internal_bracing = sec_list[idx].internal_bracing;
+        let current_lifting_body = sec_list[idx].lifting_body;
+        let _ = sec_list; // Explicitly drop the immutable borrow
 
         // Update frame type
-        if options.frame.selected != current_sec.frame {
+        if options.frame.selected != current_frame {
             self.set_frame(idx, options.frame.selected);
         }
 
         // Update flags
-        if options.geodesic.selected != current_sec.geodesic {
+        if options.geodesic.selected != current_geodesic {
             self.set_geodesic(idx, options.geodesic.selected);
         }
 
-        if options.monocoque.selected != current_sec.monocoque {
+        if options.monocoque.selected != current_monocoque {
             self.set_monocoque(idx, options.monocoque.selected);
         }
 
-        if options.internal_bracing.selected != current_sec.internal_bracing {
+        if options.internal_bracing.selected != current_internal_bracing {
             self.set_internal_bracing(idx, options.internal_bracing.selected);
         }
 
-        if options.lifting_body.selected != current_sec.lifting_body {
+        if options.lifting_body.selected != current_lifting_body {
             self.set_lifting_body(idx, options.lifting_body.selected);
         }
     }
@@ -344,23 +350,28 @@ impl Frames {
             return;
         }
 
-        let current_sec = &tail_sec_list[idx];
+        // Extract all current values before dropping the immutable borrow
+        let current_frame = tail_sec_list[idx].frame;
+        let current_geodesic = tail_sec_list[idx].geodesic;
+        let current_monocoque = tail_sec_list[idx].monocoque;
+        let current_lifting_body = tail_sec_list[idx].lifting_body;
+        let _ = tail_sec_list; // Explicitly drop the immutable borrow
 
         // Update frame type
-        if options.frame.selected != current_sec.frame {
+        if options.frame.selected != current_frame {
             self.set_tail_frame(idx, options.frame.selected);
         }
 
         // Update flags
-        if options.geodesic.selected != current_sec.geodesic {
+        if options.geodesic.selected != current_geodesic {
             self.set_tail_geodesic(idx, options.geodesic.selected);
         }
 
-        if options.monocoque.selected != current_sec.monocoque {
+        if options.monocoque.selected != current_monocoque {
             self.set_tail_monocoque(idx, options.monocoque.selected);
         }
 
-        if options.lifting_body.selected != current_sec.lifting_body {
+        if options.lifting_body.selected != current_lifting_body {
             self.set_tail_lifting_body(idx, options.lifting_body.selected);
         }
     }
