@@ -254,6 +254,7 @@ export class WasmApplication {
     private render(forceFull: boolean = false): void {
         this.eraUI.render(forceFull);
         this.cockpitsUI.render(forceFull);
+        this.propellerUI.render(forceFull);
         this.stabilizersUI.render(forceFull);
         this.controlSurfacesUI.render(forceFull);
         this.reinforcementsUI.render(forceFull);
