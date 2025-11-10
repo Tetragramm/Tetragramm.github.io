@@ -87,44 +87,42 @@ export class AccessoriesUI extends BaseComponentUI {
 
         const bindings = bridge.getAccessoriesBindings();
 
-        // Create main table with 4 columns: Armour | Electrical | Information | Stats
+        // Create main table with 2 rows: first row has 4 cells, second row has 3 cells
         const mainTable = document.createElement('table');
         mainTable.style.width = '100%';
         mainTable.id = 'tbl_accessories';
 
-        // Header row
-        const headerRow = document.createElement('tr');
-        const headers = [
-            localization.translate('Accessories Armour'),
-            localization.translate('Accessories Electrical'),
-            localization.translate('Accessories Information'),
-            localization.translate('Accessories Accessories Stats')
-        ];
-        headers.forEach(headerText => {
+        // Row 1 - Header
+        const headerRow1 = document.createElement('tr');
+        [
+            localization.translate('Accessories Climate'),
+            localization.translate('Accessories Armour Coverage'),
+            localization.translate('Accessories Visibility'),
+            localization.translate('Accessories Additional Part Stats')
+        ].forEach(headerText => {
             const th = document.createElement('th');
             th.textContent = headerText;
-            headerRow.appendChild(th);
+            headerRow1.appendChild(th);
         });
-        mainTable.appendChild(headerRow);
+        mainTable.appendChild(headerRow1);
 
-        // Data row
-        const dataRow = document.createElement('tr');
+        // Row 1 - Data
+        const dataRow1 = document.createElement('tr');
+
+        // Climate cell
+        const climateCell = document.createElement('td');
+        const climCheckboxes = this.createClimateSection(climateCell, bindings, bridge);
+        dataRow1.appendChild(climateCell);
 
         // Armour cell
         const armourCell = document.createElement('td');
         const armourInputs = this.createArmourSection(armourCell, bindings, bridge);
-        dataRow.appendChild(armourCell);
+        dataRow1.appendChild(armourCell);
 
-        // Electrical cell (radio + electrical equipment)
-        const electricalCell = document.createElement('td');
-        const { radioSelect, electricalInputs } = this.createElectricalSection(electricalCell, bindings, bridge);
-        dataRow.appendChild(electricalCell);
-
-        // Information cell (recon, visibility, climate, autopilot, control)
-        const infoCell = document.createElement('td');
-        const { reconInputs, visiCheckboxes, climCheckboxes, autopilotSelect, controlSelect } =
-            this.createInformationSection(infoCell, bindings, bridge);
-        dataRow.appendChild(infoCell);
+        // Visibility cell
+        const visibilityCell = document.createElement('td');
+        const visiCheckboxes = this.createVisibilitySection(visibilityCell, bindings, bridge);
+        dataRow1.appendChild(visibilityCell);
 
         // Stats cell
         const statsCell = document.createElement('td');
@@ -132,9 +130,42 @@ export class AccessoriesUI extends BaseComponentUI {
         const stats = bridge.getAccessoriesStats();
         const statsTable = createStatsTable(stats, ACCESSORIES_STATS);
         statsCell.append(statsTable);
-        dataRow.appendChild(statsCell);
+        dataRow1.appendChild(statsCell);
 
-        mainTable.appendChild(dataRow);
+        mainTable.appendChild(dataRow1);
+
+        // Row 2 - Header
+        const headerRow2 = document.createElement('tr');
+        [
+            localization.translate('Accessories Information'),
+            localization.translate('Accessories Electrical'),
+            localization.translate('Accessories Control')
+        ].forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow2.appendChild(th);
+        });
+        mainTable.appendChild(headerRow2);
+
+        // Row 2 - Data
+        const dataRow2 = document.createElement('tr');
+
+        // Information cell (reconnaissance)
+        const infoCell = document.createElement('td');
+        const reconInputs = this.createInformationSection(infoCell, bindings, bridge);
+        dataRow2.appendChild(infoCell);
+
+        // Electrical cell (radio + electrical equipment)
+        const electricalCell = document.createElement('td');
+        const { radioSelect, electricalInputs } = this.createElectricalSection(electricalCell, bindings, bridge);
+        dataRow2.appendChild(electricalCell);
+
+        // Control cell (autopilot + control system)
+        const controlCell = document.createElement('td');
+        const { autopilotSelect, controlSelect } = this.createControlSection(controlCell, bindings, bridge);
+        dataRow2.appendChild(controlCell);
+
+        mainTable.appendChild(dataRow2);
 
         // Cache elements
         this.cache = {
@@ -281,50 +312,14 @@ export class AccessoriesUI extends BaseComponentUI {
     }
 
     /**
-     * Create information section (recon, visibility, climate, autopilot, control)
+     * Create climate section (climate control checkboxes)
      */
-    private createInformationSection(
+    private createClimateSection(
         cell: HTMLTableCellElement,
         bindings: any,
         bridge: AircraftBridge
-    ): {
-        reconInputs: HTMLInputElement[];
-        visiCheckboxes: HTMLInputElement[];
-        climCheckboxes: HTMLInputElement[];
-        autopilotSelect: HTMLSelectElement;
-        controlSelect: HTMLSelectElement;
-    } {
+    ): HTMLInputElement[] {
         const flexContainer = createFlexSection();
-
-        // Reconnaissance equipment counts
-        const reconBinding = bindings.recon_sel;
-        const reconInputs = reconBinding && Array.isArray(reconBinding)
-            ? createFlexNumberInputs(
-                flexContainer,
-                reconBinding,
-                (idx) => (value) => {
-                    const updatedBindings = bridge.getAccessoriesBindings();
-                    updatedBindings.recon_sel[idx].value = value;
-                    bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
-                }
-            )
-            : [];
-
-        // Visibility equipment toggles
-        const visiBinding = bindings.visi_sel;
-        const visiCheckboxes = visiBinding && Array.isArray(visiBinding)
-            ? createFlexCheckboxes(
-                flexContainer,
-                visiBinding,
-                (idx) => (checked) => {
-                    const updatedBindings = bridge.getAccessoriesBindings();
-                    updatedBindings.visi_sel[idx].selected = checked;
-                    bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
-                }
-            )
-            : [];
 
         // Climate control toggles
         const climBinding = bindings.clim_sel;
@@ -342,8 +337,81 @@ export class AccessoriesUI extends BaseComponentUI {
             : [];
 
         cell.appendChild(flexContainer.div0);
+        return climCheckboxes;
+    }
 
-        // Autopilot select (separate from flex container)
+    /**
+     * Create visibility section (visibility equipment checkboxes)
+     */
+    private createVisibilitySection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): HTMLInputElement[] {
+        const flexContainer = createFlexSection();
+
+        // Visibility equipment toggles
+        const visiBinding = bindings.visi_sel;
+        const visiCheckboxes = visiBinding && Array.isArray(visiBinding)
+            ? createFlexCheckboxes(
+                flexContainer,
+                visiBinding,
+                (idx) => (checked) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.visi_sel[idx].selected = checked;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
+
+        cell.appendChild(flexContainer.div0);
+        return visiCheckboxes;
+    }
+
+    /**
+     * Create information section (reconnaissance equipment)
+     */
+    private createInformationSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): HTMLInputElement[] {
+        const flexContainer = createFlexSection();
+
+        // Reconnaissance equipment counts
+        const reconBinding = bindings.recon_sel;
+        const reconInputs = reconBinding && Array.isArray(reconBinding)
+            ? createFlexNumberInputs(
+                flexContainer,
+                reconBinding,
+                (idx) => (value) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.recon_sel[idx].value = value;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.render();
+                }
+            )
+            : [];
+
+        cell.appendChild(flexContainer.div0);
+        return reconInputs;
+    }
+
+    /**
+     * Create control section (autopilot and control system)
+     */
+    private createControlSection(
+        cell: HTMLTableCellElement,
+        bindings: any,
+        bridge: AircraftBridge
+    ): {
+        autopilotSelect: HTMLSelectElement;
+        controlSelect: HTMLSelectElement;
+    } {
+        const flexContainer = createFlexSection();
+
+        // Autopilot select
         const autopilotBinding = bindings.auto_sel;
         const autopilotSelect = autopilotBinding ? createSelectElement(
             autopilotBinding,
@@ -364,7 +432,7 @@ export class AccessoriesUI extends BaseComponentUI {
             cell.appendChild(document.createElement('br'));
         }
 
-        // Control system select (separate from flex container)
+        // Control system select
         const controlBinding = bindings.cont_sel;
         const controlSelect = controlBinding ? createSelectElement(
             controlBinding,
@@ -385,7 +453,7 @@ export class AccessoriesUI extends BaseComponentUI {
             cell.appendChild(document.createElement('br'));
         }
 
-        return { reconInputs, visiCheckboxes, climCheckboxes, autopilotSelect, controlSelect };
+        return { autopilotSelect, controlSelect };
     }
 
     /**
