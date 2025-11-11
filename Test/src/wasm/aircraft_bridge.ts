@@ -177,6 +177,15 @@ export interface AircraftWasmAPI {
     getRadiatorStats(index: number): any;
     getRadiatorBindings(index: number): any;
     setRadiatorBindings(index: number, bindings: any): void;
+
+    // Engine selection methods
+    getEngineFullStats(index: number): any;
+    getEngineListNames(): string[];
+    getEngineNamesInList(listName: string): string[];
+    getEngineSelectedList(index: number): string;
+    getEngineSelectedName(index: number): string;
+    setEngineSelectedList(index: number, listName: string): void;
+    setEngineSelectedIndex(index: number, engineIndex: number): void;
 }
 
 // Interface for initialization function
@@ -767,6 +776,65 @@ export class AircraftBridge {
     setNumberOfRadiators(num: number): void {
         this.ensureInitialized();
         this.wasm!.setNumberOfRadiators(num);
+    }
+
+    /**
+     * Get full EngineStats for a specific engine (includes rarity, overspeed, altitude, torque, rumble)
+     */
+    getEngineFullStats(index: number): any {
+        this.ensureInitialized();
+        return this.wasm!.getEngineFullStats(index);
+    }
+
+    /**
+     * Get all available engine list names (static method, doesn't need bridge initialized)
+     */
+    getEngineListNames(): string[] {
+        this.ensureInitialized();
+        return this.wasm!.getEngineListNames();
+    }
+
+    /**
+     * Get all engine names in a specific list (static method)
+     */
+    getEngineNamesInList(listName: string): string[] {
+        this.ensureInitialized();
+        return this.wasm!.getEngineNamesInList(listName);
+    }
+
+    /**
+     * Get the selected engine list name for a specific engine
+     */
+    getEngineSelectedList(index: number): string {
+        this.ensureInitialized();
+        return this.wasm!.getEngineSelectedList(index);
+    }
+
+    /**
+     * Get the selected engine name for a specific engine
+     */
+    getEngineSelectedName(index: number): string {
+        this.ensureInitialized();
+        return this.wasm!.getEngineSelectedName(index);
+    }
+
+    /**
+     * Set the selected engine list for a specific engine
+     * Automatically selects the first engine in the new list
+     * Recalculates stats
+     */
+    setEngineSelectedList(index: number, listName: string): void {
+        this.ensureInitialized();
+        this.wasm!.setEngineSelectedList(index, listName);
+    }
+
+    /**
+     * Set the selected engine by index within its current list
+     * Recalculates stats
+     */
+    setEngineSelectedIndex(index: number, engineIndex: number): void {
+        this.ensureInitialized();
+        this.wasm!.setEngineSelectedIndex(index, engineIndex);
     }
 
     /**
