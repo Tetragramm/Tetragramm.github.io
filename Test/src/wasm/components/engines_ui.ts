@@ -402,6 +402,7 @@ class EngineUI {
         if (fullStats.oiltank) {
             // Rotary engine
             const span = document.createElement('span');
+            span.style = "white-space: pre-line";
             span.textContent = localization.translate('Engine Rotary Cooling');
             cell.appendChild(span);
         } else if (cooling === 0) {
@@ -479,23 +480,24 @@ class EngineUI {
         // Push-pull and torque-to-struct checkboxes
         const flexContainer = createFlexSection();
 
+        console.log(bindings);
         const pushPullCheckbox = createFlexCheckbox(
-            bindings.use_pushpull,
+            bindings.is_push_pull,
             flexContainer,
             (checked) => {
                 const updatedBindings = bridge.getEngineBindings(this.index);
-                updatedBindings.use_pushpull.selected = checked;
+                updatedBindings.is_push_pull.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
                 this.update();
             }
         );
 
         const torqueCheckbox = createFlexCheckbox(
-            bindings.pp_torque_to_struct,
+            bindings.torque_to_struct,
             flexContainer,
             (checked) => {
                 const updatedBindings = bridge.getEngineBindings(this.index);
-                updatedBindings.pp_torque_to_struct.selected = checked;
+                updatedBindings.torque_to_struct.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
                 this.update();
             }
@@ -510,11 +512,11 @@ class EngineUI {
 
         // Extended driveshafts checkbox
         const driveshaftCheckbox = createFlexCheckbox(
-            bindings.use_driveshafts,
+            bindings.extended_ds,
             flexContainer,
             (checked) => {
                 const updatedBindings = bridge.getEngineBindings(this.index);
-                updatedBindings.use_driveshafts.selected = checked;
+                updatedBindings.extended_ds.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
                 this.update();
             }
@@ -534,11 +536,11 @@ class EngineUI {
 
         // Geared propeller count input
         const gearCountInput = createFlexNumberInput(
-            bindings.geared_propeller_ratio,
+            bindings.gear_count,
             flexContainer,
             (value) => {
                 const updatedBindings = bridge.getEngineBindings(this.index);
-                updatedBindings.geared_propeller_ratio.value = value;
+                updatedBindings.gear_count.value = value;
                 bridge.setEngineBindings(this.index, updatedBindings);
                 this.update();
             }
@@ -546,11 +548,11 @@ class EngineUI {
 
         // Geared propeller reliability input
         const gearReliabilityInput = createFlexNumberInput(
-            bindings.geared_propeller_reliability,
+            bindings.geared_reliability,
             flexContainer,
             (value) => {
                 const updatedBindings = bridge.getEngineBindings(this.index);
-                updatedBindings.geared_propeller_reliability.value = value;
+                updatedBindings.geared_reliability.value = value;
                 bridge.setEngineBindings(this.index, updatedBindings);
                 this.update();
             }

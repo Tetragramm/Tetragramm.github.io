@@ -192,7 +192,7 @@ pub struct Engine {
 
     #[ui(
         check,
-        name = "use_pushpull",
+        name = "Engine Push Pull",
         enabled_fn = "is_pushpull_enabled",
         set_fn = "set_use_push_pull"
     )]
@@ -200,7 +200,7 @@ pub struct Engine {
 
     #[ui(
         check,
-        name = "pp_torque_to_struct",
+        name = "Engine Torque To Structure",
         enabled_fn = "is_torque_to_struct_enabled",
         set_fn = "set_torque_to_struct"
     )]
@@ -208,7 +208,7 @@ pub struct Engine {
 
     #[ui(
         check,
-        name = "intake_fan",
+        name = "Engine Air Cooling Fan",
         enabled_fn = "is_intake_fan_enabled",
         set_fn = "set_intake_fan"
     )]
@@ -216,7 +216,7 @@ pub struct Engine {
 
     #[ui(
         check,
-        name = "use_driveshafts",
+        name = "Engine Extended Driveshafts",
         enabled_fn = "is_extended_ds_enabled",
         set_fn = "set_use_extended_driveshaft"
     )]
@@ -224,7 +224,7 @@ pub struct Engine {
 
     #[ui(
         check,
-        name = "outboard_prop",
+        name = "Engine Outboard Propeller",
         enabled_fn = "is_outboard_prop_enabled",
         set_fn = "set_outboard_prop"
     )]
@@ -232,7 +232,7 @@ pub struct Engine {
 
     #[ui(
         number,
-        name = "geared_propeller_ratio",
+        name = "Engine Geared Propeller",
         enabled_fn = "is_gears_enabled",
         set_fn = "set_gear_count"
     )]
@@ -240,7 +240,7 @@ pub struct Engine {
 
     #[ui(
         number,
-        name = "geared_propeller_reliability",
+        name = "Engine Negate Reliability Penalty",
         enabled_fn = "is_gears_enabled",
         set_fn = "set_gear_reliability"
     )]
@@ -258,7 +258,7 @@ pub struct Engine {
 
     #[ui(
         check,
-        name = "is_generator",
+        name = "Engine Generator",
         enabled_fn = "is_generator_enabled",
         set_fn = "set_generator"
     )]
@@ -266,7 +266,7 @@ pub struct Engine {
 
     #[ui(
         check,
-        name = "has_alternator",
+        name = "Engine Alternator",
         enabled_fn = "is_alternator_enabled",
         set_fn = "set_alternator"
     )]
