@@ -662,6 +662,99 @@ export class AircraftBridge {
     }
 
     /**
+     * Get Engines UI bindings (includes localized strings from Rust)
+     */
+    getEnginesBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getEnginesBindings();
+    }
+
+    /**
+     * Update Engines from UI bindings
+     * Automatically recalculates stats
+     */
+    setEnginesBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setEnginesBindings(bindings);
+    }
+
+    /**
+     * Get stats for Engines container
+     */
+    getEnginesStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getEnginesStats();
+    }
+
+    /**
+     * Get UI bindings for a specific engine
+     */
+    getEngineBindings(index: number): any {
+        this.ensureInitialized();
+        return this.wasm!.getEngineBindings(index);
+    }
+
+    /**
+     * Update a specific engine from UI bindings
+     * Automatically recalculates stats
+     */
+    setEngineBindings(index: number, bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setEngineBindings(index, bindings);
+    }
+
+    /**
+     * Get stats for a specific engine
+     */
+    getEngineStats(index: number): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getEngineStats(index);
+    }
+
+    /**
+     * Get UI bindings for a specific radiator
+     */
+    getRadiatorBindings(index: number): any {
+        this.ensureInitialized();
+        return this.wasm!.getRadiatorBindings(index);
+    }
+
+    /**
+     * Update a specific radiator from UI bindings
+     * Automatically recalculates stats
+     */
+    setRadiatorBindings(index: number, bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setRadiatorBindings(index, bindings);
+    }
+
+    /**
+     * Get stats for a specific radiator
+     */
+    getRadiatorStats(index: number): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getRadiatorStats(index);
+    }
+
+    /**
+     * Set the number of engines
+     * Automatically recalculates stats
+     */
+    setNumberOfEngines(num: number): void {
+        this.ensureInitialized();
+        this.wasm!.setNumberOfEngines(num);
+    }
+
+    /**
+     * Set the number of radiators
+     * Automatically recalculates stats
+     */
+    setNumberOfRadiators(num: number): void {
+        this.ensureInitialized();
+        this.wasm!.setNumberOfRadiators(num);
+    }
+
+    /**
      * Get Cockpits UI bindings (includes localized strings from Rust)
      */
     getCockpitsBindings(): CockpitsOptions {

@@ -372,4 +372,81 @@ impl Engines {
         }
         m
     }
+
+    /// Set number of engines
+    /// TypeScript: SetNumberOfEngines(num: number)
+    /// Clamps to 0-20, removes or adds engines as needed
+    /// New engines are clones of the last engine (if one exists)
+    pub fn set_number_of_engines(&mut self, mut num: usize) {
+        // Clamp to valid range
+        num = num.min(20);
+
+        // Remove excess engines
+        while self.engines.len() > num {
+            self.engines.pop();
+        }
+
+        // Add new engines if needed
+        if self.engines.len() < num {
+            // Clone the last engine (if one exists) to use as template
+            let template = if let Some(last_engine) = self.engines.last() {
+                // Serialize and deserialize to clone
+                use crate::serialization::{Serializable, Serializer};
+                let mut serializer = Serializer::new();
+                if last_engine.serialize(&mut serializer).is_ok() {
+                    Some(serializer)
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
+            while self.engines.len() < num {
+                let mut new_engine = crate::engine::Engine::new(
+                    self.mounts.as_ref().clone(),
+                    self.cowls.as_ref().clone(),
+                );
+
+                // If we have a template, deserialize from it
+                if let Some(ref ser) = template {
+                    use crate::serialization::Deserializer;
+                    let mut deserializer = Deserializer::from_data(ser.data(), 1000.0);
+                    let _ = new_engine.deserialize(&mut deserializer);
+                }
+
+                // Update radiator count for new engine
+                new_engine.set_num_radiators(self.radiators.len());
+                self.engines.push(new_engine);
+            }
+        }
+    }
+
+    /// Set number of radiators
+    /// TypeScript: SetNumberOfRadiators(num: number)
+    /// Clamps to 0-20, removes or adds radiators as needed
+    /// Updates all engines with new radiator count
+    pub fn set_number_of_radiators(&mut self, mut num: usize) {
+        // Clamp to valid range
+        num = num.min(20);
+
+        // Remove excess radiators
+        while self.radiators.len() > num {
+            self.radiators.pop();
+        }
+
+        // Add new radiators if needed
+        while self.radiators.len() < num {
+            self.radiators.push(Radiator::new(
+                self.radiator_types.as_ref().clone(),
+                self.radiator_mounts.as_ref().clone(),
+                self.radiator_coolants.as_ref().clone(),
+            ));
+        }
+
+        // Update all engines with new radiator count
+        for engine in &mut self.engines {
+            engine.set_num_radiators(self.radiators.len());
+        }
+    }
 }

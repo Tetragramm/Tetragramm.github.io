@@ -513,6 +513,20 @@ impl AircraftWasm {
         }
     }
 
+    /// Set the number of engines
+    #[wasm_bindgen(js_name = setNumberOfEngines)]
+    pub fn set_number_of_engines(&mut self, num: usize) {
+        self.inner.engines.set_number_of_engines(num);
+        self.inner.part_stats();
+    }
+
+    /// Set the number of radiators
+    #[wasm_bindgen(js_name = setNumberOfRadiators)]
+    pub fn set_number_of_radiators(&mut self, num: usize) {
+        self.inner.engines.set_number_of_radiators(num);
+        self.inner.part_stats();
+    }
+
     /// Calculate all aircraft statistics
     #[wasm_bindgen(js_name = calculateStats)]
     pub fn calculate_stats(&mut self) {
