@@ -247,6 +247,20 @@ interface EngineCache {
     engineSelect: HTMLSelectElement;
     rarityLabel: HTMLSpanElement;
     statLabels: HTMLSpanElement[];
+
+    // Cooling section (conditional elements based on engine type)
+    coolingCell: HTMLTableCellElement;
+
+    // Mounting section
+    mountSelect?: HTMLSelectElement;
+    pushPullCheckbox?: HTMLInputElement;
+    torqueCheckbox?: HTMLInputElement;
+
+    // Upgrades section
+    driveshaftCheckbox?: HTMLInputElement;
+    outboardCheckbox?: HTMLInputElement;
+    gearCountInput?: HTMLInputElement;
+    gearReliabilityInput?: HTMLInputElement;
 }
 
 /**
@@ -354,7 +368,7 @@ class EngineUI {
         // Cooling Section Content
         const coolingRow = optionsTable.insertRow();
         const coolingCell = coolingRow.insertCell();
-        this.buildCoolingSection(coolingCell, bindings, fullStats);
+        const coolingElements = this.buildCoolingSection(coolingCell, bindings, fullStats);
 
         // Mounting Section Header
         const mountingHeaderRow = optionsTable.insertRow();
@@ -365,7 +379,7 @@ class EngineUI {
         // Mounting Section Content
         const mountingRow = optionsTable.insertRow();
         const mountingCell = mountingRow.insertCell();
-        this.buildMountingSection(mountingCell, bindings);
+        const mountingElements = this.buildMountingSection(mountingCell, bindings);
 
         // Upgrades Section Header
         const upgradesHeaderRow = optionsTable.insertRow();
@@ -376,7 +390,7 @@ class EngineUI {
         // Upgrades Section Content
         const upgradesRow = optionsTable.insertRow();
         const upgradesCell = upgradesRow.insertCell();
-        this.buildUpgradesSection(upgradesCell, bindings);
+        const upgradesElements = this.buildUpgradesSection(upgradesCell, bindings);
 
         // TODO: Add additional cells for:
         // - Cowl & Electrical
@@ -389,11 +403,14 @@ class EngineUI {
             statLabels: [PowerLabel, MassLabel, DragLabel,
                 ReliabilityLabel, CoolingLabel, OverspeedLabel,
                 FuelLabel, AltitudeLabel, TorqueLabel,
-                RumbleLabel, CostLabel]
+                RumbleLabel, CostLabel],
+            coolingCell,
+            ...mountingElements,
+            ...upgradesElements
         }
     }
 
-    private buildCoolingSection(cell: HTMLTableCellElement, bindings: any, fullStats: any): void {
+    private buildCoolingSection(cell: HTMLTableCellElement, bindings: any, fullStats: any): {} {
         const bridge = this.getBridge();
 
         // Check engine type to determine cooling display
@@ -454,9 +471,12 @@ class EngineUI {
 
             cell.appendChild(flexContainer.div0);
         }
+
+        // Return empty object since we rebuild cooling section on update
+        return {};
     }
 
-    private buildMountingSection(cell: HTMLTableCellElement, bindings: any): void {
+    private buildMountingSection(cell: HTMLTableCellElement, bindings: any) {
         const bridge = this.getBridge();
 
         // Mounting location select
@@ -480,7 +500,6 @@ class EngineUI {
         // Push-pull and torque-to-struct checkboxes
         const flexContainer = createFlexSection();
 
-        console.log(bindings);
         const pushPullCheckbox = createFlexCheckbox(
             bindings.is_push_pull,
             flexContainer,
@@ -504,9 +523,15 @@ class EngineUI {
         );
 
         cell.appendChild(flexContainer.div0);
+
+        return {
+            mountSelect,
+            pushPullCheckbox,
+            torqueCheckbox
+        };
     }
 
-    private buildUpgradesSection(cell: HTMLTableCellElement, bindings: any): void {
+    private buildUpgradesSection(cell: HTMLTableCellElement, bindings: any) {
         const bridge = this.getBridge();
         const flexContainer = createFlexSection();
 
@@ -559,6 +584,13 @@ class EngineUI {
         );
 
         cell.appendChild(flexContainer.div0);
+
+        return {
+            driveshaftCheckbox,
+            outboardCheckbox,
+            gearCountInput,
+            gearReliabilityInput
+        };
     }
 
     private getRarityText(rarity: any): string {
@@ -603,6 +635,10 @@ class EngineUI {
 
     update(): void {
         const bridge = this.getBridge();
+        const bindings = bridge.getEngineBindings(this.index);
+        const fullStats = bridge.getEngineFullStats(this.index);
+
+        // Update engine list/type selects
         const allLists = bridge.getEngineNamesOfLists();
         const selectedList = bridge.getEngineSelectedList(this.index);
         const enginesInList = bridge.getEngineNamesInList(selectedList);
@@ -621,7 +657,8 @@ class EngineUI {
                 selected: enginesInList.indexOf(selectedEngineName),
                 enabled: true
             });
-        const fullStats = bridge.getEngineFullStats(this.index);
+
+        // Update rarity and stats
         this.cache.rarityLabel.textContent = this.getRarityText(fullStats.rarity);
         this.cache.rarityLabel.className = this.getRarityClass(fullStats.rarity);
         const stats = [
@@ -639,6 +676,41 @@ class EngineUI {
         ]
         for (let i = 0; i < this.cache.statLabels.length; i++) {
             this.cache.statLabels[i].innerText = stats[i].toString();
+        }
+
+        // Rebuild cooling section (conditional content based on engine type)
+        this.cache.coolingCell.innerHTML = '';
+        this.buildCoolingSection(this.cache.coolingCell, bindings, fullStats);
+
+        // Update mounting section
+        if (this.cache.mountSelect) {
+            updateSelectElement(this.cache.mountSelect, bindings.mount_sel);
+        }
+        if (this.cache.pushPullCheckbox) {
+            this.cache.pushPullCheckbox.checked = bindings.is_push_pull.selected;
+            this.cache.pushPullCheckbox.disabled = !bindings.is_push_pull.enabled;
+        }
+        if (this.cache.torqueCheckbox) {
+            this.cache.torqueCheckbox.checked = bindings.torque_to_struct.selected;
+            this.cache.torqueCheckbox.disabled = !bindings.torque_to_struct.enabled;
+        }
+
+        // Update upgrades section
+        if (this.cache.driveshaftCheckbox) {
+            this.cache.driveshaftCheckbox.checked = bindings.extended_ds.selected;
+            this.cache.driveshaftCheckbox.disabled = !bindings.extended_ds.enabled;
+        }
+        if (this.cache.outboardCheckbox) {
+            this.cache.outboardCheckbox.checked = bindings.outboard_prop.selected;
+            this.cache.outboardCheckbox.disabled = !bindings.outboard_prop.enabled;
+        }
+        if (this.cache.gearCountInput) {
+            this.cache.gearCountInput.value = bindings.gear_count.value.toString();
+            this.cache.gearCountInput.disabled = !bindings.gear_count.enabled;
+        }
+        if (this.cache.gearReliabilityInput) {
+            this.cache.gearReliabilityInput.value = bindings.geared_reliability.value.toString();
+            this.cache.gearReliabilityInput.disabled = !bindings.geared_reliability.enabled;
         }
     }
 }
