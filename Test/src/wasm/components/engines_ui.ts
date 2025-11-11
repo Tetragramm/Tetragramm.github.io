@@ -1,7 +1,8 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createRulesLink } from '../dom_utils';
+import { createCollapsibleSection, createFlexCheckbox, createFlexNumberInput, createRulesLink } from '../dom_utils';
+import { CreateCheckbox } from '../../disp/Tools';
 
 /**
  * Engines UI Component
@@ -66,121 +67,71 @@ export class EnginesUI extends BaseComponentUI {
 
         // Create collapsible section for Engines
         const sectionDiv = document.createElement('div');
-        this.container.appendChild(sectionDiv);
 
-        const { section, header, content } = createCollapsibleSection(
-            'engines-section',
+        const section = createCollapsibleSection(
             localization.translate('Engines Title'),
-            createRulesLink('engines')
+            sectionDiv,
+            true
         );
+
+        this.sectionElement = section;
+
+        // Add rules link using utility function
+        const rulesLine = document.createElement('span');
+        rulesLine.appendChild(createRulesLink('_Engines', 'Engine Rules').firstChild);
+        rulesLine.appendChild(createRulesLink('_Engines_Upgrades', 'Upgrade Rules').firstChild);
+        rulesLine.appendChild(createRulesLink('_Cooling_(Air)', 'Cooling Rules').firstChild);
+        rulesLine.appendChild(document.createElement('br'));
+        this.sectionElement.insertBefore(
+            rulesLine,
+            this.sectionElement.children[1]
+        );
+        this.container.appendChild(section);
         this.enginesSection = section;
-        sectionDiv.appendChild(section);
 
         // Create global controls table
-        const controlsTable = document.createElement('table');
-        controlsTable.className = 'part_table';
-        content.appendChild(controlsTable);
+        const controlsSpan = document.createElement('span');
+        sectionDiv.appendChild(controlsSpan);
 
-        const controlsRow = controlsTable.insertRow();
-
-        // Asymmetric checkbox cell
-        const asymmetricCell = controlsRow.insertCell();
-        this.asymmetricCheckbox = document.createElement('input');
-        this.asymmetricCheckbox.type = 'checkbox';
-        this.asymmetricCheckbox.onchange = () => {
-            const bindings = this.getBridge().getEnginesBindings();
-            bindings.is_asymmetric.selected = this.asymmetricCheckbox!.checked;
-            this.getBridge().setEnginesBindings(bindings);
-            this.render();
-        };
-        const asymmetricLabel = document.createElement('label');
-        asymmetricLabel.appendChild(this.asymmetricCheckbox);
-        asymmetricLabel.appendChild(document.createTextNode(' ' + localization.translate('Engines Asymmetric Plane')));
-        asymmetricCell.appendChild(asymmetricLabel);
-
-        // Number of engines cell
-        const numEnginesCell = controlsRow.insertCell();
-        const numEnginesLabel = document.createElement('span');
-        numEnginesLabel.textContent = localization.translate('Engines Number of Engines') + ': ';
-        numEnginesCell.appendChild(numEnginesLabel);
-
-        const enginesMinusBtn = document.createElement('button');
-        enginesMinusBtn.textContent = '-';
-        enginesMinusBtn.onclick = () => {
-            const bindings = this.getBridge().getEnginesBindings();
-            const newNum = Math.max(0, bindings.num_engines - 1);
-            this.getBridge().setNumberOfEngines(newNum);
-            this.render();
-        };
-        numEnginesCell.appendChild(enginesMinusBtn);
-
-        this.numEnginesInput = document.createElement('input');
-        this.numEnginesInput.type = 'number';
+        // Number of engines 
+        this.numEnginesInput = createFlexNumberInput({ name: localization.translate("Engines Num Engines"), value: 1, enabled: true },
+            { div1: controlsSpan, div2: controlsSpan },
+            () => {
+                const newNum = parseInt(this.numEnginesInput!.value) || 0;
+                this.getBridge().setNumberOfEngines(newNum);
+                this.render();
+            });
         this.numEnginesInput.min = '0';
         this.numEnginesInput.max = '20';
-        this.numEnginesInput.style.width = '60px';
-        this.numEnginesInput.onchange = () => {
-            const newNum = parseInt(this.numEnginesInput!.value) || 0;
-            this.getBridge().setNumberOfEngines(newNum);
-            this.render();
-        };
-        numEnginesCell.appendChild(this.numEnginesInput);
 
-        const enginesPlusBtn = document.createElement('button');
-        enginesPlusBtn.textContent = '+';
-        enginesPlusBtn.onclick = () => {
-            const bindings = this.getBridge().getEnginesBindings();
-            const newNum = Math.min(20, bindings.num_engines + 1);
-            this.getBridge().setNumberOfEngines(newNum);
-            this.render();
-        };
-        numEnginesCell.appendChild(enginesPlusBtn);
-
-        // Number of radiators cell
-        const numRadiatorsCell = controlsRow.insertCell();
-        const numRadiatorsLabel = document.createElement('span');
-        numRadiatorsLabel.textContent = localization.translate('Engines Number of Radiators') + ': ';
-        numRadiatorsCell.appendChild(numRadiatorsLabel);
-
-        const radiatorsMinusBtn = document.createElement('button');
-        radiatorsMinusBtn.textContent = '-';
-        radiatorsMinusBtn.onclick = () => {
-            const bindings = this.getBridge().getEnginesBindings();
-            const newNum = Math.max(0, bindings.num_radiators - 1);
-            this.getBridge().setNumberOfRadiators(newNum);
-            this.render();
-        };
-        numRadiatorsCell.appendChild(radiatorsMinusBtn);
-
-        this.numRadiatorsInput = document.createElement('input');
-        this.numRadiatorsInput.type = 'number';
+        // Number of radiators 
+        this.numRadiatorsInput = createFlexNumberInput({ name: localization.translate("Engines Num Radiators"), value: 1, enabled: true },
+            { div1: controlsSpan, div2: controlsSpan },
+            () => {
+                const newNum = parseInt(this.numRadiatorsInput!.value) || 0;
+                this.getBridge().setNumberOfRadiators(newNum);
+                this.render();
+            });
         this.numRadiatorsInput.min = '0';
         this.numRadiatorsInput.max = '20';
-        this.numRadiatorsInput.style.width = '60px';
-        this.numRadiatorsInput.onchange = () => {
-            const newNum = parseInt(this.numRadiatorsInput!.value) || 0;
-            this.getBridge().setNumberOfRadiators(newNum);
-            this.render();
-        };
-        numRadiatorsCell.appendChild(this.numRadiatorsInput);
 
-        const radiatorsPlusBtn = document.createElement('button');
-        radiatorsPlusBtn.textContent = '+';
-        radiatorsPlusBtn.onclick = () => {
-            const bindings = this.getBridge().getEnginesBindings();
-            const newNum = Math.min(20, bindings.num_radiators + 1);
-            this.getBridge().setNumberOfRadiators(newNum);
-            this.render();
-        };
-        numRadiatorsCell.appendChild(radiatorsPlusBtn);
+        // Asymmetric checkbox
+        this.asymmetricCheckbox = createFlexCheckbox({ name: localization.translate("Engines Asymmetric Plane"), value: false, enabled: true },
+            { div1: controlsSpan, div2: controlsSpan },
+            () => {
+                const bindings = this.getBridge().getEnginesBindings();
+                bindings.is_asymmetric.selected = this.asymmetricCheckbox!.checked;
+                this.getBridge().setEnginesBindings(bindings);
+                this.render();
+            });
 
         // Container for individual engines
         this.enginesContainer = document.createElement('div');
-        content.appendChild(this.enginesContainer);
+        sectionDiv.appendChild(this.enginesContainer);
 
         // Container for individual radiators
         this.radiatorsContainer = document.createElement('div');
-        content.appendChild(this.radiatorsContainer);
+        sectionDiv.appendChild(this.radiatorsContainer);
 
         // Initial update
         this.updateValues();

@@ -4,6 +4,7 @@ use crate::{
     engine::Engine,
     propeller::{DriveType, EngineInfo},
     radiator::{Radiator, RadiatorCoolantEntry, RadiatorEntry, RadiatorMountEntry},
+    serialization::Serializable,
     stats::Stats,
 };
 
@@ -394,7 +395,7 @@ impl Engines {
                 use crate::serialization::{Serializable, Serializer};
                 let mut serializer = Serializer::new();
                 if last_engine.serialize(&mut serializer).is_ok() {
-                    Some(serializer)
+                    Some(serializer.into_inner())
                 } else {
                     None
                 }
@@ -403,20 +404,17 @@ impl Engines {
             };
 
             while self.engines.len() < num {
-                let mut new_engine = crate::engine::Engine::new(
-                    self.mounts.as_ref().clone(),
-                    self.cowls.as_ref().clone(),
-                );
+                let mut new_engine = Engine::new(self.mounts.clone(), self.cowls.clone());
 
                 // If we have a template, deserialize from it
-                if let Some(ref ser) = template {
+                if let Some(ref bytes) = template {
                     use crate::serialization::Deserializer;
-                    let mut deserializer = Deserializer::from_data(ser.data(), 1000.0);
+                    let mut deserializer = Deserializer::new(bytes.as_slice()).unwrap();
                     let _ = new_engine.deserialize(&mut deserializer);
                 }
 
                 // Update radiator count for new engine
-                new_engine.set_num_radiators(self.radiators.len());
+                new_engine.set_num_radiators(self.radiators.len() as i16);
                 self.engines.push(new_engine);
             }
         }
@@ -446,7 +444,7 @@ impl Engines {
 
         // Update all engines with new radiator count
         for engine in &mut self.engines {
-            engine.set_num_radiators(self.radiators.len());
+            engine.set_num_radiators(self.radiators.len() as i16);
         }
     }
 }

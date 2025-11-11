@@ -30,16 +30,22 @@ export function createFlexSection(): { div0: HTMLDivElement, div1: HTMLDivElemen
  * @param sectionName - The anchor name in the Rules HTML (e.g., "_Cockpits", "_Era")
  * @returns An H4 element containing the formatted rules link
  */
-export function createRulesLink(sectionName: string): HTMLElement {
+export function createRulesLink(sectionName: string, specialText?: string): HTMLElement {
     const rulesLine = document.createElement('h4');
+    const rulesSpan = document.createElement('span');
     const rulesLink = document.createElement('a');
     rulesLink.href = `./Rules/Rules.htm#${sectionName}`;
     const rulesText = document.createElement('u');
-    rulesText.textContent = 'Rules';
+    if (specialText === undefined) {
+        rulesText.textContent = 'Rules';
+    } else {
+        rulesText.textContent = specialText;
+    }
     rulesLink.appendChild(rulesText);
-    rulesLine.appendChild(document.createTextNode('('));
-    rulesLine.appendChild(rulesLink);
-    rulesLine.appendChild(document.createTextNode(')'));
+    rulesSpan.appendChild(document.createTextNode('('));
+    rulesSpan.appendChild(rulesLink);
+    rulesSpan.appendChild(document.createTextNode(') '));
+    rulesLine.appendChild(rulesSpan);
 
     return rulesLine;
 }

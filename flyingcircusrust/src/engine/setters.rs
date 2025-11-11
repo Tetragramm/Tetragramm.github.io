@@ -192,4 +192,8 @@ impl Engine {
             self.extended_ds = true;
         }
     }
+
+    pub fn set_num_radiators(&mut self, num: i16) {
+        self.num_radiators = num;
+    }
 }

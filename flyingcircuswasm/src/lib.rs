@@ -502,6 +502,13 @@ impl AircraftWasm {
         }
     }
 
+    /// Get stats for a all engines
+    #[wasm_bindgen(js_name = getEnginesStats)]
+    pub fn get_engines_stats(&mut self) -> JsValue {
+        let stats = self.inner.engines.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
     /// Get stats for a specific engine
     #[wasm_bindgen(js_name = getEngineStats)]
     pub fn get_engine_stats(&mut self, index: usize) -> JsValue {

@@ -162,6 +162,21 @@ export interface AircraftWasmAPI {
     getStats(): any;
     serialize(): Uint8Array;
     serializeToLZString(): string;
+
+    setNumberOfEngines(count: number): void;
+
+    getEnginesStats(): any;
+    getEnginesBindings(): any;
+    setEnginesBindings(bindings: any): void;
+
+    getEngineStats(index: number): any;
+    getEngineBindings(index: number): any;
+    setEngineBindings(index: number, bindings: any): void;
+
+    setNumberOfRadiators(count: number): void;
+    getRadiatorStats(index: number): any;
+    getRadiatorBindings(index: number): any;
+    setRadiatorBindings(index: number, bindings: any): void;
 }
 
 // Interface for initialization function
