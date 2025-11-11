@@ -532,8 +532,8 @@ impl AircraftWasm {
     }
 
     /// Get all available engine list names
-    #[wasm_bindgen(js_name = getEngineListNames)]
-    pub fn get_engine_list_names() -> JsValue {
+    #[wasm_bindgen(js_name = getEngineNamesOfLists)]
+    pub fn get_engine_list_names(&self) -> JsValue {
         use flyingcircusrust::engine::Engine;
         let names = Engine::get_available_lists();
         serde_wasm_bindgen::to_value(&names).unwrap()
@@ -541,7 +541,7 @@ impl AircraftWasm {
 
     /// Get all engine names in a specific list
     #[wasm_bindgen(js_name = getEngineNamesInList)]
-    pub fn get_engine_names_in_list(list_name: &str) -> JsValue {
+    pub fn get_engine_names_in_list(&self, list_name: &str) -> JsValue {
         use flyingcircusrust::engine::Engine;
         let names = Engine::get_engines_in_list(list_name);
         serde_wasm_bindgen::to_value(&names).unwrap()
@@ -551,7 +551,9 @@ impl AircraftWasm {
     #[wasm_bindgen(js_name = getEngineSelectedList)]
     pub fn get_engine_selected_list(&self, index: usize) -> String {
         if index < self.inner.engines.engines.len() {
-            self.inner.engines.engines[index].get_selected_list().to_string()
+            self.inner.engines.engines[index]
+                .get_selected_list()
+                .to_string()
         } else {
             String::new()
         }
@@ -561,7 +563,9 @@ impl AircraftWasm {
     #[wasm_bindgen(js_name = getEngineSelectedName)]
     pub fn get_engine_selected_name(&self, index: usize) -> String {
         if index < self.inner.engines.engines.len() {
-            self.inner.engines.engines[index].get_selected_engine_name().to_string()
+            self.inner.engines.engines[index]
+                .get_selected_engine_name()
+                .to_string()
         } else {
             String::new()
         }

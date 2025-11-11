@@ -223,7 +223,8 @@ impl Engine {
     pub fn set_selected_index(&mut self, index: usize) {
         let engines = crate::engine_list::get_engine_names_in_list(&self.elist_key);
         if let Some(engine_name) = engines.get(index) {
-            self.set_selected_engine(&self.elist_key, engine_name);
+            let key = self.elist_key.clone();
+            self.set_selected_engine(key.as_str(), engine_name);
         }
     }
 }

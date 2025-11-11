@@ -90,16 +90,31 @@ export function createSelectElement(
  * @param binding - The binding with current state
  */
 export function updateSelectElement(select: HTMLSelectElement, binding: any): void {
+    if (binding.options) {
+        if (binding.options.length == select.options.length) {
+            binding.options.forEach((opt: any, idx: number) => {
+                select.options[idx].text = opt.name;
+                select.options[idx].disabled = !opt.enabled;
+            });
+        } else {
+            for (let idx = select.options.length - 1; idx >= 0; idx--) {
+                select.remove(idx);
+            }
+            binding.options.forEach((opt: any, idx: number) => {
+                const option = document.createElement('option');
+                option.value = idx.toString();
+                option.textContent = opt.name;
+                option.disabled = !opt.enabled;
+                if (idx === binding.selected) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+    }
+
     select.selectedIndex = binding.selected;
     select.disabled = !binding.enabled;
-
-    if (binding.options) {
-        binding.options.forEach((opt: any, idx: number) => {
-            if (idx < select.options.length) {
-                select.options[idx].disabled = !opt.enabled;
-            }
-        });
-    }
 }
 
 /**
@@ -394,6 +409,30 @@ export function createFlexSelect(
     flexContainer.div2.appendChild(select);
 
     return select;
+}
+
+/**
+ * Create a flex label that displays a read-only value
+ * @param binding - The binding object with name and value
+ * @param flexContainer - The flex container to add the label to
+ * @returns The created span element displaying the value
+ */
+export function createFlexLabel(
+    binding: any,
+    flexContainer: { div1: HTMLElement, div2: HTMLElement }
+): HTMLSpanElement {
+    const label = document.createElement('label');
+    label.textContent = binding.name;
+    label.style.marginLeft = '0.25em';
+    label.style.marginRight = '0.5em';
+    flexContainer.div1.appendChild(label);
+
+    const valueSpan = document.createElement('span');
+    valueSpan.textContent = binding.value?.toString() || '';
+    valueSpan.className = 'flex-item';
+    flexContainer.div2.appendChild(valueSpan);
+
+    return valueSpan;
 }
 
 /**

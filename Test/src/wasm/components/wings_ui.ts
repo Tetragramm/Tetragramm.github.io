@@ -302,7 +302,6 @@ export class WingsUI extends BaseComponentUI {
         }
 
         // Add "add mini wing" select
-        console.log(bindings.add_mini_wing.deck);
         const addMiniWingSelect = createSelectElement(
             bindings.add_mini_wing.deck,
             (selectedIndex) => {

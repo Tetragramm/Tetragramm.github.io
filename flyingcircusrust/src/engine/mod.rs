@@ -1,5 +1,6 @@
 use std::rc::Rc;
 
+use serde::Serialize;
 use ui_core::*;
 use ui_macro::*;
 
@@ -21,7 +22,7 @@ mod validation;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, PartialEq, Debug)]
 pub enum EngineRarity {
     CUSTOM,
     COMMON,
@@ -29,7 +30,7 @@ pub enum EngineRarity {
     LEGENDARY,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, PartialEq, Debug)]
 pub struct EngineStats {
     pub name: String,
     pub overspeed: i16,
@@ -160,7 +161,7 @@ impl EngineInputs {
     }
 }
 
-#[derive(UIBindings)]
+#[derive(UIBindings, Clone)]
 pub struct Engine {
     elist_key: String,
     pub etype_stats: EngineStats,

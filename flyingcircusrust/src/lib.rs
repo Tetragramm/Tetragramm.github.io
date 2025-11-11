@@ -4370,7 +4370,7 @@ mod cockpit;
 mod cockpits;
 mod control_surfaces;
 mod electric_builder;
-mod engine;
+pub mod engine;
 mod engine_list;
 mod engines;
 mod era;
@@ -4433,13 +4433,15 @@ pub fn translate_with_param(key: &str, value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use std::iter::zip;
+    use std::{iter::zip, rc::Rc};
 
     use crate::{
         aircraft::{Aircraft, AircraftType},
+        engine::{Engine, EngineInputs},
         json::vstr,
-        part::Part,
-        serialization::{JSSerializable, Serializable, Serializer},
+        part::{self, Part},
+        part_list::{self, get_part_list},
+        serialization::{Deserializer, JSSerializable, Serializable, Serializer},
         stats::Stats,
         types::DerivedStats,
     };
@@ -6240,29 +6242,25 @@ mod tests {
 
     #[test]
     fn test_serialize() {
-        let lz_in = "AAEAjATAdA7MAIA3A9gOwAQFlkCcDmAphgAoBmBOAJsAIDADgwAwMAGDAd0fse+h+8WrLlzYCOIcczYjePAZPFDeo+X0VT5qqRo4AoOSsPjdArcYVSBAIGAAMAEIUALgAsAhugBiEAAwAOX3QAYYAcgCMKdAgYX1cAB2AATGAAXClbPgBYaQ4AeCsBAGgAf4Bf4ABsYAAsQvr6ukcXD28-QJCIqJi4xKYAdX6ASXsnHDdPHwCgsMicaNiEgRoAQQBcgEyALIABDe3aYAAIAH4AAI4TpO2T-a2dG2AANDlRPnZRZvHWqY7Z7sWiRS6XEmV4ORY+QaHFKFWqdWhiKMXwmbWmnTmC16zEGIxRP3aMy68x6Sz4q02uzuh1OF2AVxu1JMjxedGEmkenHEb2AYIAKIdycthULRUYxVyJYLxTLJbLpXLFQrlSweWqBJCuWDUMAAFT1HX6jW8UxgsFWTXAACQwAAMEjeDaHbwAKCNdTAAxWYigHl8S1HZ25SyMJGWy1B42Zdk0WN0WxvGglEq85nRuO0eMKpMp80cN3Rw6iBPk5OpsxKyPQoA";
-        let mut deserialize = crate::serialization::Deserializer::from_lz_string(lz_in)
-            .expect("From LZ String Failed");
+        let part_list = get_part_list();
+        let mounts = Rc::new(part_list.engine_mounts);
+        let cowls = Rc::new(part_list.engine_cowls);
 
-        let u16_str = lz_str::decompress_from_encoded_uri_component(lz_in).unwrap();
+        let mut engine = Engine::new(mounts.clone(), cowls.clone());
+        engine.set_selected_list("Himmilgard Rotary");
+        engine.set_selected_engine("Himmilgard Rotary", "Rhona Motorbau Z11 80hp");
 
-        let bytes_in: Vec<u8> = u16_str.iter().map(|x| *x as u8).collect();
+        let mut ser = Serializer::new();
+        ser.push_string("12.7").unwrap();
+        engine.serialize(&mut ser).unwrap();
 
-        let mut acft = Aircraft::new();
-        acft.deserialize(&mut deserialize).unwrap();
+        let bytes = ser.into_inner();
 
-        acft.part_stats();
-        println!("relibility: {:?}", acft.engines.get_reliability_list());
+        let mut des = Deserializer::new(bytes.as_slice()).unwrap();
+        let _ = des.get_string().unwrap();
+        let mut e2 = Engine::new(mounts.clone(), cowls.clone());
+        e2.deserialize(&mut des).unwrap();
 
-        println!(
-            "estats.stats: {:?}",
-            acft.engines.get_engine(0).unwrap().etype_stats.stats
-        );
-
-        let mut s = Serializer::new();
-        acft.serialize(&mut s).unwrap();
-        let bytes_out = s.into_inner();
-
-        assert_eq!(bytes_in, bytes_out);
+        assert_eq!(engine.etype_stats, e2.etype_stats);
     }
 }

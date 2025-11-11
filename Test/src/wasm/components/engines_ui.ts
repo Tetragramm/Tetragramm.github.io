@@ -1,7 +1,7 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createFlexCheckbox, createFlexNumberInput, createRulesLink } from '../dom_utils';
+import { createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput, createFlexSection, createRulesLink, createSelectElement, updateSelectElement } from '../dom_utils';
 import { CreateCheckbox } from '../../disp/Tools';
 
 /**
@@ -241,6 +241,14 @@ export class EnginesUI extends BaseComponentUI {
     }
 }
 
+// Cache interface for type safety
+interface EngineCache {
+    listSelect: HTMLSelectElement;
+    engineSelect: HTMLSelectElement;
+    rarityLabel: HTMLSpanElement;
+    statLabels: HTMLSpanElement[];
+}
+
 /**
  * Individual Engine UI
  * Handles UI for a single engine
@@ -249,6 +257,7 @@ class EngineUI {
     private getBridge: () => AircraftBridge;
     private index: number;
     private row: HTMLTableRowElement;
+    private cache: EngineCache;
 
     constructor(getBridge: () => AircraftBridge, index: number, row: HTMLTableRowElement) {
         this.getBridge = getBridge;
@@ -261,115 +270,82 @@ class EngineUI {
         const bridge = this.getBridge();
         if (!bridge) return;
 
-        // Get engine bindings and stats
-        const bindings = bridge.getEngineBindings(this.index);
-        const stats = bridge.getEngineStats(this.index);
-
         // First cell: Engine Type Selection and Stats Display
         const typeCell = this.row.insertCell();
-        typeCell.className = 'inner_table';
 
-        // Create inner table for type selection
-        const typeTable = document.createElement('table');
-        typeTable.className = 'inner_table';
-        typeCell.appendChild(typeTable);
-
-        // Engine name/title row
-        const nameRow = typeTable.insertRow();
-        const nameCell = nameRow.insertCell();
-        nameCell.colSpan = 2;
-        const engineTitle = document.createElement('h4');
-        engineTitle.textContent = `Engine ${this.index + 1}`;
-        nameCell.appendChild(engineTitle);
 
         // Engine list selection
-        const listRow = typeTable.insertRow();
-        const listLabelCell = listRow.insertCell();
-        listLabelCell.textContent = localization.translate('Engine List') + ':';
-        listLabelCell.style.fontWeight = 'bold';
-        const listSelectCell = listRow.insertCell();
-        const listSelect = document.createElement('select');
-        const allLists = bridge.getEngineListNames();
+        const allLists = bridge.getEngineNamesOfLists();
         const selectedList = bridge.getEngineSelectedList(this.index);
-        allLists.forEach((listName: string) => {
-            const option = document.createElement('option');
-            option.text = listName;
-            option.value = listName;
-            if (listName === selectedList) {
-                option.selected = true;
-            }
-            listSelect.add(option);
-        });
-        listSelect.onchange = () => {
-            bridge.setEngineSelectedList(this.index, listSelect.value);
-            this.update();
-        };
-        listSelectCell.appendChild(listSelect);
+        const listSelect = createSelectElement(
+            {
+                name: localization.translate('Engine List'),
+                options: allLists.map((o) => { return { name: o, enabled: true } }),
+                selected: allLists.indexOf(selectedList),
+                enabled: true
+            },
+            () => {
+                bridge.setEngineSelectedList(this.index, listSelect.options[listSelect.selectedIndex].text);
+                //Update engineSelect
+                const enginesInList = bridge.getEngineNamesInList(selectedList);
+                const selectedEngineName = bridge.getEngineSelectedName(this.index);
+
+
+                this.update();
+            });
+        typeCell.appendChild(listSelect);
+        typeCell.appendChild(document.createElement('br'));
 
         // Engine selection within list
-        const engineRow = typeTable.insertRow();
-        const engineLabelCell = engineRow.insertCell();
-        engineLabelCell.textContent = localization.translate('Engine Type') + ':';
-        engineLabelCell.style.fontWeight = 'bold';
-        const engineSelectCell = engineRow.insertCell();
-        const engineSelect = document.createElement('select');
+
         const enginesInList = bridge.getEngineNamesInList(selectedList);
         const selectedEngineName = bridge.getEngineSelectedName(this.index);
-        enginesInList.forEach((engineName: string, idx: number) => {
-            const option = document.createElement('option');
-            option.text = engineName;
-            option.value = idx.toString();
-            if (engineName === selectedEngineName) {
-                option.selected = true;
-            }
-            engineSelect.add(option);
-        });
-        engineSelect.onchange = () => {
-            bridge.setEngineSelectedIndex(this.index, parseInt(engineSelect.value));
-            this.update();
-        };
-        engineSelectCell.appendChild(engineSelect);
+        const engineSelect = createSelectElement(
+            {
+                name: localization.translate('Engine Type'),
+                options: enginesInList.map((o) => { return { name: o, enabled: true } }),
+                selected: enginesInList.indexOf(selectedEngineName),
+                enabled: true
+            },
+            () => {
+                bridge.setEngineSelectedIndex(this.index, engineSelect.selectedIndex);
+                this.update();
+            });
+        typeCell.appendChild(engineSelect);
+        typeCell.appendChild(document.createElement('br'));
 
         // Get full engine stats (includes rarity, overspeed, altitude, torque, rumble)
         const fullStats = bridge.getEngineFullStats(this.index);
-
+        const flex = createFlexSection();
         // Display rarity with coloring
-        const rarityRow = typeTable.insertRow();
-        const rarityLabelCell = rarityRow.insertCell();
-        const rarityValueCell = rarityRow.insertCell();
-        rarityLabelCell.textContent = localization.translate('Rarity') + ':';
-        rarityLabelCell.style.fontWeight = 'bold';
-        rarityValueCell.textContent = this.getRarityText(fullStats.rarity);
-        rarityValueCell.className = this.getRarityClass(fullStats.rarity);
-
-        // Display all engine stats
-        this.addStatRow(typeTable, 'Stat Power', fullStats.stats.power?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Mass', fullStats.stats.mass?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Drag', fullStats.stats.drag?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Reliability', fullStats.stats.reliability?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Cooling', fullStats.stats.cooling?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Overspeed', fullStats.overspeed?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Fuel Consumption', fullStats.stats.fuelconsumption?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Altitude', `${fullStats.altitude || 0}`);
-        this.addStatRow(typeTable, 'Stat Torque', fullStats.torque?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Rumble', fullStats.rumble?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Cost', fullStats.stats.cost?.toString() || '0');
-
+        const rarityLabel = createFlexLabel({ name: localization.translate('Rarity'), value: this.getRarityText(fullStats.rarity) },
+            flex);
+        rarityLabel.className = this.getRarityClass(fullStats.rarity);
+        const PowerLabel = createFlexLabel({ name: localization.translate('Stat Power'), value: fullStats.stats.power }, flex);
+        const MassLabel = createFlexLabel({ name: localization.translate('Stat Mass'), value: fullStats.stats.mass }, flex);
+        const DragLabel = createFlexLabel({ name: localization.translate('Stat Drag'), value: fullStats.stats.drag }, flex);
+        const ReliabilityLabel = createFlexLabel({ name: localization.translate('Stat Reliability'), value: fullStats.stats.reliability }, flex);
+        const CoolingLabel = createFlexLabel({ name: localization.translate('Stat Cooling'), value: fullStats.stats.cooling }, flex);
+        const OverspeedLabel = createFlexLabel({ name: localization.translate('Stat Overspeed'), value: fullStats.overspeed }, flex);
+        const FuelLabel = createFlexLabel({ name: localization.translate('Stat Fuel Consumption'), value: fullStats.stats.fuelconsumption }, flex);
+        const AltitudeLabel = createFlexLabel({ name: localization.translate('Stat Altitude'), value: fullStats.altitude }, flex);
+        const TorqueLabel = createFlexLabel({ name: localization.translate('Stat Torque'), value: fullStats.torque }, flex);
+        const RumbleLabel = createFlexLabel({ name: localization.translate('Stat Rumble'), value: fullStats.rumble }, flex);
+        const CostLabel = createFlexLabel({ name: localization.translate('Stat Cost'), value: fullStats.stats.cost }, flex);
+        typeCell.appendChild(flex.div0);
         // TODO: Add additional cells for:
         // - Engine options (mounting, cooling, upgrades, cowls, electrical)
         // - Stats display table
-    }
 
-    private addStatRow(table: HTMLTableElement, labelKey: string, value: string): void {
-        const row = table.insertRow();
-        const labelCell = row.insertCell();
-        const valueCell = row.insertCell();
-
-        labelCell.textContent = localization.translate(labelKey) + ':';
-        labelCell.style.fontWeight = 'bold';
-        labelCell.style.paddingRight = '8px';
-
-        valueCell.textContent = value;
+        this.cache = {
+            listSelect,
+            engineSelect,
+            rarityLabel,
+            statLabels: [PowerLabel, MassLabel, DragLabel,
+                ReliabilityLabel, CoolingLabel, OverspeedLabel,
+                FuelLabel, AltitudeLabel, TorqueLabel,
+                RumbleLabel, CostLabel]
+        }
     }
 
     private getRarityText(rarity: any): string {
@@ -413,9 +389,44 @@ class EngineUI {
     }
 
     update(): void {
-        // Rebuild the row (simple approach)
-        this.row.innerHTML = '';
-        this.buildUI();
+        const bridge = this.getBridge();
+        const allLists = bridge.getEngineNamesOfLists();
+        const selectedList = bridge.getEngineSelectedList(this.index);
+        const enginesInList = bridge.getEngineNamesInList(selectedList);
+        const selectedEngineName = bridge.getEngineSelectedName(this.index);
+        updateSelectElement(this.cache.listSelect,
+            {
+                name: localization.translate('Engine List'),
+                options: allLists.map((o) => { return { name: o, enabled: true } }),
+                selected: allLists.indexOf(selectedList),
+                enabled: true
+            });
+        updateSelectElement(this.cache.engineSelect,
+            {
+                name: localization.translate('Engine Type'),
+                options: enginesInList.map((o) => { return { name: o, enabled: true } }),
+                selected: enginesInList.indexOf(selectedEngineName),
+                enabled: true
+            });
+        const fullStats = bridge.getEngineFullStats(this.index);
+        this.cache.rarityLabel.textContent = this.getRarityText(fullStats.rarity);
+        this.cache.rarityLabel.className = this.getRarityClass(fullStats.rarity);
+        const stats = [
+            fullStats.stats.power,
+            fullStats.stats.mass,
+            fullStats.stats.drag,
+            fullStats.stats.reliability,
+            fullStats.stats.cooling,
+            fullStats.overspeed,
+            fullStats.stats.fuelconsumption,
+            fullStats.altitude,
+            fullStats.torque,
+            fullStats.rumble,
+            fullStats.stats.cost,
+        ]
+        for (let i = 0; i < this.cache.statLabels.length; i++) {
+            this.cache.statLabels[i].innerText = stats[i].toString();
+        }
     }
 }
 

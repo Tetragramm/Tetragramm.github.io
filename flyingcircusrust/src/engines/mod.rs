@@ -390,32 +390,15 @@ impl Engines {
         // Add new engines if needed
         if self.engines.len() < num {
             // Clone the last engine (if one exists) to use as template
-            let template = if let Some(last_engine) = self.engines.last() {
-                // Serialize and deserialize to clone
-                use crate::serialization::{Serializable, Serializer};
-                let mut serializer = Serializer::new();
-                if last_engine.serialize(&mut serializer).is_ok() {
-                    Some(serializer.into_inner())
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
-
             while self.engines.len() < num {
-                let mut new_engine = Engine::new(self.mounts.clone(), self.cowls.clone());
-
-                // If we have a template, deserialize from it
-                if let Some(ref bytes) = template {
-                    use crate::serialization::Deserializer;
-                    let mut deserializer = Deserializer::new(bytes.as_slice()).unwrap();
-                    let _ = new_engine.deserialize(&mut deserializer);
-                }
-
-                // Update radiator count for new engine
-                new_engine.set_num_radiators(self.radiators.len() as i16);
-                self.engines.push(new_engine);
+                if let Some(last_engine) = self.engines.last() {
+                    self.engines.push(last_engine.clone());
+                } else {
+                    let mut new_engine = Engine::new(self.mounts.clone(), self.cowls.clone());
+                    // Update radiator count for new engine
+                    new_engine.set_num_radiators(self.radiators.len() as i16);
+                    self.engines.push(new_engine);
+                };
             }
         }
     }

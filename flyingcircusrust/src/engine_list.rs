@@ -111,11 +111,6 @@ impl EngineList {
         }
     }
 
-    /// Get the length of the list
-    pub fn len(&self) -> usize {
-        self.list.len()
-    }
-
     /// Check if the list is empty
     pub fn is_empty(&self) -> bool {
         self.list.is_empty()

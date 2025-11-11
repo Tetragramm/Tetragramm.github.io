@@ -180,7 +180,7 @@ export interface AircraftWasmAPI {
 
     // Engine selection methods
     getEngineFullStats(index: number): any;
-    getEngineListNames(): string[];
+    getEngineNamesOfLists(): string[];
     getEngineNamesInList(listName: string): string[];
     getEngineSelectedList(index: number): string;
     getEngineSelectedName(index: number): string;
@@ -789,9 +789,9 @@ export class AircraftBridge {
     /**
      * Get all available engine list names (static method, doesn't need bridge initialized)
      */
-    getEngineListNames(): string[] {
+    getEngineNamesOfLists(): string[] {
         this.ensureInitialized();
-        return this.wasm!.getEngineListNames();
+        return this.wasm!.getEngineNamesOfLists();
     }
 
     /**
