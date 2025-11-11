@@ -1,7 +1,7 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput, createFlexSection, createRulesLink, createSelectElement, updateSelectElement } from '../dom_utils';
+import { createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput, createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement } from '../dom_utils';
 import { CreateCheckbox } from '../../disp/Tools';
 
 /**
@@ -333,8 +333,53 @@ class EngineUI {
         const RumbleLabel = createFlexLabel({ name: localization.translate('Stat Rumble'), value: fullStats.rumble }, flex);
         const CostLabel = createFlexLabel({ name: localization.translate('Stat Cost'), value: fullStats.stats.cost }, flex);
         typeCell.appendChild(flex.div0);
+
+        // Second cell: Options (Cooling, Mounting, Upgrades)
+        const optionsCell = this.row.insertCell();
+        optionsCell.className = 'inner_table';
+
+        const optionsTable = document.createElement('table');
+        optionsTable.className = 'inner_table';
+        optionsCell.appendChild(optionsTable);
+
+        // Get engine bindings
+        const bindings = bridge.getEngineBindings(this.index);
+
+        // Cooling Section Header
+        const coolingHeaderRow = optionsTable.insertRow();
+        const coolingHeader = document.createElement('th');
+        coolingHeader.textContent = localization.translate('Engine Cooling');
+        coolingHeaderRow.appendChild(coolingHeader);
+
+        // Cooling Section Content
+        const coolingRow = optionsTable.insertRow();
+        const coolingCell = coolingRow.insertCell();
+        this.buildCoolingSection(coolingCell, bindings, fullStats);
+
+        // Mounting Section Header
+        const mountingHeaderRow = optionsTable.insertRow();
+        const mountingHeader = document.createElement('th');
+        mountingHeader.textContent = localization.translate('Engine Mounting');
+        mountingHeaderRow.appendChild(mountingHeader);
+
+        // Mounting Section Content
+        const mountingRow = optionsTable.insertRow();
+        const mountingCell = mountingRow.insertCell();
+        this.buildMountingSection(mountingCell, bindings);
+
+        // Upgrades Section Header
+        const upgradesHeaderRow = optionsTable.insertRow();
+        const upgradesHeader = document.createElement('th');
+        upgradesHeader.textContent = localization.translate('Engine Upgrades');
+        upgradesHeaderRow.appendChild(upgradesHeader);
+
+        // Upgrades Section Content
+        const upgradesRow = optionsTable.insertRow();
+        const upgradesCell = upgradesRow.insertCell();
+        this.buildUpgradesSection(upgradesCell, bindings);
+
         // TODO: Add additional cells for:
-        // - Engine options (mounting, cooling, upgrades, cowls, electrical)
+        // - Cowl & Electrical
         // - Stats display table
 
         this.cache = {
@@ -346,6 +391,172 @@ class EngineUI {
                 FuelLabel, AltitudeLabel, TorqueLabel,
                 RumbleLabel, CostLabel]
         }
+    }
+
+    private buildCoolingSection(cell: HTMLTableCellElement, bindings: any, fullStats: any): void {
+        const bridge = this.getBridge();
+
+        // Check engine type to determine cooling display
+        const cooling = fullStats.stats.cooling || 0;
+
+        if (fullStats.oiltank) {
+            // Rotary engine
+            const span = document.createElement('span');
+            span.textContent = localization.translate('Engine Rotary Cooling');
+            cell.appendChild(span);
+        } else if (cooling === 0) {
+            // Air-cooled engine
+            const span = document.createElement('span');
+            span.textContent = localization.translate('Engine Air-Cooled Engine.');
+            cell.appendChild(span);
+
+            // Add intake fan checkbox (for turbines)
+            const flexContainer = createFlexSection();
+            const intakeFanCheckbox = createFlexCheckbox(
+                bindings.intake_fan,
+                flexContainer,
+                (checked) => {
+                    const updatedBindings = bridge.getEngineBindings(this.index);
+                    updatedBindings.intake_fan.selected = checked;
+                    bridge.setEngineBindings(this.index, updatedBindings);
+                    this.update();
+                }
+            );
+            cell.appendChild(flexContainer.div0);
+        } else {
+            // Liquid-cooled engine - show radiator select and cooling count
+            const flexContainer = createFlexSection();
+
+            // Radiator select dropdown
+            const radiatorSelect = createFlexSelect(
+                bindings.radiator_index,
+                flexContainer,
+                (selectedIndex) => {
+                    const updatedBindings = bridge.getEngineBindings(this.index);
+                    updatedBindings.radiator_index.selected = selectedIndex;
+                    bridge.setEngineBindings(this.index, updatedBindings);
+                    this.update();
+                }
+            );
+
+            // Cooling count input
+            const coolingInput = createFlexNumberInput(
+                bindings.cooling_count,
+                flexContainer,
+                (value) => {
+                    const updatedBindings = bridge.getEngineBindings(this.index);
+                    updatedBindings.cooling_count.value = value;
+                    bridge.setEngineBindings(this.index, updatedBindings);
+                    this.update();
+                }
+            );
+
+            cell.appendChild(flexContainer.div0);
+        }
+    }
+
+    private buildMountingSection(cell: HTMLTableCellElement, bindings: any): void {
+        const bridge = this.getBridge();
+
+        // Mounting location select
+        const mountLabel = document.createElement('span');
+        mountLabel.textContent = localization.translate('Engine Mounting Location');
+        cell.appendChild(mountLabel);
+        cell.appendChild(document.createElement('br'));
+
+        const mountSelect = createSelectElement(
+            bindings.mount_sel,
+            () => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.mount_sel.selected = mountSelect.selectedIndex;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+        cell.appendChild(mountSelect);
+        cell.appendChild(document.createElement('br'));
+
+        // Push-pull and torque-to-struct checkboxes
+        const flexContainer = createFlexSection();
+
+        const pushPullCheckbox = createFlexCheckbox(
+            bindings.use_pushpull,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.use_pushpull.selected = checked;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        const torqueCheckbox = createFlexCheckbox(
+            bindings.pp_torque_to_struct,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.pp_torque_to_struct.selected = checked;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        cell.appendChild(flexContainer.div0);
+    }
+
+    private buildUpgradesSection(cell: HTMLTableCellElement, bindings: any): void {
+        const bridge = this.getBridge();
+        const flexContainer = createFlexSection();
+
+        // Extended driveshafts checkbox
+        const driveshaftCheckbox = createFlexCheckbox(
+            bindings.use_driveshafts,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.use_driveshafts.selected = checked;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        // Outboard propeller checkbox
+        const outboardCheckbox = createFlexCheckbox(
+            bindings.outboard_prop,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.outboard_prop.selected = checked;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        // Geared propeller count input
+        const gearCountInput = createFlexNumberInput(
+            bindings.geared_propeller_ratio,
+            flexContainer,
+            (value) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.geared_propeller_ratio.value = value;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        // Geared propeller reliability input
+        const gearReliabilityInput = createFlexNumberInput(
+            bindings.geared_propeller_reliability,
+            flexContainer,
+            (value) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.geared_propeller_reliability.value = value;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        cell.appendChild(flexContainer.div0);
     }
 
     private getRarityText(rarity: any): string {
