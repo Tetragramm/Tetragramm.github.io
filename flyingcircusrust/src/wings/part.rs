@@ -231,6 +231,8 @@ impl Part for Wings {
             stats = stats.add(&self.stagger_list[self.wing_stagger].stats);
         }
 
+        stats.round();
+
         stats
     }
 

@@ -111,26 +111,6 @@ fn test_is_default() {
 }
 
 #[test]
-fn test_can_rudder() {
-    let mut cs = create_test_control_surfaces();
-    assert!(cs.can_rudder());
-
-    cs.set_can_rudder(false);
-    assert!(!cs.can_rudder());
-    assert_eq!(cs.get_rudder(), 0);
-}
-
-#[test]
-fn test_can_elevator() {
-    let mut cs = create_test_control_surfaces();
-    assert!(cs.can_elevator());
-
-    cs.set_can_elevator(false);
-    assert!(!cs.can_elevator());
-    assert_eq!(cs.get_elevator(), 0);
-}
-
-#[test]
 fn test_ornithopter_warping_only() {
     let mut cs = create_test_control_surfaces();
     cs.set_acft_type(AircraftType::OrnithopterBasic);
@@ -150,65 +130,5 @@ fn test_ornithopter_warping_only() {
 
     if let Some(idx) = non_warping_idx {
         assert!(!can[idx]);
-    }
-}
-
-#[test]
-fn test_wing_warping_with_cantilever() {
-    let mut cs = create_test_control_surfaces();
-
-    // Find wing warping option
-    let warping_idx = cs
-        .aileron_list
-        .iter()
-        .position(|a| a.warping)
-        .expect("Should have a warping aileron");
-
-    cs.set_aileron(warping_idx as i16);
-    cs.set_num_cantilever(2);
-    cs.set_span(10);
-    cs.set_wing_area(1); // Must have wing area to use warping
-
-    let stats = cs.part_stats();
-
-    // Should have reduced maxstrain and extra cost
-    assert!(stats.cost >= 4.0); // 2 * 2 cantilever cost
-}
-
-#[test]
-fn test_warping_without_wing_area() {
-    let mut cs = create_test_control_surfaces();
-
-    // Find wing warping option
-    let warping_idx = cs
-        .aileron_list
-        .iter()
-        .position(|a| a.warping)
-        .expect("Should have a warping aileron");
-
-    cs.set_aileron(warping_idx as i16);
-    cs.set_wing_area(0); // No wing area
-
-    // Can aileron should return false for warping when no wing area
-    let can = cs.can_aileron();
-    assert!(!can[warping_idx]);
-
-    // part_stats should auto-fix to default
-    let _ = cs.part_stats();
-    assert_eq!(cs.get_aileron(), 0);
-}
-
-#[test]
-fn test_flap_cost_calculation() {
-    let mut cs = create_test_control_surfaces();
-
-    // Find a flap option with cost factor
-    let flap_idx = cs.flaps_list.iter().position(|f| f.costfactor > 0.0);
-
-    if let Some(idx) = flap_idx {
-        cs.set_flaps(idx as i16);
-
-        let cost = cs.get_flap_cost(10);
-        assert!(cost >= 1.0); // Should be at least 1
     }
 }

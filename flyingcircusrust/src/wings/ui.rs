@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
 use ui_core::{Check, Number, Select, SelectOpt, UIBindings};
 
-use super::{Wings, WingType};
+use super::{WingType, Wings};
 use rust_i18n::t;
 
 /// UI options for a single full wing
 #[derive(Serialize, Deserialize)]
 pub struct FullWingOptions {
-    pub idx: Number,  // Wing index for identification
+    pub idx: Number, // Wing index for identification
     pub deck: Select,
     pub skin: Select,
     pub area: Number,
@@ -20,7 +20,7 @@ pub struct FullWingOptions {
 /// UI options for a single mini wing
 #[derive(Serialize, Deserialize)]
 pub struct MiniWingOptions {
-    pub idx: Number,  // Wing index for identification
+    pub idx: Number, // Wing index for identification
     pub deck: Select,
     pub skin: Select,
     pub area: Number,
@@ -61,7 +61,7 @@ impl UIBindings for Wings {
             .iter()
             .enumerate()
             .map(|(i, s)| SelectOpt {
-                name: t!(&s.name).to_string(),
+                name: s.name.clone(),
                 enabled: self.can_stagger()[i],
             })
             .collect();
@@ -92,7 +92,11 @@ impl UIBindings for Wings {
             stagger: Select {
                 enabled: true,
                 options: stagger_options,
-                selected: if self.get_stagger() < 0 { 0 } else { self.get_stagger() as usize },
+                selected: if self.get_stagger() < 0 {
+                    0
+                } else {
+                    self.get_stagger() as usize
+                },
             },
             closed: Check {
                 name: t!("Wings Closed Wing").to_string(),
@@ -200,7 +204,7 @@ impl Wings {
             };
 
             deck_options.push(SelectOpt {
-                name: t!(&deck_entry.name).to_string(),
+                name: deck_entry.name.clone(),
                 enabled,
             });
         }
@@ -210,7 +214,7 @@ impl Wings {
             .get_skin_list()
             .iter()
             .map(|s| SelectOpt {
-                name: t!(&s.name).to_string(),
+                name: s.name.clone(),
                 enabled: true,
             })
             .collect();
@@ -277,7 +281,7 @@ impl Wings {
             };
 
             deck_options.push(SelectOpt {
-                name: t!(&deck_entry.name).to_string(),
+                name: deck_entry.name.clone(),
                 enabled,
             });
         }
@@ -287,7 +291,7 @@ impl Wings {
             .get_skin_list()
             .iter()
             .map(|s| SelectOpt {
-                name: t!(&s.name).to_string(),
+                name: s.name.clone(),
                 enabled: true,
             })
             .collect();
@@ -340,7 +344,7 @@ impl Wings {
             }
 
             deck_options.push(SelectOpt {
-                name: t!(&deck_entry.name).to_string(),
+                name: deck_entry.name.clone(),
                 enabled,
             });
         }
@@ -373,7 +377,7 @@ impl Wings {
             }
 
             deck_options.push(SelectOpt {
-                name: t!(&deck_entry.name).to_string(),
+                name: deck_entry.name.clone(),
                 enabled,
             });
         }
@@ -460,8 +464,8 @@ impl Wings {
             area: options.area.value,
             span: options.span.value,
             gull: false, // Mini wings don't have gull
-            dihedral: 0,  // Mini wings don't have dihedral
-            anhedral: 0,  // Mini wings don't have anhedral
+            dihedral: 0, // Mini wings don't have dihedral
+            anhedral: 0, // Mini wings don't have anhedral
             deck: options.deck.selected - 1,
         };
 

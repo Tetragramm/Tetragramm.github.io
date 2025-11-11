@@ -18,7 +18,8 @@ import {
     StatDisplayConfig,
     createFlexCheckbox,
     createFlexSection,
-    createFlexNumberInputs
+    createFlexNumberInputs,
+    createFlexNumberInput
 } from '../dom_utils';
 
 // Stats configuration for wings
@@ -77,7 +78,6 @@ interface MiniWingRowCache {
 
 export class WingsUI extends BaseComponentUI {
     private cache: WingsCache = undefined;
-    private sectionElement: HTMLElement | null = null;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;
@@ -257,13 +257,8 @@ export class WingsUI extends BaseComponentUI {
         miniWingsLabelRow.appendChild(miniWingsLabel);
         table.appendChild(miniWingsLabelRow);
 
-        // Data row with full wings, mini wings, and stats
-        const fullWingsDataRow = document.createElement('tr');
-        const fullWingsCell = document.createElement('td');
-        fullWingsDataRow.appendChild(fullWingsCell);
-
         const fullWingsOptionsCell = document.createElement('td');
-        fullWingsDataRow.appendChild(fullWingsOptionsCell);
+        fullWingsLabelRow.appendChild(fullWingsOptionsCell);
 
         // Stats cell (spans both full + mini rows)
         const statsCell = document.createElement('td');
@@ -271,24 +266,16 @@ export class WingsUI extends BaseComponentUI {
         statsCell.rowSpan = 2;
         const statsTable = createStatsTable(stats, WINGS_STATS);
         statsCell.appendChild(statsTable);
-        fullWingsDataRow.appendChild(statsCell);
-
-        table.appendChild(fullWingsDataRow);
+        fullWingsLabelRow.appendChild(statsCell);
 
         // Mini wings data row
-        const miniWingsDataRow = document.createElement('tr');
-        const miniWingsCell = document.createElement('td');
-        miniWingsDataRow.appendChild(miniWingsCell);
-
         const miniWingsOptionsCell = document.createElement('td');
-        miniWingsDataRow.appendChild(miniWingsOptionsCell);
-
-        table.appendChild(miniWingsDataRow);
+        miniWingsLabelRow.appendChild(miniWingsOptionsCell);
 
         // Build full wing rows
         const fullWingRows: FullWingRowCache[] = [];
         for (let i = 0; i < bindings.full_wings.length; i++) {
-            const rowCache = this.createFullWingRow(bindings.full_wings[i], i, fullWingsCell, fullWingsOptionsCell);
+            const rowCache = this.createFullWingRow(bindings.full_wings[i], i, fullWingsOptionsCell);
             fullWingRows.push(rowCache);
         }
 
@@ -305,16 +292,17 @@ export class WingsUI extends BaseComponentUI {
             }
         );
         addFullWingSelect.disabled = !bindings.add_full_wing.can_add;
-        fullWingsCell.appendChild(addFullWingSelect);
+        fullWingsOptionsCell.appendChild(addFullWingSelect);
 
         // Build mini wing rows
         const miniWingRows: MiniWingRowCache[] = [];
         for (let i = 0; i < bindings.mini_wings.length; i++) {
-            const rowCache = this.createMiniWingRow(bindings.mini_wings[i], i, miniWingsCell, miniWingsOptionsCell);
+            const rowCache = this.createMiniWingRow(bindings.mini_wings[i], i, miniWingsOptionsCell);
             miniWingRows.push(rowCache);
         }
 
         // Add "add mini wing" select
+        console.log(bindings.add_mini_wing.deck);
         const addMiniWingSelect = createSelectElement(
             bindings.add_mini_wing.deck,
             (selectedIndex) => {
@@ -327,7 +315,7 @@ export class WingsUI extends BaseComponentUI {
             }
         );
         addMiniWingSelect.disabled = !bindings.add_mini_wing.can_add;
-        miniWingsCell.appendChild(addMiniWingSelect);
+        miniWingsOptionsCell.appendChild(addMiniWingSelect);
 
         contentDiv.appendChild(table);
 
@@ -364,7 +352,6 @@ export class WingsUI extends BaseComponentUI {
     private createFullWingRow(
         wingBindings: any,
         index: number,
-        wingCell: HTMLTableCellElement,
         optionsCell: HTMLTableCellElement
     ): FullWingRowCache {
         // Wing span (deck select)
@@ -392,39 +379,34 @@ export class WingsUI extends BaseComponentUI {
         );
         wingSpan.appendChild(skinSelect);
 
-        wingSpan.appendChild(document.createElement('br'));
-        wingCell.appendChild(wingSpan);
-
         // Options span (area, span, gull, dihedral, anhedral)
         const optionsSpan = document.createElement('span');
 
         // Create number inputs for area and span
-        const flexContainer = createFlexSection();
+        const flexContainer = { div0: optionsSpan, div1: optionsSpan, div2: optionsSpan };
 
         // Area input
         const areaBinding = { ...wingBindings.area, name: localization.translate('Wings Area') };
-        const areaInputs = createFlexNumberInputs([areaBinding], flexContainer, [
+        const areaInput = createFlexNumberInput(areaBinding, flexContainer,
             (value) => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].area.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.render();
             }
-        ]);
-        const areaInput = areaInputs[0];
+        );
         areaInput.min = '3';
 
         // Span input
         const spanBinding = { ...wingBindings.span, name: localization.translate('Wings Span') };
-        const spanInputs = createFlexNumberInputs([spanBinding], flexContainer, [
+        const spanInput = createFlexNumberInput(spanBinding, flexContainer,
             (value) => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].span.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.render();
             }
-        ]);
-        const spanInput = spanInputs[0];
+        );
         spanInput.min = '1';
 
         // Gull checkbox
@@ -442,35 +424,33 @@ export class WingsUI extends BaseComponentUI {
 
         // Dihedral input
         const dihedralBinding = { ...wingBindings.dihedral, name: localization.translate('Wings Dihedral') };
-        const dihedralInputs = createFlexNumberInputs([dihedralBinding], flexContainer, [
+        const dihedralInput = createFlexNumberInput(dihedralBinding, flexContainer,
             (value) => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].dihedral.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.render();
             }
-        ]);
-        const dihedralInput = dihedralInputs[0];
+        );
         dihedralInput.min = '0';
         dihedralInput.max = (wingBindings.span.value - wingBindings.anhedral.value - 1).toString();
 
         // Anhedral input
         const anhedralBinding = { ...wingBindings.anhedral, name: localization.translate('Wings Anhedral') };
-        const anhedralInputs = createFlexNumberInputs([anhedralBinding], flexContainer, [
+        const anhedralInput = createFlexNumberInput(anhedralBinding, flexContainer,
             (value) => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].anhedral.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.render();
             }
-        ]);
-        const anhedralInput = anhedralInputs[0];
+        );
         anhedralInput.min = '0';
         anhedralInput.max = (wingBindings.span.value - wingBindings.dihedral.value - 1).toString();
 
-        optionsSpan.appendChild(flexContainer.div0);
-        optionsSpan.appendChild(document.createElement('br'));
-        optionsCell.appendChild(optionsSpan);
+        wingSpan.appendChild(optionsSpan);
+        wingSpan.appendChild(document.createElement('br'));
+        optionsCell.appendChild(wingSpan);
 
         return {
             row: null!, // Not used
@@ -478,7 +458,7 @@ export class WingsUI extends BaseComponentUI {
             skinSelect,
             areaInput,
             spanInput,
-            gullCheckbox: gullCheckbox.checkbox,
+            gullCheckbox,
             dihedralInput,
             anhedralInput,
         };
@@ -490,7 +470,6 @@ export class WingsUI extends BaseComponentUI {
     private createMiniWingRow(
         wingBindings: any,
         index: number,
-        wingCell: HTMLTableCellElement,
         optionsCell: HTMLTableCellElement
     ): MiniWingRowCache {
         // Wing span (deck select)
@@ -518,43 +497,38 @@ export class WingsUI extends BaseComponentUI {
         );
         wingSpan.appendChild(skinSelect);
 
-        wingSpan.appendChild(document.createElement('br'));
-        wingCell.appendChild(wingSpan);
-
         // Options span (area and span only)
         const optionsSpan = document.createElement('span');
-        const flexContainer = createFlexSection();
+        const flexContainer = { div0: optionsSpan, div1: optionsSpan, div2: optionsSpan };
 
         // Area input
         const areaBinding = { ...wingBindings.area, name: localization.translate('Wings Area') };
-        const areaInputs = createFlexNumberInputs([areaBinding], flexContainer, [
+        const areaInput = createFlexNumberInput(areaBinding, flexContainer,
             (value) => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.mini_wings[index].area.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.render();
             }
-        ]);
-        const areaInput = areaInputs[0];
+        );
         areaInput.min = '1';
         areaInput.max = '2';
 
         // Span input
         const spanBinding = { ...wingBindings.span, name: localization.translate('Wings Span') };
-        const spanInputs = createFlexNumberInputs([spanBinding], flexContainer, [
+        const spanInput = createFlexNumberInput(spanBinding, flexContainer,
             (value) => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.mini_wings[index].span.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.render();
             }
-        ]);
-        const spanInput = spanInputs[0];
+        );
         spanInput.min = '1';
 
-        optionsSpan.appendChild(flexContainer.div0);
-        optionsSpan.appendChild(document.createElement('br'));
-        optionsCell.appendChild(optionsSpan);
+        wingSpan.appendChild(optionsSpan);
+        wingSpan.appendChild(document.createElement('br'));
+        optionsCell.appendChild(wingSpan);
 
         return {
             row: null!, // Not used

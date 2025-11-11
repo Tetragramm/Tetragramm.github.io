@@ -559,10 +559,10 @@ impl PropellerBuilder {
         estats.stats.power = self.calc_power() as f32;
         estats.stats.mass = self.calc_mass() as f32;
         estats.stats.drag = self.calc_drag() as f32;
-        estats.stats.reliability = rtz(1.0e-6 - 2.0
+        estats.stats.reliability = (1.0e-6 - 2.0
             + self.era_sel as f32
             + (self.quality_fudge + self.material_fudge - 2.0) as f32 * 10.0)
-            as f32;
+            .floor();
         estats.stats.cooling = self.calc_cooling() as f32;
         estats.oiltank = self.is_rotary();
         estats.overspeed = self.calc_overspeed();

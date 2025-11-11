@@ -4433,6 +4433,8 @@ pub fn translate_with_param(key: &str, value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
+    use std::iter::zip;
+
     use crate::{
         aircraft::{Aircraft, AircraftType},
         json::vstr,
@@ -4442,7 +4444,6 @@ mod tests {
         types::DerivedStats,
     };
     use assert_json_diff::assert_json_eq;
-    use itertools::izip;
     #[test]
     fn test_basic_biplane() {
         let test_json: serde_json::Value = serde_json::from_str(r#"{"version":"12.7","name":"Basic Biplane","aircraft_type":0,"era":{"selected":1},"cockpits":{"positions":[{"type":0,"upgrades":[false,false,false,false,false,false],"safety":[false,false,false,false,false,false],"sights":[false,false,false,false],"bombsight":0}]},"passengers":{"seats":0,"beds":0,"connected":false},"engines":{"engines":[{"selected_stats":{"name":"Rhona Motorbau Z11 80hp","overspeed":18,"altitude":29,"torque":2,"rumble":0,"oiltank":true,"pulsejet":false,"rarity":1,"liftbleed":0,"wetmass":0,"mass":4,"drag":8,"control":0,"cost":4,"reqsections":0,"visibility":0,"flightstress":0,"escape":0,"pitchstab":0,"latstab":0,"cooling":0,"reliability":-1,"power":8,"fuelconsumption":10,"maxstrain":0,"structure":0,"pitchboost":0,"pitchspeed":0,"wingarea":0,"toughness":0,"upkeep":0,"crashsafety":0,"bomb_mass":0,"fuel":0,"charge":0,"warnings":[],"eras":[{"name":"Rhona Motorbau Z11 80hp","era":"WWI"}]},"selected_inputs":{"name":"Rhona Motorbau Z11 80hp","engine_type":0,"type":2,"era_sel":1,"displacement":10.9,"compression":4.5,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false],"rarity":1},"cooling_count":0,"radiator_index":-1,"selected_mount":0,"use_pushpull":false,"pp_torque_to_struct":false,"use_driveshafts":false,"geared_propeller_ratio":0,"geared_propeller_reliability":0,"cowl_sel":2,"is_generator":false,"has_alternator":false,"intake_fan":false,"outboard_prop":false}],"radiators":[],"is_asymmetric":false},"propeller":{"type":2,"upgrade":0},"frames":{"sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_sections":[{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false},{"frame":0,"geodesic":false,"monocoque":false,"lifting_body":false,"internal_bracing":false}],"tail_index":2,"use_farman":false,"use_boom":false,"flying_wing":false,"sel_skin":1},"wings":{"wing_list":[{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":0},{"surface":0,"area":8,"span":8,"anhedral":0,"dihedral":0,"gull":false,"deck":3}],"mini_wing_list":[],"wing_stagger":4,"is_swept":false,"is_closed":false},"stabilizers":{"hstab_sel":0,"hstab_count":1,"vstab_sel":0,"vstab_count":1},"controlsurfaces":{"aileron_sel":0,"rudder_sel":0,"elevator_sel":0,"flaps_sel":0,"slats_sel":0,"drag_sel":[false,false,false]},"reinforcements":{"ext_wood_count":[1,0,0,0,0,0,0,0,0],"ext_steel_count":[0,0,0,0,0,0,0,0,0],"cant_count":[0,0,0,0,0],"wires":true,"cabane_sel":1,"wing_blades":false},"fuel":{"tank_count":[1,0,0,0],"self_sealing":false,"fire_extinguisher":false},"munitions":{"bomb_count":0,"rocket_count":0,"bay_count":0,"bay1":false,"bay2":false},"cargo":{"space_sel":0},"gear":{"gear_sel":0,"retract":false,"extra_sel":[false,false,false]},"accessories":{"v":2,"armour_coverage":[0,0,0,0,0,0,0,0],"electrical_count":[0,0,0],"radio_sel":0,"recon_sel":[0,0,0,0,0,0,0],"visi_sel":[false,false,false],"clim_sel":[false,false,false],"auto_sel":0,"cont_sel":0},"optimization":{"free_dots":0,"cost":0,"bleed":0,"escape":0,"mass":0,"toughness":0,"maxstrain":0,"reliability":0,"drag":0},"weapons":{"weapon_systems":[{"weapon_type":3,"fixed":true,"directions":[true,false,false,false,false,false],"weapons":[{"fixed":true,"wing":false,"covered":false,"accessible":false,"free_accessible":true,"synchronization":0,"w_count":1}],"ammo":1,"action":0,"projectile":0,"repeating":false,"seat":0}],"brace_count":0},"used":{"enabled":true,"burnt_out":0,"ragged":0,"hefty":0,"sticky_guns":0,"weak":0,"fragile":0,"leaky":0,"sluggish":0},"rotor":{"type":0,"rotor_count":0,"rotor_span":0,"rotor_mat":0,"stagger_sel":0,"accessory":false,"blade_idx":0,"rotor_thickness":0},"alter":{"part_list":[]}}"#).unwrap();
@@ -5386,10 +5387,12 @@ mod tests {
             {"name":"Mauss Z-95 Phönix","cost":44,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"-1","stress":"0","DryMP":7,"WetMP":9,"WetMPwBombs":9,"DPEmpty":13,"DPFull":13,"DPwBombs":13,"MaxSpeedEmpty":19,"MaxSpeedFull":19,"MaxSpeedwBombs":19,"StallSpeedEmpty":8,"StallSpeedFull":10,"StallSpeedFullwBombs":10,"Overspeed":40,"BoostEmpty":2,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":7,"Stabiilty":2,"HandlingEmpty":98,"HandlingFull":96,"HandlingFullwBombs":96,"MaxStrain":31,"Toughness":15,"Structure":37,"EnergyLoss":4,"EnergyLosswBombs":5,"TurnBleed":2,"TurnBleedwBombs":3,"FuelUses":11,"ControlStress":1,"RumbleStress":0,"RateOfClimbFull":3,"RateOfClimbEmpty":4,"RateOfClimbwBombs":3},
             {"name": "Lockheed P-80C","cost": 405,"upkeep": 22,"bomb_mass": 35,"escape": "0","crash": "-1","stress": "2","DryMP": 19,"WetMP": 24,"WetMPwBombs": 31,"DPEmpty": 11,"DPFull": 11,"DPwBombs": 18,"MaxSpeedEmpty": 87,"MaxSpeedFull": 87,"MaxSpeedwBombs": 68,"StallSpeedEmpty": 11,"StallSpeedFull": 14,"StallSpeedFullwBombs": 18,"Overspeed": 100,"BoostEmpty": 11,"BoostFull": 9,"BoostFullwBombs": 7,"Dropoff": 17,"Stabiilty": -6,"HandlingEmpty": 82,"HandlingFull": 77,"HandlingFullwBombs": 70,"MaxStrain": 70,"Toughness": 44,"Structure": 106,"EnergyLoss": 2,"EnergyLosswBombs": 3,"TurnBleed": 3,"TurnBleedwBombs": 4,"FuelUses": 4,"ControlStress": 3,"RumbleStress": 0,"RateOfClimbFull": 15,"RateOfClimbEmpty": 18,"RateOfClimbwBombs": 7}
         ]"#).unwrap();
-        for (inp_name, inp_lz, out) in izip!(
+        for (inp_name, (inp_lz, out)) in zip(
             input["names"].as_array().unwrap(),
-            input["acft"].as_array().unwrap(),
-            output.as_array().unwrap()
+            zip(
+                input["acft"].as_array().unwrap(),
+                output.as_array().unwrap(),
+            ),
         ) {
             let mut deserialize =
                 crate::serialization::Deserializer::from_lz_string(inp_lz.as_str().unwrap())
@@ -6172,6 +6175,7 @@ mod tests {
         let mut s = Serializer::new();
         acft.serialize(&mut s).unwrap();
         let lz = s.compress_to_lz_string().unwrap();
+        println!("Deserialize Version: {}", deserialize.version);
         assert_eq!(lz_in, lz);
         let cj: serde_json::Value = acft.catalog_json();
         let true_cj: serde_json::Value = serde_json::from_str(r#"
@@ -6232,5 +6236,33 @@ mod tests {
 }
         "#).unwrap();
         assert_json_eq!(true_cj, cj);
+    }
+
+    #[test]
+    fn test_serialize() {
+        let lz_in = "AAEAjATAdA7MAIA3A9gOwAQFlkCcDmAphgAoBmBOAJsAIDADgwAwMAGDAd0fse+h+8WrLlzYCOIcczYjePAZPFDeo+X0VT5qqRo4AoOSsPjdArcYVSBAIGAAMAEIUALgAsAhugBiEAAwAOX3QAYYAcgCMKdAgYX1cAB2AATGAAXClbPgBYaQ4AeCsBAGgAf4Bf4ABsYAAsQvr6ukcXD28-QJCIqJi4xKYAdX6ASXsnHDdPHwCgsMicaNiEgRoAQQBcgEyALIABDe3aYAAIAH4AAI4TpO2T-a2dG2AANDlRPnZRZvHWqY7Z7sWiRS6XEmV4ORY+QaHFKFWqdWhiKMXwmbWmnTmC16zEGIxRP3aMy68x6Sz4q02uzuh1OF2AVxu1JMjxedGEmkenHEb2AYIAKIdycthULRUYxVyJYLxTLJbLpXLFQrlSweWqBJCuWDUMAAFT1HX6jW8UxgsFWTXAACQwAAMEjeDaHbwAKCNdTAAxWYigHl8S1HZ25SyMJGWy1B42Zdk0WN0WxvGglEq85nRuO0eMKpMp80cN3Rw6iBPk5OpsxKyPQoA";
+        let mut deserialize = crate::serialization::Deserializer::from_lz_string(lz_in)
+            .expect("From LZ String Failed");
+
+        let u16_str = lz_str::decompress_from_encoded_uri_component(lz_in).unwrap();
+
+        let bytes_in: Vec<u8> = u16_str.iter().map(|x| *x as u8).collect();
+
+        let mut acft = Aircraft::new();
+        acft.deserialize(&mut deserialize).unwrap();
+
+        acft.part_stats();
+        println!("relibility: {:?}", acft.engines.get_reliability_list());
+
+        println!(
+            "estats.stats: {:?}",
+            acft.engines.get_engine(0).unwrap().etype_stats.stats
+        );
+
+        let mut s = Serializer::new();
+        acft.serialize(&mut s).unwrap();
+        let bytes_out = s.into_inner();
+
+        assert_eq!(bytes_in, bytes_out);
     }
 }

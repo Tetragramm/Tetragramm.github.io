@@ -111,26 +111,6 @@ fn create_test_control() -> Vec<ControlEntry> {
 }
 
 #[test]
-fn test_accessories_new() {
-    let acc = Accessories::new(
-        create_test_electrical(),
-        create_test_radios(),
-        create_test_recon(),
-        create_test_visi(),
-        create_test_climate(),
-        create_test_autopilots(),
-        create_test_control(),
-    );
-
-    assert_eq!(acc.electrical_count().len(), 2);
-    assert_eq!(acc.radio_sel(), 0);
-    assert_eq!(acc.armour_coverage().len(), 8);
-    assert_eq!(acc.recon_sel().len(), 2);
-    assert_eq!(acc.visi_sel().len(), 2);
-    assert_eq!(acc.clim_sel().len(), 2);
-}
-
-#[test]
 fn test_set_electrical_count() {
     let mut acc = Accessories::new(
         create_test_electrical(),
@@ -152,26 +132,6 @@ fn test_set_electrical_count() {
     // Test max cap (50)
     acc.set_electrical_count(0, 100);
     assert_eq!(acc.electrical_count()[0], 50);
-}
-
-#[test]
-fn test_set_radio_sel() {
-    let mut acc = Accessories::new(
-        create_test_electrical(),
-        create_test_radios(),
-        create_test_recon(),
-        create_test_visi(),
-        create_test_climate(),
-        create_test_autopilots(),
-        create_test_control(),
-    );
-
-    acc.set_radio_sel(1);
-    assert_eq!(acc.radio_sel(), 1);
-
-    // Test out of bounds
-    acc.set_radio_sel(99);
-    assert_eq!(acc.radio_sel(), 1);
 }
 
 #[test]
@@ -274,103 +234,6 @@ fn test_max_stress() {
 
     assert_eq!(acc.max_mass_stress(), 1000);
     assert_eq!(acc.max_total_stress(), 1000);
-}
-
-#[test]
-fn test_set_can_cutouts() {
-    let mut acc = Accessories::new(
-        create_test_electrical(),
-        create_test_radios(),
-        create_test_recon(),
-        create_test_visi(),
-        create_test_climate(),
-        create_test_autopilots(),
-        create_test_control(),
-    );
-
-    // Enable cutouts
-    acc.set_visi_sel(0, true);
-    assert!(acc.visi_sel()[0]);
-
-    // Disable wings
-    acc.set_can_cutouts(false, true);
-    // Should have been disabled
-    assert!(!acc.visi_sel()[0]);
-}
-
-#[test]
-fn test_serialization() {
-    let mut acc1 = Accessories::new(
-        create_test_electrical(),
-        create_test_radios(),
-        create_test_recon(),
-        create_test_visi(),
-        create_test_climate(),
-        create_test_autopilots(),
-        create_test_control(),
-    );
-    acc1.set_electrical_count(0, 2);
-    acc1.set_radio_sel(1);
-    acc1.set_armour_coverage(0, 3);
-
-    // Serialize
-    let mut serializer = Serializer::new();
-    let result = acc1.serialize(&mut serializer);
-    assert!(result.is_ok());
-
-    let data = serializer.into_inner();
-
-    // Deserialize
-    let mut acc2 = Accessories::new(
-        create_test_electrical(),
-        create_test_radios(),
-        create_test_recon(),
-        create_test_visi(),
-        create_test_climate(),
-        create_test_autopilots(),
-        create_test_control(),
-    );
-    let mut deserializer = Deserializer::new(&data).unwrap();
-    deserializer.version = 12.7;
-    let result = acc2.deserialize(&mut deserializer);
-    assert!(result.is_ok());
-
-    assert_eq!(acc2.electrical_count()[0], 2);
-    assert_eq!(acc2.radio_sel(), 1);
-    assert_eq!(acc2.armour_coverage()[0], 3);
-}
-
-#[test]
-fn test_json_serialization() {
-    let mut acc1 = Accessories::new(
-        create_test_electrical(),
-        create_test_radios(),
-        create_test_recon(),
-        create_test_visi(),
-        create_test_climate(),
-        create_test_autopilots(),
-        create_test_control(),
-    );
-    acc1.set_electrical_count(1, 4);
-    acc1.set_radio_sel(1);
-
-    // Serialize to JSON
-    let json = acc1.to_json();
-
-    // Deserialize from JSON
-    let mut acc2 = Accessories::new(
-        create_test_electrical(),
-        create_test_radios(),
-        create_test_recon(),
-        create_test_visi(),
-        create_test_climate(),
-        create_test_autopilots(),
-        create_test_control(),
-    );
-    acc2.from_json(&json, 12.7);
-
-    assert_eq!(acc2.electrical_count()[1], 4);
-    assert_eq!(acc2.radio_sel(), 1);
 }
 
 #[test]

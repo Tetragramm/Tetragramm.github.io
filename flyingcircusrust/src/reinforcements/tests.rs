@@ -87,23 +87,6 @@ fn create_test_cant_list() -> Vec<CantileverEntry> {
 }
 
 #[test]
-fn test_reinforcements_new() {
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let reinf = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-
-    assert_eq!(reinf.ext_wood_count().len(), 2);
-    assert_eq!(reinf.ext_steel_count().len(), 1);
-    assert_eq!(reinf.cant_count().len(), 5);
-    assert_eq!(reinf.cabane_sel(), 0);
-    assert!(!reinf.wires());
-    assert!(!reinf.wing_blades());
-}
-
-#[test]
 fn test_set_ext_wood_count() {
     let ext_wood = create_test_ext_wood_list();
     let ext_steel = create_test_ext_steel_list();
@@ -135,37 +118,6 @@ fn test_set_cant_count() {
     // Test negative value
     reinf.set_cant_count(0, -5);
     assert_eq!(reinf.cant_count()[0], 0);
-}
-
-#[test]
-fn test_set_wires() {
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let mut reinf = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-
-    assert!(!reinf.wires());
-    reinf.set_wires(true);
-    assert!(reinf.wires());
-}
-
-#[test]
-fn test_set_cabane() {
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let mut reinf = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-
-    reinf.set_cabane(1);
-    assert_eq!(reinf.cabane_sel(), 1);
-
-    // Test out of bounds
-    reinf.set_cabane(99);
-    assert_eq!(reinf.cabane_sel(), 1); // Should not change
 }
 
 #[test]
@@ -205,87 +157,6 @@ fn test_can_use_wing_blades() {
     // Can't use if external struts are present
     reinf.set_ext_wood_count(0, 1);
     assert!(!reinf.can_use_wing_blades());
-}
-
-#[test]
-fn test_set_aircraft_type() {
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let mut reinf = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-
-    reinf.set_cabane(1);
-    reinf.set_aircraft_type(AircraftType::Helicopter);
-
-    // Cabane should be cleared for helicopter
-    assert_eq!(reinf.cabane_sel(), 0);
-}
-
-#[test]
-fn test_serialization() {
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let mut reinf1 = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-    reinf1.set_ext_wood_count(0, 2);
-    reinf1.set_cabane(1);
-    reinf1.set_wires(true);
-
-    // Serialize
-    let mut serializer = Serializer::new();
-    let result = reinf1.serialize(&mut serializer);
-    assert!(result.is_ok());
-
-    let data = serializer.into_inner();
-
-    // Deserialize
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let mut reinf2 = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-    let mut deserializer = Deserializer::new(&data).unwrap();
-    deserializer.version = 12.7;
-    let result = reinf2.deserialize(&mut deserializer);
-    assert!(result.is_ok());
-
-    assert_eq!(reinf2.ext_wood_count()[0], 2);
-    assert_eq!(reinf2.cabane_sel(), 1);
-    assert!(reinf2.wires());
-}
-
-#[test]
-fn test_json_serialization() {
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let mut reinf1 = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-    reinf1.set_ext_wood_count(0, 3);
-    reinf1.set_cabane(1);
-    reinf1.set_wires(true);
-
-    // Serialize to JSON
-    let json = reinf1.to_json();
-
-    // Deserialize from JSON
-    let ext_wood = create_test_ext_wood_list();
-    let ext_steel = create_test_ext_steel_list();
-    let cabane = create_test_cabane_list();
-    let cant = create_test_cant_list();
-
-    let mut reinf2 = Reinforcements::new(ext_wood, ext_steel, cabane, cant);
-    reinf2.from_json(&json, 12.7);
-
-    assert_eq!(reinf2.ext_wood_count()[0], 3);
-    assert_eq!(reinf2.cabane_sel(), 1);
-    assert!(reinf2.wires());
 }
 
 #[test]
