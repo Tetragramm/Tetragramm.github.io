@@ -258,11 +258,71 @@ class EngineUI {
     }
 
     private buildUI(): void {
-        // Note: Engine UI is complex and will be implemented based on Engine.ts
-        // For now, create a placeholder
-        const cell = this.row.insertCell();
-        cell.colSpan = 4;
-        cell.textContent = `Engine ${this.index + 1} - Complex UI to be implemented`;
+        const bridge = this.getBridge();
+        if (!bridge) return;
+
+        // Get engine bindings and stats
+        const bindings = bridge.getEngineBindings(this.index);
+        const stats = bridge.getEngineStats(this.index);
+
+        // First cell: Engine Type Selection and Stats Display
+        const typeCell = this.row.insertCell();
+        typeCell.className = 'inner_table';
+
+        // Create inner table for type selection
+        const typeTable = document.createElement('table');
+        typeTable.className = 'inner_table';
+        typeCell.appendChild(typeTable);
+
+        // Engine name/title row
+        const nameRow = typeTable.insertRow();
+        const nameCell = nameRow.insertCell();
+        nameCell.colSpan = 2;
+        const engineTitle = document.createElement('h4');
+        engineTitle.textContent = `Engine ${this.index + 1}`;
+        nameCell.appendChild(engineTitle);
+
+        // TODO: Add engine list selection here when UIBindings support it
+        // For now, just show a label that this is where engine selection would go
+        const placeholderRow = typeTable.insertRow();
+        const placeholderCell = placeholderRow.insertCell();
+        placeholderCell.colSpan = 2;
+        placeholderCell.textContent = '[Engine List/Type Selection - To Be Implemented]';
+        placeholderCell.style.fontStyle = 'italic';
+        placeholderCell.style.fontSize = 'smaller';
+
+        // Display engine stats (from Stats struct)
+        // Note: Stats struct contains these fields after part_stats() calculation
+        this.addStatRow(typeTable, 'Stat Power', stats.power?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Mass', stats.mass?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Drag', stats.drag?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Reliability', stats.reliability?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Cooling', stats.cooling?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Fuel Consumption', stats.fuelconsumption?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Cost', stats.cost?.toString() || '0');
+
+        // TODO: These fields need EngineStats, not Stats:
+        // - Rarity
+        // - Overspeed
+        // - Altitude (min/max)
+        // - Torque
+        // - Rumble
+
+        // TODO: Add additional cells for:
+        // - Engine options (mounting, cooling, upgrades, cowls, electrical)
+        // - Stats display table
+    }
+
+    private addStatRow(table: HTMLTableElement, labelKey: string, value: string): void {
+        const row = table.insertRow();
+        const labelCell = row.insertCell();
+        const valueCell = row.insertCell();
+
+        labelCell.textContent = localization.translate(labelKey) + ':';
+        labelCell.style.fontWeight = 'bold';
+        labelCell.style.paddingRight = '8px';
+
+        valueCell.textContent = value;
     }
 
     update(): void {
