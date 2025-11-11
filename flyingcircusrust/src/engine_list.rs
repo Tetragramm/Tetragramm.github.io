@@ -90,6 +90,17 @@ impl EngineList {
         }
     }
 
+    /// Get all engine names in this list
+    /// Returns a vector of engine names
+    pub fn get_all_names(&self) -> Vec<String> {
+        self.list.iter().map(|e| e.name.clone()).collect()
+    }
+
+    /// Get the number of engines in this list
+    pub fn len(&self) -> usize {
+        self.list.len()
+    }
+
     /// Remove an engine by name
     pub fn remove_by_name(&mut self, name: &str) {
         if self.constant {
@@ -181,6 +192,37 @@ pub fn get_engine(list_name: &str, engine_name: &str) -> Option<EngineInputs> {
         .get(list_name)
         .and_then(|list| list.get_by_name(engine_name))
         .cloned()
+}
+
+/// Get all engine list names
+/// Returns a sorted vector of list names with "Custom" first
+pub fn get_list_names() -> Vec<String> {
+    init_engine_lists();
+    let lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
+
+    let mut names: Vec<String> = lists.keys().cloned().collect();
+    names.sort();
+
+    // Move "Custom" to the front if it exists
+    if let Some(custom_idx) = names.iter().position(|n| n == "Custom") {
+        names.remove(custom_idx);
+        names.insert(0, "Custom".to_string());
+    }
+
+    names
+}
+
+/// Get all engine names in a specific list
+/// Returns a vector of engine names
+pub fn get_engine_names_in_list(list_name: &str) -> Vec<String> {
+    init_engine_lists();
+    let lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
+
+    if let Some(list) = lists.get(list_name) {
+        list.get_all_names()
+    } else {
+        Vec::new()
+    }
 }
 
 // TODO: Implement Clone for EngineList

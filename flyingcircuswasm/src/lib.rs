@@ -520,6 +520,71 @@ impl AircraftWasm {
         }
     }
 
+    /// Get full EngineStats for a specific engine (includes rarity, overspeed, altitude, etc.)
+    #[wasm_bindgen(js_name = getEngineFullStats)]
+    pub fn get_engine_full_stats(&self, index: usize) -> JsValue {
+        if index < self.inner.engines.engines.len() {
+            let engine_stats = self.inner.engines.engines[index].get_engine_stats();
+            serde_wasm_bindgen::to_value(engine_stats).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
+
+    /// Get all available engine list names
+    #[wasm_bindgen(js_name = getEngineListNames)]
+    pub fn get_engine_list_names() -> JsValue {
+        use flyingcircusrust::engine::Engine;
+        let names = Engine::get_available_lists();
+        serde_wasm_bindgen::to_value(&names).unwrap()
+    }
+
+    /// Get all engine names in a specific list
+    #[wasm_bindgen(js_name = getEngineNamesInList)]
+    pub fn get_engine_names_in_list(list_name: &str) -> JsValue {
+        use flyingcircusrust::engine::Engine;
+        let names = Engine::get_engines_in_list(list_name);
+        serde_wasm_bindgen::to_value(&names).unwrap()
+    }
+
+    /// Get the selected engine list name for a specific engine
+    #[wasm_bindgen(js_name = getEngineSelectedList)]
+    pub fn get_engine_selected_list(&self, index: usize) -> String {
+        if index < self.inner.engines.engines.len() {
+            self.inner.engines.engines[index].get_selected_list().to_string()
+        } else {
+            String::new()
+        }
+    }
+
+    /// Get the selected engine name for a specific engine
+    #[wasm_bindgen(js_name = getEngineSelectedName)]
+    pub fn get_engine_selected_name(&self, index: usize) -> String {
+        if index < self.inner.engines.engines.len() {
+            self.inner.engines.engines[index].get_selected_engine_name().to_string()
+        } else {
+            String::new()
+        }
+    }
+
+    /// Set the selected engine list for a specific engine
+    #[wasm_bindgen(js_name = setEngineSelectedList)]
+    pub fn set_engine_selected_list(&mut self, index: usize, list_name: &str) {
+        if index < self.inner.engines.engines.len() {
+            self.inner.engines.engines[index].set_selected_list(list_name);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Set the selected engine by index within its current list
+    #[wasm_bindgen(js_name = setEngineSelectedIndex)]
+    pub fn set_engine_selected_index(&mut self, index: usize, engine_index: usize) {
+        if index < self.inner.engines.engines.len() {
+            self.inner.engines.engines[index].set_selected_index(engine_index);
+            self.inner.part_stats();
+        }
+    }
+
     /// Set the number of engines
     #[wasm_bindgen(js_name = setNumberOfEngines)]
     pub fn set_number_of_engines(&mut self, num: usize) {

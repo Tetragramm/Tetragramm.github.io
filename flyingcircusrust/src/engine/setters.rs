@@ -196,4 +196,34 @@ impl Engine {
     pub fn set_num_radiators(&mut self, num: i16) {
         self.num_radiators = num;
     }
+
+    /// Set the selected engine list and engine
+    /// TypeScript: SetSelectedList(list_name: string) + SetSelectedIndex(index: number)
+    pub fn set_selected_engine(&mut self, list_name: &str, engine_name: &str) {
+        // Get the engine from the specified list
+        if let Some(engine_inputs) = crate::engine_list::get_engine(list_name, engine_name) {
+            self.elist_key = list_name.to_string();
+            self.etype_inputs = engine_inputs.clone();
+            self.etype_stats = engine_inputs.part_stats();
+        }
+    }
+
+    /// Set the selected engine list
+    /// TypeScript: SetSelectedList(list_name: string)
+    pub fn set_selected_list(&mut self, list_name: &str) {
+        // When changing lists, select the first engine in the new list
+        let engines = crate::engine_list::get_engine_names_in_list(list_name);
+        if let Some(first_engine) = engines.first() {
+            self.set_selected_engine(list_name, first_engine);
+        }
+    }
+
+    /// Set the selected engine by index within the current list
+    /// TypeScript: SetSelectedIndex(index: number)
+    pub fn set_selected_index(&mut self, index: usize) {
+        let engines = crate::engine_list::get_engine_names_in_list(&self.elist_key);
+        if let Some(engine_name) = engines.get(index) {
+            self.set_selected_engine(&self.elist_key, engine_name);
+        }
+    }
 }

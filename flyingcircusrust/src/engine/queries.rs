@@ -353,4 +353,34 @@ impl Engine {
     pub fn get_has_oil_pan(&self) -> bool {
         self.is_air_cooled()
     }
+
+    /// Get the currently selected engine list name
+    /// TypeScript: GetSelectedList()
+    pub fn get_selected_list(&self) -> &str {
+        &self.elist_key
+    }
+
+    /// Get the currently selected engine name
+    /// TypeScript: GetCurrentStats().name
+    pub fn get_selected_engine_name(&self) -> &str {
+        &self.etype_stats.name
+    }
+
+    /// Get all available engine list names
+    /// TypeScript: GetEngineLists().keys()
+    pub fn get_available_lists() -> Vec<String> {
+        crate::engine_list::get_list_names()
+    }
+
+    /// Get engines in a specific list
+    /// Returns vector of engine names
+    pub fn get_engines_in_list(list_name: &str) -> Vec<String> {
+        crate::engine_list::get_engine_names_in_list(list_name)
+    }
+
+    /// Get the EngineStats struct (includes rarity, overspeed, altitude, torque, rumble)
+    /// This is the raw stats before mounting/modifications
+    pub fn get_engine_stats(&self) -> &super::EngineStats {
+        &self.etype_stats
+    }
 }
