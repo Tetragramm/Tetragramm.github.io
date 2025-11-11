@@ -282,31 +282,78 @@ class EngineUI {
         engineTitle.textContent = `Engine ${this.index + 1}`;
         nameCell.appendChild(engineTitle);
 
-        // TODO: Add engine list selection here when UIBindings support it
-        // For now, just show a label that this is where engine selection would go
-        const placeholderRow = typeTable.insertRow();
-        const placeholderCell = placeholderRow.insertCell();
-        placeholderCell.colSpan = 2;
-        placeholderCell.textContent = '[Engine List/Type Selection - To Be Implemented]';
-        placeholderCell.style.fontStyle = 'italic';
-        placeholderCell.style.fontSize = 'smaller';
+        // Engine list selection
+        const listRow = typeTable.insertRow();
+        const listLabelCell = listRow.insertCell();
+        listLabelCell.textContent = localization.translate('Engine List') + ':';
+        listLabelCell.style.fontWeight = 'bold';
+        const listSelectCell = listRow.insertCell();
+        const listSelect = document.createElement('select');
+        const allLists = bridge.getEngineListNames();
+        const selectedList = bridge.getEngineSelectedList(this.index);
+        allLists.forEach((listName: string) => {
+            const option = document.createElement('option');
+            option.text = listName;
+            option.value = listName;
+            if (listName === selectedList) {
+                option.selected = true;
+            }
+            listSelect.add(option);
+        });
+        listSelect.onchange = () => {
+            bridge.setEngineSelectedList(this.index, listSelect.value);
+            this.update();
+        };
+        listSelectCell.appendChild(listSelect);
 
-        // Display engine stats (from Stats struct)
-        // Note: Stats struct contains these fields after part_stats() calculation
-        this.addStatRow(typeTable, 'Stat Power', stats.power?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Mass', stats.mass?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Drag', stats.drag?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Reliability', stats.reliability?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Cooling', stats.cooling?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Fuel Consumption', stats.fuelconsumption?.toString() || '0');
-        this.addStatRow(typeTable, 'Stat Cost', stats.cost?.toString() || '0');
+        // Engine selection within list
+        const engineRow = typeTable.insertRow();
+        const engineLabelCell = engineRow.insertCell();
+        engineLabelCell.textContent = localization.translate('Engine Type') + ':';
+        engineLabelCell.style.fontWeight = 'bold';
+        const engineSelectCell = engineRow.insertCell();
+        const engineSelect = document.createElement('select');
+        const enginesInList = bridge.getEngineNamesInList(selectedList);
+        const selectedEngineName = bridge.getEngineSelectedName(this.index);
+        enginesInList.forEach((engineName: string, idx: number) => {
+            const option = document.createElement('option');
+            option.text = engineName;
+            option.value = idx.toString();
+            if (engineName === selectedEngineName) {
+                option.selected = true;
+            }
+            engineSelect.add(option);
+        });
+        engineSelect.onchange = () => {
+            bridge.setEngineSelectedIndex(this.index, parseInt(engineSelect.value));
+            this.update();
+        };
+        engineSelectCell.appendChild(engineSelect);
 
-        // TODO: These fields need EngineStats, not Stats:
-        // - Rarity
-        // - Overspeed
-        // - Altitude (min/max)
-        // - Torque
-        // - Rumble
+        // Get full engine stats (includes rarity, overspeed, altitude, torque, rumble)
+        const fullStats = bridge.getEngineFullStats(this.index);
+
+        // Display rarity with coloring
+        const rarityRow = typeTable.insertRow();
+        const rarityLabelCell = rarityRow.insertCell();
+        const rarityValueCell = rarityRow.insertCell();
+        rarityLabelCell.textContent = localization.translate('Rarity') + ':';
+        rarityLabelCell.style.fontWeight = 'bold';
+        rarityValueCell.textContent = this.getRarityText(fullStats.rarity);
+        rarityValueCell.className = this.getRarityClass(fullStats.rarity);
+
+        // Display all engine stats
+        this.addStatRow(typeTable, 'Stat Power', fullStats.stats.power?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Mass', fullStats.stats.mass?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Drag', fullStats.stats.drag?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Reliability', fullStats.stats.reliability?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Cooling', fullStats.stats.cooling?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Overspeed', fullStats.overspeed?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Fuel Consumption', fullStats.stats.fuelconsumption?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Altitude', `${fullStats.altitude || 0}`);
+        this.addStatRow(typeTable, 'Stat Torque', fullStats.torque?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Rumble', fullStats.rumble?.toString() || '0');
+        this.addStatRow(typeTable, 'Stat Cost', fullStats.stats.cost?.toString() || '0');
 
         // TODO: Add additional cells for:
         // - Engine options (mounting, cooling, upgrades, cowls, electrical)
@@ -325,9 +372,50 @@ class EngineUI {
         valueCell.textContent = value;
     }
 
+    private getRarityText(rarity: any): string {
+        // Rarity enum: CUSTOM = 0, COMMON = 1, RARE = 2, LEGENDARY = 3
+        switch (rarity) {
+            case 'CUSTOM':
+            case 0:
+                return localization.translate('Rarity Custom');
+            case 'COMMON':
+            case 1:
+                return localization.translate('Rarity Common');
+            case 'RARE':
+            case 2:
+                return localization.translate('Rarity Rare');
+            case 'LEGENDARY':
+            case 3:
+                return localization.translate('Rarity Legendary');
+            default:
+                return localization.translate('Rarity Custom');
+        }
+    }
+
+    private getRarityClass(rarity: any): string {
+        // Return CSS class for rarity coloring
+        switch (rarity) {
+            case 'CUSTOM':
+            case 0:
+                return 'ER_Custom';
+            case 'COMMON':
+            case 1:
+                return '';
+            case 'RARE':
+            case 2:
+                return 'ER_Rare';
+            case 'LEGENDARY':
+            case 3:
+                return 'ER_Legendary';
+            default:
+                return 'ER_Custom';
+        }
+    }
+
     update(): void {
-        // Update engine UI based on current bindings
-        // This will be implemented when we flesh out the engine UI
+        // Rebuild the row (simple approach)
+        this.row.innerHTML = '';
+        this.buildUI();
     }
 }
 
