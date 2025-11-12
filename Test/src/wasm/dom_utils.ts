@@ -195,17 +195,58 @@ export function createFlexNumberInput(
     return input;
 }
 
+export function BlinkBad(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_b");
+}
+
+export function BlinkGood(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_g");
+}
+
+export function BlinkNeutral(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+    elem.offsetHeight;
+    elem.classList.toggle("changed_n");
+}
+
+export function BlinkNone(elem: HTMLElement) {
+    elem.classList.toggle("changed_b", false);
+    elem.classList.toggle("changed_g", false);
+    elem.classList.toggle("changed_n", false);
+}
+
 /**
  * Update stat cells with blink animation when changed
  * @param elem - The table cell element to update
  * @param newValue - The new value to display
  * @param positiveGood - Whether positive values are good (for potential future styling)
  */
-export function blinkIfChanged(elem: HTMLTableCellElement, newValue: string, positiveGood: boolean | null): void {
-    if (elem.textContent !== newValue) {
-        elem.textContent = newValue;
-        // TODO: Add blink animation CSS class if desired
+export function blinkIfChanged(elem: HTMLTableCellElement, newValue: string, positiveGood?: boolean): void {
+    if (elem.textContent != newValue) {
+        if (positiveGood == undefined) {
+            BlinkNeutral(elem);
+        } else {
+            const positive = parseInt(elem.textContent) < parseInt(newValue);
+            if (positiveGood && positive || (!positiveGood && !positive)) {
+                BlinkGood(elem);
+            } else {
+                BlinkBad(elem);
+            }
+        }
+    } else {
+        BlinkNone(elem);
     }
+    elem.textContent = newValue;
 }
 
 /**
@@ -243,7 +284,7 @@ export function createStatsTable(
 
             // Get the value from stats or derivedStats
             let value = undefined;
-            if (config.isDerived === undefined || !config.isDerived) {
+            if (config.isDerived === undefined) {
                 value = stats[config.key];
             } else {
                 value = derivedStats[config.key];
@@ -259,7 +300,15 @@ export function createStatsTable(
                 }
             }
 
-            value = value?.toString() || '';
+            if (typeof (value) == 'boolean') {
+                if (value) {
+                    value = 'Yes';
+                } else {
+                    value = 'No';
+                }
+            } else {
+                value = value?.toString() || '';
+            }
 
             td.textContent = value;
 
@@ -299,7 +348,7 @@ export function updateStatsTable(
 
             // Get the value from stats or derivedStats
             let value = undefined;
-            if (config.isDerived === undefined || !config.isDerived) {
+            if (config.isDerived === undefined) {
                 value = stats[config.key];
             } else {
                 value = derivedStats[config.key];
@@ -315,15 +364,21 @@ export function updateStatsTable(
                 }
             }
 
-            value = value?.toString() || '';
-
-            td.textContent = value;
+            if (typeof (value) == 'boolean') {
+                if (value) {
+                    value = 'Yes';
+                } else {
+                    value = 'No';
+                }
+            } else {
+                value = value?.toString() || '';
+            }
 
             // Apply derived stat styling if applicable
             if (config.isDerived) {
                 td.className = 'part_local';
             }
-            blinkIfChanged(td, value?.toString() || '0', null);
+            blinkIfChanged(td, value, config.positiveIsGood);
         }
     }
 }

@@ -13,14 +13,14 @@ const ENGINE_STATS: StatDisplayConfig[] = [
     // Row 2
     { key: 'reliability', label: 'Stat Reliability', positiveIsGood: true, isDerived: true },
     { key: 'visibility', label: 'Stat Visibility', positiveIsGood: false },
-    { key: 'overspeed', label: 'Stat Overspeed', positiveIsGood: true },
+    { key: 'overspeed', label: 'Stat Overspeed', positiveIsGood: true, isDerived: false },
     // Row 3
     { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
-    { key: 'altitude', label: 'Stat Altitude', positiveIsGood: true },
+    { key: 'altitude', label: 'Stat Altitude', isDerived: false },
     { key: 'fuelconsumption', label: 'Stat Fuel Consumption', positiveIsGood: false },
     // Row 4
-    { key: 'pitchstability', label: 'Stat Pitch Stability', positiveIsGood: true },
-    { key: 'lateralstability', label: 'Stat Lateral Stability', positiveIsGood: true },
+    { key: 'pitchstab', label: 'Stat Pitch Stability', positiveIsGood: true },
+    { key: 'latstab', label: 'Stat Lateral Stability', positiveIsGood: true },
     { key: 'maxstrain', label: 'Stat Max Strain', positiveIsGood: true },
     // Row 5
     { key: 'structure', label: 'Stat Structure', positiveIsGood: true },
@@ -28,8 +28,8 @@ const ENGINE_STATS: StatDisplayConfig[] = [
     { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
     // Row 6
     { key: 'charge', label: 'Stat Charge', positiveIsGood: true },
-    { key: '', label: '', positiveIsGood: undefined }, // Empty cell
-    { key: '', label: '', positiveIsGood: undefined }  // Empty cell
+    { key: '', label: '' }, // Empty cell
+    { key: '', label: '' }  // Empty cell
 ];
 
 /**

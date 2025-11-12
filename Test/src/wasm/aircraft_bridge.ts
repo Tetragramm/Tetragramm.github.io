@@ -145,6 +145,7 @@ export interface AircraftWasmAPI {
     getStabilizersBindings(): any;
     setStabilizersBindings(bindings: any): void;
     getStabilizersStats(): Stats;
+    getFramesFlammable(): boolean;
     getFramesBindings(): any;
     setFramesBindings(bindings: any): void;
     getFramesStats(): Stats;
@@ -618,6 +619,11 @@ export class AircraftBridge {
     getStabilizersStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getStabilizersStats();
+    }
+
+    getFramesFlammable(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getFramesFlammable();
     }
 
     /**

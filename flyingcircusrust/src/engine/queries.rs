@@ -444,6 +444,8 @@ impl Engine {
     pub fn get_derived_stats(&self) -> EngineDerivedStats {
         EngineDerivedStats {
             reliability: self.total_reliability,
+            overspeed: self.etype_stats.overspeed,
+            altitude: format!("{}-{}", self.get_min_altitude(), self.get_max_altitude()),
         }
     }
 }
@@ -452,4 +454,6 @@ impl Engine {
 #[derive(serde::Serialize)]
 pub struct EngineDerivedStats {
     pub reliability: i16,
+    pub overspeed: i16,
+    pub altitude: String,
 }

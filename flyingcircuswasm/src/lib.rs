@@ -371,6 +371,13 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get Frames Flammability
+    #[wasm_bindgen(js_name = getFramesFlammable)]
+    pub fn get_frames_flammable(&self) -> JsValue {
+        let is_flammable = self.inner.frames.get_is_flammable();
+        serde_wasm_bindgen::to_value(&is_flammable).unwrap()
+    }
+
     /// Get Frames UI bindings
     #[wasm_bindgen(js_name = getFramesBindings)]
     pub fn get_frames_bindings(&self) -> JsValue {

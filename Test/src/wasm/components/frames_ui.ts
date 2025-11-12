@@ -29,9 +29,11 @@ const FRAMES_STATS: StatDisplayConfig[] = [
     { key: 'toughness', label: 'Stat Toughness', positiveIsGood: true },
     { key: 'visibility', label: 'Stat Visibility', positiveIsGood: true },
     { key: 'wingarea', label: 'Stat Wing Area', positiveIsGood: true },
+    { key: 'flammable', label: 'Derived Is Flammable Question', isDerived: false },
     { key: 'pitchstab', label: 'Stat Pitch Stability', positiveIsGood: true },
     { key: 'maxstrain', label: 'Stat Raw Strain', positiveIsGood: true },
     { key: 'liftbleed', label: 'Stat Lift Bleed', positiveIsGood: false },
+    { key: '', label: '' }, // Empty cell
 ];
 
 // Cache interface for type safety
@@ -97,9 +99,10 @@ export class FramesUI extends BaseComponentUI {
 
         const bindings = bridge.getFramesBindings();
         const stats = bridge.getFramesStats();
+        const derived = { flammable: bridge.getFramesFlammable() };
 
         // Build Frames section
-        this.framesSectionElement = this.createFramesSection(bindings, stats);
+        this.framesSectionElement = this.createFramesSection(bindings, stats, derived);
         this.container.appendChild(this.framesSectionElement);
 
         // Add break between sections
@@ -108,8 +111,6 @@ export class FramesUI extends BaseComponentUI {
         // Build Tail section
         this.tailSectionElement = this.createTailSection(bindings, this.cache.framesTableBody);
         this.container.appendChild(this.tailSectionElement);
-
-        this.updateValues();
     }
 
     /**
@@ -121,9 +122,10 @@ export class FramesUI extends BaseComponentUI {
 
         const bindings = bridge.getFramesBindings();
         const stats = bridge.getFramesStats();
+        const derived = { flammable: bridge.getFramesFlammable() };
 
         // Update frames section
-        this.updateFramesSection(bindings, stats);
+        this.updateFramesSection(bindings, stats, derived);
 
         // Update tail section
         this.updateTailSection(bindings);
@@ -132,7 +134,7 @@ export class FramesUI extends BaseComponentUI {
     /**
      * Create the complete Frames section
      */
-    private createFramesSection(bindings: any, stats: any): HTMLElement {
+    private createFramesSection(bindings: any, stats: any, derived: any): HTMLElement {
         const contentDiv = document.createElement('div');
 
         // Flying Wing
@@ -228,7 +230,8 @@ export class FramesUI extends BaseComponentUI {
         const statsCell = document.createElement('td');
         statsCell.className = 'inner_table';
         statsCell.rowSpan = 3; // Spans header + data + tail header
-        const statsTable = createStatsTable(stats, FRAMES_STATS);
+
+        const statsTable = createStatsTable(stats, FRAMES_STATS, derived);
         statsCell.appendChild(statsTable);
         dataRow.appendChild(statsCell);
 
@@ -687,7 +690,7 @@ export class FramesUI extends BaseComponentUI {
     /**
      * Update the Frames section values
      */
-    private updateFramesSection(bindings: any, stats: any): void {
+    private updateFramesSection(bindings: any, stats: any, derived: any): void {
         if (!this.cache) return;
 
         // Update "apply to all" selects
@@ -728,7 +731,7 @@ export class FramesUI extends BaseComponentUI {
         }
 
         // Update stats table
-        updateStatsTable(this.cache.statsTable, stats, FRAMES_STATS);
+        updateStatsTable(this.cache.statsTable, stats, FRAMES_STATS, derived);
     }
 
     /**
