@@ -8,17 +8,7 @@ impl Engine {
                 self.mount_sel += 1;
             }
         } else if self.get_is_pulsejet() {
-            if self.mount_list[self.mount_sel].mount_type == crate::engines::MountType::Fuselage {
-                for i in 0..self.mount_list.len() {
-                    if !matches!(
-                        self.mount_list[i].mount_type,
-                        crate::engines::MountType::Fuselage
-                    ) {
-                        self.mount_sel = i;
-                        break;
-                    }
-                }
-            }
+            self.mount_sel = 4;
         } else if self.is_generator {
             self.mount_sel = 0;
         } else {

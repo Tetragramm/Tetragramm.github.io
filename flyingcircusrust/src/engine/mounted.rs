@@ -1,9 +1,9 @@
 use super::Engine;
 
 impl Engine {
-    pub fn verify_cowl(&mut self, num: usize) {
+    pub fn can_cowl(&self, num: usize) -> bool {
         if num >= self.cowl_list.len() {
-            return;
+            return false;
         }
 
         let cowl = &self.cowl_list[num];
@@ -17,6 +17,10 @@ impl Engine {
         } else {
             cowl.for_air_cooled
         };
+        is_valid
+    }
+    pub fn verify_cowl(&mut self, num: usize) {
+        let is_valid = self.can_cowl(num);
 
         if is_valid {
             self.cowl_sel = num;
@@ -39,6 +43,12 @@ impl Engine {
                 }
             }
         }
+    }
+
+    pub fn is_cowl_opt_enabled(&self) -> Vec<bool> {
+        (0..self.cowl_list.len())
+            .map(|n| self.can_cowl(n))
+            .collect()
     }
 
     /// Set cowl with validation

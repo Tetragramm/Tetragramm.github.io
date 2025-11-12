@@ -135,6 +135,27 @@ export class FramesUI extends BaseComponentUI {
     private createFramesSection(bindings: any, stats: any): HTMLElement {
         const contentDiv = document.createElement('div');
 
+        // Flying Wing
+        const flyingWingSpan = document.createElement('span');
+        const flyingWingLabel = document.createElement('label');
+        flyingWingLabel.htmlFor = 'flying_wing_wasm';
+        flyingWingLabel.textContent = ' ' + localization.translate('Frames Flying Wing') + ': ';
+        flyingWingSpan.appendChild(flyingWingLabel);
+
+        const flyingWingCheckbox = document.createElement('input');
+        flyingWingCheckbox.type = 'checkbox';
+        flyingWingCheckbox.id = 'flying_wing_wasm';
+        flyingWingCheckbox.checked = bindings.flying_wing.selected;
+        flyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
+        flyingWingCheckbox.onchange = () => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.flying_wing.selected = flyingWingCheckbox.checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.render();
+        };
+        flyingWingSpan.appendChild(flyingWingCheckbox);
+        contentDiv.appendChild(flyingWingSpan);
+
         // Create frames table
         const table = document.createElement('table');
         table.id = 'table_frames';
@@ -239,8 +260,9 @@ export class FramesUI extends BaseComponentUI {
                 tailTypeSelect: null!,
                 farmanCheckbox: null!,
                 boomCheckbox: null!,
-                flyingWingCheckbox: null!,
+                flyingWingCheckbox,
                 tailSectionRows: [],
+
             };
         } else {
             this.cache.allFrameSelect = allFrameSelect;
@@ -248,6 +270,7 @@ export class FramesUI extends BaseComponentUI {
             this.cache.sectionRows = sectionRows;
             this.cache.statsTable = statsTable;
             this.cache.framesTableBody = table;
+            this.cache.flyingWingCheckbox = flyingWingCheckbox;
         }
 
         // Create collapsible section
@@ -255,6 +278,14 @@ export class FramesUI extends BaseComponentUI {
             localization.translate('Frames Frames and Covering'),
             contentDiv,
             true
+        );
+
+        // Add rules link using utility function
+        const rulesLine = createRulesLink('_Frames');
+        rulesLine.appendChild(document.createElement('br'));
+        section.insertBefore(
+            rulesLine,
+            section.children[1]
         );
 
         return section;
@@ -470,27 +501,6 @@ export class FramesUI extends BaseComponentUI {
         boomSpan.appendChild(boomCheckbox);
         controlsDiv.appendChild(boomSpan);
 
-        // Flying Wing
-        const flyingWingSpan = document.createElement('span');
-        const flyingWingLabel = document.createElement('label');
-        flyingWingLabel.htmlFor = 'flying_wing_wasm';
-        flyingWingLabel.textContent = ' ' + localization.translate('Frames Flying Wing') + ': ';
-        flyingWingSpan.appendChild(flyingWingLabel);
-
-        const flyingWingCheckbox = document.createElement('input');
-        flyingWingCheckbox.type = 'checkbox';
-        flyingWingCheckbox.id = 'flying_wing_wasm';
-        flyingWingCheckbox.checked = bindings.flying_wing.selected;
-        flyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
-        flyingWingCheckbox.onchange = () => {
-            const updatedBindings = this.getBridge().getFramesBindings();
-            updatedBindings.flying_wing.selected = flyingWingCheckbox.checked;
-            this.getBridge().setFramesBindings(updatedBindings);
-            this.render();
-        };
-        flyingWingSpan.appendChild(flyingWingCheckbox);
-        controlsDiv.appendChild(flyingWingSpan);
-
         contentDiv.appendChild(controlsDiv);
 
         // Tail sections table (if any tail sections exist)
@@ -545,7 +555,6 @@ export class FramesUI extends BaseComponentUI {
                 this.cache.tailTypeSelect = tailTypeSelect;
                 this.cache.farmanCheckbox = farmanCheckbox;
                 this.cache.boomCheckbox = boomCheckbox;
-                this.cache.flyingWingCheckbox = flyingWingCheckbox;
                 this.cache.tailSectionRows = tailSectionRows;
             }
         } else {
@@ -554,7 +563,6 @@ export class FramesUI extends BaseComponentUI {
                 this.cache.tailTypeSelect = tailTypeSelect;
                 this.cache.farmanCheckbox = farmanCheckbox;
                 this.cache.boomCheckbox = boomCheckbox;
-                this.cache.flyingWingCheckbox = flyingWingCheckbox;
                 this.cache.tailSectionRows = [];
             }
         }

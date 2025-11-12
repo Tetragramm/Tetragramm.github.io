@@ -458,8 +458,8 @@ export function createCollapsibleSection(
     contentDiv.appendChild(content);
 
     // Toggle functionality
-    header.addEventListener('click', () => {
-        const isActive = header.classList.toggle('active');
+    header.addEventListener('click', function (e) {
+        const isActive = this.classList.toggle('active');
         contentDiv.style.maxHeight = isActive ? 'inherit' : '0px';
     });
 

@@ -202,7 +202,7 @@ impl Engine {
     }
 
     pub fn is_cowl_enabled(&self) -> bool {
-        true
+        !self.get_is_pulsejet()
     }
 
     pub fn is_generator_enabled(&self) -> bool {
@@ -214,7 +214,7 @@ impl Engine {
     }
 
     pub fn is_alternator_enabled(&self) -> bool {
-        !self.get_is_electric()
+        !self.get_is_electric() && !self.get_is_pulsejet()
     }
 
     pub fn radiator_list(&self) -> Vec<String> {

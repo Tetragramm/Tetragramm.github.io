@@ -197,9 +197,17 @@ export class EnginesUI extends BaseComponentUI {
         // Create header row
         const headerRow = enginesTable.insertRow();
         const headerCell = document.createElement('th');
-        headerCell.colSpan = 4;
-        headerCell.textContent = localization.translate('Engines');
+        headerCell.textContent = localization.translate('Engines Engine Type');
         headerRow.appendChild(headerCell);
+        const headerCell2 = document.createElement('th');
+        headerCell2.textContent = localization.translate('Engines Options');
+        headerRow.appendChild(headerCell2);
+        const headerCell3 = document.createElement('th');
+        headerCell3.textContent = localization.translate('Engines Options 2');
+        headerRow.appendChild(headerCell3);
+        const headerCell4 = document.createElement('th');
+        headerCell4.textContent = localization.translate('Engines Engine Stats');
+        headerRow.appendChild(headerCell4);
 
         // Create each engine
         for (let i = 0; i < bindings.num_engines; i++) {

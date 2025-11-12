@@ -102,13 +102,13 @@ impl Part for Engine {
         }
 
         // Cowl engineering cost for pushers (lines 1075-1083)
-        let cowl_name = &self.cowl_list[self.cowl_sel].name;
-        let mount_name = &self.mount_list[self.mount_sel].name;
-        if cowl_name != "No Cowling" && cowl_name != "Sealed Cowl" {
-            if mount_name == "Rear-Mounted Pusher"
-                || mount_name == "Center-Mounted Pusher"
-                || mount_name == "Center-Mounted Tractor"
-                || mount_name == "Fuselage Push-Pull"
+        let cowl_name = self.cowl_list[self.cowl_sel].name.clone();
+        let mount_name = self.mount_list[self.mount_sel].name.clone();
+        if cowl_name != t!("No Cowling") && cowl_name != t!("Sealed Cowl") {
+            if mount_name == t!("Rear-Mounted Pusher")
+                || mount_name == t!("Center-Mounted Pusher")
+                || mount_name == t!("Center-Mounted Tractor")
+                || mount_name == t!("Fuselage Push-Pull")
             {
                 stats.cost += 2.0;
             }
@@ -155,7 +155,7 @@ impl Part for Engine {
             stats.charge = (1.0e-6 + stats.power / 10.0).floor() + 1.0;
             stats.mass += 1.0;
             stats.cost += 2.0;
-            if self.is_push_pull && mount_name == "Fuselage Push-Pull" {
+            if self.is_push_pull && mount_name == t!("Fuselage Push-Pull") {
                 stats.mass += 1.0;
                 stats.cost += 2.0;
             }

@@ -253,6 +253,7 @@ pub struct Engine {
         select,
         source = "cowl_list",
         enabled_fn = "is_cowl_enabled",
+        enabled_opt_fn = "is_cowl_opt_enabled",
         set_fn = "set_cowl"
     )]
     cowl_sel: usize,
