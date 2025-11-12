@@ -261,6 +261,11 @@ interface EngineCache {
     outboardCheckbox?: HTMLInputElement;
     gearCountInput?: HTMLInputElement;
     gearReliabilityInput?: HTMLInputElement;
+
+    // Cowl & Electrical section
+    cowlSelect?: HTMLSelectElement;
+    alternatorCheckbox?: HTMLInputElement;
+    generatorCheckbox?: HTMLInputElement;
 }
 
 /**
@@ -392,8 +397,37 @@ class EngineUI {
         const upgradesCell = upgradesRow.insertCell();
         const upgradesElements = this.buildUpgradesSection(upgradesCell, bindings);
 
+        // Third cell: Cowl & Electrical
+        const cowlElectricalCell = this.row.insertCell();
+        cowlElectricalCell.className = 'inner_table';
+
+        const cowlElectricalTable = document.createElement('table');
+        cowlElectricalTable.className = 'inner_table';
+        cowlElectricalCell.appendChild(cowlElectricalTable);
+
+        // Cowl Section Header
+        const cowlHeaderRow = cowlElectricalTable.insertRow();
+        const cowlHeader = document.createElement('th');
+        cowlHeader.textContent = localization.translate('Engine Cowls');
+        cowlHeaderRow.appendChild(cowlHeader);
+
+        // Cowl Section Content
+        const cowlRow = cowlElectricalTable.insertRow();
+        const cowlCell = cowlRow.insertCell();
+        const cowlElements = this.buildCowlSection(cowlCell, bindings);
+
+        // Electrical Section Header
+        const electricalHeaderRow = cowlElectricalTable.insertRow();
+        const electricalHeader = document.createElement('th');
+        electricalHeader.textContent = localization.translate('Engine Electrical');
+        electricalHeaderRow.appendChild(electricalHeader);
+
+        // Electrical Section Content
+        const electricalRow = cowlElectricalTable.insertRow();
+        const electricalCell = electricalRow.insertCell();
+        const electricalElements = this.buildElectricalSection(electricalCell, bindings);
+
         // TODO: Add additional cells for:
-        // - Cowl & Electrical
         // - Stats display table
 
         this.cache = {
@@ -406,7 +440,9 @@ class EngineUI {
                 RumbleLabel, CostLabel],
             coolingCell,
             ...mountingElements,
-            ...upgradesElements
+            ...upgradesElements,
+            ...cowlElements,
+            ...electricalElements
         }
     }
 
@@ -593,6 +629,62 @@ class EngineUI {
         };
     }
 
+    private buildCowlSection(cell: HTMLTableCellElement, bindings: any) {
+        const bridge = this.getBridge();
+
+        // Cowl select dropdown
+        const cowlSelect = createSelectElement(
+            bindings.cowl_sel,
+            () => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.cowl_sel.selected = cowlSelect.selectedIndex;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+        cell.appendChild(cowlSelect);
+
+        return {
+            cowlSelect
+        };
+    }
+
+    private buildElectricalSection(cell: HTMLTableCellElement, bindings: any) {
+        const bridge = this.getBridge();
+        const flexContainer = createFlexSection();
+
+        // Alternator checkbox
+        const alternatorCheckbox = createFlexCheckbox(
+            bindings.has_alternator,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.has_alternator.selected = checked;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        // Generator checkbox
+        const generatorCheckbox = createFlexCheckbox(
+            bindings.is_generator,
+            flexContainer,
+            (checked) => {
+                const updatedBindings = bridge.getEngineBindings(this.index);
+                updatedBindings.is_generator.selected = checked;
+                bridge.setEngineBindings(this.index, updatedBindings);
+                this.update();
+            }
+        );
+
+        cell.appendChild(flexContainer.div0);
+
+        return {
+            alternatorCheckbox,
+            generatorCheckbox
+        };
+    }
+
     private getRarityText(rarity: any): string {
         // Rarity enum: CUSTOM = 0, COMMON = 1, RARE = 2, LEGENDARY = 3
         switch (rarity) {
@@ -711,6 +803,19 @@ class EngineUI {
         if (this.cache.gearReliabilityInput) {
             this.cache.gearReliabilityInput.value = bindings.geared_reliability.value.toString();
             this.cache.gearReliabilityInput.disabled = !bindings.geared_reliability.enabled;
+        }
+
+        // Update cowl & electrical section
+        if (this.cache.cowlSelect) {
+            updateSelectElement(this.cache.cowlSelect, bindings.cowl_sel);
+        }
+        if (this.cache.alternatorCheckbox) {
+            this.cache.alternatorCheckbox.checked = bindings.has_alternator.selected;
+            this.cache.alternatorCheckbox.disabled = !bindings.has_alternator.enabled;
+        }
+        if (this.cache.generatorCheckbox) {
+            this.cache.generatorCheckbox.checked = bindings.is_generator.selected;
+            this.cache.generatorCheckbox.disabled = !bindings.is_generator.enabled;
         }
     }
 }
