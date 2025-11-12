@@ -20,6 +20,9 @@ impl Part for Engine {
         if !self.can_outboard_prop() {
             self.outboard_prop = false;
         }
+        if !self.can_torque_to_struct() {
+            self.torque_to_struct = false;
+        }
 
         let mut stats = Stats::new();
         stats = stats.add(&self.etype_stats.stats);

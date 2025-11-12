@@ -1,6 +1,47 @@
+use crate::engines::MountType;
+
 use super::{Engine, TypedInputs};
 
 impl Engine {
+    pub fn is_mount_opt_enabled(&self) -> Vec<bool> {
+        let mut can = vec![true; self.mount_list.len()];
+        if self.is_internal {
+            for idx in 0..can.len() {
+                can[idx] = self.mount_list[idx].helicopter
+            }
+        } else if self.get_is_turbine() && !self.get_is_turboprop() {
+            for idx in 0..can.len() {
+                can[idx] = self.mount_list[idx].turbine
+            }
+        } else if self.is_generator {
+            can = vec![false; self.mount_list.len()];
+            can[0] = true;
+        } else {
+            if self.is_push_pull {
+                for idx in 0..can.len() {
+                    if self.mount_list[idx].mount_type == MountType::Fuselage
+                        && self.mount_list[idx].name != t!("Fuselage Push-Pull")
+                    {
+                        can[idx] = false;
+                    }
+                    if self.mount_list[idx].turbine {
+                        can[idx] = false;
+                    }
+                }
+            } else {
+                for idx in 0..can.len() {
+                    if self.mount_list[idx].name == t!("Fuselage Push-Pull") {
+                        can[idx] = false;
+                    }
+                    if self.mount_list[idx].turbine {
+                        can[idx] = false;
+                    }
+                }
+            }
+        }
+        can
+    }
+
     pub fn need_cooling(&self) -> bool {
         self.etype_stats.stats.cooling > 0.0
     }
@@ -62,24 +103,31 @@ impl Engine {
         if self.is_internal || self.is_generator {
             return false;
         }
-        let mount_name = &self.mount_list[self.mount_sel].name;
-        mount_name == "Tractor"
-            || mount_name == "Center-Mounted Tractor"
-            || mount_name == "Fuselage Push-Pull"
+        let mount_name = self.mount_list[self.mount_sel].name.clone();
+        mount_name == t!("Tractor").to_string()
+            || mount_name == t!("Center-Mounted Tractor").to_string()
+            || mount_name == t!("Fuselage Push-Pull").to_string()
     }
 
     pub fn is_pusher(&self) -> bool {
         if self.is_internal || self.is_generator {
             return false;
         }
-        let mount_name = &self.mount_list[self.mount_sel].name;
-        mount_name == "Pusher"
-            || mount_name == "Center-Mounted Pusher"
-            || mount_name == "Fuselage Push-Pull"
+        let mount_name = self.mount_list[self.mount_sel].name.clone();
+        mount_name == t!("Pusher").to_string()
+            || mount_name == t!("Center-Mounted Pusher").to_string()
+            || mount_name == t!("Fuselage Push-Pull").to_string()
     }
 
     pub fn can_use_push_pull(&self) -> bool {
-        self.mount_list[self.mount_sel].pushpull
+        !(self.get_generator()
+            || self.get_is_jet()
+            || self.is_internal
+            || self.mount_list[self.mount_sel].helicopter)
+    }
+
+    pub fn get_is_jet(&self) -> bool {
+        self.get_is_pulsejet() || (self.get_is_turbine() && !self.get_is_turboprop())
     }
 
     pub fn can_use_extended_driveshaft(&self) -> bool {
@@ -90,7 +138,9 @@ impl Engine {
     }
 
     pub fn can_outboard_prop(&self) -> bool {
-        self.extended_ds && self.is_push_pull
+        self.extended_ds
+            && (self.is_tractor()
+                || self.mount_list[self.mount_sel].name == t!("Fuselage Push-Pull"))
     }
 
     pub fn is_diesel(&self) -> bool {
@@ -120,27 +170,31 @@ impl Engine {
     }
 
     pub fn is_mount_select_enabled(&self) -> bool {
-        true
+        !self.get_is_pulsejet()
     }
 
     pub fn is_pushpull_enabled(&self) -> bool {
         self.can_use_push_pull()
     }
 
-    pub fn is_torque_to_struct_enabled(&self) -> bool {
+    pub fn can_torque_to_struct(&self) -> bool {
         self.is_push_pull
     }
 
     pub fn is_intake_fan_enabled(&self) -> bool {
-        self.get_is_turbine()
+        self.is_air_cooled()
     }
 
     pub fn is_extended_ds_enabled(&self) -> bool {
-        self.mount_list[self.mount_sel].require_extended_driveshafts
+        !((self.get_num_propellers() == 0)
+            || self.is_internal
+            || self.is_generator | self.mount_list[self.mount_sel].helicopter)
     }
 
     pub fn is_outboard_prop_enabled(&self) -> bool {
         self.extended_ds
+            && (self.is_tractor()
+                || self.mount_list[self.mount_sel].name == t!("Fuselage Push-Pull"))
     }
 
     pub fn is_gears_enabled(&self) -> bool {
@@ -214,19 +268,19 @@ impl Engine {
     /// Returns height value: -1 (lowest/nose), 0 (low), 1 (mid), 2 (high), 5 (generator/no prop)
     pub fn get_engine_height(&self) -> i16 {
         if !self.is_generator {
-            let mount_name = &self.mount_list[self.mount_sel].name;
+            let mount_name = self.mount_list[self.mount_sel].name.clone();
 
-            if mount_name == "Pod"
+            if mount_name == t!("Pod").to_string()
                 || self.get_is_pulsejet()
                 || self.is_internal
                 || self.outboard_prop
             {
                 2
-            } else if mount_name == "Nacelle (Offset)" {
+            } else if mount_name == t!("Nacelle (Offset)").to_string() {
                 1
-            } else if mount_name == "Nacelle (Inside)"
-                || mount_name == "Channel Tractor"
-                || mount_name == "Wing Pod"
+            } else if mount_name == t!("Nacelle (Inside)").to_string()
+                || mount_name == t!("Channel Tractor").to_string()
+                || mount_name == t!("Wing Pod").to_string()
             {
                 0
             } else {
@@ -245,8 +299,8 @@ impl Engine {
             return false;
         }
         self.is_rotary()
-            && (self.mount_list[self.mount_sel].name == "Tractor"
-                || self.mount_list[self.mount_sel].name == "Fuselage Push-Pull")
+            && (self.mount_list[self.mount_sel].name == t!("Tractor")
+                || self.mount_list[self.mount_sel].name == t!("Fuselage Push-Pull"))
     }
 
     /// Get engine rumble value

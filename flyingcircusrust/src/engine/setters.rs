@@ -1,3 +1,5 @@
+use crate::engines::MountType;
+
 use super::Engine;
 
 impl Engine {
@@ -70,29 +72,28 @@ impl Engine {
             if self.cooling_count > 0 {
                 self.cooling_count *= 2;
             }
+            if self.mount_list[self.mount_sel].mount_type == MountType::Fuselage {
+                self.mount_sel = 8;
+            }
         } else {
             // When disabling push-pull, halve cooling
             if self.cooling_count > 0 {
-                self.cooling_count = (self.cooling_count + 1) / 2;
+                self.cooling_count =
+                    (1.0e-6 + (self.cooling_count as f32 + 1.) / 2.).floor() as i16;
             }
-            // Reset push-pull-only features
-            self.torque_to_struct = false;
+            if self.mount_list[self.mount_sel].name == t!("Fuselage Push-Pull") {
+                self.mount_sel = 0;
+            }
         }
     }
 
     /// Set use extended driveshaft with validation
     /// TypeScript: SetUseExtendedDriveshaft(use: boolean)
     pub fn set_use_extended_driveshaft(&mut self, use_it: bool) {
-        self.extended_ds = use_it;
-
-        // Validate mount supports extended driveshaft
-        if use_it && !self.mount_list[self.mount_sel].require_extended_driveshafts {
+        if !self.can_use_extended_driveshaft() {
             self.extended_ds = false;
-        }
-
-        // Clear outboard prop if disabling extended driveshaft
-        if !use_it {
-            self.outboard_prop = false;
+        } else {
+            self.extended_ds = use_it;
         }
     }
 
@@ -135,10 +136,9 @@ impl Engine {
     /// Set outboard prop with validation
     /// TypeScript: SetOutboardProp(use: boolean)
     pub fn set_outboard_prop(&mut self, use_it: bool) {
-        self.outboard_prop = use_it;
-
-        // Requires extended driveshaft
-        if use_it && !self.extended_ds {
+        if use_it && self.extended_ds {
+            self.outboard_prop = true;
+        } else {
             self.outboard_prop = false;
         }
     }
@@ -180,13 +180,13 @@ impl Engine {
         // If mount requires tail and doesn't have farman/boom or swept wing with v-tail outboard
         if self.mount_list[self.mount_sel].require_tail
             && !(farman_or_boom || swept_v_outboard)
-            && !self.is_generator_enabled()
+            && !self.is_generator
         {
             self.extended_ds = true;
         }
         // If mount requires extended driveshaft and it's not a canard with farman/boom or swept
         if self.mount_list[self.mount_sel].require_extended_driveshafts
-            && !self.is_generator_enabled()
+            && !self.is_generator
             && !(canard && (farman_or_boom || swept_v_outboard))
         {
             self.extended_ds = true;

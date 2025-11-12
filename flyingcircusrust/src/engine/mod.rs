@@ -1,6 +1,6 @@
-use std::rc::Rc;
-
 use serde::Serialize;
+use std::iter::zip;
+use std::rc::Rc;
 use ui_core::*;
 use ui_macro::*;
 
@@ -167,12 +167,12 @@ pub struct Engine {
     pub etype_stats: EngineStats,
     etype_inputs: EngineInputs,
 
-    #[ui(number, name = "cooling_count", set_fn = "set_cooling")]
+    #[ui(number, name = "Engine Cooling Amount", set_fn = "set_cooling")]
     cooling_count: i16,
 
     #[ui(
         number,
-        name = "radiator_index",
+        name = "Engine Select Radiator",
         enabled_fn = "is_radiator_enabled",
         set_fn = "set_radiator"
     )]
@@ -186,6 +186,7 @@ pub struct Engine {
         select,
         source = "mount_list",
         enabled_fn = "is_mount_select_enabled",
+        enabled_opt_fn = "is_mount_opt_enabled",
         set_fn = "set_mount_index"
     )]
     mount_sel: usize,
@@ -201,7 +202,7 @@ pub struct Engine {
     #[ui(
         check,
         name = "Engine Torque To Structure",
-        enabled_fn = "is_torque_to_struct_enabled",
+        enabled_fn = "can_torque_to_struct",
         set_fn = "set_torque_to_struct"
     )]
     pub torque_to_struct: bool,
