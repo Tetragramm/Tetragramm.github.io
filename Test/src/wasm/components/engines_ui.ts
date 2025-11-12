@@ -1,8 +1,36 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput, createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement } from '../dom_utils';
+import { createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput, createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement, createStatsTable, updateStatsTable, StatDisplayConfig } from '../dom_utils';
 import { CreateCheckbox } from '../../disp/Tools';
+
+// Engine stats configuration for stats table
+const ENGINE_STATS: StatDisplayConfig[] = [
+    // Row 1
+    { key: 'power', label: 'Stat Power', positiveIsGood: true },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    // Row 2
+    { key: 'reliability', label: 'Stat Reliability', positiveIsGood: true, isDerived: true },
+    { key: 'visibility', label: 'Stat Visibility', positiveIsGood: false },
+    { key: 'overspeed', label: 'Stat Overspeed', positiveIsGood: true },
+    // Row 3
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'altitude', label: 'Stat Altitude', positiveIsGood: true },
+    { key: 'fuelconsumption', label: 'Stat Fuel Consumption', positiveIsGood: false },
+    // Row 4
+    { key: 'pitchstability', label: 'Stat Pitch Stability', positiveIsGood: true },
+    { key: 'lateralstability', label: 'Stat Lateral Stability', positiveIsGood: true },
+    { key: 'maxstrain', label: 'Stat Max Strain', positiveIsGood: true },
+    // Row 5
+    { key: 'structure', label: 'Stat Structure', positiveIsGood: true },
+    { key: 'flightstress', label: 'Stat Flight Stress', positiveIsGood: false },
+    { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
+    // Row 6
+    { key: 'charge', label: 'Stat Charge', positiveIsGood: true },
+    { key: '', label: '', positiveIsGood: undefined }, // Empty cell
+    { key: '', label: '', positiveIsGood: undefined }  // Empty cell
+];
 
 /**
  * Engines UI Component
@@ -274,6 +302,9 @@ interface EngineCache {
     cowlSelect?: HTMLSelectElement;
     alternatorCheckbox?: HTMLInputElement;
     generatorCheckbox?: HTMLInputElement;
+
+    // Stats display table
+    statsTable?: HTMLTableElement;
 }
 
 /**
@@ -435,8 +466,10 @@ class EngineUI {
         const electricalCell = electricalRow.insertCell();
         const electricalElements = this.buildElectricalSection(electricalCell, bindings);
 
-        // TODO: Add additional cells for:
-        // - Stats display table
+        // Fourth cell: Stats Display Table
+        const statsTableCell = this.row.insertCell();
+        statsTableCell.className = 'inner_table';
+        const statsTable = this.buildStatsTable(statsTableCell, bindings);
 
         this.cache = {
             listSelect,
@@ -450,7 +483,8 @@ class EngineUI {
             ...mountingElements,
             ...upgradesElements,
             ...cowlElements,
-            ...electricalElements
+            ...electricalElements,
+            statsTable
         }
     }
 
@@ -693,6 +727,14 @@ class EngineUI {
         };
     }
 
+    private buildStatsTable(cell: HTMLTableCellElement, bindings: any): HTMLTableElement {
+        const bridge = this.getBridge();
+        const engineStats = bridge.getEngineStats(this.index);
+        const statsTable = createStatsTable(engineStats, ENGINE_STATS);
+        cell.appendChild(statsTable);
+        return statsTable;
+    }
+
     private getRarityText(rarity: any): string {
         // Rarity enum: CUSTOM = 0, COMMON = 1, RARE = 2, LEGENDARY = 3
         switch (rarity) {
@@ -824,6 +866,12 @@ class EngineUI {
         if (this.cache.generatorCheckbox) {
             this.cache.generatorCheckbox.checked = bindings.is_generator.selected;
             this.cache.generatorCheckbox.disabled = !bindings.is_generator.enabled;
+        }
+
+        // Update stats table
+        if (this.cache.statsTable) {
+            const engineStats = bridge.getEngineStats(this.index);
+            updateStatsTable(this.cache.statsTable, engineStats, ENGINE_STATS);
         }
     }
 }
