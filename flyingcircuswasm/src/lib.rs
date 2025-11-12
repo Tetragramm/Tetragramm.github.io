@@ -531,6 +531,17 @@ impl AircraftWasm {
         }
     }
 
+    /// Get derived stats for a specific engine (calculated values like reliability)
+    #[wasm_bindgen(js_name = getEngineDerivedStats)]
+    pub fn get_engine_derived_stats(&self, index: usize) -> JsValue {
+        if index < self.inner.engines.engines.len() {
+            let derived_stats = self.inner.engines.engines[index].get_derived_stats();
+            serde_wasm_bindgen::to_value(&derived_stats).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
+
     /// Get all available engine list names
     #[wasm_bindgen(js_name = getEngineNamesOfLists)]
     pub fn get_engine_list_names(&self) -> JsValue {

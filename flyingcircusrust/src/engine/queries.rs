@@ -437,4 +437,19 @@ impl Engine {
     pub fn get_engine_stats(&self) -> &super::EngineStats {
         &self.etype_stats
     }
+
+    /// Get derived stats for engine (calculated values like reliability)
+    /// TypeScript: Used for stats display with derived values
+    /// Returns reliability as integer (total_reliability after all modifications)
+    pub fn get_derived_stats(&self) -> EngineDerivedStats {
+        EngineDerivedStats {
+            reliability: self.total_reliability,
+        }
+    }
+}
+
+/// Derived stats for engine display
+#[derive(serde::Serialize)]
+pub struct EngineDerivedStats {
+    pub reliability: i16,
 }

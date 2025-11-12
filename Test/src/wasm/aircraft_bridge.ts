@@ -180,6 +180,7 @@ export interface AircraftWasmAPI {
 
     // Engine selection methods
     getEngineFullStats(index: number): any;
+    getEngineDerivedStats(index: number): any;
     getEngineNamesOfLists(): string[];
     getEngineNamesInList(listName: string): string[];
     getEngineSelectedList(index: number): string;
@@ -733,6 +734,14 @@ export class AircraftBridge {
     getEngineStats(index: number): Stats {
         this.ensureInitialized();
         return this.wasm!.getEngineStats(index);
+    }
+
+    /**
+     * Get derived stats for a specific engine (calculated values like reliability)
+     */
+    getEngineDerivedStats(index: number): any {
+        this.ensureInitialized();
+        return this.wasm!.getEngineDerivedStats(index);
     }
 
     /**

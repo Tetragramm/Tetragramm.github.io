@@ -730,7 +730,8 @@ class EngineUI {
     private buildStatsTable(cell: HTMLTableCellElement, bindings: any): HTMLTableElement {
         const bridge = this.getBridge();
         const engineStats = bridge.getEngineStats(this.index);
-        const statsTable = createStatsTable(engineStats, ENGINE_STATS);
+        const derivedStats = bridge.getEngineDerivedStats(this.index);
+        const statsTable = createStatsTable(engineStats, ENGINE_STATS, derivedStats);
         cell.appendChild(statsTable);
         return statsTable;
     }
@@ -871,7 +872,8 @@ class EngineUI {
         // Update stats table
         if (this.cache.statsTable) {
             const engineStats = bridge.getEngineStats(this.index);
-            updateStatsTable(this.cache.statsTable, engineStats, ENGINE_STATS);
+            const derivedStats = bridge.getEngineDerivedStats(this.index);
+            updateStatsTable(this.cache.statsTable, engineStats, ENGINE_STATS, derivedStats);
         }
     }
 }
