@@ -265,7 +265,7 @@ export function createStatsTable(
     const table = document.createElement('table');
     table.className = 'inner_table';
 
-    // Group stats into rows of 3
+    // Group stats into rows
     for (let i = 0; i < statConfig.length; i += statsPerRow) {
         const rowStats = statConfig.slice(i, Math.min(i + statsPerRow, statConfig.length));
 
@@ -331,10 +331,10 @@ export function updateStatsTable(
     table: HTMLTableElement,
     stats: any,
     statConfig: StatDisplayConfig[],
-    derivedStats?: any
+    derivedStats?: any,
+    statsPerRow = 3
 ): void {
-    // Group stats into rows of 3
-    const statsPerRow = 3;
+    // Group stats into rows
     let row_idx = 1;
     for (let i = 0; i < statConfig.length; i += statsPerRow) {
         const rowStats = statConfig.slice(i, Math.min(i + statsPerRow, statConfig.length));

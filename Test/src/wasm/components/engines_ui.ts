@@ -1057,6 +1057,6 @@ class RadiatorUI {
         // Update stats table
         const stats = this.getBridge().getRadiatorStats(this.index);
         const derived = { flammable: this.getBridge().getRadiatorFlammable(this.index) };
-        updateStatsTable(this.cache.statsTable, stats, RADIATOR_STATS, derived);
+        updateStatsTable(this.cache.statsTable, stats, RADIATOR_STATS, derived, 6);
     }
 }
