@@ -348,6 +348,108 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get Weapons UI bindings (container with weapon system count and brace count)
+    #[wasm_bindgen(js_name = getWeaponsBindings)]
+    pub fn get_weapons_bindings(&self) -> JsValue {
+        let options = self.inner.weapons.create_ui_options();
+        serde_wasm_bindgen::to_value(&options).unwrap()
+    }
+
+    /// Update Weapons from UI bindings
+    #[wasm_bindgen(js_name = setWeaponsBindings)]
+    pub fn set_weapons_bindings(&mut self, js_options: JsValue) {
+        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+            self.inner.weapons.receive_ui_selections(options);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Get stats for weapons
+    #[wasm_bindgen(js_name = getWeaponsStats)]
+    pub fn get_weapons_stats(&mut self) -> JsValue {
+        let stats = self.inner.weapons.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
+    /// Get WeaponSystem UI bindings for a specific weapon system
+    #[wasm_bindgen(js_name = getWeaponSystemBindings)]
+    pub fn get_weapon_system_bindings(&self, index: usize) -> JsValue {
+        if index < self.inner.weapons.weapon_sets.len() {
+            let options = self.inner.weapons.weapon_sets[index].create_ui_options();
+            serde_wasm_bindgen::to_value(&options).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
+
+    /// Update WeaponSystem from UI bindings
+    #[wasm_bindgen(js_name = setWeaponSystemBindings)]
+    pub fn set_weapon_system_bindings(&mut self, index: usize, js_options: JsValue) {
+        if index < self.inner.weapons.weapon_sets.len() {
+            if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+                self.inner.weapons.weapon_sets[index].receive_ui_selections(options);
+                self.inner.part_stats();
+            }
+        }
+    }
+
+    /// Get stats for a specific weapon system
+    #[wasm_bindgen(js_name = getWeaponSystemStats)]
+    pub fn get_weapon_system_stats(&mut self, index: usize) -> JsValue {
+        if index < self.inner.weapons.weapon_sets.len() {
+            let stats = self.inner.weapons.weapon_sets[index].part_stats();
+            serde_wasm_bindgen::to_value(&stats).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
+
+    /// Get Weapon UI bindings for a specific weapon in a weapon system
+    #[wasm_bindgen(js_name = getWeaponBindings)]
+    pub fn get_weapon_bindings(&self, system_index: usize, weapon_index: usize) -> JsValue {
+        if system_index < self.inner.weapons.weapon_sets.len() {
+            let weapons = self.inner.weapons.weapon_sets[system_index].get_weapons();
+            if weapon_index < weapons.len() {
+                let options = weapons[weapon_index].create_ui_options();
+                serde_wasm_bindgen::to_value(&options).unwrap()
+            } else {
+                JsValue::NULL
+            }
+        } else {
+            JsValue::NULL
+        }
+    }
+
+    /// Update Weapon from UI bindings
+    #[wasm_bindgen(js_name = setWeaponBindings)]
+    pub fn set_weapon_bindings(&mut self, system_index: usize, weapon_index: usize, js_options: JsValue) {
+        if system_index < self.inner.weapons.weapon_sets.len() {
+            let weapons = self.inner.weapons.weapon_sets[system_index].get_weapons_mut();
+            if weapon_index < weapons.len() {
+                if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+                    weapons[weapon_index].receive_ui_selections(options);
+                    self.inner.part_stats();
+                }
+            }
+        }
+    }
+
+    /// Get stats for a specific weapon
+    #[wasm_bindgen(js_name = getWeaponStats)]
+    pub fn get_weapon_stats(&mut self, system_index: usize, weapon_index: usize) -> JsValue {
+        if system_index < self.inner.weapons.weapon_sets.len() {
+            let weapons = self.inner.weapons.weapon_sets[system_index].get_weapons_mut();
+            if weapon_index < weapons.len() {
+                let stats = weapons[weapon_index].part_stats();
+                serde_wasm_bindgen::to_value(&stats).unwrap()
+            } else {
+                JsValue::NULL
+            }
+        } else {
+            JsValue::NULL
+        }
+    }
+
     /// Get Reinforcements UI bindings
     #[wasm_bindgen(js_name = getReinforcementsBindings)]
     pub fn get_reinforcements_bindings(&self) -> JsValue {

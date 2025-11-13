@@ -142,6 +142,15 @@ export interface AircraftWasmAPI {
     getUsedBindings(): any;
     setUsedBindings(bindings: any): void;
     getUsedStats(): Stats;
+    getWeaponsBindings(): any;
+    setWeaponsBindings(bindings: any): void;
+    getWeaponsStats(): Stats;
+    getWeaponSystemBindings(index: number): any;
+    setWeaponSystemBindings(index: number, bindings: any): void;
+    getWeaponSystemStats(index: number): Stats;
+    getWeaponBindings(systemIndex: number, weaponIndex: number): any;
+    setWeaponBindings(systemIndex: number, weaponIndex: number, bindings: any): void;
+    getWeaponStats(systemIndex: number, weaponIndex: number): Stats;
     getReinforcementsBindings(): any;
     setReinforcementsBindings(bindings: any): void;
     getReinforcementsStats(): Stats;
@@ -600,6 +609,81 @@ export class AircraftBridge {
     getUsedStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getUsedStats();
+    }
+
+    /**
+     * Get Weapons UI bindings (includes localized strings from Rust)
+     */
+    getWeaponsBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponsBindings();
+    }
+
+    /**
+     * Update Weapons from UI bindings
+     * Automatically recalculates stats
+     */
+    setWeaponsBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setWeaponsBindings(bindings);
+    }
+
+    /**
+     * Get stats for Weapons
+     */
+    getWeaponsStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponsStats();
+    }
+
+    /**
+     * Get WeaponSystem UI bindings for a specific weapon system
+     */
+    getWeaponSystemBindings(index: number): any {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponSystemBindings(index);
+    }
+
+    /**
+     * Update WeaponSystem from UI bindings
+     * Automatically recalculates stats
+     */
+    setWeaponSystemBindings(index: number, bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setWeaponSystemBindings(index, bindings);
+    }
+
+    /**
+     * Get stats for a specific weapon system
+     */
+    getWeaponSystemStats(index: number): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponSystemStats(index);
+    }
+
+    /**
+     * Get Weapon UI bindings for a specific weapon in a weapon system
+     */
+    getWeaponBindings(systemIndex: number, weaponIndex: number): any {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponBindings(systemIndex, weaponIndex);
+    }
+
+    /**
+     * Update Weapon from UI bindings
+     * Automatically recalculates stats
+     */
+    setWeaponBindings(systemIndex: number, weaponIndex: number, bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setWeaponBindings(systemIndex, weaponIndex, bindings);
+    }
+
+    /**
+     * Get stats for a specific weapon
+     */
+    getWeaponStats(systemIndex: number, weaponIndex: number): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponStats(systemIndex, weaponIndex);
     }
 
     /**
