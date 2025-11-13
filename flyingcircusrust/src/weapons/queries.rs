@@ -86,7 +86,7 @@ impl Weapons {
         let mut lst = vec![false; self.cockpit_count as usize];
         for ws in &self.weapon_sets {
             let seat = ws.get_seat() as usize;
-            if seat < ws.cockpit_count as usize {
+            if seat < self.cockpit_count as usize {
                 lst[seat] = true;
             }
         }
@@ -109,7 +109,7 @@ impl Weapons {
     /// Check if pusher spinner is available
     /// TypeScript: CanPusherSpinner()
     pub fn can_pusher_spinner(&self) -> bool {
-        self.count_pusher_spinner() + self.count_arty_pusher_spinner() < self.pusher_spinner_count
+        self.count_pusher_spinner() + self.count_arty_tractor_spinner() < self.pusher_spinner_count
     }
 
     /// Check if arty pusher spinner is available

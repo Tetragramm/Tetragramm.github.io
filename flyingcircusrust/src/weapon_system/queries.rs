@@ -114,10 +114,6 @@ impl WeaponSystem {
                 && self.action_sel != ActionType::Rotary
                 && self.action_sel != ActionType::Gast
                 && self.action_sel != ActionType::Mechanical,
-            self.final_weapon.can_projectile
-                && self.action_sel != ActionType::Rotary
-                && self.action_sel != ActionType::Gast
-                && self.action_sel != ActionType::Mechanical,
         ]
     }
 
