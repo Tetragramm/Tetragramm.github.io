@@ -84,7 +84,7 @@ export class TotalStatsUI extends BaseComponentUI {
         this.statsTable.className = '';
 
         // Create collapsible section
-        const sectionTitle = localization.translate('Total Sum of Stats');
+        const sectionTitle = localization.translate('Aircraft Stats Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
             contentDiv,
