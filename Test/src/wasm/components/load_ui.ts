@@ -190,7 +190,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getFuelBindings();
                 updatedBindings.tank_count[idx].value = value;
                 bridge.setFuelBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -202,7 +202,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getFuelBindings();
                 updatedBindings.self_sealing.selected = checked;
                 bridge.setFuelBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -214,7 +214,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getFuelBindings();
                 updatedBindings.fire_extinguisher.selected = checked;
                 bridge.setFuelBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -254,7 +254,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getMunitionsBindings();
                 updatedBindings.bomb_count.value = value;
                 bridge.setMunitionsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -266,7 +266,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getMunitionsBindings();
                 updatedBindings.rocket_count.value = value;
                 bridge.setMunitionsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -278,7 +278,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getMunitionsBindings();
                 updatedBindings.internal_bay_count.value = value;
                 bridge.setMunitionsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -290,7 +290,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getMunitionsBindings();
                 updatedBindings.internal_bay_1.selected = checked;
                 bridge.setMunitionsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -302,7 +302,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getMunitionsBindings();
                 updatedBindings.internal_bay_2.selected = checked;
                 bridge.setMunitionsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -332,7 +332,7 @@ export class LoadUI extends BaseComponentUI {
                 const updatedBindings = bridge.getCargoBindings();
                 updatedBindings.space_sel.selected = selectedIndex;
                 bridge.setCargoBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 

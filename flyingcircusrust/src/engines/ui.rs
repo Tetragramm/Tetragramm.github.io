@@ -6,8 +6,8 @@ use ui_core::*;
 #[derive(Serialize, Deserialize)]
 pub struct EnginesOptions {
     pub is_asymmetric: Check,
-    pub num_engines: usize,
-    pub num_radiators: usize,
+    pub engines: Number,
+    pub radiators: Number,
 }
 
 impl UIBindings for Engines {
@@ -20,13 +20,22 @@ impl UIBindings for Engines {
                 enabled: true,
                 selected: self.is_asymmetric,
             },
-            num_engines: self.engines.len(),
-            num_radiators: self.radiators.len(),
+            engines: Number {
+                name: t!("Engines Num Engines").into(),
+                enabled: true,
+                value: self.engines.len() as i16,
+            },
+            radiators: Number {
+                name: t!("Engines Num Radiators").into(),
+                enabled: self.needs_cooling(),
+                value: self.radiators.len() as i16,
+            },
         }
     }
 
     fn receive_ui_selections(&mut self, options: Self::OptionsType) {
         self.is_asymmetric = options.is_asymmetric.selected;
-        // num_engines and num_radiators are read-only, so we don't update them
+        self.set_number_of_engines(options.engines.value as usize);
+        self.set_number_of_radiators(options.radiators.value as usize);
     }
 }

@@ -153,7 +153,7 @@ export class FramesUI extends BaseComponentUI {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.flying_wing.selected = flyingWingCheckbox.checked;
             this.getBridge().setFramesBindings(updatedBindings);
-            this.render();
+            this.onUpdate();
         };
         flyingWingSpan.appendChild(flyingWingCheckbox);
         contentDiv.appendChild(flyingWingSpan);
@@ -175,7 +175,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.all_frame.selected = selectedIndex;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         allFrameSelect.selectedIndex = -1; // No selection by default
@@ -192,7 +192,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.all_skin.selected = selectedIndex;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         skinTypeHeader.appendChild(allSkinSelect);
@@ -322,6 +322,8 @@ export class FramesUI extends BaseComponentUI {
             this.render(true); // Full rebuild needed for section addition
         };
         frameSpan.appendChild(addButton);
+        addButton.disabled = !sectionBindings.can_add;
+        removeButton.disabled = !sectionBindings.can_remove;
 
         const frameSelect = createSelectElement(
             sectionBindings.frame,
@@ -329,7 +331,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].frame.selected = selectedIndex;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         frameSpan.appendChild(frameSelect);
@@ -357,7 +359,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].geodesic.selected = checked;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -370,7 +372,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].monocoque.selected = checked;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -383,7 +385,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].internal_bracing.selected = checked;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -396,7 +398,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.sections[index].lifting_body.selected = checked;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         rowDiv.appendChild(rowSpan);
@@ -478,7 +480,7 @@ export class FramesUI extends BaseComponentUI {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.farman.selected = farmanCheckbox.checked;
             this.getBridge().setFramesBindings(updatedBindings);
-            this.render();
+            this.onUpdate();
         };
         farmanSpan.appendChild(farmanCheckbox);
         controlsDiv.appendChild(farmanSpan);
@@ -499,7 +501,7 @@ export class FramesUI extends BaseComponentUI {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.boom.selected = boomCheckbox.checked;
             this.getBridge().setFramesBindings(updatedBindings);
-            this.render();
+            this.onUpdate();
         };
         boomSpan.appendChild(boomCheckbox);
         controlsDiv.appendChild(boomSpan);
@@ -604,7 +606,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.tail_sections[index].frame.selected = selectedIndex;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         frameSpan.appendChild(frameSelect);
@@ -630,7 +632,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.tail_sections[index].geodesic.selected = checked;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -643,7 +645,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.tail_sections[index].monocoque.selected = checked;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -656,7 +658,7 @@ export class FramesUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getFramesBindings();
                 updatedBindings.tail_sections[index].lifting_body.selected = checked;
                 this.getBridge().setFramesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         rowDiv.appendChild(rowSpan);

@@ -165,6 +165,7 @@ export interface AircraftWasmAPI {
     serializeToLZString(): string;
 
     setNumberOfEngines(count: number): void;
+    getNumberOfEngines(): number;
 
     getEnginesStats(): any;
     getEnginesBindings(): any;
@@ -175,6 +176,8 @@ export interface AircraftWasmAPI {
     setEngineBindings(index: number, bindings: any): void;
 
     setNumberOfRadiators(count: number): void;
+    getNumberOfRadiators(): number;
+    getRadiatorFlammable(index: number): boolean;
     getRadiatorStats(index: number): any;
     getRadiatorBindings(index: number): any;
     setRadiatorBindings(index: number, bindings: any): void;
@@ -785,12 +788,36 @@ export class AircraftBridge {
     }
 
     /**
+     * Get the number of engines
+     */
+    getNumberOfEngines(): number {
+        this.ensureInitialized();
+        return this.wasm!.getNumberOfEngines();
+    }
+
+    /**
      * Set the number of radiators
      * Automatically recalculates stats
      */
     setNumberOfRadiators(num: number): void {
         this.ensureInitialized();
         this.wasm!.setNumberOfRadiators(num);
+    }
+
+    /**
+     * Get the number of radiators
+     */
+    getNumberOfRadiators(): number {
+        this.ensureInitialized();
+        return this.wasm!.getNumberOfRadiators();
+    }
+
+    /**
+     * Get the radiator flammability
+     */
+    getRadiatorFlammable(index: number): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getRadiatorFlammable(index);
     }
 
     /**

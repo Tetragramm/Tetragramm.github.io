@@ -151,7 +151,7 @@ export class StabilizersUI extends BaseComponentUI {
                 const bindings = bridge.getStabilizersBindings();
                 bindings.hstab_sel.selected = selectedIndex;
                 bridge.setStabilizersBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -171,7 +171,7 @@ export class StabilizersUI extends BaseComponentUI {
                 const bindings = bridge.getStabilizersBindings();
                 bindings.hstab_count.value = value;
                 bridge.setStabilizersBindings(bindings);
-                this.render();
+                this.onUpdate();
             },
             '0',
             '20'
@@ -200,7 +200,7 @@ export class StabilizersUI extends BaseComponentUI {
                 const bindings = bridge.getStabilizersBindings();
                 bindings.vstab_sel.selected = selectedIndex;
                 bridge.setStabilizersBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -220,7 +220,7 @@ export class StabilizersUI extends BaseComponentUI {
                 const bindings = bridge.getStabilizersBindings();
                 bindings.vstab_count.value = value;
                 bridge.setStabilizersBindings(bindings);
-                this.render();
+                this.onUpdate();
             },
             '0',
             '20'

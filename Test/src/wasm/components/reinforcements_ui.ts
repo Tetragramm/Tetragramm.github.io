@@ -211,7 +211,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                     const updatedBindings = bridge.getReinforcementsBindings();
                     updatedBindings.ext_wood_count[woodIndex].value = parseInt(woodInput.value) || 0;
                     bridge.setReinforcementsBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 });
 
                 fsWood.div2.appendChild(woodInput);
@@ -237,7 +237,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                     const updatedBindings = bridge.getReinforcementsBindings();
                     updatedBindings.ext_steel_count[steelIndex].value = parseInt(steelInput.value) || 0;
                     bridge.setReinforcementsBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 });
 
                 fsSteel.div2.appendChild(steelInput);
@@ -253,7 +253,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                 const updatedBindings = bridge.getReinforcementsBindings();
                 updatedBindings.cabane_sel.selected = selectedIndex;
                 bridge.setReinforcementsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -292,7 +292,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                 const updatedBindings = bridge.getReinforcementsBindings();
                 updatedBindings.wires.selected = wiresCheckbox.checked;
                 bridge.setReinforcementsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             });
 
             const emptyLabel = document.createElement('label');
@@ -329,7 +329,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                     const updatedBindings = bridge.getReinforcementsBindings();
                     updatedBindings.cant_count[idx].value = value;
                     bridge.setReinforcementsBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 }
             )
             : [];
@@ -357,7 +357,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                 const updatedBindings = bridge.getReinforcementsBindings();
                 updatedBindings.wing_blades.selected = wingBladesCheckbox.checked;
                 bridge.setReinforcementsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             });
 
             const emptyLabel = document.createElement('label');

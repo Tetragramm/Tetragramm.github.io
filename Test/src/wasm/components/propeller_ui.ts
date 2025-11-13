@@ -61,7 +61,7 @@ export class PropellerUI extends BaseComponentUI {
                 const updatedBindings = bridge.getPropellerBindings();
                 updatedBindings.idx_prop.selected = selectedIndex;
                 bridge.setPropellerBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         pitchSelect.id = 'propeller_pitch_wasm';
@@ -81,7 +81,7 @@ export class PropellerUI extends BaseComponentUI {
                 const updatedBindings = bridge.getPropellerBindings();
                 updatedBindings.idx_upg.selected = selectedIndex;
                 bridge.setPropellerBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         upgradeSelect.id = 'propeller_upgrade_wasm';

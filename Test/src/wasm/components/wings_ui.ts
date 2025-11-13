@@ -172,7 +172,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.stagger.selected = selectedIndex;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render(true); // Full rebuild when stagger changes
+                this.onUpdate(); // Full rebuild when stagger changes
             }
         );
         staggerSelect.id = 'wing_stagger_wasm';
@@ -181,44 +181,21 @@ export class WingsUI extends BaseComponentUI {
 
         // Closed Wing
         const closedSpan = document.createElement('span');
-        const closedLabel = document.createElement('label');
-        closedLabel.htmlFor = 'wing_closed_wasm';
-        closedLabel.textContent = ' ' + bindings.closed.name + ': ';
-        closedSpan.appendChild(closedLabel);
-
-        const closedCheckbox = document.createElement('input');
-        closedCheckbox.type = 'checkbox';
-        closedCheckbox.id = 'wing_closed_wasm';
-        closedCheckbox.checked = bindings.closed.selected;
-        closedCheckbox.disabled = !bindings.closed.enabled;
-        closedCheckbox.onchange = () => {
+        const closedCheckbox = createFlexCheckbox(bindings.closed, { div1: closedSpan, div2: closedSpan }, (selected) => {
             const updatedBindings = this.getBridge().getWingsBindings();
-            updatedBindings.closed.selected = closedCheckbox.checked;
+            updatedBindings.closed.selected = selected;
             this.getBridge().setWingsBindings(updatedBindings);
-            this.render();
-        };
-        closedSpan.appendChild(closedCheckbox);
-        controlsDiv.appendChild(closedSpan);
+            this.onUpdate();
+        });
 
         // Swept Wing
         const sweptSpan = document.createElement('span');
-        const sweptLabel = document.createElement('label');
-        sweptLabel.htmlFor = 'wing_swept_wasm';
-        sweptLabel.textContent = ' ' + bindings.swept.name + ': ';
-        sweptSpan.appendChild(sweptLabel);
-
-        const sweptCheckbox = document.createElement('input');
-        sweptCheckbox.type = 'checkbox';
-        sweptCheckbox.id = 'wing_swept_wasm';
-        sweptCheckbox.checked = bindings.swept.selected;
-        sweptCheckbox.disabled = !bindings.swept.enabled;
-        sweptCheckbox.onchange = () => {
+        const sweptCheckbox = createFlexCheckbox(bindings.swept, { div1: sweptSpan, div2: sweptSpan }, (selected) => {
             const updatedBindings = this.getBridge().getWingsBindings();
-            updatedBindings.swept.selected = sweptCheckbox.checked;
+            updatedBindings.swept.selected = selected;
             this.getBridge().setWingsBindings(updatedBindings);
-            this.render();
-        };
-        sweptSpan.appendChild(sweptCheckbox);
+            this.onUpdate();
+        });
         controlsDiv.appendChild(sweptSpan);
 
         contentDiv.appendChild(controlsDiv);
@@ -287,7 +264,7 @@ export class WingsUI extends BaseComponentUI {
                     const updatedBindings = this.getBridge().getWingsBindings();
                     updatedBindings.add_full_wing.deck.selected = selectedIndex;
                     this.getBridge().setWingsBindings(updatedBindings);
-                    this.render(true); // Full rebuild when adding wing
+                    this.onUpdate(); // Full rebuild when adding wing
                 }
             }
         );
@@ -309,7 +286,7 @@ export class WingsUI extends BaseComponentUI {
                     const updatedBindings = this.getBridge().getWingsBindings();
                     updatedBindings.add_mini_wing.deck.selected = selectedIndex;
                     this.getBridge().setWingsBindings(updatedBindings);
-                    this.render(true);
+                    this.onUpdate();
                 }
             }
         );
@@ -362,7 +339,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].deck.selected = selectedIndex;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render(true); // Full rebuild when changing deck (might remove wing)
+                this.onUpdate(); // Full rebuild when changing deck (might remove wing)
             }
         );
         wingSpan.appendChild(deckSelect);
@@ -373,7 +350,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].skin.selected = selectedIndex;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         wingSpan.appendChild(skinSelect);
@@ -391,7 +368,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].area.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         areaInput.min = '3';
@@ -403,7 +380,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].span.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         spanInput.min = '1';
@@ -417,7 +394,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].gull.selected = checked;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 
@@ -428,7 +405,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].dihedral.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         dihedralInput.min = '0';
@@ -441,7 +418,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.full_wings[index].anhedral.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         anhedralInput.min = '0';
@@ -480,7 +457,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.mini_wings[index].deck.selected = selectedIndex;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render(true);
+                this.onUpdate();
             }
         );
         wingSpan.appendChild(deckSelect);
@@ -491,7 +468,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.mini_wings[index].skin.selected = selectedIndex;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         wingSpan.appendChild(skinSelect);
@@ -507,7 +484,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.mini_wings[index].area.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         areaInput.min = '1';
@@ -520,7 +497,7 @@ export class WingsUI extends BaseComponentUI {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.mini_wings[index].span.value = value;
                 this.getBridge().setWingsBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         spanInput.min = '1';

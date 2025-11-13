@@ -79,7 +79,7 @@ export class EraUI extends BaseComponentUI {
                 bridge.setEraBindings(bindings);
 
                 // Re-render to update any dependent states
-                this.render();
+                this.onUpdate();
 
                 console.log(`[EraUI] Era changed to index ${selectedIndex}`);
             }

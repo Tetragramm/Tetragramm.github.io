@@ -87,7 +87,7 @@ export class PassengersUI extends BaseComponentUI {
             const updatedBindings = bridge.getPassengersBindings();
             updatedBindings.seats.value = parseInt(seatsInput.value) || 0;
             bridge.setPassengersBindings(updatedBindings);
-            this.render();
+            this.onUpdate();
         });
         seatsCell.appendChild(seatsInput);
         dataRow.appendChild(seatsCell);
@@ -103,7 +103,7 @@ export class PassengersUI extends BaseComponentUI {
             const updatedBindings = bridge.getPassengersBindings();
             updatedBindings.beds.value = parseInt(bedsInput.value) || 0;
             bridge.setPassengersBindings(updatedBindings);
-            this.render();
+            this.onUpdate();
         });
         bedsCell.appendChild(bedsInput);
         dataRow.appendChild(bedsCell);
@@ -118,7 +118,7 @@ export class PassengersUI extends BaseComponentUI {
                 const updatedBindings = bridge.getPassengersBindings();
                 updatedBindings.connected.selected = checked;
                 bridge.setPassengersBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
         upgradeCell.appendChild(flexContainer.div0);

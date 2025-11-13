@@ -206,6 +206,17 @@ impl Engine {
             self.etype_inputs = engine_inputs.clone();
             self.etype_stats = engine_inputs.part_stats();
         }
+
+        if self.is_push_pull {
+            self.cooling_count = 2 * (self.etype_stats.stats.cooling as i16);
+        } else {
+            self.cooling_count = self.etype_stats.stats.cooling as i16;
+        }
+        if self.radiator_index < 0 {
+            self.radiator_index = 0;
+        }
+        self.pulsejet_check();
+        self.verify_cowl(self.cowl_sel);
     }
 
     /// Set the selected engine list

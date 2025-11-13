@@ -5,6 +5,8 @@ use std::collections::HashMap;
 
 impl Part for Engines {
     fn part_stats(&mut self) -> Stats {
+        self.verify_cooling();
+
         let mut stats = Stats::new();
 
         // Track cooling needs for each radiator

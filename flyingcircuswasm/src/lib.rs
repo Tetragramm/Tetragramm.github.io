@@ -621,6 +621,25 @@ impl AircraftWasm {
         self.inner.part_stats();
     }
 
+    /// Get the number of engines
+    #[wasm_bindgen(js_name = getNumberOfEngines)]
+    pub fn get_number_of_engines(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.inner.engines.get_number_engines()).unwrap()
+    }
+
+    /// Get the number of radiators
+    #[wasm_bindgen(js_name = getNumberOfRadiators)]
+    pub fn get_number_of_radiators(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.inner.engines.get_num_radiators()).unwrap()
+    }
+
+    /// Get Radiator flammability
+    #[wasm_bindgen(js_name = getRadiatorFlammable)]
+    pub fn get_radiator_flammable(&self, index: usize) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.inner.engines.radiators[index].get_is_flammable())
+            .unwrap()
+    }
+
     /// Calculate all aircraft statistics
     #[wasm_bindgen(js_name = calculateStats)]
     pub fn calculate_stats(&mut self) {

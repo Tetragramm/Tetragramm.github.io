@@ -403,6 +403,10 @@ impl Engines {
         }
     }
 
+    pub fn needs_cooling(&self) -> bool {
+        self.engines.iter().any(|e| e.need_cooling())
+    }
+
     /// Set number of radiators
     /// TypeScript: SetNumberOfRadiators(num: number)
     /// Clamps to 0-20, removes or adds radiators as needed
@@ -410,6 +414,9 @@ impl Engines {
     pub fn set_number_of_radiators(&mut self, mut num: usize) {
         // Clamp to valid range
         num = num.min(20);
+        if !self.needs_cooling() {
+            num = 0;
+        }
 
         // Remove excess radiators
         while self.radiators.len() > num {
@@ -429,5 +436,35 @@ impl Engines {
         for engine in &mut self.engines {
             engine.set_num_radiators(self.radiators.len() as i16);
         }
+    }
+
+    pub fn verify_cooling(&mut self) {
+        if self.needs_cooling() && self.radiators.len() == 0 {
+            self.set_number_of_radiators(1);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{engines::Engines, part::Part, part_list::get_part_list};
+
+    #[test]
+    fn test_needs_cooling() {
+        let part_list = get_part_list();
+        let mut engines = Engines::new(
+            part_list.engine_mounts,
+            part_list.engine_cowls,
+            part_list.radiator_types,
+            part_list.radiator_mounts,
+            part_list.radiator_coolants,
+        );
+        engines.set_number_of_engines(1);
+        engines.engines[0].set_selected_engine("Himmilgard Liquid Cooled", "Bertha F1166 120hp");
+        assert!(engines.engines[0].need_cooling());
+        assert!(engines.needs_cooling());
+        // engines.part_stats();
+        assert!(engines.needs_cooling());
+        assert_eq!(engines.get_num_radiators(), 1);
     }
 }

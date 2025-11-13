@@ -226,7 +226,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     const updatedBindings = bridge.getAccessoriesBindings();
                     updatedBindings.armour_coverage[idx].value = value;
                     bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 }
             )
             : [];
@@ -238,7 +238,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     const updatedBindings = bridge.getAccessoriesBindings();
                     updatedBindings.armour_coverage[idx + 4].value = value;
                     bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 }
             )
             : [];
@@ -268,7 +268,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 const updatedBindings = bridge.getAccessoriesBindings();
                 updatedBindings.radio_sel.selected = selectedIndex;
                 bridge.setAccessoriesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -291,7 +291,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     const updatedBindings = bridge.getAccessoriesBindings();
                     updatedBindings.electrical_count[idx].value = value;
                     bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 }
             )
             : [];
@@ -320,7 +320,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     const updatedBindings = bridge.getAccessoriesBindings();
                     updatedBindings.clim_sel[idx].selected = checked;
                     bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 }
             )
             : [];
@@ -349,7 +349,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     const updatedBindings = bridge.getAccessoriesBindings();
                     updatedBindings.visi_sel[idx].selected = checked;
                     bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 }
             )
             : [];
@@ -378,7 +378,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     const updatedBindings = bridge.getAccessoriesBindings();
                     updatedBindings.recon_sel[idx].value = value;
                     bridge.setAccessoriesBindings(updatedBindings);
-                    this.render();
+                    this.onUpdate();
                 }
             )
             : [];
@@ -408,7 +408,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 const updatedBindings = bridge.getAccessoriesBindings();
                 updatedBindings.auto_sel.selected = selectedIndex;
                 bridge.setAccessoriesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -429,7 +429,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 const updatedBindings = bridge.getAccessoriesBindings();
                 updatedBindings.cont_sel.selected = selectedIndex;
                 bridge.setAccessoriesBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 

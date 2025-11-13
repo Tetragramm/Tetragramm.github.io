@@ -106,7 +106,7 @@ export class CockpitsUI extends BaseComponentUI {
                 const bindings = bridge.getCockpitsBindings(); // Get fresh bindings
                 bindings.num_cockpits.value = newValue;
                 bridge.setCockpitsBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         });
         controlDiv.appendChild(numCockpitsLabel);
@@ -207,7 +207,7 @@ export class CockpitsUI extends BaseComponentUI {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].selected_type.selected = selectedIndex;
                 bridge.setCockpitsBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         );
         optionCell.appendChild(typeSelect);
@@ -222,7 +222,7 @@ export class CockpitsUI extends BaseComponentUI {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].selected_upgrades[idx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         );
         row.appendChild(upgradesCell);
@@ -236,7 +236,7 @@ export class CockpitsUI extends BaseComponentUI {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].selected_safety[idx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         );
         row.appendChild(safetyCell);
@@ -250,7 +250,7 @@ export class CockpitsUI extends BaseComponentUI {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].selected_gunsights[idx].selected = checked;
                 bridge.setCockpitsBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         );
         // Add bombsight as number input
@@ -261,7 +261,7 @@ export class CockpitsUI extends BaseComponentUI {
                 const bindings = bridge.getCockpitsBindings();
                 bindings.positions[index].bombsight.value = value;
                 bridge.setCockpitsBindings(bindings);
-                this.render();
+                this.onUpdate();
             },
             '0', '20', '1'
         );

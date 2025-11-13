@@ -7,7 +7,7 @@ use rust_i18n::t;
 /// UI options for a single frame section
 #[derive(Serialize, Deserialize)]
 pub struct SectionOptions {
-    pub idx: Number,  // Section index for identification
+    pub idx: Number, // Section index for identification
     pub frame: Select,
     pub geodesic: Check,
     pub monocoque: Check,
@@ -21,7 +21,7 @@ pub struct SectionOptions {
 /// UI options for a single tail section
 #[derive(Serialize, Deserialize)]
 pub struct TailSectionOptions {
-    pub idx: Number,  // Section index for identification
+    pub idx: Number, // Section index for identification
     pub frame: Select,
     pub geodesic: Check,
     pub monocoque: Check,
@@ -137,11 +137,6 @@ impl UIBindings for Frames {
 
     fn receive_ui_selections(&mut self, options: FramesOptions) {
         // Handle "apply to all" selections
-        // Note: In UI, all_frame will be -1 (no selection) unless user explicitly changes it
-        // We only apply if the selection changes from the previous call
-        if options.all_frame.selected < options.all_frame.options.len() {
-            self.set_all_frame(options.all_frame.selected);
-        }
 
         if options.all_skin.selected != self.get_skin() {
             self.set_all_skin(options.all_skin.selected);
@@ -177,6 +172,13 @@ impl UIBindings for Frames {
             if i < self.get_tail_section_list().len() {
                 self.receive_tail_section_selections(i, tail_sec_options);
             }
+        }
+
+        // Note: In UI, all_frame will be -1 (no selection) unless user explicitly changes it
+        // We only apply if the selection changes from the previous call
+        // This goes last because it overrides each individual frame skin selection.
+        if options.all_frame.selected < options.all_frame.options.len() {
+            self.set_all_frame(options.all_frame.selected);
         }
     }
 }

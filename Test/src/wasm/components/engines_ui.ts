@@ -66,8 +66,8 @@ export class EnginesUI extends BaseComponentUI {
         if (!bridge) return false;
 
         const bindings = bridge.getEnginesBindings();
-        const engineCountChanged = bindings.num_engines !== this.cachedEngineCount;
-        const radiatorCountChanged = bindings.num_radiators !== this.cachedRadiatorCount;
+        const engineCountChanged = bindings.engines.value !== this.cachedEngineCount;
+        const radiatorCountChanged = bindings.radiators.value !== this.cachedRadiatorCount;
 
         // If counts changed, need full rebuild
         if (engineCountChanged || radiatorCountChanged) return false;
@@ -91,13 +91,19 @@ export class EnginesUI extends BaseComponentUI {
 
     protected rebuildFull(): void {
         this.clearCache();
+
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const bindings = bridge.getEnginesBindings();
+
         this.container.innerHTML = '';
 
         // Create collapsible section for Engines
         const sectionDiv = document.createElement('div');
 
         const section = createCollapsibleSection(
-            localization.translate('Engines Title'),
+            localization.translate('Engines Section Title'),
             sectionDiv,
             true
         );
@@ -122,23 +128,25 @@ export class EnginesUI extends BaseComponentUI {
         sectionDiv.appendChild(controlsSpan);
 
         // Number of engines 
-        this.numEnginesInput = createFlexNumberInput({ name: localization.translate("Engines Num Engines"), value: 1, enabled: true },
+        this.numEnginesInput = createFlexNumberInput(bindings.engines,
             { div1: controlsSpan, div2: controlsSpan },
-            () => {
-                const newNum = parseInt(this.numEnginesInput!.value) || 0;
-                this.getBridge().setNumberOfEngines(newNum);
-                this.render();
+            (value) => {
+                const bindings = bridge.getEnginesBindings()
+                bindings.engines.value = value;
+                bridge.setEnginesBindings(bindings);
+                this.onUpdate();
             });
         this.numEnginesInput.min = '0';
         this.numEnginesInput.max = '20';
 
         // Number of radiators 
-        this.numRadiatorsInput = createFlexNumberInput({ name: localization.translate("Engines Num Radiators"), value: 1, enabled: true },
+        this.numRadiatorsInput = createFlexNumberInput(bindings.radiators,
             { div1: controlsSpan, div2: controlsSpan },
-            () => {
-                const newNum = parseInt(this.numRadiatorsInput!.value) || 0;
-                this.getBridge().setNumberOfRadiators(newNum);
-                this.render();
+            (value) => {
+                const bindings = bridge.getEnginesBindings()
+                bindings.radiators.value = value;
+                bridge.setEnginesBindings(bindings);
+                this.onUpdate();
             });
         this.numRadiatorsInput.min = '0';
         this.numRadiatorsInput.max = '20';
@@ -150,7 +158,7 @@ export class EnginesUI extends BaseComponentUI {
                 const bindings = this.getBridge().getEnginesBindings();
                 bindings.is_asymmetric.selected = this.asymmetricCheckbox!.checked;
                 this.getBridge().setEnginesBindings(bindings);
-                this.render();
+                this.onUpdate();
             });
 
         // Container for individual engines
@@ -178,20 +186,20 @@ export class EnginesUI extends BaseComponentUI {
         }
 
         if (this.numEnginesInput) {
-            this.numEnginesInput.value = bindings.num_engines.toString();
+            this.numEnginesInput.value = bindings.engines.value;
         }
 
         if (this.numRadiatorsInput) {
-            this.numRadiatorsInput.value = bindings.num_radiators.toString();
+            this.numRadiatorsInput.value = bindings.radiators.value;
         }
 
         // Check if engine/radiator counts changed
-        const engineCountChanged = bindings.num_engines !== this.cachedEngineCount;
-        const radiatorCountChanged = bindings.num_radiators !== this.cachedRadiatorCount;
+        const engineCountChanged = bindings.engines.value !== this.cachedEngineCount;
+        const radiatorCountChanged = bindings.radiators.value !== this.cachedRadiatorCount;
 
         // Rebuild engine UIs if count changed
         if (engineCountChanged) {
-            this.cachedEngineCount = bindings.num_engines;
+            this.cachedEngineCount = bindings.engines.value;
             this.rebuildEngines();
         } else {
             // Just update existing engine UIs
@@ -200,7 +208,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Rebuild radiator UIs if count changed
         if (radiatorCountChanged) {
-            this.cachedRadiatorCount = bindings.num_radiators;
+            this.cachedRadiatorCount = bindings.radiators.value;
             this.rebuildRadiators();
         } else {
             // Just update existing radiator UIs
@@ -238,9 +246,9 @@ export class EnginesUI extends BaseComponentUI {
         headerRow.appendChild(headerCell4);
 
         // Create each engine
-        for (let i = 0; i < bindings.num_engines; i++) {
+        for (let i = 0; i < bindings.engines.value; i++) {
             const engineRow = enginesTable.insertRow();
-            const engineUI = new EngineUI(this.getBridge, i, engineRow);
+            const engineUI = new EngineUI(this.getBridge, i, engineRow, this.onUpdate);
             this.engineUIs.push(engineUI);
         }
     }
@@ -254,7 +262,7 @@ export class EnginesUI extends BaseComponentUI {
 
         const bindings = this.getBridge().getEnginesBindings();
 
-        if (bindings.num_radiators === 0) return;
+        if (bindings.radiators.value === 0) return;
 
         // Create a table for all radiators
         const radiatorsTable = document.createElement('table');
@@ -264,14 +272,22 @@ export class EnginesUI extends BaseComponentUI {
         // Create header row
         const headerRow = radiatorsTable.insertRow();
         const headerCell = document.createElement('th');
-        headerCell.colSpan = 3;
-        headerCell.textContent = localization.translate('Radiators');
+        headerCell.textContent = localization.translate('Radiators Radiator Type');
         headerRow.appendChild(headerCell);
+        const headerCell2 = document.createElement('th');
+        headerCell2.textContent = localization.translate('Radiators Mounting');
+        headerRow.appendChild(headerCell2);
+        const headerCell3 = document.createElement('th');
+        headerCell3.textContent = localization.translate('Radiators Coolant');
+        headerRow.appendChild(headerCell3);
+        const headerCell4 = document.createElement('th');
+        headerCell4.textContent = localization.translate('Radiators Radiator Stats');
+        headerRow.appendChild(headerCell4);
 
         // Create each radiator
-        for (let i = 0; i < bindings.num_radiators; i++) {
+        for (let i = 0; i < bindings.radiators.value; i++) {
             const radiatorRow = radiatorsTable.insertRow();
-            const radiatorUI = new RadiatorUI(this.getBridge, i, radiatorRow);
+            const radiatorUI = new RadiatorUI(this.getBridge, i, radiatorRow, this.onUpdate);
             this.radiatorUIs.push(radiatorUI);
         }
     }
@@ -316,12 +332,15 @@ class EngineUI {
     private index: number;
     private row: HTMLTableRowElement;
     private cache: EngineCache;
+    private onUpdate: () => void;
 
-    constructor(getBridge: () => AircraftBridge, index: number, row: HTMLTableRowElement) {
+    constructor(getBridge: () => AircraftBridge, index: number, row: HTMLTableRowElement, onUpdateFunc?: () => void) {
         this.getBridge = getBridge;
         this.index = index;
         this.row = row;
         this.buildUI();
+        console.log("onUpdateFunc = " + onUpdateFunc)
+        this.onUpdate = onUpdateFunc;
     }
 
     private buildUI(): void {
@@ -342,14 +361,13 @@ class EngineUI {
                 selected: allLists.indexOf(selectedList),
                 enabled: true
             },
-            () => {
-                bridge.setEngineSelectedList(this.index, listSelect.options[listSelect.selectedIndex].text);
+            (selected) => {
+                bridge.setEngineSelectedList(this.index, listSelect.options[selected].text);
                 //Update engineSelect
                 const enginesInList = bridge.getEngineNamesInList(selectedList);
                 const selectedEngineName = bridge.getEngineSelectedName(this.index);
-
-
-                this.update();
+                console.log("this = " + this.index)
+                this.onUpdate();
             });
         typeCell.appendChild(listSelect);
         typeCell.appendChild(document.createElement('br'));
@@ -367,7 +385,7 @@ class EngineUI {
             },
             () => {
                 bridge.setEngineSelectedIndex(this.index, engineSelect.selectedIndex);
-                this.update();
+                this.onUpdate();
             });
         typeCell.appendChild(engineSelect);
         typeCell.appendChild(document.createElement('br'));
@@ -515,7 +533,7 @@ class EngineUI {
                     const updatedBindings = bridge.getEngineBindings(this.index);
                     updatedBindings.intake_fan.selected = checked;
                     bridge.setEngineBindings(this.index, updatedBindings);
-                    this.update();
+                    this.onUpdate();
                 }
             );
             cell.appendChild(flexContainer.div0);
@@ -525,13 +543,23 @@ class EngineUI {
 
             // Radiator select dropdown
             const radiatorSelect = createFlexSelect(
-                bindings.radiator_index,
+                {
+                    name: localization.translate("Engine Select Radiator"),
+                    value: bindings.radiator_index,
+                    enabled: true,
+                    options: Array.from({ length: bridge.getNumberOfRadiators() }, (e, i) => {
+                        return {
+                            name: localization.translateWithParam("Vital Part Radiator", i + 1),
+                            enabled: true
+                        }
+                    })
+                },
                 flexContainer,
                 (selectedIndex) => {
                     const updatedBindings = bridge.getEngineBindings(this.index);
                     updatedBindings.radiator_index.selected = selectedIndex;
                     bridge.setEngineBindings(this.index, updatedBindings);
-                    this.update();
+                    this.onUpdate();
                 }
             );
 
@@ -543,7 +571,7 @@ class EngineUI {
                     const updatedBindings = bridge.getEngineBindings(this.index);
                     updatedBindings.cooling_count.value = value;
                     bridge.setEngineBindings(this.index, updatedBindings);
-                    this.update();
+                    this.onUpdate();
                 }
             );
 
@@ -569,7 +597,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.mount_sel.selected = mountSelect.selectedIndex;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
         cell.appendChild(mountSelect);
@@ -585,7 +613,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.is_push_pull.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -596,7 +624,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.torque_to_struct.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -621,7 +649,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.extended_ds.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -633,7 +661,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.outboard_prop.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -645,7 +673,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.gear_count.value = value;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -657,7 +685,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.geared_reliability.value = value;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -681,7 +709,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.cowl_sel.selected = cowlSelect.selectedIndex;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
         cell.appendChild(cowlSelect);
@@ -703,7 +731,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.has_alternator.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -715,7 +743,7 @@ class EngineUI {
                 const updatedBindings = bridge.getEngineBindings(this.index);
                 updatedBindings.is_generator.selected = checked;
                 bridge.setEngineBindings(this.index, updatedBindings);
-                this.update();
+                this.onUpdate();
             }
         );
 
@@ -878,6 +906,18 @@ class EngineUI {
     }
 }
 
+// Radiator stats configuration for stats table
+const RADIATOR_STATS: StatDisplayConfig[] = [
+    // Row 1
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    // Row 2
+    { key: 'reliability', label: 'Stat Reliability', positiveIsGood: true },
+    { key: 'latstab', label: 'Stat Lateral Stability', positiveIsGood: true },
+    { key: 'flammable', label: 'Derived Is Flammable Question', isDerived: false },
+];
+
 /**
  * Individual Radiator UI
  * Handles UI for a single radiator
@@ -886,12 +926,14 @@ class RadiatorUI {
     private getBridge: () => AircraftBridge;
     private index: number;
     private row: HTMLTableRowElement;
+    private onUpdate?: () => void;
 
-    constructor(getBridge: () => AircraftBridge, index: number, row: HTMLTableRowElement) {
+    constructor(getBridge: () => AircraftBridge, index: number, row: HTMLTableRowElement, onUpdateFunc?: () => void) {
         this.getBridge = getBridge;
         this.index = index;
         this.row = row;
         this.buildUI();
+        this.onUpdate = onUpdateFunc;
     }
 
     private buildUI(): void {
@@ -900,88 +942,50 @@ class RadiatorUI {
 
         // Type select cell
         const typeCell = this.row.insertCell();
-        const typeLabel = document.createElement('span');
-        typeLabel.textContent = localization.translate('Radiator Type') + ': ';
-        typeCell.appendChild(typeLabel);
-
-        const typeSelect = document.createElement('select');
-        bindings.idx_type.options.forEach((opt: any, i: number) => {
-            const option = document.createElement('option');
-            option.text = opt.name;
-            option.disabled = !opt.enabled;
-            typeSelect.add(option);
-        });
-        typeSelect.selectedIndex = bindings.idx_type.selected;
-        typeSelect.onchange = () => {
+        const typeSelect = createSelectElement(bindings.idx_type, (selected) => {
             const updatedBindings = this.getBridge().getRadiatorBindings(this.index);
-            updatedBindings.idx_type.selected = typeSelect.selectedIndex;
+            updatedBindings.idx_type.selected = selected;
             this.getBridge().setRadiatorBindings(this.index, updatedBindings);
-            this.update();
-        };
+            this.onUpdate();
+        });
         typeCell.appendChild(typeSelect);
 
         // Mount select cell
         const mountCell = this.row.insertCell();
-        const mountLabel = document.createElement('span');
-        mountLabel.textContent = localization.translate('Radiator Mount') + ': ';
-        mountCell.appendChild(mountLabel);
-
-        const mountSelect = document.createElement('select');
-        bindings.idx_mount.options.forEach((opt: any, i: number) => {
-            const option = document.createElement('option');
-            option.text = opt.name;
-            option.disabled = !opt.enabled;
-            mountSelect.add(option);
-        });
-        mountSelect.selectedIndex = bindings.idx_mount.selected;
-        mountSelect.onchange = () => {
+        const mountSelect = createSelectElement(bindings.idx_mount, (selected) => {
             const updatedBindings = this.getBridge().getRadiatorBindings(this.index);
-            updatedBindings.idx_mount.selected = mountSelect.selectedIndex;
+            updatedBindings.idx_mount.selected = selected;
             this.getBridge().setRadiatorBindings(this.index, updatedBindings);
-            this.update();
-        };
+            this.onUpdate();
+        });
         mountCell.appendChild(mountSelect);
 
         // Coolant select cell
         const coolantCell = this.row.insertCell();
-        const coolantLabel = document.createElement('span');
-        coolantLabel.textContent = localization.translate('Radiator Coolant') + ': ';
-        coolantCell.appendChild(coolantLabel);
-
-        const coolantSelect = document.createElement('select');
-        bindings.idx_coolant.options.forEach((opt: any, i: number) => {
-            const option = document.createElement('option');
-            option.text = opt.name;
-            option.disabled = !opt.enabled;
-            coolantSelect.add(option);
-        });
-        coolantSelect.selectedIndex = bindings.idx_coolant.selected;
-        coolantSelect.onchange = () => {
+        const coolantSelect = createSelectElement(bindings.idx_coolant, (selected) => {
             const updatedBindings = this.getBridge().getRadiatorBindings(this.index);
-            updatedBindings.idx_coolant.selected = coolantSelect.selectedIndex;
+            updatedBindings.idx_coolant.selected = selected;
             this.getBridge().setRadiatorBindings(this.index, updatedBindings);
-            this.update();
-        };
+            this.onUpdate();
+        });
         coolantCell.appendChild(coolantSelect);
 
         // Harden checkbox (if coolant has it)
         if (bindings.harden_cool) {
-            const hardenCheckbox = document.createElement('input');
-            hardenCheckbox.type = 'checkbox';
-            hardenCheckbox.checked = bindings.harden_cool.selected;
-            hardenCheckbox.disabled = !bindings.harden_cool.enabled;
-            hardenCheckbox.onchange = () => {
+            coolantCell.appendChild(document.createElement('br'));
+            const hardenCheckbox = createFlexCheckbox(bindings.harden_cool, { div1: coolantCell, div2: coolantCell }, () => {
                 const updatedBindings = this.getBridge().getRadiatorBindings(this.index);
                 updatedBindings.harden_cool.selected = hardenCheckbox.checked;
                 this.getBridge().setRadiatorBindings(this.index, updatedBindings);
-                this.update();
-            };
-            const hardenLabel = document.createElement('label');
-            hardenLabel.appendChild(hardenCheckbox);
-            hardenLabel.appendChild(document.createTextNode(' ' + bindings.harden_cool.name));
-            coolantCell.appendChild(document.createElement('br'));
-            coolantCell.appendChild(hardenLabel);
+                this.onUpdate();
+            })
         }
+
+        const statCell = this.row.insertCell();
+        const stats = this.getBridge().getRadiatorStats(this.index);
+        const derived = { flammable: this.getBridge().getRadiatorFlammable(this.index) };
+        statCell.className = 'inner_table';
+        statCell.appendChild(createStatsTable(stats, RADIATOR_STATS, derived, 6));
     }
 
     update(): void {

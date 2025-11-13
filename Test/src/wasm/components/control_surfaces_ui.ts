@@ -174,7 +174,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
                     const bindings = bridge.getControlSurfacesBindings();
                     bindings[surfaceKey].selected = selectedIndex;
                     bridge.setControlSurfacesBindings(bindings);
-                    this.render();
+                    this.onUpdate();
                 },
                 localization.translate(labels[idx])
             );
@@ -217,7 +217,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
                 const bindings = bridge.getControlSurfacesBindings();
                 bindings.drag_sel[idx].selected = checked;
                 bridge.setControlSurfacesBindings(bindings);
-                this.render();
+                this.onUpdate();
             }
         );
 

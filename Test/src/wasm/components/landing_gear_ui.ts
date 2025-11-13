@@ -155,7 +155,7 @@ export class LandingGearUI extends BaseComponentUI {
                 const updatedBindings = bridge.getLandingGearBindings();
                 updatedBindings.gear_sel.selected = selectedIndex;
                 bridge.setLandingGearBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             },
             'Type'
         ) : undefined;
@@ -168,7 +168,7 @@ export class LandingGearUI extends BaseComponentUI {
                 const updatedBindings = bridge.getLandingGearBindings();
                 updatedBindings.retract.selected = checked;
                 bridge.setLandingGearBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         ) : undefined;
 
@@ -202,7 +202,7 @@ export class LandingGearUI extends BaseComponentUI {
                 const updatedBindings = bridge.getLandingGearBindings();
                 updatedBindings.extra_sel[idx].selected = checked;
                 bridge.setLandingGearBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             }
         );
 

@@ -259,13 +259,13 @@ export function blinkIfChanged(elem: HTMLTableCellElement, newValue: string, pos
 export function createStatsTable(
     stats: any,
     statConfig: StatDisplayConfig[],
-    derivedStats?: any
+    derivedStats?: any,
+    statsPerRow = 3
 ): HTMLTableElement {
     const table = document.createElement('table');
     table.className = 'inner_table';
 
     // Group stats into rows of 3
-    const statsPerRow = 3;
     for (let i = 0; i < statConfig.length; i += statsPerRow) {
         const rowStats = statConfig.slice(i, Math.min(i + statsPerRow, statConfig.length));
 

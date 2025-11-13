@@ -84,7 +84,7 @@ export class OptimizationUI extends BaseComponentUI {
             const updatedBindings = bridge.getOptimizationBindings();
             updatedBindings.free_dots.value = parseInt(freeInput.value) || 0;
             bridge.setOptimizationBindings(updatedBindings);
-            this.render();
+            this.onUpdate();
         });
 
         freeDiv.appendChild(freeLabel);
@@ -204,7 +204,7 @@ export class OptimizationUI extends BaseComponentUI {
                 const newValue = checkbox.checked ? (index - 3) : (index - 2);
                 updatedBindings[key].value = newValue;
                 bridge.setOptimizationBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             });
 
             negCell.appendChild(checkbox);
@@ -230,7 +230,7 @@ export class OptimizationUI extends BaseComponentUI {
                 const newValue = checkbox.checked ? (index - 2) : (index - 3);
                 updatedBindings[key].value = newValue;
                 bridge.setOptimizationBindings(updatedBindings);
-                this.render();
+                this.onUpdate();
             });
 
             posCell.appendChild(checkbox);

@@ -11,12 +11,14 @@ import { localization } from './localization';
 export abstract class BaseComponentUI {
     protected container: HTMLElement;
     protected sectionElement: HTMLElement | null = null;
+    protected onUpdate: () => void;
 
     constructor(
         protected getBridge: () => AircraftBridge | null,
         containerId: string,
-        protected onUpdate?: () => void
+        protected onUpdateFunc?: () => void
     ) {
+        this.onUpdate = onUpdateFunc;
         // Get container
         const container = document.getElementById(containerId);
         if (!container) {

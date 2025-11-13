@@ -57,7 +57,7 @@ pub struct Radiator {
     #[ui(select, source = "coolant_list", set_fn = "set_coolant_index")]
     idx_coolant: usize,
 
-    #[ui(check, name = "harden_cool", set_fn = "set_harden")]
+    #[ui(check, name = "Radiators Harden Radiator", set_fn = "set_harden")]
     harden_cool: bool,
 
     need_cool: f32,
