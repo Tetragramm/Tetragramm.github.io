@@ -378,16 +378,18 @@ export class DerivedStatsUI extends BaseComponentUI {
         // Update cost and upkeep
         if (this.costCell) {
             this.costCell.textContent = stats.cost.toString() + 'þ ';
-            // TODO: Add used price calculation when bridge supports GetUsed().IsDefault()
+            // Add used price if aircraft has damage/wear
+            if (!bridge.getUsedIsDefault()) {
+                this.costCell.textContent += ' (' + Math.floor(1.0e-6 + stats.cost / 2).toString() + 'þ ' + localization.translate('Price Word Used') + ')';
+            }
         }
         if (this.upkeepCell) {
             this.upkeepCell.textContent = stats.upkeep.toString() + 'þ';
         }
 
-        // Update era report (simplified version without tooltip)
+        // Update era report
         if (this.versionCell) {
-            // TODO: Implement era report with tooltip when bridge supports GetEra()
-            this.versionCell.textContent = ''; // Placeholder
+            this.versionCell.textContent = localization.translate(bridge.getEraText());
         }
 
         // Update mass variation cells - Empty (all zeros in TypeScript version)
@@ -505,69 +507,125 @@ export class DerivedStatsUI extends BaseComponentUI {
             this.maxfuelCell.textContent = (Math.floor(1.0e-6 + derivedStats.fuel_uses * 10) / 10).toString();
         }
         if (this.flammableCell) {
-            // TODO: Get from bridge when GetIsFlammable() is available
-            this.flammableCell.textContent = localization.translate('No');
+            if (bridge.getIsFlammable()) {
+                this.flammableCell.textContent = localization.translate('Yes');
+            } else {
+                this.flammableCell.textContent = localization.translate('No');
+            }
         }
 
         if (this.stabilityCell) this.stabilityCell.textContent = derivedStats.stability.toString();
         if (this.elossCell) this.elossCell.textContent = derivedStats.energy_loss.toString();
         if (this.landingCell) {
-            // TODO: Get from bridge when GetGearName() is available
-            this.landingCell.textContent = '';
+            this.landingCell.textContent = bridge.getGearName();
         }
         if (this.maxaltCell) {
-            // TODO: Get from bridge when GetMinAltitude()/GetMaxAltitude() available
-            this.maxaltCell.textContent = '';
+            const minAlt = bridge.getMinAltitude();
+            const maxAlt = bridge.getMaxAltitude();
+            this.maxaltCell.textContent = minAlt.toString() + '-' + maxAlt.toString();
         }
 
         if (this.reliabilityCell) {
-            // TODO: Get from bridge when GetReliabilityList() is available
-            this.reliabilityCell.textContent = '';
+            const reliabilityList = bridge.getReliabilityList();
+            this.reliabilityCell.textContent = reliabilityList.join(', ');
         }
         if (this.toughnessCell) this.toughnessCell.textContent = derivedStats.toughness.toString();
         if (this.mxstrainCell) this.mxstrainCell.textContent = derivedStats.max_strain.toString();
         if (this.escapeCell) {
-            // TODO: Get from bridge when GetEscapeList() is available
-            this.escapeCell.textContent = '';
+            const escapeList = bridge.getEscapeList();
+            this.escapeCell.textContent = escapeList.join(', ');
         }
         if (this.crashsafetyCell) this.crashsafetyCell.textContent = stats.crashsafety.toString();
 
         if (this.crewCell) {
-            // TODO: Get from bridge when GetCockpits() and GetPassengers() available
-            this.crewCell.textContent = '';
+            const cockpitCount = bridge.getCockpitsCount();
+            const passengerCount = bridge.getPassengersCount();
+            this.crewCell.textContent = cockpitCount.toString() + '/' + passengerCount.toString();
         }
         if (this.flightstressCell) {
-            // TODO: Get from bridge when GetStressList() is available
-            this.flightstressCell.textContent = '';
+            // Format stress list similar to TypeScript Stress2Str function
+            const stressList = bridge.getStressList();
+            let str = '';
+            for (let i = 0; i < stressList.length - 1; i++) {
+                if (stressList[i][0] !== stressList[i][1]) {
+                    str += stressList[i][0].toString() + '(' + stressList[i][1].toString() + '), ';
+                } else {
+                    str += stressList[i][0].toString() + ', ';
+                }
+            }
+            if (stressList.length > 0) {
+                const i = stressList.length - 1;
+                if (stressList[i][0] !== stressList[i][1]) {
+                    str += stressList[i][0].toString() + '(' + stressList[i][1].toString() + ')';
+                } else {
+                    str += stressList[i][0].toString();
+                }
+            }
+            this.flightstressCell.textContent = str;
         }
         if (this.visibilityCell) {
-            // TODO: Get from bridge when GetVisibilityList() is available
-            this.visibilityCell.textContent = '';
+            const visibilityList = bridge.getVisibilityList();
+            this.visibilityCell.textContent = visibilityList.join(', ');
         }
         if (this.attackCell) {
-            // TODO: Get from bridge when GetAttackList() is available
-            this.attackCell.textContent = '';
+            const attackList = bridge.getAttackList();
+            this.attackCell.textContent = attackList.join(', ');
         }
         if (this.communicationsCell) {
-            // TODO: Get from bridge when GetCommunicationName() is available
-            this.communicationsCell.textContent = '';
+            this.communicationsCell.textContent = bridge.getCommunicationName();
         }
 
         // Update electrics
         if (this.electricCell) {
-            // TODO: Get from bridge when GetElectrics() is available
             this.electricCell.innerHTML = '';
+            const electrics = bridge.getElectrics();
+
+            if (electrics.storage > 0) {
+                const batteryDiv = document.createElement('div');
+                batteryDiv.style.display = 'flex';
+                batteryDiv.style.justifyContent = 'space-between';
+
+                const label = document.createElement('span');
+                label.textContent = localization.translate('Derived Battery');
+                batteryDiv.appendChild(label);
+
+                const value = document.createElement('span');
+                value.textContent = electrics.storage.toString();
+                batteryDiv.appendChild(value);
+
+                this.electricCell.appendChild(batteryDiv);
+            }
+
+            for (const equip of electrics.equipment) {
+                const equipDiv = document.createElement('div');
+                equipDiv.style.display = 'flex';
+                equipDiv.style.justifyContent = 'space-between';
+
+                const label = document.createElement('span');
+                label.textContent = equip.source;
+                equipDiv.appendChild(label);
+
+                const value = document.createElement('span');
+                value.textContent = equip.charge;
+                equipDiv.appendChild(value);
+
+                this.electricCell.appendChild(equipDiv);
+            }
         }
 
         // Update vital components
         if (this.vitalComponents) {
-            // TODO: Get from bridge when VitalComponentList() is available
-            this.vitalComponents.innerHTML = '';
+            let vital = '';
+            const vlist = bridge.vitalComponentList();
+            for (const v of vlist) {
+                vital += v + '<br/>';
+            }
+            this.vitalComponents.innerHTML = vital;
         }
 
         // Update weapons
         if (this.weaponCell) {
-            // TODO: Get from bridge when GetWeapons() is available
+            // TODO: Weapons display requires munitions and weapon set data - more complex implementation needed
             this.weaponCell.innerHTML = '';
         }
 
@@ -593,7 +651,9 @@ export class DerivedStatsUI extends BaseComponentUI {
 
         // Update description
         if (this.descCell) {
-            // TODO: Implement description generation when bridge supports wing/frame queries
+            // TODO: Aircraft description requires wing configuration queries (GetWings().GetWingList(),
+            // GetWings().GetIsSesquiplane(), GetWings().GetTandem(), GetWings().GetClosed(),
+            // GetFrames().GetFlyingWing(), GetFrames().CanFlyingWing()) - complex implementation needed
             this.descCell.textContent = '';
         }
     }
