@@ -918,6 +918,16 @@ const RADIATOR_STATS: StatDisplayConfig[] = [
     { key: 'flammable', label: 'Derived Is Flammable Question', isDerived: false },
 ];
 
+// Cache for radiator row elements
+interface RadiatorCache {
+    typeSelect: HTMLSelectElement;
+    mountSelect: HTMLSelectElement;
+    coolantCell: HTMLTableCellElement;
+    coolantSelect: HTMLSelectElement;
+    hardenCheckbox?: HTMLInputElement;
+    statsTable: HTMLTableElement;
+}
+
 /**
  * Individual Radiator UI
  * Handles UI for a single radiator
@@ -927,13 +937,14 @@ class RadiatorUI {
     private index: number;
     private row: HTMLTableRowElement;
     private onUpdate?: () => void;
+    private cache: RadiatorCache;
 
     constructor(getBridge: () => AircraftBridge, index: number, row: HTMLTableRowElement, onUpdateFunc?: () => void) {
         this.getBridge = getBridge;
         this.index = index;
         this.row = row;
-        this.buildUI();
         this.onUpdate = onUpdateFunc;
+        this.buildUI();
     }
 
     private buildUI(): void {
@@ -971,26 +982,81 @@ class RadiatorUI {
         coolantCell.appendChild(coolantSelect);
 
         // Harden checkbox (if coolant has it)
+        let hardenCheckbox: HTMLInputElement | undefined;
         if (bindings.harden_cool) {
             coolantCell.appendChild(document.createElement('br'));
-            const hardenCheckbox = createFlexCheckbox(bindings.harden_cool, { div1: coolantCell, div2: coolantCell }, () => {
+            hardenCheckbox = createFlexCheckbox(bindings.harden_cool, { div1: coolantCell, div2: coolantCell }, (checked) => {
                 const updatedBindings = this.getBridge().getRadiatorBindings(this.index);
-                updatedBindings.harden_cool.selected = hardenCheckbox.checked;
+                if (updatedBindings.harden_cool) {
+                    updatedBindings.harden_cool.selected = checked;
+                }
                 this.getBridge().setRadiatorBindings(this.index, updatedBindings);
                 this.onUpdate();
-            })
+            });
         }
 
+        // Stats cell
         const statCell = this.row.insertCell();
         const stats = this.getBridge().getRadiatorStats(this.index);
         const derived = { flammable: this.getBridge().getRadiatorFlammable(this.index) };
         statCell.className = 'inner_table';
-        statCell.appendChild(createStatsTable(stats, RADIATOR_STATS, derived, 6));
+        const statsTable = createStatsTable(stats, RADIATOR_STATS, derived, 6);
+        statCell.appendChild(statsTable);
+
+        // Cache elements
+        this.cache = {
+            typeSelect,
+            mountSelect,
+            coolantCell,
+            coolantSelect,
+            hardenCheckbox,
+            statsTable
+        };
     }
 
     update(): void {
-        // Rebuild the row (simple approach for now)
-        this.row.innerHTML = '';
-        this.buildUI();
+        const bindings = this.getBridge().getRadiatorBindings(this.index);
+
+        // Update type select
+        updateSelectElement(this.cache.typeSelect, bindings.idx_type);
+
+        // Update mount select
+        updateSelectElement(this.cache.mountSelect, bindings.idx_mount);
+
+        // Update coolant select
+        updateSelectElement(this.cache.coolantSelect, bindings.idx_coolant);
+
+        // Handle harden checkbox - rebuild coolant cell if presence changes
+        const hasHardenNow = bindings.harden_cool !== undefined;
+        const hadHardenBefore = this.cache.hardenCheckbox !== undefined;
+
+        if (hasHardenNow !== hadHardenBefore) {
+            // Need to rebuild coolant cell
+            this.cache.coolantCell.innerHTML = '';
+            this.cache.coolantCell.appendChild(this.cache.coolantSelect);
+
+            if (hasHardenNow) {
+                this.cache.coolantCell.appendChild(document.createElement('br'));
+                this.cache.hardenCheckbox = createFlexCheckbox(bindings.harden_cool!, { div1: this.cache.coolantCell, div2: this.cache.coolantCell }, (checked) => {
+                    const updatedBindings = this.getBridge().getRadiatorBindings(this.index);
+                    if (updatedBindings.harden_cool) {
+                        updatedBindings.harden_cool.selected = checked;
+                    }
+                    this.getBridge().setRadiatorBindings(this.index, updatedBindings);
+                    this.onUpdate();
+                });
+            } else {
+                this.cache.hardenCheckbox = undefined;
+            }
+        } else if (hasHardenNow && this.cache.hardenCheckbox) {
+            // Update existing checkbox
+            this.cache.hardenCheckbox.checked = bindings.harden_cool!.selected;
+            this.cache.hardenCheckbox.disabled = !bindings.harden_cool!.enabled;
+        }
+
+        // Update stats table
+        const stats = this.getBridge().getRadiatorStats(this.index);
+        const derived = { flammable: this.getBridge().getRadiatorFlammable(this.index) };
+        updateStatsTable(this.cache.statsTable, stats, RADIATOR_STATS, derived);
     }
 }
