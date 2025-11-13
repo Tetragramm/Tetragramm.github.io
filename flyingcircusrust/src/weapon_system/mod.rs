@@ -11,6 +11,7 @@ mod part;
 mod queries;
 mod serialization;
 mod setters;
+mod ui;
 mod validation;
 
 #[cfg(test)]

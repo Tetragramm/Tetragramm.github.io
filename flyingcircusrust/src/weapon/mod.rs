@@ -51,6 +51,17 @@ pub enum ProjectileType {
     Gyrojets = 4,
 }
 
+impl From<i16> for ProjectileType {
+    fn from(v: i16) -> Self {
+        match v {
+            1 => ProjectileType::Heatray,
+            2 => ProjectileType::Pneumatic,
+            4 => ProjectileType::Gyrojets,
+            _ => ProjectileType::Bullets,
+        }
+    }
+}
+
 /// Action type for weapons
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ActionType {
@@ -58,6 +69,17 @@ pub enum ActionType {
     Mechanical = 1,
     Gast = 2,
     Rotary = 3,
+}
+
+impl From<i16> for ActionType {
+    fn from(v: i16) -> Self {
+        match v {
+            1 => ActionType::Mechanical,
+            2 => ActionType::Gast,
+            3 => ActionType::Rotary,
+            _ => ActionType::Standard,
+        }
+    }
 }
 
 /// Weapon type entry with stats and properties
