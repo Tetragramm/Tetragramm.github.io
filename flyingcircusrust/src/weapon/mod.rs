@@ -1,7 +1,6 @@
 use crate::stats::Stats;
 use std::rc::Rc;
 use ui_core::*;
-use ui_macro::UIBindings;
 
 // Sub-module declarations
 mod core;
@@ -10,6 +9,7 @@ mod part;
 mod queries;
 mod serialization;
 mod setters;
+mod ui;
 mod validation;
 
 #[cfg(test)]
@@ -30,14 +30,30 @@ pub enum SynchronizationType {
 
 impl From<i16> for SynchronizationType {
     fn from(v: i16) -> Self {
+        // Maps from UI select index to SynchronizationType
+        // UI indices: 0=None, 1=Interrupt, 2=Synch, 3=Spinner, 4=Deflect, 5=NoInterference
         match v {
-            -1 => SynchronizationType::None,
-            0 => SynchronizationType::Interrupt,
-            1 => SynchronizationType::Synch,
-            2 => SynchronizationType::Spinner,
-            3 => SynchronizationType::Deflect,
-            4 => SynchronizationType::NoInterference,
+            0 => SynchronizationType::None,
+            1 => SynchronizationType::Interrupt,
+            2 => SynchronizationType::Synch,
+            3 => SynchronizationType::Spinner,
+            4 => SynchronizationType::Deflect,
+            5 => SynchronizationType::NoInterference,
             _ => SynchronizationType::None,
+        }
+    }
+}
+
+impl SynchronizationType {
+    /// Convert to UI select index
+    pub fn to_ui_index(self) -> i16 {
+        match self {
+            SynchronizationType::None => 0,
+            SynchronizationType::Interrupt => 1,
+            SynchronizationType::Synch => 2,
+            SynchronizationType::Spinner => 3,
+            SynchronizationType::Deflect => 4,
+            SynchronizationType::NoInterference => 5,
         }
     }
 }
@@ -106,7 +122,7 @@ pub struct WeaponType {
 
 /// Main Weapon struct
 /// Represents a single weapon mount with configuration
-#[derive(Clone, UIBindings)]
+#[derive(Clone)]
 pub struct Weapon {
     // Weapon type reference
     weapon_type: Rc<WeaponType>,
@@ -114,35 +130,15 @@ pub struct Weapon {
     projectile: ProjectileType,
 
     // Mounting configuration
-    #[ui(check, name = "fixed", enabled_fn, set_fn = "set_fixed")]
     fixed: bool,
-
-    #[ui(check, name = "wing", enabled_fn = "can_wing", set_fn = "set_wing")]
     wing: bool,
-
-    #[ui(
-        check,
-        name = "covered",
-        enabled_fn = "can_covered",
-        set_fn = "set_covered"
-    )]
     covered: bool,
-
-    #[ui(check, name = "accessible", enabled_fn, set_fn = "set_accessible")]
     accessible: bool,
-
-    #[ui(
-        check,
-        name = "free_accessible",
-        enabled_fn,
-        set_fn = "set_free_accessible"
-    )]
     free_accessible: bool,
 
-    // Synchronization doesn't use UIBindings - handled manually
+    // Synchronization (now uses UIBindings via manual implementation)
     synchronization: SynchronizationType,
 
-    #[ui(number, name = "w_count", enabled_fn, set_fn = "set_count")]
     w_count: i16,
 
     repeating: bool,
