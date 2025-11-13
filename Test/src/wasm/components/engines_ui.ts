@@ -135,9 +135,7 @@ export class EnginesUI extends BaseComponentUI {
                 bindings.engines.value = value;
                 bridge.setEnginesBindings(bindings);
                 this.onUpdate();
-            });
-        this.numEnginesInput.min = '0';
-        this.numEnginesInput.max = '20';
+            }, '0', '20', '1');
 
         // Number of radiators 
         this.numRadiatorsInput = createFlexNumberInput(bindings.radiators,
@@ -147,9 +145,7 @@ export class EnginesUI extends BaseComponentUI {
                 bindings.radiators.value = value;
                 bridge.setEnginesBindings(bindings);
                 this.onUpdate();
-            });
-        this.numRadiatorsInput.min = '0';
-        this.numRadiatorsInput.max = '20';
+            }, '0', '20', '1');
 
         // Asymmetric checkbox
         this.asymmetricCheckbox = createFlexCheckbox({ name: localization.translate("Engines Asymmetric Plane"), value: false, enabled: true },

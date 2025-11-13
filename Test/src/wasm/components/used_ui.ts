@@ -90,6 +90,7 @@ export class UsedUI extends BaseComponentUI {
             const flex = createFlexSection();
             inputCell.appendChild(flex.div0);
 
+            binding.name = ''
             const input = createFlexNumberInput(
                 binding,
                 flex,
