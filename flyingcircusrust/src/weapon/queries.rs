@@ -211,7 +211,7 @@ impl Weapon {
         self.weapon_type.name == "Lightning Arc"
     }
 
-    // UIBindings enabled functions (always enabled)
+    // UIBindings enabled functions
 
     /// Check if fixed can be changed (always true)
     pub fn is_fixed_enabled(&self) -> bool {
@@ -223,9 +223,11 @@ impl Weapon {
         true
     }
 
-    /// Check if free_accessible can be changed (always true)
+    /// Check if free_accessible can be changed
+    /// TypeScript: !(wlist[i].can_free_accessible || wlist[i].GetFreeAccessible())
+    /// Enabled if either can_free_accessible flag is set OR free_accessible is already selected
     pub fn is_free_accessible_enabled(&self) -> bool {
-        true
+        self.can_free_accessible || self.free_accessible
     }
 
     /// Check if w_count can be changed (always true)
