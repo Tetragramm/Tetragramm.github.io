@@ -13,6 +13,7 @@ import { localization } from '../localization';
 import {
     createCollapsibleSection,
     createFlexCheckbox,
+    createFlexLabel,
     createFlexNumberInput,
     createFlexSection,
     createFlexSelect,
@@ -58,13 +59,13 @@ export class WeaponsUI extends BaseComponentUI {
         contentDiv.className = 'content';
 
         // Create container controls section
-        const controlsSection = createFlexSection();
-        contentDiv.appendChild(controlsSection.div0);
+        const controlsSpan = document.createElement('span');
+        contentDiv.appendChild(controlsSpan);
 
         // Number of weapon systems input
         this.numSystemsInput = createFlexNumberInput(
             bindings.num_weapon_systems,
-            controlsSection,
+            { div1: controlsSpan, div2: controlsSpan },
             (value) => {
                 const newBindings = bridge.getWeaponsBindings();
                 newBindings.num_weapon_systems.value = value;
@@ -79,7 +80,7 @@ export class WeaponsUI extends BaseComponentUI {
         // Brace count input
         this.braceCountInput = createFlexNumberInput(
             bindings.brace_count,
-            controlsSection,
+            { div1: controlsSpan, div2: controlsSpan },
             (value) => {
                 const newBindings = bridge.getWeaponsBindings();
                 newBindings.brace_count.value = value;
@@ -192,14 +193,21 @@ class WeaponSystemRow {
 
         // Create header row
         this.headerRow = this.table.insertRow();
-        const headerCell = this.headerRow.insertCell();
-        headerCell.colSpan = 2;
-        headerCell.innerHTML = `<h4>${localization.translate('Weapons Weapon Set')} ${this.index + 1}</h4>`;
+        const headerCell = document.createElement('th');
+        headerCell.innerText = localization.translate('Weapons Weapon Set');
+        this.headerRow.appendChild(headerCell);
+        const headerCell2 = document.createElement('th');
+        headerCell2.innerText = localization.translate('Weapons Weapons');
+        this.headerRow.appendChild(headerCell2);
+        const headerCell3 = document.createElement('th');
+        headerCell3.innerText = localization.translate('Weapons Weapon Stats');
+        this.headerRow.appendChild(headerCell3);
 
         // Create content row
         this.contentRow = this.table.insertRow();
         const configCell = this.contentRow.insertCell();
         const weaponsCell = this.contentRow.insertCell();
+        const statCell = this.contentRow.insertCell();
 
         // Build configuration section
         this.buildConfigSection(configCell, bindings);
@@ -216,25 +224,39 @@ class WeaponSystemRow {
         cell.appendChild(flexSection.div0);
 
         // Weapon type select
-        const weaponTypeSelect = createSelectElement(bindings.weapon_type, (selected) => {
-            const updatedBindings = bridge.getWeaponSystemBindings(this.index);
-            updatedBindings.weapon_type.selected = selected;
-            bridge.setWeaponSystemBindings(this.index, updatedBindings);
-            this.onUpdate?.();
-        });
+        const weaponTypeSelect = createFlexSelect(
+            bindings.weapon_type,
+            flexSection,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(this.index);
+                updatedBindings.weapon_type.selected = selected;
+                bridge.setWeaponSystemBindings(this.index, updatedBindings);
+                this.onUpdate?.();
+            },
+            localization.translate('Weapons Type')
+        );
 
         // Seat select
-        const seatSelect = createSelectElement(bindings.seat, (selected) => {
-            const updatedBindings = bridge.getWeaponSystemBindings(this.index);
-            updatedBindings.seat.selected = selected;
-            bridge.setWeaponSystemBindings(this.index, updatedBindings);
-            this.onUpdate?.();
-        });
+        const seatSelect = createFlexSelect(bindings.seat, flexSection,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(this.index);
+                updatedBindings.seat.selected = selected;
+                bridge.setWeaponSystemBindings(this.index, updatedBindings);
+                this.onUpdate?.();
+            },
+            localization.translate('Seat Location')
+        );
+
+        //Left & Right FlexSections
+        const lFlex = createFlexSection();
+        const rFlex = createFlexSection();
+        flexSection.div1.appendChild(lFlex.div0);
+        flexSection.div2.appendChild(rFlex.div0);
 
         // Mounting count
         const mountingCountInput = createFlexNumberInput(
             bindings.mounting_count,
-            flexSection,
+            lFlex,
             (value) => {
                 const updatedBindings = bridge.getWeaponSystemBindings(this.index);
                 updatedBindings.mounting_count.value = value;
@@ -246,7 +268,7 @@ class WeaponSystemRow {
         // Ammo
         const ammoInput = createFlexNumberInput(
             bindings.ammo,
-            flexSection,
+            rFlex,
             (value) => {
                 const updatedBindings = bridge.getWeaponSystemBindings(this.index);
                 updatedBindings.ammo.value = value;
@@ -256,47 +278,64 @@ class WeaponSystemRow {
         );
 
         // Action select
-        const actionSelect = createSelectElement(bindings.action_sel, (selected) => {
-            const updatedBindings = bridge.getWeaponSystemBindings(this.index);
-            updatedBindings.action_sel.selected = selected;
-            bridge.setWeaponSystemBindings(this.index, updatedBindings);
-            this.onUpdate?.();
-        });
+        const actionSelect = createFlexSelect(bindings.action_sel, lFlex,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(this.index);
+                updatedBindings.action_sel.selected = selected;
+                bridge.setWeaponSystemBindings(this.index, updatedBindings);
+                this.onUpdate?.();
+            },
+            localization.translate('Weapons Action')
+        );
 
         // Projectile select
-        const projectileSelect = createSelectElement(bindings.projectile_sel, (selected) => {
-            const updatedBindings = bridge.getWeaponSystemBindings(this.index);
-            updatedBindings.projectile_sel.selected = selected;
-            bridge.setWeaponSystemBindings(this.index, updatedBindings);
-            this.onUpdate?.();
-        });
-
-        // Fixed checkbox
-        const fixedCheckbox = createFlexCheckbox(bindings.fixed, flexSection, (checked) => {
-            const updatedBindings = bridge.getWeaponSystemBindings(this.index);
-            updatedBindings.fixed.selected = checked;
-            bridge.setWeaponSystemBindings(this.index, updatedBindings);
-            this.onUpdate?.();
-        });
+        const projectileSelect = createFlexSelect(bindings.projectile_sel, rFlex,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(this.index);
+                updatedBindings.projectile_sel.selected = selected;
+                bridge.setWeaponSystemBindings(this.index, updatedBindings);
+                this.onUpdate?.();
+            },
+            localization.translate('Weapons Projectile')
+        );
 
         // Repeating checkbox
-        const repeatingCheckbox = createFlexCheckbox(bindings.repeating, flexSection, (checked) => {
+        const repeatingCheckbox = createFlexCheckbox(bindings.repeating, lFlex, (checked) => {
             const updatedBindings = bridge.getWeaponSystemBindings(this.index);
             updatedBindings.repeating.selected = checked;
             bridge.setWeaponSystemBindings(this.index, updatedBindings);
             this.onUpdate?.();
         });
 
+        // Fixed checkbox
+        const fixedCheckbox = createFlexCheckbox(bindings.fixed, lFlex, (checked) => {
+            const updatedBindings = bridge.getWeaponSystemBindings(this.index);
+            updatedBindings.fixed.selected = checked;
+            bridge.setWeaponSystemBindings(this.index, updatedBindings);
+            this.onUpdate?.();
+        });
+
+        createFlexLabel({ name: '', value: '' }, rFlex);
+        createFlexLabel({ name: '', value: '' }, rFlex);
+
+
         // Direction checkboxes
         const directionCheckboxes: HTMLInputElement[] = [];
-        for (let i = 0; i < bindings.directions.length; i++) {
-            const checkbox = createFlexCheckbox(bindings.directions[i], flexSection, (checked) => {
+        for (let i = 0; i < bindings.directions.length; i += 2) {
+            const checkbox = createFlexCheckbox(bindings.directions[i], lFlex, (checked) => {
                 const updatedBindings = bridge.getWeaponSystemBindings(this.index);
                 updatedBindings.directions[i].selected = checked;
                 bridge.setWeaponSystemBindings(this.index, updatedBindings);
                 this.onUpdate?.();
             });
             directionCheckboxes.push(checkbox);
+            const checkbox2 = createFlexCheckbox(bindings.directions[i + 1], rFlex, (checked) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(this.index);
+                updatedBindings.directions[i + 1].selected = checked;
+                bridge.setWeaponSystemBindings(this.index, updatedBindings);
+                this.onUpdate?.();
+            });
+            directionCheckboxes.push(checkbox2);
         }
 
         // Cache everything
@@ -319,7 +358,7 @@ class WeaponSystemRow {
 
         // Create weapons table
         const weaponsTable = document.createElement('table');
-        weaponsTable.className = 'inner_table';
+        cell.className = 'inner_table';
         cell.appendChild(weaponsTable);
 
         // Clear existing weapon rows
@@ -437,36 +476,21 @@ class WeaponRow {
         if (!bindings) return;
 
         this.row = this.table.insertRow();
+        const cell = this.row.insertCell();
 
-        const flexSection = createFlexSection();
-        this.row.insertCell().appendChild(flexSection.div0);
-
-        // Fixed checkbox
-        const fixedCheckbox = createFlexCheckbox(bindings.fixed, flexSection, (checked) => {
-            const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
-            updatedBindings.fixed.selected = checked;
-            bridge.setWeaponBindings(this.systemIndex, this.weaponIndex, updatedBindings);
-            this.onUpdate?.();
-        });
+        const top_span = document.createElement('span');
+        cell.appendChild(top_span);
 
         // Wing checkbox
-        const wingCheckbox = createFlexCheckbox(bindings.wing, flexSection, (checked) => {
+        const wingCheckbox = createFlexCheckbox(bindings.wing, { div1: top_span, div2: top_span }, (checked) => {
             const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
             updatedBindings.wing.selected = checked;
             bridge.setWeaponBindings(this.systemIndex, this.weaponIndex, updatedBindings);
             this.onUpdate?.();
         });
 
-        // Covered checkbox
-        const coveredCheckbox = createFlexCheckbox(bindings.covered, flexSection, (checked) => {
-            const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
-            updatedBindings.covered.selected = checked;
-            bridge.setWeaponBindings(this.systemIndex, this.weaponIndex, updatedBindings);
-            this.onUpdate?.();
-        });
-
         // Accessible checkbox
-        const accessibleCheckbox = createFlexCheckbox(bindings.accessible, flexSection, (checked) => {
+        const accessibleCheckbox = createFlexCheckbox(bindings.accessible, { div1: top_span, div2: top_span }, (checked) => {
             const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
             updatedBindings.accessible.selected = checked;
             bridge.setWeaponBindings(this.systemIndex, this.weaponIndex, updatedBindings);
@@ -474,25 +498,29 @@ class WeaponRow {
         });
 
         // Free accessible checkbox
-        const freeAccessibleCheckbox = createFlexCheckbox(bindings.free_accessible, flexSection, (checked) => {
+        const freeAccessibleCheckbox = createFlexCheckbox(bindings.free_accessible, { div1: top_span, div2: top_span }, (checked) => {
             const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
             updatedBindings.free_accessible.selected = checked;
             bridge.setWeaponBindings(this.systemIndex, this.weaponIndex, updatedBindings);
             this.onUpdate?.();
         });
 
-        // Synchronization select
-        const synchronizationSelect = createSelectElement(bindings.synchronization, (selected) => {
+        // Covered checkbox
+        const coveredCheckbox = createFlexCheckbox(bindings.covered, { div1: top_span, div2: top_span }, (checked) => {
             const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
-            updatedBindings.synchronization.selected = selected;
+            updatedBindings.covered.selected = checked;
             bridge.setWeaponBindings(this.systemIndex, this.weaponIndex, updatedBindings);
             this.onUpdate?.();
         });
 
+        cell.appendChild(document.createElement('br'));
+        const bottom_span = document.createElement('span');
+        cell.appendChild(bottom_span);
+
         // Weapon count
         const wCountInput = createFlexNumberInput(
             bindings.w_count,
-            flexSection,
+            { div1: bottom_span, div2: bottom_span },
             (value) => {
                 const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
                 updatedBindings.w_count.value = value;
@@ -500,9 +528,22 @@ class WeaponRow {
                 this.onUpdate?.();
             }
         );
+        // Synchronization select
+        const syncLabel = document.createElement('label');
+        syncLabel.textContent = localization.translate('Weapons Synchronization');
+        syncLabel.style.marginLeft = '0.25em';
+        syncLabel.style.marginRight = '0.5em';
+        const synchronizationSelect = createSelectElement(bindings.synchronization, (selected) => {
+            const updatedBindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
+            updatedBindings.synchronization.selected = selected;
+            bridge.setWeaponBindings(this.systemIndex, this.weaponIndex, updatedBindings);
+            this.onUpdate?.();
+        });
+        bottom_span.appendChild(syncLabel);
+        bottom_span.appendChild(synchronizationSelect);
+
 
         this.cache = {
-            fixedCheckbox,
             wingCheckbox,
             coveredCheckbox,
             accessibleCheckbox,
@@ -518,9 +559,6 @@ class WeaponRow {
 
         const bindings = bridge.getWeaponBindings(this.systemIndex, this.weaponIndex);
         if (!bindings || !this.cache) return;
-
-        this.cache.fixedCheckbox.checked = bindings.fixed.selected;
-        this.cache.fixedCheckbox.disabled = !bindings.fixed.enabled;
 
         this.cache.wingCheckbox.checked = bindings.wing.selected;
         this.cache.wingCheckbox.disabled = !bindings.wing.enabled;
@@ -542,7 +580,6 @@ class WeaponRow {
 }
 
 interface WeaponCache {
-    fixedCheckbox: HTMLInputElement;
     wingCheckbox: HTMLInputElement;
     coveredCheckbox: HTMLInputElement;
     accessibleCheckbox: HTMLInputElement;

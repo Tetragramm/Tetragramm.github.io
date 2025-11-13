@@ -23,6 +23,7 @@ impl WeaponSystem {
             projectile_sel: ProjectileType::Bullets,
             repeating: false,
             seat: 0,
+            cockpit_count: 1,
             tractor: false,
             pusher: false,
             heli: false,

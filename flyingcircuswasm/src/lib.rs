@@ -374,8 +374,9 @@ impl AircraftWasm {
     /// Get WeaponSystem UI bindings for a specific weapon system
     #[wasm_bindgen(js_name = getWeaponSystemBindings)]
     pub fn get_weapon_system_bindings(&self, index: usize) -> JsValue {
-        if index < self.inner.weapons.weapon_sets.len() {
-            let options = self.inner.weapons.weapon_sets[index].create_ui_options();
+        let sets = self.inner.weapons.get_weapon_sets();
+        if index < sets.len() {
+            let options = sets[index].create_ui_options();
             serde_wasm_bindgen::to_value(&options).unwrap()
         } else {
             JsValue::NULL
@@ -385,9 +386,10 @@ impl AircraftWasm {
     /// Update WeaponSystem from UI bindings
     #[wasm_bindgen(js_name = setWeaponSystemBindings)]
     pub fn set_weapon_system_bindings(&mut self, index: usize, js_options: JsValue) {
-        if index < self.inner.weapons.weapon_sets.len() {
+        let sets = self.inner.weapons.get_weapon_sets_mut();
+        if index < sets.len() {
             if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-                self.inner.weapons.weapon_sets[index].receive_ui_selections(options);
+                sets[index].receive_ui_selections(options);
                 self.inner.part_stats();
             }
         }
@@ -396,8 +398,9 @@ impl AircraftWasm {
     /// Get stats for a specific weapon system
     #[wasm_bindgen(js_name = getWeaponSystemStats)]
     pub fn get_weapon_system_stats(&mut self, index: usize) -> JsValue {
-        if index < self.inner.weapons.weapon_sets.len() {
-            let stats = self.inner.weapons.weapon_sets[index].part_stats();
+        let sets = self.inner.weapons.get_weapon_sets_mut();
+        if index < sets.len() {
+            let stats = sets[index].part_stats();
             serde_wasm_bindgen::to_value(&stats).unwrap()
         } else {
             JsValue::NULL
@@ -407,8 +410,9 @@ impl AircraftWasm {
     /// Get Weapon UI bindings for a specific weapon in a weapon system
     #[wasm_bindgen(js_name = getWeaponBindings)]
     pub fn get_weapon_bindings(&self, system_index: usize, weapon_index: usize) -> JsValue {
-        if system_index < self.inner.weapons.weapon_sets.len() {
-            let weapons = self.inner.weapons.weapon_sets[system_index].get_weapons();
+        let sets = self.inner.weapons.get_weapon_sets();
+        if system_index < sets.len() {
+            let weapons = sets[system_index].get_weapons();
             if weapon_index < weapons.len() {
                 let options = weapons[weapon_index].create_ui_options();
                 serde_wasm_bindgen::to_value(&options).unwrap()
@@ -422,9 +426,15 @@ impl AircraftWasm {
 
     /// Update Weapon from UI bindings
     #[wasm_bindgen(js_name = setWeaponBindings)]
-    pub fn set_weapon_bindings(&mut self, system_index: usize, weapon_index: usize, js_options: JsValue) {
-        if system_index < self.inner.weapons.weapon_sets.len() {
-            let weapons = self.inner.weapons.weapon_sets[system_index].get_weapons_mut();
+    pub fn set_weapon_bindings(
+        &mut self,
+        system_index: usize,
+        weapon_index: usize,
+        js_options: JsValue,
+    ) {
+        let sets = self.inner.weapons.get_weapon_sets_mut();
+        if system_index < sets.len() {
+            let weapons = sets[system_index].get_weapons_mut();
             if weapon_index < weapons.len() {
                 if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
                     weapons[weapon_index].receive_ui_selections(options);
@@ -437,8 +447,9 @@ impl AircraftWasm {
     /// Get stats for a specific weapon
     #[wasm_bindgen(js_name = getWeaponStats)]
     pub fn get_weapon_stats(&mut self, system_index: usize, weapon_index: usize) -> JsValue {
-        if system_index < self.inner.weapons.weapon_sets.len() {
-            let weapons = self.inner.weapons.weapon_sets[system_index].get_weapons_mut();
+        let sets = self.inner.weapons.get_weapon_sets_mut();
+        if system_index < sets.len() {
+            let weapons = sets[system_index].get_weapons_mut();
             if weapon_index < weapons.len() {
                 let stats = weapons[weapon_index].part_stats();
                 serde_wasm_bindgen::to_value(&stats).unwrap()

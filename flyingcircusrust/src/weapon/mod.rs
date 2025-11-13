@@ -44,9 +44,25 @@ impl From<i16> for SynchronizationType {
     }
 }
 
+impl From<usize> for SynchronizationType {
+    fn from(v: usize) -> Self {
+        // Maps from UI select index to SynchronizationType
+        // UI indices: 0=None, 1=Interrupt, 2=Synch, 3=Spinner, 4=Deflect, 5=NoInterference
+        match v {
+            0 => SynchronizationType::None,
+            1 => SynchronizationType::Interrupt,
+            2 => SynchronizationType::Synch,
+            3 => SynchronizationType::Spinner,
+            4 => SynchronizationType::Deflect,
+            5 => SynchronizationType::NoInterference,
+            _ => SynchronizationType::None,
+        }
+    }
+}
+
 impl SynchronizationType {
     /// Convert to UI select index
-    pub fn to_ui_index(self) -> i16 {
+    pub fn to_ui_index(self) -> usize {
         match self {
             SynchronizationType::None => 0,
             SynchronizationType::Interrupt => 1,
@@ -78,6 +94,16 @@ impl From<i16> for ProjectileType {
     }
 }
 
+impl From<usize> for ProjectileType {
+    fn from(v: usize) -> Self {
+        match v {
+            1 => ProjectileType::Heatray,
+            2 => ProjectileType::Pneumatic,
+            4 => ProjectileType::Gyrojets,
+            _ => ProjectileType::Bullets,
+        }
+    }
+}
 /// Action type for weapons
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ActionType {
@@ -89,6 +115,17 @@ pub enum ActionType {
 
 impl From<i16> for ActionType {
     fn from(v: i16) -> Self {
+        match v {
+            1 => ActionType::Mechanical,
+            2 => ActionType::Gast,
+            3 => ActionType::Rotary,
+            _ => ActionType::Standard,
+        }
+    }
+}
+
+impl From<usize> for ActionType {
+    fn from(v: usize) -> Self {
         match v {
             1 => ActionType::Mechanical,
             2 => ActionType::Gast,

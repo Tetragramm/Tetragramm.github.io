@@ -89,6 +89,9 @@ impl Weapons {
     /// TypeScript: SetNumberOfCockpits(num: number)
     pub fn set_number_of_cockpits(&mut self, num: i16) {
         self.cockpit_count = num;
+        for ws in self.weapon_sets.iter_mut() {
+            ws.cockpit_count = num;
+        }
     }
 
     /// Set helicopter mode

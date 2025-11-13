@@ -48,6 +48,7 @@ pub struct WeaponSystem {
     seat: i16,
 
     // External configuration (set by Aircraft)
+    pub cockpit_count: i16,
     tractor: bool,
     pusher: bool,
     heli: bool,

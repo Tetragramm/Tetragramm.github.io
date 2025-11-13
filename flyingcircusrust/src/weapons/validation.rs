@@ -10,7 +10,7 @@ impl Weapons {
         // First pass: identify which seats already have freely accessible weapons
         for ws in &mut self.weapon_sets {
             let seat = ws.get_seat() as usize;
-            if seat < self.cockpit_count as usize {
+            if seat < ws.cockpit_count as usize {
                 for w in ws.get_weapons_mut() {
                     if w.get_free_accessible() && has_fa[seat] {
                         w.set_free_accessible(false);
@@ -24,7 +24,7 @@ impl Weapons {
         // Second pass: update can_free_accessible flags
         for ws in &mut self.weapon_sets {
             let seat = ws.get_seat() as usize;
-            if seat < self.cockpit_count as usize {
+            if seat < ws.cockpit_count as usize {
                 for w in ws.get_weapons_mut() {
                     if (has_fa[seat] && !w.get_free_accessible()) || w.get_wing() {
                         w.can_free_accessible = false;

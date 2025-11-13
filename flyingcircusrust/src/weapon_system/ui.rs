@@ -21,11 +21,11 @@ impl UIBindings for WeaponSystem {
 
     fn create_ui_options(&self) -> Self::OptionsType {
         // Create weapon type options
-        let weapon_options: Vec<SelectOption> = self
+        let weapon_options: Vec<SelectOpt> = self
             .weapon_list
             .iter()
             .enumerate()
-            .map(|(i, wt)| SelectOption {
+            .map(|(i, wt)| SelectOpt {
                 name: format!("{} ({})", t!(wt.name.as_str()), t!(wt.era.as_str())),
                 enabled: true,
             })
@@ -33,12 +33,12 @@ impl UIBindings for WeaponSystem {
 
         // Create direction checkboxes
         let direction_names = vec![
-            t!("Weapons Forward"),
-            t!("Weapons Aft"),
-            t!("Weapons Up"),
-            t!("Weapons Down"),
-            t!("Weapons Left"),
-            t!("Weapons Right"),
+            t!("Forward"),
+            t!("Rearward"),
+            t!("Up"),
+            t!("Down"),
+            t!("Left"),
+            t!("Right"),
         ];
         let can_direction = self.can_direction();
         let directions: Vec<Check> = self
@@ -54,58 +54,56 @@ impl UIBindings for WeaponSystem {
 
         // Create action type options
         let action_options = vec![
-            SelectOption {
-                name: t!("Weapons Action Standard").to_string(),
+            SelectOpt {
+                name: t!("Standard Action").to_string(),
                 enabled: true,
             },
-            SelectOption {
-                name: t!("Weapons Action Mechanical").to_string(),
+            SelectOpt {
+                name: t!("Mechanical Action").to_string(),
                 enabled: self.get_can_action()[1],
             },
-            SelectOption {
-                name: t!("Weapons Action Gast").to_string(),
+            SelectOpt {
+                name: t!("Gast Principle").to_string(),
                 enabled: self.get_can_action()[2],
             },
-            SelectOption {
-                name: t!("Weapons Action Rotary").to_string(),
+            SelectOpt {
+                name: t!("Rotary_Gun").to_string(),
                 enabled: self.get_can_action()[3],
             },
         ];
 
         // Create projectile type options
         let projectile_options = vec![
-            SelectOption {
-                name: t!("Weapons Projectile Bullets").to_string(),
+            SelectOpt {
+                name: t!("Standard").to_string(),
                 enabled: true,
             },
-            SelectOption {
-                name: t!("Weapons Projectile Heatray").to_string(),
+            SelectOpt {
+                name: t!("Heat Ray").to_string(),
                 enabled: self.get_can_projectile()[1],
             },
-            SelectOption {
-                name: t!("Weapons Projectile Pneumatic").to_string(),
+            SelectOpt {
+                name: t!("Pneumatic").to_string(),
                 enabled: self.get_can_projectile()[2],
             },
-            SelectOption {
-                name: t!("Weapons Projectile Gyrojets").to_string(),
+            SelectOpt {
+                name: t!("Gyrojets").to_string(),
                 enabled: self.get_can_projectile()[3],
             },
         ];
 
         // Create seat options (from parent Weapons cockpit_count)
-        let num_seats = 20; // Max seats, will be constrained by parent
-        let seat_options: Vec<SelectOption> = (0..num_seats)
-            .map(|i| SelectOption {
-                name: format!("{}", i),
+        let seat_options: Vec<SelectOpt> = (0..self.cockpit_count)
+            .map(|i| SelectOpt {
+                name: t!("Seat #", A = i + 1).to_string(),
                 enabled: true,
             })
             .collect();
 
         WeaponSystemOptions {
             weapon_type: Select {
-                name: t!("Weapons Type").to_string(),
                 enabled: true,
-                selected: self.weapon_type as i16,
+                selected: self.weapon_type,
                 options: weapon_options,
             },
             directions,
@@ -120,15 +118,13 @@ impl UIBindings for WeaponSystem {
                 value: self.ammo,
             },
             action_sel: Select {
-                name: t!("Weapons Action").to_string(),
                 enabled: true,
-                selected: self.action_sel as i16,
+                selected: self.action_sel as usize,
                 options: action_options,
             },
             projectile_sel: Select {
-                name: t!("Weapons Projectile").to_string(),
                 enabled: true,
-                selected: self.projectile_sel as i16,
+                selected: self.projectile_sel as usize,
                 options: projectile_options,
             },
             fixed: Check {
@@ -142,9 +138,8 @@ impl UIBindings for WeaponSystem {
                 selected: self.repeating,
             },
             seat: Select {
-                name: t!("Seat Location").to_string(),
                 enabled: true,
-                selected: self.seat,
+                selected: self.seat as usize,
                 options: seat_options,
             },
         }
@@ -180,9 +175,9 @@ impl UIBindings for WeaponSystem {
         self.set_repeating(options.repeating.selected);
 
         // Update seat
-        self.set_seat(options.seat.selected);
+        self.set_seat(options.seat.selected as i16);
 
         // Recalculate
-        self.calculate_final_weapon();
+        self.make_final_weapon();
     }
 }

@@ -448,13 +448,12 @@ export function createFlexNumberInputs(
  */
 export function createFlexSelect(
     binding: any,
-    flexContainer: { div1: HTMLDivElement, div2: HTMLDivElement },
+    flexContainer: { div1: HTMLElement, div2: HTMLElement },
     onChange: (selectedIndex: number) => void,
     labelText?: string
 ): HTMLSelectElement {
     const label = document.createElement('label');
     label.textContent = labelText || binding.name;
-    label.className = 'flex-item';
     label.style.marginLeft = '0.25em';
     label.style.marginRight = '0.5em';
     flexContainer.div1.appendChild(label);

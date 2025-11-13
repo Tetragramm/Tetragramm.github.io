@@ -86,7 +86,7 @@ impl Weapons {
         let mut lst = vec![false; self.cockpit_count as usize];
         for ws in &self.weapon_sets {
             let seat = ws.get_seat() as usize;
-            if seat < self.cockpit_count as usize {
+            if seat < ws.cockpit_count as usize {
                 lst[seat] = true;
             }
         }

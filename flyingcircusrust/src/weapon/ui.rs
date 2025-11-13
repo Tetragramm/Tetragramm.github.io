@@ -11,7 +11,7 @@ pub struct WeaponOptions {
     pub accessible: Check,
     pub free_accessible: Check,
     pub synchronization: Select,
-    pub w_count: NumberInput,
+    pub w_count: Number,
 }
 
 impl UIBindings for Weapon {
@@ -29,10 +29,10 @@ impl UIBindings for Weapon {
         ];
 
         let can_synch = self.can_synchronization();
-        let sync_options: Vec<SelectOption> = sync_list
+        let sync_options: Vec<SelectOpt> = sync_list
             .iter()
             .enumerate()
-            .map(|(i, name)| SelectOption {
+            .map(|(i, name)| SelectOpt {
                 name: name.to_string(),
                 enabled: can_synch[i],
             })
@@ -40,38 +40,37 @@ impl UIBindings for Weapon {
 
         WeaponOptions {
             fixed: Check {
-                name: t!("fixed").to_string(),
+                name: t!("Fixed").to_string(),
                 enabled: self.is_fixed_enabled(),
                 selected: self.fixed,
             },
             wing: Check {
-                name: t!("wing").to_string(),
+                name: t!("Weapons Wing Mount").to_string(),
                 enabled: self.can_wing(),
                 selected: self.wing,
             },
             covered: Check {
-                name: t!("covered").to_string(),
+                name: t!("Weapons Covered").to_string(),
                 enabled: self.can_covered(),
                 selected: self.covered,
             },
             accessible: Check {
-                name: t!("accessible").to_string(),
+                name: t!("Weapons Accessible").to_string(),
                 enabled: self.is_accessible_enabled(),
                 selected: self.accessible,
             },
             free_accessible: Check {
-                name: t!("free_accessible").to_string(),
+                name: t!("Weapons Free Accessible").to_string(),
                 enabled: self.is_free_accessible_enabled(),
                 selected: self.free_accessible,
             },
             synchronization: Select {
-                name: t!("Weapons Synchronization").to_string(),
                 enabled: true,
                 selected: self.synchronization.to_ui_index(),
                 options: sync_options,
             },
-            w_count: NumberInput {
-                name: t!("w_count").to_string(),
+            w_count: Number {
+                name: t!("Weapons # Weapons at Mount").to_string(),
                 enabled: self.is_w_count_enabled(),
                 value: self.w_count,
             },
