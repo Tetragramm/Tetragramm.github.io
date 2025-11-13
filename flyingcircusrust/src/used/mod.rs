@@ -4,6 +4,7 @@ use crate::stats::Stats;
 
 mod json;
 mod serialization;
+mod ui;
 
 /// Aircraft condition modifiers (damage, wear, maintenance state)
 /// Each modifier is normalized to range [-1, 1] where:

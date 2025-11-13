@@ -17,6 +17,7 @@ import { AccessoriesUI } from './wasm/components/accessories_ui';
 import { ControlSurfacesUI } from './wasm/components/control_surfaces_ui';
 import { LandingGearUI } from './wasm/components/landing_gear_ui';
 import { OptimizationUI } from './wasm/components/optimization_ui';
+import { UsedUI } from './wasm/components/used_ui';
 import { ReinforcementsUI } from './wasm/components/reinforcements_ui';
 import { StabilizersUI } from './wasm/components/stabilizers_ui';
 import { FramesUI } from './wasm/components/frames_ui';
@@ -39,6 +40,7 @@ export class WasmApplication {
     private controlSurfacesUI: ControlSurfacesUI | null = null;
     private landingGearUI: LandingGearUI | null = null;
     private optimizationUI: OptimizationUI | null = null;
+    private usedUI: UsedUI | null = null;
     private reinforcementsUI: ReinforcementsUI | null = null;
     private stabilizersUI: StabilizersUI | null = null;
     private framesUI: FramesUI | null = null;
@@ -174,6 +176,12 @@ export class WasmApplication {
             });
             console.log('[WasmApp] Optimization UI created');
 
+            // Create Used Part UI component
+            this.usedUI = new UsedUI(() => this.bridge, 'Used Planes', () => {
+                this.onStatsUpdate();
+            });
+            console.log('[WasmApp] Used UI created');
+
             // Create Reinforcements UI component
             this.reinforcementsUI = new ReinforcementsUI(() => this.bridge, 'Reinforcements', () => {
                 this.onStatsUpdate();
@@ -289,6 +297,7 @@ export class WasmApplication {
         this.landingGearUI.render(forceFull);
         this.accessoriesUI.render(forceFull);
         this.optimizationUI.render(forceFull);
+        this.usedUI.render(forceFull);
         this.passengersUI.render(forceFull);
     }
 

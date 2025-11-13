@@ -325,6 +325,29 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&self.inner.optimization.get_unassigned_count()).unwrap()
     }
 
+    /// Get Used Part UI bindings
+    #[wasm_bindgen(js_name = getUsedBindings)]
+    pub fn get_used_bindings(&self) -> JsValue {
+        let options = self.inner.used.create_ui_options();
+        serde_wasm_bindgen::to_value(&options).unwrap()
+    }
+
+    /// Update Used Part from UI bindings
+    #[wasm_bindgen(js_name = setUsedBindings)]
+    pub fn set_used_bindings(&mut self, js_options: JsValue) {
+        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+            self.inner.used.receive_ui_selections(options);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Get stats for used part
+    #[wasm_bindgen(js_name = getUsedStats)]
+    pub fn get_used_stats(&mut self) -> JsValue {
+        let stats = self.inner.used.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
     /// Get Reinforcements UI bindings
     #[wasm_bindgen(js_name = getReinforcementsBindings)]
     pub fn get_reinforcements_bindings(&self) -> JsValue {

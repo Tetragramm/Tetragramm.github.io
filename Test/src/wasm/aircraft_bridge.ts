@@ -139,6 +139,9 @@ export interface AircraftWasmAPI {
     setOptimizationBindings(bindings: any): void;
     getOptimizationStats(): Stats;
     getOptimizationAvailable(): number;
+    getUsedBindings(): any;
+    setUsedBindings(bindings: any): void;
+    getUsedStats(): Stats;
     getReinforcementsBindings(): any;
     setReinforcementsBindings(bindings: any): void;
     getReinforcementsStats(): Stats;
@@ -572,6 +575,31 @@ export class AircraftBridge {
     getOptimizationAvailable(): number {
         this.ensureInitialized();
         return this.wasm!.getOptimizationAvailable();
+    }
+
+    /**
+     * Get Used Part UI bindings (includes localized strings from Rust)
+     */
+    getUsedBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getUsedBindings();
+    }
+
+    /**
+     * Update Used Part from UI bindings
+     * Automatically recalculates stats
+     */
+    setUsedBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setUsedBindings(bindings);
+    }
+
+    /**
+     * Get stats for Used Part
+     */
+    getUsedStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getUsedStats();
     }
 
     /**
