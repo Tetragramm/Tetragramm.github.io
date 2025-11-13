@@ -807,6 +807,102 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&self.inner.stats).unwrap()
     }
 
+    /// Check if used modifiers are at default (no damage/wear)
+    #[wasm_bindgen(js_name = getUsedIsDefault)]
+    pub fn get_used_is_default(&self) -> bool {
+        self.inner.get_used_is_default()
+    }
+
+    /// Get the name of the currently selected era
+    #[wasm_bindgen(js_name = getEraText)]
+    pub fn get_era_text(&self) -> String {
+        self.inner.get_era_text()
+    }
+
+    /// Check if aircraft has flammable components
+    #[wasm_bindgen(js_name = getIsFlammable)]
+    pub fn get_is_flammable(&self) -> bool {
+        self.inner.get_is_flammable()
+    }
+
+    /// Get landing gear type name
+    #[wasm_bindgen(js_name = getGearName)]
+    pub fn get_gear_name(&self) -> String {
+        self.inner.get_gear_name()
+    }
+
+    /// Get minimum operational altitude
+    #[wasm_bindgen(js_name = getMinAltitude)]
+    pub fn get_min_altitude(&self) -> i16 {
+        self.inner.get_min_altitude()
+    }
+
+    /// Get maximum operational altitude
+    #[wasm_bindgen(js_name = getMaxAltitude)]
+    pub fn get_max_altitude(&self) -> i16 {
+        self.inner.get_max_altitude()
+    }
+
+    /// Get reliability strings from all engines
+    #[wasm_bindgen(js_name = getReliabilityList)]
+    pub fn get_reliability_list(&self) -> Vec<String> {
+        self.inner.get_reliability_list()
+    }
+
+    /// Get escape values from all cockpit positions
+    #[wasm_bindgen(js_name = getEscapeList)]
+    pub fn get_escape_list(&self) -> Vec<i16> {
+        self.inner.get_escape_list()
+    }
+
+    /// Get flight stress values from all cockpit positions
+    #[wasm_bindgen(js_name = getStressList)]
+    pub fn get_stress_list(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.inner.get_stress_list()).unwrap()
+    }
+
+    /// Get visibility values from all cockpit positions
+    #[wasm_bindgen(js_name = getVisibilityList)]
+    pub fn get_visibility_list(&self) -> Vec<i16> {
+        self.inner.get_visibility_list()
+    }
+
+    /// Get attack modifier values from all cockpit positions
+    #[wasm_bindgen(js_name = getAttackList)]
+    pub fn get_attack_list(&self) -> Vec<i16> {
+        self.inner.get_attack_list()
+    }
+
+    /// Get communication system name
+    #[wasm_bindgen(js_name = getCommunicationName)]
+    pub fn get_communication_name(&self) -> String {
+        self.inner.get_communication_name()
+    }
+
+    /// Get number of cockpit positions
+    #[wasm_bindgen(js_name = getCockpitsCount)]
+    pub fn get_cockpits_count(&self) -> i16 {
+        self.inner.get_cockpits_count()
+    }
+
+    /// Get total passenger capacity (seats + beds)
+    #[wasm_bindgen(js_name = getPassengersCount)]
+    pub fn get_passengers_count(&self) -> i16 {
+        self.inner.get_passengers_count()
+    }
+
+    /// Get electrical systems data
+    #[wasm_bindgen(js_name = getElectrics)]
+    pub fn get_electrics(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.inner.get_electrics()).unwrap()
+    }
+
+    /// Get list of vital component names
+    #[wasm_bindgen(js_name = vitalComponentList)]
+    pub fn vital_component_list(&self) -> Vec<String> {
+        self.inner.vital_component_list()
+    }
+
     /// Serialize aircraft to bytes
     #[wasm_bindgen(js_name = serialize)]
     pub fn serialize(&self) -> String {

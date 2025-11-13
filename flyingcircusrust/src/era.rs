@@ -43,6 +43,12 @@ impl Era {
     pub fn get_max_bomb(&self) -> f32 {
         self.vals[self.selected_era].maxbomb
     }
+
+    /// Get the name of the currently selected era
+    /// TypeScript: GetSelectedText()
+    pub fn get_selected_text(&self) -> String {
+        self.vals[self.selected_era].name.clone()
+    }
 }
 
 impl Part for Era {

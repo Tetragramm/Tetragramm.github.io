@@ -1,11 +1,13 @@
 use crate::stats::Stats;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Equipment {
     pub source: String,
     pub charge: String,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct ElectricsMessage {
     pub storage: i32,
     pub equipment: Vec<Equipment>,

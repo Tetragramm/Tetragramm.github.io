@@ -175,6 +175,12 @@ impl Cockpits {
     pub fn get_crash_list(&self) -> Vec<i16> {
         self.positions.iter().map(|p| p.get_crash()).collect()
     }
+
+    /// Get attack modifier values from all cockpit positions
+    /// TypeScript: GetAttackList()
+    pub fn get_attack_list(&self) -> Vec<i16> {
+        self.positions.iter().map(|p| p.get_attack()).collect()
+    }
 }
 
 impl Part for Cockpits {

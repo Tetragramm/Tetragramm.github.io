@@ -374,6 +374,12 @@ impl Engines {
         m
     }
 
+    /// Check if any radiator is flammable
+    /// TypeScript: GetIsFlammable()
+    pub fn get_is_flammable(&self) -> bool {
+        self.radiators.iter().any(|r| r.get_is_flammable())
+    }
+
     /// Set number of engines
     /// TypeScript: SetNumberOfEngines(num: number)
     /// Clamps to 0-20, removes or adds engines as needed

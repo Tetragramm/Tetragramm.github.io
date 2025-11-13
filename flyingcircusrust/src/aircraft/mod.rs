@@ -11,6 +11,7 @@ use crate::{
 mod derived_stats;
 mod json;
 mod part;
+mod queries;
 mod serialization;
 
 #[cfg(test)]

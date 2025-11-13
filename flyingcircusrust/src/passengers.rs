@@ -38,6 +38,18 @@ impl Passengers {
     fn is_connected_enabled(&self) -> bool {
         self.seats + self.beds > 0
     }
+
+    /// Get number of passenger seats
+    /// TypeScript: GetSeats()
+    pub fn get_seats(&self) -> i16 {
+        self.seats
+    }
+
+    /// Get number of passenger beds
+    /// TypeScript: GetBeds()
+    pub fn get_beds(&self) -> i16 {
+        self.beds
+    }
 }
 
 impl Part for Passengers {

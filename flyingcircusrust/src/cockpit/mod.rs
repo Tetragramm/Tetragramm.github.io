@@ -239,6 +239,18 @@ impl Cockpit {
         self.total_crash
     }
 
+    /// Get the maximum attack bonus from selected gunsights
+    /// TypeScript: GetAttack()
+    pub fn get_attack(&self) -> i16 {
+        let mut mx = 0;
+        for (i, selected) in self.selected_gunsights.iter().enumerate() {
+            if *selected {
+                mx = mx.max(self.gunsights[i].attack);
+            }
+        }
+        mx
+    }
+
     pub fn get_name(&self) -> String {
         if self.is_primary() {
             return "Crew Pilot".to_string();

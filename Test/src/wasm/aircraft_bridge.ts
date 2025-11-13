@@ -174,6 +174,25 @@ export interface AircraftWasmAPI {
     calculateStats(): void;
     getDerivedStats(): DerivedStats;
     getStats(): any;
+
+    // Aircraft query methods
+    getUsedIsDefault(): boolean;
+    getEraText(): string;
+    getIsFlammable(): boolean;
+    getGearName(): string;
+    getMinAltitude(): number;
+    getMaxAltitude(): number;
+    getReliabilityList(): string[];
+    getEscapeList(): number[];
+    getStressList(): Array<[number, number]>;
+    getVisibilityList(): number[];
+    getAttackList(): number[];
+    getCommunicationName(): string;
+    getCockpitsCount(): number;
+    getPassengersCount(): number;
+    getElectrics(): any;
+    vitalComponentList(): string[];
+
     serialize(): Uint8Array;
     serializeToLZString(): string;
 
@@ -1047,6 +1066,135 @@ export class AircraftBridge {
     getStats(): any {
         this.ensureInitialized();
         return this.wasm!.getStats();
+    }
+
+    /**
+     * Check if used modifiers are at default (no damage/wear)
+     */
+    getUsedIsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getUsedIsDefault();
+    }
+
+    /**
+     * Get the name of the currently selected era
+     */
+    getEraText(): string {
+        this.ensureInitialized();
+        return this.wasm!.getEraText();
+    }
+
+    /**
+     * Check if aircraft has flammable components
+     */
+    getIsFlammable(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getIsFlammable();
+    }
+
+    /**
+     * Get landing gear type name
+     */
+    getGearName(): string {
+        this.ensureInitialized();
+        return this.wasm!.getGearName();
+    }
+
+    /**
+     * Get minimum operational altitude
+     */
+    getMinAltitude(): number {
+        this.ensureInitialized();
+        return this.wasm!.getMinAltitude();
+    }
+
+    /**
+     * Get maximum operational altitude
+     */
+    getMaxAltitude(): number {
+        this.ensureInitialized();
+        return this.wasm!.getMaxAltitude();
+    }
+
+    /**
+     * Get reliability strings from all engines
+     */
+    getReliabilityList(): string[] {
+        this.ensureInitialized();
+        return this.wasm!.getReliabilityList();
+    }
+
+    /**
+     * Get escape values from all cockpit positions
+     */
+    getEscapeList(): number[] {
+        this.ensureInitialized();
+        return this.wasm!.getEscapeList();
+    }
+
+    /**
+     * Get flight stress values from all cockpit positions
+     * Returns array of [non_copilot_stress, copilot_stress] tuples
+     */
+    getStressList(): Array<[number, number]> {
+        this.ensureInitialized();
+        return this.wasm!.getStressList();
+    }
+
+    /**
+     * Get visibility values from all cockpit positions
+     */
+    getVisibilityList(): number[] {
+        this.ensureInitialized();
+        return this.wasm!.getVisibilityList();
+    }
+
+    /**
+     * Get attack modifier values from all cockpit positions
+     */
+    getAttackList(): number[] {
+        this.ensureInitialized();
+        return this.wasm!.getAttackList();
+    }
+
+    /**
+     * Get communication system name
+     */
+    getCommunicationName(): string {
+        this.ensureInitialized();
+        return this.wasm!.getCommunicationName();
+    }
+
+    /**
+     * Get number of cockpit positions
+     */
+    getCockpitsCount(): number {
+        this.ensureInitialized();
+        return this.wasm!.getCockpitsCount();
+    }
+
+    /**
+     * Get total passenger capacity (seats + beds)
+     */
+    getPassengersCount(): number {
+        this.ensureInitialized();
+        return this.wasm!.getPassengersCount();
+    }
+
+    /**
+     * Get electrical systems data
+     */
+    getElectrics(): any {
+        this.ensureInitialized();
+        return this.wasm!.getElectrics();
+    }
+
+    /**
+     * Get list of vital component names
+     */
+    vitalComponentList(): string[] {
+        this.ensureInitialized();
+        return this.wasm!.vitalComponentList();
     }
 
     /**
