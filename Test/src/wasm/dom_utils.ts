@@ -306,6 +306,8 @@ export function createStatsTable(
                 } else {
                     value = 'No';
                 }
+            } else if (typeof (value) == 'number') {
+                value = parseFloat(value?.toPrecision(4)).toString() || '';
             } else {
                 value = value?.toString() || '';
             }
@@ -370,6 +372,8 @@ export function updateStatsTable(
                 } else {
                     value = 'No';
                 }
+            } else if (typeof (value) == 'number') {
+                value = parseFloat(value?.toPrecision(4)).toString() || '';
             } else {
                 value = value?.toString() || '';
             }

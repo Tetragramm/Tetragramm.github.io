@@ -79,8 +79,9 @@ export class TotalStatsUI extends BaseComponentUI {
 
         // Get stats and create table with 6 stats per row
         const stats = bridge.getStats();
-        this.statsTable = createStatsTable(stats, TOTAL_STATS, undefined, 6);
+        this.statsTable = createStatsTable(stats, TOTAL_STATS, undefined, 7);
         contentDiv.appendChild(this.statsTable);
+        this.statsTable.className = '';
 
         // Create collapsible section
         const sectionTitle = localization.translate('Total Sum of Stats');
@@ -104,7 +105,7 @@ export class TotalStatsUI extends BaseComponentUI {
 
         if (this.statsTable) {
             const stats = bridge.getStats();
-            updateStatsTable(this.statsTable, stats, TOTAL_STATS, undefined, 6);
+            updateStatsTable(this.statsTable, stats, TOTAL_STATS, undefined, 7);
         }
     }
 }
