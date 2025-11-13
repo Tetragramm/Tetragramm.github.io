@@ -33,11 +33,11 @@ const WEAPON_SYSTEM_STATS: StatDisplayConfig[] = [
     { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
     { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
     { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
-    { key: 'mounting', label: 'Weapons Stat Mounting', positiveIsGood: true, isDerived: true },
-    { key: 'jam', label: 'Weapons Stat Jam', positiveIsGood: false, isDerived: true },
-    { key: 'hits', label: 'Weapons Stat Hits', positiveIsGood: true, isDerived: true },
-    { key: 'damage', label: 'Weapons Stat Damage', positiveIsGood: true, isDerived: true },
-    { key: 'shots', label: 'Weapons Stat Shots', positiveIsGood: true, isDerived: true },  // Will be handled specially for heat rays
+    { key: 'mounting', label: 'Weapons Stat Mounting', positiveIsGood: true, isDerived: false },
+    { key: 'jam', label: 'Weapons Stat Jam', positiveIsGood: false, isDerived: false },
+    { key: 'hits', label: 'Weapons Stat Hits', positiveIsGood: true, isDerived: false },
+    { key: 'damage', label: 'Weapons Stat Damage', positiveIsGood: true, isDerived: false },
+    { key: 'shots', label: 'Weapons Stat Shots', positiveIsGood: true, isDerived: false },  // Will be handled specially for heat rays
 ];
 
 /**
@@ -370,7 +370,9 @@ class WeaponSystemRow {
             projectileSelect,
             fixedCheckbox,
             repeatingCheckbox,
-            directionCheckboxes
+            directionCheckboxes,
+            statsTable: undefined,
+            shotsHeaderCell: undefined,
         };
     }
 
