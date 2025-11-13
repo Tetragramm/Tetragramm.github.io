@@ -1,32 +1,41 @@
 use crate::part::ElectricsMessage;
 use crate::part::Part;
 use crate::stats::Stats;
+use ui_core::*;
+use ui_macro::UIBindings;
 
 mod json;
 mod serialization;
-mod ui;
 
 /// Aircraft condition modifiers (damage, wear, maintenance state)
 /// Each modifier is normalized to range [-1, 1] where:
 /// - Positive values represent penalties (damage/wear)
 /// - Negative values represent benefits (improvements/repairs)
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, UIBindings)]
 pub struct Used {
     /// Engine burnt out condition
+    #[ui(number, name = "Used Burnt Out")]
     pub burnt_out: i16,
     /// Airframe ragged/worn condition (affects max speed)
+    #[ui(number, name = "Used Ragged")]
     pub ragged: i16,
     /// Aircraft heavy condition (affects stall speed)
+    #[ui(number, name = "Used Hefty")]
     pub hefty: i16,
     /// Weapons jam frequently
+    #[ui(number, name = "Used Sticky Guns")]
     pub sticky_guns: i16,
     /// Structural weakness (affects toughness)
+    #[ui(number, name = "Used Weak")]
     pub weak: i16,
     /// Structural fragility (affects max strain)
+    #[ui(number, name = "Used Fragile")]
     pub fragile: i16,
     /// Fuel/fluid leaks (affects fuel uses)
+    #[ui(number, name = "Used Leaky")]
     pub leaky: i16,
     /// Poor performance/responsiveness (affects handling)
+    #[ui(number, name = "Used Sluggish")]
     pub sluggish: i16,
 }
 
