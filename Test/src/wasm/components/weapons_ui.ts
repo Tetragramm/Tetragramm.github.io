@@ -18,8 +18,27 @@ import {
     createFlexSection,
     createFlexSelect,
     createSelectElement,
-    updateSelectElement
+    updateSelectElement,
+    createStatsTable,
+    updateStatsTable,
+    StatDisplayConfig
 } from '../dom_utils';
+
+/**
+ * Configuration for weapon system stats display
+ * Based on Weapons.ts lines 159-181
+ */
+const WEAPON_SYSTEM_STATS: StatDisplayConfig[] = [
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'reqsections', label: 'Stat Required Sections', positiveIsGood: false },
+    { key: 'mounting', label: 'Weapons Stat Mounting', positiveIsGood: true, isDerived: true },
+    { key: 'jam', label: 'Weapons Stat Jam', positiveIsGood: false, isDerived: true },
+    { key: 'hits', label: 'Weapons Stat Hits', positiveIsGood: true, isDerived: true },
+    { key: 'damage', label: 'Weapons Stat Damage', positiveIsGood: true, isDerived: true },
+    { key: 'shots', label: 'Weapons Stat Shots', positiveIsGood: true, isDerived: true },  // Will be handled specially for heat rays
+];
 
 /**
  * Weapons UI Component
@@ -207,13 +226,16 @@ class WeaponSystemRow {
         this.contentRow = this.table.insertRow();
         const configCell = this.contentRow.insertCell();
         const weaponsCell = this.contentRow.insertCell();
-        const statCell = this.contentRow.insertCell();
+        const statsCell = this.contentRow.insertCell();
 
         // Build configuration section
         this.buildConfigSection(configCell, bindings);
 
         // Build weapons section
         this.buildWeaponsSection(weaponsCell, bindings);
+
+        // Build stats section
+        this.buildStatsSection(statsCell);
     }
 
     private buildConfigSection(cell: HTMLTableCellElement, bindings: any): void {
@@ -378,6 +400,31 @@ class WeaponSystemRow {
         }
     }
 
+    private buildStatsSection(cell: HTMLTableCellElement): void {
+        const bridge = this.getBridge();
+        if (!bridge) return;
+
+        cell.className = 'inner_table';
+
+        // Get stats from bridge
+        const stats = bridge.getWeaponSystemStats(this.index);
+        const derivedStats = bridge.getWeaponSystemDerivedStats(this.index);
+
+        // Create the stats table using standard helper
+        const statsTable = createStatsTable(stats, WEAPON_SYSTEM_STATS, derivedStats);
+        cell.appendChild(statsTable);
+
+        // Cache the table and the shots header (row 4, header 2)
+        // Row indices: 0=header1, 1=values1, 2=header2, 3=values2, 4=header3, 5=values3
+        const shotsHeaderCell = statsTable.rows[4].cells[2] as HTMLTableHeaderCellElement;
+
+        if (!this.cache) {
+            this.cache = {} as any;
+        }
+        this.cache.statsTable = statsTable;
+        this.cache.shotsHeaderCell = shotsHeaderCell;
+    }
+
     update(): void {
         const bridge = this.getBridge();
         if (!bridge) return;
@@ -426,6 +473,25 @@ class WeaponSystemRow {
                 weaponRow.update();
             }
         }
+
+        // Update stats table
+        if (this.cache.statsTable) {
+            const stats = bridge.getWeaponSystemStats(this.index);
+            const derivedStats = bridge.getWeaponSystemDerivedStats(this.index);
+
+            // Handle Heat Ray / Lightning Arc special case
+            // TypeScript reference: Weapons.ts lines 322-329
+            if (derivedStats.is_heat_ray) {
+                // Change header to "Charges" and use hr_charges instead of shots
+                this.cache.shotsHeaderCell.textContent = localization.translate('Weapons Stat Charges');
+                derivedStats.shots = derivedStats.hr_charges;  // Replace shots with hr_charges for display
+            } else {
+                // Normal case: use "Shots"
+                this.cache.shotsHeaderCell.textContent = localization.translate('Weapons Stat Shots');
+            }
+
+            updateStatsTable(this.cache.statsTable, stats, WEAPON_SYSTEM_STATS, derivedStats);
+        }
     }
 }
 
@@ -439,6 +505,8 @@ interface WeaponSystemCache {
     fixedCheckbox: HTMLInputElement;
     repeatingCheckbox: HTMLInputElement;
     directionCheckboxes: HTMLInputElement[];
+    statsTable: HTMLTableElement;
+    shotsHeaderCell: HTMLTableHeaderCellElement;
 }
 
 /**

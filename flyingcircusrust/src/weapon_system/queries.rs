@@ -1,6 +1,17 @@
 use super::*;
 use crate::part::Part;
 
+#[derive(serde::Serialize)]
+pub struct WeaponSystemDerivedStats {
+    pub hits: String,  // "X/Y/Z/W" format
+    pub damage: i16,
+    pub shots: i16,
+    pub jam: String,
+    pub hr_charges: String,  // For heat rays, "/" separated
+    pub mounting: String,  // "Fixed", "Flexible", or "Turret"
+    pub is_heat_ray: bool,  // True if projectile is heat ray or Lightning Arc
+}
+
 impl WeaponSystem {
     /// Get selected weapon type index
     /// TypeScript: GetWeaponSelected()
@@ -305,6 +316,44 @@ impl WeaponSystem {
             } else {
                 vec![]
             }
+        }
+    }
+
+    /// Get derived stats for display
+    /// Returns formatted strings for hits, damage, shots, jam, and mounting type
+    pub fn get_derived_stats(&self) -> WeaponSystemDerivedStats {
+        let hits = self.get_hits();
+        let hits_str = format!("{}/{}/{}/{}", hits[0], hits[1], hits[2], hits[3]);
+
+        let damage = self.get_damage();
+        let shots = self.get_shots();
+        let jam = self.get_jam();
+
+        let hr_charges_vec = self.get_hr_charges();
+        let hr_charges = hr_charges_vec
+            .iter()
+            .map(|c| c.to_string())
+            .collect::<Vec<_>>()
+            .join("/");
+
+        let mounting = if self.get_fixed() {
+            "Fixed".to_string()
+        } else if self.get_direction_count() <= 2 {
+            "Flexible".to_string()
+        } else {
+            "Turret".to_string()
+        };
+
+        let is_heat_ray = self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
+
+        WeaponSystemDerivedStats {
+            hits: hits_str,
+            damage,
+            shots,
+            jam,
+            hr_charges,
+            mounting,
+            is_heat_ray,
         }
     }
 }

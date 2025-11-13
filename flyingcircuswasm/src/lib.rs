@@ -407,6 +407,18 @@ impl AircraftWasm {
         }
     }
 
+    /// Get WeaponSystem derived stats for display
+    #[wasm_bindgen(js_name = getWeaponSystemDerivedStats)]
+    pub fn get_weapon_system_derived_stats(&self, index: usize) -> JsValue {
+        let sets = self.inner.weapons.get_weapon_sets();
+        if index < sets.len() {
+            let derived_stats = sets[index].get_derived_stats();
+            serde_wasm_bindgen::to_value(&derived_stats).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
+
     /// Get Weapon UI bindings for a specific weapon in a weapon system
     #[wasm_bindgen(js_name = getWeaponBindings)]
     pub fn get_weapon_bindings(&self, system_index: usize, weapon_index: usize) -> JsValue {
