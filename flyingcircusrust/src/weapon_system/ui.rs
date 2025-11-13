@@ -66,10 +66,6 @@ impl UIBindings for WeaponSystem {
                 name: t!("Gast Principle").to_string(),
                 enabled: self.get_can_action()[2],
             },
-            SelectOpt {
-                name: t!("Rotary_Gun").to_string(),
-                enabled: self.get_can_action()[3],
-            },
         ];
 
         // Create projectile type options
@@ -85,10 +81,6 @@ impl UIBindings for WeaponSystem {
             SelectOpt {
                 name: t!("Pneumatic").to_string(),
                 enabled: self.get_can_projectile()[2],
-            },
-            SelectOpt {
-                name: t!("Gyrojets").to_string(),
-                enabled: self.get_can_projectile()[3],
             },
         ];
 

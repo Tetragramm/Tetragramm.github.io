@@ -57,7 +57,7 @@ impl UIBindings for Weapon {
             accessible: Check {
                 name: t!("Weapons Accessible").to_string(),
                 enabled: self.is_accessible_enabled(),
-                selected: self.accessible,
+                selected: self.accessible || self.free_accessible,
             },
             free_accessible: Check {
                 name: t!("Weapons Free Accessible").to_string(),
@@ -65,7 +65,7 @@ impl UIBindings for Weapon {
                 selected: self.free_accessible,
             },
             synchronization: Select {
-                enabled: true,
+                enabled: !self.wing,
                 selected: self.synchronization.to_ui_index(),
                 options: sync_options,
             },
