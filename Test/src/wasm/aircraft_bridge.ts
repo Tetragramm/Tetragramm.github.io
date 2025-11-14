@@ -717,7 +717,6 @@ export class AircraftBridge {
     duplicateWeaponSet(index: number): void {
         this.ensureInitialized();
         this.wasm!.duplicateWeaponSet(index);
-        this.clearCache();
     }
 
     /**
@@ -726,7 +725,6 @@ export class AircraftBridge {
     removeWeaponSet(index: number): void {
         this.ensureInitialized();
         this.wasm!.removeWeaponSet(index);
-        this.clearCache();
     }
 
     /**

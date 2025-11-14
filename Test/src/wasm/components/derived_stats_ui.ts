@@ -181,7 +181,10 @@ export class DerivedStatsUI extends BaseComponentUI {
         nameCell.colSpan = 2;
         this.nameInput = document.createElement('input');
         this.nameInput.type = 'text';
-        this.nameInput.defaultValue = localization.translate('Derived Aircraft Name');
+        this.nameInput.defaultValue = bridge.getName();
+        this.nameInput.onchange = () => {
+            bridge.setName(this.nameInput.value);
+        };
         nameCell.appendChild(this.nameInput);
 
         const th1 = document.createElement('th');

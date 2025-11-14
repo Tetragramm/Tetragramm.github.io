@@ -215,7 +215,8 @@ class WeaponSystemRow {
         this.headerRow = this.table.insertRow();
 
         // First header cell with buttons
-        const headerCell = document.createElement('th');
+        const headerCell = this.headerRow.insertCell();
+        const headerCell_inner = document.createElement('th');
         const buttonSpan = document.createElement('span');
 
         // Add minus button
@@ -240,10 +241,15 @@ class WeaponSystemRow {
         const labelSpan = document.createElement('span');
         labelSpan.textContent = localization.translate('Weapons Weapon Set');
         labelSpan.style.border = 'none';
-        buttonSpan.appendChild(labelSpan);
+        headerCell_inner.style.border = "none";
+        headerCell_inner.style.width = "100%";
+        headerCell_inner.style.padding = "0";
+        buttonSpan.style.display = "inline-flex";
+        buttonSpan.style.width = "100%";
 
+        headerCell_inner.appendChild(labelSpan);
+        buttonSpan.appendChild(headerCell_inner);
         headerCell.appendChild(buttonSpan);
-        this.headerRow.appendChild(headerCell);
 
         const headerCell2 = document.createElement('th');
         headerCell2.innerText = localization.translate('Weapons Weapons');
