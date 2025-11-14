@@ -138,6 +138,7 @@ export class WeaponsUI extends BaseComponentUI {
 
         this.container.appendChild(this.sectionElement);
 
+        this.updateValues();
         console.log('[WeaponsUI] Full rebuild complete');
     }
 
@@ -480,7 +481,6 @@ class WeaponSystemRow {
         if (this.cache.statsTable) {
             const stats = bridge.getWeaponSystemStats(this.index);
             const derivedStats = bridge.getWeaponSystemDerivedStats(this.index);
-
             // Handle Heat Ray / Lightning Arc special case
             // TypeScript reference: Weapons.ts lines 322-329
             if (derivedStats.is_heat_ray) {

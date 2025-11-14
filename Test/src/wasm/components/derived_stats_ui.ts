@@ -387,11 +387,6 @@ export class DerivedStatsUI extends BaseComponentUI {
             this.upkeepCell.textContent = stats.upkeep.toString() + 'þ';
         }
 
-        // Update era report
-        if (this.versionCell) {
-            this.versionCell.textContent = localization.translate(bridge.getEraText());
-        }
-
         // Update mass variation cells - Empty (all zeros in TypeScript version)
         if (this.tsEmpty) this.tsEmpty.textContent = '0';
         if (this.ssEmpty) this.ssEmpty.textContent = derivedStats.stall_speed_empty.toString();
@@ -666,38 +661,7 @@ export class DerivedStatsUI extends BaseComponentUI {
             const weaponSetsCount = bridge.getWeaponSetsCount();
             for (let i = 0; i < weaponSetsCount; i++) {
                 const ws = bridge.getWeaponSystemDisplayInfo(i);
-                if (ws) {
-                    const seatLabel = localization.translate('Seat #').replace('%{A}', (ws.seat + 1).toString());
-                    const dirs = ws.directions.join(' ');
-                    const tags = ws.tags.join(', ');
-
-                    // Use localization format string with placeholders
-                    let weaponDesc: string;
-                    if (ws.is_heat_ray) {
-                        // Heat ray format: {0}: {1}x {2} fires [{3}] for {4} damage with {5} hits with {6} charges. [{7}]
-                        weaponDesc = localization.translate('Weapon Description Heat Ray');
-                        weaponDesc = weaponDesc.replace('{0}', seatLabel);
-                        weaponDesc = weaponDesc.replace('{1}', ws.weapon_count.toString());
-                        weaponDesc = weaponDesc.replace('{2}', ws.weapon_name);
-                        weaponDesc = weaponDesc.replace('{3}', dirs);
-                        weaponDesc = weaponDesc.replace('{4}', ws.damage.toString());
-                        weaponDesc = weaponDesc.replace('{5}', ws.hits);
-                        weaponDesc = weaponDesc.replace('{6}', ws.hr_charges);
-                        weaponDesc = weaponDesc.replace('{7}', tags);
-                    } else {
-                        // Normal weapon format: {0}: {1}x {2} fires [{3}] for {4} damage with {5} hits with {6} ammunition. [{7}]
-                        weaponDesc = localization.translate('Weapon Description');
-                        weaponDesc = weaponDesc.replace('{0}', seatLabel);
-                        weaponDesc = weaponDesc.replace('{1}', ws.weapon_count.toString());
-                        weaponDesc = weaponDesc.replace('{2}', ws.weapon_name);
-                        weaponDesc = weaponDesc.replace('{3}', dirs);
-                        weaponDesc = weaponDesc.replace('{4}', ws.damage.toString());
-                        weaponDesc = weaponDesc.replace('{5}', ws.hits);
-                        weaponDesc = weaponDesc.replace('{6}', ws.shots.toString());
-                        weaponDesc = weaponDesc.replace('{7}', tags);
-                    }
-                    weaphtml += weaponDesc + '<br/>';
-                }
+                weaphtml += ws + '<br/>';
             }
 
             this.weaponCell.innerHTML = weaphtml;
@@ -764,7 +728,7 @@ export class DerivedStatsUI extends BaseComponentUI {
         tooltipDiv.appendChild(headerP);
 
         // Get aircraft era
-        const aircraftEra = this.bridge.getEraText();
+        const aircraftEra = this.getBridge().getEraText();
         const aircraftEraNum = this.eraToNum(aircraftEra);
 
         // Calculate era break and list problematic parts
@@ -773,6 +737,7 @@ export class DerivedStatsUI extends BaseComponentUI {
 
         for (const part of eras) {
             const partEraNum = this.eraToNum(part.era);
+            console.log("Era Break? " + part.name + "  " + part.era + "  " + partEraNum + " " + aircraftEraNum);
             if (partEraNum > aircraftEraNum) {
                 eraBreak += partEraNum - aircraftEraNum;
                 hasProblematicParts = true;
@@ -811,13 +776,13 @@ export class DerivedStatsUI extends BaseComponentUI {
      */
     private eraToNum(era: string): number {
         switch (era) {
-            case 'Pioneer': return 0;
-            case 'WWI': return 1;
-            case 'Roaring 20s': return 2;
-            case 'Coming Storm': return 3;
-            case 'WWII': return 4;
-            case 'Last Hurrah': return 5;
-            case 'Himmilgard': return -1;
+            case localization.translate('Pioneer'): return 0;
+            case localization.translate('WWI'): return 1;
+            case localization.translate('Roaring 20s'): return 2;
+            case localization.translate('Coming Storm'): return 3;
+            case localization.translate('WWII'): return 4;
+            case localization.translate('Last Hurrah'): return 5;
+            case localization.translate('Himmilgard'): return -1;
             default: return 0;
         }
     }
@@ -827,11 +792,11 @@ export class DerivedStatsUI extends BaseComponentUI {
      */
     private buildAircraftDescription(): string {
         let description = '';
-        const num_wings = this.bridge.getWingCount();
+        const num_wings = this.getBridge().getWingCount();
 
         // Describe wing configuration
         if (num_wings === 1) {
-            const deck = this.bridge.getWingDeck(0);
+            const deck = this.getBridge().getWingDeck(0);
             if (deck !== null && deck !== undefined) {
                 // WING_DECK: PARASOL=0, SHOULDER=1, MID=2, LOW=3, GEAR=4
                 if (deck < 2) {
@@ -843,7 +808,7 @@ export class DerivedStatsUI extends BaseComponentUI {
                 }
             }
         } else {
-            const sesqui = this.bridge.getWingsSesquiplane();
+            const sesqui = this.getBridge().getWingsSesquiplane();
             if (sesqui && sesqui.is) {
                 if (num_wings === 2) {
                     description += 'Sesquiplane ';
@@ -852,8 +817,8 @@ export class DerivedStatsUI extends BaseComponentUI {
                 } else {
                     description += 'Sesqui-' + this.wingPrefix(num_wings);
                 }
-            } else if (this.bridge.getWingsTandem()) {
-                if (num_wings === 2 && this.bridge.getWingsClosed()) {
+            } else if (this.getBridge().getWingsTandem()) {
+                if (num_wings === 2 && this.getBridge().getWingsClosed()) {
                     description += 'Annular Monoplane ';
                 } else {
                     description += 'Tandem ' + this.wingPrefix(num_wings);
@@ -864,9 +829,9 @@ export class DerivedStatsUI extends BaseComponentUI {
         }
 
         // Describe airframe type
-        if (this.bridge.getFramesFlyingWing()) {
+        if (this.getBridge().getFramesFlyingWing()) {
             description += 'Flying Wing ';
-        } else if (this.bridge.getFramesCanFlyingWing()) {
+        } else if (this.getBridge().getFramesCanFlyingWing()) {
             description += 'Lifting Body ';
         } else if (num_wings === 0) {
             description += 'Falling Rock ';

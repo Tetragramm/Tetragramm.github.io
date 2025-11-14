@@ -236,26 +236,70 @@ impl Part for Aircraft {
             self.wings.has_inverted_gull(),
         );
 
+        let em = self.get_electrics();
+
+        let mut have_generation = false;
+        for eq in em.equipment.iter() {
+            if eq.charge.chars().nth(0) == Some('+') {
+                have_generation = true;
+                break;
+            }
+        }
+
+        if em.equipment.len() > 0
+            && em.storage <= 0
+            && !have_generation
+            && self
+                .stats
+                .warnings
+                .iter()
+                .find(|w| w.name == "Insufficient Charge")
+                .is_none()
+        {
+            self.stats.warnings.push(crate::stats::Warning {
+                name: t!("Insufficient Charge").to_string(),
+                warning: t!("Insufficient Charge Warning").to_string(),
+                level: crate::stats::WarningLevel::Red,
+            });
+        }
+
         self.stats.clone()
     }
 
     fn get_electrics(&self) -> ElectricsMessage {
         let mut em = ElectricsMessage::new();
-        em = merge_electrics(em, self.alter.get_electrics());
-        em = merge_electrics(em, self.era.get_electrics());
+        em = merge_electrics(em, self.accessories.get_electrics());
+        em = merge_electrics(em, self.wings.get_electrics());
         em = merge_electrics(em, self.cockpits.get_electrics());
+        em = merge_electrics(em, self.alter.get_electrics());
+        em = merge_electrics(em, self.cargo.get_electrics());
+        em = merge_electrics(em, self.era.get_electrics());
+        em = merge_electrics(em, self.frames.get_electrics());
+        em = merge_electrics(em, self.gear.get_electrics());
+        em = merge_electrics(em, self.munitions.get_electrics());
+        em = merge_electrics(em, self.optimization.get_electrics());
         em = merge_electrics(em, self.passengers.get_electrics());
+        em = merge_electrics(em, self.reinforcements.get_electrics());
+        em = merge_electrics(em, self.rotor.get_electrics());
+        em = merge_electrics(em, self.stabilizers.get_electrics());
+        em = merge_electrics(em, self.used.get_electrics());
         em = merge_electrics(em, self.engines.get_electrics());
         em = merge_electrics(em, self.propeller.get_electrics());
-        em = merge_electrics(em, self.frames.get_electrics());
-        em = merge_electrics(em, self.munitions.get_electrics());
         em = merge_electrics(em, self.weapons.get_electrics());
-        em = merge_electrics(em, self.wings.get_electrics());
         em = merge_electrics(em, self.controlsurfaces.get_electrics());
-        em = merge_electrics(em, self.reinforcements.get_electrics());
-        em = merge_electrics(em, self.accessories.get_electrics());
-        em = merge_electrics(em, self.stabilizers.get_electrics());
-        em = merge_electrics(em, self.gear.get_electrics());
+
+        let mut have_generation = false;
+        //Add + symbols
+        for eq in em.equipment.iter_mut() {
+            let Ok(chg) = eq.charge.parse::<i16>() else {
+                continue;
+            };
+            if chg > 0 {
+                eq.charge = "+".to_string() + &eq.charge;
+                have_generation = true;
+            }
+        }
+
         em
     }
 }

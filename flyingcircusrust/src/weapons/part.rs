@@ -136,12 +136,12 @@ impl Part for Weapons {
                     .join("/");
 
                 msg.equipment.push(Equipment {
-                    source: format!(
-                        "{} {} {}",
-                        t!("Vital Part Weapon Set").to_string(),
-                        i + 1,
-                        set.get_final_weapon().name
-                    ),
+                    source: t!(
+                        "Vital Part Weapon Set",
+                        A = i + 1,
+                        B = set.get_final_weapon().abrv
+                    )
+                    .to_string(),
                     charge: charge_str,
                 });
             }

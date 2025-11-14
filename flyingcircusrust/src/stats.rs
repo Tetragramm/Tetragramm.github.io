@@ -1,5 +1,6 @@
 use itertools::{chain, Itertools};
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 use std::str::FromStr;
 
 use serde_json::Map;
@@ -26,6 +27,7 @@ fn merge_warnings(a: Vec<Warning>, b: Vec<Warning>) -> Vec<Warning> {
 }
 
 #[derive(Clone, PartialEq, Eq, Hash, Debug, Serialize, Deserialize)]
+#[serde(try_from = "&str", into = "String")]
 pub enum ERA {
     Himmilgard,
     Pioneer,
@@ -38,14 +40,20 @@ pub enum ERA {
 
 impl ToString for ERA {
     fn to_string(&self) -> String {
-        match self {
-            ERA::Himmilgard => ("Himmilgard").to_string(),
-            ERA::Pioneer => ("Pioneer").to_string(),
-            ERA::WWI => ("WWI").to_string(),
-            ERA::Roaring20s => ("Roaring 20s").to_string(),
-            ERA::ComingStorm => ("Coming Storm").to_string(),
-            ERA::WWII => ("WWII").to_string(),
-            ERA::LastHurrah => ("Last Hurrah").to_string(),
+        String::from(self.clone())
+    }
+}
+
+impl From<ERA> for String {
+    fn from(era: ERA) -> String {
+        match era {
+            ERA::Himmilgard => t!("Himmilgard").to_string(),
+            ERA::Pioneer => t!("Pioneer").to_string(),
+            ERA::WWI => t!("WWI").to_string(),
+            ERA::Roaring20s => t!("Roaring 20s").to_string(),
+            ERA::ComingStorm => t!("Coming Storm").to_string(),
+            ERA::WWII => t!("WWII").to_string(),
+            ERA::LastHurrah => t!("Last Hurrah").to_string(),
         }
         .to_owned()
     }
@@ -53,10 +61,15 @@ impl ToString for ERA {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseEraError;
-impl FromStr for ERA {
-    type Err = ParseEraError;
+impl Display for ParseEraError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("Failed to Parse Era.")
+    }
+}
+impl TryFrom<&str> for ERA {
+    type Error = ParseEraError;
 
-    fn from_str(v: &str) -> Result<Self, Self::Err> {
+    fn try_from(v: &str) -> Result<Self, ParseEraError> {
         match v {
             "Himmilgard" => Ok(ERA::Himmilgard),
             "Pioneer" => Ok(ERA::Pioneer),
@@ -67,6 +80,13 @@ impl FromStr for ERA {
             "Last Hurrah" => Ok(ERA::LastHurrah),
             _ => Err(ParseEraError),
         }
+    }
+}
+impl TryFrom<String> for ERA {
+    type Error = ParseEraError;
+
+    fn try_from(v: String) -> Result<Self, ParseEraError> {
+        ERA::try_from(v.as_str())
     }
 }
 
@@ -208,7 +228,7 @@ impl Stats {
             eras: if let Some(e) = js.get("era") {
                 vec![Era {
                     name: t!(jsstr(js, "name")).to_string(),
-                    era: ERA::from_str(&vstr(e)).unwrap(),
+                    era: ERA::try_from(vstr(e)).unwrap(),
                 }]
             } else if let Some(es) = js.get("eras") {
                 es.as_array()
@@ -216,7 +236,7 @@ impl Stats {
                     .iter()
                     .map(|x| Era {
                         name: t!(jsstr(js, "name")).to_string(),
-                        era: ERA::from_str(&vstr(x)).unwrap(),
+                        era: ERA::try_from(vstr(x)).unwrap(),
                     })
                     .collect()
             } else {
@@ -367,7 +387,7 @@ impl Serializable for Stats {
         s.push_num(self.eras.len() as i16)?;
         for era in &self.eras {
             s.push_string(&era.name)?;
-            s.push_string(&era.era.to_string())?;
+            s.push_string(&String::from(era.era.clone()))?;
         }
         Ok(())
     }
@@ -416,7 +436,7 @@ impl Serializable for Stats {
                 .map(|_| -> Result<Era, Error> {
                     Ok(Era {
                         name: d.get_string()?,
-                        era: ERA::from_str(&(d.get_string()?)).unwrap(),
+                        era: ERA::try_from(d.get_string()?).unwrap(),
                     })
                 })
                 .try_collect()?;
@@ -516,7 +536,7 @@ impl JSSerializable for Stats {
                     .filter_map(|e| {
                         let name = jsstr(e, "name");
                         let era_str = jsstr(e, "era");
-                        ERA::from_str(&era_str).ok().map(|era| Era { name, era })
+                        ERA::try_from(era_str).ok().map(|era| Era { name, era })
                     })
                     .collect();
             }

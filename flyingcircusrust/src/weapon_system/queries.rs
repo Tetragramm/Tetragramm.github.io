@@ -1,14 +1,16 @@
+use std::net::ToSocketAddrs;
+
 use super::*;
 use crate::part::Part;
 
 #[derive(serde::Serialize)]
 pub struct WeaponSystemDerivedStats {
-    pub hits: String,  // "X/Y/Z/W" format
+    pub hits: String, // "X/Y/Z/W" format
     pub damage: i16,
     pub shots: i16,
     pub jam: String,
-    pub hr_charges: String,  // For heat rays, "/" separated
-    pub mounting: String,  // "Fixed", "Flexible", or "Turret"
+    pub hr_charges: String, // For heat rays, "/" separated
+    pub mounting: String,   // "Fixed", "Flexible", or "Turret"
     pub is_heat_ray: bool,  // True if projectile is heat ray or Lightning Arc
 }
 
@@ -18,11 +20,11 @@ pub struct WeaponSystemDisplayInfo {
     pub weapon_count: i16,
     pub weapon_name: String,
     pub weapon_abrv: String,
-    pub directions: Vec<String>,  // Active directions as translated strings
+    pub directions: Vec<String>, // Active directions as translated strings
     pub damage: f32,
-    pub hits: String,  // "X/Y/Z/W" format
-    pub shots: i16,  // Or charges for heat rays
-    pub hr_charges: String,  // For heat rays
+    pub hits: String,       // "X/Y/Z/W" format
+    pub shots: i16,         // Or charges for heat rays
+    pub hr_charges: String, // For heat rays
     pub tags: Vec<String>,  // Tags like "Repeating", "Synched", etc.
     pub is_heat_ray: bool,
 }
@@ -359,7 +361,8 @@ impl WeaponSystem {
             "Turret".to_string()
         };
 
-        let is_heat_ray = self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
+        let is_heat_ray =
+            self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
 
         WeaponSystemDerivedStats {
             hits: hits_str,
@@ -374,12 +377,13 @@ impl WeaponSystem {
 
     /// Get weapon system display information for derived stats UI
     /// Returns all information needed to display a weapon set
-    pub fn get_display_info(&self, direction_list: &[String]) -> WeaponSystemDisplayInfo {
+    pub fn get_display_info(&self, direction_list: &[String]) -> String {
         let hits = self.get_hits();
         let hits_str = format!("{}/{}/{}/{}", hits[0], hits[1], hits[2], hits[3]);
 
         let weapon = &self.weapon_list[self.weapon_type];
-        let is_heat_ray = self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
+        let is_heat_ray =
+            self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
 
         // Build weapon name like TypeScript WeaponName()
         let direction_count = self.directions.iter().filter(|&&d| d).count();
@@ -387,28 +391,28 @@ impl WeaponSystem {
 
         // Add mounting type
         if direction_count == 1 && self.get_fixed() {
-            name.push_str(&rust_i18n::t!("Fixed"));
+            name.push_str(&t!("Fixed"));
             name.push(' ');
         } else if direction_count <= 2 {
-            name.push_str(&rust_i18n::t!("Flexible"));
+            name.push_str(&t!("Flexible"));
             name.push(' ');
         } else {
-            name.push_str(&rust_i18n::t!("Turreted"));
+            name.push_str(&t!("Turreted"));
             name.push(' ');
         }
 
         // Add action type modifier
         match self.action_sel {
             ActionType::Mechanical => {
-                name.push_str(&rust_i18n::t!("Weapon Tag Mechanical Action"));
+                name.push_str(&t!("Weapon Tag Mechanical Action"));
                 name.push(' ');
             }
             ActionType::Gast => {
-                name.push_str(&rust_i18n::t!("Weapon Tag Gast Principle"));
+                name.push_str(&t!("Weapon Tag Gast Principle"));
                 name.push(' ');
             }
             ActionType::Rotary => {
-                name.push_str(&rust_i18n::t!("Weapon Tag Rotary"));
+                name.push_str(&t!("Weapon Tag Rotary"));
                 name.push(' ');
             }
             _ => {}
@@ -417,15 +421,15 @@ impl WeaponSystem {
         // Add projectile type modifier
         match self.get_projectile() {
             ProjectileType::Heatray => {
-                name.push_str(&rust_i18n::t!("Weapon Tag Heat Ray"));
+                name.push_str(&t!("Weapon Tag Heat Ray"));
                 name.push(' ');
             }
             ProjectileType::Gyrojets => {
-                name.push_str(&rust_i18n::t!("Weapon Tag Gyrojet"));
+                name.push_str(&t!("Weapon Tag Gyrojet"));
                 name.push(' ');
             }
             ProjectileType::Pneumatic => {
-                name.push_str(&rust_i18n::t!("Weapon Tag Pneumatic"));
+                name.push_str(&t!("Weapon Tag Pneumatic"));
                 name.push(' ');
             }
             _ => {}
@@ -438,7 +442,7 @@ impl WeaponSystem {
         let mut directions = Vec::new();
         for (i, &active) in self.directions.iter().enumerate() {
             if active && i < direction_list.len() {
-                directions.push(rust_i18n::t!(&direction_list[i]).to_string());
+                directions.push(t!(&direction_list[i]).to_string());
             }
         }
 
@@ -446,45 +450,51 @@ impl WeaponSystem {
         let mut tags = Vec::new();
 
         // Jam (always first)
-        tags.push(rust_i18n::t!("Weapon Tag Jam", jam = &self.get_jam()).to_string());
+        tags.push(t!("Weapon Tag Jam", A = &self.get_jam()).to_string());
 
         // Reload
         let reload = self.get_reload();
         if reload > 0 {
             if reload == 1 {
-                tags.push(rust_i18n::t!("Weapon Tag Manual").to_string());
+                tags.push(t!("Weapon Tag Manual").to_string());
             } else {
-                tags.push(rust_i18n::t!("Weapon Tag Reload", reload = reload).to_string());
+                tags.push(t!("Weapon Tag Reload", A = reload).to_string());
             }
         }
 
         // Rapid Fire
         if self.final_weapon.rapid {
-            tags.push(rust_i18n::t!("Weapon Tag Rapid Fire").to_string());
+            tags.push(t!("Weapon Tag Rapid Fire").to_string());
         }
 
         // Shells
         if self.final_weapon.shells {
-            tags.push(rust_i18n::t!("Weapon Tag Shells").to_string());
+            tags.push(t!("Weapon Tag Shells").to_string());
         }
 
         // AP
         if self.final_weapon.ap > 0 {
-            tags.push(rust_i18n::t!("Weapon Tag AP", ap = self.final_weapon.ap).to_string());
+            tags.push(t!("Weapon Tag AP", A = self.final_weapon.ap).to_string());
         }
 
         // Accessibility
         if self.get_is_fully_accessible() {
-            tags.push(rust_i18n::t!("Weapon Tag Fully Accessible").to_string());
+            tags.push(t!("Weapon Tag Fully Accessible").to_string());
         } else if self.get_is_partly_accessible() {
-            tags.push(rust_i18n::t!("Weapon Tag Partly Accessible").to_string());
+            tags.push(t!("Weapon Tag Partly Accessible").to_string());
         } else {
-            tags.push(rust_i18n::t!("Weapon Tag Inaccessible").to_string());
+            tags.push(t!("Weapon Tag Inaccessible").to_string());
         }
 
         // Deflection/Awkward
         if self.final_weapon.deflection > 0 {
-            tags.push(rust_i18n::t!("Weapon Tag Awkward", deflection = self.final_weapon.deflection).to_string());
+            tags.push(
+                t!(
+                    "Weapon Tag Awkward",
+                    deflection = self.final_weapon.deflection
+                )
+                .to_string(),
+            );
         }
 
         let hr_charges_vec = self.get_hr_charges();
@@ -494,18 +504,33 @@ impl WeaponSystem {
             .collect::<Vec<_>>()
             .join("/");
 
-        WeaponSystemDisplayInfo {
-            seat: self.get_seat(),
-            weapon_count: self.get_weapon_count(),
-            weapon_name: name,
-            weapon_abrv: weapon.abrv.clone(),
-            directions,
-            damage: weapon.damage,
-            hits: hits_str,
-            shots: self.get_shots(),
-            hr_charges,
-            tags,
-            is_heat_ray,
+        let seat_str = t!("Seat #", A = self.get_seat() + 1).to_string();
+        if !is_heat_ray {
+            t!(
+                "Weapon Description",
+                A = seat_str,
+                B = self.get_weapon_count(),
+                C = name,
+                D = directions.join(" "),
+                E = weapon.damage,
+                F = hits_str,
+                G = self.get_shots(),
+                H = tags.join(", ")
+            )
+            .to_string()
+        } else {
+            t!(
+                "Weapon Description Heat Ray",
+                A = seat_str,
+                B = self.get_weapon_count(),
+                C = name,
+                D = directions.join(" "),
+                E = weapon.damage,
+                F = hits_str,
+                G = hr_charges,
+                H = tags.join(", ")
+            )
+            .to_string()
         }
     }
 }

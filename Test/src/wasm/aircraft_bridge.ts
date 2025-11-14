@@ -154,7 +154,7 @@ export interface AircraftWasmAPI {
     setWeaponSystemBindings(index: number, bindings: any): void;
     getWeaponSystemStats(index: number): Stats;
     getWeaponSystemDerivedStats(index: number): any;
-    getWeaponSystemDisplayInfo(index: number): any;
+    getWeaponSystemDisplayInfo(index: number): string;
     getWeaponBindings(systemIndex: number, weaponIndex: number): any;
     setWeaponBindings(systemIndex: number, weaponIndex: number, bindings: any): void;
     getWeaponStats(systemIndex: number, weaponIndex: number): Stats;
@@ -745,7 +745,7 @@ export class AircraftBridge {
     /**
      * Get display information for a specific weapon system (for derived stats UI)
      */
-    getWeaponSystemDisplayInfo(index: number): any {
+    getWeaponSystemDisplayInfo(index: number): string {
         this.ensureInitialized();
         return this.wasm!.getWeaponSystemDisplayInfo(index);
     }
