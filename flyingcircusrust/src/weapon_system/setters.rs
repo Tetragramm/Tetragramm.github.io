@@ -120,19 +120,17 @@ impl WeaponSystem {
             use_dir = true; // Can't disable the only direction
         }
 
+        let mut adjusted_num = num;
         if self.fixed {
             self.directions = vec![false; 6];
-            let mut adjusted_num = num;
             if !self.weapons.is_empty() && self.weapons[0].get_arty() && !self.weapons[0].get_wing()
             {
                 if adjusted_num == 2 && self.heli {
                     adjusted_num = 3;
                 }
             }
-            self.directions[adjusted_num] = use_dir; // Use the parameter, not always true
-        } else {
-            self.directions[num] = use_dir;
         }
+        self.directions[adjusted_num] = use_dir;
     }
 
     /// Set number of weapon mounts (internal version)
