@@ -145,6 +145,9 @@ impl UIBindings for WeaponSystem {
         for (i, check) in options.directions.iter().enumerate() {
             if i < self.directions.len() && self.directions[i] != check.selected {
                 self.set_direction(i, check.selected);
+                if self.fixed {
+                    break;
+                }
             }
         }
 
