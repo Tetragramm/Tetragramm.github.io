@@ -150,6 +150,8 @@ export interface AircraftWasmAPI {
     setWeaponsBindings(bindings: any): void;
     getWeaponsStats(): Stats;
     getWeaponSetsCount(): number;
+    duplicateWeaponSet(index: number): void;
+    removeWeaponSet(index: number): void;
     getWeaponSystemBindings(index: number): any;
     setWeaponSystemBindings(index: number, bindings: any): void;
     getWeaponSystemStats(index: number): Stats;
@@ -707,6 +709,24 @@ export class AircraftBridge {
     getWeaponSetsCount(): number {
         this.ensureInitialized();
         return this.wasm!.getWeaponSetsCount();
+    }
+
+    /**
+     * Duplicate a weapon set at the given index
+     */
+    duplicateWeaponSet(index: number): void {
+        this.ensureInitialized();
+        this.wasm!.duplicateWeaponSet(index);
+        this.clearCache();
+    }
+
+    /**
+     * Remove a weapon set at the given index
+     */
+    removeWeaponSet(index: number): void {
+        this.ensureInitialized();
+        this.wasm!.removeWeaponSet(index);
+        this.clearCache();
     }
 
     /**

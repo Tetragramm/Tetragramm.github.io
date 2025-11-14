@@ -395,6 +395,20 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Duplicate a weapon set at the given index
+    #[wasm_bindgen(js_name = duplicateWeaponSet)]
+    pub fn duplicate_weapon_set(&mut self, idx: usize) {
+        self.inner.weapons.duplicate_set(idx);
+        self.inner.part_stats();
+    }
+
+    /// Remove a weapon set at the given index
+    #[wasm_bindgen(js_name = removeWeaponSet)]
+    pub fn remove_weapon_set(&mut self, idx: usize) {
+        self.inner.weapons.remove_set(idx);
+        self.inner.part_stats();
+    }
+
     /// Get number of weapon sets
     #[wasm_bindgen(js_name = getWeaponSetsCount)]
     pub fn get_weapon_sets_count(&self) -> usize {

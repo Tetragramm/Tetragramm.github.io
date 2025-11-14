@@ -213,9 +213,38 @@ class WeaponSystemRow {
 
         // Create header row
         this.headerRow = this.table.insertRow();
+
+        // First header cell with buttons
         const headerCell = document.createElement('th');
-        headerCell.innerText = localization.translate('Weapons Weapon Set');
+        const buttonSpan = document.createElement('span');
+
+        // Add minus button
+        const minusBtn = document.createElement('button');
+        minusBtn.textContent = '-';
+        minusBtn.onclick = () => {
+            bridge.removeWeaponSet(this.index);
+            this.onUpdate?.();
+        };
+        buttonSpan.appendChild(minusBtn);
+
+        // Add plus button
+        const plusBtn = document.createElement('button');
+        plusBtn.textContent = '+';
+        plusBtn.onclick = () => {
+            bridge.duplicateWeaponSet(this.index);
+            this.onUpdate?.();
+        };
+        buttonSpan.appendChild(plusBtn);
+
+        // Add label text
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = localization.translate('Weapons Weapon Set');
+        labelSpan.style.border = 'none';
+        buttonSpan.appendChild(labelSpan);
+
+        headerCell.appendChild(buttonSpan);
         this.headerRow.appendChild(headerCell);
+
         const headerCell2 = document.createElement('th');
         headerCell2.innerText = localization.translate('Weapons Weapons');
         this.headerRow.appendChild(headerCell2);
