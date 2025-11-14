@@ -141,10 +141,10 @@ impl UIBindings for WeaponSystem {
         // Update weapon type
         self.set_weapon_selected(options.weapon_type.selected as usize);
 
-        // Update directions
+        // Update directions - use set_direction to enforce fixed weapon logic
         for (i, check) in options.directions.iter().enumerate() {
-            if i < self.directions.len() {
-                self.directions[i] = check.selected;
+            if i < self.directions.len() && self.directions[i] != check.selected {
+                self.set_direction(i, check.selected);
             }
         }
 
