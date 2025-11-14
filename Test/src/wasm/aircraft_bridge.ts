@@ -135,6 +135,10 @@ export interface AircraftWasmAPI {
     getMunitionsBindings(): any;
     setMunitionsBindings(bindings: any): void;
     getMunitionsStats(): Stats;
+    getBombCount(): number;
+    getRocketCount(): number;
+    getInternalBombCount(): number;
+    getMaxBombSize(): number;
     getOptimizationBindings(): any;
     setOptimizationBindings(bindings: any): void;
     getOptimizationStats(): Stats;
@@ -145,10 +149,12 @@ export interface AircraftWasmAPI {
     getWeaponsBindings(): any;
     setWeaponsBindings(bindings: any): void;
     getWeaponsStats(): Stats;
+    getWeaponSetsCount(): number;
     getWeaponSystemBindings(index: number): any;
     setWeaponSystemBindings(index: number, bindings: any): void;
     getWeaponSystemStats(index: number): Stats;
     getWeaponSystemDerivedStats(index: number): any;
+    getWeaponSystemDisplayInfo(index: number): any;
     getWeaponBindings(systemIndex: number, weaponIndex: number): any;
     setWeaponBindings(systemIndex: number, weaponIndex: number, bindings: any): void;
     getWeaponStats(systemIndex: number, weaponIndex: number): Stats;
@@ -577,6 +583,38 @@ export class AircraftBridge {
     }
 
     /**
+     * Get bomb count
+     */
+    getBombCount(): number {
+        this.ensureInitialized();
+        return this.wasm!.getBombCount();
+    }
+
+    /**
+     * Get rocket count
+     */
+    getRocketCount(): number {
+        this.ensureInitialized();
+        return this.wasm!.getRocketCount();
+    }
+
+    /**
+     * Get internal bomb storage count
+     */
+    getInternalBombCount(): number {
+        this.ensureInitialized();
+        return this.wasm!.getInternalBombCount();
+    }
+
+    /**
+     * Get maximum bomb size
+     */
+    getMaxBombSize(): number {
+        this.ensureInitialized();
+        return this.wasm!.getMaxBombSize();
+    }
+
+    /**
      * Get Optimization UI bindings (includes localized strings from Rust)
      */
     getOptimizationBindings(): any {
@@ -657,6 +695,14 @@ export class AircraftBridge {
     }
 
     /**
+     * Get number of weapon sets
+     */
+    getWeaponSetsCount(): number {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponSetsCount();
+    }
+
+    /**
      * Get WeaponSystem UI bindings for a specific weapon system
      */
     getWeaponSystemBindings(index: number): any {
@@ -687,6 +733,14 @@ export class AircraftBridge {
     getWeaponSystemDerivedStats(index: number): any {
         this.ensureInitialized();
         return this.wasm!.getWeaponSystemDerivedStats(index);
+    }
+
+    /**
+     * Get display information for a specific weapon system (for derived stats UI)
+     */
+    getWeaponSystemDisplayInfo(index: number): any {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponSystemDisplayInfo(index);
     }
 
     /**

@@ -626,8 +626,63 @@ export class DerivedStatsUI extends BaseComponentUI {
 
         // Update weapons
         if (this.weaponCell) {
-            // TODO: Weapons display requires munitions and weapon set data - more complex implementation needed
-            this.weaponCell.innerHTML = '';
+            let weaphtml = '';
+            const bombs = bridge.getBombCount();
+            const rockets = bridge.getRocketCount();
+            let internal = bridge.getInternalBombCount();
+
+            // Display bombs
+            if (bombs > 0) {
+                const int_bomb = Math.min(bombs, internal);
+                const ext_bomb = Math.max(0, bombs - int_bomb);
+                if (int_bomb > 0) {
+                    weaphtml += localization.translate(' Bomb Mass Internally.').replace('%{A}', int_bomb.toString());
+                }
+                if (ext_bomb > 0) {
+                    weaphtml += localization.translate(' Bomb Mass Externally.').replace('%{A}', ext_bomb.toString());
+                }
+                if (int_bomb > 0) {
+                    const mib = Math.min(int_bomb, bridge.getMaxBombSize());
+                    weaphtml += localization.translate('Largest Internal Bomb').replace('%{A}', mib.toString());
+                }
+                internal -= int_bomb;
+                weaphtml += '<br/>';
+            }
+
+            // Display rockets
+            if (rockets > 0) {
+                const int_rock = Math.min(rockets, internal);
+                const ext_rock = Math.max(0, rockets - int_rock);
+                if (int_rock > 0) {
+                    weaphtml += localization.translate(' Rocket Mass Internally.').replace('%{A}', int_rock.toString());
+                }
+                if (ext_rock > 0) {
+                    weaphtml += localization.translate(' Rocket Mass Externally.').replace('%{A}', ext_rock.toString());
+                }
+                weaphtml += '<br/>';
+            }
+
+            // Display weapon sets
+            const weaponSetsCount = bridge.getWeaponSetsCount();
+            for (let i = 0; i < weaponSetsCount; i++) {
+                const ws = bridge.getWeaponSystemDisplayInfo(i);
+                if (ws) {
+                    const seatLabel = localization.translate('Seat #').replace('%{A}', (ws.seat + 1).toString());
+                    const dirs = ws.directions.join(' ');
+                    const tags = ws.tags.join(', ');
+
+                    if (ws.is_heat_ray) {
+                        // Heat ray format: Seat #X: Y weaponName dir damage hits charges tags
+                        weaphtml += `${seatLabel}: ${ws.weapon_count} ${ws.weapon_name} ${dirs} ${ws.damage} ${ws.hits} ${ws.hr_charges} ${tags}`;
+                    } else {
+                        // Normal weapon format: Seat #X: Y weaponName dir damage hits shots tags
+                        weaphtml += `${seatLabel}: ${ws.weapon_count} ${ws.weapon_name} ${dirs} ${ws.damage} ${ws.hits} ${ws.shots} ${tags}`;
+                    }
+                    weaphtml += '<br/>';
+                }
+            }
+
+            this.weaponCell.innerHTML = weaphtml;
         }
 
         // Update warnings

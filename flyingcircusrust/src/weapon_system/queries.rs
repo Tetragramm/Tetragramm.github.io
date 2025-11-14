@@ -12,6 +12,21 @@ pub struct WeaponSystemDerivedStats {
     pub is_heat_ray: bool,  // True if projectile is heat ray or Lightning Arc
 }
 
+#[derive(serde::Serialize)]
+pub struct WeaponSystemDisplayInfo {
+    pub seat: i16,
+    pub weapon_count: i16,
+    pub weapon_name: String,
+    pub weapon_abrv: String,
+    pub directions: Vec<String>,  // Active directions as translated strings
+    pub damage: f32,
+    pub hits: String,  // "X/Y/Z/W" format
+    pub shots: i16,  // Or charges for heat rays
+    pub hr_charges: String,  // For heat rays
+    pub tags: Vec<String>,  // Tags like "Repeating", "Synched", etc.
+    pub is_heat_ray: bool,
+}
+
 impl WeaponSystem {
     /// Get selected weapon type index
     /// TypeScript: GetWeaponSelected()
@@ -353,6 +368,60 @@ impl WeaponSystem {
             jam,
             hr_charges,
             mounting,
+            is_heat_ray,
+        }
+    }
+
+    /// Get weapon system display information for derived stats UI
+    /// Returns all information needed to display a weapon set
+    pub fn get_display_info(&self, direction_list: &[String]) -> WeaponSystemDisplayInfo {
+        let hits = self.get_hits();
+        let hits_str = format!("{}/{}/{}/{}", hits[0], hits[1], hits[2], hits[3]);
+
+        let weapon = &self.weapon_list[self.weapon_type];
+        let is_heat_ray = self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
+
+        // Get active directions
+        let mut directions = Vec::new();
+        for (i, &active) in self.directions.iter().enumerate() {
+            if active && i < direction_list.len() {
+                directions.push(rust_i18n::t!(&direction_list[i]).to_string());
+            }
+        }
+
+        // Get tags (simplified version of WeaponTags)
+        let mut tags = Vec::new();
+        if self.repeating && self.can_repeating() {
+            tags.push(rust_i18n::t!("Tag Repeating").to_string());
+        }
+        if weapon.synched {
+            tags.push(rust_i18n::t!("Tag Synched").to_string());
+        }
+        if weapon.rapid {
+            tags.push(rust_i18n::t!("Tag Rapid").to_string());
+        }
+        if weapon.shells {
+            tags.push(rust_i18n::t!("Tag Shells").to_string());
+        }
+
+        let hr_charges_vec = self.get_hr_charges();
+        let hr_charges = hr_charges_vec
+            .iter()
+            .map(|c| c.to_string())
+            .collect::<Vec<_>>()
+            .join("/");
+
+        WeaponSystemDisplayInfo {
+            seat: self.get_seat(),
+            weapon_count: self.get_weapon_count(),
+            weapon_name: rust_i18n::t!(&weapon.name).to_string(),
+            weapon_abrv: weapon.abrv.clone(),
+            directions,
+            damage: weapon.damage,
+            hits: hits_str,
+            shots: self.get_shots(),
+            hr_charges,
+            tags,
             is_heat_ray,
         }
     }

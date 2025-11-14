@@ -296,6 +296,30 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get bomb count
+    #[wasm_bindgen(js_name = getBombCount)]
+    pub fn get_bomb_count(&self) -> i16 {
+        self.inner.munitions.get_bomb_count()
+    }
+
+    /// Get rocket count
+    #[wasm_bindgen(js_name = getRocketCount)]
+    pub fn get_rocket_count(&self) -> i16 {
+        self.inner.munitions.get_rocket_count()
+    }
+
+    /// Get internal bomb storage count
+    #[wasm_bindgen(js_name = getInternalBombCount)]
+    pub fn get_internal_bomb_count(&self) -> i16 {
+        self.inner.munitions.get_internal_bomb_count()
+    }
+
+    /// Get maximum bomb size
+    #[wasm_bindgen(js_name = getMaxBombSize)]
+    pub fn get_max_bomb_size(&self) -> i16 {
+        self.inner.munitions.get_max_bomb_size()
+    }
+
     /// Get Optimization UI bindings
     #[wasm_bindgen(js_name = getOptimizationBindings)]
     pub fn get_optimization_bindings(&self) -> JsValue {
@@ -371,6 +395,12 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get number of weapon sets
+    #[wasm_bindgen(js_name = getWeaponSetsCount)]
+    pub fn get_weapon_sets_count(&self) -> usize {
+        self.inner.weapons.get_weapon_sets().len()
+    }
+
     /// Get WeaponSystem UI bindings for a specific weapon system
     #[wasm_bindgen(js_name = getWeaponSystemBindings)]
     pub fn get_weapon_system_bindings(&self, index: usize) -> JsValue {
@@ -414,6 +444,19 @@ impl AircraftWasm {
         if index < sets.len() {
             let derived_stats = sets[index].get_derived_stats();
             serde_wasm_bindgen::to_value(&derived_stats).unwrap()
+        } else {
+            JsValue::NULL
+        }
+    }
+
+    /// Get WeaponSystem display information for derived stats UI
+    #[wasm_bindgen(js_name = getWeaponSystemDisplayInfo)]
+    pub fn get_weapon_system_display_info(&self, index: usize) -> JsValue {
+        let sets = self.inner.weapons.get_weapon_sets();
+        if index < sets.len() {
+            let direction_list = self.inner.weapons.get_direction_list();
+            let display_info = sets[index].get_display_info(&direction_list);
+            serde_wasm_bindgen::to_value(&display_info).unwrap()
         } else {
             JsValue::NULL
         }
