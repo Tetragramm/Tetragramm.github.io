@@ -671,14 +671,32 @@ export class DerivedStatsUI extends BaseComponentUI {
                     const dirs = ws.directions.join(' ');
                     const tags = ws.tags.join(', ');
 
+                    // Use localization format string with placeholders
+                    let weaponDesc: string;
                     if (ws.is_heat_ray) {
-                        // Heat ray format: Seat #X: Y weaponName dir damage hits charges tags
-                        weaphtml += `${seatLabel}: ${ws.weapon_count} ${ws.weapon_name} ${dirs} ${ws.damage} ${ws.hits} ${ws.hr_charges} ${tags}`;
+                        // Heat ray format: {0}: {1}x {2} fires [{3}] for {4} damage with {5} hits with {6} charges. [{7}]
+                        weaponDesc = localization.translate('Weapon Description Heat Ray');
+                        weaponDesc = weaponDesc.replace('{0}', seatLabel);
+                        weaponDesc = weaponDesc.replace('{1}', ws.weapon_count.toString());
+                        weaponDesc = weaponDesc.replace('{2}', ws.weapon_name);
+                        weaponDesc = weaponDesc.replace('{3}', dirs);
+                        weaponDesc = weaponDesc.replace('{4}', ws.damage.toString());
+                        weaponDesc = weaponDesc.replace('{5}', ws.hits);
+                        weaponDesc = weaponDesc.replace('{6}', ws.hr_charges);
+                        weaponDesc = weaponDesc.replace('{7}', tags);
                     } else {
-                        // Normal weapon format: Seat #X: Y weaponName dir damage hits shots tags
-                        weaphtml += `${seatLabel}: ${ws.weapon_count} ${ws.weapon_name} ${dirs} ${ws.damage} ${ws.hits} ${ws.shots} ${tags}`;
+                        // Normal weapon format: {0}: {1}x {2} fires [{3}] for {4} damage with {5} hits with {6} ammunition. [{7}]
+                        weaponDesc = localization.translate('Weapon Description');
+                        weaponDesc = weaponDesc.replace('{0}', seatLabel);
+                        weaponDesc = weaponDesc.replace('{1}', ws.weapon_count.toString());
+                        weaponDesc = weaponDesc.replace('{2}', ws.weapon_name);
+                        weaponDesc = weaponDesc.replace('{3}', dirs);
+                        weaponDesc = weaponDesc.replace('{4}', ws.damage.toString());
+                        weaponDesc = weaponDesc.replace('{5}', ws.hits);
+                        weaponDesc = weaponDesc.replace('{6}', ws.shots.toString());
+                        weaponDesc = weaponDesc.replace('{7}', tags);
                     }
-                    weaphtml += '<br/>';
+                    weaphtml += weaponDesc + '<br/>';
                 }
             }
 

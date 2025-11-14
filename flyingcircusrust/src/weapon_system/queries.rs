@@ -381,6 +381,59 @@ impl WeaponSystem {
         let weapon = &self.weapon_list[self.weapon_type];
         let is_heat_ray = self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
 
+        // Build weapon name like TypeScript WeaponName()
+        let direction_count = self.directions.iter().filter(|&&d| d).count();
+        let mut name = String::new();
+
+        // Add mounting type
+        if direction_count == 1 && self.get_fixed() {
+            name.push_str(&rust_i18n::t!("Fixed"));
+            name.push(' ');
+        } else if direction_count <= 2 {
+            name.push_str(&rust_i18n::t!("Flexible"));
+            name.push(' ');
+        } else {
+            name.push_str(&rust_i18n::t!("Turreted"));
+            name.push(' ');
+        }
+
+        // Add action type modifier
+        match self.action_sel {
+            ActionType::Mechanical => {
+                name.push_str(&rust_i18n::t!("Weapon Tag Mechanical Action"));
+                name.push(' ');
+            }
+            ActionType::Gast => {
+                name.push_str(&rust_i18n::t!("Weapon Tag Gast Principle"));
+                name.push(' ');
+            }
+            ActionType::Rotary => {
+                name.push_str(&rust_i18n::t!("Weapon Tag Rotary"));
+                name.push(' ');
+            }
+            _ => {}
+        }
+
+        // Add projectile type modifier
+        match self.get_projectile() {
+            ProjectileType::Heatray => {
+                name.push_str(&rust_i18n::t!("Weapon Tag Heat Ray"));
+                name.push(' ');
+            }
+            ProjectileType::Gyrojets => {
+                name.push_str(&rust_i18n::t!("Weapon Tag Gyrojet"));
+                name.push(' ');
+            }
+            ProjectileType::Pneumatic => {
+                name.push_str(&rust_i18n::t!("Weapon Tag Pneumatic"));
+                name.push(' ');
+            }
+            _ => {}
+        }
+
+        // Add weapon abbreviation
+        name.push_str(&weapon.abrv);
+
         // Get active directions
         let mut directions = Vec::new();
         for (i, &active) in self.directions.iter().enumerate() {
@@ -389,19 +442,49 @@ impl WeaponSystem {
             }
         }
 
-        // Get tags (simplified version of WeaponTags)
+        // Build tags like TypeScript WeaponTags()
         let mut tags = Vec::new();
-        if self.repeating && self.can_repeating() {
-            tags.push(rust_i18n::t!("Tag Repeating").to_string());
+
+        // Jam (always first)
+        tags.push(rust_i18n::t!("Weapon Tag Jam", jam = &self.get_jam()).to_string());
+
+        // Reload
+        let reload = self.get_reload();
+        if reload > 0 {
+            if reload == 1 {
+                tags.push(rust_i18n::t!("Weapon Tag Manual").to_string());
+            } else {
+                tags.push(rust_i18n::t!("Weapon Tag Reload", reload = reload).to_string());
+            }
         }
-        if weapon.synched {
-            tags.push(rust_i18n::t!("Tag Synched").to_string());
+
+        // Rapid Fire
+        if self.final_weapon.rapid {
+            tags.push(rust_i18n::t!("Weapon Tag Rapid Fire").to_string());
         }
-        if weapon.rapid {
-            tags.push(rust_i18n::t!("Tag Rapid").to_string());
+
+        // Shells
+        if self.final_weapon.shells {
+            tags.push(rust_i18n::t!("Weapon Tag Shells").to_string());
         }
-        if weapon.shells {
-            tags.push(rust_i18n::t!("Tag Shells").to_string());
+
+        // AP
+        if self.final_weapon.ap > 0 {
+            tags.push(rust_i18n::t!("Weapon Tag AP", ap = self.final_weapon.ap).to_string());
+        }
+
+        // Accessibility
+        if self.get_is_fully_accessible() {
+            tags.push(rust_i18n::t!("Weapon Tag Fully Accessible").to_string());
+        } else if self.get_is_partly_accessible() {
+            tags.push(rust_i18n::t!("Weapon Tag Partly Accessible").to_string());
+        } else {
+            tags.push(rust_i18n::t!("Weapon Tag Inaccessible").to_string());
+        }
+
+        // Deflection/Awkward
+        if self.final_weapon.deflection > 0 {
+            tags.push(rust_i18n::t!("Weapon Tag Awkward", deflection = self.final_weapon.deflection).to_string());
         }
 
         let hr_charges_vec = self.get_hr_charges();
@@ -414,7 +497,7 @@ impl WeaponSystem {
         WeaponSystemDisplayInfo {
             seat: self.get_seat(),
             weapon_count: self.get_weapon_count(),
-            weapon_name: rust_i18n::t!(&weapon.name).to_string(),
+            weapon_name: name,
             weapon_abrv: weapon.abrv.clone(),
             directions,
             damage: weapon.damage,
