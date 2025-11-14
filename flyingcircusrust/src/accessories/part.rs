@@ -105,14 +105,16 @@ impl Part for Accessories {
                 battery_storage += (count * item.storage) as i32;
 
                 if item.cp10s > 0.0 {
+                    let value = (count as f32 * item.cp10s).floor();
                     equipment.push(crate::part::Equipment {
                         source: t!(&item.name).to_string(),
-                        charge: format!("{:.0}", (count as f32 * item.cp10s).floor()),
+                        charge: format!("+{}{}", value as i32, t!("Derived Per 10 Speed")),
                     });
                 } else if item.stats.charge != 0.0 {
+                    let charge_value = count as f32 * item.stats.charge;
                     equipment.push(crate::part::Equipment {
                         source: t!(&item.name).to_string(),
-                        charge: (count as f32 * item.stats.charge).to_string(),
+                        charge: Self::format_charge(charge_value),
                     });
                 }
             }
@@ -120,34 +122,37 @@ impl Part for Accessories {
 
         // Process radio
         let radio_idx = self.radio_sel as usize;
-        if radio_idx < self.radio_list.len() && self.radio_list[radio_idx].stats.charge != 0.0 {
-            equipment.push(crate::part::Equipment {
-                source: t!(&self.radio_list[radio_idx].name).to_string(),
-                charge: self.radio_list[radio_idx].stats.charge.to_string(),
-            });
+        if radio_idx < self.radio_list.len() {
+            let charge_value = self.radio_list[radio_idx].stats.charge;
+            if charge_value.abs() > 0.5 || (charge_value > 0.0 && charge_value < 1.0e-6) {
+                equipment.push(crate::part::Equipment {
+                    source: t!(&self.radio_list[radio_idx].name).to_string(),
+                    charge: Self::format_charge(charge_value),
+                });
+            }
         }
 
         // Process climate
         for i in 0..self.clim_sel.len() {
-            if self.clim_sel[i]
-                && i < self.climate_list.len()
-                && self.climate_list[i].stats.charge != 0.0
-            {
-                equipment.push(crate::part::Equipment {
-                    source: t!(&self.climate_list[i].name).to_string(),
-                    charge: self.climate_list[i].stats.charge.to_string(),
-                });
+            if self.clim_sel[i] && i < self.climate_list.len() {
+                let charge_value = self.climate_list[i].stats.charge;
+                if charge_value.abs() > 0.5 || (charge_value > 0.0 && charge_value < 1.0e-6) {
+                    equipment.push(crate::part::Equipment {
+                        source: t!(&self.climate_list[i].name).to_string(),
+                        charge: Self::format_charge(charge_value),
+                    });
+                }
             }
         }
 
         // Process reconnaissance
         for i in 0..self.recon_sel.len() {
             if self.recon_sel[i] > 0 && i < self.recon_list.len() {
-                let charge = self.recon_sel[i] as f32 * self.recon_list[i].stats.charge;
-                if charge != 0.0 {
+                let charge_value = self.recon_sel[i] as f32 * self.recon_list[i].stats.charge;
+                if charge_value.abs() > 0.5 || (charge_value > 0.0 && charge_value < 1.0e-6) {
                     equipment.push(crate::part::Equipment {
                         source: t!(&self.recon_list[i].name).to_string(),
-                        charge: charge.to_string(),
+                        charge: Self::format_charge(charge_value),
                     });
                 }
             }
@@ -155,37 +160,60 @@ impl Part for Accessories {
 
         // Process visibility
         for i in 0..self.visi_sel.len() {
-            if self.visi_sel[i] && i < self.visi_list.len() && self.visi_list[i].stats.charge != 0.0
-            {
-                equipment.push(crate::part::Equipment {
-                    source: t!(&self.visi_list[i].name).to_string(),
-                    charge: self.visi_list[i].stats.charge.to_string(),
-                });
+            if self.visi_sel[i] && i < self.visi_list.len() {
+                let charge_value = self.visi_list[i].stats.charge;
+                if charge_value.abs() > 0.5 || (charge_value > 0.0 && charge_value < 1.0e-6) {
+                    equipment.push(crate::part::Equipment {
+                        source: t!(&self.visi_list[i].name).to_string(),
+                        charge: Self::format_charge(charge_value),
+                    });
+                }
             }
         }
 
         // Process autopilot
         let auto_idx = self.auto_sel as usize;
-        if auto_idx < self.autopilot_list.len() && self.autopilot_list[auto_idx].stats.charge != 0.0
-        {
-            equipment.push(crate::part::Equipment {
-                source: t!(&self.autopilot_list[auto_idx].name).to_string(),
-                charge: self.autopilot_list[auto_idx].stats.charge.to_string(),
-            });
+        if auto_idx < self.autopilot_list.len() {
+            let charge_value = self.autopilot_list[auto_idx].stats.charge;
+            if charge_value.abs() > 0.5 || (charge_value > 0.0 && charge_value < 1.0e-6) {
+                equipment.push(crate::part::Equipment {
+                    source: t!(&self.autopilot_list[auto_idx].name).to_string(),
+                    charge: Self::format_charge(charge_value),
+                });
+            }
         }
 
         // Process control system
         let cont_idx = self.cont_sel as usize;
-        if cont_idx < self.control_list.len() && self.control_list[cont_idx].stats.charge != 0.0 {
-            equipment.push(crate::part::Equipment {
-                source: t!(&self.control_list[cont_idx].name).to_string(),
-                charge: self.control_list[cont_idx].stats.charge.to_string(),
-            });
+        if cont_idx < self.control_list.len() {
+            let charge_value = self.control_list[cont_idx].stats.charge;
+            if charge_value.abs() > 0.5 || (charge_value > 0.0 && charge_value < 1.0e-6) {
+                equipment.push(crate::part::Equipment {
+                    source: t!(&self.control_list[cont_idx].name).to_string(),
+                    charge: Self::format_charge(charge_value),
+                });
+            }
         }
 
         ElectricsMessage {
             storage: battery_storage,
             equipment,
+        }
+    }
+}
+
+impl Accessories {
+    /// Format charge value according to TypeScript FormatEquipment logic
+    /// - If abs(charge) > 0.5: Show the number
+    /// - If charge > 0 && charge < 1.0e-6: Show "-" (flag for equipment like Intercom)
+    /// - Otherwise: Don't show (filtered out before this is called)
+    fn format_charge(charge: f32) -> String {
+        if charge.abs() > 0.5 {
+            charge.to_string()
+        } else if charge > 0.0 && charge < 1.0e-6 {
+            "-".to_string()
+        } else {
+            charge.to_string()
         }
     }
 }
