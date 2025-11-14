@@ -208,6 +208,14 @@ export interface AircraftWasmAPI {
     getFramesCanFlyingWing(): boolean;
     vitalComponentList(): string[];
 
+    // Custom Parts (Alter) methods
+    getCustomParts(): any[];
+    addCustomPart(name: string, stats: any): void;
+    removeCustomPart(name: string): void;
+    setCustomPartQty(index: number, qty: number): void;
+    isCustomPartsDefault(): boolean;
+    getCustomPartsStats(): Stats;
+
     serialize(): Uint8Array;
     serializeToLZString(): string;
 
@@ -1331,6 +1339,59 @@ export class AircraftBridge {
     vitalComponentList(): string[] {
         this.ensureInitialized();
         return this.wasm!.vitalComponentList();
+    }
+
+    // ========== Custom Parts (Alter) Methods ==========
+
+    /**
+     * Get list of all custom parts
+     */
+    getCustomParts(): any[] {
+        this.ensureInitialized();
+        return this.wasm!.getCustomParts();
+    }
+
+    /**
+     * Add or update a custom part
+     */
+    addCustomPart(name: string, stats: any): void {
+        this.ensureInitialized();
+        this.wasm!.addCustomPart(name, stats);
+        this.clearCache();
+    }
+
+    /**
+     * Remove a custom part by name
+     */
+    removeCustomPart(name: string): void {
+        this.ensureInitialized();
+        this.wasm!.removeCustomPart(name);
+        this.clearCache();
+    }
+
+    /**
+     * Set quantity for a custom part by index
+     */
+    setCustomPartQty(index: number, qty: number): void {
+        this.ensureInitialized();
+        this.wasm!.setCustomPartQty(index, qty);
+        this.clearCache();
+    }
+
+    /**
+     * Check if custom parts are in default state (all quantities zero)
+     */
+    isCustomPartsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.isCustomPartsDefault();
+    }
+
+    /**
+     * Get custom parts stats
+     */
+    getCustomPartsStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getCustomPartsStats();
     }
 
     /**

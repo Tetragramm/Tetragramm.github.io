@@ -1,4 +1,5 @@
 use crate::stats::Stats;
+use serde::{Deserialize, Serialize};
 
 mod core;
 mod json;
@@ -8,7 +9,7 @@ mod serialization;
 mod setters;
 
 /// A custom part definition: name, stats contribution, and quantity used
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct CustomPart {
     pub name: String,
     pub stats: Stats,

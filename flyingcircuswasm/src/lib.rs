@@ -1007,6 +1007,50 @@ impl AircraftWasm {
         self.inner.vital_component_list()
     }
 
+    // ========== Custom Parts (Alter) Methods ==========
+
+    /// Get list of all custom parts
+    #[wasm_bindgen(js_name = getCustomParts)]
+    pub fn get_custom_parts(&self) -> JsValue {
+        serde_wasm_bindgen::to_value(&self.inner.alter.get_parts()).unwrap()
+    }
+
+    /// Add or update a custom part
+    #[wasm_bindgen(js_name = addCustomPart)]
+    pub fn add_custom_part(&mut self, name: String, stats_js: JsValue) {
+        if let Ok(stats) = serde_wasm_bindgen::from_value(stats_js) {
+            self.inner.alter.add_part(name, stats);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Remove a custom part by name
+    #[wasm_bindgen(js_name = removeCustomPart)]
+    pub fn remove_custom_part(&mut self, name: String) {
+        self.inner.alter.remove_part(&name);
+        self.inner.part_stats();
+    }
+
+    /// Set quantity for a custom part by index
+    #[wasm_bindgen(js_name = setCustomPartQty)]
+    pub fn set_custom_part_qty(&mut self, idx: usize, qty: i16) {
+        self.inner.alter.set_used_part(idx, qty);
+        self.inner.part_stats();
+    }
+
+    /// Check if custom parts are in default state (all quantities zero)
+    #[wasm_bindgen(js_name = isCustomPartsDefault)]
+    pub fn is_custom_parts_default(&self) -> bool {
+        self.inner.alter.is_default()
+    }
+
+    /// Get custom parts stats
+    #[wasm_bindgen(js_name = getCustomPartsStats)]
+    pub fn get_custom_parts_stats(&mut self) -> JsValue {
+        let stats = self.inner.alter.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
     /// Serialize aircraft to bytes
     #[wasm_bindgen(js_name = serialize)]
     pub fn serialize(&self) -> String {
