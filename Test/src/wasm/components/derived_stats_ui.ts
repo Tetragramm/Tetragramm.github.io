@@ -707,15 +707,25 @@ export class DerivedStatsUI extends BaseComponentUI {
         if (this.warningCell) {
             let warnhtml = '';
             if (stats.warnings && stats.warnings.length > 0) {
-                // Sort warnings by level (assuming warnings have a level property)
+                // Sort warnings by level (White=0, Yellow=1, Red=2)
+                const levelToNum = (level: string): number => {
+                    if (level === 'Red') return 2;
+                    if (level === 'Yellow') return 1;
+                    return 0; // White
+                };
+
                 const sortedWarnings = [...stats.warnings].sort((a: any, b: any) => {
-                    return (a.level || 0) - (b.level || 0);
+                    return levelToNum(a.level) - levelToNum(b.level);
                 });
 
                 for (const w of sortedWarnings) {
                     let color = 'var(--inp_txt_color)';
-                    if (w.level === 2) color = '#FF0000'; // Red
-                    else if (w.level === 1) color = '#FFFF00'; // Yellow
+                    if (w.level === 'Red') {
+                        color = '#FF0000';
+                    } else if (w.level === 'Yellow') {
+                        color = '#FFFF00';
+                    }
+                    // White uses default color
 
                     warnhtml += `<div style="color:${color};">${w.name}:  ${w.warning}</div>`;
                 }
@@ -725,10 +735,173 @@ export class DerivedStatsUI extends BaseComponentUI {
 
         // Update description
         if (this.descCell) {
-            // TODO: Aircraft description requires wing configuration queries (GetWings().GetWingList(),
-            // GetWings().GetIsSesquiplane(), GetWings().GetTandem(), GetWings().GetClosed(),
-            // GetFrames().GetFlyingWing(), GetFrames().CanFlyingWing()) - complex implementation needed
-            this.descCell.textContent = '';
+            const description = this.buildAircraftDescription();
+            this.descCell.textContent = description;
+        }
+
+        // Update era display with hover and coloration
+        if (this.versionCell && stats.eras) {
+            this.updateEraDisplay(stats.eras);
+        }
+    }
+
+    /**
+     * Update era display with tooltip and color coding
+     */
+    private updateEraDisplay(eras: Array<{ name: string; era: string }>): void {
+        // Clear existing content
+        while (this.versionCell!.children.length > 0) {
+            this.versionCell!.removeChild(this.versionCell!.children[0]);
+        }
+        this.versionCell!.className = 'tooltip';
+
+        // Create tooltip div
+        const tooltipDiv = document.createElement('div');
+        tooltipDiv.className = 'tooltiptext';
+
+        const headerP = document.createElement('p');
+        headerP.textContent = localization.translate('Derived Problematic Parts');
+        tooltipDiv.appendChild(headerP);
+
+        // Get aircraft era
+        const aircraftEra = this.bridge.getEraText();
+        const aircraftEraNum = this.eraToNum(aircraftEra);
+
+        // Calculate era break and list problematic parts
+        let eraBreak = 0;
+        let hasProblematicParts = false;
+
+        for (const part of eras) {
+            const partEraNum = this.eraToNum(part.era);
+            if (partEraNum > aircraftEraNum) {
+                eraBreak += partEraNum - aircraftEraNum;
+                hasProblematicParts = true;
+
+                const partP = document.createElement('p');
+                partP.textContent = `${part.name}: ${part.era}`;
+                tooltipDiv.appendChild(partP);
+            }
+        }
+
+        if (!hasProblematicParts) {
+            const noneP = document.createElement('p');
+            noneP.textContent = localization.translate('None');
+            tooltipDiv.appendChild(noneP);
+        }
+
+        // Create era text element with color coding
+        const eraP = document.createElement('p');
+        eraP.textContent = localization.translate(aircraftEra);
+
+        if (eraBreak === 0) {
+            eraP.className = 'green';
+        } else if (eraBreak > 2) {
+            eraP.className = 'red';
+        } else {
+            eraP.className = 'yellow';
+        }
+
+        this.versionCell!.appendChild(eraP);
+        this.versionCell!.appendChild(tooltipDiv);
+    }
+
+    /**
+     * Convert era string to numeric value for comparison
+     * Matches TypeScript era2numHl function
+     */
+    private eraToNum(era: string): number {
+        switch (era) {
+            case 'Pioneer': return 0;
+            case 'WWI': return 1;
+            case 'Roaring 20s': return 2;
+            case 'Coming Storm': return 3;
+            case 'WWII': return 4;
+            case 'Last Hurrah': return 5;
+            case 'Himmilgard': return -1;
+            default: return 0;
+        }
+    }
+
+    /**
+     * Build aircraft description based on wing and frame configuration
+     */
+    private buildAircraftDescription(): string {
+        let description = '';
+        const num_wings = this.bridge.getWingCount();
+
+        // Describe wing configuration
+        if (num_wings === 1) {
+            const deck = this.bridge.getWingDeck(0);
+            if (deck !== null && deck !== undefined) {
+                // WING_DECK: PARASOL=0, SHOULDER=1, MID=2, LOW=3, GEAR=4
+                if (deck < 2) {
+                    description += 'High-Wing Monoplane ';
+                } else if (deck === 2) {
+                    description += 'Mid-Wing Monoplane ';
+                } else {
+                    description += 'Low-Wing Monoplane ';
+                }
+            }
+        } else {
+            const sesqui = this.bridge.getWingsSesquiplane();
+            if (sesqui && sesqui.is) {
+                if (num_wings === 2) {
+                    description += 'Sesquiplane ';
+                } else if (num_wings === 3) {
+                    description += 'Sestertiplane ';
+                } else {
+                    description += 'Sesqui-' + this.wingPrefix(num_wings);
+                }
+            } else if (this.bridge.getWingsTandem()) {
+                if (num_wings === 2 && this.bridge.getWingsClosed()) {
+                    description += 'Annular Monoplane ';
+                } else {
+                    description += 'Tandem ' + this.wingPrefix(num_wings);
+                }
+            } else {
+                description += this.wingPrefix(num_wings);
+            }
+        }
+
+        // Describe airframe type
+        if (this.bridge.getFramesFlyingWing()) {
+            description += 'Flying Wing ';
+        } else if (this.bridge.getFramesCanFlyingWing()) {
+            description += 'Lifting Body ';
+        } else if (num_wings === 0) {
+            description += 'Falling Rock ';
+        }
+
+        return description;
+    }
+
+    /**
+     * Get wing configuration prefix name (Monoplane, Biplane, etc.)
+     */
+    private wingPrefix(num_wings: number): string {
+        switch (num_wings) {
+            case 0: return '';
+            case 1: return 'Monoplane ';
+            case 2: return 'Biplane ';
+            case 3: return 'Triplane ';
+            case 4: return 'Quadruplane ';
+            case 5: return 'Pentaplane ';
+            case 6: return 'Hexaplane ';
+            case 7: return 'Heptaplane ';
+            case 8: return 'Octoplane ';
+            case 9: return 'Nonaplane ';
+            case 10: return 'Decaplane ';
+            case 11: return 'Undecaplane ';
+            case 12: return 'Duodecaplane ';
+            case 13: return 'Tredecaplane ';
+            case 14: return 'Quattuordecaplane ';
+            case 15: return 'Quindecaplane ';
+            case 16: return 'Sexdecaplane ';
+            case 17: return 'Septendecaplane ';
+            case 18: return 'Octodecaplane ';
+            case 19: return 'Novendecaplane ';
+            case 20: return 'Vigintiplane ';
+            default: return 'Window Blinds ';
         }
     }
 

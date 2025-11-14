@@ -129,7 +129,7 @@ impl WeaponSystem {
                     adjusted_num = 3;
                 }
             }
-            self.directions[adjusted_num] = true;
+            self.directions[adjusted_num] = use_dir; // Use the parameter, not always true
         } else {
             self.directions[num] = use_dir;
         }

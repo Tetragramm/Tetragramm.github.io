@@ -197,6 +197,13 @@ export interface AircraftWasmAPI {
     getCockpitsCount(): number;
     getPassengersCount(): number;
     getElectrics(): any;
+    getWingCount(): number;
+    getWingDeck(index: number): number | null;
+    getWingsTandem(): boolean;
+    getWingsClosed(): boolean;
+    getWingsSesquiplane(): { is: boolean; deck: number; super_small: boolean };
+    getFramesFlyingWing(): boolean;
+    getFramesCanFlyingWing(): boolean;
     vitalComponentList(): string[];
 
     serialize(): Uint8Array;
@@ -1241,6 +1248,63 @@ export class AircraftBridge {
     getElectrics(): any {
         this.ensureInitialized();
         return this.wasm!.getElectrics();
+    }
+
+    /**
+     * Get number of wings
+     */
+    getWingCount(): number {
+        this.ensureInitialized();
+        return this.wasm!.getWingCount();
+    }
+
+    /**
+     * Get wing deck at index
+     */
+    getWingDeck(index: number): number | null {
+        this.ensureInitialized();
+        const deck = this.wasm!.getWingDeck(index);
+        return deck !== undefined ? deck : null;
+    }
+
+    /**
+     * Check if wings are in tandem configuration
+     */
+    getWingsTandem(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getWingsTandem();
+    }
+
+    /**
+     * Check if wings are closed
+     */
+    getWingsClosed(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getWingsClosed();
+    }
+
+    /**
+     * Get sesquiplane info
+     */
+    getWingsSesquiplane(): { is: boolean; deck: number; super_small: boolean } {
+        this.ensureInitialized();
+        return this.wasm!.getWingsSesquiplane();
+    }
+
+    /**
+     * Check if frames are flying wing
+     */
+    getFramesFlyingWing(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getFramesFlyingWing();
+    }
+
+    /**
+     * Check if frames can be flying wing (lifting body)
+     */
+    getFramesCanFlyingWing(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getFramesCanFlyingWing();
     }
 
     /**

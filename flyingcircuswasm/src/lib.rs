@@ -940,6 +940,53 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&self.inner.get_electrics()).unwrap()
     }
 
+    /// Get number of wings
+    #[wasm_bindgen(js_name = getWingCount)]
+    pub fn get_wing_count(&self) -> usize {
+        self.inner.wings.get_wing_list().len()
+    }
+
+    /// Get wing deck at index
+    #[wasm_bindgen(js_name = getWingDeck)]
+    pub fn get_wing_deck(&self, index: usize) -> Option<usize> {
+        self.inner.wings.get_wing_list().get(index).map(|w| w.deck)
+    }
+
+    /// Check if wings are in tandem configuration
+    #[wasm_bindgen(js_name = getWingsTandem)]
+    pub fn get_wings_tandem(&self) -> bool {
+        self.inner.wings.get_tandem()
+    }
+
+    /// Check if wings are closed
+    #[wasm_bindgen(js_name = getWingsClosed)]
+    pub fn get_wings_closed(&self) -> bool {
+        self.inner.wings.get_closed()
+    }
+
+    /// Get sesquiplane info: (is_sesquiplane, biggest_deck, super_small)
+    #[wasm_bindgen(js_name = getWingsSesquiplane)]
+    pub fn get_wings_sesquiplane(&self) -> JsValue {
+        let (is_sesqui, deck, super_small) = self.inner.wings.get_is_sesquiplane();
+        serde_wasm_bindgen::to_value(&serde_json::json!({
+            "is": is_sesqui,
+            "deck": deck,
+            "super_small": super_small
+        })).unwrap()
+    }
+
+    /// Check if frames are flying wing
+    #[wasm_bindgen(js_name = getFramesFlyingWing)]
+    pub fn get_frames_flying_wing(&self) -> bool {
+        self.inner.frames.get_flying_wing()
+    }
+
+    /// Check if frames can be flying wing (lifting body)
+    #[wasm_bindgen(js_name = getFramesCanFlyingWing)]
+    pub fn get_frames_can_flying_wing(&self) -> bool {
+        self.inner.frames.can_flying_wing()
+    }
+
     /// Get list of vital component names
     #[wasm_bindgen(js_name = vitalComponentList)]
     pub fn vital_component_list(&self) -> Vec<String> {

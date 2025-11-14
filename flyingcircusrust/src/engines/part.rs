@@ -158,18 +158,27 @@ impl Part for Engines {
     }
 
     fn get_electrics(&self) -> ElectricsMessage {
+        use crate::part::{merge_electrics, Equipment};
+
         let mut msg = ElectricsMessage::new();
 
-        for engine in self.engines.iter() {
-            let e_msg = engine.get_electrics();
-            msg.storage += e_msg.storage;
-            msg.equipment.extend(e_msg.equipment);
+        // Add engine charges
+        for (i, engine) in self.engines.iter().enumerate() {
+            // Get engine stats to check charge
+            let mut engine_clone = engine.clone();
+            let stats = engine_clone.part_stats();
+
+            if stats.charge != 0.0 {
+                msg.equipment.push(Equipment {
+                    source: rust_i18n::t!("Vital Part Engine", index = (i + 1)).to_string(),
+                    charge: stats.charge.to_string(),
+                });
+            }
         }
 
+        // Merge radiator electrics
         for radiator in &self.radiators {
-            let r_msg = radiator.get_electrics();
-            msg.storage += r_msg.storage;
-            msg.equipment.extend(r_msg.equipment);
+            msg = merge_electrics(msg, radiator.get_electrics());
         }
 
         msg
