@@ -603,6 +603,7 @@ export class DerivedStatsUI extends BaseComponentUI {
 
                 const label = document.createElement('span');
                 label.textContent = equip.source;
+                label.style.marginRight = '0.5em';
                 equipDiv.appendChild(label);
 
                 const value = document.createElement('span');
