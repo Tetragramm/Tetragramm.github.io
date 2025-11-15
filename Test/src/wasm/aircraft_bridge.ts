@@ -1356,8 +1356,9 @@ export class AircraftBridge {
      */
     addCustomPart(name: string, stats: any): void {
         this.ensureInitialized();
+        console.log("Adding Stats: ");
+        console.log(stats);
         this.wasm!.addCustomPart(name, stats);
-        this.clearCache();
     }
 
     /**
@@ -1366,7 +1367,6 @@ export class AircraftBridge {
     removeCustomPart(name: string): void {
         this.ensureInitialized();
         this.wasm!.removeCustomPart(name);
-        this.clearCache();
     }
 
     /**
@@ -1375,7 +1375,6 @@ export class AircraftBridge {
     setCustomPartQty(index: number, qty: number): void {
         this.ensureInitialized();
         this.wasm!.setCustomPartQty(index, qty);
-        this.clearCache();
     }
 
     /**

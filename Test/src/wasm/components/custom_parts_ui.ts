@@ -14,6 +14,7 @@ import {
     createCollapsibleSection,
     createFlexSection,
 } from '../dom_utils';
+import { CreateFlexSection, FlexSection } from '../../disp/Tools';
 
 interface CustomPart {
     name: string;
@@ -25,28 +26,29 @@ interface CustomPart {
  * Custom Parts (Alter Stats) UI Component
  */
 export class CustomPartsUI extends BaseComponentUI {
-    private addCell: HTMLTableCellElement | undefined;
+    private addFlex: FlexSection | undefined;
     private editCell: HTMLTableCellElement | undefined;
     private partList: { label: HTMLLabelElement; qtyInput: HTMLInputElement; }[] = [];
 
     // Edit form inputs
     private nameInput: HTMLInputElement | undefined;
-    private statInputs: { [key: string]: HTMLInputElement } = {};
+    private statInputs: Map<string, HTMLInputElement>;
     private specialRulesInput: HTMLInputElement | undefined;
     private partSelectDropdown: HTMLSelectElement | undefined;
     private addButton: HTMLButtonElement | undefined;
     private removeButton: HTMLButtonElement | undefined;
 
     protected shouldUpdate(): boolean {
-        return this.addCell !== undefined;
+        return this.addFlex !== undefined;
     }
 
     protected clearCache(): void {
-        this.addCell = undefined;
+        this.addFlex = undefined;
         this.editCell = undefined;
         this.partList = [];
         this.nameInput = undefined;
-        this.statInputs = {};
+        this.statInputs = new Map<string, HTMLInputElement>();
+        delete this.statInputs.clear;
         this.specialRulesInput = undefined;
         this.partSelectDropdown = undefined;
         this.addButton = undefined;
@@ -66,7 +68,8 @@ export class CustomPartsUI extends BaseComponentUI {
         // Create main table
         const table = document.createElement('table');
         const row = table.insertRow();
-        this.addCell = row.insertCell();
+        const addCell = row.insertCell();
+        this.addFlex = CreateFlexSection(addCell);
         this.editCell = row.insertCell();
 
         // Build the two columns
@@ -90,23 +93,20 @@ export class CustomPartsUI extends BaseComponentUI {
      * Build the left column (Add/Use Parts)
      */
     private buildAddCell(bridge: AircraftBridge): void {
-        if (!this.addCell) return;
-
-        const flexSection = createFlexSection();
-        this.addCell.appendChild(flexSection.div0);
+        if (!this.addFlex) return;
 
         // Headers
         const labelHeader = document.createElement('label');
         labelHeader.textContent = localization.translate('Alter Select Part');
         labelHeader.style.marginLeft = '0.25em';
         labelHeader.style.marginRight = '0.5em';
-        flexSection.div1.appendChild(labelHeader);
+        this.addFlex.div1.appendChild(labelHeader);
 
         const qtyHeader = document.createElement('label');
         qtyHeader.textContent = localization.translate('Alter Quantity');
         qtyHeader.style.marginLeft = '0.25em';
         qtyHeader.style.marginRight = '0.5em';
-        flexSection.div2.appendChild(qtyHeader);
+        this.addFlex.div2.appendChild(qtyHeader);
 
         // Part list will be populated in updateValues
         this.partList = [];
@@ -195,7 +195,7 @@ export class CustomPartsUI extends BaseComponentUI {
 
         this.addButton = document.createElement('button');
         this.addButton.textContent = localization.translate('Add Part');
-        this.addButton.onclick = () => this.onAddPart(bridge);
+        this.addButton.onclick = () => { this.onAddPart(bridge); };
         buttonSpan.appendChild(this.addButton);
 
         this.removeButton = document.createElement('button');
@@ -225,7 +225,7 @@ export class CustomPartsUI extends BaseComponentUI {
         input.min = ''; // Allow negative values
         flexSection.div2.appendChild(input);
 
-        this.statInputs[key] = input;
+        this.statInputs.set(key, input);
     }
 
     /**
@@ -233,8 +233,8 @@ export class CustomPartsUI extends BaseComponentUI {
      */
     private resetInputs(): void {
         if (this.nameInput) this.nameInput.value = 'Default';
-        for (const key in this.statInputs) {
-            this.statInputs[key].value = '0';
+        for (const key of this.statInputs.keys()) {
+            this.statInputs.get(key).value = '0';
         }
         if (this.specialRulesInput) this.specialRulesInput.value = '';
     }
@@ -253,8 +253,8 @@ export class CustomPartsUI extends BaseComponentUI {
 
             // Fill stat inputs
             const stats = part.stats as any;
-            for (const key in this.statInputs) {
-                this.statInputs[key].value = (stats[key] || 0).toString();
+            for (const key of this.statInputs.keys()) {
+                this.statInputs.get(key).value = (stats[key] || 0).toString();
             }
 
             // Fill special rules from warnings
@@ -276,8 +276,8 @@ export class CustomPartsUI extends BaseComponentUI {
         if (!this.nameInput) return;
 
         const stats: any = {};
-        for (const key in this.statInputs) {
-            stats[key] = parseFloat(this.statInputs[key].value) || 0;
+        for (const key of this.statInputs.keys()) {
+            stats[key] = parseFloat(this.statInputs.get(key).value) || 0;
         }
 
         // Add special rules as warning
@@ -289,6 +289,12 @@ export class CustomPartsUI extends BaseComponentUI {
                 level: 'White'
             });
         }
+        stats.eras = [];
+        stats.cooling = 0;
+        stats.flightstress = 0;
+        stats.pitchboost = 0;
+        stats.pitchspeed = 0;
+        stats.reqsections = 0;
 
         bridge.addCustomPart(this.nameInput.value, stats);
         this.updatePartSelect(bridge);
@@ -367,47 +373,42 @@ export class CustomPartsUI extends BaseComponentUI {
         const parts = bridge.getCustomParts();
 
         // Update the quantity inputs in the add cell
-        if (this.addCell) {
-            const flexSection = this.addCell.querySelector('div.flex_section');
-            if (flexSection) {
-                const div1 = flexSection.children[1] as HTMLDivElement;
-                const div2 = flexSection.children[2] as HTMLDivElement;
+        if (this.addFlex) {
+            const flexSection = this.addFlex;
+            // Update existing part quantity inputs
+            for (let i = 0; i < parts.length; i++) {
+                if (i >= this.partList.length) {
+                    // Create new entry
+                    const label = document.createElement('label');
+                    label.style.marginLeft = '0.25em';
+                    label.style.marginRight = '0.5em';
+                    this.addFlex.div1.appendChild(label);
 
-                // Update existing part quantity inputs
-                for (let i = 0; i < parts.length; i++) {
-                    if (i >= this.partList.length) {
-                        // Create new entry
-                        const label = document.createElement('label');
-                        label.style.marginLeft = '0.25em';
-                        label.style.marginRight = '0.5em';
-                        div1.appendChild(label);
+                    const qtyInput = document.createElement('input');
+                    qtyInput.type = 'number';
+                    qtyInput.min = '0';
+                    qtyInput.step = '1';
+                    qtyInput.value = '0';
+                    const idx = i; // Capture for closure
+                    qtyInput.onchange = () => {
+                        bridge.setCustomPartQty(idx, parseInt(qtyInput.value) || 0);
+                        this.saveToLocalStorage(bridge);
+                        this.onUpdate?.();
+                    };
+                    this.addFlex.div2.appendChild(qtyInput);
 
-                        const qtyInput = document.createElement('input');
-                        qtyInput.type = 'number';
-                        qtyInput.min = '0';
-                        qtyInput.step = '1';
-                        qtyInput.value = '0';
-                        const idx = i; // Capture for closure
-                        qtyInput.onchange = () => {
-                            bridge.setCustomPartQty(idx, parseInt(qtyInput.value) || 0);
-                            this.saveToLocalStorage(bridge);
-                            this.onUpdate?.();
-                        };
-                        div2.appendChild(qtyInput);
-
-                        this.partList.push({ label, qtyInput });
-                    }
-
-                    this.partList[i].label.textContent = parts[i].name;
-                    this.partList[i].qtyInput.value = parts[i].qty.toString();
+                    this.partList.push({ label, qtyInput });
                 }
 
-                // Remove excess entries
-                while (this.partList.length > parts.length) {
-                    const last = this.partList.pop()!;
-                    last.label.remove();
-                    last.qtyInput.remove();
-                }
+                this.partList[i].label.textContent = parts[i].name;
+                this.partList[i].qtyInput.value = parts[i].qty.toString();
+            }
+
+            // Remove excess entries
+            while (this.partList.length > parts.length) {
+                const last = this.partList.pop()!;
+                last.label.remove();
+                last.qtyInput.remove();
             }
         }
 
