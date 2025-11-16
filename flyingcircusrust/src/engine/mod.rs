@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::iter::zip;
 use std::rc::Rc;
 use ui_core::*;
@@ -22,12 +22,69 @@ mod validation;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
+// Custom deserializer for EngineRarity to handle both old numeric format and new string format
+fn deserialize_engine_rarity<'de, D>(deserializer: D) -> Result<EngineRarity, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    use serde::de::Error;
+    use serde_json::Value;
+
+    let value = Value::deserialize(deserializer)?;
+
+    match value {
+        // Handle numeric format (old TypeScript format)
+        Value::Number(n) => {
+            if let Some(i) = n.as_i64() {
+                match i {
+                    0 => Ok(EngineRarity::CUSTOM),
+                    1 => Ok(EngineRarity::COMMON),
+                    2 => Ok(EngineRarity::RARE),
+                    3 => Ok(EngineRarity::LEGENDARY),
+                    _ => Err(D::Error::custom(format!("invalid rarity number: {}", i))),
+                }
+            } else if let Some(f) = n.as_f64() {
+                // Handle floating point numbers (convert to int)
+                match f as i64 {
+                    0 => Ok(EngineRarity::CUSTOM),
+                    1 => Ok(EngineRarity::COMMON),
+                    2 => Ok(EngineRarity::RARE),
+                    3 => Ok(EngineRarity::LEGENDARY),
+                    _ => Err(D::Error::custom(format!("invalid rarity number: {}", f))),
+                }
+            } else {
+                Err(D::Error::custom("invalid rarity number"))
+            }
+        },
+        // Handle string format (new Rust format)
+        Value::String(s) => {
+            match s.as_str() {
+                "CUSTOM" => Ok(EngineRarity::CUSTOM),
+                "COMMON" => Ok(EngineRarity::COMMON),
+                "RARE" => Ok(EngineRarity::RARE),
+                "LEGENDARY" => Ok(EngineRarity::LEGENDARY),
+                _ => Err(D::Error::custom(format!("invalid rarity string: {}", s))),
+            }
+        },
+        _ => Err(D::Error::custom("expected number or string for rarity")),
+    }
+}
+
+#[derive(Clone, Serialize, PartialEq, Debug)]
 pub enum EngineRarity {
     CUSTOM,
     COMMON,
     RARE,
     LEGENDARY,
+}
+
+impl<'de> Deserialize<'de> for EngineRarity {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserialize_engine_rarity(deserializer)
+    }
 }
 
 #[derive(Clone, Serialize, PartialEq, Debug)]
