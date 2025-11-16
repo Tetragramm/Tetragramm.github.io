@@ -770,6 +770,41 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&names).unwrap()
     }
 
+    /// Add an engine to a specific list
+    /// Creates the list if it doesn't exist
+    #[wasm_bindgen(js_name = addEngineToList)]
+    pub fn add_engine_to_list(&self, list_name: &str, engine_data: JsValue) -> Result<(), JsValue> {
+        use flyingcircusrust::engine_list;
+
+        let engine: flyingcircusrust::engine::EngineInputs = serde_wasm_bindgen::from_value(engine_data)
+            .map_err(|e| JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e)))?;
+
+        engine_list::add_engine_to_list(list_name, engine)
+            .map_err(|e| JsValue::from_str(&e))?;
+
+        Ok(())
+    }
+
+    /// Get all engines in a specific list with full data
+    #[wasm_bindgen(js_name = getEnginesInList)]
+    pub fn get_engines_in_list(&self, list_name: &str) -> JsValue {
+        use flyingcircusrust::engine_list;
+
+        let engines = engine_list::get_engines_in_list(list_name);
+        serde_wasm_bindgen::to_value(&engines).unwrap()
+    }
+
+    /// Clear all engines from a non-constant list
+    #[wasm_bindgen(js_name = clearEngineList)]
+    pub fn clear_engine_list(&self, list_name: &str) -> Result<(), JsValue> {
+        use flyingcircusrust::engine_list;
+
+        engine_list::clear_list(list_name)
+            .map_err(|e| JsValue::from_str(&e))?;
+
+        Ok(())
+    }
+
     /// Get the selected engine list name for a specific engine
     #[wasm_bindgen(js_name = getEngineSelectedList)]
     pub fn get_engine_selected_list(&self, index: usize) -> String {

@@ -246,6 +246,11 @@ export interface AircraftWasmAPI {
     getEngineSelectedName(index: number): string;
     setEngineSelectedList(index: number, listName: string): void;
     setEngineSelectedIndex(index: number, engineIndex: number): void;
+
+    // Engine list management methods
+    addEngineToList(listName: string, engineData: any): void;
+    getEnginesInList(listName: string): any[];
+    clearEngineList(listName: string): void;
 }
 
 // Interface for initialization function
@@ -1107,6 +1112,31 @@ export class AircraftBridge {
     }
 
     /**
+     * Add an engine to a specific list
+     * Creates the list if it doesn't exist
+     */
+    addEngineToList(listName: string, engineData: any): void {
+        this.ensureInitialized();
+        this.wasm!.addEngineToList(listName, engineData);
+    }
+
+    /**
+     * Get all engines in a specific list with full data
+     */
+    getEnginesInList(listName: string): any[] {
+        this.ensureInitialized();
+        return this.wasm!.getEnginesInList(listName);
+    }
+
+    /**
+     * Clear all engines from a non-constant list
+     */
+    clearEngineList(listName: string): void {
+        this.ensureInitialized();
+        this.wasm!.clearEngineList(listName);
+    }
+
+    /**
      * Get Cockpits UI bindings (includes localized strings from Rust)
      */
     getCockpitsBindings(): CockpitsOptions {
@@ -1446,6 +1476,85 @@ export class AircraftBridge {
         bridge.wasm = AircraftWasmClass.deserializeFromLZString(lzStr);
         bridge.initialized = true;
         bridge.calculateStats();
+
+        // Save engine lists to localStorage
+        bridge.saveEngineListsToLocalStorage();
+
         return bridge;
+    }
+
+    /**
+     * Load custom engine lists from localStorage
+     * Called after creating a new AircraftBridge
+     */
+    loadEngineListsFromLocalStorage(): void {
+        this.ensureInitialized();
+
+        try {
+            // Read the list of engine list names
+            const engineNamesJson = localStorage.getItem('test.engines_names');
+            if (!engineNamesJson) {
+                console.log('[AircraftBridge] No custom engine lists found in localStorage');
+                return;
+            }
+
+            const engineListNames: string[] = JSON.parse(engineNamesJson);
+            console.log(`[AircraftBridge] Loading ${engineListNames.length} custom engine lists from localStorage`);
+
+            // For each list name, load the engines
+            for (const listName of engineListNames) {
+                const enginesJson = localStorage.getItem(`test.engines.${listName}`);
+                if (enginesJson) {
+                    try {
+                        const engines = JSON.parse(enginesJson);
+                        console.log(`[AircraftBridge] Loading ${engines.length} engines into list "${listName}"`);
+
+                        // Add each engine to the list
+                        for (const engine of engines) {
+                            this.addEngineToList(listName, engine);
+                        }
+                    } catch (e) {
+                        console.error(`[AircraftBridge] Failed to load engine list "${listName}":`, e);
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('[AircraftBridge] Failed to load engine lists from localStorage:', e);
+        }
+    }
+
+    /**
+     * Save custom engine lists to localStorage
+     * Called after deserializing an aircraft
+     */
+    saveEngineListsToLocalStorage(): void {
+        this.ensureInitialized();
+
+        try {
+            // Get all engine list names
+            const allListNames = this.getEngineNamesOfLists();
+
+            // Filter out the built-in constant lists (we only want to save custom lists)
+            // Built-in lists typically include things like manufacturers
+            // For now, we'll save all lists. If needed, we can filter later.
+            const customListNames: string[] = [];
+
+            for (const listName of allListNames) {
+                const engines = this.getEnginesInList(listName);
+
+                // Only save non-empty lists
+                if (engines && engines.length > 0) {
+                    customListNames.push(listName);
+                    localStorage.setItem(`test.engines.${listName}`, JSON.stringify(engines));
+                    console.log(`[AircraftBridge] Saved ${engines.length} engines to list "${listName}"`);
+                }
+            }
+
+            // Save the list of custom list names
+            localStorage.setItem('test.engines_names', JSON.stringify(customListNames));
+            console.log(`[AircraftBridge] Saved ${customListNames.length} custom engine list names`);
+        } catch (e) {
+            console.error('[AircraftBridge] Failed to save engine lists to localStorage:', e);
+        }
     }
 }

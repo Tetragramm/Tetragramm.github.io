@@ -220,5 +220,58 @@ pub fn get_engine_names_in_list(list_name: &str) -> Vec<String> {
     }
 }
 
+/// Add an engine to a specific list by name
+/// Creates the list if it doesn't exist
+pub fn add_engine_to_list(list_name: &str, engine: EngineInputs) -> Result<usize, String> {
+    init_engine_lists();
+    let mut lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
+
+    // Create the list if it doesn't exist
+    if !lists.contains_key(list_name) {
+        lists.insert(list_name.to_string(), EngineList::new(list_name.to_string()));
+    }
+
+    if let Some(list) = lists.get_mut(list_name) {
+        list.push(engine, false)
+    } else {
+        Err(format!("Failed to get list: {}", list_name))
+    }
+}
+
+/// Get all engines in a specific list (with full data)
+/// Returns a vector of EngineInputs
+pub fn get_engines_in_list(list_name: &str) -> Vec<EngineInputs> {
+    init_engine_lists();
+    let lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
+
+    if let Some(list) = lists.get(list_name) {
+        (0..list.len())
+            .filter_map(|i| list.get(i).cloned())
+            .collect()
+    } else {
+        Vec::new()
+    }
+}
+
+/// Clear all engines from a non-constant list
+pub fn clear_list(list_name: &str) -> Result<(), String> {
+    init_engine_lists();
+    let mut lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
+
+    if let Some(list) = lists.get_mut(list_name) {
+        if list.constant {
+            return Err(format!("Cannot clear constant list: {}", list_name));
+        }
+
+        // Remove all engines
+        while !list.is_empty() {
+            list.list.pop();
+        }
+        Ok(())
+    } else {
+        Err(format!("List not found: {}", list_name))
+    }
+}
+
 // TODO: Implement Clone for EngineList
 // For now, we'll work without it

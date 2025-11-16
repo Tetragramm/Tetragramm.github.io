@@ -106,6 +106,9 @@ export class WasmApplication {
             );
             console.log('[WasmApp] Aircraft bridge initialized');
 
+            // Load custom engine lists from localStorage
+            this.bridge.loadEngineListsFromLocalStorage();
+
             // Check for aircraft data in URL (for loading shared aircraft)
             let jsonParam = urlParams.get('json');
             //Debug: Always start with known aircraft.
@@ -306,6 +309,10 @@ export class WasmApplication {
             // Replace the bridge with the new one
             this.bridge = newBridge;
             console.log('[WasmApp] Aircraft reconstructed with new language');
+
+            // Load custom engine lists from localStorage
+            this.bridge.loadEngineListsFromLocalStorage();
+
             this.render(true);
 
             // Note: UI components will re-render automatically because they're registered

@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::iter::zip;
 use std::rc::Rc;
 use ui_core::*;
@@ -22,7 +22,7 @@ mod validation;
 #[cfg(test)]
 mod tests;
 
-#[derive(Clone, Serialize, PartialEq, Debug)]
+#[derive(Clone, Serialize, Deserialize, PartialEq, Debug)]
 pub enum EngineRarity {
     CUSTOM,
     COMMON,
@@ -59,7 +59,7 @@ impl EngineStats {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub enum TypedInputs {
     Propeller {
         displacement: f32,
@@ -95,7 +95,7 @@ pub enum TypedInputs {
     },
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct EngineInputs {
     pub name: String,
     pub etype: i16,
