@@ -62,7 +62,7 @@ fn test_serialization() {
 
     // Serialize (version string must be written first)
     let mut serializer = Serializer::new();
-    serializer.push_string("12.65").unwrap(); // Write version first
+    serializer.push_string("12.7").unwrap(); // Write version first
     aircraft.serialize(&mut serializer).unwrap();
 
     // Deserialize
@@ -116,12 +116,12 @@ fn test_json_serialization() {
     // To JSON
     let json = aircraft.to_json();
     assert_eq!(json["name"].as_str().unwrap(), "JSON Test Plane");
-    assert_eq!(json["version"].as_str().unwrap(), "12.65");
+    assert_eq!(json["version"].as_str().unwrap(), "12.7");
     assert_eq!(json["aircraft_type"].as_i64().unwrap(), 3);
 
     // From JSON
     let mut aircraft2 = Aircraft::new();
-    aircraft2.from_json(&json, 12.65);
+    aircraft2.from_json(&json, 12.7);
     assert_eq!(aircraft2.name, "JSON Test Plane");
     assert_eq!(aircraft2.aircraft_type, AircraftType::OrnithopterBasic);
 }

@@ -170,7 +170,7 @@ impl Part for Engines {
 
             if stats.charge != 0.0 {
                 msg.equipment.push(Equipment {
-                    source: rust_i18n::t!("Vital Part Engine", index = (i + 1)).to_string(),
+                    source: t!("Vital Part Engine", A = (i + 1)).to_string(),
                     charge: stats.charge.to_string(),
                 });
             }

@@ -111,7 +111,7 @@ impl JSSerializable for Aircraft {
         let mut map = Map::new();
 
         // Add version
-        map.insert("version".to_string(), "12.65".into());
+        map.insert("version".to_string(), "12.7".into());
 
         // Add name
         map.insert("name".to_string(), self.name.clone().into());

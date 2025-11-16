@@ -21,9 +21,9 @@ impl EngineList {
 
     /// Add an engine to the list. Returns the index of the engine.
     /// If force is true, removes any existing matching engine first.
-    pub fn push(&mut self, engine: EngineInputs, force: bool) -> Result<usize, String> {
+    pub fn push(&mut self, engine: EngineInputs, force: bool) -> Result<(), String> {
         if self.constant {
-            return Err("Engine List is Constant".to_string());
+            return Ok(());
         }
 
         if force {
@@ -32,7 +32,7 @@ impl EngineList {
             // Check if engine already exists
             for (i, existing) in self.list.iter().enumerate() {
                 if existing.name == engine.name {
-                    return Ok(i);
+                    return Ok(());
                 }
             }
         }
@@ -40,10 +40,7 @@ impl EngineList {
         self.list.push(engine);
         // Sort by name
         self.list.sort_by(|a, b| a.name.cmp(&b.name));
-
-        // Find the index after sorting
-        self.find_by_name(&self.list.last().unwrap().name)
-            .ok_or_else(|| "Failed to find engine after push".to_string())
+        Ok(())
     }
 
     /// Get an engine by index
@@ -167,7 +164,7 @@ pub fn search_all_engine_lists(engine_name: &str) -> String {
 }
 
 /// Add a custom engine to the Custom list
-pub fn add_custom_engine(engine: EngineInputs) -> Result<usize, String> {
+pub fn add_custom_engine(engine: EngineInputs) -> Result<(), String> {
     init_engine_lists();
     let mut lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
 
@@ -222,13 +219,16 @@ pub fn get_engine_names_in_list(list_name: &str) -> Vec<String> {
 
 /// Add an engine to a specific list by name
 /// Creates the list if it doesn't exist
-pub fn add_engine_to_list(list_name: &str, engine: EngineInputs) -> Result<usize, String> {
+pub fn add_engine_to_list(list_name: &str, engine: EngineInputs) -> Result<(), String> {
     init_engine_lists();
     let mut lists = ENGINE_LISTS.get().unwrap().lock().unwrap();
 
     // Create the list if it doesn't exist
     if !lists.contains_key(list_name) {
-        lists.insert(list_name.to_string(), EngineList::new(list_name.to_string()));
+        lists.insert(
+            list_name.to_string(),
+            EngineList::new(list_name.to_string()),
+        );
     }
 
     if let Some(list) = lists.get_mut(list_name) {

@@ -98,22 +98,11 @@ export class WasmApplication {
             }
 
             // Create aircraft bridge
-            // Note: We already called initWasm() above, so we pass a no-op function
-            this.bridge = new AircraftBridge();
-            await this.bridge.initialize(
-                async () => { /* Already initialized */ },
-                this.wasmModule.AircraftWasm
-            );
-            console.log('[WasmApp] Aircraft bridge initialized');
-
-            // Load custom engine lists from localStorage
-            this.bridge.loadEngineListsFromLocalStorage();
-
             // Check for aircraft data in URL (for loading shared aircraft)
+            let loaded = false;
             let jsonParam = urlParams.get('json');
             //Debug: Always start with known aircraft.
-            jsonParam = "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A";
-            if (jsonParam && this.bridge) {
+            if (jsonParam) {
                 try {
                     const loadedBridge = await AircraftBridge.deserializeFromLZString(
                         jsonParam,
@@ -121,11 +110,43 @@ export class WasmApplication {
                         this.wasmModule.AircraftWasm
                     );
                     this.bridge = loadedBridge;
+                    loaded = true;
                     console.log('[WasmApp] Loaded aircraft from URL');
                 } catch (e) {
                     console.error('[WasmApp] Failed to load aircraft from URL:', e);
                 }
             }
+            if (!loaded) {
+                console.log("Used Saved Data");
+                try {
+                    let acft_data = window.localStorage.getItem("test.aircraft");
+                    const loadedBridge = await AircraftBridge.fromJSON(acft_data, async () => { /* Already initialized */ }, this.wasmModule.AircraftWasm);
+                    this.bridge = loadedBridge;
+                    console.log('[WasmApp] Loaded aircraft from saved data');
+                    loaded = true;
+                } catch (e) { console.log("Saved Data Failed. " + e); }
+            }
+            if (!loaded) {
+                // Note: We already called initWasm() above, so we pass a no-op function
+                try {
+                    this.bridge = await AircraftBridge.deserializeFromLZString(
+                        "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
+                        async () => { /* Already initialized */ },
+                        this.wasmModule.AircraftWasm
+                    );
+                    loaded = true;
+                } catch (e) {
+                    console.log("Failed to load Basic Biplane. " + e);
+                }
+            }
+            if (loaded) {
+                console.log('[WasmApp] Aircraft bridge initialized');
+            } else {
+                console.error("[Error] Major error, no aircraft load worked.");
+            }
+
+            // Load custom engine lists from localStorage
+            this.bridge.loadEngineListsFromLocalStorage();
 
             // Create language selector
             this.languageSelector = new LanguageSelector('language_selector_container');
@@ -295,12 +316,12 @@ export class WasmApplication {
             console.log(`[WasmApp] Language changed to ${locale}, reconstructing aircraft...`);
 
             // Serialize current aircraft state
-            const serialized = this.bridge.serialize();
+            const serialized = this.bridge.serializeToLZString();
             console.log('[WasmApp] Aircraft serialized');
 
             // Locale has already been changed by LocalizationManager
             // Now deserialize to create a new aircraft with fresh UIBindings in the new language
-            const newBridge = await AircraftBridge.deserialize(
+            const newBridge = await AircraftBridge.deserializeFromLZString(
                 serialized,
                 async () => { /* Already initialized */ },
                 this.wasmModule.AircraftWasm

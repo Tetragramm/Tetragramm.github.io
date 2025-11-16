@@ -1,6 +1,6 @@
 use flyingcircusrust::aircraft::Aircraft;
 use flyingcircusrust::part::Part;
-use flyingcircusrust::serialization::{Deserializer, Serializable, Serializer};
+use flyingcircusrust::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
 use flyingcircusrust::types::DerivedStats;
 use flyingcircusrust::UIBindings;
 use rust_i18n::t;
@@ -776,8 +776,10 @@ impl AircraftWasm {
     pub fn add_engine_to_list(&self, list_name: &str, engine_data: JsValue) -> Result<(), JsValue> {
         use flyingcircusrust::engine_list;
 
-        let engine: flyingcircusrust::engine::EngineInputs = serde_wasm_bindgen::from_value(engine_data)
-            .map_err(|e| JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e)))?;
+        let engine: flyingcircusrust::engine::EngineInputs =
+            serde_wasm_bindgen::from_value(engine_data).map_err(|e| {
+                JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e))
+            })?;
 
         engine_list::add_engine_to_list(list_name, engine)
             .map_err(|e| JsValue::from_str(e.as_str()))?;
@@ -799,8 +801,7 @@ impl AircraftWasm {
     pub fn clear_engine_list(&self, list_name: &str) -> Result<(), JsValue> {
         use flyingcircusrust::engine_list;
 
-        engine_list::clear_list(list_name)
-            .map_err(|e| JsValue::from_str(e.as_str()))?;
+        engine_list::clear_list(list_name).map_err(|e| JsValue::from_str(e.as_str()))?;
 
         Ok(())
     }
@@ -1021,7 +1022,8 @@ impl AircraftWasm {
             "is": is_sesqui,
             "deck": deck,
             "super_small": super_small
-        })).unwrap()
+        }))
+        .unwrap()
     }
 
     /// Check if frames are flying wing
@@ -1086,23 +1088,20 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
-    /// Serialize aircraft to bytes
-    #[wasm_bindgen(js_name = serialize)]
-    pub fn serialize(&self) -> String {
-        let mut s = Serializer::new();
-        self.inner.serialize(&mut s).unwrap();
-        s.compress_to_lz_string().unwrap()
+    /// Serialize to JSON string (for saved data)
+    #[wasm_bindgen(js_name = toJSON)]
+    pub fn serialize_to_json(&self) -> Result<String, JsValue> {
+        Ok(self.inner.to_json().to_string())
     }
 
-    /// Deserialize aircraft from bytes
-    #[wasm_bindgen(js_name = deserialize)]
-    pub fn deserialize(data: &str) -> Result<AircraftWasm, JsValue> {
-        let mut d = Deserializer::from_lz_string(data)
-            .map_err(|_| JsValue::from_str("Failed to Deserialize"))?;
-        let mut aircraft = Aircraft::new();
-        aircraft
-            .deserialize(&mut d)
+    /// Deserialize from JSON string (for saved data)
+    #[wasm_bindgen(js_name = fromJSON)]
+    pub fn deserialize_from_json(js_str: String) -> Result<AircraftWasm, JsValue> {
+        let json: serde_json::Value = serde_json::from_str(js_str.as_str())
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let mut aircraft = Aircraft::new();
+        let ver = json["version"].as_str().unwrap().parse::<f32>().unwrap();
+        aircraft.from_json(&json, ver);
         Ok(AircraftWasm { inner: aircraft })
     }
 

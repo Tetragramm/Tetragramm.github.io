@@ -218,6 +218,7 @@ export interface AircraftWasmAPI {
 
     serialize(): Uint8Array;
     serializeToLZString(): string;
+    toJSON(): string;
 
     setNumberOfEngines(count: number): void;
     getNumberOfEngines(): number;
@@ -1429,14 +1430,8 @@ export class AircraftBridge {
     calculateStats(): void {
         this.ensureInitialized();
         this.wasm!.calculateStats();
-    }
-
-    /**
-     * Serialize aircraft to bytes
-     */
-    serialize(): Uint8Array {
-        this.ensureInitialized();
-        return this.wasm!.serialize();
+        localStorage.setItem("test.aircraft", this.wasm!.toJSON());
+        console.log("Saved JSON");
     }
 
     /**
@@ -1447,19 +1442,32 @@ export class AircraftBridge {
         return this.wasm!.serializeToLZString();
     }
 
+    toJSON(): string {
+        this.ensureInitialized();
+        return this.wasm!.toJSON();
+    }
+
     /**
-     * Deserialize from bytes (static method)
+     * Deserialize from json (static method)
      */
-    static async deserialize(
-        data: Uint8Array,
+    static async fromJSON(
+        acft_json: string,
         wasmInit: WasmInit,
         AircraftWasmClass: any
     ): Promise<AircraftBridge> {
-        await wasmInit();
         const bridge = new AircraftBridge();
-        bridge.wasm = AircraftWasmClass.deserialize(data);
+        await bridge.initialize(
+            wasmInit,
+            AircraftWasmClass
+        );
+        bridge.wasm = AircraftWasmClass.fromJSON(acft_json);
+        bridge.loadEngineListsFromLocalStorage();
         bridge.initialized = true;
         bridge.calculateStats();
+
+        // Save engine lists to localStorage
+        bridge.saveEngineListsToLocalStorage();
+
         return bridge;
     }
 
@@ -1471,9 +1479,13 @@ export class AircraftBridge {
         wasmInit: WasmInit,
         AircraftWasmClass: any
     ): Promise<AircraftBridge> {
-        await wasmInit();
         const bridge = new AircraftBridge();
+        await bridge.initialize(
+            wasmInit,
+            AircraftWasmClass
+        );
         bridge.wasm = AircraftWasmClass.deserializeFromLZString(lzStr);
+        bridge.loadEngineListsFromLocalStorage();
         bridge.initialized = true;
         bridge.calculateStats();
 
@@ -1521,6 +1533,7 @@ export class AircraftBridge {
         } catch (e) {
             console.error('[AircraftBridge] Failed to load engine lists from localStorage:', e);
         }
+        // {"name":"Custom","engines":[{"name":"Bentley BR.1 150hp","engine_type":0,"type":2,"era_sel":1,"displacement":17.1,"compression":4.9,"cyl_per_row":9,"rows":1,"RPM_boost":1,"material_fudge":1,"quality_fudge":1.2,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false],"rarity":0},{"name":"Renault V8 70hp","engine_type":0,"type":0,"era_sel":1,"displacement":7,"compression":4,"cyl_per_row":2,"rows":4,"RPM_boost":1.1,"material_fudge":1.4,"quality_fudge":1,"compressor_type":0,"compressor_count":0,"min_IAF":0,"upgrades":[false,false,false,false],"rarity":0}]}
     }
 
     /**

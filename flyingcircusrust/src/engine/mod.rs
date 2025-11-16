@@ -23,25 +23,17 @@ mod validation;
 mod tests;
 
 // Custom deserializer for EngineRarity to handle both old numeric format and new string format
-fn deserialize_engine_rarity<'de, D>(deserializer: D) -> Result<EngineRarity, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    use serde::de::Error;
-    use serde_json::Value;
-
-    let value = Value::deserialize(deserializer)?;
-
+fn deserialize_engine_rarity(value: serde_json::Value) -> Result<EngineRarity, String> {
     match value {
         // Handle numeric format (old TypeScript format)
-        Value::Number(n) => {
+        serde_json::Value::Number(n) => {
             if let Some(i) = n.as_i64() {
                 match i {
                     0 => Ok(EngineRarity::CUSTOM),
                     1 => Ok(EngineRarity::COMMON),
                     2 => Ok(EngineRarity::RARE),
                     3 => Ok(EngineRarity::LEGENDARY),
-                    _ => Err(D::Error::custom(format!("invalid rarity number: {}", i))),
+                    _ => Err(format!("invalid rarity number: {}", i)),
                 }
             } else if let Some(f) = n.as_f64() {
                 // Handle floating point numbers (convert to int)
@@ -50,23 +42,21 @@ where
                     1 => Ok(EngineRarity::COMMON),
                     2 => Ok(EngineRarity::RARE),
                     3 => Ok(EngineRarity::LEGENDARY),
-                    _ => Err(D::Error::custom(format!("invalid rarity number: {}", f))),
+                    _ => Err(format!("invalid rarity number: {}", f)),
                 }
             } else {
-                Err(D::Error::custom("invalid rarity number"))
+                Err("invalid rarity number".to_string())
             }
-        },
+        }
         // Handle string format (new Rust format)
-        Value::String(s) => {
-            match s.as_str() {
-                "CUSTOM" => Ok(EngineRarity::CUSTOM),
-                "COMMON" => Ok(EngineRarity::COMMON),
-                "RARE" => Ok(EngineRarity::RARE),
-                "LEGENDARY" => Ok(EngineRarity::LEGENDARY),
-                _ => Err(D::Error::custom(format!("invalid rarity string: {}", s))),
-            }
+        serde_json::Value::String(s) => match s.as_str() {
+            "CUSTOM" => Ok(EngineRarity::CUSTOM),
+            "COMMON" => Ok(EngineRarity::COMMON),
+            "RARE" => Ok(EngineRarity::RARE),
+            "LEGENDARY" => Ok(EngineRarity::LEGENDARY),
+            _ => Err(format!("invalid rarity string: {}", s)),
         },
-        _ => Err(D::Error::custom("expected number or string for rarity")),
+        _ => Err("expected number or string for rarity".to_string()),
     }
 }
 
@@ -83,7 +73,12 @@ impl<'de> Deserialize<'de> for EngineRarity {
     where
         D: Deserializer<'de>,
     {
-        deserialize_engine_rarity(deserializer)
+        use serde::de::Error;
+        let value = serde_json::Value::deserialize(deserializer)?;
+        match deserialize_engine_rarity(value) {
+            Ok(v) => Ok(v),
+            Err(msg) => Err(D::Error::custom(msg)),
+        }
     }
 }
 
@@ -174,18 +169,19 @@ impl<'de> Deserialize<'de> for EngineInputs {
         let value = Value::deserialize(deserializer)?;
 
         // Try to extract common fields
-        let name = value.get("name")
+        let name = value
+            .get("name")
             .and_then(|v| v.as_str())
             .ok_or_else(|| D::Error::missing_field("name"))?
             .to_string();
 
-        let era_sel = value.get("era_sel")
+        let era_sel = value
+            .get("era_sel")
             .and_then(|v| v.as_i64())
             .ok_or_else(|| D::Error::missing_field("era_sel"))? as i16;
 
         let rarity = if let Some(r) = value.get("rarity") {
-            deserialize_engine_rarity(serde_json::value::Deserializer::new(r.clone()))
-                .map_err(|_| D::Error::custom("invalid rarity"))?
+            deserialize_engine_rarity(r.clone()).map_err(|_| D::Error::custom("invalid rarity"))?
         } else {
             EngineRarity::CUSTOM
         };
@@ -193,10 +189,13 @@ impl<'de> Deserialize<'de> for EngineInputs {
         // Check if this is new format (has "etype" and "inputs") or old format (has "engine_type" and flat fields)
         let (etype, inputs) = if let Some(etype_val) = value.get("etype") {
             // New format
-            let etype = etype_val.as_i64()
-                .ok_or_else(|| D::Error::custom("etype must be a number"))? as i16;
+            let etype = etype_val
+                .as_i64()
+                .ok_or_else(|| D::Error::custom("etype must be a number"))?
+                as i16;
 
-            let inputs = value.get("inputs")
+            let inputs = value
+                .get("inputs")
                 .ok_or_else(|| D::Error::missing_field("inputs"))?
                 .clone();
 
@@ -206,61 +205,121 @@ impl<'de> Deserialize<'de> for EngineInputs {
             (etype, typed_inputs)
         } else {
             // Old flat format
-            let etype = value.get("engine_type")
+            let etype = value
+                .get("engine_type")
                 .or_else(|| value.get("type"))
                 .and_then(|v| v.as_i64())
-                .ok_or_else(|| D::Error::missing_field("engine_type"))? as i16;
+                .ok_or_else(|| D::Error::missing_field("engine_type"))?
+                as i16;
 
             // Based on etype, construct the appropriate TypedInputs variant
             let typed_inputs = match etype {
                 0 => {
                     // Propeller
                     TypedInputs::Propeller {
-                        displacement: value.get("displacement").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                        compression: value.get("compression").and_then(|v| v.as_f64()).unwrap_or(5.0) as f32,
-                        cyl_per_row: value.get("cyl_per_row").and_then(|v| v.as_i64()).unwrap_or(1) as i16,
+                        displacement: value
+                            .get("displacement")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(0.0) as f32,
+                        compression: value
+                            .get("compression")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(5.0) as f32,
+                        cyl_per_row: value
+                            .get("cyl_per_row")
+                            .and_then(|v| v.as_i64())
+                            .unwrap_or(1) as i16,
                         rows: value.get("rows").and_then(|v| v.as_i64()).unwrap_or(1) as i16,
-                        rpm_boost: value.get("RPM_boost").or_else(|| value.get("rpm_boost")).and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        material_fudge: value.get("material_fudge").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        quality_fudge: value.get("quality_fudge").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        compressor_type: value.get("compressor_type").and_then(|v| v.as_i64()).unwrap_or(0) as i16,
-                        compressor_count: value.get("compressor_count").and_then(|v| v.as_i64()).unwrap_or(0) as i16,
-                        min_ideal_alt: value.get("min_IAF").or_else(|| value.get("min_ideal_alt")).and_then(|v| v.as_i64()).unwrap_or(0) as i16,
-                        upgrades: value.get("upgrades")
+                        rpm_boost: value
+                            .get("RPM_boost")
+                            .or_else(|| value.get("rpm_boost"))
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        material_fudge: value
+                            .get("material_fudge")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        quality_fudge: value
+                            .get("quality_fudge")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        compressor_type: value
+                            .get("compressor_type")
+                            .and_then(|v| v.as_i64())
+                            .unwrap_or(0) as i16,
+                        compressor_count: value
+                            .get("compressor_count")
+                            .and_then(|v| v.as_i64())
+                            .unwrap_or(0) as i16,
+                        min_ideal_alt: value
+                            .get("min_IAF")
+                            .or_else(|| value.get("min_ideal_alt"))
+                            .and_then(|v| v.as_i64())
+                            .unwrap_or(0) as i16,
+                        upgrades: value
+                            .get("upgrades")
                             .and_then(|v| serde_json::from_value(v.clone()).ok())
                             .unwrap_or_else(|| vec![false; 4]),
                     }
-                },
+                }
                 1 => {
                     // Pulsejet
                     TypedInputs::Pulsejet {
                         power: value.get("power").and_then(|v| v.as_i64()).unwrap_or(0) as i16,
-                        quality_cost: value.get("quality_cost").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        quality_reliability: value.get("quality_reliability").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        starter: value.get("starter").and_then(|v| v.as_bool()).unwrap_or(false),
+                        quality_cost: value
+                            .get("quality_cost")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        quality_reliability: value
+                            .get("quality_reliability")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        starter: value
+                            .get("starter")
+                            .and_then(|v| v.as_bool())
+                            .unwrap_or(false),
                     }
-                },
+                }
                 2 => {
                     // Turbine
                     TypedInputs::Turbine {
-                        flow_adjustment: value.get("flow_adjustment").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        diameter: value.get("diameter").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        compression_ratio: value.get("compression_ratio").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
-                        bypass_ratio: value.get("bypass_ratio").and_then(|v| v.as_f64()).unwrap_or(0.0) as f32,
-                        upgrades: value.get("upgrades")
+                        flow_adjustment: value
+                            .get("flow_adjustment")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        diameter: value
+                            .get("diameter")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        compression_ratio: value
+                            .get("compression_ratio")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
+                        bypass_ratio: value
+                            .get("bypass_ratio")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(0.0) as f32,
+                        upgrades: value
+                            .get("upgrades")
                             .and_then(|v| serde_json::from_value(v.clone()).ok())
                             .unwrap_or_else(|| vec![false; 4]),
                     }
-                },
+                }
                 3 => {
                     // Electric
                     TypedInputs::Electric {
                         power: value.get("power").and_then(|v| v.as_i64()).unwrap_or(0) as i16,
-                        winding_sel: value.get("winding_sel").and_then(|v| v.as_i64()).unwrap_or(0) as i16,
+                        winding_sel: value
+                            .get("winding_sel")
+                            .and_then(|v| v.as_i64())
+                            .unwrap_or(0) as i16,
                         chonk: value.get("chonk").and_then(|v| v.as_i64()).unwrap_or(0) as i16,
-                        quality_fudge: value.get("quality_fudge").and_then(|v| v.as_f64()).unwrap_or(1.0) as f32,
+                        quality_fudge: value
+                            .get("quality_fudge")
+                            .and_then(|v| v.as_f64())
+                            .unwrap_or(1.0) as f32,
                     }
-                },
+                }
                 _ => {
                     return Err(D::Error::custom(format!("invalid engine type: {}", etype)));
                 }
