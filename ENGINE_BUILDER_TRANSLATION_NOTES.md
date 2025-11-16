@@ -17,246 +17,131 @@ Each builder:
 
 ## Required WASM Functions
 
-### PropellerBuilder WASM Wrapper
-The Rust `propeller_builder.rs` exists but needs WASM bindings:
+### **SIMPLIFIED APPROACH** - Single Calculation Function
+
+Instead of creating separate WASM wrappers for each builder, we can use a much simpler approach:
+
+**ALREADY IMPLEMENTED**: `calculateEngineStats(engine_data: JsValue) -> Result<JsValue, JsValue>`
+
+This single function:
+1. Accepts `EngineInputs` as JSON (via JsValue)
+2. Calls `EngineInputs.part_stats()` which internally dispatches to the correct builder based on `etype`
+3. Returns `EngineStats` as JSON (via JsValue)
 
 ```rust
-#[wasm_bindgen]
-pub struct PropellerBuilderWasm {
-    inner: PropellerBuilder,
-}
+/// Calculate engine stats from EngineInputs
+/// This is a standalone function that can be used by the engine builder UI
+/// without needing to add the engine to the aircraft.
+/// Accepts EngineInputs as JSON and returns EngineStats as JSON.
+#[wasm_bindgen(js_name = calculateEngineStats)]
+pub fn calculate_engine_stats(&self, engine_data: JsValue) -> Result<JsValue, JsValue> {
+    let engine: flyingcircusrust::engine::EngineInputs =
+        serde_wasm_bindgen::from_value(engine_data).map_err(|e| {
+            JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e))
+        })?;
 
-#[wasm_bindgen]
-impl PropellerBuilderWasm {
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> PropellerBuilderWasm;
-
-    // Setters
-    #[wasm_bindgen(js_name = setName)]
-    pub fn set_name(&mut self, name: String);
-
-    #[wasm_bindgen(js_name = setEra)]
-    pub fn set_era(&mut self, era_sel: i16);
-
-    #[wasm_bindgen(js_name = setCoolingType)]
-    pub fn set_cooling_type(&mut self, cool_sel: i16);
-
-    #[wasm_bindgen(js_name = setDisplacement)]
-    pub fn set_displacement(&mut self, liters: f32);
-
-    #[wasm_bindgen(js_name = setCompression)]
-    pub fn set_compression(&mut self, ratio: f32);
-
-    #[wasm_bindgen(js_name = setCylindersPerRow)]
-    pub fn set_cylinders_per_row(&mut self, count: i16);
-
-    #[wasm_bindgen(js_name = setRows)]
-    pub fn set_rows(&mut self, count: i16);
-
-    #[wasm_bindgen(js_name = setRPMBoost)]
-    pub fn set_rpm_boost(&mut self, boost: f32);
-
-    #[wasm_bindgen(js_name = setMaterialFudge)]
-    pub fn set_material_fudge(&mut self, fudge: f32);
-
-    #[wasm_bindgen(js_name = setQualityFudge)]
-    pub fn set_quality_fudge(&mut self, fudge: f32);
-
-    #[wasm_bindgen(js_name = setCompressorType)]
-    pub fn set_compressor_type(&mut self, type_sel: i16);
-
-    #[wasm_bindgen(js_name = setCompressorCount)]
-    pub fn set_compressor_count(&mut self, count: i16);
-
-    #[wasm_bindgen(js_name = setMinIdealAltitude)]
-    pub fn set_min_ideal_altitude(&mut self, altitude: i16);
-
-    #[wasm_bindgen(js_name = setUpgrade)]
-    pub fn set_upgrade(&mut self, index: usize, enabled: bool);
-
-    // Getters
-    #[wasm_bindgen(js_name = getName)]
-    pub fn get_name(&self) -> String;
-
-    #[wasm_bindgen(js_name = getEra)]
-    pub fn get_era(&self) -> i16;
-
-    // ... similar getters for all fields ...
-
-    // Get available options
-    #[wasm_bindgen(js_name = getEraTable)]
-    pub fn get_era_table(&self) -> JsValue; // Returns array of {name, ...}
-
-    #[wasm_bindgen(js_name = getCoolingTable)]
-    pub fn get_cooling_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getCompressorTable)]
-    pub fn get_compressor_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getUpgrades)]
-    pub fn get_upgrades(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = canUpgrade)]
-    pub fn can_upgrade(&self) -> JsValue; // Returns array of booleans
-
-    // Calculate results
-    #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats(&self) -> JsValue; // Returns EngineStats
-
-    #[wasm_bindgen(js_name = getEngineInputs)]
-    pub fn get_engine_inputs(&self) -> JsValue; // Returns EngineInputs for saving
-
-    #[wasm_bindgen(js_name = getGearedRPM)]
-    pub fn get_geared_rpm(&self) -> f32;
+    let stats = engine.part_stats();
+    Ok(serde_wasm_bindgen::to_value(&stats).unwrap())
 }
 ```
 
-### PulsejetBuilder WASM Wrapper
-```rust
-#[wasm_bindgen]
-pub struct PulsejetBuilderWasm {
-    inner: PulsejetBuilder,
+### EngineInputs Structure
+
+The TypeScript UI will construct `EngineInputs` objects directly:
+
+```typescript
+interface EngineInputs {
+    name: string;
+    etype: number;  // 0=Propeller, 1=Pulsejet, 2=Turbine, 3=Electric
+    era_sel: number;
+    rarity: number | string;  // 0=CUSTOM, 1=COMMON, etc. or "CUSTOM", "COMMON", etc.
+    inputs: TypedInputs;
 }
 
-#[wasm_bindgen]
-impl PulsejetBuilderWasm {
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> PulsejetBuilderWasm;
+type TypedInputs = PropellerInputs | PulsejetInputs | TurbineInputs | ElectricInputs;
 
-    #[wasm_bindgen(js_name = setDesiredPower)]
-    pub fn set_desired_power(&mut self, power: i16);
-
-    #[wasm_bindgen(js_name = setValveType)]
-    pub fn set_valve_type(&mut self, valve_sel: i16);
-
-    #[wasm_bindgen(js_name = setEra)]
-    pub fn set_era(&mut self, era_sel: i16);
-
-    #[wasm_bindgen(js_name = setBuildQuality)]
-    pub fn set_build_quality(&mut self, quality: f32);
-
-    #[wasm_bindgen(js_name = setOverallQuality)]
-    pub fn set_overall_quality(&mut self, quality: f32);
-
-    #[wasm_bindgen(js_name = setStarter)]
-    pub fn set_starter(&mut self, has_starter: bool);
-
-    #[wasm_bindgen(js_name = getValveTable)]
-    pub fn get_valve_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getEraTable)]
-    pub fn get_era_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats(&self) -> JsValue; // Returns EngineStats
-
-    #[wasm_bindgen(js_name = getEngineInputs)]
-    pub fn get_engine_inputs(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getDesignCost)]
-    pub fn get_design_cost(&self) -> i16;
-}
-```
-
-### TurboBuilder WASM Wrapper
-```rust
-#[wasm_bindgen]
-pub struct TurboBuilderWasm {
-    inner: TurboBuilder,
+interface PropellerInputs {
+    Propeller: {
+        displacement: number;
+        compression: number;
+        cyl_per_row: number;
+        rows: number;
+        rpm_boost: number;
+        material_fudge: number;
+        quality_fudge: number;
+        compressor_type: number;
+        compressor_count: number;
+        min_ideal_alt: number;
+        upgrades: boolean[];
+    }
 }
 
-#[wasm_bindgen]
-impl TurboBuilderWasm {
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> TurboBuilderWasm;
+interface PulsejetInputs {
+    Pulsejet: {
+        power: number;
+        quality_cost: number;
+        quality_reliability: number;
+        starter: boolean;
+    }
+}
 
-    #[wasm_bindgen(js_name = setName)]
-    pub fn set_name(&mut self, name: String);
+interface TurbineInputs {
+    Turbine: {
+        flow_adjustment: number;
+        diameter: number;
+        compression_ratio: number;
+        bypass_ratio: number;
+        upgrades: boolean[];
+    }
+}
 
-    #[wasm_bindgen(js_name = setEra)]
-    pub fn set_era(&mut self, era_sel: i16);
-
-    #[wasm_bindgen(js_name = setType)]
-    pub fn set_type(&mut self, type_sel: i16);
-
-    #[wasm_bindgen(js_name = setDiameter)]
-    pub fn set_diameter(&mut self, meters: f32);
-
-    #[wasm_bindgen(js_name = setCompressionRatio)]
-    pub fn set_compression_ratio(&mut self, ratio: f32);
-
-    #[wasm_bindgen(js_name = setBypassRatio)]
-    pub fn set_bypass_ratio(&mut self, ratio: f32);
-
-    #[wasm_bindgen(js_name = setFlowAdjustment)]
-    pub fn set_flow_adjustment(&mut self, adjustment: f32);
-
-    #[wasm_bindgen(js_name = setAfterburner)]
-    pub fn set_afterburner(&mut self, enabled: bool);
-
-    #[wasm_bindgen(js_name = getEraTable)]
-    pub fn get_era_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getTypeTable)]
-    pub fn get_type_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getEngineInputs)]
-    pub fn get_engine_inputs(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getThrust)]
-    pub fn get_thrust(&self) -> f32; // kN
-
-    #[wasm_bindgen(js_name = getTSFC)]
-    pub fn get_tsfc(&self) -> f32; // g/(kN*s)
+interface ElectricInputs {
+    Electric: {
+        power: number;
+        winding_sel: number;
+        chonk: number;
+        quality_fudge: number;
+    }
 }
 ```
 
-### ElectricBuilder WASM Wrapper
+### Additional Helper Functions Needed
+
+For table data (eras, types, upgrades), we'll need static helper functions to get options without instantiating builders:
+
 ```rust
-#[wasm_bindgen]
-pub struct ElectricBuilderWasm {
-    inner: ElectricBuilder,
-}
+// These would be module-level functions or static methods
 
-#[wasm_bindgen]
-impl ElectricBuilderWasm {
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> ElectricBuilderWasm;
+/// Get era table for propeller engines
+#[wasm_bindgen(js_name = getPropellerEraTable)]
+pub fn get_propeller_era_table() -> JsValue;
 
-    #[wasm_bindgen(js_name = setName)]
-    pub fn set_name(&mut self, name: String);
+/// Get cooling type table for propeller engines
+#[wasm_bindgen(js_name = getPropellerCoolingTable)]
+pub fn get_propeller_cooling_table() -> JsValue;
 
-    #[wasm_bindgen(js_name = setEra)]
-    pub fn set_era(&mut self, era_sel: i16);
+/// Get compressor type table for propeller engines
+#[wasm_bindgen(js_name = getPropellerCompressorTable)]
+pub fn get_propeller_compressor_table() -> JsValue;
 
-    #[wasm_bindgen(js_name = setWinding)]
-    pub fn set_winding(&mut self, winding_sel: i16);
+/// Get upgrade table for propeller engines
+#[wasm_bindgen(js_name = getPropellerUpgradeTable)]
+pub fn get_propeller_upgrade_table() -> JsValue;
 
-    #[wasm_bindgen(js_name = setPower)]
-    pub fn set_power(&mut self, power: i16);
+/// Get valve type table for pulsejet engines
+#[wasm_bindgen(js_name = getPulsejetValveTable)]
+pub fn get_pulsejet_valve_table() -> JsValue;
 
-    #[wasm_bindgen(js_name = setChonk)]
-    pub fn set_chonk(&mut self, chonk: i16);
+/// Get turbine type table
+#[wasm_bindgen(js_name = getTurbineTypeTable)]
+pub fn get_turbine_type_table() -> JsValue;
 
-    #[wasm_bindgen(js_name = setQualityFudge)]
-    pub fn set_quality_fudge(&mut self, fudge: f32);
-
-    #[wasm_bindgen(js_name = getEraTable)]
-    pub fn get_era_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getWindingTable)]
-    pub fn get_winding_table(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = calculateStats)]
-    pub fn calculate_stats(&self) -> JsValue;
-
-    #[wasm_bindgen(js_name = getEngineInputs)]
-    pub fn get_engine_inputs(&self) -> JsValue;
-}
+/// Get electric winding table
+#[wasm_bindgen(js_name = getElectricWindingTable)]
+pub fn get_electric_winding_table() -> JsValue;
 ```
+
+These functions can read from the builder structs' static data or from JSON files.
 
 ## Missing Localization Keys
 
@@ -615,19 +500,24 @@ Engine Builder Delete List:
 
 ## Implementation Strategy
 
-1. **Phase 1: WASM Wrapper Implementation**
-   - Create WASM wrappers for all 4 builders in `flyingcircuswasm/src/lib.rs`
-   - Expose builder methods through wasm_bindgen
-   - Ensure all table data (eras, types, upgrades) can be retrieved
+### **REVISED - Simplified Approach**
 
-2. **Phase 2: TypeScript Bridge**
-   - Create TypeScript interface types for each builder
-   - Add bridge methods to interact with WASM builders
+1. **Phase 1: WASM Helper Functions** ✅ PARTIALLY COMPLETE
+   - ✅ `calculateEngineStats()` - Already implemented
+   - ⬜ Add table data functions (eras, types, upgrades, etc.)
+   - The main calculation is already done via `EngineInputs.part_stats()`
+
+2. **Phase 2: TypeScript Interfaces**
+   - Create TypeScript interfaces for `EngineInputs` structure
+   - Create helper functions to construct properly-formatted `EngineInputs` objects
+   - No need for separate builder classes - just construct the data structure
 
 3. **Phase 3: UI Components**
-   - Create 4 separate UI components (one per builder)
+   - Create 4 separate UI components (one per engine type)
+   - Each component manages its own form state
+   - On change, constructs `EngineInputs` object and calls `bridge.calculateEngineStats()`
+   - Display returned `EngineStats`
    - Create a list management component
-   - Wire up event handlers and state management
 
 4. **Phase 4: Localization**
    - Add all missing keys to app.yaml
@@ -635,8 +525,16 @@ Engine Builder Delete List:
 
 5. **Phase 5: Integration**
    - Create main engine builder page/component
-   - Wire up to localStorage for persistence
+   - Wire up to localStorage for persistence (already works via engine list system)
    - Test save/load functionality
+
+### Advantages of This Approach
+
+1. **Much Simpler**: One WASM function instead of 4 complex builder wrappers
+2. **Stateless**: UI constructs data, calls function, gets result - no state management in WASM
+3. **Easier to Test**: Just need to verify EngineInputs → EngineStats conversion
+4. **Smaller Bundle**: Less WASM code to ship
+5. **Uses Existing Code**: `EngineInputs.part_stats()` already exists and is well-tested
 
 ## Notes
 

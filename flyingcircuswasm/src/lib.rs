@@ -806,6 +806,21 @@ impl AircraftWasm {
         Ok(())
     }
 
+    /// Calculate engine stats from EngineInputs
+    /// This is a standalone function that can be used by the engine builder UI
+    /// without needing to add the engine to the aircraft.
+    /// Accepts EngineInputs as JSON and returns EngineStats as JSON.
+    #[wasm_bindgen(js_name = calculateEngineStats)]
+    pub fn calculate_engine_stats(&self, engine_data: JsValue) -> Result<JsValue, JsValue> {
+        let engine: flyingcircusrust::engine::EngineInputs =
+            serde_wasm_bindgen::from_value(engine_data).map_err(|e| {
+                JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e))
+            })?;
+
+        let stats = engine.part_stats();
+        Ok(serde_wasm_bindgen::to_value(&stats).unwrap())
+    }
+
     /// Get the selected engine list name for a specific engine
     #[wasm_bindgen(js_name = getEngineSelectedList)]
     pub fn get_engine_selected_list(&self, index: usize) -> String {
