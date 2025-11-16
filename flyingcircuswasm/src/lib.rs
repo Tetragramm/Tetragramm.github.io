@@ -820,7 +820,64 @@ impl AircraftWasm {
         let stats = engine.part_stats();
         Ok(serde_wasm_bindgen::to_value(&stats).unwrap())
     }
+}
 
+// ============================================================================
+// Engine Builder Helper Functions (Module-level, static)
+// ============================================================================
+
+/// Get propeller engine era names
+#[wasm_bindgen(js_name = getPropellerEras)]
+pub fn get_propeller_eras() -> JsValue {
+    let eras = vec!["Pioneer", "WWI", "Roaring 20s", "Coming Storm", "WWII", "Last Hurrah"];
+    serde_wasm_bindgen::to_value(&eras).unwrap()
+}
+
+/// Get propeller cooling type names
+#[wasm_bindgen(js_name = getPropellerCoolingTypes)]
+pub fn get_propeller_cooling_types() -> JsValue {
+    let types = vec!["Liquid Cooled", "Air Cooled", "Rotary Dry", "Rotary Castor", "Radial", "Diesel"];
+    serde_wasm_bindgen::to_value(&types).unwrap()
+}
+
+/// Get propeller compressor type names
+#[wasm_bindgen(js_name = getPropellerCompressorTypes)]
+pub fn get_propeller_compressor_types() -> JsValue {
+    let types = vec!["None", "Altitude Throttle", "Supercharger", "Turbocharger"];
+    serde_wasm_bindgen::to_value(&types).unwrap()
+}
+
+/// Get propeller upgrade names
+#[wasm_bindgen(js_name = getPropellerUpgrades)]
+pub fn get_propeller_upgrades() -> JsValue {
+    let upgrades = vec!["War Emergency Power", "Reduction Gear", "High Compression Heads", "Fuel Injection"];
+    serde_wasm_bindgen::to_value(&upgrades).unwrap()
+}
+
+/// Get pulsejet valve type names
+#[wasm_bindgen(js_name = getPulsejetValveTypes)]
+pub fn get_pulsejet_valve_types() -> JsValue {
+    let types = vec!["Valved", "Valveless"];
+    serde_wasm_bindgen::to_value(&types).unwrap()
+}
+
+/// Get turbine type names
+#[wasm_bindgen(js_name = getTurbineTypes)]
+pub fn get_turbine_types() -> JsValue {
+    let types = vec!["Turbojet", "Low Bypass Turbofan", "High Bypass Turbofan", "Turboprop"];
+    serde_wasm_bindgen::to_value(&types).unwrap()
+}
+
+/// Get electric motor winding names
+#[wasm_bindgen(js_name = getElectricWindings)]
+pub fn get_electric_windings() -> JsValue {
+    let windings = vec!["High RPM", "Medium RPM", "Low RPM"];
+    serde_wasm_bindgen::to_value(&windings).unwrap()
+}
+
+// Back to AircraftWasm implementation
+#[wasm_bindgen]
+impl AircraftWasm {
     /// Get the selected engine list name for a specific engine
     #[wasm_bindgen(js_name = getEngineSelectedList)]
     pub fn get_engine_selected_list(&self, index: usize) -> String {

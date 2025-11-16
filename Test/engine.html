@@ -7,7 +7,7 @@
 	<title>Flying Circus Engine Builder</title>
 	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="page/style.css" />
-	<script type="module" src="EngineBuilder/engine_builder.js"></script>
+	<script type="module" src="wasm/builders/engine_builder_app.js"></script>
 </head>
 <!-- python -m http.server 8080 -->
 
@@ -32,62 +32,35 @@
 					<p>Here is a guide on how to use the builder: <a href="./EngineBuilder/Engine Building Guide.pdf">
 							Engine Builder Guide</a> </p>
 					<br />
-					<table style="width:100%" id="table_engine">
-						<tr>
-							<th>Input Values</th>
-							<th>Upgrades</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
+					<div id="engine_builder_propeller"></div>
 				</div>
 				<br />
 				<div id="Pulsejets">
 					<h3>Pulsejet Builder
 						<br />
 					</h3>
-					<table style="width:100%" id="table_pulsejet">
-						<tr>
-							<th>Input Values</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
+					<div id="engine_builder_pulsejet"></div>
 				</div>
 				<br />
 				<div id="Turbojets/Turbofans">
 					<h3>Turbine Builder
 						<br />
 					</h3>
-					<table style="width:100%" id="table_turbox">
-						<tr>
-							<th>Input Values</th>
-							<th>Description</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
+					<div id="engine_builder_turbine"></div>
 				</div>
 				<br />
 				<div id="Electric">
 					<h3>Electric Engine Builder
 						<br />
 					</h3>
-					<table style="width:100%" id="table_electric">
-						<tr>
-							<th>Input Values</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
+					<div id="engine_builder_electric"></div>
 				</div>
 				<br />
 				<div id="Manual">
 					<h3>List Management
 						<br />
 					</h3>
-					<table style="width:100%" id="table_manual">
-						<tr>
-							<th>Engine Values</th>
-							<th>Management</th>
-						</tr>
-					</table>
+					<div id="engine_builder_list_manager"></div>
 				</div>
 			</div>
 			<br />
