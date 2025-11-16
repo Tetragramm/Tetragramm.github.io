@@ -65,6 +65,7 @@ export class CustomPartsUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
+        this.loadFromLocalStorage(bridge);
         // Create main table
         const table = document.createElement('table');
         const row = table.insertRow();
@@ -342,14 +343,14 @@ export class CustomPartsUI extends BaseComponentUI {
      */
     private saveToLocalStorage(bridge: AircraftBridge): void {
         const parts = bridge.getCustomParts();
-        localStorage.setItem('CustomParts', JSON.stringify(parts));
+        localStorage.setItem('test.CustomParts', JSON.stringify(parts));
     }
 
     /**
      * Load custom parts from localStorage on initialization
      */
     private loadFromLocalStorage(bridge: AircraftBridge): void {
-        const stored = localStorage.getItem('CustomParts');
+        const stored = localStorage.getItem('test.CustomParts');
         if (stored) {
             try {
                 const parts = JSON.parse(stored);
