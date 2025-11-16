@@ -1506,7 +1506,7 @@ export class AircraftBridge {
                 const enginesJson = localStorage.getItem(`test.engines.${listName}`);
                 if (enginesJson) {
                     try {
-                        const engines = JSON.parse(enginesJson);
+                        const engines = JSON.parse(enginesJson).engines;
                         console.log(`[AircraftBridge] Loading ${engines.length} engines into list "${listName}"`);
 
                         // Add each engine to the list
@@ -1541,11 +1541,12 @@ export class AircraftBridge {
 
             for (const listName of allListNames) {
                 const engines = this.getEnginesInList(listName);
+                const list = { name: listName, engines: engines };
 
                 // Only save non-empty lists
                 if (engines && engines.length > 0) {
                     customListNames.push(listName);
-                    localStorage.setItem(`test.engines.${listName}`, JSON.stringify(engines));
+                    localStorage.setItem(`test.engines.${listName}`, JSON.stringify(list));
                     console.log(`[AircraftBridge] Saved ${engines.length} engines to list "${listName}"`);
                 }
             }
