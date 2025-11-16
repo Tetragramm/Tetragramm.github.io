@@ -4375,7 +4375,7 @@ mod cockpits;
 mod control_surfaces;
 mod electric_builder;
 pub mod engine;
-mod engine_list;
+pub mod engine_list;
 mod engines;
 mod era;
 mod frames;

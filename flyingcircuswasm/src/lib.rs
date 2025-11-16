@@ -780,7 +780,7 @@ impl AircraftWasm {
             .map_err(|e| JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e)))?;
 
         engine_list::add_engine_to_list(list_name, engine)
-            .map_err(|e| JsValue::from_str(&e))?;
+            .map_err(|e| JsValue::from_str(e.as_str()))?;
 
         Ok(())
     }
@@ -800,7 +800,7 @@ impl AircraftWasm {
         use flyingcircusrust::engine_list;
 
         engine_list::clear_list(list_name)
-            .map_err(|e| JsValue::from_str(&e))?;
+            .map_err(|e| JsValue::from_str(e.as_str()))?;
 
         Ok(())
     }
