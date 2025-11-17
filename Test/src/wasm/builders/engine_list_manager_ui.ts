@@ -6,7 +6,7 @@
 
 import { EngineInputs } from '../types/engine_inputs';
 import { AircraftBridge } from '../aircraft_bridge';
-import { createSection, blinkElement } from './builder_utils';
+import { BlinkGood, BlinkBad } from '../dom_utils';
 import { localization } from '../localization';
 
 export class EngineListManagerUI {
@@ -53,7 +53,8 @@ export class EngineListManagerUI {
     private buildUI(): void {
         this.container.innerHTML = '';
 
-        const section = createSection('Engine Builder Lists');
+        const section = document.createElement('div');
+        section.style.padding = '10px';
 
         // List selector
         const listRow = document.createElement('div');
@@ -245,7 +246,7 @@ export class EngineListManagerUI {
         }
 
         if (engineInputs.name === 'Default' || engineInputs.name === '') {
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
             alert('Please set a name for the engine before adding to list');
             return;
         }
@@ -253,20 +254,20 @@ export class EngineListManagerUI {
         try {
             this.bridge.addEngineToList(this.currentList, engineInputs);
             this.updateEngines();
-            blinkElement(this.container, true);
+            BlinkGood(this.container);
 
             // Save to localStorage
             this.bridge.saveEngineListsToLocalStorage();
         } catch (e) {
             console.error('Failed to add engine to list:', e);
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
         }
     }
 
     private deleteEngine(): void {
         const selectedIndex = this.engineSelect.selectedIndex;
         if (selectedIndex < 0) {
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
             return;
         }
 
@@ -283,13 +284,13 @@ export class EngineListManagerUI {
             }
 
             this.updateEngines();
-            blinkElement(this.container, true);
+            BlinkGood(this.container);
 
             // Save to localStorage
             this.bridge.saveEngineListsToLocalStorage();
         } catch (e) {
             console.error('Failed to delete engine:', e);
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
         }
     }
 
@@ -298,7 +299,7 @@ export class EngineListManagerUI {
         name = name.replace(/\s+/g, ' ');
 
         if (name === '') {
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
             return;
         }
 
@@ -307,7 +308,7 @@ export class EngineListManagerUI {
         const listNames: string[] = namesJson ? JSON.parse(namesJson) : ['Custom'];
 
         if (listNames.includes(name)) {
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
             alert('List already exists');
             return;
         }
@@ -321,14 +322,14 @@ export class EngineListManagerUI {
 
         this.currentList = name;
         this.updateLists();
-        blinkElement(this.container, true);
+        BlinkGood(this.container);
 
         this.listNameInput.value = '';
     }
 
     private deleteList(): void {
         if (this.currentList === 'Custom') {
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
             alert('Cannot delete Custom list');
             return;
         }
@@ -354,7 +355,7 @@ export class EngineListManagerUI {
 
         this.currentList = 'Custom';
         this.updateLists();
-        blinkElement(this.container, true);
+        BlinkGood(this.container);
     }
 
     private saveList(): void {
@@ -375,10 +376,10 @@ export class EngineListManagerUI {
             a.click();
 
             URL.revokeObjectURL(url);
-            blinkElement(this.container, true);
+            BlinkGood(this.container);
         } catch (e) {
             console.error('Failed to save list:', e);
-            blinkElement(this.container, false);
+            BlinkBad(this.container);
         }
     }
 
@@ -416,10 +417,10 @@ export class EngineListManagerUI {
 
                 this.currentList = name;
                 this.updateLists();
-                blinkElement(this.container, true);
+                BlinkGood(this.container);
             } catch (e) {
                 console.error('Failed to load list:', e);
-                blinkElement(this.container, false);
+                BlinkBad(this.container);
             }
         };
         reader.readAsText(file);

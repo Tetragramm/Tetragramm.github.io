@@ -5,7 +5,7 @@
  */
 
 import { createElectricEngine, EngineInputs, EngineStats } from '../types/engine_inputs';
-import { createLabeledInput, createLabeledSelect, createLabeledDisplay, createSection } from './builder_utils';
+import { createFlexSection, createFlexNumberInput, createFlexSelect, createFlexLabel } from '../dom_utils';
 import { localization } from '../localization';
 import * as wasm from '../../../pkg/flyingcircuswasm';
 
@@ -22,14 +22,14 @@ export class ElectricBuilderUI {
     private qualityInput: HTMLInputElement;
 
     // Output elements
-    private nameDisplay: HTMLLabelElement;
-    private powerDisplay: HTMLLabelElement;
-    private massDisplay: HTMLLabelElement;
-    private dragDisplay: HTMLLabelElement;
-    private reliabilityDisplay: HTMLLabelElement;
-    private chargeDrawDisplay: HTMLLabelElement;
-    private overspeedDisplay: HTMLLabelElement;
-    private costDisplay: HTMLLabelElement;
+    private nameDisplay: HTMLSpanElement;
+    private powerDisplay: HTMLSpanElement;
+    private massDisplay: HTMLSpanElement;
+    private dragDisplay: HTMLSpanElement;
+    private reliabilityDisplay: HTMLSpanElement;
+    private chargeDrawDisplay: HTMLSpanElement;
+    private overspeedDisplay: HTMLSpanElement;
+    private costDisplay: HTMLSpanElement;
 
     // Current stats
     private currentStats: EngineStats | null = null;
@@ -49,17 +49,14 @@ export class ElectricBuilderUI {
     private buildUI(): void {
         this.container.innerHTML = '';
 
-        // Create main table structure
         const table = document.createElement('table');
         table.style.width = '100%';
         const row = table.insertRow();
 
-        // Left column: Input parameters
         const inputCell = row.insertCell();
         inputCell.style.verticalAlign = 'top';
         this.buildInputSection(inputCell);
 
-        // Right column: Output stats
         const outputCell = row.insertCell();
         outputCell.style.verticalAlign = 'top';
         this.buildOutputSection(outputCell);
@@ -68,107 +65,82 @@ export class ElectricBuilderUI {
     }
 
     private buildInputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Electric Builder Title');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
-        // Get table data from WASM
-        const eras: string[] = wasm.getPropellerEras(); // Electric uses same eras
+        const eras: string[] = wasm.getPropellerEras();
         const windings: string[] = wasm.getElectricWindings();
 
         // Name
-        const nameRow = createLabeledInput('Engine Builder Name', 'text');
-        this.nameInput = nameRow.input;
+        const nameLabel = document.createElement('label');
+        nameLabel.textContent = localization.translate('Engine Builder Name');
+        nameLabel.style.marginLeft = '0.25em';
+        nameLabel.style.marginRight = '0.5em';
+        flex.div1.appendChild(nameLabel);
+
+        this.nameInput = document.createElement('input');
+        this.nameInput.type = 'text';
+        this.nameInput.className = 'flex-item';
         this.nameInput.value = 'Custom Electric Motor';
         this.nameInput.onchange = () => this.updateStats();
-        section.appendChild(nameRow.container);
+        flex.div2.appendChild(this.nameInput);
 
-        // Era
-        const eraRow = createLabeledSelect('Engine Builder Era', eras);
-        this.eraSelect = eraRow.select;
-        this.eraSelect.onchange = () => this.updateStats();
-        section.appendChild(eraRow.container);
+        this.eraSelect = createFlexSelect(
+            { name: localization.translate('Engine Builder Era'), options: eras.map(e => ({ name: e, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
-        // Winding
-        const windingRow = createLabeledSelect('Electric Builder Winding', windings);
-        this.windingSelect = windingRow.select;
-        this.windingSelect.onchange = () => this.updateStats();
-        section.appendChild(windingRow.container);
+        this.windingSelect = createFlexSelect(
+            { name: localization.translate('Electric Builder Winding'), options: windings.map(w => ({ name: w, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
-        // Desired Power
-        const powerRow = createLabeledInput('Electric Builder Desired Power', 'number', '0', undefined, '1');
-        this.powerInput = powerRow.input;
+        this.powerInput = createFlexNumberInput(
+            { name: localization.translate('Electric Builder Desired Power'), value: 100, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '1'
+        );
         this.powerInput.valueAsNumber = 100;
-        this.powerInput.onchange = () => this.updateStats();
-        section.appendChild(powerRow.container);
 
-        // Chonk
-        const chonkRow = createLabeledInput('Electric Builder Chonk', 'number', '0', undefined, '0.1');
-        this.chonkInput = chonkRow.input;
+        this.chonkInput = createFlexNumberInput(
+            { name: localization.translate('Electric Builder Chonk'), value: 1.0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '0.1'
+        );
         this.chonkInput.valueAsNumber = 1.0;
-        this.chonkInput.onchange = () => this.updateStats();
-        section.appendChild(chonkRow.container);
 
-        // Quality
-        const qualRow = createLabeledInput('Electric Builder Quality', 'number', '0.5', '2', '0.05');
-        this.qualityInput = qualRow.input;
+        this.qualityInput = createFlexNumberInput(
+            { name: localization.translate('Electric Builder Quality'), value: 1.0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0.5', '2', '0.05'
+        );
         this.qualityInput.valueAsNumber = 1.0;
-        this.qualityInput.onchange = () => this.updateStats();
-        section.appendChild(qualRow.container);
-
-        cell.appendChild(section);
     }
 
     private buildOutputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Engine Builder Outputs');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
-        // Name
-        const nameRow = createLabeledDisplay('Engine Builder Name');
-        this.nameDisplay = nameRow.display;
-        section.appendChild(nameRow.container);
-
-        // Power
-        const powerRow = createLabeledDisplay('Engine Builder Power');
-        this.powerDisplay = powerRow.display;
-        section.appendChild(powerRow.container);
-
-        // Mass
-        const massRow = createLabeledDisplay('Engine Builder Mass');
-        this.massDisplay = massRow.display;
-        section.appendChild(massRow.container);
-
-        // Drag
-        const dragRow = createLabeledDisplay('Engine Builder Drag');
-        this.dragDisplay = dragRow.display;
-        section.appendChild(dragRow.container);
-
-        // Reliability
-        const relyRow = createLabeledDisplay('Engine Builder Reliability');
-        this.reliabilityDisplay = relyRow.display;
-        section.appendChild(relyRow.container);
-
-        // Charge Draw
-        const chargeRow = createLabeledDisplay('Electric Builder Charge Draw');
-        this.chargeDrawDisplay = chargeRow.display;
-        section.appendChild(chargeRow.container);
-
-        // Overspeed
-        const overspeedRow = createLabeledDisplay('Engine Builder Overspeed');
-        this.overspeedDisplay = overspeedRow.display;
-        section.appendChild(overspeedRow.container);
-
-        // Cost
-        const costRow = createLabeledDisplay('Engine Builder Cost');
-        this.costDisplay = costRow.display;
-        section.appendChild(costRow.container);
-
-        cell.appendChild(section);
+        this.nameDisplay = createFlexLabel({ name: localization.translate('Engine Builder Name'), value: '' }, flex);
+        this.powerDisplay = createFlexLabel({ name: localization.translate('Engine Builder Power'), value: '0' }, flex);
+        this.massDisplay = createFlexLabel({ name: localization.translate('Engine Builder Mass'), value: '0' }, flex);
+        this.dragDisplay = createFlexLabel({ name: localization.translate('Engine Builder Drag'), value: '0' }, flex);
+        this.reliabilityDisplay = createFlexLabel({ name: localization.translate('Engine Builder Reliability'), value: '0' }, flex);
+        this.chargeDrawDisplay = createFlexLabel({ name: localization.translate('Electric Builder Charge Draw'), value: '0' }, flex);
+        this.overspeedDisplay = createFlexLabel({ name: localization.translate('Engine Builder Overspeed'), value: '0' }, flex);
+        this.costDisplay = createFlexLabel({ name: localization.translate('Engine Builder Cost'), value: '0' }, flex);
     }
 
     private updateStats(): void {
-        // Construct EngineInputs object
         const engineInputs = createElectricEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
-            0, // rarity = CUSTOM
+            0,
             this.powerInput.valueAsNumber,
             this.windingSelect.selectedIndex,
             this.chonkInput.valueAsNumber,
@@ -176,11 +148,8 @@ export class ElectricBuilderUI {
         );
 
         try {
-            // Call WASM function to calculate stats
             const statsJs = wasm.calculateEngineStats(engineInputs);
             this.currentStats = statsJs as EngineStats;
-
-            // Update display
             this.displayStats();
         } catch (e) {
             console.error('Failed to calculate engine stats:', e);
@@ -195,21 +164,16 @@ export class ElectricBuilderUI {
         this.massDisplay.textContent = this.currentStats.mass.toString();
         this.dragDisplay.textContent = this.currentStats.drag.toString();
         this.reliabilityDisplay.textContent = this.currentStats.reliability.toString();
-        // Charge draw - need to check if it's in EngineStats
-        // For now, placeholder
         this.chargeDrawDisplay.textContent = '0';
         this.overspeedDisplay.textContent = this.currentStats.overspeed.toString();
         this.costDisplay.textContent = this.currentStats.cost.toString();
     }
 
-    /**
-     * Get current engine configuration as EngineInputs
-     */
     public getEngineInputs(): EngineInputs {
         return createElectricEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
-            0, // rarity = CUSTOM
+            0,
             this.powerInput.valueAsNumber,
             this.windingSelect.selectedIndex,
             this.chonkInput.valueAsNumber,
@@ -217,9 +181,6 @@ export class ElectricBuilderUI {
         );
     }
 
-    /**
-     * Load engine configuration from EngineInputs
-     */
     public setEngineInputs(inputs: EngineInputs): void {
         if (inputs.etype !== 3 || !('Electric' in inputs.inputs)) {
             console.error('Invalid engine type for electric builder');

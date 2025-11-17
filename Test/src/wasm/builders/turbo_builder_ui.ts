@@ -5,7 +5,7 @@
  */
 
 import { createTurbineEngine, EngineInputs, EngineStats } from '../types/engine_inputs';
-import { createLabeledInput, createLabeledSelect, createLabeledCheckbox, createLabeledDisplay, createSection } from './builder_utils';
+import { createFlexSection, createFlexNumberInput, createFlexSelect, createFlexCheckbox, createFlexLabel } from '../dom_utils';
 import { localization } from '../localization';
 import * as wasm from '../../../pkg/flyingcircuswasm';
 
@@ -25,14 +25,14 @@ export class TurboBuilderUI {
 
     // Output elements
     private descriptionCell: HTMLTableCellElement;
-    private nameDisplay: HTMLLabelElement;
-    private powerDisplay: HTMLLabelElement;
-    private massDisplay: HTMLLabelElement;
-    private dragDisplay: HTMLLabelElement;
-    private reliabilityDisplay: HTMLLabelElement;
-    private fuelDisplay: HTMLLabelElement;
-    private costDisplay: HTMLLabelElement;
-    private altitudeDisplay: HTMLLabelElement;
+    private nameDisplay: HTMLSpanElement;
+    private powerDisplay: HTMLSpanElement;
+    private massDisplay: HTMLSpanElement;
+    private dragDisplay: HTMLSpanElement;
+    private reliabilityDisplay: HTMLSpanElement;
+    private fuelDisplay: HTMLSpanElement;
+    private costDisplay: HTMLSpanElement;
+    private altitudeDisplay: HTMLSpanElement;
 
     // Current stats
     private currentStats: EngineStats | null = null;
@@ -52,23 +52,19 @@ export class TurboBuilderUI {
     private buildUI(): void {
         this.container.innerHTML = '';
 
-        // Create main table structure
         const table = document.createElement('table');
         table.style.width = '100%';
         const row = table.insertRow();
 
-        // Left column: Input parameters
         const inputCell = row.insertCell();
         inputCell.style.verticalAlign = 'top';
         this.buildInputSection(inputCell);
 
-        // Middle column: Description
         this.descriptionCell = row.insertCell();
         this.descriptionCell.style.verticalAlign = 'top';
         this.descriptionCell.style.padding = '10px';
         this.descriptionCell.style.maxWidth = '300px';
 
-        // Right column: Output stats
         const outputCell = row.insertCell();
         outputCell.style.verticalAlign = 'top';
         this.buildOutputSection(outputCell);
@@ -77,135 +73,108 @@ export class TurboBuilderUI {
     }
 
     private buildInputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Turbo Builder Title');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
-        // Get table data from WASM
-        const eras: string[] = wasm.getPropellerEras(); // Turbines use same eras
+        const eras: string[] = wasm.getPropellerEras();
         const types: string[] = wasm.getTurbineTypes();
 
         // Name
-        const nameRow = createLabeledInput('Engine Builder Name', 'text');
-        this.nameInput = nameRow.input;
+        const nameLabel = document.createElement('label');
+        nameLabel.textContent = localization.translate('Engine Builder Name');
+        nameLabel.style.marginLeft = '0.25em';
+        nameLabel.style.marginRight = '0.5em';
+        flex.div1.appendChild(nameLabel);
+
+        this.nameInput = document.createElement('input');
+        this.nameInput.type = 'text';
+        this.nameInput.className = 'flex-item';
         this.nameInput.value = 'Custom Turbine';
         this.nameInput.onchange = () => this.updateStats();
-        section.appendChild(nameRow.container);
+        flex.div2.appendChild(this.nameInput);
 
-        // Era
-        const eraRow = createLabeledSelect('Engine Builder Era', eras);
-        this.eraSelect = eraRow.select;
-        this.eraSelect.onchange = () => this.updateStats();
-        section.appendChild(eraRow.container);
+        this.eraSelect = createFlexSelect(
+            { name: localization.translate('Engine Builder Era'), options: eras.map(e => ({ name: e, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
-        // Type
-        const typeRow = createLabeledSelect('Engine Builder Type', types);
-        this.typeSelect = typeRow.select;
-        this.typeSelect.onchange = () => this.updateTypeChanged();
-        section.appendChild(typeRow.container);
+        this.typeSelect = createFlexSelect(
+            { name: localization.translate('Engine Builder Type'), options: types.map(t => ({ name: t, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateTypeChanged()
+        );
 
-        // Diameter
-        const diamRow = createLabeledInput('Turbo Builder Diameter', 'number', '0', undefined, '0.01');
-        this.diameterInput = diamRow.input;
+        this.diameterInput = createFlexNumberInput(
+            { name: localization.translate('Turbo Builder Diameter'), value: 1.0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '0.01'
+        );
         this.diameterInput.valueAsNumber = 1.0;
-        this.diameterInput.onchange = () => this.updateStats();
-        section.appendChild(diamRow.container);
 
-        // Overall Pressure Ratio
-        const comprRow = createLabeledInput('Turbo Builder Overall Pressure Ratio', 'number', '0', undefined, '0.01');
-        this.compressionInput = comprRow.input;
+        this.compressionInput = createFlexNumberInput(
+            { name: localization.translate('Turbo Builder Overall Pressure Ratio'), value: 10, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '0.01'
+        );
         this.compressionInput.valueAsNumber = 10;
-        this.compressionInput.onchange = () => this.updateStats();
-        section.appendChild(comprRow.container);
 
-        // Bypass Ratio
-        const bypassRow = createLabeledInput('Turbo Builder Bypass Ratio', 'number', '0', undefined, '0.1');
-        this.bypassInput = bypassRow.input;
+        this.bypassInput = createFlexNumberInput(
+            { name: localization.translate('Turbo Builder Bypass Ratio'), value: 0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '0.1'
+        );
         this.bypassInput.valueAsNumber = 0;
-        this.bypassInput.onchange = () => this.updateStats();
-        section.appendChild(bypassRow.container);
 
-        // Mass Flow Adjustment
-        const flowRow = createLabeledInput('Turbo Builder Mass Flow Adjustment', 'number', '-0.5', '0.5', '0.05');
-        this.flowAdjustInput = flowRow.input;
+        this.flowAdjustInput = createFlexNumberInput(
+            { name: localization.translate('Turbo Builder Mass Flow Adjustment'), value: 0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '-0.5', '0.5', '0.05'
+        );
         this.flowAdjustInput.valueAsNumber = 0;
-        this.flowAdjustInput.onchange = () => this.updateStats();
-        section.appendChild(flowRow.container);
 
-        // Afterburner
-        const abRow = createLabeledCheckbox('Turbo Builder Afterburner');
-        this.afterburnerCheckbox = abRow.checkbox;
-        this.afterburnerCheckbox.onchange = () => this.updateStats();
-        section.appendChild(abRow.container);
-
-        cell.appendChild(section);
+        this.afterburnerCheckbox = createFlexCheckbox(
+            { name: localization.translate('Turbo Builder Afterburner'), selected: false, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
     }
 
     private buildOutputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Engine Builder Outputs');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
-        // Name
-        const nameRow = createLabeledDisplay('Engine Builder Name');
-        this.nameDisplay = nameRow.display;
-        section.appendChild(nameRow.container);
-
-        // Power
-        const powerRow = createLabeledDisplay('Turbo Builder Thrust');
-        this.powerDisplay = powerRow.display;
-        section.appendChild(powerRow.container);
-
-        // Mass
-        const massRow = createLabeledDisplay('Engine Builder Mass');
-        this.massDisplay = massRow.display;
-        section.appendChild(massRow.container);
-
-        // Drag
-        const dragRow = createLabeledDisplay('Engine Builder Drag');
-        this.dragDisplay = dragRow.display;
-        section.appendChild(dragRow.container);
-
-        // Reliability
-        const relyRow = createLabeledDisplay('Engine Builder Reliability');
-        this.reliabilityDisplay = relyRow.display;
-        section.appendChild(relyRow.container);
-
-        // Fuel Consumption
-        const fuelRow = createLabeledDisplay('Engine Builder Fuel Consumption');
-        this.fuelDisplay = fuelRow.display;
-        section.appendChild(fuelRow.container);
-
-        // Cost
-        const costRow = createLabeledDisplay('Engine Builder Cost');
-        this.costDisplay = costRow.display;
-        section.appendChild(costRow.container);
-
-        // Altitude
-        const altRow = createLabeledDisplay('Engine Builder Altitude');
-        this.altitudeDisplay = altRow.display;
-        section.appendChild(altRow.container);
-
-        cell.appendChild(section);
+        this.nameDisplay = createFlexLabel({ name: localization.translate('Engine Builder Name'), value: '' }, flex);
+        this.powerDisplay = createFlexLabel({ name: localization.translate('Turbo Builder Thrust'), value: '0' }, flex);
+        this.massDisplay = createFlexLabel({ name: localization.translate('Engine Builder Mass'), value: '0' }, flex);
+        this.dragDisplay = createFlexLabel({ name: localization.translate('Engine Builder Drag'), value: '0' }, flex);
+        this.reliabilityDisplay = createFlexLabel({ name: localization.translate('Engine Builder Reliability'), value: '0' }, flex);
+        this.fuelDisplay = createFlexLabel({ name: localization.translate('Engine Builder Fuel Consumption'), value: '0' }, flex);
+        this.costDisplay = createFlexLabel({ name: localization.translate('Engine Builder Cost'), value: '0' }, flex);
+        this.altitudeDisplay = createFlexLabel({ name: localization.translate('Engine Builder Altitude'), value: '0' }, flex);
     }
 
     private updateTypeChanged(): void {
-        // Disable bypass ratio for turbojet and turboprop
         const selectedType = this.typeSelect.selectedIndex;
         if (selectedType === 0 || selectedType === 3) {
-            // Turbojet or Turboprop
             this.bypassInput.disabled = true;
         } else {
-            // Low Bypass or High Bypass Turbofan
             this.bypassInput.disabled = false;
         }
         this.updateStats();
     }
 
     private updateStats(): void {
-        // Construct EngineInputs object
         const upgrades = [this.afterburnerCheckbox.checked];
 
         const engineInputs = createTurbineEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
-            0, // rarity = CUSTOM
+            0,
             this.flowAdjustInput.valueAsNumber,
             this.diameterInput.valueAsNumber,
             this.compressionInput.valueAsNumber,
@@ -214,11 +183,8 @@ export class TurboBuilderUI {
         );
 
         try {
-            // Call WASM function to calculate stats
             const statsJs = wasm.calculateEngineStats(engineInputs);
             this.currentStats = statsJs as EngineStats;
-
-            // Update display
             this.displayStats();
             this.updateDescription();
         } catch (e) {
@@ -242,15 +208,13 @@ export class TurboBuilderUI {
     private updateDescription(): void {
         const typeIndex = this.typeSelect.selectedIndex;
 
-        // TODO: Get actual thrust and TSFC values from WASM
-        // For now, using placeholder logic
         const thrust = 'N/A';
         const tsfc = 'N/A';
 
         let description = '';
 
         switch (typeIndex) {
-            case 0: // Turbojet
+            case 0:
                 description = `<b>Engine Parameters:</b><br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Thrust = ${thrust} kN<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = ${tsfc} g/(kN*s)<br/>
@@ -261,7 +225,7 @@ export class TurboBuilderUI {
                     For a fictional engine, it is not suggested to adjust the mass flow rate.<br/>`;
                 break;
 
-            case 1: // Low Bypass Turbofan
+            case 1:
                 description = `<b>Engine Parameters:</b><br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Thrust = ${thrust} kN<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = ${tsfc} g/(kN*s)<br/>
@@ -273,7 +237,7 @@ export class TurboBuilderUI {
                     For a fictional engine, it is not suggested to adjust the mass flow rate.`;
                 break;
 
-            case 2: // High Bypass Turbofan
+            case 2:
                 description = `<b>Engine Parameters:</b><br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Thrust = ${thrust} kN<br/>
                     &nbsp;&nbsp;&nbsp;&nbsp;Fuel Consumption = ${tsfc} g/(kN*s)<br/>
@@ -285,7 +249,7 @@ export class TurboBuilderUI {
                     For a fictional engine, it is not suggested to adjust the mass flow rate.`;
                 break;
 
-            case 3: // Turboprop
+            case 3:
                 description = `For a real engine, set the era, total engine diameter (not intake), Bypass
                     Ratio and OPR. Then adjust the mass flow rate until the Power is just below
                     the rated takeoff power (in effective shp if available, shp if not). Note
@@ -298,16 +262,13 @@ export class TurboBuilderUI {
         this.descriptionCell.innerHTML = description;
     }
 
-    /**
-     * Get current engine configuration as EngineInputs
-     */
     public getEngineInputs(): EngineInputs {
         const upgrades = [this.afterburnerCheckbox.checked];
 
         return createTurbineEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
-            0, // rarity = CUSTOM
+            0,
             this.flowAdjustInput.valueAsNumber,
             this.diameterInput.valueAsNumber,
             this.compressionInput.valueAsNumber,
@@ -316,9 +277,6 @@ export class TurboBuilderUI {
         );
     }
 
-    /**
-     * Load engine configuration from EngineInputs
-     */
     public setEngineInputs(inputs: EngineInputs): void {
         if (inputs.etype !== 2 || !('Turbine' in inputs.inputs)) {
             console.error('Invalid engine type for turbine builder');
@@ -329,7 +287,6 @@ export class TurboBuilderUI {
 
         this.nameInput.value = inputs.name;
         this.eraSelect.selectedIndex = inputs.era_sel;
-        // Note: type stored separately, need to extract
         this.flowAdjustInput.valueAsNumber = turbineInputs.flow_adjustment;
         this.diameterInput.valueAsNumber = turbineInputs.diameter;
         this.compressionInput.valueAsNumber = turbineInputs.compression_ratio;

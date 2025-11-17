@@ -5,7 +5,7 @@
  */
 
 import { createPulsejetEngine, EngineInputs, EngineStats } from '../types/engine_inputs';
-import { createLabeledInput, createLabeledSelect, createLabeledCheckbox, createLabeledDisplay, createSection } from './builder_utils';
+import { createFlexSection, createFlexNumberInput, createFlexSelect, createFlexCheckbox, createFlexLabel } from '../dom_utils';
 import { localization } from '../localization';
 import * as wasm from '../../../pkg/flyingcircuswasm';
 
@@ -21,16 +21,16 @@ export class PulsejetBuilderUI {
     private starterCheckbox: HTMLInputElement;
 
     // Output elements
-    private nameDisplay: HTMLLabelElement;
-    private powerDisplay: HTMLLabelElement;
-    private massDisplay: HTMLLabelElement;
-    private dragDisplay: HTMLLabelElement;
-    private reliabilityDisplay: HTMLLabelElement;
-    private fuelDisplay: HTMLLabelElement;
-    private rumbleDisplay: HTMLLabelElement;
-    private costDisplay: HTMLLabelElement;
-    private altitudeDisplay: HTMLLabelElement;
-    private designCostDisplay: HTMLLabelElement;
+    private nameDisplay: HTMLSpanElement;
+    private powerDisplay: HTMLSpanElement;
+    private massDisplay: HTMLSpanElement;
+    private dragDisplay: HTMLSpanElement;
+    private reliabilityDisplay: HTMLSpanElement;
+    private fuelDisplay: HTMLSpanElement;
+    private rumbleDisplay: HTMLSpanElement;
+    private costDisplay: HTMLSpanElement;
+    private altitudeDisplay: HTMLSpanElement;
+    private designCostDisplay: HTMLSpanElement;
 
     // Current stats
     private currentStats: EngineStats | null = null;
@@ -69,121 +69,83 @@ export class PulsejetBuilderUI {
     }
 
     private buildInputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Pulsejet Builder Title');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
         // Get table data from WASM
         const valveTypes: string[] = wasm.getPulsejetValveTypes();
         const eras: string[] = wasm.getPropellerEras(); // Pulsejet uses same eras
 
         // Desired Power
-        const powerRow = createLabeledInput('Pulsejet Builder Desired Power', 'number', '0', undefined, '1');
-        this.powerInput = powerRow.input;
+        this.powerInput = createFlexNumberInput(
+            { name: localization.translate('Pulsejet Builder Desired Power'), value: 100, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '1'
+        );
         this.powerInput.valueAsNumber = 100;
-        this.powerInput.onchange = () => this.updateStats();
-        section.appendChild(powerRow.container);
 
         // Valve Type
-        const valveRow = createLabeledSelect('Pulsejet Builder Valve Type', valveTypes);
-        this.valveTypeSelect = valveRow.select;
-        this.valveTypeSelect.onchange = () => this.updateStats();
-        section.appendChild(valveRow.container);
+        this.valveTypeSelect = createFlexSelect(
+            { name: localization.translate('Pulsejet Builder Valve Type'), options: valveTypes.map(v => ({ name: v, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
         // Era
-        const eraRow = createLabeledSelect('Engine Builder Era', eras);
-        this.eraSelect = eraRow.select;
-        this.eraSelect.onchange = () => this.updateStats();
-        section.appendChild(eraRow.container);
+        this.eraSelect = createFlexSelect(
+            { name: localization.translate('Engine Builder Era'), options: eras.map(e => ({ name: e, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
         // Quality
-        const qualRow = createLabeledInput('Pulsejet Builder Quality', 'number', '0', undefined, '0.1');
-        this.qualityInput = qualRow.input;
+        this.qualityInput = createFlexNumberInput(
+            { name: localization.translate('Pulsejet Builder Quality'), value: 0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '0.1'
+        );
         this.qualityInput.valueAsNumber = 0;
-        this.qualityInput.onchange = () => this.updateStats();
-        section.appendChild(qualRow.container);
 
         // Starter
-        const starterRow = createLabeledCheckbox('Pulsejet Builder Starter');
-        this.starterCheckbox = starterRow.checkbox;
-        this.starterCheckbox.onchange = () => this.updateStats();
-        section.appendChild(starterRow.container);
-
-        cell.appendChild(section);
+        this.starterCheckbox = createFlexCheckbox(
+            { name: localization.translate('Pulsejet Builder Starter'), selected: false, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
     }
 
     private buildOutputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Engine Builder Outputs');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
-        // Name
-        const nameRow = createLabeledDisplay('Engine Builder Name');
-        this.nameDisplay = nameRow.display;
-        section.appendChild(nameRow.container);
-
-        // Power
-        const powerRow = createLabeledDisplay('Engine Builder Power');
-        this.powerDisplay = powerRow.display;
-        section.appendChild(powerRow.container);
-
-        // Mass
-        const massRow = createLabeledDisplay('Engine Builder Mass');
-        this.massDisplay = massRow.display;
-        section.appendChild(massRow.container);
-
-        // Drag
-        const dragRow = createLabeledDisplay('Engine Builder Drag');
-        this.dragDisplay = dragRow.display;
-        section.appendChild(dragRow.container);
-
-        // Reliability
-        const relyRow = createLabeledDisplay('Engine Builder Reliability');
-        this.reliabilityDisplay = relyRow.display;
-        section.appendChild(relyRow.container);
-
-        // Fuel Consumption
-        const fuelRow = createLabeledDisplay('Engine Builder Fuel Consumption');
-        this.fuelDisplay = fuelRow.display;
-        section.appendChild(fuelRow.container);
-
-        // Rumble
-        const rumbleRow = createLabeledDisplay('Pulsejet Builder Rumble');
-        this.rumbleDisplay = rumbleRow.display;
-        section.appendChild(rumbleRow.container);
-
-        // Cost
-        const costRow = createLabeledDisplay('Engine Builder Cost');
-        this.costDisplay = costRow.display;
-        section.appendChild(costRow.container);
-
-        // Altitude
-        const altRow = createLabeledDisplay('Engine Builder Altitude');
-        this.altitudeDisplay = altRow.display;
-        section.appendChild(altRow.container);
-
-        // Design Cost
-        const designCostRow = createLabeledDisplay('Pulsejet Builder Design Cost');
-        this.designCostDisplay = designCostRow.display;
-        section.appendChild(designCostRow.container);
-
-        cell.appendChild(section);
+        this.nameDisplay = createFlexLabel({ name: localization.translate('Engine Builder Name'), value: '' }, flex);
+        this.powerDisplay = createFlexLabel({ name: localization.translate('Engine Builder Power'), value: '0' }, flex);
+        this.massDisplay = createFlexLabel({ name: localization.translate('Engine Builder Mass'), value: '0' }, flex);
+        this.dragDisplay = createFlexLabel({ name: localization.translate('Engine Builder Drag'), value: '0' }, flex);
+        this.reliabilityDisplay = createFlexLabel({ name: localization.translate('Engine Builder Reliability'), value: '0' }, flex);
+        this.fuelDisplay = createFlexLabel({ name: localization.translate('Engine Builder Fuel Consumption'), value: '0' }, flex);
+        this.rumbleDisplay = createFlexLabel({ name: localization.translate('Pulsejet Builder Rumble'), value: '0' }, flex);
+        this.costDisplay = createFlexLabel({ name: localization.translate('Engine Builder Cost'), value: '0' }, flex);
+        this.altitudeDisplay = createFlexLabel({ name: localization.translate('Engine Builder Altitude'), value: '0' }, flex);
+        this.designCostDisplay = createFlexLabel({ name: localization.translate('Pulsejet Builder Design Cost'), value: '0' }, flex);
     }
 
     private updateStats(): void {
-        // Construct EngineInputs object
         const engineInputs = createPulsejetEngine(
             'Custom Pulsejet',
             this.eraSelect.selectedIndex,
-            0, // rarity = CUSTOM
+            0,
             this.powerInput.valueAsNumber,
-            this.qualityInput.valueAsNumber, // quality_cost
-            this.qualityInput.valueAsNumber, // quality_reliability (same as cost)
+            this.qualityInput.valueAsNumber,
+            this.qualityInput.valueAsNumber,
             this.starterCheckbox.checked
         );
 
         try {
-            // Call WASM function to calculate stats
             const statsJs = wasm.calculateEngineStats(engineInputs);
             this.currentStats = statsJs as EngineStats;
-
-            // Update display
             this.displayStats();
         } catch (e) {
             console.error('Failed to calculate engine stats:', e);
@@ -199,24 +161,17 @@ export class PulsejetBuilderUI {
         this.dragDisplay.textContent = this.currentStats.drag.toString();
         this.reliabilityDisplay.textContent = this.currentStats.reliability.toString();
         this.fuelDisplay.textContent = this.currentStats.fuel_consumption.toString();
-        // Rumble is stored in... where? Need to check if it's in EngineStats
-        // For now, leaving as placeholder
         this.rumbleDisplay.textContent = '0';
         this.costDisplay.textContent = this.currentStats.cost.toString();
         this.altitudeDisplay.textContent = this.currentStats.altitude.toString();
-        // Design cost - need to calculate separately or get from WASM
-        // For now, placeholder
         this.designCostDisplay.textContent = '0';
     }
 
-    /**
-     * Get current engine configuration as EngineInputs
-     */
     public getEngineInputs(): EngineInputs {
         return createPulsejetEngine(
             'Custom Pulsejet',
             this.eraSelect.selectedIndex,
-            0, // rarity = CUSTOM
+            0,
             this.powerInput.valueAsNumber,
             this.qualityInput.valueAsNumber,
             this.qualityInput.valueAsNumber,
@@ -224,9 +179,6 @@ export class PulsejetBuilderUI {
         );
     }
 
-    /**
-     * Load engine configuration from EngineInputs
-     */
     public setEngineInputs(inputs: EngineInputs): void {
         if (inputs.etype !== 1 || !('Pulsejet' in inputs.inputs)) {
             console.error('Invalid engine type for pulsejet builder');
@@ -234,12 +186,10 @@ export class PulsejetBuilderUI {
         }
 
         const pulseInputs = (inputs.inputs as any).Pulsejet;
-
         this.eraSelect.selectedIndex = inputs.era_sel;
         this.powerInput.valueAsNumber = pulseInputs.power;
         this.qualityInput.valueAsNumber = pulseInputs.quality_cost;
         this.starterCheckbox.checked = pulseInputs.starter;
-
         this.updateStats();
     }
 }

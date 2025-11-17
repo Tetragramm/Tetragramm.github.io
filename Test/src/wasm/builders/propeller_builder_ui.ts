@@ -5,7 +5,7 @@
  */
 
 import { createPropellerEngine, EngineInputs, EngineStats } from '../types/engine_inputs';
-import { createLabeledInput, createLabeledSelect, createLabeledCheckbox, createLabeledDisplay, createSection } from './builder_utils';
+import { createFlexSection, createFlexNumberInput, createFlexSelect, createFlexCheckbox, createFlexLabel } from '../dom_utils';
 import { localization } from '../localization';
 import * as wasm from '../../../pkg/flyingcircuswasm';
 
@@ -30,19 +30,19 @@ export class PropellerBuilderUI {
     private upgradeCheckboxes: HTMLInputElement[] = [];
 
     // Output elements
-    private nameDisplay: HTMLLabelElement;
-    private powerDisplay: HTMLLabelElement;
-    private massDisplay: HTMLLabelElement;
-    private dragDisplay: HTMLLabelElement;
-    private reliabilityDisplay: HTMLLabelElement;
-    private coolingDisplay: HTMLLabelElement;
-    private overspeedDisplay: HTMLLabelElement;
-    private fuelDisplay: HTMLLabelElement;
-    private altitudeDisplay: HTMLLabelElement;
-    private torqueDisplay: HTMLLabelElement;
-    private costDisplay: HTMLLabelElement;
-    private oilTankDisplay: HTMLLabelElement;
-    private gearedRPMDisplay: HTMLLabelElement;
+    private nameDisplay: HTMLSpanElement;
+    private powerDisplay: HTMLSpanElement;
+    private massDisplay: HTMLSpanElement;
+    private dragDisplay: HTMLSpanElement;
+    private reliabilityDisplay: HTMLSpanElement;
+    private coolingDisplay: HTMLSpanElement;
+    private overspeedDisplay: HTMLSpanElement;
+    private fuelDisplay: HTMLSpanElement;
+    private altitudeDisplay: HTMLSpanElement;
+    private torqueDisplay: HTMLSpanElement;
+    private costDisplay: HTMLSpanElement;
+    private oilTankDisplay: HTMLSpanElement;
+    private gearedRPMDisplay: HTMLSpanElement;
 
     // Current stats
     private currentStats: EngineStats | null = null;
@@ -86,190 +86,230 @@ export class PropellerBuilderUI {
     }
 
     private buildInputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Engine Builder Propeller Inputs');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
         // Get table data from WASM
         const eras: string[] = wasm.getPropellerEras();
         const coolingTypes: string[] = wasm.getPropellerCoolingTypes();
 
-        // Name
-        const nameRow = createLabeledInput('Engine Builder Name', 'text');
-        this.nameInput = nameRow.input;
+        // Name - using regular input since dom_utils doesn't have text input helper
+        const nameLabel = document.createElement('label');
+        nameLabel.textContent = localization.translate('Engine Builder Name');
+        nameLabel.style.marginLeft = '0.25em';
+        nameLabel.style.marginRight = '0.5em';
+        flex.div1.appendChild(nameLabel);
+
+        this.nameInput = document.createElement('input');
+        this.nameInput.type = 'text';
+        this.nameInput.className = 'flex-item';
         this.nameInput.value = 'Custom Engine';
         this.nameInput.onchange = () => this.updateStats();
-        section.appendChild(nameRow.container);
+        flex.div2.appendChild(this.nameInput);
 
         // Era
-        const eraRow = createLabeledSelect('Engine Builder Era', eras);
-        this.eraSelect = eraRow.select;
-        this.eraSelect.onchange = () => this.updateStats();
-        section.appendChild(eraRow.container);
+        this.eraSelect = createFlexSelect(
+            { name: localization.translate('Engine Builder Era'), options: eras.map(e => ({ name: e, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
         // Cooling Type
-        const coolingRow = createLabeledSelect('Engine Builder Type', coolingTypes);
-        this.coolingSelect = coolingRow.select;
-        this.coolingSelect.onchange = () => this.updateStats();
-        section.appendChild(coolingRow.container);
+        this.coolingSelect = createFlexSelect(
+            { name: localization.translate('Engine Builder Type'), options: coolingTypes.map(c => ({ name: c, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
         // Displacement
-        const dispRow = createLabeledInput('Engine Builder Displacement', 'number', '0.01', undefined, '0.01');
-        this.displacementInput = dispRow.input;
+        this.displacementInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Displacement'), value: 10, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0.01', undefined, '0.01'
+        );
         this.displacementInput.valueAsNumber = 10;
-        this.displacementInput.onchange = () => this.updateStats();
-        section.appendChild(dispRow.container);
 
         // Compression Ratio
-        const comprRow = createLabeledInput('Engine Builder Compression Ratio', 'number', '0.01', undefined, '0.01');
-        this.compressionInput = comprRow.input;
+        this.compressionInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Compression Ratio'), value: 5, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0.01', undefined, '0.01'
+        );
         this.compressionInput.valueAsNumber = 5;
-        this.compressionInput.onchange = () => this.updateStats();
-        section.appendChild(comprRow.container);
 
         // Cylinders per Row
-        const cylRow = createLabeledInput('Engine Builder Cylinders Per Row', 'number', '1', undefined, '1');
-        this.cylPerRowInput = cylRow.input;
+        this.cylPerRowInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Cylinders Per Row'), value: 6, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '1', undefined, '1'
+        );
         this.cylPerRowInput.valueAsNumber = 6;
-        this.cylPerRowInput.onchange = () => this.updateStats();
-        section.appendChild(cylRow.container);
 
         // Number of Rows
-        const rowsRow = createLabeledInput('Engine Builder Number of Rows', 'number', '1', undefined, '1');
-        this.rowsInput = rowsRow.input;
+        this.rowsInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Number of Rows'), value: 1, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '1', undefined, '1'
+        );
         this.rowsInput.valueAsNumber = 1;
-        this.rowsInput.onchange = () => this.updateStats();
-        section.appendChild(rowsRow.container);
 
         // RPM Boost
-        const rpmRow = createLabeledInput('Engine Builder RPM Boost', 'number', '0.01', '2000', '0.01');
-        this.rpmBoostInput = rpmRow.input;
+        this.rpmBoostInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder RPM Boost'), value: 0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0.01', '2000', '0.01'
+        );
         this.rpmBoostInput.valueAsNumber = 0;
-        this.rpmBoostInput.onchange = () => this.updateStats();
-        section.appendChild(rpmRow.container);
 
         // Material Fudge
-        const matRow = createLabeledInput('Engine Builder Material Fudge', 'number', '0.1', '1.9', '0.1');
-        this.materialFudgeInput = matRow.input;
+        this.materialFudgeInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Material Fudge'), value: 1.0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0.1', '1.9', '0.1'
+        );
         this.materialFudgeInput.valueAsNumber = 1.0;
-        this.materialFudgeInput.onchange = () => this.updateStats();
-        section.appendChild(matRow.container);
 
         // Quality Fudge
-        const qualRow = createLabeledInput('Engine Builder Quality Fudge', 'number', '0.1', '1.9', '0.1');
-        this.qualityFudgeInput = qualRow.input;
+        this.qualityFudgeInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Quality Fudge'), value: 1.0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0.1', '1.9', '0.1'
+        );
         this.qualityFudgeInput.valueAsNumber = 1.0;
-        this.qualityFudgeInput.onchange = () => this.updateStats();
-        section.appendChild(qualRow.container);
-
-        cell.appendChild(section);
     }
 
     private buildUpgradesSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Engine Builder Upgrades');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
         // Get table data from WASM
         const compressorTypes: string[] = wasm.getPropellerCompressorTypes();
 
         // Compressor Type
-        const compRow = createLabeledSelect('Engine Builder Compressor Type', compressorTypes);
-        this.compressorTypeSelect = compRow.select;
-        this.compressorTypeSelect.onchange = () => this.updateStats();
-        section.appendChild(compRow.container);
+        this.compressorTypeSelect = createFlexSelect(
+            { name: localization.translate('Engine Builder Compressor Type'), options: compressorTypes.map(c => ({ name: c, enabled: true })), selected: 0, enabled: true },
+            flex,
+            () => this.updateStats()
+        );
 
         // Compressor Count
-        const countRow = createLabeledInput('Engine Builder Compressor Count', 'number', '0', undefined, '1');
-        this.compressorCountInput = countRow.input;
+        this.compressorCountInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Compressor Count'), value: 0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '1'
+        );
         this.compressorCountInput.valueAsNumber = 0;
-        this.compressorCountInput.onchange = () => this.updateStats();
-        section.appendChild(countRow.container);
 
         // Min Ideal Altitude
-        const altRow = createLabeledInput('Engine Builder Min Ideal Altitude', 'number', '0', undefined, '10');
-        this.minIdealAltInput = altRow.input;
+        this.minIdealAltInput = createFlexNumberInput(
+            { name: localization.translate('Engine Builder Min Ideal Altitude'), value: 0, enabled: true },
+            flex,
+            (val) => this.updateStats(),
+            '0', undefined, '10'
+        );
         this.minIdealAltInput.valueAsNumber = 0;
-        this.minIdealAltInput.onchange = () => this.updateStats();
-        section.appendChild(altRow.container);
 
         // Upgrades (checkboxes)
         const upgrades: string[] = wasm.getPropellerUpgrades();
         for (const upgrade of upgrades) {
-            const upRow = createLabeledCheckbox(upgrade);
-            upRow.checkbox.onchange = () => this.updateStats();
-            this.upgradeCheckboxes.push(upRow.checkbox);
-            section.appendChild(upRow.container);
+            const checkbox = createFlexCheckbox(
+                { name: upgrade, selected: false, enabled: true },
+                flex,
+                () => this.updateStats()
+            );
+            this.upgradeCheckboxes.push(checkbox);
         }
-
-        cell.appendChild(section);
     }
 
     private buildOutputSection(cell: HTMLTableCellElement): void {
-        const section = createSection('Engine Builder Outputs');
+        const flex = createFlexSection();
+        cell.appendChild(flex.div0);
 
         // Name
-        const nameRow = createLabeledDisplay('Engine Builder Name');
-        this.nameDisplay = nameRow.display;
-        section.appendChild(nameRow.container);
+        this.nameDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Name'), value: '' },
+            flex
+        );
 
         // Power
-        const powerRow = createLabeledDisplay('Engine Builder Power');
-        this.powerDisplay = powerRow.display;
-        section.appendChild(powerRow.container);
+        this.powerDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Power'), value: '0' },
+            flex
+        );
 
         // Mass
-        const massRow = createLabeledDisplay('Engine Builder Mass');
-        this.massDisplay = massRow.display;
-        section.appendChild(massRow.container);
+        this.massDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Mass'), value: '0' },
+            flex
+        );
 
         // Drag
-        const dragRow = createLabeledDisplay('Engine Builder Drag');
-        this.dragDisplay = dragRow.display;
-        section.appendChild(dragRow.container);
+        this.dragDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Drag'), value: '0' },
+            flex
+        );
 
         // Reliability
-        const relyRow = createLabeledDisplay('Engine Builder Reliability');
-        this.reliabilityDisplay = relyRow.display;
-        section.appendChild(relyRow.container);
+        this.reliabilityDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Reliability'), value: '0' },
+            flex
+        );
 
         // Required Cooling
-        const coolRow = createLabeledDisplay('Engine Builder Required Cooling');
-        this.coolingDisplay = coolRow.display;
-        section.appendChild(coolRow.container);
+        this.coolingDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Required Cooling'), value: '0' },
+            flex
+        );
 
         // Overspeed
-        const overspeedRow = createLabeledDisplay('Engine Builder Overspeed');
-        this.overspeedDisplay = overspeedRow.display;
-        section.appendChild(overspeedRow.container);
+        this.overspeedDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Overspeed'), value: '0' },
+            flex
+        );
 
         // Fuel Consumption
-        const fuelRow = createLabeledDisplay('Engine Builder Fuel Consumption');
-        this.fuelDisplay = fuelRow.display;
-        section.appendChild(fuelRow.container);
+        this.fuelDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Fuel Consumption'), value: '0' },
+            flex
+        );
 
         // Altitude
-        const altRow = createLabeledDisplay('Engine Builder Altitude');
-        this.altitudeDisplay = altRow.display;
-        section.appendChild(altRow.container);
+        this.altitudeDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Altitude'), value: '0' },
+            flex
+        );
 
         // Torque
-        const torqueRow = createLabeledDisplay('Engine Builder Torque');
-        this.torqueDisplay = torqueRow.display;
-        section.appendChild(torqueRow.container);
+        this.torqueDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Torque'), value: '0' },
+            flex
+        );
 
         // Cost
-        const costRow = createLabeledDisplay('Engine Builder Cost');
-        this.costDisplay = costRow.display;
-        section.appendChild(costRow.container);
+        this.costDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Cost'), value: '0' },
+            flex
+        );
 
         // Oil Tank
-        const oilRow = createLabeledDisplay('Engine Builder Oil Tank');
-        this.oilTankDisplay = oilRow.display;
-        section.appendChild(oilRow.container);
+        this.oilTankDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Oil Tank'), value: '0' },
+            flex
+        );
 
         // Geared RPM
-        const rpmRow = createLabeledDisplay('Engine Builder Geared RPM');
-        this.gearedRPMDisplay = rpmRow.display;
-        section.appendChild(rpmRow.container);
-
-        cell.appendChild(section);
+        this.gearedRPMDisplay = createFlexLabel(
+            { name: localization.translate('Engine Builder Geared RPM'), value: '0' },
+            flex
+        );
     }
 
     private updateStats(): void {
