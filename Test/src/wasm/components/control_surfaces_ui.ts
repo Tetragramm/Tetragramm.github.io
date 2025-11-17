@@ -102,6 +102,9 @@ export class ControlSurfacesUI extends BaseComponentUI {
         // Stats cell
         const statsCell = document.createElement('td');
         const stats = bridge.getControlSurfacesStats();
+        const derivedStats = bridge.getDerivedStats();
+        const flapCost = bridge.getControlSurfacesFlapCost(Math.round(derivedStats.dry_mp));
+        stats.cost += flapCost;
         const statsTables = createStatsTable(stats, CONTROLS_STATS);
         dataRow.appendChild(statsTables);
 
@@ -251,8 +254,11 @@ export class ControlSurfacesUI extends BaseComponentUI {
             });
         }
 
-        // Update stat values
+        // Update stat values (including flap cost)
         const stats = bridge.getControlSurfacesStats();
+        const derivedStats = bridge.getDerivedStats();
+        const flapCost = bridge.getControlSurfacesFlapCost(Math.round(derivedStats.dry_mp));
+        stats.cost += flapCost;
         updateStatsTable(this.cache.statsTables, stats, CONTROLS_STATS);
     }
 }

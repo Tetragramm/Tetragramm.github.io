@@ -129,6 +129,7 @@ export interface AircraftWasmAPI {
     getControlSurfacesBindings(): any;
     setControlSurfacesBindings(bindings: any): void;
     getControlSurfacesStats(): Stats;
+    getControlSurfacesFlapCost(dryMp: number): number;
     getLandingGearBindings(): any;
     setLandingGearBindings(bindings: any): void;
     getLandingGearStats(): Stats;
@@ -182,6 +183,7 @@ export interface AircraftWasmAPI {
     calculateStats(): void;
     getDerivedStats(): DerivedStats;
     getStats(): any;
+    calculateEngineStats(engineData: any): any;
 
     // Aircraft query methods
     getUsedIsDefault(): boolean;
@@ -553,6 +555,14 @@ export class AircraftBridge {
     getControlSurfacesStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getControlSurfacesStats();
+    }
+
+    /**
+     * Get flap cost based on dry MP (for display purposes)
+     */
+    getControlSurfacesFlapCost(dryMp: number): number {
+        this.ensureInitialized();
+        return this.wasm!.getControlSurfacesFlapCost(dryMp);
     }
 
     /**
@@ -1184,6 +1194,14 @@ export class AircraftBridge {
     getStats(): any {
         this.ensureInitialized();
         return this.wasm!.getStats();
+    }
+
+    /**
+     * Calculate engine stats from EngineInputs JSON (standalone calculation)
+     */
+    calculateEngineStats(engineData: any): any {
+        this.ensureInitialized();
+        return this.wasm!.calculateEngineStats(engineData);
     }
 
     /**

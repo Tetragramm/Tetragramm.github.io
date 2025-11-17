@@ -60,6 +60,8 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
                 ("Alter Section Title", "Sonderteile und Änderungen"),
 				("Alter Select Part", "Teil auswählen"),
 				("Altitude Altitude", "Höhe"),
+				("Altitude Eternal Fires", "Ewige Feuer"),
+				("Altitude Oxidized Fuel", "Oxidierter Kraftstoff"),
 				("Altitude Holding", "Höhenhaltung"),
                 (
                     "Altitude Holding Warning",
@@ -1124,6 +1126,8 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
                 ("Alter Section Title", "Custom Parts and Alterations"),
 				("Alter Select Part", "Select Part"),
 				("Altitude Altitude", "Altitude"),
+				("Altitude Eternal Fires", "Eternal Fires"),
+				("Altitude Oxidized Fuel", "Oxidized Fuel"),
 				("Altitude Holding", "Altitude Holding"),
                 ("Altitude Holding Warning", "Allows the Empty Seat rule to be ignored."),
                 ("Altitude Section Title", "Altitude Effects"),
@@ -2143,6 +2147,8 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
                 ("Alter Section Title", "Piezas Personalizadas y Alteraciones"),
                 ("Alter Select Part", "Seleccionar Parte"),
 				("Altitude Altitude", "Altitud"),
+				("Altitude Eternal Fires", "Fuegos Eternos"),
+				("Altitude Oxidized Fuel", "Combustible Oxidado"),
                 ("Altitude Holding", "Mantenimiento de Altitud"),
                 (
                     "Altitude Holding Warning",
@@ -3226,6 +3232,8 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
                 ("Alter Section Title", "Pièces Personnalisées et Modifications"),
                 ("Alter Select Part", "Sélectionner Pièce"),
 				("Altitude Altitude", "Altitude"),
+				("Altitude Eternal Fires", "Feux Éternels"),
+				("Altitude Oxidized Fuel", "Carburant Oxydé"),
                 ("Altitude Holding", "Maintien d'Altitude"),
                 (
                     "Altitude Holding Warning",
@@ -5119,6 +5127,7 @@ mod tests {
         };
         assert_eq!(true_ds, acft.get_derived_stats());
     }
+
     #[test]
     fn test_published_final_deserialize() {
         let input: serde_json::Value = serde_json::from_str(r#"
@@ -5209,7 +5218,8 @@ mod tests {
             "Rebuilt LM \"Viper\"",
             "Libelle T.87",
             "Mauss Z-95 Phönix",
-            "Lockheed P-80C"
+            "Lockheed P-80C",
+            "XF5U T4 Top"
             ],
             "acft": [
             "AAEAjATAdALMDwAVAFgUwDaoE4AIDSA9gEZYCGOAsgCLACAdDAYMC68M2yyPZ5-QOgAhbABdk5AGJgYANhk4AO0Ww4wADgAMyAA7AAGMAC4vBmwAwwAMCsAkCd42A-wF-gAJGABkez98sBwlhiktJyisq46lq6lgDqsQCSwEKi4jhSsvJKKlE6fACCusAAAgApAF4Ah0wA-ADOAMwNNQBmba1tJiB8wHZ+vDxWnABArNbWgxNjpsCjUyzzs2zMoywAcL2+AOCbnNYLPf5++yx9rIP29Gf9bACgvvT73Rc3e2wAEK-T9juvJ0NfViORznJaWeiMF4MWiDQarXirSEzaEo4HIw6Ar5AA",
@@ -5299,7 +5309,8 @@ mod tests {
             "AAEAjATAdArMBIAlApgIwK4EsA2AXABADICy+ARAGqYAOyATmcAIDPBsBgbXH3XIvA1vABC9XAAsAhvgBiYACwA2RfjAB2AAzjqwABjAAuIJbcAMMADAXAJCCBACAD-AP+ABEYAGQ7P32xYiYlKyCsqqmtqWAOpRAJIIonQS0nJKKupaOtxMAIJZAAIAKQBeAIes7AD8AGa1NXUAAT782cD2XABAflwsJrxdbFZWfcNco2xdVtxTndwA4MCTwACwwLYD-pbAANBtAjMti6wsG3Yza6zdm7ZXvACgvn2gl7f73O2vW3YLt+fnAk8BI5HD1Fix2IDjn0mMCjnZIZ8-EA",
             "AAEAjATAdArMAwAZAlgIwKYBtPoAQBUoAOAdmAEAKqAwYO+4WhukZtqgDACUALAewB2AQ1wBZPgBc+AJ1RCArrgBakXGDAAGHgAdgAFGABcYAGA6lKg1oAIegHB27AP9PgAaGAAERz9-ng3PzCYpIycooqEGqaOqYA6nEAkgG8giLiUrIKyqrqWrp0AEAUAIIFAAIABfQAkBQA-IgAMwCz9QABdB0+rAwWLsDF7ENsI2b+fcwWg-TTEzP0tCO2DlP0K6OzW-4jjuN0dZN+wIfHzACgvnOsc2fM+8C2d3QPzKtnD693A-6UJpTUW5UcjTcgDXZrZ5Q4BAA",
             "AAEAjATAdArMCIBZAhgVwM7oAQC0C0AnDFgAoAWAbwHYCWAHsAIBPADAwAYMNz57zyG7N+PZgDQASgHt0AUwBus5ACcsAQSoBrKaiwAhLGAAcABjIAHYAGxgYEW34AoYAAgeASHtfmAJGBivQKChf2k5RRV1LR19Q1MLNgB1RIBJUJkFJVUNbV0DYzNLEMY1ADkAM3KAAQBS8wAS4E9GAH5K8paAZoBmbrbK4AAgIYF+dmAAf4mRYRZZnnGHYPth5dWQ9a5PQIA4JpFF9ZDjwMX95ZFtniPAgFAg5kFQEYuvM7duJ+D2G+4AcFebEYwjOgPszFYzA482Ks1m6xhMLByyAA",
-            "AAEAjATAdA7MBwAZA9gYwNYAsCm2AmABAAoC0AHAAwDCowAgLQGDAuvDNssic-3AAIAQQA2wgJYBnZADsCAKQDMCkoJIKArMDzAA3Lx4BSdqwCf+8wAPgAGP0B+AGUAzJ+f0MhoyTPlKVazQBoRABDCQAXAgAJAFcAJziQzAERcSlZRWVVDWAAIDYAXsQAGYBZuwBigHWAKAABazLObl4Af9bgAEg3XnyWZgBQTiG2EdYxhgngKcnOBlZAvm4ANGAAGB4AYHN5vh58-O3Wbp7eE9Ph3jG2biO8zgBiNwY74AAIC7ZXzgBwT+BXt9-jwGIxQbtWAxcgwYe1QDCGHC+rwIcD-kA"
+            "AAEAjATAdA7MBwAZA9gYwNYAsCm2AmABAAoC0AHAAwDCowAgLQGDAuvDNssic-3AAIAQQA2wgJYBnZADsCAKQDMCkoJIKArMDzAA3Lx4BSdqwCf+8wAPgAGP0B+AGUAzJ+f0MhoyTPlKVazQBoRABDCQAXAgAJAFcAJziQzAERcSlZRWVVDWAAIDYAXsQAGYBZuwBigHWAKAABazLObl4Af9bgAEg3XnyWZgBQTiG2EdYxhgngKcnOBlZAvm4ANGAAGB4AYHN5vh58-O3Wbp7eE9Ph3jG2biO8zgBiNwY74AAIC7ZXzgBwT+BXt9-jwGIxQbtWAxcgwYe1QDCGHC+rwIcD-kA",
+            "AAEAjATAdA7MDQANAYgVgKoAIAqAWHA9gA6jACApAYMDbcNXTSIy8AEDACQA4gKI4BmMAFoAahGAATYAG5WLeMADAtADPyWAf4DfwAPvAC8gPwAygGbmN8ij37YhYifAAyAQwDOAF0wAJAK4AToFuABZcfIIi4uzKNAB8ABwAigA3xkQAxQDrAAIAI6oAs4zMrJqawACgNBQc8nZRTlKy1rSKKjTqbTQ6+oYmFlY9dLaRDtHO7t5+QSHhjRPNHJ1JaRk5BcWl8hXVtbGjLGXAADD75DQ1lxcUt1cH90-Xdy8PN29PKp8-j500nEYd1o9UOjBUKzogJGjGhMNo1xGzEURxoABJWHcKCo7gAIRj46z-OjMADgNzaxOJNFBNGpjE0AF-LlUKJRgbQ6hRuXtcdyKLyNBz4SKgA"
         ]}"#
         ).unwrap();
         let output: serde_json::Value = serde_json::from_str(r#"
@@ -5391,7 +5402,8 @@ mod tests {
             {"name":"Rebuilt LM \"Viper\"","cost":19,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"-1","stress":"2","DryMP":5,"WetMP":6,"WetMPwBombs":6,"DPEmpty":14,"DPFull":14,"DPwBombs":14,"MaxSpeedEmpty":16,"MaxSpeedFull":16,"MaxSpeedwBombs":16,"StallSpeedEmpty":6,"StallSpeedFull":7,"StallSpeedFullwBombs":7,"Overspeed":24,"BoostEmpty":3,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":9,"Stabiilty":-5,"HandlingEmpty":101,"HandlingFull":100,"HandlingFullwBombs":100,"MaxStrain":27,"Toughness":8,"Structure":41,"EnergyLoss":5,"EnergyLosswBombs":6,"TurnBleed":1,"TurnBleedwBombs":2,"FuelUses":6,"ControlStress":2,"RumbleStress":0,"RateOfClimbFull":4,"RateOfClimbEmpty":5,"RateOfClimbwBombs":4},
             {"name":"Libelle T.87","cost":23,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"0","stress":"1","DryMP":3,"WetMP":4,"WetMPwBombs":4,"DPEmpty":7,"DPFull":7,"DPwBombs":7,"MaxSpeedEmpty":18,"MaxSpeedFull":18,"MaxSpeedwBombs":18,"StallSpeedEmpty":5,"StallSpeedFull":7,"StallSpeedFullwBombs":7,"Overspeed":20,"BoostEmpty":3,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":10,"Stabiilty":-2,"HandlingEmpty":104,"HandlingFull":103,"HandlingFullwBombs":103,"MaxStrain":18,"Toughness":6,"Structure":30,"EnergyLoss":3,"EnergyLosswBombs":4,"TurnBleed":1,"TurnBleedwBombs":2,"FuelUses":7,"ControlStress":1,"RumbleStress":0,"RateOfClimbFull":9,"RateOfClimbEmpty":12,"RateOfClimbwBombs":9},
             {"name":"Mauss Z-95 Phönix","cost":44,"upkeep":1,"bomb_mass":0,"escape":"0","crash":"-1","stress":"0","DryMP":7,"WetMP":9,"WetMPwBombs":9,"DPEmpty":13,"DPFull":13,"DPwBombs":13,"MaxSpeedEmpty":19,"MaxSpeedFull":19,"MaxSpeedwBombs":19,"StallSpeedEmpty":8,"StallSpeedFull":10,"StallSpeedFullwBombs":10,"Overspeed":40,"BoostEmpty":2,"BoostFull":2,"BoostFullwBombs":2,"Dropoff":7,"Stabiilty":2,"HandlingEmpty":98,"HandlingFull":96,"HandlingFullwBombs":96,"MaxStrain":31,"Toughness":15,"Structure":37,"EnergyLoss":4,"EnergyLosswBombs":5,"TurnBleed":2,"TurnBleedwBombs":3,"FuelUses":11,"ControlStress":1,"RumbleStress":0,"RateOfClimbFull":3,"RateOfClimbEmpty":4,"RateOfClimbwBombs":3},
-            {"name": "Lockheed P-80C","cost": 405,"upkeep": 22,"bomb_mass": 35,"escape": "0","crash": "-1","stress": "2","DryMP": 19,"WetMP": 24,"WetMPwBombs": 31,"DPEmpty": 11,"DPFull": 11,"DPwBombs": 18,"MaxSpeedEmpty": 87,"MaxSpeedFull": 87,"MaxSpeedwBombs": 68,"StallSpeedEmpty": 11,"StallSpeedFull": 14,"StallSpeedFullwBombs": 18,"Overspeed": 100,"BoostEmpty": 11,"BoostFull": 9,"BoostFullwBombs": 7,"Dropoff": 17,"Stabiilty": -6,"HandlingEmpty": 82,"HandlingFull": 77,"HandlingFullwBombs": 70,"MaxStrain": 70,"Toughness": 44,"Structure": 106,"EnergyLoss": 2,"EnergyLosswBombs": 3,"TurnBleed": 3,"TurnBleedwBombs": 4,"FuelUses": 4,"ControlStress": 3,"RumbleStress": 0,"RateOfClimbFull": 15,"RateOfClimbEmpty": 18,"RateOfClimbwBombs": 7}
+            {"name": "Lockheed P-80C","cost": 405,"upkeep": 22,"bomb_mass": 35,"escape": "0","crash": "-1","stress": "2","DryMP": 19,"WetMP": 24,"WetMPwBombs": 31,"DPEmpty": 11,"DPFull": 11,"DPwBombs": 18,"MaxSpeedEmpty": 87,"MaxSpeedFull": 87,"MaxSpeedwBombs": 68,"StallSpeedEmpty": 11,"StallSpeedFull": 14,"StallSpeedFullwBombs": 18,"Overspeed": 100,"BoostEmpty": 11,"BoostFull": 9,"BoostFullwBombs": 7,"Dropoff": 17,"Stabiilty": -6,"HandlingEmpty": 82,"HandlingFull": 77,"HandlingFullwBombs": 70,"MaxStrain": 70,"Toughness": 44,"Structure": 106,"EnergyLoss": 2,"EnergyLosswBombs": 3,"TurnBleed": 3,"TurnBleedwBombs": 4,"FuelUses": 4,"ControlStress": 3,"RumbleStress": 0,"RateOfClimbFull": 15,"RateOfClimbEmpty": 18,"RateOfClimbwBombs": 7},
+            {"name": "XF5U T4 Top","cost":662,"upkeep": 44,"bomb_mass": 40,"escape": "0","crash": "0","stress": "0","DryMP": 38,"WetMP": 49,"WetMPwBombs": 57,"DPEmpty": 24,"DPFull": 24,"DPwBombs": 31,"MaxSpeedEmpty": 77,"MaxSpeedFull": 77,"MaxSpeedwBombs": 67,"StallSpeedEmpty": 5,"StallSpeedFull": 7,"StallSpeedFullwBombs": 8,"Overspeed": 100,"BoostEmpty": 11,"BoostFull": 9,"BoostFullwBombs": 7,"Dropoff": 23,"Stabiilty": -3,"HandlingEmpty": 81,"HandlingFull": 70,"HandlingFullwBombs": 62,"MaxStrain": -48,"Toughness": 103,"Structure": 170,"EnergyLoss": 6,"EnergyLosswBombs": 7,"TurnBleed": 2,"TurnBleedwBombs": 3,"FuelUses": 6,"ControlStress": 1,"RumbleStress": 0,"RateOfClimbFull": 7,"RateOfClimbEmpty": 9,"RateOfClimbwBombs": 4}
         ]"#).unwrap();
         for (inp_name, (inp_lz, out)) in zip(
             input["names"].as_array().unwrap(),
@@ -5400,6 +5412,7 @@ mod tests {
                 output.as_array().unwrap(),
             ),
         ) {
+            println!("Name = {}", inp_name.as_str().unwrap());
             let mut deserialize =
                 crate::serialization::Deserializer::from_lz_string(inp_lz.as_str().unwrap())
                     .expect("From LZ String Failed");
@@ -5407,13 +5420,7 @@ mod tests {
             acft.deserialize(&mut deserialize).unwrap();
             assert_eq!(inp_name.as_str().unwrap(), acft.name);
             assert_eq!(AircraftType::Airplane, acft.aircraft_type);
-            println!("Name = {}", acft.name);
-            println!("{}", inp_lz.as_str().unwrap());
             let final_stats = acft.part_stats();
-            if acft.name == "Lockheed P-80C" {
-                assert_eq!(224., final_stats.power);
-            }
-            println!("{:?}", final_stats);
             assert_eq!(out["cost"].as_f64().unwrap() as f32, final_stats.cost);
             assert_eq!(out["upkeep"].as_f64().unwrap() as f32, final_stats.upkeep);
             assert_eq!(

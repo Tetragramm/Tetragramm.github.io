@@ -431,6 +431,11 @@ impl Wings {
     /// Returns: (is_sesquiplane, biggest_deck, super_small)
     /// TypeScript: GetIsSesquiplane()
     pub fn get_is_sesquiplane(&self) -> (bool, i16, bool) {
+        // If no wings, can't be a sesquiplane
+        if self.wing_list.is_empty() {
+            return (false, -1, false);
+        }
+
         let mut biggest_area = 0;
         let mut biggest_deck = -1;
         let mut biggest_span = 0;

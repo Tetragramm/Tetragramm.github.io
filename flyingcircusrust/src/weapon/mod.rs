@@ -33,12 +33,12 @@ impl From<i16> for SynchronizationType {
         // Maps from UI select index to SynchronizationType
         // UI indices: 0=None, 1=Interrupt, 2=Synch, 3=Spinner, 4=Deflect, 5=NoInterference
         match v {
-            0 => SynchronizationType::None,
-            1 => SynchronizationType::Interrupt,
-            2 => SynchronizationType::Synch,
-            3 => SynchronizationType::Spinner,
-            4 => SynchronizationType::Deflect,
-            5 => SynchronizationType::NoInterference,
+            -1 => SynchronizationType::None,
+            0 => SynchronizationType::Interrupt,
+            1 => SynchronizationType::Synch,
+            2 => SynchronizationType::Spinner,
+            3 => SynchronizationType::Deflect,
+            4 => SynchronizationType::NoInterference,
             _ => SynchronizationType::None,
         }
     }

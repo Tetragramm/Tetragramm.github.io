@@ -7,6 +7,7 @@
 
 import { AircraftBridge, DerivedStats } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
+import { createCollapsibleSection, createFlexCheckbox, createRulesLink } from '../dom_utils';
 import { localization } from '../localization';
 
 enum FUEL_STATE {
@@ -20,25 +21,25 @@ enum FUEL_STATE {
  * Altitude Effects UI Component
  */
 export class AltitudeUI extends BaseComponentUI {
-    private tbl: HTMLTableElement | null = null;
-    private fRow: HTMLTableRowElement | null = null;
-    private rows: HTMLTableRowElement[] = [];
+    private tbl: HTMLTableElement;
+    private fRow: HTMLTableRowElement;
+    private rows: HTMLTableRowElement[];
 
-    private fuelStateSelect: HTMLSelectElement | null = null;
-    private firesCheckbox: HTMLInputElement | null = null;
-    private oxidizedCheckbox: HTMLInputElement | null = null;
+    private fuelStateSelect: HTMLSelectElement;
+    private firesCheckbox: HTMLInputElement;
+    private oxidizedCheckbox: HTMLInputElement;
 
     protected shouldUpdate(): boolean {
-        return this.tbl !== null;
+        return this.tbl !== undefined;
     }
 
     protected clearCache(): void {
-        this.tbl = null;
-        this.fRow = null;
+        this.tbl = undefined;
+        this.fRow = undefined;
         this.rows = [];
-        this.fuelStateSelect = null;
-        this.firesCheckbox = null;
-        this.oxidizedCheckbox = null;
+        this.fuelStateSelect = undefined;
+        this.firesCheckbox = undefined;
+        this.oxidizedCheckbox = undefined;
     }
 
     /**
@@ -51,21 +52,16 @@ export class AltitudeUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
-        // Set section title
-        const lblAltitude = document.getElementById('lbl_altitude') as HTMLLabelElement;
-        if (lblAltitude) {
-            lblAltitude.textContent = localization.translate('Altitude Section Title');
-        }
-
+        const contentDiv = document.createElement('div');
         // Get table element
-        this.tbl = document.getElementById('table_altitude') as HTMLTableElement;
+        this.tbl = document.createElement('table') as HTMLTableElement;
         if (!this.tbl) {
             console.error('[AltitudeUI] Could not find table_altitude element');
             return;
         }
 
         // Get fuel state dropdown
-        this.fuelStateSelect = document.getElementById('select_fuelstate') as HTMLSelectElement;
+        this.fuelStateSelect = document.createElement('select') as HTMLSelectElement;
         if (this.fuelStateSelect) {
             // Clear existing options
             this.fuelStateSelect.innerHTML = '';
@@ -87,27 +83,19 @@ export class AltitudeUI extends BaseComponentUI {
             this.fuelStateSelect.onchange = () => this.updateValues();
         }
 
-        // Get checkboxes
-        this.firesCheckbox = document.getElementById('input_fires') as HTMLInputElement;
-        if (this.firesCheckbox) {
-            this.firesCheckbox.onchange = () => this.updateValues();
-        }
+        const span = document.createElement('span');
 
-        // Set labels
-        const lblFires = document.getElementById('lbl_fires') as HTMLLabelElement;
-        if (lblFires) {
-            lblFires.textContent = localization.translate('Altitude Eternal Fires');
-        }
+        this.firesCheckbox = createFlexCheckbox(
+            { name: localization.translate('Altitude Eternal Fires'), value: false, enabled: true },
+            { div1: span, div2: span },
+            (value) => this.updateValues()
+        );
 
-        this.oxidizedCheckbox = document.getElementById('input_oxidized') as HTMLInputElement;
-        if (this.oxidizedCheckbox) {
-            this.oxidizedCheckbox.onchange = () => this.updateValues();
-        }
-
-        const lblOxidized = document.getElementById('lbl_oxidized') as HTMLLabelElement;
-        if (lblOxidized) {
-            lblOxidized.textContent = localization.translate('Altitude Oxidized Fuel');
-        }
+        this.oxidizedCheckbox = createFlexCheckbox(
+            { name: localization.translate('Altitude Oxidized Fuel'), value: false, enabled: true },
+            { div1: span, div2: span },
+            (value) => this.updateValues()
+        );
 
         // Create header row
         this.fRow = document.createElement('tr');
@@ -118,6 +106,28 @@ export class AltitudeUI extends BaseComponentUI {
         this.createTH(this.fRow, localization.translate('Derived Top Speed'));
 
         this.rows = [];
+
+        contentDiv.appendChild(this.fuelStateSelect);
+        contentDiv.appendChild(document.createElement('br'));
+        contentDiv.appendChild(span);
+        contentDiv.appendChild(this.tbl);
+
+        // Create collapsible section
+        const sectionTitle = localization.translate('Altitude Section Title');
+        this.sectionElement = createCollapsibleSection(
+            sectionTitle,
+            contentDiv,
+            false
+        );
+
+        // Add rules link using utility
+        const rulesLine = createRulesLink('_Altitude_Rules');
+        this.sectionElement.insertBefore(
+            rulesLine,
+            this.sectionElement.children[1]
+        );
+
+        this.container.appendChild(this.sectionElement);
 
         console.log('[AltitudeUI] Full rebuild complete');
         this.updateValues();
@@ -155,8 +165,8 @@ export class AltitudeUI extends BaseComponentUI {
         if (!bridge || !this.tbl || !this.fRow) return;
 
         // Clear table
-        while (this.tbl.lastChild) {
-            this.tbl.removeChild(this.tbl.lastChild);
+        while (this.tbl.rows.length) {
+            this.tbl.deleteRow(0);
         }
 
         const fragment = document.createDocumentFragment();
@@ -201,8 +211,9 @@ export class AltitudeUI extends BaseComponentUI {
         }
 
         // Get min/max altitude from aircraft
-        const minIAF = bridge.getMinAltitude();
-        const maxIAF = bridge.getMaxAltitude();
+        const minIAF = Math.floor(bridge.getMinAltitude() / 10);
+        const maxIAF = Math.floor(bridge.getMaxAltitude() / 10);
+        console.log("minIAF: " + minIAF + "  maxIAF: " + maxIAF);
 
         const firesChecked = this.firesCheckbox?.checked ?? false;
         const oxidizedChecked = this.oxidizedCheckbox?.checked ?? false;

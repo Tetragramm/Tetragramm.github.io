@@ -199,6 +199,11 @@ impl WeaponSystem {
             for w in &mut self.weapons {
                 if w.get_fixed() && !w.get_wing() {
                     w.can_synchronize = true;
+                    println!(
+                        "{} {}",
+                        can_spinner_t,
+                        w.get_synchronization() == SynchronizationType::Spinner
+                    );
                     w.can_spinner =
                         can_spinner_t || w.get_synchronization() == SynchronizationType::Spinner;
                     w.can_arty_spinner = can_arty_spinner_t

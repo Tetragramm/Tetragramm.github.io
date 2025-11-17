@@ -250,6 +250,12 @@ impl AircraftWasm {
         serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
+    /// Get flap cost based on dry MP (for display purposes)
+    #[wasm_bindgen(js_name = getControlSurfacesFlapCost)]
+    pub fn get_control_surfaces_flap_cost(&self, dry_mp: i16) -> f32 {
+        self.inner.controlsurfaces.get_flap_cost(dry_mp)
+    }
+
     /// Get LandingGear UI bindings
     #[wasm_bindgen(js_name = getLandingGearBindings)]
     pub fn get_landing_gear_bindings(&self) -> JsValue {
@@ -805,21 +811,20 @@ impl AircraftWasm {
 
         Ok(())
     }
+}
 
-    /// Calculate engine stats from EngineInputs
-    /// This is a standalone function that can be used by the engine builder UI
-    /// without needing to add the engine to the aircraft.
-    /// Accepts EngineInputs as JSON and returns EngineStats as JSON.
-    #[wasm_bindgen(js_name = calculateEngineStats)]
-    pub fn calculate_engine_stats(&self, engine_data: JsValue) -> Result<JsValue, JsValue> {
-        let engine: flyingcircusrust::engine::EngineInputs =
-            serde_wasm_bindgen::from_value(engine_data).map_err(|e| {
-                JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e))
-            })?;
+/// Calculate engine stats from EngineInputs
+/// This is a standalone function that can be used by the engine builder UI
+/// without needing to add the engine to the aircraft.
+/// Accepts EngineInputs as JSON and returns EngineStats as JSON.
+#[wasm_bindgen(js_name = calculateEngineStats)]
+pub fn calculate_engine_stats(engine_data: JsValue) -> Result<JsValue, JsValue> {
+    let engine: flyingcircusrust::engine::EngineInputs =
+        serde_wasm_bindgen::from_value(engine_data)
+            .map_err(|e| JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e)))?;
 
-        let stats = engine.part_stats();
-        Ok(serde_wasm_bindgen::to_value(&stats).unwrap())
-    }
+    let stats = engine.part_stats();
+    Ok(serde_wasm_bindgen::to_value(&stats).unwrap())
 }
 
 // ============================================================================
@@ -829,14 +834,28 @@ impl AircraftWasm {
 /// Get propeller engine era names
 #[wasm_bindgen(js_name = getPropellerEras)]
 pub fn get_propeller_eras() -> JsValue {
-    let eras = vec!["Pioneer", "WWI", "Roaring 20s", "Coming Storm", "WWII", "Last Hurrah"];
+    let eras = vec![
+        "Pioneer",
+        "WWI",
+        "Roaring 20s",
+        "Coming Storm",
+        "WWII",
+        "Last Hurrah",
+    ];
     serde_wasm_bindgen::to_value(&eras).unwrap()
 }
 
 /// Get propeller cooling type names
 #[wasm_bindgen(js_name = getPropellerCoolingTypes)]
 pub fn get_propeller_cooling_types() -> JsValue {
-    let types = vec!["Liquid Cooled", "Air Cooled", "Rotary Dry", "Rotary Castor", "Radial", "Diesel"];
+    let types = vec![
+        "Liquid Cooled",
+        "Air Cooled",
+        "Rotary Dry",
+        "Rotary Castor",
+        "Radial",
+        "Diesel",
+    ];
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
@@ -850,7 +869,12 @@ pub fn get_propeller_compressor_types() -> JsValue {
 /// Get propeller upgrade names
 #[wasm_bindgen(js_name = getPropellerUpgrades)]
 pub fn get_propeller_upgrades() -> JsValue {
-    let upgrades = vec!["War Emergency Power", "Reduction Gear", "High Compression Heads", "Fuel Injection"];
+    let upgrades = vec![
+        "War Emergency Power",
+        "Reduction Gear",
+        "High Compression Heads",
+        "Fuel Injection",
+    ];
     serde_wasm_bindgen::to_value(&upgrades).unwrap()
 }
 
@@ -864,7 +888,12 @@ pub fn get_pulsejet_valve_types() -> JsValue {
 /// Get turbine type names
 #[wasm_bindgen(js_name = getTurbineTypes)]
 pub fn get_turbine_types() -> JsValue {
-    let types = vec!["Turbojet", "Low Bypass Turbofan", "High Bypass Turbofan", "Turboprop"];
+    let types = vec![
+        "Turbojet",
+        "Low Bypass Turbofan",
+        "High Bypass Turbofan",
+        "Turboprop",
+    ];
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
