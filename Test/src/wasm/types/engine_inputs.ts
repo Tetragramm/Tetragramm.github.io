@@ -5,6 +5,8 @@
  * to construct engine data for the calculateEngineStats() WASM function.
  */
 
+import { Stats } from "../aircraft_bridge";
+
 /**
  * Main EngineInputs structure
  */
@@ -81,18 +83,16 @@ export interface ElectricInputs {
  * EngineStats returned by calculateEngineStats()
  */
 export interface EngineStats {
-    power: number;
+    name: string;
     torque: number;
-    mass: number;
-    drag: number;
-    reliability: number;
-    required_cooling: number;
     overspeed: number;
-    fuel_consumption: number;
     altitude: number;
-    cost: number;
     oil_tank: number;
     geared_rpm: number;
+    rumble: number;
+    stats: Stats;
+    es1: number;
+    es2: number;
 }
 
 /**
@@ -101,6 +101,7 @@ export interface EngineStats {
 export function createPropellerEngine(
     name: string,
     era_sel: number,
+    etype: number,
     rarity: number | string,
     displacement: number,
     compression: number,
@@ -116,7 +117,7 @@ export function createPropellerEngine(
 ): EngineInputs {
     return {
         name,
-        etype: 0,
+        etype,
         era_sel,
         rarity,
         inputs: {
@@ -142,6 +143,7 @@ export function createPropellerEngine(
  */
 export function createPulsejetEngine(
     name: string,
+    etype: number,
     era_sel: number,
     rarity: number | string,
     power: number,
@@ -151,7 +153,7 @@ export function createPulsejetEngine(
 ): EngineInputs {
     return {
         name,
-        etype: 1,
+        etype,
         era_sel,
         rarity,
         inputs: {
@@ -171,6 +173,7 @@ export function createPulsejetEngine(
 export function createTurbineEngine(
     name: string,
     era_sel: number,
+    etype: number,
     rarity: number | string,
     flow_adjustment: number,
     diameter: number,
@@ -180,7 +183,7 @@ export function createTurbineEngine(
 ): EngineInputs {
     return {
         name,
-        etype: 2,
+        etype,
         era_sel,
         rarity,
         inputs: {

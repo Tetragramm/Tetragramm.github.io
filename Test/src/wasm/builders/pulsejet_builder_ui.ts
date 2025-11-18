@@ -53,6 +53,17 @@ export class PulsejetBuilderUI {
         // Create main table structure
         const table = document.createElement('table');
         table.style.width = '100%';
+
+
+        const headerRow = table.insertRow();
+        const input = document.createElement('th');
+        input.textContent = localization.translate('Engines Options');
+        headerRow.appendChild(input);
+        const stats = document.createElement('th');
+        stats.textContent = localization.translate('Engines Engine Stats');
+        headerRow.appendChild(stats);
+
+
         const row = table.insertRow();
 
         // Left column: Input parameters
@@ -78,13 +89,11 @@ export class PulsejetBuilderUI {
 
         // Desired Power
         this.powerInput = createFlexNumberInput(
-            { name: localization.translate('Pulsejet Builder Desired Power'), value: 100, enabled: true },
+            { name: localization.translate('Pulsejet Builder Desired Power'), value: 1, enabled: true },
             flex,
             (val) => this.updateStats(),
             '0', undefined, '1'
         );
-        this.powerInput.valueAsNumber = 100;
-
         // Valve Type
         this.valveTypeSelect = createFlexSelect(
             { name: localization.translate('Pulsejet Builder Valve Type'), options: valveTypes.map(v => ({ name: v, enabled: true })), selected: 0, enabled: true },
@@ -101,12 +110,11 @@ export class PulsejetBuilderUI {
 
         // Quality
         this.qualityInput = createFlexNumberInput(
-            { name: localization.translate('Pulsejet Builder Quality'), value: 0, enabled: true },
+            { name: localization.translate('Pulsejet Builder Quality'), value: 1, enabled: true },
             flex,
             (val) => this.updateStats(),
             '0', undefined, '0.1'
         );
-        this.qualityInput.valueAsNumber = 0;
 
         // Starter
         this.starterCheckbox = createFlexCheckbox(
@@ -135,6 +143,7 @@ export class PulsejetBuilderUI {
     private updateStats(): void {
         const engineInputs = createPulsejetEngine(
             'Custom Pulsejet',
+            this.valveTypeSelect.selectedIndex,
             this.eraSelect.selectedIndex,
             0,
             this.powerInput.valueAsNumber,
@@ -155,14 +164,15 @@ export class PulsejetBuilderUI {
     private displayStats(): void {
         if (!this.currentStats) return;
 
-        this.nameDisplay.textContent = 'Custom Pulsejet';
-        this.powerDisplay.textContent = this.currentStats.power.toString();
-        this.massDisplay.textContent = this.currentStats.mass.toString();
-        this.dragDisplay.textContent = this.currentStats.drag.toString();
-        this.reliabilityDisplay.textContent = this.currentStats.reliability.toString();
-        this.fuelDisplay.textContent = this.currentStats.fuel_consumption.toString();
-        this.rumbleDisplay.textContent = '0';
-        this.costDisplay.textContent = this.currentStats.cost.toString();
+        console.log(this.currentStats);
+        this.nameDisplay.textContent = this.currentStats.name;
+        this.powerDisplay.textContent = this.currentStats.stats.power.toString();
+        this.massDisplay.textContent = this.currentStats.stats.mass.toString();
+        this.dragDisplay.textContent = this.currentStats.stats.drag.toString();
+        this.reliabilityDisplay.textContent = this.currentStats.stats.reliability.toString();
+        this.fuelDisplay.textContent = this.currentStats.stats.fuelconsumption.toString();
+        this.rumbleDisplay.textContent = this.currentStats.rumble.toString();
+        this.costDisplay.textContent = this.currentStats.stats.cost.toString();
         this.altitudeDisplay.textContent = this.currentStats.altitude.toString();
         this.designCostDisplay.textContent = '0';
     }
@@ -170,6 +180,7 @@ export class PulsejetBuilderUI {
     public getEngineInputs(): EngineInputs {
         return createPulsejetEngine(
             'Custom Pulsejet',
+            this.valveTypeSelect.selectedIndex,
             this.eraSelect.selectedIndex,
             0,
             this.powerInput.valueAsNumber,
@@ -180,7 +191,7 @@ export class PulsejetBuilderUI {
     }
 
     public setEngineInputs(inputs: EngineInputs): void {
-        if (inputs.etype !== 1 || !('Pulsejet' in inputs.inputs)) {
+        if (!('Pulsejet' in inputs.inputs)) {
             console.error('Invalid engine type for pulsejet builder');
             return;
         }

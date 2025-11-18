@@ -65,6 +65,18 @@ export class PropellerBuilderUI {
         // Create main table structure
         const table = document.createElement('table');
         table.style.width = '100%';
+
+        const headerRow = table.insertRow();
+        const input = document.createElement('th');
+        input.textContent = localization.translate('Engines Options');
+        headerRow.appendChild(input);
+        const upgrades = document.createElement('th');
+        upgrades.textContent = localization.translate('Engine Upgrades');
+        headerRow.appendChild(upgrades);
+        const stats = document.createElement('th');
+        stats.textContent = localization.translate('Engines Engine Stats');
+        headerRow.appendChild(stats);
+
         const row = table.insertRow();
 
         // Left column: Input parameters
@@ -123,48 +135,43 @@ export class PropellerBuilderUI {
 
         // Displacement
         this.displacementInput = createFlexNumberInput(
-            { name: localization.translate('Engine Builder Displacement'), value: 10, enabled: true },
+            { name: localization.translate('Engine Builder Displacement'), value: 1, enabled: true },
             flex,
             (val) => this.updateStats(),
             '0.01', undefined, '0.01'
         );
-        this.displacementInput.valueAsNumber = 10;
 
         // Compression Ratio
         this.compressionInput = createFlexNumberInput(
-            { name: localization.translate('Engine Builder Compression Ratio'), value: 5, enabled: true },
+            { name: localization.translate('Engine Builder Compression Ratio'), value: 2, enabled: true },
             flex,
             (val) => this.updateStats(),
             '0.01', undefined, '0.01'
         );
-        this.compressionInput.valueAsNumber = 5;
 
         // Cylinders per Row
         this.cylPerRowInput = createFlexNumberInput(
-            { name: localization.translate('Engine Builder Cylinders Per Row'), value: 6, enabled: true },
+            { name: localization.translate('Engine Builder Cylinders Per Row'), value: 2, enabled: true },
             flex,
             (val) => this.updateStats(),
             '1', undefined, '1'
         );
-        this.cylPerRowInput.valueAsNumber = 6;
 
         // Number of Rows
         this.rowsInput = createFlexNumberInput(
-            { name: localization.translate('Engine Builder Number of Rows'), value: 1, enabled: true },
+            { name: localization.translate('Engine Builder Number of Rows'), value: 2, enabled: true },
             flex,
             (val) => this.updateStats(),
             '1', undefined, '1'
         );
-        this.rowsInput.valueAsNumber = 1;
 
         // RPM Boost
         this.rpmBoostInput = createFlexNumberInput(
-            { name: localization.translate('Engine Builder RPM Boost'), value: 0, enabled: true },
+            { name: localization.translate('Engine Builder RPM Boost'), value: 1, enabled: true },
             flex,
             (val) => this.updateStats(),
             '0.01', '2000', '0.01'
         );
-        this.rpmBoostInput.valueAsNumber = 0;
 
         // Material Fudge
         this.materialFudgeInput = createFlexNumberInput(
@@ -173,7 +180,6 @@ export class PropellerBuilderUI {
             (val) => this.updateStats(),
             '0.1', '1.9', '0.1'
         );
-        this.materialFudgeInput.valueAsNumber = 1.0;
 
         // Quality Fudge
         this.qualityFudgeInput = createFlexNumberInput(
@@ -182,7 +188,6 @@ export class PropellerBuilderUI {
             (val) => this.updateStats(),
             '0.1', '1.9', '0.1'
         );
-        this.qualityFudgeInput.valueAsNumber = 1.0;
     }
 
     private buildUpgradesSection(cell: HTMLTableCellElement): void {
@@ -319,6 +324,7 @@ export class PropellerBuilderUI {
         const engineInputs = createPropellerEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
+            this.coolingSelect.selectedIndex,
             0, // rarity = CUSTOM
             this.displacementInput.valueAsNumber,
             this.compressionInput.valueAsNumber,
@@ -348,14 +354,15 @@ export class PropellerBuilderUI {
     private displayStats(): void {
         if (!this.currentStats) return;
 
-        this.nameDisplay.textContent = this.nameInput.value;
-        this.powerDisplay.textContent = this.currentStats.power.toString();
-        this.massDisplay.textContent = this.currentStats.mass.toString();
-        this.dragDisplay.textContent = this.currentStats.drag.toString();
-        this.reliabilityDisplay.textContent = this.currentStats.reliability.toString();
-        this.coolingDisplay.textContent = this.currentStats.required_cooling.toString();
+        console.log(this.currentStats);
+        this.nameDisplay.textContent = this.currentStats.name;
+        this.powerDisplay.textContent = this.currentStats.stats.power.toString();
+        this.massDisplay.textContent = this.currentStats.stats.mass.toString();
+        this.dragDisplay.textContent = this.currentStats.stats.drag.toString();
+        this.reliabilityDisplay.textContent = this.currentStats.stats.reliability.toString();
+        this.coolingDisplay.textContent = this.currentStats.stats.cooling.toString();
         this.overspeedDisplay.textContent = this.currentStats.overspeed.toString();
-        this.fuelDisplay.textContent = this.currentStats.fuel_consumption.toString();
+        this.fuelDisplay.textContent = this.currentStats.stats.fuelconsumption.toString();
 
         // Altitude range display
         const minAlt = this.minIdealAltInput.valueAsNumber;
@@ -363,11 +370,11 @@ export class PropellerBuilderUI {
         this.altitudeDisplay.textContent = `${minAlt}-${maxAlt}`;
 
         this.torqueDisplay.textContent = this.currentStats.torque.toString();
-        this.costDisplay.textContent = this.currentStats.cost.toString();
+        this.costDisplay.textContent = this.currentStats.stats.cost.toString();
         this.oilTankDisplay.textContent = this.currentStats.oil_tank > 0
             ? localization.translate('Engine Builder Yes')
             : localization.translate('Engine Builder No');
-        this.gearedRPMDisplay.textContent = (Math.round(this.currentStats.geared_rpm * 100) / 100).toString();
+        this.gearedRPMDisplay.textContent = this.currentStats.es1.toFixed(2);
     }
 
     /**
@@ -379,6 +386,7 @@ export class PropellerBuilderUI {
         return createPropellerEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
+            this.coolingSelect.selectedIndex,
             0, // rarity = CUSTOM
             this.displacementInput.valueAsNumber,
             this.compressionInput.valueAsNumber,
@@ -398,7 +406,7 @@ export class PropellerBuilderUI {
      * Load engine configuration from EngineInputs
      */
     public setEngineInputs(inputs: EngineInputs): void {
-        if (inputs.etype !== 0 || !('Propeller' in inputs.inputs)) {
+        if (!('Propeller' in inputs.inputs)) {
             console.error('Invalid engine type for propeller builder');
             return;
         }

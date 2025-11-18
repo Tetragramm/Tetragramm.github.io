@@ -346,6 +346,8 @@ impl TurboBuilder {
         estats.stats.pitchspeed = self.get_pitch_speed();
         estats.rarity = self.rarity.clone();
         estats.pulsejet = false;
+        estats.es1 = self.kn;
+        estats.es2 = self.tsfc;
 
         estats
     }

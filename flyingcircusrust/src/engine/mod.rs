@@ -93,6 +93,8 @@ pub struct EngineStats {
     pub pulsejet: bool,
     pub stats: Stats,
     pub rarity: EngineRarity,
+    pub es1: f32,
+    pub es2: f32,
 }
 
 impl EngineStats {
@@ -107,6 +109,8 @@ impl EngineStats {
             pulsejet: false,
             stats: Stats::new(),
             rarity: EngineRarity::CUSTOM,
+            es1: 0.0,
+            es2: 0.0,
         }
     }
 }

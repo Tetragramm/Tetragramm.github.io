@@ -51,6 +51,15 @@ export class ElectricBuilderUI {
 
         const table = document.createElement('table');
         table.style.width = '100%';
+
+        const headerRow = table.insertRow();
+        const input = document.createElement('th');
+        input.textContent = localization.translate('Engines Options');
+        headerRow.appendChild(input);
+        const stats = document.createElement('th');
+        stats.textContent = localization.translate('Engines Engine Stats');
+        headerRow.appendChild(stats);
+
         const row = table.insertRow();
 
         const inputCell = row.insertCell();
@@ -159,14 +168,14 @@ export class ElectricBuilderUI {
     private displayStats(): void {
         if (!this.currentStats) return;
 
-        this.nameDisplay.textContent = this.nameInput.value;
-        this.powerDisplay.textContent = this.currentStats.power.toString();
-        this.massDisplay.textContent = this.currentStats.mass.toString();
-        this.dragDisplay.textContent = this.currentStats.drag.toString();
-        this.reliabilityDisplay.textContent = this.currentStats.reliability.toString();
-        this.chargeDrawDisplay.textContent = '0';
+        this.nameDisplay.textContent = this.currentStats.name;
+        this.powerDisplay.textContent = this.currentStats.stats.power.toString();
+        this.massDisplay.textContent = this.currentStats.stats.mass.toString();
+        this.dragDisplay.textContent = this.currentStats.stats.drag.toString();
+        this.reliabilityDisplay.textContent = this.currentStats.stats.reliability.toString();
+        this.chargeDrawDisplay.textContent = this.currentStats.stats.charge.toString();
         this.overspeedDisplay.textContent = this.currentStats.overspeed.toString();
-        this.costDisplay.textContent = this.currentStats.cost.toString();
+        this.costDisplay.textContent = this.currentStats.stats.cost.toString();
     }
 
     public getEngineInputs(): EngineInputs {
@@ -182,7 +191,7 @@ export class ElectricBuilderUI {
     }
 
     public setEngineInputs(inputs: EngineInputs): void {
-        if (inputs.etype !== 3 || !('Electric' in inputs.inputs)) {
+        if (!('Electric' in inputs.inputs)) {
             console.error('Invalid engine type for electric builder');
             return;
         }

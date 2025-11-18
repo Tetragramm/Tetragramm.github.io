@@ -2,7 +2,7 @@ use flyingcircusrust::aircraft::Aircraft;
 use flyingcircusrust::part::Part;
 use flyingcircusrust::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
 use flyingcircusrust::types::DerivedStats;
-use flyingcircusrust::UIBindings;
+use flyingcircusrust::{translate, UIBindings};
 use rust_i18n::t;
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -824,6 +824,7 @@ pub fn calculate_engine_stats(engine_data: JsValue) -> Result<JsValue, JsValue> 
             .map_err(|e| JsValue::from_str(&format!("Failed to deserialize engine: {:?}", e)))?;
 
     let stats = engine.part_stats();
+
     Ok(serde_wasm_bindgen::to_value(&stats).unwrap())
 }
 
@@ -832,75 +833,110 @@ pub fn calculate_engine_stats(engine_data: JsValue) -> Result<JsValue, JsValue> 
 // ============================================================================
 
 /// Get propeller engine era names
+#[wasm_bindgen(js_name = getTurbineEras)]
+pub fn get_turbine_eras() -> JsValue {
+    let eras = vec![
+        "Gen 1 1945-1955",
+        "Gen 1.5 1955-1965",
+        "Gen 2 1965-1975",
+        "Gen 2.5 1975-1985",
+        "Gen 3 1985-1995",
+        "Gen 3.5 1995-2005",
+        "Gen 4 2005-2015",
+        "Gen 4.5 2015-2025",
+        "Himmilgard",
+    ];
+    serde_wasm_bindgen::to_value(&eras).unwrap()
+}
+
 #[wasm_bindgen(js_name = getPropellerEras)]
 pub fn get_propeller_eras() -> JsValue {
-    let eras = vec![
+    let eras: Vec<String> = vec![
         "Pioneer",
         "WWI",
         "Roaring 20s",
         "Coming Storm",
         "WWII",
         "Last Hurrah",
-    ];
+    ]
+    .iter()
+    .map(|s| translate(s))
+    .collect();
     serde_wasm_bindgen::to_value(&eras).unwrap()
 }
 
 /// Get propeller cooling type names
 #[wasm_bindgen(js_name = getPropellerCoolingTypes)]
 pub fn get_propeller_cooling_types() -> JsValue {
-    let types = vec![
+    let types: Vec<String> = vec![
         "Liquid Cooled",
         "Air Cooled",
         "Rotary Dry",
         "Rotary Castor",
         "Radial",
         "Diesel",
-    ];
+    ]
+    .iter()
+    .map(|s| translate(s))
+    .collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
 /// Get propeller compressor type names
 #[wasm_bindgen(js_name = getPropellerCompressorTypes)]
 pub fn get_propeller_compressor_types() -> JsValue {
-    let types = vec!["None", "Altitude Throttle", "Supercharger", "Turbocharger"];
+    let types: Vec<String> = vec!["None", "Altitude Throttle", "Supercharger", "Turbocharger"]
+        .iter()
+        .map(|s| translate(s))
+        .collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
 /// Get propeller upgrade names
 #[wasm_bindgen(js_name = getPropellerUpgrades)]
 pub fn get_propeller_upgrades() -> JsValue {
-    let upgrades = vec![
-        "War Emergency Power",
-        "Reduction Gear",
-        "High Compression Heads",
-        "Fuel Injection",
-    ];
+    let upgrades: Vec<String> = vec!["War Emergency Power", "Fuel Injection", "Diesel"]
+        .iter()
+        .map(|s| translate(s))
+        .collect();
     serde_wasm_bindgen::to_value(&upgrades).unwrap()
 }
 
 /// Get pulsejet valve type names
 #[wasm_bindgen(js_name = getPulsejetValveTypes)]
 pub fn get_pulsejet_valve_types() -> JsValue {
-    let types = vec!["Valved", "Valveless"];
+    let types: Vec<String> = vec!["Valved", "Valveless"]
+        .iter()
+        .map(|s| translate(s))
+        .collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
 /// Get turbine type names
 #[wasm_bindgen(js_name = getTurbineTypes)]
 pub fn get_turbine_types() -> JsValue {
-    let types = vec![
-        "Turbojet",
-        "Low Bypass Turbofan",
-        "High Bypass Turbofan",
-        "Turboprop",
-    ];
+    let types: Vec<String> = vec!["Turbojet", "Turbofan", "Propfan", "Turboprop"]
+        .iter()
+        .map(|s| translate(s))
+        .collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
 /// Get electric motor winding names
 #[wasm_bindgen(js_name = getElectricWindings)]
 pub fn get_electric_windings() -> JsValue {
-    let windings = vec!["High RPM", "Medium RPM", "Low RPM"];
+    let windings: Vec<String> = vec![
+        "Aluminum",
+        "Copper",
+        "Silver",
+        "Electrum",
+        "Platinum",
+        "Screamer Sinew",
+        "Lightning Sprite Ephemera",
+    ]
+    .iter()
+    .map(|s| translate(s))
+    .collect();
     serde_wasm_bindgen::to_value(&windings).unwrap()
 }
 

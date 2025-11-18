@@ -54,6 +54,20 @@ export class TurboBuilderUI {
 
         const table = document.createElement('table');
         table.style.width = '100%';
+
+
+        const headerRow = table.insertRow();
+        const input = document.createElement('th');
+        input.textContent = localization.translate('Engines Options');
+        headerRow.appendChild(input);
+        const description = document.createElement('th');
+        description.textContent = localization.translate('Used Description');
+        headerRow.appendChild(description);
+        const stats = document.createElement('th');
+        stats.textContent = localization.translate('Engines Engine Stats');
+        headerRow.appendChild(stats);
+
+
         const row = table.insertRow();
 
         const inputCell = row.insertCell();
@@ -70,13 +84,15 @@ export class TurboBuilderUI {
         this.buildOutputSection(outputCell);
 
         this.container.appendChild(table);
+
+        this.updateTypeChanged();
     }
 
     private buildInputSection(cell: HTMLTableCellElement): void {
         const flex = createFlexSection();
         cell.appendChild(flex.div0);
 
-        const eras: string[] = wasm.getPropellerEras();
+        const eras: string[] = wasm.getTurbineEras();
         const types: string[] = wasm.getTurbineTypes();
 
         // Name
@@ -174,6 +190,7 @@ export class TurboBuilderUI {
         const engineInputs = createTurbineEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
+            this.typeSelect.selectedIndex,
             0,
             this.flowAdjustInput.valueAsNumber,
             this.diameterInput.valueAsNumber,
@@ -195,21 +212,21 @@ export class TurboBuilderUI {
     private displayStats(): void {
         if (!this.currentStats) return;
 
-        this.nameDisplay.textContent = this.nameInput.value;
-        this.powerDisplay.textContent = this.currentStats.power.toString();
-        this.massDisplay.textContent = this.currentStats.mass.toString();
-        this.dragDisplay.textContent = this.currentStats.drag.toString();
-        this.reliabilityDisplay.textContent = this.currentStats.reliability.toString();
-        this.fuelDisplay.textContent = this.currentStats.fuel_consumption.toString();
-        this.costDisplay.textContent = this.currentStats.cost.toString();
+        this.nameDisplay.textContent = this.currentStats.name;
+        this.powerDisplay.textContent = this.currentStats.stats.power.toString();
+        this.massDisplay.textContent = this.currentStats.stats.mass.toString();
+        this.dragDisplay.textContent = this.currentStats.stats.drag.toString();
+        this.reliabilityDisplay.textContent = this.currentStats.stats.reliability.toString();
+        this.fuelDisplay.textContent = this.currentStats.stats.fuelconsumption.toString();
+        this.costDisplay.textContent = this.currentStats.stats.cost.toString();
         this.altitudeDisplay.textContent = this.currentStats.altitude.toString();
     }
 
     private updateDescription(): void {
         const typeIndex = this.typeSelect.selectedIndex;
 
-        const thrust = 'N/A';
-        const tsfc = 'N/A';
+        const thrust = this.currentStats.es1.toFixed(2);
+        const tsfc = this.currentStats.es2.toFixed(2);
 
         let description = '';
 
@@ -268,6 +285,7 @@ export class TurboBuilderUI {
         return createTurbineEngine(
             this.nameInput.value,
             this.eraSelect.selectedIndex,
+            this.typeSelect.selectedIndex,
             0,
             this.flowAdjustInput.valueAsNumber,
             this.diameterInput.valueAsNumber,
@@ -278,7 +296,7 @@ export class TurboBuilderUI {
     }
 
     public setEngineInputs(inputs: EngineInputs): void {
-        if (inputs.etype !== 2 || !('Turbine' in inputs.inputs)) {
+        if (!('Turbine' in inputs.inputs)) {
             console.error('Invalid engine type for turbine builder');
             return;
         }

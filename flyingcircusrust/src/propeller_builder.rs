@@ -640,6 +640,7 @@ impl PropellerBuilder {
 
         estats.stats.fuelconsumption = estats.stats.fuelconsumption.max(1.0);
         estats.rarity = self.rarity.clone();
+        estats.es1 = self.geared_rpm();
 
         estats
     }

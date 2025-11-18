@@ -98,29 +98,24 @@ export class EngineBuilderApp {
      * Load an engine configuration into the appropriate builder
      */
     private loadEngineIntoBuilder(engine: EngineInputs): void {
-        switch (engine.etype) {
-            case 0: // Propeller
-                if (this.propellerBuilder) {
-                    this.propellerBuilder.setEngineInputs(engine);
-                }
-                break;
-            case 1: // Pulsejet
-                if (this.pulsejetBuilder) {
-                    this.pulsejetBuilder.setEngineInputs(engine);
-                }
-                break;
-            case 2: // Turbine
-                if (this.turboBuilder) {
-                    this.turboBuilder.setEngineInputs(engine);
-                }
-                break;
-            case 3: // Electric
-                if (this.electricBuilder) {
-                    this.electricBuilder.setEngineInputs(engine);
-                }
-                break;
-            default:
-                console.error('Unknown engine type:', engine.etype);
+        if ('Propeller' in engine.inputs) {
+            if (this.propellerBuilder) {
+                this.propellerBuilder.setEngineInputs(engine);
+            }
+        } else if ('Pulsejet' in engine.inputs) {
+            if (this.pulsejetBuilder) {
+                this.pulsejetBuilder.setEngineInputs(engine);
+            }
+        } else if ('Turbine' in engine.inputs) {
+            if (this.turboBuilder) {
+                this.turboBuilder.setEngineInputs(engine);
+            }
+        } else if ('Electric' in engine.inputs) {
+            if (this.electricBuilder) {
+                this.electricBuilder.setEngineInputs(engine);
+            }
+        } else {
+            console.error('Unknown engine type:', engine.inputs);
         }
     }
 }
