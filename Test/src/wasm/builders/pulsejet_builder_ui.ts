@@ -179,7 +179,7 @@ export class PulsejetBuilderUI {
 
     public getEngineInputs(): EngineInputs {
         return createPulsejetEngine(
-            'Custom Pulsejet',
+            this.currentStats.name,
             this.valveTypeSelect.selectedIndex,
             this.eraSelect.selectedIndex,
             0,

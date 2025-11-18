@@ -110,14 +110,12 @@ export class EngineListManagerUI {
 
         // Create list section
         const { label: createLabel, span: createSpan } = createButton(
-            '<b>&nbsp;' + localization.translate('Engine Builder Create List') + '&nbsp;&nbsp;</b>',
+            localization.translate('Engine Builder Create List'),
             this.createListBtn,
             this.container,
             false  // Don't add br, we'll add the input on the same line
         );
-        createLabel.innerHTML = '<b>&nbsp;' + localization.translate('Engine Builder Create List') + '&nbsp;&nbsp;</b>';
         createSpan.appendChild(this.listNameInput);
-        this.container.appendChild(document.createElement('br'));
         this.container.appendChild(document.createElement('br'));
 
         createButton(localization.translate('Engine Builder Delete List'), this.deleteListBtn, this.container);
@@ -190,6 +188,7 @@ export class EngineListManagerUI {
         } catch (e) {
             console.error('Failed to get engines from list:', e);
         }
+        this.engineSelect.selectedIndex = -1;
     }
 
     private addFromBuilder(type: 'propeller' | 'pulsejet' | 'turbine' | 'electric'): void {

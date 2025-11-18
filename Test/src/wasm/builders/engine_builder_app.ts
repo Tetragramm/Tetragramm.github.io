@@ -88,6 +88,7 @@ export class EngineBuilderApp {
                 this.loadEngineIntoBuilder(engine);
             });
 
+
             console.log('[EngineBuilderApp] Initialization complete!');
         } catch (error) {
             console.error('[EngineBuilderApp] Failed to initialize:', error);
