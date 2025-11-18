@@ -6,7 +6,7 @@
 
 import { EngineInputs } from '../types/engine_inputs';
 import { AircraftBridge } from '../aircraft_bridge';
-import { BlinkGood, BlinkBad } from '../dom_utils';
+import { BlinkGood, BlinkBad, createSelect, createButton } from '../dom_utils';
 import { localization } from '../localization';
 
 export class EngineListManagerUI {
@@ -39,7 +39,6 @@ export class EngineListManagerUI {
 
     private currentList: string = 'Custom';
     private selectedEngineName: string = '';
-    private internalIdCounter: number = 0;
 
     constructor(containerId: string, bridge: AircraftBridge) {
         const container = document.getElementById(containerId);
@@ -51,48 +50,6 @@ export class EngineListManagerUI {
 
         this.buildUI();
         this.updateLists();
-    }
-
-    private generateID(): string {
-        this.internalIdCounter++;
-        return `engine_list_manager_${this.internalIdCounter}`;
-    }
-
-    private createSelect(text: string, select: HTMLSelectElement, parent: HTMLElement, br: boolean = true): void {
-        const span = document.createElement('span');
-        const label = document.createElement('label');
-        select.id = this.generateID();
-        label.htmlFor = select.id;
-        label.style.marginLeft = '0.25em';
-        label.style.marginRight = '0.5em';
-        label.textContent = text;
-        span.appendChild(label);
-        span.appendChild(select);
-        parent.appendChild(span);
-        if (br) {
-            parent.appendChild(document.createElement('br'));
-        }
-    }
-
-    private createButton(text: string, button: HTMLElement, parent: HTMLElement, br: boolean = true): HTMLLabelElement {
-        const span = document.createElement('span');
-        const label = document.createElement('label');
-        button.hidden = true;
-        button.id = this.generateID();
-        button.textContent = text;
-        label.htmlFor = button.id;
-        label.style.marginLeft = '0.25em';
-        label.style.marginRight = '0.5em';
-        label.textContent = text;
-        label.classList.add('lbl_action');
-        label.classList.add('btn_th');
-        span.appendChild(label);
-        span.appendChild(button);
-        parent.appendChild(span);
-        if (br) {
-            parent.appendChild(document.createElement('br'));
-        }
-        return label;
     }
 
     private buildUI(): void {
@@ -129,52 +86,41 @@ export class EngineListManagerUI {
         this.deleteListBtn.onclick = () => this.deleteList();
 
         // Build layout
-        this.createSelect(localization.translate('Engine Builder Lists'), this.listSelect, this.container);
-        this.createSelect(localization.translate('Engine Builder Engines'), this.engineSelect, this.container);
+        createSelect(localization.translate('Engine Builder Lists'), this.listSelect, this.container);
+        createSelect(localization.translate('Engine Builder Engines'), this.engineSelect, this.container);
         this.container.appendChild(document.createElement('br'));
 
-        this.createButton(localization.translate('Engine Builder Save List'), this.saveListBtn, this.container);
-        const loadLabel = this.createButton(localization.translate('Engine Builder Load List'), this.loadListInput, this.container);
+        createButton(localization.translate('Engine Builder Save List'), this.saveListBtn, this.container);
+        const { label: loadLabel } = createButton(localization.translate('Engine Builder Load List'), this.loadListInput, this.container);
         loadLabel.onclick = () => this.loadListInput.click();
 
-        this.createButton(localization.translate('Engine Builder Add From Propeller'), this.addPropellerBtn, this.container);
-        this.createButton(localization.translate('Engine Builder Add From Pulsejet'), this.addPulsejetBtn, this.container);
-        this.createButton(localization.translate('Engine Builder Add From Turbine'), this.addTurbineBtn, this.container);
-        this.createButton(localization.translate('Engine Builder Add From Electric'), this.addElectricBtn, this.container);
+        createButton(localization.translate('Engine Builder Add From Propeller'), this.addPropellerBtn, this.container);
+        createButton(localization.translate('Engine Builder Add From Pulsejet'), this.addPulsejetBtn, this.container);
+        createButton(localization.translate('Engine Builder Add From Turbine'), this.addTurbineBtn, this.container);
+        createButton(localization.translate('Engine Builder Add From Electric'), this.addElectricBtn, this.container);
 
         // Delete engine button with engine name display
-        const deleteSpan = document.createElement('span');
-        this.deleteEngineLabel = document.createElement('label');
-        this.deleteEngineBtn.hidden = true;
-        this.deleteEngineBtn.id = this.generateID();
-        this.deleteEngineLabel.htmlFor = this.deleteEngineBtn.id;
-        this.deleteEngineLabel.style.marginLeft = '0.25em';
-        this.deleteEngineLabel.style.marginRight = '0.5em';
-        this.deleteEngineLabel.classList.add('lbl_action');
-        this.deleteEngineLabel.classList.add('btn_th');
+        const { label: deleteLabel } = createButton(
+            localization.translate('Engine Builder Delete Engine'),
+            this.deleteEngineBtn,
+            this.container
+        );
+        this.deleteEngineLabel = deleteLabel;
         this.updateDeleteButtonLabel();
-        deleteSpan.appendChild(this.deleteEngineLabel);
-        deleteSpan.appendChild(this.deleteEngineBtn);
-        this.container.appendChild(deleteSpan);
-        this.container.appendChild(document.createElement('br'));
 
         // Create list section
-        const createSpan = document.createElement('span');
-        const createLabel = document.createElement('label');
-        this.createListBtn.hidden = true;
-        this.createListBtn.id = this.generateID();
-        createLabel.htmlFor = this.createListBtn.id;
+        const { label: createLabel, span: createSpan } = createButton(
+            '<b>&nbsp;' + localization.translate('Engine Builder Create List') + '&nbsp;&nbsp;</b>',
+            this.createListBtn,
+            this.container,
+            false  // Don't add br, we'll add the input on the same line
+        );
         createLabel.innerHTML = '<b>&nbsp;' + localization.translate('Engine Builder Create List') + '&nbsp;&nbsp;</b>';
-        createLabel.classList.add('lbl_action');
-        createLabel.classList.add('btn_th');
-        createSpan.appendChild(createLabel);
-        createSpan.appendChild(this.createListBtn);
         createSpan.appendChild(this.listNameInput);
-        this.container.appendChild(createSpan);
         this.container.appendChild(document.createElement('br'));
         this.container.appendChild(document.createElement('br'));
 
-        this.createButton(localization.translate('Engine Builder Delete List'), this.deleteListBtn, this.container);
+        createButton(localization.translate('Engine Builder Delete List'), this.deleteListBtn, this.container);
     }
 
     private updateDeleteButtonLabel(): void {

@@ -7,6 +7,20 @@
 import { localization } from './localization';
 
 /**
+ * Global ID counter for generating unique element IDs
+ */
+let idCounter = 0;
+
+/**
+ * Generate a unique ID for DOM elements
+ * Used to link labels to inputs via htmlFor attribute
+ */
+export function generateUniqueId(prefix: string = 'elem'): string {
+    idCounter++;
+    return `${prefix}_${idCounter}`;
+}
+
+/**
  * Create flex section matching original Tools.ts CreateFlexSection
  */
 export function createFlexSection(): { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement } {
@@ -23,6 +37,60 @@ export function createFlexSection(): { div0: HTMLDivElement, div1: HTMLDivElemen
     div0.appendChild(div2);
 
     return { div0, div1, div2 };
+}
+
+/**
+ * Create a select element with label wrapper (non-flex layout)
+ * Wraps an existing select element with a label and span, optionally adding a line break
+ * @param text - Label text to display
+ * @param select - The select element to wrap
+ * @param parent - Parent element to append to
+ * @param br - Whether to add a line break after (default: true)
+ */
+export function createSelect(text: string, select: HTMLSelectElement, parent: HTMLElement, br: boolean = true): void {
+    const span = document.createElement('span');
+    const label = document.createElement('label');
+    select.id = generateUniqueId('select');
+    label.htmlFor = select.id;
+    label.style.marginLeft = '0.25em';
+    label.style.marginRight = '0.5em';
+    label.textContent = text;
+    span.appendChild(label);
+    span.appendChild(select);
+    parent.appendChild(span);
+    if (br) {
+        parent.appendChild(document.createElement('br'));
+    }
+}
+
+/**
+ * Create a button with clickable label (hidden button pattern)
+ * Button is hidden, label is styled to look like a button and is clickable
+ * @param text - Text to display on the label
+ * @param button - The button element (will be hidden)
+ * @param parent - Parent element to append to
+ * @param br - Whether to add a line break after (default: true)
+ * @returns Object with label and span elements for further customization
+ */
+export function createButton(text: string, button: HTMLElement, parent: HTMLElement, br: boolean = true): { label: HTMLLabelElement, span: HTMLSpanElement } {
+    const span = document.createElement('span');
+    const label = document.createElement('label');
+    button.hidden = true;
+    button.id = generateUniqueId('btn');
+    button.textContent = text;
+    label.htmlFor = button.id;
+    label.style.marginLeft = '0.25em';
+    label.style.marginRight = '0.5em';
+    label.textContent = text;
+    label.classList.add('lbl_action');
+    label.classList.add('btn_th');
+    span.appendChild(label);
+    span.appendChild(button);
+    parent.appendChild(span);
+    if (br) {
+        parent.appendChild(document.createElement('br'));
+    }
+    return { label, span };
 }
 
 /**
@@ -129,16 +197,9 @@ export function createFlexCheckbox(
     flexContainer: { div1: HTMLElement, div2: HTMLElement },
     onChange: (checked: boolean) => void
 ): HTMLInputElement {
-    const label = document.createElement('label');
-    label.textContent = binding.name;
-    // label.className = 'flex-item';
-    label.style.marginLeft = '0.25em';
-    label.style.marginRight = '0.5em';
-    flexContainer.div1.appendChild(label);
-
-    // const checkboxSpan = document.createElement('span');
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
+    checkbox.id = generateUniqueId('checkbox');
     checkbox.className = 'flex-item';
     checkbox.checked = binding.selected;
     checkbox.disabled = !binding.enabled;
@@ -146,7 +207,13 @@ export function createFlexCheckbox(
         onChange(checkbox.checked);
     });
 
-    // checkboxSpan.appendChild(checkbox);
+    const label = document.createElement('label');
+    label.htmlFor = checkbox.id;
+    label.textContent = binding.name;
+    label.style.marginLeft = '0.25em';
+    label.style.marginRight = '0.5em';
+    flexContainer.div1.appendChild(label);
+
     flexContainer.div2.appendChild(checkbox);
 
     return checkbox;
@@ -170,15 +237,9 @@ export function createFlexNumberInput(
     max?: string,
     step: string = '1'
 ): HTMLInputElement {
-    const label = document.createElement('label');
-    label.textContent = binding.name;
-    // label.className = 'flex-item';
-    label.style.marginLeft = '0.25em';
-    label.style.marginRight = '0.5em';
-    flexContainer.div1.appendChild(label);
-
     const input = document.createElement('input');
     input.type = 'number';
+    input.id = generateUniqueId('number');
     input.min = min;
     if (max !== undefined) {
         input.max = max;
@@ -190,6 +251,14 @@ export function createFlexNumberInput(
     input.addEventListener('change', () => {
         onChange(parseInt(input.value) || 0);
     });
+
+    const label = document.createElement('label');
+    label.htmlFor = input.id;
+    label.textContent = binding.name;
+    label.style.marginLeft = '0.25em';
+    label.style.marginRight = '0.5em';
+    flexContainer.div1.appendChild(label);
+
     flexContainer.div2.appendChild(input);
 
     return input;
@@ -456,14 +525,17 @@ export function createFlexSelect(
     onChange: (selectedIndex: number) => void,
     labelText?: string
 ): HTMLSelectElement {
+    const select = createSelectElement(binding, onChange);
+    select.id = generateUniqueId('select');
+    select.className = 'flex-item';
+
     const label = document.createElement('label');
+    label.htmlFor = select.id;
     label.textContent = labelText || binding.name;
     label.style.marginLeft = '0.25em';
     label.style.marginRight = '0.5em';
     flexContainer.div1.appendChild(label);
 
-    const select = createSelectElement(binding, onChange);
-    select.className = 'flex-item';
     flexContainer.div2.appendChild(select);
 
     return select;
@@ -479,15 +551,18 @@ export function createFlexLabel(
     binding: any,
     flexContainer: { div1: HTMLElement, div2: HTMLElement }
 ): HTMLSpanElement {
+    const valueSpan = document.createElement('span');
+    valueSpan.id = generateUniqueId('label');
+    valueSpan.textContent = binding.value?.toString() || '';
+    valueSpan.className = 'flex-item';
+
     const label = document.createElement('label');
+    label.htmlFor = valueSpan.id;
     label.textContent = binding.name;
     label.style.marginLeft = '0.25em';
     label.style.marginRight = '0.5em';
     flexContainer.div1.appendChild(label);
 
-    const valueSpan = document.createElement('span');
-    valueSpan.textContent = binding.value?.toString() || '';
-    valueSpan.className = 'flex-item';
     flexContainer.div2.appendChild(valueSpan);
 
     return valueSpan;
