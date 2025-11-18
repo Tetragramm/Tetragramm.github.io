@@ -20,6 +20,7 @@ export class EngineListManagerUI {
     private createListBtn: HTMLButtonElement;
     private deleteListBtn: HTMLButtonElement;
     private deleteEngineBtn: HTMLButtonElement;
+    private deleteEngineLabel: HTMLLabelElement;
     private saveListBtn: HTMLButtonElement;
     private loadListInput: HTMLInputElement;
     private addPropellerBtn: HTMLButtonElement;
@@ -37,6 +38,8 @@ export class EngineListManagerUI {
     private onEngineSelected: ((engine: EngineInputs) => void) | null = null;
 
     private currentList: string = 'Custom';
+    private selectedEngineName: string = '';
+    private internalIdCounter: number = 0;
 
     constructor(containerId: string, bridge: AircraftBridge) {
         const container = document.getElementById(containerId);
@@ -50,117 +53,144 @@ export class EngineListManagerUI {
         this.updateLists();
     }
 
+    private generateID(): string {
+        this.internalIdCounter++;
+        return `engine_list_manager_${this.internalIdCounter}`;
+    }
+
+    private createSelect(text: string, select: HTMLSelectElement, parent: HTMLElement, br: boolean = true): void {
+        const span = document.createElement('span');
+        const label = document.createElement('label');
+        select.id = this.generateID();
+        label.htmlFor = select.id;
+        label.style.marginLeft = '0.25em';
+        label.style.marginRight = '0.5em';
+        label.textContent = text;
+        span.appendChild(label);
+        span.appendChild(select);
+        parent.appendChild(span);
+        if (br) {
+            parent.appendChild(document.createElement('br'));
+        }
+    }
+
+    private createButton(text: string, button: HTMLElement, parent: HTMLElement, br: boolean = true): HTMLLabelElement {
+        const span = document.createElement('span');
+        const label = document.createElement('label');
+        button.hidden = true;
+        button.id = this.generateID();
+        button.textContent = text;
+        label.htmlFor = button.id;
+        label.style.marginLeft = '0.25em';
+        label.style.marginRight = '0.5em';
+        label.textContent = text;
+        label.classList.add('lbl_action');
+        label.classList.add('btn_th');
+        span.appendChild(label);
+        span.appendChild(button);
+        parent.appendChild(span);
+        if (br) {
+            parent.appendChild(document.createElement('br'));
+        }
+        return label;
+    }
+
     private buildUI(): void {
         this.container.innerHTML = '';
 
-        const section = document.createElement('div');
-        section.style.padding = '10px';
-
-        // List selector
-        const listRow = document.createElement('div');
-        listRow.style.marginBottom = '10px';
-        const listLabel = document.createElement('label');
-        listLabel.textContent = localization.translate('Engine Builder Lists');
-        listLabel.style.display = 'inline-block';
-        listLabel.style.minWidth = '200px';
+        // Create elements
         this.listSelect = document.createElement('select');
-        this.listSelect.style.width = '200px';
-        this.listSelect.onchange = () => this.onListChanged();
-        listRow.appendChild(listLabel);
-        listRow.appendChild(this.listSelect);
-        section.appendChild(listRow);
-
-        // Engine selector
-        const engineRow = document.createElement('div');
-        engineRow.style.marginBottom = '10px';
-        const engineLabel = document.createElement('label');
-        engineLabel.textContent = localization.translate('Engine Builder Engines');
-        engineLabel.style.display = 'inline-block';
-        engineLabel.style.minWidth = '200px';
         this.engineSelect = document.createElement('select');
-        this.engineSelect.style.width = '200px';
-        this.engineSelect.onchange = () => this.onEngineChanged();
-        engineRow.appendChild(engineLabel);
-        engineRow.appendChild(this.engineSelect);
-        section.appendChild(engineRow);
-
-        section.appendChild(document.createElement('br'));
-
-        // Save/Load buttons
-        this.saveListBtn = this.createButton('Engine Builder Save List', () => this.saveList());
-        section.appendChild(this.saveListBtn);
-
+        this.listNameInput = document.createElement('input');
+        this.createListBtn = document.createElement('button');
+        this.deleteListBtn = document.createElement('button');
+        this.deleteEngineBtn = document.createElement('button');
+        this.saveListBtn = document.createElement('button');
         this.loadListInput = document.createElement('input');
+        this.addPropellerBtn = document.createElement('button');
+        this.addPulsejetBtn = document.createElement('button');
+        this.addTurbineBtn = document.createElement('button');
+        this.addElectricBtn = document.createElement('button');
+
+        // Set up event handlers
+        this.listSelect.onchange = () => this.onListChanged();
+        this.engineSelect.onchange = () => this.onEngineChanged();
+        this.deleteEngineBtn.onclick = () => this.deleteEngine();
+        this.saveListBtn.onclick = () => this.saveList();
         this.loadListInput.type = 'file';
         this.loadListInput.accept = 'application/json';
         this.loadListInput.style.display = 'none';
         this.loadListInput.onchange = () => this.loadList();
-        section.appendChild(this.loadListInput);
-
-        const loadListBtn = this.createButton('Engine Builder Load List', () => this.loadListInput.click());
-        section.appendChild(loadListBtn);
-
-        section.appendChild(document.createElement('br'));
-
-        // Add from builder buttons
-        this.addPropellerBtn = this.createButton('Engine Builder Add From Propeller', () => this.addFromBuilder('propeller'));
-        section.appendChild(this.addPropellerBtn);
-
-        this.addPulsejetBtn = this.createButton('Engine Builder Add From Pulsejet', () => this.addFromBuilder('pulsejet'));
-        section.appendChild(this.addPulsejetBtn);
-
-        this.addTurbineBtn = this.createButton('Engine Builder Add From Turbine', () => this.addFromBuilder('turbine'));
-        section.appendChild(this.addTurbineBtn);
-
-        this.addElectricBtn = this.createButton('Engine Builder Add From Electric', () => this.addFromBuilder('electric'));
-        section.appendChild(this.addElectricBtn);
-
-        section.appendChild(document.createElement('br'));
-
-        this.deleteEngineBtn = this.createButton('Engine Builder Delete Engine', () => this.deleteEngine());
-        section.appendChild(this.deleteEngineBtn);
-
-        section.appendChild(document.createElement('br'));
-        section.appendChild(document.createElement('br'));
-
-        // Create/Delete list controls
-        const createRow = document.createElement('div');
-        createRow.style.marginBottom = '10px';
-        const createLabel = document.createElement('label');
-        createLabel.textContent = localization.translate('Engine Builder Create List');
-        createLabel.style.display = 'inline-block';
-        createLabel.style.minWidth = '200px';
-        this.listNameInput = document.createElement('input');
-        this.listNameInput.type = 'text';
-        this.listNameInput.style.width = '150px';
-        this.createListBtn = document.createElement('button');
-        this.createListBtn.textContent = localization.translate('Engine Builder Create List');
+        this.addPropellerBtn.onclick = () => this.addFromBuilder('propeller');
+        this.addPulsejetBtn.onclick = () => this.addFromBuilder('pulsejet');
+        this.addTurbineBtn.onclick = () => this.addFromBuilder('turbine');
+        this.addElectricBtn.onclick = () => this.addFromBuilder('electric');
         this.createListBtn.onclick = () => this.createList();
-        createRow.appendChild(createLabel);
-        createRow.appendChild(this.listNameInput);
-        createRow.appendChild(this.createListBtn);
-        section.appendChild(createRow);
+        this.deleteListBtn.onclick = () => this.deleteList();
 
-        section.appendChild(document.createElement('br'));
+        // Build layout
+        this.createSelect(localization.translate('Engine Builder Lists'), this.listSelect, this.container);
+        this.createSelect(localization.translate('Engine Builder Engines'), this.engineSelect, this.container);
+        this.container.appendChild(document.createElement('br'));
 
-        this.deleteListBtn = this.createButton('Engine Builder Delete List', () => this.deleteList());
-        section.appendChild(this.deleteListBtn);
+        this.createButton(localization.translate('Engine Builder Save List'), this.saveListBtn, this.container);
+        const loadLabel = this.createButton(localization.translate('Engine Builder Load List'), this.loadListInput, this.container);
+        loadLabel.onclick = () => this.loadListInput.click();
 
-        this.container.appendChild(section);
+        this.createButton(localization.translate('Engine Builder Add From Propeller'), this.addPropellerBtn, this.container);
+        this.createButton(localization.translate('Engine Builder Add From Pulsejet'), this.addPulsejetBtn, this.container);
+        this.createButton(localization.translate('Engine Builder Add From Turbine'), this.addTurbineBtn, this.container);
+        this.createButton(localization.translate('Engine Builder Add From Electric'), this.addElectricBtn, this.container);
+
+        // Delete engine button with engine name display
+        const deleteSpan = document.createElement('span');
+        this.deleteEngineLabel = document.createElement('label');
+        this.deleteEngineBtn.hidden = true;
+        this.deleteEngineBtn.id = this.generateID();
+        this.deleteEngineLabel.htmlFor = this.deleteEngineBtn.id;
+        this.deleteEngineLabel.style.marginLeft = '0.25em';
+        this.deleteEngineLabel.style.marginRight = '0.5em';
+        this.deleteEngineLabel.classList.add('lbl_action');
+        this.deleteEngineLabel.classList.add('btn_th');
+        this.updateDeleteButtonLabel();
+        deleteSpan.appendChild(this.deleteEngineLabel);
+        deleteSpan.appendChild(this.deleteEngineBtn);
+        this.container.appendChild(deleteSpan);
+        this.container.appendChild(document.createElement('br'));
+
+        // Create list section
+        const createSpan = document.createElement('span');
+        const createLabel = document.createElement('label');
+        this.createListBtn.hidden = true;
+        this.createListBtn.id = this.generateID();
+        createLabel.htmlFor = this.createListBtn.id;
+        createLabel.innerHTML = '<b>&nbsp;' + localization.translate('Engine Builder Create List') + '&nbsp;&nbsp;</b>';
+        createLabel.classList.add('lbl_action');
+        createLabel.classList.add('btn_th');
+        createSpan.appendChild(createLabel);
+        createSpan.appendChild(this.createListBtn);
+        createSpan.appendChild(this.listNameInput);
+        this.container.appendChild(createSpan);
+        this.container.appendChild(document.createElement('br'));
+        this.container.appendChild(document.createElement('br'));
+
+        this.createButton(localization.translate('Engine Builder Delete List'), this.deleteListBtn, this.container);
     }
 
-    private createButton(labelKey: string, onClick: () => void): HTMLButtonElement {
-        const btn = document.createElement('button');
-        btn.textContent = localization.translate(labelKey);
-        btn.style.margin = '2px';
-        btn.onclick = onClick;
-        return btn;
+    private updateDeleteButtonLabel(): void {
+        if (this.selectedEngineName) {
+            this.deleteEngineLabel.textContent = `${localization.translate('Engine Builder Delete Engine')} (${this.selectedEngineName})`;
+        } else {
+            this.deleteEngineLabel.textContent = localization.translate('Engine Builder Delete Engine');
+        }
     }
 
     private onListChanged(): void {
         const selected = this.listSelect.options[this.listSelect.selectedIndex];
         if (selected) {
             this.currentList = selected.text;
+            this.selectedEngineName = '';
+            this.updateDeleteButtonLabel();
             this.updateEngines();
         }
     }
@@ -171,6 +201,8 @@ export class EngineListManagerUI {
             try {
                 const engines = this.bridge.getEnginesInList(this.currentList);
                 if (selectedIndex < engines.length) {
+                    this.selectedEngineName = engines[selectedIndex].name;
+                    this.updateDeleteButtonLabel();
                     this.onEngineSelected(engines[selectedIndex]);
                 }
             } catch (e) {
@@ -265,24 +297,31 @@ export class EngineListManagerUI {
     }
 
     private deleteEngine(): void {
-        const selectedIndex = this.engineSelect.selectedIndex;
-        if (selectedIndex < 0) {
+        if (!this.selectedEngineName) {
             BlinkBad(this.container);
+            alert('Please select an engine first');
             return;
         }
 
         try {
             const engines = this.bridge.getEnginesInList(this.currentList);
-            const engineToDelete = engines[selectedIndex];
+            const indexToDelete = engines.findIndex(e => e.name === this.selectedEngineName);
+
+            if (indexToDelete < 0) {
+                BlinkBad(this.container);
+                return;
+            }
 
             // Clear the list and re-add all engines except the one to delete
             this.bridge.clearEngineList(this.currentList);
             for (let i = 0; i < engines.length; i++) {
-                if (i !== selectedIndex) {
+                if (i !== indexToDelete) {
                     this.bridge.addEngineToList(this.currentList, engines[i]);
                 }
             }
 
+            this.selectedEngineName = '';
+            this.updateDeleteButtonLabel();
             this.updateEngines();
             BlinkGood(this.container);
 
