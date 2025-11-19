@@ -469,16 +469,17 @@ function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLT
         tbl3.removeChild(tbl3.lastChild);
     }
 
-    const maxRows = Math.max(tbl1.children.length, tbl2.children.length);
+    // Use .rows to access table rows directly (not .children which gets tbody)
+    const maxRows = Math.max(tbl1.rows.length, tbl2.rows.length);
 
     for (let r = 0; r < maxRows; r++) {
-        const row1 = r < tbl1.children.length ? tbl1.children[r] : null;
-        const row2 = r < tbl2.children.length ? tbl2.children[r] : null;
+        const row1 = r < tbl1.rows.length ? tbl1.rows[r] : null;
+        const row2 = r < tbl2.rows.length ? tbl2.rows[r] : null;
         const row3 = tbl3.insertRow();
 
         const maxCols = Math.max(
-            row1 ? row1.children.length : 0,
-            row2 ? row2.children.length : 0
+            row1 ? row1.cells.length : 0,
+            row2 ? row2.cells.length : 0
         );
 
         for (let c = 0; c < maxCols; c++) {
@@ -496,8 +497,8 @@ function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLT
                 continue;
             }
 
-            const cell1 = row1 && c < row1.children.length ? row1.children[c] : null;
-            const cell2 = row2 && c < row2.children.length ? row2.children[c] : null;
+            const cell1 = row1 && c < row1.cells.length ? row1.cells[c] : null;
+            const cell2 = row2 && c < row2.cells.length ? row2.cells[c] : null;
 
             if (cell1 && cell1.nodeName == "TH") {
                 row3.appendChild(cell1.cloneNode(true));
