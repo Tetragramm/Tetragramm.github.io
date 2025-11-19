@@ -80,7 +80,10 @@ impl Serializable for Era {
 
 impl JSSerializable for Era {
     fn to_json(&self) -> serde_json::Value {
-        serde_json::to_value(self.selected_era).unwrap()
+        let mut map = serde_json::Map::new();
+        map.insert("selected".to_string(), self.selected_era.into());
+
+        serde_json::Value::Object(map)
     }
 
     fn from_json(&mut self, js: &serde_json::Value, json_version: f32) {
