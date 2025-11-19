@@ -1589,4 +1589,186 @@ export class AircraftBridge {
             console.error('[AircraftBridge] Failed to save engine lists to localStorage:', e);
         }
     }
+
+    /**
+     * Additional helper methods for Aircraft Actions (buttons)
+     */
+
+    getAircraftName(): string {
+        this.ensureInitialized();
+        return this.wasm!.getName();
+    }
+
+    getPartsVersion(): string {
+        this.ensureInitialized();
+        // Parts version is stored in the parts JSON, typically as a number like 20.3
+        // For now, return a placeholder - this would need to be exposed from Rust
+        return "v1.0";
+    }
+
+    resetAircraft(): void {
+        this.ensureInitialized();
+        // Reset to default aircraft - this would need to be exposed from Rust
+        // For now, create a new aircraft and replace
+        this.wasm = new this.AircraftWasmClass!();
+        this.calculateStats();
+    }
+
+    fromJSON(json: any): boolean {
+        this.ensureInitialized();
+        try {
+            const jsonStr = typeof json === 'string' ? json : JSON.stringify(json);
+            this.wasm = this.AircraftWasmClass!.fromJSON(jsonStr);
+            this.calculateStats();
+            return true;
+        } catch (e) {
+            console.error('Failed to load aircraft from JSON:', e);
+            return false;
+        }
+    }
+
+    getWeaponSets(): number {
+        this.ensureInitialized();
+        return this.wasm!.getWeaponSetsCount();
+    }
+
+    getWeaponSetData(index: number): any {
+        this.ensureInitialized();
+        const displayInfo = this.wasm!.getWeaponSystemDisplayInfo(index);
+        const derivedStats = this.wasm!.getWeaponSystemDerivedStats(index);
+
+        // Parse the display info (it's a formatted string)
+        // Format includes name, shots, hits, damage, etc.
+        return {
+            name: derivedStats.name || '',
+            abrv: derivedStats.abrv || '',
+            shots: derivedStats.shots || 0,
+            ap: derivedStats.ap || 0,
+            jam: derivedStats.jam || '',
+            hits: derivedStats.hits || [0, 0, 0, 0],
+            damage: derivedStats.damage || [0, 0, 0, 0],
+            tags: derivedStats.tags || [],
+            reload: derivedStats.reload || 0,
+            gyrojet: derivedStats.gyrojet || false,
+        };
+    }
+
+    getCockpitEscape(index: number): number {
+        this.ensureInitialized();
+        const escapeList = this.wasm!.getEscapeList();
+        return escapeList[index] || 0;
+    }
+
+    getCockpitFlightStress(index: number): [number, number] {
+        this.ensureInitialized();
+        const stressList = this.wasm!.getStressList();
+        return stressList[index] || [0, 0];
+    }
+
+    getCockpitVisibility(index: number): number {
+        this.ensureInitialized();
+        const visibilityList = this.wasm!.getVisibilityList();
+        return visibilityList[index] || 0;
+    }
+
+    getCockpitCrash(index: number): number {
+        this.ensureInitialized();
+        // Crash safety is part of cockpit stats
+        const stats = this.wasm!.getCockpitStats(index);
+        return stats.crashsafety || 0;
+    }
+
+    getVitalComponentList(): string[] {
+        this.ensureInitialized();
+        return this.wasm!.vitalComponentList();
+    }
+
+    getEffectiveCoverage(): number[] {
+        this.ensureInitialized();
+        // This requires exposing from Rust - return empty array for now
+        // Would need to be implemented in the WASM bindings
+        return [];
+    }
+
+    getEngineReliability(index: number): string {
+        this.ensureInitialized();
+        const reliabilityList = this.wasm!.getReliabilityList();
+        return reliabilityList[index] || '0';
+    }
+
+    getEngineOverspeed(index: number): number {
+        this.ensureInitialized();
+        const fullStats = this.wasm!.getEngineFullStats(index);
+        return fullStats.overspeed || 0;
+    }
+
+    getEngineAltitude(index: number): number {
+        this.ensureInitialized();
+        const fullStats = this.wasm!.getEngineFullStats(index);
+        return fullStats.altitude || 0;
+    }
+
+    engineNeedsCooling(index: number): boolean {
+        this.ensureInitialized();
+        const stats = this.wasm!.getEngineStats(index);
+        return (stats.cooling || 0) > 0;
+    }
+
+    getEngineRadiatorIndex(index: number): number {
+        this.ensureInitialized();
+        const bindings = this.wasm!.getEngineBindings(index);
+        return bindings.radiator_index?.selected || 0;
+    }
+
+    getEngineNotes(index: number): string[] {
+        this.ensureInitialized();
+        const fullStats = this.wasm!.getEngineFullStats(index);
+        const notes: string[] = [];
+
+        // Check if it's a pulsejet
+        if (fullStats.stats?.pulsejet) {
+            notes.push('Pulsejet');
+        }
+
+        // Check for rotary engine direction
+        if (fullStats.oiltank) {
+            // This is a rotary
+            const bindings = this.wasm!.getEngineBindings(index);
+            if (bindings.mount_sel?.selected === 0) { // Tractor
+                notes.push('Turns Right');
+            } else if (bindings.mount_sel?.selected === 1) { // Pusher
+                notes.push('Turns Left');
+            }
+        }
+
+        return notes;
+    }
+
+    getEngineMinAltitude(index: number): number {
+        this.ensureInitialized();
+        const minAlt = this.wasm!.getMinAltitude();
+        return minAlt;
+    }
+
+    getEngineMaxAltitude(index: number): number {
+        this.ensureInitialized();
+        const maxAlt = this.wasm!.getMaxAltitude();
+        return maxAlt;
+    }
+
+    getRadiatorMountType(index: number): string {
+        this.ensureInitialized();
+        const bindings = this.wasm!.getRadiatorBindings(index);
+        const mountOptions = bindings.idx_mount?.options || [];
+        const selectedMount = bindings.idx_mount?.selected || 0;
+        return mountOptions[selectedMount]?.name || '';
+    }
+
+    getRadiatorCoolantType(index: number): string {
+        this.ensureInitialized();
+        const bindings = this.wasm!.getRadiatorBindings(index);
+        const coolantOptions = bindings.idx_coolant?.options || [];
+        const selectedCoolant = bindings.idx_coolant?.selected || 0;
+        return coolantOptions[selectedCoolant]?.name || '';
+    }
 }

@@ -7,6 +7,7 @@
 
 import { localization } from './wasm/localization';
 import { AircraftBridge } from './wasm/aircraft_bridge';
+import { AircraftActions } from './wasm/aircraft_actions';
 import { LanguageSelector } from './wasm/components/language_selector';
 import { EraUI } from './wasm/components/era_ui';
 import { CockpitsUI } from './wasm/components/cockpits_ui';
@@ -35,6 +36,7 @@ type WasmModule = any;
 
 export class WasmApplication {
     private bridge: AircraftBridge | null = null;
+    private actions: AircraftActions | null = null;
     private languageSelector: LanguageSelector | null = null;
     private eraUI: EraUI | null = null;
     private cockpitsUI: CockpitsUI | null = null;
@@ -149,6 +151,10 @@ export class WasmApplication {
 
             // Load custom engine lists from localStorage
             this.bridge.loadEngineListsFromLocalStorage();
+
+            // Create aircraft actions (buttons)
+            this.actions = new AircraftActions(this.bridge);
+            console.log('[WasmApp] Aircraft actions initialized');
 
             // Create language selector
             this.languageSelector = new LanguageSelector('language_selector_container');
