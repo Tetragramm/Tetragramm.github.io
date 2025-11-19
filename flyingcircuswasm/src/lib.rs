@@ -1,4 +1,4 @@
-use flyingcircusrust::aircraft::Aircraft;
+use flyingcircusrust::aircraft::{self, Aircraft};
 use flyingcircusrust::part::Part;
 use flyingcircusrust::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
 use flyingcircusrust::types::DerivedStats;
@@ -1233,13 +1233,13 @@ impl AircraftWasm {
 
     /// Deserialize from JSON string (for saved data)
     #[wasm_bindgen(js_name = fromJSON)]
-    pub fn deserialize_from_json(js_str: String) -> Result<AircraftWasm, JsValue> {
-        let json: serde_json::Value = serde_json::from_str(js_str.as_str())
-            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
-        let mut aircraft = Aircraft::new();
+    pub fn deserialize_from_json(&mut self, js_str: String) {
+        let json: serde_json::Value = serde_json::from_str(js_str.as_str()).unwrap();
         let ver = json["version"].as_str().unwrap().parse::<f32>().unwrap();
+        let mut aircraft = Aircraft::new();
         aircraft.from_json(&json, ver);
-        Ok(AircraftWasm { inner: aircraft })
+        self.inner = aircraft;
+        let _ = self.inner.part_stats();
     }
 
     /// Serialize to LZ-compressed string (for URLs)
@@ -1263,6 +1263,14 @@ impl AircraftWasm {
             .deserialize(&mut d)
             .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
         Ok(AircraftWasm { inner: aircraft })
+    }
+
+    #[wasm_bindgen(js_name = reset)]
+    pub fn reset_aircraft(&mut self) {
+        let lz_str = "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A";
+        let mut d = Deserializer::from_lz_string(lz_str).unwrap();
+        self.inner.deserialize(&mut d).unwrap();
+        let _ = self.inner.part_stats();
     }
 
     /// Get Cockpits UI bindings (includes localized strings)

@@ -346,7 +346,6 @@ class EngineUI {
         this.index = index;
         this.row = row;
         this.buildUI();
-        console.log("onUpdateFunc = " + onUpdateFunc)
         this.onUpdate = onUpdateFunc;
     }
 
@@ -370,10 +369,6 @@ class EngineUI {
             },
             (selected) => {
                 bridge.setEngineSelectedList(this.index, listSelect.options[selected].text);
-                //Update engineSelect
-                const enginesInList = bridge.getEngineNamesInList(selectedList);
-                const selectedEngineName = bridge.getEngineSelectedName(this.index);
-                console.log("this = " + this.index)
                 this.onUpdate();
             });
         typeCell.appendChild(listSelect);

@@ -213,7 +213,6 @@ export class AltitudeUI extends BaseComponentUI {
         // Get min/max altitude from aircraft
         const minIAF = Math.floor(bridge.getMinAltitude() / 10);
         const maxIAF = Math.floor(bridge.getMaxAltitude() / 10);
-        console.log("minIAF: " + minIAF + "  maxIAF: " + maxIAF);
 
         const firesChecked = this.firesCheckbox?.checked ?? false;
         const oxidizedChecked = this.oxidizedCheckbox?.checked ?? false;

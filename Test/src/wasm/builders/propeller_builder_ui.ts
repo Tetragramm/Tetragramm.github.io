@@ -354,7 +354,6 @@ export class PropellerBuilderUI {
     private displayStats(): void {
         if (!this.currentStats) return;
 
-        console.log(this.currentStats);
         this.nameDisplay.textContent = this.currentStats.name;
         this.powerDisplay.textContent = this.currentStats.stats.power.toString();
         this.massDisplay.textContent = this.currentStats.stats.mass.toString();

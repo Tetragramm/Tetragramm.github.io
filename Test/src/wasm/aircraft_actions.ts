@@ -11,9 +11,11 @@ import { localization } from './localization';
 export class AircraftActions {
     private bridge: AircraftBridge;
     private cards: Cards;
+    private onUpdate: () => void;
 
-    constructor(bridge: AircraftBridge) {
+    constructor(bridge: AircraftBridge, onUpdate: () => void) {
         this.bridge = bridge;
+        this.onUpdate = onUpdate;
         this.cards = new Cards();
         this.setupButtons();
     }
@@ -70,6 +72,7 @@ export class AircraftActions {
         // Default Aircraft button
         const resetBtn = document.getElementById('acft_reset') as HTMLButtonElement;
         if (resetBtn) {
+            console.log("Setting Reset Button");
             resetBtn.onclick = () => this.resetAircraft();
         }
     }
@@ -80,8 +83,8 @@ export class AircraftActions {
     private saveJSON(): void {
         const json = this.bridge.toJSON();
         const name = this.bridge.getAircraftName();
-        const version = this.bridge.getPartsVersion();
-        download(JSON.stringify(json), `${name}_${version}.json`, 'json');
+        const version = JSON.parse(json).version;
+        download(json, `${name}_${version}.json`, 'json');
     }
 
     /**
@@ -141,7 +144,7 @@ export class AircraftActions {
 
         // Save weapon cards
         const weaponSets = this.bridge.getWeaponSets();
-        for (let i = 0; i < weaponSets.length; i++) {
+        for (let i = 0; i < weaponSets; i++) {
             this.updateWeaponCard(i);
             this.cards.SaveWeapon(i);
         }
@@ -189,7 +192,7 @@ export class AircraftActions {
         // Collect all weapon data
         this.cards.all_weapons = [];
         const weaponSets = this.bridge.getWeaponSets();
-        for (let i = 0; i < weaponSets.length; i++) {
+        for (let i = 0; i < weaponSets; i++) {
             this.updateWeaponCard(i);
             this.cards.all_weapons.push(Object.assign({}, this.cards.weap_data));
         }
@@ -202,47 +205,48 @@ export class AircraftActions {
      */
     private resetAircraft(): void {
         this.bridge.resetAircraft();
+        this.onUpdate();
     }
 
     /**
      * Update main aircraft card data
      */
     private updateCard(): void {
-        const stats = this.bridge.getAircraftStats();
+        const stats = this.bridge.getStats();
         const derived = this.bridge.getDerivedStats();
 
         this.cards.name = this.bridge.getAircraftName();
         this.cards.acft_data.crash = stats.crashsafety;
-        this.cards.acft_data.dropoff = derived.Dropoff;
-        this.cards.acft_data.empty_boost = derived.BoostEmpty;
-        this.cards.acft_data.empty_hand = derived.HandlingEmpty;
-        this.cards.acft_data.empty_climb = derived.RateOfClimbEmpty;
-        this.cards.acft_data.empty_stall = derived.StallSpeedEmpty;
-        this.cards.acft_data.empty_speed = Math.floor(1.0e-6 + derived.MaxSpeedEmpty);
-        this.cards.acft_data.energy_loss = derived.EnergyLoss;
+        this.cards.acft_data.dropoff = derived.dropoff;
+        this.cards.acft_data.empty_boost = derived.boost_empty;
+        this.cards.acft_data.empty_hand = derived.handling_empty;
+        this.cards.acft_data.empty_climb = derived.rate_of_climb_empty;
+        this.cards.acft_data.empty_stall = derived.stall_speed_empty;
+        this.cards.acft_data.empty_speed = derived.max_speed_empty;
+        this.cards.acft_data.energy_loss = derived.energy_loss;
         this.cards.acft_data.escape = this.bridge.getCockpitEscape(0);
-        this.cards.acft_data.fuel = derived.FuelUses;
-        this.cards.acft_data.full_bomb_boost = derived.BoostFullwBombs;
-        this.cards.acft_data.full_bomb_hand = derived.HandlingFullwBombs;
-        this.cards.acft_data.full_bomb_climb = derived.RateOfClimbwBombs;
-        this.cards.acft_data.full_bomb_stall = derived.StallSpeedFullwBombs;
-        this.cards.acft_data.full_bomb_speed = derived.MaxSpeedwBombs;
-        this.cards.acft_data.full_boost = derived.BoostFull;
-        this.cards.acft_data.full_hand = derived.HandlingFull;
-        this.cards.acft_data.full_climb = derived.RateOfClimbFull;
-        this.cards.acft_data.full_stall = derived.StallSpeedFull;
-        this.cards.acft_data.full_speed = Math.floor(1.0e-6 + derived.MaxSpeedFull);
-        this.cards.acft_data.half_bomb_boost = Math.floor((derived.BoostFullwBombs + derived.BoostEmpty) / 2);
-        this.cards.acft_data.half_bomb_hand = Math.floor((derived.HandlingFullwBombs + derived.HandlingEmpty) / 2);
-        this.cards.acft_data.half_bomb_climb = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2);
-        this.cards.acft_data.half_bomb_stall = Math.floor((derived.StallSpeedFullwBombs + derived.StallSpeedEmpty) / 2);
-        this.cards.acft_data.half_bomb_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2);
-        this.cards.acft_data.half_boost = Math.floor((derived.BoostFull + derived.BoostEmpty) / 2);
-        this.cards.acft_data.half_hand = Math.floor((derived.HandlingFull + derived.HandlingEmpty) / 2);
-        this.cards.acft_data.half_climb = Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2);
-        this.cards.acft_data.half_stall = Math.floor((derived.StallSpeedFull + derived.StallSpeedEmpty) / 2);
-        this.cards.acft_data.half_speed = Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2);
-        this.cards.acft_data.max_strain = derived.MaxStrain;
+        this.cards.acft_data.fuel = derived.fuel_uses;
+        this.cards.acft_data.full_bomb_boost = derived.boost_full_w_bombs;
+        this.cards.acft_data.full_bomb_hand = derived.handling_full_w_bombs;
+        this.cards.acft_data.full_bomb_climb = derived.rate_of_climb_w_bombs;
+        this.cards.acft_data.full_bomb_stall = derived.stall_speed_full_w_bombs;
+        this.cards.acft_data.full_bomb_speed = derived.max_speed_w_bombs;
+        this.cards.acft_data.full_boost = derived.boost_full;
+        this.cards.acft_data.full_hand = derived.handling_full;
+        this.cards.acft_data.full_climb = derived.rate_of_climb_full;
+        this.cards.acft_data.full_stall = derived.stall_speed_full;
+        this.cards.acft_data.full_speed = derived.max_speed_full;
+        this.cards.acft_data.half_bomb_boost = Math.floor((derived.boost_full_w_bombs + derived.boost_empty) / 2);
+        this.cards.acft_data.half_bomb_hand = Math.floor((derived.handling_full_w_bombs + derived.handling_empty) / 2);
+        this.cards.acft_data.half_bomb_climb = Math.floor(1.0e-6 + (derived.rate_of_climb_w_bombs + derived.rate_of_climb_empty) / 2);
+        this.cards.acft_data.half_bomb_stall = Math.floor((derived.stall_speed_full_w_bombs + derived.stall_speed_empty) / 2);
+        this.cards.acft_data.half_bomb_speed = Math.floor(1.0e-6 + (derived.max_speed_w_bombs + derived.max_speed_empty) / 2);
+        this.cards.acft_data.half_boost = Math.floor((derived.boost_full + derived.boost_empty) / 2);
+        this.cards.acft_data.half_hand = Math.floor((derived.handling_full + derived.handling_empty) / 2);
+        this.cards.acft_data.half_climb = Math.floor(1.0e-6 + (derived.rate_of_climb_full + derived.rate_of_climb_empty) / 2);
+        this.cards.acft_data.half_stall = Math.floor((derived.stall_speed_full + derived.stall_speed_empty) / 2);
+        this.cards.acft_data.half_speed = Math.floor(1.0e-6 + (derived.max_speed_full + derived.max_speed_empty) / 2);
+        this.cards.acft_data.max_strain = derived.max_strain;
 
         // Ordinance
         const ordinance = [];
@@ -279,10 +283,10 @@ export class AircraftActions {
         }
 
         this.cards.acft_data.ordinance = ordinance;
-        this.cards.acft_data.stability = derived.Stabiilty;
+        this.cards.acft_data.stability = derived.stability;
         this.cards.acft_data.stress = this.bridge.getCockpitFlightStress(0)[0];
-        this.cards.acft_data.toughness = derived.Toughness;
-        this.cards.acft_data.turn_bleed = derived.TurnBleed;
+        this.cards.acft_data.toughness = derived.toughness;
+        this.cards.acft_data.turn_bleed = derived.turn_bleed;
         this.cards.acft_data.visibility = this.bridge.getCockpitVisibility(0);
         this.cards.acft_data.vital_parts = this.bridge.getVitalComponentList();
         this.cards.acft_data.armour = this.bridge.getEffectiveCoverage();
@@ -340,7 +344,7 @@ export class AircraftActions {
      * Build interactive dashboard JSON data
      */
     private buildInteractiveDash(): string {
-        const stats = this.bridge.getAircraftStats();
+        const stats = this.bridge.getStats();
         const derived = this.bridge.getDerivedStats();
 
         // Get vital parts (limit to 10)
@@ -424,45 +428,45 @@ export class AircraftActions {
         const planeState = {
             altitude: 0,
             airspeed: 0,
-            fuel: derived.FuelUses,
-            dropoff: derived.Dropoff,
+            fuel: derived.fuel_uses,
+            dropoff: derived.dp_empty,
             visibility: this.bridge.getCockpitVisibility(0),
-            energy_loss: derived.EnergyLoss,
-            turn_bleed: derived.TurnBleed,
-            stability: derived.Stabiilty,
+            energy_loss: derived.energy_loss,
+            turn_bleed: derived.turn_bleed,
+            stability: derived.stability,
             stress: this.bridge.getCockpitFlightStress(0)[0],
             plane_escape: this.bridge.getCockpitEscape(0),
             crash: this.bridge.getCockpitCrash(0),
-            max_toughness: derived.Toughness,
-            current_toughness: derived.Toughness,
-            max_strain: derived.MaxStrain,
-            current_strain: derived.MaxStrain,
+            max_toughness: derived.toughness,
+            current_toughness: derived.toughness,
+            max_strain: derived.max_strain,
+            current_strain: derived.max_strain,
             g_force: 0,
             kills: 0,
-            full_load_boost: derived.BoostFullwBombs,
-            full_load_handling: derived.HandlingFullwBombs,
-            full_load_climb: derived.RateOfClimbwBombs,
-            full_load_stall: derived.StallSpeedFullwBombs,
-            full_load_speed: derived.MaxSpeedwBombs,
-            half_fuel_bombs_boost: Math.floor((derived.BoostFullwBombs + derived.BoostEmpty) / 2),
-            half_fuel_bombs_handling: Math.floor((derived.HandlingFullwBombs + derived.HandlingEmpty) / 2),
-            half_fuel_bombs_climb: Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbwBombs) / 2),
-            half_fuel_bombs_stall: Math.floor((derived.StallSpeedFullwBombs + derived.StallSpeedEmpty) / 2),
-            half_fuel_bombs_speed: Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedwBombs) / 2),
-            full_fuel_no_bombs_boost: derived.BoostFull,
-            full_fuel_no_bombs_handling: derived.HandlingFull,
-            full_fuel_no_bombs_climb: derived.RateOfClimbFull,
-            full_fuel_no_bombs_stall: derived.StallSpeedFull,
-            full_fuel_no_bombs_speed: Math.floor(1.0e-6 + derived.MaxSpeedFull),
-            half_fuel_no_bombs_boost: Math.floor((derived.BoostFull + derived.BoostEmpty) / 2),
-            half_fuel_no_bombs_handling: Math.floor((derived.HandlingFull + derived.HandlingEmpty) / 2),
-            half_fuel_no_bombs_climb: Math.floor(1.0e-6 + (derived.RateOfClimbEmpty + derived.RateOfClimbFull) / 2),
-            half_fuel_no_bombs_stall: Math.floor((derived.StallSpeedFull + derived.StallSpeedEmpty) / 2),
-            half_fuel_no_bombs_speed: Math.floor(1.0e-6 + (derived.MaxSpeedEmpty + derived.MaxSpeedFull) / 2),
+            full_load_boost: derived.boost_full_w_bombs,
+            full_load_handling: derived.handling_full_w_bombs,
+            full_load_climb: derived.rate_of_climb_w_bombs,
+            full_load_stall: derived.stall_speed_full_w_bombs,
+            full_load_speed: derived.max_speed_w_bombs,
+            half_fuel_bombs_boost: Math.floor((derived.boost_full_w_bombs + derived.boost_empty) / 2),
+            half_fuel_bombs_handling: Math.floor((derived.handling_full_w_bombs + derived.handling_empty) / 2),
+            half_fuel_bombs_climb: Math.floor(1.0e-6 + (derived.rate_of_climb_w_bombs + derived.rate_of_climb_empty) / 2),
+            half_fuel_bombs_stall: Math.floor((derived.stall_speed_full_w_bombs + derived.stall_speed_empty) / 2),
+            half_fuel_bombs_speed: Math.floor(1.0e-6 + (derived.max_speed_w_bombs + derived.max_speed_empty) / 2),
+            full_fuel_no_bombs_boost: derived.boost_full,
+            full_fuel_no_bombs_handling: derived.handling_full,
+            full_fuel_no_bombs_climb: derived.rate_of_climb_full,
+            full_fuel_no_bombs_stall: derived.stall_speed_full,
+            full_fuel_no_bombs_speed: derived.max_speed_full,
+            half_fuel_no_bombs_boost: Math.floor((derived.boost_full + derived.boost_empty) / 2),
+            half_fuel_no_bombs_handling: Math.floor((derived.handling_full + derived.handling_empty) / 2),
+            half_fuel_no_bombs_climb: Math.floor(1.0e-6 + (derived.rate_of_climb_full + derived.rate_of_climb_empty) / 2),
+            half_fuel_no_bombs_stall: Math.floor((derived.stall_speed_full + derived.stall_speed_empty) / 2),
+            half_fuel_no_bombs_speed: Math.floor(1.0e-6 + (derived.max_speed_full + derived.max_speed_empty) / 2),
             empty_boost: 0,
-            empty_handling: derived.HandlingEmpty,
+            empty_handling: derived.handling_empty,
             empty_climb: 0,
-            empty_stall: derived.StallSpeedEmpty,
+            empty_stall: derived.stall_speed_empty,
             empty_speed: 0,
             vital_part_1: vitalParts[0],
             vital_part_2: vitalParts[1],
@@ -529,7 +533,7 @@ export class AircraftActions {
         const weapons = [];
         const weaponSets = this.bridge.getWeaponSets();
 
-        for (let i = 0; i < weaponSets.length; i++) {
+        for (let i = 0; i < weaponSets; i++) {
             const weaponData = this.bridge.getWeaponSetData(i);
 
             const weaponState = {

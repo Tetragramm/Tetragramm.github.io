@@ -153,7 +153,9 @@ export class WasmApplication {
             this.bridge.loadEngineListsFromLocalStorage();
 
             // Create aircraft actions (buttons)
-            this.actions = new AircraftActions(this.bridge);
+            this.actions = new AircraftActions(this.bridge, () => {
+                this.onStatsUpdate();
+            });
             console.log('[WasmApp] Aircraft actions initialized');
 
             // Create language selector

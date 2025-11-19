@@ -184,6 +184,8 @@ export interface AircraftWasmAPI {
     getDerivedStats(): DerivedStats;
     getStats(): any;
     calculateEngineStats(engineData: any): any;
+    reset();
+    fromJSON(jsonStr: string);
 
     // Aircraft query methods
     getUsedIsDefault(): boolean;
@@ -1405,8 +1407,6 @@ export class AircraftBridge {
      */
     addCustomPart(name: string, stats: any): void {
         this.ensureInitialized();
-        console.log("Adding Stats: ");
-        console.log(stats);
         this.wasm!.addCustomPart(name, stats);
     }
 
@@ -1610,16 +1610,14 @@ export class AircraftBridge {
         this.ensureInitialized();
         // Reset to default aircraft - this would need to be exposed from Rust
         // For now, create a new aircraft and replace
-        this.wasm = new this.AircraftWasmClass!();
-        this.calculateStats();
+        this.wasm!.reset();
     }
 
     fromJSON(json: any): boolean {
         this.ensureInitialized();
         try {
             const jsonStr = typeof json === 'string' ? json : JSON.stringify(json);
-            this.wasm = this.AircraftWasmClass!.fromJSON(jsonStr);
-            this.calculateStats();
+            this.wasm = this.wasm!.fromJSON(jsonStr);
             return true;
         } catch (e) {
             console.error('Failed to load aircraft from JSON:', e);

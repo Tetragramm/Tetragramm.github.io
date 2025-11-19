@@ -740,7 +740,6 @@ export class DerivedStatsUI extends BaseComponentUI {
 
         for (const part of eras) {
             const partEraNum = this.eraToNum(part.era);
-            console.log("Era Break? " + part.name + "  " + part.era + "  " + partEraNum + " " + aircraftEraNum);
             if (partEraNum > aircraftEraNum) {
                 eraBreak += partEraNum - aircraftEraNum;
                 hasProblematicParts = true;
