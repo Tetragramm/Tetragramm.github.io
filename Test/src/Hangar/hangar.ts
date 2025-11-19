@@ -1,45 +1,85 @@
-import { lu, localization } from "../impl/Localization";
-import { SetEngineLists } from "../impl/EngineList";
-import { Aircraft } from "../impl/Aircraft";
-import { Serialize, Deserialize } from "../impl/Serialize";
-import { Derived_HTML } from "../disp/Derived";
-import { BlinkBad, BlinkNeutral, _arrayBufferToString, _stringToArrayBuffer, download } from "../disp/Tools";
-import { LZString } from "../lz/lz-string";
+import { localization } from "../wasm/localization";
+import { AircraftBridge } from "../wasm/aircraft_bridge";
+import { DerivedStatsUI } from "../wasm/components/derived_stats_ui";
+import { BlinkBad, BlinkNeutral } from "../disp/Tools";
 import { JSON2CSV } from "../JSON2CSV/json2csv";
 import { StringFmt } from "../string";
-import { Stress2Str } from "../impl/Stats";
 
-import * as parts_JSON from "../parts.json";
+// Type for the WASM module
+type WasmModule = any;
 
-const init = () => {
+let wasmModule: WasmModule | null = null;
+let acft_builder: AircraftBridge;
+let stats_builder: DerivedStatsUI;
+let acft_hangar: AircraftBridge;
+let stats_hangar: DerivedStatsUI;
+
+let name_builder: HTMLInputElement;
+let select_hangar: HTMLSelectElement;
+let select_acft: HTMLSelectElement;
+let chosen_hangar: string;
+
+const init = async () => {
     const sp = new URLSearchParams(location.search);
-    var lang = sp.get("lang");
-    if (lang) {
-        localization.SetCurrentLanguage(lang);
-    } else if (window.localStorage.language) {
-        localization.SetCurrentLanguage(window.localStorage.language);
-    }
+    const lang = sp.get("lang");
 
-    //Engine bit
-    var nameliststr = window.localStorage.getItem("test.engines_names");
-    SetEngineLists(nameliststr);
-    InitHTML();
-    InitStats();
-    LoadFromHangar(0);
+    // Initialize WASM module first
+    try {
+        console.log('[Hangar] Loading WASM module...');
+        wasmModule = await loadWasmModule();
+
+        if (!wasmModule) {
+            throw new Error('WASM module not available');
+        }
+
+        // Initialize WASM
+        const initWasm = wasmModule.default || wasmModule.init;
+        await initWasm();
+        console.log('[Hangar] WASM binary loaded');
+
+        // Initialize localization with WASM backend
+        localization.initializeWasm(wasmModule.Localization);
+        console.log('[Hangar] Localization initialized');
+
+        // Set language from URL or localStorage
+        if (lang) {
+            localization.setLocale(lang);
+        } else if (window.localStorage.language) {
+            localization.setLocale(window.localStorage.language);
+        }
+
+        await InitHTML();
+        await InitStats();
+        await LoadFromHangar(0);
+
+        console.log('[Hangar] Initialization complete');
+    } catch (error) {
+        console.error('[Hangar] Failed to initialize:', error);
+        alert('Failed to initialize hangar. Please refresh the page.');
+    }
 };
+
 window.addEventListener("DOMContentLoaded", init);
 
-var acft_builder: Aircraft;
-var stats_builder: Derived_HTML;
-var acft_hangar: Aircraft;
-var stats_hangar: Derived_HTML;
+/**
+ * Load the WASM module
+ */
+async function loadWasmModule(): Promise<WasmModule | null> {
+    try {
+        const wasmModule = await import('../pkg/flyingcircuswasm');
+        return {
+            default: wasmModule.init_panic_hook,
+            init: wasmModule.init_panic_hook,
+            AircraftWasm: wasmModule.AircraftWasm,
+            Localization: wasmModule.Localization
+        };
+    } catch (e) {
+        console.error('[Hangar] WASM module not found:', e);
+        return null;
+    }
+}
 
-var name_builder: HTMLInputElement;
-var select_hangar: HTMLSelectElement;
-var select_acft: HTMLSelectElement;
-var chosen_hangar: string;
-
-function InitHTML() {
+async function InitHTML() {
     chosen_hangar = "Default";
     select_hangar = document.createElement("SELECT") as HTMLSelectElement;
     select_hangar.onchange = () => {
@@ -49,65 +89,77 @@ function InitHTML() {
     RefreshHangarSelect(LoadHangarList());
 
     select_acft = document.createElement("SELECT") as HTMLSelectElement;
-    select_acft.onchange = () => { LoadFromHangar(select_acft.selectedIndex); };
+    select_acft.onchange = async () => { await LoadFromHangar(select_acft.selectedIndex); };
     RefreshAcftSelect(LoadAcftList());
 
     name_builder = document.createElement("INPUT") as HTMLInputElement;
 
-    var load_btn = document.getElementById("btn_load") as HTMLButtonElement;
-    load_btn.onclick = () => {
-        acft_builder.fromJSON(JSON.parse(JSON.stringify(acft_hangar.toJSON())));
-        acft_builder.CalculateStats();
-        stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
-        window.localStorage.setItem("test.aircraft", JSON.stringify(acft_builder.toJSON()));
+    const load_btn = document.getElementById("btn_load") as HTMLButtonElement;
+    load_btn.onclick = async () => {
+        // Copy hangar aircraft to builder
+        const json = acft_hangar.toJSON();
+        const newBridge = await AircraftBridge.fromJSON(
+            json,
+            async () => { /* Already initialized */ },
+            wasmModule.AircraftWasm
+        );
+        acft_builder = newBridge;
+        acft_builder.loadEngineListsFromLocalStorage();
+        acft_builder.calculateStats();
+
+        // Update builder display
+        stats_builder.render(true);
+
+        // Save to localStorage
+        window.localStorage.setItem("test.aircraft", acft_builder.toJSON());
+
         RefreshDisplay();
         BlinkNeutral(load_btn.parentElement);
     };
 
-    var save_btn = document.getElementById("btn_save") as HTMLButtonElement;
+    const save_btn = document.getElementById("btn_save") as HTMLButtonElement;
     save_btn.onclick = () => {
-        acft_builder.name = name_builder.value;
+        acft_builder.setName(name_builder.value);
         AddToHangar(acft_builder);
         BlinkNeutral(save_btn.parentElement);
     };
 
-    var json_btn = document.getElementById("btn_json") as HTMLInputElement;
+    const json_btn = document.getElementById("btn_json") as HTMLInputElement;
     json_btn.multiple = false;
     json_btn.accept = "application/JSON";
-    json_btn.onchange = (evt) => {
-        LoadJSON(json_btn);
+    json_btn.onchange = async (evt) => {
+        await LoadJSON(json_btn);
         BlinkNeutral(json_btn.parentElement);
     };
 
-    var remove_btn = document.getElementById("btn_remove") as HTMLButtonElement;
+    const remove_btn = document.getElementById("btn_remove") as HTMLButtonElement;
     remove_btn.onclick = () => {
-        RemoveFromHangar(acft_hangar.name);
+        RemoveFromHangar(acft_hangar.getName());
         BlinkNeutral(remove_btn.parentElement);
     };
 
-    var hangar_save = document.getElementById("btn_save_h") as HTMLButtonElement;
+    const hangar_save = document.getElementById("btn_save_h") as HTMLButtonElement;
     hangar_save.onclick = () => {
         download(JSON.stringify(LoadAcftList()), chosen_hangar + ".json", "json");
         BlinkNeutral(hangar_save.parentElement);
     };
 
-    var hangar_load = document.getElementById("btn_json_h") as HTMLInputElement;
+    const hangar_load = document.getElementById("btn_json_h") as HTMLInputElement;
     hangar_load.setAttribute("type", "file");
     hangar_load.multiple = false;
     hangar_load.accept = "application/JSON";
-    hangar_load.onchange = (evt) => {
+    hangar_load.onchange = async (evt) => {
         if (hangar_load.files.length == 0)
             return;
         BlinkNeutral(hangar_load.parentElement);
-        var file = hangar_load.files[0];
-        var reader = new FileReader();
-        reader.onloadend = () => {
+        const file = hangar_load.files[0];
+        const reader = new FileReader();
+        reader.onloadend = async () => {
             try {
-                var name = file.name.substr(0, file.name.length - 5);
+                let name = file.name.substr(0, file.name.length - 5);
                 name = name.trim();
                 name = name.replace(/\s+/g, ' ');
-                var acft_list: { names: string[], acft: string[] };
-                acft_list = JSON.parse(reader.result as string);
+                const acft_list: { names: string[], acft: string[] } = JSON.parse(reader.result as string);
                 if (acft_list.names.length != acft_list.acft.length) {
                     throw "Bad";
                 }
@@ -122,10 +174,10 @@ function InitHTML() {
         hangar_load.value = "";
     };
 
-    var list_create = document.getElementById("lbl_create_list") as HTMLLabelElement;
-    var list_input = document.getElementById("btn_create_list") as HTMLInputElement;
+    const list_create = document.getElementById("lbl_create_list") as HTMLLabelElement;
+    const list_input = document.getElementById("btn_create_list") as HTMLInputElement;
     list_create.onclick = () => {
-        var n = list_input.value;
+        let n = list_input.value;
         n = n.trim();
         n = n.replace(/\s+/g, ' ');
         if (n != "") {
@@ -137,70 +189,126 @@ function InitHTML() {
         list_input.value = "";
     };
 
-    var list_delete = document.getElementById("btn_delete_list") as HTMLButtonElement;
+    const list_delete = document.getElementById("btn_delete_list") as HTMLButtonElement;
     list_delete.onclick = () => {
         RemoveHangar(chosen_hangar);
         BlinkNeutral(list_delete.parentElement);
     }
 
-    var to_csv = document.getElementById("btn_to_csv") as HTMLButtonElement;
-    to_csv.onclick = () => {
-        var acft_list = LoadAcftList();
-        var DerivedStats = [];
-        var curr_acft = JSON.stringify(acft_hangar.toJSON());
+    const to_csv = document.getElementById("btn_to_csv") as HTMLButtonElement;
+    to_csv.onclick = async () => {
+        const acft_list = LoadAcftList();
+        const DerivedStats = [];
+        const curr_acft = acft_hangar.toJSON();
+
         for (let acft of acft_list.acft) {
             try {
-                var str = LZString.decompressFromEncodedURIComponent(acft);
-                var arr = _stringToArrayBuffer(str);
-                var des = new Deserialize(arr);
-                acft_hangar.deserialize(des);
-                acft_hangar.CalculateStats();
-            } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); acft_hangar.Reset(); }
+                const loadedBridge = await AircraftBridge.deserializeFromLZString(
+                    acft,
+                    async () => { /* Already initialized */ },
+                    wasmModule.AircraftWasm
+                );
+                loadedBridge.loadEngineListsFromLocalStorage();
+                loadedBridge.calculateStats();
 
-            let stats = acft_hangar.GetStats();
-            let dstats = acft_hangar.GetDerivedStats();
-            let entries = Object.entries<any>(dstats);
-            entries.splice(0, 0, ["name", acft_hangar.name]);
-            entries.splice(1, 0, ["cost", stats.cost]);
-            entries.splice(2, 0, ["upkeep", stats.upkeep]);
-            entries.splice(3, 0, ["bomb_mass", stats.bomb_mass]);
-            entries.splice(4, 0, ["escape", StringFmt.Join("/", acft_hangar.GetEscapeList())]);
-            entries.splice(5, 0, ["crash", StringFmt.Join("/", acft_hangar.GetCrashList())]);
-            entries.splice(6, 0, ["stress", Stress2Str(acft_hangar.GetStressList())]);
-            let dstatsn = Object.fromEntries(entries);
-            DerivedStats.push(dstatsn);
+                const stats = loadedBridge.getStats();
+                const dstats = loadedBridge.getDerivedStats();
+
+                // Build CSV row with derived stats
+                const entries = Object.entries<any>(dstats);
+                entries.splice(0, 0, ["name", loadedBridge.getName()]);
+                entries.splice(1, 0, ["cost", stats.cost]);
+                entries.splice(2, 0, ["upkeep", stats.upkeep]);
+                entries.splice(3, 0, ["bomb_mass", stats.bomb_mass]);
+                entries.splice(4, 0, ["escape", StringFmt.Join("/", loadedBridge.getEscapeList())]);
+                entries.splice(5, 0, ["crash", StringFmt.Join("/", loadedBridge.getEscapeList())]); // TODO: getCrashList if it exists
+                entries.splice(6, 0, ["stress", formatStressList(loadedBridge.getStressList())]);
+
+                const dstatsn = Object.fromEntries(entries);
+                DerivedStats.push(dstatsn);
+            } catch (e) {
+                console.error("Failed to load aircraft for CSV:", e);
+            }
         }
-        acft_hangar.fromJSON(JSON.parse(curr_acft));
-        var json2csv = new JSON2CSV();
+
+        // Restore original hangar aircraft
+        const restoredBridge = await AircraftBridge.fromJSON(
+            curr_acft,
+            async () => { /* Already initialized */ },
+            wasmModule.AircraftWasm
+        );
+        acft_hangar = restoredBridge;
+        acft_hangar.loadEngineListsFromLocalStorage();
+
+        const json2csv = new JSON2CSV();
         download(json2csv.convert(DerivedStats, { separator: ',', flatten: true, output_csvjson_variant: false }), chosen_hangar + ".csv", "csv");
     }
 }
 
-function InitStats() {
-    let acft_data = window.localStorage.getItem("test.aircraft");
-    acft_builder = new Aircraft(parts_JSON, false);
+async function InitStats() {
+    const acft_data = window.localStorage.getItem("test.aircraft");
+
+    // Create builder aircraft
     if (acft_data) {
         console.log("Used Saved Data");
         try {
-            acft_builder.fromJSON(JSON.parse(acft_data));
-            acft_builder.CalculateStats();
-        } catch { console.log("Saved Data Failed."); acft_builder.Reset(); }
+            acft_builder = await AircraftBridge.fromJSON(
+                acft_data,
+                async () => { /* Already initialized */ },
+                wasmModule.AircraftWasm
+            );
+            acft_builder.loadEngineListsFromLocalStorage();
+        } catch (e) {
+            console.error("Saved Data Failed:", e);
+            // Load default aircraft
+            acft_builder = await AircraftBridge.deserializeFromLZString(
+                "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
+                async () => { /* Already initialized */ },
+                wasmModule.AircraftWasm
+            );
+        }
+    } else {
+        // Load default aircraft
+        acft_builder = await AircraftBridge.deserializeFromLZString(
+            "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
+            async () => { /* Already initialized */ },
+            wasmModule.AircraftWasm
+        );
     }
-    stats_builder = new Derived_HTML(document.getElementById("table_builder") as HTMLTableElement);
-    stats_builder.SetShowBombs(true);
-    stats_builder.UpdateDisplay(acft_builder, acft_builder.GetStats(), acft_builder.GetDerivedStats());
+    acft_builder.loadEngineListsFromLocalStorage();
+    acft_builder.calculateStats();
 
-    acft_hangar = new Aircraft(parts_JSON, false);
-    stats_hangar = new Derived_HTML(document.getElementById("table_hangar") as HTMLTableElement);
-    stats_hangar.SetShowBombs(true);
+    // Create builder stats UI
+    stats_builder = new DerivedStatsUI(
+        () => acft_builder,
+        'table_builder',
+        () => { /* No update callback needed for hangar */ }
+    );
+    stats_builder.setShowBombs(true);
+    stats_builder.render(true);
+
+    // Create hangar aircraft (will be loaded in LoadFromHangar)
+    acft_hangar = await AircraftBridge.deserializeFromLZString(
+        "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
+        async () => { /* Already initialized */ },
+        wasmModule.AircraftWasm
+    );
+    acft_hangar.loadEngineListsFromLocalStorage();
+
+    // Create hangar stats UI
+    stats_hangar = new DerivedStatsUI(
+        () => acft_hangar,
+        'table_hangar',
+        () => { /* No update callback needed for hangar */ }
+    );
+    stats_hangar.setShowBombs(true);
 }
 
-function LoadHangarList() {
-    var hangar_list: string[];
+function LoadHangarList(): string[] {
     if (!window.localStorage.getItem("test.hangar_names")) {
         window.localStorage.setItem("test.hangar_names", JSON.stringify(["Default"]));
     }
-    hangar_list = JSON.parse(window.localStorage.getItem("test.hangar_names"));
+    let hangar_list: string[] = JSON.parse(window.localStorage.getItem("test.hangar_names"));
     if (hangar_list.length == 0) {
         window.localStorage.setItem("test.hangar_names", JSON.stringify(["Default"]));
         hangar_list = JSON.parse(window.localStorage.getItem("test.hangar_names"));
@@ -208,8 +316,8 @@ function LoadHangarList() {
     return hangar_list;
 }
 
-function LoadAcftList() {
-    var acft_list: { names: string[], acft: string[] };
+function LoadAcftList(): { names: string[], acft: string[] } {
+    let acft_list: { names: string[], acft: string[] };
     if (window.localStorage.getItem("test.hangar." + chosen_hangar)) {
         acft_list = JSON.parse(window.localStorage.getItem("test.hangar." + chosen_hangar));
     } else {
@@ -222,24 +330,36 @@ function LoadAcftList() {
     return acft_list;
 }
 
-function LoadFromHangar(idx: number) {
-    var acft_list = LoadAcftList();
+async function LoadFromHangar(idx: number) {
+    const acft_list = LoadAcftList();
     try {
-        var str = LZString.decompressFromEncodedURIComponent(acft_list.acft[idx]);
-        var arr = _stringToArrayBuffer(str);
-        var des = new Deserialize(arr);
-        acft_hangar.deserialize(des);
-        acft_hangar.CalculateStats();
-    } catch (e) { console.log("Compressed Query Parameter Failed."); console.log(e); acft_hangar.Reset(); }
+        const loadedBridge = await AircraftBridge.deserializeFromLZString(
+            acft_list.acft[idx],
+            async () => { /* Already initialized */ },
+            wasmModule.AircraftWasm
+        );
+        acft_hangar = loadedBridge;
+        acft_hangar.loadEngineListsFromLocalStorage();
+        acft_hangar.calculateStats();
+    } catch (e) {
+        console.error("Failed to load aircraft from hangar:", e);
+        // Load default on error
+        acft_hangar = await AircraftBridge.deserializeFromLZString(
+            "AAEAjGB0DMwLACECGBnAlgYwAQLQBwBskA7AU2AEBLgaAwGhmgUEZpFY+oHQAlACwD2xJFgCyAgC4CATgCMkAVywAtCFgAcABj55gAJGABcYACAaVVuwAQDdpw4B-h8BsAoex8+9BwsZJnySqpgGtq6NGYUAIKQAGaxAAIACQwAkJQA-AABNNm5OfZ2jE6eZhxlAMCeHmXVtdS1NjYeTRxVbKwW1J7tNOld1WmDnCweVBbsA8OsvS7TtnUMs0XzY8AVVLRT1BRde6sHDEA",
+            async () => { /* Already initialized */ },
+            wasmModule.AircraftWasm
+        );
+        acft_hangar.loadEngineListsFromLocalStorage();
+    }
 
-    stats_hangar.UpdateDisplay(acft_hangar, acft_hangar.GetStats(), acft_hangar.GetDerivedStats());
+    stats_hangar.render(true);
     select_acft.selectedIndex = idx;
     RefreshDisplay();
 }
 
-function AddHangar(hangar: string) {
-    var hangar_list = LoadHangarList();
-    var idx = hangar_list.findIndex(n => n == hangar);
+function AddHangar(hangar: string): number {
+    const hangar_list = LoadHangarList();
+    let idx = hangar_list.findIndex(n => n == hangar);
     if (idx == -1) {
         hangar_list.push(hangar);
         idx = hangar_list.length - 1;
@@ -248,29 +368,24 @@ function AddHangar(hangar: string) {
     return idx;
 }
 
-function AddToHangar(acft: Aircraft) {
-    var s = new Serialize();
-    acft.serialize(s);
-    var arr = s.FinalArray();
-    var str2 = _arrayBufferToString(arr);
-    var data = LZString.compressToEncodedURIComponent(str2);
-    var acft_list = LoadAcftList();
-    var idx = acft_list.names.findIndex(n => n == acft.name);
+function AddToHangar(acft: AircraftBridge): number {
+    const data = acft.serializeToLZString();
+    const acft_list = LoadAcftList();
+    let idx = acft_list.names.findIndex(n => n == acft.getName());
     if (idx == -1) {
-        acft_list.names.push(acft.name);
+        acft_list.names.push(acft.getName());
         acft_list.acft.push(data);
         idx = acft_list.names.length - 1;
     } else {
         acft_list.acft[idx] = data;
     }
     SaveAcftList(acft_list);
-
     return idx;
 }
 
 function RemoveHangar(name: string) {
-    var hangar_list = LoadHangarList();
-    var idx = hangar_list.findIndex(n => n == name);
+    const hangar_list = LoadHangarList();
+    const idx = hangar_list.findIndex(n => n == name);
     if (idx != -1) {
         hangar_list.splice(idx, 1);
         window.localStorage.removeItem("test.hangar." + name);
@@ -283,8 +398,8 @@ function RemoveHangar(name: string) {
 }
 
 function RemoveFromHangar(name: string) {
-    var acft_list = LoadAcftList();
-    var idx = acft_list.names.findIndex(n => n == name);
+    const acft_list = LoadAcftList();
+    const idx = acft_list.names.findIndex(n => n == name);
     if (idx != -1) {
         acft_list.names.splice(idx, 1);
         acft_list.acft.splice(idx, 1);
@@ -308,7 +423,7 @@ function RefreshAcftSelect(acft_list: { names: string[], acft: string[] }) {
         select_acft.removeChild(select_acft.lastChild);
     }
     for (let i = 0; i < acft_list.names.length; i++) {
-        let opt = document.createElement("OPTION") as HTMLOptionElement;
+        const opt = document.createElement("OPTION") as HTMLOptionElement;
         opt.text = acft_list.names[i];
         select_acft.add(opt);
     }
@@ -318,9 +433,9 @@ function RefreshHangarSelect(hangar_list: string[]) {
     while (select_hangar.lastChild) {
         select_hangar.removeChild(select_hangar.lastChild);
     }
-    var idx = 0;
+    let idx = 0;
     for (let i = 0; i < hangar_list.length; i++) {
-        let opt = document.createElement("OPTION") as HTMLOptionElement;
+        const opt = document.createElement("OPTION") as HTMLOptionElement;
         opt.text = hangar_list[i];
         select_hangar.add(opt);
         if (hangar_list[i] == chosen_hangar)
@@ -329,22 +444,25 @@ function RefreshHangarSelect(hangar_list: string[]) {
     select_hangar.selectedIndex = idx;
 }
 
-function LoadJSON(input: HTMLInputElement) {
+async function LoadJSON(input: HTMLInputElement) {
     if (input.files.length == 0)
         return;
-    var file = input.files[0];
-    var reader = new FileReader();
-    reader.onloadend = () => {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onloadend = async () => {
         try {
-            var str = JSON.parse(reader.result as string);
-            var acft = new Aircraft(parts_JSON, false);
-            if (acft.fromJSON(str)) {
-                var idx = AddToHangar(acft);
-                LoadFromHangar(idx);
-            }
-
+            const str = reader.result as string;
+            const loadedBridge = await AircraftBridge.fromJSON(
+                str,
+                async () => { /* Already initialized */ },
+                wasmModule.AircraftWasm
+            );
+            loadedBridge.loadEngineListsFromLocalStorage();
+            const idx = AddToHangar(loadedBridge);
+            await LoadFromHangar(idx);
         } catch (e) {
-            console.error(e, e.stack);
+            console.error("Failed to load JSON:", e);
+            BlinkBad(input.parentElement);
         }
     };
     reader.readAsText(file);
@@ -352,9 +470,9 @@ function LoadJSON(input: HTMLInputElement) {
 }
 
 function RefreshDisplay() {
-    var tbl1 = document.getElementById("table_builder") as HTMLTableElement;
-    var tbl2 = document.getElementById("table_hangar") as HTMLTableElement;
-    var tbl3 = document.getElementById("table_comp") as HTMLTableElement;
+    const tbl1 = document.getElementById("table_builder") as HTMLTableElement;
+    const tbl2 = document.getElementById("table_hangar") as HTMLTableElement;
+    const tbl3 = document.getElementById("table_comp") as HTMLTableElement;
     MergeTables(tbl1, tbl2, tbl3);
 }
 
@@ -362,19 +480,26 @@ function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLT
     while (tbl3.lastChild) {
         tbl3.removeChild(tbl3.lastChild);
     }
-    console.log(acft_builder.GetStats());
-    for (let r = 0; r < tbl1.children.length; r++) {
-        var row1 = tbl1.children[r];
-        var row2 = tbl2.children[r];
-        var row3 = tbl3.insertRow();
-        for (let c = 0; c < Math.max(row1.children.length, row2.children.length); c++) {
 
+    const maxRows = Math.max(tbl1.children.length, tbl2.children.length);
+
+    for (let r = 0; r < maxRows; r++) {
+        const row1 = r < tbl1.children.length ? tbl1.children[r] : null;
+        const row2 = r < tbl2.children.length ? tbl2.children[r] : null;
+        const row3 = tbl3.insertRow();
+
+        const maxCols = Math.max(
+            row1 ? row1.children.length : 0,
+            row2 ? row2.children.length : 0
+        );
+
+        for (let c = 0; c < maxCols; c++) {
             if (r == 0 && c == 0) {
-                var cell = row3.insertCell();
+                const cell = row3.insertCell();
                 cell.colSpan = 2;
                 cell.appendChild(name_builder);
-                name_builder.value = acft_builder.name;
-                var hr = document.createElement("HR");
+                name_builder.value = acft_builder.getName();
+                const hr = document.createElement("HR");
                 hr.className = "dashed";
                 cell.appendChild(hr);
                 cell.appendChild(select_hangar);
@@ -383,15 +508,56 @@ function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLT
                 continue;
             }
 
-            var cell1 = row1.children[c];
-            var cell2 = row2.children[c];
-            if (cell1.nodeName == "TH") {
+            const cell1 = row1 && c < row1.children.length ? row1.children[c] : null;
+            const cell2 = row2 && c < row2.children.length ? row2.children[c] : null;
+
+            if (cell1 && cell1.nodeName == "TH") {
                 row3.appendChild(cell1.cloneNode(true));
-            } else {
-                var clone = cell1.cloneNode(true) as HTMLTableCellElement;
+            } else if (cell1 && cell2) {
+                const clone = cell1.cloneNode(true) as HTMLTableCellElement;
                 clone.innerHTML += "<hr class=\"dashed\">" + cell2.innerHTML;
                 row3.appendChild(clone);
+            } else if (cell1) {
+                row3.appendChild(cell1.cloneNode(true));
+            } else if (cell2) {
+                row3.appendChild(cell2.cloneNode(true));
             }
         }
     }
+}
+
+// Helper function to format stress list for CSV export
+function formatStressList(stressList: Array<[number, number]>): string {
+    let str = '';
+    for (let i = 0; i < stressList.length - 1; i++) {
+        if (stressList[i][0] !== stressList[i][1]) {
+            str += stressList[i][0].toString() + '(' + stressList[i][1].toString() + '), ';
+        } else {
+            str += stressList[i][0].toString() + ', ';
+        }
+    }
+    if (stressList.length > 0) {
+        const i = stressList.length - 1;
+        if (stressList[i][0] !== stressList[i][1]) {
+            str += stressList[i][0].toString() + '(' + stressList[i][1].toString() + ')';
+        } else {
+            str += stressList[i][0].toString();
+        }
+    }
+    return str;
+}
+
+// Helper function to download files
+function download(data: string, filename: string, type: string) {
+    const file = new Blob([data], { type: type });
+    const a = document.createElement("a");
+    const url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 0);
 }
