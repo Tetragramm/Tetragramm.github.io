@@ -115,6 +115,19 @@ export class EnginesUI extends BaseComponentUI {
         rulesLine.appendChild(createRulesLink('_Engines', 'Engine Rules').firstChild);
         rulesLine.appendChild(createRulesLink('_Engines_Upgrades', 'Upgrade Rules').firstChild);
         rulesLine.appendChild(createRulesLink('_Cooling_(Air)', 'Cooling Rules').firstChild);
+
+        // Add Engine Builder link
+        const engineBuilderSpan = document.createElement('span');
+        const engineBuilderLink = document.createElement('a');
+        engineBuilderLink.href = './EngineBuilder/engine.html';
+        const engineBuilderText = document.createElement('u');
+        engineBuilderText.textContent = 'Engine Builder';
+        engineBuilderLink.appendChild(engineBuilderText);
+        engineBuilderSpan.appendChild(document.createTextNode('('));
+        engineBuilderSpan.appendChild(engineBuilderLink);
+        engineBuilderSpan.appendChild(document.createTextNode(') '));
+        rulesLine.appendChild(engineBuilderSpan);
+
         rulesLine.appendChild(document.createElement('br'));
         this.sectionElement.insertBefore(
             rulesLine,
