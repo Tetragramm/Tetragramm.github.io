@@ -123,9 +123,7 @@ export class EnginesUI extends BaseComponentUI {
         const engineBuilderText = document.createElement('u');
         engineBuilderText.textContent = 'Engine Builder';
         engineBuilderLink.appendChild(engineBuilderText);
-        engineBuilderSpan.appendChild(document.createTextNode('('));
         engineBuilderSpan.appendChild(engineBuilderLink);
-        engineBuilderSpan.appendChild(document.createTextNode(') '));
         rulesLine.appendChild(engineBuilderSpan);
 
         rulesLine.appendChild(document.createElement('br'));
