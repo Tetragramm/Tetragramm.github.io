@@ -5,7 +5,6 @@ import { wasmApp } from "./wasm_init";
 
 const init = async () => {
     // Try to initialize WASM first
-    // This will handle Era component if WASM is available
     try {
         await wasmApp.initialize();
         console.log("[PlaneBuilder] WASM initialized successfully");

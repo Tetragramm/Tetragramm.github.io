@@ -1,4 +1,4 @@
-import { localization } from "../wasm/localization";
+import { wasmApp } from "../wasm_init";
 import { AircraftBridge } from "../wasm/aircraft_bridge";
 import { DerivedStatsUI } from "../wasm/components/derived_stats_ui";
 import { BlinkBad, BlinkNeutral } from "../disp/Tools";
@@ -23,61 +23,22 @@ const init = async () => {
     const sp = new URLSearchParams(location.search);
     const lang = sp.get("lang");
 
-    // Initialize WASM module first
+    console.log('[Hangar] init?...');
+    // Try to initialize WASM first
     try {
         console.log('[Hangar] Loading WASM module...');
         wasmModule = await loadWasmModule();
-
-        if (!wasmModule) {
-            throw new Error('WASM module not available');
-        }
-
-        // Initialize WASM
-        const initWasm = wasmModule.default || wasmModule.init;
-        await initWasm();
-        console.log('[Hangar] WASM binary loaded');
-
-        // Initialize localization with WASM backend
-        localization.initializeWasm(wasmModule.Localization);
-        console.log('[Hangar] Localization initialized');
-
-        // Set language from URL or localStorage
-        if (lang) {
-            localization.setLocale(lang);
-        } else if (window.localStorage.language) {
-            localization.setLocale(window.localStorage.language);
-        }
-
+        console.log("[PlaneBuilder] WASM initialized successfully");
         await InitHTML();
         await InitStats();
         await LoadFromHangar(0);
-
         console.log('[Hangar] Initialization complete');
-    } catch (error) {
-        console.error('[Hangar] Failed to initialize:', error);
-        alert('Failed to initialize hangar. Please refresh the page.');
+    } catch (e) {
+        console.error('[Hangar] Failed to initialize:', e);
     }
 };
 
 window.addEventListener("DOMContentLoaded", init);
-
-/**
- * Load the WASM module
- */
-async function loadWasmModule(): Promise<WasmModule | null> {
-    try {
-        const wasmModule = await import('../pkg/flyingcircuswasm');
-        return {
-            default: wasmModule.init_panic_hook,
-            init: wasmModule.init_panic_hook,
-            AircraftWasm: wasmModule.AircraftWasm,
-            Localization: wasmModule.Localization
-        };
-    } catch (e) {
-        console.error('[Hangar] WASM module not found:', e);
-        return null;
-    }
-}
 
 async function InitHTML() {
     chosen_hangar = "Default";
@@ -245,12 +206,39 @@ async function InitHTML() {
     }
 }
 
+/**
+ * Load the WASM module
+ * Returns null if WASM is not available (not yet built)
+ */
+async function loadWasmModule(): Promise<WasmModule | null> {
+    try {
+        // Try to import the WASM module
+        // wasm-pack with --target bundler exports:
+        // - default: initialization function
+        // - named exports: classes and functions
+        const wasmModule = await import('../../pkg/flyingcircuswasm');
+
+        // For bundler target, the default export is the init function
+        // We need to wrap it to match our expected interface
+        return {
+            default: wasmModule.init_panic_hook,
+            init: wasmModule.init_panic_hook, // The initialization function
+            AircraftWasm: wasmModule.AircraftWasm,
+            Localization: wasmModule.Localization
+        };
+    } catch (e) {
+        console.warn('[WasmApp] WASM module not found (not yet built):', e);
+        return null;
+    }
+}
+
 async function InitStats() {
     const acft_data = window.localStorage.getItem("test.aircraft");
 
     // Create builder aircraft
     if (acft_data) {
         console.log("Used Saved Data");
+        console.log(wasmModule);
         try {
             acft_builder = await AircraftBridge.fromJSON(
                 acft_data,
@@ -556,7 +544,7 @@ function download(data: string, filename: string, type: string) {
     a.download = filename;
     document.body.appendChild(a);
     a.click();
-    setTimeout(function() {
+    setTimeout(function () {
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
     }, 0);
