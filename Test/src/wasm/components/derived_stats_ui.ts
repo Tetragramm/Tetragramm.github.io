@@ -350,6 +350,17 @@ export class DerivedStatsUI extends BaseComponentUI {
 
         contentDiv.appendChild(table);
 
+
+        // Add Hangar link
+        const hangarSpan = document.createElement('span');
+        const hangarLink = document.createElement('a');
+        hangarLink.href = './hangar.html';
+        const hangarText = document.createElement('u');
+        hangarText.textContent = 'Compare Aircraft in Hangar';
+        hangarLink.appendChild(hangarText);
+        hangarSpan.appendChild(hangarLink);
+        contentDiv.appendChild(hangarSpan);
+
         // Create collapsible section
         const sectionTitle = localization.translate('Aircraft Derived Statistics');
         this.sectionElement = createCollapsibleSection(
@@ -634,14 +645,14 @@ export class DerivedStatsUI extends BaseComponentUI {
                 const int_bomb = Math.min(bombs, internal);
                 const ext_bomb = Math.max(0, bombs - int_bomb);
                 if (int_bomb > 0) {
-                    weaphtml += localization.translate(' Bomb Mass Internally.').replace('%{A}', int_bomb.toString());
+                    weaphtml += (localization.translateWithParam('Bomb Mass Internally.', int_bomb));
                 }
                 if (ext_bomb > 0) {
-                    weaphtml += localization.translate(' Bomb Mass Externally.').replace('%{A}', ext_bomb.toString());
+                    weaphtml += (localization.translateWithParam('Bomb Mass Externally.', ext_bomb));
                 }
                 if (int_bomb > 0) {
                     const mib = Math.min(int_bomb, bridge.getMaxBombSize());
-                    weaphtml += localization.translate('Largest Internal Bomb').replace('%{A}', mib.toString());
+                    weaphtml += (localization.translateWithParam('Largest Internal Bomb', mib.toString()));
                 }
                 internal -= int_bomb;
                 weaphtml += '<br/>';
@@ -652,10 +663,10 @@ export class DerivedStatsUI extends BaseComponentUI {
                 const int_rock = Math.min(rockets, internal);
                 const ext_rock = Math.max(0, rockets - int_rock);
                 if (int_rock > 0) {
-                    weaphtml += localization.translate(' Rocket Mass Internally.').replace('%{A}', int_rock.toString());
+                    weaphtml += (localization.translateWithParam('Rocket Mass Internally.', int_rock));
                 }
                 if (ext_rock > 0) {
-                    weaphtml += localization.translate(' Rocket Mass Externally.').replace('%{A}', ext_rock.toString());
+                    weaphtml += (localization.translateWithParam('Rocket Mass Externally.', ext_rock));
                 }
                 weaphtml += '<br/>';
             }

@@ -1,4 +1,4 @@
-import { wasmApp } from "../wasm_init";
+import { localization } from '../wasm/localization';
 import { AircraftBridge } from "../wasm/aircraft_bridge";
 import { DerivedStatsUI } from "../wasm/components/derived_stats_ui";
 import { BlinkBad, BlinkNeutral } from "../disp/Tools";
@@ -29,6 +29,11 @@ const init = async () => {
         console.log('[Hangar] Loading WASM module...');
         wasmModule = await loadWasmModule();
         console.log("[PlaneBuilder] WASM initialized successfully");
+
+        // Initialize localization with WASM backend
+        localization.initializeWasm(wasmModule.Localization);
+        console.log('[WasmApp] Localization initialized');
+
         await InitHTML();
         await InitStats();
         await LoadFromHangar(0);
@@ -43,9 +48,10 @@ window.addEventListener("DOMContentLoaded", init);
 async function InitHTML() {
     chosen_hangar = "Default";
     select_hangar = document.createElement("SELECT") as HTMLSelectElement;
-    select_hangar.onchange = () => {
+    select_hangar.onchange = async () => {
         chosen_hangar = select_hangar.options[select_hangar.selectedIndex].text;
         RefreshAcftSelect(LoadAcftList());
+        await LoadFromHangar(select_acft.selectedIndex);
     };
     RefreshHangarSelect(LoadHangarList());
 
@@ -59,12 +65,12 @@ async function InitHTML() {
     load_btn.onclick = async () => {
         // Copy hangar aircraft to builder
         const json = acft_hangar.toJSON();
-        const newBridge = await AircraftBridge.fromJSON(
-            json,
+        acft_builder = new AircraftBridge();
+        await acft_builder.initialize(
             async () => { /* Already initialized */ },
             wasmModule.AircraftWasm
         );
-        acft_builder = newBridge;
+        acft_builder.fromJSON(json);
         acft_builder.loadEngineListsFromLocalStorage();
         acft_builder.calculateStats();
 
@@ -94,9 +100,10 @@ async function InitHTML() {
     };
 
     const remove_btn = document.getElementById("btn_remove") as HTMLButtonElement;
-    remove_btn.onclick = () => {
+    remove_btn.onclick = async () => {
         RemoveFromHangar(acft_hangar.getName());
         BlinkNeutral(remove_btn.parentElement);
+        await LoadFromHangar(select_acft.selectedIndex);
     };
 
     const hangar_save = document.getElementById("btn_save_h") as HTMLButtonElement;
@@ -129,6 +136,8 @@ async function InitHTML() {
                 chosen_hangar = name;
                 RefreshHangarSelect(LoadHangarList());
                 RefreshAcftSelect(LoadAcftList());
+                await LoadFromHangar(select_acft.selectedIndex);
+
             } catch { BlinkBad(hangar_load.parentElement); }
         };
         reader.readAsText(file);
@@ -137,7 +146,7 @@ async function InitHTML() {
 
     const list_create = document.getElementById("lbl_create_list") as HTMLLabelElement;
     const list_input = document.getElementById("btn_create_list") as HTMLInputElement;
-    list_create.onclick = () => {
+    list_create.onclick = async () => {
         let n = list_input.value;
         n = n.trim();
         n = n.replace(/\s+/g, ' ');
@@ -146,14 +155,16 @@ async function InitHTML() {
             chosen_hangar = n;
             RefreshAcftSelect(LoadAcftList());
             BlinkNeutral(list_create.parentElement);
+            await LoadFromHangar(select_acft.selectedIndex);
         }
         list_input.value = "";
     };
 
     const list_delete = document.getElementById("btn_delete_list") as HTMLButtonElement;
-    list_delete.onclick = () => {
+    list_delete.onclick = async () => {
         RemoveHangar(chosen_hangar);
         BlinkNeutral(list_delete.parentElement);
+        await LoadFromHangar(select_acft.selectedIndex);
     }
 
     const to_csv = document.getElementById("btn_to_csv") as HTMLButtonElement;
@@ -240,12 +251,12 @@ async function InitStats() {
         console.log("Used Saved Data");
         console.log(wasmModule);
         try {
-            acft_builder = await AircraftBridge.fromJSON(
-                acft_data,
+            acft_builder = new AircraftBridge();
+            await acft_builder.initialize(
                 async () => { /* Already initialized */ },
                 wasmModule.AircraftWasm
             );
-            acft_builder.loadEngineListsFromLocalStorage();
+            acft_builder.fromJSON(acft_data);
         } catch (e) {
             console.error("Saved Data Failed:", e);
             // Load default aircraft
@@ -440,11 +451,11 @@ async function LoadJSON(input: HTMLInputElement) {
     reader.onloadend = async () => {
         try {
             const str = reader.result as string;
-            const loadedBridge = await AircraftBridge.fromJSON(
-                str,
+            const loadedBridge = new AircraftBridge();
+            await loadedBridge.initialize(
                 async () => { /* Already initialized */ },
-                wasmModule.AircraftWasm
-            );
+                wasmModule.AircraftWasm);
+            loadedBridge.fromJSON(str);
             loadedBridge.loadEngineListsFromLocalStorage();
             const idx = AddToHangar(loadedBridge);
             await LoadFromHangar(idx);
@@ -458,9 +469,16 @@ async function LoadJSON(input: HTMLInputElement) {
 }
 
 function RefreshDisplay() {
-    const tbl1 = document.getElementById("table_builder") as HTMLTableElement;
-    const tbl2 = document.getElementById("table_hangar") as HTMLTableElement;
+    const div1 = document.getElementById("table_builder");
+    const tbl1 = div1.getElementsByTagName('table').item(0) as HTMLTableElement;
+    const div2 = document.getElementById("table_hangar");
+    const tbl2 = div2.getElementsByTagName('table').item(0) as HTMLTableElement;
     const tbl3 = document.getElementById("table_comp") as HTMLTableElement;
+
+    console.log("Refresh Display");
+    console.log(tbl1);
+    console.log(tbl2);
+    console.log(tbl3);
     MergeTables(tbl1, tbl2, tbl3);
 }
 

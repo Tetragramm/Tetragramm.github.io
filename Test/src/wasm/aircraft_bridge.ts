@@ -1617,7 +1617,7 @@ export class AircraftBridge {
         this.ensureInitialized();
         try {
             const jsonStr = typeof json === 'string' ? json : JSON.stringify(json);
-            this.wasm = this.wasm!.fromJSON(jsonStr);
+            this.wasm!.fromJSON(jsonStr);
             return true;
         } catch (e) {
             console.error('Failed to load aircraft from JSON:', e);

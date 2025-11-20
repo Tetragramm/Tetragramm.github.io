@@ -258,10 +258,10 @@ export class AircraftActions {
             const int_bomb = Math.min(bombs, internal);
             const ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0) {
-                ordinance.push(localization.translateWithParam(' Bomb Mass Internally.', int_bomb));
+                ordinance.push(localization.translateWithParam('Bomb Mass Internally.', int_bomb));
             }
             if (ext_bomb > 0) {
-                ordinance.push(localization.translateWithParam(' Bomb Mass Externally.', ext_bomb));
+                ordinance.push(localization.translateWithParam('Bomb Mass Externally.', ext_bomb));
             }
             if (int_bomb > 0) {
                 const maxBombSize = this.bridge.getMaxBombSize();
@@ -275,10 +275,10 @@ export class AircraftActions {
             const int_rock = Math.min(rockets, internal);
             const ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0) {
-                ordinance.push(localization.translateWithParam(' Rocket Mass Internally.', int_rock));
+                ordinance.push(localization.translateWithParam('Rocket Mass Internally.', int_rock));
             }
             if (ext_rock > 0) {
-                ordinance.push(localization.translateWithParam(' Rocket Mass Externally.', ext_rock));
+                ordinance.push(localization.translateWithParam('Rocket Mass Externally.', ext_rock));
             }
         }
 
@@ -391,10 +391,10 @@ export class AircraftActions {
             const int_bomb = Math.min(bombs, internal);
             const ext_bomb = Math.max(0, bombs - int_bomb);
             if (int_bomb > 0) {
-                ordinance.push(localization.translateWithParam(' Bomb Mass Internally.', int_bomb));
+                ordinance.push(localization.translateWithParam('Bomb Mass Internally.', int_bomb));
             }
             if (ext_bomb > 0) {
-                ordinance.push(localization.translateWithParam(' Bomb Mass Externally.', ext_bomb));
+                ordinance.push(localization.translateWithParam('Bomb Mass Externally.', ext_bomb));
             }
             if (int_bomb > 0) {
                 const maxBombSize = this.bridge.getMaxBombSize();
@@ -408,10 +408,10 @@ export class AircraftActions {
             const int_rock = Math.min(rockets, internal);
             const ext_rock = Math.max(0, rockets - int_rock);
             if (int_rock > 0) {
-                ordinance.push(localization.translateWithParam(' Rocket Mass Internally.', int_rock));
+                ordinance.push(localization.translateWithParam('Rocket Mass Internally.', int_rock));
             }
             if (ext_rock > 0) {
-                ordinance.push(localization.translateWithParam(' Rocket Mass Externally.', ext_rock));
+                ordinance.push(localization.translateWithParam('Rocket Mass Externally.', ext_rock));
             }
         }
 

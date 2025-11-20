@@ -179,11 +179,7 @@ impl WeaponSystem {
         if self.final_weapon.deflection != 0 {
             self.final_weapon.stats.warnings.push(Warning {
                 name: self.final_weapon.name.clone(),
-                warning: format!(
-                    "{}{}",
-                    t!("Deflection Warning").to_string(),
-                    self.final_weapon.deflection
-                ),
+                warning: t!("Deflection Warning", A = self.final_weapon.deflection).to_string(),
                 level: WarningLevel::White,
             });
         }

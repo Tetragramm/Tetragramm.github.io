@@ -488,13 +488,7 @@ impl WeaponSystem {
 
         // Deflection/Awkward
         if self.final_weapon.deflection > 0 {
-            tags.push(
-                t!(
-                    "Weapon Tag Awkward",
-                    deflection = self.final_weapon.deflection
-                )
-                .to_string(),
-            );
+            tags.push(t!("Weapon Tag Awkward", A = self.final_weapon.deflection).to_string());
         }
 
         let hr_charges_vec = self.get_hr_charges();
