@@ -181,6 +181,8 @@ async function InitHTML() {
                     wasmModule.AircraftWasm
                 );
                 loadedBridge.loadEngineListsFromLocalStorage();
+                // Disable auto-save for this temporary bridge
+                loadedBridge.setAutoSaveToLocalStorage(false);
                 loadedBridge.calculateStats();
 
                 const stats = loadedBridge.getStats();
@@ -211,6 +213,8 @@ async function InitHTML() {
         );
         acft_hangar = restoredBridge;
         acft_hangar.loadEngineListsFromLocalStorage();
+        // Disable auto-save for hangar aircraft
+        acft_hangar.setAutoSaveToLocalStorage(false);
 
         const json2csv = new JSON2CSV();
         download(json2csv.convert(DerivedStats, { separator: ',', flatten: true, output_csvjson_variant: false }), chosen_hangar + ".csv", "csv");
@@ -293,6 +297,8 @@ async function InitStats() {
         wasmModule.AircraftWasm
     );
     acft_hangar.loadEngineListsFromLocalStorage();
+    // Disable auto-save for hangar aircraft (we don't want viewing hangar aircraft to overwrite the builder's aircraft)
+    acft_hangar.setAutoSaveToLocalStorage(false);
 
     // Create hangar stats UI
     stats_hangar = new DerivedStatsUI(
@@ -339,6 +345,8 @@ async function LoadFromHangar(idx: number) {
         );
         acft_hangar = loadedBridge;
         acft_hangar.loadEngineListsFromLocalStorage();
+        // Disable auto-save for hangar aircraft (we don't want viewing hangar aircraft to overwrite the builder's aircraft)
+        acft_hangar.setAutoSaveToLocalStorage(false);
         acft_hangar.calculateStats();
     } catch (e) {
         console.error("Failed to load aircraft from hangar:", e);
@@ -349,6 +357,8 @@ async function LoadFromHangar(idx: number) {
             wasmModule.AircraftWasm
         );
         acft_hangar.loadEngineListsFromLocalStorage();
+        // Disable auto-save for hangar aircraft
+        acft_hangar.setAutoSaveToLocalStorage(false);
     }
 
     stats_hangar.render(true);
@@ -457,6 +467,8 @@ async function LoadJSON(input: HTMLInputElement) {
                 wasmModule.AircraftWasm);
             loadedBridge.fromJSON(str);
             loadedBridge.loadEngineListsFromLocalStorage();
+            // Disable auto-save for this temporary bridge
+            loadedBridge.setAutoSaveToLocalStorage(false);
             const idx = AddToHangar(loadedBridge);
             await LoadFromHangar(idx);
         } catch (e) {

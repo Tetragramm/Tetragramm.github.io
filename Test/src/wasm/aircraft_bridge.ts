@@ -337,6 +337,7 @@ export function addStats(...statsList: Stats[]): Stats {
 export class AircraftBridge {
     private wasm: AircraftWasmAPI | null = null;
     private initialized: boolean = false;
+    private autoSaveToLocalStorage: boolean = true;
 
     /**
      * Initialize the WASM module and create aircraft
@@ -1444,12 +1445,29 @@ export class AircraftBridge {
 
     /**
      * Calculate all aircraft statistics
+     * Optionally saves to localStorage if autoSaveToLocalStorage is enabled
      */
     calculateStats(): void {
         this.ensureInitialized();
         this.wasm!.calculateStats();
-        localStorage.setItem("test.aircraft", this.wasm!.toJSON());
-        console.log("Saved JSON");
+        if (this.autoSaveToLocalStorage) {
+            localStorage.setItem("test.aircraft", this.wasm!.toJSON());
+            console.log("Saved JSON");
+        }
+    }
+
+    /**
+     * Enable or disable automatic saving to localStorage when calculateStats() is called
+     */
+    setAutoSaveToLocalStorage(enabled: boolean): void {
+        this.autoSaveToLocalStorage = enabled;
+    }
+
+    /**
+     * Check if auto-save to localStorage is enabled
+     */
+    isAutoSaveToLocalStorageEnabled(): boolean {
+        return this.autoSaveToLocalStorage;
     }
 
     /**
