@@ -10,20 +10,20 @@ use rust_i18n::t;
 #[derive(Serialize, Deserialize)]
 pub struct RotorOptions {
     // Common fields
-    pub aircraft_type: i16, // Current aircraft type (for display logic)
+    pub aircraft_type: i16,  // Current aircraft type (for display logic)
     pub sizing_span: Number, // Read-only: calculated sizing span
-    pub rotor_span: Number, // Additional span adjustment
-    pub cantilever: Select, // Material selection
-    pub accessory: Check, // Clutch (autogyro) or Cross-link (helicopter)
-    pub rotor_area: f32, // Read-only: calculated rotor area
+    pub rotor_span: Number,  // Additional span adjustment
+    pub cantilever: Select,  // Material selection
+    pub accessory: Check,    // Clutch (autogyro) or Cross-link (helicopter)
+    pub rotor_area: f32,     // Read-only: calculated rotor area
 
     // Helicopter-only fields
-    pub rotor_count: Number, // Number of rotors (helicopter only)
-    pub stagger: Select, // Arrangement/stagger (helicopter only)
-    pub blade_count: Select, // Blade count (helicopter only)
+    pub rotor_count: Number,     // Number of rotors (helicopter only)
+    pub stagger: Select,         // Arrangement/stagger (helicopter only)
+    pub blade_count: Select,     // Blade count (helicopter only)
     pub rotor_thickness: Number, // Rotor thickness (helicopter only)
-    pub can_rotor_count: bool, // Whether rotor count can be modified
-    pub can_tandem: bool, // Whether tandem config is possible
+    pub can_rotor_count: bool,   // Whether rotor count can be modified
+    pub can_tandem: bool,        // Whether tandem config is possible
 }
 
 impl UIBindings for Rotor {
@@ -91,7 +91,7 @@ impl UIBindings for Rotor {
                 enabled: true,
                 selected: self.get_accessory(),
             },
-            rotor_area: self.get_rotor_area(),
+            rotor_area: self.get_rotor_area().floor(),
 
             // Helicopter-only
             rotor_count: Number {

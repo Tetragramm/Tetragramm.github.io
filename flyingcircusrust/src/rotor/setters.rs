@@ -1,12 +1,6 @@
 use super::*;
 
 impl Rotor {
-    /// Set cantilever material list (from reinforcements module)
-    /// TypeScript: SetCantileverList(cant_list)
-    pub fn set_cantilever_list(&mut self, cantilever_list: Vec<CantileverEntry>) {
-        self.cantilever_list = Rc::new(cantilever_list);
-    }
-
     /// Set cantilever material index
     /// TypeScript: SetCantilever(num: number)
     pub fn set_cantilever(&mut self, idx: usize) {

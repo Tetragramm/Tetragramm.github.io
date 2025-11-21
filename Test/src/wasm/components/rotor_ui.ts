@@ -57,10 +57,10 @@ interface RotorCache {
 
 // Stats configuration for rotor
 const ROTOR_STATS_CONFIG: StatDisplayConfig[] = [
-    { key: 'rotor_area', label: 'Rotor Area', isDerived: false },
     { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
     { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
     { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+    { key: 'rotor_area', label: 'Rotor Area', isDerived: false },
 ];
 
 export class RotorUI extends BaseComponentUI {
@@ -90,222 +90,245 @@ export class RotorUI extends BaseComponentUI {
 
         // Main table structure
         const table = document.createElement('table');
-        table.className = 'inner_table';
 
-        // === AUTOGYRO SECTION ===
-        const autoSection = document.createElement('tbody');
-        autoSection.id = 'autogyro_section';
+        if (aircraftType >= 2) {
+            // === AUTOGYRO SECTION ===
+            const autoSection = document.createElement('tbody');
+            autoSection.id = 'autogyro_section';
 
-        // Autogyro header row
-        const autoHeader = autoSection.insertRow();
-        this.createHeaderCell(autoHeader, localization.translate('Rotor Rotor'));
-        this.createHeaderCell(autoHeader, localization.translate('Rotor Material'));
-        this.createHeaderCell(autoHeader, localization.translate('Rotor Accessories'));
-        this.createHeaderCell(autoHeader, localization.translate('Rotor Stats'));
+            // Autogyro header row
+            const autoHeader = autoSection.insertRow();
+            this.createHeaderCell(autoHeader, localization.translate('Rotor Rotor'));
+            this.createHeaderCell(autoHeader, localization.translate('Rotor Material'));
+            this.createHeaderCell(autoHeader, localization.translate('Rotor Accessories'));
+            this.createHeaderCell(autoHeader, localization.translate('Rotor Stats'));
 
-        // Autogyro content row
-        const autoContent = autoSection.insertRow();
+            // Autogyro content row
+            const autoContent = autoSection.insertRow();
 
-        // Rotor column
-        const autoRotorCell = autoContent.insertCell();
-        const autoRotorFlex = createFlexSection();
-        autoRotorCell.appendChild(autoRotorFlex.div0);
+            // Rotor column
+            const autoRotorCell = autoContent.insertCell();
+            const autoRotorFlex = createFlexSection();
+            autoRotorCell.appendChild(autoRotorFlex.div0);
 
-        const autoMinSpan = createFlexLabel(bindings.sizing_span, autoRotorFlex);
-        const autoSpan = createFlexNumberInput(
-            bindings.rotor_span,
-            autoRotorFlex,
-            (value) => {
-                const updated = bridge.getRotorBindings();
-                updated.rotor_span.value = value;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            '0'
-        );
+            const autoMinSpan = createFlexLabel(bindings.sizing_span, autoRotorFlex);
+            const autoSpan = createFlexNumberInput(
+                bindings.rotor_span,
+                autoRotorFlex,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_span.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                '0'
+            );
 
-        // Material column
-        const autoMatCell = autoContent.insertCell();
-        const autoMatFlex = createFlexSection();
-        autoMatCell.appendChild(autoMatFlex.div0);
+            // Material column
+            const autoMatCell = autoContent.insertCell();
+            const autoMatFlex = createFlexSection();
+            autoMatCell.appendChild(autoMatFlex.div0);
 
-        const autoMaterial = createFlexSelect(
-            bindings.cantilever,
-            autoMatFlex,
-            (idx) => {
-                const updated = bridge.getRotorBindings();
-                updated.cantilever.selected = idx;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            localization.translate('Rotor Material')
-        );
+            const autoMaterial = createFlexSelect(
+                bindings.cantilever,
+                autoMatFlex,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.cantilever.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                localization.translate('Rotor Material')
+            );
 
-        // Accessories column
-        const autoAccCell = autoContent.insertCell();
-        const autoAccFlex = createFlexSection();
-        autoAccCell.appendChild(autoAccFlex.div0);
+            // Accessories column
+            const autoAccCell = autoContent.insertCell();
+            const autoAccFlex = createFlexSection();
+            autoAccCell.appendChild(autoAccFlex.div0);
 
-        const autoClutch = createFlexCheckbox(
-            bindings.accessory,
-            autoAccFlex,
-            (checked) => {
-                const updated = bridge.getRotorBindings();
-                updated.accessory.selected = checked;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
+            const autoClutch = createFlexCheckbox(
+                bindings.accessory,
+                autoAccFlex,
+                (checked) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.accessory.selected = checked;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
+
+            // Stats column (merge rotor_area from bindings into stats)
+            const autoStatsCell = autoContent.insertCell();
+            const autoStatsWithArea = { rotor_area: bindings.rotor_area };
+            const autoStatsTable = createStatsTable(stats, ROTOR_STATS_CONFIG, autoStatsWithArea);
+            autoStatsCell.appendChild(autoStatsTable);
+            autoStatsCell.className = 'inner_table';
+
+            table.appendChild(autoSection);
+
+            // Cache elements
+            this.cache = {
+                autoSection,
+                autoMinSpan,
+                autoSpan,
+                autoMaterial,
+                autoClutch,
+                autoStatsTable,
+                heliSection: undefined,
+                heliCount: undefined,
+                heliMinSpan: undefined,
+                heliSpan: undefined,
+                heliStagger: undefined,
+                heliBladeCount: undefined,
+                heliMaterial: undefined,
+                heliThickness: undefined,
+                heliCrosslink: undefined,
+                heliStatsTable: undefined,
             }
-        );
+        } else {
 
-        // Stats column (merge rotor_area from bindings into stats)
-        const autoStatsCell = autoContent.insertCell();
-        const autoStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
-        const autoStatsTable = createStatsTable(autoStatsWithArea, ROTOR_STATS_CONFIG);
-        autoStatsCell.appendChild(autoStatsTable);
+            // === HELICOPTER SECTION ===
+            const heliSection = document.createElement('tbody');
+            heliSection.id = 'helicopter_section';
 
-        table.appendChild(autoSection);
+            // Helicopter header row
+            const heliHeader = heliSection.insertRow();
+            this.createHeaderCell(heliHeader, localization.translate('Rotor Rotor'));
+            this.createHeaderCell(heliHeader, localization.translate('Rotor Material'));
+            this.createHeaderCell(heliHeader, localization.translate('Rotor Accessories'));
+            this.createHeaderCell(heliHeader, localization.translate('Rotor Stats'));
 
-        // === HELICOPTER SECTION ===
-        const heliSection = document.createElement('tbody');
-        heliSection.id = 'helicopter_section';
+            // Helicopter content row
+            const heliContent = heliSection.insertRow();
 
-        // Helicopter header row
-        const heliHeader = heliSection.insertRow();
-        this.createHeaderCell(heliHeader, localization.translate('Rotor Rotor'));
-        this.createHeaderCell(heliHeader, localization.translate('Rotor Material'));
-        this.createHeaderCell(heliHeader, localization.translate('Rotor Accessories'));
-        this.createHeaderCell(heliHeader, localization.translate('Rotor Stats'));
+            // Rotor column
+            const heliRotorCell = heliContent.insertCell();
+            const heliRotorFlex = createFlexSection();
+            heliRotorCell.appendChild(heliRotorFlex.div0);
 
-        // Helicopter content row
-        const heliContent = heliSection.insertRow();
+            const heliCount = createFlexNumberInput(
+                bindings.rotor_count,
+                heliRotorFlex,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_count.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                '1'
+            );
 
-        // Rotor column
-        const heliRotorCell = heliContent.insertCell();
-        const heliRotorFlex = createFlexSection();
-        heliRotorCell.appendChild(heliRotorFlex.div0);
+            const heliMinSpan = createFlexLabel(bindings.sizing_span, heliRotorFlex);
 
-        const heliCount = createFlexNumberInput(
-            bindings.rotor_count,
-            heliRotorFlex,
-            (value) => {
-                const updated = bridge.getRotorBindings();
-                updated.rotor_count.value = value;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            '1'
-        );
+            const heliSpan = createFlexNumberInput(
+                bindings.rotor_span,
+                heliRotorFlex,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_span.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                '0'
+            );
 
-        const heliMinSpan = createFlexLabel(bindings.sizing_span, heliRotorFlex);
+            const heliStagger = createFlexSelect(
+                bindings.stagger,
+                heliRotorFlex,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.stagger.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                localization.translate('Rotor Stagger')
+            );
 
-        const heliSpan = createFlexNumberInput(
-            bindings.rotor_span,
-            heliRotorFlex,
-            (value) => {
-                const updated = bridge.getRotorBindings();
-                updated.rotor_span.value = value;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            '0'
-        );
+            const heliBladeCount = createFlexSelect(
+                bindings.blade_count,
+                heliRotorFlex,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.blade_count.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                localization.translate('Rotor Blade Count')
+            );
 
-        const heliStagger = createFlexSelect(
-            bindings.stagger,
-            heliRotorFlex,
-            (idx) => {
-                const updated = bridge.getRotorBindings();
-                updated.stagger.selected = idx;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            localization.translate('Rotor Stagger')
-        );
+            // Material column
+            const heliMatCell = heliContent.insertCell();
+            const heliMatFlex = createFlexSection();
+            heliMatCell.appendChild(heliMatFlex.div0);
 
-        const heliBladeCount = createFlexSelect(
-            bindings.blade_count,
-            heliRotorFlex,
-            (idx) => {
-                const updated = bridge.getRotorBindings();
-                updated.blade_count.selected = idx;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            localization.translate('Rotor Blade Count')
-        );
+            const heliMaterial = createFlexSelect(
+                bindings.cantilever,
+                heliMatFlex,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.cantilever.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                localization.translate('Rotor Rotor Material')
+            );
 
-        // Material column
-        const heliMatCell = heliContent.insertCell();
-        const heliMatFlex = createFlexSection();
-        heliMatCell.appendChild(heliMatFlex.div0);
+            const heliThickness = createFlexNumberInput(
+                bindings.rotor_thickness,
+                heliMatFlex,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_thickness.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                '0'
+            );
 
-        const heliMaterial = createFlexSelect(
-            bindings.cantilever,
-            heliMatFlex,
-            (idx) => {
-                const updated = bridge.getRotorBindings();
-                updated.cantilever.selected = idx;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            localization.translate('Rotor Rotor Material')
-        );
+            // Accessories column
+            const heliAccCell = heliContent.insertCell();
+            const heliAccFlex = createFlexSection();
+            heliAccCell.appendChild(heliAccFlex.div0);
 
-        const heliThickness = createFlexNumberInput(
-            bindings.rotor_thickness,
-            heliMatFlex,
-            (value) => {
-                const updated = bridge.getRotorBindings();
-                updated.rotor_thickness.value = value;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
-            },
-            '0'
-        );
+            const heliCrosslink = createFlexCheckbox(
+                bindings.accessory,
+                heliAccFlex,
+                (checked) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.accessory.selected = checked;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
 
-        // Accessories column
-        const heliAccCell = heliContent.insertCell();
-        const heliAccFlex = createFlexSection();
-        heliAccCell.appendChild(heliAccFlex.div0);
+            // Stats column (merge rotor_area from bindings into stats)
+            const heliStatsCell = heliContent.insertCell();
+            const heliStatsWithArea = { rotor_area: bindings.rotor_area };
+            const heliStatsTable = createStatsTable(stats, ROTOR_STATS_CONFIG, heliStatsWithArea);
+            heliStatsCell.appendChild(heliStatsTable);
+            heliStatsCell.className = 'inner_table';
 
-        const heliCrosslink = createFlexCheckbox(
-            bindings.accessory,
-            heliAccFlex,
-            (checked) => {
-                const updated = bridge.getRotorBindings();
-                updated.accessory.selected = checked;
-                bridge.setRotorBindings(updated);
-                this.onUpdate();
+            table.appendChild(heliSection);
+            // Cache elements
+            this.cache = {
+                autoSection: undefined,
+                autoMinSpan: undefined,
+                autoSpan: undefined,
+                autoMaterial: undefined,
+                autoClutch: undefined,
+                autoStatsTable: undefined,
+                heliSection,
+                heliCount,
+                heliMinSpan,
+                heliSpan,
+                heliStagger,
+                heliBladeCount,
+                heliMaterial,
+                heliThickness,
+                heliCrosslink,
+                heliStatsTable
             }
-        );
-
-        // Stats column (merge rotor_area from bindings into stats)
-        const heliStatsCell = heliContent.insertCell();
-        const heliStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
-        const heliStatsTable = createStatsTable(heliStatsWithArea, ROTOR_STATS_CONFIG);
-        heliStatsCell.appendChild(heliStatsTable);
-
-        table.appendChild(heliSection);
-
-        // Cache elements
-        this.cache = {
-            autoSection,
-            autoMinSpan,
-            autoSpan,
-            autoMaterial,
-            autoClutch,
-            autoStatsTable,
-            heliSection,
-            heliCount,
-            heliMinSpan,
-            heliSpan,
-            heliStagger,
-            heliBladeCount,
-            heliMaterial,
-            heliThickness,
-            heliCrosslink,
-            heliStatsTable
-        };
+        }
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Rotor Section Title');
@@ -355,8 +378,8 @@ export class RotorUI extends BaseComponentUI {
         }
 
         // Show appropriate sub-section
-        this.cache.autoSection.style.display = typeNum === AIRCRAFT_TYPE.AUTOGYRO ? '' : 'none';
-        this.cache.heliSection.style.display = typeNum === AIRCRAFT_TYPE.HELICOPTER ? '' : 'none';
+        // this.cache.autoSection.style.display = typeNum === AIRCRAFT_TYPE.AUTOGYRO ? '' : 'none';
+        // this.cache.heliSection.style.display = typeNum === AIRCRAFT_TYPE.HELICOPTER ? '' : 'none';
     }
 
     /**
@@ -389,8 +412,8 @@ export class RotorUI extends BaseComponentUI {
             this.cache.autoClutch.disabled = !bindings.accessory.enabled;
         }
         if (this.cache.autoStatsTable) {
-            const autoStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
-            updateStatsTable(this.cache.autoStatsTable, autoStatsWithArea, ROTOR_STATS_CONFIG);
+            const autoStatsWithArea = { rotor_area: bindings.rotor_area };
+            updateStatsTable(this.cache.autoStatsTable, stats, ROTOR_STATS_CONFIG, autoStatsWithArea);
         }
 
         // Update helicopter elements
@@ -423,8 +446,8 @@ export class RotorUI extends BaseComponentUI {
             this.cache.heliCrosslink.disabled = !bindings.accessory.enabled;
         }
         if (this.cache.heliStatsTable) {
-            const heliStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
-            updateStatsTable(this.cache.heliStatsTable, heliStatsWithArea, ROTOR_STATS_CONFIG);
+            const heliStatsWithArea = { rotor_area: bindings.rotor_area };
+            updateStatsTable(this.cache.heliStatsTable, stats, ROTOR_STATS_CONFIG, heliStatsWithArea);
         }
     }
 }

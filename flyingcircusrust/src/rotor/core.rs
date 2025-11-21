@@ -2,18 +2,15 @@ use super::*;
 
 impl Rotor {
     /// Creates a new Rotor instance with provided reference lists
-    pub fn new(blade_list: Vec<BladeEntry>, arrangement_list: Vec<ArrangementEntry>) -> Rotor {
-        // Create default cantilever list (will be set by reinforcements module)
-        let default_cant = vec![CantileverEntry {
-            name: "Wood".to_string(),
-            limited: false,
-            stats: Stats::new(),
-        }];
-
+    pub fn new(
+        blade_list: Vec<BladeEntry>,
+        arrangement_list: Vec<ArrangementEntry>,
+        cantilever_list: Vec<CantileverEntry>,
+    ) -> Rotor {
         Rotor {
             blade_list: Rc::new(blade_list),
             arrangement_list: Rc::new(arrangement_list),
-            cantilever_list: Rc::new(default_cant),
+            cantilever_list: Rc::new(cantilever_list),
             aircraft_type: AircraftType::Airplane,
             rotor_count: 0,
             rotor_span: 0,

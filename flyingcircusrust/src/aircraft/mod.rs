@@ -89,7 +89,11 @@ impl Aircraft {
                 part_list.wing_decks,
                 part_list.wing_largest,
             ),
-            rotor: Rotor::new(part_list.rotor_blades, part_list.rotor_arrangement),
+            rotor: Rotor::new(
+                part_list.rotor_blades,
+                part_list.rotor_arrangement,
+                part_list.reinforcement_cantilever.clone(),
+            ),
             controlsurfaces: ControlSurfaces::new(
                 part_list.control_ailerons,
                 part_list.control_rudders,

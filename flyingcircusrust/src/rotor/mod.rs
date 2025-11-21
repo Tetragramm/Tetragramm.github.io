@@ -1,4 +1,4 @@
-use crate::{aircraft::AircraftType, stats::Stats};
+use crate::{aircraft::AircraftType, reinforcements::CantileverEntry, stats::Stats};
 use std::rc::Rc;
 
 // Sub-module declarations
@@ -32,14 +32,6 @@ pub struct ArrangementEntry {
     pub count: usize,     // Number of rotors (1, 2, or 3)
     pub powerfactor: f32, // Power multiplication factor
     pub blades: i16,      // Additional blade effects
-    pub stats: Stats,
-}
-
-/// Cantilever material entry (shared with reinforcements)
-#[derive(Clone)]
-pub struct CantileverEntry {
-    pub name: String,
-    pub limited: bool,
     pub stats: Stats,
 }
 
