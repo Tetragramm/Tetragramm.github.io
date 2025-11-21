@@ -1453,6 +1453,7 @@ export class AircraftBridge {
         if (this.autoSaveToLocalStorage) {
             localStorage.setItem("test.aircraft", this.wasm!.toJSON());
             console.log("Saved JSON");
+            console.trace();
         }
     }
 
@@ -1489,9 +1490,11 @@ export class AircraftBridge {
     static async fromJSON(
         acft_json: string,
         wasmInit: WasmInit,
-        AircraftWasmClass: any
+        AircraftWasmClass: any,
+        storage: boolean = true,
     ): Promise<AircraftBridge> {
         const bridge = new AircraftBridge();
+        bridge.setAutoSaveToLocalStorage(storage);
         await bridge.initialize(
             wasmInit,
             AircraftWasmClass
@@ -1513,9 +1516,11 @@ export class AircraftBridge {
     static async deserializeFromLZString(
         lzStr: string,
         wasmInit: WasmInit,
-        AircraftWasmClass: any
+        AircraftWasmClass: any,
+        storage: boolean = true,
     ): Promise<AircraftBridge> {
         const bridge = new AircraftBridge();
+        bridge.setAutoSaveToLocalStorage(storage);
         await bridge.initialize(
             wasmInit,
             AircraftWasmClass

@@ -77,9 +77,6 @@ async function InitHTML() {
         // Update builder display
         stats_builder.render(true);
 
-        // Save to localStorage
-        window.localStorage.setItem("test.aircraft", acft_builder.toJSON());
-
         RefreshDisplay();
         BlinkNeutral(load_btn.parentElement);
     };
@@ -178,11 +175,10 @@ async function InitHTML() {
                 const loadedBridge = await AircraftBridge.deserializeFromLZString(
                     acft,
                     async () => { /* Already initialized */ },
-                    wasmModule.AircraftWasm
+                    wasmModule.AircraftWasm,
+                    false
                 );
                 loadedBridge.loadEngineListsFromLocalStorage();
-                // Disable auto-save for this temporary bridge
-                loadedBridge.setAutoSaveToLocalStorage(false);
                 loadedBridge.calculateStats();
 
                 const stats = loadedBridge.getStats();
@@ -209,12 +205,12 @@ async function InitHTML() {
         const restoredBridge = await AircraftBridge.fromJSON(
             curr_acft,
             async () => { /* Already initialized */ },
-            wasmModule.AircraftWasm
+            wasmModule.AircraftWasm,
+            false
         );
         acft_hangar = restoredBridge;
         acft_hangar.loadEngineListsFromLocalStorage();
         // Disable auto-save for hangar aircraft
-        acft_hangar.setAutoSaveToLocalStorage(false);
 
         const json2csv = new JSON2CSV();
         download(json2csv.convert(DerivedStats, { separator: ',', flatten: true, output_csvjson_variant: false }), chosen_hangar + ".csv", "csv");
@@ -256,6 +252,7 @@ async function InitStats() {
         console.log(wasmModule);
         try {
             acft_builder = new AircraftBridge();
+            acft_builder.setAutoSaveToLocalStorage(false);
             await acft_builder.initialize(
                 async () => { /* Already initialized */ },
                 wasmModule.AircraftWasm
@@ -267,7 +264,8 @@ async function InitStats() {
             acft_builder = await AircraftBridge.deserializeFromLZString(
                 "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
                 async () => { /* Already initialized */ },
-                wasmModule.AircraftWasm
+                wasmModule.AircraftWasm,
+                false
             );
         }
     } else {
@@ -275,7 +273,8 @@ async function InitStats() {
         acft_builder = await AircraftBridge.deserializeFromLZString(
             "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
             async () => { /* Already initialized */ },
-            wasmModule.AircraftWasm
+            wasmModule.AircraftWasm,
+            false
         );
     }
     acft_builder.loadEngineListsFromLocalStorage();
@@ -294,11 +293,10 @@ async function InitStats() {
     acft_hangar = await AircraftBridge.deserializeFromLZString(
         "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
         async () => { /* Already initialized */ },
-        wasmModule.AircraftWasm
+        wasmModule.AircraftWasm,
+        false
     );
     acft_hangar.loadEngineListsFromLocalStorage();
-    // Disable auto-save for hangar aircraft (we don't want viewing hangar aircraft to overwrite the builder's aircraft)
-    acft_hangar.setAutoSaveToLocalStorage(false);
 
     // Create hangar stats UI
     stats_hangar = new DerivedStatsUI(
@@ -341,12 +339,11 @@ async function LoadFromHangar(idx: number) {
         const loadedBridge = await AircraftBridge.deserializeFromLZString(
             acft_list.acft[idx],
             async () => { /* Already initialized */ },
-            wasmModule.AircraftWasm
+            wasmModule.AircraftWasm,
+            false
         );
         acft_hangar = loadedBridge;
         acft_hangar.loadEngineListsFromLocalStorage();
-        // Disable auto-save for hangar aircraft (we don't want viewing hangar aircraft to overwrite the builder's aircraft)
-        acft_hangar.setAutoSaveToLocalStorage(false);
         acft_hangar.calculateStats();
     } catch (e) {
         console.error("Failed to load aircraft from hangar:", e);
@@ -354,11 +351,10 @@ async function LoadFromHangar(idx: number) {
         acft_hangar = await AircraftBridge.deserializeFromLZString(
             "AAEAjGB0DMwLACECGBnAlgYwAQLQBwBskA7AU2AEBLgaAwGhmgUEZpFY+oHQAlACwD2xJFgCyAgC4CATgCMkAVywAtCFgAcABj55gAJGABcYACAaVVuwAQDdpw4B-h8BsAoex8+9BwsZJnySqpgGtq6NGYUAIKQAGaxAAIACQwAkJQA-AABNNm5OfZ2jE6eZhxlAMCeHmXVtdS1NjYeTRxVbKwW1J7tNOld1WmDnCweVBbsA8OsvS7TtnUMs0XzY8AVVLRT1BRde6sHDEA",
             async () => { /* Already initialized */ },
-            wasmModule.AircraftWasm
+            wasmModule.AircraftWasm,
+            false
         );
         acft_hangar.loadEngineListsFromLocalStorage();
-        // Disable auto-save for hangar aircraft
-        acft_hangar.setAutoSaveToLocalStorage(false);
     }
 
     stats_hangar.render(true);
@@ -465,10 +461,9 @@ async function LoadJSON(input: HTMLInputElement) {
             await loadedBridge.initialize(
                 async () => { /* Already initialized */ },
                 wasmModule.AircraftWasm);
+            loadedBridge.setAutoSaveToLocalStorage(false);
             loadedBridge.fromJSON(str);
             loadedBridge.loadEngineListsFromLocalStorage();
-            // Disable auto-save for this temporary bridge
-            loadedBridge.setAutoSaveToLocalStorage(false);
             const idx = AddToHangar(loadedBridge);
             await LoadFromHangar(idx);
         } catch (e) {
