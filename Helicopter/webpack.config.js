@@ -2,7 +2,10 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        helicopter_builder: './src/helicopter_builder.ts',
+        helicopter_builder: './src/helicopter_wasm.ts',
+    },
+    experiments: {
+        asyncWebAssembly: true,
     },
     module: {
         rules: [
@@ -17,15 +20,7 @@ module.exports = {
         extensions: ['.tsx', '.ts', '.js'],
     },
     output: {
-        // filename: '[name].js',
-        filename: (pathData) => {
-            switch (pathData.chunk.name) {
-                case "helicopter_builder":
-                    return "[name].js";
-                default:
-                    return "[name]/[name].js";
-            }
-        },
+        filename: '[name].js',
         path: path.resolve(__dirname, '.'),
     },
 };

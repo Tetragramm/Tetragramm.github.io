@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>Flying Circus Plane Builder</title>
+	<title>Flying Circus Helicopter Builder</title>
 	<link rel="shortcut icon" type="image/x-icon" href="/Helicopter/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="/Helicopter/page/style.css" />
 	<script src="helicopter_builder.js"></script>
@@ -18,6 +18,7 @@
 				<a href="https://opensketch.itch.io/flying-circus">
 					Ohara Airworks</a>
 			</h2>
+			<div id="language_selector_container"></div>
 			<div>
 				<span>
 					<table>
@@ -129,6 +130,10 @@
 				</div>
 			</div>
 			<br />
+			<div id="Propeller">
+				<!-- PropellerUI creates its own content -->
+			</div>
+			<br />
 			<div id="Frames">
 				<h3 class="collapsible active">
 					<label id="lbl_frames">Frames and Covering</label>
@@ -160,38 +165,11 @@
 				</h4>
 			</div>
 			<br />
-			<div id="Wings">
-				<h3 class="collapsible active">
-					<label id="lbl_wings">Wings</label>
-				</h3>
-				<h4>
-					<span>(<a href="/Helicopter/Rules/Rules.htm#_Wings"><u>Rules</u></a>)</span>
-					<br />
-				</h4>
-				<div class="content">
-					<h4>
-						<span> <label id="lbl_wing_stagger" for="wing_stagger">Wing Stagger:</label> <select
-								id="wing_stagger"></select></span>
-						<span> <label id="lbl_wing_closed" for="wing_closed">Closed Wing:</label> <input type="checkbox"
-								id="wing_closed" /></span>
-						<span> <label id="lbl_wing_swept" for="wing_swept">Swept Wings:</label> <input type="checkbox"
-								id="wing_swept" /></span>
-					</h4>
-					<table id="wing_table"></table>
-				</div>
+			<!-- Wings section hidden for helicopters -->
+			<div id="Wings" hidden="true">
 			</div>
-			<br />
-			<div id="Rotors" hidden="true">
-				<h3 class="collapsible active">
-					<label id="lbl_rotor">Rotors</label>
-				</h3>
-				<h4>
-					<span>(<a href="/Helicopter/Rules/Rules.htm#_Rotors"><u>Rules</u></a>)</span>
-				</h4>
-				<div class="content">
-					<table id="rotor_table"></table>
-				</div>
-				<br />
+			<div id="Rotors">
+				<!-- RotorUI creates its own collapsible section content -->
 			</div>
 			<div id="Stabilizers">
 				<h3 id="stabilizer_collapse" class="collapsible active">
@@ -311,18 +289,15 @@
 				</div>
 			</div>
 			<br />
-			<div id=" Stats">
-						<h3 id="alter_collapse" class="collapsible"><label id="lbl_custom">Custom Parts and
-								Alterations</label>
-							<br />
-						</h3>
-						<h4></h4>
-						<div class="content" style="max-height: 0px;">
-							<table id="alter_table"></table>
-						</div>
-				</div>
-				<br />
-				<div id="Stats">
+			<div id="CustomParts">
+				<!-- CustomPartsUI creates its own content -->
+			</div>
+			<br />
+			<div id="Altitude">
+				<!-- AltitudeUI creates its own content -->
+			</div>
+			<br />
+			<div id="Stats">
 					<h3 class="collapsible"><label id="lbl_stats">Total Sum of Stats</label>
 						<br />
 					</h3>
