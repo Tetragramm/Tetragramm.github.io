@@ -1,9 +1,7 @@
-use flyingcircusrust::aircraft::{self, Aircraft};
+use flyingcircusrust::aircraft::Aircraft;
 use flyingcircusrust::part::Part;
 use flyingcircusrust::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
-use flyingcircusrust::types::DerivedStats;
 use flyingcircusrust::{translate, UIBindings};
-use rust_i18n::t;
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
 
@@ -647,6 +645,58 @@ impl AircraftWasm {
     pub fn get_wings_stats(&mut self) -> JsValue {
         let stats = self.inner.wings.part_stats();
         serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
+    /// Get Rotor UI bindings
+    #[wasm_bindgen(js_name = getRotorBindings)]
+    pub fn get_rotor_bindings(&self) -> JsValue {
+        let options = self.inner.rotor.create_ui_options();
+        serde_wasm_bindgen::to_value(&options).unwrap()
+    }
+
+    /// Update Rotor from UI bindings
+    #[wasm_bindgen(js_name = setRotorBindings)]
+    pub fn set_rotor_bindings(&mut self, js_options: JsValue) {
+        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+            self.inner.rotor.receive_ui_selections(options);
+            self.inner.part_stats();
+        }
+    }
+
+    /// Get stats for rotor
+    #[wasm_bindgen(js_name = getRotorStats)]
+    pub fn get_rotor_stats(&mut self) -> JsValue {
+        let stats = self.inner.rotor.part_stats();
+        serde_wasm_bindgen::to_value(&stats).unwrap()
+    }
+
+    /// Get current aircraft type
+    #[wasm_bindgen(js_name = getAircraftType)]
+    pub fn get_aircraft_type(&self) -> i16 {
+        self.inner.aircraft_type as i16
+    }
+
+    /// Set aircraft type (0=Airplane, 1=Helicopter, 2=Autogyro, 3=OrnithopterBasic, 4=OrnithopterFlutter, 5=OrnithopterBuzzer)
+    #[wasm_bindgen(js_name = setAircraftType)]
+    pub fn set_aircraft_type(&mut self, acft_type: i16) {
+        use flyingcircusrust::types::AircraftType;
+        self.inner.aircraft_type = AircraftType::from(acft_type);
+        self.inner.rotor.set_type(self.inner.aircraft_type);
+        self.inner.part_stats();
+    }
+
+    /// Get aircraft type names for UI dropdown
+    #[wasm_bindgen(js_name = getAircraftTypeNames)]
+    pub fn get_aircraft_type_names() -> JsValue {
+        let names: Vec<String> = vec![
+            translate("AIRPLANE"),
+            translate("HELICOPTER"),
+            translate("AUTOGYRO"),
+            translate("ORNITHOPTER_BASIC"),
+            translate("ORNITHOPTER_FLUTTER"),
+            translate("ORNITHOPTER_BUZZER"),
+        ];
+        serde_wasm_bindgen::to_value(&names).unwrap()
     }
 
     /// Get Engines UI bindings (container with asymmetric flag and counts)

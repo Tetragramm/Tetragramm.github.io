@@ -67,6 +67,22 @@ export interface CockpitDerivedStats {
     pos_visibility: number;
 }
 
+export interface RotorOptions {
+    aircraft_type: number;
+    sizing_span: NumberBinding;
+    rotor_span: NumberBinding;
+    cantilever: SelectBinding;
+    accessory: CheckBinding;
+    rotor_area: number;
+    // Helicopter-only
+    rotor_count: NumberBinding;
+    stagger: SelectBinding;
+    blade_count: SelectBinding;
+    rotor_thickness: NumberBinding;
+    can_rotor_count: boolean;
+    can_tandem: boolean;
+}
+
 export interface DerivedStats {
     dry_mp: number;
     wet_mp: number;
@@ -176,6 +192,12 @@ export interface AircraftWasmAPI {
     getWingsBindings(): any;
     setWingsBindings(bindings: any): void;
     getWingsStats(): Stats;
+    getRotorBindings(): any;
+    setRotorBindings(bindings: any): void;
+    getRotorStats(): Stats;
+    getAircraftType(): number;
+    setAircraftType(type: number): void;
+    getAircraftTypeNames(): string[];
     getCockpitsBindings(): any;
     setCockpitsBindings(bindings: any): void;
     getCockpitStats(index: number): any;
@@ -939,6 +961,56 @@ export class AircraftBridge {
     getWingsStats(): Stats {
         this.ensureInitialized();
         return this.wasm!.getWingsStats();
+    }
+
+    /**
+     * Get Rotor UI bindings (includes localized strings from Rust)
+     */
+    getRotorBindings(): any {
+        this.ensureInitialized();
+        return this.wasm!.getRotorBindings();
+    }
+
+    /**
+     * Update Rotor from UI bindings
+     * Automatically recalculates stats
+     */
+    setRotorBindings(bindings: any): void {
+        this.ensureInitialized();
+        this.wasm!.setRotorBindings(bindings);
+    }
+
+    /**
+     * Get stats for Rotor
+     */
+    getRotorStats(): Stats {
+        this.ensureInitialized();
+        return this.wasm!.getRotorStats();
+    }
+
+    /**
+     * Get current aircraft type (0=Airplane, 1=Helicopter, 2=Autogyro, 3-5=Ornithopters)
+     */
+    getAircraftType(): number {
+        this.ensureInitialized();
+        return this.wasm!.getAircraftType();
+    }
+
+    /**
+     * Set aircraft type
+     * Automatically recalculates stats
+     */
+    setAircraftType(type: number): void {
+        this.ensureInitialized();
+        this.wasm!.setAircraftType(type);
+    }
+
+    /**
+     * Get localized aircraft type names for UI dropdown
+     */
+    getAircraftTypeNames(): string[] {
+        this.ensureInitialized();
+        return this.wasm!.getAircraftTypeNames();
     }
 
     /**
