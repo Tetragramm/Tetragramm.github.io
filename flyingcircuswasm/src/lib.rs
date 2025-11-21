@@ -687,7 +687,7 @@ impl AircraftWasm {
 
     /// Get aircraft type names for UI dropdown
     #[wasm_bindgen(js_name = getAircraftTypeNames)]
-    pub fn get_aircraft_type_names() -> JsValue {
+    pub fn get_aircraft_type_names(&self) -> JsValue {
         let names: Vec<String> = vec![
             translate("AIRPLANE"),
             translate("HELICOPTER"),

@@ -176,7 +176,7 @@ export class WasmApplication {
             console.log('[WasmApp] Era UI created');
 
             // Create Aircraft Type UI component (selector for airplane/autogyro/ornithopter)
-            this.aircraftTypeUI = new AircraftTypeUI(() => this.bridge, 'AircraftType', () => {
+            this.aircraftTypeUI = new AircraftTypeUI(() => this.bridge, 'Type', () => {
                 this.onStatsUpdate();
             });
             console.log('[WasmApp] Aircraft Type UI created');
