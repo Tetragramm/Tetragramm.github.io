@@ -57,6 +57,7 @@ interface RotorCache {
 
 // Stats configuration for rotor
 const ROTOR_STATS_CONFIG: StatDisplayConfig[] = [
+    { key: 'rotor_area', label: 'Rotor Area', isDerived: false },
     { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
     { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
     { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
@@ -156,17 +157,11 @@ export class RotorUI extends BaseComponentUI {
             }
         );
 
-        // Stats column
+        // Stats column (merge rotor_area from bindings into stats)
         const autoStatsCell = autoContent.insertCell();
-        const autoStatsTable = createStatsTable(stats, ROTOR_STATS_CONFIG);
+        const autoStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
+        const autoStatsTable = createStatsTable(autoStatsWithArea, ROTOR_STATS_CONFIG);
         autoStatsCell.appendChild(autoStatsTable);
-
-        // Area display row
-        const autoAreaRow = autoSection.insertRow();
-        this.createHeaderCell(autoAreaRow, localization.translate('Rotor Area'));
-        const autoAreaCell = autoAreaRow.insertCell();
-        autoAreaCell.colSpan = 3;
-        autoAreaCell.textContent = bindings.rotor_area.toString();
 
         table.appendChild(autoSection);
 
@@ -284,17 +279,11 @@ export class RotorUI extends BaseComponentUI {
             }
         );
 
-        // Stats column
+        // Stats column (merge rotor_area from bindings into stats)
         const heliStatsCell = heliContent.insertCell();
-        const heliStatsTable = createStatsTable(stats, ROTOR_STATS_CONFIG);
+        const heliStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
+        const heliStatsTable = createStatsTable(heliStatsWithArea, ROTOR_STATS_CONFIG);
         heliStatsCell.appendChild(heliStatsTable);
-
-        // Area display row
-        const heliAreaRow = heliSection.insertRow();
-        this.createHeaderCell(heliAreaRow, localization.translate('Rotor Area'));
-        const heliAreaCell = heliAreaRow.insertCell();
-        heliAreaCell.colSpan = 3;
-        heliAreaCell.textContent = bindings.rotor_area.toString();
 
         table.appendChild(heliSection);
 
@@ -346,18 +335,28 @@ export class RotorUI extends BaseComponentUI {
      * Update visibility based on aircraft type
      */
     private updateVisibility(aircraftType: number): void {
-        if (!this.cache) return;
+        if (!this.cache) {
+            console.log('[RotorUI] updateVisibility: cache is null, skipping');
+            return;
+        }
 
         // Hide entire section for airplane and ornithopters
-        const showRotors = aircraftType === AIRCRAFT_TYPE.AUTOGYRO || aircraftType === AIRCRAFT_TYPE.HELICOPTER;
+        // Use Number() to ensure type consistency in comparison
+        const typeNum = Number(aircraftType);
+        const showRotors = typeNum === AIRCRAFT_TYPE.AUTOGYRO || typeNum === AIRCRAFT_TYPE.HELICOPTER;
+
+        console.log(`[RotorUI] updateVisibility: aircraftType=${typeNum}, showRotors=${showRotors}`);
 
         if (this.sectionElement) {
             this.sectionElement.style.display = showRotors ? '' : 'none';
+            console.log(`[RotorUI] sectionElement.style.display set to: '${this.sectionElement.style.display}'`);
+        } else {
+            console.warn('[RotorUI] sectionElement is null!');
         }
 
         // Show appropriate sub-section
-        this.cache.autoSection.style.display = aircraftType === AIRCRAFT_TYPE.AUTOGYRO ? '' : 'none';
-        this.cache.heliSection.style.display = aircraftType === AIRCRAFT_TYPE.HELICOPTER ? '' : 'none';
+        this.cache.autoSection.style.display = typeNum === AIRCRAFT_TYPE.AUTOGYRO ? '' : 'none';
+        this.cache.heliSection.style.display = typeNum === AIRCRAFT_TYPE.HELICOPTER ? '' : 'none';
     }
 
     /**
@@ -390,7 +389,8 @@ export class RotorUI extends BaseComponentUI {
             this.cache.autoClutch.disabled = !bindings.accessory.enabled;
         }
         if (this.cache.autoStatsTable) {
-            updateStatsTable(this.cache.autoStatsTable, stats, ROTOR_STATS_CONFIG);
+            const autoStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
+            updateStatsTable(this.cache.autoStatsTable, autoStatsWithArea, ROTOR_STATS_CONFIG);
         }
 
         // Update helicopter elements
@@ -423,7 +423,8 @@ export class RotorUI extends BaseComponentUI {
             this.cache.heliCrosslink.disabled = !bindings.accessory.enabled;
         }
         if (this.cache.heliStatsTable) {
-            updateStatsTable(this.cache.heliStatsTable, stats, ROTOR_STATS_CONFIG);
+            const heliStatsWithArea = { ...stats, rotor_area: bindings.rotor_area };
+            updateStatsTable(this.cache.heliStatsTable, heliStatsWithArea, ROTOR_STATS_CONFIG);
         }
     }
 }
