@@ -187,6 +187,7 @@ export class WingsUI extends BaseComponentUI {
             this.getBridge().setWingsBindings(updatedBindings);
             this.onUpdate();
         });
+        controlsDiv.appendChild(closedSpan);
 
         // Swept Wing
         const sweptSpan = document.createElement('span');
