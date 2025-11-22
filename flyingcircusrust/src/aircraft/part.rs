@@ -72,6 +72,13 @@ impl Part for Aircraft {
                 self.rotor
                     .set_engine_count(self.engines.get_number_engines());
                 s = s.add(&self.rotor.part_stats());
+            } else if self.aircraft_type == AircraftType::Helicopter {
+                // Helicopter: set dry mass power for rotor sizing
+                let dry_mp = (s.mass / 5.0).floor().max(1.0);
+                self.rotor.set_mass_power(dry_mp);
+                self.rotor
+                    .set_engine_count(self.engines.get_number_engines());
+                s = s.add(&self.rotor.part_stats());
             }
 
             self.controlsurfaces.set_wing_area(s.wingarea as i16);
@@ -110,6 +117,11 @@ impl Part for Aircraft {
                 s.power = (1.0e-6 + 0.9 * s.power).floor()
             }
 
+            // Apply helicopter power factor from rotor arrangement
+            if self.aircraft_type == AircraftType::Helicopter {
+                s.power = (1.0e-6 + self.rotor.get_power_factor() * s.power).floor();
+            }
+
             self.accessories
                 .set_has_radiator(self.engines.get_num_radiators() > 0);
             self.accessories.set_skin_armour(self.frames.get_armor());
@@ -130,10 +142,18 @@ impl Part for Aircraft {
             self.stabilizers.set_is_swept(self.wings.get_swept());
             self.stabilizers
                 .set_have_tail(!self.frames.get_is_tailless());
-            self.stabilizers.set_helicopter(false);
-            self.stabilizers.set_lifting_area(s.wingarea);
-            self.stabilizers.wing_drag =
-                (self.wings.get_wing_drag() + self.rotor.get_rotor_drag()) as f32;
+            if self.aircraft_type == AircraftType::Helicopter {
+                self.stabilizers.set_helicopter(true);
+                self.stabilizers.set_is_tandem(false);
+                self.stabilizers.set_is_swept(false);
+                self.stabilizers.set_lifting_area(self.rotor.get_rotor_area());
+                self.stabilizers.wing_drag = self.rotor.get_rotor_drag() as f32;
+            } else {
+                self.stabilizers.set_helicopter(false);
+                self.stabilizers.set_lifting_area(s.wingarea);
+                self.stabilizers.wing_drag =
+                    (self.wings.get_wing_drag() + self.rotor.get_rotor_drag()) as f32;
+            }
             s = s.add(&self.stabilizers.part_stats());
 
             //Treated Paper needs to apply near to last

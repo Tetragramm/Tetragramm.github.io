@@ -2,7 +2,10 @@ const path = require('path');
 
 module.exports = {
     entry: {
-        helicopter_builder: './src/helicopter_builder.ts',
+        helicopter_builder: './src/helicopter_builder_wasm.ts',
+    },
+    experiments: {
+        asyncWebAssembly: true,
     },
     module: {
         rules: [

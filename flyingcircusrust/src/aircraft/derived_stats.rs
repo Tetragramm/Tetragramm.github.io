@@ -375,6 +375,22 @@ impl Aircraft {
             max_speed_empty = max_speed_empty.min(37);
             max_speed_full = max_speed_full.min(37);
             max_speed_w_bombs = max_speed_w_bombs.min(37);
+
+            // Helicopter flight warning if boost is insufficient
+            if boost_full_w_bombs < 2 {
+                if stats
+                    .warnings
+                    .iter()
+                    .find(|w| w.name == t!("Helicopter Flight").to_string())
+                    .is_none()
+                {
+                    stats.warnings.push(crate::stats::Warning {
+                        name: t!("Helicopter Flight").to_string(),
+                        warning: t!("Helicopter Flight Warning").to_string(),
+                        level: crate::stats::WarningLevel::White,
+                    });
+                }
+            }
         }
         turn_bleed = turn_bleed.max(1);
         let mut turn_bleed_w_bombs = turn_bleed + 1;

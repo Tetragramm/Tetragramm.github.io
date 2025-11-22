@@ -6,15 +6,18 @@
         "resolveJsonModule": true,
         "outDir": ".",
         "rootDir": "..",
+        "lib": ["ES2021", "ESNext", "DOM"],
+        "skipLibCheck": true
     },
     "exclude": [
         "../Test/src/EngineBuilder/engine_builder.ts",
         "../Test/src/Hangar/hangar.ts",
         "../Test/src/WeaponDisplay/weapon_display.ts",
         "../Test/src/plane_builder.ts",
+        "../Test/src/wasm_init.ts"
     ],
     "include": [
         "./src",
-        "../Test/src",
+        "../Test/src"
     ]
 }

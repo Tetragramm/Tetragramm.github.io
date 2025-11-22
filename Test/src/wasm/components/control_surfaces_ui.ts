@@ -20,6 +20,16 @@ import {
     updateStatsTable
 } from '../dom_utils';
 
+// Aircraft type enum values
+const AIRCRAFT_TYPE = {
+    AIRPLANE: 0,
+    HELICOPTER: 1,
+    AUTOGYRO: 2,
+    ORNITHOPTER_BASIC: 3,
+    ORNITHOPTER_FLUTTER: 4,
+    ORNITHOPTER_BUZZER: 5
+};
+
 // Cache interface for type safety
 interface ControlSurfacesCache {
     aileronSelect: HTMLSelectElement;
@@ -134,7 +144,25 @@ export class ControlSurfacesUI extends BaseComponentUI {
 
         this.container.appendChild(this.sectionElement);
 
+        // Set visibility based on aircraft type
+        const aircraftType = bridge.getAircraftType();
+        this.updateVisibility(aircraftType);
+
         console.log('[ControlSurfacesUI] Full rebuild complete');
+    }
+
+    /**
+     * Update visibility based on aircraft type
+     * Helicopters don't have traditional control surfaces
+     */
+    private updateVisibility(aircraftType: number): void {
+        const typeNum = Number(aircraftType);
+        // Hide control surfaces for helicopters (they use rotor controls instead)
+        const showControls = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+
+        if (this.sectionElement) {
+            this.sectionElement.style.display = showControls ? '' : 'none';
+        }
     }
 
     /**
@@ -236,6 +264,10 @@ export class ControlSurfacesUI extends BaseComponentUI {
         if (!bridge || !this.cache) return;
 
         const bindings = bridge.getControlSurfacesBindings();
+        const aircraftType = bridge.getAircraftType();
+
+        // Update visibility first
+        this.updateVisibility(aircraftType);
 
         // Update control surface selects
         updateSelectElement(this.cache.aileronSelect, bindings.aileron_sel);

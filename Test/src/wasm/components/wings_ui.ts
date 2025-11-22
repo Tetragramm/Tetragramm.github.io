@@ -22,6 +22,16 @@ import {
     createFlexNumberInput
 } from '../dom_utils';
 
+// Aircraft type enum values
+const AIRCRAFT_TYPE = {
+    AIRPLANE: 0,
+    HELICOPTER: 1,
+    AUTOGYRO: 2,
+    ORNITHOPTER_BASIC: 3,
+    ORNITHOPTER_FLUTTER: 4,
+    ORNITHOPTER_BUZZER: 5
+};
+
 // Stats configuration for wings
 const WINGS_STATS: StatDisplayConfig[] = [
     { key: 'wingarea', label: 'Stat Wing Area', positiveIsGood: true },
@@ -99,10 +109,28 @@ export class WingsUI extends BaseComponentUI {
 
         const bindings = bridge.getWingsBindings();
         const stats = bridge.getWingsStats();
+        const aircraftType = bridge.getAircraftType();
 
         // Create complete Wings section
         this.sectionElement = this.createWingsSection(bindings, stats);
         this.container.appendChild(this.sectionElement);
+
+        // Set visibility based on aircraft type
+        this.updateVisibility(aircraftType);
+    }
+
+    /**
+     * Update visibility based on aircraft type
+     * Helicopters and ornithopters don't have traditional wings
+     */
+    private updateVisibility(aircraftType: number): void {
+        const typeNum = Number(aircraftType);
+        // Show wings for airplanes and autogyros only
+        const showWings = typeNum === AIRCRAFT_TYPE.AIRPLANE || typeNum === AIRCRAFT_TYPE.AUTOGYRO;
+
+        if (this.sectionElement) {
+            this.sectionElement.style.display = showWings ? '' : 'none';
+        }
     }
 
     /**
@@ -114,6 +142,10 @@ export class WingsUI extends BaseComponentUI {
 
         const bindings = bridge.getWingsBindings();
         const stats = bridge.getWingsStats();
+        const aircraftType = bridge.getAircraftType();
+
+        // Update visibility first
+        this.updateVisibility(aircraftType);
 
         // Update global controls
         updateSelectElement(this.cache.staggerSelect, bindings.stagger);
