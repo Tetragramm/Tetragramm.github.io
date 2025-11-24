@@ -861,6 +861,152 @@ pub fn get_part_list() -> PartList {
                     },
                 }
             },
+            // Helicopter engine mounts
+            {
+                let name = t!("Forward Internal");
+                MountEntry {
+                    name: name.to_string(),
+                    strain_factor: 0.,
+                    drag_factor: 0.,
+                    power_factor: 1.,
+                    mount_type: MountType::Fuselage,
+                    require_extended_driveshafts: false,
+                    require_tail: false,
+                    helicopter: true,
+                    turbine: false,
+                    pushpull: false,
+                    stats: Stats {
+                        reqsections: 2.,
+                        pitchstab: 2.,
+                        visibility: -1.,
+                        eras: vec![Era {
+                            name: name.to_string(),
+                            era: ERA::Pioneer,
+                        }],
+                        ..Stats::new()
+                    },
+                }
+            },
+            {
+                let name = t!("Center Internal");
+                MountEntry {
+                    name: name.to_string(),
+                    strain_factor: 0.,
+                    drag_factor: 0.,
+                    power_factor: 1.,
+                    mount_type: MountType::Fuselage,
+                    require_extended_driveshafts: false,
+                    require_tail: false,
+                    helicopter: true,
+                    turbine: false,
+                    pushpull: false,
+                    stats: Stats {
+                        reqsections: 1.,
+                        eras: vec![Era {
+                            name: name.to_string(),
+                            era: ERA::Pioneer,
+                        }],
+                        ..Stats::new()
+                    },
+                }
+            },
+            {
+                let name = t!("Rear Internal");
+                MountEntry {
+                    name: name.to_string(),
+                    strain_factor: 0.,
+                    drag_factor: 0.,
+                    power_factor: 1.,
+                    mount_type: MountType::Fuselage,
+                    require_extended_driveshafts: false,
+                    require_tail: false,
+                    helicopter: true,
+                    turbine: false,
+                    pushpull: false,
+                    stats: Stats {
+                        reqsections: 1.,
+                        pitchstab: -4.,
+                        eras: vec![Era {
+                            name: name.to_string(),
+                            era: ERA::Pioneer,
+                        }],
+                        ..Stats::new()
+                    },
+                }
+            },
+            {
+                let name = t!("Center Pod");
+                MountEntry {
+                    name: name.to_string(),
+                    strain_factor: 0.,
+                    drag_factor: 0.,
+                    power_factor: 1.,
+                    mount_type: MountType::Pod,
+                    require_extended_driveshafts: false,
+                    require_tail: false,
+                    helicopter: true,
+                    turbine: false,
+                    pushpull: false,
+                    stats: Stats {
+                        drag: 5.,
+                        reqsections: 1.,
+                        visibility: -1.,
+                        eras: vec![Era {
+                            name: name.to_string(),
+                            era: ERA::Pioneer,
+                        }],
+                        ..Stats::new()
+                    },
+                }
+            },
+            {
+                let name = t!("Rear Pod");
+                MountEntry {
+                    name: name.to_string(),
+                    strain_factor: 0.,
+                    drag_factor: 0.,
+                    power_factor: 1.,
+                    mount_type: MountType::Pod,
+                    require_extended_driveshafts: false,
+                    require_tail: false,
+                    helicopter: true,
+                    turbine: false,
+                    pushpull: false,
+                    stats: Stats {
+                        drag: 5.,
+                        reqsections: 1.,
+                        pitchstab: -4.,
+                        eras: vec![Era {
+                            name: name.to_string(),
+                            era: ERA::Pioneer,
+                        }],
+                        ..Stats::new()
+                    },
+                }
+            },
+            {
+                let name = t!("Not Allowed");
+                MountEntry {
+                    name: name.to_string(),
+                    strain_factor: 0.,
+                    drag_factor: 0.,
+                    power_factor: 1.,
+                    mount_type: MountType::Fuselage,
+                    require_extended_driveshafts: false,
+                    require_tail: false,
+                    helicopter: true,
+                    turbine: true,
+                    pushpull: false,
+                    stats: Stats {
+                        drag: 9999.,
+                        eras: vec![Era {
+                            name: name.to_string(),
+                            era: ERA::Pioneer,
+                        }],
+                        ..Stats::new()
+                    },
+                }
+            },
         ],
         engine_cowls: vec![
             {
