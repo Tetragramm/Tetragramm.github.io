@@ -11,16 +11,21 @@ impl Part for Aircraft {
             s = s.add(&self.cockpits.part_stats());
             s = s.add(&self.passengers.part_stats());
 
-            self.engines.set_tail_mods(
-                self.frames.get_farman_or_boom(),
-                self.wings.get_swept() && self.stabilizers.get_v_outboard(),
-                self.stabilizers.get_canard(),
-            );
-            self.engines.set_internal(
-                self.aircraft_type == AircraftType::Helicopter || self.is_ornithopter(),
-            );
-            self.engines.set_metal_area(self.wings.get_metal_area());
-            self.engines.have_parasol(self.wings.get_parasol());
+            if self.aircraft_type == AircraftType::Helicopter {
+                self.engines.set_tail_mods(false, false, false);
+                self.engines.set_internal(true);
+                self.engines.set_metal_area(0);
+                self.engines.have_parasol(false);
+            } else {
+                self.engines.set_tail_mods(
+                    self.frames.get_farman_or_boom(),
+                    self.wings.get_swept() && self.stabilizers.get_v_outboard(),
+                    self.stabilizers.get_canard(),
+                );
+                self.engines.set_internal(self.is_ornithopter());
+                self.engines.set_metal_area(self.wings.get_metal_area());
+                self.engines.have_parasol(self.wings.get_parasol());
+            }
             s = s.add(&self.engines.part_stats());
 
             self.propeller
@@ -53,55 +58,72 @@ impl Part for Aircraft {
             self.weapons.cant_type = self.reinforcements.cant_type();
             self.weapons
                 .set_have_propeller(self.engines.get_num_propellers() > 0);
-            self.weapons.set_can_wing(!self.is_ornithopter());
+            self.weapons.set_heli(self.aircraft_type == AircraftType::Helicopter);
+            self.weapons.set_can_wing(!self.is_ornithopter() && self.aircraft_type != AircraftType::Helicopter);
             s = s.add(&self.weapons.part_stats());
 
             //Cargo makes sections
             s = s.add(&self.cargo.part_stats());
 
-            self.wings.set_aircraft_type(self.aircraft_type);
-            if self.aircraft_type == AircraftType::Autogyro {
-                self.wings.set_rotor_span(self.rotor.get_rotor_span());
-            } else {
-                self.wings.set_rotor_span(0);
+            // Wings - skip for helicopters (they use rotor only)
+            if self.aircraft_type != AircraftType::Helicopter {
+                self.wings.set_aircraft_type(self.aircraft_type);
+                if self.aircraft_type == AircraftType::Autogyro {
+                    self.wings.set_rotor_span(self.rotor.get_rotor_span());
+                } else {
+                    self.wings.set_rotor_span(0);
+                }
+                s = s.add(&self.wings.part_stats());
             }
-            s = s.add(&self.wings.part_stats());
 
+            // Rotor - for both autogyro and helicopter
             self.rotor.set_wing_area(s.wingarea as i16);
-            if self.aircraft_type == AircraftType::Autogyro {
+            if self.aircraft_type == AircraftType::Autogyro || self.aircraft_type == AircraftType::Helicopter {
                 self.rotor
                     .set_engine_count(self.engines.get_number_engines());
                 s = s.add(&self.rotor.part_stats());
             }
 
-            self.controlsurfaces.set_wing_area(s.wingarea as i16);
-            self.controlsurfaces
-                .set_boom_tail(self.frames.get_use_boom());
-            self.controlsurfaces.set_span(self.wings.get_span());
-            self.controlsurfaces.set_acft_type(self.aircraft_type);
-            self.controlsurfaces
-                .set_can_elevator(self.stabilizers.get_hstab_count() > 0);
-            self.controlsurfaces
-                .set_can_rudder(self.stabilizers.get_vstab_count() > 0);
-            self.controlsurfaces
-                .set_is_vtail(self.stabilizers.get_is_vtail());
-            if self.aircraft_type == AircraftType::Airplane {
-                // self.controlsurfaces.set_num_cantilever();
-            } else {
-                self.controlsurfaces.set_num_cantilever(0);
+            // Control surfaces - skip for helicopters
+            if self.aircraft_type != AircraftType::Helicopter {
+                self.controlsurfaces.set_wing_area(s.wingarea as i16);
+                self.controlsurfaces
+                    .set_boom_tail(self.frames.get_use_boom());
+                self.controlsurfaces.set_span(self.wings.get_span());
+                self.controlsurfaces.set_acft_type(self.aircraft_type);
+                self.controlsurfaces
+                    .set_can_elevator(self.stabilizers.get_hstab_count() > 0);
+                self.controlsurfaces
+                    .set_can_rudder(self.stabilizers.get_vstab_count() > 0);
+                self.controlsurfaces
+                    .set_is_vtail(self.stabilizers.get_is_vtail());
+                if self.aircraft_type == AircraftType::Airplane {
+                    // self.controlsurfaces.set_num_cantilever();
+                } else {
+                    self.controlsurfaces.set_num_cantilever(0);
+                }
+                s = s.add(&self.controlsurfaces.part_stats());
             }
-            s = s.add(&self.controlsurfaces.part_stats());
 
-            self.reinforcements
-                .set_monoplane(self.wings.get_monoplane());
-            self.reinforcements.set_tandem(self.wings.get_tandem());
-            self.reinforcements
-                .set_staggered(self.wings.get_staggered());
-            self.reinforcements
-                .set_can_external(self.wings.get_area() > 0);
-            let (is_sesqui, _, is_small_sesqui) = self.wings.get_is_sesquiplane();
-            self.reinforcements
-                .set_sesquiplane(is_sesqui, is_small_sesqui);
+            // Reinforcements - helicopters have different settings (no wing reinforcements)
+            if self.aircraft_type == AircraftType::Helicopter {
+                self.reinforcements.set_monoplane(false);
+                self.reinforcements.set_tandem(false);
+                self.reinforcements.set_staggered(false);
+                self.reinforcements.set_can_external(false);
+                self.reinforcements.set_sesquiplane(false, false);
+            } else {
+                self.reinforcements
+                    .set_monoplane(self.wings.get_monoplane());
+                self.reinforcements.set_tandem(self.wings.get_tandem());
+                self.reinforcements
+                    .set_staggered(self.wings.get_staggered());
+                self.reinforcements
+                    .set_can_external(self.wings.get_area() > 0);
+                let (is_sesqui, _, is_small_sesqui) = self.wings.get_is_sesquiplane();
+                self.reinforcements
+                    .set_sesquiplane(is_sesqui, is_small_sesqui);
+            }
             self.reinforcements.set_aircraft_type(self.aircraft_type);
             self.reinforcements.set_cant_lift(self.era.get_cant_lift());
             s = s.add(&self.reinforcements.part_stats());
@@ -113,41 +135,69 @@ impl Part for Aircraft {
             self.accessories
                 .set_has_radiator(self.engines.get_num_radiators() > 0);
             self.accessories.set_skin_armour(self.frames.get_armor());
-            self.accessories
-                .set_can_cutouts(self.wings.can_cutout(), self.frames.can_cutout());
+            if self.aircraft_type == AircraftType::Helicopter {
+                // Helicopters have no wing cutouts
+                self.accessories.set_can_cutouts(false, self.frames.can_cutout());
+            } else {
+                self.accessories
+                    .set_can_cutouts(self.wings.can_cutout(), self.frames.can_cutout());
+            }
             s = s.add(&self.accessories.part_stats());
 
             //You know what, frames go last, because lots of things make sections.
             self.frames.set_required_sections(s.reqsections as usize);
             self.frames
                 .set_has_tractor_nacelles(self.engines.get_has_tractor_nacelles());
-            self.frames.set_is_tandem(self.wings.get_tandem());
+            if self.aircraft_type == AircraftType::Helicopter {
+                // Helicopter tandem is based on tail rotor (single rotor = needs tail boom)
+                self.frames.set_is_tandem(self.rotor.get_tail_rotor());
+            } else {
+                self.frames.set_is_tandem(self.wings.get_tandem());
+            }
             s = s.add(&self.frames.part_stats());
 
             self.stabilizers
                 .set_engine_count(self.engines.get_number_engines() as i16);
-            self.stabilizers.set_is_tandem(self.wings.get_tandem());
-            self.stabilizers.set_is_swept(self.wings.get_swept());
-            self.stabilizers
-                .set_have_tail(!self.frames.get_is_tailless());
-            self.stabilizers.set_helicopter(false);
-            self.stabilizers.set_lifting_area(s.wingarea);
-            self.stabilizers.wing_drag =
-                (self.wings.get_wing_drag() + self.rotor.get_rotor_drag()) as f32;
+            if self.aircraft_type == AircraftType::Helicopter {
+                self.stabilizers.set_is_tandem(false);
+                self.stabilizers.set_is_swept(false);
+                self.stabilizers.set_have_tail(!self.frames.get_is_tailless());
+                self.stabilizers.set_helicopter(true);
+                self.stabilizers.set_lifting_area(self.rotor.get_rotor_area());
+                self.stabilizers.wing_drag = self.rotor.get_rotor_drag() as f32;
+            } else {
+                self.stabilizers.set_is_tandem(self.wings.get_tandem());
+                self.stabilizers.set_is_swept(self.wings.get_swept());
+                self.stabilizers
+                    .set_have_tail(!self.frames.get_is_tailless());
+                self.stabilizers.set_helicopter(false);
+                self.stabilizers.set_lifting_area(s.wingarea);
+                self.stabilizers.wing_drag =
+                    (self.wings.get_wing_drag() + self.rotor.get_rotor_drag()) as f32;
+            }
             s = s.add(&self.stabilizers.part_stats());
 
-            //Treated Paper needs to apply near to last
-            self.wings.set_aircraft_mass(s.mass);
-            s.mass += self.wings.get_paper_mass();
+            //Treated Paper needs to apply near to last (helicopters have no wings)
+            if self.aircraft_type != AircraftType::Helicopter {
+                self.wings.set_aircraft_mass(s.mass);
+                s.mass += self.wings.get_paper_mass();
+            }
             //because treated paper brings mass down.
             s.mass = s.mass.max(1.0);
 
-            self.gear.set_gull_deck(self.wings.has_inverted_gull());
-            self.gear.set_loaded_mass(s.mass + s.wetmass);
-            self.gear.set_can_boat(
-                self.engines.get_engine_height(),
-                self.wings.get_wing_height(),
-            );
+            if self.aircraft_type == AircraftType::Helicopter {
+                self.gear.set_gull_deck(0);  // No gull deck for helicopters
+                self.gear.set_loaded_mass(s.mass + s.wetmass);
+                // Helicopter wing height is effectively 2 (rotor is high)
+                self.gear.set_can_boat(self.engines.get_engine_height(), 2);
+            } else {
+                self.gear.set_gull_deck(self.wings.has_inverted_gull());
+                self.gear.set_loaded_mass(s.mass + s.wetmass);
+                self.gear.set_can_boat(
+                    self.engines.get_engine_height(),
+                    self.wings.get_wing_height(),
+                );
+            }
             s = s.add(&self.gear.part_stats());
 
             //Add toughness here so it gets optimized properly.
@@ -160,6 +210,11 @@ impl Part for Aircraft {
                 .set_has_rotary(self.engines.has_tractor_rotary());
 
             s = s.add(&self.alter.part_stats());
+
+            // Helicopter power factor from rotor arrangement
+            if self.aircraft_type == AircraftType::Helicopter {
+                s.power = (1.0e-6 + self.rotor.get_power_factor() * s.power).floor();
+            }
 
             s.round();
             if s == match_stats {
@@ -225,16 +280,29 @@ impl Part for Aircraft {
         //Not really part local, but only affects number limits.
         self.reinforcements
             .set_acft_structure(self.stats.structure as i16);
-        self.fuel.set_area(self.wings.get_area() as f32);
+        if self.aircraft_type == AircraftType::Helicopter {
+            self.fuel.set_area(0.0);  // No wing tanks for helicopters
+            self.rotor.set_mass_power(derived.dry_mp as f32);
+        } else {
+            self.fuel.set_area(self.wings.get_area() as f32);
+        }
         self.fuel
             .set_cantilever(self.reinforcements.has_cantilevers());
         self.accessories
             .set_vital_parts(self.vital_component_list().len() as i16);
-        self.munitions.set_acft_parameters(
-            self.stats.structure,
-            self.era.get_max_bomb(),
-            self.wings.has_inverted_gull(),
-        );
+        if self.aircraft_type == AircraftType::Helicopter {
+            self.munitions.set_acft_parameters(
+                self.stats.structure,
+                self.era.get_max_bomb(),
+                0,  // No inverted gull for helicopters
+            );
+        } else {
+            self.munitions.set_acft_parameters(
+                self.stats.structure,
+                self.era.get_max_bomb(),
+                self.wings.has_inverted_gull(),
+            );
+        }
 
         let em = self.get_electrics();
 

@@ -258,6 +258,22 @@ impl Aircraft {
             }
         }
 
+        // Helicopter flight warning: needs minimum boost to fly
+        if self.aircraft_type == AircraftType::Helicopter && boost_full_w_bombs < 2 {
+            if stats
+                .warnings
+                .iter()
+                .find(|w| w.name == t!("Helicopter Flight").to_string())
+                .is_none()
+            {
+                stats.warnings.push(crate::stats::Warning {
+                    name: t!("Helicopter Flight").to_string(),
+                    warning: t!("Helicopter Flight Warning").to_string(),
+                    level: crate::stats::WarningLevel::Red,
+                });
+            }
+        }
+
         let dropoff = (stats.pitchboost * max_speed_empty as f32).floor() as i16;
 
         // Apply used condition: Ragged (affects max speed)
