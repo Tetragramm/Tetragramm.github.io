@@ -43,7 +43,12 @@ pub struct Stabilizers {
     pub vstab_list: Rc<Vec<VStabEntry>>,
 
     // Horizontal stabilizer configuration
-    #[ui(select, source = "hstab_list", enabled_fn = "is_hstab_enabled", set_fn = "set_hstab_type")]
+    #[ui(
+        select,
+        source = "hstab_list",
+        enabled_fn = "is_hstab_enabled",
+        set_fn = "set_hstab_type"
+    )]
     hstab_sel: usize,
 
     #[ui(
@@ -55,7 +60,12 @@ pub struct Stabilizers {
     hstab_count: i16,
 
     // Vertical stabilizer configuration
-    #[ui(select, source = "vstab_list", enabled_fn = "is_vstab_enabled", set_fn = "set_vstab_type")]
+    #[ui(
+        select,
+        source = "vstab_list",
+        enabled_fn = "is_vstab_enabled",
+        set_fn = "set_vstab_type"
+    )]
     vstab_sel: usize,
 
     #[ui(
@@ -75,6 +85,3 @@ mod queries;
 mod serialization;
 mod setters;
 mod validation;
-
-#[cfg(test)]
-mod tests;

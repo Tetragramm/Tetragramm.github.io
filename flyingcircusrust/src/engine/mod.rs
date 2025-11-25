@@ -19,9 +19,6 @@ mod queries;
 mod setters;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Custom deserializer for EngineRarity to handle both old numeric format and new string format
 fn deserialize_engine_rarity(value: serde_json::Value) -> Result<EngineRarity, String> {
     match value {

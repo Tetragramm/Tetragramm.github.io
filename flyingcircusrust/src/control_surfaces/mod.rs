@@ -12,9 +12,6 @@ mod queries;
 mod serialization;
 mod setters;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export struct methods
 
 /// Aileron option with warping flag

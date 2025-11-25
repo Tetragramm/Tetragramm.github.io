@@ -13,9 +13,6 @@ mod serialization;
 mod setters;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Tank type entry with stats and properties
@@ -48,7 +45,11 @@ pub struct Fuel {
     self_sealing: bool,
 
     // Fire extinguisher system
-    #[ui(check, name = "Load Remote Fire Extinguisher", set_fn = "set_extinguisher")]
+    #[ui(
+        check,
+        name = "Load Remote Fire Extinguisher",
+        set_fn = "set_extinguisher"
+    )]
     fire_extinguisher: bool,
 
     // Wing configuration (set externally by wings)

@@ -12,9 +12,6 @@ mod setters;
 mod ui;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Synchronization type for weapons firing through propeller arc

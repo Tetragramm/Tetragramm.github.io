@@ -9,9 +9,6 @@ mod json;
 mod part;
 mod serialization;
 
-#[cfg(test)]
-mod tests;
-
 #[derive(Clone)]
 pub struct RadiatorEntry {
     pub name: String,

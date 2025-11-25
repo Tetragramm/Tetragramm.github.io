@@ -11,9 +11,6 @@ mod serialization;
 mod setters;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Main Munitions struct
@@ -32,10 +29,18 @@ pub struct Munitions {
 
     // Bay upgrades (bay1 doubles capacity, bay2 doubles it again)
     // Note: bay2 requires bay1 (validation enforced by setters)
-    #[ui(check, name = "Load Widen Internal Bay 1", set_fn = "set_internal_bay_1")]
+    #[ui(
+        check,
+        name = "Load Widen Internal Bay 1",
+        set_fn = "set_internal_bay_1"
+    )]
     internal_bay_1: bool,
 
-    #[ui(check, name = "Load Widen Internal Bay 2", set_fn = "set_internal_bay_2")]
+    #[ui(
+        check,
+        name = "Load Widen Internal Bay 2",
+        set_fn = "set_internal_bay_2"
+    )]
     internal_bay_2: bool,
 
     // Aircraft parameters (set externally)

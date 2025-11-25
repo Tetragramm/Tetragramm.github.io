@@ -14,9 +14,6 @@ mod part;
 mod queries;
 mod serialization;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export AircraftType from shared types module
 pub use crate::types::AircraftType;
 

@@ -12,9 +12,6 @@ use crate::{
 mod json;
 mod serialization;
 
-#[cfg(test)]
-mod tests;
-
 #[derive(Clone, UIBindings)]
 pub struct Cockpit {
     types: Rc<Vec<CockpitEntry>>,

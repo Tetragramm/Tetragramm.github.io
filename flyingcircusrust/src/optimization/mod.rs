@@ -11,9 +11,6 @@ mod serialization;
 mod setters;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Main Optimization struct

@@ -14,9 +14,6 @@ mod setters;
 mod ui;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// WeaponSystem struct

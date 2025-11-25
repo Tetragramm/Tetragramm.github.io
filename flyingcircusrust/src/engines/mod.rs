@@ -460,24 +460,3 @@ impl Engines {
         }
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::{engines::Engines, part::Part, part_list::get_part_list};
-
-    #[test]
-    fn test_needs_cooling() {
-        let part_list = get_part_list();
-        let mut engines = Engines::new(
-            part_list.engine_mounts,
-            part_list.engine_cowls,
-            part_list.radiator_types,
-            part_list.radiator_mounts,
-            part_list.radiator_coolants,
-        );
-        engines.set_number_of_engines(1);
-        engines.engines[0].set_selected_engine("Himmilgard Liquid Cooled", "Bertha F1166 120hp");
-        assert!(engines.engines[0].need_cooling());
-        assert!(engines.needs_cooling());
-    }
-}

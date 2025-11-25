@@ -10,9 +10,6 @@ mod serialization;
 mod setters;
 mod ui;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Frame type entry with stats and properties

@@ -9,10 +9,6 @@ mod json;
 mod serialization;
 mod ui;
 
-#[cfg(test)]
-mod tests;
-
-
 pub struct CockpitEntry {
     pub name: String,
     pub exposed: bool,

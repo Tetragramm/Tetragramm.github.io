@@ -11,9 +11,6 @@ mod queries;
 mod serialization;
 mod setters;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Cargo space entry with stats

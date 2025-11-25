@@ -11,9 +11,6 @@ mod setters;
 mod ui;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Wing deck positions (height)

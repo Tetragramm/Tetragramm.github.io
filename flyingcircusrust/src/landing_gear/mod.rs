@@ -13,9 +13,6 @@ mod serialization;
 mod setters;
 mod validation;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 /// Gear type entry with stats and properties

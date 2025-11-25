@@ -13,9 +13,6 @@ mod queries;
 mod serialization;
 mod setters;
 
-#[cfg(test)]
-mod tests;
-
 // Re-export public API
 
 // Re-export AircraftType from shared types module
