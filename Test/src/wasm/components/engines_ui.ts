@@ -119,7 +119,7 @@ export class EnginesUI extends BaseComponentUI {
         // Add Engine Builder link
         const engineBuilderSpan = document.createElement('span');
         const engineBuilderLink = document.createElement('a');
-        engineBuilderLink.href = './EngineBuilder/engine.html';
+        engineBuilderLink.href = './engine.html';
         const engineBuilderText = document.createElement('u');
         engineBuilderText.textContent = 'Engine Builder';
         engineBuilderLink.appendChild(engineBuilderText);

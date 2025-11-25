@@ -4,42 +4,10 @@ use super::{Engine, TypedInputs};
 
 impl Engine {
     pub fn is_mount_opt_enabled(&self) -> Vec<bool> {
-        let mut can = vec![true; self.mount_list.len()];
-        if self.is_internal {
-            for idx in 0..can.len() {
-                can[idx] = self.mount_list[idx].helicopter
-            }
-        } else if self.get_is_turbine() && !self.get_is_turboprop() {
-            for idx in 0..can.len() {
-                can[idx] = self.mount_list[idx].turbine
-            }
-        } else if self.is_generator {
-            can = vec![false; self.mount_list.len()];
-            can[0] = true;
-        } else {
-            if self.is_push_pull {
-                for idx in 0..can.len() {
-                    if self.mount_list[idx].mount_type == MountType::Fuselage
-                        && self.mount_list[idx].name != t!("Fuselage Push-Pull")
-                    {
-                        can[idx] = false;
-                    }
-                    if self.mount_list[idx].turbine {
-                        can[idx] = false;
-                    }
-                }
-            } else {
-                for idx in 0..can.len() {
-                    if self.mount_list[idx].name == t!("Fuselage Push-Pull") {
-                        can[idx] = false;
-                    }
-                    if self.mount_list[idx].turbine {
-                        can[idx] = false;
-                    }
-                }
-            }
-        }
-        can
+        // Collect validity status for each mount using is_mount_valid
+        (0..self.mount_list.len())
+            .map(|idx| self.is_mount_valid(idx))
+            .collect()
     }
 
     pub fn need_cooling(&self) -> bool {

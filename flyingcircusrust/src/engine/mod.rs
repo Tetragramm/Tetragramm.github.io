@@ -263,7 +263,7 @@ impl<'de> Deserialize<'de> for EngineInputs {
                         upgrades: value
                             .get("upgrades")
                             .and_then(|v| serde_json::from_value(v.clone()).ok())
-                            .unwrap_or_else(|| vec![false; 4]),
+                            .unwrap_or_else(|| vec![false; 3]),
                     }
                 }
                 1 => {
@@ -366,7 +366,7 @@ impl EngineInputs {
                 compressor_type: 0,
                 compressor_count: 0,
                 min_ideal_alt: 0,
-                upgrades: vec![false; 4],
+                upgrades: vec![false; 3],
             },
         }
     }
@@ -513,6 +513,7 @@ pub struct Engine {
     has_alternator: bool,
 
     is_internal: bool,
+    is_helicopter_aircraft: bool,
 
     total_reliability: i16,
     is_first_pulsejet: bool,

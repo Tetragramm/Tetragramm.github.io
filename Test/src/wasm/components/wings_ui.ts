@@ -8,6 +8,7 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
+import { AIRCRAFT_TYPE } from './aircraft_type_ui';
 import {
     createRulesLink,
     createSelectElement,
@@ -99,10 +100,14 @@ export class WingsUI extends BaseComponentUI {
 
         const bindings = bridge.getWingsBindings();
         const stats = bridge.getWingsStats();
+        const aircraftType = bridge.getAircraftType();
 
         // Create complete Wings section
         this.sectionElement = this.createWingsSection(bindings, stats);
         this.container.appendChild(this.sectionElement);
+
+        // Set initial visibility based on aircraft type
+        this.updateVisibility(aircraftType);
     }
 
     /**
@@ -114,6 +119,10 @@ export class WingsUI extends BaseComponentUI {
 
         const bindings = bridge.getWingsBindings();
         const stats = bridge.getWingsStats();
+        const aircraftType = bridge.getAircraftType();
+
+        // Update visibility first
+        this.updateVisibility(aircraftType);
 
         // Update global controls
         updateSelectElement(this.cache.staggerSelect, bindings.stagger);
@@ -148,6 +157,18 @@ export class WingsUI extends BaseComponentUI {
 
         // Update stats
         updateStatsTable(this.cache.statsTable, stats, WINGS_STATS);
+    }
+
+    /**
+     * Update visibility based on aircraft type
+     */
+    private updateVisibility(aircraftType: number): void {
+        const typeNum = Number(aircraftType);
+        const showWings = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+
+        if (this.sectionElement) {
+            this.sectionElement.style.display = showWings ? '' : 'none';
+        }
     }
 
     /**

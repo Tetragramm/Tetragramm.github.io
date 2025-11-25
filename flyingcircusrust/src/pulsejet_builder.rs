@@ -70,15 +70,15 @@ const ERA_TABLE: [EraData; 6] = [
     },
 ];
 
-struct ValveData {
-    name: &'static str,
+pub struct ValveData {
+    pub name: &'static str,
     scale: f32,
     rumble: f32,
     design_cost: f32,
     reliability: f32,
 }
 
-const VALVE_TABLE: [ValveData; 2] = [
+pub const VALVE_TABLE: [ValveData; 2] = [
     ValveData {
         name: "Valved",
         scale: 1.0,
@@ -271,6 +271,7 @@ impl PulsejetBuilder {
         // Add rumble to mass and mass to drag (from TypeScript lines 152-153)
         estats.stats.mass += estats.rumble as f32;
         estats.stats.drag += estats.stats.mass;
+        estats.es1 = self.design_cost();
 
         estats
     }

@@ -161,6 +161,7 @@ export class WasmApplication {
             // Create aircraft actions (buttons)
             this.actions = new AircraftActions(this.bridge, () => {
                 this.onStatsUpdate();
+                this.applyInitialCollapseState();
             });
             console.log('[WasmApp] Aircraft actions initialized');
 
@@ -178,7 +179,7 @@ export class WasmApplication {
             // Create Aircraft Type UI component (selector for airplane/autogyro/ornithopter)
             this.aircraftTypeUI = new AircraftTypeUI(() => this.bridge, 'Type', () => {
                 this.onStatsUpdate();
-            });
+            }, true);
             console.log('[WasmApp] Aircraft Type UI created');
 
             // Create Cockpits UI component
@@ -302,6 +303,9 @@ export class WasmApplication {
             });
             console.log('[WasmApp] Altitude UI created');
 
+            // Apply initial collapse state based on IsDefault status
+            this.applyInitialCollapseState();
+
             this.initialized = true;
             console.log('[WasmApp] Initialization complete!');
         } catch (error) {
@@ -416,6 +420,21 @@ export class WasmApplication {
         console.log('[WasmApp] Stats updated:', derivedStats);
 
         this.render();
+    }
+
+    /**
+     * Apply initial collapse state to all collapsible sections based on IsDefault status
+     * Called after aircraft is loaded (initial load, fromJSON, or deserializeFromLZString)
+     */
+    private applyInitialCollapseState(): void {
+        // Components that have collapsible sections
+        this.controlSurfacesUI?.applyInitialCollapseState();
+        this.landingGearUI?.applyInitialCollapseState();
+        this.optimizationUI?.applyInitialCollapseState();
+        this.stabilizersUI?.applyInitialCollapseState();
+        this.usedUI?.applyInitialCollapseState();
+        this.customPartsUI?.applyInitialCollapseState();
+        this.passengersUI?.applyInitialCollapseState();
     }
 
     /**

@@ -328,4 +328,15 @@ export class OptimizationUI extends BaseComponentUI {
             checkboxes[i + 3].disabled = i + 1 > free;
         }
     }
+
+    /**
+     * Apply initial collapse state based on whether optimization is at default
+     */
+    applyInitialCollapseState(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const isDefault = bridge.getOptimizationIsDefault();
+        this.setCollapsed(isDefault);
+    }
 }

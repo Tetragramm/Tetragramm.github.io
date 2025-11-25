@@ -100,6 +100,7 @@ export class AircraftActions {
                 const json = JSON.parse(reader.result as string);
                 if (this.bridge.fromJSON(json)) {
                     // Success - aircraft loaded
+                    this.onUpdate();
                     console.log('Aircraft loaded successfully');
                 }
             } catch (e) {
@@ -117,6 +118,7 @@ export class AircraftActions {
         try {
             const json = JSON.parse(textArea.value);
             if (this.bridge.fromJSON(json)) {
+                this.onUpdate();
                 console.log('Aircraft loaded from text');
             }
         } catch (e) {

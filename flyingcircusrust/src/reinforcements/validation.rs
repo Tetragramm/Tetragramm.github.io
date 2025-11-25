@@ -3,7 +3,7 @@ use super::*;
 impl Reinforcements {
     /// Verify cabane selection is valid
     pub fn verify_cabane(&mut self) {
-        if self.cabane_sel < 0 || self.cabane_sel as usize >= self.cabane_list.len() {
+        if self.cabane_sel as usize >= self.cabane_list.len() {
             self.cabane_sel = 0;
         }
     }

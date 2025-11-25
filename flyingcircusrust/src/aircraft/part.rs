@@ -11,6 +11,7 @@ impl Part for Aircraft {
             s = s.add(&self.cockpits.part_stats());
             s = s.add(&self.passengers.part_stats());
 
+            self.engines.set_aircraft_type(self.aircraft_type);
             if self.aircraft_type == AircraftType::Helicopter {
                 self.engines.set_tail_mods(false, false, false);
                 self.engines.set_internal(true);
@@ -58,8 +59,11 @@ impl Part for Aircraft {
             self.weapons.cant_type = self.reinforcements.cant_type();
             self.weapons
                 .set_have_propeller(self.engines.get_num_propellers() > 0);
-            self.weapons.set_heli(self.aircraft_type == AircraftType::Helicopter);
-            self.weapons.set_can_wing(!self.is_ornithopter() && self.aircraft_type != AircraftType::Helicopter);
+            self.weapons
+                .set_heli(self.aircraft_type == AircraftType::Helicopter);
+            self.weapons.set_can_wing(
+                !self.is_ornithopter() && self.aircraft_type != AircraftType::Helicopter,
+            );
             s = s.add(&self.weapons.part_stats());
 
             //Cargo makes sections
@@ -78,7 +82,9 @@ impl Part for Aircraft {
 
             // Rotor - for both autogyro and helicopter
             self.rotor.set_wing_area(s.wingarea as i16);
-            if self.aircraft_type == AircraftType::Autogyro || self.aircraft_type == AircraftType::Helicopter {
+            if self.aircraft_type == AircraftType::Autogyro
+                || self.aircraft_type == AircraftType::Helicopter
+            {
                 self.rotor
                     .set_engine_count(self.engines.get_number_engines());
                 s = s.add(&self.rotor.part_stats());
@@ -137,7 +143,8 @@ impl Part for Aircraft {
             self.accessories.set_skin_armour(self.frames.get_armor());
             if self.aircraft_type == AircraftType::Helicopter {
                 // Helicopters have no wing cutouts
-                self.accessories.set_can_cutouts(false, self.frames.can_cutout());
+                self.accessories
+                    .set_can_cutouts(false, self.frames.can_cutout());
             } else {
                 self.accessories
                     .set_can_cutouts(self.wings.can_cutout(), self.frames.can_cutout());
@@ -161,9 +168,11 @@ impl Part for Aircraft {
             if self.aircraft_type == AircraftType::Helicopter {
                 self.stabilizers.set_is_tandem(false);
                 self.stabilizers.set_is_swept(false);
-                self.stabilizers.set_have_tail(!self.frames.get_is_tailless());
+                self.stabilizers
+                    .set_have_tail(!self.frames.get_is_tailless());
                 self.stabilizers.set_helicopter(true);
-                self.stabilizers.set_lifting_area(self.rotor.get_rotor_area());
+                self.stabilizers
+                    .set_lifting_area(self.rotor.get_rotor_area());
                 self.stabilizers.wing_drag = self.rotor.get_rotor_drag() as f32;
             } else {
                 self.stabilizers.set_is_tandem(self.wings.get_tandem());
@@ -186,7 +195,7 @@ impl Part for Aircraft {
             s.mass = s.mass.max(1.0);
 
             if self.aircraft_type == AircraftType::Helicopter {
-                self.gear.set_gull_deck(0);  // No gull deck for helicopters
+                self.gear.set_gull_deck(0); // No gull deck for helicopters
                 self.gear.set_loaded_mass(s.mass + s.wetmass);
                 // Helicopter wing height is effectively 2 (rotor is high)
                 self.gear.set_can_boat(self.engines.get_engine_height(), 2);
@@ -281,7 +290,7 @@ impl Part for Aircraft {
         self.reinforcements
             .set_acft_structure(self.stats.structure as i16);
         if self.aircraft_type == AircraftType::Helicopter {
-            self.fuel.set_area(0.0);  // No wing tanks for helicopters
+            self.fuel.set_area(0.0); // No wing tanks for helicopters
             self.rotor.set_mass_power(derived.dry_mp as f32);
         } else {
             self.fuel.set_area(self.wings.get_area() as f32);
@@ -294,7 +303,7 @@ impl Part for Aircraft {
             self.munitions.set_acft_parameters(
                 self.stats.structure,
                 self.era.get_max_bomb(),
-                0,  // No inverted gull for helicopters
+                0, // No inverted gull for helicopters
             );
         } else {
             self.munitions.set_acft_parameters(

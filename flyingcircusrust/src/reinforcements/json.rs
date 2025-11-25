@@ -70,7 +70,7 @@ impl JSSerializable for Reinforcements {
         }
 
         // Validate selections
-        if self.cabane_sel < 0 || self.cabane_sel as usize >= self.cabane_list.len() {
+        if self.cabane_sel as usize >= self.cabane_list.len() {
             self.cabane_sel = 0;
         }
 

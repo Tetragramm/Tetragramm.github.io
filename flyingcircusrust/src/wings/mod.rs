@@ -21,8 +21,11 @@ mod tests;
 pub enum WingDeck {
     Parasol = 0,
     Shoulder = 1,
+    #[allow(dead_code)]
     Mid = 2,
+    #[allow(dead_code)]
     Low = 3,
+    #[allow(dead_code)]
     Gear = 4,
 }
 

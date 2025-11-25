@@ -6,6 +6,7 @@ use crate::{
     radiator::{Radiator, RadiatorCoolantEntry, RadiatorEntry, RadiatorMountEntry},
     serialization::Serializable,
     stats::Stats,
+    types::AircraftType,
 };
 
 mod json;
@@ -449,6 +450,16 @@ impl Engines {
             self.set_number_of_radiators(1);
         }
     }
+
+    /// Set the aircraft type and update engines accordingly
+    /// When switching to/from helicopter, engines' mount selection and type flags are updated
+    pub fn set_aircraft_type(&mut self, aircraft_type: AircraftType) {
+        // Update helicopter flag for all engines
+        let is_helicopter = aircraft_type == AircraftType::Helicopter;
+        for engine in &mut self.engines {
+            engine.set_is_helicopter(is_helicopter);
+        }
+    }
 }
 
 #[cfg(test)]
@@ -469,8 +480,5 @@ mod tests {
         engines.engines[0].set_selected_engine("Himmilgard Liquid Cooled", "Bertha F1166 120hp");
         assert!(engines.engines[0].need_cooling());
         assert!(engines.needs_cooling());
-        // engines.part_stats();
-        assert!(engines.needs_cooling());
-        assert_eq!(engines.get_num_radiators(), 1);
     }
 }

@@ -34,6 +34,7 @@ impl Engine {
             has_alternator: false,
             is_first_pulsejet: false,
             is_internal: false,
+            is_helicopter_aircraft: false,
         }
     }
 }

@@ -211,6 +211,12 @@ export interface AircraftWasmAPI {
 
     // Aircraft query methods
     getUsedIsDefault(): boolean;
+    getControlSurfacesIsDefault(): boolean;
+    getLandingGearIsDefault(): boolean;
+    getOptimizationIsDefault(): boolean;
+    getStabilizersIsDefault(): boolean;
+    getAlterIsDefault(): boolean;
+    getPassengersIsDefault(): boolean;
     getEraText(): string;
     getIsFlammable(): boolean;
     getGearName(): string;
@@ -1285,6 +1291,54 @@ export class AircraftBridge {
     getUsedIsDefault(): boolean {
         this.ensureInitialized();
         return this.wasm!.getUsedIsDefault();
+    }
+
+    /**
+     * Check if control surfaces are at default configuration
+     */
+    getControlSurfacesIsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getControlSurfacesIsDefault();
+    }
+
+    /**
+     * Check if landing gear is at default configuration
+     */
+    getLandingGearIsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getLandingGearIsDefault();
+    }
+
+    /**
+     * Check if optimization is at default configuration
+     */
+    getOptimizationIsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getOptimizationIsDefault();
+    }
+
+    /**
+     * Check if stabilizers are at default configuration
+     */
+    getStabilizersIsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getStabilizersIsDefault();
+    }
+
+    /**
+     * Check if alter (custom parts) are at default configuration
+     */
+    getAlterIsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getAlterIsDefault();
+    }
+
+    /**
+     * Check if passengers are at default configuration
+     */
+    getPassengersIsDefault(): boolean {
+        this.ensureInitialized();
+        return this.wasm!.getPassengersIsDefault();
     }
 
     /**

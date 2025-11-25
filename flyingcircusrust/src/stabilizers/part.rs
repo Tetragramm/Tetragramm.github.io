@@ -14,10 +14,7 @@ impl Part for Stabilizers {
         let mut stats = Stats::new();
 
         // HSTAB (Horizontal Stabilizer)
-        if self.hstab_count > 0
-            && self.hstab_sel >= 0
-            && (self.hstab_sel as usize) < self.hstab_list.len()
-        {
+        if self.hstab_count > 0 && (self.hstab_sel as usize) < self.hstab_list.len() {
             let hstab = &self.hstab_list[self.hstab_sel];
             stats = stats.add(&hstab.stats);
 
@@ -41,22 +38,18 @@ impl Part for Stabilizers {
         }
 
         // VSTAB (Vertical Stabilizer)
-        if self.vstab_count > 0
-            && self.vstab_sel >= 0
-            && (self.vstab_sel as usize) < self.vstab_list.len()
-        {
+        if self.vstab_count > 0 && (self.vstab_sel as usize) < self.vstab_list.len() {
             let vstab = &self.vstab_list[self.vstab_sel];
             stats = stats.add(&vstab.stats);
 
             let drag = if self.is_heli {
                 let calculated_drag =
                     (self.wing_drag / 16.0 * vstab.dragfactor + 1.0e-6).floor() as i16;
-                let min_drag =
-                    if self.hstab_sel < self.hstab_list.len() {
-                        (1.0 * self.hstab_list[self.hstab_sel].dragfactor).ceil() as i16
-                    } else {
-                        1
-                    };
+                let min_drag = if self.hstab_sel < self.hstab_list.len() {
+                    (1.0 * self.hstab_list[self.hstab_sel].dragfactor).ceil() as i16
+                } else {
+                    1
+                };
                 calculated_drag.max(min_drag)
             } else {
                 let calculated_drag =
@@ -75,7 +68,7 @@ impl Part for Stabilizers {
         stats.drag += (2 * ((self.hstab_count - 1).max(0) + (self.vstab_count - 1).max(0))) as f32;
 
         // Pairs of stabilizers (control bonus)
-        if self.vstab_sel >= 0 && self.vstab_list[self.vstab_sel].increment != 0 {
+        if self.vstab_list[self.vstab_sel].increment != 0 {
             let mut leftovers = (self.hstab_count - 1).max(0);
             let es_pairs = (self.engine_count - 1).min(self.vstab_count - 1);
             leftovers += (self.vstab_count - 1 - es_pairs).max(0);

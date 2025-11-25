@@ -8,6 +8,7 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
+import { AIRCRAFT_TYPE } from './aircraft_type_ui';
 import {
     createRulesLink,
     createFlexSection,
@@ -66,6 +67,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getControlSurfacesBindings();
+        const aircraftType = bridge.getAircraftType();
 
         // Create main table with 3 columns: Control Surfaces | Drag Inducers | Stats
         const mainTable = document.createElement('table');
@@ -106,7 +108,8 @@ export class ControlSurfacesUI extends BaseComponentUI {
         const flapCost = bridge.getControlSurfacesFlapCost(Math.round(derivedStats.dry_mp));
         stats.cost += flapCost;
         const statsTables = createStatsTable(stats, CONTROLS_STATS);
-        dataRow.appendChild(statsTables);
+        statsCell.appendChild(statsTables);
+        dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
 
@@ -133,6 +136,9 @@ export class ControlSurfacesUI extends BaseComponentUI {
         );
 
         this.container.appendChild(this.sectionElement);
+
+        // Set initial visibility based on aircraft type
+        this.updateVisibility(aircraftType);
 
         console.log('[ControlSurfacesUI] Full rebuild complete');
     }
@@ -236,6 +242,10 @@ export class ControlSurfacesUI extends BaseComponentUI {
         if (!bridge || !this.cache) return;
 
         const bindings = bridge.getControlSurfacesBindings();
+        const aircraftType = bridge.getAircraftType();
+
+        // Update visibility first
+        this.updateVisibility(aircraftType);
 
         // Update control surface selects
         updateSelectElement(this.cache.aileronSelect, bindings.aileron_sel);
@@ -260,5 +270,28 @@ export class ControlSurfacesUI extends BaseComponentUI {
         const flapCost = bridge.getControlSurfacesFlapCost(Math.round(derivedStats.dry_mp));
         stats.cost += flapCost;
         updateStatsTable(this.cache.statsTables, stats, CONTROLS_STATS);
+    }
+
+    /**
+     * Update visibility based on aircraft type
+     */
+    private updateVisibility(aircraftType: number): void {
+        const typeNum = Number(aircraftType);
+        const showControlSurfaces = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+
+        if (this.sectionElement) {
+            this.sectionElement.style.display = showControlSurfaces ? '' : 'none';
+        }
+    }
+
+    /**
+     * Apply initial collapse state based on whether control surfaces are at default
+     */
+    applyInitialCollapseState(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const isDefault = bridge.getControlSurfacesIsDefault();
+        this.setCollapsed(isDefault);
     }
 }

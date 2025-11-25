@@ -258,4 +258,15 @@ export class UsedUI extends BaseComponentUI {
             this.sluggishInput.disabled = !bindings.sluggish.enabled;
         }
     }
+
+    /**
+     * Apply initial collapse state based on whether used modifiers are at default
+     */
+    applyInitialCollapseState(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const isDefault = bridge.getUsedIsDefault();
+        this.setCollapsed(isDefault);
+    }
 }

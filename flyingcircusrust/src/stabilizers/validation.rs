@@ -8,15 +8,9 @@ impl Stabilizers {
         }
 
         let hvalid = self.get_h_valid_list();
-        if self.hstab_sel >= 0
-            && (self.hstab_sel as usize) < hvalid.len()
-            && !hvalid[self.hstab_sel]
-        {
+        if (self.hstab_sel as usize) < hvalid.len() && !hvalid[self.hstab_sel] {
             self.hstab_sel = 0;
-            if self.hstab_sel >= 0
-                && (self.hstab_sel as usize) < hvalid.len()
-                && !hvalid[self.hstab_sel]
-            {
+            if (self.hstab_sel as usize) < hvalid.len() && !hvalid[self.hstab_sel] {
                 self.hstab_sel = 0;
                 self.hstab_count = 0;
             }
@@ -30,15 +24,9 @@ impl Stabilizers {
         }
 
         let vvalid = self.get_v_valid_list();
-        if self.vstab_sel >= 0
-            && (self.vstab_sel as usize) < vvalid.len()
-            && !vvalid[self.vstab_sel]
-        {
+        if (self.vstab_sel as usize) < vvalid.len() && !vvalid[self.vstab_sel] {
             self.vstab_sel = 0;
-            if self.vstab_sel >= 0
-                && (self.vstab_sel as usize) < vvalid.len()
-                && !vvalid[self.vstab_sel]
-            {
+            if (self.vstab_sel as usize) < vvalid.len() && !vvalid[self.vstab_sel] {
                 self.vstab_sel = 0;
                 self.vstab_count = 0;
             }

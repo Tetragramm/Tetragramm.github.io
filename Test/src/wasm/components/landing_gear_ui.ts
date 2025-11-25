@@ -294,4 +294,15 @@ export class LandingGearUI extends BaseComponentUI {
         const stats = bridge.getLandingGearStats();
         updateStatsTable(this.cache.statsTable, stats, GEAR_STATS);
     }
+
+    /**
+     * Apply initial collapse state based on whether landing gear is at default
+     */
+    applyInitialCollapseState(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const isDefault = bridge.getLandingGearIsDefault();
+        this.setCollapsed(isDefault);
+    }
 }

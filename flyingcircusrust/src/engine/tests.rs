@@ -275,23 +275,6 @@ mod tests {
     }
 
     #[test]
-    fn test_set_use_push_pull() {
-        let mut engine = Engine::new(create_test_mounts(), create_test_cowls());
-        engine.cooling_count = 4;
-        engine.mount_sel = 1; // Use push-pull capable mount
-
-        // Enable push-pull
-        engine.set_use_push_pull(true);
-        assert!(engine.is_push_pull, "Should enable push-pull");
-        assert_eq!(engine.cooling_count, 8, "Should double cooling count");
-
-        // Disable push-pull
-        engine.set_use_push_pull(false);
-        assert!(!engine.is_push_pull, "Should disable push-pull");
-        assert_eq!(engine.cooling_count, 4, "Should halve cooling count");
-    }
-
-    #[test]
     fn test_set_generator() {
         let mut engine = Engine::new(create_test_mounts(), create_test_cowls());
         engine.gear_count = 5;

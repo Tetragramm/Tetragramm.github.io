@@ -124,4 +124,41 @@ export abstract class BaseComponentUI {
         }
         return bridge;
     }
+
+    /**
+     * Set the collapse state of the section
+     * Protected helper method for subclasses to use in applyInitialCollapseState
+     * @param collapsed - true to collapse, false to expand
+     */
+    protected setCollapsed(collapsed: boolean): void {
+        if (!this.sectionElement) {
+            return;
+        }
+
+        const header = this.sectionElement.querySelector('h3.collapsible') as HTMLElement | null;
+        const content = this.sectionElement.querySelector('.content') as HTMLElement | null;
+
+        if (!header || !content) {
+            return;
+        }
+
+        if (collapsed) {
+            header.classList.remove('active');
+            content.style.maxHeight = '0px';
+        } else {
+            header.classList.add('active');
+            content.style.maxHeight = 'inherit';
+        }
+    }
+
+    /**
+     * Apply collapse state based on IsDefault status
+     * Called after aircraft is completely loaded/replaced (fromJSON, deserializeFromLZString)
+     * Subclasses should override to implement collapse behavior based on their IsDefault status
+     * Use setCollapsed() to toggle the section
+     */
+    applyInitialCollapseState(): void {
+        // Default implementation does nothing
+        // Subclasses that have collapsible sections should override this
+    }
 }

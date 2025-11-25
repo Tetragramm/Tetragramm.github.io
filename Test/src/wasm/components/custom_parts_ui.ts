@@ -416,4 +416,15 @@ export class CustomPartsUI extends BaseComponentUI {
         // Update the dropdown
         this.updatePartSelect(bridge);
     }
+
+    /**
+     * Apply initial collapse state based on whether alter/custom parts are at default
+     */
+    applyInitialCollapseState(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const isDefault = bridge.getAlterIsDefault();
+        this.setCollapsed(isDefault);
+    }
 }

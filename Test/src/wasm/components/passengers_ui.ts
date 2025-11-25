@@ -194,4 +194,15 @@ export class PassengersUI extends BaseComponentUI {
         const stats = bridge.getPassengersStats();
         updateStatsTable(this.cache.statsTable, stats, PASSENGERS_STATS);
     }
+
+    /**
+     * Apply initial collapse state based on whether passengers are at default
+     */
+    applyInitialCollapseState(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const isDefault = bridge.getPassengersIsDefault();
+        this.setCollapsed(isDefault);
+    }
 }

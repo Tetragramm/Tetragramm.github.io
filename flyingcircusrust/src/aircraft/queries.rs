@@ -10,6 +10,43 @@ impl Aircraft {
         self.used.is_default()
     }
 
+    /// Check if control surfaces are at default configuration
+    /// TypeScript: GetControlSurfaces().IsDefault()
+    pub fn get_control_surfaces_is_default(&self) -> bool {
+        self.controlsurfaces.is_default()
+    }
+
+    /// Check if landing gear is at default configuration
+    /// TypeScript: GetLandingGear().IsDefault()
+    pub fn get_landing_gear_is_default(&self) -> bool {
+        self.gear.is_default()
+    }
+
+    /// Check if optimization is at default configuration
+    /// TypeScript: GetOptimization().IsDefault()
+    pub fn get_optimization_is_default(&self) -> bool {
+        self.optimization.is_default()
+    }
+
+    /// Check if stabilizers are at default configuration
+    /// TypeScript: GetStabilizers().IsDefault()
+    pub fn get_stabilizers_is_default(&self) -> bool {
+        self.stabilizers.is_default()
+    }
+
+    /// Check if alter (custom parts) are at default configuration
+    /// TypeScript: GetAlter().IsDefault()
+    pub fn get_alter_is_default(&self) -> bool {
+        self.alter.is_default()
+    }
+
+    /// Check if passengers are at default configuration
+    /// TypeScript: GetPassengers() methods at default
+    pub fn get_passengers_is_default(&self) -> bool {
+        // Passengers are default if cockpits count is 1 and no additional passengers
+        self.passengers.is_default()
+    }
+
     /// Get the name of the currently selected era
     /// TypeScript: GetEra().GetSelectedText()
     pub fn get_era_text(&self) -> String {

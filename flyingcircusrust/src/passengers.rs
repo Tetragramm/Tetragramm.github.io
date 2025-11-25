@@ -50,6 +50,10 @@ impl Passengers {
     pub fn get_beds(&self) -> i16 {
         self.beds
     }
+
+    pub fn is_default(&self) -> bool {
+        self.seats == 0 && self.beds == 0
+    }
 }
 
 impl Part for Passengers {

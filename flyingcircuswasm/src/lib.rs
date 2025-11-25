@@ -1,6 +1,8 @@
 use flyingcircusrust::aircraft::Aircraft;
 use flyingcircusrust::part::Part;
+use flyingcircusrust::pulsejet_builder::VALVE_TABLE;
 use flyingcircusrust::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
+use flyingcircusrust::turbo_builder::{ERA_TABLE, TYPE_TABLE};
 use flyingcircusrust::{translate, UIBindings};
 use serde::Serialize;
 use wasm_bindgen::prelude::*;
@@ -885,17 +887,7 @@ pub fn calculate_engine_stats(engine_data: JsValue) -> Result<JsValue, JsValue> 
 /// Get propeller engine era names
 #[wasm_bindgen(js_name = getTurbineEras)]
 pub fn get_turbine_eras() -> JsValue {
-    let eras = vec![
-        "Gen 1 1945-1955",
-        "Gen 1.5 1955-1965",
-        "Gen 2 1965-1975",
-        "Gen 2.5 1975-1985",
-        "Gen 3 1985-1995",
-        "Gen 3.5 1995-2005",
-        "Gen 4 2005-2015",
-        "Gen 4.5 2015-2025",
-        "Himmilgard",
-    ];
+    let eras: Vec<String> = ERA_TABLE.iter().map(|e| e.name.to_string()).collect();
     serde_wasm_bindgen::to_value(&eras).unwrap()
 }
 
@@ -955,9 +947,9 @@ pub fn get_propeller_upgrades() -> JsValue {
 /// Get pulsejet valve type names
 #[wasm_bindgen(js_name = getPulsejetValveTypes)]
 pub fn get_pulsejet_valve_types() -> JsValue {
-    let types: Vec<String> = vec!["Valved", "Valveless"]
+    let types: Vec<String> = VALVE_TABLE
         .iter()
-        .map(|s| translate(s))
+        .map(|s| translate(s.name)
         .collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
@@ -965,10 +957,7 @@ pub fn get_pulsejet_valve_types() -> JsValue {
 /// Get turbine type names
 #[wasm_bindgen(js_name = getTurbineTypes)]
 pub fn get_turbine_types() -> JsValue {
-    let types: Vec<String> = vec!["Turbojet", "Turbofan", "Propfan", "Turboprop"]
-        .iter()
-        .map(|s| translate(s))
-        .collect();
+    let types: Vec<String> = TYPE_TABLE.iter().map(|s| translate(s.name)).collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
@@ -1091,6 +1080,42 @@ impl AircraftWasm {
     #[wasm_bindgen(js_name = getUsedIsDefault)]
     pub fn get_used_is_default(&self) -> bool {
         self.inner.get_used_is_default()
+    }
+
+    /// Check if control surfaces are at default configuration
+    #[wasm_bindgen(js_name = getControlSurfacesIsDefault)]
+    pub fn get_control_surfaces_is_default(&self) -> bool {
+        self.inner.get_control_surfaces_is_default()
+    }
+
+    /// Check if landing gear is at default configuration
+    #[wasm_bindgen(js_name = getLandingGearIsDefault)]
+    pub fn get_landing_gear_is_default(&self) -> bool {
+        self.inner.get_landing_gear_is_default()
+    }
+
+    /// Check if optimization is at default configuration
+    #[wasm_bindgen(js_name = getOptimizationIsDefault)]
+    pub fn get_optimization_is_default(&self) -> bool {
+        self.inner.get_optimization_is_default()
+    }
+
+    /// Check if stabilizers are at default configuration
+    #[wasm_bindgen(js_name = getStabilizersIsDefault)]
+    pub fn get_stabilizers_is_default(&self) -> bool {
+        self.inner.get_stabilizers_is_default()
+    }
+
+    /// Check if alter (custom parts) are at default configuration
+    #[wasm_bindgen(js_name = getAlterIsDefault)]
+    pub fn get_alter_is_default(&self) -> bool {
+        self.inner.get_alter_is_default()
+    }
+
+    /// Check if passengers are at default configuration
+    #[wasm_bindgen(js_name = getPassengersIsDefault)]
+    pub fn get_passengers_is_default(&self) -> bool {
+        self.inner.get_passengers_is_default()
     }
 
     /// Get the name of the currently selected era

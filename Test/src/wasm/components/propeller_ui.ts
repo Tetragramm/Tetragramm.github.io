@@ -8,6 +8,7 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
+import { AIRCRAFT_TYPE } from './aircraft_type_ui';
 import {
     createRulesLink,
     createSelectElement,
@@ -43,6 +44,7 @@ export class PropellerUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getPropellerBindings();
+        const aircraftType = bridge.getAircraftType();
 
         // Create content container (h4 with spans matching original HTML structure)
         const contentDiv = document.createElement('h4');
@@ -112,6 +114,9 @@ export class PropellerUI extends BaseComponentUI {
 
         this.container.appendChild(this.sectionElement);
 
+        // Set initial visibility based on aircraft type
+        this.updateVisibility(aircraftType);
+
         console.log('[PropellerUI] Full rebuild complete');
     }
 
@@ -123,6 +128,10 @@ export class PropellerUI extends BaseComponentUI {
         if (!bridge || !this.cache) return;
 
         const bindings = bridge.getPropellerBindings();
+        const aircraftType = bridge.getAircraftType();
+
+        // Update visibility first
+        this.updateVisibility(aircraftType);
 
         // Update pitch select
         if (this.cache.pitchSelect && bindings.idx_prop) {
@@ -132,6 +141,18 @@ export class PropellerUI extends BaseComponentUI {
         // Update upgrade select
         if (this.cache.upgradeSelect && bindings.idx_upg) {
             updateSelectElement(this.cache.upgradeSelect, bindings.idx_upg);
+        }
+    }
+
+    /**
+     * Update visibility based on aircraft type
+     */
+    private updateVisibility(aircraftType: number): void {
+        const typeNum = Number(aircraftType);
+        const showPropeller = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+
+        if (this.sectionElement) {
+            this.sectionElement.style.display = showPropeller ? '' : 'none';
         }
     }
 }

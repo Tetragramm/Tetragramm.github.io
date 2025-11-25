@@ -3,14 +3,14 @@ use crate::{
     stats::{rtz, Era, ERA},
 };
 
-struct TypeData {
-    name: &'static str,
+pub struct TypeData {
+    pub name: &'static str,
     efficiency: f32,
     mass_factor: f32,
     cost_factor: f32,
 }
 
-const TYPE_TABLE: [TypeData; 4] = [
+pub const TYPE_TABLE: [TypeData; 4] = [
     TypeData {
         name: "Turbojet",
         efficiency: 0.0,
@@ -37,14 +37,14 @@ const TYPE_TABLE: [TypeData; 4] = [
     },
 ];
 
-struct EraData {
-    name: &'static str,
+pub struct EraData {
+    pub name: &'static str,
     max_temp: f32,
     efficiency: f32,
     cost_factor: f32,
 }
 
-const ERA_TABLE: [EraData; 9] = [
+pub const ERA_TABLE: [EraData; 9] = [
     EraData {
         name: "Gen 1 1945-1955",
         max_temp: 1100.0,

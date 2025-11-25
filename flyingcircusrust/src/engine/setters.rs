@@ -174,6 +174,13 @@ impl Engine {
         }
     }
 
+    /// Set helicopter aircraft flag
+    /// This flag indicates the aircraft type is Helicopter, which affects mount selection validation
+    /// Mount adjustment is handled by verify_mount()
+    pub fn set_is_helicopter(&mut self, is_helicopter: bool) {
+        self.is_helicopter_aircraft = is_helicopter;
+    }
+
     /// Set tail modifiers - adjusts extended driveshaft based on tail configuration
     /// TypeScript: SetTailMods(forb: boolean, swr: boolean, canard: boolean)
     pub fn set_tail_mods(&mut self, farman_or_boom: bool, swept_v_outboard: bool, canard: bool) {

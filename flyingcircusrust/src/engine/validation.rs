@@ -1,24 +1,62 @@
 use super::Engine;
+use crate::engines::MountType;
 
 impl Engine {
-    pub fn verify_mount(&mut self) {
+    /// Check if the currently selected mount is valid for current engine configuration
+    pub fn is_mount_valid(&self, idx: usize) -> bool {
+        if idx >= self.mount_list.len() {
+            return false;
+        }
+
+        let mount = &self.mount_list[idx];
+
+        // Turbine (non-turboprop) engines require turbine mounts
         if self.get_is_turbine() && !self.get_is_turboprop() {
-            while self.mount_sel < self.mount_list.len() && !self.mount_list[self.mount_sel].turbine
-            {
-                self.mount_sel += 1;
+            return mount.turbine && (mount.helicopter == self.is_helicopter_aircraft);
+        }
+
+        // Pulsejet engines have specific mount requirements
+        if self.get_is_pulsejet() {
+            if self.is_helicopter_aircraft {
+                // Pulsejets on helicopters use "Not Allowed" mount (typically mount 17)
+                return idx == 17;
+            } else {
+                // Pulsejets on aircraft use mount 4 (fuselage)
+                return idx == 4;
             }
-        } else if self.get_is_pulsejet() {
-            self.mount_sel = 4;
-        } else if self.is_generator {
-            self.mount_sel = 0;
-        } else {
-            if self.mount_list[self.mount_sel].turbine {
-                if self.is_push_pull {
-                    self.mount_sel = 8;
-                } else {
-                    self.mount_sel = 0;
+        }
+
+        // Generators always use mount 0
+        if self.is_generator {
+            return idx == 0;
+        }
+
+        if idx == 8 {
+            return self.is_push_pull;
+        }
+
+        if self.is_push_pull {
+            return mount.pushpull;
+        }
+
+        // Normal propeller aircraft: non-turbine, non-helicopter mounts (0-7)
+        !mount.turbine && (mount.helicopter == self.is_helicopter_aircraft)
+    }
+
+    /// Verify and correct the mount selection if needed
+    /// If current mount is invalid, switches to first valid mount
+    pub fn verify_mount(&mut self) {
+        // Check if current mount is valid
+        if !self.is_mount_valid(self.mount_sel) {
+            // Find first valid mount
+            for idx in 0..self.mount_list.len() {
+                if self.is_mount_valid(idx) {
+                    self.mount_sel = idx;
+                    return;
                 }
             }
+            // Fallback to mount 0 if no valid mount found (shouldn't happen)
+            self.mount_sel = 0;
         }
     }
 

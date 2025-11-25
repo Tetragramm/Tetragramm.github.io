@@ -112,7 +112,12 @@ pub struct Accessories {
     pub(super) recon_sel: Vec<i16>,
 
     // Visibility equipment toggles
-    #[ui(check_list, source = "visi_list", set_fn = "set_visi_sel")]
+    #[ui(
+        check_list,
+        source = "visi_list",
+        set_fn = "set_visi_sel",
+        enabled_fn = "can_visi"
+    )]
     pub(super) visi_sel: Vec<bool>,
 
     // Climate control toggles

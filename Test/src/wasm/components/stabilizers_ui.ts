@@ -254,4 +254,15 @@ export class StabilizersUI extends BaseComponentUI {
         const stats = bridge.getStabilizersStats();
         updateStatsTable(this.cache.statsTable, stats, STABILIZER_STATS);
     }
+
+    /**
+     * Apply initial collapse state based on whether stabilizers are at default
+     */
+    applyInitialCollapseState(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const isDefault = bridge.getStabilizersIsDefault();
+        this.setCollapsed(isDefault);
+    }
 }
