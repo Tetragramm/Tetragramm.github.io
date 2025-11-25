@@ -48,27 +48,4 @@ impl Alter {
             part.qty = qty;
         }
     }
-
-    /// Update custom parts from a list, resetting quantities first
-    /// TypeScript: fromJSON behavior
-    pub(super) fn update_from_list(&mut self, parts: Vec<super::CustomPart>) {
-        // Reset all quantities
-        for p in &mut self.custom_parts {
-            p.qty = 0;
-        }
-
-        // Update from provided list
-        for incoming_part in parts {
-            let idx = self
-                .custom_parts
-                .iter()
-                .position(|p| p.name == incoming_part.name);
-            if let Some(idx) = idx {
-                self.custom_parts[idx].qty = incoming_part.qty;
-                self.custom_parts[idx].stats = incoming_part.stats;
-            } else {
-                self.custom_parts.push(incoming_part);
-            }
-        }
-    }
 }

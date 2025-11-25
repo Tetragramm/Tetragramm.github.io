@@ -1,5 +1,3 @@
-use crate::engines::MountType;
-
 use super::{Engine, TypedInputs};
 
 impl Engine {

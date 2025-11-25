@@ -1,6 +1,5 @@
 use super::*;
 use serde::{Deserialize, Serialize};
-use ui_core::*;
 
 /// UI options struct for Weapon
 #[derive(Serialize, Deserialize)]

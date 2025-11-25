@@ -1,5 +1,4 @@
 use super::Engine;
-use crate::engines::MountType;
 
 impl Engine {
     /// Check if the currently selected mount is valid for current engine configuration

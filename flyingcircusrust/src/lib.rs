@@ -5,7 +5,6 @@ extern crate std;
 #[macro_use]
 extern crate rust_i18n;
 // rust_i18n::i18n!("locales", fallback = "en", minify_key = true);
-use rust_i18n::Backend;
 use std::{borrow::Cow, sync};
 /// I18n backend instance
 ///
@@ -4633,7 +4632,7 @@ mod cargo;
 mod cockpit;
 mod cockpits;
 mod control_surfaces;
-mod electric_builder;
+pub mod electric_builder;
 pub mod engine;
 pub mod engine_list;
 mod engines;
@@ -4648,7 +4647,7 @@ pub mod part;
 mod part_list;
 mod passengers;
 mod propeller;
-mod propeller_builder;
+pub mod propeller_builder;
 pub mod pulsejet_builder;
 mod radiator;
 mod reinforcements;

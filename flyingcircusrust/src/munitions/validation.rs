@@ -16,27 +16,22 @@ impl Munitions {
             .get_internal_bomb_count()
             .min((3.0 * self.acft_struct * self.maxbomb) as i16);
 
-        let mut ib = 0; // internal bombs
-        let mut ir = 0; // internal rockets
-        let mut eb; // external bombs
-        let mut er; // external rockets
-
         // Fit bombs internally first
-        if self.bomb_count > allowed_internal {
-            ib = allowed_internal;
+        let ib = if self.bomb_count > allowed_internal {
+            allowed_internal
         } else {
-            ib = self.bomb_count;
-        }
+            self.bomb_count
+        };
 
         // Fit rockets internally
-        if self.rocket_count + ib > allowed_internal {
-            ir = allowed_internal - ib;
+        let ir = if self.rocket_count + ib > allowed_internal {
+            allowed_internal - ib
         } else {
-            ir = self.rocket_count;
-        }
+            self.rocket_count
+        };
 
-        eb = self.bomb_count - ib;
-        er = self.rocket_count - ir;
+        let mut eb = self.bomb_count - ib;
+        let mut er = self.rocket_count - ir;
 
         // Calculate external capacity
         let allowed_external =

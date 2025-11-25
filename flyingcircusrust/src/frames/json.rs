@@ -4,7 +4,7 @@ use crate::serialization::JSSerializable;
 use serde_json::Map;
 
 impl JSSerializable for Section {
-    fn from_json(&mut self, js: &serde_json::Value, json_version: f32) {
+    fn from_json(&mut self, js: &serde_json::Value, _: f32) {
         self.frame = jsnum(js, "frame") as usize;
         self.geodesic = jsbool(js, "geodesic");
         self.monocoque = jsbool(js, "monocoque");

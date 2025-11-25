@@ -419,7 +419,7 @@ impl Wings {
         }
 
         // Build updated wing
-        let mut updated_wing = WingType {
+        let updated_wing = WingType {
             surface: options.skin.selected,
             area: options.area.value,
             span: options.span.value,

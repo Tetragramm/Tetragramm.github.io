@@ -339,6 +339,15 @@ export class PropellerBuilderUI {
             upgrades
         );
 
+        // compressorCount limiting
+        if (this.compressorTypeSelect.selectedIndex == 0) {
+            this.compressorCountInput.valueAsNumber = 0;
+        } else if (this.compressorTypeSelect.selectedIndex == 1) {
+            this.compressorCountInput.valueAsNumber = 1;
+        } else if (this.compressorTypeSelect.selectedIndex > 1) {
+            this.compressorCountInput.valueAsNumber = Math.max(1, Math.min(5, this.compressorCountInput.valueAsNumber));
+        }
+
         try {
             // Call WASM function to calculate stats
             const statsJs = wasm.calculateEngineStats(engineInputs);

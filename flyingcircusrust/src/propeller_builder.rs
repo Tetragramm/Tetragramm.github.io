@@ -24,7 +24,6 @@ impl From<i16> for CompressorType {
 }
 
 struct EraData {
-    name: &'static str,
     materials: f32,
     cost: f32,
     max_rpm: f32,
@@ -34,7 +33,6 @@ struct EraData {
 
 const ERA_TABLE: [EraData; 6] = [
     EraData {
-        name: "Pioneer",
         materials: 3.0,
         cost: 0.5,
         max_rpm: 30.0,
@@ -42,7 +40,6 @@ const ERA_TABLE: [EraData; 6] = [
         fuel_factor: 10.0,
     },
     EraData {
-        name: "WWI",
         materials: 2.0,
         cost: 1.0,
         max_rpm: 35.0,
@@ -50,7 +47,6 @@ const ERA_TABLE: [EraData; 6] = [
         fuel_factor: 8.0,
     },
     EraData {
-        name: "Roaring 20s",
         materials: 1.5,
         cost: 2.0,
         max_rpm: 40.0,
@@ -58,7 +54,6 @@ const ERA_TABLE: [EraData; 6] = [
         fuel_factor: 6.0,
     },
     EraData {
-        name: "Coming Storm",
         materials: 1.35,
         cost: 2.25,
         max_rpm: 45.0,
@@ -66,7 +61,6 @@ const ERA_TABLE: [EraData; 6] = [
         fuel_factor: 5.0,
     },
     EraData {
-        name: "WWII",
         materials: 1.25,
         cost: 2.5,
         max_rpm: 50.0,
@@ -74,7 +68,6 @@ const ERA_TABLE: [EraData; 6] = [
         fuel_factor: 4.0,
     },
     EraData {
-        name: "Last Hurrah",
         materials: 1.0,
         cost: 3.0,
         max_rpm: 50.0,
@@ -83,21 +76,19 @@ const ERA_TABLE: [EraData; 6] = [
     },
 ];
 
-struct CoolingData {
-    name: &'static str,
+pub struct CoolingData {
+    pub name: &'static str,
     force_factor: f32,
     rpm_off: f32,
-    thrust_factor: f32,
     radiator: f32,
     mass_factor: f32,
 }
 
-const COOLING_TABLE: [CoolingData; 6] = [
+pub const COOLING_TABLE: [CoolingData; 6] = [
     CoolingData {
         name: "Liquid Cooled",
         force_factor: 1.2,
         rpm_off: 0.0,
-        thrust_factor: 1.0,
         radiator: 1.0,
         mass_factor: 1.0,
     },
@@ -105,7 +96,6 @@ const COOLING_TABLE: [CoolingData; 6] = [
         name: "Air Cooled",
         force_factor: 1.0,
         rpm_off: 0.0,
-        thrust_factor: 1.0,
         radiator: 0.0,
         mass_factor: 1.0,
     },
@@ -113,7 +103,6 @@ const COOLING_TABLE: [CoolingData; 6] = [
         name: "Rotary",
         force_factor: 1.0,
         rpm_off: 8.0,
-        thrust_factor: 1.5,
         radiator: 0.0,
         mass_factor: 1.0,
     },
@@ -121,7 +110,6 @@ const COOLING_TABLE: [CoolingData; 6] = [
         name: "Contrarotary",
         force_factor: 1.0,
         rpm_off: 8.0,
-        thrust_factor: 1.25,
         radiator: 0.0,
         mass_factor: 1.0,
     },
@@ -129,7 +117,6 @@ const COOLING_TABLE: [CoolingData; 6] = [
         name: "Semi-Radial",
         force_factor: 0.8,
         rpm_off: 0.0,
-        thrust_factor: 1.0,
         radiator: 0.0,
         mass_factor: 1.0,
     },
@@ -137,24 +124,22 @@ const COOLING_TABLE: [CoolingData; 6] = [
         name: "Liquid Radial",
         force_factor: 1.0,
         rpm_off: 0.0,
-        thrust_factor: 1.0,
         radiator: 2.5,
         mass_factor: 1.3,
     },
 ];
 
-struct UpgradeData {
-    name: &'static str,
+pub struct UpgradeData {
+    pub name: &'static str,
     power_factor: f32,
     fuel_factor: f32,
     mass_factor: f32,
     drag_factor: f32,
     ideal_alt: i16,
     cost_factor: f32,
-    req_section: bool,
 }
 
-const UPGRADES: [UpgradeData; 4] = [
+pub const UPGRADES: [UpgradeData; 4] = [
     UpgradeData {
         name: "Asperator Boost",
         power_factor: 0.11,
@@ -163,7 +148,6 @@ const UPGRADES: [UpgradeData; 4] = [
         drag_factor: 0.0,
         ideal_alt: -1,
         cost_factor: 3.0,
-        req_section: false,
     },
     UpgradeData {
         name: "War Emergency Power",
@@ -173,7 +157,6 @@ const UPGRADES: [UpgradeData; 4] = [
         drag_factor: 0.0,
         ideal_alt: 0,
         cost_factor: 5.0,
-        req_section: false,
     },
     UpgradeData {
         name: "Fuel Injector",
@@ -183,7 +166,6 @@ const UPGRADES: [UpgradeData; 4] = [
         drag_factor: 0.0,
         ideal_alt: 0,
         cost_factor: 2.0,
-        req_section: false,
     },
     UpgradeData {
         name: "Diesel",
@@ -193,7 +175,6 @@ const UPGRADES: [UpgradeData; 4] = [
         drag_factor: 0.0,
         ideal_alt: 0,
         cost_factor: 0.0,
-        req_section: false,
     },
 ];
 

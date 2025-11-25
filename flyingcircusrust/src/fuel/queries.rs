@@ -56,16 +56,6 @@ impl Fuel {
         self.fire_extinguisher
     }
 
-    /// Count internal tanks (used for self-sealing calculations)
-    pub(super) fn count_internal_tanks(&self) -> i16 {
-        self.tank_list
-            .iter()
-            .zip(&self.tank_count)
-            .filter(|(tank, _)| tank.internal)
-            .map(|(_, count)| count)
-            .sum()
-    }
-
     /// Count cantilever tanks
     pub(super) fn count_cantilever_tanks(&self) -> i16 {
         self.tank_list

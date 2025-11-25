@@ -189,8 +189,7 @@ impl Frames {
         let frame_list = self.get_frame_list();
         let frame_options: Vec<SelectOpt> = frame_list
             .iter()
-            .enumerate()
-            .map(|(i, f)| {
+            .map(|f| {
                 let mut enabled = true;
                 // Disable if geodesic is checked but frame doesn't support it
                 if sec.geodesic && !f.geodesic {
@@ -260,8 +259,7 @@ impl Frames {
         let frame_list = self.get_frame_list();
         let frame_options: Vec<SelectOpt> = frame_list
             .iter()
-            .enumerate()
-            .map(|(i, f)| {
+            .map(|f| {
                 let mut enabled = true;
                 // Disable if geodesic is checked but frame doesn't support it
                 if sec.geodesic && !f.geodesic {

@@ -1,5 +1,3 @@
-use std::net::ToSocketAddrs;
-
 use super::*;
 use crate::part::Part;
 

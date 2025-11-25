@@ -4,7 +4,6 @@ use crate::{
 };
 
 struct EraData {
-    name: &'static str,
     draw: i16,
     draw_factor: f32,
     mass_factor: f32,
@@ -15,7 +14,6 @@ struct EraData {
 
 const ERA_TABLE: [EraData; 6] = [
     EraData {
-        name: "Pioneer",
         draw: 3,
         draw_factor: 2.0 / 5.0,
         mass_factor: 2.0 / 5.0,
@@ -24,7 +22,6 @@ const ERA_TABLE: [EraData; 6] = [
         overspeed: 20,
     },
     EraData {
-        name: "WWI",
         draw: 1,
         draw_factor: 2.0 / 5.0,
         mass_factor: 1.0 / 3.0,
@@ -33,7 +30,6 @@ const ERA_TABLE: [EraData; 6] = [
         overspeed: 25,
     },
     EraData {
-        name: "Roaring 20s",
         draw: 1,
         draw_factor: 2.0 / 7.0,
         mass_factor: 2.0 / 7.0,
@@ -42,7 +38,6 @@ const ERA_TABLE: [EraData; 6] = [
         overspeed: 30,
     },
     EraData {
-        name: "Coming Storm",
         draw: 0,
         draw_factor: 2.0 / 7.0,
         mass_factor: 1.0 / 4.0,
@@ -51,7 +46,6 @@ const ERA_TABLE: [EraData; 6] = [
         overspeed: 35,
     },
     EraData {
-        name: "WWII",
         draw: 0,
         draw_factor: 1.0 / 4.0,
         mass_factor: 1.0 / 5.0,
@@ -60,7 +54,6 @@ const ERA_TABLE: [EraData; 6] = [
         overspeed: 40,
     },
     EraData {
-        name: "Last Hurrah",
         draw: 0,
         draw_factor: 1.0 / 5.0,
         mass_factor: 1.0 / 6.0,
@@ -70,8 +63,8 @@ const ERA_TABLE: [EraData; 6] = [
     },
 ];
 
-struct WindingData {
-    name: &'static str,
+pub struct WindingData {
+    pub name: &'static str,
     draw_mod: f32,
     mass: i16,
     drag: i16,
@@ -79,7 +72,7 @@ struct WindingData {
     reliability: i16,
 }
 
-const WINDING_TABLE: [WindingData; 7] = [
+pub const WINDING_TABLE: [WindingData; 7] = [
     WindingData {
         name: "Aluminum",
         draw_mod: 1.1,

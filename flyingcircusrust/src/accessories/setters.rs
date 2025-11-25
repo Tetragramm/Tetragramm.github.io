@@ -113,7 +113,6 @@ impl Accessories {
 
     /// Set vital parts value and revalidate coverage
     pub fn set_vital_parts(&mut self, value: i16) {
-        let old_vp = self.vital_parts;
         self.vital_parts = value;
         self.normalize_coverage();
     }

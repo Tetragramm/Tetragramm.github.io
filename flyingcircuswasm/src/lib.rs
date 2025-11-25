@@ -1,5 +1,7 @@
 use flyingcircusrust::aircraft::Aircraft;
+use flyingcircusrust::electric_builder::WINDING_TABLE;
 use flyingcircusrust::part::Part;
+use flyingcircusrust::propeller_builder::{COOLING_TABLE, UPGRADES};
 use flyingcircusrust::pulsejet_builder::VALVE_TABLE;
 use flyingcircusrust::serialization::{Deserializer, JSSerializable, Serializable, Serializer};
 use flyingcircusrust::turbo_builder::{ERA_TABLE, TYPE_TABLE};
@@ -893,34 +895,14 @@ pub fn get_turbine_eras() -> JsValue {
 
 #[wasm_bindgen(js_name = getPropellerEras)]
 pub fn get_propeller_eras() -> JsValue {
-    let eras: Vec<String> = vec![
-        "Pioneer",
-        "WWI",
-        "Roaring 20s",
-        "Coming Storm",
-        "WWII",
-        "Last Hurrah",
-    ]
-    .iter()
-    .map(|s| translate(s))
-    .collect();
+    let eras: Vec<String> = ERA_TABLE.iter().map(|s| translate(s.name)).collect();
     serde_wasm_bindgen::to_value(&eras).unwrap()
 }
 
 /// Get propeller cooling type names
 #[wasm_bindgen(js_name = getPropellerCoolingTypes)]
 pub fn get_propeller_cooling_types() -> JsValue {
-    let types: Vec<String> = vec![
-        "Liquid Cooled",
-        "Air Cooled",
-        "Rotary Dry",
-        "Rotary Castor",
-        "Radial",
-        "Diesel",
-    ]
-    .iter()
-    .map(|s| translate(s))
-    .collect();
+    let types: Vec<String> = COOLING_TABLE.iter().map(|s| translate(s.name)).collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
@@ -937,20 +919,14 @@ pub fn get_propeller_compressor_types() -> JsValue {
 /// Get propeller upgrade names
 #[wasm_bindgen(js_name = getPropellerUpgrades)]
 pub fn get_propeller_upgrades() -> JsValue {
-    let upgrades: Vec<String> = vec!["War Emergency Power", "Fuel Injection", "Diesel"]
-        .iter()
-        .map(|s| translate(s))
-        .collect();
+    let upgrades: Vec<String> = UPGRADES[1..].iter().map(|s| translate(s.name)).collect();
     serde_wasm_bindgen::to_value(&upgrades).unwrap()
 }
 
 /// Get pulsejet valve type names
 #[wasm_bindgen(js_name = getPulsejetValveTypes)]
 pub fn get_pulsejet_valve_types() -> JsValue {
-    let types: Vec<String> = VALVE_TABLE
-        .iter()
-        .map(|s| translate(s.name)
-        .collect();
+    let types: Vec<String> = VALVE_TABLE.iter().map(|s| translate(s.name)).collect();
     serde_wasm_bindgen::to_value(&types).unwrap()
 }
 
@@ -964,18 +940,7 @@ pub fn get_turbine_types() -> JsValue {
 /// Get electric motor winding names
 #[wasm_bindgen(js_name = getElectricWindings)]
 pub fn get_electric_windings() -> JsValue {
-    let windings: Vec<String> = vec![
-        "Aluminum",
-        "Copper",
-        "Silver",
-        "Electrum",
-        "Platinum",
-        "Screamer Sinew",
-        "Lightning Sprite Ephemera",
-    ]
-    .iter()
-    .map(|s| translate(s))
-    .collect();
+    let windings: Vec<String> = WINDING_TABLE.iter().map(|s| translate(s.name)).collect();
     serde_wasm_bindgen::to_value(&windings).unwrap()
 }
 

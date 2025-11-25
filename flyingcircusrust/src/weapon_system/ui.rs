@@ -24,8 +24,7 @@ impl UIBindings for WeaponSystem {
         let weapon_options: Vec<SelectOpt> = self
             .weapon_list
             .iter()
-            .enumerate()
-            .map(|(i, wt)| SelectOpt {
+            .map(|wt| SelectOpt {
                 name: format!("{} ({})", t!(wt.name.as_str()), t!(wt.era.as_str())),
                 enabled: true,
             })

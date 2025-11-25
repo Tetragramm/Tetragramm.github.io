@@ -4,7 +4,6 @@ use crate::{
     engine::Engine,
     propeller::{DriveType, EngineInfo},
     radiator::{Radiator, RadiatorCoolantEntry, RadiatorEntry, RadiatorMountEntry},
-    serialization::Serializable,
     stats::Stats,
     types::AircraftType,
 };

@@ -206,6 +206,40 @@ impl<'de> Deserialize<'de> for EngineInputs {
             let typed_inputs: TypedInputs = serde_json::from_value(inputs)
                 .map_err(|e| D::Error::custom(format!("failed to deserialize inputs: {}", e)))?;
 
+            //Upgrades from 3 to 4 elements, because legacy.
+            let typed_inputs = match typed_inputs {
+                TypedInputs::Propeller {
+                    displacement,
+                    compression,
+                    cyl_per_row,
+                    rows,
+                    rpm_boost,
+                    material_fudge,
+                    quality_fudge,
+                    compressor_type,
+                    compressor_count,
+                    min_ideal_alt,
+                    upgrades,
+                } => {
+                    let mut upg = vec![false];
+                    upg.extend(upgrades);
+                    TypedInputs::Propeller {
+                        displacement,
+                        compression,
+                        cyl_per_row,
+                        rows,
+                        rpm_boost,
+                        material_fudge,
+                        quality_fudge,
+                        compressor_type,
+                        compressor_count,
+                        min_ideal_alt,
+                        upgrades: upg,
+                    }
+                }
+                _ => typed_inputs,
+            };
+
             (etype, typed_inputs)
         } else {
             // Old flat format
@@ -219,6 +253,12 @@ impl<'de> Deserialize<'de> for EngineInputs {
             // Based on etype, construct the appropriate TypedInputs variant
             let typed_inputs = match etype {
                 0 => {
+                    let upgrades = value
+                        .get("upgrades")
+                        .and_then(|v| serde_json::from_value(v.clone()).ok())
+                        .unwrap_or_else(|| vec![false; 3]);
+                    let mut upg = vec![false];
+                    upg.extend(upgrades);
                     // Propeller
                     TypedInputs::Propeller {
                         displacement: value
@@ -260,10 +300,7 @@ impl<'de> Deserialize<'de> for EngineInputs {
                             .or_else(|| value.get("min_ideal_alt"))
                             .and_then(|v| v.as_i64())
                             .unwrap_or(0) as i16,
-                        upgrades: value
-                            .get("upgrades")
-                            .and_then(|v| serde_json::from_value(v.clone()).ok())
-                            .unwrap_or_else(|| vec![false; 3]),
+                        upgrades: upg,
                     }
                 }
                 1 => {

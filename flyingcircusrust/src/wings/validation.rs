@@ -40,7 +40,6 @@ impl Wings {
 
         // Verify no mini/full wing conflicts
         let full_decks = self.deck_count_full();
-        let mini_decks = self.deck_count_mini();
 
         for i in (0..self.mini_wing_list.len()).rev() {
             let deck = self.mini_wing_list[i].deck;

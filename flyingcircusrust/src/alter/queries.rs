@@ -18,11 +18,6 @@ impl Alter {
         &self.custom_parts
     }
 
-    /// Get mutable reference to custom parts
-    pub(super) fn get_parts_mut(&mut self) -> &mut Vec<super::CustomPart> {
-        &mut self.custom_parts
-    }
-
     /// Check if custom parts list is empty
     pub fn is_empty(&self) -> bool {
         self.custom_parts.is_empty()

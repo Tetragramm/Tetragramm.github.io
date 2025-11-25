@@ -151,7 +151,6 @@ impl Wings {
         }
 
         // Temporarily remove wing and check if we can add at new deck
-        let wing = self.wing_list[idx];
         let mut temp_list = self.wing_list.clone();
         temp_list.remove(idx);
 
