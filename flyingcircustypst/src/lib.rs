@@ -2,7 +2,6 @@
 #[macro_use]
 extern crate std;
 use flyingcircusrust::{aircraft::Aircraft, serialization::*};
-use std::{panic, sync};
 use wasm_minimal_protocol::*;
 
 initiate_protocol!();

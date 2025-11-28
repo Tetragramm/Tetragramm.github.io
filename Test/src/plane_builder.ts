@@ -12,12 +12,12 @@ const init = async () => {
         console.error("[PlaneBuilder] WASM not available, Panic!", e);
     }
 
-    window.addEventListener("load", () => {
-        scrollToFragment();
-        setTimeout(() => { window.onscroll = debounce(SetScroll, 250); }, 1000);
-    });
 }
 window.addEventListener("DOMContentLoaded", init);
+window.addEventListener("load", () => {
+    scrollToFragment();
+    setTimeout(() => { window.onscroll = debounce(SetScroll, 250); }, 1000);
+});
 
 function debounce(callback, delay) {
     let timeout;
@@ -29,7 +29,23 @@ function debounce(callback, delay) {
 
 var hash = "";
 function SetScroll(ev) {
-    const IDs = ["Era", "Cockpit", "Passengers", "Engines", "Frames", "Tail", "Wings", "Rotors", "Stabilizers", "ControlSurfaces", "Reinforcements", "Weapons", "Load", "Landing_Gear", "Accessories", "Propeller", "Optimization", "Stats", "Flight"];
+    const IDs = ["Era",
+        "Cockpit",
+        "Passengers",
+        "Engines",
+        "Frames",
+        "Wings",
+        "Rotors",
+        "Stabilizers",
+        "ControlSurfaces",
+        "Reinforcements",
+        "Weapons", "Load",
+        "Landing_Gear",
+        "Accessories",
+        "Propeller",
+        "Optimization",
+        "Stats",
+        "Flight"];
     var newhash = "";
     var off = window.pageYOffset;
     for (let id of IDs) {
