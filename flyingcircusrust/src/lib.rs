@@ -172,6 +172,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Cockpit Section Title", "Cockpits"),
 				("Cockpit Upgrade", "Upgrade"),
 				("Coming Storm", "Heraufziehender Sturm"),
+                ("Compare Aircraft in Hangar", "Flugzeuge im Hangar vergleichen"),
 				("Connectivity", "Zugänglich"),
                 (
                     "Connectivity Warning",
@@ -745,6 +746,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Rotor Stagger", "Rotorstaffelung"),
 				("Rotor Stats", "Rotor-Werte"),
 				("Rotor Thickness", "Rotordicke"),
+                ("Rules", "Regeln"),
                 (
                     "Rumble Warning",
                     "Rumble erfordert eine minimale Struktur von Rumble*10, um fliegen zu können.",
@@ -1294,6 +1296,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Cockpit Section Title", "Cockpits"),
 				("Cockpit Upgrade", "Upgrade"),
 				("Coming Storm", "Coming Storm"),
+                ("Compare Aircraft in Hangar", "Compare Aircraft in Hangar"),
 				("Connectivity", "Connectivity"),
                 (
                     "Connectivity Warning",
@@ -1843,6 +1846,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Rotor Stagger", "Rotor Stagger"),
 				("Rotor Stats", "Rotor Stats"),
 				("Rotor Thickness", "Rotor Thickness"),
+                ("Rules", "Rules"),
                 (
                     "Rumble Warning",
                     "Rumble requires a minimum structure of Rumble*10 to fly.",
@@ -2382,6 +2386,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Cockpit Section Title", "Cabinas"),
 				("Cockpit Upgrade", "Mejora"),
                 ("Coming Storm", "La Tormenta Que Se Avecina"),
+                ("Compare Aircraft in Hangar", "Comparar Aeronaves en el Hangar"),
 				("Connectivity", "Conectividad"),
                 (
                     "Connectivity Warning",
@@ -2976,6 +2981,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Rotor Stagger", "Decalaje del Rotor"),
                 ("Rotor Stats", "Estadísticas del Rotor"),
 				("Rotor Thickness", "Grosor del Rotor"),
+                ("Rules", "Reglas"),
                 (
                     "Rumble Warning",
                     "El Rumble requiere una estructura mínima de Rumble*10 para volar.",
@@ -3532,6 +3538,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
                 ("Cockpit Safety Options", "Options de Sécurité"),
 				("Cockpit Section Title", "Cockpits"),
 				("Cockpit Upgrade", "Amélioration"),
+                ("Compare Aircraft in Hangar", "Comparer les Aéronefs dans le Hangar"),
 				("Coming Storm", "Tempête Imminente"),
 				("Connectivity", "Connectivité"),
                 (
@@ -4130,6 +4137,7 @@ static _RUST_I18N_BACKEND: sync::LazyLock<Box<dyn rust_i18n::Backend>> = sync::L
 				("Rotor Stagger", "Décalage des Rotors"),
 				("Rotor Stats", "Stats du Rotor"),
                 ("Rotor Thickness", "Épaisseur du Rotor"),
+                ("Rules", "Règles"),
                 (
                     "Rumble Warning",
                     "Rumble nécessite une structure minimale de Rumble*10 pour voler.",
@@ -4690,8 +4698,13 @@ pub fn translate(key: &str) -> String {
 /// Translate a key with a single parameter substitution
 /// The translation string should contain %{A} which will be replaced with the value
 pub fn translate_with_param(key: &str, value: &str) -> String {
-    let translated = t!(key).to_string();
-    translated.replace("%{A}", value)
+    t!(key, A = value).into()
+}
+
+/// Translate a key with a two parameter substitution
+/// The translation string should contain %{A} %{B} which will be replaced with the value
+pub fn translate_with_params(key: &str, value: &str, value2: &str) -> String {
+    t!(key, A = value, B = value2).into()
 }
 
 #[cfg(test)]

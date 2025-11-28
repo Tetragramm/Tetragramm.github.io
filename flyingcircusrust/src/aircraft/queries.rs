@@ -94,6 +94,12 @@ impl Aircraft {
         self.cockpits.get_escape_list()
     }
 
+    /// Get crash safety values from all cockpit positions
+    /// TypeScript: GetCrashList()
+    pub fn get_crash_list(&self) -> Vec<i16> {
+        self.cockpits.get_crash_list()
+    }
+
     /// Get flight stress values from all cockpit positions
     /// TypeScript: GetStressList()
     /// Returns a vector of (non_copilot_stress, copilot_stress) tuples

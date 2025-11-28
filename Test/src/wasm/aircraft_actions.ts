@@ -4,8 +4,7 @@
  */
 
 import { AircraftBridge } from './aircraft_bridge';
-import { Cards } from '../disp/Cards';
-import { download, copyStringToClipboard } from '../disp/Tools';
+import { Cards } from './components/cards';
 import { localization } from './localization';
 
 export class AircraftActions {
@@ -84,7 +83,7 @@ export class AircraftActions {
         const json = this.bridge.toJSON();
         const name = this.bridge.getAircraftName();
         const version = JSON.parse(json).version;
-        download(json, `${name}_${version}.json`, 'json');
+        this.download(json, `${name}_${version}.json`, 'json');
     }
 
     /**
@@ -134,7 +133,7 @@ export class AircraftActions {
     private saveLink(): void {
         const compressed = this.bridge.serializeToLZString();
         const link = `${location.protocol}//${location.host}${location.pathname}?json=${compressed}`;
-        copyStringToClipboard(link);
+        this.copyStringToClipboard(link);
     }
 
     /**
@@ -558,5 +557,39 @@ export class AircraftActions {
         }
 
         return weapons;
+    }
+
+    // Function to download data to a file
+    private download(data, filename, type) {
+        const file = new Blob([data], { type: type });
+        const a = document.createElement("a"),
+
+            url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function () {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 0);
+    }
+
+    private copyStringToClipboard(str) {
+        // Create new element
+        const el = document.createElement('textarea');
+        // Set value (string to be copied)
+        el.value = str;
+        // Set non-editable to avoid focus and move outside of view
+        el.setAttribute('readonly', '');
+        el.style.position = "absolute";
+        el.style.left = "-9999px";
+        document.body.appendChild(el);
+        // Select text inside element
+        el.select();
+        // Copy text to clipboard
+        document.execCommand('copy');
+        // Remove temporary element
+        document.body.removeChild(el);
     }
 }

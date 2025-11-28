@@ -1,9 +1,8 @@
 import { localization } from '../wasm/localization';
 import { AircraftBridge } from "../wasm/aircraft_bridge";
 import { DerivedStatsUI } from "../wasm/components/derived_stats_ui";
-import { BlinkBad, BlinkNeutral } from "../disp/Tools";
+import { BlinkBad, BlinkNeutral } from "../wasm/dom_utils"
 import { JSON2CSV } from "../JSON2CSV/json2csv";
-import { StringFmt } from "../string";
 
 // Type for the WASM module
 type WasmModule = any;
@@ -190,8 +189,8 @@ async function InitHTML() {
                 entries.splice(1, 0, ["cost", stats.cost]);
                 entries.splice(2, 0, ["upkeep", stats.upkeep]);
                 entries.splice(3, 0, ["bomb_mass", stats.bomb_mass]);
-                entries.splice(4, 0, ["escape", StringFmt.Join("/", loadedBridge.getEscapeList())]);
-                entries.splice(5, 0, ["crash", StringFmt.Join("/", loadedBridge.getEscapeList())]); // TODO: getCrashList if it exists
+                entries.splice(4, 0, ["escape", loadedBridge.getEscapeList().join("/")]);
+                entries.splice(5, 0, ["crash", loadedBridge.getCrashList().join("/")]); // TODO: getCrashList if it exists
                 entries.splice(6, 0, ["stress", formatStressList(loadedBridge.getStressList())]);
 
                 const dstatsn = Object.fromEntries(entries);

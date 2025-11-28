@@ -61,6 +61,13 @@ impl Localization {
     pub fn translate_with_param(key: &str, value: &str) -> String {
         flyingcircusrust::translate_with_param(key, value)
     }
+
+    /// Translate a key with two parameter substitution
+    /// The translation string should contain %{A} and %{B} which will be replaced with the value
+    #[wasm_bindgen(js_name = translateWithParams)]
+    pub fn translate_with_params(key: &str, value: &str, value2: &str) -> String {
+        flyingcircusrust::translate_with_params(key, value, value2)
+    }
 }
 
 /// Main Aircraft wrapper for WASM
@@ -1123,6 +1130,12 @@ impl AircraftWasm {
     #[wasm_bindgen(js_name = getEscapeList)]
     pub fn get_escape_list(&self) -> Vec<i16> {
         self.inner.get_escape_list()
+    }
+
+    /// Get crash safety values from all cockpit positions
+    #[wasm_bindgen(js_name = getCrashList)]
+    pub fn get_crash_list(&self) -> Vec<i16> {
+        self.inner.get_crash_list()
     }
 
     /// Get flight stress values from all cockpit positions

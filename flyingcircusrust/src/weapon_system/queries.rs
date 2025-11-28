@@ -3,13 +3,16 @@ use crate::part::Part;
 
 #[derive(serde::Serialize)]
 pub struct WeaponSystemDerivedStats {
-    pub hits: String, // "X/Y/Z/W" format
-    pub damage: i16,
+    pub name: String,
+    pub abrv: String,
+    pub hits: String,   // "X/Y/Z/W" format
+    pub damage: String, // "X/Y/Z/W" format
     pub shots: i16,
     pub jam: String,
     pub hr_charges: String, // For heat rays, "/" separated
     pub mounting: String,   // "Fixed", "Flexible", or "Turret"
     pub is_heat_ray: bool,  // True if projectile is heat ray or Lightning Arc
+    pub tags: Vec<String>,  // Tags like "Repeating", "Synched", etc.
 }
 
 #[derive(serde::Serialize)]
@@ -19,11 +22,11 @@ pub struct WeaponSystemDisplayInfo {
     pub weapon_name: String,
     pub weapon_abrv: String,
     pub directions: Vec<String>, // Active directions as translated strings
-    pub damage: f32,
-    pub hits: String,       // "X/Y/Z/W" format
-    pub shots: i16,         // Or charges for heat rays
-    pub hr_charges: String, // For heat rays
-    pub tags: Vec<String>,  // Tags like "Repeating", "Synched", etc.
+    pub damage: String,          // "X/Y/Z/W" format
+    pub hits: String,            // "X/Y/Z/W" format
+    pub shots: i16,              // Or charges for heat rays
+    pub hr_charges: String,      // For heat rays
+    pub tags: Vec<String>,       // Tags like "Repeating", "Synched", etc.
     pub is_heat_ray: bool,
 }
 
@@ -151,8 +154,8 @@ impl WeaponSystem {
 
     /// Get weapon damage
     /// TypeScript: GetDamage()
-    pub fn get_damage(&self) -> i16 {
-        (1.0e-6 + self.final_weapon.damage).floor() as i16
+    pub fn get_damage(&self) -> f32 {
+        self.final_weapon.damage
     }
 
     /// Get ammunition count
@@ -337,10 +340,21 @@ impl WeaponSystem {
     /// Get derived stats for display
     /// Returns formatted strings for hits, damage, shots, jam, and mounting type
     pub fn get_derived_stats(&self) -> WeaponSystemDerivedStats {
+        let weapon = &self.weapon_list[self.weapon_type];
+        let name = self.get_name(weapon);
+        let abrv = weapon.abrv.clone();
+
         let hits = self.get_hits();
         let hits_str = format!("{}/{}/{}/{}", hits[0], hits[1], hits[2], hits[3]);
 
         let damage = self.get_damage();
+        let damage = format!(
+            "{}/{}/{}/{}",
+            (damage * hits[0] as f32).floor(),
+            (damage * hits[1] as f32).floor(),
+            (damage * hits[2] as f32).floor(),
+            (damage * hits[3] as f32).floor(),
+        );
         let shots = self.get_shots();
         let jam = self.get_jam();
 
@@ -362,7 +376,11 @@ impl WeaponSystem {
         let is_heat_ray =
             self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
 
+        let tags = self.get_tags();
+
         WeaponSystemDerivedStats {
+            name,
+            abrv,
             hits: hits_str,
             damage,
             shots,
@@ -370,20 +388,11 @@ impl WeaponSystem {
             hr_charges,
             mounting,
             is_heat_ray,
+            tags,
         }
     }
 
-    /// Get weapon system display information for derived stats UI
-    /// Returns all information needed to display a weapon set
-    pub fn get_display_info(&self, direction_list: &[String]) -> String {
-        let hits = self.get_hits();
-        let hits_str = format!("{}/{}/{}/{}", hits[0], hits[1], hits[2], hits[3]);
-
-        let weapon = &self.weapon_list[self.weapon_type];
-        let is_heat_ray =
-            self.get_projectile() == ProjectileType::Heatray || self.is_lightning_arc();
-
-        // Build weapon name like TypeScript WeaponName()
+    fn get_name(&self, weapon: &WeaponType) -> String {
         let direction_count = self.directions.iter().filter(|&&d| d).count();
         let mut name = String::new();
 
@@ -435,15 +444,10 @@ impl WeaponSystem {
 
         // Add weapon abbreviation
         name.push_str(&weapon.abrv);
+        name
+    }
 
-        // Get active directions
-        let mut directions = Vec::new();
-        for (i, &active) in self.directions.iter().enumerate() {
-            if active && i < direction_list.len() {
-                directions.push(t!(&direction_list[i]).to_string());
-            }
-        }
-
+    fn get_tags(&self) -> Vec<String> {
         // Build tags like TypeScript WeaponTags()
         let mut tags = Vec::new();
 
@@ -470,7 +474,7 @@ impl WeaponSystem {
             tags.push(t!("Weapon Tag Shells").to_string());
         }
 
-        // AP
+        // APdirection_count
         if self.final_weapon.ap > 0 {
             tags.push(t!("Weapon Tag AP", A = self.final_weapon.ap).to_string());
         }
@@ -488,26 +492,36 @@ impl WeaponSystem {
         if self.final_weapon.deflection > 0 {
             tags.push(t!("Weapon Tag Awkward", A = self.final_weapon.deflection).to_string());
         }
+        tags
+    }
 
-        let hr_charges_vec = self.get_hr_charges();
-        let hr_charges = hr_charges_vec
-            .iter()
-            .map(|c| c.to_string())
-            .collect::<Vec<_>>()
-            .join("/");
+    /// Get weapon system display information for derived stats UI
+    /// Returns all information needed to display a weapon set
+    pub fn get_display_info(&self, direction_list: &[String]) -> String {
+        let weapon = &self.weapon_list[self.weapon_type];
+
+        // Get active directions
+        let mut directions = Vec::new();
+        for (i, &active) in self.directions.iter().enumerate() {
+            if active && i < direction_list.len() {
+                directions.push(t!(&direction_list[i]).to_string());
+            }
+        }
+
+        let ws = self.get_derived_stats();
 
         let seat_str = t!("Seat #", A = self.get_seat() + 1).to_string();
-        if !is_heat_ray {
+        if !ws.is_heat_ray {
             t!(
                 "Weapon Description",
                 A = seat_str,
                 B = self.get_weapon_count(),
-                C = name,
+                C = ws.name,
                 D = directions.join(" "),
                 E = weapon.damage,
-                F = hits_str,
-                G = self.get_shots(),
-                H = tags.join(", ")
+                F = ws.hits,
+                G = ws.shots,
+                H = ws.tags.join(", ")
             )
             .to_string()
         } else {
@@ -515,12 +529,12 @@ impl WeaponSystem {
                 "Weapon Description Heat Ray",
                 A = seat_str,
                 B = self.get_weapon_count(),
-                C = name,
+                C = ws.name,
                 D = directions.join(" "),
                 E = weapon.damage,
-                F = hits_str,
-                G = hr_charges,
-                H = tags.join(", ")
+                F = ws.hits,
+                G = ws.hr_charges,
+                H = ws.tags.join(", ")
             )
             .to_string()
         }

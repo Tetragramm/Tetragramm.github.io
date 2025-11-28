@@ -148,7 +148,9 @@ async function initApp(): Promise<void> {
 
 // Initialize when page loads
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
+    // DOM is still loading, wait for DOMContentLoaded
+    window.addEventListener("DOMContentLoaded", initApp);
 } else {
+    // DOM is already loaded (common with ES modules)
     initApp();
 }

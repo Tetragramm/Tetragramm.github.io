@@ -102,10 +102,10 @@ export function createRulesLink(sectionName: string, specialText?: string): HTML
     const rulesLine = document.createElement('h4');
     const rulesSpan = document.createElement('span');
     const rulesLink = document.createElement('a');
-    rulesLink.href = `./Rules/Rules.htm#${sectionName}`;
+    rulesLink.href = `./Rules/Rules_${localization.getCurrentLocale()}.html#${sectionName}`;
     const rulesText = document.createElement('u');
     if (specialText === undefined) {
-        rulesText.textContent = 'Rules';
+        rulesText.textContent = localization.translate('Rules');
     } else {
         rulesText.textContent = specialText;
     }

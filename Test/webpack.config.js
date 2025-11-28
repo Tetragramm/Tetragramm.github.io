@@ -3,13 +3,12 @@ const path = require('path');
 module.exports = {
     entry: {
         plane_builder: './src/plane_builder.ts',
-        weapon_display: './src/WeaponDisplay/weapon_display.ts',
         hangar: './src/Hangar/hangar.ts',
-        engine_builder: './src/EngineBuilder/engine_builder.ts',
         engine_builder_app: './src/wasm/builders/engine_builder_app.ts'
     },
     experiments: {
         asyncWebAssembly: true,
+        outputModule: true,
     },
     module: {
         rules: [
@@ -23,24 +22,37 @@ module.exports = {
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
     },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                wasmPkg: {
+                    test: /[\\/]pkg[\\/]/,
+                    name: 'pkg_flyingcircuswasm',
+                    chunks: 'all',
+                    enforce: true,
+                    priority: 10,
+                },
+            },
+        },
+    },
     output: {
         // filename: '[name].js',
         filename: (pathData) => {
             switch (pathData.chunk.name) {
                 case "plane_builder":
                     return "[name].js";
-                case "weapon_display":
-                    return "WeaponDisplay/[name].js";
                 case "hangar":
                     return "Hangar/[name].js";
-                case "engine_builder":
-                    return "EngineBuilder/[name].js";
                 case "engine_builder_app":
-                    return "wasm/builders/[name].js";
+                    return "EngineBuilder/[name].js";
+                case "pkg_flyingcircuswasm":
+                    return "pkg_flyingcircuswasm.js";
                 default:
-                    return "[name]/[name].js";
+                    return "[name].js";
             }
         },
         path: path.resolve(__dirname, '.'),
+        webassemblyModuleFilename: 'flyingcircus.module.wasm',
+        publicPath: 'auto',
     },
 };

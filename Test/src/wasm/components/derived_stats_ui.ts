@@ -356,7 +356,7 @@ export class DerivedStatsUI extends BaseComponentUI {
         const hangarLink = document.createElement('a');
         hangarLink.href = './hangar.html';
         const hangarText = document.createElement('u');
-        hangarText.textContent = 'Compare Aircraft in Hangar';
+        hangarText.textContent = localization.translate('Compare Aircraft in Hangar');
         hangarLink.appendChild(hangarText);
         hangarSpan.appendChild(hangarLink);
         contentDiv.appendChild(hangarSpan);

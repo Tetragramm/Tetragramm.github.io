@@ -2,7 +2,6 @@ import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
 import { createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput, createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement, createStatsTable, updateStatsTable, StatDisplayConfig } from '../dom_utils';
-import { CreateCheckbox } from '../../disp/Tools';
 
 // Engine stats configuration for stats table
 const ENGINE_STATS: StatDisplayConfig[] = [

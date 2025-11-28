@@ -14,7 +14,6 @@ import {
     createCollapsibleSection,
     createFlexSection,
 } from '../dom_utils';
-import { CreateFlexSection, FlexSection } from '../../disp/Tools';
 
 interface CustomPart {
     name: string;
@@ -26,7 +25,7 @@ interface CustomPart {
  * Custom Parts (Alter Stats) UI Component
  */
 export class CustomPartsUI extends BaseComponentUI {
-    private addFlex: FlexSection | undefined;
+    private addFlex: { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement } | undefined;
     private editCell: HTMLTableCellElement | undefined;
     private partList: { label: HTMLLabelElement; qtyInput: HTMLInputElement; }[] = [];
 
@@ -70,7 +69,8 @@ export class CustomPartsUI extends BaseComponentUI {
         const table = document.createElement('table');
         const row = table.insertRow();
         const addCell = row.insertCell();
-        this.addFlex = CreateFlexSection(addCell);
+        this.addFlex = createFlexSection();
+        addCell.appendChild(this.addFlex.div0)
         this.editCell = row.insertCell();
 
         // Build the two columns

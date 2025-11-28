@@ -173,7 +173,7 @@ export interface AircraftWasmAPI {
     setWeaponSystemBindings(index: number, bindings: any): void;
     getWeaponSystemStats(index: number): Stats;
     getWeaponSystemDerivedStats(index: number): any;
-    getWeaponSystemDisplayInfo(index: number): string;
+    getWeaponSystemDisplayInfo(index: number): any;
     getWeaponBindings(systemIndex: number, weaponIndex: number): any;
     setWeaponBindings(systemIndex: number, weaponIndex: number, bindings: any): void;
     getWeaponStats(systemIndex: number, weaponIndex: number): Stats;
@@ -224,6 +224,7 @@ export interface AircraftWasmAPI {
     getMaxAltitude(): number;
     getReliabilityList(): string[];
     getEscapeList(): number[];
+    getCrashList(): number[];
     getStressList(): Array<[number, number]>;
     getVisibilityList(): number[];
     getAttackList(): number[];
@@ -1398,6 +1399,14 @@ export class AircraftBridge {
     }
 
     /**
+     * Get crash safety values from all cockpit positions
+     */
+    getCrashList(): number[] {
+        this.ensureInitialized();
+        return this.wasm!.getCrashList();
+    }
+
+    /**
      * Get flight stress values from all cockpit positions
      * Returns array of [non_copilot_stress, copilot_stress] tuples
      */
@@ -1781,8 +1790,9 @@ export class AircraftBridge {
 
     getWeaponSetData(index: number): any {
         this.ensureInitialized();
-        const displayInfo = this.wasm!.getWeaponSystemDisplayInfo(index);
         const derivedStats = this.wasm!.getWeaponSystemDerivedStats(index);
+        console.log("DerivedInfo");
+        console.log(derivedStats);
 
         // Parse the display info (it's a formatted string)
         // Format includes name, shots, hits, damage, etc.
