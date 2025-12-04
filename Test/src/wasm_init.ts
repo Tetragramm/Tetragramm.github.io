@@ -9,6 +9,7 @@ import { localization } from './wasm/localization';
 import { AircraftBridge } from './wasm/aircraft_bridge';
 import { AircraftActions } from './wasm/aircraft_actions';
 import { LanguageSelector } from './wasm/components/language_selector';
+import { MobileNavigation, MobileSectionConfig } from './wasm/components/mobile_nav';
 import { EraUI } from './wasm/components/era_ui';
 import { CockpitsUI } from './wasm/components/cockpits_ui';
 import { PropellerUI } from './wasm/components/propeller_ui';
@@ -40,6 +41,7 @@ export class WasmApplication {
     private bridge: AircraftBridge | null = null;
     private actions: AircraftActions | null = null;
     private languageSelector: LanguageSelector | null = null;
+    private mobileNav: MobileNavigation | null = null;
     private eraUI: EraUI | null = null;
     private cockpitsUI: CockpitsUI | null = null;
     private propellerUI: PropellerUI | null = null;
@@ -168,6 +170,11 @@ export class WasmApplication {
             // Create language selector
             this.languageSelector = new LanguageSelector('language_selector_container');
             console.log('[WasmApp] Language selector created');
+
+            // Create mobile navigation
+            this.mobileNav = new MobileNavigation('mobile_nav_container');
+            this.mobileNav.setSections(this.getMobileSections());
+            console.log('[WasmApp] Mobile navigation created');
 
             // Create Era UI component
             // Pass a bridge getter function so it always gets the current bridge
@@ -449,6 +456,36 @@ export class WasmApplication {
      */
     getBridge(): AircraftBridge | null {
         return this.bridge;
+    }
+
+    /**
+     * Get mobile section configuration
+     */
+    private getMobileSections(): MobileSectionConfig[] {
+        return [
+            { id: 'Type', labelKey: 'Aircraft Type' },
+            { id: 'Era', labelKey: 'Era' },
+            { id: 'Cockpit', labelKey: 'Cockpits' },
+            { id: 'Passengers', labelKey: 'Passengers' },
+            { id: 'Engines', labelKey: 'Engines' },
+            { id: 'Frames', labelKey: 'Frames' },
+            { id: 'Wings', labelKey: 'Wings' },
+            { id: 'Rotors', labelKey: 'Rotors', isVisible: () => this.rotorUI !== null },
+            { id: 'Stabilizers', labelKey: 'Stabilizers' },
+            { id: 'ControlSurfaces', labelKey: 'Control Surfaces' },
+            { id: 'Reinforcements', labelKey: 'Reinforcements' },
+            { id: 'Weapons', labelKey: 'Weapons' },
+            { id: 'Load', labelKey: 'Load' },
+            { id: 'Landing_Gear', labelKey: 'Landing Gear' },
+            { id: 'Accessories', labelKey: 'Additional Parts' },
+            { id: 'Propeller', labelKey: 'Propeller' },
+            { id: 'Optimization', labelKey: 'Optimizations' },
+            { id: 'Used Planes', labelKey: 'Used Planes' },
+            { id: 'CustomParts', labelKey: 'Custom Parts' },
+            { id: 'Stats', labelKey: 'Total Stats' },
+            { id: 'Flight', labelKey: 'Derived Stats' },
+            { id: 'Altitude', labelKey: 'Altitude' },
+        ];
     }
 }
 

@@ -264,6 +264,240 @@ export function createFlexNumberInput(
     return input;
 }
 
+/**
+ * Create a mobile-friendly number input with large +/- buttons
+ * @param binding - The binding object with name, value, and enabled
+ * @param parent - The parent element to append to
+ * @param onChange - Callback when value changes, receives new number value
+ * @param min - Minimum value (default: 0)
+ * @param max - Maximum value (optional)
+ * @param step - Step value (default: 1)
+ * @returns Object with container and input element
+ */
+export function createMobileNumberInput(
+    binding: any,
+    parent: HTMLElement,
+    onChange: (value: number) => void,
+    min: number = 0,
+    max?: number,
+    step: number = 1
+): { container: HTMLElement, input: HTMLInputElement } {
+    const container = document.createElement('div');
+    container.className = 'mobile-number-container';
+
+    // Minus button
+    const minusBtn = document.createElement('button');
+    minusBtn.type = 'button';
+    minusBtn.className = 'mobile-number-btn';
+    minusBtn.textContent = '-';
+    minusBtn.disabled = !binding.enabled || binding.value <= min;
+
+    // Number input
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.id = generateUniqueId('mobile-number');
+    input.className = 'mobile-number-input';
+    input.min = min.toString();
+    if (max !== undefined) {
+        input.max = max.toString();
+    }
+    input.step = step.toString();
+    input.value = binding.value.toString();
+    input.disabled = !binding.enabled;
+
+    // Plus button
+    const plusBtn = document.createElement('button');
+    plusBtn.type = 'button';
+    plusBtn.className = 'mobile-number-btn';
+    plusBtn.textContent = '+';
+    plusBtn.disabled = !binding.enabled || (max !== undefined && binding.value >= max);
+
+    // Update button states based on value
+    const updateButtonStates = () => {
+        const value = parseInt(input.value) || 0;
+        minusBtn.disabled = !binding.enabled || value <= min;
+        plusBtn.disabled = !binding.enabled || (max !== undefined && value >= max);
+    };
+
+    // Event handlers
+    minusBtn.onclick = () => {
+        const currentValue = parseInt(input.value) || 0;
+        const newValue = Math.max(min, currentValue - step);
+        input.value = newValue.toString();
+        onChange(newValue);
+        updateButtonStates();
+    };
+
+    plusBtn.onclick = () => {
+        const currentValue = parseInt(input.value) || 0;
+        const newValue = max !== undefined ? Math.min(max, currentValue + step) : currentValue + step;
+        input.value = newValue.toString();
+        onChange(newValue);
+        updateButtonStates();
+    };
+
+    input.addEventListener('change', () => {
+        let value = parseInt(input.value) || 0;
+        // Clamp value to min/max
+        value = Math.max(min, value);
+        if (max !== undefined) {
+            value = Math.min(max, value);
+        }
+        input.value = value.toString();
+        onChange(value);
+        updateButtonStates();
+    });
+
+    container.appendChild(minusBtn);
+    container.appendChild(input);
+    container.appendChild(plusBtn);
+    parent.appendChild(container);
+
+    return { container, input };
+}
+
+/**
+ * Create a mobile-friendly option item with title and content
+ * @param title - Title text for the option
+ * @param parent - Parent element to append to
+ * @returns Object with container and content div for adding controls
+ */
+export function createMobileOptionItem(
+    title: string,
+    parent: HTMLElement
+): { container: HTMLElement, content: HTMLElement } {
+    const container = document.createElement('div');
+    container.className = 'mobile-option-item';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'mobile-option-title';
+    titleDiv.textContent = title;
+    container.appendChild(titleDiv);
+
+    const content = document.createElement('div');
+    content.className = 'mobile-option-content';
+    container.appendChild(content);
+
+    parent.appendChild(container);
+
+    return { container, content };
+}
+
+/**
+ * Create a mobile-friendly checkbox with larger touch target
+ * @param binding - The binding object with name, selected, and enabled
+ * @param parent - Parent element to append to
+ * @param onChange - Callback when checkbox changes
+ * @returns The created checkbox input element
+ */
+export function createMobileCheckbox(
+    binding: any,
+    parent: HTMLElement,
+    onChange: (checked: boolean) => void
+): HTMLInputElement {
+    const label = document.createElement('label');
+    label.className = 'mobile-checkbox-label';
+
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = generateUniqueId('mobile-checkbox');
+    checkbox.checked = binding.selected;
+    checkbox.disabled = !binding.enabled;
+    checkbox.addEventListener('change', () => {
+        onChange(checkbox.checked);
+    });
+
+    const text = document.createElement('span');
+    text.textContent = binding.name;
+
+    label.appendChild(checkbox);
+    label.appendChild(text);
+    parent.appendChild(label);
+
+    return checkbox;
+}
+
+/**
+ * Create a mobile-friendly select with full width styling
+ * @param binding - The binding object with options and selected
+ * @param parent - Parent element to append to
+ * @param onChange - Callback when selection changes
+ * @returns The created select element
+ */
+export function createMobileSelect(
+    binding: any,
+    parent: HTMLElement,
+    onChange: (selectedIndex: number) => void
+): HTMLSelectElement {
+    const select = createSelectElement(binding, onChange);
+    select.className = 'mobile-select';
+    parent.appendChild(select);
+    return select;
+}
+
+/**
+ * Create a mobile stats grid
+ * @param stats - Stats object
+ * @param statConfig - Configuration for which stats to display
+ * @param derivedStats - Optional derived stats
+ * @returns HTML element containing the stats grid
+ */
+export function createMobileStatsGrid(
+    stats: any,
+    statConfig: StatDisplayConfig[],
+    derivedStats?: any
+): HTMLElement {
+    const grid = document.createElement('div');
+    grid.className = 'mobile-stats-grid';
+
+    statConfig.forEach(config => {
+        if (!config.key) return; // Skip empty configs
+
+        const item = document.createElement('div');
+        item.className = 'mobile-stat-item';
+
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'mobile-stat-label';
+        labelDiv.textContent = localization.translate(config.label);
+        item.appendChild(labelDiv);
+
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'mobile-stat-value';
+
+        // Get value
+        let value = config.isDerived === undefined
+            ? stats[config.key]
+            : derivedStats?.[config.key];
+
+        // Format value
+        if (typeof value === 'boolean') {
+            value = value ? 'Yes' : 'No';
+        } else if (typeof value === 'number') {
+            value = parseFloat(value?.toPrecision(4)).toString();
+        } else {
+            value = value?.toString() || '';
+        }
+
+        valueDiv.textContent = value;
+
+        if (config.isDerived) {
+            item.classList.add('part_local');
+        }
+
+        item.appendChild(valueDiv);
+        grid.appendChild(item);
+    });
+
+    return grid;
+}
+
+/**
+ * Check if the current device is in mobile view
+ */
+export function isMobileView(): boolean {
+    return window.innerWidth <= 768;
+}
+
 export function BlinkBad(elem: HTMLElement) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);

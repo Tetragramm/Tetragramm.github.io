@@ -776,3 +776,368 @@ select.flex-item {
 	color: black;
 	background-color: gold;
 }
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+/* Mobile navigation header */
+.mobile-nav {
+	display: none;
+	position: sticky;
+	top: 0;
+	background-color: var(--bkg_color);
+	border-bottom: 2px solid var(--inp_bdr_color);
+	z-index: 100;
+	padding: 0.5rem;
+	touch-action: pan-y;
+}
+
+.mobile-nav-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 2.5rem;
+}
+
+.mobile-nav-prev,
+.mobile-nav-next {
+	width: 3rem;
+	height: 2.5rem;
+	font-size: 1.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--inp_bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	color: var(--lnk_color);
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+.mobile-nav-prev:active,
+.mobile-nav-next:active {
+	background-color: var(--lnk_color);
+	color: var(--bkg_color);
+}
+
+.mobile-nav-title {
+	flex: 1;
+	text-align: center;
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(--lnk_color);
+	cursor: pointer;
+	padding: 0.5rem;
+}
+
+.mobile-nav-title:active {
+	color: var(--lnk_act_color);
+}
+
+/* Mobile component list (dropdown) */
+.mobile-nav-list {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 100%;
+	background-color: var(--bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	max-height: 60vh;
+	overflow-y: auto;
+	z-index: 101;
+}
+
+.mobile-nav-list.show {
+	display: block;
+}
+
+.mobile-nav-list-item {
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid var(--inp_bdr_color);
+	cursor: pointer;
+	color: var(--inp_txt_color);
+}
+
+.mobile-nav-list-item:active,
+.mobile-nav-list-item.active {
+	background-color: var(--lnk_color);
+	color: var(--bkg_color);
+}
+
+/* Large +/- buttons for mobile number inputs */
+.mobile-number-container {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.mobile-number-btn {
+	width: 2.5rem !important;
+	height: 2.5rem !important;
+	font-size: 1.5rem !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--inp_bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	color: var(--lnk_color);
+	cursor: pointer;
+	border-radius: 4px;
+	padding: 0;
+	line-height: 1;
+}
+
+.mobile-number-btn:active {
+	background-color: var(--lnk_color);
+	color: var(--bkg_color);
+}
+
+.mobile-number-btn:disabled {
+	background-color: #000000;
+	border-color: #000000;
+	color: #333333;
+	cursor: not-allowed;
+}
+
+.mobile-number-input {
+	width: 4rem !important;
+	height: 2.5rem !important;
+	text-align: center;
+	font-size: 1.2rem !important;
+}
+
+/* Mobile flexbox layout for options */
+.mobile-option-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 0.5rem;
+}
+
+.mobile-option-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.5rem;
+	background-color: rgba(56, 56, 56, 0.3);
+	border-radius: 4px;
+}
+
+.mobile-option-title {
+	color: var(--lnk_color);
+	font-weight: bold;
+	font-size: 0.9rem;
+}
+
+.mobile-option-content {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+/* Mobile checkbox styling - larger touch targets */
+.mobile-checkbox-label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	background-color: var(--inp_bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	border-radius: 4px;
+	cursor: pointer;
+	min-height: 2.5rem;
+}
+
+.mobile-checkbox-label input[type='checkbox'] {
+	width: 1.5rem !important;
+	height: 1.5rem !important;
+}
+
+/* Mobile section styling */
+.mobile-section {
+	margin-bottom: 1rem;
+	border: 1px solid var(--inp_bdr_color);
+	border-radius: 4px;
+}
+
+.mobile-section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem;
+	background-color: var(--ftr_bkg_color);
+	cursor: pointer;
+}
+
+.mobile-section-title {
+	font-weight: bold;
+	color: var(--lnk_color);
+}
+
+.mobile-section-content {
+	padding: 0.5rem;
+}
+
+/* Mobile stats display */
+.mobile-stats-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.5rem;
+}
+
+.mobile-stat-item {
+	display: flex;
+	flex-direction: column;
+	padding: 0.5rem;
+	background-color: rgba(56, 56, 56, 0.3);
+	border-radius: 4px;
+}
+
+.mobile-stat-label {
+	font-size: 0.75rem;
+	color: var(--lnk_color);
+}
+
+.mobile-stat-value {
+	font-size: 1.1rem;
+	font-weight: bold;
+}
+
+/* Mobile select styling - full width */
+.mobile-select {
+	width: 100%;
+	height: 2.5rem !important;
+	font-size: 1rem !important;
+	padding: 0.5rem;
+}
+
+/* Fuselage Frames section mobile layout */
+.mobile-frames-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.mobile-frame-row {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	background-color: rgba(56, 56, 56, 0.3);
+	border-radius: 4px;
+}
+
+.mobile-frame-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.mobile-frame-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+/* Mobile media query - apply styles on narrow screens */
+@media (max-width: 768px) {
+	/* Show mobile navigation */
+	.mobile-nav {
+		display: block;
+	}
+
+	/* Hide desktop-style tables on mobile, show mobile alternatives */
+	.desktop-only {
+		display: none !important;
+	}
+
+	.mobile-only {
+		display: block !important;
+	}
+
+	/* Hide all main sections except active one in mobile single-section mode */
+	body.mobile-single-section .html_content > div > div:not(.mobile-nav):not(.mobile-active-section) {
+		display: none;
+	}
+
+	/* Make collapsible sections full-width and properly spaced */
+	.collapsible {
+		max-width: 100%;
+		padding: 0.75rem;
+	}
+
+	/* Improve table scrollability on mobile */
+	table {
+		font-size: 0.75rem;
+	}
+
+	/* Larger touch targets for buttons */
+	button {
+		min-width: 2.5rem;
+		min-height: 2.5rem;
+	}
+
+	/* Full-width selects */
+	select {
+		min-width: 100%;
+		height: 2.5rem !important;
+	}
+
+	/* Larger checkboxes */
+	input[type='checkbox'] {
+		width: 1.25rem !important;
+		height: 1.25rem !important;
+	}
+
+	/* Stack flex containers vertically on mobile */
+	.flex-container-o {
+		flex-direction: column;
+	}
+
+	/* Ensure content doesn't overflow */
+	.html_outer {
+		padding: 0.25rem;
+	}
+
+	/* Adjust header sizes for mobile */
+	h1 {
+		font-size: 1.5rem;
+	}
+
+	h2 {
+		font-size: 1.25rem;
+	}
+
+	h3 {
+		font-size: 1.1rem;
+	}
+
+	/* Better spacing for list items */
+	li {
+		margin-left: 1em;
+		margin-bottom: 0.5em;
+	}
+}
+
+/* Desktop-only class - visible by default, hidden on mobile */
+.desktop-only {
+	display: block;
+}
+
+/* Mobile-only class - hidden by default, shown on mobile */
+.mobile-only {
+	display: none;
+}
+
+/* On desktop (769px+) - ensure mobile-only stays hidden */
+@media (min-width: 769px) {
+	.mobile-only {
+		display: none !important;
+	}
+	.desktop-only {
+		display: block !important;
+	}
+}

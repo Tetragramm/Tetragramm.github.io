@@ -17,7 +17,13 @@ import {
     updateStatsTable,
     StatDisplayConfig,
     createFlexCheckbox,
-    createFlexSection
+    createFlexSection,
+    createMobileNumberInput,
+    createMobileOptionItem,
+    createMobileCheckbox,
+    createMobileSelect,
+    createMobileStatsGrid,
+    isMobileView
 } from '../dom_utils';
 
 // Stats configuration for the combined frames + tail stats table
@@ -101,16 +107,21 @@ export class FramesUI extends BaseComponentUI {
         const stats = bridge.getFramesStats();
         const derived = { flammable: bridge.getFramesFlammable() };
 
-        // Build Frames section
+        // Build desktop Frames section
+        const desktopWrapper = document.createElement('div');
+        desktopWrapper.className = 'desktop-only';
         this.framesSectionElement = this.createFramesSection(bindings, stats, derived);
-        this.container.appendChild(this.framesSectionElement);
-
-        // Add break between sections
-        this.container.appendChild(document.createElement('br'));
-
-        // Build Tail section
+        desktopWrapper.appendChild(this.framesSectionElement);
+        desktopWrapper.appendChild(document.createElement('br'));
         this.tailSectionElement = this.createTailSection(bindings, this.cache.framesTableBody);
-        this.container.appendChild(this.tailSectionElement);
+        desktopWrapper.appendChild(this.tailSectionElement);
+        this.container.appendChild(desktopWrapper);
+
+        // Build mobile Frames section
+        const mobileWrapper = document.createElement('div');
+        mobileWrapper.className = 'mobile-only';
+        this.createMobileFramesSection(bindings, stats, derived, mobileWrapper);
+        this.container.appendChild(mobileWrapper);
     }
 
     /**
@@ -778,5 +789,329 @@ export class FramesUI extends BaseComponentUI {
             tailSectionCache.liftingBodyCheckbox.checked = tailSectionBindings.lifting_body.selected;
             tailSectionCache.liftingBodyCheckbox.disabled = !tailSectionBindings.lifting_body.enabled;
         }
+    }
+
+    /**
+     * Create mobile-friendly frames section
+     */
+    private createMobileFramesSection(bindings: any, stats: any, derived: any, parent: HTMLElement): void {
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'mobile-option-group';
+
+        // Flying Wing checkbox
+        const flyingWingItem = createMobileOptionItem(
+            localization.translate('Frames Flying Wing'),
+            contentDiv
+        );
+        const flyingWingCheckbox = document.createElement('input');
+        flyingWingCheckbox.type = 'checkbox';
+        flyingWingCheckbox.checked = bindings.flying_wing.selected;
+        flyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
+        flyingWingCheckbox.onchange = () => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.flying_wing.selected = flyingWingCheckbox.checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        };
+        flyingWingItem.content.appendChild(flyingWingCheckbox);
+
+        // Frame Type selector (apply to all)
+        const frameTypeItem = createMobileOptionItem(
+            localization.translate('Frames Frame Type'),
+            contentDiv
+        );
+        const allFrameSelect = createMobileSelect(
+            bindings.all_frame,
+            frameTypeItem.content,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getFramesBindings();
+                updatedBindings.all_frame.selected = selectedIndex;
+                this.getBridge().setFramesBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        allFrameSelect.selectedIndex = -1;
+
+        // Skin Type selector (apply to all)
+        const skinTypeItem = createMobileOptionItem(
+            localization.translate('Frames Skin Type'),
+            contentDiv
+        );
+        createMobileSelect(
+            bindings.all_skin,
+            skinTypeItem.content,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getFramesBindings();
+                updatedBindings.all_skin.selected = selectedIndex;
+                this.getBridge().setFramesBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Fuselage Frames section
+        const fuselageTitle = document.createElement('div');
+        fuselageTitle.className = 'mobile-option-title';
+        fuselageTitle.style.marginTop = '1rem';
+        fuselageTitle.textContent = localization.translate('Frames Fuselage Frames');
+        contentDiv.appendChild(fuselageTitle);
+
+        // Each fuselage section
+        for (let i = 0; i < bindings.sections.length; i++) {
+            this.createMobileSectionRow(bindings.sections[i], i, contentDiv, bindings);
+        }
+
+        // Tail section title
+        const tailTitle = document.createElement('div');
+        tailTitle.className = 'mobile-option-title';
+        tailTitle.style.marginTop = '1rem';
+        tailTitle.textContent = localization.translate('Frames Tail Section Title');
+        contentDiv.appendChild(tailTitle);
+
+        // Tail type selector
+        const tailTypeItem = createMobileOptionItem(
+            localization.translate('Frames Tail Type'),
+            contentDiv
+        );
+        createMobileSelect(
+            bindings.tail_type,
+            tailTypeItem.content,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getFramesBindings();
+                updatedBindings.tail_type.selected = selectedIndex;
+                this.getBridge().setFramesBindings(updatedBindings);
+                this.render(true);
+            }
+        );
+
+        // Farman checkbox
+        const farmanItem = createMobileOptionItem(
+            localization.translate('Frames Tail Farman'),
+            contentDiv
+        );
+        const farmanCheckbox = document.createElement('input');
+        farmanCheckbox.type = 'checkbox';
+        farmanCheckbox.checked = bindings.farman.selected;
+        farmanCheckbox.disabled = !bindings.farman.enabled;
+        farmanCheckbox.onchange = () => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.farman.selected = farmanCheckbox.checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        };
+        farmanItem.content.appendChild(farmanCheckbox);
+
+        // Boom checkbox
+        const boomItem = createMobileOptionItem(
+            localization.translate('Frames Tail Boom'),
+            contentDiv
+        );
+        const boomCheckbox = document.createElement('input');
+        boomCheckbox.type = 'checkbox';
+        boomCheckbox.checked = bindings.boom.selected;
+        boomCheckbox.disabled = !bindings.boom.enabled;
+        boomCheckbox.onchange = () => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.boom.selected = boomCheckbox.checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        };
+        boomItem.content.appendChild(boomCheckbox);
+
+        // Tail sections
+        if (bindings.tail_sections && bindings.tail_sections.length > 0) {
+            for (let i = 0; i < bindings.tail_sections.length; i++) {
+                this.createMobileTailSectionRow(bindings.tail_sections[i], bindings, i, contentDiv);
+            }
+        }
+
+        // Stats grid
+        const statsTitle = document.createElement('div');
+        statsTitle.className = 'mobile-option-title';
+        statsTitle.style.marginTop = '1rem';
+        statsTitle.textContent = localization.translate('Frames Frame Stats');
+        contentDiv.appendChild(statsTitle);
+
+        const statsGrid = createMobileStatsGrid(stats, FRAMES_STATS, derived);
+        contentDiv.appendChild(statsGrid);
+
+        // Wrap in collapsible section
+        const section = createCollapsibleSection(
+            localization.translate('Frames Frames and Covering'),
+            contentDiv,
+            true
+        );
+
+        // Add rules link
+        const rulesLine = createRulesLink('_Frames');
+        rulesLine.appendChild(document.createElement('br'));
+        section.insertBefore(rulesLine, section.children[1]);
+
+        parent.appendChild(section);
+    }
+
+    /**
+     * Create a mobile fuselage section row
+     */
+    private createMobileSectionRow(sectionBindings: any, index: number, parent: HTMLElement, bindings: any): void {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'mobile-frame-row';
+
+        // Header with +/- buttons and frame count
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'mobile-frame-header';
+
+        // Remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'mobile-number-btn';
+        removeBtn.textContent = '-';
+        removeBtn.disabled = !sectionBindings.can_remove;
+        removeBtn.onclick = () => {
+            this.getBridge().deleteSection(index);
+            this.render(true);
+        };
+        headerDiv.appendChild(removeBtn);
+
+        // Frame select
+        const frameSelect = createSelectElement(
+            sectionBindings.frame,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getFramesBindings();
+                updatedBindings.sections[index].frame.selected = selectedIndex;
+                this.getBridge().setFramesBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        frameSelect.style.flex = '1';
+        headerDiv.appendChild(frameSelect);
+
+        // Add button
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'mobile-number-btn';
+        addBtn.textContent = '+';
+        addBtn.disabled = !sectionBindings.can_add;
+        addBtn.onclick = () => {
+            this.getBridge().duplicateSection(index);
+            this.render(true);
+        };
+        headerDiv.appendChild(addBtn);
+
+        sectionDiv.appendChild(headerDiv);
+
+        // Skin label
+        const skinDiv = document.createElement('div');
+        skinDiv.style.fontSize = '0.9rem';
+        skinDiv.style.color = 'var(--inp_txt_color)';
+        skinDiv.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForSection(sectionBindings);
+        sectionDiv.appendChild(skinDiv);
+
+        // Options row
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'mobile-frame-options';
+
+        // Geodesic
+        const geodesicBinding = { ...sectionBindings.geodesic, name: localization.translate('Frames Geodesic') };
+        createMobileCheckbox(geodesicBinding, optionsDiv, (checked) => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.sections[index].geodesic.selected = checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        // Monocoque
+        const monocoqueBinding = { ...sectionBindings.monocoque, name: localization.translate('Frames Monocoque') };
+        createMobileCheckbox(monocoqueBinding, optionsDiv, (checked) => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.sections[index].monocoque.selected = checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        // Internal Bracing
+        const internalBracingBinding = { ...sectionBindings.internal_bracing, name: localization.translate('Frames Internal Bracing') };
+        createMobileCheckbox(internalBracingBinding, optionsDiv, (checked) => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.sections[index].internal_bracing.selected = checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        // Lifting Body
+        const liftingBodyBinding = { ...sectionBindings.lifting_body, name: localization.translate('Frames Lifting Body') };
+        createMobileCheckbox(liftingBodyBinding, optionsDiv, (checked) => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.sections[index].lifting_body.selected = checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        sectionDiv.appendChild(optionsDiv);
+        parent.appendChild(sectionDiv);
+    }
+
+    /**
+     * Create a mobile tail section row
+     */
+    private createMobileTailSectionRow(tailSectionBindings: any, bindings: any, index: number, parent: HTMLElement): void {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'mobile-frame-row';
+
+        // Frame select
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'mobile-frame-header';
+        const frameSelect = createSelectElement(
+            tailSectionBindings.frame,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getFramesBindings();
+                updatedBindings.tail_sections[index].frame.selected = selectedIndex;
+                this.getBridge().setFramesBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        frameSelect.style.flex = '1';
+        headerDiv.appendChild(frameSelect);
+        sectionDiv.appendChild(headerDiv);
+
+        // Skin label
+        const skinDiv = document.createElement('div');
+        skinDiv.style.fontSize = '0.9rem';
+        skinDiv.style.color = 'var(--inp_txt_color)';
+        skinDiv.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForTailSection(bindings);
+        sectionDiv.appendChild(skinDiv);
+
+        // Options row
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'mobile-frame-options';
+
+        // Geodesic
+        const geodesicBinding = { ...tailSectionBindings.geodesic, name: localization.translate('Frames Geodesic') };
+        createMobileCheckbox(geodesicBinding, optionsDiv, (checked) => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.tail_sections[index].geodesic.selected = checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        // Monocoque
+        const monocoqueBinding = { ...tailSectionBindings.monocoque, name: localization.translate('Frames Monocoque') };
+        createMobileCheckbox(monocoqueBinding, optionsDiv, (checked) => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.tail_sections[index].monocoque.selected = checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        // Lifting Body
+        const liftingBodyBinding = { ...tailSectionBindings.lifting_body, name: localization.translate('Frames Lifting Body') };
+        createMobileCheckbox(liftingBodyBinding, optionsDiv, (checked) => {
+            const updatedBindings = this.getBridge().getFramesBindings();
+            updatedBindings.tail_sections[index].lifting_body.selected = checked;
+            this.getBridge().setFramesBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        sectionDiv.appendChild(optionsDiv);
+        parent.appendChild(sectionDiv);
     }
 }
