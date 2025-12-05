@@ -13,7 +13,9 @@ import {
     createRulesLink,
     createSelectElement,
     updateSelectElement,
-    createCollapsibleSection
+    createCollapsibleSection,
+    createMobileOptionItem,
+    createMobileSelect
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -45,6 +47,13 @@ export class PropellerUI extends BaseComponentUI {
 
         const bindings = bridge.getPropellerBindings();
         const aircraftType = bridge.getAircraftType();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create content container (h4 with spans matching original HTML structure)
         const contentDiv = document.createElement('h4');
@@ -89,6 +98,46 @@ export class PropellerUI extends BaseComponentUI {
         upgradeSelect.id = 'propeller_upgrade_wasm';
         upgradeSpan.appendChild(upgradeSelect);
         contentDiv.appendChild(upgradeSpan);
+        desktopDiv.appendChild(contentDiv);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Propeller Pitch
+        const pitchItem = createMobileOptionItem(
+            localization.translate('Propeller Propeller Pitch'),
+            mobileDiv
+        );
+        createMobileSelect(
+            bindings.idx_prop,
+            pitchItem.content,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getPropellerBindings();
+                updatedBindings.idx_prop.selected = selectedIndex;
+                bridge.setPropellerBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Propeller Upgrades
+        const upgradeItem = createMobileOptionItem(
+            localization.translate('Propeller Propeller Upgrades:'),
+            mobileDiv
+        );
+        createMobileSelect(
+            bindings.idx_upg,
+            upgradeItem.content,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getPropellerBindings();
+                updatedBindings.idx_upg.selected = selectedIndex;
+                bridge.setPropellerBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Cache elements
         this.cache = {
@@ -100,7 +149,7 @@ export class PropellerUI extends BaseComponentUI {
         const sectionTitle = localization.translate('Propeller Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             true // Initially open
         );
 

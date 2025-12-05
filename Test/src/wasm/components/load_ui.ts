@@ -19,7 +19,12 @@ import {
     createCollapsibleSection,
     StatDisplayConfig,
     createStatsTable,
-    updateStatsTable
+    updateStatsTable,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileNumberInput,
+    createMobileCheckbox,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 
@@ -82,6 +87,20 @@ export class LoadUI extends BaseComponentUI {
         const munitionsBindings = bridge.getMunitionsBindings();
         const cargoBindings = bridge.getCargoBindings();
 
+        // Get combined stats
+        const fuelStats = bridge.getFuelStats();
+        const munitionsStats = bridge.getMunitionsStats();
+        const cargoStats = bridge.getCargoStats();
+        const stats = addStats(fuelStats, munitionsStats, cargoStats);
+        const derived = bridge.getDerivedStats();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
+
         // Create main table with 4 columns: Fuel | Munitions | Cargo | Stats
         const mainTable = document.createElement('table');
         mainTable.style.width = '100%';
@@ -123,17 +142,162 @@ export class LoadUI extends BaseComponentUI {
         // Stats cell
         const statsCell = document.createElement('td');
         statsCell.className = "inner_table";
-        // Get all three component stats and combine them
-        const fuelStats = bridge.getFuelStats();
-        const munitionsStats = bridge.getMunitionsStats();
-        const cargoStats = bridge.getCargoStats();
-        const stats = addStats(fuelStats, munitionsStats, cargoStats);
-        const derived = bridge.getDerivedStats();
         const statsTable = createStatsTable(stats, LOAD_STATS, derived);
         statsCell.append(statsTable);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Fuel section
+        const fuelItem = createMobileOptionItem(
+            localization.translate('Load Fuel'),
+            mobileDiv
+        );
+        // Fuel tank inputs
+        if (fuelBindings.tank_count && Array.isArray(fuelBindings.tank_count)) {
+            fuelBindings.tank_count.forEach((tank: any, idx: number) => {
+                createMobileNumberInput(
+                    tank,
+                    fuelItem.content,
+                    (value) => {
+                        const updatedBindings = bridge.getFuelBindings();
+                        updatedBindings.tank_count[idx].value = value;
+                        bridge.setFuelBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    0
+                );
+            });
+        }
+        // Self-sealing checkbox
+        if (fuelBindings.self_sealing) {
+            createMobileCheckbox(
+                fuelBindings.self_sealing,
+                fuelItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getFuelBindings();
+                    updatedBindings.self_sealing.selected = checked;
+                    bridge.setFuelBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+        // Fire extinguisher checkbox
+        if (fuelBindings.fire_extinguisher) {
+            createMobileCheckbox(
+                fuelBindings.fire_extinguisher,
+                fuelItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getFuelBindings();
+                    updatedBindings.fire_extinguisher.selected = checked;
+                    bridge.setFuelBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Munitions section
+        const munitionsItem = createMobileOptionItem(
+            localization.translate('Load Munitions'),
+            mobileDiv
+        );
+        if (munitionsBindings.bomb_count) {
+            createMobileNumberInput(
+                munitionsBindings.bomb_count,
+                munitionsItem.content,
+                (value) => {
+                    const updatedBindings = bridge.getMunitionsBindings();
+                    updatedBindings.bomb_count.value = value;
+                    bridge.setMunitionsBindings(updatedBindings);
+                    this.onUpdate();
+                },
+                0
+            );
+        }
+        if (munitionsBindings.rocket_count) {
+            createMobileNumberInput(
+                munitionsBindings.rocket_count,
+                munitionsItem.content,
+                (value) => {
+                    const updatedBindings = bridge.getMunitionsBindings();
+                    updatedBindings.rocket_count.value = value;
+                    bridge.setMunitionsBindings(updatedBindings);
+                    this.onUpdate();
+                },
+                0
+            );
+        }
+        if (munitionsBindings.internal_bay_count) {
+            createMobileNumberInput(
+                munitionsBindings.internal_bay_count,
+                munitionsItem.content,
+                (value) => {
+                    const updatedBindings = bridge.getMunitionsBindings();
+                    updatedBindings.internal_bay_count.value = value;
+                    bridge.setMunitionsBindings(updatedBindings);
+                    this.onUpdate();
+                },
+                0
+            );
+        }
+        if (munitionsBindings.internal_bay_1) {
+            createMobileCheckbox(
+                munitionsBindings.internal_bay_1,
+                munitionsItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getMunitionsBindings();
+                    updatedBindings.internal_bay_1.selected = checked;
+                    bridge.setMunitionsBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+        if (munitionsBindings.internal_bay_2) {
+            createMobileCheckbox(
+                munitionsBindings.internal_bay_2,
+                munitionsItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getMunitionsBindings();
+                    updatedBindings.internal_bay_2.selected = checked;
+                    bridge.setMunitionsBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Cargo section
+        const cargoItem = createMobileOptionItem(
+            localization.translate('Load Cargo and Passengers'),
+            mobileDiv
+        );
+        if (cargoBindings.space_sel) {
+            createMobileSelect(
+                cargoBindings.space_sel,
+                cargoItem.content,
+                (selectedIndex) => {
+                    const updatedBindings = bridge.getCargoBindings();
+                    updatedBindings.space_sel.selected = selectedIndex;
+                    bridge.setCargoBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Load Load Stats'),
+            mobileDiv
+        );
+        const statsGrid = createMobileStatsGrid(stats, LOAD_STATS, derived);
+        statsItem.content.appendChild(statsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Cache elements
         this.cache = {
@@ -147,7 +311,7 @@ export class LoadUI extends BaseComponentUI {
         const sectionTitle = localization.translate('Load Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            mainTable,
+            contentWrapper,
             true // Initially open
         );
 

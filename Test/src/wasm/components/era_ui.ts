@@ -8,7 +8,18 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
-import { createCollapsibleSection, createRulesLink, createSelectElement, createStatsTable, StatDisplayConfig, updateSelectElement, updateStatsTable } from '../dom_utils';
+import {
+    createCollapsibleSection,
+    createRulesLink,
+    createSelectElement,
+    createStatsTable,
+    StatDisplayConfig,
+    updateSelectElement,
+    updateStatsTable,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileStatsGrid
+} from '../dom_utils';
 
 // Era stats configuration (matching original TypeScript: liftbleed, cost, pitchstab)
 const ERA_STATS: StatDisplayConfig[] = [
@@ -48,6 +59,14 @@ export class EraUI extends BaseComponentUI {
         console.log('[EraUI] rebuildFull: Starting rebuild');
 
         const eraBindings = bridge.getEraBindings();
+        const stats = bridge.getEraStats();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create table for Era selection (matching original TypeScript layout)
         const table = document.createElement('table');
@@ -90,18 +109,49 @@ export class EraUI extends BaseComponentUI {
         // Add stat cells
         const statCell = document.createElement("td") as HTMLTableCellElement;
         statCell.className = 'inner_table';
-        const stats = bridge.getEraStats();
         this.statsTable = createStatsTable(stats, ERA_STATS);
         statCell.appendChild(this.statsTable)
         dataRow.appendChild(statCell);
 
         table.appendChild(dataRow);
+        desktopDiv.appendChild(table);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Era select
+        const eraItem = createMobileOptionItem(
+            localization.translate('Era Option'),
+            mobileDiv
+        );
+        createMobileSelect(
+            eraBindings.selected_era,
+            eraItem.content,
+            (selectedIndex) => {
+                const bindings = bridge.getEraBindings();
+                bindings.selected_era.selected = selectedIndex;
+                bridge.setEraBindings(bindings);
+                this.onUpdate();
+            }
+        );
+
+        // Stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Era Era Stats'),
+            mobileDiv
+        );
+        const statsGrid = createMobileStatsGrid(stats, ERA_STATS);
+        statsItem.content.appendChild(statsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Era Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            table,
+            contentWrapper,
             true // Initially open
         );
 

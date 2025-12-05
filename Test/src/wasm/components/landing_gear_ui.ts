@@ -18,7 +18,11 @@ import {
     createCollapsibleSection,
     StatDisplayConfig,
     createStatsTable,
-    updateStatsTable
+    updateStatsTable,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileCheckbox,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -61,6 +65,14 @@ export class LandingGearUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getLandingGearBindings();
+        const stats = bridge.getLandingGearStats();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create main table with 3 columns: Landing Gear | Extras | Stats
         const mainTable = document.createElement('table');
@@ -97,11 +109,76 @@ export class LandingGearUI extends BaseComponentUI {
         // Stats cell
         const statsCell = document.createElement('td');
         statsCell.className = "inner_table";
-        const stats = bridge.getLandingGearStats();
         const statsTable = createStatsTable(stats, GEAR_STATS);
         statsCell.appendChild(statsTable);
         UIRow.appendChild(statsCell);
         mainTable.appendChild(UIRow);
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Landing Gear Type
+        const gearItem = createMobileOptionItem(
+            localization.translate('Landing Gear Landing Gear'),
+            mobileDiv
+        );
+        if (bindings.gear_sel) {
+            createMobileSelect(
+                bindings.gear_sel,
+                gearItem.content,
+                (selectedIndex) => {
+                    const updatedBindings = bridge.getLandingGearBindings();
+                    updatedBindings.gear_sel.selected = selectedIndex;
+                    bridge.setLandingGearBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+        if (bindings.retract) {
+            createMobileCheckbox(
+                bindings.retract,
+                gearItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getLandingGearBindings();
+                    updatedBindings.retract.selected = checked;
+                    bridge.setLandingGearBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Extras
+        const extrasItem = createMobileOptionItem(
+            localization.translate('Landing Gear Extras'),
+            mobileDiv
+        );
+        if (bindings.extra_sel && Array.isArray(bindings.extra_sel)) {
+            bindings.extra_sel.forEach((extra: any, idx: number) => {
+                createMobileCheckbox(
+                    extra,
+                    extrasItem.content,
+                    (checked) => {
+                        const updatedBindings = bridge.getLandingGearBindings();
+                        updatedBindings.extra_sel[idx].selected = checked;
+                        bridge.setLandingGearBindings(updatedBindings);
+                        this.onUpdate();
+                    }
+                );
+            });
+        }
+
+        // Stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Landing Gear Gear Stats'),
+            mobileDiv
+        );
+        const statsGrid = createMobileStatsGrid(stats, GEAR_STATS);
+        statsItem.content.appendChild(statsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Cache elements
         this.cache = {
@@ -114,7 +191,7 @@ export class LandingGearUI extends BaseComponentUI {
         const sectionTitle = localization.translate('Landing Gear Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            mainTable,
+            contentWrapper,
             true // Initially open
         );
 

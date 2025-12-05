@@ -15,7 +15,11 @@ import {
     createCollapsibleSection,
     createStatsTable,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileNumberInput,
+    createMobileCheckbox,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -54,6 +58,14 @@ export class PassengersUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getPassengersBindings();
+        const stats = bridge.getPassengersStats();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create main table: Seats | Beds | Upgrade | Mass | Required Sections
         const mainTable = document.createElement('table');
@@ -128,12 +140,77 @@ export class PassengersUI extends BaseComponentUI {
         const statsCell = document.createElement('td');
         statsCell.className = "inner_table";
         statsCell.rowSpan = 2;
-        const stats = bridge.getPassengersStats();
         const statsTable = createStatsTable(stats, PASSENGERS_STATS);
         statsCell.appendChild(statsTable);
         headerRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Seats
+        const seatsItem = createMobileOptionItem(
+            localization.translate('Passengers Number of Seats'),
+            mobileDiv
+        );
+        createMobileNumberInput(
+            { ...bindings.seats, name: '' },
+            seatsItem.content,
+            (value) => {
+                const updatedBindings = bridge.getPassengersBindings();
+                updatedBindings.seats.value = value;
+                bridge.setPassengersBindings(updatedBindings);
+                this.onUpdate();
+            },
+            0
+        );
+
+        // Beds
+        const bedsItem = createMobileOptionItem(
+            localization.translate('Passengers Number of Beds'),
+            mobileDiv
+        );
+        createMobileNumberInput(
+            { ...bindings.beds, name: '' },
+            bedsItem.content,
+            (value) => {
+                const updatedBindings = bridge.getPassengersBindings();
+                updatedBindings.beds.value = value;
+                bridge.setPassengersBindings(updatedBindings);
+                this.onUpdate();
+            },
+            0
+        );
+
+        // Connectivity upgrade
+        const upgradeItem = createMobileOptionItem(
+            localization.translate('Passengers Upgrade'),
+            mobileDiv
+        );
+        createMobileCheckbox(
+            bindings.connected,
+            upgradeItem.content,
+            (checked) => {
+                const updatedBindings = bridge.getPassengersBindings();
+                updatedBindings.connected.selected = checked;
+                bridge.setPassengersBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Passengers Stats'),
+            mobileDiv
+        );
+        const statsGrid = createMobileStatsGrid(stats, PASSENGERS_STATS);
+        statsItem.content.appendChild(statsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Cache elements
         this.cache = {
@@ -147,7 +224,7 @@ export class PassengersUI extends BaseComponentUI {
         const sectionTitle = localization.translate('Passengers Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            mainTable,
+            contentWrapper,
             true // Initially open
         );
 

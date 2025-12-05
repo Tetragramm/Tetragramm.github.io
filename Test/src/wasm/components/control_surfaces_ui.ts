@@ -18,7 +18,11 @@ import {
     StatDisplayConfig,
     createStatsTable,
     createCollapsibleSection,
-    updateStatsTable
+    updateStatsTable,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileCheckbox,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -68,6 +72,17 @@ export class ControlSurfacesUI extends BaseComponentUI {
 
         const bindings = bridge.getControlSurfacesBindings();
         const aircraftType = bridge.getAircraftType();
+        const stats = bridge.getControlSurfacesStats();
+        const derivedStats = bridge.getDerivedStats();
+        const flapCost = bridge.getControlSurfacesFlapCost(Math.round(derivedStats.dry_mp));
+        stats.cost += flapCost;
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create main table with 3 columns: Control Surfaces | Drag Inducers | Stats
         const mainTable = document.createElement('table');
@@ -103,15 +118,77 @@ export class ControlSurfacesUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
-        const stats = bridge.getControlSurfacesStats();
-        const derivedStats = bridge.getDerivedStats();
-        const flapCost = bridge.getControlSurfacesFlapCost(Math.round(derivedStats.dry_mp));
-        stats.cost += flapCost;
         const statsTables = createStatsTable(stats, CONTROLS_STATS);
         statsCell.appendChild(statsTables);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Control Surfaces section
+        const surfacesLabels = [
+            'Control Surfaces Ailerons',
+            'Control Surfaces Rudders',
+            'Control Surfaces Elevators',
+            'Control Surfaces Flaps',
+            'Control Surfaces Slats'
+        ];
+        const surfacesKeys = ['aileron_sel', 'rudder_sel', 'elevator_sel', 'flaps_sel', 'slats_sel'];
+
+        surfacesKeys.forEach((key, idx) => {
+            const binding = bindings[key];
+            if (!binding || !binding.options) return;
+
+            const item = createMobileOptionItem(
+                localization.translate(surfacesLabels[idx]),
+                mobileDiv
+            );
+            createMobileSelect(
+                binding,
+                item.content,
+                (selectedIndex) => {
+                    const bindings = bridge.getControlSurfacesBindings();
+                    bindings[key].selected = selectedIndex;
+                    bridge.setControlSurfacesBindings(bindings);
+                    this.onUpdate();
+                }
+            );
+        });
+
+        // Drag Inducers section
+        const dragItem = createMobileOptionItem(
+            localization.translate('Control Surfaces Drag Inducers'),
+            mobileDiv
+        );
+        if (bindings.drag_sel && Array.isArray(bindings.drag_sel)) {
+            bindings.drag_sel.forEach((item: any, idx: number) => {
+                createMobileCheckbox(
+                    item,
+                    dragItem.content,
+                    (checked) => {
+                        const bindings = bridge.getControlSurfacesBindings();
+                        bindings.drag_sel[idx].selected = checked;
+                        bridge.setControlSurfacesBindings(bindings);
+                        this.onUpdate();
+                    }
+                );
+            });
+        }
+
+        // Stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Control Surfaces Stats'),
+            mobileDiv
+        );
+        const statsGrid = createMobileStatsGrid(stats, CONTROLS_STATS);
+        statsItem.content.appendChild(statsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Cache elements
         this.cache = {
@@ -124,7 +201,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
         const sectionTitle = localization.translate('Control Surfaces Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            mainTable,
+            contentWrapper,
             true // Initially open
         );
 

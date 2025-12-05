@@ -17,7 +17,11 @@ import {
     createCollapsibleSection,
     createStatsTable,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileNumberInput,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Stabilizer stats configuration
@@ -61,6 +65,14 @@ export class StabilizersUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getStabilizersBindings();
+        const stats = bridge.getStabilizersStats();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create main table with 3 columns: Horizontal | Vertical | Stats
         const mainTable = document.createElement('table');
@@ -97,12 +109,81 @@ export class StabilizersUI extends BaseComponentUI {
         // Stats cell
         const statsCell = document.createElement('td');
         statsCell.className = "inner_table";
-        let stats = bridge.getStabilizersStats();
         const statsTable = createStatsTable(stats, STABILIZER_STATS);
         statsCell.appendChild(statsTable);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Horizontal Stabilizers
+        const hStabItem = createMobileOptionItem(
+            localization.translate('Stabilizers Horizontal Stabilizers'),
+            mobileDiv
+        );
+        createMobileSelect(
+            bindings.hstab_sel,
+            hStabItem.content,
+            (selectedIndex) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.hstab_sel.selected = selectedIndex;
+                bridge.setStabilizersBindings(bindings);
+                this.onUpdate();
+            }
+        );
+        createMobileNumberInput(
+            { ...bindings.hstab_count, name: localization.translate('Stabilizers # of Stabilizers') },
+            hStabItem.content,
+            (value) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.hstab_count.value = value;
+                bridge.setStabilizersBindings(bindings);
+                this.onUpdate();
+            },
+            0, 20
+        );
+
+        // Vertical Stabilizers
+        const vStabItem = createMobileOptionItem(
+            localization.translate('Stabilizers Vertical Stabilizers'),
+            mobileDiv
+        );
+        createMobileSelect(
+            bindings.vstab_sel,
+            vStabItem.content,
+            (selectedIndex) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.vstab_sel.selected = selectedIndex;
+                bridge.setStabilizersBindings(bindings);
+                this.onUpdate();
+            }
+        );
+        createMobileNumberInput(
+            { ...bindings.vstab_count, name: localization.translate('Stabilizers # of Stabilizers') },
+            vStabItem.content,
+            (value) => {
+                const bindings = bridge.getStabilizersBindings();
+                bindings.vstab_count.value = value;
+                bridge.setStabilizersBindings(bindings);
+                this.onUpdate();
+            },
+            0, 20
+        );
+
+        // Stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Stabilizers Stabilizer Stats'),
+            mobileDiv
+        );
+        const statsGrid = createMobileStatsGrid(stats, STABILIZER_STATS);
+        statsItem.content.appendChild(statsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Cache elements
         this.cache = {
@@ -117,7 +198,7 @@ export class StabilizersUI extends BaseComponentUI {
         const sectionTitle = localization.translate('Stabilizers Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            mainTable,
+            contentWrapper,
             true // Initially open
         );
 
