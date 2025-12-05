@@ -19,7 +19,8 @@ import {
     createMobileOptionItem,
     createMobileNumberInput,
     createMobileCheckbox,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -28,6 +29,7 @@ interface PassengersCache {
     bedsInput: HTMLInputElement;
     connectCheckbox: HTMLInputElement;
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 // Passengers stats configuration
@@ -207,8 +209,8 @@ export class PassengersUI extends BaseComponentUI {
             localization.translate('Passengers Stats'),
             mobileDiv
         );
-        const statsGrid = createMobileStatsGrid(stats, PASSENGERS_STATS);
-        statsItem.content.appendChild(statsGrid);
+        const mobileStatsGrid = createMobileStatsGrid(stats, PASSENGERS_STATS);
+        statsItem.content.appendChild(mobileStatsGrid);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -217,7 +219,8 @@ export class PassengersUI extends BaseComponentUI {
             seatsInput,
             bedsInput,
             connectCheckbox,
-            statsTable
+            statsTable,
+            mobileStatsGrid
         };
 
         // Create collapsible section with localized title
@@ -270,6 +273,11 @@ export class PassengersUI extends BaseComponentUI {
         // Update stats table
         const stats = bridge.getPassengersStats();
         updateStatsTable(this.cache.statsTable, stats, PASSENGERS_STATS);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, PASSENGERS_STATS);
+        }
     }
 
     /**

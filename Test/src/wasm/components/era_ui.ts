@@ -18,7 +18,8 @@ import {
     updateStatsTable,
     createMobileOptionItem,
     createMobileSelect,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Era stats configuration (matching original TypeScript: liftbleed, cost, pitchstab)
@@ -32,6 +33,7 @@ export class EraUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
     private selectElement: HTMLSelectElement = undefined;
     private statsTable: HTMLTableElement = undefined;
+    private mobileStatsGrid: HTMLDivElement = undefined;
 
     protected shouldUpdate(): boolean {
         console.log("[EraUI] selectElement is " + this.selectElement);
@@ -41,6 +43,7 @@ export class EraUI extends BaseComponentUI {
     protected clearCache(): void {
         this.selectElement = undefined;
         this.statsTable = undefined;
+        this.mobileStatsGrid = undefined;
     }
 
     /**
@@ -142,8 +145,8 @@ export class EraUI extends BaseComponentUI {
             localization.translate('Era Era Stats'),
             mobileDiv
         );
-        const statsGrid = createMobileStatsGrid(stats, ERA_STATS);
-        statsItem.content.appendChild(statsGrid);
+        this.mobileStatsGrid = createMobileStatsGrid(stats, ERA_STATS);
+        statsItem.content.appendChild(this.mobileStatsGrid);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -182,5 +185,10 @@ export class EraUI extends BaseComponentUI {
         // Update stat values
         const stats = bridge.getEraStats();
         updateStatsTable(this.statsTable, stats, ERA_STATS);
+
+        // Update mobile stats grid
+        if (this.mobileStatsGrid) {
+            updateMobileStatsGrid(this.mobileStatsGrid, stats, ERA_STATS);
+        }
     }
 }

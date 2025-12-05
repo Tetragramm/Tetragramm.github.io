@@ -22,7 +22,8 @@ import {
     createMobileOptionItem,
     createMobileSelect,
     createMobileCheckbox,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -31,6 +32,7 @@ interface LandingGearCache {
     retractCheckbox: HTMLInputElement;
     extrasCheckboxes: HTMLInputElement[];
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 // Landing Gear stats configuration
@@ -175,8 +177,8 @@ export class LandingGearUI extends BaseComponentUI {
             localization.translate('Landing Gear Gear Stats'),
             mobileDiv
         );
-        const statsGrid = createMobileStatsGrid(stats, GEAR_STATS);
-        statsItem.content.appendChild(statsGrid);
+        const mobileStatsGrid = createMobileStatsGrid(stats, GEAR_STATS);
+        statsItem.content.appendChild(mobileStatsGrid);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -184,7 +186,8 @@ export class LandingGearUI extends BaseComponentUI {
         this.cache = {
             ...gearCache,
             extrasCheckboxes,
-            statsTable
+            statsTable,
+            mobileStatsGrid
         };
 
         // Create collapsible section with localized title
@@ -370,6 +373,11 @@ export class LandingGearUI extends BaseComponentUI {
         // Update stat values
         const stats = bridge.getLandingGearStats();
         updateStatsTable(this.cache.statsTable, stats, GEAR_STATS);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, GEAR_STATS);
+        }
     }
 
     /**

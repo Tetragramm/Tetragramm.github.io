@@ -25,7 +25,8 @@ import {
     createMobileSelect,
     createMobileCheckbox,
     createMobileNumberInput,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Stats configuration for wings
@@ -61,6 +62,7 @@ interface WingsCache {
 
     // Stats
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 interface FullWingRowCache {
@@ -247,6 +249,11 @@ export class WingsUI extends BaseComponentUI {
         );
         const statsGrid = createMobileStatsGrid(stats, WINGS_STATS);
         statsItem.content.appendChild(statsGrid);
+
+        // Store mobile stats grid in cache
+        if (this.cache) {
+            this.cache.mobileStatsGrid = statsGrid;
+        }
     }
 
     /**
@@ -431,6 +438,11 @@ export class WingsUI extends BaseComponentUI {
 
         // Update stats
         updateStatsTable(this.cache.statsTable, stats, WINGS_STATS);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, WINGS_STATS);
+        }
     }
 
     /**

@@ -21,7 +21,8 @@ import {
     createMobileOptionItem,
     createMobileSelect,
     createMobileNumberInput,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Stabilizer stats configuration
@@ -41,6 +42,7 @@ interface StabilizersCache {
     vTypeSelect: HTMLSelectElement;
     vCountInput: HTMLInputElement;
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 export class StabilizersUI extends BaseComponentUI {
@@ -180,8 +182,8 @@ export class StabilizersUI extends BaseComponentUI {
             localization.translate('Stabilizers Stabilizer Stats'),
             mobileDiv
         );
-        const statsGrid = createMobileStatsGrid(stats, STABILIZER_STATS);
-        statsItem.content.appendChild(statsGrid);
+        const mobileStatsGrid = createMobileStatsGrid(stats, STABILIZER_STATS);
+        statsItem.content.appendChild(mobileStatsGrid);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -191,7 +193,8 @@ export class StabilizersUI extends BaseComponentUI {
             hCountInput,
             vTypeSelect,
             vCountInput,
-            statsTable
+            statsTable,
+            mobileStatsGrid
         };
 
         // Create collapsible section with localized title
@@ -334,6 +337,11 @@ export class StabilizersUI extends BaseComponentUI {
         // Update stat values
         const stats = bridge.getStabilizersStats();
         updateStatsTable(this.cache.statsTable, stats, STABILIZER_STATS);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, STABILIZER_STATS);
+        }
     }
 
     /**

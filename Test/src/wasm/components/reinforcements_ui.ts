@@ -23,7 +23,8 @@ import {
     createMobileNumberInput,
     createMobileSelect,
     createMobileCheckbox,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -40,6 +41,7 @@ interface ReinforcementsCache {
 
     // Stats table
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 // Reinforcements stats configuration
@@ -265,8 +267,8 @@ export class ReinforcementsUI extends BaseComponentUI {
             localization.translate('Reinforcement Reinforcement Stats'),
             mobileDiv
         );
-        const statsGrid = createMobileStatsGrid(stats, REINFORCEMENTS_STATS, derivedStats);
-        statsItem.content.appendChild(statsGrid);
+        const mobileStatsGrid = createMobileStatsGrid(stats, REINFORCEMENTS_STATS, derivedStats);
+        statsItem.content.appendChild(mobileStatsGrid);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -274,7 +276,8 @@ export class ReinforcementsUI extends BaseComponentUI {
         this.cache = {
             ...externalCache,
             ...internalCache,
-            statsTable
+            statsTable,
+            mobileStatsGrid
         };
 
         // Create collapsible section with localized title
@@ -588,5 +591,10 @@ export class ReinforcementsUI extends BaseComponentUI {
         const stats = bridge.getReinforcementsStats();
         const derivedStats = bridge.getDerivedStats();
         updateStatsTable(this.cache.statsTable, stats, REINFORCEMENTS_STATS, derivedStats);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, REINFORCEMENTS_STATS, derivedStats);
+        }
     }
 }

@@ -22,7 +22,8 @@ import {
     createMobileSelect,
     createMobileCheckbox,
     createMobileNumberInput,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Cockpit stats configuration
@@ -52,6 +53,7 @@ interface CockpitRowCache {
 export class CockpitsUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
     private cockpitRowCaches: CockpitRowCache[] = [];
+    private mobileCockpitStatsGrids: HTMLDivElement[] = [];
     private numCockpitsInput: HTMLInputElement = undefined;
     private mainTable: HTMLTableElement = undefined;
     private lastCockpitCount: number = 0;
@@ -70,6 +72,7 @@ export class CockpitsUI extends BaseComponentUI {
 
     protected clearCache(): void {
         this.cockpitRowCaches = [];
+        this.mobileCockpitStatsGrids = [];
         this.numCockpitsInput = undefined;
         this.mainTable = undefined;
     }
@@ -342,6 +345,9 @@ export class CockpitsUI extends BaseComponentUI {
         const statsGrid = createMobileStatsGrid(stats, COCKPIT_STATS, derivedStats);
         content.appendChild(statsGrid);
 
+        // Store the mobile stats grid for updates
+        this.mobileCockpitStatsGrids[index] = statsGrid;
+
         cockpitDiv.appendChild(content);
         parent.appendChild(cockpitDiv);
     }
@@ -365,6 +371,13 @@ export class CockpitsUI extends BaseComponentUI {
         cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
             if (idx < this.cockpitRowCaches.length) {
                 this.updateCockpitRow(this.cockpitRowCaches[idx], cockpitOptions, idx, bridge);
+            }
+
+            // Update mobile stats grid for this cockpit
+            if (idx < this.mobileCockpitStatsGrids.length && this.mobileCockpitStatsGrids[idx]) {
+                const stats = bridge.getCockpitStats(idx);
+                const derivedStats = bridge.getCockpitDerivedStats(idx);
+                updateMobileStatsGrid(this.mobileCockpitStatsGrids[idx], stats, COCKPIT_STATS, derivedStats);
             }
         });
     }

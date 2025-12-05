@@ -23,6 +23,7 @@ import {
     createMobileCheckbox,
     createMobileSelect,
     createMobileStatsGrid,
+    updateMobileStatsGrid,
     isMobileView
 } from '../dom_utils';
 
@@ -57,6 +58,9 @@ interface FramesCache {
     boomCheckbox: HTMLInputElement;
     flyingWingCheckbox: HTMLInputElement;
     tailSectionRows: TailSectionRowCache[];
+
+    // Mobile stats grid
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 interface SectionRowCache {
@@ -745,6 +749,11 @@ export class FramesUI extends BaseComponentUI {
 
         // Update stats table
         updateStatsTable(this.cache.statsTable, stats, FRAMES_STATS, derived);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, FRAMES_STATS, derived);
+        }
     }
 
     /**
@@ -933,6 +942,11 @@ export class FramesUI extends BaseComponentUI {
 
         const statsGrid = createMobileStatsGrid(stats, FRAMES_STATS, derived);
         contentDiv.appendChild(statsGrid);
+
+        // Store mobile stats grid in cache
+        if (this.cache) {
+            this.cache.mobileStatsGrid = statsGrid;
+        }
 
         // Wrap in collapsible section
         const section = createCollapsibleSection(
