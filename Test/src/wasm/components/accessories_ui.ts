@@ -377,7 +377,7 @@ export class AccessoriesUI extends BaseComponentUI {
             localization.translate('Accessories Additional Part Stats'),
             mobileDiv
         );
-        const stats = bridge.getAccessoriesStats();
+        //const stats already gathered above.
         const mobileStatsGrid = createMobileStatsGrid(stats, ACCESSORIES_STATS);
         statsItem.content.appendChild(mobileStatsGrid);
 
