@@ -18,7 +18,12 @@ import {
     createStatsTable,
     createCollapsibleSection,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileNumberInput,
+    createMobileSelect,
+    createMobileCheckbox,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -70,6 +75,13 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         const bindings = bridge.getReinforcementsBindings();
 
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
+
         // Create main table with 3 columns: External | Internal | Stats
         const mainTable = document.createElement('table');
         mainTable.style.width = '100%';
@@ -113,6 +125,151 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         mainTable.appendChild(dataRow);
 
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // External Reinforcements section
+        const extItem = createMobileOptionItem(
+            localization.translate('Reinforcement External Reinforcements'),
+            mobileDiv
+        );
+
+        // Wood/Steel counts for each row
+        const extWoodBinding = bindings.ext_wood_count;
+        const extSteelBinding = bindings.ext_steel_count;
+
+        if (extWoodBinding && Array.isArray(extWoodBinding) && extSteelBinding && Array.isArray(extSteelBinding)) {
+            for (let i = 0; i < extWoodBinding.length; i++) {
+                const woodItem = extWoodBinding[i];
+                const steelItem = extSteelBinding[i];
+
+                // Row label
+                const rowDiv = document.createElement('div');
+                rowDiv.style.marginBottom = '0.5em';
+                const rowLabel = document.createElement('strong');
+                rowLabel.textContent = woodItem.name;
+                rowDiv.appendChild(rowLabel);
+                extItem.content.appendChild(rowDiv);
+
+                // Wood input
+                const woodIndex = i;
+                createMobileNumberInput(
+                    { ...woodItem, name: localization.translate('Reinforcement Wood') },
+                    extItem.content,
+                    (value) => {
+                        const updatedBindings = bridge.getReinforcementsBindings();
+                        updatedBindings.ext_wood_count[woodIndex].value = value;
+                        bridge.setReinforcementsBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    0,
+                    99,
+                    1
+                );
+
+                // Steel input
+                const steelIndex = i;
+                createMobileNumberInput(
+                    { ...steelItem, name: localization.translate('Reinforcement Steel') },
+                    extItem.content,
+                    (value) => {
+                        const updatedBindings = bridge.getReinforcementsBindings();
+                        updatedBindings.ext_steel_count[steelIndex].value = value;
+                        bridge.setReinforcementsBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    0,
+                    99,
+                    1
+                );
+            }
+        }
+
+        // Cabane select
+        const cabaneBinding = bindings.cabane_sel;
+        if (cabaneBinding) {
+            createMobileSelect(
+                { ...cabaneBinding, name: localization.translate('Reinforcement Cabane') },
+                extItem.content,
+                (selectedIndex) => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.cabane_sel.selected = selectedIndex;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Wires checkbox
+        const wiresBinding = bindings.wires;
+        if (wiresBinding) {
+            createMobileCheckbox(
+                { ...wiresBinding, name: localization.translate('Reinforcement Wires') },
+                extItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.wires.selected = checked;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Internal Reinforcements section
+        const intItem = createMobileOptionItem(
+            localization.translate('Reinforcement Internal Reinforcements'),
+            mobileDiv
+        );
+
+        // Cantilever counts
+        const cantBinding = bindings.cant_count;
+        if (cantBinding && Array.isArray(cantBinding)) {
+            cantBinding.forEach((item: any, idx: number) => {
+                createMobileNumberInput(
+                    item,
+                    intItem.content,
+                    (value) => {
+                        const updatedBindings = bridge.getReinforcementsBindings();
+                        updatedBindings.cant_count[idx].value = value;
+                        bridge.setReinforcementsBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    0,
+                    99,
+                    1
+                );
+            });
+        }
+
+        // Wing blades checkbox
+        const wingBladesBinding = bindings.wing_blades;
+        if (wingBladesBinding) {
+            createMobileCheckbox(
+                { ...wingBladesBinding, name: localization.translate('Reinforcement Wing Blades') },
+                intItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.wing_blades.selected = checked;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Reinforcement Reinforcement Stats'),
+            mobileDiv
+        );
+        const statsGrid = createMobileStatsGrid(stats, REINFORCEMENTS_STATS, derivedStats);
+        statsItem.content.appendChild(statsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
+
         // Cache elements
         this.cache = {
             ...externalCache,
@@ -124,7 +281,7 @@ export class ReinforcementsUI extends BaseComponentUI {
         const sectionTitle = localization.translate('Reinforcement Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            mainTable,
+            contentWrapper,
             true // Initially open
         );
 
