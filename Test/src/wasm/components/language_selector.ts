@@ -42,6 +42,8 @@ export class LanguageSelector {
         const languageNames: Record<string, string> = {
             'en': 'English',
             'de': 'Deutsch',
+            'es': 'Español',
+            'fr': 'Français',
         };
 
         // Get available languages and current locale

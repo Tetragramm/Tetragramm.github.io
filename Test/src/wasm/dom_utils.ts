@@ -464,16 +464,32 @@ export function createMobileStatsGrid(
         const valueDiv = document.createElement('div');
         valueDiv.className = 'mobile-stat-value';
 
-        // Get value
-        let value = config.isDerived === undefined
-            ? stats[config.key]
-            : derivedStats?.[config.key];
+        // Get the value from stats or derivedStats
+        let value = undefined;
+        if (config.isDerived === undefined) {
+            value = stats[config.key];
+        } else {
+            value = derivedStats[config.key];
+            // Handle special cases (like flight stress range)
+            if (config.key === 'flightstress') {
+                const norm = derivedStats["flight_stress_norm"];
+                const cp = derivedStats['flight_stress_cp'];
+                if (norm != cp) {
+                    value = norm.toString() + " (" + cp.toString() + ")";
+                } else {
+                    value = norm.toString()
+                }
+            }
+        }
 
-        // Format value
-        if (typeof value === 'boolean') {
-            value = value ? 'Yes' : 'No';
-        } else if (typeof value === 'number') {
-            value = parseFloat(value?.toPrecision(4)).toString();
+        if (typeof (value) == 'boolean') {
+            if (value) {
+                value = 'Yes';
+            } else {
+                value = 'No';
+            }
+        } else if (typeof (value) == 'number') {
+            value = parseFloat(value?.toPrecision(4)).toString() || '';
         } else {
             value = value?.toString() || '';
         }
@@ -492,37 +508,91 @@ export function createMobileStatsGrid(
 }
 
 /**
+ * Update a mobile stats grid
+ * @param grid - stats grid to update
+ * @param stats - Stats object
+ * @param statConfig - Configuration for which stats to display
+ * @param derivedStats - Optional derived stats
+ * @returns HTML element containing the stats grid
+ */
+export function updateMobileStatsGrid(
+    grid: HTMLDivElement,
+    stats: any,
+    statConfig: StatDisplayConfig[],
+    derivedStats?: any
+) {
+
+    for (let idx = 0; idx < statConfig.length; idx++) {
+        const config = statConfig[idx];
+        const item = grid.children[idx];
+        let valueDiv = item.children[1];
+
+        // Get the value from stats or derivedStats
+        let value = undefined;
+        if (config.isDerived === undefined) {
+            value = stats[config.key];
+        } else {
+            value = derivedStats[config.key];
+            // Handle special cases (like flight stress range)
+            if (config.key === 'flightstress') {
+                const norm = derivedStats["flight_stress_norm"];
+                const cp = derivedStats['flight_stress_cp'];
+                if (norm != cp) {
+                    value = norm.toString() + " (" + cp.toString() + ")";
+                } else {
+                    value = norm.toString()
+                }
+            }
+        }
+
+        if (typeof (value) == 'boolean') {
+            if (value) {
+                value = 'Yes';
+            } else {
+                value = 'No';
+            }
+        } else if (typeof (value) == 'number') {
+            value = parseFloat(value?.toPrecision(4)).toString() || '';
+        } else {
+            value = value?.toString() || '';
+        }
+
+        blinkIfChanged(valueDiv, value, config.positiveIsGood);
+    }
+}
+
+/**
  * Check if the current device is in mobile view
  */
 export function isMobileView(): boolean {
     return window.innerWidth <= 768;
 }
 
-export function BlinkBad(elem: HTMLElement) {
+export function BlinkBad(elem: Element) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
-    elem.offsetHeight;
+    elem.scrollHeight;
     elem.classList.toggle("changed_b");
 }
 
-export function BlinkGood(elem: HTMLElement) {
+export function BlinkGood(elem: Element) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
-    elem.offsetHeight;
+    elem.scrollHeight;
     elem.classList.toggle("changed_g");
 }
 
-export function BlinkNeutral(elem: HTMLElement) {
+export function BlinkNeutral(elem: Element) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
-    elem.offsetHeight;
+    elem.scrollHeight;
     elem.classList.toggle("changed_n");
 }
 
-export function BlinkNone(elem: HTMLElement) {
+export function BlinkNone(elem: Element) {
     elem.classList.toggle("changed_b", false);
     elem.classList.toggle("changed_g", false);
     elem.classList.toggle("changed_n", false);
@@ -534,7 +604,7 @@ export function BlinkNone(elem: HTMLElement) {
  * @param newValue - The new value to display
  * @param positiveGood - Whether positive values are good (for potential future styling)
  */
-export function blinkIfChanged(elem: HTMLTableCellElement, newValue: string, positiveGood?: boolean): void {
+export function blinkIfChanged(elem: Element, newValue: string, positiveGood?: boolean): void {
     if (elem.textContent != newValue) {
         if (positiveGood == undefined) {
             BlinkNeutral(elem);
