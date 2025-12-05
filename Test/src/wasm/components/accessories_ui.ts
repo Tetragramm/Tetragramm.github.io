@@ -18,7 +18,13 @@ import {
     createStatsTable,
     createCollapsibleSection,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileCheckbox,
+    createMobileNumberInput,
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -49,6 +55,7 @@ interface AccessoriesCache {
 
     // Stat cells
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 // Accessories stats configuration
@@ -86,6 +93,13 @@ export class AccessoriesUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getAccessoriesBindings();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create main table with 2 rows: first row has 4 cells, second row has 3 cells
         const mainTable = document.createElement('table');
@@ -168,6 +182,207 @@ export class AccessoriesUI extends BaseComponentUI {
 
         mainTable.appendChild(dataRow2);
 
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Climate Section
+        const climateItem = createMobileOptionItem(
+            localization.translate('Accessories Climate'),
+            mobileDiv
+        );
+        if (bindings.clim_sel && Array.isArray(bindings.clim_sel)) {
+            for (let i = 0; i < bindings.clim_sel.length; i++) {
+                const binding = bindings.clim_sel[i];
+                const idx = i;
+                createMobileCheckbox(
+                    { name: binding.name, selected: binding.selected, enabled: binding.enabled },
+                    climateItem.content,
+                    (checked) => {
+                        const updatedBindings = bridge.getAccessoriesBindings();
+                        updatedBindings.clim_sel[idx].selected = checked;
+                        bridge.setAccessoriesBindings(updatedBindings);
+                        this.onUpdate();
+                    }
+                );
+            }
+        }
+
+        // Armour Coverage Section
+        const armourItem = createMobileOptionItem(
+            localization.translate('Accessories Armour Coverage'),
+            mobileDiv
+        );
+        if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage)) {
+            for (let i = 0; i < bindings.armour_coverage.length; i++) {
+                const binding = bindings.armour_coverage[i];
+                const idx = i;
+                createMobileNumberInput(
+                    binding,
+                    armourItem.content,
+                    (value) => {
+                        const updatedBindings = bridge.getAccessoriesBindings();
+                        updatedBindings.armour_coverage[idx].value = value;
+                        bridge.setAccessoriesBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    0,
+                    99,
+                    1
+                );
+            }
+        }
+
+        // Visibility Section
+        const visiItem = createMobileOptionItem(
+            localization.translate('Accessories Visibility'),
+            mobileDiv
+        );
+        if (bindings.visi_sel && Array.isArray(bindings.visi_sel)) {
+            for (let i = 0; i < bindings.visi_sel.length; i++) {
+                const binding = bindings.visi_sel[i];
+                const idx = i;
+                createMobileCheckbox(
+                    { name: binding.name, selected: binding.selected, enabled: binding.enabled },
+                    visiItem.content,
+                    (checked) => {
+                        const updatedBindings = bridge.getAccessoriesBindings();
+                        updatedBindings.visi_sel[idx].selected = checked;
+                        bridge.setAccessoriesBindings(updatedBindings);
+                        this.onUpdate();
+                    }
+                );
+            }
+        }
+
+        // Information (Reconnaissance) Section
+        const infoItem = createMobileOptionItem(
+            localization.translate('Accessories Information'),
+            mobileDiv
+        );
+        if (bindings.recon_sel && Array.isArray(bindings.recon_sel)) {
+            for (let i = 0; i < bindings.recon_sel.length; i++) {
+                const binding = bindings.recon_sel[i];
+                const idx = i;
+                createMobileNumberInput(
+                    binding,
+                    infoItem.content,
+                    (value) => {
+                        const updatedBindings = bridge.getAccessoriesBindings();
+                        updatedBindings.recon_sel[idx].value = value;
+                        bridge.setAccessoriesBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    0,
+                    99,
+                    1
+                );
+            }
+        }
+
+        // Electrical Section
+        const electricalItem = createMobileOptionItem(
+            localization.translate('Accessories Electrical'),
+            mobileDiv
+        );
+        // Radio select
+        if (bindings.radio_sel) {
+            const radioBinding = {
+                name: localization.translate('Accessories Radio'),
+                options: bindings.radio_sel.options,
+                selected: bindings.radio_sel.selected,
+                enabled: bindings.radio_sel.enabled
+            };
+            createMobileSelect(
+                radioBinding,
+                electricalItem.content,
+                (selectedIndex) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.radio_sel.selected = selectedIndex;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+        // Electrical equipment counts
+        if (bindings.electrical_count && Array.isArray(bindings.electrical_count)) {
+            for (let i = 0; i < bindings.electrical_count.length; i++) {
+                const binding = bindings.electrical_count[i];
+                const idx = i;
+                createMobileNumberInput(
+                    binding,
+                    electricalItem.content,
+                    (value) => {
+                        const updatedBindings = bridge.getAccessoriesBindings();
+                        updatedBindings.electrical_count[idx].value = value;
+                        bridge.setAccessoriesBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    0,
+                    99,
+                    1
+                );
+            }
+        }
+
+        // Control Section
+        const controlItem = createMobileOptionItem(
+            localization.translate('Accessories Control'),
+            mobileDiv
+        );
+        // Autopilot select
+        if (bindings.auto_sel) {
+            const autopilotBinding = {
+                name: localization.translate('Accessories Autopilot'),
+                options: bindings.auto_sel.options,
+                selected: bindings.auto_sel.selected,
+                enabled: bindings.auto_sel.enabled
+            };
+            createMobileSelect(
+                autopilotBinding,
+                controlItem.content,
+                (selectedIndex) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.auto_sel.selected = selectedIndex;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+        // Control system select
+        if (bindings.cont_sel) {
+            const controlBinding = {
+                name: localization.translate('Accessories Control System'),
+                options: bindings.cont_sel.options,
+                selected: bindings.cont_sel.selected,
+                enabled: bindings.cont_sel.enabled
+            };
+            createMobileSelect(
+                controlBinding,
+                controlItem.content,
+                (selectedIndex) => {
+                    const updatedBindings = bridge.getAccessoriesBindings();
+                    updatedBindings.cont_sel.selected = selectedIndex;
+                    bridge.setAccessoriesBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Mobile stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Accessories Additional Part Stats'),
+            mobileDiv
+        );
+        const stats = bridge.getAccessoriesStats();
+        const mobileStatsGrid = createMobileStatsGrid(stats, ACCESSORIES_STATS);
+        statsItem.content.appendChild(mobileStatsGrid);
+
+        contentWrapper.appendChild(mobileDiv);
+
         // Cache elements
         this.cache = {
             armourInputs,
@@ -178,14 +393,15 @@ export class AccessoriesUI extends BaseComponentUI {
             climCheckboxes,
             autopilotSelect,
             controlSelect,
-            statsTable
+            statsTable,
+            mobileStatsGrid
         };
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Accessories Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            mainTable,
+            contentWrapper,
             true // Initially open
         );
 
@@ -522,5 +738,10 @@ export class AccessoriesUI extends BaseComponentUI {
         // Update stat values
         const stats = bridge.getAccessoriesStats();
         updateStatsTable(this.cache.statsTable, stats, ACCESSORIES_STATS);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, ACCESSORIES_STATS);
+        }
     }
 }

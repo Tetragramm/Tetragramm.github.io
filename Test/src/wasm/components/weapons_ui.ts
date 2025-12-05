@@ -21,7 +21,11 @@ import {
     updateSelectElement,
     createStatsTable,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileNumberInput,
+    createMobileSelect,
+    createMobileCheckbox
 } from '../dom_utils';
 
 /**
@@ -50,6 +54,9 @@ export class WeaponsUI extends BaseComponentUI {
     private weaponSystemsTable: HTMLTableElement | undefined;
     private weaponSystemRows: WeaponSystemRow[] = [];
 
+    // Mobile elements
+    private mobileWeaponSystemsContainer: HTMLDivElement | undefined;
+
     protected shouldUpdate(): boolean {
         return this.numSystemsInput !== undefined;
     }
@@ -59,6 +66,7 @@ export class WeaponsUI extends BaseComponentUI {
         this.braceCountInput = undefined;
         this.weaponSystemsTable = undefined;
         this.weaponSystemRows = [];
+        this.mobileWeaponSystemsContainer = undefined;
     }
 
     /**
@@ -72,6 +80,13 @@ export class WeaponsUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getWeaponsBindings();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create main content container
         const contentDiv = document.createElement('div');
@@ -128,11 +143,56 @@ export class WeaponsUI extends BaseComponentUI {
             this.weaponSystemRows.push(row);
         }
 
+        desktopDiv.appendChild(contentDiv);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Global controls
+        const controlsItem = createMobileOptionItem(
+            localization.translate('Weapons Settings'),
+            mobileDiv
+        );
+
+        // Number of weapon systems
+        createMobileNumberInput(
+            bindings.num_weapon_systems,
+            controlsItem.content,
+            (value) => {
+                const newBindings = bridge.getWeaponsBindings();
+                newBindings.num_weapon_systems.value = value;
+                bridge.setWeaponsBindings(newBindings);
+                this.onUpdate?.();
+            },
+            0, 20, 1
+        );
+
+        // Brace count
+        createMobileNumberInput(
+            bindings.brace_count,
+            controlsItem.content,
+            (value) => {
+                const newBindings = bridge.getWeaponsBindings();
+                newBindings.brace_count.value = value;
+                bridge.setWeaponsBindings(newBindings);
+                this.onUpdate?.();
+            },
+            0, 30, 3
+        );
+
+        // Mobile weapon systems container
+        this.mobileWeaponSystemsContainer = document.createElement('div');
+        mobileDiv.appendChild(this.mobileWeaponSystemsContainer);
+
+        contentWrapper.appendChild(mobileDiv);
+
         // Create collapsible section
         const sectionTitle = localization.translate('Weapons Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             true
         );
 
@@ -140,6 +200,175 @@ export class WeaponsUI extends BaseComponentUI {
 
         this.updateValues();
         console.log('[WeaponsUI] Full rebuild complete');
+    }
+
+    /**
+     * Rebuild mobile weapon systems UI
+     */
+    private rebuildMobileWeaponSystems(): void {
+        if (!this.mobileWeaponSystemsContainer) return;
+        this.mobileWeaponSystemsContainer.innerHTML = '';
+
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const bindings = bridge.getWeaponsBindings();
+        const numSystems = bindings.num_weapon_systems.value;
+
+        for (let i = 0; i < numSystems; i++) {
+            const wsBindings = bridge.getWeaponSystemBindings(i);
+            if (!wsBindings) continue;
+
+            const idx = i;
+
+            const wsItem = createMobileOptionItem(
+                localization.translate('Weapons Weapon Set') + ' ' + (i + 1),
+                this.mobileWeaponSystemsContainer
+            );
+
+            // Duplicate/Remove buttons
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.style.display = 'flex';
+            buttonsDiv.style.gap = '10px';
+            buttonsDiv.style.marginBottom = '10px';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.textContent = localization.translate('Remove');
+            removeBtn.onclick = () => {
+                bridge.removeWeaponSet(idx);
+                this.onUpdate?.();
+            };
+            buttonsDiv.appendChild(removeBtn);
+
+            const duplicateBtn = document.createElement('button');
+            duplicateBtn.textContent = localization.translate('Duplicate');
+            duplicateBtn.onclick = () => {
+                bridge.duplicateWeaponSet(idx);
+                this.onUpdate?.();
+            };
+            buttonsDiv.appendChild(duplicateBtn);
+
+            wsItem.content.appendChild(buttonsDiv);
+
+            // Weapon type select
+            createMobileSelect(
+                {
+                    name: localization.translate('Weapons Type'),
+                    options: wsBindings.weapon_type.options,
+                    selected: wsBindings.weapon_type.selected,
+                    enabled: wsBindings.weapon_type.enabled
+                },
+                wsItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                    updatedBindings.weapon_type.selected = selected;
+                    bridge.setWeaponSystemBindings(idx, updatedBindings);
+                    this.onUpdate?.();
+                }
+            );
+
+            // Seat select
+            createMobileSelect(
+                {
+                    name: localization.translate('Seat Location'),
+                    options: wsBindings.seat.options,
+                    selected: wsBindings.seat.selected,
+                    enabled: wsBindings.seat.enabled
+                },
+                wsItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                    updatedBindings.seat.selected = selected;
+                    bridge.setWeaponSystemBindings(idx, updatedBindings);
+                    this.onUpdate?.();
+                }
+            );
+
+            // Mounting count
+            createMobileNumberInput(
+                wsBindings.mounting_count,
+                wsItem.content,
+                (value) => {
+                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                    updatedBindings.mounting_count.value = value;
+                    bridge.setWeaponSystemBindings(idx, updatedBindings);
+                    this.onUpdate?.();
+                },
+                0, 10, 1
+            );
+
+            // Ammo
+            createMobileNumberInput(
+                wsBindings.ammo,
+                wsItem.content,
+                (value) => {
+                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                    updatedBindings.ammo.value = value;
+                    bridge.setWeaponSystemBindings(idx, updatedBindings);
+                    this.onUpdate?.();
+                },
+                0, 999, 1
+            );
+
+            // Action select
+            createMobileSelect(
+                {
+                    name: localization.translate('Weapons Action'),
+                    options: wsBindings.action_sel.options,
+                    selected: wsBindings.action_sel.selected,
+                    enabled: wsBindings.action_sel.enabled
+                },
+                wsItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                    updatedBindings.action_sel.selected = selected;
+                    bridge.setWeaponSystemBindings(idx, updatedBindings);
+                    this.onUpdate?.();
+                }
+            );
+
+            // Projectile select
+            createMobileSelect(
+                {
+                    name: localization.translate('Weapons Projectile'),
+                    options: wsBindings.projectile_sel.options,
+                    selected: wsBindings.projectile_sel.selected,
+                    enabled: wsBindings.projectile_sel.enabled
+                },
+                wsItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                    updatedBindings.projectile_sel.selected = selected;
+                    bridge.setWeaponSystemBindings(idx, updatedBindings);
+                    this.onUpdate?.();
+                }
+            );
+
+            // Fixed checkbox
+            createMobileCheckbox(
+                { name: wsBindings.fixed.name, selected: wsBindings.fixed.selected, enabled: wsBindings.fixed.enabled },
+                wsItem.content,
+                (checked) => {
+                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                    updatedBindings.fixed.selected = checked;
+                    bridge.setWeaponSystemBindings(idx, updatedBindings);
+                    this.onUpdate?.();
+                }
+            );
+
+            // Key stats display
+            const stats = bridge.getWeaponSystemStats(i);
+            const derivedStats = bridge.getWeaponSystemDerivedStats(i);
+            const statsDiv = document.createElement('div');
+            statsDiv.style.fontSize = '0.85em';
+            statsDiv.style.marginTop = '5px';
+            statsDiv.innerHTML = `
+                <div style="display:flex;justify-content:space-between"><span>Hits:</span><span>${derivedStats.hits}</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Damage:</span><span>${derivedStats.damage}</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Jam:</span><span>${derivedStats.jam}</span></div>
+            `;
+            wsItem.content.appendChild(statsDiv);
+        }
     }
 
     /**
@@ -175,6 +404,9 @@ export class WeaponsUI extends BaseComponentUI {
         for (let i = 0; i < this.weaponSystemRows.length; i++) {
             this.weaponSystemRows[i].update();
         }
+
+        // Update mobile weapon systems
+        this.rebuildMobileWeaponSystems();
     }
 }
 

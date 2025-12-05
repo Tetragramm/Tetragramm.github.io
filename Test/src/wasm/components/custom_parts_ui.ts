@@ -13,6 +13,8 @@ import { localization } from '../localization';
 import {
     createCollapsibleSection,
     createFlexSection,
+    createMobileOptionItem,
+    createMobileNumberInput
 } from '../dom_utils';
 
 interface CustomPart {
@@ -65,6 +67,14 @@ export class CustomPartsUI extends BaseComponentUI {
         if (!bridge) return;
 
         this.loadFromLocalStorage(bridge);
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
+
         // Create main table
         const table = document.createElement('table');
         const row = table.insertRow();
@@ -77,11 +87,172 @@ export class CustomPartsUI extends BaseComponentUI {
         this.buildAddCell(bridge);
         this.buildEditCell(bridge);
 
+        desktopDiv.appendChild(table);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Part list section for mobile
+        const partsListItem = createMobileOptionItem(
+            localization.translate('Alter Select Part'),
+            mobileDiv
+        );
+        partsListItem.content.id = 'mobile-parts-list';
+
+        // Edit form section for mobile
+        const editItem = createMobileOptionItem(
+            localization.translate('Alter Edit Part'),
+            mobileDiv
+        );
+
+        // Mobile name input
+        const mobileNameLabel = document.createElement('label');
+        mobileNameLabel.textContent = localization.translate('Alter Part Name');
+        mobileNameLabel.style.display = 'block';
+        mobileNameLabel.style.marginBottom = '5px';
+        editItem.content.appendChild(mobileNameLabel);
+
+        const mobileNameInput = document.createElement('input');
+        mobileNameInput.type = 'text';
+        mobileNameInput.value = 'Default';
+        mobileNameInput.style.width = '100%';
+        mobileNameInput.style.marginBottom = '10px';
+        mobileNameInput.id = 'mobile-custom-name';
+        editItem.content.appendChild(mobileNameInput);
+
+        // Create mobile stat inputs - organize in a grid-like format
+        const mobileStatInputs = new Map<string, HTMLInputElement>();
+        const statDefs = [
+            ['cost', 'Cost'], ['mass', 'Mass'], ['wetmass', 'Wet Mass'],
+            ['bomb_mass', 'Bomb Mass'], ['drag', 'Drag'], ['liftbleed', 'Lift Bleed'],
+            ['wingarea', 'Wing Area'], ['control', 'Control'], ['pitchstab', 'Pitch Stability'],
+            ['latstab', 'Lateral Stability'], ['maxstrain', 'Raw Strain'], ['structure', 'Structure'],
+            ['toughness', 'Toughness'], ['power', 'Power'], ['fuelconsumption', 'Fuel Consumption'],
+            ['fuel', 'Fuel'], ['visibility', 'Visibility'], ['crashsafety', 'Crash Safety'],
+            ['escape', 'Escape'], ['charge', 'Charge'], ['upkeep', 'Upkeep'],
+            ['reliability', 'Reliability']
+        ];
+
+        for (const [key, label] of statDefs) {
+            const statRow = document.createElement('div');
+            statRow.style.display = 'flex';
+            statRow.style.justifyContent = 'space-between';
+            statRow.style.alignItems = 'center';
+            statRow.style.marginBottom = '5px';
+
+            const statLabel = document.createElement('label');
+            statLabel.textContent = label;
+            statLabel.style.flex = '1';
+            statRow.appendChild(statLabel);
+
+            const statInput = document.createElement('input');
+            statInput.type = 'number';
+            statInput.value = '0';
+            statInput.style.width = '80px';
+            statRow.appendChild(statInput);
+
+            mobileStatInputs.set(key, statInput);
+            editItem.content.appendChild(statRow);
+        }
+
+        // Mobile special rules
+        const mobileSpecialLabel = document.createElement('label');
+        mobileSpecialLabel.textContent = localization.translate('Alter Part Special Rules');
+        mobileSpecialLabel.style.display = 'block';
+        mobileSpecialLabel.style.marginTop = '10px';
+        mobileSpecialLabel.style.marginBottom = '5px';
+        editItem.content.appendChild(mobileSpecialLabel);
+
+        const mobileSpecialInput = document.createElement('input');
+        mobileSpecialInput.type = 'text';
+        mobileSpecialInput.style.width = '100%';
+        mobileSpecialInput.style.marginBottom = '10px';
+        mobileSpecialInput.id = 'mobile-custom-special';
+        editItem.content.appendChild(mobileSpecialInput);
+
+        // Mobile dropdown and buttons
+        const mobileButtonsDiv = document.createElement('div');
+        mobileButtonsDiv.style.display = 'flex';
+        mobileButtonsDiv.style.flexWrap = 'wrap';
+        mobileButtonsDiv.style.gap = '10px';
+
+        const mobilePartSelect = document.createElement('select');
+        mobilePartSelect.style.flex = '1';
+        mobilePartSelect.style.minWidth = '120px';
+        mobilePartSelect.id = 'mobile-custom-select';
+        mobilePartSelect.onchange = () => {
+            const parts = bridge.getCustomParts();
+            const idx = mobilePartSelect.selectedIndex;
+            if (idx >= 0 && idx < parts.length) {
+                const part = parts[idx];
+                mobileNameInput.value = part.name;
+                const stats = part.stats as any;
+                for (const key of mobileStatInputs.keys()) {
+                    mobileStatInputs.get(key)!.value = (stats[key] || 0).toString();
+                }
+                if (stats.warnings && stats.warnings.length > 0) {
+                    mobileSpecialInput.value = stats.warnings.map((w: any) => w.warning).join('   ');
+                } else {
+                    mobileSpecialInput.value = '';
+                }
+            }
+            mobilePartSelect.selectedIndex = -1;
+        };
+        mobileButtonsDiv.appendChild(mobilePartSelect);
+
+        const mobileAddBtn = document.createElement('button');
+        mobileAddBtn.textContent = localization.translate('Add Part');
+        mobileAddBtn.onclick = () => {
+            const stats: any = {};
+            for (const key of mobileStatInputs.keys()) {
+                stats[key] = parseFloat(mobileStatInputs.get(key)!.value) || 0;
+            }
+            stats.warnings = [];
+            if (mobileSpecialInput.value.trim()) {
+                stats.warnings.push({
+                    name: mobileNameInput.value,
+                    warning: mobileSpecialInput.value.trim(),
+                    level: 'White'
+                });
+            }
+            stats.eras = [];
+            stats.cooling = 0;
+            stats.flightstress = 0;
+            stats.pitchboost = 0;
+            stats.pitchspeed = 0;
+            stats.reqsections = 0;
+
+            bridge.addCustomPart(mobileNameInput.value, stats);
+            this.saveToLocalStorage(bridge);
+            this.onUpdate?.();
+        };
+        mobileButtonsDiv.appendChild(mobileAddBtn);
+
+        const mobileRemoveBtn = document.createElement('button');
+        mobileRemoveBtn.textContent = localization.translate('Remove Part');
+        mobileRemoveBtn.onclick = () => {
+            bridge.removeCustomPart(mobileNameInput.value);
+            mobileNameInput.value = 'Default';
+            for (const key of mobileStatInputs.keys()) {
+                mobileStatInputs.get(key)!.value = '0';
+            }
+            mobileSpecialInput.value = '';
+            this.saveToLocalStorage(bridge);
+            this.onUpdate?.();
+        };
+        mobileButtonsDiv.appendChild(mobileRemoveBtn);
+
+        editItem.content.appendChild(mobileButtonsDiv);
+
+        contentWrapper.appendChild(mobileDiv);
+
         // Create collapsible section
         const sectionTitle = localization.translate('Alter Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            table,
+            contentWrapper,
             !bridge.isCustomPartsDefault()
         );
 
@@ -415,6 +586,54 @@ export class CustomPartsUI extends BaseComponentUI {
 
         // Update the dropdown
         this.updatePartSelect(bridge);
+
+        // Update mobile parts list
+        const mobilePartsList = document.getElementById('mobile-parts-list');
+        if (mobilePartsList) {
+            mobilePartsList.innerHTML = '';
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                const partRow = document.createElement('div');
+                partRow.style.display = 'flex';
+                partRow.style.justifyContent = 'space-between';
+                partRow.style.alignItems = 'center';
+                partRow.style.marginBottom = '8px';
+
+                const nameLabel = document.createElement('span');
+                nameLabel.textContent = part.name;
+                nameLabel.style.flex = '1';
+                partRow.appendChild(nameLabel);
+
+                const qtyInput = document.createElement('input');
+                qtyInput.type = 'number';
+                qtyInput.min = '0';
+                qtyInput.value = part.qty.toString();
+                qtyInput.style.width = '60px';
+                const idx = i;
+                qtyInput.onchange = () => {
+                    bridge.setCustomPartQty(idx, parseInt(qtyInput.value) || 0);
+                    this.saveToLocalStorage(bridge);
+                    this.onUpdate?.();
+                };
+                partRow.appendChild(qtyInput);
+
+                mobilePartsList.appendChild(partRow);
+            }
+        }
+
+        // Update mobile part select dropdown
+        const mobilePartSelect = document.getElementById('mobile-custom-select') as HTMLSelectElement;
+        if (mobilePartSelect) {
+            while (mobilePartSelect.options.length > 0) {
+                mobilePartSelect.remove(0);
+            }
+            for (const part of parts) {
+                const option = document.createElement('option');
+                option.textContent = part.name;
+                mobilePartSelect.add(option);
+            }
+            mobilePartSelect.selectedIndex = -1;
+        }
     }
 
     /**

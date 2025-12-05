@@ -1,7 +1,12 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput, createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement, createStatsTable, updateStatsTable, StatDisplayConfig } from '../dom_utils';
+import {
+    createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput,
+    createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement,
+    createStatsTable, updateStatsTable, StatDisplayConfig,
+    createMobileOptionItem, createMobileNumberInput, createMobileCheckbox, createMobileSelect
+} from '../dom_utils';
 
 // Engine stats configuration for stats table
 const ENGINE_STATS: StatDisplayConfig[] = [
@@ -46,6 +51,10 @@ export class EnginesUI extends BaseComponentUI {
     private enginesContainer: HTMLDivElement | undefined;
     private radiatorsContainer: HTMLDivElement | undefined;
 
+    // Mobile containers
+    private mobileEnginesContainer: HTMLDivElement | undefined;
+    private mobileRadiatorsContainer: HTMLDivElement | undefined;
+
     // Cached engine/radiator UIs (will be cleared when counts change)
     private engineUIs: EngineUI[] = [];
     private radiatorUIs: RadiatorUI[] = [];
@@ -82,6 +91,8 @@ export class EnginesUI extends BaseComponentUI {
         this.numRadiatorsInput = undefined;
         this.enginesContainer = undefined;
         this.radiatorsContainer = undefined;
+        this.mobileEnginesContainer = undefined;
+        this.mobileRadiatorsContainer = undefined;
         this.engineUIs = [];
         this.radiatorUIs = [];
         this.cachedEngineCount = 0;
@@ -98,40 +109,15 @@ export class EnginesUI extends BaseComponentUI {
 
         this.container.innerHTML = '';
 
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
+
         // Create collapsible section for Engines
         const sectionDiv = document.createElement('div');
-
-        const section = createCollapsibleSection(
-            localization.translate('Engines Section Title'),
-            sectionDiv,
-            true
-        );
-
-        this.sectionElement = section;
-
-        // Add rules link using utility function
-        const rulesLine = document.createElement('span');
-        rulesLine.appendChild(createRulesLink('_Engines', 'Engine Rules').firstChild);
-        rulesLine.appendChild(createRulesLink('_Engines_Upgrades', 'Upgrade Rules').firstChild);
-        rulesLine.appendChild(createRulesLink('_Cooling_(Air)', 'Cooling Rules').firstChild);
-
-        // Add Engine Builder link
-        const engineBuilderSpan = document.createElement('span');
-        const engineBuilderLink = document.createElement('a');
-        engineBuilderLink.href = './engine.html';
-        const engineBuilderText = document.createElement('u');
-        engineBuilderText.textContent = 'Engine Builder';
-        engineBuilderLink.appendChild(engineBuilderText);
-        engineBuilderSpan.appendChild(engineBuilderLink);
-        rulesLine.appendChild(engineBuilderSpan);
-
-        rulesLine.appendChild(document.createElement('br'));
-        this.sectionElement.insertBefore(
-            rulesLine,
-            this.sectionElement.children[1]
-        );
-        this.container.appendChild(section);
-        this.enginesSection = section;
 
         // Create global controls table
         const controlsSpan = document.createElement('span');
@@ -175,6 +161,114 @@ export class EnginesUI extends BaseComponentUI {
         this.radiatorsContainer = document.createElement('div');
         sectionDiv.appendChild(this.radiatorsContainer);
 
+        desktopDiv.appendChild(sectionDiv);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Global controls
+        const controlsItem = createMobileOptionItem(
+            localization.translate('Engines Settings'),
+            mobileDiv
+        );
+
+        // Number of engines
+        createMobileNumberInput(
+            bindings.engines,
+            controlsItem.content,
+            (value) => {
+                const bindings = bridge.getEnginesBindings();
+                bindings.engines.value = value;
+                bridge.setEnginesBindings(bindings);
+                this.onUpdate();
+            },
+            0, 20, 1
+        );
+
+        // Number of radiators
+        createMobileNumberInput(
+            bindings.radiators,
+            controlsItem.content,
+            (value) => {
+                const bindings = bridge.getEnginesBindings();
+                bindings.radiators.value = value;
+                bridge.setEnginesBindings(bindings);
+                this.onUpdate();
+            },
+            0, 20, 1
+        );
+
+        // Asymmetric checkbox
+        createMobileCheckbox(
+            { name: localization.translate("Engines Asymmetric Plane"), selected: bindings.is_asymmetric.selected, enabled: bindings.is_asymmetric.enabled },
+            controlsItem.content,
+            (checked) => {
+                const bindings = bridge.getEnginesBindings();
+                bindings.is_asymmetric.selected = checked;
+                bridge.setEnginesBindings(bindings);
+                this.onUpdate();
+            }
+        );
+
+        // Container for mobile engines
+        this.mobileEnginesContainer = document.createElement('div');
+        mobileDiv.appendChild(this.mobileEnginesContainer);
+
+        // Container for mobile radiators
+        this.mobileRadiatorsContainer = document.createElement('div');
+        mobileDiv.appendChild(this.mobileRadiatorsContainer);
+
+        // Engine Builder link
+        const mobileBuilderDiv = document.createElement('div');
+        mobileBuilderDiv.style.marginTop = '10px';
+        mobileBuilderDiv.style.textAlign = 'center';
+        const mobileBuilderLink = document.createElement('a');
+        mobileBuilderLink.href = './engine.html';
+        const mobileBuilderText = document.createElement('u');
+        mobileBuilderText.textContent = 'Engine Builder';
+        mobileBuilderLink.appendChild(mobileBuilderText);
+        mobileBuilderDiv.appendChild(mobileBuilderLink);
+        mobileDiv.appendChild(mobileBuilderDiv);
+
+        contentWrapper.appendChild(mobileDiv);
+
+        // Create the collapsible section with the content wrapper
+        const section = createCollapsibleSection(
+            localization.translate('Engines Section Title'),
+            contentWrapper,
+            true
+        );
+
+        this.sectionElement = section;
+        this.enginesSection = section;
+
+        // Add rules link using utility function
+        const rulesLine = document.createElement('span');
+        rulesLine.appendChild(createRulesLink('_Engines', 'Engine Rules').firstChild);
+        rulesLine.appendChild(createRulesLink('_Engines_Upgrades', 'Upgrade Rules').firstChild);
+        rulesLine.appendChild(createRulesLink('_Cooling_(Air)', 'Cooling Rules').firstChild);
+
+        // Add Engine Builder link (desktop)
+        const engineBuilderSpan = document.createElement('span');
+        engineBuilderSpan.className = 'desktop-only';
+        const engineBuilderLink = document.createElement('a');
+        engineBuilderLink.href = './engine.html';
+        const engineBuilderText = document.createElement('u');
+        engineBuilderText.textContent = 'Engine Builder';
+        engineBuilderLink.appendChild(engineBuilderText);
+        engineBuilderSpan.appendChild(engineBuilderLink);
+        rulesLine.appendChild(engineBuilderSpan);
+
+        rulesLine.appendChild(document.createElement('br'));
+        this.sectionElement.insertBefore(
+            rulesLine,
+            this.sectionElement.children[1]
+        );
+
+        this.container.appendChild(section);
+
         // Initial update
         this.updateValues();
     }
@@ -207,6 +301,7 @@ export class EnginesUI extends BaseComponentUI {
         if (engineCountChanged) {
             this.cachedEngineCount = bindings.engines.value;
             this.rebuildEngines();
+            this.rebuildMobileEngines();
         } else {
             // Just update existing engine UIs
             this.engineUIs.forEach(engineUI => engineUI.update());
@@ -216,9 +311,180 @@ export class EnginesUI extends BaseComponentUI {
         if (radiatorCountChanged) {
             this.cachedRadiatorCount = bindings.radiators.value;
             this.rebuildRadiators();
+            this.rebuildMobileRadiators();
         } else {
             // Just update existing radiator UIs
             this.radiatorUIs.forEach(radiatorUI => radiatorUI.update());
+        }
+    }
+
+    private rebuildMobileEngines(): void {
+        if (!this.mobileEnginesContainer) return;
+        this.mobileEnginesContainer.innerHTML = '';
+
+        const bridge = this.getBridge();
+        const bindings = bridge.getEnginesBindings();
+
+        for (let i = 0; i < bindings.engines.value; i++) {
+            const engineItem = createMobileOptionItem(
+                localization.translate('Engines Engine') + ' ' + (i + 1),
+                this.mobileEnginesContainer
+            );
+
+            // Engine list selection
+            const allLists = bridge.getEngineNamesOfLists();
+            const selectedList = bridge.getEngineSelectedList(i);
+            const idx = i;
+
+            createMobileSelect(
+                {
+                    name: localization.translate('Engine List'),
+                    options: allLists.map(o => ({ name: o, enabled: true })),
+                    selected: allLists.indexOf(selectedList),
+                    enabled: true
+                },
+                engineItem.content,
+                (selected) => {
+                    bridge.setEngineSelectedList(idx, allLists[selected]);
+                    this.onUpdate();
+                }
+            );
+
+            // Engine type selection
+            const enginesInList = bridge.getEngineNamesInList(selectedList);
+            const selectedEngine = bridge.getEngineSelectedName(i);
+
+            createMobileSelect(
+                {
+                    name: localization.translate('Engine Type'),
+                    options: enginesInList.map(o => ({ name: o, enabled: true })),
+                    selected: enginesInList.indexOf(selectedEngine),
+                    enabled: true
+                },
+                engineItem.content,
+                (selected) => {
+                    bridge.setEngineSelectedIndex(idx, selected);
+                    this.onUpdate();
+                }
+            );
+
+            // Show key stats
+            const fullStats = bridge.getEngineFullStats(i);
+            const statsDiv = document.createElement('div');
+            statsDiv.style.fontSize = '0.85em';
+            statsDiv.style.marginTop = '5px';
+            statsDiv.innerHTML = `
+                <div style="display:flex;justify-content:space-between"><span>Power:</span><span>${fullStats.stats.power}</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Mass:</span><span>${fullStats.stats.mass}</span></div>
+                <div style="display:flex;justify-content:space-between"><span>Reliability:</span><span>${fullStats.stats.reliability}</span></div>
+            `;
+            engineItem.content.appendChild(statsDiv);
+
+            // Mounting select
+            const engineBindings = bridge.getEngineBindings(i);
+            createMobileSelect(
+                {
+                    name: localization.translate('Engine Mounting Location'),
+                    options: engineBindings.mount_sel.options,
+                    selected: engineBindings.mount_sel.selected,
+                    enabled: engineBindings.mount_sel.enabled
+                },
+                engineItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.mount_sel.selected = selected;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+
+            // Cowl select
+            createMobileSelect(
+                {
+                    name: localization.translate('Engine Cowls'),
+                    options: engineBindings.cowl_sel.options,
+                    selected: engineBindings.cowl_sel.selected,
+                    enabled: engineBindings.cowl_sel.enabled
+                },
+                engineItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.cowl_sel.selected = selected;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+    }
+
+    private rebuildMobileRadiators(): void {
+        if (!this.mobileRadiatorsContainer) return;
+        this.mobileRadiatorsContainer.innerHTML = '';
+
+        const bridge = this.getBridge();
+        const bindings = bridge.getEnginesBindings();
+
+        if (bindings.radiators.value === 0) return;
+
+        for (let i = 0; i < bindings.radiators.value; i++) {
+            const radiatorItem = createMobileOptionItem(
+                localization.translate('Radiators Radiator') + ' ' + (i + 1),
+                this.mobileRadiatorsContainer
+            );
+
+            const radiatorBindings = bridge.getRadiatorBindings(i);
+            const idx = i;
+
+            // Type select
+            createMobileSelect(
+                {
+                    name: localization.translate('Radiators Radiator Type'),
+                    options: radiatorBindings.idx_type.options,
+                    selected: radiatorBindings.idx_type.selected,
+                    enabled: radiatorBindings.idx_type.enabled
+                },
+                radiatorItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getRadiatorBindings(idx);
+                    updatedBindings.idx_type.selected = selected;
+                    bridge.setRadiatorBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+
+            // Mount select
+            createMobileSelect(
+                {
+                    name: localization.translate('Radiators Mounting'),
+                    options: radiatorBindings.idx_mount.options,
+                    selected: radiatorBindings.idx_mount.selected,
+                    enabled: radiatorBindings.idx_mount.enabled
+                },
+                radiatorItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getRadiatorBindings(idx);
+                    updatedBindings.idx_mount.selected = selected;
+                    bridge.setRadiatorBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+
+            // Coolant select
+            createMobileSelect(
+                {
+                    name: localization.translate('Radiators Coolant'),
+                    options: radiatorBindings.idx_coolant.options,
+                    selected: radiatorBindings.idx_coolant.selected,
+                    enabled: radiatorBindings.idx_coolant.enabled
+                },
+                radiatorItem.content,
+                (selected) => {
+                    const updatedBindings = bridge.getRadiatorBindings(idx);
+                    updatedBindings.idx_coolant.selected = selected;
+                    bridge.setRadiatorBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
         }
     }
 

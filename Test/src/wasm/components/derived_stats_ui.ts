@@ -10,7 +10,7 @@
 
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection } from '../dom_utils';
+import { createCollapsibleSection, createMobileOptionItem } from '../dom_utils';
 
 /**
  * Derived Stats UI Component - displays calculated aircraft performance
@@ -18,11 +18,22 @@ import { createCollapsibleSection } from '../dom_utils';
 export class DerivedStatsUI extends BaseComponentUI {
     // Name input
     private nameInput: HTMLInputElement | undefined;
+    private mobileNameInput: HTMLInputElement | undefined;
 
     // Top row cells
     private costCell: HTMLTableCellElement | undefined;
     private upkeepCell: HTMLTableCellElement | undefined;
     private versionCell: HTMLTableCellElement | undefined;
+
+    // Mobile stat cells
+    private mobileCostCell: HTMLElement | undefined;
+    private mobileUpkeepCell: HTMLElement | undefined;
+    private mobileVersionCell: HTMLElement | undefined;
+    private mobileMassVariationsDiv: HTMLElement | undefined;
+    private mobileStatsDiv: HTMLElement | undefined;
+    private mobileWeaponsDiv: HTMLElement | undefined;
+    private mobileElectricsDiv: HTMLElement | undefined;
+    private mobileWarningsDiv: HTMLElement | undefined;
 
     // Mass variation cells - Empty
     private tsEmpty: HTMLTableCellElement | undefined;
@@ -99,9 +110,18 @@ export class DerivedStatsUI extends BaseComponentUI {
 
     protected clearCache(): void {
         this.nameInput = undefined;
+        this.mobileNameInput = undefined;
         this.costCell = undefined;
         this.upkeepCell = undefined;
         this.versionCell = undefined;
+        this.mobileCostCell = undefined;
+        this.mobileUpkeepCell = undefined;
+        this.mobileVersionCell = undefined;
+        this.mobileMassVariationsDiv = undefined;
+        this.mobileStatsDiv = undefined;
+        this.mobileWeaponsDiv = undefined;
+        this.mobileElectricsDiv = undefined;
+        this.mobileWarningsDiv = undefined;
         this.tsEmpty = undefined;
         this.ssEmpty = undefined;
         this.handEmpty = undefined;
@@ -167,9 +187,12 @@ export class DerivedStatsUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
-        // Create main content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only content';
 
         // Create table
         const table = document.createElement('table');
@@ -348,10 +371,9 @@ export class DerivedStatsUI extends BaseComponentUI {
         this.warningCell = table.insertRow().insertCell();
         this.warningCell.colSpan = 6;
 
-        contentDiv.appendChild(table);
+        desktopDiv.appendChild(table);
 
-
-        // Add Hangar link
+        // Add Hangar link (desktop)
         const hangarSpan = document.createElement('span');
         const hangarLink = document.createElement('a');
         hangarLink.href = './hangar.html';
@@ -359,13 +381,114 @@ export class DerivedStatsUI extends BaseComponentUI {
         hangarText.textContent = localization.translate('Compare Aircraft in Hangar');
         hangarLink.appendChild(hangarText);
         hangarSpan.appendChild(hangarLink);
-        contentDiv.appendChild(hangarSpan);
+        desktopDiv.appendChild(hangarSpan);
+
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Name input section
+        const nameItem = createMobileOptionItem(
+            localization.translate('Aircraft Name'),
+            mobileDiv
+        );
+        this.mobileNameInput = document.createElement('input');
+        this.mobileNameInput.type = 'text';
+        this.mobileNameInput.defaultValue = bridge.getName();
+        this.mobileNameInput.style.width = '100%';
+        this.mobileNameInput.onchange = () => {
+            bridge.setName(this.mobileNameInput!.value);
+            if (this.nameInput) {
+                this.nameInput.value = this.mobileNameInput!.value;
+            }
+        };
+        nameItem.content.appendChild(this.mobileNameInput);
+
+        // Cost/Upkeep/Era section
+        const basicItem = createMobileOptionItem(
+            localization.translate('Derived Basic Stats'),
+            mobileDiv
+        );
+        const basicGrid = document.createElement('div');
+        basicGrid.style.display = 'grid';
+        basicGrid.style.gridTemplateColumns = '1fr 1fr';
+        basicGrid.style.gap = '5px';
+
+        this.mobileCostCell = this.createMobileStatRow(basicGrid, localization.translate('Stat Cost'));
+        this.mobileUpkeepCell = this.createMobileStatRow(basicGrid, localization.translate('Stat Upkeep'));
+        this.mobileVersionCell = this.createMobileStatRow(basicGrid, localization.translate('Derived Era Report'));
+        basicItem.content.appendChild(basicGrid);
+
+        // Mass variations section (scrollable table)
+        const massItem = createMobileOptionItem(
+            localization.translate('Derived Mass Variations'),
+            mobileDiv
+        );
+        this.mobileMassVariationsDiv = document.createElement('div');
+        this.mobileMassVariationsDiv.style.overflowX = 'auto';
+        this.mobileMassVariationsDiv.style.fontSize = '0.85em';
+        massItem.content.appendChild(this.mobileMassVariationsDiv);
+
+        // Other stats section
+        const statsItem = createMobileOptionItem(
+            localization.translate('Derived Performance Stats'),
+            mobileDiv
+        );
+        this.mobileStatsDiv = document.createElement('div');
+        this.mobileStatsDiv.style.display = 'grid';
+        this.mobileStatsDiv.style.gridTemplateColumns = '1fr 1fr';
+        this.mobileStatsDiv.style.gap = '5px';
+        this.mobileStatsDiv.style.fontSize = '0.9em';
+        statsItem.content.appendChild(this.mobileStatsDiv);
+
+        // Weapons section
+        const weaponsItem = createMobileOptionItem(
+            localization.translate('Derived Weapon Systems'),
+            mobileDiv
+        );
+        this.mobileWeaponsDiv = document.createElement('div');
+        this.mobileWeaponsDiv.style.fontSize = '0.9em';
+        weaponsItem.content.appendChild(this.mobileWeaponsDiv);
+
+        // Electrics section
+        const electricsItem = createMobileOptionItem(
+            localization.translate('Derived Electrics'),
+            mobileDiv
+        );
+        this.mobileElectricsDiv = document.createElement('div');
+        this.mobileElectricsDiv.style.fontSize = '0.9em';
+        electricsItem.content.appendChild(this.mobileElectricsDiv);
+
+        // Warnings section
+        const warningsItem = createMobileOptionItem(
+            localization.translate('Derived Special Rules'),
+            mobileDiv
+        );
+        this.mobileWarningsDiv = document.createElement('div');
+        this.mobileWarningsDiv.style.fontSize = '0.9em';
+        warningsItem.content.appendChild(this.mobileWarningsDiv);
+
+        // Mobile Hangar link
+        const mobileHangarSpan = document.createElement('div');
+        mobileHangarSpan.style.marginTop = '10px';
+        mobileHangarSpan.style.textAlign = 'center';
+        const mobileHangarLink = document.createElement('a');
+        mobileHangarLink.href = './hangar.html';
+        const mobileHangarText = document.createElement('u');
+        mobileHangarText.textContent = localization.translate('Compare Aircraft in Hangar');
+        mobileHangarLink.appendChild(mobileHangarText);
+        mobileHangarSpan.appendChild(mobileHangarLink);
+        mobileDiv.appendChild(mobileHangarSpan);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Create collapsible section
         const sectionTitle = localization.translate('Aircraft Derived Statistics');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             true // Expanded by default
         );
 
@@ -721,6 +844,9 @@ export class DerivedStatsUI extends BaseComponentUI {
         if (this.versionCell && stats.eras) {
             this.updateEraDisplay(stats.eras);
         }
+
+        // Update mobile stats
+        this.updateMobileStats();
     }
 
     /**
@@ -895,5 +1021,268 @@ export class DerivedStatsUI extends BaseComponentUI {
 
     public setShowBombs(show: boolean): void {
         this.showBombs = show;
+    }
+
+    /**
+     * Helper to create a mobile stat row (label + value span)
+     */
+    private createMobileStatRow(container: HTMLElement, label: string): HTMLElement {
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.padding = '2px 0';
+
+        const labelSpan = document.createElement('span');
+        labelSpan.textContent = label + ':';
+        labelSpan.style.fontWeight = 'bold';
+        row.appendChild(labelSpan);
+
+        const valueSpan = document.createElement('span');
+        row.appendChild(valueSpan);
+
+        container.appendChild(row);
+        return valueSpan;
+    }
+
+    /**
+     * Update mobile stats display
+     */
+    private updateMobileStats(): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const stats = bridge.getStats();
+        const derivedStats = bridge.getDerivedStats();
+
+        // Update basic stats
+        if (this.mobileCostCell) {
+            let costText = stats.cost.toString() + 'þ';
+            if (!bridge.getUsedIsDefault()) {
+                costText += ' (' + Math.floor(1.0e-6 + stats.cost / 2).toString() + 'þ used)';
+            }
+            this.mobileCostCell.textContent = costText;
+        }
+        if (this.mobileUpkeepCell) {
+            this.mobileUpkeepCell.textContent = stats.upkeep.toString() + 'þ';
+        }
+        if (this.mobileVersionCell) {
+            const aircraftEra = bridge.getEraText();
+            this.mobileVersionCell.textContent = localization.translate(aircraftEra);
+        }
+
+        // Update mass variations table
+        if (this.mobileMassVariationsDiv) {
+            this.mobileMassVariationsDiv.innerHTML = '';
+            const massTable = document.createElement('table');
+            massTable.style.width = '100%';
+            massTable.style.minWidth = '400px';
+
+            // Header row
+            const headerRow = massTable.insertRow();
+            ['', 'Boost', 'Hand', 'RoC', 'Stall', 'Speed'].forEach(text => {
+                const th = document.createElement('th');
+                th.textContent = text;
+                th.style.textAlign = 'center';
+                headerRow.appendChild(th);
+            });
+
+            // Show bomb rows if needed
+            if (stats.bomb_mass > 0 || this.showBombs) {
+                // Full with Bombs row
+                const fwbRow = massTable.insertRow();
+                fwbRow.insertCell().textContent = 'Full+B';
+                fwbRow.insertCell().textContent = derivedStats.boost_full_w_bombs.toString();
+                fwbRow.insertCell().textContent = derivedStats.handling_full_w_bombs.toString();
+                fwbRow.insertCell().textContent = derivedStats.rate_of_climb_w_bombs.toString();
+                fwbRow.insertCell().textContent = derivedStats.stall_speed_full_w_bombs.toString();
+                fwbRow.insertCell().textContent = Math.floor(1.0e-6 + derivedStats.max_speed_w_bombs).toString();
+
+                // Half with Bombs row
+                const hwbRow = massTable.insertRow();
+                hwbRow.insertCell().textContent = 'Half+B';
+                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.boost_empty + derivedStats.boost_full_w_bombs) / 2).toString();
+                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.handling_empty + derivedStats.handling_full_w_bombs) / 2).toString();
+                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.rate_of_climb_empty + derivedStats.rate_of_climb_w_bombs) / 2).toString();
+                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.stall_speed_empty + derivedStats.stall_speed_full_w_bombs) / 2).toString();
+                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.max_speed_empty + derivedStats.max_speed_w_bombs) / 2).toString();
+            }
+
+            // Full row
+            const fullRow = massTable.insertRow();
+            fullRow.insertCell().textContent = 'Full';
+            fullRow.insertCell().textContent = derivedStats.boost_full.toString();
+            fullRow.insertCell().textContent = derivedStats.handling_full.toString();
+            fullRow.insertCell().textContent = derivedStats.rate_of_climb_full.toString();
+            fullRow.insertCell().textContent = derivedStats.stall_speed_full.toString();
+            fullRow.insertCell().textContent = Math.floor(1.0e-6 + derivedStats.max_speed_full).toString();
+
+            // Half row
+            const halfRow = massTable.insertRow();
+            halfRow.insertCell().textContent = 'Half';
+            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.boost_empty + derivedStats.boost_full) / 2).toString();
+            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.handling_empty + derivedStats.handling_full) / 2).toString();
+            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.rate_of_climb_empty + derivedStats.rate_of_climb_full) / 2).toString();
+            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.stall_speed_empty + derivedStats.stall_speed_full) / 2).toString();
+            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.max_speed_empty + derivedStats.max_speed_full) / 2).toString();
+
+            // Empty row
+            const emptyRow = massTable.insertRow();
+            emptyRow.insertCell().textContent = 'Empty';
+            emptyRow.insertCell().textContent = '0';
+            emptyRow.insertCell().textContent = derivedStats.handling_empty.toString();
+            emptyRow.insertCell().textContent = '0';
+            emptyRow.insertCell().textContent = derivedStats.stall_speed_empty.toString();
+            emptyRow.insertCell().textContent = '0';
+
+            this.mobileMassVariationsDiv.appendChild(massTable);
+        }
+
+        // Update performance stats
+        if (this.mobileStatsDiv) {
+            this.mobileStatsDiv.innerHTML = '';
+
+            const addStat = (label: string, value: string) => {
+                const row = document.createElement('div');
+                row.style.display = 'flex';
+                row.style.justifyContent = 'space-between';
+                row.style.padding = '2px 5px';
+                row.style.borderBottom = '1px solid var(--inp_txt_color)';
+
+                const labelSpan = document.createElement('span');
+                labelSpan.textContent = label;
+                row.appendChild(labelSpan);
+
+                const valueSpan = document.createElement('span');
+                valueSpan.textContent = value;
+                row.appendChild(valueSpan);
+
+                this.mobileStatsDiv!.appendChild(row);
+            };
+
+            addStat(localization.translate('Derived Dropoff'), derivedStats.dropoff.toString());
+            addStat(localization.translate('Derived Stability'), derivedStats.stability.toString());
+            addStat(localization.translate('Derived Overspeed'), derivedStats.overspeed.toString());
+            addStat(localization.translate('Derived Energy Loss'), derivedStats.energy_loss.toString());
+            addStat(localization.translate('Derived Turn Bleed'), derivedStats.turn_bleed.toString());
+            addStat(localization.translate('Stat Max Strain'), derivedStats.max_strain.toString());
+            addStat(localization.translate('Stat Toughness'), derivedStats.toughness.toString());
+            addStat(localization.translate('Derived Crash Safety'), stats.crashsafety.toString());
+            addStat(localization.translate('Derived Fuel Uses'), (Math.floor(1.0e-6 + derivedStats.fuel_uses * 10) / 10).toString());
+            addStat(localization.translate('Derived Landing Gear'), bridge.getGearName());
+            addStat(localization.translate('Derived Communications'), bridge.getCommunicationName());
+            addStat(localization.translate('Stat Reliability'), bridge.getReliabilityList().join(', '));
+            addStat(localization.translate('Stat Visibility'), bridge.getVisibilityList().join(', '));
+            addStat(localization.translate('Derived Attack Modifier'), bridge.getAttackList().join(', '));
+            addStat(localization.translate('Derived Escape'), bridge.getEscapeList().join(', '));
+            addStat(localization.translate('Derived Crew/Passengers'), bridge.getCockpitsCount() + '/' + bridge.getPassengersCount());
+            addStat(localization.translate('Derived Ideal Engine Altitude'), bridge.getMinAltitude() + '-' + bridge.getMaxAltitude());
+            addStat(localization.translate('Derived Is Flammable Question'), bridge.getIsFlammable() ? localization.translate('Yes') : localization.translate('No'));
+        }
+
+        // Update weapons
+        if (this.mobileWeaponsDiv) {
+            this.mobileWeaponsDiv.innerHTML = '';
+            const bombs = bridge.getBombCount();
+            const rockets = bridge.getRocketCount();
+            let internal = bridge.getInternalBombCount();
+
+            if (bombs > 0) {
+                const int_bomb = Math.min(bombs, internal);
+                const ext_bomb = Math.max(0, bombs - int_bomb);
+                if (int_bomb > 0) {
+                    const div = document.createElement('div');
+                    div.textContent = localization.translateWithParam('Bomb Mass Internally.', int_bomb);
+                    this.mobileWeaponsDiv.appendChild(div);
+                }
+                if (ext_bomb > 0) {
+                    const div = document.createElement('div');
+                    div.textContent = localization.translateWithParam('Bomb Mass Externally.', ext_bomb);
+                    this.mobileWeaponsDiv.appendChild(div);
+                }
+                internal -= int_bomb;
+            }
+
+            if (rockets > 0) {
+                const int_rock = Math.min(rockets, internal);
+                const ext_rock = Math.max(0, rockets - int_rock);
+                if (int_rock > 0) {
+                    const div = document.createElement('div');
+                    div.textContent = localization.translateWithParam('Rocket Mass Internally.', int_rock);
+                    this.mobileWeaponsDiv.appendChild(div);
+                }
+                if (ext_rock > 0) {
+                    const div = document.createElement('div');
+                    div.textContent = localization.translateWithParam('Rocket Mass Externally.', ext_rock);
+                    this.mobileWeaponsDiv.appendChild(div);
+                }
+            }
+
+            const weaponSetsCount = bridge.getWeaponSetsCount();
+            for (let i = 0; i < weaponSetsCount; i++) {
+                const ws = bridge.getWeaponSystemDisplayInfo(i);
+                const div = document.createElement('div');
+                div.innerHTML = ws;
+                this.mobileWeaponsDiv.appendChild(div);
+            }
+        }
+
+        // Update electrics
+        if (this.mobileElectricsDiv) {
+            this.mobileElectricsDiv.innerHTML = '';
+            const electrics = bridge.getElectrics();
+
+            if (electrics.storage > 0) {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.justifyContent = 'space-between';
+                const label = document.createElement('span');
+                label.textContent = localization.translate('Derived Battery');
+                div.appendChild(label);
+                const value = document.createElement('span');
+                value.textContent = electrics.storage.toString();
+                div.appendChild(value);
+                this.mobileElectricsDiv.appendChild(div);
+            }
+
+            for (const equip of electrics.equipment) {
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.justifyContent = 'space-between';
+                const label = document.createElement('span');
+                label.textContent = equip.source;
+                div.appendChild(label);
+                const value = document.createElement('span');
+                value.textContent = equip.charge;
+                div.appendChild(value);
+                this.mobileElectricsDiv.appendChild(div);
+            }
+        }
+
+        // Update warnings
+        if (this.mobileWarningsDiv) {
+            this.mobileWarningsDiv.innerHTML = '';
+            if (stats.warnings && stats.warnings.length > 0) {
+                const levelToNum = (level: string): number => {
+                    if (level === 'Red') return 2;
+                    if (level === 'Yellow') return 1;
+                    return 0;
+                };
+
+                const sortedWarnings = [...stats.warnings].sort((a: any, b: any) => {
+                    return levelToNum(a.level) - levelToNum(b.level);
+                });
+
+                for (const w of sortedWarnings) {
+                    let color = 'var(--inp_txt_color)';
+                    if (w.level === 'Red') color = '#FF0000';
+                    else if (w.level === 'Yellow') color = '#FFFF00';
+
+                    const div = document.createElement('div');
+                    div.style.color = color;
+                    div.textContent = `${w.name}: ${w.warning}`;
+                    this.mobileWarningsDiv.appendChild(div);
+                }
+            }
+        }
     }
 }
