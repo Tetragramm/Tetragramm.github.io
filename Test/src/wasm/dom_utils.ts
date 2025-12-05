@@ -446,7 +446,7 @@ export function createMobileStatsGrid(
     stats: any,
     statConfig: StatDisplayConfig[],
     derivedStats?: any
-): HTMLElement {
+): HTMLDivElement {
     const grid = document.createElement('div');
     grid.className = 'mobile-stats-grid';
 
