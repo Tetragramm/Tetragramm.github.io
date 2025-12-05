@@ -10,7 +10,13 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createFlexNumberInput, createFlexSection } from '../dom_utils';
+import {
+    createCollapsibleSection,
+    createFlexNumberInput,
+    createFlexSection,
+    createMobileOptionItem,
+    createMobileNumberInput
+} from '../dom_utils';
 
 /**
  * Used Part UI Component
@@ -54,9 +60,12 @@ export class UsedUI extends BaseComponentUI {
 
         const bindings = bridge.getUsedBindings();
 
-        // Create main content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only content';
 
         // Create table
         const table = document.createElement('table');
@@ -200,13 +209,144 @@ export class UsedUI extends BaseComponentUI {
             }
         );
 
-        contentDiv.appendChild(table);
+        desktopDiv.appendChild(table);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Helper to create mobile row
+        const createMobileRow = (
+            effectKey: string,
+            descriptionKey: string,
+            binding: any,
+            updateCallback: (value: number) => void
+        ) => {
+            const title = localization.translate(effectKey);
+            const item = createMobileOptionItem(title, mobileDiv);
+            // Add description as subtitle
+            const descSpan = document.createElement('span');
+            descSpan.className = 'mobile-description';
+            descSpan.style.fontSize = '0.85em';
+            descSpan.style.color = 'var(--inp_txt_color)';
+            descSpan.style.opacity = '0.8';
+            descSpan.textContent = localization.translate(descriptionKey);
+            item.content.appendChild(descSpan);
+
+            createMobileNumberInput(
+                { ...binding, name: '' },
+                item.content,
+                updateCallback,
+                -1,
+                1,
+                1
+            );
+        };
+
+        createMobileRow(
+            'Used Burnt Out',
+            'Used Burnt Out Description',
+            bindings.burnt_out,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.burnt_out.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        createMobileRow(
+            'Used Ragged',
+            'Used Ragged Description',
+            bindings.ragged,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.ragged.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        createMobileRow(
+            'Used Hefty',
+            'Used Hefty Description',
+            bindings.hefty,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.hefty.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        createMobileRow(
+            'Used Sticky Guns',
+            'Used Sticky Guns Description',
+            bindings.sticky_guns,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.sticky_guns.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        createMobileRow(
+            'Used Weak',
+            'Used Weak Description',
+            bindings.weak,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.weak.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        createMobileRow(
+            'Used Fragile',
+            'Used Fragile Description',
+            bindings.fragile,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.fragile.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        createMobileRow(
+            'Used Leaky',
+            'Used Leaky Description',
+            bindings.leaky,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.leaky.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        createMobileRow(
+            'Used Sluggish',
+            'Used Sluggish Description',
+            bindings.sluggish,
+            (value) => {
+                const newBindings = bridge.getUsedBindings();
+                newBindings.sluggish.value = value;
+                bridge.setUsedBindings(newBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Used Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             true // Initially open
         );
 

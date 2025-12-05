@@ -7,7 +7,14 @@
 
 import { AircraftBridge, DerivedStats } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
-import { createCollapsibleSection, createFlexCheckbox, createRulesLink } from '../dom_utils';
+import {
+    createCollapsibleSection,
+    createFlexCheckbox,
+    createRulesLink,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileCheckbox
+} from '../dom_utils';
 import { localization } from '../localization';
 
 enum FUEL_STATE {
@@ -52,13 +59,19 @@ export class AltitudeUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
-        const contentDiv = document.createElement('div');
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
         // Get table element
         this.tbl = document.createElement('table') as HTMLTableElement;
         if (!this.tbl) {
             console.error('[AltitudeUI] Could not find table_altitude element');
             return;
         }
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Get fuel state dropdown
         this.fuelStateSelect = document.createElement('select') as HTMLSelectElement;
@@ -107,16 +120,102 @@ export class AltitudeUI extends BaseComponentUI {
 
         this.rows = [];
 
-        contentDiv.appendChild(this.fuelStateSelect);
-        contentDiv.appendChild(document.createElement('br'));
-        contentDiv.appendChild(span);
-        contentDiv.appendChild(this.tbl);
+        desktopDiv.appendChild(this.fuelStateSelect);
+        desktopDiv.appendChild(document.createElement('br'));
+        desktopDiv.appendChild(span);
+        desktopDiv.appendChild(this.tbl);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Mobile fuel state selector
+        const fuelItem = createMobileOptionItem(
+            localization.translate('Altitude Fuel State'),
+            mobileDiv
+        );
+        const fuelOptions = [
+            'Derived Full Fuel with Bombs',
+            'Derived Half Fuel with Bombs',
+            'Derived Full Fuel',
+            'Derived Half Fuel'
+        ];
+        const fuelBinding = {
+            name: localization.translate('Altitude Fuel State'),
+            options: fuelOptions.map(opt => ({
+                name: localization.translate(opt),
+                enabled: true
+            })),
+            selected: 2, // Default to Full Fuel
+            enabled: true
+        };
+        createMobileSelect(
+            fuelBinding,
+            fuelItem.content,
+            (selectedIndex) => {
+                if (this.fuelStateSelect) {
+                    this.fuelStateSelect.selectedIndex = selectedIndex;
+                }
+                this.updateValues();
+            }
+        );
+
+        // Mobile checkboxes
+        const optionsItem = createMobileOptionItem(
+            localization.translate('Altitude Options'),
+            mobileDiv
+        );
+        createMobileCheckbox(
+            { name: localization.translate('Altitude Eternal Fires'), selected: false, enabled: true },
+            optionsItem.content,
+            (checked) => {
+                if (this.firesCheckbox) {
+                    this.firesCheckbox.checked = checked;
+                }
+                this.updateValues();
+            }
+        );
+        createMobileCheckbox(
+            { name: localization.translate('Altitude Oxidized Fuel'), selected: false, enabled: true },
+            optionsItem.content,
+            (checked) => {
+                if (this.oxidizedCheckbox) {
+                    this.oxidizedCheckbox.checked = checked;
+                }
+                this.updateValues();
+            }
+        );
+
+        // Mobile table in scrollable container
+        const tableItem = createMobileOptionItem(
+            localization.translate('Altitude Effects'),
+            mobileDiv
+        );
+        const scrollContainer = document.createElement('div');
+        scrollContainer.style.overflowX = 'auto';
+        scrollContainer.style.maxWidth = '100%';
+        // Clone table for mobile - it will share the same row data
+        const mobileTable = document.createElement('table');
+        mobileTable.className = 'altitude-table-mobile';
+        mobileTable.style.fontSize = '0.9em';
+        const mobileHeader = document.createElement('tr');
+        this.createTH(mobileHeader, localization.translate('Altitude Altitude'));
+        this.createTH(mobileHeader, localization.translate('Derived Boost'));
+        this.createTH(mobileHeader, localization.translate('Derived Rate of Climb'));
+        this.createTH(mobileHeader, localization.translate('Derived Stall Speed'));
+        this.createTH(mobileHeader, localization.translate('Derived Top Speed'));
+        mobileTable.appendChild(mobileHeader);
+        scrollContainer.appendChild(mobileTable);
+        tableItem.content.appendChild(scrollContainer);
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Create collapsible section
         const sectionTitle = localization.translate('Altitude Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             false
         );
 

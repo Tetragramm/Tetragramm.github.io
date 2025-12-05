@@ -11,7 +11,8 @@ import {
     createCollapsibleSection,
     createStatsTable,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 /**
@@ -54,6 +55,7 @@ const TOTAL_STATS: StatDisplayConfig[] = [
  */
 export class TotalStatsUI extends BaseComponentUI {
     private statsTable: HTMLTableElement | undefined;
+    private mobileStatsGrid: HTMLDivElement | undefined;
 
     protected shouldUpdate(): boolean {
         return this.statsTable !== undefined;
@@ -61,6 +63,7 @@ export class TotalStatsUI extends BaseComponentUI {
 
     protected clearCache(): void {
         this.statsTable = undefined;
+        this.mobileStatsGrid = undefined;
     }
 
     /**
@@ -73,21 +76,35 @@ export class TotalStatsUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
-        // Create main content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
 
-        // Get stats and create table with 6 stats per row
+        // Get stats
         const stats = bridge.getStats();
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only content';
+
+        // Create table with 6 stats per row
         this.statsTable = createStatsTable(stats, TOTAL_STATS, undefined, 7);
-        contentDiv.appendChild(this.statsTable);
+        desktopDiv.appendChild(this.statsTable);
         this.statsTable.className = '';
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        this.mobileStatsGrid = createMobileStatsGrid(stats, TOTAL_STATS);
+        mobileDiv.appendChild(this.mobileStatsGrid);
+        contentWrapper.appendChild(mobileDiv);
 
         // Create collapsible section
         const sectionTitle = localization.translate('Aircraft Stats Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             false // Collapsed by default
         );
 
@@ -103,9 +120,18 @@ export class TotalStatsUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
+        const stats = bridge.getStats();
+
         if (this.statsTable) {
-            const stats = bridge.getStats();
             updateStatsTable(this.statsTable, stats, TOTAL_STATS, undefined, 7);
+        }
+
+        // Update mobile grid by rebuilding it
+        if (this.mobileStatsGrid && this.mobileStatsGrid.parentElement) {
+            const parent = this.mobileStatsGrid.parentElement;
+            const newGrid = createMobileStatsGrid(stats, TOTAL_STATS);
+            parent.replaceChild(newGrid, this.mobileStatsGrid);
+            this.mobileStatsGrid = newGrid;
         }
     }
 }

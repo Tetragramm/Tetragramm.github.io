@@ -20,7 +20,12 @@ import {
     createFlexLabel,
     createStatsTable,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileNumberInput,
+    createMobileSelect,
+    createMobileCheckbox,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Aircraft type enum values
@@ -87,6 +92,13 @@ export class RotorUI extends BaseComponentUI {
         const bindings: RotorOptions = bridge.getRotorBindings();
         const stats = bridge.getRotorStats();
         const aircraftType = bridge.getAircraftType();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Main table structure
         const table = document.createElement('table');
@@ -330,9 +342,225 @@ export class RotorUI extends BaseComponentUI {
             }
         }
 
+        desktopDiv.appendChild(table);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        if (aircraftType >= 2) {
+            // Autogyro mobile layout
+            // Rotor Span
+            const spanItem = createMobileOptionItem(
+                localization.translate('Rotor Rotor'),
+                mobileDiv
+            );
+            // Show min span as label
+            const minSpanLabel = document.createElement('span');
+            minSpanLabel.textContent = `${localization.translate('Rotor Min Span')}: ${bindings.sizing_span.value}`;
+            minSpanLabel.style.fontSize = '0.9em';
+            minSpanLabel.style.marginRight = '1em';
+            spanItem.content.appendChild(minSpanLabel);
+
+            createMobileNumberInput(
+                bindings.rotor_span,
+                spanItem.content,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_span.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                0,
+                999,
+                1
+            );
+
+            // Material
+            const matItem = createMobileOptionItem(
+                localization.translate('Rotor Material'),
+                mobileDiv
+            );
+            createMobileSelect(
+                bindings.cantilever,
+                matItem.content,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.cantilever.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
+
+            // Accessories
+            const accItem = createMobileOptionItem(
+                localization.translate('Rotor Accessories'),
+                mobileDiv
+            );
+            createMobileCheckbox(
+                bindings.accessory,
+                accItem.content,
+                (checked) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.accessory.selected = checked;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
+
+            // Stats
+            const statsItem = createMobileOptionItem(
+                localization.translate('Rotor Stats'),
+                mobileDiv
+            );
+            const autoStatsWithArea = { rotor_area: bindings.rotor_area };
+            const statsGrid = createMobileStatsGrid(stats, ROTOR_STATS_CONFIG, autoStatsWithArea);
+            statsItem.content.appendChild(statsGrid);
+        } else {
+            // Helicopter mobile layout
+            // Rotor Count
+            const countItem = createMobileOptionItem(
+                localization.translate('Rotor Rotor Count'),
+                mobileDiv
+            );
+            createMobileNumberInput(
+                bindings.rotor_count,
+                countItem.content,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_count.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                1,
+                10,
+                1
+            );
+
+            // Rotor Span
+            const spanItem = createMobileOptionItem(
+                localization.translate('Rotor Rotor'),
+                mobileDiv
+            );
+            const minSpanLabel = document.createElement('span');
+            minSpanLabel.textContent = `${localization.translate('Rotor Min Span')}: ${bindings.sizing_span.value}`;
+            minSpanLabel.style.fontSize = '0.9em';
+            minSpanLabel.style.marginRight = '1em';
+            spanItem.content.appendChild(minSpanLabel);
+
+            createMobileNumberInput(
+                bindings.rotor_span,
+                spanItem.content,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_span.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                0,
+                999,
+                1
+            );
+
+            // Stagger
+            const staggerItem = createMobileOptionItem(
+                localization.translate('Rotor Stagger'),
+                mobileDiv
+            );
+            createMobileSelect(
+                bindings.stagger,
+                staggerItem.content,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.stagger.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
+
+            // Blade Count
+            const bladeItem = createMobileOptionItem(
+                localization.translate('Rotor Blade Count'),
+                mobileDiv
+            );
+            createMobileSelect(
+                bindings.blade_count,
+                bladeItem.content,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.blade_count.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
+
+            // Material
+            const matItem = createMobileOptionItem(
+                localization.translate('Rotor Material'),
+                mobileDiv
+            );
+            createMobileSelect(
+                bindings.cantilever,
+                matItem.content,
+                (idx) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.cantilever.selected = idx;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
+
+            // Thickness
+            const thickItem = createMobileOptionItem(
+                localization.translate('Rotor Thickness'),
+                mobileDiv
+            );
+            createMobileNumberInput(
+                bindings.rotor_thickness,
+                thickItem.content,
+                (value) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.rotor_thickness.value = value;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                },
+                0,
+                999,
+                1
+            );
+
+            // Accessories
+            const accItem = createMobileOptionItem(
+                localization.translate('Rotor Accessories'),
+                mobileDiv
+            );
+            createMobileCheckbox(
+                bindings.accessory,
+                accItem.content,
+                (checked) => {
+                    const updated = bridge.getRotorBindings();
+                    updated.accessory.selected = checked;
+                    bridge.setRotorBindings(updated);
+                    this.onUpdate();
+                }
+            );
+
+            // Stats
+            const statsItem = createMobileOptionItem(
+                localization.translate('Rotor Stats'),
+                mobileDiv
+            );
+            const heliStatsWithArea = { rotor_area: bindings.rotor_area };
+            const statsGrid = createMobileStatsGrid(stats, ROTOR_STATS_CONFIG, heliStatsWithArea);
+            statsItem.content.appendChild(statsGrid);
+        }
+
+        contentWrapper.appendChild(mobileDiv);
+
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Rotor Section Title');
-        this.sectionElement = createCollapsibleSection(sectionTitle, table, true);
+        this.sectionElement = createCollapsibleSection(sectionTitle, contentWrapper, true);
 
         // Add rules link
         const rulesLine = createRulesLink('_Rotor');

@@ -13,7 +13,10 @@ import {
     createCollapsibleSection,
     createStatsTable,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileNumberInput,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -21,6 +24,7 @@ interface OptimizationCache {
     freeInput: HTMLInputElement;
     optimizationRows: OptimizationRow[];
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 interface OptimizationRow {
@@ -64,6 +68,13 @@ export class OptimizationUI extends BaseComponentUI {
         if (!bridge) return;
 
         const bindings = bridge.getOptimizationBindings();
+
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
 
         // Create wrapper div for free optimizations input
         const freeDiv = document.createElement('div');
@@ -153,15 +164,77 @@ export class OptimizationUI extends BaseComponentUI {
             }
         });
 
+        desktopDiv.appendChild(freeDiv);
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Free Optimizations input
+        const freeItem = createMobileOptionItem(
+            localization.translate('Optimization Num Free Optimizations'),
+            mobileDiv
+        );
+        createMobileNumberInput(
+            bindings.free_dots,
+            freeItem.content,
+            (value) => {
+                const updatedBindings = bridge.getOptimizationBindings();
+                updatedBindings.free_dots.value = value;
+                bridge.setOptimizationBindings(updatedBindings);
+                this.onUpdate();
+            },
+            0,
+            99,
+            1
+        );
+
+        // Create mobile optimization controls (number inputs -3 to +3)
+        optimizationTypes.forEach(opt => {
+            const binding = bindings[opt.key];
+            if (!binding) return;
+
+            const item = createMobileOptionItem(
+                localization.translate(opt.label),
+                mobileDiv
+            );
+            createMobileNumberInput(
+                { ...binding, name: '' },
+                item.content,
+                (value) => {
+                    const updatedBindings = bridge.getOptimizationBindings();
+                    updatedBindings[opt.key].value = value;
+                    bridge.setOptimizationBindings(updatedBindings);
+                    this.onUpdate();
+                },
+                -3,
+                3,
+                1
+            );
+        });
+
+        // Mobile stats grid
+        const statsItem = createMobileOptionItem(
+            localization.translate('Optimization Optimization Stats'),
+            mobileDiv
+        );
+        const stats = bridge.getOptimizationStats();
+        const mobileStatsGrid = createMobileStatsGrid(stats, OPTIMIZATION_STATS);
+        statsItem.content.appendChild(mobileStatsGrid);
+        if (this.cache) {
+            this.cache.mobileStatsGrid = mobileStatsGrid;
+        }
+
+        contentWrapper.appendChild(mobileDiv);
+
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Optimization Section Title');
-        const contentDiv = document.createElement('div');
-        contentDiv.appendChild(freeDiv);
-        contentDiv.appendChild(mainTable);
 
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             true // Initially open
         );
 

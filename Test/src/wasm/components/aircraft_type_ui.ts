@@ -11,7 +11,9 @@ import { BaseComponentUI } from '../base_component_ui';
 import {
     createSelectElement,
     updateSelectElement,
-    generateUniqueId
+    generateUniqueId,
+    createMobileOptionItem,
+    createMobileSelect
 } from '../dom_utils';
 
 // Aircraft type enum values (matching Rust AircraftType)
@@ -85,6 +87,13 @@ export class AircraftTypeUI extends BaseComponentUI {
                AIRCRAFT_TYPE.ORNITHOPTER_BASIC, AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER, AIRCRAFT_TYPE.ORNITHOPTER_BUZZER]
             : SELECTABLE_TYPES;
 
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
+
         // Create wrapper span
         const span = document.createElement('span');
 
@@ -121,7 +130,41 @@ export class AircraftTypeUI extends BaseComponentUI {
         });
 
         span.appendChild(select);
-        this.container.appendChild(span);
+        desktopDiv.appendChild(span);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        const typeItem = createMobileOptionItem(
+            localization.translate('Aircraft Type'),
+            mobileDiv
+        );
+
+        // Create binding for mobile select
+        const selectBinding = {
+            name: localization.translate('Aircraft Type'),
+            options: selectableTypes.map(typeValue => ({
+                name: typeNames[typeValue] || `Type ${typeValue}`,
+                enabled: true
+            })),
+            selected: selectedSelectableIndex,
+            enabled: true
+        };
+
+        createMobileSelect(
+            selectBinding,
+            typeItem.content,
+            (selectedIndex) => {
+                const newType = selectableTypes[selectedIndex];
+                bridge.setAircraftType(newType);
+                this.onUpdate();
+            }
+        );
+
+        contentWrapper.appendChild(mobileDiv);
+        this.container.appendChild(contentWrapper);
 
         // Cache elements
         this.cache = { select };
