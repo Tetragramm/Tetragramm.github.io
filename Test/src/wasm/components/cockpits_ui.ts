@@ -17,7 +17,12 @@ import {
     createCollapsibleSection,
     createStatsTable,
     updateStatsTable,
-    StatDisplayConfig
+    StatDisplayConfig,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileCheckbox,
+    createMobileNumberInput,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Cockpit stats configuration
@@ -82,9 +87,12 @@ export class CockpitsUI extends BaseComponentUI {
         const cockpitsBindings = bridge.getCockpitsBindings();
         this.lastCockpitCount = cockpitsBindings.positions.length;
 
-        // Create main content container
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'content';
+        // Create wrapper for both desktop and mobile content
+        const contentWrapper = document.createElement('div');
+
+        // === DESKTOP VERSION ===
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only content';
 
         // Number of cockpits control (simple row above table)
         const controlDiv = document.createElement('div');
@@ -111,7 +119,7 @@ export class CockpitsUI extends BaseComponentUI {
         });
         controlDiv.appendChild(numCockpitsLabel);
         controlDiv.appendChild(this.numCockpitsInput);
-        contentDiv.appendChild(controlDiv);
+        desktopDiv.appendChild(controlDiv);
 
         // Create main table for cockpits
         this.mainTable = document.createElement('table');
@@ -142,13 +150,42 @@ export class CockpitsUI extends BaseComponentUI {
             this.mainTable!.appendChild(cache.row);
         });
 
-        contentDiv.appendChild(this.mainTable);
+        desktopDiv.appendChild(this.mainTable);
+        contentWrapper.appendChild(desktopDiv);
+
+        // === MOBILE VERSION ===
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+
+        // Number of cockpits
+        const numItem = createMobileOptionItem(
+            cockpitsBindings.num_cockpits.name,
+            mobileDiv
+        );
+        createMobileNumberInput(
+            cockpitsBindings.num_cockpits,
+            numItem.content,
+            (value) => {
+                const bindings = bridge.getCockpitsBindings();
+                bindings.num_cockpits.value = value;
+                bridge.setCockpitsBindings(bindings);
+                this.onUpdate();
+            },
+            1, 20
+        );
+
+        // Each cockpit position
+        cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
+            this.buildMobileCockpitSection(cockpitOptions, idx, mobileDiv, bridge);
+        });
+
+        contentWrapper.appendChild(mobileDiv);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Cockpit Section Title');
         this.sectionElement = createCollapsibleSection(
             sectionTitle,
-            contentDiv,
+            contentWrapper,
             true // Initially open
         );
 
@@ -163,6 +200,150 @@ export class CockpitsUI extends BaseComponentUI {
         this.container.appendChild(this.sectionElement);
 
         console.log('[CockpitsUI] Full rebuild with', this.lastCockpitCount, 'cockpits');
+    }
+
+    /**
+     * Build mobile cockpit section for a single position
+     */
+    private buildMobileCockpitSection(
+        cockpitOptions: CockpitOptions,
+        index: number,
+        parent: HTMLElement,
+        bridge: AircraftBridge
+    ): void {
+        // Container for this cockpit
+        const cockpitDiv = document.createElement('div');
+        cockpitDiv.className = 'mobile-section';
+        cockpitDiv.style.marginTop = '0.5rem';
+
+        // Header
+        const header = document.createElement('div');
+        header.className = 'mobile-option-title';
+        header.textContent = localization.translate('Cockpit Position') + ' ' + (index + 1);
+        cockpitDiv.appendChild(header);
+
+        // Content
+        const content = document.createElement('div');
+        content.className = 'mobile-option-content';
+        content.style.flexDirection = 'column';
+        content.style.gap = '0.5rem';
+
+        // Type select
+        const typeRow = document.createElement('div');
+        typeRow.style.width = '100%';
+        createMobileSelect(
+            cockpitOptions.selected_type,
+            typeRow,
+            (selectedIndex) => {
+                const bindings = bridge.getCockpitsBindings();
+                bindings.positions[index].selected_type.selected = selectedIndex;
+                bridge.setCockpitsBindings(bindings);
+                this.onUpdate();
+            }
+        );
+        content.appendChild(typeRow);
+
+        // Upgrades
+        if (cockpitOptions.selected_upgrades && cockpitOptions.selected_upgrades.length > 0) {
+            const upgradesLabel = document.createElement('div');
+            upgradesLabel.className = 'mobile-option-title';
+            upgradesLabel.style.fontSize = '0.8rem';
+            upgradesLabel.textContent = localization.translate('Cockpit Upgrade');
+            content.appendChild(upgradesLabel);
+
+            const upgradesRow = document.createElement('div');
+            upgradesRow.style.display = 'flex';
+            upgradesRow.style.flexWrap = 'wrap';
+            upgradesRow.style.gap = '0.25rem';
+            cockpitOptions.selected_upgrades.forEach((upgrade, idx) => {
+                createMobileCheckbox(
+                    upgrade,
+                    upgradesRow,
+                    (checked) => {
+                        const bindings = bridge.getCockpitsBindings();
+                        bindings.positions[index].selected_upgrades[idx].selected = checked;
+                        bridge.setCockpitsBindings(bindings);
+                        this.onUpdate();
+                    }
+                );
+            });
+            content.appendChild(upgradesRow);
+        }
+
+        // Safety Options
+        if (cockpitOptions.selected_safety && cockpitOptions.selected_safety.length > 0) {
+            const safetyLabel = document.createElement('div');
+            safetyLabel.className = 'mobile-option-title';
+            safetyLabel.style.fontSize = '0.8rem';
+            safetyLabel.textContent = localization.translate('Cockpit Safety Options');
+            content.appendChild(safetyLabel);
+
+            const safetyRow = document.createElement('div');
+            safetyRow.style.display = 'flex';
+            safetyRow.style.flexWrap = 'wrap';
+            safetyRow.style.gap = '0.25rem';
+            cockpitOptions.selected_safety.forEach((safety, idx) => {
+                createMobileCheckbox(
+                    safety,
+                    safetyRow,
+                    (checked) => {
+                        const bindings = bridge.getCockpitsBindings();
+                        bindings.positions[index].selected_safety[idx].selected = checked;
+                        bridge.setCockpitsBindings(bindings);
+                        this.onUpdate();
+                    }
+                );
+            });
+            content.appendChild(safetyRow);
+        }
+
+        // Gunsights
+        if (cockpitOptions.selected_gunsights && cockpitOptions.selected_gunsights.length > 0) {
+            const gunsightsLabel = document.createElement('div');
+            gunsightsLabel.className = 'mobile-option-title';
+            gunsightsLabel.style.fontSize = '0.8rem';
+            gunsightsLabel.textContent = localization.translate('Cockpit Gunsights');
+            content.appendChild(gunsightsLabel);
+
+            const gunsightsRow = document.createElement('div');
+            gunsightsRow.style.display = 'flex';
+            gunsightsRow.style.flexWrap = 'wrap';
+            gunsightsRow.style.gap = '0.25rem';
+            cockpitOptions.selected_gunsights.forEach((gunsight, idx) => {
+                createMobileCheckbox(
+                    gunsight,
+                    gunsightsRow,
+                    (checked) => {
+                        const bindings = bridge.getCockpitsBindings();
+                        bindings.positions[index].selected_gunsights[idx].selected = checked;
+                        bridge.setCockpitsBindings(bindings);
+                        this.onUpdate();
+                    }
+                );
+            });
+            // Bombsight
+            createMobileNumberInput(
+                cockpitOptions.bombsight,
+                gunsightsRow,
+                (value) => {
+                    const bindings = bridge.getCockpitsBindings();
+                    bindings.positions[index].bombsight.value = value;
+                    bridge.setCockpitsBindings(bindings);
+                    this.onUpdate();
+                },
+                0, 20
+            );
+            content.appendChild(gunsightsRow);
+        }
+
+        // Stats
+        const stats = bridge.getCockpitStats(index);
+        const derivedStats = bridge.getCockpitDerivedStats(index);
+        const statsGrid = createMobileStatsGrid(stats, COCKPIT_STATS, derivedStats);
+        content.appendChild(statsGrid);
+
+        cockpitDiv.appendChild(content);
+        parent.appendChild(cockpitDiv);
     }
 
     /**

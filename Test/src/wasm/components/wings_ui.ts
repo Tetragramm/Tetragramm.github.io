@@ -20,7 +20,12 @@ import {
     createFlexCheckbox,
     createFlexSection,
     createFlexNumberInputs,
-    createFlexNumberInput
+    createFlexNumberInput,
+    createMobileOptionItem,
+    createMobileSelect,
+    createMobileCheckbox,
+    createMobileNumberInput,
+    createMobileStatsGrid
 } from '../dom_utils';
 
 // Stats configuration for wings
@@ -102,12 +107,281 @@ export class WingsUI extends BaseComponentUI {
         const stats = bridge.getWingsStats();
         const aircraftType = bridge.getAircraftType();
 
-        // Create complete Wings section
-        this.sectionElement = this.createWingsSection(bindings, stats);
+        // Create wrapper for both desktop and mobile
+        const contentWrapper = document.createElement('div');
+
+        // Desktop version
+        const desktopDiv = document.createElement('div');
+        desktopDiv.className = 'desktop-only';
+        const desktopSection = this.createWingsSection(bindings, stats);
+        // Extract just the content, we'll wrap it all together
+        desktopDiv.appendChild(desktopSection);
+
+        // Mobile version
+        const mobileDiv = document.createElement('div');
+        mobileDiv.className = 'mobile-only mobile-option-group';
+        this.createMobileWingsSection(bindings, stats, mobileDiv, bridge);
+
+        contentWrapper.appendChild(desktopDiv);
+        contentWrapper.appendChild(mobileDiv);
+
+        // Create collapsible section
+        this.sectionElement = createCollapsibleSection(
+            localization.translate('Wings Section Title'),
+            contentWrapper,
+            true
+        );
+
+        // Add rules link
+        const rulesLine = createRulesLink('_Wings');
+        rulesLine.appendChild(document.createElement('br'));
+        this.sectionElement.insertBefore(rulesLine, this.sectionElement.children[1]);
+
         this.container.appendChild(this.sectionElement);
 
         // Set initial visibility based on aircraft type
         this.updateVisibility(aircraftType);
+    }
+
+    /**
+     * Create mobile wings section
+     */
+    private createMobileWingsSection(bindings: any, stats: any, parent: HTMLElement, bridge: AircraftBridge): void {
+        // Global controls
+        const globalItem = createMobileOptionItem(
+            localization.translate('Wings Wing Options'),
+            parent
+        );
+
+        // Stagger
+        const staggerRow = document.createElement('div');
+        staggerRow.style.width = '100%';
+        staggerRow.style.marginBottom = '0.5rem';
+        const staggerLabel = document.createElement('span');
+        staggerLabel.textContent = localization.translate('Wings Wing Stagger') + ': ';
+        staggerRow.appendChild(staggerLabel);
+        createMobileSelect(
+            bindings.stagger,
+            staggerRow,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getWingsBindings();
+                updatedBindings.stagger.selected = selectedIndex;
+                this.getBridge().setWingsBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        globalItem.content.appendChild(staggerRow);
+
+        // Closed and Swept checkboxes
+        createMobileCheckbox(bindings.closed, globalItem.content, (selected) => {
+            const updatedBindings = this.getBridge().getWingsBindings();
+            updatedBindings.closed.selected = selected;
+            this.getBridge().setWingsBindings(updatedBindings);
+            this.onUpdate();
+        });
+        createMobileCheckbox(bindings.swept, globalItem.content, (selected) => {
+            const updatedBindings = this.getBridge().getWingsBindings();
+            updatedBindings.swept.selected = selected;
+            this.getBridge().setWingsBindings(updatedBindings);
+            this.onUpdate();
+        });
+
+        // Full Wings section
+        const fullWingsItem = createMobileOptionItem(
+            localization.translate('Wings Full Wings'),
+            parent
+        );
+
+        bindings.full_wings.forEach((wing: any, i: number) => {
+            this.createMobileWingRow(wing, i, 'full', fullWingsItem.content, bridge);
+        });
+
+        // Add wing button
+        if (bindings.add_full_wing.can_add) {
+            const addBtn = document.createElement('button');
+            addBtn.type = 'button';
+            addBtn.className = 'mobile-number-btn';
+            addBtn.style.width = '100%';
+            addBtn.style.marginTop = '0.5rem';
+            addBtn.textContent = '+ ' + localization.translate('Wings Add Wing');
+            addBtn.onclick = () => {
+                const updatedBindings = this.getBridge().getWingsBindings();
+                updatedBindings.add_full_wing.deck.selected = 1; // First non-empty option
+                this.getBridge().setWingsBindings(updatedBindings);
+                this.onUpdate();
+            };
+            fullWingsItem.content.appendChild(addBtn);
+        }
+
+        // Mini Wings section
+        const miniWingsItem = createMobileOptionItem(
+            localization.translate('Wings Miniature Wings'),
+            parent
+        );
+
+        bindings.mini_wings.forEach((wing: any, i: number) => {
+            this.createMobileWingRow(wing, i, 'mini', miniWingsItem.content, bridge);
+        });
+
+        // Add mini wing button
+        if (bindings.add_mini_wing.can_add) {
+            const addMiniBtn = document.createElement('button');
+            addMiniBtn.type = 'button';
+            addMiniBtn.className = 'mobile-number-btn';
+            addMiniBtn.style.width = '100%';
+            addMiniBtn.style.marginTop = '0.5rem';
+            addMiniBtn.textContent = '+ ' + localization.translate('Wings Add Wing');
+            addMiniBtn.onclick = () => {
+                const updatedBindings = this.getBridge().getWingsBindings();
+                updatedBindings.add_mini_wing.deck.selected = 1;
+                this.getBridge().setWingsBindings(updatedBindings);
+                this.onUpdate();
+            };
+            miniWingsItem.content.appendChild(addMiniBtn);
+        }
+
+        // Stats
+        const statsItem = createMobileOptionItem(
+            localization.translate('Wings Wing Stats'),
+            parent
+        );
+        const statsGrid = createMobileStatsGrid(stats, WINGS_STATS);
+        statsItem.content.appendChild(statsGrid);
+    }
+
+    /**
+     * Create a mobile wing row
+     */
+    private createMobileWingRow(wing: any, index: number, type: 'full' | 'mini', parent: HTMLElement, bridge: AircraftBridge): void {
+        const wingDiv = document.createElement('div');
+        wingDiv.className = 'mobile-frame-row';
+        wingDiv.style.marginBottom = '0.5rem';
+
+        // Deck select
+        const deckRow = document.createElement('div');
+        deckRow.style.display = 'flex';
+        deckRow.style.gap = '0.25rem';
+        deckRow.style.marginBottom = '0.25rem';
+        createMobileSelect(
+            wing.deck,
+            deckRow,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getWingsBindings();
+                if (type === 'full') {
+                    updatedBindings.full_wings[index].deck.selected = selectedIndex;
+                } else {
+                    updatedBindings.mini_wings[index].deck.selected = selectedIndex;
+                }
+                this.getBridge().setWingsBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        createMobileSelect(
+            wing.skin,
+            deckRow,
+            (selectedIndex) => {
+                const updatedBindings = this.getBridge().getWingsBindings();
+                if (type === 'full') {
+                    updatedBindings.full_wings[index].skin.selected = selectedIndex;
+                } else {
+                    updatedBindings.mini_wings[index].skin.selected = selectedIndex;
+                }
+                this.getBridge().setWingsBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        wingDiv.appendChild(deckRow);
+
+        // Area and Span inputs
+        const inputsRow = document.createElement('div');
+        inputsRow.style.display = 'flex';
+        inputsRow.style.gap = '0.25rem';
+        inputsRow.style.flexWrap = 'wrap';
+
+        createMobileNumberInput(
+            { ...wing.area, name: localization.translate('Wings Area') },
+            inputsRow,
+            (value) => {
+                const updatedBindings = this.getBridge().getWingsBindings();
+                if (type === 'full') {
+                    updatedBindings.full_wings[index].area.value = value;
+                } else {
+                    updatedBindings.mini_wings[index].area.value = value;
+                }
+                this.getBridge().setWingsBindings(updatedBindings);
+                this.onUpdate();
+            },
+            type === 'full' ? 3 : 1,
+            type === 'mini' ? 2 : undefined
+        );
+
+        createMobileNumberInput(
+            { ...wing.span, name: localization.translate('Wings Span') },
+            inputsRow,
+            (value) => {
+                const updatedBindings = this.getBridge().getWingsBindings();
+                if (type === 'full') {
+                    updatedBindings.full_wings[index].span.value = value;
+                } else {
+                    updatedBindings.mini_wings[index].span.value = value;
+                }
+                this.getBridge().setWingsBindings(updatedBindings);
+                this.onUpdate();
+            },
+            1
+        );
+
+        wingDiv.appendChild(inputsRow);
+
+        // Full wing specific options
+        if (type === 'full') {
+            const optionsRow = document.createElement('div');
+            optionsRow.style.display = 'flex';
+            optionsRow.style.gap = '0.25rem';
+            optionsRow.style.flexWrap = 'wrap';
+            optionsRow.style.marginTop = '0.25rem';
+
+            // Gull checkbox
+            createMobileCheckbox(
+                { ...wing.gull, name: localization.translate('Wings Gull') },
+                optionsRow,
+                (checked) => {
+                    const updatedBindings = this.getBridge().getWingsBindings();
+                    updatedBindings.full_wings[index].gull.selected = checked;
+                    this.getBridge().setWingsBindings(updatedBindings);
+                    this.onUpdate();
+                }
+            );
+
+            // Dihedral/Anhedral
+            createMobileNumberInput(
+                { ...wing.dihedral, name: localization.translate('Wings Dihedral') },
+                optionsRow,
+                (value) => {
+                    const updatedBindings = this.getBridge().getWingsBindings();
+                    updatedBindings.full_wings[index].dihedral.value = value;
+                    this.getBridge().setWingsBindings(updatedBindings);
+                    this.onUpdate();
+                },
+                0
+            );
+
+            createMobileNumberInput(
+                { ...wing.anhedral, name: localization.translate('Wings Anhedral') },
+                optionsRow,
+                (value) => {
+                    const updatedBindings = this.getBridge().getWingsBindings();
+                    updatedBindings.full_wings[index].anhedral.value = value;
+                    this.getBridge().setWingsBindings(updatedBindings);
+                    this.onUpdate();
+                },
+                0
+            );
+
+            wingDiv.appendChild(optionsRow);
+        }
+
+        parent.appendChild(wingDiv);
     }
 
     /**
