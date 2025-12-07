@@ -16,7 +16,8 @@ import {
     StatDisplayConfig,
     createMobileOptionItem,
     createMobileNumberInput,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -355,6 +356,11 @@ export class OptimizationUI extends BaseComponentUI {
         // Update stats table
         const stats = bridge.getOptimizationStats();
         updateStatsTable(this.cache.statsTable, stats, OPTIMIZATION_STATS);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, OPTIMIZATION_STATS);
+        }
     }
 
     /**

@@ -24,7 +24,8 @@ import {
     createMobileSelect,
     createMobileNumberInput,
     createMobileCheckbox,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 
@@ -60,6 +61,7 @@ interface LoadCache {
 
     // Stat cells
     statsTable: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 export class LoadUI extends BaseComponentUI {
@@ -294,8 +296,8 @@ export class LoadUI extends BaseComponentUI {
             localization.translate('Load Load Stats'),
             mobileDiv
         );
-        const statsGrid = createMobileStatsGrid(stats, LOAD_STATS, derived);
-        statsItem.content.appendChild(statsGrid);
+        const mobileStatsGrid = createMobileStatsGrid(stats, LOAD_STATS, derived);
+        statsItem.content.appendChild(mobileStatsGrid);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -304,7 +306,8 @@ export class LoadUI extends BaseComponentUI {
             ...fuelCache,
             ...munitionsCache,
             cargoSelect,
-            statsTable
+            statsTable,
+            mobileStatsGrid
         };
 
         // Create collapsible section with localized title
@@ -590,5 +593,10 @@ export class LoadUI extends BaseComponentUI {
         const stats = addStats(fuelStats, munitionsStats, cargoStats);
         const derived = bridge.getDerivedStats();
         updateStatsTable(this.cache.statsTable, stats, LOAD_STATS, derived);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, LOAD_STATS, derived);
+        }
     }
 }

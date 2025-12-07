@@ -22,7 +22,8 @@ import {
     createMobileOptionItem,
     createMobileSelect,
     createMobileCheckbox,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 // Cache interface for type safety
@@ -34,6 +35,7 @@ interface ControlSurfacesCache {
     slatsSelect: HTMLSelectElement;
     dragCheckboxes: HTMLInputElement[];
     statsTables: HTMLTableElement;
+    mobileStatsGrid?: HTMLDivElement;
 }
 
 // Control Surfaces stats configuration
@@ -185,8 +187,8 @@ export class ControlSurfacesUI extends BaseComponentUI {
             localization.translate('Control Surfaces Stats'),
             mobileDiv
         );
-        const statsGrid = createMobileStatsGrid(stats, CONTROLS_STATS);
-        statsItem.content.appendChild(statsGrid);
+        const mobileStatsGrid = createMobileStatsGrid(stats, CONTROLS_STATS);
+        statsItem.content.appendChild(mobileStatsGrid);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -194,7 +196,8 @@ export class ControlSurfacesUI extends BaseComponentUI {
         this.cache = {
             ...surfaceSelects,
             dragCheckboxes,
-            statsTables
+            statsTables,
+            mobileStatsGrid
         };
 
         // Create collapsible section with localized title
@@ -347,6 +350,11 @@ export class ControlSurfacesUI extends BaseComponentUI {
         const flapCost = bridge.getControlSurfacesFlapCost(Math.round(derivedStats.dry_mp));
         stats.cost += flapCost;
         updateStatsTable(this.cache.statsTables, stats, CONTROLS_STATS);
+
+        // Update mobile stats grid
+        if (this.cache.mobileStatsGrid) {
+            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, CONTROLS_STATS);
+        }
     }
 
     /**
