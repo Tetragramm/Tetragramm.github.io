@@ -30,6 +30,10 @@ interface PassengersCache {
     connectCheckbox: HTMLInputElement;
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+    // Mobile controls
+    mobileSeatsInput?: HTMLInputElement;
+    mobileBedsInput?: HTMLInputElement;
+    mobileConnectCheckbox?: HTMLInputElement;
 }
 
 // Passengers stats configuration
@@ -159,7 +163,7 @@ export class PassengersUI extends BaseComponentUI {
             localization.translate('Passengers Number of Seats'),
             mobileDiv
         );
-        createMobileNumberInput(
+        const { input: mobileSeatsInput } = createMobileNumberInput(
             { ...bindings.seats, name: '' },
             seatsItem.content,
             (value) => {
@@ -176,7 +180,7 @@ export class PassengersUI extends BaseComponentUI {
             localization.translate('Passengers Number of Beds'),
             mobileDiv
         );
-        createMobileNumberInput(
+        const { input: mobileBedsInput } = createMobileNumberInput(
             { ...bindings.beds, name: '' },
             bedsItem.content,
             (value) => {
@@ -193,7 +197,7 @@ export class PassengersUI extends BaseComponentUI {
             localization.translate('Passengers Upgrade'),
             mobileDiv
         );
-        createMobileCheckbox(
+        const mobileConnectCheckbox = createMobileCheckbox(
             bindings.connected,
             upgradeItem.content,
             (checked) => {
@@ -220,7 +224,10 @@ export class PassengersUI extends BaseComponentUI {
             bedsInput,
             connectCheckbox,
             statsTable,
-            mobileStatsGrid
+            mobileStatsGrid,
+            mobileSeatsInput,
+            mobileBedsInput,
+            mobileConnectCheckbox
         };
 
         // Create collapsible section with localized title
@@ -252,22 +259,34 @@ export class PassengersUI extends BaseComponentUI {
 
         const bindings = bridge.getPassengersBindings();
 
-        // Update seats input
+        // Update seats input (desktop and mobile)
         if (this.cache.seatsInput && bindings.seats) {
             this.cache.seatsInput.value = bindings.seats.value.toString();
             this.cache.seatsInput.disabled = !bindings.seats.enabled;
         }
+        if (this.cache.mobileSeatsInput && bindings.seats) {
+            this.cache.mobileSeatsInput.value = bindings.seats.value.toString();
+            this.cache.mobileSeatsInput.disabled = !bindings.seats.enabled;
+        }
 
-        // Update beds input
+        // Update beds input (desktop and mobile)
         if (this.cache.bedsInput && bindings.beds) {
             this.cache.bedsInput.value = bindings.beds.value.toString();
             this.cache.bedsInput.disabled = !bindings.beds.enabled;
         }
+        if (this.cache.mobileBedsInput && bindings.beds) {
+            this.cache.mobileBedsInput.value = bindings.beds.value.toString();
+            this.cache.mobileBedsInput.disabled = !bindings.beds.enabled;
+        }
 
-        // Update connectivity checkbox
+        // Update connectivity checkbox (desktop and mobile)
         if (this.cache.connectCheckbox && bindings.connected) {
             this.cache.connectCheckbox.checked = bindings.connected.selected;
             this.cache.connectCheckbox.disabled = !bindings.connected.enabled;
+        }
+        if (this.cache.mobileConnectCheckbox && bindings.connected) {
+            this.cache.mobileConnectCheckbox.checked = bindings.connected.selected;
+            this.cache.mobileConnectCheckbox.disabled = !bindings.connected.enabled;
         }
 
         // Update stats table

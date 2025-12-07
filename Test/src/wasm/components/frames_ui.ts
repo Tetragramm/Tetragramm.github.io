@@ -61,6 +61,16 @@ interface FramesCache {
 
     // Mobile stats grid
     mobileStatsGrid?: HTMLDivElement;
+
+    // Mobile controls
+    mobileFlyingWingCheckbox?: HTMLInputElement;
+    mobileAllFrameSelect?: HTMLSelectElement;
+    mobileAllSkinSelect?: HTMLSelectElement;
+    mobileSectionRows?: MobileSectionRowCache[];
+    mobileTailTypeSelect?: HTMLSelectElement;
+    mobileFarmanCheckbox?: HTMLInputElement;
+    mobileBoomCheckbox?: HTMLInputElement;
+    mobileTailSectionRows?: MobileTailSectionRowCache[];
 }
 
 interface SectionRowCache {
@@ -79,6 +89,27 @@ interface TailSectionRowCache {
     row: HTMLTableRowElement;
     frameSelect: HTMLSelectElement;
     skinLabel: HTMLLabelElement;
+    geodesicCheckbox: HTMLInputElement;
+    monocoqueCheckbox: HTMLInputElement;
+    liftingBodyCheckbox: HTMLInputElement;
+}
+
+// Mobile section row cache
+interface MobileSectionRowCache {
+    frameSelect: HTMLSelectElement;
+    skinLabel: HTMLElement;
+    geodesicCheckbox: HTMLInputElement;
+    monocoqueCheckbox: HTMLInputElement;
+    internalBracingCheckbox: HTMLInputElement;
+    liftingBodyCheckbox: HTMLInputElement;
+    addButton: HTMLButtonElement;
+    removeButton: HTMLButtonElement;
+}
+
+// Mobile tail section row cache
+interface MobileTailSectionRowCache {
+    frameSelect: HTMLSelectElement;
+    skinLabel: HTMLElement;
     geodesicCheckbox: HTMLInputElement;
     monocoqueCheckbox: HTMLInputElement;
     liftingBodyCheckbox: HTMLInputElement;
@@ -710,11 +741,19 @@ export class FramesUI extends BaseComponentUI {
     private updateFramesSection(bindings: any, stats: any, derived: any): void {
         if (!this.cache) return;
 
-        // Update "apply to all" selects
+        // Update "apply to all" selects (desktop)
         updateSelectElement(this.cache.allFrameSelect, bindings.all_frame);
         this.cache.allFrameSelect.selectedIndex = -1; // Reset to "no selection"
-
         updateSelectElement(this.cache.allSkinSelect, bindings.all_skin);
+
+        // Update "apply to all" selects (mobile)
+        if (this.cache.mobileAllFrameSelect) {
+            updateSelectElement(this.cache.mobileAllFrameSelect, bindings.all_frame);
+            this.cache.mobileAllFrameSelect.selectedIndex = -1;
+        }
+        if (this.cache.mobileAllSkinSelect) {
+            updateSelectElement(this.cache.mobileAllSkinSelect, bindings.all_skin);
+        }
 
         // Check if sections count changed - if so, need full rebuild
         if (bindings.sections.length !== this.cache.sectionRows.length) {
@@ -722,7 +761,7 @@ export class FramesUI extends BaseComponentUI {
             return;
         }
 
-        // Update each section
+        // Update each section (desktop)
         for (let i = 0; i < bindings.sections.length; i++) {
             const sectionBindings = bindings.sections[i];
             const sectionCache = this.cache.sectionRows[i];
@@ -747,6 +786,33 @@ export class FramesUI extends BaseComponentUI {
             sectionCache.removeButton.disabled = !sectionBindings.can_remove;
         }
 
+        // Update each section (mobile)
+        if (this.cache.mobileSectionRows) {
+            for (let i = 0; i < bindings.sections.length && i < this.cache.mobileSectionRows.length; i++) {
+                const sectionBindings = bindings.sections[i];
+                const mobileCache = this.cache.mobileSectionRows[i];
+
+                updateSelectElement(mobileCache.frameSelect, sectionBindings.frame);
+
+                mobileCache.skinLabel.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForSection(sectionBindings);
+
+                mobileCache.geodesicCheckbox.checked = sectionBindings.geodesic.selected;
+                mobileCache.geodesicCheckbox.disabled = !sectionBindings.geodesic.enabled;
+
+                mobileCache.monocoqueCheckbox.checked = sectionBindings.monocoque.selected;
+                mobileCache.monocoqueCheckbox.disabled = !sectionBindings.monocoque.enabled;
+
+                mobileCache.internalBracingCheckbox.checked = sectionBindings.internal_bracing.selected;
+                mobileCache.internalBracingCheckbox.disabled = !sectionBindings.internal_bracing.enabled;
+
+                mobileCache.liftingBodyCheckbox.checked = sectionBindings.lifting_body.selected;
+                mobileCache.liftingBodyCheckbox.disabled = !sectionBindings.lifting_body.enabled;
+
+                mobileCache.addButton.disabled = !sectionBindings.can_add;
+                mobileCache.removeButton.disabled = !sectionBindings.can_remove;
+            }
+        }
+
         // Update stats table
         updateStatsTable(this.cache.statsTable, stats, FRAMES_STATS, derived);
 
@@ -762,7 +828,7 @@ export class FramesUI extends BaseComponentUI {
     private updateTailSection(bindings: any): void {
         if (!this.cache) return;
 
-        // Update tail controls
+        // Update tail controls (desktop)
         updateSelectElement(this.cache.tailTypeSelect, bindings.tail_type);
 
         this.cache.farmanCheckbox.checked = bindings.farman.selected;
@@ -774,13 +840,30 @@ export class FramesUI extends BaseComponentUI {
         this.cache.flyingWingCheckbox.checked = bindings.flying_wing.selected;
         this.cache.flyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
 
+        // Update tail controls (mobile)
+        if (this.cache.mobileTailTypeSelect) {
+            updateSelectElement(this.cache.mobileTailTypeSelect, bindings.tail_type);
+        }
+        if (this.cache.mobileFarmanCheckbox) {
+            this.cache.mobileFarmanCheckbox.checked = bindings.farman.selected;
+            this.cache.mobileFarmanCheckbox.disabled = !bindings.farman.enabled;
+        }
+        if (this.cache.mobileBoomCheckbox) {
+            this.cache.mobileBoomCheckbox.checked = bindings.boom.selected;
+            this.cache.mobileBoomCheckbox.disabled = !bindings.boom.enabled;
+        }
+        if (this.cache.mobileFlyingWingCheckbox) {
+            this.cache.mobileFlyingWingCheckbox.checked = bindings.flying_wing.selected;
+            this.cache.mobileFlyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
+        }
+
         // Check if tail sections count changed - if so, need full rebuild
         if (bindings.tail_sections.length !== this.cache.tailSectionRows.length) {
             this.render(true);
             return;
         }
 
-        // Update each tail section
+        // Update each tail section (desktop)
         for (let i = 0; i < bindings.tail_sections.length; i++) {
             const tailSectionBindings = bindings.tail_sections[i];
             const tailSectionCache = this.cache.tailSectionRows[i];
@@ -798,6 +881,27 @@ export class FramesUI extends BaseComponentUI {
             tailSectionCache.liftingBodyCheckbox.checked = tailSectionBindings.lifting_body.selected;
             tailSectionCache.liftingBodyCheckbox.disabled = !tailSectionBindings.lifting_body.enabled;
         }
+
+        // Update each tail section (mobile)
+        if (this.cache.mobileTailSectionRows) {
+            for (let i = 0; i < bindings.tail_sections.length && i < this.cache.mobileTailSectionRows.length; i++) {
+                const tailSectionBindings = bindings.tail_sections[i];
+                const mobileCache = this.cache.mobileTailSectionRows[i];
+
+                updateSelectElement(mobileCache.frameSelect, tailSectionBindings.frame);
+
+                mobileCache.skinLabel.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForTailSection(bindings);
+
+                mobileCache.geodesicCheckbox.checked = tailSectionBindings.geodesic.selected;
+                mobileCache.geodesicCheckbox.disabled = !tailSectionBindings.geodesic.enabled;
+
+                mobileCache.monocoqueCheckbox.checked = tailSectionBindings.monocoque.selected;
+                mobileCache.monocoqueCheckbox.disabled = !tailSectionBindings.monocoque.enabled;
+
+                mobileCache.liftingBodyCheckbox.checked = tailSectionBindings.lifting_body.selected;
+                mobileCache.liftingBodyCheckbox.disabled = !tailSectionBindings.lifting_body.enabled;
+            }
+        }
     }
 
     /**
@@ -812,24 +916,24 @@ export class FramesUI extends BaseComponentUI {
             localization.translate('Frames Flying Wing'),
             contentDiv
         );
-        const flyingWingCheckbox = document.createElement('input');
-        flyingWingCheckbox.type = 'checkbox';
-        flyingWingCheckbox.checked = bindings.flying_wing.selected;
-        flyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
-        flyingWingCheckbox.onchange = () => {
+        const mobileFlyingWingCheckbox = document.createElement('input');
+        mobileFlyingWingCheckbox.type = 'checkbox';
+        mobileFlyingWingCheckbox.checked = bindings.flying_wing.selected;
+        mobileFlyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
+        mobileFlyingWingCheckbox.onchange = () => {
             const updatedBindings = this.getBridge().getFramesBindings();
-            updatedBindings.flying_wing.selected = flyingWingCheckbox.checked;
+            updatedBindings.flying_wing.selected = mobileFlyingWingCheckbox.checked;
             this.getBridge().setFramesBindings(updatedBindings);
             this.onUpdate();
         };
-        flyingWingItem.content.appendChild(flyingWingCheckbox);
+        flyingWingItem.content.appendChild(mobileFlyingWingCheckbox);
 
         // Frame Type selector (apply to all)
         const frameTypeItem = createMobileOptionItem(
             localization.translate('Frames Frame Type'),
             contentDiv
         );
-        const allFrameSelect = createMobileSelect(
+        const mobileAllFrameSelect = createMobileSelect(
             bindings.all_frame,
             frameTypeItem.content,
             (selectedIndex) => {
@@ -839,14 +943,14 @@ export class FramesUI extends BaseComponentUI {
                 this.onUpdate();
             }
         );
-        allFrameSelect.selectedIndex = -1;
+        mobileAllFrameSelect.selectedIndex = -1;
 
         // Skin Type selector (apply to all)
         const skinTypeItem = createMobileOptionItem(
             localization.translate('Frames Skin Type'),
             contentDiv
         );
-        createMobileSelect(
+        const mobileAllSkinSelect = createMobileSelect(
             bindings.all_skin,
             skinTypeItem.content,
             (selectedIndex) => {
@@ -865,8 +969,10 @@ export class FramesUI extends BaseComponentUI {
         contentDiv.appendChild(fuselageTitle);
 
         // Each fuselage section
+        const mobileSectionRows: MobileSectionRowCache[] = [];
         for (let i = 0; i < bindings.sections.length; i++) {
-            this.createMobileSectionRow(bindings.sections[i], i, contentDiv, bindings);
+            const rowCache = this.createMobileSectionRow(bindings.sections[i], i, contentDiv, bindings);
+            mobileSectionRows.push(rowCache);
         }
 
         // Tail section title
@@ -881,7 +987,7 @@ export class FramesUI extends BaseComponentUI {
             localization.translate('Frames Tail Type'),
             contentDiv
         );
-        createMobileSelect(
+        const mobileTailTypeSelect = createMobileSelect(
             bindings.tail_type,
             tailTypeItem.content,
             (selectedIndex) => {
@@ -897,39 +1003,41 @@ export class FramesUI extends BaseComponentUI {
             localization.translate('Frames Tail Farman'),
             contentDiv
         );
-        const farmanCheckbox = document.createElement('input');
-        farmanCheckbox.type = 'checkbox';
-        farmanCheckbox.checked = bindings.farman.selected;
-        farmanCheckbox.disabled = !bindings.farman.enabled;
-        farmanCheckbox.onchange = () => {
+        const mobileFarmanCheckbox = document.createElement('input');
+        mobileFarmanCheckbox.type = 'checkbox';
+        mobileFarmanCheckbox.checked = bindings.farman.selected;
+        mobileFarmanCheckbox.disabled = !bindings.farman.enabled;
+        mobileFarmanCheckbox.onchange = () => {
             const updatedBindings = this.getBridge().getFramesBindings();
-            updatedBindings.farman.selected = farmanCheckbox.checked;
+            updatedBindings.farman.selected = mobileFarmanCheckbox.checked;
             this.getBridge().setFramesBindings(updatedBindings);
             this.onUpdate();
         };
-        farmanItem.content.appendChild(farmanCheckbox);
+        farmanItem.content.appendChild(mobileFarmanCheckbox);
 
         // Boom checkbox
         const boomItem = createMobileOptionItem(
             localization.translate('Frames Tail Boom'),
             contentDiv
         );
-        const boomCheckbox = document.createElement('input');
-        boomCheckbox.type = 'checkbox';
-        boomCheckbox.checked = bindings.boom.selected;
-        boomCheckbox.disabled = !bindings.boom.enabled;
-        boomCheckbox.onchange = () => {
+        const mobileBoomCheckbox = document.createElement('input');
+        mobileBoomCheckbox.type = 'checkbox';
+        mobileBoomCheckbox.checked = bindings.boom.selected;
+        mobileBoomCheckbox.disabled = !bindings.boom.enabled;
+        mobileBoomCheckbox.onchange = () => {
             const updatedBindings = this.getBridge().getFramesBindings();
-            updatedBindings.boom.selected = boomCheckbox.checked;
+            updatedBindings.boom.selected = mobileBoomCheckbox.checked;
             this.getBridge().setFramesBindings(updatedBindings);
             this.onUpdate();
         };
-        boomItem.content.appendChild(boomCheckbox);
+        boomItem.content.appendChild(mobileBoomCheckbox);
 
         // Tail sections
+        const mobileTailSectionRows: MobileTailSectionRowCache[] = [];
         if (bindings.tail_sections && bindings.tail_sections.length > 0) {
             for (let i = 0; i < bindings.tail_sections.length; i++) {
-                this.createMobileTailSectionRow(bindings.tail_sections[i], bindings, i, contentDiv);
+                const rowCache = this.createMobileTailSectionRow(bindings.tail_sections[i], bindings, i, contentDiv);
+                mobileTailSectionRows.push(rowCache);
             }
         }
 
@@ -943,9 +1051,17 @@ export class FramesUI extends BaseComponentUI {
         const statsGrid = createMobileStatsGrid(stats, FRAMES_STATS, derived);
         contentDiv.appendChild(statsGrid);
 
-        // Store mobile stats grid in cache
+        // Store mobile controls in cache
         if (this.cache) {
             this.cache.mobileStatsGrid = statsGrid;
+            this.cache.mobileFlyingWingCheckbox = mobileFlyingWingCheckbox;
+            this.cache.mobileAllFrameSelect = mobileAllFrameSelect;
+            this.cache.mobileAllSkinSelect = mobileAllSkinSelect;
+            this.cache.mobileSectionRows = mobileSectionRows;
+            this.cache.mobileTailTypeSelect = mobileTailTypeSelect;
+            this.cache.mobileFarmanCheckbox = mobileFarmanCheckbox;
+            this.cache.mobileBoomCheckbox = mobileBoomCheckbox;
+            this.cache.mobileTailSectionRows = mobileTailSectionRows;
         }
 
         // Wrap in collapsible section
@@ -966,7 +1082,7 @@ export class FramesUI extends BaseComponentUI {
     /**
      * Create a mobile fuselage section row
      */
-    private createMobileSectionRow(sectionBindings: any, index: number, parent: HTMLElement, bindings: any): void {
+    private createMobileSectionRow(sectionBindings: any, index: number, parent: HTMLElement, bindings: any): MobileSectionRowCache {
         const sectionDiv = document.createElement('div');
         sectionDiv.className = 'mobile-frame-row';
 
@@ -975,16 +1091,16 @@ export class FramesUI extends BaseComponentUI {
         headerDiv.className = 'mobile-frame-header';
 
         // Remove button
-        const removeBtn = document.createElement('button');
-        removeBtn.type = 'button';
-        removeBtn.className = 'mobile-number-btn';
-        removeBtn.textContent = '-';
-        removeBtn.disabled = !sectionBindings.can_remove;
-        removeBtn.onclick = () => {
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'mobile-number-btn';
+        removeButton.textContent = '-';
+        removeButton.disabled = !sectionBindings.can_remove;
+        removeButton.onclick = () => {
             this.getBridge().deleteSection(index);
             this.render(true);
         };
-        headerDiv.appendChild(removeBtn);
+        headerDiv.appendChild(removeButton);
 
         // Frame select
         const frameSelect = createSelectElement(
@@ -1000,25 +1116,25 @@ export class FramesUI extends BaseComponentUI {
         headerDiv.appendChild(frameSelect);
 
         // Add button
-        const addBtn = document.createElement('button');
-        addBtn.type = 'button';
-        addBtn.className = 'mobile-number-btn';
-        addBtn.textContent = '+';
-        addBtn.disabled = !sectionBindings.can_add;
-        addBtn.onclick = () => {
+        const addButton = document.createElement('button');
+        addButton.type = 'button';
+        addButton.className = 'mobile-number-btn';
+        addButton.textContent = '+';
+        addButton.disabled = !sectionBindings.can_add;
+        addButton.onclick = () => {
             this.getBridge().duplicateSection(index);
             this.render(true);
         };
-        headerDiv.appendChild(addBtn);
+        headerDiv.appendChild(addButton);
 
         sectionDiv.appendChild(headerDiv);
 
         // Skin label
-        const skinDiv = document.createElement('div');
-        skinDiv.style.fontSize = '0.9rem';
-        skinDiv.style.color = 'var(--inp_txt_color)';
-        skinDiv.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForSection(sectionBindings);
-        sectionDiv.appendChild(skinDiv);
+        const skinLabel = document.createElement('div');
+        skinLabel.style.fontSize = '0.9rem';
+        skinLabel.style.color = 'var(--inp_txt_color)';
+        skinLabel.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForSection(sectionBindings);
+        sectionDiv.appendChild(skinLabel);
 
         // Options row
         const optionsDiv = document.createElement('div');
@@ -1026,7 +1142,7 @@ export class FramesUI extends BaseComponentUI {
 
         // Geodesic
         const geodesicBinding = { ...sectionBindings.geodesic, name: localization.translate('Frames Geodesic') };
-        createMobileCheckbox(geodesicBinding, optionsDiv, (checked) => {
+        const geodesicCheckbox = createMobileCheckbox(geodesicBinding, optionsDiv, (checked) => {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.sections[index].geodesic.selected = checked;
             this.getBridge().setFramesBindings(updatedBindings);
@@ -1035,7 +1151,7 @@ export class FramesUI extends BaseComponentUI {
 
         // Monocoque
         const monocoqueBinding = { ...sectionBindings.monocoque, name: localization.translate('Frames Monocoque') };
-        createMobileCheckbox(monocoqueBinding, optionsDiv, (checked) => {
+        const monocoqueCheckbox = createMobileCheckbox(monocoqueBinding, optionsDiv, (checked) => {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.sections[index].monocoque.selected = checked;
             this.getBridge().setFramesBindings(updatedBindings);
@@ -1044,7 +1160,7 @@ export class FramesUI extends BaseComponentUI {
 
         // Internal Bracing
         const internalBracingBinding = { ...sectionBindings.internal_bracing, name: localization.translate('Frames Internal Bracing') };
-        createMobileCheckbox(internalBracingBinding, optionsDiv, (checked) => {
+        const internalBracingCheckbox = createMobileCheckbox(internalBracingBinding, optionsDiv, (checked) => {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.sections[index].internal_bracing.selected = checked;
             this.getBridge().setFramesBindings(updatedBindings);
@@ -1053,7 +1169,7 @@ export class FramesUI extends BaseComponentUI {
 
         // Lifting Body
         const liftingBodyBinding = { ...sectionBindings.lifting_body, name: localization.translate('Frames Lifting Body') };
-        createMobileCheckbox(liftingBodyBinding, optionsDiv, (checked) => {
+        const liftingBodyCheckbox = createMobileCheckbox(liftingBodyBinding, optionsDiv, (checked) => {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.sections[index].lifting_body.selected = checked;
             this.getBridge().setFramesBindings(updatedBindings);
@@ -1062,12 +1178,23 @@ export class FramesUI extends BaseComponentUI {
 
         sectionDiv.appendChild(optionsDiv);
         parent.appendChild(sectionDiv);
+
+        return {
+            frameSelect,
+            skinLabel,
+            geodesicCheckbox,
+            monocoqueCheckbox,
+            internalBracingCheckbox,
+            liftingBodyCheckbox,
+            addButton,
+            removeButton
+        };
     }
 
     /**
      * Create a mobile tail section row
      */
-    private createMobileTailSectionRow(tailSectionBindings: any, bindings: any, index: number, parent: HTMLElement): void {
+    private createMobileTailSectionRow(tailSectionBindings: any, bindings: any, index: number, parent: HTMLElement): MobileTailSectionRowCache {
         const sectionDiv = document.createElement('div');
         sectionDiv.className = 'mobile-frame-row';
 
@@ -1088,11 +1215,11 @@ export class FramesUI extends BaseComponentUI {
         sectionDiv.appendChild(headerDiv);
 
         // Skin label
-        const skinDiv = document.createElement('div');
-        skinDiv.style.fontSize = '0.9rem';
-        skinDiv.style.color = 'var(--inp_txt_color)';
-        skinDiv.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForTailSection(bindings);
-        sectionDiv.appendChild(skinDiv);
+        const skinLabel = document.createElement('div');
+        skinLabel.style.fontSize = '0.9rem';
+        skinLabel.style.color = 'var(--inp_txt_color)';
+        skinLabel.textContent = localization.translate('Frames Skin Type') + ': ' + this.getSkinNameForTailSection(bindings);
+        sectionDiv.appendChild(skinLabel);
 
         // Options row
         const optionsDiv = document.createElement('div');
@@ -1100,7 +1227,7 @@ export class FramesUI extends BaseComponentUI {
 
         // Geodesic
         const geodesicBinding = { ...tailSectionBindings.geodesic, name: localization.translate('Frames Geodesic') };
-        createMobileCheckbox(geodesicBinding, optionsDiv, (checked) => {
+        const geodesicCheckbox = createMobileCheckbox(geodesicBinding, optionsDiv, (checked) => {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.tail_sections[index].geodesic.selected = checked;
             this.getBridge().setFramesBindings(updatedBindings);
@@ -1109,7 +1236,7 @@ export class FramesUI extends BaseComponentUI {
 
         // Monocoque
         const monocoqueBinding = { ...tailSectionBindings.monocoque, name: localization.translate('Frames Monocoque') };
-        createMobileCheckbox(monocoqueBinding, optionsDiv, (checked) => {
+        const monocoqueCheckbox = createMobileCheckbox(monocoqueBinding, optionsDiv, (checked) => {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.tail_sections[index].monocoque.selected = checked;
             this.getBridge().setFramesBindings(updatedBindings);
@@ -1118,7 +1245,7 @@ export class FramesUI extends BaseComponentUI {
 
         // Lifting Body
         const liftingBodyBinding = { ...tailSectionBindings.lifting_body, name: localization.translate('Frames Lifting Body') };
-        createMobileCheckbox(liftingBodyBinding, optionsDiv, (checked) => {
+        const liftingBodyCheckbox = createMobileCheckbox(liftingBodyBinding, optionsDiv, (checked) => {
             const updatedBindings = this.getBridge().getFramesBindings();
             updatedBindings.tail_sections[index].lifting_body.selected = checked;
             this.getBridge().setFramesBindings(updatedBindings);
@@ -1127,5 +1254,13 @@ export class FramesUI extends BaseComponentUI {
 
         sectionDiv.appendChild(optionsDiv);
         parent.appendChild(sectionDiv);
+
+        return {
+            frameSelect,
+            skinLabel,
+            geodesicCheckbox,
+            monocoqueCheckbox,
+            liftingBodyCheckbox
+        };
     }
 }
