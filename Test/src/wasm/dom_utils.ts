@@ -285,6 +285,14 @@ export function createMobileNumberInput(
     const container = document.createElement('div');
     container.className = 'mobile-number-container';
 
+    // Add label if binding has a name
+    if (binding.name) {
+        const label = document.createElement('span');
+        label.className = 'mobile-number-label';
+        label.textContent = binding.name;
+        container.appendChild(label);
+    }
+
     // Minus button
     const minusBtn = document.createElement('button');
     minusBtn.type = 'button';
