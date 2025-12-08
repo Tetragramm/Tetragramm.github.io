@@ -471,9 +471,17 @@ export class EnginesUI extends BaseComponentUI {
         baseStatsDiv.style.borderRadius = '4px';
 
         // Rarity
-        const raritySpan = document.createElement('div');
-        raritySpan.innerHTML = `<strong>${localization.translate('Rarity')}:</strong> <span class="${this.getRarityClass(fullStats.rarity)}">${this.getRarityText(fullStats.rarity)}</span>`;
-        baseStatsDiv.appendChild(raritySpan);
+        const rarityDiv = document.createElement('div');
+        const rarityLabel = document.createElement('strong');
+        rarityLabel.textContent = `${localization.translate('Rarity')}: `;
+        rarityDiv.appendChild(rarityLabel);
+        const rarityValue = document.createElement('span');
+        rarityValue.className = this.getRarityClass(fullStats.rarity);
+        rarityValue.style.display = 'inline';
+        rarityValue.style.padding = '0 0.25rem';
+        rarityValue.textContent = this.getRarityText(fullStats.rarity);
+        rarityDiv.appendChild(rarityValue);
+        baseStatsDiv.appendChild(rarityDiv);
 
         // Key engine stats in a grid
         const statsGrid = document.createElement('div');
