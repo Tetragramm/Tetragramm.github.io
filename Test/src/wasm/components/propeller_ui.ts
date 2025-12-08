@@ -22,6 +22,9 @@ import {
 interface PropellerCache {
     pitchSelect: HTMLSelectElement;
     upgradeSelect: HTMLSelectElement;
+    // Mobile controls
+    mobilePitchSelect?: HTMLSelectElement;
+    mobileUpgradeSelect?: HTMLSelectElement;
 }
 
 export class PropellerUI extends BaseComponentUI {
@@ -110,7 +113,7 @@ export class PropellerUI extends BaseComponentUI {
             localization.translate('Propeller Propeller Pitch'),
             mobileDiv
         );
-        createMobileSelect(
+        const mobilePitchSelect = createMobileSelect(
             bindings.idx_prop,
             pitchItem.content,
             (selectedIndex) => {
@@ -126,7 +129,7 @@ export class PropellerUI extends BaseComponentUI {
             localization.translate('Propeller Propeller Upgrades:'),
             mobileDiv
         );
-        createMobileSelect(
+        const mobileUpgradeSelect = createMobileSelect(
             bindings.idx_upg,
             upgradeItem.content,
             (selectedIndex) => {
@@ -142,7 +145,9 @@ export class PropellerUI extends BaseComponentUI {
         // Cache elements
         this.cache = {
             pitchSelect,
-            upgradeSelect
+            upgradeSelect,
+            mobilePitchSelect,
+            mobileUpgradeSelect
         };
 
         // Create collapsible section with localized title
@@ -182,14 +187,24 @@ export class PropellerUI extends BaseComponentUI {
         // Update visibility first
         this.updateVisibility(aircraftType);
 
-        // Update pitch select
+        // Update pitch select (desktop)
         if (this.cache.pitchSelect && bindings.idx_prop) {
             updateSelectElement(this.cache.pitchSelect, bindings.idx_prop);
         }
 
-        // Update upgrade select
+        // Update pitch select (mobile)
+        if (this.cache.mobilePitchSelect && bindings.idx_prop) {
+            updateSelectElement(this.cache.mobilePitchSelect, bindings.idx_prop);
+        }
+
+        // Update upgrade select (desktop)
         if (this.cache.upgradeSelect && bindings.idx_upg) {
             updateSelectElement(this.cache.upgradeSelect, bindings.idx_upg);
+        }
+
+        // Update upgrade select (mobile)
+        if (this.cache.mobileUpgradeSelect && bindings.idx_upg) {
+            updateSelectElement(this.cache.mobileUpgradeSelect, bindings.idx_upg);
         }
     }
 

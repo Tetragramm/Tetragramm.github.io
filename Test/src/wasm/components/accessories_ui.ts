@@ -56,6 +56,16 @@ interface AccessoriesCache {
     // Stat cells
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+
+    // Mobile controls
+    mobileClimCheckboxes?: HTMLInputElement[];
+    mobileArmourInputs?: HTMLInputElement[];
+    mobileVisiCheckboxes?: HTMLInputElement[];
+    mobileReconInputs?: HTMLInputElement[];
+    mobileRadioSelect?: HTMLSelectElement;
+    mobileElectricalInputs?: HTMLInputElement[];
+    mobileAutopilotSelect?: HTMLSelectElement;
+    mobileControlSelect?: HTMLSelectElement;
 }
 
 // Accessories stats configuration
@@ -194,11 +204,12 @@ export class AccessoriesUI extends BaseComponentUI {
             localization.translate('Accessories Climate'),
             mobileDiv
         );
+        const mobileClimCheckboxes: HTMLInputElement[] = [];
         if (bindings.clim_sel && Array.isArray(bindings.clim_sel)) {
             for (let i = 0; i < bindings.clim_sel.length; i++) {
                 const binding = bindings.clim_sel[i];
                 const idx = i;
-                createMobileCheckbox(
+                const checkbox = createMobileCheckbox(
                     { name: binding.name, selected: binding.selected, enabled: binding.enabled },
                     climateItem.content,
                     (checked) => {
@@ -208,6 +219,7 @@ export class AccessoriesUI extends BaseComponentUI {
                         this.onUpdate();
                     }
                 );
+                mobileClimCheckboxes.push(checkbox);
             }
         }
 
@@ -216,11 +228,12 @@ export class AccessoriesUI extends BaseComponentUI {
             localization.translate('Accessories Armour Coverage'),
             mobileDiv
         );
+        const mobileArmourInputs: HTMLInputElement[] = [];
         if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage)) {
             for (let i = 0; i < bindings.armour_coverage.length; i++) {
                 const binding = bindings.armour_coverage[i];
                 const idx = i;
-                createMobileNumberInput(
+                const { input } = createMobileNumberInput(
                     binding,
                     armourItem.content,
                     (value) => {
@@ -233,6 +246,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     99,
                     1
                 );
+                mobileArmourInputs.push(input);
             }
         }
 
@@ -241,11 +255,12 @@ export class AccessoriesUI extends BaseComponentUI {
             localization.translate('Accessories Visibility'),
             mobileDiv
         );
+        const mobileVisiCheckboxes: HTMLInputElement[] = [];
         if (bindings.visi_sel && Array.isArray(bindings.visi_sel)) {
             for (let i = 0; i < bindings.visi_sel.length; i++) {
                 const binding = bindings.visi_sel[i];
                 const idx = i;
-                createMobileCheckbox(
+                const checkbox = createMobileCheckbox(
                     { name: binding.name, selected: binding.selected, enabled: binding.enabled },
                     visiItem.content,
                     (checked) => {
@@ -255,6 +270,7 @@ export class AccessoriesUI extends BaseComponentUI {
                         this.onUpdate();
                     }
                 );
+                mobileVisiCheckboxes.push(checkbox);
             }
         }
 
@@ -263,11 +279,12 @@ export class AccessoriesUI extends BaseComponentUI {
             localization.translate('Accessories Information'),
             mobileDiv
         );
+        const mobileReconInputs: HTMLInputElement[] = [];
         if (bindings.recon_sel && Array.isArray(bindings.recon_sel)) {
             for (let i = 0; i < bindings.recon_sel.length; i++) {
                 const binding = bindings.recon_sel[i];
                 const idx = i;
-                createMobileNumberInput(
+                const { input } = createMobileNumberInput(
                     binding,
                     infoItem.content,
                     (value) => {
@@ -280,6 +297,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     99,
                     1
                 );
+                mobileReconInputs.push(input);
             }
         }
 
@@ -289,6 +307,7 @@ export class AccessoriesUI extends BaseComponentUI {
             mobileDiv
         );
         // Radio select
+        let mobileRadioSelect: HTMLSelectElement | undefined;
         if (bindings.radio_sel) {
             const radioBinding = {
                 name: localization.translate('Accessories Radio'),
@@ -296,7 +315,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 selected: bindings.radio_sel.selected,
                 enabled: bindings.radio_sel.enabled
             };
-            createMobileSelect(
+            mobileRadioSelect = createMobileSelect(
                 radioBinding,
                 electricalItem.content,
                 (selectedIndex) => {
@@ -308,11 +327,12 @@ export class AccessoriesUI extends BaseComponentUI {
             );
         }
         // Electrical equipment counts
+        const mobileElectricalInputs: HTMLInputElement[] = [];
         if (bindings.electrical_count && Array.isArray(bindings.electrical_count)) {
             for (let i = 0; i < bindings.electrical_count.length; i++) {
                 const binding = bindings.electrical_count[i];
                 const idx = i;
-                createMobileNumberInput(
+                const { input } = createMobileNumberInput(
                     binding,
                     electricalItem.content,
                     (value) => {
@@ -325,6 +345,7 @@ export class AccessoriesUI extends BaseComponentUI {
                     99,
                     1
                 );
+                mobileElectricalInputs.push(input);
             }
         }
 
@@ -334,6 +355,7 @@ export class AccessoriesUI extends BaseComponentUI {
             mobileDiv
         );
         // Autopilot select
+        let mobileAutopilotSelect: HTMLSelectElement | undefined;
         if (bindings.auto_sel) {
             const autopilotBinding = {
                 name: localization.translate('Accessories Autopilot'),
@@ -341,7 +363,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 selected: bindings.auto_sel.selected,
                 enabled: bindings.auto_sel.enabled
             };
-            createMobileSelect(
+            mobileAutopilotSelect = createMobileSelect(
                 autopilotBinding,
                 controlItem.content,
                 (selectedIndex) => {
@@ -353,6 +375,7 @@ export class AccessoriesUI extends BaseComponentUI {
             );
         }
         // Control system select
+        let mobileControlSelect: HTMLSelectElement | undefined;
         if (bindings.cont_sel) {
             const controlBinding = {
                 name: localization.translate('Accessories Control System'),
@@ -360,7 +383,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 selected: bindings.cont_sel.selected,
                 enabled: bindings.cont_sel.enabled
             };
-            createMobileSelect(
+            mobileControlSelect = createMobileSelect(
                 controlBinding,
                 controlItem.content,
                 (selectedIndex) => {
@@ -394,7 +417,15 @@ export class AccessoriesUI extends BaseComponentUI {
             autopilotSelect,
             controlSelect,
             statsTable,
-            mobileStatsGrid
+            mobileStatsGrid,
+            mobileClimCheckboxes,
+            mobileArmourInputs,
+            mobileVisiCheckboxes,
+            mobileReconInputs,
+            mobileRadioSelect,
+            mobileElectricalInputs,
+            mobileAutopilotSelect,
+            mobileControlSelect
         };
 
         // Create collapsible section with localized title
@@ -670,7 +701,7 @@ export class AccessoriesUI extends BaseComponentUI {
 
         const bindings = bridge.getAccessoriesBindings();
 
-        // Update armour inputs
+        // Update armour inputs (desktop)
         if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage)) {
             bindings.armour_coverage.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.armourInputs.length) {
@@ -680,7 +711,17 @@ export class AccessoriesUI extends BaseComponentUI {
             });
         }
 
-        // Update electrical inputs
+        // Update armour inputs (mobile)
+        if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage) && this.cache.mobileArmourInputs) {
+            bindings.armour_coverage.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileArmourInputs!.length) {
+                    this.cache!.mobileArmourInputs![idx].value = item.value.toString();
+                    this.cache!.mobileArmourInputs![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update electrical inputs (desktop)
         if (bindings.electrical_count && Array.isArray(bindings.electrical_count)) {
             bindings.electrical_count.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.electricalInputs.length) {
@@ -690,12 +731,27 @@ export class AccessoriesUI extends BaseComponentUI {
             });
         }
 
-        // Update radio select
+        // Update electrical inputs (mobile)
+        if (bindings.electrical_count && Array.isArray(bindings.electrical_count) && this.cache.mobileElectricalInputs) {
+            bindings.electrical_count.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileElectricalInputs!.length) {
+                    this.cache!.mobileElectricalInputs![idx].value = item.value.toString();
+                    this.cache!.mobileElectricalInputs![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update radio select (desktop)
         if (this.cache.radioSelect && bindings.radio_sel) {
             updateSelectElement(this.cache.radioSelect, bindings.radio_sel);
         }
 
-        // Update recon inputs
+        // Update radio select (mobile)
+        if (this.cache.mobileRadioSelect && bindings.radio_sel) {
+            updateSelectElement(this.cache.mobileRadioSelect, bindings.radio_sel);
+        }
+
+        // Update recon inputs (desktop)
         if (bindings.recon_sel && Array.isArray(bindings.recon_sel)) {
             bindings.recon_sel.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.reconInputs.length) {
@@ -705,7 +761,17 @@ export class AccessoriesUI extends BaseComponentUI {
             });
         }
 
-        // Update visibility checkboxes
+        // Update recon inputs (mobile)
+        if (bindings.recon_sel && Array.isArray(bindings.recon_sel) && this.cache.mobileReconInputs) {
+            bindings.recon_sel.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileReconInputs!.length) {
+                    this.cache!.mobileReconInputs![idx].value = item.value.toString();
+                    this.cache!.mobileReconInputs![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update visibility checkboxes (desktop)
         if (bindings.visi_sel && Array.isArray(bindings.visi_sel)) {
             bindings.visi_sel.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.visiCheckboxes.length) {
@@ -715,7 +781,17 @@ export class AccessoriesUI extends BaseComponentUI {
             });
         }
 
-        // Update climate checkboxes
+        // Update visibility checkboxes (mobile)
+        if (bindings.visi_sel && Array.isArray(bindings.visi_sel) && this.cache.mobileVisiCheckboxes) {
+            bindings.visi_sel.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileVisiCheckboxes!.length) {
+                    this.cache!.mobileVisiCheckboxes![idx].checked = item.selected;
+                    this.cache!.mobileVisiCheckboxes![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update climate checkboxes (desktop)
         if (bindings.clim_sel && Array.isArray(bindings.clim_sel)) {
             bindings.clim_sel.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.climCheckboxes.length) {
@@ -725,14 +801,34 @@ export class AccessoriesUI extends BaseComponentUI {
             });
         }
 
-        // Update autopilot select
+        // Update climate checkboxes (mobile)
+        if (bindings.clim_sel && Array.isArray(bindings.clim_sel) && this.cache.mobileClimCheckboxes) {
+            bindings.clim_sel.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileClimCheckboxes!.length) {
+                    this.cache!.mobileClimCheckboxes![idx].checked = item.selected;
+                    this.cache!.mobileClimCheckboxes![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update autopilot select (desktop)
         if (this.cache.autopilotSelect && bindings.auto_sel) {
             updateSelectElement(this.cache.autopilotSelect, bindings.auto_sel);
         }
 
-        // Update control select
+        // Update autopilot select (mobile)
+        if (this.cache.mobileAutopilotSelect && bindings.auto_sel) {
+            updateSelectElement(this.cache.mobileAutopilotSelect, bindings.auto_sel);
+        }
+
+        // Update control select (desktop)
         if (this.cache.controlSelect && bindings.cont_sel) {
             updateSelectElement(this.cache.controlSelect, bindings.cont_sel);
+        }
+
+        // Update control select (mobile)
+        if (this.cache.mobileControlSelect && bindings.cont_sel) {
+            updateSelectElement(this.cache.mobileControlSelect, bindings.cont_sel);
         }
 
         // Update stat values

@@ -26,6 +26,9 @@ interface OptimizationCache {
     optimizationRows: OptimizationRow[];
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+    // Mobile controls
+    mobileFreeInput?: HTMLInputElement;
+    mobileOptInputs?: Map<string, HTMLInputElement>;
 }
 
 interface OptimizationRow {
@@ -178,7 +181,7 @@ export class OptimizationUI extends BaseComponentUI {
             localization.translate('Optimization Num Free Optimizations'),
             mobileDiv
         );
-        createMobileNumberInput(
+        const { input: mobileFreeInput } = createMobileNumberInput(
             bindings.free_dots,
             freeItem.content,
             (value) => {
@@ -193,6 +196,7 @@ export class OptimizationUI extends BaseComponentUI {
         );
 
         // Create mobile optimization controls (number inputs -3 to +3)
+        const mobileOptInputs = new Map<string, HTMLInputElement>();
         optimizationTypes.forEach(opt => {
             const binding = bindings[opt.key];
             if (!binding) return;
@@ -201,7 +205,7 @@ export class OptimizationUI extends BaseComponentUI {
                 localization.translate(opt.label),
                 mobileDiv
             );
-            createMobileNumberInput(
+            const { input } = createMobileNumberInput(
                 { ...binding, name: '' },
                 item.content,
                 (value) => {
@@ -214,6 +218,7 @@ export class OptimizationUI extends BaseComponentUI {
                 3,
                 1
             );
+            mobileOptInputs.set(opt.key, input);
         });
 
         // Mobile stats grid
@@ -226,6 +231,8 @@ export class OptimizationUI extends BaseComponentUI {
         statsItem.content.appendChild(mobileStatsGrid);
         if (this.cache) {
             this.cache.mobileStatsGrid = mobileStatsGrid;
+            this.cache.mobileFreeInput = mobileFreeInput;
+            this.cache.mobileOptInputs = mobileOptInputs;
         }
 
         contentWrapper.appendChild(mobileDiv);
@@ -330,16 +337,22 @@ export class OptimizationUI extends BaseComponentUI {
 
         const bindings = bridge.getOptimizationBindings();
 
-        // Update free dots input
+        // Update free dots input (desktop)
         if (this.cache.freeInput && bindings.free_dots) {
             this.cache.freeInput.value = bindings.free_dots.value.toString();
             this.cache.freeInput.disabled = !bindings.free_dots.enabled;
         }
 
+        // Update free dots input (mobile)
+        if (this.cache.mobileFreeInput && bindings.free_dots) {
+            this.cache.mobileFreeInput.value = bindings.free_dots.value.toString();
+            this.cache.mobileFreeInput.disabled = !bindings.free_dots.enabled;
+        }
+
         // Get available free dots for enabling/disabling positive checkboxes
         const freeDots = bindings.free_dots?.value || 0;
 
-        // Update optimization rows
+        // Update optimization rows (desktop)
         this.cache.optimizationRows.forEach(row => {
             const binding = bindings[row.key];
             if (!binding) return;
@@ -352,6 +365,17 @@ export class OptimizationUI extends BaseComponentUI {
             // Update enabled state for positive checkboxes (only positive checkboxes can be limited by free dots)
             this.updateEnabled(row.checkboxes);
         });
+
+        // Update mobile optimization inputs
+        if (this.cache.mobileOptInputs) {
+            this.cache.mobileOptInputs.forEach((input, key) => {
+                const binding = bindings[key];
+                if (binding) {
+                    input.value = binding.value.toString();
+                    input.disabled = !binding.enabled;
+                }
+            });
+        }
 
         // Update stats table
         const stats = bridge.getOptimizationStats();
