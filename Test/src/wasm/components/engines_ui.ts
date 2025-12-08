@@ -351,12 +351,9 @@ export class EnginesUI extends BaseComponentUI {
         // Create navigation header
         const navDiv = document.createElement('div');
         navDiv.className = 'mobile-nav-header';
-        navDiv.style.display = 'flex';
-        navDiv.style.alignItems = 'center';
-        navDiv.style.justifyContent = 'space-between';
         navDiv.style.marginBottom = '0.5rem';
         navDiv.style.padding = '0.5rem';
-        navDiv.style.backgroundColor = 'var(--card-bg, #f5f5f5)';
+        navDiv.style.backgroundColor = 'rgba(56, 56, 56, 0.3)';
         navDiv.style.borderRadius = '4px';
 
         // Prev button
@@ -375,7 +372,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Engine label
         this.mobileEngineNavLabel = document.createElement('span');
-        this.mobileEngineNavLabel.style.fontWeight = 'bold';
+        this.mobileEngineNavLabel.className = 'mobile-option-title';
         this.mobileEngineNavLabel.textContent = `${localization.translate('Engines Engine')} ${this.mobileSelectedEngine + 1} / ${engineCount}`;
         navDiv.appendChild(this.mobileEngineNavLabel);
 
@@ -467,7 +464,7 @@ export class EnginesUI extends BaseComponentUI {
         baseStatsDiv.style.fontSize = '0.85em';
         baseStatsDiv.style.marginTop = '0.5rem';
         baseStatsDiv.style.padding = '0.5rem';
-        baseStatsDiv.style.backgroundColor = 'var(--card-bg, #f0f0f0)';
+        baseStatsDiv.style.backgroundColor = 'rgba(56, 56, 56, 0.3)';
         baseStatsDiv.style.borderRadius = '4px';
 
         // Rarity
@@ -841,13 +838,10 @@ export class EnginesUI extends BaseComponentUI {
         // Create navigation header
         const navDiv = document.createElement('div');
         navDiv.className = 'mobile-nav-header';
-        navDiv.style.display = 'flex';
-        navDiv.style.alignItems = 'center';
-        navDiv.style.justifyContent = 'space-between';
         navDiv.style.marginBottom = '0.5rem';
         navDiv.style.marginTop = '1rem';
         navDiv.style.padding = '0.5rem';
-        navDiv.style.backgroundColor = 'var(--card-bg, #f5f5f5)';
+        navDiv.style.backgroundColor = 'rgba(56, 56, 56, 0.3)';
         navDiv.style.borderRadius = '4px';
 
         // Prev button
@@ -866,7 +860,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Radiator label
         this.mobileRadiatorNavLabel = document.createElement('span');
-        this.mobileRadiatorNavLabel.style.fontWeight = 'bold';
+        this.mobileRadiatorNavLabel.className = 'mobile-option-title';
         this.mobileRadiatorNavLabel.textContent = `${localization.translate('Radiators Radiator')} ${this.mobileSelectedRadiator + 1} / ${radiatorCount}`;
         navDiv.appendChild(this.mobileRadiatorNavLabel);
 
