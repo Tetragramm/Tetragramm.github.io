@@ -62,6 +62,17 @@ interface LoadCache {
     // Stat cells
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+
+    // Mobile controls
+    mobileFuelInputs?: HTMLInputElement[];
+    mobileSealCheckbox?: HTMLInputElement;
+    mobileExtinguisherCheckbox?: HTMLInputElement;
+    mobileBombsInput?: HTMLInputElement;
+    mobileRocketsInput?: HTMLInputElement;
+    mobileBayCountInput?: HTMLInputElement;
+    mobileBay1Checkbox?: HTMLInputElement;
+    mobileBay2Checkbox?: HTMLInputElement;
+    mobileCargoSelect?: HTMLSelectElement;
 }
 
 export class LoadUI extends BaseComponentUI {
@@ -162,9 +173,10 @@ export class LoadUI extends BaseComponentUI {
             mobileDiv
         );
         // Fuel tank inputs
+        const mobileFuelInputs: HTMLInputElement[] = [];
         if (fuelBindings.tank_count && Array.isArray(fuelBindings.tank_count)) {
             fuelBindings.tank_count.forEach((tank: any, idx: number) => {
-                createMobileNumberInput(
+                const { input } = createMobileNumberInput(
                     tank,
                     fuelItem.content,
                     (value) => {
@@ -175,11 +187,13 @@ export class LoadUI extends BaseComponentUI {
                     },
                     0
                 );
+                mobileFuelInputs.push(input);
             });
         }
         // Self-sealing checkbox
+        let mobileSealCheckbox: HTMLInputElement | undefined;
         if (fuelBindings.self_sealing) {
-            createMobileCheckbox(
+            mobileSealCheckbox = createMobileCheckbox(
                 fuelBindings.self_sealing,
                 fuelItem.content,
                 (checked) => {
@@ -191,8 +205,9 @@ export class LoadUI extends BaseComponentUI {
             );
         }
         // Fire extinguisher checkbox
+        let mobileExtinguisherCheckbox: HTMLInputElement | undefined;
         if (fuelBindings.fire_extinguisher) {
-            createMobileCheckbox(
+            mobileExtinguisherCheckbox = createMobileCheckbox(
                 fuelBindings.fire_extinguisher,
                 fuelItem.content,
                 (checked) => {
@@ -209,8 +224,9 @@ export class LoadUI extends BaseComponentUI {
             localization.translate('Load Munitions'),
             mobileDiv
         );
+        let mobileBombsInput: HTMLInputElement | undefined;
         if (munitionsBindings.bomb_count) {
-            createMobileNumberInput(
+            const { input } = createMobileNumberInput(
                 munitionsBindings.bomb_count,
                 munitionsItem.content,
                 (value) => {
@@ -221,9 +237,11 @@ export class LoadUI extends BaseComponentUI {
                 },
                 0
             );
+            mobileBombsInput = input;
         }
+        let mobileRocketsInput: HTMLInputElement | undefined;
         if (munitionsBindings.rocket_count) {
-            createMobileNumberInput(
+            const { input } = createMobileNumberInput(
                 munitionsBindings.rocket_count,
                 munitionsItem.content,
                 (value) => {
@@ -234,9 +252,11 @@ export class LoadUI extends BaseComponentUI {
                 },
                 0
             );
+            mobileRocketsInput = input;
         }
+        let mobileBayCountInput: HTMLInputElement | undefined;
         if (munitionsBindings.internal_bay_count) {
-            createMobileNumberInput(
+            const { input } = createMobileNumberInput(
                 munitionsBindings.internal_bay_count,
                 munitionsItem.content,
                 (value) => {
@@ -247,9 +267,11 @@ export class LoadUI extends BaseComponentUI {
                 },
                 0
             );
+            mobileBayCountInput = input;
         }
+        let mobileBay1Checkbox: HTMLInputElement | undefined;
         if (munitionsBindings.internal_bay_1) {
-            createMobileCheckbox(
+            mobileBay1Checkbox = createMobileCheckbox(
                 munitionsBindings.internal_bay_1,
                 munitionsItem.content,
                 (checked) => {
@@ -260,8 +282,9 @@ export class LoadUI extends BaseComponentUI {
                 }
             );
         }
+        let mobileBay2Checkbox: HTMLInputElement | undefined;
         if (munitionsBindings.internal_bay_2) {
-            createMobileCheckbox(
+            mobileBay2Checkbox = createMobileCheckbox(
                 munitionsBindings.internal_bay_2,
                 munitionsItem.content,
                 (checked) => {
@@ -278,8 +301,9 @@ export class LoadUI extends BaseComponentUI {
             localization.translate('Load Cargo and Passengers'),
             mobileDiv
         );
+        let mobileCargoSelect: HTMLSelectElement | undefined;
         if (cargoBindings.space_sel) {
-            createMobileSelect(
+            mobileCargoSelect = createMobileSelect(
                 cargoBindings.space_sel,
                 cargoItem.content,
                 (selectedIndex) => {
@@ -307,7 +331,16 @@ export class LoadUI extends BaseComponentUI {
             ...munitionsCache,
             cargoSelect,
             statsTable,
-            mobileStatsGrid
+            mobileStatsGrid,
+            mobileFuelInputs,
+            mobileSealCheckbox,
+            mobileExtinguisherCheckbox,
+            mobileBombsInput,
+            mobileRocketsInput,
+            mobileBayCountInput,
+            mobileBay1Checkbox,
+            mobileBay2Checkbox,
+            mobileCargoSelect
         };
 
         // Create collapsible section with localized title
@@ -518,7 +551,7 @@ export class LoadUI extends BaseComponentUI {
         const munitionsBindings = bridge.getMunitionsBindings();
         const cargoBindings = bridge.getCargoBindings();
 
-        // Update fuel inputs
+        // Update fuel inputs (desktop)
         let fuelIdx = 0;
         for (const key in fuelBindings) {
             if (!fuelBindings.hasOwnProperty(key)) continue;
@@ -543,17 +576,41 @@ export class LoadUI extends BaseComponentUI {
             }
         }
 
+        // Update fuel inputs (mobile)
+        if (fuelBindings.tank_count && Array.isArray(fuelBindings.tank_count) && this.cache.mobileFuelInputs) {
+            fuelBindings.tank_count.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileFuelInputs!.length) {
+                    this.cache!.mobileFuelInputs![idx].value = item.value.toString();
+                    this.cache!.mobileFuelInputs![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update seal checkbox (desktop)
         if (this.cache.sealCheckbox) {
             this.cache.sealCheckbox.checked = fuelBindings.self_sealing?.selected || false;
             this.cache.sealCheckbox.disabled = !fuelBindings.self_sealing?.enabled;
         }
 
+        // Update seal checkbox (mobile)
+        if (this.cache.mobileSealCheckbox && fuelBindings.self_sealing) {
+            this.cache.mobileSealCheckbox.checked = fuelBindings.self_sealing.selected || false;
+            this.cache.mobileSealCheckbox.disabled = !fuelBindings.self_sealing.enabled;
+        }
+
+        // Update extinguisher checkbox (desktop)
         if (this.cache.extinguisherCheckbox) {
             this.cache.extinguisherCheckbox.checked = fuelBindings.fire_extinguisher?.selected || false;
             this.cache.extinguisherCheckbox.disabled = !fuelBindings.fire_extinguisher?.enabled;
         }
 
-        // Update munitions inputs
+        // Update extinguisher checkbox (mobile)
+        if (this.cache.mobileExtinguisherCheckbox && fuelBindings.fire_extinguisher) {
+            this.cache.mobileExtinguisherCheckbox.checked = fuelBindings.fire_extinguisher.selected || false;
+            this.cache.mobileExtinguisherCheckbox.disabled = !fuelBindings.fire_extinguisher.enabled;
+        }
+
+        // Update munitions inputs (desktop)
         if (this.cache.bombsInput) {
             this.cache.bombsInput.value = munitionsBindings.bomb_count?.value?.toString() || '0';
             this.cache.bombsInput.disabled = !munitionsBindings.bomb_count?.enabled;
@@ -579,10 +636,41 @@ export class LoadUI extends BaseComponentUI {
             this.cache.bay2Checkbox.disabled = !munitionsBindings.internal_bay_2?.enabled;
         }
 
-        // Update cargo select
+        // Update munitions inputs (mobile)
+        if (this.cache.mobileBombsInput && munitionsBindings.bomb_count) {
+            this.cache.mobileBombsInput.value = munitionsBindings.bomb_count.value?.toString() || '0';
+            this.cache.mobileBombsInput.disabled = !munitionsBindings.bomb_count.enabled;
+        }
+
+        if (this.cache.mobileRocketsInput && munitionsBindings.rocket_count) {
+            this.cache.mobileRocketsInput.value = munitionsBindings.rocket_count.value?.toString() || '0';
+            this.cache.mobileRocketsInput.disabled = !munitionsBindings.rocket_count.enabled;
+        }
+
+        if (this.cache.mobileBayCountInput && munitionsBindings.internal_bay_count) {
+            this.cache.mobileBayCountInput.value = munitionsBindings.internal_bay_count.value?.toString() || '0';
+            this.cache.mobileBayCountInput.disabled = !munitionsBindings.internal_bay_count.enabled;
+        }
+
+        if (this.cache.mobileBay1Checkbox && munitionsBindings.internal_bay_1) {
+            this.cache.mobileBay1Checkbox.checked = munitionsBindings.internal_bay_1.selected || false;
+            this.cache.mobileBay1Checkbox.disabled = !munitionsBindings.internal_bay_1.enabled;
+        }
+
+        if (this.cache.mobileBay2Checkbox && munitionsBindings.internal_bay_2) {
+            this.cache.mobileBay2Checkbox.checked = munitionsBindings.internal_bay_2.selected || false;
+            this.cache.mobileBay2Checkbox.disabled = !munitionsBindings.internal_bay_2.enabled;
+        }
+
+        // Update cargo select (desktop)
         if (this.cache.cargoSelect && cargoBindings.space_sel) {
             this.cache.cargoSelect.selectedIndex = cargoBindings.space_sel.selected;
             this.cache.cargoSelect.disabled = !cargoBindings.space_sel.enabled;
+        }
+
+        // Update cargo select (mobile)
+        if (this.cache.mobileCargoSelect && cargoBindings.space_sel) {
+            updateSelectElement(this.cache.mobileCargoSelect, cargoBindings.space_sel);
         }
 
         // Update stat values

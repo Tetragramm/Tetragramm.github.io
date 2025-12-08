@@ -33,6 +33,11 @@ interface LandingGearCache {
     extrasCheckboxes: HTMLInputElement[];
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+
+    // Mobile controls
+    mobileTypeSelect?: HTMLSelectElement;
+    mobileRetractCheckbox?: HTMLInputElement;
+    mobileExtrasCheckboxes?: HTMLInputElement[];
 }
 
 // Landing Gear stats configuration
@@ -127,8 +132,9 @@ export class LandingGearUI extends BaseComponentUI {
             localization.translate('Landing Gear Landing Gear'),
             mobileDiv
         );
+        let mobileTypeSelect: HTMLSelectElement | undefined;
         if (bindings.gear_sel) {
-            createMobileSelect(
+            mobileTypeSelect = createMobileSelect(
                 bindings.gear_sel,
                 gearItem.content,
                 (selectedIndex) => {
@@ -139,8 +145,9 @@ export class LandingGearUI extends BaseComponentUI {
                 }
             );
         }
+        let mobileRetractCheckbox: HTMLInputElement | undefined;
         if (bindings.retract) {
-            createMobileCheckbox(
+            mobileRetractCheckbox = createMobileCheckbox(
                 bindings.retract,
                 gearItem.content,
                 (checked) => {
@@ -157,9 +164,10 @@ export class LandingGearUI extends BaseComponentUI {
             localization.translate('Landing Gear Extras'),
             mobileDiv
         );
+        const mobileExtrasCheckboxes: HTMLInputElement[] = [];
         if (bindings.extra_sel && Array.isArray(bindings.extra_sel)) {
             bindings.extra_sel.forEach((extra: any, idx: number) => {
-                createMobileCheckbox(
+                const checkbox = createMobileCheckbox(
                     extra,
                     extrasItem.content,
                     (checked) => {
@@ -169,6 +177,7 @@ export class LandingGearUI extends BaseComponentUI {
                         this.onUpdate();
                     }
                 );
+                mobileExtrasCheckboxes.push(checkbox);
             });
         }
 
@@ -187,7 +196,10 @@ export class LandingGearUI extends BaseComponentUI {
             ...gearCache,
             extrasCheckboxes,
             statsTable,
-            mobileStatsGrid
+            mobileStatsGrid,
+            mobileTypeSelect,
+            mobileRetractCheckbox,
+            mobileExtrasCheckboxes
         };
 
         // Create collapsible section with localized title
@@ -349,23 +361,44 @@ export class LandingGearUI extends BaseComponentUI {
 
         const bindings = bridge.getLandingGearBindings();
 
-        // Update gear type select
+        // Update gear type select (desktop)
         if (this.cache.typeSelect && bindings.gear_sel) {
             updateSelectElement(this.cache.typeSelect, bindings.gear_sel);
         }
 
-        // Update retractable checkbox
+        // Update gear type select (mobile)
+        if (this.cache.mobileTypeSelect && bindings.gear_sel) {
+            updateSelectElement(this.cache.mobileTypeSelect, bindings.gear_sel);
+        }
+
+        // Update retractable checkbox (desktop)
         if (this.cache.retractCheckbox && bindings.retract) {
             this.cache.retractCheckbox.checked = bindings.retract.selected;
             this.cache.retractCheckbox.disabled = !bindings.retract.enabled;
         }
 
-        // Update extras checkboxes
+        // Update retractable checkbox (mobile)
+        if (this.cache.mobileRetractCheckbox && bindings.retract) {
+            this.cache.mobileRetractCheckbox.checked = bindings.retract.selected;
+            this.cache.mobileRetractCheckbox.disabled = !bindings.retract.enabled;
+        }
+
+        // Update extras checkboxes (desktop)
         if (bindings.extra_sel && Array.isArray(bindings.extra_sel)) {
             bindings.extra_sel.forEach((binding: any, idx: number) => {
                 if (idx < this.cache.extrasCheckboxes.length) {
                     this.cache.extrasCheckboxes[idx].checked = binding.selected;
                     this.cache.extrasCheckboxes[idx].disabled = !binding.enabled;
+                }
+            });
+        }
+
+        // Update extras checkboxes (mobile)
+        if (bindings.extra_sel && Array.isArray(bindings.extra_sel) && this.cache.mobileExtrasCheckboxes) {
+            bindings.extra_sel.forEach((binding: any, idx: number) => {
+                if (idx < this.cache!.mobileExtrasCheckboxes!.length) {
+                    this.cache!.mobileExtrasCheckboxes![idx].checked = binding.selected;
+                    this.cache!.mobileExtrasCheckboxes![idx].disabled = !binding.enabled;
                 }
             });
         }

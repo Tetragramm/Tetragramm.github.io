@@ -42,6 +42,14 @@ interface ReinforcementsCache {
     // Stats table
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+
+    // Mobile controls
+    mobileExtWoodInputs?: HTMLInputElement[];
+    mobileExtSteelInputs?: HTMLInputElement[];
+    mobileCabaneSelect?: HTMLSelectElement;
+    mobileWiresCheckbox?: HTMLInputElement;
+    mobileCantInputs?: HTMLInputElement[];
+    mobileWingBladesCheckbox?: HTMLInputElement;
 }
 
 // Reinforcements stats configuration
@@ -144,6 +152,9 @@ export class ReinforcementsUI extends BaseComponentUI {
         const extWoodBinding = bindings.ext_wood_count;
         const extSteelBinding = bindings.ext_steel_count;
 
+        const mobileExtWoodInputs: HTMLInputElement[] = [];
+        const mobileExtSteelInputs: HTMLInputElement[] = [];
+
         if (extWoodBinding && Array.isArray(extWoodBinding) && extSteelBinding && Array.isArray(extSteelBinding)) {
             for (let i = 0; i < extWoodBinding.length; i++) {
                 const woodItem = extWoodBinding[i];
@@ -159,7 +170,7 @@ export class ReinforcementsUI extends BaseComponentUI {
 
                 // Wood input
                 const woodIndex = i;
-                createMobileNumberInput(
+                const { input: woodInput } = createMobileNumberInput(
                     { ...woodItem, name: localization.translate('Reinforcement Wood') },
                     extItem.content,
                     (value) => {
@@ -172,10 +183,11 @@ export class ReinforcementsUI extends BaseComponentUI {
                     99,
                     1
                 );
+                mobileExtWoodInputs.push(woodInput);
 
                 // Steel input
                 const steelIndex = i;
-                createMobileNumberInput(
+                const { input: steelInput } = createMobileNumberInput(
                     { ...steelItem, name: localization.translate('Reinforcement Steel') },
                     extItem.content,
                     (value) => {
@@ -188,13 +200,15 @@ export class ReinforcementsUI extends BaseComponentUI {
                     99,
                     1
                 );
+                mobileExtSteelInputs.push(steelInput);
             }
         }
 
         // Cabane select
         const cabaneBinding = bindings.cabane_sel;
+        let mobileCabaneSelect: HTMLSelectElement | undefined;
         if (cabaneBinding) {
-            createMobileSelect(
+            mobileCabaneSelect = createMobileSelect(
                 { ...cabaneBinding, name: localization.translate('Reinforcement Cabane') },
                 extItem.content,
                 (selectedIndex) => {
@@ -208,8 +222,9 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         // Wires checkbox
         const wiresBinding = bindings.wires;
+        let mobileWiresCheckbox: HTMLInputElement | undefined;
         if (wiresBinding) {
-            createMobileCheckbox(
+            mobileWiresCheckbox = createMobileCheckbox(
                 { ...wiresBinding, name: localization.translate('Reinforcement Wires') },
                 extItem.content,
                 (checked) => {
@@ -229,9 +244,10 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         // Cantilever counts
         const cantBinding = bindings.cant_count;
+        const mobileCantInputs: HTMLInputElement[] = [];
         if (cantBinding && Array.isArray(cantBinding)) {
             cantBinding.forEach((item: any, idx: number) => {
-                createMobileNumberInput(
+                const { input: cantInput } = createMobileNumberInput(
                     item,
                     intItem.content,
                     (value) => {
@@ -244,13 +260,15 @@ export class ReinforcementsUI extends BaseComponentUI {
                     99,
                     1
                 );
+                mobileCantInputs.push(cantInput);
             });
         }
 
         // Wing blades checkbox
         const wingBladesBinding = bindings.wing_blades;
+        let mobileWingBladesCheckbox: HTMLInputElement | undefined;
         if (wingBladesBinding) {
-            createMobileCheckbox(
+            mobileWingBladesCheckbox = createMobileCheckbox(
                 { ...wingBladesBinding, name: localization.translate('Reinforcement Wing Blades') },
                 intItem.content,
                 (checked) => {
@@ -277,7 +295,13 @@ export class ReinforcementsUI extends BaseComponentUI {
             ...externalCache,
             ...internalCache,
             statsTable,
-            mobileStatsGrid
+            mobileStatsGrid,
+            mobileExtWoodInputs,
+            mobileExtSteelInputs,
+            mobileCabaneSelect,
+            mobileWiresCheckbox,
+            mobileCantInputs,
+            mobileWingBladesCheckbox
         };
 
         // Create collapsible section with localized title
@@ -540,7 +564,7 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         const bindings = bridge.getReinforcementsBindings();
 
-        // Update external wood counts
+        // Update external wood counts (desktop)
         if (bindings.ext_wood_count && Array.isArray(bindings.ext_wood_count)) {
             bindings.ext_wood_count.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.extWoodInputs.length) {
@@ -550,7 +574,17 @@ export class ReinforcementsUI extends BaseComponentUI {
             });
         }
 
-        // Update external steel counts
+        // Update external wood counts (mobile)
+        if (bindings.ext_wood_count && Array.isArray(bindings.ext_wood_count) && this.cache.mobileExtWoodInputs) {
+            bindings.ext_wood_count.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileExtWoodInputs!.length) {
+                    this.cache!.mobileExtWoodInputs![idx].value = item.value.toString();
+                    this.cache!.mobileExtWoodInputs![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update external steel counts (desktop)
         if (bindings.ext_steel_count && Array.isArray(bindings.ext_steel_count)) {
             bindings.ext_steel_count.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.extSteelInputs.length) {
@@ -560,7 +594,17 @@ export class ReinforcementsUI extends BaseComponentUI {
             });
         }
 
-        // Update cantilever counts
+        // Update external steel counts (mobile)
+        if (bindings.ext_steel_count && Array.isArray(bindings.ext_steel_count) && this.cache.mobileExtSteelInputs) {
+            bindings.ext_steel_count.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileExtSteelInputs!.length) {
+                    this.cache!.mobileExtSteelInputs![idx].value = item.value.toString();
+                    this.cache!.mobileExtSteelInputs![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update cantilever counts (desktop)
         if (bindings.cant_count && Array.isArray(bindings.cant_count)) {
             bindings.cant_count.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.cantInputs.length) {
@@ -570,21 +614,48 @@ export class ReinforcementsUI extends BaseComponentUI {
             });
         }
 
-        // Update cabane select
+        // Update cantilever counts (mobile)
+        if (bindings.cant_count && Array.isArray(bindings.cant_count) && this.cache.mobileCantInputs) {
+            bindings.cant_count.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileCantInputs!.length) {
+                    this.cache!.mobileCantInputs![idx].value = item.value.toString();
+                    this.cache!.mobileCantInputs![idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update cabane select (desktop)
         if (this.cache.cabaneSelect && bindings.cabane_sel) {
             updateSelectElement(this.cache.cabaneSelect, bindings.cabane_sel);
         }
 
-        // Update wires checkbox
+        // Update cabane select (mobile)
+        if (this.cache.mobileCabaneSelect && bindings.cabane_sel) {
+            updateSelectElement(this.cache.mobileCabaneSelect, bindings.cabane_sel);
+        }
+
+        // Update wires checkbox (desktop)
         if (this.cache.wiresCheckbox && bindings.wires) {
             this.cache.wiresCheckbox.checked = bindings.wires.selected;
             this.cache.wiresCheckbox.disabled = !bindings.wires.enabled;
         }
 
-        // Update wing blades checkbox
+        // Update wires checkbox (mobile)
+        if (this.cache.mobileWiresCheckbox && bindings.wires) {
+            this.cache.mobileWiresCheckbox.checked = bindings.wires.selected;
+            this.cache.mobileWiresCheckbox.disabled = !bindings.wires.enabled;
+        }
+
+        // Update wing blades checkbox (desktop)
         if (this.cache.wingBladesCheckbox && bindings.wing_blades) {
             this.cache.wingBladesCheckbox.checked = bindings.wing_blades.selected;
             this.cache.wingBladesCheckbox.disabled = !bindings.wing_blades.enabled;
+        }
+
+        // Update wing blades checkbox (mobile)
+        if (this.cache.mobileWingBladesCheckbox && bindings.wing_blades) {
+            this.cache.mobileWingBladesCheckbox.checked = bindings.wing_blades.selected;
+            this.cache.mobileWingBladesCheckbox.disabled = !bindings.wing_blades.enabled;
         }
 
         // Update stats table
