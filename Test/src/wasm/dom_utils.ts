@@ -530,9 +530,12 @@ export function updateMobileStatsGrid(
     derivedStats?: any
 ) {
 
+    let idx2 = 0;
     for (let idx = 0; idx < statConfig.length; idx++) {
         const config = statConfig[idx];
-        const item = grid.children[idx];
+        if (!config.key) continue; // Skip empty configs
+        const item = grid.children[idx2];
+        idx2++;
         let valueDiv = item.children[1];
 
         // Get the value from stats or derivedStats
