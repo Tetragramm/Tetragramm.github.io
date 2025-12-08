@@ -25,7 +25,9 @@ import {
     createMobileOptionItem,
     createMobileNumberInput,
     createMobileSelect,
-    createMobileCheckbox
+    createMobileCheckbox,
+    createMobileStatsGrid,
+    updateMobileStatsGrid
 } from '../dom_utils';
 
 /**
@@ -57,6 +59,14 @@ export class WeaponsUI extends BaseComponentUI {
     // Mobile elements
     private mobileWeaponSystemsContainer: HTMLDivElement | undefined;
 
+    // Mobile navigation state
+    private mobileSelectedSystem: number = 0;
+    private mobileSelectedMount: number = 0;
+    private mobileSystemContent: HTMLDivElement | undefined;
+    private mobileSystemNavLabel: HTMLSpanElement | undefined;
+    private mobileMountContent: HTMLDivElement | undefined;
+    private mobileMountNavLabel: HTMLSpanElement | undefined;
+
     protected shouldUpdate(): boolean {
         return this.numSystemsInput !== undefined;
     }
@@ -67,6 +77,12 @@ export class WeaponsUI extends BaseComponentUI {
         this.weaponSystemsTable = undefined;
         this.weaponSystemRows = [];
         this.mobileWeaponSystemsContainer = undefined;
+        this.mobileSelectedSystem = 0;
+        this.mobileSelectedMount = 0;
+        this.mobileSystemContent = undefined;
+        this.mobileSystemNavLabel = undefined;
+        this.mobileMountContent = undefined;
+        this.mobileMountNavLabel = undefined;
     }
 
     /**
@@ -215,160 +231,473 @@ export class WeaponsUI extends BaseComponentUI {
         const bindings = bridge.getWeaponsBindings();
         const numSystems = bindings.num_weapon_systems.value;
 
-        for (let i = 0; i < numSystems; i++) {
-            const wsBindings = bridge.getWeaponSystemBindings(i);
-            if (!wsBindings) continue;
+        if (numSystems === 0) return;
 
-            const idx = i;
+        // Ensure selected system is within bounds
+        if (this.mobileSelectedSystem >= numSystems) {
+            this.mobileSelectedSystem = 0;
+        }
 
-            const wsItem = createMobileOptionItem(
-                localization.translate('Weapons Weapon Set') + ' ' + (i + 1),
-                this.mobileWeaponSystemsContainer
-            );
+        // Create navigation header for weapon systems
+        const navDiv = document.createElement('div');
+        navDiv.className = 'mobile-nav-header';
+        navDiv.style.marginBottom = '0.5rem';
+        navDiv.style.padding = '0.5rem';
+        navDiv.style.backgroundColor = 'rgba(56, 56, 56, 0.3)';
+        navDiv.style.borderRadius = '4px';
 
-            // Duplicate/Remove buttons
-            const buttonsDiv = document.createElement('div');
-            buttonsDiv.style.display = 'flex';
-            buttonsDiv.style.gap = '10px';
-            buttonsDiv.style.marginBottom = '10px';
+        // Prev button
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'mobile-number-btn';
+        prevBtn.textContent = '◀';
+        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.onclick = () => {
+            if (this.mobileSelectedSystem > 0) {
+                this.mobileSelectedSystem--;
+                this.mobileSelectedMount = 0;
+                this.updateMobileWeaponSystemContent();
+            }
+        };
+        navDiv.appendChild(prevBtn);
 
-            const removeBtn = document.createElement('button');
-            removeBtn.textContent = localization.translate('Remove');
-            removeBtn.onclick = () => {
-                bridge.removeWeaponSet(idx);
+        // System label
+        this.mobileSystemNavLabel = document.createElement('span');
+        this.mobileSystemNavLabel.className = 'mobile-option-title';
+        this.mobileSystemNavLabel.textContent = `${localization.translate('Weapons Weapon Set')} ${this.mobileSelectedSystem + 1} / ${numSystems}`;
+        navDiv.appendChild(this.mobileSystemNavLabel);
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'mobile-number-btn';
+        nextBtn.textContent = '▶';
+        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.onclick = () => {
+            if (this.mobileSelectedSystem < numSystems - 1) {
+                this.mobileSelectedSystem++;
+                this.mobileSelectedMount = 0;
+                this.updateMobileWeaponSystemContent();
+            }
+        };
+        navDiv.appendChild(nextBtn);
+
+        this.mobileWeaponSystemsContainer.appendChild(navDiv);
+
+        // Content container for the selected weapon system
+        this.mobileSystemContent = document.createElement('div');
+        this.mobileWeaponSystemsContainer.appendChild(this.mobileSystemContent);
+
+        // Build content for the currently selected system
+        this.updateMobileWeaponSystemContent();
+    }
+
+    /**
+     * Update mobile weapon system content for the selected system
+     */
+    private updateMobileWeaponSystemContent(): void {
+        if (!this.mobileSystemContent) return;
+        this.mobileSystemContent.innerHTML = '';
+
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const bindings = bridge.getWeaponsBindings();
+        const numSystems = bindings.num_weapon_systems.value;
+        const idx = this.mobileSelectedSystem;
+
+        // Update nav label
+        if (this.mobileSystemNavLabel) {
+            this.mobileSystemNavLabel.textContent = `${localization.translate('Weapons Weapon Set')} ${idx + 1} / ${numSystems}`;
+        }
+
+        if (idx >= numSystems) return;
+
+        const wsBindings = bridge.getWeaponSystemBindings(idx);
+        if (!wsBindings) return;
+
+        // Duplicate/Remove buttons section
+        const buttonsItem = createMobileOptionItem(
+            localization.translate('Weapons Settings'),
+            this.mobileSystemContent
+        );
+
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.style.display = 'flex';
+        buttonsDiv.style.gap = '10px';
+        buttonsDiv.style.marginBottom = '10px';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = localization.translate('Remove');
+        removeBtn.onclick = () => {
+            bridge.removeWeaponSet(idx);
+            this.onUpdate?.();
+        };
+        buttonsDiv.appendChild(removeBtn);
+
+        const duplicateBtn = document.createElement('button');
+        duplicateBtn.textContent = localization.translate('Duplicate');
+        duplicateBtn.onclick = () => {
+            bridge.duplicateWeaponSet(idx);
+            this.onUpdate?.();
+        };
+        buttonsDiv.appendChild(duplicateBtn);
+
+        buttonsItem.content.appendChild(buttonsDiv);
+
+        // Weapon type section
+        const typeItem = createMobileOptionItem(
+            localization.translate('Weapons Type'),
+            this.mobileSystemContent
+        );
+        createMobileSelect(
+            {
+                name: '',
+                options: wsBindings.weapon_type.options,
+                selected: wsBindings.weapon_type.selected,
+                enabled: wsBindings.weapon_type.enabled
+            },
+            typeItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.weapon_type.selected = selected;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
                 this.onUpdate?.();
-            };
-            buttonsDiv.appendChild(removeBtn);
+            }
+        );
 
-            const duplicateBtn = document.createElement('button');
-            duplicateBtn.textContent = localization.translate('Duplicate');
-            duplicateBtn.onclick = () => {
-                bridge.duplicateWeaponSet(idx);
+        // Seat select
+        createMobileSelect(
+            {
+                name: localization.translate('Seat Location'),
+                options: wsBindings.seat.options,
+                selected: wsBindings.seat.selected,
+                enabled: wsBindings.seat.enabled
+            },
+            typeItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.seat.selected = selected;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
                 this.onUpdate?.();
-            };
-            buttonsDiv.appendChild(duplicateBtn);
+            }
+        );
 
-            wsItem.content.appendChild(buttonsDiv);
+        // Configuration section
+        const configItem = createMobileOptionItem(
+            localization.translate('Weapons Action') + ' & ' + localization.translate('Weapons Projectile'),
+            this.mobileSystemContent
+        );
 
-            // Weapon type select
-            createMobileSelect(
-                {
-                    name: localization.translate('Weapons Type'),
-                    options: wsBindings.weapon_type.options,
-                    selected: wsBindings.weapon_type.selected,
-                    enabled: wsBindings.weapon_type.enabled
-                },
-                wsItem.content,
-                (selected) => {
-                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
-                    updatedBindings.weapon_type.selected = selected;
-                    bridge.setWeaponSystemBindings(idx, updatedBindings);
-                    this.onUpdate?.();
-                }
-            );
+        // Mounting count
+        createMobileNumberInput(
+            wsBindings.mounting_count,
+            configItem.content,
+            (value) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.mounting_count.value = value;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
+                this.mobileSelectedMount = 0;
+                this.onUpdate?.();
+            },
+            0, 10, 1
+        );
 
-            // Seat select
-            createMobileSelect(
-                {
-                    name: localization.translate('Seat Location'),
-                    options: wsBindings.seat.options,
-                    selected: wsBindings.seat.selected,
-                    enabled: wsBindings.seat.enabled
-                },
-                wsItem.content,
-                (selected) => {
-                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
-                    updatedBindings.seat.selected = selected;
-                    bridge.setWeaponSystemBindings(idx, updatedBindings);
-                    this.onUpdate?.();
-                }
-            );
+        // Ammo
+        createMobileNumberInput(
+            wsBindings.ammo,
+            configItem.content,
+            (value) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.ammo.value = value;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
+                this.onUpdate?.();
+            },
+            0, 999, 1
+        );
 
-            // Mounting count
-            createMobileNumberInput(
-                wsBindings.mounting_count,
-                wsItem.content,
-                (value) => {
-                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
-                    updatedBindings.mounting_count.value = value;
-                    bridge.setWeaponSystemBindings(idx, updatedBindings);
-                    this.onUpdate?.();
-                },
-                0, 10, 1
-            );
+        // Action select
+        createMobileSelect(
+            {
+                name: localization.translate('Weapons Action'),
+                options: wsBindings.action_sel.options,
+                selected: wsBindings.action_sel.selected,
+                enabled: wsBindings.action_sel.enabled
+            },
+            configItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.action_sel.selected = selected;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
 
-            // Ammo
-            createMobileNumberInput(
-                wsBindings.ammo,
-                wsItem.content,
-                (value) => {
-                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
-                    updatedBindings.ammo.value = value;
-                    bridge.setWeaponSystemBindings(idx, updatedBindings);
-                    this.onUpdate?.();
-                },
-                0, 999, 1
-            );
+        // Projectile select
+        createMobileSelect(
+            {
+                name: localization.translate('Weapons Projectile'),
+                options: wsBindings.projectile_sel.options,
+                selected: wsBindings.projectile_sel.selected,
+                enabled: wsBindings.projectile_sel.enabled
+            },
+            configItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.projectile_sel.selected = selected;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
 
-            // Action select
-            createMobileSelect(
-                {
-                    name: localization.translate('Weapons Action'),
-                    options: wsBindings.action_sel.options,
-                    selected: wsBindings.action_sel.selected,
-                    enabled: wsBindings.action_sel.enabled
-                },
-                wsItem.content,
-                (selected) => {
-                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
-                    updatedBindings.action_sel.selected = selected;
-                    bridge.setWeaponSystemBindings(idx, updatedBindings);
-                    this.onUpdate?.();
-                }
-            );
+        // Options section (checkboxes)
+        const optionsItem = createMobileOptionItem(
+            localization.translate('Weapons Directions'),
+            this.mobileSystemContent
+        );
 
-            // Projectile select
-            createMobileSelect(
-                {
-                    name: localization.translate('Weapons Projectile'),
-                    options: wsBindings.projectile_sel.options,
-                    selected: wsBindings.projectile_sel.selected,
-                    enabled: wsBindings.projectile_sel.enabled
-                },
-                wsItem.content,
-                (selected) => {
-                    const updatedBindings = bridge.getWeaponSystemBindings(idx);
-                    updatedBindings.projectile_sel.selected = selected;
-                    bridge.setWeaponSystemBindings(idx, updatedBindings);
-                    this.onUpdate?.();
-                }
-            );
+        // Repeating checkbox
+        createMobileCheckbox(
+            wsBindings.repeating,
+            optionsItem.content,
+            (checked) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.repeating.selected = checked;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
 
-            // Fixed checkbox
+        // Fixed checkbox
+        createMobileCheckbox(
+            wsBindings.fixed,
+            optionsItem.content,
+            (checked) => {
+                const updatedBindings = bridge.getWeaponSystemBindings(idx);
+                updatedBindings.fixed.selected = checked;
+                bridge.setWeaponSystemBindings(idx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        // Direction checkboxes
+        for (let i = 0; i < wsBindings.directions.length; i++) {
             createMobileCheckbox(
-                { name: wsBindings.fixed.name, selected: wsBindings.fixed.selected, enabled: wsBindings.fixed.enabled },
-                wsItem.content,
+                wsBindings.directions[i],
+                optionsItem.content,
                 (checked) => {
                     const updatedBindings = bridge.getWeaponSystemBindings(idx);
-                    updatedBindings.fixed.selected = checked;
+                    updatedBindings.directions[i].selected = checked;
                     bridge.setWeaponSystemBindings(idx, updatedBindings);
                     this.onUpdate?.();
                 }
             );
-
-            // Key stats display
-            const stats = bridge.getWeaponSystemStats(i);
-            const derivedStats = bridge.getWeaponSystemDerivedStats(i);
-            const statsDiv = document.createElement('div');
-            statsDiv.style.fontSize = '0.85em';
-            statsDiv.style.marginTop = '5px';
-            statsDiv.innerHTML = `
-                <div style="display:flex;justify-content:space-between"><span>Hits:</span><span>${derivedStats.hits}</span></div>
-                <div style="display:flex;justify-content:space-between"><span>Damage:</span><span>${derivedStats.damage}</span></div>
-                <div style="display:flex;justify-content:space-between"><span>Jam:</span><span>${derivedStats.jam}</span></div>
-            `;
-            wsItem.content.appendChild(statsDiv);
         }
+
+        // Mounts section with navigation
+        const numMounts = wsBindings.mounting_count.value;
+        if (numMounts > 0) {
+            this.buildMobileMountsSection(this.mobileSystemContent, idx, numMounts);
+        }
+
+        // Stats section
+        const statsItem = createMobileOptionItem(
+            localization.translate('Weapons Weapon Stats'),
+            this.mobileSystemContent
+        );
+
+        const stats = bridge.getWeaponSystemStats(idx);
+        const derivedStats = bridge.getWeaponSystemDerivedStats(idx);
+
+        // Handle Heat Ray / Lightning Arc special case
+        const adjustedStats = [...WEAPON_SYSTEM_STATS];
+        if (derivedStats.is_heat_ray) {
+            // Change shots label to charges
+            const shotsIndex = adjustedStats.findIndex(s => s.key === 'shots');
+            if (shotsIndex >= 0) {
+                adjustedStats[shotsIndex] = { ...adjustedStats[shotsIndex], label: 'Weapons Stat Charges' };
+            }
+            derivedStats.shots = derivedStats.hr_charges;
+        }
+
+        const mobileStatsGrid = createMobileStatsGrid(stats, adjustedStats, derivedStats);
+        statsItem.content.appendChild(mobileStatsGrid);
+    }
+
+    /**
+     * Build mobile mounts section with navigation
+     */
+    private buildMobileMountsSection(container: HTMLElement, systemIdx: number, numMounts: number): void {
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        // Ensure selected mount is within bounds
+        if (this.mobileSelectedMount >= numMounts) {
+            this.mobileSelectedMount = 0;
+        }
+
+        // Create navigation header for mounts
+        const mountNavDiv = document.createElement('div');
+        mountNavDiv.className = 'mobile-nav-header';
+        mountNavDiv.style.marginTop = '1rem';
+        mountNavDiv.style.marginBottom = '0.5rem';
+        mountNavDiv.style.padding = '0.5rem';
+        mountNavDiv.style.backgroundColor = 'rgba(56, 56, 56, 0.3)';
+        mountNavDiv.style.borderRadius = '4px';
+
+        // Prev button
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'mobile-number-btn';
+        prevBtn.textContent = '◀';
+        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.onclick = () => {
+            if (this.mobileSelectedMount > 0) {
+                this.mobileSelectedMount--;
+                this.updateMobileMountContent(systemIdx);
+            }
+        };
+        mountNavDiv.appendChild(prevBtn);
+
+        // Mount label
+        this.mobileMountNavLabel = document.createElement('span');
+        this.mobileMountNavLabel.className = 'mobile-option-title';
+        this.mobileMountNavLabel.textContent = `${localization.translate('Weapons Mounting')} ${this.mobileSelectedMount + 1} / ${numMounts}`;
+        mountNavDiv.appendChild(this.mobileMountNavLabel);
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'mobile-number-btn';
+        nextBtn.textContent = '▶';
+        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.onclick = () => {
+            if (this.mobileSelectedMount < numMounts - 1) {
+                this.mobileSelectedMount++;
+                this.updateMobileMountContent(systemIdx);
+            }
+        };
+        mountNavDiv.appendChild(nextBtn);
+
+        container.appendChild(mountNavDiv);
+
+        // Content container for the selected mount
+        this.mobileMountContent = document.createElement('div');
+        container.appendChild(this.mobileMountContent);
+
+        // Build content for the currently selected mount
+        this.updateMobileMountContent(systemIdx);
+    }
+
+    /**
+     * Update mobile mount content for the selected mount
+     */
+    private updateMobileMountContent(systemIdx: number): void {
+        if (!this.mobileMountContent) return;
+        this.mobileMountContent.innerHTML = '';
+
+        const bridge = this.getBridgeIfInitialized();
+        if (!bridge) return;
+
+        const wsBindings = bridge.getWeaponSystemBindings(systemIdx);
+        if (!wsBindings) return;
+
+        const numMounts = wsBindings.mounting_count.value;
+        const mountIdx = this.mobileSelectedMount;
+
+        // Update nav label
+        if (this.mobileMountNavLabel) {
+            this.mobileMountNavLabel.textContent = `${localization.translate('Weapons Mounting')} ${mountIdx + 1} / ${numMounts}`;
+        }
+
+        if (mountIdx >= numMounts) return;
+
+        const weaponBindings = bridge.getWeaponBindings(systemIdx, mountIdx);
+        if (!weaponBindings) return;
+
+        // Mount options section
+        const mountItem = createMobileOptionItem(
+            localization.translate('Weapons Weapons'),
+            this.mobileMountContent
+        );
+
+        // Wing checkbox
+        createMobileCheckbox(
+            weaponBindings.wing,
+            mountItem.content,
+            (checked) => {
+                const updatedBindings = bridge.getWeaponBindings(systemIdx, mountIdx);
+                updatedBindings.wing.selected = checked;
+                bridge.setWeaponBindings(systemIdx, mountIdx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        // Accessible checkbox
+        createMobileCheckbox(
+            weaponBindings.accessible,
+            mountItem.content,
+            (checked) => {
+                const updatedBindings = bridge.getWeaponBindings(systemIdx, mountIdx);
+                updatedBindings.accessible.selected = checked;
+                bridge.setWeaponBindings(systemIdx, mountIdx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        // Free accessible checkbox
+        createMobileCheckbox(
+            weaponBindings.free_accessible,
+            mountItem.content,
+            (checked) => {
+                const updatedBindings = bridge.getWeaponBindings(systemIdx, mountIdx);
+                updatedBindings.free_accessible.selected = checked;
+                bridge.setWeaponBindings(systemIdx, mountIdx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        // Covered checkbox
+        createMobileCheckbox(
+            weaponBindings.covered,
+            mountItem.content,
+            (checked) => {
+                const updatedBindings = bridge.getWeaponBindings(systemIdx, mountIdx);
+                updatedBindings.covered.selected = checked;
+                bridge.setWeaponBindings(systemIdx, mountIdx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
+
+        // Weapon count
+        createMobileNumberInput(
+            weaponBindings.w_count,
+            mountItem.content,
+            (value) => {
+                const updatedBindings = bridge.getWeaponBindings(systemIdx, mountIdx);
+                updatedBindings.w_count.value = value;
+                bridge.setWeaponBindings(systemIdx, mountIdx, updatedBindings);
+                this.onUpdate?.();
+            },
+            0, 10, 1
+        );
+
+        // Synchronization select
+        createMobileSelect(
+            {
+                name: localization.translate('Weapons Synchronization'),
+                options: weaponBindings.synchronization.options,
+                selected: weaponBindings.synchronization.selected,
+                enabled: weaponBindings.synchronization.enabled
+            },
+            mountItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getWeaponBindings(systemIdx, mountIdx);
+                updatedBindings.synchronization.selected = selected;
+                bridge.setWeaponBindings(systemIdx, mountIdx, updatedBindings);
+                this.onUpdate?.();
+            }
+        );
     }
 
     /**
