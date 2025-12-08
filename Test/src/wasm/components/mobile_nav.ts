@@ -38,6 +38,10 @@ export class MobileNavigation {
         this.container = container;
         this.buildUI();
         this.setupTouchHandlers();
+        this.setupResizeHandler();
+
+        // Enable single-section mode on mobile
+        this.updateMobileSingleSectionMode();
 
         // Listen for locale changes
         localization.onLocaleChange(() => this.updateTitle());
@@ -50,7 +54,7 @@ export class MobileNavigation {
         this.sections = sections;
         this.updateList();
         this.updateTitle();
-        this.showSection(0);
+        this.updateMobileSingleSectionMode();
     }
 
     /**
@@ -293,5 +297,36 @@ export class MobileNavigation {
      */
     static isMobileView(): boolean {
         return window.innerWidth <= 768;
+    }
+
+    /**
+     * Setup resize handler to toggle mobile single-section mode
+     */
+    private setupResizeHandler(): void {
+        window.addEventListener('resize', () => {
+            this.updateMobileSingleSectionMode();
+        });
+    }
+
+    /**
+     * Update mobile single-section mode based on viewport width
+     */
+    private updateMobileSingleSectionMode(): void {
+        if (MobileNavigation.isMobileView()) {
+            document.body.classList.add('mobile-single-section');
+            // Ensure a section is active
+            if (this.sections.length > 0) {
+                this.showSection(this.currentIndex);
+            }
+        } else {
+            document.body.classList.remove('mobile-single-section');
+            // Remove mobile-active-section from all sections when not in mobile mode
+            this.sections.forEach(section => {
+                const elem = document.getElementById(section.id);
+                if (elem) {
+                    elem.classList.remove('mobile-active-section');
+                }
+            });
+        }
     }
 }
