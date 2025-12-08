@@ -5,7 +5,8 @@ import {
     createCollapsibleSection, createFlexCheckbox, createFlexLabel, createFlexNumberInput,
     createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement,
     createStatsTable, updateStatsTable, StatDisplayConfig,
-    createMobileOptionItem, createMobileNumberInput, createMobileCheckbox, createMobileSelect
+    createMobileOptionItem, createMobileNumberInput, createMobileCheckbox, createMobileSelect,
+    createMobileStatsGrid, updateMobileStatsGrid
 } from '../dom_utils';
 
 // Engine stats configuration for stats table
@@ -55,6 +56,14 @@ export class EnginesUI extends BaseComponentUI {
     private mobileEnginesContainer: HTMLDivElement | undefined;
     private mobileRadiatorsContainer: HTMLDivElement | undefined;
 
+    // Mobile navigation state
+    private mobileSelectedEngine: number = 0;
+    private mobileSelectedRadiator: number = 0;
+    private mobileEngineContent: HTMLDivElement | undefined;
+    private mobileEngineNavLabel: HTMLSpanElement | undefined;
+    private mobileRadiatorContent: HTMLDivElement | undefined;
+    private mobileRadiatorNavLabel: HTMLSpanElement | undefined;
+
     // Cached engine/radiator UIs (will be cleared when counts change)
     private engineUIs: EngineUI[] = [];
     private radiatorUIs: RadiatorUI[] = [];
@@ -93,6 +102,12 @@ export class EnginesUI extends BaseComponentUI {
         this.radiatorsContainer = undefined;
         this.mobileEnginesContainer = undefined;
         this.mobileRadiatorsContainer = undefined;
+        this.mobileEngineContent = undefined;
+        this.mobileEngineNavLabel = undefined;
+        this.mobileRadiatorContent = undefined;
+        this.mobileRadiatorNavLabel = undefined;
+        this.mobileSelectedEngine = 0;
+        this.mobileSelectedRadiator = 0;
         this.engineUIs = [];
         this.radiatorUIs = [];
         this.cachedEngineCount = 0;
@@ -324,96 +339,479 @@ export class EnginesUI extends BaseComponentUI {
 
         const bridge = this.getBridge();
         const bindings = bridge.getEnginesBindings();
+        const engineCount = bindings.engines.value;
 
-        for (let i = 0; i < bindings.engines.value; i++) {
-            const engineItem = createMobileOptionItem(
-                localization.translate('Engines Engine') + ' ' + (i + 1),
-                this.mobileEnginesContainer
-            );
+        if (engineCount === 0) return;
 
-            // Engine list selection
-            const allLists = bridge.getEngineNamesOfLists();
-            const selectedList = bridge.getEngineSelectedList(i);
-            const idx = i;
+        // Ensure selected engine is within bounds
+        if (this.mobileSelectedEngine >= engineCount) {
+            this.mobileSelectedEngine = 0;
+        }
 
-            createMobileSelect(
-                {
-                    name: localization.translate('Engine List'),
-                    options: allLists.map(o => ({ name: o, enabled: true })),
-                    selected: allLists.indexOf(selectedList),
-                    enabled: true
-                },
-                engineItem.content,
-                (selected) => {
-                    bridge.setEngineSelectedList(idx, allLists[selected]);
-                    this.onUpdate();
-                }
-            );
+        // Create navigation header
+        const navDiv = document.createElement('div');
+        navDiv.className = 'mobile-nav-header';
+        navDiv.style.display = 'flex';
+        navDiv.style.alignItems = 'center';
+        navDiv.style.justifyContent = 'space-between';
+        navDiv.style.marginBottom = '0.5rem';
+        navDiv.style.padding = '0.5rem';
+        navDiv.style.backgroundColor = 'var(--card-bg, #f5f5f5)';
+        navDiv.style.borderRadius = '4px';
 
-            // Engine type selection
-            const enginesInList = bridge.getEngineNamesInList(selectedList);
-            const selectedEngine = bridge.getEngineSelectedName(i);
+        // Prev button
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'mobile-number-btn';
+        prevBtn.textContent = '◀';
+        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.onclick = () => {
+            if (this.mobileSelectedEngine > 0) {
+                this.mobileSelectedEngine--;
+                this.updateMobileEngineContent();
+            }
+        };
+        navDiv.appendChild(prevBtn);
 
-            createMobileSelect(
-                {
-                    name: localization.translate('Engine Type'),
-                    options: enginesInList.map(o => ({ name: o, enabled: true })),
-                    selected: enginesInList.indexOf(selectedEngine),
-                    enabled: true
-                },
-                engineItem.content,
-                (selected) => {
-                    bridge.setEngineSelectedIndex(idx, selected);
-                    this.onUpdate();
-                }
-            );
+        // Engine label
+        this.mobileEngineNavLabel = document.createElement('span');
+        this.mobileEngineNavLabel.style.fontWeight = 'bold';
+        this.mobileEngineNavLabel.textContent = `${localization.translate('Engines Engine')} ${this.mobileSelectedEngine + 1} / ${engineCount}`;
+        navDiv.appendChild(this.mobileEngineNavLabel);
 
-            // Show key stats
-            const fullStats = bridge.getEngineFullStats(i);
-            const statsDiv = document.createElement('div');
-            statsDiv.style.fontSize = '0.85em';
-            statsDiv.style.marginTop = '5px';
-            statsDiv.innerHTML = `
-                <div style="display:flex;justify-content:space-between"><span>Power:</span><span>${fullStats.stats.power}</span></div>
-                <div style="display:flex;justify-content:space-between"><span>Mass:</span><span>${fullStats.stats.mass}</span></div>
-                <div style="display:flex;justify-content:space-between"><span>Reliability:</span><span>${fullStats.stats.reliability}</span></div>
-            `;
-            engineItem.content.appendChild(statsDiv);
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'mobile-number-btn';
+        nextBtn.textContent = '▶';
+        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.onclick = () => {
+            if (this.mobileSelectedEngine < engineCount - 1) {
+                this.mobileSelectedEngine++;
+                this.updateMobileEngineContent();
+            }
+        };
+        navDiv.appendChild(nextBtn);
 
-            // Mounting select
-            const engineBindings = bridge.getEngineBindings(i);
-            createMobileSelect(
-                {
-                    name: localization.translate('Engine Mounting Location'),
-                    options: engineBindings.mount_sel.options,
-                    selected: engineBindings.mount_sel.selected,
-                    enabled: engineBindings.mount_sel.enabled
-                },
-                engineItem.content,
-                (selected) => {
+        this.mobileEnginesContainer.appendChild(navDiv);
+
+        // Content container for the selected engine
+        this.mobileEngineContent = document.createElement('div');
+        this.mobileEnginesContainer.appendChild(this.mobileEngineContent);
+
+        // Build content for the currently selected engine
+        this.updateMobileEngineContent();
+    }
+
+    private updateMobileEngineContent(): void {
+        if (!this.mobileEngineContent) return;
+        this.mobileEngineContent.innerHTML = '';
+
+        const bridge = this.getBridge();
+        const bindings = bridge.getEnginesBindings();
+        const engineCount = bindings.engines.value;
+        const idx = this.mobileSelectedEngine;
+
+        // Update nav label
+        if (this.mobileEngineNavLabel) {
+            this.mobileEngineNavLabel.textContent = `${localization.translate('Engines Engine')} ${idx + 1} / ${engineCount}`;
+        }
+
+        if (idx >= engineCount) return;
+
+        // Engine Selection section
+        const selectionItem = createMobileOptionItem(
+            localization.translate('Engines Engine Type'),
+            this.mobileEngineContent
+        );
+
+        // Engine list selection
+        const allLists = bridge.getEngineNamesOfLists();
+        const selectedList = bridge.getEngineSelectedList(idx);
+
+        createMobileSelect(
+            {
+                name: localization.translate('Engine List'),
+                options: allLists.map(o => ({ name: o, enabled: true })),
+                selected: allLists.indexOf(selectedList),
+                enabled: true
+            },
+            selectionItem.content,
+            (selected) => {
+                bridge.setEngineSelectedList(idx, allLists[selected]);
+                this.onUpdate();
+            }
+        );
+
+        // Engine type selection
+        const enginesInList = bridge.getEngineNamesInList(selectedList);
+        const selectedEngine = bridge.getEngineSelectedName(idx);
+
+        createMobileSelect(
+            {
+                name: localization.translate('Engine Type'),
+                options: enginesInList.map(o => ({ name: o, enabled: true })),
+                selected: enginesInList.indexOf(selectedEngine),
+                enabled: true
+            },
+            selectionItem.content,
+            (selected) => {
+                bridge.setEngineSelectedIndex(idx, selected);
+                this.onUpdate();
+            }
+        );
+
+        // Engine base stats display
+        const fullStats = bridge.getEngineFullStats(idx);
+        const baseStatsDiv = document.createElement('div');
+        baseStatsDiv.style.fontSize = '0.85em';
+        baseStatsDiv.style.marginTop = '0.5rem';
+        baseStatsDiv.style.padding = '0.5rem';
+        baseStatsDiv.style.backgroundColor = 'var(--card-bg, #f0f0f0)';
+        baseStatsDiv.style.borderRadius = '4px';
+
+        // Rarity
+        const raritySpan = document.createElement('div');
+        raritySpan.innerHTML = `<strong>${localization.translate('Rarity')}:</strong> <span class="${this.getRarityClass(fullStats.rarity)}">${this.getRarityText(fullStats.rarity)}</span>`;
+        baseStatsDiv.appendChild(raritySpan);
+
+        // Key engine stats in a grid
+        const statsGrid = document.createElement('div');
+        statsGrid.style.display = 'grid';
+        statsGrid.style.gridTemplateColumns = '1fr 1fr';
+        statsGrid.style.gap = '0.25rem';
+        statsGrid.style.marginTop = '0.25rem';
+
+        const baseStats = [
+            { label: localization.translate('Stat Power'), value: fullStats.stats.power },
+            { label: localization.translate('Stat Mass'), value: fullStats.stats.mass },
+            { label: localization.translate('Stat Drag'), value: fullStats.stats.drag },
+            { label: localization.translate('Stat Reliability'), value: fullStats.stats.reliability },
+            { label: localization.translate('Stat Cooling'), value: fullStats.stats.cooling },
+            { label: localization.translate('Stat Overspeed'), value: fullStats.overspeed },
+            { label: localization.translate('Stat Fuel Consumption'), value: fullStats.stats.fuelconsumption },
+            { label: localization.translate('Stat Altitude'), value: fullStats.altitude },
+            { label: localization.translate('Stat Torque'), value: fullStats.torque },
+            { label: localization.translate('Stat Rumble'), value: fullStats.rumble },
+            { label: localization.translate('Stat Cost'), value: fullStats.stats.cost },
+        ];
+        baseStats.forEach(stat => {
+            const row = document.createElement('div');
+            row.style.display = 'flex';
+            row.style.justifyContent = 'space-between';
+            row.innerHTML = `<span>${stat.label}:</span><span>${stat.value}</span>`;
+            statsGrid.appendChild(row);
+        });
+        baseStatsDiv.appendChild(statsGrid);
+        selectionItem.content.appendChild(baseStatsDiv);
+
+        // Get engine bindings for options
+        const engineBindings = bridge.getEngineBindings(idx);
+
+        // Cooling section
+        const coolingItem = createMobileOptionItem(
+            localization.translate('Engine Cooling'),
+            this.mobileEngineContent
+        );
+        this.buildMobileCoolingSection(coolingItem.content, engineBindings, fullStats, idx);
+
+        // Mounting section
+        const mountingItem = createMobileOptionItem(
+            localization.translate('Engine Mounting'),
+            this.mobileEngineContent
+        );
+        this.buildMobileMountingSection(mountingItem.content, engineBindings, idx);
+
+        // Upgrades section
+        const upgradesItem = createMobileOptionItem(
+            localization.translate('Engine Upgrades'),
+            this.mobileEngineContent
+        );
+        this.buildMobileUpgradesSection(upgradesItem.content, engineBindings, idx);
+
+        // Cowl & Electrical section
+        const cowlItem = createMobileOptionItem(
+            localization.translate('Engine Cowls') + ' & ' + localization.translate('Engine Electrical'),
+            this.mobileEngineContent
+        );
+        this.buildMobileCowlElectricalSection(cowlItem.content, engineBindings, idx);
+
+        // Full Stats section
+        const statsItem = createMobileOptionItem(
+            localization.translate('Engines Engine Stats'),
+            this.mobileEngineContent
+        );
+        const engineStats = bridge.getEngineStats(idx);
+        const derivedStats = bridge.getEngineDerivedStats(idx);
+        const mobileStatsGrid = createMobileStatsGrid(engineStats, ENGINE_STATS, derivedStats);
+        statsItem.content.appendChild(mobileStatsGrid);
+    }
+
+    private buildMobileCoolingSection(container: HTMLElement, bindings: any, fullStats: any, idx: number): void {
+        const bridge = this.getBridge();
+        const cooling = fullStats.stats.cooling || 0;
+
+        if (fullStats.oiltank) {
+            // Rotary engine
+            const span = document.createElement('div');
+            span.style.whiteSpace = 'pre-line';
+            span.textContent = localization.translate('Engine Rotary Cooling');
+            container.appendChild(span);
+        } else if (cooling === 0) {
+            // Air-cooled engine
+            const span = document.createElement('div');
+            span.textContent = localization.translate('Engine Air-Cooled Engine.');
+            container.appendChild(span);
+
+            // Intake fan checkbox (for turbines)
+            if (bindings.intake_fan && bindings.intake_fan.enabled) {
+                createMobileCheckbox(
+                    bindings.intake_fan,
+                    container,
+                    (checked) => {
+                        const updatedBindings = bridge.getEngineBindings(idx);
+                        updatedBindings.intake_fan.selected = checked;
+                        bridge.setEngineBindings(idx, updatedBindings);
+                        this.onUpdate();
+                    }
+                );
+            }
+        } else {
+            // Liquid-cooled engine
+            const radiatorCount = bridge.getNumberOfRadiators();
+            if (radiatorCount > 0) {
+                createMobileSelect(
+                    {
+                        name: localization.translate('Engine Select Radiator'),
+                        options: Array.from({ length: radiatorCount }, (_, i) => ({
+                            name: localization.translateWithParam('Vital Part Radiator', i + 1),
+                            enabled: true
+                        })),
+                        selected: bindings.radiator_index?.selected || 0,
+                        enabled: true
+                    },
+                    container,
+                    (selected) => {
+                        const updatedBindings = bridge.getEngineBindings(idx);
+                        updatedBindings.radiator_index.selected = selected;
+                        bridge.setEngineBindings(idx, updatedBindings);
+                        this.onUpdate();
+                    }
+                );
+            }
+
+            // Cooling count
+            if (bindings.cooling_count) {
+                createMobileNumberInput(
+                    bindings.cooling_count,
+                    container,
+                    (value) => {
+                        const updatedBindings = bridge.getEngineBindings(idx);
+                        updatedBindings.cooling_count.value = value;
+                        bridge.setEngineBindings(idx, updatedBindings);
+                        this.onUpdate();
+                    },
+                    0, 99, 1
+                );
+            }
+        }
+    }
+
+    private buildMobileMountingSection(container: HTMLElement, bindings: any, idx: number): void {
+        const bridge = this.getBridge();
+
+        // Mounting location
+        createMobileSelect(
+            {
+                name: localization.translate('Engine Mounting Location'),
+                options: bindings.mount_sel.options,
+                selected: bindings.mount_sel.selected,
+                enabled: bindings.mount_sel.enabled
+            },
+            container,
+            (selected) => {
+                const updatedBindings = bridge.getEngineBindings(idx);
+                updatedBindings.mount_sel.selected = selected;
+                bridge.setEngineBindings(idx, updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Push-pull checkbox
+        if (bindings.is_push_pull) {
+            createMobileCheckbox(
+                bindings.is_push_pull,
+                container,
+                (checked) => {
                     const updatedBindings = bridge.getEngineBindings(idx);
-                    updatedBindings.mount_sel.selected = selected;
+                    updatedBindings.is_push_pull.selected = checked;
                     bridge.setEngineBindings(idx, updatedBindings);
                     this.onUpdate();
                 }
             );
+        }
 
-            // Cowl select
-            createMobileSelect(
-                {
-                    name: localization.translate('Engine Cowls'),
-                    options: engineBindings.cowl_sel.options,
-                    selected: engineBindings.cowl_sel.selected,
-                    enabled: engineBindings.cowl_sel.enabled
-                },
-                engineItem.content,
-                (selected) => {
+        // Torque to structure checkbox
+        if (bindings.torque_to_struct) {
+            createMobileCheckbox(
+                bindings.torque_to_struct,
+                container,
+                (checked) => {
                     const updatedBindings = bridge.getEngineBindings(idx);
-                    updatedBindings.cowl_sel.selected = selected;
+                    updatedBindings.torque_to_struct.selected = checked;
                     bridge.setEngineBindings(idx, updatedBindings);
                     this.onUpdate();
                 }
             );
+        }
+    }
+
+    private buildMobileUpgradesSection(container: HTMLElement, bindings: any, idx: number): void {
+        const bridge = this.getBridge();
+
+        // Extended driveshafts
+        if (bindings.extended_ds) {
+            createMobileCheckbox(
+                bindings.extended_ds,
+                container,
+                (checked) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.extended_ds.selected = checked;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Outboard propeller
+        if (bindings.outboard_prop) {
+            createMobileCheckbox(
+                bindings.outboard_prop,
+                container,
+                (checked) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.outboard_prop.selected = checked;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Geared propeller count
+        if (bindings.gear_count) {
+            createMobileNumberInput(
+                bindings.gear_count,
+                container,
+                (value) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.gear_count.value = value;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                },
+                0, 10, 1
+            );
+        }
+
+        // Geared propeller reliability
+        if (bindings.geared_reliability) {
+            createMobileNumberInput(
+                bindings.geared_reliability,
+                container,
+                (value) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.geared_reliability.value = value;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                },
+                0, 10, 1
+            );
+        }
+    }
+
+    private buildMobileCowlElectricalSection(container: HTMLElement, bindings: any, idx: number): void {
+        const bridge = this.getBridge();
+
+        // Cowl select
+        createMobileSelect(
+            {
+                name: localization.translate('Engine Cowls'),
+                options: bindings.cowl_sel.options,
+                selected: bindings.cowl_sel.selected,
+                enabled: bindings.cowl_sel.enabled
+            },
+            container,
+            (selected) => {
+                const updatedBindings = bridge.getEngineBindings(idx);
+                updatedBindings.cowl_sel.selected = selected;
+                bridge.setEngineBindings(idx, updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Alternator checkbox
+        if (bindings.has_alternator) {
+            createMobileCheckbox(
+                bindings.has_alternator,
+                container,
+                (checked) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.has_alternator.selected = checked;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+
+        // Generator checkbox
+        if (bindings.is_generator) {
+            createMobileCheckbox(
+                bindings.is_generator,
+                container,
+                (checked) => {
+                    const updatedBindings = bridge.getEngineBindings(idx);
+                    updatedBindings.is_generator.selected = checked;
+                    bridge.setEngineBindings(idx, updatedBindings);
+                    this.onUpdate();
+                }
+            );
+        }
+    }
+
+    private getRarityText(rarity: any): string {
+        switch (rarity) {
+            case 'CUSTOM':
+            case 0:
+                return localization.translate('Rarity Custom');
+            case 'COMMON':
+            case 1:
+                return localization.translate('Rarity Common');
+            case 'RARE':
+            case 2:
+                return localization.translate('Rarity Rare');
+            case 'LEGENDARY':
+            case 3:
+                return localization.translate('Rarity Legendary');
+            default:
+                return localization.translate('Rarity Custom');
+        }
+    }
+
+    private getRarityClass(rarity: any): string {
+        switch (rarity) {
+            case 'CUSTOM':
+            case 0:
+                return 'ER_Custom';
+            case 'COMMON':
+            case 1:
+                return '';
+            case 'RARE':
+            case 2:
+                return 'ER_Rare';
+            case 'LEGENDARY':
+            case 3:
+                return 'ER_Legendary';
+            default:
+                return 'ER_Custom';
         }
     }
 
@@ -423,69 +821,177 @@ export class EnginesUI extends BaseComponentUI {
 
         const bridge = this.getBridge();
         const bindings = bridge.getEnginesBindings();
+        const radiatorCount = bindings.radiators.value;
 
-        if (bindings.radiators.value === 0) return;
+        if (radiatorCount === 0) return;
 
-        for (let i = 0; i < bindings.radiators.value; i++) {
-            const radiatorItem = createMobileOptionItem(
-                localization.translate('Radiators Radiator') + ' ' + (i + 1),
-                this.mobileRadiatorsContainer
-            );
+        // Ensure selected radiator is within bounds
+        if (this.mobileSelectedRadiator >= radiatorCount) {
+            this.mobileSelectedRadiator = 0;
+        }
 
-            const radiatorBindings = bridge.getRadiatorBindings(i);
-            const idx = i;
+        // Create navigation header
+        const navDiv = document.createElement('div');
+        navDiv.className = 'mobile-nav-header';
+        navDiv.style.display = 'flex';
+        navDiv.style.alignItems = 'center';
+        navDiv.style.justifyContent = 'space-between';
+        navDiv.style.marginBottom = '0.5rem';
+        navDiv.style.marginTop = '1rem';
+        navDiv.style.padding = '0.5rem';
+        navDiv.style.backgroundColor = 'var(--card-bg, #f5f5f5)';
+        navDiv.style.borderRadius = '4px';
 
-            // Type select
-            createMobileSelect(
-                {
-                    name: localization.translate('Radiators Radiator Type'),
-                    options: radiatorBindings.idx_type.options,
-                    selected: radiatorBindings.idx_type.selected,
-                    enabled: radiatorBindings.idx_type.enabled
-                },
-                radiatorItem.content,
-                (selected) => {
+        // Prev button
+        const prevBtn = document.createElement('button');
+        prevBtn.type = 'button';
+        prevBtn.className = 'mobile-number-btn';
+        prevBtn.textContent = '◀';
+        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.onclick = () => {
+            if (this.mobileSelectedRadiator > 0) {
+                this.mobileSelectedRadiator--;
+                this.updateMobileRadiatorContent();
+            }
+        };
+        navDiv.appendChild(prevBtn);
+
+        // Radiator label
+        this.mobileRadiatorNavLabel = document.createElement('span');
+        this.mobileRadiatorNavLabel.style.fontWeight = 'bold';
+        this.mobileRadiatorNavLabel.textContent = `${localization.translate('Radiators Radiator')} ${this.mobileSelectedRadiator + 1} / ${radiatorCount}`;
+        navDiv.appendChild(this.mobileRadiatorNavLabel);
+
+        // Next button
+        const nextBtn = document.createElement('button');
+        nextBtn.type = 'button';
+        nextBtn.className = 'mobile-number-btn';
+        nextBtn.textContent = '▶';
+        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.onclick = () => {
+            if (this.mobileSelectedRadiator < radiatorCount - 1) {
+                this.mobileSelectedRadiator++;
+                this.updateMobileRadiatorContent();
+            }
+        };
+        navDiv.appendChild(nextBtn);
+
+        this.mobileRadiatorsContainer.appendChild(navDiv);
+
+        // Content container for the selected radiator
+        this.mobileRadiatorContent = document.createElement('div');
+        this.mobileRadiatorsContainer.appendChild(this.mobileRadiatorContent);
+
+        // Build content for the currently selected radiator
+        this.updateMobileRadiatorContent();
+    }
+
+    private updateMobileRadiatorContent(): void {
+        if (!this.mobileRadiatorContent) return;
+        this.mobileRadiatorContent.innerHTML = '';
+
+        const bridge = this.getBridge();
+        const bindings = bridge.getEnginesBindings();
+        const radiatorCount = bindings.radiators.value;
+        const idx = this.mobileSelectedRadiator;
+
+        // Update nav label
+        if (this.mobileRadiatorNavLabel) {
+            this.mobileRadiatorNavLabel.textContent = `${localization.translate('Radiators Radiator')} ${idx + 1} / ${radiatorCount}`;
+        }
+
+        if (idx >= radiatorCount) return;
+
+        const radiatorBindings = bridge.getRadiatorBindings(idx);
+
+        // Radiator Type section
+        const typeItem = createMobileOptionItem(
+            localization.translate('Radiators Radiator Type'),
+            this.mobileRadiatorContent
+        );
+        createMobileSelect(
+            {
+                name: '',
+                options: radiatorBindings.idx_type.options,
+                selected: radiatorBindings.idx_type.selected,
+                enabled: radiatorBindings.idx_type.enabled
+            },
+            typeItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getRadiatorBindings(idx);
+                updatedBindings.idx_type.selected = selected;
+                bridge.setRadiatorBindings(idx, updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Mounting section
+        const mountItem = createMobileOptionItem(
+            localization.translate('Radiators Mounting'),
+            this.mobileRadiatorContent
+        );
+        createMobileSelect(
+            {
+                name: '',
+                options: radiatorBindings.idx_mount.options,
+                selected: radiatorBindings.idx_mount.selected,
+                enabled: radiatorBindings.idx_mount.enabled
+            },
+            mountItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getRadiatorBindings(idx);
+                updatedBindings.idx_mount.selected = selected;
+                bridge.setRadiatorBindings(idx, updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Coolant section
+        const coolantItem = createMobileOptionItem(
+            localization.translate('Radiators Coolant'),
+            this.mobileRadiatorContent
+        );
+        createMobileSelect(
+            {
+                name: '',
+                options: radiatorBindings.idx_coolant.options,
+                selected: radiatorBindings.idx_coolant.selected,
+                enabled: radiatorBindings.idx_coolant.enabled
+            },
+            coolantItem.content,
+            (selected) => {
+                const updatedBindings = bridge.getRadiatorBindings(idx);
+                updatedBindings.idx_coolant.selected = selected;
+                bridge.setRadiatorBindings(idx, updatedBindings);
+                this.onUpdate();
+            }
+        );
+
+        // Harden checkbox (if available)
+        if (radiatorBindings.harden_cool) {
+            createMobileCheckbox(
+                radiatorBindings.harden_cool,
+                coolantItem.content,
+                (checked) => {
                     const updatedBindings = bridge.getRadiatorBindings(idx);
-                    updatedBindings.idx_type.selected = selected;
-                    bridge.setRadiatorBindings(idx, updatedBindings);
-                    this.onUpdate();
-                }
-            );
-
-            // Mount select
-            createMobileSelect(
-                {
-                    name: localization.translate('Radiators Mounting'),
-                    options: radiatorBindings.idx_mount.options,
-                    selected: radiatorBindings.idx_mount.selected,
-                    enabled: radiatorBindings.idx_mount.enabled
-                },
-                radiatorItem.content,
-                (selected) => {
-                    const updatedBindings = bridge.getRadiatorBindings(idx);
-                    updatedBindings.idx_mount.selected = selected;
-                    bridge.setRadiatorBindings(idx, updatedBindings);
-                    this.onUpdate();
-                }
-            );
-
-            // Coolant select
-            createMobileSelect(
-                {
-                    name: localization.translate('Radiators Coolant'),
-                    options: radiatorBindings.idx_coolant.options,
-                    selected: radiatorBindings.idx_coolant.selected,
-                    enabled: radiatorBindings.idx_coolant.enabled
-                },
-                radiatorItem.content,
-                (selected) => {
-                    const updatedBindings = bridge.getRadiatorBindings(idx);
-                    updatedBindings.idx_coolant.selected = selected;
+                    if (updatedBindings.harden_cool) {
+                        updatedBindings.harden_cool.selected = checked;
+                    }
                     bridge.setRadiatorBindings(idx, updatedBindings);
                     this.onUpdate();
                 }
             );
         }
+
+        // Stats section
+        const statsItem = createMobileOptionItem(
+            localization.translate('Radiators Radiator Stats'),
+            this.mobileRadiatorContent
+        );
+        const stats = bridge.getRadiatorStats(idx);
+        const derived = { flammable: bridge.getRadiatorFlammable(idx) };
+        const mobileStatsGrid = createMobileStatsGrid(stats, RADIATOR_STATS, derived);
+        statsItem.content.appendChild(mobileStatsGrid);
     }
 
     private rebuildEngines(): void {
