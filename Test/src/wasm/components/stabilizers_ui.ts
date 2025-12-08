@@ -43,6 +43,11 @@ interface StabilizersCache {
     vCountInput: HTMLInputElement;
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+    // Mobile controls
+    mobileHTypeSelect?: HTMLSelectElement;
+    mobileHCountInput?: HTMLInputElement;
+    mobileVTypeSelect?: HTMLSelectElement;
+    mobileVCountInput?: HTMLInputElement;
 }
 
 export class StabilizersUI extends BaseComponentUI {
@@ -128,7 +133,7 @@ export class StabilizersUI extends BaseComponentUI {
             localization.translate('Stabilizers Horizontal Stabilizers'),
             mobileDiv
         );
-        createMobileSelect(
+        const mobileHTypeSelect = createMobileSelect(
             bindings.hstab_sel,
             hStabItem.content,
             (selectedIndex) => {
@@ -138,7 +143,7 @@ export class StabilizersUI extends BaseComponentUI {
                 this.onUpdate();
             }
         );
-        createMobileNumberInput(
+        const { input: mobileHCountInput } = createMobileNumberInput(
             { ...bindings.hstab_count, name: localization.translate('Stabilizers # of Stabilizers') },
             hStabItem.content,
             (value) => {
@@ -155,7 +160,7 @@ export class StabilizersUI extends BaseComponentUI {
             localization.translate('Stabilizers Vertical Stabilizers'),
             mobileDiv
         );
-        createMobileSelect(
+        const mobileVTypeSelect = createMobileSelect(
             bindings.vstab_sel,
             vStabItem.content,
             (selectedIndex) => {
@@ -165,7 +170,7 @@ export class StabilizersUI extends BaseComponentUI {
                 this.onUpdate();
             }
         );
-        createMobileNumberInput(
+        const { input: mobileVCountInput } = createMobileNumberInput(
             { ...bindings.vstab_count, name: localization.translate('Stabilizers # of Stabilizers') },
             vStabItem.content,
             (value) => {
@@ -194,7 +199,11 @@ export class StabilizersUI extends BaseComponentUI {
             vTypeSelect,
             vCountInput,
             statsTable,
-            mobileStatsGrid
+            mobileStatsGrid,
+            mobileHTypeSelect,
+            mobileHCountInput,
+            mobileVTypeSelect,
+            mobileVCountInput
         };
 
         // Create collapsible section with localized title
@@ -324,15 +333,33 @@ export class StabilizersUI extends BaseComponentUI {
 
         const bindings = bridge.getStabilizersBindings();
 
-        // Update horizontal stabilizers
+        // Update horizontal stabilizers (desktop)
         updateSelectElement(this.cache.hTypeSelect, bindings.hstab_sel);
         this.cache.hCountInput.value = bindings.hstab_count.value.toString();
         this.cache.hCountInput.disabled = !bindings.hstab_count.enabled;
 
-        // Update vertical stabilizers
+        // Update vertical stabilizers (desktop)
         updateSelectElement(this.cache.vTypeSelect, bindings.vstab_sel);
         this.cache.vCountInput.value = bindings.vstab_count.value.toString();
         this.cache.vCountInput.disabled = !bindings.vstab_count.enabled;
+
+        // Update horizontal stabilizers (mobile)
+        if (this.cache.mobileHTypeSelect) {
+            updateSelectElement(this.cache.mobileHTypeSelect, bindings.hstab_sel);
+        }
+        if (this.cache.mobileHCountInput) {
+            this.cache.mobileHCountInput.value = bindings.hstab_count.value.toString();
+            this.cache.mobileHCountInput.disabled = !bindings.hstab_count.enabled;
+        }
+
+        // Update vertical stabilizers (mobile)
+        if (this.cache.mobileVTypeSelect) {
+            updateSelectElement(this.cache.mobileVTypeSelect, bindings.vstab_sel);
+        }
+        if (this.cache.mobileVCountInput) {
+            this.cache.mobileVCountInput.value = bindings.vstab_count.value.toString();
+            this.cache.mobileVCountInput.disabled = !bindings.vstab_count.enabled;
+        }
 
         // Update stat values
         const stats = bridge.getStabilizersStats();

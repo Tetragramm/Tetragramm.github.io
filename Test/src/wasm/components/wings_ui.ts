@@ -63,6 +63,13 @@ interface WingsCache {
     // Stats
     statsTable: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+
+    // Mobile controls
+    mobileStaggerSelect?: HTMLSelectElement;
+    mobileClosedCheckbox?: HTMLInputElement;
+    mobileSweptCheckbox?: HTMLInputElement;
+    mobileFullWingRows?: MobileFullWingRowCache[];
+    mobileMiniWingRows?: MobileMiniWingRowCache[];
 }
 
 interface FullWingRowCache {
@@ -78,6 +85,23 @@ interface FullWingRowCache {
 
 interface MiniWingRowCache {
     row: HTMLTableRowElement;
+    deckSelect: HTMLSelectElement;
+    skinSelect: HTMLSelectElement;
+    areaInput: HTMLInputElement;
+    spanInput: HTMLInputElement;
+}
+
+interface MobileFullWingRowCache {
+    deckSelect: HTMLSelectElement;
+    skinSelect: HTMLSelectElement;
+    areaInput: HTMLInputElement;
+    spanInput: HTMLInputElement;
+    gullCheckbox: HTMLInputElement;
+    dihedralInput: HTMLInputElement;
+    anhedralInput: HTMLInputElement;
+}
+
+interface MobileMiniWingRowCache {
     deckSelect: HTMLSelectElement;
     skinSelect: HTMLSelectElement;
     areaInput: HTMLInputElement;
@@ -122,7 +146,17 @@ export class WingsUI extends BaseComponentUI {
         // Mobile version
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
-        this.createMobileWingsSection(bindings, stats, mobileDiv, bridge);
+        const mobileControls = this.createMobileWingsSection(bindings, stats, mobileDiv, bridge);
+
+        // Add mobile controls to cache
+        if (this.cache) {
+            this.cache.mobileStaggerSelect = mobileControls.mobileStaggerSelect;
+            this.cache.mobileClosedCheckbox = mobileControls.mobileClosedCheckbox;
+            this.cache.mobileSweptCheckbox = mobileControls.mobileSweptCheckbox;
+            this.cache.mobileFullWingRows = mobileControls.mobileFullWingRows;
+            this.cache.mobileMiniWingRows = mobileControls.mobileMiniWingRows;
+            this.cache.mobileStatsGrid = mobileControls.mobileStatsGrid;
+        }
 
         contentWrapper.appendChild(desktopDiv);
         contentWrapper.appendChild(mobileDiv);
@@ -148,7 +182,14 @@ export class WingsUI extends BaseComponentUI {
     /**
      * Create mobile wings section
      */
-    private createMobileWingsSection(bindings: any, stats: any, parent: HTMLElement, bridge: AircraftBridge): void {
+    private createMobileWingsSection(bindings: any, stats: any, parent: HTMLElement, bridge: AircraftBridge): {
+        mobileStaggerSelect: HTMLSelectElement;
+        mobileClosedCheckbox: HTMLInputElement;
+        mobileSweptCheckbox: HTMLInputElement;
+        mobileFullWingRows: MobileFullWingRowCache[];
+        mobileMiniWingRows: MobileMiniWingRowCache[];
+        mobileStatsGrid: HTMLDivElement;
+    } {
         // Global controls
         const globalItem = createMobileOptionItem(
             localization.translate('Wings Wing Options'),
@@ -162,7 +203,7 @@ export class WingsUI extends BaseComponentUI {
         const staggerLabel = document.createElement('span');
         staggerLabel.textContent = localization.translate('Wings Wing Stagger') + ': ';
         staggerRow.appendChild(staggerLabel);
-        createMobileSelect(
+        const mobileStaggerSelect = createMobileSelect(
             bindings.stagger,
             staggerRow,
             (selectedIndex) => {
@@ -175,13 +216,13 @@ export class WingsUI extends BaseComponentUI {
         globalItem.content.appendChild(staggerRow);
 
         // Closed and Swept checkboxes
-        createMobileCheckbox(bindings.closed, globalItem.content, (selected) => {
+        const mobileClosedCheckbox = createMobileCheckbox(bindings.closed, globalItem.content, (selected) => {
             const updatedBindings = this.getBridge().getWingsBindings();
             updatedBindings.closed.selected = selected;
             this.getBridge().setWingsBindings(updatedBindings);
             this.onUpdate();
         });
-        createMobileCheckbox(bindings.swept, globalItem.content, (selected) => {
+        const mobileSweptCheckbox = createMobileCheckbox(bindings.swept, globalItem.content, (selected) => {
             const updatedBindings = this.getBridge().getWingsBindings();
             updatedBindings.swept.selected = selected;
             this.getBridge().setWingsBindings(updatedBindings);
@@ -194,8 +235,12 @@ export class WingsUI extends BaseComponentUI {
             parent
         );
 
+        const mobileFullWingRows: MobileFullWingRowCache[] = [];
         bindings.full_wings.forEach((wing: any, i: number) => {
-            this.createMobileWingRow(wing, i, 'full', fullWingsItem.content, bridge);
+            const rowCache = this.createMobileWingRow(wing, i, 'full', fullWingsItem.content, bridge);
+            if (rowCache) {
+                mobileFullWingRows.push(rowCache as MobileFullWingRowCache);
+            }
         });
 
         // Add wing button
@@ -221,8 +266,12 @@ export class WingsUI extends BaseComponentUI {
             parent
         );
 
+        const mobileMiniWingRows: MobileMiniWingRowCache[] = [];
         bindings.mini_wings.forEach((wing: any, i: number) => {
-            this.createMobileWingRow(wing, i, 'mini', miniWingsItem.content, bridge);
+            const rowCache = this.createMobileWingRow(wing, i, 'mini', miniWingsItem.content, bridge);
+            if (rowCache) {
+                mobileMiniWingRows.push(rowCache as MobileMiniWingRowCache);
+            }
         });
 
         // Add mini wing button
@@ -247,19 +296,23 @@ export class WingsUI extends BaseComponentUI {
             localization.translate('Wings Wing Stats'),
             parent
         );
-        const statsGrid = createMobileStatsGrid(stats, WINGS_STATS);
-        statsItem.content.appendChild(statsGrid);
+        const mobileStatsGrid = createMobileStatsGrid(stats, WINGS_STATS);
+        statsItem.content.appendChild(mobileStatsGrid);
 
-        // Store mobile stats grid in cache
-        if (this.cache) {
-            this.cache.mobileStatsGrid = statsGrid;
-        }
+        return {
+            mobileStaggerSelect,
+            mobileClosedCheckbox,
+            mobileSweptCheckbox,
+            mobileFullWingRows,
+            mobileMiniWingRows,
+            mobileStatsGrid
+        };
     }
 
     /**
      * Create a mobile wing row
      */
-    private createMobileWingRow(wing: any, index: number, type: 'full' | 'mini', parent: HTMLElement, bridge: AircraftBridge): void {
+    private createMobileWingRow(wing: any, index: number, type: 'full' | 'mini', parent: HTMLElement, bridge: AircraftBridge): MobileFullWingRowCache | MobileMiniWingRowCache {
         const wingDiv = document.createElement('div');
         wingDiv.className = 'mobile-frame-row';
         wingDiv.style.marginBottom = '0.5rem';
@@ -269,7 +322,7 @@ export class WingsUI extends BaseComponentUI {
         deckRow.style.display = 'flex';
         deckRow.style.gap = '0.25rem';
         deckRow.style.marginBottom = '0.25rem';
-        createMobileSelect(
+        const deckSelect = createMobileSelect(
             wing.deck,
             deckRow,
             (selectedIndex) => {
@@ -283,7 +336,7 @@ export class WingsUI extends BaseComponentUI {
                 this.onUpdate();
             }
         );
-        createMobileSelect(
+        const skinSelect = createMobileSelect(
             wing.skin,
             deckRow,
             (selectedIndex) => {
@@ -305,7 +358,7 @@ export class WingsUI extends BaseComponentUI {
         inputsRow.style.gap = '0.25rem';
         inputsRow.style.flexWrap = 'wrap';
 
-        createMobileNumberInput(
+        const { input: areaInput } = createMobileNumberInput(
             { ...wing.area, name: localization.translate('Wings Area') },
             inputsRow,
             (value) => {
@@ -322,7 +375,7 @@ export class WingsUI extends BaseComponentUI {
             type === 'mini' ? 2 : undefined
         );
 
-        createMobileNumberInput(
+        const { input: spanInput } = createMobileNumberInput(
             { ...wing.span, name: localization.translate('Wings Span') },
             inputsRow,
             (value) => {
@@ -341,6 +394,10 @@ export class WingsUI extends BaseComponentUI {
         wingDiv.appendChild(inputsRow);
 
         // Full wing specific options
+        let gullCheckbox: HTMLInputElement | undefined;
+        let dihedralInput: HTMLInputElement | undefined;
+        let anhedralInput: HTMLInputElement | undefined;
+
         if (type === 'full') {
             const optionsRow = document.createElement('div');
             optionsRow.style.display = 'flex';
@@ -349,7 +406,7 @@ export class WingsUI extends BaseComponentUI {
             optionsRow.style.marginTop = '0.25rem';
 
             // Gull checkbox
-            createMobileCheckbox(
+            gullCheckbox = createMobileCheckbox(
                 { ...wing.gull, name: localization.translate('Wings Gull') },
                 optionsRow,
                 (checked) => {
@@ -361,7 +418,7 @@ export class WingsUI extends BaseComponentUI {
             );
 
             // Dihedral/Anhedral
-            createMobileNumberInput(
+            const dihedralResult = createMobileNumberInput(
                 { ...wing.dihedral, name: localization.translate('Wings Dihedral') },
                 optionsRow,
                 (value) => {
@@ -372,8 +429,9 @@ export class WingsUI extends BaseComponentUI {
                 },
                 0
             );
+            dihedralInput = dihedralResult.input;
 
-            createMobileNumberInput(
+            const anhedralResult = createMobileNumberInput(
                 { ...wing.anhedral, name: localization.translate('Wings Anhedral') },
                 optionsRow,
                 (value) => {
@@ -384,11 +442,31 @@ export class WingsUI extends BaseComponentUI {
                 },
                 0
             );
+            anhedralInput = anhedralResult.input;
 
             wingDiv.appendChild(optionsRow);
         }
 
         parent.appendChild(wingDiv);
+
+        if (type === 'full') {
+            return {
+                deckSelect,
+                skinSelect,
+                areaInput,
+                spanInput,
+                gullCheckbox: gullCheckbox!,
+                dihedralInput: dihedralInput!,
+                anhedralInput: anhedralInput!
+            };
+        } else {
+            return {
+                deckSelect,
+                skinSelect,
+                areaInput,
+                spanInput
+            };
+        }
     }
 
     /**
@@ -405,12 +483,25 @@ export class WingsUI extends BaseComponentUI {
         // Update visibility first
         this.updateVisibility(aircraftType);
 
-        // Update global controls
+        // Update global controls (desktop)
         updateSelectElement(this.cache.staggerSelect, bindings.stagger);
         this.cache.closedCheckbox.checked = bindings.closed.selected;
         this.cache.closedCheckbox.disabled = !bindings.closed.enabled;
         this.cache.sweptCheckbox.checked = bindings.swept.selected;
         this.cache.sweptCheckbox.disabled = !bindings.swept.enabled;
+
+        // Update global controls (mobile)
+        if (this.cache.mobileStaggerSelect) {
+            updateSelectElement(this.cache.mobileStaggerSelect, bindings.stagger);
+        }
+        if (this.cache.mobileClosedCheckbox) {
+            this.cache.mobileClosedCheckbox.checked = bindings.closed.selected;
+            this.cache.mobileClosedCheckbox.disabled = !bindings.closed.enabled;
+        }
+        if (this.cache.mobileSweptCheckbox) {
+            this.cache.mobileSweptCheckbox.checked = bindings.swept.selected;
+            this.cache.mobileSweptCheckbox.disabled = !bindings.swept.enabled;
+        }
 
         // Check if wings count changed - if so, need full rebuild
         if (bindings.full_wings.length !== this.cache.fullWingRows.length ||
@@ -419,14 +510,28 @@ export class WingsUI extends BaseComponentUI {
             return;
         }
 
-        // Update full wings
+        // Update full wings (desktop)
         for (let i = 0; i < bindings.full_wings.length; i++) {
             this.updateFullWingRow(this.cache.fullWingRows[i], bindings.full_wings[i]);
         }
 
-        // Update mini wings
+        // Update full wings (mobile)
+        if (this.cache.mobileFullWingRows) {
+            for (let i = 0; i < bindings.full_wings.length && i < this.cache.mobileFullWingRows.length; i++) {
+                this.updateMobileFullWingRow(this.cache.mobileFullWingRows[i], bindings.full_wings[i]);
+            }
+        }
+
+        // Update mini wings (desktop)
         for (let i = 0; i < bindings.mini_wings.length; i++) {
             this.updateMiniWingRow(this.cache.miniWingRows[i], bindings.mini_wings[i]);
+        }
+
+        // Update mini wings (mobile)
+        if (this.cache.mobileMiniWingRows) {
+            for (let i = 0; i < bindings.mini_wings.length && i < this.cache.mobileMiniWingRows.length; i++) {
+                this.updateMobileMiniWingRow(this.cache.mobileMiniWingRows[i], bindings.mini_wings[i]);
+            }
         }
 
         // Update add wing selects
@@ -847,6 +952,34 @@ export class WingsUI extends BaseComponentUI {
      * Update a mini wing row
      */
     private updateMiniWingRow(rowCache: MiniWingRowCache, wingBindings: any): void {
+        updateSelectElement(rowCache.deckSelect, wingBindings.deck);
+        updateSelectElement(rowCache.skinSelect, wingBindings.skin);
+
+        rowCache.areaInput.valueAsNumber = wingBindings.area.value;
+        rowCache.spanInput.valueAsNumber = wingBindings.span.value;
+    }
+
+    /**
+     * Update a mobile full wing row
+     */
+    private updateMobileFullWingRow(rowCache: MobileFullWingRowCache, wingBindings: any): void {
+        updateSelectElement(rowCache.deckSelect, wingBindings.deck);
+        updateSelectElement(rowCache.skinSelect, wingBindings.skin);
+
+        rowCache.areaInput.valueAsNumber = wingBindings.area.value;
+        rowCache.spanInput.valueAsNumber = wingBindings.span.value;
+
+        rowCache.gullCheckbox.checked = wingBindings.gull.selected;
+        rowCache.gullCheckbox.disabled = !wingBindings.gull.enabled;
+
+        rowCache.dihedralInput.valueAsNumber = wingBindings.dihedral.value;
+        rowCache.anhedralInput.valueAsNumber = wingBindings.anhedral.value;
+    }
+
+    /**
+     * Update a mobile mini wing row
+     */
+    private updateMobileMiniWingRow(rowCache: MobileMiniWingRowCache, wingBindings: any): void {
         updateSelectElement(rowCache.deckSelect, wingBindings.deck);
         updateSelectElement(rowCache.skinSelect, wingBindings.skin);
 

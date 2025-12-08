@@ -36,6 +36,13 @@ interface ControlSurfacesCache {
     dragCheckboxes: HTMLInputElement[];
     statsTables: HTMLTableElement;
     mobileStatsGrid?: HTMLDivElement;
+    // Mobile controls
+    mobileAileronSelect?: HTMLSelectElement;
+    mobileRudderSelect?: HTMLSelectElement;
+    mobileElevatorSelect?: HTMLSelectElement;
+    mobileFlapsSelect?: HTMLSelectElement;
+    mobileSlatsSelect?: HTMLSelectElement;
+    mobileDragCheckboxes?: HTMLInputElement[];
 }
 
 // Control Surfaces stats configuration
@@ -142,6 +149,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
         ];
         const surfacesKeys = ['aileron_sel', 'rudder_sel', 'elevator_sel', 'flaps_sel', 'slats_sel'];
 
+        const mobileSurfaceSelects: HTMLSelectElement[] = [];
         surfacesKeys.forEach((key, idx) => {
             const binding = bindings[key];
             if (!binding || !binding.options) return;
@@ -150,7 +158,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
                 localization.translate(surfacesLabels[idx]),
                 mobileDiv
             );
-            createMobileSelect(
+            const select = createMobileSelect(
                 binding,
                 item.content,
                 (selectedIndex) => {
@@ -160,6 +168,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
                     this.onUpdate();
                 }
             );
+            mobileSurfaceSelects.push(select);
         });
 
         // Drag Inducers section
@@ -167,9 +176,10 @@ export class ControlSurfacesUI extends BaseComponentUI {
             localization.translate('Control Surfaces Drag Inducers'),
             mobileDiv
         );
+        const mobileDragCheckboxes: HTMLInputElement[] = [];
         if (bindings.drag_sel && Array.isArray(bindings.drag_sel)) {
             bindings.drag_sel.forEach((item: any, idx: number) => {
-                createMobileCheckbox(
+                const checkbox = createMobileCheckbox(
                     item,
                     dragItem.content,
                     (checked) => {
@@ -179,6 +189,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
                         this.onUpdate();
                     }
                 );
+                mobileDragCheckboxes.push(checkbox);
             });
         }
 
@@ -197,7 +208,13 @@ export class ControlSurfacesUI extends BaseComponentUI {
             ...surfaceSelects,
             dragCheckboxes,
             statsTables,
-            mobileStatsGrid
+            mobileStatsGrid,
+            mobileAileronSelect: mobileSurfaceSelects[0],
+            mobileRudderSelect: mobileSurfaceSelects[1],
+            mobileElevatorSelect: mobileSurfaceSelects[2],
+            mobileFlapsSelect: mobileSurfaceSelects[3],
+            mobileSlatsSelect: mobileSurfaceSelects[4],
+            mobileDragCheckboxes
         };
 
         // Create collapsible section with localized title
@@ -327,19 +344,46 @@ export class ControlSurfacesUI extends BaseComponentUI {
         // Update visibility first
         this.updateVisibility(aircraftType);
 
-        // Update control surface selects
+        // Update control surface selects (desktop)
         updateSelectElement(this.cache.aileronSelect, bindings.aileron_sel);
         updateSelectElement(this.cache.rudderSelect, bindings.rudder_sel);
         updateSelectElement(this.cache.elevatorSelect, bindings.elevator_sel);
         updateSelectElement(this.cache.flapsSelect, bindings.flaps_sel);
         updateSelectElement(this.cache.slatsSelect, bindings.slats_sel);
 
-        // Update drag inducer checkboxes
+        // Update control surface selects (mobile)
+        if (this.cache.mobileAileronSelect) {
+            updateSelectElement(this.cache.mobileAileronSelect, bindings.aileron_sel);
+        }
+        if (this.cache.mobileRudderSelect) {
+            updateSelectElement(this.cache.mobileRudderSelect, bindings.rudder_sel);
+        }
+        if (this.cache.mobileElevatorSelect) {
+            updateSelectElement(this.cache.mobileElevatorSelect, bindings.elevator_sel);
+        }
+        if (this.cache.mobileFlapsSelect) {
+            updateSelectElement(this.cache.mobileFlapsSelect, bindings.flaps_sel);
+        }
+        if (this.cache.mobileSlatsSelect) {
+            updateSelectElement(this.cache.mobileSlatsSelect, bindings.slats_sel);
+        }
+
+        // Update drag inducer checkboxes (desktop)
         if (bindings.drag_sel && Array.isArray(bindings.drag_sel)) {
             bindings.drag_sel.forEach((item: any, idx: number) => {
                 if (idx < this.cache!.dragCheckboxes.length) {
                     this.cache!.dragCheckboxes[idx].checked = item.selected;
                     this.cache!.dragCheckboxes[idx].disabled = !item.enabled;
+                }
+            });
+        }
+
+        // Update drag inducer checkboxes (mobile)
+        if (bindings.drag_sel && Array.isArray(bindings.drag_sel) && this.cache.mobileDragCheckboxes) {
+            bindings.drag_sel.forEach((item: any, idx: number) => {
+                if (idx < this.cache!.mobileDragCheckboxes!.length) {
+                    this.cache!.mobileDragCheckboxes![idx].checked = item.selected;
+                    this.cache!.mobileDragCheckboxes![idx].disabled = !item.enabled;
                 }
             });
         }
