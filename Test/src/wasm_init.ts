@@ -463,6 +463,7 @@ export class WasmApplication {
      */
     private getMobileSections(): MobileSectionConfig[] {
         return [
+            { id: 'Intro', labelKey: 'Intro' },
             { id: 'Type', labelKey: 'Aircraft Type' },
             { id: 'Era', labelKey: 'Era' },
             { id: 'Cockpit', labelKey: 'Cockpits' },
