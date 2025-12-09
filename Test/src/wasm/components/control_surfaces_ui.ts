@@ -59,7 +59,7 @@ const CONTROLS_STATS: StatDisplayConfig[] = [
 ];
 
 export class ControlSurfacesUI extends BaseComponentUI {
-    private cache: ControlSurfacesCache = undefined;
+    private cache: ControlSurfacesCache;
     public showControlSurfaces: boolean;
 
     protected shouldUpdate(): boolean {

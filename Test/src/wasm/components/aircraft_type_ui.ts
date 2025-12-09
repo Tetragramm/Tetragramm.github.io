@@ -41,7 +41,7 @@ interface AircraftTypeCache {
 }
 
 export class AircraftTypeUI extends BaseComponentUI {
-    private cache: AircraftTypeCache | undefined = undefined;
+    private cache: AircraftTypeCache;
     private includeHelicopter: boolean = false;
 
     constructor(
@@ -84,7 +84,7 @@ export class AircraftTypeUI extends BaseComponentUI {
         // Build options for the select
         const selectableTypes = this.includeHelicopter
             ? [AIRCRAFT_TYPE.AIRPLANE, AIRCRAFT_TYPE.HELICOPTER, AIRCRAFT_TYPE.AUTOGYRO,
-               AIRCRAFT_TYPE.ORNITHOPTER_BASIC, AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER, AIRCRAFT_TYPE.ORNITHOPTER_BUZZER]
+            AIRCRAFT_TYPE.ORNITHOPTER_BASIC, AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER, AIRCRAFT_TYPE.ORNITHOPTER_BUZZER]
             : SELECTABLE_TYPES;
 
         // Create wrapper for both desktop and mobile content
@@ -202,8 +202,8 @@ export class AircraftTypeUI extends BaseComponentUI {
     isOrnithopter(): boolean {
         const type = this.getCurrentType();
         return type === AIRCRAFT_TYPE.ORNITHOPTER_BASIC ||
-               type === AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER ||
-               type === AIRCRAFT_TYPE.ORNITHOPTER_BUZZER;
+            type === AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER ||
+            type === AIRCRAFT_TYPE.ORNITHOPTER_BUZZER;
     }
 
     /**

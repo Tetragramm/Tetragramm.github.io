@@ -82,7 +82,7 @@ const ACCESSORIES_STATS: StatDisplayConfig[] = [
 ];
 
 export class AccessoriesUI extends BaseComponentUI {
-    private cache: AccessoriesCache = undefined;
+    private cache: AccessoriesCache;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;

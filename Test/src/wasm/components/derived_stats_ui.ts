@@ -10,7 +10,35 @@
 
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createMobileOptionItem } from '../dom_utils';
+import { createCollapsibleSection, createMobileOptionItem, createMobileStatsGrid, StatDisplayConfig, updateMobileStatsGrid } from '../dom_utils';
+
+const MOBILE_PROP_STATS: StatDisplayConfig[] = [
+    { key: 'dropoff', label: 'Derived Dropoff', positiveIsGood: true, isDerived: false },
+    { key: 'overspeed', label: 'Derived Overspeed', positiveIsGood: true, isDerived: false },
+    { key: 'fuel_uses', label: 'Derived Fuel Uses', positiveIsGood: true, isDerived: false },
+    { key: 'reliability', label: 'Stat Reliability', positiveIsGood: true, isDerived: false },
+    { key: 'ideal_alt', label: 'Derived Ideal Engine Altitude', positiveIsGood: true, isDerived: false },
+];
+const MOBILE_AERO_STATS: StatDisplayConfig[] = [
+    { key: 'stability', label: 'Derived Stability', positiveIsGood: undefined, isDerived: false },
+    { key: 'energy_loss', label: 'Derived Energy Loss', positiveIsGood: false, isDerived: false },
+    { key: 'turn_bleed', label: 'Derived Turn Bleed', positiveIsGood: false, isDerived: false },
+    { key: 'landing_gear', label: 'Derived Landing Gear', positiveIsGood: undefined, isDerived: false },
+    { key: 'flammable', label: 'Derived Is Flammable Question', positiveIsGood: true, isDerived: false },
+];
+const MOBILE_SURV_STATS: StatDisplayConfig[] = [
+    { key: 'crashsafety', label: 'Derived Crash Safety', positiveIsGood: true },
+    { key: 'toughness', label: 'Stat Toughness', positiveIsGood: true, isDerived: false },
+    { key: 'max_strain', label: 'Stat Max Strain', positiveIsGood: true, isDerived: false },
+    { key: 'communications', label: 'Derived Communications', positiveIsGood: undefined, isDerived: false },
+];
+const MOBILE_CREW_STATS: StatDisplayConfig[] = [
+    { key: 'crew', label: 'Derived Crew/Passengers', positiveIsGood: undefined, isDerived: false },
+    { key: 'visibility', label: 'Stat Visibility', positiveIsGood: true, isDerived: false },
+    { key: 'attack', label: 'Derived Attack Modifier', positiveIsGood: true, isDerived: false },
+    { key: 'escape', label: 'Derived Escape', positiveIsGood: true, isDerived: false },
+    { key: 'flight_stress', label: 'Stat Flight Stress', positiveIsGood: false, isDerived: false },
+];
 
 /**
  * Derived Stats UI Component - displays calculated aircraft performance
@@ -30,7 +58,10 @@ export class DerivedStatsUI extends BaseComponentUI {
     private mobileUpkeepCell: HTMLElement;
     private mobileVersionCell: HTMLElement;
     private mobileMassVariationsDiv: HTMLElement;
-    private mobileStatsDiv: HTMLElement;
+    private mobilePropStatsDiv: HTMLDivElement;
+    private mobileAeroStatsDiv: HTMLDivElement;
+    private mobileSurvStatsDiv: HTMLDivElement;
+    private mobileCrewStatsDiv: HTMLDivElement;
     private mobileWeaponsDiv: HTMLElement;
     private mobileElectricsDiv: HTMLElement;
     private mobileWarningsDiv: HTMLElement;
@@ -118,7 +149,10 @@ export class DerivedStatsUI extends BaseComponentUI {
         this.mobileUpkeepCell = undefined;
         this.mobileVersionCell = undefined;
         this.mobileMassVariationsDiv = undefined;
-        this.mobileStatsDiv = undefined;
+        this.mobilePropStatsDiv = undefined;
+        this.mobileAeroStatsDiv = undefined;
+        this.mobileSurvStatsDiv = undefined;
+        this.mobileCrewStatsDiv = undefined;
         this.mobileWeaponsDiv = undefined;
         this.mobileElectricsDiv = undefined;
         this.mobileWarningsDiv = undefined;
@@ -414,7 +448,8 @@ export class DerivedStatsUI extends BaseComponentUI {
         const basicGrid = document.createElement('div');
         basicGrid.style.display = 'grid';
         basicGrid.style.gridTemplateColumns = '1fr 1fr';
-        basicGrid.style.gap = '5px';
+        basicGrid.style.columnGap = '2em';
+        basicGrid.style.rowGap = '0.5em';
 
         this.mobileCostCell = this.createMobileStatRow(basicGrid, localization.translate('Stat Cost'));
         this.mobileUpkeepCell = this.createMobileStatRow(basicGrid, localization.translate('Stat Upkeep'));
@@ -427,21 +462,55 @@ export class DerivedStatsUI extends BaseComponentUI {
             mobileDiv
         );
         this.mobileMassVariationsDiv = document.createElement('div');
-        this.mobileMassVariationsDiv.style.overflowX = 'auto';
-        this.mobileMassVariationsDiv.style.fontSize = '0.85em';
+        this.mobileMassVariationsDiv.style.display = 'grid';
+        this.mobileMassVariationsDiv.style.gridTemplateColumns = '50px repeat(5, minmax(3em, 1fr)) '
+        this.mobileMassVariationsDiv.style.gap = '0.5em';
+        this.mobileMassVariationsDiv.style.width = '100%';
         massItem.content.appendChild(this.mobileMassVariationsDiv);
 
+
         // Other stats section
-        const statsItem = createMobileOptionItem(
-            localization.translate('Derived Performance Stats'),
+        const stats = bridge.getStats();
+        const derivedStats = bridge.getDerivedStats();
+        derivedStats['landing_gear'] = bridge.getGearName();
+        derivedStats['flammable'] = bridge.getIsFlammable();
+        derivedStats['reliability'] = bridge.getReliabilityList().join(', ');
+        derivedStats['ideal_alt'] = bridge.getMinAltitude() + '-' + bridge.getMaxAltitude();
+        derivedStats['communications'] = bridge.getCommunicationName();
+        derivedStats['crew'] = bridge.getCockpitsCount() + '/' + bridge.getPassengersCount();
+        derivedStats['visibility'] = bridge.getVisibilityList().join(', ');
+        derivedStats['attack'] = bridge.getAttackList().join(', ');
+        derivedStats['escape'] = bridge.getEscapeList().join(', ');
+        derivedStats['flight_stress'] = this.flightstressCell.textContent;
+        console.log(stats);
+        console.log(derivedStats);
+        const statsAeroItem = createMobileOptionItem(
+            localization.translate('Derived Aerodynamics'),
             mobileDiv
         );
-        this.mobileStatsDiv = document.createElement('div');
-        this.mobileStatsDiv.style.display = 'grid';
-        this.mobileStatsDiv.style.gridTemplateColumns = '1fr 1fr';
-        this.mobileStatsDiv.style.gap = '5px';
-        this.mobileStatsDiv.style.fontSize = '0.9em';
-        statsItem.content.appendChild(this.mobileStatsDiv);
+        this.mobileAeroStatsDiv = createMobileStatsGrid(stats, MOBILE_AERO_STATS, derivedStats);
+        statsAeroItem.content.appendChild(this.mobileAeroStatsDiv);
+
+        const statsPropItem = createMobileOptionItem(
+            localization.translate('Derived Propulsion'),
+            mobileDiv
+        );
+        this.mobilePropStatsDiv = createMobileStatsGrid(stats, MOBILE_PROP_STATS, derivedStats);
+        statsPropItem.content.appendChild(this.mobilePropStatsDiv);
+
+        const statsSurvItem = createMobileOptionItem(
+            localization.translate('Derived Survivability'),
+            mobileDiv
+        );
+        this.mobileSurvStatsDiv = createMobileStatsGrid(stats, MOBILE_SURV_STATS, derivedStats);
+        statsSurvItem.content.appendChild(this.mobileSurvStatsDiv);
+
+        const statsCrewItem = createMobileOptionItem(
+            localization.translate('Derived Crew Members'),
+            mobileDiv
+        );
+        this.mobileCrewStatsDiv = createMobileStatsGrid(stats, MOBILE_CREW_STATS, derivedStats);
+        statsCrewItem.content.appendChild(this.mobileCrewStatsDiv);
 
         // Weapons section
         const weaponsItem = createMobileOptionItem(
@@ -1073,111 +1142,89 @@ export class DerivedStatsUI extends BaseComponentUI {
         // Update mass variations table
         if (this.mobileMassVariationsDiv) {
             this.mobileMassVariationsDiv.innerHTML = '';
-            const massTable = document.createElement('table');
-            massTable.style.width = '100%';
-            massTable.style.minWidth = '400px';
 
-            // Header row
-            const headerRow = massTable.insertRow();
-            ['', 'Boost', 'Hand', 'RoC', 'Stall', 'Speed'].forEach(text => {
-                const th = document.createElement('th');
-                th.textContent = text;
-                th.style.textAlign = 'center';
-                headerRow.appendChild(th);
-            });
+            const appendLabel = text => {
+                const label = document.createElement('div');
+                label.className = 'mobile-stat-label';
+                label.textContent = localization.translate(text);
+                const item = document.createElement('div');
+                item.className = 'mobile-stat-item';
+                item.appendChild(label);
+                this.mobileMassVariationsDiv.appendChild(item);
+            }
+            const appendValue = text => {
+                const value = document.createElement('div');
+                value.className = 'mobile-stat-value';
+                value.textContent = text;
+                const item = document.createElement('div');
+                item.className = 'mobile-stat-item';
+                item.appendChild(value);
+                this.mobileMassVariationsDiv.appendChild(item);
+            }
+
+            ['', 'Derived Boost', 'Derived Handling', 'Derived Rate of Climb', 'Derived Stall Speed', 'Derived Top Speed'].forEach(appendLabel);
 
             // Show bomb rows if needed
             if (stats.bomb_mass > 0 || this.showBombs) {
                 // Full with Bombs row
-                const fwbRow = massTable.insertRow();
-                fwbRow.insertCell().textContent = 'Full+B';
-                fwbRow.insertCell().textContent = derivedStats.boost_full_w_bombs.toString();
-                fwbRow.insertCell().textContent = derivedStats.handling_full_w_bombs.toString();
-                fwbRow.insertCell().textContent = derivedStats.rate_of_climb_w_bombs.toString();
-                fwbRow.insertCell().textContent = derivedStats.stall_speed_full_w_bombs.toString();
-                fwbRow.insertCell().textContent = Math.floor(1.0e-6 + derivedStats.max_speed_w_bombs).toString();
+                appendLabel('Derived Full Fuel with Bombs');
+                appendValue(derivedStats.boost_full_w_bombs.toString());
+                appendValue(derivedStats.handling_full_w_bombs.toString());
+                appendValue(derivedStats.rate_of_climb_w_bombs.toString());
+                appendValue(derivedStats.stall_speed_full_w_bombs.toString());
+                appendValue(Math.floor(1.0e-6 + derivedStats.max_speed_w_bombs).toString());
 
                 // Half with Bombs row
-                const hwbRow = massTable.insertRow();
-                hwbRow.insertCell().textContent = 'Half+B';
-                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.boost_empty + derivedStats.boost_full_w_bombs) / 2).toString();
-                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.handling_empty + derivedStats.handling_full_w_bombs) / 2).toString();
-                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.rate_of_climb_empty + derivedStats.rate_of_climb_w_bombs) / 2).toString();
-                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.stall_speed_empty + derivedStats.stall_speed_full_w_bombs) / 2).toString();
-                hwbRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.max_speed_empty + derivedStats.max_speed_w_bombs) / 2).toString();
+                appendLabel('Derived Half Fuel with Bombs');
+                appendValue(Math.floor(1.0e-6 + (derivedStats.boost_empty + derivedStats.boost_full_w_bombs) / 2).toString());
+                appendValue(Math.floor(1.0e-6 + (derivedStats.handling_empty + derivedStats.handling_full_w_bombs) / 2).toString());
+                appendValue(Math.floor(1.0e-6 + (derivedStats.rate_of_climb_empty + derivedStats.rate_of_climb_w_bombs) / 2).toString());
+                appendValue(Math.floor(1.0e-6 + (derivedStats.stall_speed_empty + derivedStats.stall_speed_full_w_bombs) / 2).toString());
+                appendValue(Math.floor(1.0e-6 + (derivedStats.max_speed_empty + derivedStats.max_speed_w_bombs) / 2).toString());
             }
 
             // Full row
-            const fullRow = massTable.insertRow();
-            fullRow.insertCell().textContent = 'Full';
-            fullRow.insertCell().textContent = derivedStats.boost_full.toString();
-            fullRow.insertCell().textContent = derivedStats.handling_full.toString();
-            fullRow.insertCell().textContent = derivedStats.rate_of_climb_full.toString();
-            fullRow.insertCell().textContent = derivedStats.stall_speed_full.toString();
-            fullRow.insertCell().textContent = Math.floor(1.0e-6 + derivedStats.max_speed_full).toString();
+            appendLabel('Derived Full Fuel');
+            appendValue(derivedStats.boost_full.toString());
+            appendValue(derivedStats.handling_full.toString());
+            appendValue(derivedStats.rate_of_climb_full.toString());
+            appendValue(derivedStats.stall_speed_full.toString());
+            appendValue(Math.floor(1.0e-6 + derivedStats.max_speed_full).toString());
 
             // Half row
-            const halfRow = massTable.insertRow();
-            halfRow.insertCell().textContent = 'Half';
-            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.boost_empty + derivedStats.boost_full) / 2).toString();
-            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.handling_empty + derivedStats.handling_full) / 2).toString();
-            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.rate_of_climb_empty + derivedStats.rate_of_climb_full) / 2).toString();
-            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.stall_speed_empty + derivedStats.stall_speed_full) / 2).toString();
-            halfRow.insertCell().textContent = Math.floor(1.0e-6 + (derivedStats.max_speed_empty + derivedStats.max_speed_full) / 2).toString();
+            appendLabel('Derived Half Fuel');
+            appendValue(Math.floor(1.0e-6 + (derivedStats.boost_empty + derivedStats.boost_full) / 2).toString());
+            appendValue(Math.floor(1.0e-6 + (derivedStats.handling_empty + derivedStats.handling_full) / 2).toString());
+            appendValue(Math.floor(1.0e-6 + (derivedStats.rate_of_climb_empty + derivedStats.rate_of_climb_full) / 2).toString());
+            appendValue(Math.floor(1.0e-6 + (derivedStats.stall_speed_empty + derivedStats.stall_speed_full) / 2).toString());
+            appendValue(Math.floor(1.0e-6 + (derivedStats.max_speed_empty + derivedStats.max_speed_full) / 2).toString());
 
             // Empty row
-            const emptyRow = massTable.insertRow();
-            emptyRow.insertCell().textContent = 'Empty';
-            emptyRow.insertCell().textContent = '0';
-            emptyRow.insertCell().textContent = derivedStats.handling_empty.toString();
-            emptyRow.insertCell().textContent = '0';
-            emptyRow.insertCell().textContent = derivedStats.stall_speed_empty.toString();
-            emptyRow.insertCell().textContent = '0';
-
-            this.mobileMassVariationsDiv.appendChild(massTable);
+            appendLabel('Derived Empty Fuel');
+            appendValue('0');
+            appendValue(derivedStats.handling_empty.toString());
+            appendValue('0');
+            appendValue(derivedStats.stall_speed_empty.toString());
+            appendValue('0');
         }
+
+
+        derivedStats['landing_gear'] = bridge.getGearName();
+        derivedStats['flammable'] = bridge.getIsFlammable();
+        derivedStats['reliability'] = bridge.getReliabilityList().join(', ');
+        derivedStats['ideal_alt'] = bridge.getMinAltitude() + '-' + bridge.getMaxAltitude();
+        derivedStats['communications'] = bridge.getCommunicationName();
+        derivedStats['crew'] = bridge.getCockpitsCount() + '/' + bridge.getPassengersCount();
+        derivedStats['visibility'] = bridge.getVisibilityList().join(', ');
+        derivedStats['attack'] = bridge.getAttackList().join(', ');
+        derivedStats['escape'] = bridge.getEscapeList().join(', ');
+        derivedStats['flight_stress'] = this.flightstressCell.textContent;
 
         // Update performance stats
-        if (this.mobileStatsDiv) {
-            this.mobileStatsDiv.innerHTML = '';
-
-            const addStat = (label: string, value: string) => {
-                const row = document.createElement('div');
-                row.style.display = 'flex';
-                row.style.justifyContent = 'space-between';
-                row.style.padding = '2px 5px';
-                row.style.borderBottom = '1px solid var(--inp_txt_color)';
-
-                const labelSpan = document.createElement('span');
-                labelSpan.textContent = label;
-                row.appendChild(labelSpan);
-
-                const valueSpan = document.createElement('span');
-                valueSpan.textContent = value;
-                row.appendChild(valueSpan);
-
-                this.mobileStatsDiv!.appendChild(row);
-            };
-
-            addStat(localization.translate('Derived Dropoff'), derivedStats.dropoff.toString());
-            addStat(localization.translate('Derived Stability'), derivedStats.stability.toString());
-            addStat(localization.translate('Derived Overspeed'), derivedStats.overspeed.toString());
-            addStat(localization.translate('Derived Energy Loss'), derivedStats.energy_loss.toString());
-            addStat(localization.translate('Derived Turn Bleed'), derivedStats.turn_bleed.toString());
-            addStat(localization.translate('Stat Max Strain'), derivedStats.max_strain.toString());
-            addStat(localization.translate('Stat Toughness'), derivedStats.toughness.toString());
-            addStat(localization.translate('Derived Crash Safety'), stats.crashsafety.toString());
-            addStat(localization.translate('Derived Fuel Uses'), (Math.floor(1.0e-6 + derivedStats.fuel_uses * 10) / 10).toString());
-            addStat(localization.translate('Derived Landing Gear'), bridge.getGearName());
-            addStat(localization.translate('Derived Communications'), bridge.getCommunicationName());
-            addStat(localization.translate('Stat Reliability'), bridge.getReliabilityList().join(', '));
-            addStat(localization.translate('Stat Visibility'), bridge.getVisibilityList().join(', '));
-            addStat(localization.translate('Derived Attack Modifier'), bridge.getAttackList().join(', '));
-            addStat(localization.translate('Derived Escape'), bridge.getEscapeList().join(', '));
-            addStat(localization.translate('Derived Crew/Passengers'), bridge.getCockpitsCount() + '/' + bridge.getPassengersCount());
-            addStat(localization.translate('Derived Ideal Engine Altitude'), bridge.getMinAltitude() + '-' + bridge.getMaxAltitude());
-            addStat(localization.translate('Derived Is Flammable Question'), bridge.getIsFlammable() ? localization.translate('Yes') : localization.translate('No'));
-        }
+        updateMobileStatsGrid(this.mobileAeroStatsDiv, stats, MOBILE_AERO_STATS, derivedStats);
+        updateMobileStatsGrid(this.mobilePropStatsDiv, stats, MOBILE_PROP_STATS, derivedStats);
+        updateMobileStatsGrid(this.mobileSurvStatsDiv, stats, MOBILE_SURV_STATS, derivedStats);
+        updateMobileStatsGrid(this.mobileCrewStatsDiv, stats, MOBILE_CREW_STATS, derivedStats);
 
         // Update weapons
         if (this.mobileWeaponsDiv) {
