@@ -879,6 +879,11 @@ select.flex-item {
 	gap: 0.25rem;
 }
 
+.mobile-number-spacer {
+	flex: 1 1 0;
+	min-width: 0;
+}
+
 .mobile-number-btn {
 	width: 2.5rem !important;
 	height: 2.5rem !important;
