@@ -1055,6 +1055,11 @@ select.flex-item {
 		display: block;
 	}
 
+	/* Ensure mobile nav container is always visible */
+	#mobile_nav_container {
+		display: block !important;
+	}
+
 	/* Hide desktop-style tables on mobile, show mobile alternatives */
 	.desktop-only {
 		display: none !important;
@@ -1065,7 +1070,8 @@ select.flex-item {
 	}
 
 	/* Hide all main sections except active one in mobile single-section mode */
-	body.mobile-single-section .html_content > div > div:not(.mobile-nav):not(.mobile-active-section) {
+	/* Use :not(.mobile-nav) on the parent to avoid hiding mobile nav children */
+	body.mobile-single-section .html_content > div:not(.mobile-nav) > div:not(.mobile-active-section) {
 		display: none;
 	}
 
