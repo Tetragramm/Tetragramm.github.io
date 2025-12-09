@@ -70,6 +70,7 @@ const ROTOR_STATS_CONFIG: StatDisplayConfig[] = [
 
 export class RotorUI extends BaseComponentUI {
     private cache: RotorCache | undefined = undefined;
+    private showRotors: boolean;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;
@@ -594,12 +595,12 @@ export class RotorUI extends BaseComponentUI {
         // Hide entire section for airplane and ornithopters
         // Use Number() to ensure type consistency in comparison
         const typeNum = Number(aircraftType);
-        const showRotors = typeNum === AIRCRAFT_TYPE.AUTOGYRO || typeNum === AIRCRAFT_TYPE.HELICOPTER;
+        this.showRotors = typeNum === AIRCRAFT_TYPE.AUTOGYRO || typeNum === AIRCRAFT_TYPE.HELICOPTER;
 
-        console.log(`[RotorUI] updateVisibility: aircraftType=${typeNum}, showRotors=${showRotors}`);
+        console.log(`[RotorUI] updateVisibility: aircraftType=${typeNum}, showRotors=${this.showRotors}`);
 
         if (this.sectionElement) {
-            this.sectionElement.style.display = showRotors ? '' : 'none';
+            this.sectionElement.style.display = this.showRotors ? '' : 'none';
             console.log(`[RotorUI] sectionElement.style.display set to: '${this.sectionElement.style.display}'`);
         } else {
             console.warn('[RotorUI] sectionElement is null!');
@@ -608,6 +609,10 @@ export class RotorUI extends BaseComponentUI {
         // Show appropriate sub-section
         // this.cache.autoSection.style.display = typeNum === AIRCRAFT_TYPE.AUTOGYRO ? '' : 'none';
         // this.cache.heliSection.style.display = typeNum === AIRCRAFT_TYPE.HELICOPTER ? '' : 'none';
+    }
+
+    public isVisible(): boolean {
+        return this.showRotors;
     }
 
     /**

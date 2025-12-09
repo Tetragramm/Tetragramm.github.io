@@ -110,6 +110,7 @@ interface MobileMiniWingRowCache {
 
 export class WingsUI extends BaseComponentUI {
     private cache: WingsCache = undefined;
+    private showWings: boolean;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;
@@ -250,7 +251,7 @@ export class WingsUI extends BaseComponentUI {
             addBtn.className = 'mobile-number-btn';
             addBtn.style.width = '100%';
             addBtn.style.marginTop = '0.5rem';
-            addBtn.textContent = '+ ' + localization.translate('Wings Add Wing');
+            addBtn.textContent = '+ ';
             addBtn.onclick = () => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.add_full_wing.deck.selected = 1; // First non-empty option
@@ -281,7 +282,7 @@ export class WingsUI extends BaseComponentUI {
             addMiniBtn.className = 'mobile-number-btn';
             addMiniBtn.style.width = '100%';
             addMiniBtn.style.marginTop = '0.5rem';
-            addMiniBtn.textContent = '+ ' + localization.translate('Wings Add Wing');
+            addMiniBtn.textContent = '+ ';
             addMiniBtn.onclick = () => {
                 const updatedBindings = this.getBridge().getWingsBindings();
                 updatedBindings.add_mini_wing.deck.selected = 1;
@@ -555,11 +556,15 @@ export class WingsUI extends BaseComponentUI {
      */
     private updateVisibility(aircraftType: number): void {
         const typeNum = Number(aircraftType);
-        const showWings = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+        this.showWings = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
 
         if (this.sectionElement) {
-            this.sectionElement.style.display = showWings ? '' : 'none';
+            this.sectionElement.style.display = this.showWings ? '' : 'none';
         }
+    }
+
+    public isVisible(): boolean {
+        return this.showWings;
     }
 
     /**

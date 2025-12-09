@@ -60,6 +60,7 @@ const CONTROLS_STATS: StatDisplayConfig[] = [
 
 export class ControlSurfacesUI extends BaseComponentUI {
     private cache: ControlSurfacesCache = undefined;
+    public showControlSurfaces: boolean;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;
@@ -406,11 +407,15 @@ export class ControlSurfacesUI extends BaseComponentUI {
      */
     private updateVisibility(aircraftType: number): void {
         const typeNum = Number(aircraftType);
-        const showControlSurfaces = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+        this.showControlSurfaces = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
 
         if (this.sectionElement) {
-            this.sectionElement.style.display = showControlSurfaces ? '' : 'none';
+            this.sectionElement.style.display = this.showControlSurfaces ? '' : 'none';
         }
+    }
+
+    public isVisible(): boolean {
+        return this.showControlSurfaces;
     }
 
     /**

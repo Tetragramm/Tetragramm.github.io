@@ -29,6 +29,7 @@ interface PropellerCache {
 
 export class PropellerUI extends BaseComponentUI {
     private cache: PropellerCache = undefined;
+    private showPropeller: boolean;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;
@@ -213,10 +214,14 @@ export class PropellerUI extends BaseComponentUI {
      */
     private updateVisibility(aircraftType: number): void {
         const typeNum = Number(aircraftType);
-        const showPropeller = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+        this.showPropeller = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
 
         if (this.sectionElement) {
-            this.sectionElement.style.display = showPropeller ? '' : 'none';
+            this.sectionElement.style.display = this.showPropeller ? '' : 'none';
         }
+    }
+
+    public isVisible(): boolean {
+        return this.showPropeller;
     }
 }

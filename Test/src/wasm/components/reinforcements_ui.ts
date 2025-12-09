@@ -26,6 +26,7 @@ import {
     createMobileStatsGrid,
     updateMobileStatsGrid
 } from '../dom_utils';
+import { AIRCRAFT_TYPE } from './aircraft_type_ui';
 
 // Cache interface for type safety
 interface ReinforcementsCache {
@@ -64,6 +65,7 @@ const REINFORCEMENTS_STATS: StatDisplayConfig[] = [
 
 export class ReinforcementsUI extends BaseComponentUI {
     private cache: ReinforcementsCache = undefined;
+    private showReinforcements: boolean;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;
@@ -328,6 +330,9 @@ export class ReinforcementsUI extends BaseComponentUI {
         );
 
         this.container.appendChild(this.sectionElement);
+
+        // Set initial visibility based on aircraft type
+        this.updateVisibility(bridge.getAircraftType());
 
         console.log('[ReinforcementsUI] Full rebuild complete');
     }
@@ -675,5 +680,21 @@ export class ReinforcementsUI extends BaseComponentUI {
         if (this.cache.mobileStatsGrid) {
             updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, REINFORCEMENTS_STATS, derivedStats);
         }
+    }
+
+    /**
+         * Update visibility based on aircraft type
+         */
+    private updateVisibility(aircraftType: number): void {
+        const typeNum = Number(aircraftType);
+        this.showReinforcements = typeNum !== AIRCRAFT_TYPE.HELICOPTER;
+
+        if (this.sectionElement) {
+            this.sectionElement.style.display = this.showReinforcements ? '' : 'none';
+        }
+    }
+
+    public isVisible(): boolean {
+        return this.showReinforcements;
     }
 }
