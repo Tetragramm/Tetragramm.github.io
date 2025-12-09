@@ -9,6 +9,40 @@ import {
     createMobileStatsGrid, updateMobileStatsGrid
 } from '../dom_utils';
 
+// Mobile cache interfaces
+interface MobileEngineCache {
+    engineIndex: number;
+    listSelect: HTMLSelectElement;
+    typeSelect: HTMLSelectElement;
+    rarityValue: HTMLSpanElement;
+    baseStatsGrid: HTMLDivElement;
+    coolingContent: HTMLDivElement;
+    coolingType: 'rotary' | 'air' | 'liquid';
+    radiatorSelect?: HTMLSelectElement;
+    coolingCountInput?: HTMLInputElement;
+    intakeFanCheckbox?: HTMLInputElement;
+    mountSelect?: HTMLSelectElement;
+    pushPullCheckbox?: HTMLInputElement;
+    torqueCheckbox?: HTMLInputElement;
+    driveshaftCheckbox?: HTMLInputElement;
+    outboardCheckbox?: HTMLInputElement;
+    gearCountInput?: HTMLInputElement;
+    gearReliabilityInput?: HTMLInputElement;
+    cowlSelect?: HTMLSelectElement;
+    alternatorCheckbox?: HTMLInputElement;
+    generatorCheckbox?: HTMLInputElement;
+    statsGrid: HTMLDivElement;
+}
+
+interface MobileRadiatorCache {
+    radiatorIndex: number;
+    typeSelect: HTMLSelectElement;
+    mountSelect: HTMLSelectElement;
+    coolantSelect: HTMLSelectElement;
+    hardenCheckbox?: HTMLInputElement;
+    statsGrid: HTMLDivElement;
+}
+
 // Engine stats configuration for stats table
 const ENGINE_STATS: StatDisplayConfig[] = [
     // Row 1
@@ -64,6 +98,10 @@ export class EnginesUI extends BaseComponentUI {
     private mobileRadiatorContent: HTMLDivElement;
     private mobileRadiatorNavLabel: HTMLSpanElement;
 
+    // Mobile caches
+    private mobileEngineCache: MobileEngineCache | undefined;
+    private mobileRadiatorCache: MobileRadiatorCache | undefined;
+
     // Cached engine/radiator UIs (will be cleared when counts change)
     private engineUIs: EngineUI[];
     private radiatorUIs: RadiatorUI[];
@@ -108,6 +146,8 @@ export class EnginesUI extends BaseComponentUI {
         this.mobileRadiatorNavLabel = undefined;
         this.mobileSelectedEngine = 0;
         this.mobileSelectedRadiator = 0;
+        this.mobileEngineCache = undefined;
+        this.mobileRadiatorCache = undefined;
         this.engineUIs = [];
         this.radiatorUIs = [];
         this.cachedEngineCount = 0;
@@ -336,6 +376,7 @@ export class EnginesUI extends BaseComponentUI {
     private rebuildMobileEngines(): void {
         if (!this.mobileEnginesContainer) return;
         this.mobileEnginesContainer.innerHTML = '';
+        this.mobileEngineCache = undefined; // Clear cache when rebuilding
 
         const bridge = this.getBridge();
         const bindings = bridge.getEnginesBindings();
@@ -402,7 +443,6 @@ export class EnginesUI extends BaseComponentUI {
 
     private updateMobileEngineContent(): void {
         if (!this.mobileEngineContent) return;
-        this.mobileEngineContent.innerHTML = '';
 
         const bridge = this.getBridge();
         const bindings = bridge.getEnginesBindings();
@@ -416,6 +456,34 @@ export class EnginesUI extends BaseComponentUI {
 
         if (idx >= engineCount) return;
 
+        // Determine current cooling type for cache validation
+        const fullStats = bridge.getEngineFullStats(idx);
+        const currentCoolingType = this.determineCoolingType(fullStats);
+
+        // Check if cache is valid
+        if (this.mobileEngineCache &&
+            this.mobileEngineCache.engineIndex === idx &&
+            this.mobileEngineCache.coolingType === currentCoolingType) {
+            // Update existing cache values
+            this.updateMobileEngineCacheValues(bridge, idx);
+        } else {
+            // Rebuild content and create new cache
+            this.buildMobileEngineContent(bridge, idx);
+        }
+    }
+
+    private determineCoolingType(fullStats: any): 'rotary' | 'air' | 'liquid' {
+        if (fullStats.oiltank) return 'rotary';
+        const cooling = fullStats.stats.cooling || 0;
+        return cooling === 0 ? 'air' : 'liquid';
+    }
+
+    private buildMobileEngineContent(bridge: AircraftBridge, idx: number): void {
+        this.mobileEngineContent.innerHTML = '';
+
+        const fullStats = bridge.getEngineFullStats(idx);
+        const coolingType = this.determineCoolingType(fullStats);
+
         // Engine Selection section
         const selectionItem = createMobileOptionItem(
             localization.translate('Engines Engine Type'),
@@ -426,7 +494,7 @@ export class EnginesUI extends BaseComponentUI {
         const allLists = bridge.getEngineNamesOfLists();
         const selectedList = bridge.getEngineSelectedList(idx);
 
-        createMobileSelect(
+        const listSelect = createMobileSelect(
             {
                 name: localization.translate('Engine List'),
                 options: allLists.map(o => ({ name: o, enabled: true })),
@@ -444,7 +512,7 @@ export class EnginesUI extends BaseComponentUI {
         const enginesInList = bridge.getEngineNamesInList(selectedList);
         const selectedEngine = bridge.getEngineSelectedName(idx);
 
-        createMobileSelect(
+        const typeSelect = createMobileSelect(
             {
                 name: localization.translate('Engine Type'),
                 options: enginesInList.map(o => ({ name: o, enabled: true })),
@@ -459,7 +527,6 @@ export class EnginesUI extends BaseComponentUI {
         );
 
         // Engine base stats display
-        const fullStats = bridge.getEngineFullStats(idx);
         const baseStatsDiv = document.createElement('div');
         baseStatsDiv.style.fontSize = '0.85em';
         baseStatsDiv.style.marginTop = '0.5rem';
@@ -481,12 +548,76 @@ export class EnginesUI extends BaseComponentUI {
         baseStatsDiv.appendChild(rarityDiv);
 
         // Key engine stats in a grid
-        const statsGrid = document.createElement('div');
-        statsGrid.style.display = 'grid';
-        statsGrid.style.gridTemplateColumns = '1fr 1fr';
-        statsGrid.style.gap = '0.25rem';
-        statsGrid.style.marginTop = '0.25rem';
+        const baseStatsGrid = document.createElement('div');
+        baseStatsGrid.style.display = 'grid';
+        baseStatsGrid.style.gridTemplateColumns = '1fr 1fr';
+        baseStatsGrid.style.gap = '0.25rem';
+        baseStatsGrid.style.marginTop = '0.25rem';
 
+        this.populateBaseStatsGrid(baseStatsGrid, fullStats);
+        baseStatsDiv.appendChild(baseStatsGrid);
+        selectionItem.content.appendChild(baseStatsDiv);
+
+        // Get engine bindings for options
+        const engineBindings = bridge.getEngineBindings(idx);
+
+        // Cooling section
+        const coolingItem = createMobileOptionItem(
+            localization.translate('Engine Cooling'),
+            this.mobileEngineContent
+        );
+        const coolingElements = this.buildMobileCoolingSectionWithCache(coolingItem.content, engineBindings, fullStats, idx);
+
+        // Mounting section
+        const mountingItem = createMobileOptionItem(
+            localization.translate('Engine Mounting'),
+            this.mobileEngineContent
+        );
+        const mountingElements = this.buildMobileMountingSectionWithCache(mountingItem.content, engineBindings, idx);
+
+        // Upgrades section
+        const upgradesItem = createMobileOptionItem(
+            localization.translate('Engine Upgrades'),
+            this.mobileEngineContent
+        );
+        const upgradesElements = this.buildMobileUpgradesSectionWithCache(upgradesItem.content, engineBindings, idx);
+
+        // Cowl & Electrical section
+        const cowlItem = createMobileOptionItem(
+            localization.translate('Engine Cowls') + ' & ' + localization.translate('Engine Electrical'),
+            this.mobileEngineContent
+        );
+        const cowlElements = this.buildMobileCowlElectricalSectionWithCache(cowlItem.content, engineBindings, idx);
+
+        // Full Stats section
+        const statsItem = createMobileOptionItem(
+            localization.translate('Engines Engine Stats'),
+            this.mobileEngineContent
+        );
+        const engineStats = bridge.getEngineStats(idx);
+        const derivedStats = bridge.getEngineDerivedStats(idx);
+        const statsGrid = createMobileStatsGrid(engineStats, ENGINE_STATS, derivedStats);
+        statsItem.content.appendChild(statsGrid);
+
+        // Store cache
+        this.mobileEngineCache = {
+            engineIndex: idx,
+            listSelect,
+            typeSelect,
+            rarityValue,
+            baseStatsGrid,
+            coolingContent: coolingItem.content as HTMLDivElement,
+            coolingType,
+            ...coolingElements,
+            ...mountingElements,
+            ...upgradesElements,
+            ...cowlElements,
+            statsGrid
+        };
+    }
+
+    private populateBaseStatsGrid(grid: HTMLDivElement, fullStats: any): void {
+        grid.innerHTML = '';
         const baseStats = [
             { label: localization.translate('Stat Power'), value: fullStats.stats.power },
             { label: localization.translate('Stat Mass'), value: fullStats.stats.mass },
@@ -505,56 +636,142 @@ export class EnginesUI extends BaseComponentUI {
             row.style.display = 'flex';
             row.style.justifyContent = 'space-between';
             row.innerHTML = `<span>${stat.label}:</span><span>${stat.value}</span>`;
-            statsGrid.appendChild(row);
+            grid.appendChild(row);
         });
-        baseStatsDiv.appendChild(statsGrid);
-        selectionItem.content.appendChild(baseStatsDiv);
-
-        // Get engine bindings for options
-        const engineBindings = bridge.getEngineBindings(idx);
-
-        // Cooling section
-        const coolingItem = createMobileOptionItem(
-            localization.translate('Engine Cooling'),
-            this.mobileEngineContent
-        );
-        this.buildMobileCoolingSection(coolingItem.content, engineBindings, fullStats, idx);
-
-        // Mounting section
-        const mountingItem = createMobileOptionItem(
-            localization.translate('Engine Mounting'),
-            this.mobileEngineContent
-        );
-        this.buildMobileMountingSection(mountingItem.content, engineBindings, idx);
-
-        // Upgrades section
-        const upgradesItem = createMobileOptionItem(
-            localization.translate('Engine Upgrades'),
-            this.mobileEngineContent
-        );
-        this.buildMobileUpgradesSection(upgradesItem.content, engineBindings, idx);
-
-        // Cowl & Electrical section
-        const cowlItem = createMobileOptionItem(
-            localization.translate('Engine Cowls') + ' & ' + localization.translate('Engine Electrical'),
-            this.mobileEngineContent
-        );
-        this.buildMobileCowlElectricalSection(cowlItem.content, engineBindings, idx);
-
-        // Full Stats section
-        const statsItem = createMobileOptionItem(
-            localization.translate('Engines Engine Stats'),
-            this.mobileEngineContent
-        );
-        const engineStats = bridge.getEngineStats(idx);
-        const derivedStats = bridge.getEngineDerivedStats(idx);
-        const mobileStatsGrid = createMobileStatsGrid(engineStats, ENGINE_STATS, derivedStats);
-        statsItem.content.appendChild(mobileStatsGrid);
     }
 
-    private buildMobileCoolingSection(container: HTMLElement, bindings: any, fullStats: any, idx: number): void {
+    private updateMobileEngineCacheValues(bridge: AircraftBridge, idx: number): void {
+        if (!this.mobileEngineCache) return;
+
+        const cache = this.mobileEngineCache;
+        const fullStats = bridge.getEngineFullStats(idx);
+        const engineBindings = bridge.getEngineBindings(idx);
+
+        // Update list select
+        const allLists = bridge.getEngineNamesOfLists();
+        const selectedList = bridge.getEngineSelectedList(idx);
+        cache.listSelect.innerHTML = '';
+        allLists.forEach((list, i) => {
+            const opt = document.createElement('option');
+            opt.value = i.toString();
+            opt.textContent = list;
+            cache.listSelect.appendChild(opt);
+        });
+        cache.listSelect.selectedIndex = allLists.indexOf(selectedList);
+
+        // Update type select
+        const enginesInList = bridge.getEngineNamesInList(selectedList);
+        const selectedEngine = bridge.getEngineSelectedName(idx);
+        cache.typeSelect.innerHTML = '';
+        enginesInList.forEach((eng, i) => {
+            const opt = document.createElement('option');
+            opt.value = i.toString();
+            opt.textContent = eng;
+            cache.typeSelect.appendChild(opt);
+        });
+        cache.typeSelect.selectedIndex = enginesInList.indexOf(selectedEngine);
+
+        // Update rarity
+        cache.rarityValue.className = this.getRarityClass(fullStats.rarity);
+        cache.rarityValue.textContent = this.getRarityText(fullStats.rarity);
+
+        // Update base stats grid
+        this.populateBaseStatsGrid(cache.baseStatsGrid, fullStats);
+
+        // Update cooling section elements based on type
+        if (cache.coolingType === 'liquid') {
+            if (cache.radiatorSelect) {
+                const radiatorCount = bridge.getNumberOfRadiators();
+                cache.radiatorSelect.innerHTML = '';
+                for (let i = 0; i < radiatorCount; i++) {
+                    const opt = document.createElement('option');
+                    opt.value = i.toString();
+                    opt.textContent = localization.translateWithParam('Vital Part Radiator', i + 1);
+                    cache.radiatorSelect.appendChild(opt);
+                }
+                cache.radiatorSelect.selectedIndex = engineBindings.radiator_index?.selected || 0;
+            }
+            if (cache.coolingCountInput && engineBindings.cooling_count) {
+                cache.coolingCountInput.value = engineBindings.cooling_count.value.toString();
+                cache.coolingCountInput.disabled = !engineBindings.cooling_count.enabled;
+            }
+        } else if (cache.coolingType === 'air' && cache.intakeFanCheckbox && engineBindings.intake_fan) {
+            cache.intakeFanCheckbox.checked = engineBindings.intake_fan.selected;
+            cache.intakeFanCheckbox.disabled = !engineBindings.intake_fan.enabled;
+        }
+
+        // Update mounting section
+        if (cache.mountSelect) {
+            cache.mountSelect.innerHTML = '';
+            engineBindings.mount_sel.options.forEach((opt: any, i: number) => {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                option.textContent = opt.name;
+                option.disabled = !opt.enabled;
+                cache.mountSelect.appendChild(option);
+            });
+            cache.mountSelect.selectedIndex = engineBindings.mount_sel.selected;
+            cache.mountSelect.disabled = !engineBindings.mount_sel.enabled;
+        }
+        if (cache.pushPullCheckbox && engineBindings.is_push_pull) {
+            cache.pushPullCheckbox.checked = engineBindings.is_push_pull.selected;
+            cache.pushPullCheckbox.disabled = !engineBindings.is_push_pull.enabled;
+        }
+        if (cache.torqueCheckbox && engineBindings.torque_to_struct) {
+            cache.torqueCheckbox.checked = engineBindings.torque_to_struct.selected;
+            cache.torqueCheckbox.disabled = !engineBindings.torque_to_struct.enabled;
+        }
+
+        // Update upgrades section
+        if (cache.driveshaftCheckbox && engineBindings.extended_ds) {
+            cache.driveshaftCheckbox.checked = engineBindings.extended_ds.selected;
+            cache.driveshaftCheckbox.disabled = !engineBindings.extended_ds.enabled;
+        }
+        if (cache.outboardCheckbox && engineBindings.outboard_prop) {
+            cache.outboardCheckbox.checked = engineBindings.outboard_prop.selected;
+            cache.outboardCheckbox.disabled = !engineBindings.outboard_prop.enabled;
+        }
+        if (cache.gearCountInput && engineBindings.gear_count) {
+            cache.gearCountInput.value = engineBindings.gear_count.value.toString();
+            cache.gearCountInput.disabled = !engineBindings.gear_count.enabled;
+        }
+        if (cache.gearReliabilityInput && engineBindings.geared_reliability) {
+            cache.gearReliabilityInput.value = engineBindings.geared_reliability.value.toString();
+            cache.gearReliabilityInput.disabled = !engineBindings.geared_reliability.enabled;
+        }
+
+        // Update cowl & electrical section
+        if (cache.cowlSelect) {
+            cache.cowlSelect.innerHTML = '';
+            engineBindings.cowl_sel.options.forEach((opt: any, i: number) => {
+                const option = document.createElement('option');
+                option.value = i.toString();
+                option.textContent = opt.name;
+                option.disabled = !opt.enabled;
+                cache.cowlSelect.appendChild(option);
+            });
+            cache.cowlSelect.selectedIndex = engineBindings.cowl_sel.selected;
+            cache.cowlSelect.disabled = !engineBindings.cowl_sel.enabled;
+        }
+        if (cache.alternatorCheckbox && engineBindings.has_alternator) {
+            cache.alternatorCheckbox.checked = engineBindings.has_alternator.selected;
+            cache.alternatorCheckbox.disabled = !engineBindings.has_alternator.enabled;
+        }
+        if (cache.generatorCheckbox && engineBindings.is_generator) {
+            cache.generatorCheckbox.checked = engineBindings.is_generator.selected;
+            cache.generatorCheckbox.disabled = !engineBindings.is_generator.enabled;
+        }
+
+        // Update stats grid
+        const engineStats = bridge.getEngineStats(idx);
+        const derivedStats = bridge.getEngineDerivedStats(idx);
+        updateMobileStatsGrid(cache.statsGrid, engineStats, ENGINE_STATS, derivedStats);
+    }
+
+    private buildMobileCoolingSectionWithCache(container: HTMLElement, bindings: any, fullStats: any, idx: number): Partial<MobileEngineCache> {
         const bridge = this.getBridge();
         const cooling = fullStats.stats.cooling || 0;
+        const result: Partial<MobileEngineCache> = {};
 
         if (fullStats.oiltank) {
             // Rotary engine
@@ -570,7 +787,7 @@ export class EnginesUI extends BaseComponentUI {
 
             // Intake fan checkbox (for turbines)
             if (bindings.intake_fan && bindings.intake_fan.enabled) {
-                createMobileCheckbox(
+                result.intakeFanCheckbox = createMobileCheckbox(
                     bindings.intake_fan,
                     container,
                     (checked) => {
@@ -585,7 +802,7 @@ export class EnginesUI extends BaseComponentUI {
             // Liquid-cooled engine
             const radiatorCount = bridge.getNumberOfRadiators();
             if (radiatorCount > 0) {
-                createMobileSelect(
+                result.radiatorSelect = createMobileSelect(
                     {
                         name: localization.translate('Engine Select Radiator'),
                         options: Array.from({ length: radiatorCount }, (_, i) => ({
@@ -607,7 +824,7 @@ export class EnginesUI extends BaseComponentUI {
 
             // Cooling count
             if (bindings.cooling_count) {
-                createMobileNumberInput(
+                const { input } = createMobileNumberInput(
                     bindings.cooling_count,
                     container,
                     (value) => {
@@ -618,15 +835,19 @@ export class EnginesUI extends BaseComponentUI {
                     },
                     0, 99, 1
                 );
+                result.coolingCountInput = input;
             }
         }
+
+        return result;
     }
 
-    private buildMobileMountingSection(container: HTMLElement, bindings: any, idx: number): void {
+    private buildMobileMountingSectionWithCache(container: HTMLElement, bindings: any, idx: number): Partial<MobileEngineCache> {
         const bridge = this.getBridge();
+        const result: Partial<MobileEngineCache> = {};
 
         // Mounting location
-        createMobileSelect(
+        result.mountSelect = createMobileSelect(
             {
                 name: localization.translate('Engine Mounting Location'),
                 options: bindings.mount_sel.options,
@@ -644,7 +865,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Push-pull checkbox
         if (bindings.is_push_pull) {
-            createMobileCheckbox(
+            result.pushPullCheckbox = createMobileCheckbox(
                 bindings.is_push_pull,
                 container,
                 (checked) => {
@@ -658,7 +879,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Torque to structure checkbox
         if (bindings.torque_to_struct) {
-            createMobileCheckbox(
+            result.torqueCheckbox = createMobileCheckbox(
                 bindings.torque_to_struct,
                 container,
                 (checked) => {
@@ -669,14 +890,17 @@ export class EnginesUI extends BaseComponentUI {
                 }
             );
         }
+
+        return result;
     }
 
-    private buildMobileUpgradesSection(container: HTMLElement, bindings: any, idx: number): void {
+    private buildMobileUpgradesSectionWithCache(container: HTMLElement, bindings: any, idx: number): Partial<MobileEngineCache> {
         const bridge = this.getBridge();
+        const result: Partial<MobileEngineCache> = {};
 
         // Extended driveshafts
         if (bindings.extended_ds) {
-            createMobileCheckbox(
+            result.driveshaftCheckbox = createMobileCheckbox(
                 bindings.extended_ds,
                 container,
                 (checked) => {
@@ -690,7 +914,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Outboard propeller
         if (bindings.outboard_prop) {
-            createMobileCheckbox(
+            result.outboardCheckbox = createMobileCheckbox(
                 bindings.outboard_prop,
                 container,
                 (checked) => {
@@ -704,7 +928,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Geared propeller count
         if (bindings.gear_count) {
-            createMobileNumberInput(
+            const { input } = createMobileNumberInput(
                 bindings.gear_count,
                 container,
                 (value) => {
@@ -715,11 +939,12 @@ export class EnginesUI extends BaseComponentUI {
                 },
                 0, 10, 1
             );
+            result.gearCountInput = input;
         }
 
         // Geared propeller reliability
         if (bindings.geared_reliability) {
-            createMobileNumberInput(
+            const { input } = createMobileNumberInput(
                 bindings.geared_reliability,
                 container,
                 (value) => {
@@ -730,14 +955,18 @@ export class EnginesUI extends BaseComponentUI {
                 },
                 0, 10, 1
             );
+            result.gearReliabilityInput = input;
         }
+
+        return result;
     }
 
-    private buildMobileCowlElectricalSection(container: HTMLElement, bindings: any, idx: number): void {
+    private buildMobileCowlElectricalSectionWithCache(container: HTMLElement, bindings: any, idx: number): Partial<MobileEngineCache> {
         const bridge = this.getBridge();
+        const result: Partial<MobileEngineCache> = {};
 
         // Cowl select
-        createMobileSelect(
+        result.cowlSelect = createMobileSelect(
             {
                 name: localization.translate('Engine Cowls'),
                 options: bindings.cowl_sel.options,
@@ -755,7 +984,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Alternator checkbox
         if (bindings.has_alternator) {
-            createMobileCheckbox(
+            result.alternatorCheckbox = createMobileCheckbox(
                 bindings.has_alternator,
                 container,
                 (checked) => {
@@ -769,7 +998,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Generator checkbox
         if (bindings.is_generator) {
-            createMobileCheckbox(
+            result.generatorCheckbox = createMobileCheckbox(
                 bindings.is_generator,
                 container,
                 (checked) => {
@@ -780,6 +1009,8 @@ export class EnginesUI extends BaseComponentUI {
                 }
             );
         }
+
+        return result;
     }
 
     private getRarityText(rarity: any): string {
@@ -823,6 +1054,7 @@ export class EnginesUI extends BaseComponentUI {
     private rebuildMobileRadiators(): void {
         if (!this.mobileRadiatorsContainer) return;
         this.mobileRadiatorsContainer.innerHTML = '';
+        this.mobileRadiatorCache = undefined; // Clear cache when rebuilding
 
         const bridge = this.getBridge();
         const bindings = bridge.getEnginesBindings();
@@ -890,7 +1122,6 @@ export class EnginesUI extends BaseComponentUI {
 
     private updateMobileRadiatorContent(): void {
         if (!this.mobileRadiatorContent) return;
-        this.mobileRadiatorContent.innerHTML = '';
 
         const bridge = this.getBridge();
         const bindings = bridge.getEnginesBindings();
@@ -904,6 +1135,19 @@ export class EnginesUI extends BaseComponentUI {
 
         if (idx >= radiatorCount) return;
 
+        // Check if cache is valid for this radiator
+        if (this.mobileRadiatorCache && this.mobileRadiatorCache.radiatorIndex === idx) {
+            // Update existing cache values
+            this.updateMobileRadiatorCacheValues(bridge, idx);
+        } else {
+            // Rebuild content and create new cache
+            this.buildMobileRadiatorContent(bridge, idx);
+        }
+    }
+
+    private buildMobileRadiatorContent(bridge: AircraftBridge, idx: number): void {
+        this.mobileRadiatorContent.innerHTML = '';
+
         const radiatorBindings = bridge.getRadiatorBindings(idx);
 
         // Radiator Type section
@@ -911,7 +1155,7 @@ export class EnginesUI extends BaseComponentUI {
             localization.translate('Radiators Radiator Type'),
             this.mobileRadiatorContent
         );
-        createMobileSelect(
+        const typeSelect = createMobileSelect(
             {
                 name: '',
                 options: radiatorBindings.idx_type.options,
@@ -932,7 +1176,7 @@ export class EnginesUI extends BaseComponentUI {
             localization.translate('Radiators Mounting'),
             this.mobileRadiatorContent
         );
-        createMobileSelect(
+        const mountSelect = createMobileSelect(
             {
                 name: '',
                 options: radiatorBindings.idx_mount.options,
@@ -953,7 +1197,7 @@ export class EnginesUI extends BaseComponentUI {
             localization.translate('Radiators Coolant'),
             this.mobileRadiatorContent
         );
-        createMobileSelect(
+        const coolantSelect = createMobileSelect(
             {
                 name: '',
                 options: radiatorBindings.idx_coolant.options,
@@ -970,8 +1214,9 @@ export class EnginesUI extends BaseComponentUI {
         );
 
         // Harden checkbox (if available)
+        let hardenCheckbox: HTMLInputElement | undefined;
         if (radiatorBindings.harden_cool) {
-            createMobileCheckbox(
+            hardenCheckbox = createMobileCheckbox(
                 radiatorBindings.harden_cool,
                 coolantItem.content,
                 (checked) => {
@@ -992,8 +1237,72 @@ export class EnginesUI extends BaseComponentUI {
         );
         const stats = bridge.getRadiatorStats(idx);
         const derived = { flammable: bridge.getRadiatorFlammable(idx) };
-        const mobileStatsGrid = createMobileStatsGrid(stats, RADIATOR_STATS, derived);
-        statsItem.content.appendChild(mobileStatsGrid);
+        const statsGrid = createMobileStatsGrid(stats, RADIATOR_STATS, derived);
+        statsItem.content.appendChild(statsGrid);
+
+        // Store cache
+        this.mobileRadiatorCache = {
+            radiatorIndex: idx,
+            typeSelect,
+            mountSelect,
+            coolantSelect,
+            hardenCheckbox,
+            statsGrid
+        };
+    }
+
+    private updateMobileRadiatorCacheValues(bridge: AircraftBridge, idx: number): void {
+        if (!this.mobileRadiatorCache) return;
+
+        const cache = this.mobileRadiatorCache;
+        const radiatorBindings = bridge.getRadiatorBindings(idx);
+
+        // Update type select
+        cache.typeSelect.innerHTML = '';
+        radiatorBindings.idx_type.options.forEach((opt: any, i: number) => {
+            const option = document.createElement('option');
+            option.value = i.toString();
+            option.textContent = opt.name;
+            option.disabled = !opt.enabled;
+            cache.typeSelect.appendChild(option);
+        });
+        cache.typeSelect.selectedIndex = radiatorBindings.idx_type.selected;
+        cache.typeSelect.disabled = !radiatorBindings.idx_type.enabled;
+
+        // Update mount select
+        cache.mountSelect.innerHTML = '';
+        radiatorBindings.idx_mount.options.forEach((opt: any, i: number) => {
+            const option = document.createElement('option');
+            option.value = i.toString();
+            option.textContent = opt.name;
+            option.disabled = !opt.enabled;
+            cache.mountSelect.appendChild(option);
+        });
+        cache.mountSelect.selectedIndex = radiatorBindings.idx_mount.selected;
+        cache.mountSelect.disabled = !radiatorBindings.idx_mount.enabled;
+
+        // Update coolant select
+        cache.coolantSelect.innerHTML = '';
+        radiatorBindings.idx_coolant.options.forEach((opt: any, i: number) => {
+            const option = document.createElement('option');
+            option.value = i.toString();
+            option.textContent = opt.name;
+            option.disabled = !opt.enabled;
+            cache.coolantSelect.appendChild(option);
+        });
+        cache.coolantSelect.selectedIndex = radiatorBindings.idx_coolant.selected;
+        cache.coolantSelect.disabled = !radiatorBindings.idx_coolant.enabled;
+
+        // Update harden checkbox if it exists
+        if (cache.hardenCheckbox && radiatorBindings.harden_cool) {
+            cache.hardenCheckbox.checked = radiatorBindings.harden_cool.selected;
+            cache.hardenCheckbox.disabled = !radiatorBindings.harden_cool.enabled;
+        }
+
+        // Update stats grid
+        const stats = bridge.getRadiatorStats(idx);
+        const derived = { flammable: bridge.getRadiatorFlammable(idx) };
+        updateMobileStatsGrid(cache.statsGrid, stats, RADIATOR_STATS, derived);
     }
 
     private rebuildEngines(): void {
