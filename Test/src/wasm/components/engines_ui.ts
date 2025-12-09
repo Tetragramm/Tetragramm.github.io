@@ -360,6 +360,7 @@ export class EnginesUI extends BaseComponentUI {
         } else {
             // Just update existing engine UIs
             this.engineUIs.forEach(engineUI => engineUI.update());
+            this.updateMobileEngineContent();
         }
 
         // Rebuild radiator UIs if count changed
@@ -370,6 +371,7 @@ export class EnginesUI extends BaseComponentUI {
         } else {
             // Just update existing radiator UIs
             this.radiatorUIs.forEach(radiatorUI => radiatorUI.update());
+            this.updateMobileRadiatorContent();
         }
     }
 
