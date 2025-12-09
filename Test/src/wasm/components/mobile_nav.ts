@@ -259,11 +259,16 @@ export class MobileNavigation {
         const visibleSections = this.getVisibleSections();
         if (index < 0 || index >= visibleSections.length) return;
 
-        // Hide all sections
+        const isMobile = MobileNavigation.isMobileView();
+
+        // Hide all sections (only on mobile)
         this.sections.forEach(section => {
             const elem = document.getElementById(section.id);
             if (elem) {
                 elem.classList.remove('mobile-active-section');
+                if (isMobile) {
+                    elem.style.display = 'none';
+                }
             }
         });
 
@@ -272,6 +277,9 @@ export class MobileNavigation {
         const elem = document.getElementById(section.id);
         if (elem) {
             elem.classList.add('mobile-active-section');
+            if (isMobile) {
+                elem.style.display = '';
+            }
             // Scroll to top of section
             elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -314,17 +322,18 @@ export class MobileNavigation {
     private updateMobileSingleSectionMode(): void {
         if (MobileNavigation.isMobileView()) {
             document.body.classList.add('mobile-single-section');
-            // Ensure a section is active
+            // Ensure a section is active and hide others
             if (this.sections.length > 0) {
                 this.showSection(this.currentIndex);
             }
         } else {
             document.body.classList.remove('mobile-single-section');
-            // Remove mobile-active-section from all sections when not in mobile mode
+            // Show all sections when not in mobile mode
             this.sections.forEach(section => {
                 const elem = document.getElementById(section.id);
                 if (elem) {
                     elem.classList.remove('mobile-active-section');
+                    elem.style.display = '';
                 }
             });
         }
