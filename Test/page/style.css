@@ -1069,6 +1069,28 @@ select.flex-item {
 		display: none;
 	}
 
+	/* Hide br elements between sections on mobile to avoid empty space */
+	body.mobile-single-section .html_content > div > br {
+		display: none;
+	}
+
+	/* Hide collapsible headers on mobile - the nav dropdown shows the section title */
+	body.mobile-single-section h3.collapsible,
+	body.mobile-single-section h3:not(.collapsible) {
+		display: none;
+	}
+
+	/* Hide the h4 subtitle/rules links on mobile */
+	body.mobile-single-section .mobile-active-section > h4 {
+		display: none;
+	}
+
+	/* Ensure collapsible content is always visible on mobile */
+	body.mobile-single-section .content {
+		max-height: none !important;
+		display: block !important;
+	}
+
 	/* Make collapsible sections full-width and properly spaced */
 	.collapsible {
 		max-width: 100%;

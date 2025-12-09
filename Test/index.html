@@ -71,81 +71,81 @@
 				</span><br />
 				<span><a href="https://opensketch.itch.io/chariots-of-steel">Chariots of Steel</a> is out! Try the <a
 						href="https://tetragramm.github.io/VehicleBuilder/">Vehicle Builder</a></span>
+			</div>
+			<br />
+			<div id="Type">
+				<h3><label id="lbl_acft_type">Aircraft Type</label>
+				</h3>
+				<h4>
+					<span> <select id="acft_type"></select></span>
+				</h4>
 				<br />
-				<div id="Type">
-					<h3><label id="lbl_acft_type">Aircraft Type</label>
-					</h3>
-					<h4>
-						<span> <select id="acft_type"></select></span>
-					</h4>
+			</div>
+			<div id="Era">
+				<h3 class="collapsible active"><label id="lbl_era">Era</label>
+				</h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Era"><u>Rules</u></a>)</span>
+				</h4>
+				<div class="content">
+					<table style="width:100%" id="table_era">
+					</table>
+				</div>
+			</div>
+			<br />
+			<div id="AircraftType">
+				<!-- Aircraft Type selector (Airplane/Autogyro/Ornithopter) - populated by WASM -->
+			</div>
+			<br />
+			<div id="Cockpit">
+				<h3 class="collapsible active">
+					<label id="lbl_cockpits">Cockpits</label>
+				</h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Crew"><u>Rules</u></a>)</span>
 					<br />
-				</div>
-				<div id="Era">
-					<h3 class="collapsible active"><label id="lbl_era">Era</label>
-					</h3>
+				</h4>
+				<div class="content">
 					<h4>
-						<span>(<a href="./Rules/Rules.htm#_Era"><u>Rules</u></a>)</span>
+						<span> <label id="lbl_num_cockpits" for="num_cockpits">Number of Cockpits:</label> <input
+								type="number" id="num_cockpits" min="1" max="20" value="1" /></span>
 					</h4>
-					<div class="content">
-						<table style="width:100%" id="table_era">
-						</table>
-					</div>
+					<table style="width:100%" id="table_cockpit"></table>
 				</div>
-				<br />
-				<div id="AircraftType">
-					<!-- Aircraft Type selector (Airplane/Autogyro/Ornithopter) - populated by WASM -->
+			</div>
+			<br />
+			<div id="Passengers">
+				<h3 id="passenger_collapse" class="collapsible">
+					<label id="lbl_passengers">Passengers</label>
+				</h3>
+				<h4><span>(<a href="./Rules/Rules.htm#_Passenger_Capacity"><u>Rules</u></a>)</span></h4>
+				<div class="content" style="max-height: 0px;">
+					<table style="width:100%" id="table_passengers"></table>
 				</div>
-				<br />
-				<div id="Cockpit">
-					<h3 class="collapsible active">
-						<label id="lbl_cockpits">Cockpits</label>
-					</h3>
+			</div>
+			<br />
+			<div id="Engines">
+				<h3 class="collapsible active">
+					<label id="lbl_engines">Engines</label>
+				</h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Engines"><u>Engine Rules</u></a>)</span>
+					<span>(<a href="./Rules/Rules.htm#_Engine_Upgrades"><u>Upgrade Rules</u></a>)</span>
+					<span>(<a href="./Rules/Rules.htm#_Cooling_(Air)"><u>Cooling Rules</u></a>)</span>
+					<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
+				</h4>
+				<div class="content">
 					<h4>
-						<span>(<a href="./Rules/Rules.htm#_Crew"><u>Rules</u></a>)</span>
-						<br />
+						<span> <label id="lbl_num_engines" for="num_engines">Number of Engines:</label> <input
+								type="number" id="num_engines" min="0" max="20" value="1" /></span>
+						<span> <label id="lbl_num_radiators" for="num_radiators">Number of Radiators:</label> <input
+								type="number" id="num_radiators" min="1" max="20" value="0" /></span>
+						<span><label id="lbl_asymmetric" for="asymmetric">Asymmetric Plane:</label> <input
+								type="checkbox" id="asymmetric" /></span>
 					</h4>
-					<div class="content">
-						<h4>
-							<span> <label id="lbl_num_cockpits" for="num_cockpits">Number of Cockpits:</label> <input
-									type="number" id="num_cockpits" min="1" max="20" value="1" /></span>
-						</h4>
-						<table style="width:100%" id="table_cockpit"></table>
-					</div>
-				</div>
-				<br />
-				<div id="Passengers">
-					<h3 id="passenger_collapse" class="collapsible">
-						<label id="lbl_passengers">Passengers</label>
-					</h3>
-					<h4><span>(<a href="./Rules/Rules.htm#_Passenger_Capacity"><u>Rules</u></a>)</span></h4>
-					<div class="content" style="max-height: 0px;">
-						<table style="width:100%" id="table_passengers"></table>
-					</div>
-				</div>
-				<br />
-				<div id="Engines">
-					<h3 class="collapsible active">
-						<label id="lbl_engines">Engines</label>
-					</h3>
-					<h4>
-						<span>(<a href="./Rules/Rules.htm#_Engines"><u>Engine Rules</u></a>)</span>
-						<span>(<a href="./Rules/Rules.htm#_Engine_Upgrades"><u>Upgrade Rules</u></a>)</span>
-						<span>(<a href="./Rules/Rules.htm#_Cooling_(Air)"><u>Cooling Rules</u></a>)</span>
-						<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
-					</h4>
-					<div class="content">
-						<h4>
-							<span> <label id="lbl_num_engines" for="num_engines">Number of Engines:</label> <input
-									type="number" id="num_engines" min="0" max="20" value="1" /></span>
-							<span> <label id="lbl_num_radiators" for="num_radiators">Number of Radiators:</label> <input
-									type="number" id="num_radiators" min="1" max="20" value="0" /></span>
-							<span><label id="lbl_asymmetric" for="asymmetric">Asymmetric Plane:</label> <input
-									type="checkbox" id="asymmetric" /></span>
-						</h4>
-						<table style="width:100%" id="table_engine"></table>
-						<br />
-						<table style="width:100%" id="table_radiator"></table>
-					</div>
+					<table style="width:100%" id="table_engine"></table>
+					<br />
+					<table style="width:100%" id="table_radiator"></table>
 				</div>
 			</div>
 			<br />
