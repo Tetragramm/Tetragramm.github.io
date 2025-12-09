@@ -164,7 +164,6 @@ export class ReinforcementsUI extends BaseComponentUI {
 
                 // Row label
                 const rowDiv = document.createElement('div');
-                rowDiv.style.marginBottom = '0.5em';
                 const rowLabel = document.createElement('strong');
                 rowLabel.textContent = woodItem.name;
                 rowDiv.appendChild(rowLabel);
@@ -206,9 +205,8 @@ export class ReinforcementsUI extends BaseComponentUI {
 
                 // Add separator line after steel input before next strut
                 if (i < extWoodBinding.length - 1) {
-                    const separator = document.createElement('hr');
-                    separator.style.margin = '0.5em 0';
-                    separator.style.borderColor = 'rgba(56, 56, 56, 0.3)';
+                    const separator = document.createElement('div');
+                    separator.style.width = "100%"
                     extItem.content.appendChild(separator);
                 }
             }
