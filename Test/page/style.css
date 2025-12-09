@@ -866,6 +866,12 @@ select.flex-item {
 	color: var(--bkg_color);
 }
 
+.mobile-nav-list-item.disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	color: var(--inp_txt_color);
+}
+
 /* Large +/- buttons for mobile number inputs */
 .mobile-number-container {
 	display: flex;
@@ -1092,7 +1098,8 @@ select.flex-item {
 	}
 
 	/* Ensure collapsible content is always visible on mobile */
-	body.mobile-single-section .content {
+	/* Exclude .desktop-only to not override desktop-only hiding */
+	body.mobile-single-section .content:not(.desktop-only) {
 		max-height: none !important;
 		display: block !important;
 	}

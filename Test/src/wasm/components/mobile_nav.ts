@@ -166,23 +166,39 @@ export class MobileNavigation {
 
     /**
      * Update the section list
+     * Shows all sections, but disables ones that aren't currently available
      */
     private updateList(): void {
         this.listElement.innerHTML = '';
         const visibleSections = this.getVisibleSections();
 
-        visibleSections.forEach((section, index) => {
+        // Show all sections in list, but mark unavailable ones as disabled
+        this.sections.forEach((section) => {
             const item = document.createElement('div');
             item.className = 'mobile-nav-list-item';
-            if (index === this.currentIndex) {
+
+            // Check if this section is enabled (visible)
+            const isEnabled = !section.isVisible || section.isVisible();
+
+            // Find the index in visible sections for navigation
+            const visibleIndex = visibleSections.findIndex(s => s.id === section.id);
+
+            if (!isEnabled) {
+                item.classList.add('disabled');
+            } else if (visibleIndex === this.currentIndex) {
                 item.classList.add('active');
             }
+
             item.textContent = localization.translate(section.labelKey);
-            item.onclick = (e) => {
-                e.stopPropagation();
-                this.showSection(index);
-                this.hideList();
-            };
+
+            if (isEnabled) {
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    this.showSection(visibleIndex);
+                    this.hideList();
+                };
+            }
+
             this.listElement.appendChild(item);
         });
     }

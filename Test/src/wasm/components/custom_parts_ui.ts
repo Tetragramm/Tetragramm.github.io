@@ -122,7 +122,7 @@ export class CustomPartsUI extends BaseComponentUI {
         mobileNameInput.id = 'mobile-custom-name';
         editItem.content.appendChild(mobileNameInput);
 
-        // Create mobile stat inputs - organize in a grid-like format
+        // Create mobile stat inputs using mobile number input component
         const mobileStatInputs = new Map<string, HTMLInputElement>();
         const statDefs = [
             ['cost', 'Cost'], ['mass', 'Mass'], ['wetmass', 'Wet Mass'],
@@ -136,25 +136,15 @@ export class CustomPartsUI extends BaseComponentUI {
         ];
 
         for (const [key, label] of statDefs) {
-            const statRow = document.createElement('div');
-            statRow.style.display = 'flex';
-            statRow.style.justifyContent = 'space-between';
-            statRow.style.alignItems = 'center';
-            statRow.style.marginBottom = '5px';
-
-            const statLabel = document.createElement('label');
-            statLabel.textContent = label;
-            statLabel.style.flex = '1';
-            statRow.appendChild(statLabel);
-
-            const statInput = document.createElement('input');
-            statInput.type = 'number';
-            statInput.value = '0';
-            statInput.style.width = '80px';
-            statRow.appendChild(statInput);
-
+            const { input: statInput } = createMobileNumberInput(
+                { name: label, value: 0, enabled: true },
+                editItem.content,
+                () => {}, // No onChange needed - value read when button pressed
+                -999,
+                999,
+                1
+            );
             mobileStatInputs.set(key, statInput);
-            editItem.content.appendChild(statRow);
         }
 
         // Mobile special rules
@@ -593,31 +583,20 @@ export class CustomPartsUI extends BaseComponentUI {
             mobilePartsList.innerHTML = '';
             for (let i = 0; i < parts.length; i++) {
                 const part = parts[i];
-                const partRow = document.createElement('div');
-                partRow.style.display = 'flex';
-                partRow.style.justifyContent = 'space-between';
-                partRow.style.alignItems = 'center';
-                partRow.style.marginBottom = '8px';
-
-                const nameLabel = document.createElement('span');
-                nameLabel.textContent = part.name;
-                nameLabel.style.flex = '1';
-                partRow.appendChild(nameLabel);
-
-                const qtyInput = document.createElement('input');
-                qtyInput.type = 'number';
-                qtyInput.min = '0';
-                qtyInput.value = part.qty.toString();
-                qtyInput.style.width = '60px';
                 const idx = i;
-                qtyInput.onchange = () => {
-                    bridge.setCustomPartQty(idx, parseInt(qtyInput.value) || 0);
-                    this.saveToLocalStorage(bridge);
-                    this.onUpdate?.();
-                };
-                partRow.appendChild(qtyInput);
 
-                mobilePartsList.appendChild(partRow);
+                const { input: qtyInput } = createMobileNumberInput(
+                    { name: part.name, value: part.qty, enabled: true },
+                    mobilePartsList,
+                    (value) => {
+                        bridge.setCustomPartQty(idx, value);
+                        this.saveToLocalStorage(bridge);
+                        this.onUpdate?.();
+                    },
+                    0,
+                    99,
+                    1
+                );
             }
         }
 

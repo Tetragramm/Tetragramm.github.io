@@ -201,6 +201,14 @@ export class ReinforcementsUI extends BaseComponentUI {
                     1
                 );
                 mobileExtSteelInputs.push(steelInput);
+
+                // Add separator line after steel input before next strut
+                if (i < extWoodBinding.length - 1) {
+                    const separator = document.createElement('hr');
+                    separator.style.margin = '0.5em 0';
+                    separator.style.borderColor = 'rgba(56, 56, 56, 0.3)';
+                    extItem.content.appendChild(separator);
+                }
             }
         }
 
