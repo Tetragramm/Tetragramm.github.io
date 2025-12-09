@@ -27,17 +27,17 @@ interface CustomPart {
  * Custom Parts (Alter Stats) UI Component
  */
 export class CustomPartsUI extends BaseComponentUI {
-    private addFlex: { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement } | undefined;
-    private editCell: HTMLTableCellElement | undefined;
-    private partList: { label: HTMLLabelElement; qtyInput: HTMLInputElement; }[] = [];
+    private addFlex: { div0: HTMLDivElement, div1: HTMLDivElement, div2: HTMLDivElement };
+    private editCell: HTMLTableCellElement;
+    private partList: { label: HTMLLabelElement; qtyInput: HTMLInputElement; }[];
 
     // Edit form inputs
-    private nameInput: HTMLInputElement | undefined;
+    private nameInput: HTMLInputElement;
     private statInputs: Map<string, HTMLInputElement>;
-    private specialRulesInput: HTMLInputElement | undefined;
-    private partSelectDropdown: HTMLSelectElement | undefined;
-    private addButton: HTMLButtonElement | undefined;
-    private removeButton: HTMLButtonElement | undefined;
+    private specialRulesInput: HTMLInputElement;
+    private partSelectDropdown: HTMLSelectElement;
+    private addButton: HTMLButtonElement;
+    private removeButton: HTMLButtonElement;
 
     protected shouldUpdate(): boolean {
         return this.addFlex !== undefined;
@@ -139,7 +139,7 @@ export class CustomPartsUI extends BaseComponentUI {
             const { input: statInput } = createMobileNumberInput(
                 { name: label, value: 0, enabled: true },
                 editItem.content,
-                () => {}, // No onChange needed - value read when button pressed
+                () => { }, // No onChange needed - value read when button pressed
                 -999,
                 999,
                 1

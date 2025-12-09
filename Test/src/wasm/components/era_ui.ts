@@ -31,9 +31,9 @@ const ERA_STATS: StatDisplayConfig[] = [
 
 export class EraUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
-    private selectElement: HTMLSelectElement = undefined;
-    private statsTable: HTMLTableElement = undefined;
-    private mobileStatsGrid: HTMLDivElement = undefined;
+    private selectElement: HTMLSelectElement;
+    private statsTable: HTMLTableElement;
+    private mobileStatsGrid: HTMLDivElement;
 
     protected shouldUpdate(): boolean {
         console.log("[EraUI] selectElement is " + this.selectElement);

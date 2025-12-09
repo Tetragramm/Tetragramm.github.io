@@ -51,21 +51,21 @@ const WEAPON_SYSTEM_STATS: StatDisplayConfig[] = [
  */
 export class WeaponsUI extends BaseComponentUI {
     // Main container elements
-    private numSystemsInput: HTMLInputElement | undefined;
-    private braceCountInput: HTMLInputElement | undefined;
-    private weaponSystemsTable: HTMLTableElement | undefined;
-    private weaponSystemRows: WeaponSystemRow[] = [];
+    private numSystemsInput: HTMLInputElement;
+    private braceCountInput: HTMLInputElement;
+    private weaponSystemsTable: HTMLTableElement;
+    private weaponSystemRows: WeaponSystemRow[];
 
     // Mobile elements
-    private mobileWeaponSystemsContainer: HTMLDivElement | undefined;
+    private mobileWeaponSystemsContainer: HTMLDivElement;
 
     // Mobile navigation state
-    private mobileSelectedSystem: number = 0;
-    private mobileSelectedMount: number = 0;
-    private mobileSystemContent: HTMLDivElement | undefined;
-    private mobileSystemNavLabel: HTMLSpanElement | undefined;
-    private mobileMountContent: HTMLDivElement | undefined;
-    private mobileMountNavLabel: HTMLSpanElement | undefined;
+    private mobileSelectedSystem: number;
+    private mobileSelectedMount: number;
+    private mobileSystemContent: HTMLDivElement;
+    private mobileSystemNavLabel: HTMLSpanElement;
+    private mobileMountContent: HTMLDivElement;
+    private mobileMountNavLabel: HTMLSpanElement;
 
     protected shouldUpdate(): boolean {
         return this.numSystemsInput !== undefined;
@@ -746,10 +746,10 @@ class WeaponSystemRow {
     private getBridge: () => AircraftBridge | null;
     private index: number;
     private table: HTMLTableElement;
-    private onUpdate: (() => void) | undefined;
+    private onUpdate: (() => void);
     private headerRow: HTMLTableRowElement;
     private contentRow: HTMLTableRowElement;
-    private cache: WeaponSystemCache | undefined;
+    private cache: WeaponSystemCache;
     private weaponRows: WeaponRow[] = [];
 
     constructor(
@@ -1115,9 +1115,9 @@ class WeaponRow {
     private systemIndex: number;
     private weaponIndex: number;
     private table: HTMLTableElement;
-    private onUpdate: (() => void) | undefined;
+    private onUpdate: (() => void);
     private row: HTMLTableRowElement;
-    private cache: WeaponCache | undefined;
+    private cache: WeaponCache;
 
     constructor(
         getBridge: () => AircraftBridge | null,

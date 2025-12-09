@@ -43,35 +43,35 @@ const ENGINE_STATS: StatDisplayConfig[] = [
  */
 export class EnginesUI extends BaseComponentUI {
     // Container elements
-    private enginesSection: HTMLElement | undefined;
-    private asymmetricCheckbox: HTMLInputElement | undefined;
-    private numEnginesInput: HTMLInputElement | undefined;
-    private numRadiatorsInput: HTMLInputElement | undefined;
+    private enginesSection: HTMLElement;
+    private asymmetricCheckbox: HTMLInputElement;
+    private numEnginesInput: HTMLInputElement;
+    private numRadiatorsInput: HTMLInputElement;
 
     // Individual engine/radiator containers
-    private enginesContainer: HTMLDivElement | undefined;
-    private radiatorsContainer: HTMLDivElement | undefined;
+    private enginesContainer: HTMLDivElement;
+    private radiatorsContainer: HTMLDivElement;
 
     // Mobile containers
-    private mobileEnginesContainer: HTMLDivElement | undefined;
-    private mobileRadiatorsContainer: HTMLDivElement | undefined;
+    private mobileEnginesContainer: HTMLDivElement;
+    private mobileRadiatorsContainer: HTMLDivElement;
 
     // Mobile navigation state
-    private mobileSelectedEngine: number = 0;
-    private mobileSelectedRadiator: number = 0;
-    private mobileEngineContent: HTMLDivElement | undefined;
-    private mobileEngineNavLabel: HTMLSpanElement | undefined;
-    private mobileRadiatorContent: HTMLDivElement | undefined;
-    private mobileRadiatorNavLabel: HTMLSpanElement | undefined;
+    private mobileSelectedEngine: number;
+    private mobileSelectedRadiator: number;
+    private mobileEngineContent: HTMLDivElement;
+    private mobileEngineNavLabel: HTMLSpanElement;
+    private mobileRadiatorContent: HTMLDivElement;
+    private mobileRadiatorNavLabel: HTMLSpanElement;
 
     // Cached engine/radiator UIs (will be cleared when counts change)
-    private engineUIs: EngineUI[] = [];
-    private radiatorUIs: RadiatorUI[] = [];
-    private cachedEngineCount: number = 0;
-    private cachedRadiatorCount: number = 0;
+    private engineUIs: EngineUI[];
+    private radiatorUIs: RadiatorUI[];
+    private cachedEngineCount: number;
+    private cachedRadiatorCount: number;
 
     constructor(
-        getBridge: () => AircraftBridge | null,
+        getBridge: () => AircraftBridge,
         containerId: string,
         onUpdate?: () => void
     ) {
@@ -1757,7 +1757,7 @@ class RadiatorUI {
         coolantCell.appendChild(coolantSelect);
 
         // Harden checkbox (if coolant has it)
-        let hardenCheckbox: HTMLInputElement | undefined;
+        let hardenCheckbox: HTMLInputElement;
         if (bindings.harden_cool) {
             coolantCell.appendChild(document.createElement('br'));
             hardenCheckbox = createFlexCheckbox(bindings.harden_cool, { div1: coolantCell, div2: coolantCell }, (checked) => {

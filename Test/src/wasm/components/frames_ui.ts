@@ -116,9 +116,9 @@ interface MobileTailSectionRowCache {
 }
 
 export class FramesUI extends BaseComponentUI {
-    private cache: FramesCache = undefined;
-    private framesSectionElement: HTMLElement | null = null;
-    private tailSectionElement: HTMLElement | null = null;
+    private cache: FramesCache;
+    private framesSectionElement: HTMLElement;
+    private tailSectionElement: HTMLElement;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;

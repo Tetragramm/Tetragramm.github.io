@@ -51,7 +51,7 @@ interface StabilizersCache {
 }
 
 export class StabilizersUI extends BaseComponentUI {
-    private cache: StabilizersCache = undefined;
+    private cache: StabilizersCache;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;

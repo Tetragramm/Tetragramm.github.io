@@ -51,7 +51,7 @@ const GEAR_STATS: StatDisplayConfig[] = [
 ];
 
 export class LandingGearUI extends BaseComponentUI {
-    private cache: LandingGearCache = undefined;
+    private cache: LandingGearCache;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;

@@ -62,12 +62,12 @@ interface MobileCockpitCache {
 
 export class CockpitsUI extends BaseComponentUI {
     // Cache DOM elements to avoid recreating
-    private cockpitRowCaches: CockpitRowCache[] = [];
-    private mobileCockpitCaches: MobileCockpitCache[] = [];
-    private mobileNumCockpitsInput: HTMLInputElement = undefined;
-    private numCockpitsInput: HTMLInputElement = undefined;
-    private mainTable: HTMLTableElement = undefined;
-    private lastCockpitCount: number = 0;
+    private cockpitRowCaches: CockpitRowCache[];
+    private mobileCockpitCaches: MobileCockpitCache[];
+    private mobileNumCockpitsInput: HTMLInputElement;
+    private numCockpitsInput: HTMLInputElement;
+    private mainTable: HTMLTableElement;
+    private lastCockpitCount: number;
 
     protected shouldUpdate(): boolean {
         // Check if cockpit count changed - need rebuild if it did
@@ -320,7 +320,7 @@ export class CockpitsUI extends BaseComponentUI {
 
         // Gunsights
         const gunsightChecks: HTMLInputElement[] = [];
-        let bombsightInput: HTMLInputElement = undefined;
+        let bombsightInput: HTMLInputElement;
         if (cockpitOptions.selected_gunsights && cockpitOptions.selected_gunsights.length > 0) {
             const gunsightsLabel = document.createElement('div');
             gunsightsLabel.className = 'mobile-option-title';

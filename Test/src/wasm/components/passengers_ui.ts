@@ -43,7 +43,7 @@ const PASSENGERS_STATS: StatDisplayConfig[] = [
 ];
 
 export class PassengersUI extends BaseComponentUI {
-    private cache: PassengersCache = undefined;
+    private cache: PassengersCache;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;

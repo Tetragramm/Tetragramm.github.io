@@ -76,7 +76,7 @@ interface LoadCache {
 }
 
 export class LoadUI extends BaseComponentUI {
-    private cache: LoadCache = undefined;
+    private cache: LoadCache;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;

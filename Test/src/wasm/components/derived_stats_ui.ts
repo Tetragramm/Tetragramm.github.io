@@ -17,90 +17,90 @@ import { createCollapsibleSection, createMobileOptionItem } from '../dom_utils';
  */
 export class DerivedStatsUI extends BaseComponentUI {
     // Name input
-    private nameInput: HTMLInputElement | undefined;
-    private mobileNameInput: HTMLInputElement | undefined;
+    private nameInput: HTMLInputElement;
+    private mobileNameInput: HTMLInputElement;
 
     // Top row cells
-    private costCell: HTMLTableCellElement | undefined;
-    private upkeepCell: HTMLTableCellElement | undefined;
-    private versionCell: HTMLTableCellElement | undefined;
+    private costCell: HTMLTableCellElement;
+    private upkeepCell: HTMLTableCellElement;
+    private versionCell: HTMLTableCellElement;
 
     // Mobile stat cells
-    private mobileCostCell: HTMLElement | undefined;
-    private mobileUpkeepCell: HTMLElement | undefined;
-    private mobileVersionCell: HTMLElement | undefined;
-    private mobileMassVariationsDiv: HTMLElement | undefined;
-    private mobileStatsDiv: HTMLElement | undefined;
-    private mobileWeaponsDiv: HTMLElement | undefined;
-    private mobileElectricsDiv: HTMLElement | undefined;
-    private mobileWarningsDiv: HTMLElement | undefined;
+    private mobileCostCell: HTMLElement;
+    private mobileUpkeepCell: HTMLElement;
+    private mobileVersionCell: HTMLElement;
+    private mobileMassVariationsDiv: HTMLElement;
+    private mobileStatsDiv: HTMLElement;
+    private mobileWeaponsDiv: HTMLElement;
+    private mobileElectricsDiv: HTMLElement;
+    private mobileWarningsDiv: HTMLElement;
 
     // Mass variation cells - Empty
-    private tsEmpty: HTMLTableCellElement | undefined;
-    private ssEmpty: HTMLTableCellElement | undefined;
-    private handEmpty: HTMLTableCellElement | undefined;
-    private boostEmpty: HTMLTableCellElement | undefined;
-    private rocEmpty: HTMLTableCellElement | undefined;
+    private tsEmpty: HTMLTableCellElement;
+    private ssEmpty: HTMLTableCellElement;
+    private handEmpty: HTMLTableCellElement;
+    private boostEmpty: HTMLTableCellElement;
+    private rocEmpty: HTMLTableCellElement;
 
     // Mass variation cells - Half
-    private tsHalf: HTMLTableCellElement | undefined;
-    private ssHalf: HTMLTableCellElement | undefined;
-    private handHalf: HTMLTableCellElement | undefined;
-    private boostHalf: HTMLTableCellElement | undefined;
-    private rocHalf: HTMLTableCellElement | undefined;
+    private tsHalf: HTMLTableCellElement;
+    private ssHalf: HTMLTableCellElement;
+    private handHalf: HTMLTableCellElement;
+    private boostHalf: HTMLTableCellElement;
+    private rocHalf: HTMLTableCellElement;
 
     // Mass variation cells - Full
-    private tsFull: HTMLTableCellElement | undefined;
-    private ssFull: HTMLTableCellElement | undefined;
-    private handFull: HTMLTableCellElement | undefined;
-    private boostFull: HTMLTableCellElement | undefined;
-    private rocFull: HTMLTableCellElement | undefined;
+    private tsFull: HTMLTableCellElement;
+    private ssFull: HTMLTableCellElement;
+    private handFull: HTMLTableCellElement;
+    private boostFull: HTMLTableCellElement;
+    private rocFull: HTMLTableCellElement;
 
     // Mass variation cells - Half with Bombs
-    private tsHalfwB: HTMLTableCellElement | undefined;
-    private ssHalfwB: HTMLTableCellElement | undefined;
-    private handHalfwB: HTMLTableCellElement | undefined;
-    private boostHalfwB: HTMLTableCellElement | undefined;
-    private rocHalfwB: HTMLTableCellElement | undefined;
+    private tsHalfwB: HTMLTableCellElement;
+    private ssHalfwB: HTMLTableCellElement;
+    private handHalfwB: HTMLTableCellElement;
+    private boostHalfwB: HTMLTableCellElement;
+    private rocHalfwB: HTMLTableCellElement;
 
     // Mass variation cells - Full with Bombs
-    private tsFullwB: HTMLTableCellElement | undefined;
-    private ssFullwB: HTMLTableCellElement | undefined;
-    private handFullwB: HTMLTableCellElement | undefined;
-    private boostFullwB: HTMLTableCellElement | undefined;
-    private rocFullwB: HTMLTableCellElement | undefined;
+    private tsFullwB: HTMLTableCellElement;
+    private ssFullwB: HTMLTableCellElement;
+    private handFullwB: HTMLTableCellElement;
+    private boostFullwB: HTMLTableCellElement;
+    private rocFullwB: HTMLTableCellElement;
 
     // Bomb rows (conditionally shown)
-    private bombRow1: HTMLTableRowElement | undefined;
-    private bombRow2: HTMLTableRowElement | undefined;
-    private fullRow: HTMLTableRowElement | undefined;
+    private bombRow1: HTMLTableRowElement;
+    private bombRow2: HTMLTableRowElement;
+    private fullRow: HTMLTableRowElement;
 
     // Other stat cells
-    private vitalComponents: HTMLTableCellElement | undefined;
-    private dropoffCell: HTMLTableCellElement | undefined;
-    private stabilityCell: HTMLTableCellElement | undefined;
-    private reliabilityCell: HTMLTableCellElement | undefined;
-    private flightstressCell: HTMLTableCellElement | undefined;
-    private overspeedCell: HTMLTableCellElement | undefined;
-    private elossCell: HTMLTableCellElement | undefined;
-    private toughnessCell: HTMLTableCellElement | undefined;
-    private visibilityCell: HTMLTableCellElement | undefined;
-    private electricCell: HTMLTableCellElement | undefined;
-    private turnbleedLabel: HTMLTableCellElement | undefined;
-    private turnbleedCell: HTMLTableCellElement | undefined;
-    private mxstrainCell: HTMLTableCellElement | undefined;
-    private attackCell: HTMLTableCellElement | undefined;
-    private maxfuelCell: HTMLTableCellElement | undefined;
-    private landingCell: HTMLTableCellElement | undefined;
-    private escapeCell: HTMLTableCellElement | undefined;
-    private communicationsCell: HTMLTableCellElement | undefined;
-    private crewCell: HTMLTableCellElement | undefined;
-    private maxaltCell: HTMLTableCellElement | undefined;
-    private crashsafetyCell: HTMLTableCellElement | undefined;
-    private flammableCell: HTMLTableCellElement | undefined;
-    private weaponCell: HTMLTableCellElement | undefined;
-    private warningCell: HTMLTableCellElement | undefined;
-    private descCell: HTMLTableCellElement | undefined;
+    private vitalComponents: HTMLTableCellElement;
+    private dropoffCell: HTMLTableCellElement;
+    private stabilityCell: HTMLTableCellElement;
+    private reliabilityCell: HTMLTableCellElement;
+    private flightstressCell: HTMLTableCellElement;
+    private overspeedCell: HTMLTableCellElement;
+    private elossCell: HTMLTableCellElement;
+    private toughnessCell: HTMLTableCellElement;
+    private visibilityCell: HTMLTableCellElement;
+    private electricCell: HTMLTableCellElement;
+    private turnbleedLabel: HTMLTableCellElement;
+    private turnbleedCell: HTMLTableCellElement;
+    private mxstrainCell: HTMLTableCellElement;
+    private attackCell: HTMLTableCellElement;
+    private maxfuelCell: HTMLTableCellElement;
+    private landingCell: HTMLTableCellElement;
+    private escapeCell: HTMLTableCellElement;
+    private communicationsCell: HTMLTableCellElement;
+    private crewCell: HTMLTableCellElement;
+    private maxaltCell: HTMLTableCellElement;
+    private crashsafetyCell: HTMLTableCellElement;
+    private flammableCell: HTMLTableCellElement;
+    private weaponCell: HTMLTableCellElement;
+    private warningCell: HTMLTableCellElement;
+    private descCell: HTMLTableCellElement;
 
     private showBombs: boolean = false;
 

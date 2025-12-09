@@ -54,8 +54,8 @@ const TOTAL_STATS: StatDisplayConfig[] = [
  * Total Stats UI Component - displays total aircraft statistics
  */
 export class TotalStatsUI extends BaseComponentUI {
-    private statsTable: HTMLTableElement | undefined;
-    private mobileStatsGrid: HTMLDivElement | undefined;
+    private statsTable: HTMLTableElement;
+    private mobileStatsGrid: HTMLDivElement;
 
     protected shouldUpdate(): boolean {
         return this.statsTable !== undefined;

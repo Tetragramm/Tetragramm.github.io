@@ -109,7 +109,7 @@ interface MobileMiniWingRowCache {
 }
 
 export class WingsUI extends BaseComponentUI {
-    private cache: WingsCache = undefined;
+    private cache: WingsCache;
     private showWings: boolean;
 
     protected shouldUpdate(): boolean {
@@ -246,6 +246,10 @@ export class WingsUI extends BaseComponentUI {
 
         // Add wing button
         if (bindings.add_full_wing.can_add) {
+            const wingDiv = document.createElement('div');
+            wingDiv.className = 'mobile-frame-row';
+            wingDiv.style.marginBottom = '0.5rem';
+
             const addBtn = document.createElement('button');
             addBtn.type = 'button';
             addBtn.className = 'mobile-number-btn';
@@ -258,7 +262,8 @@ export class WingsUI extends BaseComponentUI {
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.onUpdate();
             };
-            fullWingsItem.content.appendChild(addBtn);
+            wingDiv.appendChild(addBtn);
+            fullWingsItem.content.appendChild(wingDiv);
         }
 
         // Mini Wings section
@@ -277,6 +282,10 @@ export class WingsUI extends BaseComponentUI {
 
         // Add mini wing button
         if (bindings.add_mini_wing.can_add) {
+            const wingDiv = document.createElement('div');
+            wingDiv.className = 'mobile-frame-row';
+            wingDiv.style.marginBottom = '0.5rem';
+
             const addMiniBtn = document.createElement('button');
             addMiniBtn.type = 'button';
             addMiniBtn.className = 'mobile-number-btn';
@@ -289,7 +298,8 @@ export class WingsUI extends BaseComponentUI {
                 this.getBridge().setWingsBindings(updatedBindings);
                 this.onUpdate();
             };
-            miniWingsItem.content.appendChild(addMiniBtn);
+            wingDiv.appendChild(addMiniBtn);
+            miniWingsItem.content.appendChild(wingDiv);
         }
 
         // Stats
@@ -320,7 +330,6 @@ export class WingsUI extends BaseComponentUI {
 
         // Deck select
         const deckRow = document.createElement('div');
-        deckRow.style.display = 'flex';
         deckRow.style.gap = '0.25rem';
         deckRow.style.marginBottom = '0.25rem';
         const deckSelect = createMobileSelect(

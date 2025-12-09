@@ -23,14 +23,14 @@ import {
  */
 export class UsedUI extends BaseComponentUI {
     // Cache for inputs
-    private burntOutInput: HTMLInputElement | undefined;
-    private raggedInput: HTMLInputElement | undefined;
-    private heftyInput: HTMLInputElement | undefined;
-    private stickyGunsInput: HTMLInputElement | undefined;
-    private weakInput: HTMLInputElement | undefined;
-    private fragileInput: HTMLInputElement | undefined;
-    private leakyInput: HTMLInputElement | undefined;
-    private sluggishInput: HTMLInputElement | undefined;
+    private burntOutInput: HTMLInputElement;
+    private raggedInput: HTMLInputElement;
+    private heftyInput: HTMLInputElement;
+    private stickyGunsInput: HTMLInputElement;
+    private weakInput: HTMLInputElement;
+    private fragileInput: HTMLInputElement;
+    private leakyInput: HTMLInputElement;
+    private sluggishInput: HTMLInputElement;
 
     protected shouldUpdate(): boolean {
         // Can always update if we have cached elements

@@ -28,7 +28,7 @@ interface PropellerCache {
 }
 
 export class PropellerUI extends BaseComponentUI {
-    private cache: PropellerCache = undefined;
+    private cache: PropellerCache;
     private showPropeller: boolean;
 
     protected shouldUpdate(): boolean {

@@ -51,7 +51,7 @@ const OPTIMIZATION_STATS: StatDisplayConfig[] = [
 ];
 
 export class OptimizationUI extends BaseComponentUI {
-    private cache: OptimizationCache = undefined;
+    private cache: OptimizationCache;
 
     protected shouldUpdate(): boolean {
         return this.cache !== undefined;

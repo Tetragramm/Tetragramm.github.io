@@ -64,7 +64,7 @@ const REINFORCEMENTS_STATS: StatDisplayConfig[] = [
 ];
 
 export class ReinforcementsUI extends BaseComponentUI {
-    private cache: ReinforcementsCache = undefined;
+    private cache: ReinforcementsCache;
     private showReinforcements: boolean;
 
     protected shouldUpdate(): boolean {
@@ -466,7 +466,7 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         // Wires checkbox - need custom layout for empty label
         const wiresBinding = bindings.wires;
-        let wiresCheckbox: HTMLInputElement = undefined;
+        let wiresCheckbox: HTMLInputElement;
 
         if (wiresBinding) {
             const wiresLabel = document.createElement('label');
@@ -531,7 +531,7 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         // Wing blades checkbox - need custom layout for empty label
         const wingBladesBinding = bindings.wing_blades;
-        let wingBladesCheckbox: HTMLInputElement = undefined;
+        let wingBladesCheckbox: HTMLInputElement;
 
         if (wingBladesBinding) {
             const wingLabel = document.createElement('label');

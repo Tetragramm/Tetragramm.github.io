@@ -877,13 +877,13 @@ select.flex-item {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 0.25rem;
+	flex-direction: row-reverse;
 }
 
 .mobile-number-controls {
 	display: flex;
 	align-items: center;
-	gap: 0.25rem;
+	gap: 0;
 	flex-shrink: 0;
 }
 
@@ -916,16 +916,19 @@ select.flex-item {
 }
 
 .mobile-number-input {
-	width: 4rem !important;
+	width: 2rem !important;
 	height: 2.5rem !important;
 	text-align: center;
 	font-size: 1.2rem !important;
+	appearance: textfield;
+	margin: 0;
 }
 
 .mobile-number-label {
 	flex: 1;
 	font-size: 0.9rem;
-	margin-right: 0.5rem;
+	margin-left: 0.5rem;
+	margin-right: 1rem;
 }
 
 /* Mobile flexbox layout for options */
@@ -1004,15 +1007,16 @@ select.flex-item {
 /* Mobile stats display */
 .mobile-stats-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 	gap: 0.5rem;
+	width: 100%;
 }
 
 .mobile-stat-item {
 	display: flex;
 	flex-direction: column;
 	padding: 0.5rem;
-	background-color: rgba(56, 56, 56, 0.3);
+	background-color: var(--bkg_color);
 	border-radius: 4px;
 }
 
@@ -1064,6 +1068,7 @@ select.flex-item {
 
 /* Mobile media query - apply styles on narrow screens */
 @media (max-width: 768px) {
+
 	/* Show mobile navigation */
 	.mobile-nav {
 		display: block;
@@ -1085,12 +1090,12 @@ select.flex-item {
 
 	/* Hide all main sections except active one in mobile single-section mode */
 	/* Use :not(.mobile-nav) on the parent to avoid hiding mobile nav children */
-	body.mobile-single-section .html_content > div:not(.mobile-nav) > div:not(.mobile-active-section) {
+	body.mobile-single-section .html_content>div:not(.mobile-nav)>div:not(.mobile-active-section) {
 		display: none;
 	}
 
 	/* Hide br elements between sections on mobile to avoid empty space */
-	body.mobile-single-section .html_content > div > br {
+	body.mobile-single-section .html_content>div>br {
 		display: none;
 	}
 
@@ -1101,7 +1106,7 @@ select.flex-item {
 	}
 
 	/* Hide the h4 subtitle/rules links on mobile */
-	body.mobile-single-section .mobile-active-section > h4 {
+	body.mobile-single-section .mobile-active-section>h4 {
 		display: none;
 	}
 
@@ -1186,6 +1191,7 @@ select.flex-item {
 	.mobile-only {
 		display: none !important;
 	}
+
 	.desktop-only {
 		display: block !important;
 	}

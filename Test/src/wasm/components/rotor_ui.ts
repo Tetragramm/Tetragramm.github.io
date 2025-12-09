@@ -69,7 +69,7 @@ const ROTOR_STATS_CONFIG: StatDisplayConfig[] = [
 ];
 
 export class RotorUI extends BaseComponentUI {
-    private cache: RotorCache | undefined = undefined;
+    private cache: RotorCache;
     private showRotors: boolean;
 
     protected shouldUpdate(): boolean {
