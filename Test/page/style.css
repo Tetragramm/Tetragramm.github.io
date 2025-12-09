@@ -876,12 +876,15 @@ select.flex-item {
 .mobile-number-container {
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	gap: 0.25rem;
 }
 
-.mobile-number-spacer {
-	flex: 1 1 0;
-	min-width: 0;
+.mobile-number-controls {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex-shrink: 0;
 }
 
 .mobile-number-btn {

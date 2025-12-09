@@ -293,10 +293,9 @@ export function createMobileNumberInput(
         container.appendChild(label);
     }
 
-    // Flexible spacer - pushes buttons right when space available, shrinks when tight
-    const spacer = document.createElement('span');
-    spacer.className = 'mobile-number-spacer';
-    container.appendChild(spacer);
+    // Controls wrapper - groups buttons and input together
+    const controls = document.createElement('div');
+    controls.className = 'mobile-number-controls';
 
     // Minus button
     const minusBtn = document.createElement('button');
@@ -361,9 +360,10 @@ export function createMobileNumberInput(
         updateButtonStates();
     });
 
-    container.appendChild(minusBtn);
-    container.appendChild(input);
-    container.appendChild(plusBtn);
+    controls.appendChild(minusBtn);
+    controls.appendChild(input);
+    controls.appendChild(plusBtn);
+    container.appendChild(controls);
     parent.appendChild(container);
 
     return { container, input };
