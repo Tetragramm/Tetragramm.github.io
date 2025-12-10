@@ -248,7 +248,6 @@ async function InitStats() {
     // Create builder aircraft
     if (acft_data) {
         console.log("Used Saved Data");
-        console.log(wasmModule);
         try {
             acft_builder = new AircraftBridge();
             acft_builder.setAutoSaveToLocalStorage(false);
@@ -481,10 +480,6 @@ function RefreshDisplay() {
     const tbl2 = div2.getElementsByTagName('table').item(0) as HTMLTableElement;
     const tbl3 = document.getElementById("table_comp") as HTMLTableElement;
 
-    console.log("Refresh Display");
-    console.log(tbl1);
-    console.log(tbl2);
-    console.log(tbl3);
     MergeTables(tbl1, tbl2, tbl3);
 }
 

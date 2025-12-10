@@ -1023,12 +1023,11 @@ export class DerivedStatsUI extends BaseComponentUI {
         tooltip.style.display = 'none';
         tooltip.style.position = 'absolute';
         tooltip.style.bottom = '100%';
-        tooltip.style.right = '0';
-        tooltip.style.backgroundColor = 'var(--bg_color)';
-        tooltip.style.border = '1px solid var(--inp_txt_color)';
-        tooltip.style.borderRadius = '4px';
+        tooltip.style.backgroundColor = 'var(--inp_bkg_color)';
+        tooltip.style.border = '1px solid var(--inp_bdr_color)';
+        tooltip.style.borderRadius = '0.5em';
         tooltip.style.padding = '0.5em';
-        tooltip.style.zIndex = '1000';
+        tooltip.style.zIndex = '1';
         tooltip.style.whiteSpace = 'nowrap';
         tooltip.style.fontSize = '0.9em';
         tooltip.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
