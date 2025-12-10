@@ -10,7 +10,7 @@ impl Part for Engines {
         let mut stats = Stats::new();
 
         // Track cooling needs for each radiator
-        let mut need_cool: Vec<(f32, usize)> = vec![(0.0, 0); self.radiators.len()];
+        let mut need_cool: Vec<(i16, usize)> = vec![(0, 0); self.radiators.len()];
         let mut ecost = 0.0;
         let mut pitchspeedmin: f32 = 100.0;
 
@@ -36,7 +36,7 @@ impl Part for Engines {
             if engine.need_cooling() {
                 let rad_idx = engine.radiator_index as usize;
                 if rad_idx < need_cool.len() {
-                    need_cool[rad_idx].0 += enstats.cooling;
+                    need_cool[rad_idx].0 += engine.get_cooling_use();
                     need_cool[rad_idx].1 += 1;
                 }
             }

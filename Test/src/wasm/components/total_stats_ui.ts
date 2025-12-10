@@ -12,7 +12,8 @@ import {
     createStatsTable,
     updateStatsTable,
     StatDisplayConfig,
-    createMobileStatsGrid
+    createMobileStatsGrid,
+    createMobileOptionItem
 } from '../dom_utils';
 
 /**
@@ -96,8 +97,13 @@ export class TotalStatsUI extends BaseComponentUI {
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
 
+        const statsTitle = createMobileOptionItem(
+            '',
+            mobileDiv
+        );
+
         this.mobileStatsGrid = createMobileStatsGrid(stats, TOTAL_STATS);
-        mobileDiv.appendChild(this.mobileStatsGrid);
+        statsTitle.content.appendChild(this.mobileStatsGrid);
         contentWrapper.appendChild(mobileDiv);
 
         // Create collapsible section

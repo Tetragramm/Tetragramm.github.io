@@ -145,9 +145,9 @@ export function createSelectElement(
     }
 
     select.selectedIndex = binding.selected;
-    select.addEventListener('change', () => {
+    select.onchange = () => {
         onChange(parseInt(select.value));
-    });
+    };
 
     return select;
 }
@@ -327,14 +327,14 @@ export function createMobileNumberInput(
     // Update button states based on value
     const updateButtonStates = () => {
         const value = parseInt(input.value) || 0;
-        minusBtn.disabled = !binding.enabled || value <= min;
-        plusBtn.disabled = !binding.enabled || (max !== undefined && value >= max);
+        minusBtn.disabled = input.disabled || value <= parseInt(input.min);
+        plusBtn.disabled = input.disabled || (input.max !== undefined && value >= parseInt(input.max));
     };
 
     // Event handlers
     minusBtn.onclick = () => {
         const currentValue = parseInt(input.value) || 0;
-        const newValue = Math.max(min, currentValue - step);
+        const newValue = Math.max(parseInt(input.min), currentValue - step);
         input.value = newValue.toString();
         onChange(newValue);
         updateButtonStates();
@@ -342,7 +342,7 @@ export function createMobileNumberInput(
 
     plusBtn.onclick = () => {
         const currentValue = parseInt(input.value) || 0;
-        const newValue = max !== undefined ? Math.min(max, currentValue + step) : currentValue + step;
+        const newValue = input.max !== undefined ? Math.min(parseInt(input.max), currentValue + step) : currentValue + step;
         input.value = newValue.toString();
         onChange(newValue);
         updateButtonStates();
@@ -351,9 +351,9 @@ export function createMobileNumberInput(
     input.addEventListener('change', () => {
         let value = parseInt(input.value) || 0;
         // Clamp value to min/max
-        value = Math.max(min, value);
+        value = Math.max(parseInt(input.min), value);
         if (max !== undefined) {
-            value = Math.min(max, value);
+            value = Math.min(parseInt(input.max), value);
         }
         input.value = value.toString();
         onChange(value);
@@ -418,9 +418,9 @@ export function createMobileCheckbox(
     checkbox.id = generateUniqueId('mobile-checkbox');
     checkbox.checked = binding.selected;
     checkbox.disabled = !binding.enabled;
-    checkbox.addEventListener('change', () => {
+    checkbox.onchange = () => {
         onChange(checkbox.checked);
-    });
+    };
 
     const text = document.createElement('span');
     text.textContent = binding.name;

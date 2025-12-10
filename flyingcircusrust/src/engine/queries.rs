@@ -189,6 +189,10 @@ impl Engine {
             .collect()
     }
 
+    pub fn get_cooling_use(&self) -> i16 {
+        self.cooling_count
+    }
+
     /// Get spinner configuration [can_use_gun, can_use_arty]
     /// TypeScript: GetSpinner()
     /// Returns array indicating if spinner can mount guns and/or artillery

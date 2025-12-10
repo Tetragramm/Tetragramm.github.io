@@ -177,8 +177,10 @@ impl UIBindings for Frames {
         // Note: In UI, all_frame will be -1 (no selection) unless user explicitly changes it
         // We only apply if the selection changes from the previous call
         // This goes last because it overrides each individual frame skin selection.
-        if options.all_frame.selected < options.all_frame.options.len() {
-            self.set_all_frame(options.all_frame.selected);
+        if options.all_frame.selected != 0
+            && options.all_frame.selected < options.all_frame.options.len()
+        {
+            self.set_all_frame(options.all_frame.selected - 1);
         }
     }
 }

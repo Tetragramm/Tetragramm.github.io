@@ -445,9 +445,7 @@ impl Engines {
     }
 
     pub fn verify_cooling(&mut self) {
-        if self.needs_cooling() && self.radiators.len() == 0 {
-            self.set_number_of_radiators(1);
-        }
+        self.set_number_of_radiators(self.radiators.len().max(1));
     }
 
     /// Set the aircraft type and update engines accordingly

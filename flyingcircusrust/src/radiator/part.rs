@@ -13,7 +13,7 @@ impl Part for Radiator {
         stats = stats.add(&self.coolant_list[self.idx_coolant].stats);
 
         stats.drag += (-1.0e-6
-            + self.type_list[self.idx_type].dragpercool * (self.need_cool - stats.cooling))
+            + self.type_list[self.idx_type].dragpercool * (self.need_cool as f32 - stats.cooling))
             .ceil() as f32;
 
         if self.harden_cool {

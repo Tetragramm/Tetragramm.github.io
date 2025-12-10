@@ -57,7 +57,7 @@ pub struct Radiator {
     #[ui(check, name = "Radiators Harden Radiator", set_fn = "set_harden")]
     harden_cool: bool,
 
-    need_cool: f32,
+    need_cool: i16,
     engine_count: usize,
     has_parasol: bool,
     metal_area: f32,
@@ -77,7 +77,7 @@ impl Radiator {
             coolant_list: Rc::new(coolant_list),
             idx_coolant: 0,
             harden_cool: false,
-            need_cool: 0.0,
+            need_cool: 0,
             engine_count: 0,
             has_parasol: false,
             metal_area: 0.0,
@@ -92,7 +92,7 @@ impl Radiator {
         }
     }
 
-    pub fn set_need_cool(&mut self, num: f32, engnum: usize) {
+    pub fn set_need_cool(&mut self, num: i16, engnum: usize) {
         self.need_cool = num;
         self.engine_count = engnum;
     }

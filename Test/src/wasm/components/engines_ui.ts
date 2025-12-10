@@ -71,6 +71,21 @@ const ENGINE_STATS: StatDisplayConfig[] = [
     { key: '', label: '' }  // Empty cell
 ];
 
+const BASE_STATS: StatDisplayConfig[] = [
+    { key: 'rarity', label: 'Rarity', isDerived: false },
+    { key: 'power', label: 'Stat Power', positiveIsGood: true },
+    { key: 'mass', label: 'Stat Mass', positiveIsGood: false },
+    { key: 'drag', label: 'Stat Drag', positiveIsGood: false },
+    { key: 'reliability', label: 'Stat Reliability', positiveIsGood: true },
+    { key: 'cooling', label: 'Stat Cooling', positiveIsGood: false },
+    { key: 'overspeed', label: 'Stat Overspeed', positiveIsGood: true, isDerived: false },
+    { key: 'fuelconsumption', label: 'Stat Fuel Consumption', positiveIsGood: false },
+    { key: 'altitude', label: 'Stat Altitude', positiveIsGood: true, isDerived: false },
+    { key: 'torque', label: 'Stat Torque', positiveIsGood: false, isDerived: false },
+    { key: 'rumble', label: 'Stat Rumble', positiveIsGood: false, isDerived: false },
+    { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
+];
+
 /**
  * Engines UI Component
  * Handles both Engines container and individual Engine/Radiator UI
@@ -91,6 +106,9 @@ export class EnginesUI extends BaseComponentUI {
     private mobileRadiatorsContainer: HTMLDivElement;
 
     // Mobile navigation state
+    private mobileNumEnginesInput: HTMLInputElement;
+    private mobileNumRadiatorsInput: HTMLInputElement;
+    private mobileAsymmetricCheckbox: HTMLInputElement;
     private mobileSelectedEngine: number;
     private mobileSelectedRadiator: number;
     private mobileEngineContent: HTMLDivElement;
@@ -152,6 +170,9 @@ export class EnginesUI extends BaseComponentUI {
         this.radiatorUIs = [];
         this.cachedEngineCount = 0;
         this.cachedRadiatorCount = 0;
+        this.mobileNumEnginesInput = undefined;
+        this.mobileNumRadiatorsInput = undefined;
+        this.mobileAsymmetricCheckbox = undefined;
     }
 
     protected rebuildFull(): void {
@@ -230,7 +251,7 @@ export class EnginesUI extends BaseComponentUI {
         );
 
         // Number of engines
-        createMobileNumberInput(
+        this.mobileNumEnginesInput = createMobileNumberInput(
             bindings.engines,
             controlsItem.content,
             (value) => {
@@ -240,10 +261,10 @@ export class EnginesUI extends BaseComponentUI {
                 this.onUpdate();
             },
             0, 20, 1
-        );
+        ).input;
 
         // Number of radiators
-        createMobileNumberInput(
+        this.mobileNumRadiatorsInput = createMobileNumberInput(
             bindings.radiators,
             controlsItem.content,
             (value) => {
@@ -253,10 +274,10 @@ export class EnginesUI extends BaseComponentUI {
                 this.onUpdate();
             },
             0, 20, 1
-        );
+        ).input;
 
         // Asymmetric checkbox
-        createMobileCheckbox(
+        this.mobileAsymmetricCheckbox = createMobileCheckbox(
             { name: localization.translate("Engines Asymmetric Plane"), selected: bindings.is_asymmetric.selected, enabled: bindings.is_asymmetric.enabled },
             controlsItem.content,
             (checked) => {
@@ -360,6 +381,21 @@ export class EnginesUI extends BaseComponentUI {
             // Just update existing radiator UIs
             this.radiatorUIs.forEach(radiatorUI => radiatorUI.update());
             this.updateMobileRadiatorContent();
+        }
+
+        if (this.mobileAsymmetricCheckbox) {
+            this.mobileAsymmetricCheckbox.checked = bindings.is_asymmetric.selected;
+            this.mobileAsymmetricCheckbox.disabled = !bindings.is_asymmetric.enabled;
+        }
+
+        if (this.mobileNumEnginesInput) {
+            this.mobileNumEnginesInput.value = bindings.engines.value;
+            this.mobileNumEnginesInput.disabled = !bindings.engines.enabled;
+        }
+
+        if (this.mobileNumRadiatorsInput) {
+            this.mobileNumRadiatorsInput.value = bindings.radiators.value;
+            this.mobileNumRadiatorsInput.disabled = !bindings.radiators.enabled;
         }
     }
 
@@ -517,36 +553,13 @@ export class EnginesUI extends BaseComponentUI {
         );
 
         // Engine base stats display
-        const baseStatsDiv = document.createElement('div');
-        baseStatsDiv.style.fontSize = '0.85em';
-        baseStatsDiv.style.marginTop = '0.5rem';
-        baseStatsDiv.style.padding = '0.5rem';
-        baseStatsDiv.style.backgroundColor = 'rgba(56, 56, 56, 0.3)';
-        baseStatsDiv.style.borderRadius = '4px';
-
-        // Rarity
-        const rarityDiv = document.createElement('div');
-        const rarityLabel = document.createElement('strong');
-        rarityLabel.textContent = `${localization.translate('Rarity')}: `;
-        rarityDiv.appendChild(rarityLabel);
-        const rarityValue = document.createElement('span');
-        rarityValue.className = this.getRarityClass(fullStats.rarity);
-        rarityValue.style.display = 'inline';
-        rarityValue.style.padding = '0 0.25rem';
+        const baseStatsGrid = createMobileStatsGrid(fullStats.stats, BASE_STATS, fullStats);
+        const rarityValue = baseStatsGrid.children[0].children[1] as HTMLDivElement;
+        rarityValue.className = 'mobile-stat-value ' + this.getRarityClass(fullStats.rarity);
         rarityValue.textContent = this.getRarityText(fullStats.rarity);
-        rarityDiv.appendChild(rarityValue);
-        baseStatsDiv.appendChild(rarityDiv);
 
-        // Key engine stats in a grid
-        const baseStatsGrid = document.createElement('div');
-        baseStatsGrid.style.display = 'grid';
-        baseStatsGrid.style.gridTemplateColumns = '1fr 1fr';
-        baseStatsGrid.style.gap = '0.25rem';
-        baseStatsGrid.style.marginTop = '0.25rem';
 
-        this.populateBaseStatsGrid(baseStatsGrid, fullStats);
-        baseStatsDiv.appendChild(baseStatsGrid);
-        selectionItem.content.appendChild(baseStatsDiv);
+        selectionItem.content.appendChild(baseStatsGrid);
 
         // Get engine bindings for options
         const engineBindings = bridge.getEngineBindings(idx);
@@ -606,30 +619,6 @@ export class EnginesUI extends BaseComponentUI {
         };
     }
 
-    private populateBaseStatsGrid(grid: HTMLDivElement, fullStats: any): void {
-        grid.innerHTML = '';
-        const baseStats = [
-            { label: localization.translate('Stat Power'), value: fullStats.stats.power },
-            { label: localization.translate('Stat Mass'), value: fullStats.stats.mass },
-            { label: localization.translate('Stat Drag'), value: fullStats.stats.drag },
-            { label: localization.translate('Stat Reliability'), value: fullStats.stats.reliability },
-            { label: localization.translate('Stat Cooling'), value: fullStats.stats.cooling },
-            { label: localization.translate('Stat Overspeed'), value: fullStats.overspeed },
-            { label: localization.translate('Stat Fuel Consumption'), value: fullStats.stats.fuelconsumption },
-            { label: localization.translate('Stat Altitude'), value: fullStats.altitude },
-            { label: localization.translate('Stat Torque'), value: fullStats.torque },
-            { label: localization.translate('Stat Rumble'), value: fullStats.rumble },
-            { label: localization.translate('Stat Cost'), value: fullStats.stats.cost },
-        ];
-        baseStats.forEach(stat => {
-            const row = document.createElement('div');
-            row.style.display = 'flex';
-            row.style.justifyContent = 'space-between';
-            row.innerHTML = `<span>${stat.label}:</span><span>${stat.value}</span>`;
-            grid.appendChild(row);
-        });
-    }
-
     private updateMobileEngineCacheValues(bridge: AircraftBridge, idx: number): void {
         if (!this.mobileEngineCache) return;
 
@@ -661,12 +650,10 @@ export class EnginesUI extends BaseComponentUI {
         });
         cache.typeSelect.selectedIndex = enginesInList.indexOf(selectedEngine);
 
-        // Update rarity
-        cache.rarityValue.className = this.getRarityClass(fullStats.rarity);
-        cache.rarityValue.textContent = this.getRarityText(fullStats.rarity);
-
         // Update base stats grid
-        this.populateBaseStatsGrid(cache.baseStatsGrid, fullStats);
+        updateMobileStatsGrid(cache.baseStatsGrid, fullStats.stats, BASE_STATS, fullStats);
+        cache.rarityValue.className = 'mobile-stat-value ' + this.getRarityClass(fullStats.rarity);
+        cache.rarityValue.textContent = this.getRarityText(fullStats.rarity);
 
         // Update cooling section elements based on type
         if (cache.coolingType === 'liquid') {

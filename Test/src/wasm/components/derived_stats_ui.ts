@@ -1222,6 +1222,7 @@ export class DerivedStatsUI extends BaseComponentUI {
         }
         if (this.mobileUpkeepCell) {
             this.mobileUpkeepCell.textContent = stats.upkeep.toString() + 'þ';
+            this.mobileUpkeepCell.style = 'padding-left:1em';
         }
         if (this.mobileVersionCell) {
             this.updateMobileEraDisplay(stats.eras);
