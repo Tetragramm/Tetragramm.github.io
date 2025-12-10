@@ -24,29 +24,41 @@ enum FUEL_STATE {
     HALF = 3,
 }
 
+interface TableCache {
+    table: HTMLTableElement;
+    headerRow: HTMLTableRowElement;
+    dataRows: HTMLTableRowElement[];
+}
+
 /**
  * Altitude Effects UI Component
  */
 export class AltitudeUI extends BaseComponentUI {
-    private tbl: HTMLTableElement;
-    private fRow: HTMLTableRowElement;
-    private rows: HTMLTableRowElement[];
-
+    // Desktop elements
+    private desktopTable: TableCache;
     private fuelStateSelect: HTMLSelectElement;
     private firesCheckbox: HTMLInputElement;
     private oxidizedCheckbox: HTMLInputElement;
 
+    // Mobile elements
+    private mobileTable: TableCache;
+    private mobileFuelStateSelect: HTMLSelectElement;
+    private mobileFiresCheckbox: HTMLInputElement;
+    private mobileOxidizedCheckbox: HTMLInputElement;
+
     protected shouldUpdate(): boolean {
-        return this.tbl !== undefined;
+        return this.desktopTable !== undefined;
     }
 
     protected clearCache(): void {
-        this.tbl = undefined;
-        this.fRow = undefined;
-        this.rows = [];
+        this.desktopTable = undefined;
+        this.mobileTable = undefined;
         this.fuelStateSelect = undefined;
         this.firesCheckbox = undefined;
         this.oxidizedCheckbox = undefined;
+        this.mobileFuelStateSelect = undefined;
+        this.mobileFiresCheckbox = undefined;
+        this.mobileOxidizedCheckbox = undefined;
     }
 
     /**
@@ -62,39 +74,29 @@ export class AltitudeUI extends BaseComponentUI {
         // Create wrapper for both desktop and mobile content
         const contentWrapper = document.createElement('div');
 
-        // Get table element
-        this.tbl = document.createElement('table') as HTMLTableElement;
-        if (!this.tbl) {
-            console.error('[AltitudeUI] Could not find table_altitude element');
-            return;
-        }
-
         // === DESKTOP VERSION ===
         const desktopDiv = document.createElement('div');
         desktopDiv.className = 'desktop-only';
 
         // Get fuel state dropdown
         this.fuelStateSelect = document.createElement('select') as HTMLSelectElement;
-        if (this.fuelStateSelect) {
-            // Clear existing options
-            this.fuelStateSelect.innerHTML = '';
+        this.fuelStateSelect.innerHTML = '';
 
-            // Add fuel state options
-            const options = [
-                'Derived Full Fuel with Bombs',
-                'Derived Half Fuel with Bombs',
-                'Derived Full Fuel',
-                'Derived Half Fuel'
-            ];
+        // Add fuel state options
+        const options = [
+            'Derived Full Fuel with Bombs',
+            'Derived Half Fuel with Bombs',
+            'Derived Full Fuel',
+            'Derived Half Fuel'
+        ];
 
-            for (const optText of options) {
-                const opt = document.createElement('option');
-                opt.textContent = localization.translate(optText);
-                this.fuelStateSelect.appendChild(opt);
-            }
-
-            this.fuelStateSelect.onchange = () => this.updateValues();
+        for (const optText of options) {
+            const opt = document.createElement('option');
+            opt.textContent = localization.translate(optText);
+            this.fuelStateSelect.appendChild(opt);
         }
+        this.fuelStateSelect.selectedIndex = FUEL_STATE.FULL;
+        this.fuelStateSelect.onchange = () => this.updateValues();
 
         const span = document.createElement('span');
 
@@ -110,20 +112,13 @@ export class AltitudeUI extends BaseComponentUI {
             (value) => this.updateValues()
         );
 
-        // Create header row
-        this.fRow = document.createElement('tr');
-        this.createTH(this.fRow, localization.translate('Altitude Altitude'));
-        this.createTH(this.fRow, localization.translate('Derived Boost'));
-        this.createTH(this.fRow, localization.translate('Derived Rate of Climb'));
-        this.createTH(this.fRow, localization.translate('Derived Stall Speed'));
-        this.createTH(this.fRow, localization.translate('Derived Top Speed'));
-
-        this.rows = [];
+        // Create desktop table
+        this.desktopTable = this.createTableCache();
 
         desktopDiv.appendChild(this.fuelStateSelect);
         desktopDiv.appendChild(document.createElement('br'));
         desktopDiv.appendChild(span);
-        desktopDiv.appendChild(this.tbl);
+        desktopDiv.appendChild(this.desktopTable.table);
         contentWrapper.appendChild(desktopDiv);
 
         // === MOBILE VERSION ===
@@ -147,16 +142,15 @@ export class AltitudeUI extends BaseComponentUI {
                 name: localization.translate(opt),
                 enabled: true
             })),
-            selected: 2, // Default to Full Fuel
+            selected: FUEL_STATE.FULL,
             enabled: true
         };
-        createMobileSelect(
+        this.mobileFuelStateSelect = createMobileSelect(
             fuelBinding,
             fuelItem.content,
             (selectedIndex) => {
-                if (this.fuelStateSelect) {
-                    this.fuelStateSelect.selectedIndex = selectedIndex;
-                }
+                this.fuelStateSelect.selectedIndex = selectedIndex;
+                this.mobileFuelStateSelect.selectedIndex = selectedIndex;
                 this.updateValues();
             }
         );
@@ -166,23 +160,21 @@ export class AltitudeUI extends BaseComponentUI {
             '',
             mobileDiv
         );
-        createMobileCheckbox(
+        this.mobileFiresCheckbox = createMobileCheckbox(
             { name: localization.translate('Altitude Eternal Fires'), selected: false, enabled: true },
             optionsItem.content,
             (checked) => {
-                if (this.firesCheckbox) {
-                    this.firesCheckbox.checked = checked;
-                }
+                this.firesCheckbox.checked = checked;
+                this.mobileFiresCheckbox.checked = checked;
                 this.updateValues();
             }
         );
-        createMobileCheckbox(
+        this.mobileOxidizedCheckbox = createMobileCheckbox(
             { name: localization.translate('Altitude Oxidized Fuel'), selected: false, enabled: true },
             optionsItem.content,
             (checked) => {
-                if (this.oxidizedCheckbox) {
-                    this.oxidizedCheckbox.checked = checked;
-                }
+                this.oxidizedCheckbox.checked = checked;
+                this.mobileOxidizedCheckbox.checked = checked;
                 this.updateValues();
             }
         );
@@ -195,18 +187,11 @@ export class AltitudeUI extends BaseComponentUI {
         const scrollContainer = document.createElement('div');
         scrollContainer.style.overflowX = 'auto';
         scrollContainer.style.maxWidth = '100%';
-        // Clone table for mobile - it will share the same row data
-        const mobileTable = document.createElement('table');
-        mobileTable.className = 'altitude-table-mobile';
-        mobileTable.style.fontSize = '0.9em';
-        const mobileHeader = document.createElement('tr');
-        this.createTH(mobileHeader, localization.translate('Altitude Altitude'));
-        this.createTH(mobileHeader, localization.translate('Derived Boost'));
-        this.createTH(mobileHeader, localization.translate('Derived Rate of Climb'));
-        this.createTH(mobileHeader, localization.translate('Derived Stall Speed'));
-        this.createTH(mobileHeader, localization.translate('Derived Top Speed'));
-        mobileTable.appendChild(mobileHeader);
-        scrollContainer.appendChild(mobileTable);
+
+        this.mobileTable = this.createTableCache();
+        this.mobileTable.table.style.fontSize = '0.9em';
+
+        scrollContainer.appendChild(this.mobileTable.table);
         tableItem.content.appendChild(scrollContainer);
 
         contentWrapper.appendChild(mobileDiv);
@@ -233,6 +218,28 @@ export class AltitudeUI extends BaseComponentUI {
     }
 
     /**
+     * Create a table cache with header row
+     */
+    private createTableCache(): TableCache {
+        const table = document.createElement('table');
+        const headerRow = document.createElement('tr');
+
+        this.createTH(headerRow, localization.translate('Altitude Altitude'));
+        this.createTH(headerRow, localization.translate('Derived Boost'));
+        this.createTH(headerRow, localization.translate('Derived Rate of Climb'));
+        this.createTH(headerRow, localization.translate('Derived Stall Speed'));
+        this.createTH(headerRow, localization.translate('Derived Top Speed'));
+
+        table.appendChild(headerRow);
+
+        return {
+            table,
+            headerRow,
+            dataRows: []
+        };
+    }
+
+    /**
      * Create a table header cell
      */
     private createTH(row: HTMLTableRowElement, text: string): void {
@@ -242,9 +249,9 @@ export class AltitudeUI extends BaseComponentUI {
     }
 
     /**
-     * Add a row for a specific altitude band
+     * Add a data row to a table cache
      */
-    private addRow(af: number): HTMLTableRowElement {
+    private addRowToCache(cache: TableCache, af: number): HTMLTableRowElement {
         const row = document.createElement('tr');
         const afCell = row.insertCell();
         afCell.textContent = `${af * 10}-${af * 10 + 9}`;
@@ -252,7 +259,7 @@ export class AltitudeUI extends BaseComponentUI {
         row.insertCell(); // RoC
         row.insertCell(); // Stall
         row.insertCell(); // Speed
-        this.rows.push(row);
+        cache.dataRows.push(row);
         return row;
     }
 
@@ -261,15 +268,7 @@ export class AltitudeUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge || !this.tbl || !this.fRow) return;
-
-        // Clear table
-        while (this.tbl.rows.length) {
-            this.tbl.deleteRow(0);
-        }
-
-        const fragment = document.createDocumentFragment();
-        fragment.appendChild(this.fRow);
+        if (!bridge || !this.desktopTable) return;
 
         // Get derived stats
         const derived = bridge.getDerivedStats();
@@ -316,7 +315,9 @@ export class AltitudeUI extends BaseComponentUI {
         const firesChecked = this.firesCheckbox?.checked ?? false;
         const oxidizedChecked = this.oxidizedCheckbox?.checked ?? false;
 
-        // Generate rows for each altitude band
+        // Calculate altitude data
+        const altitudeData: Array<{ boost: number; roc: number; stall: number; speed: number }> = [];
+
         for (let af = 0; af < 100; af++) {
             let powerReduction = 0;
             let speedIncrease = 0;
@@ -338,12 +339,6 @@ export class AltitudeUI extends BaseComponentUI {
                 powerReduction = 0;
             }
 
-            // Create row if needed
-            if (this.rows.length <= af) {
-                this.addRow(af);
-            }
-            const row = this.rows[af];
-
             // Calculate adjusted values
             let adjBoost = 0;
             if (powerReduction > 0 && boost !== 0) {
@@ -356,23 +351,56 @@ export class AltitudeUI extends BaseComponentUI {
             const adjStall = Math.max(1, stall + af);
             const adjSpeed = Math.max(1, speed + speedIncrease - powerReduction);
 
-            // Update row cells
-            row.children[1].textContent = adjBoost.toString();
-            row.children[2].textContent = adjRoC.toString();
-            row.children[3].textContent = adjStall.toString();
-            row.children[4].textContent = adjSpeed.toString();
-
-            fragment.appendChild(row);
+            altitudeData.push({ boost: adjBoost, roc: adjRoC, stall: adjStall, speed: adjSpeed });
 
             // Stop if stall speed exceeds top speed
             if (adjStall > adjSpeed) {
-                while (this.rows.length > af + 1) {
-                    this.rows.pop();
-                }
                 break;
             }
         }
 
-        this.tbl.appendChild(fragment);
+        // Update both tables with the same data
+        this.updateTableWithData(this.desktopTable, altitudeData);
+        if (this.mobileTable) {
+            this.updateTableWithData(this.mobileTable, altitudeData);
+        }
+    }
+
+    /**
+     * Update a table with altitude data
+     */
+    private updateTableWithData(cache: TableCache, data: Array<{ boost: number; roc: number; stall: number; speed: number }>): void {
+        // Clear table except header
+        while (cache.table.rows.length > 1) {
+            cache.table.deleteRow(1);
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        // Ensure we have enough rows in cache
+        while (cache.dataRows.length < data.length) {
+            this.addRowToCache(cache, cache.dataRows.length);
+        }
+
+        // Trim excess rows from cache
+        while (cache.dataRows.length > data.length) {
+            cache.dataRows.pop();
+        }
+
+        // Update row data and add to fragment
+        for (let af = 0; af < data.length; af++) {
+            const row = cache.dataRows[af];
+            const d = data[af];
+
+            row.children[0].textContent = `${af * 10}-${af * 10 + 9}`;
+            row.children[1].textContent = d.boost.toString();
+            row.children[2].textContent = d.roc.toString();
+            row.children[3].textContent = d.stall.toString();
+            row.children[4].textContent = d.speed.toString();
+
+            fragment.appendChild(row);
+        }
+
+        cache.table.appendChild(fragment);
     }
 }
