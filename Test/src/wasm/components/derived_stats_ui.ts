@@ -978,6 +978,97 @@ export class DerivedStatsUI extends BaseComponentUI {
     }
 
     /**
+     * Update mobile era display with tap-to-show tooltip and color coding
+     */
+    private updateMobileEraDisplay(eras: Array<{ name: string; era: string }>): void {
+        const bridge = this.getBridge();
+        const aircraftEra = bridge.getEraText();
+        const aircraftEraNum = this.eraToNum(aircraftEra);
+
+        // Calculate era break and collect problematic parts
+        let eraBreak = 0;
+        const problematicParts: Array<{ name: string; era: string }> = [];
+
+        for (const part of eras) {
+            const partEraNum = this.eraToNum(part.era);
+            if (partEraNum > aircraftEraNum) {
+                eraBreak += partEraNum - aircraftEraNum;
+                problematicParts.push(part);
+            }
+        }
+
+        // Clear and rebuild the cell content
+        this.mobileVersionCell.innerHTML = '';
+
+        // Create wrapper for tap-to-show tooltip
+        const wrapper = document.createElement('span');
+        wrapper.style.position = 'relative';
+        wrapper.style.cursor = 'pointer';
+
+        // Era text with color coding
+        const eraText = document.createElement('span');
+        eraText.textContent = localization.translate(aircraftEra);
+        if (eraBreak === 0) {
+            eraText.className = 'green';
+        } else if (eraBreak > 2) {
+            eraText.className = 'red';
+        } else {
+            eraText.className = 'yellow';
+        }
+        wrapper.appendChild(eraText);
+
+        // Create tooltip for mobile (shown on tap)
+        const tooltip = document.createElement('div');
+        tooltip.className = 'mobile-era-tooltip';
+        tooltip.style.display = 'none';
+        tooltip.style.position = 'absolute';
+        tooltip.style.bottom = '100%';
+        tooltip.style.right = '0';
+        tooltip.style.backgroundColor = 'var(--bg_color)';
+        tooltip.style.border = '1px solid var(--inp_txt_color)';
+        tooltip.style.borderRadius = '4px';
+        tooltip.style.padding = '0.5em';
+        tooltip.style.zIndex = '1000';
+        tooltip.style.whiteSpace = 'nowrap';
+        tooltip.style.fontSize = '0.9em';
+        tooltip.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+
+        const headerP = document.createElement('div');
+        headerP.style.fontWeight = 'bold';
+        headerP.style.marginBottom = '0.25em';
+        headerP.textContent = localization.translate('Derived Problematic Parts');
+        tooltip.appendChild(headerP);
+
+        if (problematicParts.length === 0) {
+            const noneP = document.createElement('div');
+            noneP.textContent = localization.translate('None');
+            tooltip.appendChild(noneP);
+        } else {
+            for (const part of problematicParts) {
+                const partP = document.createElement('div');
+                partP.textContent = `${part.name}: ${part.era}`;
+                tooltip.appendChild(partP);
+            }
+        }
+
+        wrapper.appendChild(tooltip);
+
+        // Toggle tooltip on tap
+        wrapper.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = tooltip.style.display !== 'none';
+            tooltip.style.display = isVisible ? 'none' : 'block';
+        });
+
+        // Close tooltip when tapping elsewhere
+        document.addEventListener('click', () => {
+            tooltip.style.display = 'none';
+        }, { once: false });
+
+        this.mobileVersionCell.appendChild(wrapper);
+    }
+
+    /**
      * Convert era string to numeric value for comparison
      * Matches TypeScript era2numHl function
      */
@@ -1134,8 +1225,7 @@ export class DerivedStatsUI extends BaseComponentUI {
             this.mobileUpkeepCell.textContent = stats.upkeep.toString() + 'þ';
         }
         if (this.mobileVersionCell) {
-            const aircraftEra = bridge.getEraText();
-            this.mobileVersionCell.textContent = localization.translate(aircraftEra);
+            this.updateMobileEraDisplay(stats.eras);
         }
 
         // Update mass variations table
