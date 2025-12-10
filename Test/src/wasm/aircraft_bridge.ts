@@ -1791,8 +1791,6 @@ export class AircraftBridge {
     getWeaponSetData(index: number): any {
         this.ensureInitialized();
         const derivedStats = this.wasm!.getWeaponSystemDerivedStats(index);
-        console.log("DerivedInfo");
-        console.log(derivedStats);
 
         // Parse the display info (it's a formatted string)
         // Format includes name, shots, hits, damage, etc.

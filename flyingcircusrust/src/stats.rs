@@ -59,10 +59,12 @@ impl From<ERA> for String {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct ParseEraError;
+pub struct ParseEraError {
+    key: String,
+}
 impl Display for ParseEraError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("Failed to Parse Era.")
+        f.write_str(format!("Failed to Parse Era {}.", self.key).as_str())
     }
 }
 impl TryFrom<&str> for ERA {
@@ -77,7 +79,14 @@ impl TryFrom<&str> for ERA {
             "Coming Storm" => Ok(ERA::ComingStorm),
             "WWII" => Ok(ERA::WWII),
             "Last Hurrah" => Ok(ERA::LastHurrah),
-            _ => Err(ParseEraError),
+            v if v == t!("Himmilgard") => Ok(ERA::Himmilgard),
+            v if v == t!("Pioneer") => Ok(ERA::Pioneer),
+            v if v == t!("WWI") => Ok(ERA::WWI),
+            v if v == t!("Roaring 20s") => Ok(ERA::Roaring20s),
+            v if v == t!("Coming Storm") => Ok(ERA::ComingStorm),
+            v if v == t!("WWII") => Ok(ERA::WWII),
+            v if v == t!("Last Hurrah") => Ok(ERA::LastHurrah),
+            _ => Err(ParseEraError { key: v.to_string() }),
         }
     }
 }

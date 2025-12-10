@@ -19,7 +19,7 @@ export class AircraftActions {
         this.setupButtons();
     }
 
-    private setupButtons(): void {
+    public setupButtons(): void {
         // Save buttons (top and bottom)
         const saveBtn = document.getElementById('acft_save') as HTMLButtonElement;
         if (saveBtn) {
@@ -71,9 +71,20 @@ export class AircraftActions {
         // Default Aircraft button
         const resetBtn = document.getElementById('acft_reset') as HTMLButtonElement;
         if (resetBtn) {
-            console.log("Setting Reset Button");
             resetBtn.onclick = () => this.resetAircraft();
         }
+
+        //Set Labels
+        [{ id: "lbl_acft_save_", key: "Btn Save" },
+        { id: "lbl_acft_load_", key: "Btn Load" },
+        { id: "lbl_acft_save_link_", key: "Btn Copy As Link" },
+        { id: "lbl_acft_save_dash_", key: "Btn Save Dashboard" },
+        { id: "lbl_acft_interactive_dash_", key: "Btn Interactive Dashboard" },
+        { id: "lbl_acft_save_npc_", key: "Btn Save NPC" },
+        { id: "lbl_acft_reset_", key: "Btn Default Aircraft" }].forEach(value => {
+            document.getElementById(value.id + "top").textContent = localization.translate(value.key);
+            document.getElementById(value.id + "bot").textContent = localization.translate(value.key);
+        });
     }
 
     /**

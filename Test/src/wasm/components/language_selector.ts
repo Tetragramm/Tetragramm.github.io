@@ -31,12 +31,13 @@ export class LanguageSelector {
         const label = document.createElement('label');
         label.htmlFor = 'language_selector';
         label.textContent = 'Language: ';
-        label.style.marginRight = '5px';
+        label.style.marginRight = '0.5em';
 
         // Create select element
         this.select = document.createElement('select');
         this.select.id = 'language_selector';
-        this.select.className = 'language-selector';
+        this.select.className = 'mobile-select';
+        this.select.style = "min-width:0px; width:auto;";
 
         // Language names for display
         const languageNames: Record<string, string> = {

@@ -168,7 +168,7 @@ export class WeaponsUI extends BaseComponentUI {
 
         // Global controls
         const controlsItem = createMobileOptionItem(
-            localization.translate('Weapons Settings'),
+            '',
             mobileDiv
         );
 
@@ -251,7 +251,7 @@ export class WeaponsUI extends BaseComponentUI {
         prevBtn.type = 'button';
         prevBtn.className = 'mobile-number-btn';
         prevBtn.textContent = '◀';
-        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         prevBtn.onclick = () => {
             if (this.mobileSelectedSystem > 0) {
                 this.mobileSelectedSystem--;
@@ -272,7 +272,7 @@ export class WeaponsUI extends BaseComponentUI {
         nextBtn.type = 'button';
         nextBtn.className = 'mobile-number-btn';
         nextBtn.textContent = '▶';
-        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         nextBtn.onclick = () => {
             if (this.mobileSelectedSystem < numSystems - 1) {
                 this.mobileSelectedSystem++;
@@ -318,7 +318,7 @@ export class WeaponsUI extends BaseComponentUI {
 
         // Duplicate/Remove buttons section
         const buttonsItem = createMobileOptionItem(
-            localization.translate('Weapons Settings'),
+            '',
             this.mobileSystemContent
         );
 
@@ -450,22 +450,22 @@ export class WeaponsUI extends BaseComponentUI {
             }
         );
 
-        // Options section (checkboxes)
-        const optionsItem = createMobileOptionItem(
-            localization.translate('Weapons Directions'),
-            this.mobileSystemContent
-        );
-
         // Repeating checkbox
         createMobileCheckbox(
             wsBindings.repeating,
-            optionsItem.content,
+            configItem.content,
             (checked) => {
                 const updatedBindings = bridge.getWeaponSystemBindings(idx);
                 updatedBindings.repeating.selected = checked;
                 bridge.setWeaponSystemBindings(idx, updatedBindings);
                 this.onUpdate?.();
             }
+        );
+
+        // Options section (checkboxes)
+        const optionsItem = createMobileOptionItem(
+            localization.translate('Weapons Directions'),
+            this.mobileSystemContent
         );
 
         // Fixed checkbox
@@ -550,7 +550,7 @@ export class WeaponsUI extends BaseComponentUI {
         prevBtn.type = 'button';
         prevBtn.className = 'mobile-number-btn';
         prevBtn.textContent = '◀';
-        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         prevBtn.onclick = () => {
             if (this.mobileSelectedMount > 0) {
                 this.mobileSelectedMount--;
@@ -570,7 +570,7 @@ export class WeaponsUI extends BaseComponentUI {
         nextBtn.type = 'button';
         nextBtn.className = 'mobile-number-btn';
         nextBtn.textContent = '▶';
-        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         nextBtn.onclick = () => {
             if (this.mobileSelectedMount < numMounts - 1) {
                 this.mobileSelectedMount++;

@@ -262,7 +262,7 @@ export class CockpitsUI extends BaseComponentUI {
         prevBtn.type = 'button';
         prevBtn.className = 'mobile-number-btn';
         prevBtn.textContent = '◀';
-        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         prevBtn.onclick = () => {
             if (this.mobileSelectedCockpit > 0) {
                 this.mobileSelectedCockpit--;
@@ -282,7 +282,7 @@ export class CockpitsUI extends BaseComponentUI {
         nextBtn.type = 'button';
         nextBtn.className = 'mobile-number-btn';
         nextBtn.textContent = '▶';
-        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         nextBtn.onclick = () => {
             if (this.mobileSelectedCockpit < cockpitCount - 1) {
                 this.mobileSelectedCockpit++;
@@ -343,7 +343,7 @@ export class CockpitsUI extends BaseComponentUI {
 
         // Type select
         const typeItem = createMobileOptionItem(
-            localization.translate('Cockpit Type'),
+            undefined,
             this.mobileCockpitContent
         );
         const typeSelect = createMobileSelect(

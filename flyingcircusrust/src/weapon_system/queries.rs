@@ -15,21 +15,6 @@ pub struct WeaponSystemDerivedStats {
     pub tags: Vec<String>,  // Tags like "Repeating", "Synched", etc.
 }
 
-#[derive(serde::Serialize)]
-pub struct WeaponSystemDisplayInfo {
-    pub seat: i16,
-    pub weapon_count: i16,
-    pub weapon_name: String,
-    pub weapon_abrv: String,
-    pub directions: Vec<String>, // Active directions as translated strings
-    pub damage: String,          // "X/Y/Z/W" format
-    pub hits: String,            // "X/Y/Z/W" format
-    pub shots: i16,              // Or charges for heat rays
-    pub hr_charges: String,      // For heat rays
-    pub tags: Vec<String>,       // Tags like "Repeating", "Synched", etc.
-    pub is_heat_ray: bool,
-}
-
 impl WeaponSystem {
     /// Get selected weapon type index
     /// TypeScript: GetWeaponSelected()

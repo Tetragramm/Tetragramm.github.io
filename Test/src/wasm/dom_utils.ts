@@ -382,10 +382,12 @@ export function createMobileOptionItem(
     const container = document.createElement('div');
     container.className = 'mobile-option-item';
 
-    const titleDiv = document.createElement('div');
-    titleDiv.className = 'mobile-option-title';
-    titleDiv.textContent = title;
-    container.appendChild(titleDiv);
+    if (title && title.length > 0) {
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'mobile-option-title';
+        titleDiv.textContent = title;
+        container.appendChild(titleDiv);
+    }
 
     const content = document.createElement('div');
     content.className = 'mobile-option-content';

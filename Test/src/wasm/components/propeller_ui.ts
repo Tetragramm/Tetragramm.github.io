@@ -87,7 +87,7 @@ export class PropellerUI extends BaseComponentUI {
         const upgradeSpan = document.createElement('span');
         const upgradeLabel = document.createElement('label');
         upgradeLabel.htmlFor = 'propeller_upgrade_wasm';
-        upgradeLabel.textContent = ' ' + localization.translate('Propeller Propeller Upgrades:') + ' ';
+        upgradeLabel.textContent = ' ' + localization.translate('Propeller Propeller Upgrades') + ' ';
         upgradeSpan.appendChild(upgradeLabel);
 
         const upgradeSelect = createSelectElement(
@@ -127,7 +127,7 @@ export class PropellerUI extends BaseComponentUI {
 
         // Propeller Upgrades
         const upgradeItem = createMobileOptionItem(
-            localization.translate('Propeller Propeller Upgrades:'),
+            localization.translate('Propeller Propeller Upgrades'),
             mobileDiv
         );
         const mobileUpgradeSelect = createMobileSelect(

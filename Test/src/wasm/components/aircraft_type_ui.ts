@@ -101,7 +101,7 @@ export class AircraftTypeUI extends BaseComponentUI {
         const label = document.createElement('label');
         const selectId = generateUniqueId('aircraft_type');
         label.htmlFor = selectId;
-        label.textContent = localization.translate('Aircraft Type') + ': ';
+        label.textContent = localization.translate('Aircraft Type Section Title') + ': ';
         label.style.marginLeft = '0.25em';
         label.style.marginRight = '0.5em';
         span.appendChild(label);
@@ -138,13 +138,13 @@ export class AircraftTypeUI extends BaseComponentUI {
         mobileDiv.className = 'mobile-only mobile-option-group';
 
         const typeItem = createMobileOptionItem(
-            localization.translate('Aircraft Type'),
+            localization.translate('Aircraft Type Section Title'),
             mobileDiv
         );
 
         // Create binding for mobile select
         const selectBinding = {
-            name: localization.translate('Aircraft Type'),
+            name: localization.translate('Aircraft Type Section Title'),
             options: selectableTypes.map(typeValue => ({
                 name: typeNames[typeValue] || `Type ${typeValue}`,
                 enabled: true

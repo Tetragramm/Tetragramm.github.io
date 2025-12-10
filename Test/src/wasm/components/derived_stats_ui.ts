@@ -442,7 +442,7 @@ export class DerivedStatsUI extends BaseComponentUI {
 
         // Cost/Upkeep/Era section
         const basicItem = createMobileOptionItem(
-            localization.translate('Derived Basic Stats'),
+            '',
             mobileDiv
         );
         const basicGrid = document.createElement('div');
@@ -482,8 +482,7 @@ export class DerivedStatsUI extends BaseComponentUI {
         derivedStats['attack'] = bridge.getAttackList().join(', ');
         derivedStats['escape'] = bridge.getEscapeList().join(', ');
         derivedStats['flight_stress'] = this.flightstressCell.textContent;
-        console.log(stats);
-        console.log(derivedStats);
+
         const statsAeroItem = createMobileOptionItem(
             localization.translate('Derived Aerodynamics'),
             mobileDiv

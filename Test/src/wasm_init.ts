@@ -386,6 +386,7 @@ export class WasmApplication {
         } catch (error) {
             console.error('[WasmApp] Failed to reconstruct aircraft on language change:', error);
         }
+        this.actions.setupButtons();
     }
 
     private render(forceFull: boolean = false): void {
@@ -463,29 +464,29 @@ export class WasmApplication {
      */
     private getMobileSections(): MobileSectionConfig[] {
         return [
-            { id: 'Intro', labelKey: 'Intro' },
-            { id: 'Type', labelKey: 'Aircraft Type' },
-            { id: 'Era', labelKey: 'Era' },
-            { id: 'Cockpit', labelKey: 'Cockpits' },
-            { id: 'Passengers', labelKey: 'Passengers' },
-            { id: 'Engines', labelKey: 'Engines' },
-            { id: 'Frames', labelKey: 'Frames' },
-            { id: 'Wings', labelKey: 'Wings', isVisible: () => this.wingsUI?.isVisible() },
-            { id: 'Rotors', labelKey: 'Rotors', isVisible: () => this.rotorUI?.isVisible() },
-            { id: 'Stabilizers', labelKey: 'Stabilizers' },
-            { id: 'ControlSurfaces', labelKey: 'Control Surfaces', isVisible: () => this.controlSurfacesUI?.isVisible() },
-            { id: 'Reinforcements', labelKey: 'Reinforcements', isVisible: () => this.reinforcementsUI?.isVisible() },
-            { id: 'Weapons', labelKey: 'Weapons' },
-            { id: 'Load', labelKey: 'Load' },
-            { id: 'Landing_Gear', labelKey: 'Landing Gear' },
-            { id: 'Accessories', labelKey: 'Additional Parts' },
-            { id: 'Propeller', labelKey: 'Propeller', isVisible: () => this.propellerUI?.isVisible() },
-            { id: 'Optimization', labelKey: 'Optimizations' },
-            { id: 'Used Planes', labelKey: 'Used Planes' },
-            { id: 'CustomParts', labelKey: 'Custom Parts' },
-            { id: 'Stats', labelKey: 'Total Stats' },
-            { id: 'Flight', labelKey: 'Derived Stats' },
-            { id: 'Altitude', labelKey: 'Altitude' },
+            { id: 'Intro', labelKey: 'Intro Section Title' },
+            { id: 'Type', labelKey: 'Aircraft Type Section Title' },
+            { id: 'Era', labelKey: 'Era Section Title' },
+            { id: 'Cockpit', labelKey: 'Cockpit Section Title' },
+            { id: 'Passengers', labelKey: 'Passengers Section Title' },
+            { id: 'Engines', labelKey: 'Engines Section Title' },
+            { id: 'Frames', labelKey: 'Frames Frames and Covering' },
+            { id: 'Wings', labelKey: 'Wings Section Title', isVisible: () => this.wingsUI?.isVisible() },
+            { id: 'Rotors', labelKey: 'Rotor Section Title', isVisible: () => this.rotorUI?.isVisible() },
+            { id: 'Stabilizers', labelKey: 'Stabilizers Section Title' },
+            { id: 'ControlSurfaces', labelKey: 'Control Surfaces Section Title', isVisible: () => this.controlSurfacesUI?.isVisible() },
+            { id: 'Reinforcements', labelKey: 'Reinforcement Section Title', isVisible: () => this.reinforcementsUI?.isVisible() },
+            { id: 'Weapons', labelKey: 'Weapons Section Title' },
+            { id: 'Load', labelKey: 'Load Section Title' },
+            { id: 'Landing_Gear', labelKey: 'Landing Gear Section Title' },
+            { id: 'Accessories', labelKey: 'Accessories Section Title' },
+            { id: 'Propeller', labelKey: 'Propeller Section Title', isVisible: () => this.propellerUI?.isVisible() },
+            { id: 'Optimization', labelKey: 'Optimization Section Title' },
+            { id: 'Used Planes', labelKey: 'Used Section Title' },
+            { id: 'CustomParts', labelKey: 'Alter Section Title' },
+            { id: 'Stats', labelKey: 'Aircraft Stats Section Title' },
+            { id: 'Flight', labelKey: 'Aircraft Derived Section Title' },
+            { id: 'Altitude', labelKey: 'Altitude Section Title' },
         ];
     }
 }

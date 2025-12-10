@@ -358,13 +358,11 @@ export class Cards {
         context.fillText(this.weap_data.jam, 230, 158, 65);
 
         const hits = this.weap_data.hits.split("/");
-        console.log(this.weap_data.hits);
         context.fillText(hits[0], 157, 208, 80);
         context.fillText(hits[1], 157 + 80, 208, 80);
         context.fillText(hits[2], 157 + 160, 208, 80);
         context.fillText(hits[3], 157 + 240, 208, 80);
 
-        console.log(this.weap_data.damage);
         const damage = this.weap_data.damage.split("/");
         context.fillText(damage[0], 157, 208 + 23, 80);
         context.fillText(damage[1], 157 + 80, 208 + 23, 80);

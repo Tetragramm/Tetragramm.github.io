@@ -193,7 +193,7 @@ export class CustomPartsUI extends BaseComponentUI {
         mobileButtonsDiv.appendChild(mobilePartSelect);
 
         const mobileAddBtn = document.createElement('button');
-        mobileAddBtn.textContent = localization.translate('Add Part');
+        mobileAddBtn.textContent = localization.translate('Alter Add Part');
         mobileAddBtn.onclick = () => {
             const stats: any = {};
             for (const key of mobileStatInputs.keys()) {
@@ -221,7 +221,7 @@ export class CustomPartsUI extends BaseComponentUI {
         mobileButtonsDiv.appendChild(mobileAddBtn);
 
         const mobileRemoveBtn = document.createElement('button');
-        mobileRemoveBtn.textContent = localization.translate('Remove Part');
+        mobileRemoveBtn.textContent = localization.translate('Alter Remove Part');
         mobileRemoveBtn.onclick = () => {
             bridge.removeCustomPart(mobileNameInput.value);
             mobileNameInput.value = 'Default';

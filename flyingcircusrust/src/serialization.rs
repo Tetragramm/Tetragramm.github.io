@@ -264,7 +264,7 @@ impl<'a> Deserializer<'a> {
     /// Creates a Deserializer from an LZ-String compressed string.
     /// Decompresses the LZ-String and creates a Deserializer
     /// to read the binary data.
-    pub fn from_lz_string(compressed: &str) -> Result<Deserializer, Error> {
+    pub fn from_lz_string(compressed: &str) -> Result<Deserializer<'_>, Error> {
         // Decompress the LZ-String to get Base64 string
         let u16_str =
             lz_str::decompress_from_encoded_uri_component(compressed).ok_or_else(|| {

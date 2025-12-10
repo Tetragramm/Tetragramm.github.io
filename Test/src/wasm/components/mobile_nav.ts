@@ -297,7 +297,7 @@ export class MobileNavigation {
                 elem.style.display = '';
             }
             // Scroll to top of section
-            elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         }
 
         this.currentIndex = index;

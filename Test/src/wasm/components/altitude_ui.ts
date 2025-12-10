@@ -132,7 +132,7 @@ export class AltitudeUI extends BaseComponentUI {
 
         // Mobile fuel state selector
         const fuelItem = createMobileOptionItem(
-            localization.translate('Altitude Fuel State'),
+            '',
             mobileDiv
         );
         const fuelOptions = [
@@ -163,7 +163,7 @@ export class AltitudeUI extends BaseComponentUI {
 
         // Mobile checkboxes
         const optionsItem = createMobileOptionItem(
-            localization.translate('Altitude Options'),
+            '',
             mobileDiv
         );
         createMobileCheckbox(
@@ -189,7 +189,7 @@ export class AltitudeUI extends BaseComponentUI {
 
         // Mobile table in scrollable container
         const tableItem = createMobileOptionItem(
-            localization.translate('Altitude Effects'),
+            '',
             mobileDiv
         );
         const scrollContainer = document.createElement('div');

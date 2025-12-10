@@ -14,7 +14,7 @@
 	background-color: var(--bkg_color);
 	color: var(--inp_txt_color);
 	font-family: Open Sans, Helvetica, Arial, sans-serif;
-	margin-left: 1em;
+	overflow-x: visible;
 }
 
 li {
@@ -151,6 +151,7 @@ th {
 	padding: 0.25rem;
 	font-size: 1rem;
 	margin: 0.25rem;
+	font-weight: bold;
 }
 
 td {
@@ -333,7 +334,6 @@ button {
 button[disabled] {
 	background-color: #000000;
 	border-color: #000000;
-	visibility: hidden;
 }
 
 /* Use for marking stats as local to a part. */
@@ -979,6 +979,11 @@ select.flex-item {
 	height: 1.5rem !important;
 }
 
+.mobile-checkbox-label input[type='checkbox']:checked:after {
+	font-size: 1.2em;
+	line-height: 1.2em;
+}
+
 /* Mobile section styling */
 .mobile-section {
 	margin-bottom: 1rem;
@@ -1036,6 +1041,7 @@ select.flex-item {
 	height: 2.5rem !important;
 	font-size: 1rem !important;
 	padding: 0.5rem;
+	background: var(--inp_bkg_color);
 }
 
 /* Fuselage Frames section mobile layout */
@@ -1136,7 +1142,6 @@ select.flex-item {
 
 	/* Full-width selects */
 	select {
-		min-width: 100%;
 		height: 2.5rem !important;
 	}
 
@@ -1190,9 +1195,5 @@ select.flex-item {
 @media (min-width: 769px) {
 	.mobile-only {
 		display: none !important;
-	}
-
-	.desktop-only {
-		display: block !important;
 	}
 }

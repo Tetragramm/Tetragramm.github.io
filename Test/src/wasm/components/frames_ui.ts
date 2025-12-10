@@ -913,20 +913,19 @@ export class FramesUI extends BaseComponentUI {
 
         // Flying Wing checkbox
         const flyingWingItem = createMobileOptionItem(
-            localization.translate('Frames Flying Wing'),
+            '',
             contentDiv
         );
-        const mobileFlyingWingCheckbox = document.createElement('input');
-        mobileFlyingWingCheckbox.type = 'checkbox';
-        mobileFlyingWingCheckbox.checked = bindings.flying_wing.selected;
-        mobileFlyingWingCheckbox.disabled = !bindings.flying_wing.enabled;
-        mobileFlyingWingCheckbox.onchange = () => {
-            const updatedBindings = this.getBridge().getFramesBindings();
-            updatedBindings.flying_wing.selected = mobileFlyingWingCheckbox.checked;
-            this.getBridge().setFramesBindings(updatedBindings);
-            this.onUpdate();
-        };
-        flyingWingItem.content.appendChild(mobileFlyingWingCheckbox);
+        const mobileFlyingWingCheckbox = createMobileCheckbox(
+            { name: localization.translate('Frames Flying Wing'), selected: bindings.flying_wing.selected, enabled: bindings.flying_wing.enabled },
+            flyingWingItem.content,
+            (checked) => {
+                const updatedBindings = this.getBridge().getFramesBindings();
+                updatedBindings.flying_wing.selected = checked;
+                this.getBridge().setFramesBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
 
         // Frame Type selector (apply to all)
         const frameTypeItem = createMobileOptionItem(

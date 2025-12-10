@@ -225,7 +225,7 @@ export class EnginesUI extends BaseComponentUI {
 
         // Global controls
         const controlsItem = createMobileOptionItem(
-            localization.translate('Engines Settings'),
+            '',
             mobileDiv
         );
 
@@ -275,17 +275,6 @@ export class EnginesUI extends BaseComponentUI {
         this.mobileRadiatorsContainer = document.createElement('div');
         mobileDiv.appendChild(this.mobileRadiatorsContainer);
 
-        // Engine Builder link
-        const mobileBuilderDiv = document.createElement('div');
-        mobileBuilderDiv.style.marginTop = '10px';
-        mobileBuilderDiv.style.textAlign = 'center';
-        const mobileBuilderLink = document.createElement('a');
-        mobileBuilderLink.href = './engine.html';
-        const mobileBuilderText = document.createElement('u');
-        mobileBuilderText.textContent = 'Engine Builder';
-        mobileBuilderLink.appendChild(mobileBuilderText);
-        mobileBuilderDiv.appendChild(mobileBuilderLink);
-        mobileDiv.appendChild(mobileBuilderDiv);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -307,7 +296,6 @@ export class EnginesUI extends BaseComponentUI {
 
         // Add Engine Builder link (desktop)
         const engineBuilderSpan = document.createElement('span');
-        engineBuilderSpan.className = 'desktop-only';
         const engineBuilderLink = document.createElement('a');
         engineBuilderLink.href = './engine.html';
         const engineBuilderText = document.createElement('u');
@@ -404,7 +392,7 @@ export class EnginesUI extends BaseComponentUI {
         prevBtn.type = 'button';
         prevBtn.className = 'mobile-number-btn';
         prevBtn.textContent = '◀';
-        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         prevBtn.onclick = () => {
             if (this.mobileSelectedEngine > 0) {
                 this.mobileSelectedEngine--;
@@ -424,7 +412,7 @@ export class EnginesUI extends BaseComponentUI {
         nextBtn.type = 'button';
         nextBtn.className = 'mobile-number-btn';
         nextBtn.textContent = '▶';
-        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         nextBtn.onclick = () => {
             if (this.mobileSelectedEngine < engineCount - 1) {
                 this.mobileSelectedEngine++;
@@ -1083,7 +1071,7 @@ export class EnginesUI extends BaseComponentUI {
         prevBtn.type = 'button';
         prevBtn.className = 'mobile-number-btn';
         prevBtn.textContent = '◀';
-        prevBtn.style.padding = '0.5rem 1rem';
+        prevBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         prevBtn.onclick = () => {
             if (this.mobileSelectedRadiator > 0) {
                 this.mobileSelectedRadiator--;
@@ -1103,7 +1091,7 @@ export class EnginesUI extends BaseComponentUI {
         nextBtn.type = 'button';
         nextBtn.className = 'mobile-number-btn';
         nextBtn.textContent = '▶';
-        nextBtn.style.padding = '0.5rem 1rem';
+        nextBtn.style.padding = '0.5rem 1rem 1rem 1rem';
         nextBtn.onclick = () => {
             if (this.mobileSelectedRadiator < radiatorCount - 1) {
                 this.mobileSelectedRadiator++;
