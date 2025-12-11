@@ -24,7 +24,8 @@ import {
     createMobileSelect,
     createMobileCheckbox,
     createMobileStatsGrid,
-    updateMobileStatsGrid
+    updateMobileStatsGrid,
+    updateResponsiveGridColumnWidth
 } from '../dom_utils';
 import { AIRCRAFT_TYPE } from './aircraft_type_ui';
 
@@ -149,6 +150,11 @@ export class ReinforcementsUI extends BaseComponentUI {
             localization.translate('Reinforcement External Reinforcements'),
             mobileDiv
         );
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'mobile-responsive-grid';
+        gridDiv.style.gap = '0em';
+        gridDiv.style.columnGap = '-1rem';
+        extItem.content.appendChild(gridDiv);
 
         // Wood/Steel counts for each row
         const extWoodBinding = bindings.ext_wood_count;
@@ -166,14 +172,15 @@ export class ReinforcementsUI extends BaseComponentUI {
                 const rowDiv = document.createElement('div');
                 const rowLabel = document.createElement('strong');
                 rowLabel.textContent = woodItem.name;
+                rowDiv.style.gridColumnStart = '1';
                 rowDiv.appendChild(rowLabel);
-                extItem.content.appendChild(rowDiv);
+                gridDiv.appendChild(rowDiv);
 
                 // Wood input
                 const woodIndex = i;
                 const { input: woodInput } = createMobileNumberInput(
                     { ...woodItem, name: localization.translate('Reinforcement Wood') },
-                    extItem.content,
+                    gridDiv,
                     (value) => {
                         const updatedBindings = bridge.getReinforcementsBindings();
                         updatedBindings.ext_wood_count[woodIndex].value = value;
@@ -190,7 +197,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                 const steelIndex = i;
                 const { input: steelInput } = createMobileNumberInput(
                     { ...steelItem, name: localization.translate('Reinforcement Steel') },
-                    extItem.content,
+                    gridDiv,
                     (value) => {
                         const updatedBindings = bridge.getReinforcementsBindings();
                         updatedBindings.ext_steel_count[steelIndex].value = value;
@@ -202,13 +209,6 @@ export class ReinforcementsUI extends BaseComponentUI {
                     1
                 );
                 mobileExtSteelInputs.push(steelInput);
-
-                // Add separator line after steel input before next strut
-                if (i < extWoodBinding.length - 1) {
-                    const separator = document.createElement('div');
-                    separator.style.width = "100%"
-                    extItem.content.appendChild(separator);
-                }
             }
         }
 
@@ -226,6 +226,7 @@ export class ReinforcementsUI extends BaseComponentUI {
                     this.onUpdate();
                 }
             );
+            mobileCabaneSelect.style.gridColumnStart = '1';
         }
 
         // Wires checkbox
@@ -331,6 +332,10 @@ export class ReinforcementsUI extends BaseComponentUI {
 
         // Set initial visibility based on aircraft type
         this.updateVisibility(bridge.getAircraftType());
+
+        requestAnimationFrame(() => {
+            updateResponsiveGridColumnWidth(gridDiv);
+        });
 
         console.log('[ReinforcementsUI] Full rebuild complete');
     }

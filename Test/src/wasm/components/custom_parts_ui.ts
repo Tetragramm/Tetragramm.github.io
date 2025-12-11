@@ -14,7 +14,8 @@ import {
     createCollapsibleSection,
     createFlexSection,
     createMobileOptionItem,
-    createMobileNumberInput
+    createMobileNumberInput,
+    updateResponsiveGridColumnWidth
 } from '../dom_utils';
 
 interface CustomPart {
@@ -107,7 +108,7 @@ export class CustomPartsUI extends BaseComponentUI {
             mobileDiv
         );
 
-        // Mobile name input
+        // Mobile name input (outside the grid)
         const mobileNameLabel = document.createElement('label');
         mobileNameLabel.textContent = localization.translate('Alter Part Name');
         mobileNameLabel.style.display = 'block';
@@ -122,23 +123,28 @@ export class CustomPartsUI extends BaseComponentUI {
         mobileNameInput.id = 'mobile-custom-name';
         editItem.content.appendChild(mobileNameInput);
 
+        // Responsive grid for stat inputs
+        const innerDiv = document.createElement('div');
+        innerDiv.className = 'mobile-responsive-grid';
+        editItem.content.appendChild(innerDiv);
+
         // Create mobile stat inputs using mobile number input component
         const mobileStatInputs = new Map<string, HTMLInputElement>();
         const statDefs = [
-            ['cost', 'Cost'], ['mass', 'Mass'], ['wetmass', 'Wet Mass'],
-            ['bomb_mass', 'Bomb Mass'], ['drag', 'Drag'], ['liftbleed', 'Lift Bleed'],
-            ['wingarea', 'Wing Area'], ['control', 'Control'], ['pitchstab', 'Pitch Stability'],
-            ['latstab', 'Lateral Stability'], ['maxstrain', 'Raw Strain'], ['structure', 'Structure'],
-            ['toughness', 'Toughness'], ['power', 'Power'], ['fuelconsumption', 'Fuel Consumption'],
-            ['fuel', 'Fuel'], ['visibility', 'Visibility'], ['crashsafety', 'Crash Safety'],
-            ['escape', 'Escape'], ['charge', 'Charge'], ['upkeep', 'Upkeep'],
-            ['reliability', 'Reliability']
+            ['cost', 'Stat Cost'], ['mass', 'Stat Mass'], ['wetmass', 'Stat Wet Mass'],
+            ['bomb_mass', 'Stat Bomb Mass'], ['drag', 'Stat Drag'], ['liftbleed', 'Stat Lift Bleed'],
+            ['wingarea', 'Stat Wing Area'], ['control', 'Stat Control'], ['pitchstab', 'Stat Pitch Stability'],
+            ['latstab', 'Stat Lateral Stability'], ['maxstrain', 'Stat Raw Strain'], ['structure', 'Stat Structure'],
+            ['toughness', 'Stat Toughness'], ['power', 'Stat Power'], ['fuelconsumption', 'Stat Fuel Consumption'],
+            ['fuel', 'Stat Fuel'], ['visibility', 'Stat Visibility'], ['crashsafety', 'Stat Crash Safety'],
+            ['escape', 'Stat Escape'], ['charge', 'Stat Charge'], ['upkeep', 'Stat Upkeep'],
+            ['reliability', 'Stat Reliability']
         ];
 
         for (const [key, label] of statDefs) {
             const { input: statInput } = createMobileNumberInput(
-                { name: label, value: 0, enabled: true },
-                editItem.content,
+                { name: localization.translate(label), value: 0, enabled: true },
+                innerDiv,
                 () => { }, // No onChange needed - value read when button pressed
                 -999,
                 999,
@@ -148,19 +154,23 @@ export class CustomPartsUI extends BaseComponentUI {
         }
 
         // Mobile special rules
+        const innerDiv2 = document.createElement('div');
+        innerDiv2.style.width = '100%';
+
         const mobileSpecialLabel = document.createElement('label');
         mobileSpecialLabel.textContent = localization.translate('Alter Part Special Rules');
         mobileSpecialLabel.style.display = 'block';
         mobileSpecialLabel.style.marginTop = '10px';
         mobileSpecialLabel.style.marginBottom = '5px';
-        editItem.content.appendChild(mobileSpecialLabel);
+        innerDiv2.appendChild(mobileSpecialLabel);
 
         const mobileSpecialInput = document.createElement('input');
         mobileSpecialInput.type = 'text';
         mobileSpecialInput.style.width = '100%';
         mobileSpecialInput.style.marginBottom = '10px';
         mobileSpecialInput.id = 'mobile-custom-special';
-        editItem.content.appendChild(mobileSpecialInput);
+        innerDiv2.appendChild(mobileSpecialInput);
+        editItem.content.appendChild(innerDiv2);
 
         // Mobile dropdown and buttons
         const mobileButtonsDiv = document.createElement('div');
@@ -248,6 +258,12 @@ export class CustomPartsUI extends BaseComponentUI {
 
         this.container.appendChild(this.sectionElement);
         this.updateValues();
+
+        // Calculate and set responsive grid column width after DOM renders
+        requestAnimationFrame(() => {
+            updateResponsiveGridColumnWidth(innerDiv);
+        });
+
         console.log('[CustomPartsUI] Full rebuild complete');
     }
 

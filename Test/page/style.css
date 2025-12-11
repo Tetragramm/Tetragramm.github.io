@@ -1044,6 +1044,15 @@ select.flex-item {
 	background: var(--inp_bkg_color);
 }
 
+/* Responsive grid that reflows to multiple equal-width columns
+   Uses --min-col-width CSS variable set by JavaScript based on content */
+.mobile-responsive-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(var(--min-col-width, 100%), 1fr));
+	gap: 0.5rem;
+	width: 100%;
+}
+
 /* Fuselage Frames section mobile layout */
 .mobile-frames-section {
 	display: flex;
@@ -1058,6 +1067,7 @@ select.flex-item {
 	padding: 0.5rem;
 	background-color: rgba(56, 56, 56, 0.3);
 	border-radius: 4px;
+	width: 100%;
 }
 
 .mobile-frame-header {

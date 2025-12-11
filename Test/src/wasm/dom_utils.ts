@@ -331,6 +331,17 @@ export function createMobileNumberInput(
         plusBtn.disabled = input.disabled || (input.max !== undefined && value >= parseInt(input.max));
     };
 
+    input['_max'] = input.max;
+    input['_min'] = input.min;
+    Object.defineProperty(input, 'max', {
+        set: function (newMax: string) { this._max = newMax; updateButtonStates(); },
+        get: function () { return this._max; }
+    });
+    Object.defineProperty(input, 'min', {
+        set: function (newMin: string) { this._min = newMin; updateButtonStates(); },
+        get: function () { return this._min; }
+    });
+
     // Event handlers
     minusBtn.onclick = () => {
         const currentValue = parseInt(input.value) || 0;
@@ -939,3 +950,48 @@ export interface StatDisplayConfig {
     isDerived?: boolean;
 }
 
+
+/**
+ * Calculate the maximum natural width of grid items and set CSS variable
+ * This ensures all columns are wide enough to fit the largest item
+ */
+export function updateResponsiveGridColumnWidth(gridElement: HTMLElement): void {
+    if (!gridElement || gridElement.children.length === 0) {
+        console.log('[CustomPartsUI] Grid element empty or missing');
+        return;
+    }
+
+    // Create a hidden measurement container
+    const measureContainer = document.createElement('div');
+    measureContainer.style.position = 'absolute';
+    measureContainer.style.visibility = 'hidden';
+    measureContainer.style.width = 'auto';
+    measureContainer.style.height = 'auto';
+    measureContainer.style.overflow = 'visible';
+    measureContainer.style.whiteSpace = 'nowrap';
+    document.body.appendChild(measureContainer);
+
+    // Find the maximum natural width by cloning and measuring
+    let maxWidth = 0;
+    for (let i = 0; i < gridElement.children.length; i++) {
+        const child = gridElement.children[i] as HTMLElement;
+        const clone = child.cloneNode(true) as HTMLElement;
+        clone.style.width = 'auto';
+        clone.style.position = 'static';
+        measureContainer.appendChild(clone);
+        const width = clone.offsetWidth;
+        measureContainer.removeChild(clone);
+
+        if (width > maxWidth) {
+            maxWidth = width;
+        }
+    }
+
+    document.body.removeChild(measureContainer);
+
+    console.log('[CustomPartsUI] Measured max width:', maxWidth);
+
+    if (maxWidth > 0) {
+        gridElement.style.setProperty('--min-col-width', `${Math.ceil(maxWidth)}px`);
+    }
+}

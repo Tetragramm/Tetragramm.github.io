@@ -1327,11 +1327,15 @@ export class DerivedStatsUI extends BaseComponentUI {
                 const ext_bomb = Math.max(0, bombs - int_bomb);
                 if (int_bomb > 0) {
                     const div = document.createElement('div');
+                    div.style.paddingTop = '0.5em';
+                    div.style.paddingBottom = '0.5em';
                     div.textContent = localization.translateWithParam('Bomb Mass Internally.', int_bomb);
                     this.mobileWeaponsDiv.appendChild(div);
                 }
                 if (ext_bomb > 0) {
                     const div = document.createElement('div');
+                    div.style.paddingTop = '0.5em';
+                    div.style.paddingBottom = '0.5em';
                     div.textContent = localization.translateWithParam('Bomb Mass Externally.', ext_bomb);
                     this.mobileWeaponsDiv.appendChild(div);
                 }
@@ -1343,11 +1347,15 @@ export class DerivedStatsUI extends BaseComponentUI {
                 const ext_rock = Math.max(0, rockets - int_rock);
                 if (int_rock > 0) {
                     const div = document.createElement('div');
+                    div.style.paddingTop = '0.5em';
+                    div.style.paddingBottom = '0.5em';
                     div.textContent = localization.translateWithParam('Rocket Mass Internally.', int_rock);
                     this.mobileWeaponsDiv.appendChild(div);
                 }
                 if (ext_rock > 0) {
                     const div = document.createElement('div');
+                    div.style.paddingTop = '0.5em';
+                    div.style.paddingBottom = '0.5em';
                     div.textContent = localization.translateWithParam('Rocket Mass Externally.', ext_rock);
                     this.mobileWeaponsDiv.appendChild(div);
                 }
@@ -1357,6 +1365,8 @@ export class DerivedStatsUI extends BaseComponentUI {
             for (let i = 0; i < weaponSetsCount; i++) {
                 const ws = bridge.getWeaponSystemDisplayInfo(i);
                 const div = document.createElement('div');
+                div.style.paddingTop = '0.5em';
+                div.style.paddingBottom = '0.5em';
                 div.innerHTML = ws;
                 this.mobileWeaponsDiv.appendChild(div);
             }
@@ -1375,6 +1385,7 @@ export class DerivedStatsUI extends BaseComponentUI {
                 label.textContent = localization.translate('Derived Battery');
                 div.appendChild(label);
                 const value = document.createElement('span');
+                value.style.paddingLeft = '1em';
                 value.textContent = electrics.storage.toString();
                 div.appendChild(value);
                 this.mobileElectricsDiv.appendChild(div);
@@ -1388,6 +1399,7 @@ export class DerivedStatsUI extends BaseComponentUI {
                 label.textContent = equip.source;
                 div.appendChild(label);
                 const value = document.createElement('span');
+                value.style.paddingLeft = '1em';
                 value.textContent = equip.charge;
                 div.appendChild(value);
                 this.mobileElectricsDiv.appendChild(div);
@@ -1414,6 +1426,8 @@ export class DerivedStatsUI extends BaseComponentUI {
                     else if (w.level === 'Yellow') color = '#FFFF00';
 
                     const div = document.createElement('div');
+                    div.style.paddingTop = '0.5em';
+                    div.style.paddingBottom = '0.5em';
                     div.style.color = color;
                     div.textContent = `${w.name}: ${w.warning}`;
                     this.mobileWarningsDiv.appendChild(div);

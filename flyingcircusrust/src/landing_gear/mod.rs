@@ -53,7 +53,7 @@ pub struct LandingGear {
     // Retractable gear option
     #[ui(
         check,
-        name = "retract",
+        name = "Landing Gear Retractable",
         enabled_fn = "is_retract_enabled",
         set_fn = "set_retract"
     )]

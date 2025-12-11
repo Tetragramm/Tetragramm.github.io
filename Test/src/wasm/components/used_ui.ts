@@ -231,6 +231,7 @@ export class UsedUI extends BaseComponentUI {
             descSpan.style.fontSize = '0.85em';
             descSpan.style.color = 'var(--inp_txt_color)';
             descSpan.style.opacity = '0.8';
+            descSpan.style.flexGrow = '1';
             descSpan.textContent = localization.translate(descriptionKey);
             item.content.appendChild(descSpan);
 

@@ -182,7 +182,7 @@ export class OptimizationUI extends BaseComponentUI {
             mobileDiv
         );
         const { input: mobileFreeInput } = createMobileNumberInput(
-            bindings.free_dots,
+            { ...bindings.free_dots, name: '' },
             freeItem.content,
             (value) => {
                 const updatedBindings = bridge.getOptimizationBindings();
@@ -350,7 +350,7 @@ export class OptimizationUI extends BaseComponentUI {
         }
 
         // Get available free dots for enabling/disabling positive checkboxes
-        const freeDots = bindings.free_dots?.value || 0;
+        const freeDots = bridge.getOptimizationAvailable();
 
         // Update optimization rows (desktop)
         this.cache.optimizationRows.forEach(row => {
@@ -373,6 +373,11 @@ export class OptimizationUI extends BaseComponentUI {
                 if (binding) {
                     input.value = binding.value.toString();
                     input.disabled = !binding.enabled;
+                    if (freeDots > 0) {
+                        input.max = Math.min(3, binding.value + freeDots).toString();
+                    } else {
+                        input.max = Math.max(0, binding.value).toString();
+                    }
                 }
             });
         }

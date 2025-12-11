@@ -154,6 +154,7 @@ export class MobileNavigation {
                     this.navigatePrev();
                 } else {
                     // Swipe left -> go to next
+                    console.log("NN: Swipe");
                     this.navigateNext();
                 }
             }
