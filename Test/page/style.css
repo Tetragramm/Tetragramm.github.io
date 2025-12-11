@@ -1207,3 +1207,200 @@ select.flex-item {
 		display: none !important;
 	}
 }
+
+/* ============================================
+   ENGINE BUILDER RESPONSIVE STYLES
+   ============================================ */
+
+/* Main container for engine builder sections */
+.engine-builder-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1rem;
+	width: 100%;
+	align-items: start;
+}
+
+/* For 3-column layouts (propeller builder with options/upgrades/stats) */
+.engine-builder-container.three-column {
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Section within engine builder (Options, Upgrades, Stats) */
+.engine-builder-section {
+	background-color: rgba(56, 56, 56, 0.3);
+	border-radius: 4px;
+	padding: 0.75rem;
+	min-width: 0; /* Prevent grid blowout */
+}
+
+.engine-builder-section-title {
+	color: var(--lnk_color);
+	font-weight: bold;
+	font-size: 1rem;
+	margin-bottom: 0.5rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--inp_bdr_color);
+}
+
+/* Engine name display below title */
+.engine-builder-name-display {
+	font-size: 1.1rem;
+	font-weight: bold;
+	color: var(--inp_txt_color);
+	margin-bottom: 0.75rem;
+	word-break: break-word;
+}
+
+/* Flex layout for form inputs within a section */
+.engine-builder-inputs {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+/* Input row with label and control */
+.engine-builder-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.engine-builder-row label {
+	flex: 1;
+	min-width: 120px;
+	font-size: 0.9rem;
+}
+
+.engine-builder-row input[type="text"],
+.engine-builder-row input[type="number"],
+.engine-builder-row select {
+	flex: 1;
+	min-width: 100px;
+	max-width: 200px;
+}
+
+/* Checkbox rows - full width */
+.engine-builder-row.checkbox-row {
+	padding: 0.25rem 0;
+}
+
+.engine-builder-row.checkbox-row label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.engine-builder-row.checkbox-row input[type="checkbox"] {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+/* Stats display grid */
+.engine-builder-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 0.5rem;
+}
+
+.engine-builder-stat-item {
+	display: flex;
+	flex-direction: column;
+	padding: 0.5rem;
+	background-color: var(--bkg_color);
+	border-radius: 4px;
+}
+
+.engine-builder-stat-label {
+	font-size: 0.75rem;
+	color: var(--lnk_color);
+}
+
+.engine-builder-stat-value {
+	font-size: 1.1rem;
+	font-weight: bold;
+}
+
+/* Description text area for turbine builder */
+.engine-builder-description {
+	font-size: 0.85rem;
+	line-height: 1.4;
+	padding: 0.5rem;
+	background-color: var(--bkg_color);
+	border-radius: 4px;
+}
+
+/* List manager responsive layout */
+.engine-list-manager {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.engine-list-manager-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.engine-list-manager-row label {
+	min-width: 80px;
+}
+
+.engine-list-manager-row select {
+	flex: 1;
+	min-width: 150px;
+	max-width: 300px;
+}
+
+.engine-list-manager-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.engine-list-manager-buttons button {
+	padding: 0.5rem 1rem;
+	min-height: 2.5rem;
+}
+
+/* Create list row with inline input */
+.engine-list-manager-create {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.engine-list-manager-create input[type="text"] {
+	flex: 1;
+	min-width: 150px;
+	max-width: 200px;
+}
+
+/* Mobile adjustments for engine builder */
+@media (max-width: 768px) {
+	.engine-builder-container {
+		grid-template-columns: 1fr;
+	}
+
+	.engine-builder-row label {
+		min-width: 100%;
+		margin-bottom: 0.25rem;
+	}
+
+	.engine-builder-row input[type="text"],
+	.engine-builder-row input[type="number"],
+	.engine-builder-row select {
+		max-width: 100%;
+		width: 100%;
+	}
+
+	.engine-list-manager-buttons button {
+		flex: 1 1 calc(50% - 0.25rem);
+		min-width: 120px;
+	}
+}

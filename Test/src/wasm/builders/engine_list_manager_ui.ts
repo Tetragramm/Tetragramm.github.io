@@ -85,7 +85,7 @@ export class EngineListManagerUI {
         this.createListBtn.onclick = () => this.createList();
         this.deleteListBtn.onclick = () => this.deleteList();
 
-        // Build layout
+        // Build layout using original helper functions
         createSelect(localization.translate('Engine Builder Lists'), this.listSelect, this.container);
         createSelect(localization.translate('Engine Builder Engines'), this.engineSelect, this.container);
         this.container.appendChild(document.createElement('br'));
@@ -109,7 +109,7 @@ export class EngineListManagerUI {
         this.updateDeleteButtonLabel();
 
         // Create list section
-        const { label: createLabel, span: createSpan } = createButton(
+        const { span: createSpan } = createButton(
             localization.translate('Engine Builder Create List'),
             this.createListBtn,
             this.container,

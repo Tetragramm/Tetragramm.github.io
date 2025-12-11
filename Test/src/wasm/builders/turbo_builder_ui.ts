@@ -5,7 +5,6 @@
  */
 
 import { createTurbineEngine, EngineInputs, EngineStats } from '../types/engine_inputs';
-import { createFlexSection, createFlexNumberInput, createFlexSelect, createFlexCheckbox, createFlexLabel } from '../dom_utils';
 import { localization } from '../localization';
 import * as wasm from '../../../pkg/flyingcircuswasm';
 
@@ -24,7 +23,7 @@ export class TurboBuilderUI {
     private afterburnerCheckbox: HTMLInputElement;
 
     // Output elements
-    private descriptionCell: HTMLTableCellElement;
+    private descriptionCell: HTMLElement;
     private nameDisplay: HTMLSpanElement;
     private powerDisplay: HTMLSpanElement;
     private massDisplay: HTMLSpanElement;
@@ -52,126 +51,212 @@ export class TurboBuilderUI {
     private buildUI(): void {
         this.container.innerHTML = '';
 
-        const table = document.createElement('table');
-        table.style.width = '100%';
+        // Create responsive grid container
+        const gridContainer = document.createElement('div');
+        gridContainer.className = 'engine-builder-container three-column';
 
+        // Left section: Input parameters
+        const inputSection = document.createElement('div');
+        inputSection.className = 'engine-builder-section';
+        const inputTitle = document.createElement('div');
+        inputTitle.className = 'engine-builder-section-title';
+        inputTitle.textContent = localization.translate('Engines Options');
+        inputSection.appendChild(inputTitle);
+        this.buildInputSection(inputSection);
+        gridContainer.appendChild(inputSection);
 
-        const headerRow = table.insertRow();
-        const input = document.createElement('th');
-        input.textContent = localization.translate('Engines Options');
-        headerRow.appendChild(input);
-        const description = document.createElement('th');
-        description.textContent = localization.translate('Used Description');
-        headerRow.appendChild(description);
-        const stats = document.createElement('th');
-        stats.textContent = localization.translate('Engines Engine Stats');
-        headerRow.appendChild(stats);
+        // Middle section: Description
+        const descSection = document.createElement('div');
+        descSection.className = 'engine-builder-section';
+        const descTitle = document.createElement('div');
+        descTitle.className = 'engine-builder-section-title';
+        descTitle.textContent = localization.translate('Used Description');
+        descSection.appendChild(descTitle);
+        this.descriptionCell = document.createElement('div');
+        this.descriptionCell.className = 'engine-builder-description';
+        descSection.appendChild(this.descriptionCell);
+        gridContainer.appendChild(descSection);
 
+        // Right section: Output stats
+        const outputSection = document.createElement('div');
+        outputSection.className = 'engine-builder-section';
+        const outputTitle = document.createElement('div');
+        outputTitle.className = 'engine-builder-section-title';
+        outputTitle.textContent = localization.translate('Engines Engine Stats');
+        outputSection.appendChild(outputTitle);
+        // Name display in title area
+        this.nameDisplay = document.createElement('div');
+        this.nameDisplay.className = 'engine-builder-name-display';
+        this.nameDisplay.textContent = 'Custom Turbine';
+        outputSection.appendChild(this.nameDisplay);
+        this.buildOutputSection(outputSection);
+        gridContainer.appendChild(outputSection);
 
-        const row = table.insertRow();
-
-        const inputCell = row.insertCell();
-        inputCell.style.verticalAlign = 'top';
-        this.buildInputSection(inputCell);
-
-        this.descriptionCell = row.insertCell();
-        this.descriptionCell.style.verticalAlign = 'top';
-        this.descriptionCell.style.padding = '10px';
-        this.descriptionCell.style.maxWidth = '300px';
-
-        const outputCell = row.insertCell();
-        outputCell.style.verticalAlign = 'top';
-        this.buildOutputSection(outputCell);
-
-        this.container.appendChild(table);
+        this.container.appendChild(gridContainer);
 
         this.updateTypeChanged();
     }
 
-    private buildInputSection(cell: HTMLTableCellElement): void {
-        const flex = createFlexSection();
-        cell.appendChild(flex.div0);
+    private buildInputSection(container: HTMLElement): void {
+        const inputsDiv = document.createElement('div');
+        inputsDiv.className = 'engine-builder-inputs';
 
         const eras: string[] = wasm.getTurbineEras();
         const types: string[] = wasm.getTurbineTypes();
 
         // Name
+        const nameRow = document.createElement('div');
+        nameRow.className = 'engine-builder-row';
         const nameLabel = document.createElement('label');
         nameLabel.textContent = localization.translate('Engine Builder Name');
-        nameLabel.style.marginLeft = '0.25em';
-        nameLabel.style.marginRight = '0.5em';
-        flex.div1.appendChild(nameLabel);
-
         this.nameInput = document.createElement('input');
         this.nameInput.type = 'text';
-        this.nameInput.className = 'flex-item';
         this.nameInput.value = 'Custom Turbine';
         this.nameInput.onchange = () => this.updateStats();
-        flex.div2.appendChild(this.nameInput);
+        nameRow.appendChild(nameLabel);
+        nameRow.appendChild(this.nameInput);
+        inputsDiv.appendChild(nameRow);
 
-        this.eraSelect = createFlexSelect(
-            { name: localization.translate('Engine Builder Era'), options: eras.map(e => ({ name: e, enabled: true })), selected: 0, enabled: true },
-            flex,
-            () => this.updateStats()
-        );
+        // Era
+        const eraRow = document.createElement('div');
+        eraRow.className = 'engine-builder-row';
+        const eraLabel = document.createElement('label');
+        eraLabel.textContent = localization.translate('Engine Builder Era');
+        this.eraSelect = document.createElement('select');
+        eras.forEach((e, i) => {
+            const opt = document.createElement('option');
+            opt.text = e;
+            opt.value = i.toString();
+            this.eraSelect.add(opt);
+        });
+        this.eraSelect.onchange = () => this.updateStats();
+        eraRow.appendChild(eraLabel);
+        eraRow.appendChild(this.eraSelect);
+        inputsDiv.appendChild(eraRow);
 
-        this.typeSelect = createFlexSelect(
-            { name: localization.translate('Engine Builder Type'), options: types.map(t => ({ name: t, enabled: true })), selected: 0, enabled: true },
-            flex,
-            () => this.updateTypeChanged()
-        );
+        // Type
+        const typeRow = document.createElement('div');
+        typeRow.className = 'engine-builder-row';
+        const typeLabel = document.createElement('label');
+        typeLabel.textContent = localization.translate('Engine Builder Type');
+        this.typeSelect = document.createElement('select');
+        types.forEach((t, i) => {
+            const opt = document.createElement('option');
+            opt.text = t;
+            opt.value = i.toString();
+            this.typeSelect.add(opt);
+        });
+        this.typeSelect.onchange = () => this.updateTypeChanged();
+        typeRow.appendChild(typeLabel);
+        typeRow.appendChild(this.typeSelect);
+        inputsDiv.appendChild(typeRow);
 
-        this.diameterInput = createFlexNumberInput(
-            { name: localization.translate('Turbo Builder Diameter'), value: 1.0, enabled: true },
-            flex,
-            (val) => this.updateStats(),
-            '0', undefined, '0.01'
-        );
+        // Diameter
+        const diamRow = document.createElement('div');
+        diamRow.className = 'engine-builder-row';
+        const diamLabel = document.createElement('label');
+        diamLabel.textContent = localization.translate('Turbo Builder Diameter');
+        this.diameterInput = document.createElement('input');
+        this.diameterInput.type = 'number';
+        this.diameterInput.min = '0';
+        this.diameterInput.step = '0.01';
         this.diameterInput.valueAsNumber = 1.0;
+        this.diameterInput.onchange = () => this.updateStats();
+        diamRow.appendChild(diamLabel);
+        diamRow.appendChild(this.diameterInput);
+        inputsDiv.appendChild(diamRow);
 
-        this.compressionInput = createFlexNumberInput(
-            { name: localization.translate('Turbo Builder Overall Pressure Ratio'), value: 10, enabled: true },
-            flex,
-            (val) => this.updateStats(),
-            '0', undefined, '0.01'
-        );
+        // Overall Pressure Ratio
+        const compRow = document.createElement('div');
+        compRow.className = 'engine-builder-row';
+        const compLabel = document.createElement('label');
+        compLabel.textContent = localization.translate('Turbo Builder Overall Pressure Ratio');
+        this.compressionInput = document.createElement('input');
+        this.compressionInput.type = 'number';
+        this.compressionInput.min = '0';
+        this.compressionInput.step = '0.01';
         this.compressionInput.valueAsNumber = 10;
+        this.compressionInput.onchange = () => this.updateStats();
+        compRow.appendChild(compLabel);
+        compRow.appendChild(this.compressionInput);
+        inputsDiv.appendChild(compRow);
 
-        this.bypassInput = createFlexNumberInput(
-            { name: localization.translate('Turbo Builder Bypass Ratio'), value: 0, enabled: true },
-            flex,
-            (val) => this.updateStats(),
-            '0', undefined, '0.1'
-        );
+        // Bypass Ratio
+        const bypassRow = document.createElement('div');
+        bypassRow.className = 'engine-builder-row';
+        const bypassLabel = document.createElement('label');
+        bypassLabel.textContent = localization.translate('Turbo Builder Bypass Ratio');
+        this.bypassInput = document.createElement('input');
+        this.bypassInput.type = 'number';
+        this.bypassInput.min = '0';
+        this.bypassInput.step = '0.1';
         this.bypassInput.valueAsNumber = 0;
+        this.bypassInput.onchange = () => this.updateStats();
+        bypassRow.appendChild(bypassLabel);
+        bypassRow.appendChild(this.bypassInput);
+        inputsDiv.appendChild(bypassRow);
 
-        this.flowAdjustInput = createFlexNumberInput(
-            { name: localization.translate('Turbo Builder Mass Flow Adjustment'), value: 0, enabled: true },
-            flex,
-            (val) => this.updateStats(),
-            '-0.5', '0.5', '0.05'
-        );
+        // Mass Flow Adjustment
+        const flowRow = document.createElement('div');
+        flowRow.className = 'engine-builder-row';
+        const flowLabel = document.createElement('label');
+        flowLabel.textContent = localization.translate('Turbo Builder Mass Flow Adjustment');
+        this.flowAdjustInput = document.createElement('input');
+        this.flowAdjustInput.type = 'number';
+        this.flowAdjustInput.min = '-0.5';
+        this.flowAdjustInput.max = '0.5';
+        this.flowAdjustInput.step = '0.05';
         this.flowAdjustInput.valueAsNumber = 0;
+        this.flowAdjustInput.onchange = () => this.updateStats();
+        flowRow.appendChild(flowLabel);
+        flowRow.appendChild(this.flowAdjustInput);
+        inputsDiv.appendChild(flowRow);
 
-        this.afterburnerCheckbox = createFlexCheckbox(
-            { name: localization.translate('Turbo Builder Afterburner'), selected: false, enabled: true },
-            flex,
-            () => this.updateStats()
-        );
+        // Afterburner
+        const abRow = document.createElement('div');
+        abRow.className = 'engine-builder-row checkbox-row';
+        const abLabel = document.createElement('label');
+        this.afterburnerCheckbox = document.createElement('input');
+        this.afterburnerCheckbox.type = 'checkbox';
+        this.afterburnerCheckbox.onchange = () => this.updateStats();
+        const abText = document.createElement('span');
+        abText.textContent = localization.translate('Turbo Builder Afterburner');
+        abLabel.appendChild(this.afterburnerCheckbox);
+        abLabel.appendChild(abText);
+        abRow.appendChild(abLabel);
+        inputsDiv.appendChild(abRow);
+
+        container.appendChild(inputsDiv);
     }
 
-    private buildOutputSection(cell: HTMLTableCellElement): void {
-        const flex = createFlexSection();
-        cell.appendChild(flex.div0);
+    private buildOutputSection(container: HTMLElement): void {
+        const statsGrid = document.createElement('div');
+        statsGrid.className = 'engine-builder-stats';
 
-        this.nameDisplay = createFlexLabel({ name: localization.translate('Engine Builder Name'), value: '' }, flex);
-        this.powerDisplay = createFlexLabel({ name: localization.translate('Turbo Builder Thrust'), value: '0' }, flex);
-        this.massDisplay = createFlexLabel({ name: localization.translate('Engine Builder Mass'), value: '0' }, flex);
-        this.dragDisplay = createFlexLabel({ name: localization.translate('Engine Builder Drag'), value: '0' }, flex);
-        this.reliabilityDisplay = createFlexLabel({ name: localization.translate('Engine Builder Reliability'), value: '0' }, flex);
-        this.fuelDisplay = createFlexLabel({ name: localization.translate('Engine Builder Fuel Consumption'), value: '0' }, flex);
-        this.costDisplay = createFlexLabel({ name: localization.translate('Engine Builder Cost'), value: '0' }, flex);
-        this.altitudeDisplay = createFlexLabel({ name: localization.translate('Engine Builder Altitude'), value: '0' }, flex);
+        const createStatItem = (labelKey: string): HTMLSpanElement => {
+            const item = document.createElement('div');
+            item.className = 'engine-builder-stat-item';
+            const label = document.createElement('div');
+            label.className = 'engine-builder-stat-label';
+            label.textContent = localization.translate(labelKey);
+            const value = document.createElement('span');
+            value.className = 'engine-builder-stat-value';
+            value.textContent = '0';
+            item.appendChild(label);
+            item.appendChild(value);
+            statsGrid.appendChild(item);
+            return value;
+        };
+
+        this.powerDisplay = createStatItem('Turbo Builder Thrust');
+        this.massDisplay = createStatItem('Engine Builder Mass');
+        this.dragDisplay = createStatItem('Engine Builder Drag');
+        this.reliabilityDisplay = createStatItem('Engine Builder Reliability');
+        this.fuelDisplay = createStatItem('Engine Builder Fuel Consumption');
+        this.costDisplay = createStatItem('Engine Builder Cost');
+        this.altitudeDisplay = createStatItem('Engine Builder Altitude');
+
+        container.appendChild(statsGrid);
     }
 
     private updateTypeChanged(): void {
