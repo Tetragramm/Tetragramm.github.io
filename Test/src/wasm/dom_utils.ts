@@ -331,8 +331,8 @@ export function createMobileNumberInput(
         plusBtn.disabled = input.disabled || (input.max !== undefined && value >= parseInt(input.max));
     };
 
-    input['_max'] = input.max;
-    input['_min'] = input.min;
+    input['_max'] = max !== undefined ? max.toString() : undefined;
+    input['_min'] = min !== undefined ? min.toString() : undefined;
     Object.defineProperty(input, 'max', {
         set: function (newMax: string) { this._max = newMax; updateButtonStates(); },
         get: function () { return this._max; }
