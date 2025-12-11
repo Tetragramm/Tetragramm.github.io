@@ -1,7 +1,7 @@
 import { localization } from '../wasm/localization';
 import { AircraftBridge } from "../wasm/aircraft_bridge";
 import { DerivedStatsUI } from "../wasm/components/derived_stats_ui";
-import { BlinkBad, BlinkNeutral } from "../wasm/dom_utils"
+import { BlinkBad, BlinkNeutral, createMobileOptionItem } from "../wasm/dom_utils"
 import { JSON2CSV } from "../JSON2CSV/json2csv";
 
 // Type for the WASM module
@@ -481,6 +481,12 @@ function RefreshDisplay() {
     const tbl3 = document.getElementById("table_comp") as HTMLTableElement;
 
     MergeTables(tbl1, tbl2, tbl3);
+
+    // Update mobile comparison view
+    const mobileComp = document.getElementById("Compare_Mobile");
+    if (mobileComp) {
+        MergeMobile(mobileComp);
+    }
 }
 
 function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLTableElement) {
@@ -532,6 +538,445 @@ function MergeTables(tbl1: HTMLTableElement, tbl2: HTMLTableElement, tbl3: HTMLT
             }
         }
     }
+}
+
+/**
+ * Create a mobile-friendly comparison view for two aircraft
+ */
+function MergeMobile(container: HTMLElement) {
+    container.innerHTML = '';
+
+    const builderStats = acft_builder.getStats();
+    const builderDerived = acft_builder.getDerivedStats();
+    const hangarStats = acft_hangar.getStats();
+    const hangarDerived = acft_hangar.getDerivedStats();
+
+    // Create mobile option group
+    const mobileGroup = document.createElement('div');
+    mobileGroup.className = 'mobile-option-group';
+
+    // === Name/Selection Section ===
+    const nameSection = createMobileOptionItem('', mobileGroup);
+    nameSection.content.style.display = 'grid';
+    nameSection.content.style.gridTemplateColumns = '1fr 1fr';
+    nameSection.content.style.gap = '1em';
+
+    // Builder name column
+    const builderNameDiv = document.createElement('div');
+    const builderLabel = document.createElement('div');
+    builderLabel.style.fontWeight = 'bold';
+    builderLabel.style.marginBottom = '0.25em';
+    builderLabel.textContent = localization.translate('Aircraft From Builder') || 'Builder';
+    builderNameDiv.appendChild(builderLabel);
+    const nameInputClone = name_builder.cloneNode(true) as HTMLInputElement;
+    nameInputClone.style.width = '100%';
+    nameInputClone.value = acft_builder.getName();
+    nameInputClone.onchange = () => {
+        acft_builder.setName(nameInputClone.value);
+        name_builder.value = nameInputClone.value;
+    };
+    builderNameDiv.appendChild(nameInputClone);
+    nameSection.content.appendChild(builderNameDiv);
+
+    // Hangar selection column
+    const hangarNameDiv = document.createElement('div');
+    const hangarLabel = document.createElement('div');
+    hangarLabel.style.fontWeight = 'bold';
+    hangarLabel.style.marginBottom = '0.25em';
+    hangarLabel.textContent = localization.translate('Aircraft From Hangar') || 'Hangar';
+    hangarNameDiv.appendChild(hangarLabel);
+
+    const hangarSelectClone = select_hangar.cloneNode(true) as HTMLSelectElement;
+    hangarSelectClone.style.width = '100%';
+    hangarSelectClone.selectedIndex = select_hangar.selectedIndex;
+    hangarSelectClone.onchange = async () => {
+        select_hangar.selectedIndex = hangarSelectClone.selectedIndex;
+        chosen_hangar = select_hangar.options[select_hangar.selectedIndex].text;
+        RefreshAcftSelect(LoadAcftList());
+        await LoadFromHangar(select_acft.selectedIndex);
+    };
+    hangarNameDiv.appendChild(hangarSelectClone);
+
+    const acftSelectClone = select_acft.cloneNode(true) as HTMLSelectElement;
+    acftSelectClone.style.width = '100%';
+    acftSelectClone.style.marginTop = '0.25em';
+    acftSelectClone.selectedIndex = select_acft.selectedIndex;
+    acftSelectClone.onchange = async () => {
+        select_acft.selectedIndex = acftSelectClone.selectedIndex;
+        await LoadFromHangar(select_acft.selectedIndex);
+    };
+    hangarNameDiv.appendChild(acftSelectClone);
+    nameSection.content.appendChild(hangarNameDiv);
+
+    // === Cost/Upkeep Section ===
+    const costSection = createMobileOptionItem('', mobileGroup);
+    const costGrid = document.createElement('div');
+    costGrid.style.display = 'grid';
+    costGrid.style.gridTemplateColumns = '1fr 1fr 1fr';
+    costGrid.style.gap = '0.5em';
+
+    // Header row
+    addMobileCompCell(costGrid, '', true);
+    addMobileCompCell(costGrid, localization.translate('Aircraft From Builder') || 'Builder', true);
+    addMobileCompCell(costGrid, localization.translate('Aircraft From Hangar') || 'Hangar', true);
+
+    // Cost row
+    addMobileCompCell(costGrid, localization.translate('Stat Cost'), true);
+    addMobileCompCell(costGrid, builderStats.cost.toString() + 'þ');
+    addMobileCompCell(costGrid, hangarStats.cost.toString() + 'þ');
+
+    // Upkeep row
+    addMobileCompCell(costGrid, localization.translate('Stat Upkeep'), true);
+    addMobileCompCell(costGrid, builderStats.upkeep.toString() + 'þ');
+    addMobileCompCell(costGrid, hangarStats.upkeep.toString() + 'þ');
+
+    costSection.content.appendChild(costGrid);
+
+    // === Mass Variations Section ===
+    const massSection = createMobileOptionItem(localization.translate('Derived Mass Variations'), mobileGroup);
+    const massGrid = document.createElement('div');
+    massGrid.className = 'mobile-stats-grid';
+    massGrid.style.gridTemplateColumns = 'auto repeat(5, 1fr)';
+
+    // Headers
+    addMobileCompCell(massGrid, '', true);
+    addMobileCompLabel(massGrid, localization.translate('Derived Boost'));
+    addMobileCompLabel(massGrid, localization.translate('Derived Handling'));
+    addMobileCompLabel(massGrid, localization.translate('Derived Rate of Climb'));
+    addMobileCompLabel(massGrid, localization.translate('Derived Stall Speed'));
+    addMobileCompLabel(massGrid, localization.translate('Derived Top Speed'));
+
+    // Full Fuel row with combined cells
+    addMobileCompLabel(massGrid, localization.translate('Derived Full Fuel'));
+    addMobileCompValueCell(massGrid, builderDerived.boost_full, hangarDerived.boost_full);
+    addMobileCompValueCell(massGrid, builderDerived.handling_full, hangarDerived.handling_full);
+    addMobileCompValueCell(massGrid, builderDerived.rate_of_climb_full, hangarDerived.rate_of_climb_full);
+    addMobileCompValueCell(massGrid, builderDerived.stall_speed_full, hangarDerived.stall_speed_full);
+    addMobileCompValueCell(massGrid, Math.floor(1.0e-6 + builderDerived.max_speed_full), Math.floor(1.0e-6 + hangarDerived.max_speed_full));
+
+    // Half Fuel row with combined cells
+    addMobileCompLabel(massGrid, localization.translate('Derived Half Fuel'));
+    addMobileCompValueCell(massGrid,
+        Math.floor((builderDerived.boost_empty + builderDerived.boost_full) / 2),
+        Math.floor((hangarDerived.boost_empty + hangarDerived.boost_full) / 2));
+    addMobileCompValueCell(massGrid,
+        Math.floor((builderDerived.handling_empty + builderDerived.handling_full) / 2),
+        Math.floor((hangarDerived.handling_empty + hangarDerived.handling_full) / 2));
+    addMobileCompValueCell(massGrid,
+        Math.floor((builderDerived.rate_of_climb_empty + builderDerived.rate_of_climb_full) / 2),
+        Math.floor((hangarDerived.rate_of_climb_empty + hangarDerived.rate_of_climb_full) / 2));
+    addMobileCompValueCell(massGrid,
+        Math.floor((builderDerived.stall_speed_empty + builderDerived.stall_speed_full) / 2),
+        Math.floor((hangarDerived.stall_speed_empty + hangarDerived.stall_speed_full) / 2));
+    addMobileCompValueCell(massGrid,
+        Math.floor((builderDerived.max_speed_empty + builderDerived.max_speed_full) / 2),
+        Math.floor((hangarDerived.max_speed_empty + hangarDerived.max_speed_full) / 2));
+
+    // Empty Fuel row with combined cells
+    addMobileCompLabel(massGrid, localization.translate('Derived Empty Fuel'));
+    addMobileCompValueCell(massGrid, 0, 0);
+    addMobileCompValueCell(massGrid, builderDerived.handling_empty, hangarDerived.handling_empty);
+    addMobileCompValueCell(massGrid, 0, 0);
+    addMobileCompValueCell(massGrid, builderDerived.stall_speed_empty, hangarDerived.stall_speed_empty);
+    addMobileCompValueCell(massGrid, 0, 0);
+
+    massSection.content.appendChild(massGrid);
+
+    // === Stats Comparison Sections ===
+    const statSections = [
+        {
+            title: localization.translate('Derived Propulsion'),
+            stats: [
+                { label: 'Derived Dropoff', b: builderDerived.dropoff, h: hangarDerived.dropoff },
+                { label: 'Derived Overspeed', b: builderDerived.overspeed, h: hangarDerived.overspeed },
+                { label: 'Derived Fuel Uses', b: (Math.floor(builderDerived.fuel_uses * 10) / 10), h: (Math.floor(hangarDerived.fuel_uses * 10) / 10) },
+                { label: 'Stat Reliability', b: acft_builder.getReliabilityList().join(', '), h: acft_hangar.getReliabilityList().join(', ') },
+                { label: 'Derived Ideal Engine Altitude', b: acft_builder.getMinAltitude() + '-' + acft_builder.getMaxAltitude(), h: acft_hangar.getMinAltitude() + '-' + acft_hangar.getMaxAltitude() },
+            ]
+        },
+        {
+            title: localization.translate('Derived Aerodynamics'),
+            stats: [
+                { label: 'Derived Stability', b: builderDerived.stability, h: hangarDerived.stability },
+                { label: 'Derived Energy Loss', b: builderDerived.energy_loss, h: hangarDerived.energy_loss },
+                { label: 'Derived Turn Bleed', b: builderDerived.turn_bleed, h: hangarDerived.turn_bleed },
+                { label: 'Derived Landing Gear', b: acft_builder.getGearName(), h: acft_hangar.getGearName() },
+                { label: 'Derived Is Flammable Question', b: acft_builder.getIsFlammable() ? localization.translate('Yes') : localization.translate('No'), h: acft_hangar.getIsFlammable() ? localization.translate('Yes') : localization.translate('No') },
+            ]
+        },
+        {
+            title: localization.translate('Derived Survivability'),
+            stats: [
+                { label: 'Derived Crash Safety', b: builderStats.crashsafety, h: hangarStats.crashsafety },
+                { label: 'Stat Toughness', b: builderDerived.toughness, h: hangarDerived.toughness },
+                { label: 'Stat Max Strain', b: builderDerived.max_strain, h: hangarDerived.max_strain },
+                { label: 'Derived Communications', b: acft_builder.getCommunicationName(), h: acft_hangar.getCommunicationName() },
+            ]
+        },
+        {
+            title: localization.translate('Derived Crew Members'),
+            stats: [
+                { label: 'Derived Crew/Passengers', b: acft_builder.getCockpitsCount() + '/' + acft_builder.getPassengersCount(), h: acft_hangar.getCockpitsCount() + '/' + acft_hangar.getPassengersCount() },
+                { label: 'Stat Visibility', b: acft_builder.getVisibilityList().join(', '), h: acft_hangar.getVisibilityList().join(', ') },
+                { label: 'Derived Attack Modifier', b: acft_builder.getAttackList().join(', '), h: acft_hangar.getAttackList().join(', ') },
+                { label: 'Derived Escape', b: acft_builder.getEscapeList().join(', '), h: acft_hangar.getEscapeList().join(', ') },
+                { label: 'Stat Flight Stress', b: formatStressList(acft_builder.getStressList()), h: formatStressList(acft_hangar.getStressList()) },
+            ]
+        }
+    ];
+
+    for (const section of statSections) {
+        const statSection = createMobileOptionItem(section.title, mobileGroup);
+        const statGrid = document.createElement('div');
+        statGrid.className = 'mobile-stats-grid';
+        statGrid.style.display = 'flex';
+        statGrid.style.flexWrap = 'wrap';
+
+        for (const stat of section.stats) {
+            // Create stat item with label and combined value cell
+            const item = document.createElement('div');
+            item.className = 'mobile-stat-item';
+
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'mobile-stat-label';
+            labelDiv.textContent = localization.translate(stat.label);
+            item.appendChild(labelDiv);
+
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'mobile-stat-value';
+            valueDiv.style.display = 'flex';
+            valueDiv.style.justifyContent = 'center';
+            valueDiv.style.gap = '0';
+
+            const builderSpan = document.createElement('span');
+            builderSpan.textContent = stat.b?.toString() || '';
+            builderSpan.style.paddingRight = '0.5em';
+            builderSpan.style.borderRight = '1px dashed var(--inp_bdr_color)';
+            builderSpan.style.height = 'auto';
+            builderSpan.style.whiteSpace = 'wrap'
+
+            const hangarSpan = document.createElement('span');
+            hangarSpan.textContent = stat.h?.toString() || '';
+            hangarSpan.style.paddingLeft = '0.5em';
+            hangarSpan.style.height = 'auto';
+            hangarSpan.style.whiteSpace = 'wrap'
+
+            valueDiv.appendChild(builderSpan);
+            valueDiv.appendChild(hangarSpan);
+            item.appendChild(valueDiv);
+
+            statGrid.appendChild(item);
+        }
+
+        statSection.content.appendChild(statGrid);
+    }
+
+    // === Weapons Section ===
+    const weaponsSection = createMobileOptionItem(localization.translate('Derived Weapon Systems'), mobileGroup);
+    weaponsSection.content.appendChild(createCenteredDividerGrid(
+        formatWeaponsHTML(acft_builder),
+        formatWeaponsHTML(acft_hangar)
+    ));
+
+    // === Electrics Section ===
+    const electricsSection = createMobileOptionItem(localization.translate('Derived Electrics'), mobileGroup);
+    electricsSection.content.appendChild(createCenteredDividerGrid(
+        formatElectricsHTML(acft_builder),
+        formatElectricsHTML(acft_hangar)
+    ));
+
+    // === Special Rules/Warnings Section ===
+    const warningsSection = createMobileOptionItem(localization.translate('Derived Special Rules'), mobileGroup);
+    warningsSection.content.appendChild(createCenteredDividerGrid(
+        formatWarningsHTML(builderStats.warnings),
+        formatWarningsHTML(hangarStats.warnings)
+    ));
+
+    container.appendChild(mobileGroup);
+}
+
+/**
+ * Add a simple cell to the mobile comparison grid
+ */
+function addMobileCompCell(grid: HTMLElement, text: string, isHeader: boolean = false) {
+    const cell = document.createElement('div');
+    cell.textContent = text;
+    cell.style.padding = '0.25em';
+    if (isHeader) {
+        cell.style.fontWeight = 'bold';
+        cell.style.fontSize = '0.85em';
+    }
+    grid.appendChild(cell);
+}
+
+/**
+ * Add a label cell (mobile-stat-label style)
+ */
+function addMobileCompLabel(grid: HTMLElement, text: string) {
+    const item = document.createElement('div');
+    item.className = 'mobile-stat-item';
+    const label = document.createElement('div');
+    label.className = 'mobile-stat-label';
+    label.textContent = text;
+    item.appendChild(label);
+    grid.appendChild(item);
+}
+
+/**
+ * Add a combined value cell with vertical dashed divider (mobile-stat-value style)
+ */
+function addMobileCompValueCell(grid: HTMLElement, builderVal: any, hangarVal: any) {
+    const item = document.createElement('div');
+    item.className = 'mobile-stat-item';
+
+    const valueDiv = document.createElement('div');
+    valueDiv.className = 'mobile-stat-value';
+    valueDiv.style.display = 'flex';
+    valueDiv.style.justifyContent = 'center';
+    valueDiv.style.gap = '0';
+
+    const builderSpan = document.createElement('span');
+    builderSpan.textContent = builderVal?.toString() || '';
+    builderSpan.style.paddingRight = '0.3em';
+    builderSpan.style.borderRight = '1px dashed var(--inp_bdr_color)';
+
+    const hangarSpan = document.createElement('span');
+    hangarSpan.textContent = hangarVal?.toString() || '';
+    hangarSpan.style.paddingLeft = '0.3em';
+
+    valueDiv.appendChild(builderSpan);
+    valueDiv.appendChild(hangarSpan);
+    item.appendChild(valueDiv);
+
+    grid.appendChild(item);
+}
+
+/**
+ * Create a two-column grid with a centered vertical dashed divider
+ */
+function createCenteredDividerGrid(leftHTML: string, rightHTML: string): HTMLElement {
+    const container = document.createElement('div');
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = '1fr 0px 1fr';
+    container.style.width = '100%';
+
+    // Left column
+    const leftDiv = document.createElement('div');
+    leftDiv.style.paddingRight = '0.5em';
+    leftDiv.innerHTML = leftHTML;
+    container.appendChild(leftDiv);
+
+    // Centered divider line (middle column with zero width, border creates the line)
+    const divider = document.createElement('div');
+    divider.style.borderLeft = '1px dashed var(--inp_bdr_color)';
+    container.appendChild(divider);
+
+    // Right column
+    const rightDiv = document.createElement('div');
+    rightDiv.style.paddingLeft = '0.5em';
+    rightDiv.innerHTML = rightHTML;
+    container.appendChild(rightDiv);
+
+    return container;
+}
+
+/**
+ * Format weapons HTML for an aircraft
+ */
+function formatWeaponsHTML(acft: AircraftBridge): string {
+    let html = '';
+    const bombs = acft.getBombCount();
+    const rockets = acft.getRocketCount();
+    let internal = acft.getInternalBombCount();
+
+    // Display bombs
+    if (bombs > 0) {
+        const int_bomb = Math.min(bombs, internal);
+        const ext_bomb = Math.max(0, bombs - int_bomb);
+        if (int_bomb > 0) {
+            html += `<div style="padding:0.25em 0;">${localization.translateWithParam('Bomb Mass Internally.', int_bomb)}</div>`;
+        }
+        if (ext_bomb > 0) {
+            html += `<div style="padding:0.25em 0;">${localization.translateWithParam('Bomb Mass Externally.', ext_bomb)}</div>`;
+        }
+        if (int_bomb > 0) {
+            const mib = Math.min(int_bomb, acft.getMaxBombSize());
+            html += `<div style="padding:0.25em 0;">${localization.translateWithParam('Largest Internal Bomb', mib.toString())}</div>`;
+        }
+        internal -= int_bomb;
+    }
+
+    // Display rockets
+    if (rockets > 0) {
+        const int_rock = Math.min(rockets, internal);
+        const ext_rock = Math.max(0, rockets - int_rock);
+        if (int_rock > 0) {
+            html += `<div style="padding:0.25em 0;">${localization.translateWithParam('Rocket Mass Internally.', int_rock)}</div>`;
+        }
+        if (ext_rock > 0) {
+            html += `<div style="padding:0.25em 0;">${localization.translateWithParam('Rocket Mass Externally.', ext_rock)}</div>`;
+        }
+    }
+
+    // Display weapon sets
+    const weaponSetsCount = acft.getWeaponSetsCount();
+    for (let i = 0; i < weaponSetsCount; i++) {
+        const ws = acft.getWeaponSystemDisplayInfo(i);
+        html += `<div style="padding:0.25em 0;">${ws}</div>`;
+    }
+
+    return html || '<em>None</em>';
+}
+
+/**
+ * Format electrics HTML for an aircraft
+ */
+function formatElectricsHTML(acft: AircraftBridge): string {
+    let html = '';
+    const electrics = acft.getElectrics();
+
+    if (electrics.storage > 0) {
+        html += `<div style="display:flex;justify-content:space-between;gap:1em;padding:0.25em 0;"><span>${localization.translate('Derived Battery')}</span><span>${electrics.storage}</span></div>`;
+    }
+
+    for (const equip of electrics.equipment) {
+        html += `<div style="display:flex;justify-content:space-between;gap:1em;padding:0.25em 0;"><span>${equip.source}</span><span>${equip.charge}</span></div>`;
+    }
+
+    return html || '<em>None</em>';
+}
+
+/**
+ * Format warnings HTML with color coding
+ */
+function formatWarningsHTML(warnings: any[]): string {
+    if (!warnings || warnings.length === 0) {
+        return '<em>None</em>';
+    }
+
+    // Sort warnings by level (White=0, Yellow=1, Red=2)
+    const levelToNum = (level: string): number => {
+        if (level === 'Red') return 2;
+        if (level === 'Yellow') return 1;
+        return 0; // White
+    };
+
+    const sortedWarnings = [...warnings].sort((a: any, b: any) => {
+        return levelToNum(a.level) - levelToNum(b.level);
+    });
+
+    let html = '';
+    for (const w of sortedWarnings) {
+        let color = 'var(--inp_txt_color)';
+        if (w.level === 'Red') {
+            color = '#FF0000';
+        } else if (w.level === 'Yellow') {
+            color = '#FFFF00';
+        }
+        html += `<div style="color:${color};padding:0.25em 0;">${w.name}: ${w.warning}</div>`;
+    }
+
+    return html;
 }
 
 // Helper function to format stress list for CSV export

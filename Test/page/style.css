@@ -269,7 +269,7 @@ hr.dashed {
 }
 
 span {
-	height: 1.5em !important;
+	height: 1.5em;
 	padding-top: 2px;
 }
 
