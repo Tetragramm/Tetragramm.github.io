@@ -131,11 +131,14 @@ export class WasmApplication {
                 try {
                     let acft_data = window.localStorage.getItem("test.aircraft");
                     const loadedBridge = new AircraftBridge();
-                    await loadedBridge.initialize(async () => { /* Already initialized */ }, this.wasmModule.AircraftWasm);
-                    loadedBridge.fromJSON(acft_data);
-                    this.bridge = loadedBridge;
-                    console.log('[WasmApp] Loaded aircraft from saved data');
-                    loaded = true;
+                    loadedBridge.initialize(async () => { /* Already initialized */ }, this.wasmModule.AircraftWasm);
+                    if (loadedBridge.fromJSON(acft_data)) {
+                        this.bridge = loadedBridge;
+                        console.log('[WasmApp] Loaded aircraft from saved data');
+                        loaded = true;
+                    } else {
+                        console.log('[WasmApp] Failed to load aircraft from saved data');
+                    }
                 } catch (e) { console.log("Saved Data Failed. " + e); }
             }
             if (!loaded) {
