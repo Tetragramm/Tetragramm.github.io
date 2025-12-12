@@ -28,6 +28,12 @@ export class EngineListManagerUI {
     private addTurbineBtn: HTMLButtonElement;
     private addElectricBtn: HTMLButtonElement;
 
+    // Button containers for visibility control
+    private addPropellerSpan: HTMLElement;
+    private addPulsejetSpan: HTMLElement;
+    private addTurbineSpan: HTMLElement;
+    private addElectricSpan: HTMLElement;
+
     // Callbacks for getting engine inputs from each builder
     private onGetPropellerEngine: (() => EngineInputs) | null = null;
     private onGetPulsejetEngine: (() => EngineInputs) | null = null;
@@ -90,14 +96,24 @@ export class EngineListManagerUI {
         createSelect(localization.translate('Engine Builder Engines'), this.engineSelect, this.container);
         this.container.appendChild(document.createElement('br'));
 
+        const btnDiv = document.createElement('div');
+        btnDiv.style.display = 'flex';
+        btnDiv.style.flexDirection = 'column';
+        btnDiv.style.marginBottom = '0.75em';
+        btnDiv.style.gap = '0.75em';
+        const { span: propSpan } = createButton(localization.translate('Engine Builder Add From Propeller'), this.addPropellerBtn, btnDiv, false);
+        this.addPropellerSpan = propSpan;
+        const { span: pulseSpan } = createButton(localization.translate('Engine Builder Add From Pulsejet'), this.addPulsejetBtn, btnDiv, false);
+        this.addPulsejetSpan = pulseSpan;
+        const { span: turboSpan } = createButton(localization.translate('Engine Builder Add From Turbine'), this.addTurbineBtn, btnDiv, false);
+        this.addTurbineSpan = turboSpan;
+        const { span: electricSpan } = createButton(localization.translate('Engine Builder Add From Electric'), this.addElectricBtn, btnDiv, false);
+        this.addElectricSpan = electricSpan;
+        this.container.appendChild(btnDiv);
+
         createButton(localization.translate('Engine Builder Save List'), this.saveListBtn, this.container);
         const { label: loadLabel } = createButton(localization.translate('Engine Builder Load List'), this.loadListInput, this.container);
         loadLabel.onclick = () => this.loadListInput.click();
-
-        createButton(localization.translate('Engine Builder Add From Propeller'), this.addPropellerBtn, this.container);
-        createButton(localization.translate('Engine Builder Add From Pulsejet'), this.addPulsejetBtn, this.container);
-        createButton(localization.translate('Engine Builder Add From Turbine'), this.addTurbineBtn, this.container);
-        createButton(localization.translate('Engine Builder Add From Electric'), this.addElectricBtn, this.container);
 
         // Delete engine button with engine name display
         const { label: deleteLabel } = createButton(
@@ -446,5 +462,26 @@ export class EngineListManagerUI {
      */
     public registerEngineSelectedCallback(callback: (engine: EngineInputs) => void): void {
         this.onEngineSelected = callback;
+    }
+
+    /**
+     * Set visibility of "Add From" buttons based on which builder is visible
+     * Only applies on mobile - desktop shows all buttons
+     */
+    public setButtonVisibility(propeller: boolean, pulsejet: boolean, turbine: boolean, electric: boolean): void {
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            this.addPropellerSpan.style.display = propeller ? '' : 'none';
+            this.addPulsejetSpan.style.display = pulsejet ? '' : 'none';
+            this.addTurbineSpan.style.display = turbine ? '' : 'none';
+            this.addElectricSpan.style.display = electric ? '' : 'none';
+        } else {
+            // Show all buttons on desktop
+            this.addPropellerSpan.style.display = '';
+            this.addPulsejetSpan.style.display = '';
+            this.addTurbineSpan.style.display = '';
+            this.addElectricSpan.style.display = '';
+        }
     }
 }

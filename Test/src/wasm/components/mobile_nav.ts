@@ -55,6 +55,7 @@ export class MobileNavigation {
         this.updateList();
         this.updateTitle();
         this.updateMobileSingleSectionMode();
+        this.showSection(0);
     }
 
     /**
@@ -154,7 +155,6 @@ export class MobileNavigation {
                     this.navigatePrev();
                 } else {
                     // Swipe left -> go to next
-                    console.log("NN: Swipe");
                     this.navigateNext();
                 }
             }
@@ -187,7 +187,7 @@ export class MobileNavigation {
             if (!isEnabled) {
                 item.classList.add('disabled');
             } else if (visibleIndex === this.currentIndex) {
-                item.classList.add('active');
+                item.classList.add('enabled');
             }
 
             item.textContent = localization.translate(section.labelKey);
@@ -293,12 +293,17 @@ export class MobileNavigation {
         const section = visibleSections[index];
         const elem = document.getElementById(section.id);
         if (elem) {
+            console.log("Adding active section to " + section.id)
             elem.classList.add('mobile-active-section');
             if (isMobile) {
                 elem.style.display = '';
             }
             // Scroll to top of section
-            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            requestAnimationFrame(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        } else {
+            console.log("Couldn't find " + section.id)
         }
 
         this.currentIndex = index;
@@ -338,10 +343,12 @@ export class MobileNavigation {
      */
     private updateMobileSingleSectionMode(): void {
         if (MobileNavigation.isMobileView()) {
-            document.body.classList.add('mobile-single-section');
-            // Ensure a section is active and hide others
-            if (this.sections.length > 0) {
-                this.showSection(this.currentIndex);
+            if (!document.body.classList.contains('mobile-single-section')) {
+                document.body.classList.add('mobile-single-section');
+                // Ensure a section is active and hide others
+                if (this.sections.length > 0) {
+                    this.showSection(this.currentIndex);
+                }
             }
         } else {
             document.body.classList.remove('mobile-single-section');
