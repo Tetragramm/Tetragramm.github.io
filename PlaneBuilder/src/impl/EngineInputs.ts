@@ -151,7 +151,7 @@ export class EngineInputs {
         };
       }
       default:
-        throw "EngineInputs.toJSON: Oh dear, you have a new engine type.";
+        throw "EngineInputs.toJSON: Oh dear, you have a new engine type. " + this.name + " has engine_type " + this.engine_type;
     }
   }
 
@@ -198,7 +198,7 @@ export class EngineInputs {
         break;
       }
       default:
-        throw "EngineInputs.fromJSON: Oh dear, you have a new engine type.";
+        throw "EngineInputs.toJSON: Oh dear, you have a new engine type. " + this.name + " has engine_type " + this.engine_type;
     }
     if (js["rarity"]) {
       this.rarity = js["rarity"];
@@ -251,7 +251,7 @@ export class EngineInputs {
         break;
       }
       default:
-        throw "EngineInputs.serialize: Oh dear, you have a new engine type.";
+        throw "EngineInputs.toJSON: Oh dear, you have a new engine type. " + this.name + " has engine_type " + this.engine_type;
     }
 
     s.PushNum(this.rarity);
@@ -300,7 +300,7 @@ export class EngineInputs {
         break;
       }
       default:
-        throw "EngineInputs.deserialize: Oh dear, you have a new engine type.";
+        throw "EngineInputs.toJSON: Oh dear, you have a new engine type. " + this.name + " has engine_type " + this.engine_type;
     }
 
     if (d.version > 12.35) {
@@ -369,7 +369,7 @@ export class EngineInputs {
         return stats;
       }
       default:
-        throw "EngineInputs.PartStats: Oh dear, you have a new engine type.";
+        throw "EngineInputs.toJSON: Oh dear, you have a new engine type. " + this.name + " has engine_type " + this.engine_type;
     }
   }
 

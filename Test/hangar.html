@@ -30,50 +30,46 @@
 					<table style="width:100%" id="table_builder">
 					</table>
 				</div>
-				<table>
-					<tr>
-						<th class="btn_th">
-							<label id="lbl_save" for="btn_save" class="btn_th">Save Plane From Builder</label>
-							<button class="btn_th" hidden id="btn_save"></button>
-						</th>
-						<th class="btn_th">
-							<label id="lbl_load" for="btn_load" class="btn_th">Load Plane To Builder</label>
-							<button class="btn_th" hidden id="btn_load"></button>
-						</th>
-						<th class="btn_th">
-							<label id="lbl_json" for="btn_json" class="btn_th">Import Plane</label>
-							<input hidden="true" type="file" id="btn_json" />
-						</th>
-						<th class="btn_th">
-							<label id="lbl_remove" for="btn_remove" class="btn_th">Delete Plane</label>
-							<button class="btn_th" hidden id="btn_remove"><b></b></button>
-						</th>
-					</tr>
-				</table>
-				<table>
-					<tr>
-						<th class="btn_th">
-							<label id="lbl_save_h" for="btn_save_h" class="btn_th">Export Hangar</label>
-							<button class="btn_th" hidden id="btn_save_h"><b></b></button>
-						</th>
-						<th class="btn_th">
-							<label id="lbl_json_h" for="btn_json_h" class="btn_th">Import Hangar</label>
-							<input hidden="true" type="file" id="btn_json_h" />
-						</th>
-						<th class="btn_th">
-							<label id="lbl_create_list" for="btn_create_list" class="btn_th">Create Hangar</label>
-							<input class="btn_th" id="btn_create_list" />
-						</th>
-						<th class="btn_th">
-							<label id="lbl_delete_list" for="btn_delete_list" class="btn_th">Delete Hangar</label>
-							<button class="btn_th" hidden id="btn_delete_list"><b></b></button>
-						</th>
-						<th class="btn_th">
-							<label id="lbl_to_csv" for="btn_to_csv" class="btn_th">Hangar to CSV</label>
-							<button class="btn_th" hidden id="btn_to_csv"><b></b></button>
-						</th>
-					</tr>
-				</table>
+				<div style="display:flex; flex-wrap:wrap; gap: 0.5em;">
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_save" for="btn_save">Save Plane From Builder</label>
+						<button hidden="true" id="btn_save">Save</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_load" for="btn_load">Load Plane To Builder</label>
+						<button hidden="true" id="btn_load">Load</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_json" for="btn_json">Import Plane</label>
+						<input hidden="true" type="file" id="btn_json" />
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_remove" for="btn_remove">Delete Plane</label>
+						<button hidden="true" id="btn_remove">Delete</button>
+					</div>
+				</div>
+				<div style="display:flex; flex-wrap:wrap; gap: 0.5em; margin-top: 0.5em;">
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_save_h" for="btn_save_h">Export Hangar</label>
+						<button hidden="true" id="btn_save_h">Export</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_json_h" for="btn_json_h">Import Hangar</label>
+						<input hidden="true" type="file" id="btn_json_h" />
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_create_list" for="btn_create_list">Create Hangar</label>
+						<input class="btn_th" id="btn_create_list" />
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_delete_list" for="btn_delete_list">Delete Hangar</label>
+						<button hidden="true" id="btn_delete_list">Delete</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_to_csv" for="btn_to_csv">Hangar to CSV</label>
+						<button hidden="true" id="btn_to_csv">CSV</button>
+					</div>
+				</div>
 				<br />
 				<div hidden id="Saved">
 					<h3>Aircraft From Hangar
@@ -82,12 +78,14 @@
 					<table style="width:100%" id="table_hangar">
 					</table>
 				</div>
-				<div id="Compare">
+				<div id="Compare" class="desktop-only">
 					<h3>Comparison
 						<br />
 					</h3>
 					<table style="width:100%" id="table_comp">
 					</table>
+				</div>
+				<div id="Compare_Mobile" class="mobile-only">
 				</div>
 			</div>
 			<br />

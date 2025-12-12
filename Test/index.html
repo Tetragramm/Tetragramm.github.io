@@ -13,131 +13,144 @@
 
 <body class="html_body" dir="ltr">
 	<div class="html_outer html_content">
+		<!-- Mobile Navigation (shown only on mobile) -->
+		<div id="mobile_nav_container"></div>
 		<div>
-			<h2>
-				<a href="https://opensketch.itch.io/flying-circus">
-					Ohara Airworks</a>
-			</h2>
-			<div>
-				<span>
-					<table>
-						<tr>
-							<th class="btn_th">
+			<div id="Intro">
+				<h2>
+					<a href="https://opensketch.itch.io/flying-circus">
+						Ohara Airworks</a>
+				</h2>
+				<span style="float: right; font-size: 0.8em;" id="language_selector_container"></span>
+				<div class="content">
+					<span>
+						<div style="display:flex; flex-wrap:wrap; gap: 0.5em;" class="desktop-only">
+							<div class="btn_th">
 								<label class="lbl_action" id="lbl_acft_save_top" for="acft_save">Save</label>
-							</th>
-							<th class="btn_th">
+							</div>
+							<div class="btn_th">
 								<label class="lbl_action" id="lbl_acft_load_top" for="acft_load">Load</label>
-							</th>
-							<th class="btn_th" hidden>
+							</div>
+							<div class="btn_th" hidden>
 								<label class="lbl_action" for="acft_load_text2">Load Text</label> <input type="text"
 									id="acft_load_text2" class="skinny" />
-							</th>
-							<th class="btn_th">
+							</div>
+							<div class="btn_th">
 								<label class="lbl_action" id="lbl_acft_save_link_top" for="acft_save_link">Copy As
 									Link</label>
-							</th>
-							<th class="btn_th">
+							</div>
+							<div class="btn_th">
 								<label class="lbl_action" id="lbl_acft_save_dash_top" for="acft_save_dash">Save
 									Dashboard</label>
-							</th>
-							<th class="btn_th">
+							</div>
+							<div class="btn_th">
 								<label class="lbl_action" id="lbl_acft_interactive_dash_top"
 									for="acft_interactive_dash">Interactive
 									Dashboard</label>
-							</th>
-							<th class="btn_th">
+							</div>
+							<div class="btn_th">
 								<label class="lbl_action" id="lbl_acft_save_npc_top" for="acft_save_npc">Save
 									NPC</label>
-							</th>
-							<th class="btn_th" hidden>
-								<label class="lbl_action" id="lbl_acft_save_cat_top" for="acft_save_cat">Save
-									Catalog</label>
-							</th>
-							<th class="btn_th">
+							</div>
+							<div class="btn_th">
 								<label class="lbl_action" id="lbl_acft_reset_top" for="acft_reset">Default
 									Aircraft</label>
-							</th>
-						</tr>
+							</div>
+						</div>
+					</span>
+					<p>Latest Releases:
+					<ul>
+						<li><a href="https://opensketch.itch.io/flying-circus">Flying Circus Core v1.3.2</a></li>
+						<li><a href="https://opensketch.itch.io/flying-circus">Aircraft Catalog Core v1.3.3</a></li>
+						<li><a href="https://opensketch.itch.io/flying-circus-the-horror-of-the-heights">Horrors of the
+								Heights v1.2.1</a></li>
+						<li><a href="https://opensketch.itch.io/flying-circus-flights-of-fancy">Flights of Fancy
+								v1.1.1</a></li>
+						<li><a href="https://opensketch.itch.io/flying-circus-flights-at-the-museum">Flights of Fancy
+								v1.1.2</a></li>
+						<li><a href="https://opensketch.itch.io/fc-firstflights">First Flights v1.0.2</a></li>
+						<li><a href="https://opensketch.itch.io/flying-circus-flight-hazards">Flight Hazards v1.0.0</a>
+						</li>
+						<li><a href="https://opensketch.itch.io/chariots-of-steel">Chariots of Steel v1.2.0</a></li>
+						<li><a href="https://tetragramm.github.io/VehicleBuilder/">Vehicle Builder</a></li>
+					</ul>
+					</p>
+				</div>
+			</div>
+			<br />
+			<div id="Type">
+				<h3><label id="lbl_acft_type">Aircraft Type</label>
+				</h3>
+				<h4>
+					<span> <select id="acft_type"></select></span>
+				</h4>
+				<br />
+			</div>
+			<div id="Era">
+				<h3 class="collapsible active"><label id="lbl_era">Era</label>
+				</h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Era"><u>Rules</u></a>)</span>
+				</h4>
+				<div class="content">
+					<table style="width:100%" id="table_era">
 					</table>
-				</span>
-				<span>With the release of updated pulsejet rules, all plane packs have received a new update. Make sure
-					you've got the latest!</span><br />
-				<span>Enjoy the release of Core Catalogue 1.3.3, Horrors of the Heights Catalogue 1.2</span><br />
-				<span>Flights of Fancy 1.1.1, Flight at the Museum 1.1.2, First Flights 1.0.2, and Playbooks 1.3.2.
-				</span><br />
-				<span><a href="https://opensketch.itch.io/chariots-of-steel">Chariots of Steel</a> is out! Try the <a
-						href="https://tetragramm.github.io/VehicleBuilder/">Vehicle Builder</a></span>
-				<br />
-				<div id="Type">
-					<h3><label id="lbl_acft_type">Aircraft Type</label>
-					</h3>
-					<h4>
-						<span> <select id="acft_type"></select></span>
-					</h4>
+				</div>
+			</div>
+			<br />
+			<div id="AircraftType">
+				<!-- Aircraft Type selector (Airplane/Autogyro/Ornithopter) - populated by WASM -->
+			</div>
+			<br />
+			<div id="Cockpit">
+				<h3 class="collapsible active">
+					<label id="lbl_cockpits">Cockpits</label>
+				</h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Crew"><u>Rules</u></a>)</span>
 					<br />
-				</div>
-				<div id="Era">
-					<h3 class="collapsible active"><label id="lbl_era">Era</label>
-					</h3>
+				</h4>
+				<div class="content">
 					<h4>
-						<span>(<a href="./Rules/Rules.htm#_Era"><u>Rules</u></a>)</span>
+						<span> <label id="lbl_num_cockpits" for="num_cockpits">Number of Cockpits:</label> <input
+								type="number" id="num_cockpits" min="1" max="20" value="1" /></span>
 					</h4>
-					<div class="content">
-						<table style="width:100%" id="table_era">
-						</table>
-					</div>
+					<table style="width:100%" id="table_cockpit"></table>
 				</div>
-				<br />
-				<div id="Cockpit">
-					<h3 class="collapsible active">
-						<label id="lbl_cockpits">Cockpits</label>
-					</h3>
+			</div>
+			<br />
+			<div id="Passengers">
+				<h3 id="passenger_collapse" class="collapsible">
+					<label id="lbl_passengers">Passengers</label>
+				</h3>
+				<h4><span>(<a href="./Rules/Rules.htm#_Passenger_Capacity"><u>Rules</u></a>)</span></h4>
+				<div class="content" style="max-height: 0px;">
+					<table style="width:100%" id="table_passengers"></table>
+				</div>
+			</div>
+			<br />
+			<div id="Engines">
+				<h3 class="collapsible active">
+					<label id="lbl_engines">Engines</label>
+				</h3>
+				<h4>
+					<span>(<a href="./Rules/Rules.htm#_Engines"><u>Engine Rules</u></a>)</span>
+					<span>(<a href="./Rules/Rules.htm#_Engine_Upgrades"><u>Upgrade Rules</u></a>)</span>
+					<span>(<a href="./Rules/Rules.htm#_Cooling_(Air)"><u>Cooling Rules</u></a>)</span>
+					<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
+				</h4>
+				<div class="content">
 					<h4>
-						<span>(<a href="./Rules/Rules.htm#_Crew"><u>Rules</u></a>)</span>
-						<br />
+						<span> <label id="lbl_num_engines" for="num_engines">Number of Engines:</label> <input
+								type="number" id="num_engines" min="0" max="20" value="1" /></span>
+						<span> <label id="lbl_num_radiators" for="num_radiators">Number of Radiators:</label> <input
+								type="number" id="num_radiators" min="1" max="20" value="0" /></span>
+						<span><label id="lbl_asymmetric" for="asymmetric">Asymmetric Plane:</label> <input
+								type="checkbox" id="asymmetric" /></span>
 					</h4>
-					<div class="content">
-						<h4>
-							<span> <label id="lbl_num_cockpits" for="num_cockpits">Number of Cockpits:</label> <input
-									type="number" id="num_cockpits" min="1" max="20" value="1" /></span>
-						</h4>
-						<table style="width:100%" id="table_cockpit"></table>
-					</div>
-				</div>
-				<br />
-				<div id="Passengers">
-					<h3 id="passenger_collapse" class="collapsible">
-						<label id="lbl_passengers">Passengers</label>
-					</h3>
-					<h4><span>(<a href="./Rules/Rules.htm#_Passenger_Capacity"><u>Rules</u></a>)</span></h4>
-					<div class="content" style="max-height: 0px;">
-						<table style="width:100%" id="table_passengers"></table>
-					</div>
-				</div>
-				<br />
-				<div id="Engines">
-					<h3 class="collapsible active">
-						<label id="lbl_engines">Engines</label>
-					</h3>
-					<h4>
-						<span>(<a href="./Rules/Rules.htm#_Engines"><u>Engine Rules</u></a>)</span>
-						<span>(<a href="./Rules/Rules.htm#_Engine_Upgrades"><u>Upgrade Rules</u></a>)</span>
-						<span>(<a href="./Rules/Rules.htm#_Cooling_(Air)"><u>Cooling Rules</u></a>)</span>
-						<span><a href="./engine.html"><b>Engine Builder</b></a></span><br />
-					</h4>
-					<div class="content">
-						<h4>
-							<span> <label id="lbl_num_engines" for="num_engines">Number of Engines:</label> <input
-									type="number" id="num_engines" min="0" max="20" value="1" /></span>
-							<span> <label id="lbl_num_radiators" for="num_radiators">Number of Radiators:</label> <input
-									type="number" id="num_radiators" min="1" max="20" value="0" /></span>
-							<span><label id="lbl_asymmetric" for="asymmetric">Asymmetric Plane:</label> <input
-									type="checkbox" id="asymmetric" /></span>
-						</h4>
-						<table style="width:100%" id="table_engine"></table>
-						<br />
-						<table style="width:100%" id="table_radiator"></table>
-					</div>
+					<table style="width:100%" id="table_engine"></table>
+					<br />
+					<table style="width:100%" id="table_radiator"></table>
 				</div>
 			</div>
 			<br />
@@ -153,23 +166,6 @@
 				<div class="content">
 					<table id="table_frames"></table>
 				</div>
-			</div>
-			<br />
-			<div id="Tail">
-				<h3 class="collapsible active">
-					<label id="lbl_tail">Tail</label>
-				</h3>
-				<h4>
-					<span>(<a href="./Rules/Rules.htm#_Tail"><u>Rules</u></a>)</span><br />
-				</h4>
-				<h4 class="content">
-					<span> <label id="lbl_tail_type" for="tail_type">Tail Length:</label> <select
-							id="tail_type"></select></span>
-					<span> <label id="lbl_tail_farman" for="tail_farman">Farman Tail:</label> <input type="checkbox"
-							id="tail_farman" /></span>
-					<span> <label id="lbl_tail_boom" for="tail_boom">Boom Tail:</label> <input type="checkbox"
-							id="tail_boom" /></span>
-				</h4>
 			</div>
 			<br />
 			<div id="Wings">
@@ -193,17 +189,8 @@
 				</div>
 			</div>
 			<br />
-			<div id="Rotors" hidden="true">
-				<h3 class="collapsible active">
-					<label id="lbl_rotor">Rotors</label>
-				</h3>
-				<h4>
-					<span>(<a href="./Rules/Rules.htm#_gk8wobugdkuf"><u>Rules</u></a>)</span>
-				</h4>
-				<div class="content">
-					<table id="rotor_table"></table>
-				</div>
-				<br />
+			<div id="Rotors">
+				<!-- RotorUI creates its own collapsible section content -->
 			</div>
 			<div id="Stabilizers">
 				<h3 id="stabilizer_collapse" class="collapsible active">
@@ -338,15 +325,7 @@
 				</div>
 			</div>
 			<br />
-			<div id=" Stats">
-						<h3 id="alter_collapse" class="collapsible"><label id="lbl_custom">Custom Parts and
-								Alterations</label>
-							<br />
-						</h3>
-						<h4></h4>
-						<div class="content" style="max-height: 0px;">
-							<table id="alter_table"></table>
-						</div>
+			<div id="CustomParts">
 				</div>
 				<br />
 				<div id="Stats">
@@ -388,51 +367,41 @@
 			<br />
 			<br />
 			<span>
-				<table>
-					<tr>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_save_bot" for="acft_save">Save</label><button
-								hidden="true" id="acft_save">Save</button>
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_load_bot" for="acft_load">Load</label> <input
-								hidden="true" type="file" id="acft_load" />
-						</th>
-						<th class="btn_th" hidden>
-							<label class="lbl_action" for="acft_load_text">Load Text</label> <input type="text"
-								id="acft_load_text" class="skinny" />
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_save_link_bot" for="acft_save_link">Copy As
-								Link</label><button hidden="true" id="acft_save_link">Save</button>
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_save_dash_bot" for="acft_save_dash">Save
-								Dashboard</label><button hidden="true" id="acft_save_dash">Save</button>
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_interactive_dash_bot"
-								for="acft_interactive_dash">Interactive
-								Dashboard</label><button hidden="true" id="acft_interactive_dash">Interactive</button>
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_save_npc_bot" for="acft_save_npc">Save
-								NPC</label><button hidden="true" id="acft_save_npc">Save</button>
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_save_cat_bot" for="acft_save_cat">Save
-								Catalog</label><button hidden="true" id="acft_save_cat">Save</button>
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="acft_save_cat_json_bot" for="acft_save_cat_json">Catalog
-								JSON</label><button hidden="true" id="acft_save_cat_json">Save</button>
-						</th>
-						<th class="btn_th">
-							<label class="lbl_action" id="lbl_acft_reset_bot" for="acft_reset">Default
-								Aircraft</label><button hidden="true" id="acft_reset">Default Aircraft</button>
-						</th>
-					</tr>
-				</table>
+				<div style="display:flex; flex-wrap:wrap; gap: 0.5em;">
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_bot" for="acft_save">Save</label><button
+							hidden="true" id="acft_save">Save</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_acft_load_bot" for="acft_load">Load</label> <input
+							hidden="true" type="file" id="acft_load" />
+					</div>
+					<div class="btn_th" hidden>
+						<label class="lbl_action" for="acft_load_text">Load Text</label> <input type="text"
+							id="acft_load_text" class="skinny" />
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_link_bot" for="acft_save_link">Copy As
+							Link</label><button hidden="true" id="acft_save_link">Save</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_dash_bot" for="acft_save_dash">Save
+							Dashboard</label><button hidden="true" id="acft_save_dash">Save</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_acft_interactive_dash_bot"
+							for="acft_interactive_dash">Interactive
+							Dashboard</label><button hidden="true" id="acft_interactive_dash">Interactive</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_acft_save_npc_bot" for="acft_save_npc">Save
+							NPC</label><button hidden="true" id="acft_save_npc">Save</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_acft_reset_bot" for="acft_reset">Default
+							Aircraft</label><button hidden="true" id="acft_reset">Default Aircraft</button>
+					</div>
+				</div>
 			</span>
 			<img id="dash_img" hidden="true" src='./Cards/Dashboard.png'></img>
 			<img id="weap_img" hidden="true" src='./Cards/Weapon.png'></img>

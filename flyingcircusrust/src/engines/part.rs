@@ -1,0 +1,186 @@
+use super::Engines;
+use crate::part::{ElectricsMessage, Part};
+use crate::stats::{Stats, Warning, WarningLevel};
+use std::collections::HashMap;
+
+impl Part for Engines {
+    fn part_stats(&mut self) -> Stats {
+        self.verify_cooling();
+
+        let mut stats = Stats::new();
+
+        // Track cooling needs for each radiator
+        let mut need_cool: Vec<(i16, usize)> = vec![(0, 0); self.radiators.len()];
+        let mut ecost = 0.0;
+        let mut pitchspeedmin: f32 = 100.0;
+
+        // Track first pulsejet
+        let mut first_pulsejet = false;
+        let mut final_visibility_mod: f32 = 2.0;
+
+        // Process each engine
+        for engine in &mut self.engines {
+            // Set first pulsejet flag
+            if !first_pulsejet && engine.get_is_pulsejet() {
+                first_pulsejet = true;
+                engine.set_first_pulsejet(true);
+            } else {
+                engine.set_first_pulsejet(false);
+            }
+
+            let enstats = engine.part_stats();
+            final_visibility_mod = final_visibility_mod.min(enstats.visibility);
+            stats = stats.add(&enstats);
+
+            // Track cooling needs
+            if engine.need_cooling() {
+                let rad_idx = engine.radiator_index as usize;
+                if rad_idx < need_cool.len() {
+                    need_cool[rad_idx].0 += engine.get_cooling_use();
+                    need_cool[rad_idx].1 += 1;
+                }
+            }
+
+            ecost += engine.etype_stats.stats.cost;
+
+            if enstats.pitchspeed > 0.0 {
+                pitchspeedmin = pitchspeedmin.min(enstats.pitchspeed);
+            }
+        }
+
+        stats.visibility = final_visibility_mod;
+
+        if pitchspeedmin < 100.0 {
+            stats.pitchspeed = pitchspeedmin;
+        }
+
+        // Upkeep calc only uses engine costs
+        stats.upkeep = (1.0e-6 + stats.upkeep.min(ecost)).floor();
+
+        // Include radiators
+        let mut radstats = Stats::new();
+        let mut warningmap: HashMap<String, Vec<usize>> = HashMap::new();
+
+        for i in 0..self.radiators.len() {
+            let rad = &mut self.radiators[i];
+            rad.set_need_cool(need_cool[i].0, need_cool[i].1);
+
+            let rstats = rad.part_stats();
+            radstats = radstats.add(&rstats);
+
+            // Merge warnings for different radiators
+            for w in &rstats.warnings {
+                warningmap
+                    .entry(w.name.clone())
+                    .or_insert_with(Vec::new)
+                    .push(i + 1);
+            }
+        }
+
+        // Update radiator warning sources with radiator numbers
+        for w in &mut radstats.warnings {
+            if let Some(rad_nums) = warningmap.get(&w.name) {
+                let rad_str = rad_nums
+                    .iter()
+                    .map(|n| n.to_string())
+                    .collect::<Vec<_>>()
+                    .join(",");
+                w.name = format!("{} {}", t!("Radiators #", A = rad_str), w.name);
+            }
+        }
+
+        stats = stats.add(&radstats);
+
+        // Asymmetric planes
+        if self.is_asymmetric {
+            stats.latstab -= 3.0;
+        }
+
+        // Add warnings for special engine types
+        if self.has_pulsejet() {
+            stats.warnings.push(Warning {
+                name: t!("Pulsejets").to_string(),
+                warning: t!("Pulsejet Boost Warning").to_string(),
+                level: WarningLevel::White,
+            });
+        }
+
+        if self.has_turbine_no_prop() {
+            stats.warnings.push(Warning {
+                name: t!("Turbine").to_string(),
+                warning: t!("Turbine Boost Warning").to_string(),
+                level: WarningLevel::White,
+            });
+        }
+
+        if self.has_diesel() {
+            stats.warnings.push(Warning {
+                name: t!("Diesel").to_string(),
+                warning: t!("Diesel Warning").to_string(),
+                level: WarningLevel::White,
+            });
+        }
+
+        // Calculate rotary torque direction
+        let mut rotation_t = 0;
+        for e in &self.engines {
+            if e.is_rotary() {
+                if e.is_push_pull && e.torque_to_struct {
+                    // No change to rotation_t
+                } else if e.is_push_pull && e.is_tractor() {
+                    rotation_t += 2;
+                } else if e.is_tractor() {
+                    rotation_t += 1;
+                } else if e.is_pusher() {
+                    rotation_t -= 1;
+                }
+            }
+        }
+
+        if rotation_t > 0 {
+            stats.warnings.push(Warning {
+                name: t!("Rotary").to_string(),
+                warning: t!("Rotary Right Warning").to_string(),
+                level: WarningLevel::White,
+            });
+        } else if rotation_t < 0 {
+            stats.warnings.push(Warning {
+                name: t!("Rotary").to_string(),
+                warning: t!("Rotary Left Warning").to_string(),
+                level: WarningLevel::White,
+            });
+        }
+
+        // Part local, gets handled in UpdateReliability
+        stats.reliability = 0.0;
+
+        stats
+    }
+
+    fn get_electrics(&self) -> ElectricsMessage {
+        use crate::part::{merge_electrics, Equipment};
+
+        let mut msg = ElectricsMessage::new();
+
+        // Add engine charges
+        for (i, engine) in self.engines.iter().enumerate() {
+            // Get engine stats to check charge
+            let mut engine_clone = engine.clone();
+            let stats = engine_clone.part_stats();
+
+            if stats.charge != 0.0 {
+                msg.equipment.push(Equipment {
+                    source: t!("Vital Part Engine", A = (i + 1)).to_string(),
+                    charge: stats.charge.to_string(),
+                });
+            }
+        }
+
+        // Merge radiator electrics
+        for radiator in &self.radiators {
+            msg = merge_electrics(msg, radiator.get_electrics());
+        }
+
+        msg
+    }
+}

@@ -1,0 +1,23 @@
+[package]
+name = "flyingcircustypst"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = [
+    "cdylib",
+    "rlib",
+] # Compile to dynamic system library and Rust library format
+
+[dependencies]
+flyingcircusrust = { path = "../flyingcircusrust" }
+rust-i18n = "3"
+wasm-minimal-protocol = "0.1.0"
+
+[dev-dependencies]
+assert-json-diff = "2.0.2"
+itertools = "0.14.0"
+serde_json = { version = "1.0.140", features = ["preserve_order"] }
+
+[profile.release]
+lto = true

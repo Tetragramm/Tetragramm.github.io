@@ -1,0 +1,27 @@
+# Node modules
+node_modules/
+
+# Build outputs
+*.js.map
+Test/pkg/
+
+# Rust build outputs
+target/
+Cargo.lock
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

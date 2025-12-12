@@ -7,11 +7,12 @@
 	<title>Flying Circus Engine Builder</title>
 	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="page/style.css" />
-	<script type="module" src="EngineBuilder/engine_builder.js"></script>
+	<script type="module" src="EngineBuilder/engine_builder_app.js"></script>
 </head>
 <!-- python -m http.server 8080 -->
 
-<body class="html_body" dir="ltr">
+<body class="html_body mobile-single-section" dir="ltr">
+	<div id="mobile_nav_container"></div>
 	<div class="html_outer html_content">
 		<div>
 
@@ -22,73 +23,44 @@
 			<br />
 			<a class="btn_th" href="./index.html#Engines"><b>Return to Aircraft Builder</b></a>
 			<br /><br />
-			<div>
-				<div id="Engines">
-					<h3>Engine Builder
-						<br />
-					</h3>
-					<p style="color:rgb(255, 108, 108)">Warning: It is very easy to produce overpowered engines with
-						this builder. <br /> We suggest sticking to replicating real engines where possible. </p>
-					<p>Here is a guide on how to use the builder: <a href="./EngineBuilder/Engine Building Guide.pdf">
-							Engine Builder Guide</a> </p>
+			<div id="Engines">
+				<h3>Engine Builder
 					<br />
-					<table style="width:100%" id="table_engine">
-						<tr>
-							<th>Input Values</th>
-							<th>Upgrades</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
-				</div>
+				</h3>
+				<p style="color:rgb(255, 108, 108)">Warning: It is very easy to produce overpowered engines with
+					this builder. <br /> We suggest sticking to replicating real engines where possible. </p>
+				<p>Here is a guide on how to use the builder: <a href="./EngineBuilder/Engine Building Guide.pdf">
+						Engine Builder Guide</a> </p>
 				<br />
-				<div id="Pulsejets">
-					<h3>Pulsejet Builder
-						<br />
-					</h3>
-					<table style="width:100%" id="table_pulsejet">
-						<tr>
-							<th>Input Values</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
-				</div>
-				<br />
-				<div id="Turbojets/Turbofans">
-					<h3>Turbine Builder
-						<br />
-					</h3>
-					<table style="width:100%" id="table_turbox">
-						<tr>
-							<th>Input Values</th>
-							<th>Description</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
-				</div>
-				<br />
-				<div id="Electric">
-					<h3>Electric Engine Builder
-						<br />
-					</h3>
-					<table style="width:100%" id="table_electric">
-						<tr>
-							<th>Input Values</th>
-							<th>Engine Stats</th>
-						</tr>
-					</table>
-				</div>
-				<br />
-				<div id="Manual">
-					<h3>List Management
-						<br />
-					</h3>
-					<table style="width:100%" id="table_manual">
-						<tr>
-							<th>Engine Values</th>
-							<th>Management</th>
-						</tr>
-					</table>
-				</div>
+				<div id="engine_builder_propeller"></div>
+			</div>
+			<br />
+			<div id="Pulsejets">
+				<h3>Pulsejet Builder
+					<br />
+				</h3>
+				<div id="engine_builder_pulsejet"></div>
+			</div>
+			<br />
+			<div id="Turbojets/Turbofans">
+				<h3>Turbine Builder
+					<br />
+				</h3>
+				<div id="engine_builder_turbine"></div>
+			</div>
+			<br />
+			<div id="Electric">
+				<h3>Electric Engine Builder
+					<br />
+				</h3>
+				<div id="engine_builder_electric"></div>
+			</div>
+			<br />
+			<div id="Manual" class="mobile-active-section">
+				<h3>List Management
+					<br />
+				</h3>
+				<div id="engine_builder_list_manager"></div>
 			</div>
 			<br />
 			<a class="btn_th" href="./index.html#Engines"><b>Return to Aircraft Builder</b></a>
