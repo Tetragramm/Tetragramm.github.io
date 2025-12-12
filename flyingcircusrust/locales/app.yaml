@@ -1,24 +1,4 @@
 _version: 2
-"Bomb Mass Externally.":
-  de: "%{A} Bombenmasse extern. "
-  en: "%{A} Bomb Mass Externally. "
-  es: "%{A} Masa de Bombas Externamente. "
-  fr: "%{A} Masse de Bombes à l'extérieur. "
-"Bomb Mass Internally.":
-  de: "%{A} Bombenmasse intern. "
-  en: "%{A} Bomb Mass Internally. "
-  es: "%{A} Masa de Bombas Internamente. "
-  fr: "%{A} Masse de Bombes à l'intérieur. "
-"Rocket Mass Externally.":
-  de: "%{A} Raketenmasse extern. "
-  en: "%{A} Rocket Mass Externally. "
-  es: "%{A} Masa de Cohetes Externamente. "
-  fr: "%{A} Masse de Fusées à l'extérieur. "
-"Rocket Mass Internally.":
-  de: "%{A} Raketenmasse intern. "
-  en: "%{A} Rocket Mass Internally. "
-  es: "%{A} Masa de Cohetes Internamente. "
-  fr: "%{A} Masse de Fusées à l'intérieur. "
 AIRPLANE:
   de: Starrflügler
   en: Fixed Wing
@@ -30,7 +10,7 @@ AUTOGYRO:
   es: Autogiro
   fr: Autogire
 Accessories Additional Part Stats:
-  de: "Zusätzliche Teil-Werte"
+  de: Zusätzliche Teil-Werte
   en: Additional Part Stats
   es: Estadísticas de Partes Adicionales
   fr: Stats des Pièces Additionnelles
@@ -60,7 +40,7 @@ Accessories Control Aids:
   es: Ayudas de Control
   fr: Aides au Contrôle
 Accessories Electrical:
-  de: Elektrik
+  de: Elektrisch
   en: Electrical
   es: Eléctrico
   fr: Électricité
@@ -100,10 +80,14 @@ Air Brake:
   es: Freno de Aire
   fr: Aérofrein
 Air Brake Warning:
-  de: "Beim Ausfahren verlierst du sofort Geschwindigkeit in Höhe des Geschwindigkeitsfaktors und erhältst +1 auf Dogfight!."
-  en: "When deployed, immediately bleed of speed equal to Speed Factor and gain +1 to Dogfight!."
-  es: "Al desplegarse, pierde inmediatamente velocidad igual al Factor de Velocidad y gana +1 a Dogfight!."
-  fr: "Lorsqu'ils sont déployés, purgez immédiatement de la vitesse égale au Facteur de Vitesse et gagnez +1 à Dogfight!."
+  de: Beim Ausfahren verlierst du sofort Geschwindigkeit in Höhe des Geschwindigkeitsfaktors
+    und erhältst +1 auf Dogfight!.
+  en: When deployed, immediately bleed of speed equal to Speed Factor and gain +1
+    to Dogfight!.
+  es: Al desplegarse, pierde inmediatamente velocidad igual al Factor de Velocidad
+    y gana +1 a Dogfight!.
+  fr: Lorsqu'ils sont déployés, purgez immédiatement de la vitesse égale au Facteur
+    de Vitesse et gagnez +1 à Dogfight!.
 Air Conditioning:
   de: Klimaanlage
   en: Air Conditioning
@@ -164,6 +148,16 @@ Aircraft Type Section Title:
   en: Aircraft Type
   es: Tipo de Aeronave
   fr: Type d'Avion
+Alter Add Part:
+  de: Teil Hinzufügen
+  en: Add Part
+  es: Añadir Pieza
+  fr: Ajouter une Pièce
+Alter Edit Part:
+  de: Teil Bearbeiten
+  en: Edit Part
+  es: Editar Pieza
+  fr: Modifier la Pièce
 Alter Part Name:
   de: Teilname
   en: Part Name
@@ -179,6 +173,16 @@ Alter Quantity:
   en: Quantity
   es: Cantidad
   fr: Quantité
+Alter Remove Part:
+  de: Teil Entfernen
+  en: Remove Part
+  es: Eliminar Pieza
+  fr: Retirer la Pièce
+Alter Section Title:
+  de: Sonderteile und Änderungen
+  en: Custom Parts and Alterations
+  es: Piezas Personalizadas y Alteraciones
+  fr: Pièces Personnalisées et Modifications
 Alter Select Part:
   de: Teil auswählen
   en: Select Part
@@ -194,21 +198,21 @@ Altitude Eternal Fires:
   en: Eternal Fires
   es: Fuegos Eternos
   fr: Feux Éternels
-Altitude Oxidized Fuel:
-  de: Oxidierter Kraftstoff
-  en: Oxidized Fuel
-  es: Combustible Oxidado
-  fr: Carburant Oxydé
 Altitude Holding:
   de: Höhenhaltung
   en: Altitude Holding
   es: Mantenimiento de Altitud
   fr: Maintien d'Altitude
 Altitude Holding Warning:
-  de: "Ermöglicht, die Leerersitz-Regel zu ignorieren."
+  de: Ermöglicht, die Leerersitz-Regel zu ignorieren.
   en: Allows the Empty Seat rule to be ignored.
   es: Permite ignorar la regla del Asiento Vacío.
   fr: Permet d'ignorer la règle du Siège Vide.
+Altitude Oxidized Fuel:
+  de: Oxidierter Kraftstoff
+  en: Oxidized Fuel
+  es: Combustible Oxidado
+  fr: Carburant Oxydé
 Altitude Section Title:
   de: Höheneffekte
   en: Altitude Effects
@@ -220,10 +224,10 @@ Altitude Throttle:
   es: Acelerador de Altitud
   fr: Manette d'Altitude
 Altitude Throttle Warning:
-  de: "Dieser Motor verfügt über das Kriegsnotleistungs-Upgrade auf Höhen von 0-9."
-  en: "This engine has the WEP upgrade at Altitudes 0-9."
-  es: "Este motor tiene la mejora de WEP en Altitudes 0-9."
-  fr: "Ce moteur possède l'amélioration WEP aux Altitudes 0-9."
+  de: Dieser Motor verfügt über das Kriegsnotleistungs-Upgrade auf Höhen von 0-9.
+  en: This engine has the WEP upgrade at Altitudes 0-9.
+  es: Este motor tiene la mejora de WEP en Altitudes 0-9.
+  fr: Ce moteur possède l'amélioration WEP aux Altitudes 0-9.
 Aluminium:
   de: Aluminium
   en: Aluminium
@@ -250,10 +254,13 @@ Ammonia:
   es: Amoníaco
   fr: Ammoniaque
 Ammonia Warning:
-  de: Erleide 1 Leistungsreduzierung, während die Drehzahl unter 4 liegt. Verursacht 2 Schaden bei Leckage.
+  de: Erleide 1 Leistungsreduzierung, während die Drehzahl unter 4 liegt. Verursacht
+    2 Schaden bei Leckage.
   en: Take 1 Power Reduction while RPM is below 4. Causes 2 Injury when leaking.
-  es: Sufrir 1 Reducción de Potencia mientras las RPM estén por debajo de 4. Causa 2 Daños al tener fugas.
-  fr: Subissez 1 Réduction de Puissance tant que le régime est inférieur à 4. Cause 2 Blessures en cas de fuite.
+  es: Sufrir 1 Reducción de Potencia mientras las RPM estén por debajo de 4. Causa
+    2 Daños al tener fugas.
+  fr: Subissez 1 Réduction de Puissance tant que le régime est inférieur à 4. Cause
+    2 Blessures en cas de fuite.
 Armour:
   de: Panzerung
   en: Armour
@@ -265,15 +272,27 @@ Autocannon:
   es: Cañón Automático
   fr: Canon Automatique
 Autogyro Stall:
-  de: "Tragschrauber-Strömungsabriss"
+  de: Tragschrauber-Strömungsabriss
   en: Autogyro Stall
   es: Entrada en Pérdida de Autogiro
   fr: Décrochage d'Autogire
 Autogyro Stall Warning:
-  de: "Ein Tragschrauber kann keinen Strömungsabriss erleiden; er tauscht automatisch Höhe gegen Geschwindigkeit im Verhältnis 1:1. Wenn ihm die Höhe ausgeht, bevor er die Kontrolle wiedererlangt, landet er sanft. Wenn der Tragschrauber Geschwindigkeit 37 überschreitet oder negative G-Kräfte erfährt, erleidet er einen traditionelleren Strömungsabriss."
-  en: "An Autogyro cannot stall, it automatically trades Altitude for speed 1-1.  If it runs out of altitude before regaining control, it lands gently.  If the autogyro exceeds speed 37 or sustains negative Gs it suffers a more traditional stall."
-  es: "Un Autogiro no puede entrar en pérdida, automáticamente intercambia Altitud por velocidad 1-1. Si se queda sin altitud antes de recuperar el control, aterriza suavemente. Si el autogiro supera la velocidad 37 o sufre Gs negativos, sufre una entrada en pérdida más tradicional."
-  fr: Un autogire ne peut pas décrocher, il échange automatiquement l'Altitude contre la vitesse 1 contre 1. S'il n'a plus d'altitude avant de reprendre le contrôle, il atterrit doucement. Si l'autogire dépasse la vitesse 37 ou subit des G négatifs, il subit un décrochage plus traditionnel.
+  de: Ein Tragschrauber kann keinen Strömungsabriss erleiden; er tauscht automatisch
+    Höhe gegen Geschwindigkeit im Verhältnis 1:1. Wenn ihm die Höhe ausgeht, bevor
+    er die Kontrolle wiedererlangt, landet er sanft. Wenn der Tragschrauber Geschwindigkeit
+    37 überschreitet oder negative G-Kräfte erfährt, erleidet er einen traditionelleren
+    Strömungsabriss.
+  en: An Autogyro cannot stall, it automatically trades Altitude for speed 1-1.  If
+    it runs out of altitude before regaining control, it lands gently.  If the autogyro
+    exceeds speed 37 or sustains negative Gs it suffers a more traditional stall.
+  es: Un Autogiro no puede entrar en pérdida, automáticamente intercambia Altitud
+    por velocidad 1-1. Si se queda sin altitud antes de recuperar el control, aterriza
+    suavemente. Si el autogiro supera la velocidad 37 o sufre Gs negativos, sufre
+    una entrada en pérdida más tradicional.
+  fr: Un autogire ne peut pas décrocher, il échange automatiquement l'Altitude contre
+    la vitesse 1 contre 1. S'il n'a plus d'altitude avant de reprendre le contrôle,
+    il atterrit doucement. Si l'autogire dépasse la vitesse 37 ou subit des G négatifs,
+    il subit un décrochage plus traditionnel.
 Automatic Pitch:
   de: Automatische Blattverstellung
   en: Automatic Pitch
@@ -288,7 +307,7 @@ Balloon Gun:
   de: Ballonkanone
   en: Balloon Gun
   es: Cañón Antidirigible
-  fr: "Canon Anti-Ballon"
+  fr: Canon Anti-Ballon
 Basic Cowl:
   de: Einfache Motorverkleidung
   en: Basic Cowl
@@ -339,8 +358,18 @@ Boat Hull:
   en: Boat Hull
   es: Casco de Barco
   fr: Coque de Bateau
+Bomb Mass Externally.:
+  de: '%{A} Bombenmasse extern. '
+  en: '%{A} Bomb Mass Externally. '
+  es: '%{A} Masa de Bombas Externamente. '
+  fr: '%{A} Masse de Bombes à l''extérieur. '
+Bomb Mass Internally.:
+  de: '%{A} Bombenmasse intern. '
+  en: '%{A} Bomb Mass Internally. '
+  es: '%{A} Masa de Bombas Internamente. '
+  fr: '%{A} Masse de Bombes à l''intérieur. '
 Bombadier Controls:
-  de: "Bombenschützen-Steuerung"
+  de: Bombenschützen-Steuerung
   en: Bombardier Controls
   es: Controles de Bombardero
   fr: Commandes du Bombardier
@@ -355,12 +384,13 @@ Bombsight:
   es: Mira de Bombardeo
   fr: Viseur de Bombardement
 Bombsight Warning:
-  de: "Ziehe %{A} von deiner Flughöhe ab, wenn du auf Bombardierung würfelst."
-  en: "Subtract %{A} from your Altitude when rolling for bombing."
-  es: "Restar %{A} de tu Altitud al lanzar los dados para bombardear."
-  fr: "Soustrayez %{A} de votre Altitude lorsque vous lancez pour le bombardement."
+  de: Ziehe %{A} von deiner Flughöhe ab, wenn du auf Bombardierung würfelst.
+  en: Subtract %{A} from your Altitude when rolling for bombing.
+  es: Restar %{A} de tu Altitud al lanzar los dados para bombardear.
+  fr: Soustrayez %{A} de votre Altitude lorsque vous lancez pour le bombardement.
 Boost Warning:
-  de: Boost ist 0 bei einigen Zuladungen. Das Flugzeug kann nicht beschleunigen, um abzuheben.
+  de: Boost ist 0 bei einigen Zuladungen. Das Flugzeug kann nicht beschleunigen, um
+    abzuheben.
   en: Boost is 0 for some loads.  The plane cannot accelerate to take off.
   es: Boost es 0 para algunas cargas. El avión no puede acelerar para despegar.
   fr: Boost est 0 pour certaines charges. L'avion ne peut pas accélérer pour décoller.
@@ -369,6 +399,41 @@ Box:
   en: Box
   es: Caja
   fr: Boîte
+Btn Copy As Link:
+  de: Als Link Kopieren
+  en: Copy as Link
+  es: Copiar como Enlace
+  fr: Copier en tant que Lien
+Btn Default Aircraft:
+  de: Standardflugzeug
+  en: Default Aircraft
+  es: Aeronave Predeterminada
+  fr: Aéronef par Défaut
+Btn Interactive Dashboard:
+  de: Interaktives Dashboard
+  en: Interactive Dashboard
+  es: Tablero Interactivo
+  fr: Tableau de Bord Interactif
+Btn Load:
+  de: Laden
+  en: Load
+  es: Cargar
+  fr: Charger
+Btn Save:
+  de: Speichern
+  en: Save
+  es: Guardar
+  fr: Sauvegarder
+Btn Save Dashboard:
+  de: Dashboard Speichern
+  en: Save Dashboard
+  es: Guardar el Tablero de Instrumentos
+  fr: Sauvegarder le Tableau de Bord
+Btn Save NPC:
+  de: NSC Speichern
+  en: Save NPC Card
+  es: Guardar PNJ
+  fr: Sauvegarder le PNJ
 Bubble Canopy:
   de: Blasenkanzel
   en: Bubble Canopy
@@ -385,40 +450,42 @@ Cantilever Wing Warping:
   es: Deformación del Ala en Voladizo
   fr: Vrillage d'Aile en Cantilever
 Cards Gun String No Reload:
-  de: "%{A} Schuss"
-  en: "%{A} shots"
-  es: "%{A} disparos"
-  fr: "%{A} tirs"
+  de: '%{A} Schuss'
+  en: '%{A} shots'
+  es: '%{A} disparos'
+  fr: '%{A} tirs'
 Cards Gun String Reload:
-  de: "%{A} Ladungen à %{B} Schuss"
-  en: "%{A} loads of %{B} shots"
-  es: "%{A} cargas de %{B} disparos"
-  fr: "%{A} charges de %{B} tirs"
+  de: '%{A} Ladungen à %{B} Schuss'
+  en: '%{A} loads of %{B} shots'
+  es: '%{A} cargas de %{B} disparos'
+  fr: '%{A} charges de %{B} tirs'
 Cards Too Many Warnings Warning:
-  de: "Und mehr! Siehe den Flugzeug-Builder für Details."
-  en: "And More!  See the Plane Builder for details."
-  es: "¡Y Más! Consulta el Constructor de Aviones para detalles."
-  fr: "Et Plus Encore ! Voir le Constructeur d'Avions pour les détails."
+  de: Und mehr! Siehe den Flugzeug-Builder für Details.
+  en: And More!  See the Plane Builder for details.
+  es: ¡Y Más! Consulta el Constructor de Aviones para detalles.
+  fr: Et Plus Encore ! Voir le Constructeur d'Avions pour les détails.
 Cards Uses Radiator:
-  de: "Verwendet Kühler Nr. %{A}"
-  en: "Uses Radiator #%{A}"
-  es: "Usa Radiador #%{A}"
-  fr: "Utilise Radiateur #%{A}"
+  de: 'Verwendet Kühler #%{A}'
+  en: 'Uses Radiator #%{A}'
+  es: 'Usa Radiador #%{A}'
+  fr: 'Utilise Radiateur #%{A}'
 Cargo Huge:
   de: Passt für so ziemlich alles, was man sich vorstellen kann.
   en: Will fit just about anything you can imagine.
   es: Cabrá casi cualquier cosa que puedas imaginar.
   fr: Peut contenir à peu près tout ce que vous pouvez imaginer.
 Cargo Large:
-  de: "Passt für ein Aufklärungs- oder Jagdflugzeug mit abgenommenen Flügeln."
+  de: Passt für ein Aufklärungs- oder Jagdflugzeug mit abgenommenen Flügeln.
   en: Will fit a scout or fighter aircraft with the wings taken off.
   es: Cabrá una aeronave de reconocimiento o caza con las alas desmontadas.
-  fr: Peut contenir un avion de reconnaissance ou de chasse dont les ailes ont été retirées.
+  fr: Peut contenir un avion de reconnaissance ou de chasse dont les ailes ont été
+    retirées.
 Cargo Medium:
   de: Passt für ein kleines Fahrzeug wie ein Motorrad, Auto oder Zeppelinmotor.
   en: Will fit a small vehicle like a motorcycle, car, or zeppelin engine.
   es: Cabrá un vehículo pequeño como una motocicleta, coche o motor de zepelín.
-  fr: Peut contenir un petit véhicule comme une moto, une voiture ou un moteur de dirigeable.
+  fr: Peut contenir un petit véhicule comme une moto, une voiture ou un moteur de
+    dirigeable.
 Cargo Small:
   de: Passt für einen Koffer, ein Fass oder eine Kiste.
   en: Will fit a trunk, barrel, or crate.
@@ -438,7 +505,7 @@ Carrier Hook Warning:
   de: Ermöglicht die Landung auf Flugzeugträgern.
   en: Allows landing on carriers.
   es: Permite aterrizar en portaaviones.
-  fr: "Permet d'atterrir sur les porte-avions."
+  fr: Permet d'atterrir sur les porte-avions.
 Castor Oil:
   de: Rizinusöl
   en: Castor Oil
@@ -468,7 +535,7 @@ Catalog Oil Tank:
   de: Öltank
   en: Oil Tank
   es: Depósito de Aceite
-  fr: Réservoir d'Huile
+  fr: Réservoir
 Catalog Radiator:
   de: Kühler
   en: Radiator
@@ -484,18 +551,18 @@ Center Pod:
   en: Center Pod
   es: Cápsula Central
   fr: Pod Central
-"Center-Mounted Pusher":
+Center-Mounted Pusher:
   de: Mittig montierter Schubpropeller
-  en: "Center-Mounted Pusher"
+  en: Center-Mounted Pusher
   es: Empujador Montado Centralmente
   fr: Propulseur Monté au Centre
-"Center-Mounted Tractor":
+Center-Mounted Tractor:
   de: Mittig montierter Zugpropeller
-  en: "Center-Mounted Tractor"
+  en: Center-Mounted Tractor
   es: Tractor Montado Centralmente
   fr: Tracteur Monté au Centre
 Channel Tractor:
-  de: "Kanal-Zugpropeller"
+  de: Kanal-Zugpropeller
   en: Channel Tractor
   es: Tractor de Canal
   fr: Tracteur à Conduit
@@ -510,10 +577,14 @@ Clockwork Programmable:
   es: Programable con Relojería
   fr: Programmable à Remontoir
 Clockwork Programmable Warning:
-  de: "Kann alles tun außer Dogfight! würfeln, Waffen abfeuern, Bomben abwerfen oder Landungen durchführen. Nur für Himmilgard."
-  en: "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings. For Himmilgard only."
-  es: "Puede hacer cualquier cosa menos Dogfight!, disparar armas, lanzar bombas o aterrizar. Solo para Himmilgard."
-  fr: "Peut faire tout sauf Dogfight!, tirer avec des armes, larguer des bombes, ou faire des atterrissages. Uniquement pour Himmilgard."
+  de: Kann alles tun außer Dogfight! würfeln, Waffen abfeuern, Bomben abwerfen oder
+    Landungen durchführen. Nur für Himmilgard.
+  en: Can do anything but Dogfight!, fire weapons, drop bombs, or make landings. For
+    Himmilgard only.
+  es: Puede hacer cualquier cosa menos Dogfight!, disparar armas, lanzar bombas o
+    aterrizar. Solo para Himmilgard.
+  fr: Peut faire tout sauf Dogfight!, tirer avec des armes, larguer des bombes, ou
+    faire des atterrissages. Uniquement pour Himmilgard.
 Closed Cowl:
   de: Geschlossene Motorverkleidung
   en: Closed Cowl
@@ -524,16 +595,16 @@ Cloth Canvas:
   en: Cloth Canvas
   es: Lona de Tela
   fr: Toile
-"Co-Pilot Controls":
-  de: "Copiloten-Steuerung"
-  en: "Co-Pilot Controls"
+Co-Pilot Controls:
+  de: Copiloten-Steuerung
+  en: Co-Pilot Controls
   es: Controles de Copiloto
-  fr: "Commandes du Co-Pilote"
-"Co-Pilot Warning":
-  de: "Maximale Stressreduzierung von %{A}."
-  en: "Maximum stress reduction of %{A}."
-  es: "Reducción de Estrés máxima de %{A}."
-  fr: "Réduction maximale du stress de %{A}."
+  fr: Commandes du Co-Pilote
+Co-Pilot Warning:
+  de: Maximale Stressreduzierung von %{A}.
+  en: Maximum stress reduction of %{A}.
+  es: Reducción de Estrés máxima de %{A}.
+  fr: Réduction maximale du stress de %{A}.
 Coaxial:
   de: Koaxial
   en: Coaxial
@@ -545,7 +616,7 @@ Cockpit Bombsight:
   es: Mira de Bombardeo
   fr: Viseur de Bombardement
 Cockpit Cockpit Stats:
-  de: "Cockpit-Werte"
+  de: Cockpit-Werte
   en: Cockpit Stats
   es: Estadísticas de Cabina
   fr: Stats du Cockpit
@@ -555,15 +626,20 @@ Cockpit Gunsights:
   es: Miras
   fr: Viseurs
 Cockpit Num Cockpits:
-  de: "Anzahl Cockpits"
-  en: "Number of Cockpits"
-  es: "Número de Cabinas"
-  fr: "Nombre de Cockpits"
+  de: Anzahl Cockpits
+  en: Number of Cockpits
+  es: Número de Cabinas
+  fr: Nombre de Cockpits
 Cockpit Option:
   de: Option
   en: Option
   es: Opción
   fr: Option
+Cockpit Position:
+  de: Cockpit-Position
+  en: Cockpit Position
+  es: Posición de Cabina
+  fr: Position du Poste de Pilotage
 Cockpit Safety Options:
   de: Sicherheitsoptionen
   en: Safety Options
@@ -584,6 +660,11 @@ Coming Storm:
   en: Coming Storm
   es: La Tormenta Que Se Avecina
   fr: Tempête Imminente
+Compare Aircraft in Hangar:
+  de: Flugzeuge im Hangar vergleichen
+  en: Compare Aircraft in Hangar
+  es: Comparar Aeronaves en el Hangar
+  fr: Comparer les Aéronefs dans le Hangar
 Connectivity:
   de: Zugänglich
   en: Connectivity
@@ -645,17 +726,22 @@ Control Surfaces Slats:
   es: Slats
   fr: Becs de Bord d'Attaque
 Control Surfaces Stats:
-  de: "Steuerflächen-Werte"
+  de: Steuerflächen-Werte
   en: Control Surface Stats
   es: Estadísticas de Superficies de Control
   fr: Stats des Surfaces de Contrôle
+Copper:
+  de: Kupfer
+  en: Copper
+  es: Cobre
+  fr: Cuivre
 Corrugated Duralumin:
-  de: "Wellblech-Duraluminium"
+  de: Wellblech-Duraluminium
   en: Corrugated Duralumin
   es: Duraluminio Corrugado
   fr: Duralumin Ondulé
 Corrugated Steel:
-  de: "Wellblech-Stahl"
+  de: Wellblech-Stahl
   en: Corrugated Steel
   es: Acero Corrugado
   fr: Acier Ondulé
@@ -663,17 +749,17 @@ Crew Aircrew:
   de: Besatzung
   en: Aircrew
   es: Tripulante
-  fr: Membre d'équipage
+  fr: Équipage
 Crew Bombadier:
   de: Bombenschütze
   en: Bombardier
   es: Bombardero
   fr: Bombardier
-"Crew Co-Pilot":
+Crew Co-Pilot:
   de: Copilot
-  en: "Co-Pilot"
+  en: Co-Pilot
   es: Copiloto
-  fr: "Co-Pilote"
+  fr: Co-Pilote
 Crew Gunner:
   de: Schütze
   en: Gunner
@@ -690,20 +776,24 @@ Default:
   es: Predeterminado
   fr: Par Défaut
 Deflection Warning:
-  de: "Erleide %{A} auf den Angriff bei einem Ablenkschuss."
-  en: "Take %{A} to attack on a deflection shot."
-  es: "Sufre %{A} al atacar en un disparo de deflexión."
-  fr: "Subissez %{A} pour attaquer sur un tir de déflexion."
+  de: Erleide %{A} auf den Angriff bei einem Ablenkschuss.
+  en: Take %{A} to attack on a deflection shot.
+  es: Sufre %{A} al atacar en un disparo de deflexión.
+  fr: Subissez %{A} pour attaquer sur un tir de déflexion.
 Deflector Plate:
   de: Ablenkplatte
   en: Deflector Plate
   es: Placa Deflectora
   fr: Plaque Déflectrice
 Deflector Plate Warning:
-  de: "Ablenkplatten verursachen 1 Abnutzung, jedes Mal, wenn du eine natürliche 5 oder weniger auf dem ersten Krit-Würfel würfelst."
-  en: Deflector Plates inflict 1 Wear every time you roll a natural 5 or less on the first Crit die.
-  es: Las Placas Deflectoras infligen 1 Desgaste cada vez que tiras un 5 natural o menos en el primer dado de Crítico.
-  fr: Les Plaques Déflectrices infligent 1 Usure chaque fois que vous lancez un 5 naturel ou moins sur le premier dé de Crit.
+  de: Ablenkplatten verursachen 1 Abnutzung, jedes Mal, wenn du eine natürliche 5
+    oder weniger auf dem ersten Krit-Würfel würfelst.
+  en: Deflector Plates inflict 1 Wear every time you roll a natural 5 or less on the
+    first Crit die.
+  es: Las Placas Deflectoras infligen 1 Desgaste cada vez que tiras un 5 natural o
+    menos en el primer dado de Crítico.
+  fr: Les Plaques Déflectrices infligent 1 Usure chaque fois que vous lancez un 5
+    naturel ou moins sur le premier dé de Crit.
 Derived Aerodynamics:
   de: Aerodynamik
   en: Aerodynamics
@@ -760,7 +850,7 @@ Derived Electrics:
   es: Sistema Eléctrico
   fr: Électricité
 Derived Empty Fuel:
-  de: Leerer Treibstoff
+  de: Leerer Kraftstoff
   en: Empty Fuel
   es: Combustible Vacío
   fr: Carburant Vide
@@ -785,22 +875,22 @@ Derived Fuel Uses:
   es: Usos de Combustible
   fr: Utilisations de Carburant
 Derived Full Fuel:
-  de: Voller Treibstoff
+  de: Voller Kraftstoff
   en: Full Fuel
   es: Combustible Lleno
   fr: Carburant Plein
 Derived Full Fuel with Bombs:
-  de: Voller Treibstoff mit Bomben
+  de: Voller Kraftstoff mit Bomben
   en: Full Fuel with Bombs
   es: Combustible Lleno con Bombas
   fr: Carburant Plein avec Bombes
 Derived Half Fuel:
-  de: Halber Treibstoff
+  de: Halber Kraftstoff
   en: Half Fuel
   es: Medio Combustible
   fr: Carburant à Moitié
 Derived Half Fuel with Bombs:
-  de: Halber Treibstoff mit Bomben
+  de: Halber Kraftstoff mit Bomben
   en: Half Fuel with Bombs
   es: Medio Combustible con Bombas
   fr: Carburant à Moitié avec Bombes
@@ -841,7 +931,7 @@ Derived Per 10 Speed:
   fr: /10 vitesse
 Derived Problematic Parts:
   de: Teile außerhalb der Ära
-  en: "Out-of-Era Parts"
+  en: Out-of-Era Parts
   es: Piezas Fuera de Época
   fr: Pièces Hors d'Ère
 Derived Propulsion:
@@ -915,10 +1005,13 @@ Dive Brake:
   es: Freno de Picado
   fr: Frein de Piqué
 Dive Brake Warning:
-  de: "Beim Ausfahren tauschen steile Sturzflüge Höhe gegen Geschwindigkeit im Verhältnis 1:2 anstelle von 1:3."
-  en: "When deployed, steep dives trade altitude for speed at 1-2 instead of 1-3."
-  es: "Al desplegarse, los picados pronunciados intercambian altitud por velocidad a 1-2 en lugar de 1-3."
-  fr: "Lorsqu'il est déployé, les piqués raides échangent l'altitude contre la vitesse à 1-2 au lieu de 1-3."
+  de: Beim Ausfahren tauschen steile Sturzflüge Höhe gegen Geschwindigkeit im Verhältnis
+    1:2 anstelle von 1:3.
+  en: When deployed, steep dives trade altitude for speed at 1-2 instead of 1-3.
+  es: Al desplegarse, los picados pronunciados intercambian altitud por velocidad
+    a 1-2 en lugar de 1-3.
+  fr: Lorsqu'il est déployé, les piqués raides échangent l'altitude contre la vitesse
+    à 1-2 au lieu de 1-3.
 Down:
   de: Runter
   en: Down
@@ -935,10 +1028,18 @@ Drogue Chute:
   es: Paracaídas de Freno
   fr: Parachute de Freinage
 Drogue Chute Warning:
-  de: "Einmal pro Flug aktivieren für: +3 auf Absturz oder um einen nahen Verfolger abzuschütteln."
-  en: "Activate once per flight to: Give +3 to Go Down or take down a close pursuer."
-  es: "Activar una vez por vuelo para: Dar +3 a Go Down o derribar a un perseguidor cercano."
-  fr: "Activez une fois par vol pour : Donner +3 à Tombez ou abattre un poursuivant proche."
+  de: 'Einmal pro Flug aktivieren für: +3 auf Absturz oder um einen nahen Verfolger
+    abzuschütteln.'
+  en: 'Activate once per flight to: Give +3 to Go Down or take down a close pursuer.'
+  es: 'Activar una vez por vuelo para: Dar +3 a Go Down o derribar a un perseguidor
+    cercano.'
+  fr: 'Activez une fois par vol pour : Donner +3 à Tombez ou abattre un poursuivant
+    proche.'
+Duplicate:
+  de: Duplizieren
+  en: Duplicate
+  es: Duplicar
+  fr: Dupliquer
 Duralumin:
   de: Duraluminium
   en: Duralumin
@@ -949,19 +1050,44 @@ Ejection Seat:
   en: Ejection Seat
   es: Asiento Eyectable
   fr: Siège Éjectable
+Electric Builder Charge Draw:
+  de: Ladeverbrauch
+  en: Charge Draw
+  es: Consumo de Carga
+  fr: Consommation de Charge
+Electric Builder Chonk:
+  de: Größe
+  en: Chonk
+  es: Tamaño
+  fr: Taille
+Electric Builder Title:
+  de: Elektromotorbauer
+  en: Electric Motor Builder
+  es: Constructor de Motor Eléctrico
+  fr: Constructeur de Moteur Électrique
+Electric Builder Winding:
+  de: Wicklung
+  en: Winding
+  es: Bobinado
+  fr: Enroulement
 Electric Heating:
   de: Elektrische Heizung
   en: Electric Heating
   es: Calefacción Eléctrica
   fr: Chauffage Électrique
+Electrum:
+  de: Elektrum
+  en: Electrum
+  es: Electrum
+  fr: Électrum
 Engine Air Cooling Fan:
   de: Luftkühlungslüfter
   en: Air Cooling Fan
   es: Ventilador de Refrigeración por Aire
   fr: Ventilateur de Refroidissement par Air
-"Engine Air-Cooled Engine.":
+Engine Air-Cooled Engine.:
   de: Luftgekühlter Motor.
-  en: "Air-Cooled Engine."
+  en: Air-Cooled Engine.
   es: Motor Enfriado por Aire.
   fr: Moteur Refroidi par Air.
 Engine Alternator:
@@ -969,6 +1095,201 @@ Engine Alternator:
   en: Alternator
   es: Alternador
   fr: Alternateur
+Engine Builder Add From Electric:
+  de: Aus Elektromotorbauer hinzufügen
+  en: Add From Electric Builder
+  es: Agregar desde Constructor Eléctrico
+  fr: Ajouter depuis le Constructeur Électrique
+Engine Builder Add From Propeller:
+  de: Aus Motorbauer hinzufügen
+  en: Add From Engine Builder
+  es: Agregar desde Constructor de Motores
+  fr: Ajouter depuis le Constructeur de Moteur
+Engine Builder Add From Pulsejet:
+  de: Aus Strahltriebwerkbauer hinzufügen
+  en: Add From Pulsejet Builder
+  es: Agregar desde Constructor de Pulsejet
+  fr: Ajouter depuis le Constructeur de Pulsejet
+Engine Builder Add From Turbine:
+  de: Aus Turbinenbauer hinzufügen
+  en: Add From Turbine Builder
+  es: Agregar desde Constructor de Turbina
+  fr: Ajouter depuis le Constructeur de Turbine
+Engine Builder Altitude:
+  de: Höhe
+  en: Altitude
+  es: Altitud
+  fr: Altitude
+Engine Builder Compression Ratio:
+  de: Verdichtungsverhältnis (N:1)
+  en: Compression Ratio (N:1)
+  es: Relación de Compresión (N:1)
+  fr: Rapport de Compression (N:1)
+Engine Builder Compressor Count:
+  de: Kompressorzahl
+  en: Compressor Count
+  es: Número de Compresores
+  fr: Nombre de Compresseurs
+Engine Builder Compressor Type:
+  de: Kompressortyp
+  en: Compressor Type
+  es: Tipo de Compresor
+  fr: Type de Compresseur
+Engine Builder Cost:
+  de: Kosten
+  en: Cost
+  es: Costo
+  fr: Coût
+Engine Builder Create List:
+  de: Liste erstellen
+  en: Create List
+  es: Crear Lista
+  fr: Créer une Liste
+Engine Builder Cylinders Per Row:
+  de: Zylinder pro Reihe
+  en: Cylinders per Row
+  es: Cilindros por Fila
+  fr: Cylindres par Rangée
+Engine Builder Delete Engine:
+  de: Motor löschen
+  en: Delete Engine
+  es: Eliminar Motor
+  fr: Supprimer le Moteur
+Engine Builder Delete List:
+  de: Liste löschen
+  en: Delete List
+  es: Eliminar Lista
+  fr: Supprimer la Liste
+Engine Builder Displacement:
+  de: Hubraum (L)
+  en: Engine Displacement (L)
+  es: Cilindrada del Motor (L)
+  fr: Cylindrée du Moteur (L)
+Engine Builder Drag:
+  de: Luftwiderstand
+  en: Drag
+  es: Resistencia
+  fr: Traînée
+Engine Builder Engines:
+  de: Motoren
+  en: Engines
+  es: Motores
+  fr: Moteurs
+Engine Builder Era:
+  de: Ära
+  en: Era
+  es: Era
+  fr: Ère
+Engine Builder Fuel Consumption:
+  de: Kraftstoffverbrauch
+  en: Fuel Consumption
+  es: Consumo de Combustible
+  fr: Consommation de Carburant
+Engine Builder Geared RPM:
+  de: Getriebe-Drehzahl
+  en: Geared RPM
+  es: RPM con Engranajes
+  fr: Régime avec Engrenage
+Engine Builder Lists:
+  de: Listen
+  en: Lists
+  es: Listas
+  fr: Listes
+Engine Builder Load List:
+  de: Motorliste laden
+  en: Load Engine List
+  es: Cargar Lista de Motores
+  fr: Charger la Liste de Moteurs
+Engine Builder Mass:
+  de: Masse
+  en: Mass
+  es: Masa
+  fr: Masse
+Engine Builder Material Fudge:
+  de: Material-Korrekturfaktor
+  en: Material Fudge Factor
+  es: Factor de Corrección de Material
+  fr: Facteur de Correction de Matériau
+Engine Builder Min Ideal Altitude:
+  de: Minimale Idealhöhe
+  en: Minimum Ideal Altitude
+  es: Altitud Ideal Mínima
+  fr: Altitude Idéale Minimale
+Engine Builder Name:
+  de: Name
+  en: Name
+  es: Nombre
+  fr: Nom
+Engine Builder No:
+  de: Nein
+  en: 'No'
+  es: 'False'
+  fr: Non
+Engine Builder Number of Rows:
+  de: Anzahl der Reihen
+  en: Number of Rows
+  es: Número de Filas
+  fr: Nombre de Rangées
+Engine Builder Oil Tank:
+  de: Öltank
+  en: Oil Tank
+  es: Tanque de Aceite
+  fr: Réservoir d'Huile
+Engine Builder Overspeed:
+  de: Überdrehzahl
+  en: Overspeed
+  es: Sobrevelocidad
+  fr: Survitesse
+Engine Builder Power:
+  de: Leistung
+  en: Power
+  es: Potencia
+  fr: Puissance
+Engine Builder Quality Fudge:
+  de: Qualitäts-Korrekturfaktor
+  en: Quality Fudge Factor
+  es: Factor de Corrección de Calidad
+  fr: Facteur de Correction de Qualité
+Engine Builder RPM Boost:
+  de: Drehzahl-Boost
+  en: RPM Boost
+  es: Impulso de RPM
+  fr: Augmentation du Régime
+Engine Builder Reliability:
+  de: Zuverlässigkeit
+  en: Reliability
+  es: Confiabilidad
+  fr: Fiabilité
+Engine Builder Required Cooling:
+  de: Erforderliche Kühlung
+  en: Required Cooling
+  es: Refrigeración Requerida
+  fr: Refroidissement Requis
+Engine Builder Save List:
+  de: Motorliste speichern
+  en: Save Engine List
+  es: Guardar Lista de Motores
+  fr: Enregistrer la Liste de Moteurs
+Engine Builder Title:
+  de: Motorbauer
+  en: Engine Builder
+  es: Constructor de Motores
+  fr: Constructeur de Moteur
+Engine Builder Torque:
+  de: Drehmoment
+  en: Torque
+  es: Torque
+  fr: Couple
+Engine Builder Type:
+  de: Motortyp
+  en: Engine Type
+  es: Tipo de Motor
+  fr: Type de Moteur
+Engine Builder Yes:
+  de: Ja
+  en: 'Yes'
+  es: Sí
+  fr: Oui
 Engine Cooling:
   de: Kühlung
   en: Cooling
@@ -1010,38 +1331,40 @@ Engine Mounting:
   es: Montaje
   fr: Montage
 Engine Mounting Location:
-  de: "Motor-Montageort"
+  de: Motor-Montageort
   en: Engine Mounting Location
   es: Ubicación del Montaje del Motor
   fr: Emplacement de Montage Moteur
 Engine Negate Reliability Penalty:
-  de: "Negiere Zuverlässigkeits-Malus"
+  de: Negiere Zuverlässigkeits-Malus
   en: Negate Reliability Penalty
   es: Negar Penalización de Fiabilidad
   fr: Annule la Pénalité de Fiabilité
 Engine Outboard Propeller:
-  de: "Außenbord-Propeller"
+  de: Außenbord-Propeller
   en: Outboard Propeller
   es: Hélice Exterior
-  fr: "Hélice Hors-bord"
+  fr: Hélice Hors-bord
 Engine Push Pull:
-  de: "Schub-Zug"
+  de: Schub-Zug
   en: Push Pull
   es: Push Pull
-  fr: "Poussé-Tiré"
+  fr: Poussé-Tiré
 Engine Rotary Cooling:
   de: "Umlaufmotoren verwenden Öltanks. \n +1 Masse, Öltank ist ein Vitalteil."
   en: "Rotary Engines use Oil Tanks. \n +1 Mass, Oil Tank is a Vital Component."
-  es: "Los Motores Rotatorios usan Depósitos de Aceite. \n +1 Masa, el Depósito de Aceite es un Componente Vital."
-  fr: "Les Moteurs Rotatifs utilisent des Réservoirs d'Huile. \n +1 Masse, le Réservoir d'Huile est un Composant Vital."
+  es: "Los Motores Rotatorios usan Depósitos de Aceite. \n +1 Masa, el Depósito de\
+    \ Aceite es un Componente Vital."
+  fr: "Les Moteurs Rotatifs utilisent des Réservoirs d'Huile. \n +1 Masse, le Réservoir\
+    \ d'Huile est un Composant Vital."
 Engine Select Radiator:
   de: Kühler auswählen
   en: Select Radiator
   es: Seleccionar Radiador
   fr: Sélectionner Radiateur
-"Engine Side-by-Side":
+Engine Side-by-Side:
   de: Nebeneinander
-  en: "Side-by-Side"
+  en: Side-by-Side
   es: Lado a Lado
   fr: Côte à Côte
 Engine Torque To Structure:
@@ -1055,12 +1378,17 @@ Engine Upgrades:
   es: Mejoras
   fr: Améliorations
 Engines Asymmetric Plane:
-  de: "Asymmetrisches Flugzeug"
-  en: "Asymmetric Plane"
-  es: "Avión Asimétrico"
-  fr: "Avion Asymétrique"
+  de: Asymmetrisches Flugzeug
+  en: Asymmetric Plane
+  es: Avión Asimétrico
+  fr: Avion Asymétrique
+Engines Engine:
+  de: Motor
+  en: Engine
+  es: Motor
+  fr: Moteur
 Engines Engine Stats:
-  de: "Motor-Werte"
+  de: Motor-Werte
   en: Engine Stats
   es: Estadísticas del Motor
   fr: Stats du Moteur
@@ -1070,15 +1398,15 @@ Engines Engine Type:
   es: Tipo de Motor
   fr: Type de Moteur
 Engines Num Engines:
-  de: "Anzahl Motoren"
-  en: "Number of Engines"
-  es: "Número de Motores"
-  fr: "Nombre de Moteurs "
+  de: Anzahl Motoren
+  en: Number of Engines
+  es: Número de Motores
+  fr: Nombre de Moteurs
 Engines Num Radiators:
-  de: "Anzahl Kühler"
-  en: "Number of Radiators"
-  es: "Número de Radiadores"
-  fr: "Nombre de Radiateurs"
+  de: Anzahl Kühler
+  en: Number of Radiators
+  es: Número de Radiadores
+  fr: Nombre de Radiateurs
 Engines Options:
   de: Optionen
   en: Options
@@ -1104,6 +1432,11 @@ Enhanced Machine Gun:
   en: Enhanced Machine Gun
   es: Ametralladora Mejorada
   fr: Mitrailleuse Améliorée
+Era Era Stats:
+  de: Ära-Werte
+  en: Era Stats
+  es: Estadísticas del Era
+  fr: Stats du Ère
 Era Option:
   de: Option
   en: Option
@@ -1125,10 +1458,14 @@ Evaporation:
   es: Evaporación
   fr: Évaporation
 Evaporation Warning:
-  de: "Angriffe mit einem Krit-Wurf von 16+ schalten zusätzlich zu den normalen Effekten den Kühler aus."
-  en: Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to normal effects.
-  es: Los ataques con una tirada Crítica de 16+ dejarán fuera de combate el radiador, además de los efectos normales.
-  fr: Les attaques avec un jet de Crit de 16+ mettront le radiateur hors service, en plus des effets normaux.
+  de: Angriffe mit einem Krit-Wurf von 16+ schalten zusätzlich zu den normalen Effekten
+    den Kühler aus.
+  en: Attacks with a Crit rolls of 16+ will knock out the radiator, in addition to
+    normal effects.
+  es: Los ataques con una tirada Crítica de 16+ dejarán fuera de combate el radiador,
+    además de los efectos normales.
+  fr: Les attaques avec un jet de Crit de 16+ mettront le radiateur hors service,
+    en plus des effets normaux.
 External Wing Tank:
   de: Externer Flügeltank
   en: External Wing Tank
@@ -1149,6 +1486,11 @@ Fast Release System:
   en: Fast Release System
   es: Sistema de Liberación Rápida
   fr: Système à Libération Rapide
+Five:
+  de: Fünf
+  en: Five
+  es: Cinco
+  fr: Cinq
 Fixed:
   de: Fest
   en: Fixed
@@ -1162,30 +1504,32 @@ Fixed Slots:
 Flap Ailerons:
   de: Querruderklappen
   en: Flap Ailerons
-  es: "Alerones-Flaps"
-  fr: "Ailerons-Volets"
+  es: Alerones-Flaps
+  fr: Ailerons-Volets
 Flap Elevator:
   de: Höhenruderklappe
   en: Flap Elevator
-  es: "Elevador-Flap"
-  fr: "Gouverne de Profondeur-Volet"
+  es: Elevador-Flap
+  fr: Gouverne de Profondeur-Volet
 Flap Rudder:
   de: Ruderklappe
   en: Flap Rudder
-  es: "Timón-Flap"
-  fr: "Gouverne de Direction-Volet"
+  es: Timón-Flap
+  fr: Gouverne de Direction-Volet
 Flare Slot:
-  de: "Leuchtpatronen-Schacht"
+  de: Leuchtpatronen-Schacht
   en: Flare Slot
   es: Ranura para Bengala
   fr: Fente pour Fusée Éclairante
 Flare Slot Warning:
-  de: Ermöglicht das Abfeuern von Leuchtpatronen aus einem geschlossenen Cockpit, ohne dieses öffnen zu müssen.
+  de: Ermöglicht das Abfeuern von Leuchtpatronen aus einem geschlossenen Cockpit,
+    ohne dieses öffnen zu müssen.
   en: Allows flares to be fired out of a closed cockpit without opening the cockpit.
   es: Permite disparar bengalas desde una cabina cerrada sin abrirla.
-  fr: Permet de tirer des fusées éclairantes depuis un cockpit fermé sans ouvrir le cockpit.
+  fr: Permet de tirer des fusées éclairantes depuis un cockpit fermé sans ouvrir le
+    cockpit.
 Flexible:
-  de: Flexibel
+  de: Flexibles
   en: Flexible
   es: Flexible
   fr: Flexible
@@ -1195,20 +1539,36 @@ Fliergerflammenwerfer:
   es: Lanzallamas Aéreo
   fr: Fliergerflammenwerfer
 Fliergerflammenwerfer Warning:
-  de: "Anstatt auf Open Fire zu würfeln, würfelst du pro Treffer, wie im Builder angezeigt, einen W10. Du verursachst eine Anzahl von Treffern gleich dem Würfelergebnis und halben Schaden, und würfelst normale Krit-Würfel wie normal. Nicht beeinflusst von Meisterschaften oder Spezialmunition. Verbraucht Treibstoffnutzungen als Munition. Brandstiftend. Maximale Reichweite ist Nahkampf. Krits entfachen immer Feuer."
-  en: Rather than roll Open Fire, you roll a d10 per hit shown in the builder. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal. Not affected by Masteries or Special Ammo. Uses Fuel uses as Ammo. Incendiary. Max range is Knife. Crits always start fires.
-  es: En lugar de tirar Open Fire, tiras un d10 por cada impacto mostrado en el constructor. Haces un número de Impactos igual a, y Daño la mitad de los resultados de la tirada, y tiras dados Críticos de forma normal. No afectado por Maestrías o Munición Especial. Usa usos de Combustible como Munición. Incendiario. Alcance máximo es Cuchillo. Los Críticos siempre inician incendios.
-  fr: Au lieu de lancer Open Fire, vous lancez un d10 par touche indiquée dans le constructeur. Vous infligez un nombre de Touches égal à, et la moitié des Dégâts des résultats du jet, et lancez les dés de Crit comme d'habitude. Non affecté par les Maîtrises ou les Munitions Spéciales. Utilise les Utilisations de Carburant comme Munitions. Incendiaire. La portée maximale est Couteau. Les Crits déclenchent toujours des incendies.
+  de: Anstatt auf Open Fire zu würfeln, würfelst du pro Treffer, wie im Builder angezeigt,
+    einen W10. Du verursachst eine Anzahl von Treffern gleich dem Würfelergebnis und
+    halben Schaden, und würfelst normale Krit-Würfel wie normal. Nicht beeinflusst
+    von Meisterschaften oder Spezialmunition. Verbraucht Treibstoffnutzungen als Munition.
+    Brandstiftend. Maximale Reichweite ist Nahkampf. Krits entfachen immer Feuer.
+  en: Rather than roll Open Fire, you roll a d10 per hit shown in the builder. You
+    do a number of Hits equal to, and Damage half of the roll results, and roll Crit
+    dice like normal. Not affected by Masteries or Special Ammo. Uses Fuel uses as
+    Ammo. Incendiary. Max range is Knife. Crits always start fires.
+  es: En lugar de tirar Open Fire, tiras un d10 por cada impacto mostrado en el constructor.
+    Haces un número de Impactos igual a, y Daño la mitad de los resultados de la tirada,
+    y tiras dados Críticos de forma normal. No afectado por Maestrías o Munición Especial.
+    Usa usos de Combustible como Munición. Incendiario. Alcance máximo es Cuchillo.
+    Los Críticos siempre inician incendios.
+  fr: Au lieu de lancer Open Fire, vous lancez un d10 par touche indiquée dans le
+    constructeur. Vous infligez un nombre de Touches égal à, et la moitié des Dégâts
+    des résultats du jet, et lancez les dés de Crit comme d'habitude. Non affecté
+    par les Maîtrises ou les Munitions Spéciales. Utilise les Utilisations de Carburant
+    comme Munitions. Incendiaire. La portée maximale est Couteau. Les Crits déclenchent
+    toujours des incendies.
 Floats:
   de: Schwimmer
   en: Floats
   es: Flotadores
   fr: Flotteurs
 Fly by Wire:
-  de: "Fly-by-Wire"
+  de: Fly-by-Wire
   en: Fly by Wire
   es: Fly by Wire
-  fr: "Commandes Électriques (Fly-by-Wire)"
+  fr: Commandes Électriques (Fly-by-Wire)
 Flying Elevator:
   de: Fliegendes Höhenruder
   en: Flying Elevator
@@ -1220,7 +1580,7 @@ Flying Rudder:
   es: Timón Volante
   fr: Gouverne de Direction Entièrement Mobile
 Foil Cowl:
-  de: "Flügelprofil-Motorverkleidung"
+  de: Flügelprofil-Motorverkleidung
   en: Airfoil Cowl
   es: Carenado Aerodinámico
   fr: Capot Aérodynamique
@@ -1234,28 +1594,35 @@ Forward Internal:
   en: Forward Internal
   es: Interno Delantero
   fr: Interne Avant
+Four:
+  de: Vier
+  en: Four
+  es: Cuatro
+  fr: Quatre
 Frame Count:
-  de: "Struktur-Zählung"
+  de: Struktur-Zählung
   en: Frame Count
   es: Conteo de Estructuras
   fr: Nombre de Châssis
 Frame Count Warning:
-  de: Dieses Flugzeug scheint unbenutzte Struktursektionen zu haben. Überprüfe, ob dies beabsichtigt ist.
+  de: Dieses Flugzeug scheint unbenutzte Struktursektionen zu haben. Überprüfe, ob
+    dies beabsichtigt ist.
   en: This plane appears to have unused frame sections.  Check to see if this is intentional.
   es: Este avión parece tener secciones de estructura sin usar. Verifica si es intencional.
-  fr: Cet avion semble avoir des sections de châssis inutilisées. Vérifiez si cela est intentionnel.
+  fr: Cet avion semble avoir des sections de châssis inutilisées. Vérifiez si cela
+    est intentionnel.
 Frames Flying Wing:
   de: Nurflügel
   en: Flying Wing
   es: Ala Volante
   fr: Aile Volante
 Frames Frame Options:
-  de: "Struktur-Optionen"
+  de: Struktur-Optionen
   en: Frame Options
   es: Opciones de Estructura
   fr: Options de Châssis
 Frames Frame Stats:
-  de: "Struktur-Werte"
+  de: Struktur-Werte
   en: Frame Stats
   es: Estadísticas de Estructura
   fr: Stats du Châssis
@@ -1269,6 +1636,11 @@ Frames Frames and Covering:
   en: Frames and Covering
   es: Estructuras y Revestimiento
   fr: Châssis et Revêtement
+Frames Fuselage Frames:
+  de: Rumpfspanten
+  en: Frames Fuselage Frames
+  es: Estructuras del Fuselaje
+  fr: Cadres de Fuselage
 Frames Geodesic:
   de: Geodätisch
   en: Geodesic
@@ -1300,22 +1672,22 @@ Frames Skin Type:
   es: Tipo de Piel
   fr: Type de Revêtement
 Frames Tail Boom:
-  de: "Heckausleger"
-  en: "Boom Tail"
-  es: "Cola de Pluma"
-  fr: "Queue Poutre"
+  de: Heckausleger
+  en: Boom Tail
+  es: Cola de Pluma
+  fr: Queue Poutre
 Frames Tail Farman:
-  de: "Farman-Heck"
-  en: "Farman Tail"
-  es: "Cola Farman"
-  fr: "Queue Farman"
+  de: Farman-Heck
+  en: Farman Tail
+  es: Cola Farman
+  fr: Queue Farman
 Frames Tail Frame Options:
-  de: "Heck-Struktur-Optionen"
+  de: Heck-Struktur-Optionen
   en: Tail Frame Options
   es: Opciones de Estructura de Cola
   fr: Options de Châssis de Queue
 Frames Tail Frame Type:
-  de: "Heck-Strukturtyp"
+  de: Heck-Strukturtyp
   en: Tail Frame Type
   es: Tipo de Estructura de Cola
   fr: Type de Châssis de Queue
@@ -1325,15 +1697,15 @@ Frames Tail Section Title:
   es: Cola
   fr: Queue
 Frames Tail Skin Type:
-  de: "Heck-Bespannungstyp"
+  de: Heck-Bespannungstyp
   en: Tail Skin Type
   es: Tipo de Piel de Cola
   fr: Type de Revêtement de Queue
 Frames Tail Type:
-  de: "Hecklänge"
-  en: "Tail Length"
-  es: "Longitud de Cola"
-  fr: "Longueur de Queue"
+  de: Hecklänge
+  en: Tail Length
+  es: Longitud de Cola
+  fr: Longueur de Queue
 Freon:
   de: Freon
   en: Freon
@@ -1350,17 +1722,21 @@ Front Intake:
   es: Toma Delantera
   fr: L'entrée d'air Frontale
 Fuel Uses Warning:
-  de: Dieses Flugzeug hat sehr wenig Treibstoff. Betrachte 7 Treibstoffnutzungen als gute Richtlinie für das Spiel, obwohl es Spezialfälle gibt.
-  en: This plane is very short on fuel. Consider 7 Fuel Uses as a good guideline for play, although special cases exist.
-  es: Este avión tiene muy poco combustible. Considera 7 Usos de Combustible como una buena referencia para jugar, aunque existen casos especiales.
-  fr: Cet avion a très peu de carburant. Considérez 7 Utilisations de Carburant comme une bonne ligne directrice pour le jeu, bien que des cas spéciaux existent.
-"Fuselage Push-Pull":
-  de: "Rumpf-Schub-Zug-Anordnung"
-  en: "Fuselage Push-Pull"
-  es: "Fuselage Push-Pull"
-  fr: "Fuselage Poussé-Tiré"
+  de: Dieses Flugzeug hat sehr wenig Treibstoff. Betrachte 7 Treibstoffnutzungen als
+    gute Richtlinie für das Spiel, obwohl es Spezialfälle gibt.
+  en: This plane is very short on fuel. Consider 7 Fuel Uses as a good guideline for
+    play, although special cases exist.
+  es: Este avión tiene muy poco combustible. Considera 7 Usos de Combustible como
+    una buena referencia para jugar, aunque existen casos especiales.
+  fr: Cet avion a très peu de carburant. Considérez 7 Utilisations de Carburant comme
+    une bonne ligne directrice pour le jeu, bien que des cas spéciaux existent.
+Fuselage Push-Pull:
+  de: Rumpf-Schub-Zug-Anordnung
+  en: Fuselage Push-Pull
+  es: Fuselage Push-Pull
+  fr: Fuselage Poussé-Tiré
 Gast Principle:
-  de: "Gast-Prinzip"
+  de: Gast-Prinzip
   en: Gast Principle
   es: Principio Gast
   fr: Principe Gast
@@ -1390,7 +1766,7 @@ Guncam Warning:
   es: Confirma tus derribos por ti.
   fr: Confirme vos éliminations pour vous.
 Gyro Gunsight:
-  de: "Gyro-Zielvisier"
+  de: Gyro-Zielvisier
   en: Gyro Gunsight
   es: Mira Giroscópica
   fr: Viseur Gyroscopique
@@ -1405,17 +1781,21 @@ Gyrojets:
   es: Giroreactores
   fr: Gyrojets
 Gyrojets Warning:
-  de: +1 Schaden und +1 DP pro Entfernungsband (tatsächlich, nicht durch Angriffe angepasst) jenseits von Nahkampf.
-  en: +1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past Knife.
-  es: +1 Daño y +1 PA por cada Banda de Alcance (real, no ajustada por ataques) más allá de Cuchillo.
-  fr: "+1 Dégât et +1 PA pour chaque Bande de Portée (réelle, non ajustée par les attaques) au-delà de Couteau."
+  de: +1 Schaden und +1 DP pro Entfernungsband (tatsächlich, nicht durch Angriffe
+    angepasst) jenseits von Nahkampf.
+  en: +1 Damage and +1 AP for each Range Band (actual, not adjusted by attacks) past
+    Knife.
+  es: +1 Daño y +1 PA por cada Banda de Alcance (real, no ajustada por ataques) más
+    allá de Cuchillo.
+  fr: +1 Dégât et +1 PA pour chaque Bande de Portée (réelle, non ajustée par les attaques)
+    au-delà de Couteau.
 Gyroscopic:
   de: Gyroskopischer Autopilot
   en: Gyroscopic Autopilot
   es: Piloto Automático Giroscópico
   fr: Pilote Automatique Gyroscopique
 Gyroscopic Warning:
-  de: "Verleiht +4 auf Leerersitz-Würfe."
+  de: Verleiht +4 auf Leerersitz-Würfe.
   en: Gives +4 to Empty Seat rolls.
   es: Da +4 a las tiradas de Asiento Vacío.
   fr: Donne +4 aux jets de Siège Vide.
@@ -1433,22 +1813,38 @@ Harpoon Launcher:
   de: Harpunenwerfer
   en: Harpoon Launcher
   es: Lanzador de Arpones
-  fr: "Lance-Harpon"
+  fr: Lance-Harpon
 Harpoon Launcher Warning:
-  de: "Max. Reichweite Nahkampf. Ignoriert Entfernungsbänder: trifft bei 16+. Verhindert Flucht, bis die Leine gekappt ist. Harpunen können von Enterern als Seilrutschen genutzt werden."
-  en: "Max Range Close. Ignores range bands: hits on 16+. Prevents escape until the line is cut. Harpoons can be used as ziplines by boarders."
-  es: "Alcance Máximo Cercano. Ignora bandas de alcance: impacta con 16+. Evita el escape hasta que se corte la línea. Los arpones pueden usarse como tirolinas por los abordadores."
-  fr: "Portée Max Courte. Ignore les bandes de portée : touche sur 16+. Empêche l'évasion tant que le câble n'est pas coupé. Les harpons peuvent être utilisés comme tyroliennes par les abordeurs."
+  de: 'Max. Reichweite Nahkampf. Ignoriert Entfernungsbänder: trifft bei 16+. Verhindert
+    Flucht, bis die Leine gekappt ist. Harpunen können von Enterern als Seilrutschen
+    genutzt werden.'
+  en: 'Max Range Close. Ignores range bands: hits on 16+. Prevents escape until the
+    line is cut. Harpoons can be used as ziplines by boarders.'
+  es: 'Alcance Máximo Cercano. Ignora bandas de alcance: impacta con 16+. Evita el
+    escape hasta que se corte la línea. Los arpones pueden usarse como tirolinas por
+    los abordadores.'
+  fr: 'Portée Max Courte. Ignore les bandes de portée : touche sur 16+. Empêche l''évasion
+    tant que le câble n''est pas coupé. Les harpons peuvent être utilisés comme tyroliennes
+    par les abordeurs.'
 Heat Ray:
   de: Hitzestrahl
   en: Heat Ray
   es: Rayo de Calor
   fr: Rayon Thermique
 Heat Ray Warning:
-  de: "Würfle Kritische Treffer + verursachter Schaden. Bei einem Kritischen Treffer wähle eins: ein Feuer entfachen, ein Kühler-/Öl-Bauteil zerstören und Cool Off erzwingen, oder Besatzung verletzen. Erleide -2 Vorwärtsmalus auf 'Sicht' nach dem Abfeuern."
-  en: "Roll Crits +Damage done. On Crit, choose one: start a fire, destroy a radiator/oil component and push Cool Off, or injure crew. Take -2 forward to Eyeball after firing."
-  es: "Tira Críticos +Daño infligido. En Crítico, elige uno: iniciar un incendio, destruir un componente de radiador/aceite y forzar Cool Off, o herir a la tripulación. Sufre -2 hacia adelante a Eyeball después de disparar."
-  fr: "Lancez les Crits +Dégâts infligés. Sur Crit, choisissez : déclencher un incendie, détruire un composant radiateur/huile et pousser Refroidissement, ou blesser l'équipage. Prenez -2 en avant pour Eyeball après le tir."
+  de: 'Würfle Kritische Treffer + verursachter Schaden. Bei einem Kritischen Treffer
+    wähle eins: ein Feuer entfachen, ein Kühler-/Öl-Bauteil zerstören und Cool Off
+    erzwingen, oder Besatzung verletzen. Erleide -2 Vorwärtsmalus auf ''Sicht'' nach
+    dem Abfeuern.'
+  en: 'Roll Crits +Damage done. On Crit, choose one: start a fire, destroy a radiator/oil
+    component and push Cool Off, or injure crew. Take -2 forward to Eyeball after
+    firing.'
+  es: 'Tira Críticos +Daño infligido. En Crítico, elige uno: iniciar un incendio,
+    destruir un componente de radiador/aceite y forzar Cool Off, o herir a la tripulación.
+    Sufre -2 hacia adelante a Eyeball después de disparar.'
+  fr: 'Lancez les Crits +Dégâts infligés. Sur Crit, choisissez : déclencher un incendie,
+    détruire un composant radiateur/huile et pousser Refroidissement, ou blesser l''équipage.
+    Prenez -2 en avant pour Eyeball après le tir.'
 Heavy Cannon:
   de: Schwere Kanone
   en: Heavy Cannon
@@ -1475,40 +1871,54 @@ Helicopter Descent:
   es: Descenso de Helicóptero
   fr: Descente d'Hélicoptère
 Helicopter Descent Warning:
-  de: Ein Helikopter kann in einem Manöver bis zu 5 Höhenbänder absteigen, ohne an Geschwindigkeit zu gewinnen.
-  en: A helicopter can descend up to 5 altitude bands in one maneuver without gaining speed.
-  es: Un helicóptero puede descender hasta 5 bandas de altitud en una maniobra sin ganar velocidad.
-  fr: Un hélicoptère peut descendre jusqu'à 5 bandes d'altitude en une seule manœuvre sans gagner de vitesse.
+  de: Ein Helikopter kann in einem Manöver bis zu 5 Höhenbänder absteigen, ohne an
+    Geschwindigkeit zu gewinnen.
+  en: A helicopter can descend up to 5 altitude bands in one maneuver without gaining
+    speed.
+  es: Un helicóptero puede descender hasta 5 bandas de altitud en una maniobra sin
+    ganar velocidad.
+  fr: Un hélicoptère peut descendre jusqu'à 5 bandes d'altitude en une seule manœuvre
+    sans gagner de vitesse.
 Helicopter Flight:
   de: Helikopterflug
   en: Helicopter Flight
   es: Vuelo de Helicóptero
   fr: Vol d'Hélicoptère
 Helicopter Flight Warning:
-  de: "Ein Helikopter muss Boost 2 haben, um zu Boost-en oder vertikal abzuheben und dabei 1 Höhenband zu gewinnen."
+  de: Ein Helikopter muss Boost 2 haben, um zu Boost-en oder vertikal abzuheben und
+    dabei 1 Höhenband zu gewinnen.
   en: A helicopter must have Boost 2 to boost or take off vertically, gaining 1 altitude.
-  es: Un helicóptero debe tener Boost 2 para hacer Boost o despegar verticalmente, ganando 1 de altitud.
-  fr: Un hélicoptère doit avoir Boost 2 pour booster ou décoller verticalement, gagnant 1 d'altitude.
+  es: Un helicóptero debe tener Boost 2 para hacer Boost o despegar verticalmente,
+    ganando 1 de altitud.
+  fr: Un hélicoptère doit avoir Boost 2 pour booster ou décoller verticalement, gagnant
+    1 d'altitude.
 Helicopter Landing:
   de: Helikopterlandung
   en: Helicopter Landing
   es: Aterrizaje de Helicóptero
   fr: Atterrissage d'Hélicoptère
 Helicopter Landing Warning:
-  de: Ein absichtlich gelandeter Helikopter mit 0 Geschwindigkeit muss nie auf Absturz würfeln, unabhängig davon, wie uneben das Gelände ist.
-  en: A deliberately landed helicopter travelling at 0 speed never has to roll Go Down regardless of how rough the terrain is.
-  es: Un helicóptero que aterriza deliberadamente viajando a 0 de velocidad nunca tiene que tirar Go Down independientemente de cuán áspero sea el terreno.
-  fr: Un hélicoptère atterri délibérément voyageant à 0 de vitesse n'a jamais à lancer Tombez, quelle que soit l'aspérité du terrain.
+  de: Ein absichtlich gelandeter Helikopter mit 0 Geschwindigkeit muss nie auf Absturz
+    würfeln, unabhängig davon, wie uneben das Gelände ist.
+  en: A deliberately landed helicopter travelling at 0 speed never has to roll Go
+    Down regardless of how rough the terrain is.
+  es: Un helicóptero que aterriza deliberadamente viajando a 0 de velocidad nunca
+    tiene que tirar Go Down independientemente de cuán áspero sea el terreno.
+  fr: Un hélicoptère atterri délibérément voyageant à 0 de vitesse n'a jamais à lancer
+    Tombez, quelle que soit l'aspérité du terrain.
 Helicopter Stall:
-  de: "Helikopter-Strömungsabriss"
+  de: Helikopter-Strömungsabriss
   en: Helicopter Stall
   es: Entrada en Pérdida de Helicóptero
   fr: Décrochage d'Hélicoptère
 Helicopter Stall Warning:
-  de: Bei einer Geschwindigkeit über 37 erleidet man sofort einen Strömungsabriss am zurückweichenden Flügel.
+  de: Bei einer Geschwindigkeit über 37 erleidet man sofort einen Strömungsabriss
+    am zurückweichenden Flügel.
   en: Travelling faster than 37 speed immediately suffers a Retreating Wing Stall.
-  es: Viajar más rápido que 37 de velocidad sufre inmediatamente una Entrada en Pérdida por Ala en Retroceso.
-  fr: Voyager plus vite que 37 de vitesse entraîne immédiatement un Décrochage d'Aile Reculante.
+  es: Viajar más rápido que 37 de velocidad sufre inmediatamente una Entrada en Pérdida
+    por Ala en Retroceso.
+  fr: Voyager plus vite que 37 de vitesse entraîne immédiatement un Décrochage d'Aile
+    Reculante.
 High:
   de: Hoher Kühler
   en: High Radiator
@@ -1535,10 +1945,14 @@ High Speed:
   es: Alta Velocidad
   fr: Haute Vitesse
 High Warning:
-  de: "Bonus bleibt für 1 Cool Off nach einem Treffer bestehen. Wenn das Flugzeug ein offenes Cockpit hat, wird der Pilot mit Kühlflüssigkeit bespritzt!"
-  en: "Bonus persists for 1 Cool Off after being shot. If the plane is an open cockpit, will spray the pilot with the radiator fluid!"
-  es: "El bonificador persiste durante 1 Cool Off después de ser alcanzado. ¡Si el avión tiene cabina abierta, rociará al piloto con el líquido del radiador!"
-  fr: "Le bonus persiste pendant 1 Cool Down après avoir été touché. Si l'avion a un cockpit ouvert, il aspergera le pilote avec le fluide du radiateur!"
+  de: Bonus bleibt für 1 Cool Off nach einem Treffer bestehen. Wenn das Flugzeug ein
+    offenes Cockpit hat, wird der Pilot mit Kühlflüssigkeit bespritzt!
+  en: Bonus persists for 1 Cool Off after being shot. If the plane is an open cockpit,
+    will spray the pilot with the radiator fluid!
+  es: El bonificador persiste durante 1 Cool Off después de ser alcanzado. ¡Si el
+    avión tiene cabina abierta, rociará al piloto con el líquido del radiador!
+  fr: Le bonus persiste pendant 1 Cool Down après avoir été touché. Si l'avion a un
+    cockpit ouvert, il aspergera le pilote avec le fluide du radiateur!
 Himmilgard:
   de: Himmilgard
   en: Himmilgard
@@ -1550,23 +1964,23 @@ Huge:
   es: Carga Enorme
   fr: Énorme Soute
 Hull Cutouts:
-  de: "Rumpf-Aussparungen"
+  de: Rumpf-Aussparungen
   en: Hull Cutouts
   es: Recortes de Casco
   fr: Découpes de Coque
 Hybrid Floats:
-  de: "Hybrid-Schwimmer"
+  de: Hybrid-Schwimmer
   en: Hybrid Floats
   es: Flotadores Híbridos
   fr: Flotteurs Hybrides
-"Hydraulic-Assisted":
+Hydraulic-Assisted:
   de: Hydraulisch unterstützt
-  en: "Hydraulic-Assisted"
+  en: Hydraulic-Assisted
   es: Asistencia Hidráulica
   fr: Assisté par Hydraulique
-"I-Strut":
-  de: "I-Strebe"
-  en: "I-Strut"
+I-Strut:
+  de: I-Strebe
+  en: I-Strut
   es: Montante en I
   fr: Mât en I
 Illuminated Reflex Sight:
@@ -1585,7 +1999,7 @@ Injury Reduction Warning:
   es: Niega 1 daño para esta posición cuando se produce un Go Down
   fr: Annule 1 Blessure pour ce poste lorsque vous Tombez.
 Inline:
-  de: "Inline-Kühler"
+  de: Inline-Kühler
   en: Inline Radiator
   es: Radiador en Línea
   fr: Radiateur en Ligne
@@ -1639,6 +2053,11 @@ Interruptor Gear:
   en: Interruptor Gear
   es: Engranaje Interruptor
   fr: Mécanisme Interrupteur
+Intro Section Title:
+  de: Landestrich
+  en: Landing Strip
+  es: Pista de Aterrizaje
+  fr: Piste d'Atterrissage
 Isolated:
   de: Isoliert
   en: Isolated
@@ -1660,7 +2079,7 @@ Landing Gear Extras:
   es: Extras
   fr: Extras
 Landing Gear Gear Stats:
-  de: "Fahrwerk-Werte"
+  de: Fahrwerk-Werte
   en: Gear Stats
   es: Estadísticas del Tren
   fr: Stats du Train
@@ -1710,10 +2129,10 @@ Large Reconnaissance Camera Warning:
   es: Puede tomar fotos desde cualquier altura.
   fr: Peut prendre des photos de n'importe quelle hauteur.
 Largest Internal Bomb:
-  de: "Größtmögliche interne Bombe hat %{A} Masse. "
-  en: "Largest internal bomb is %{A} Mass. "
-  es: "La bomba interna más grande es de %{A} Masa. "
-  fr: "La plus grande bombe interne est de %{A} Masse. "
+  de: 'Größtmögliche interne Bombe hat %{A} Masse. '
+  en: 'Largest internal bomb is %{A} Mass. '
+  es: 'La bomba interna más grande es de %{A} Masa. '
+  fr: 'La plus grande bombe interne est de %{A} Masse. '
 Last Hurrah:
   de: Letztes Hurra
   en: Last Hurrah
@@ -1730,10 +2149,11 @@ Lift Dumpers:
   es: Destructores de Sustentación
   fr: Spoilers
 Lift Dumpers Warning:
-  de: "Aktivieren für +1 auf Dogfight!, danach sofort Strömungsabriss einleiten."
-  en: "Activate for +1 to Dogfight!, then immediately induce a stall."
-  es: "Activar para obtener +1 a Dogfight!, luego inducir inmediatamente una entrada en pérdida."
-  fr: "Activez pour +1 à Dogfight!, puis provoquez immédiatement un décrochage."
+  de: Aktivieren für +1 auf Dogfight!, danach sofort Strömungsabriss einleiten.
+  en: Activate for +1 to Dogfight!, then immediately induce a stall.
+  es: Activar para obtener +1 a Dogfight!, luego inducir inmediatamente una entrada
+    en pérdida.
+  fr: Activez pour +1 à Dogfight!, puis provoquez immédiatement un décrochage.
 Light Machine Cannon:
   de: Leichte Maschinenkanone
   en: Light Machine Cannon
@@ -1759,6 +2179,11 @@ Lightning Arc Warning:
   en: Uses 3 Charge to deal 1d10 damage to any aircraft within Close range.
   es: Usa 3 Carga para infligir 1d10 de daño a cualquier aeronave en alcance Cercano.
   fr: Utilise 3 Charges pour infliger 1d10 dégâts à tout avion à courte portée.
+Lightning Sprite Ephemera:
+  de: Ephemera des Blitzgeists
+  en: Lightning Sprite Ephemera
+  es: Efémera de Duende Relámpago
+  fr: Éphémères de Lutin-Éclair
 Living Grove:
   de: Lebender Hain
   en: Living Grove
@@ -1795,7 +2220,7 @@ Load Internal Bay Count:
   es: Número de Bahías Internas
   fr: Nombre de Soutes Internes
 Load Load Stats:
-  de: "Zuladungs-Werte"
+  de: Zuladungs-Werte
   en: Load Stats
   es: Estadísticas de Carga
   fr: Stats de Charge
@@ -1819,11 +2244,11 @@ Load Section Title:
   en: Load
   es: Carga
   fr: Charge
-"Load Self-Sealing Gas Tank":
+Load Self-Sealing Gas Tank:
   de: Selbstdichtender Kraftstofftank
-  en: "Self-Sealing Gas Tank"
+  en: Self-Sealing Gas Tank
   es: Depósito de Combustible Autosellante
-  fr: "Réservoir de Carburant Auto-Obturant"
+  fr: Réservoir de Carburant Auto-Obturant
 Load Widen Internal Bay 1:
   de: Internen Schacht 1 verbreitern
   en: Widen Internal Bay 1
@@ -1850,22 +2275,31 @@ Low:
   es: Radiador Bajo
   fr: Radiateur Bas
 Low Drag Warning:
-  de: Dieses Flugzeug hat einen sehr geringen Luftwiderstand. Wenn es ein benutzerdefiniertes Flugzeug ist, achte darauf, es nicht zu übermächtig zu gestalten.
-  en: This aircraft is very low drag. If it is a custom airplane, be careful not to make it overpowered.
-  es: Esta aeronave tiene muy poca resistencia. Si es un avión personalizado, ten cuidado de no hacerlo demasiado potente.
-  fr: Cet avion a une traînée très faible. S'il s'agit d'un avion personnalisé, faites attention à ne pas le rendre trop puissant.
+  de: Dieses Flugzeug hat einen sehr geringen Luftwiderstand. Wenn es ein benutzerdefiniertes
+    Flugzeug ist, achte darauf, es nicht zu übermächtig zu gestalten.
+  en: This aircraft is very low drag. If it is a custom airplane, be careful not to
+    make it overpowered.
+  es: Esta aeronave tiene muy poca resistencia. Si es un avión personalizado, ten
+    cuidado de no hacerlo demasiado potente.
+  fr: Cet avion a une traînée très faible. S'il s'agit d'un avion personnalisé, faites
+    attention à ne pas le rendre trop puissant.
 Low Mass Warning:
-  de: Dieses Flugzeug hat eine sehr geringe Masse. Wenn es ein benutzerdefiniertes Flugzeug ist, achte darauf, es nicht zu übermächtig zu gestalten.
-  en: This aircraft is very low mass. If it is a custom airplane, be careful not to make it overpowered.
-  es: Esta aeronave tiene muy poca masa. Si es un avión personalizado, ten cuidado de no hacerlo demasiado potente.
-  fr: Cet avion a une masse très faible. S'il s'agit d'un avion personnalisé, faites attention à ne pas le rendre trop puissant.
+  de: Dieses Flugzeug hat eine sehr geringe Masse. Wenn es ein benutzerdefiniertes
+    Flugzeug ist, achte darauf, es nicht zu übermächtig zu gestalten.
+  en: This aircraft is very low mass. If it is a custom airplane, be careful not to
+    make it overpowered.
+  es: Esta aeronave tiene muy poca masa. Si es un avión personalizado, ten cuidado
+    de no hacerlo demasiado potente.
+  fr: Cet avion a une masse très faible. S'il s'agit d'un avion personnalisé, faites
+    attention à ne pas le rendre trop puissant.
 Low Warning:
   de: Erzwinge Cool Off bei Treffer.
   en: Force Cool Off when shot.
   es: Forzar Cool Off al ser alcanzado.
   fr: Force Cool Down forcé lorsque touché.
 MVP_Warning:
-  de: Ermöglicht die Einstellung der Blattneigung am Boden, ohne den Propeller austauschen zu müssen.
+  de: Ermöglicht die Einstellung der Blattneigung am Boden, ohne den Propeller austauschen
+    zu müssen.
   en: Allows blade pitch to be adjusted on the ground without replacing it.
   es: Permite ajustar el paso de la pala en tierra sin reemplazarla.
   fr: Permet de régler le pas des pales au sol sans la remplacer.
@@ -1885,7 +2319,8 @@ Manually Variable Propeller:
   es: Hélice de Paso Variable Manualmente
   fr: Hélice à Pas Variable Manuel
 Max Strain Warning:
-  de: Eine maximale Belastung von weniger als 10 bedeutet, dass das Flugzeug am Boden auseinanderfällt.
+  de: Eine maximale Belastung von weniger als 10 bedeutet, dass das Flugzeug am Boden
+    auseinanderfällt.
   en: A Max Strain of less than 10 means the plane falls apart on the ground.
   es: Un Max Strain inferior a 10 significa que el avión se desmorona en el suelo.
   fr: Une Tension Maximale inférieure à 10 signifie que l'avion se désagrège au sol.
@@ -1895,10 +2330,17 @@ Mechanical Action:
   es: Acción Mecánica
   fr: Action Mécanique
 Mechanical Action Warning:
-  de: "Für jede Drehzahl über der ersten, verbrauche +1 Munition und würfle +1W10. Behalte die zwei höchsten Würfel. Vorteil/Nachteil ist +/- 1W10. Erleide 1 Abnutzung pro gewürfelter 1. Waffe unbrauchbar, wenn der Motor stirbt."
-  en: "For each RPM past the first, use +1 Ammo and roll +1d10. Keep the two highest.  Advantage/Disadvantage is +/- 1d10.  Take 1 Wear per 1 rolled.  Weapon unusable if engine dies."
-  es: "Por cada RPM después de la primera, usa +1 Munición y tira +1d10. Quédate con los dos más altos. Ventaja/Desventaja es +/- 1d10. Sufre 1 Desgaste por cada 1 tirado. Arma inutilizable si el motor muere."
-  fr: "Pour chaque RPM au-delà du premier, utilisez +1 Munitions et lancez +1d10. Gardez les deux plus élevés. Avantage/Désavantage est de +/- 1d10. Subissez 1 Usure par 1 lancé. Arme inutilisable si le moteur cale."
+  de: Für jede Drehzahl über der ersten, verbrauche +1 Munition und würfle +1W10.
+    Behalte die zwei höchsten Würfel. Vorteil/Nachteil ist +/- 1W10. Erleide 1 Abnutzung
+    pro gewürfelter 1. Waffe unbrauchbar, wenn der Motor stirbt.
+  en: For each RPM past the first, use +1 Ammo and roll +1d10. Keep the two highest.  Advantage/Disadvantage
+    is +/- 1d10.  Take 1 Wear per 1 rolled.  Weapon unusable if engine dies.
+  es: Por cada RPM después de la primera, usa +1 Munición y tira +1d10. Quédate con
+    los dos más altos. Ventaja/Desventaja es +/- 1d10. Sufre 1 Desgaste por cada 1
+    tirado. Arma inutilizable si el motor muere.
+  fr: Pour chaque RPM au-delà du premier, utilisez +1 Munitions et lancez +1d10. Gardez
+    les deux plus élevés. Avantage/Désavantage est de +/- 1d10. Subissez 1 Usure par
+    1 lancé. Arme inutilisable si le moteur cale.
 Medium:
   de: Mittlere Fracht
   en: Medium Cargo
@@ -1918,7 +2360,7 @@ Microtank:
   de: Mikrotank
   en: Microtank
   es: Microtanque
-  fr: "Micro-réservoir"
+  fr: Micro-réservoir
 Mineral Oil:
   de: Mineralöl
   en: Mineral Oil
@@ -1939,9 +2381,9 @@ Monoplane:
   en: Monoplane
   es: Monoplano
   fr: Monoplan
-"N-Strut":
-  de: "N-Strebe"
-  en: "N-Strut"
+N-Strut:
+  de: N-Strebe
+  en: N-Strut
   es: Montante en N
   fr: Mât en N
 Nacelle (Inside):
@@ -1969,10 +2411,10 @@ Negative:
   en: Negative
   es: Negativo
   fr: Négative
-No:
+'No':
   de: Nein
-  en: No
-  es: No
+  en: 'No'
+  es: 'No'
   fr: Non
 No Cowling:
   de: Keine Motorverkleidung
@@ -1985,10 +2427,16 @@ No Interference:
   es: Sin Interferencia
   fr: Pas d'Interférence
 No Interference Warning:
-  de: Manche Rumpfwaffen können wirklich nicht durch einen Propeller schießen, die meisten aber schon. Überprüfe dies mit dem DM und deinem gesunden Menschenverstand, bevor du dies auswählst.
-  en: Some fuselage guns really don't shoot through a propeller, but most do.  Verify with the DM and your common sense before selecting this.
-  es: Algunas armas en el fuselaje realmente no disparan a través de una hélice, pero la mayoría sí. Verifica con el DM y tu sentido común antes de seleccionar esto.
-  fr: Certains canons de fuselage ne peuvent vraiment pas tirer à travers une hélice, mais la plupart le peuvent. Vérifiez avec le MJ et votre bon sens avant de sélectionner ceci.
+  de: Manche Rumpfwaffen können wirklich nicht durch einen Propeller schießen, die
+    meisten aber schon. Überprüfe dies mit dem DM und deinem gesunden Menschenverstand,
+    bevor du dies auswählst.
+  en: Some fuselage guns really don't shoot through a propeller, but most do.  Verify
+    with the DM and your common sense before selecting this.
+  es: Algunas armas en el fuselaje realmente no disparan a través de una hélice, pero
+    la mayoría sí. Verifica con el DM y tu sentido común antes de seleccionar esto.
+  fr: Certains canons de fuselage ne peuvent vraiment pas tirer à travers une hélice,
+    mais la plupart le peuvent. Vérifiez avec le MJ et votre bon sens avant de sélectionner
+    ceci.
 None:
   de: Keine
   en: None
@@ -2014,58 +2462,63 @@ ORNITHOPTER_FLUTTER:
   en: Fluttering Ornithopter
   es: Ornitóptero de Aleteo
   fr: Ornithoptère Battant
+One:
+  de: Eins
+  en: One
+  es: Uno
+  fr: Un
 Open:
   de: Offen
   en: Open
   es: Abierta
   fr: Ouvert
 Optimization Cost:
-  de: "Kosten: +/- 10% Kosten"
-  en: "Expense: +/- 10% Cost"
-  es: "Gasto: +/- 10% Coste"
-  fr: "Dépense : +/- 10% Coût"
+  de: 'Kosten: +/- 10% Kosten'
+  en: 'Expense: +/- 10% Cost'
+  es: 'Gasto: +/- 10% Coste'
+  fr: 'Dépense : +/- 10% Coût'
 Optimization Drag:
-  de: "Stromlinienform: +/- 10% Luftwiderstand"
-  en: "Streamlining: +/- 10% Drag"
-  es: "Aerodinamización: +/- 10% Resistencia"
-  fr: "Profilage : +/- 10% Traînée"
+  de: 'Stromlinienform: +/- 10% Luftwiderstand'
+  en: 'Streamlining: +/- 10% Drag'
+  es: 'Aerodinamización: +/- 10% Resistencia'
+  fr: 'Profilage : +/- 10% Traînée'
 Optimization Effect:
   de: Effekt
   en: Effect
   es: Efecto
   fr: Effet
 Optimization Leg Room:
-  de: "Beinfreiheit: +/- 1 Flucht, Sicht"
-  en: "Leg Room: +/- 1 Escape, Visibility"
-  es: "Espacio para las Piernas: +/- 1 Escape, Visibilidad"
-  fr: "Espace pour les Jambes : +/- 1 Évacuation, Visibilité"
+  de: 'Beinfreiheit: +/- 1 Flucht, Sicht'
+  en: 'Leg Room: +/- 1 Escape, Visibility'
+  es: 'Espacio para las Piernas: +/- 1 Escape, Visibilidad'
+  fr: 'Espace pour les Jambes : +/- 1 Évacuation, Visibilité'
 Optimization Lift Bleed:
-  de: "Auftriebseffizienz: +/- 3 Auftriebsverlust"
-  en: "Lift Efficiency: +/- 3 Lift Bleed"
-  es: "Eficiencia de Sustentación: +/- 3 Pérdida de Sustentación"
-  fr: "Efficacité de Portance : +/- 3 Pertes de Portance"
+  de: 'Auftriebseffizienz: +/- 3 Auftriebsverlust'
+  en: 'Lift Efficiency: +/- 3 Lift Bleed'
+  es: 'Eficiencia de Sustentación: +/- 3 Pérdida de Sustentación'
+  fr: 'Efficacité de Portance : +/- 3 Pertes de Portance'
 Optimization Mass:
-  de: "Masse: +/- 10% Masse"
-  en: "Mass: +/- 10% Mass"
-  es: "Masa: +/- 10% Masa"
-  fr: "Masse : +/- 10% Masse"
+  de: 'Masse: +/- 10% Masse'
+  en: 'Mass: +/- 10% Mass'
+  es: 'Masa: +/- 10% Masa'
+  fr: 'Masse : +/- 10% Masse'
 Optimization Max Strain:
-  de: "Unterstützung: +/- 15% Maximale Belastung"
-  en: "Support: +/- 15% Max Strain"
-  es: "Soporte: +/- 15% Esfuerzo Máximo"
-  fr: "Support : +/- 15% Tension Maximale"
+  de: 'Unterstützung: +/- 15% Maximale Belastung'
+  en: 'Support: +/- 15% Max Strain'
+  es: 'Soporte: +/- 15% Esfuerzo Máximo'
+  fr: 'Support : +/- 15% Tension Maximale'
 Optimization Negative:
   de: Negativ
   en: Negative
   es: Negativo
   fr: Négatif
 Optimization Num Free Optimizations:
-  de: "Anzahl freier Optimierungen"
-  en: "Number of Free Optimizations"
-  es: "Número de Optimizaciones Gratuitas"
-  fr: "Nombre d'Optimisations Gratuites"
+  de: Anzahl freier Optimierungen
+  en: Number of Free Optimizations
+  es: Número de Optimizaciones Gratuitas
+  fr: Nombre d'Optimisations Gratuites
 Optimization Optimization Stats:
-  de: "Optimierungs-Werte"
+  de: Optimierungs-Werte
   en: Optimization Stats
   es: Estadísticas de Optimización
   fr: Stats d'Optimisation
@@ -2075,75 +2528,89 @@ Optimization Positive:
   es: Positivo
   fr: Positif
 Optimization Reliability:
-  de: "Zuverlässigkeit: +/- 2 Zuverlässigkeit"
-  en: "Reliability: +/- 2 Reliability"
-  es: "Fiabilidad: +/- 2 Fiabilidad"
-  fr: "Fiabilité : +/- 2 Fiabilité"
+  de: 'Zuverlässigkeit: +/- 2 Zuverlässigkeit'
+  en: 'Reliability: +/- 2 Reliability'
+  es: 'Fiabilidad: +/- 2 Fiabilidad'
+  fr: 'Fiabilité : +/- 2 Fiabilité'
 Optimization Section Title:
   de: Optimierungen
   en: Optimizations
   es: Optimizaciones
   fr: Optimisations
 Optimization Toughness:
-  de: "Redundanz: +/- 25% Zähigkeit"
-  en: "Redundancy: +/- 25% Toughness"
-  es: "Redundancia: +/- 25% Resistencia"
-  fr: "Redondance : +/- 25% Robustesse"
+  de: 'Redundanz: +/- 25% Zähigkeit'
+  en: 'Redundancy: +/- 25% Toughness'
+  es: 'Redundancia: +/- 25% Resistencia'
+  fr: 'Redondance : +/- 25% Robustesse'
 Ornithopter Buzzer Boost:
   de: Buzzer Boost
   en: Buzzer Boost
   es: Boost de Zumbido
   fr: Boost Bourdonnant
 Ornithopter Buzzer Boost Warning:
-  de: "Kann über Höchstgeschwindigkeit Boost-en. Jedes Mal, wenn du Boost-est, erleide +2 Energieverlust Vorwärtsmalus."
+  de: Kann über Höchstgeschwindigkeit Boost-en. Jedes Mal, wenn du Boost-est, erleide
+    +2 Energieverlust Vorwärtsmalus.
   en: Can boost above top speed. Every time you boost, take +2 Energy Loss forward.
-  es: Puede hacer Boost por encima de la velocidad máxima. Cada vez que haces Boost, sufres +2 de Pérdida de Energía hacia adelante.
-  fr: "Peut booster au-dessus de la vitesse maximale. Chaque fois que vous boostez, subissez +2 Perte d'Énergie en avant."
+  es: Puede hacer Boost por encima de la velocidad máxima. Cada vez que haces Boost,
+    sufres +2 de Pérdida de Energía hacia adelante.
+  fr: Peut booster au-dessus de la vitesse maximale. Chaque fois que vous boostez,
+    subissez +2 Perte d'Énergie en avant.
 Ornithopter Buzzer Stall:
   de: Buzzer Strömungsabriss
   en: Buzzer Stall
   es: Entrada en Pérdida de Zumbido
   fr: Décrochage Bourdonnant
 Ornithopter Buzzer Stall Warning:
-  de: Kann 1 Drehzahl opfern, um einen Strömungsabriss zu vermeiden. Erleide 1, wenn du unter Abrissgeschwindigkeit fällst, und 1 in jeder Runde, in der du unter Abrissgeschwindigkeit beginnst.
-  en: Can take 1 RPM to avoid a Stall.  Take 1 when you drop below Stall, and 1 every turn you start below Stall.
-  es: Puede usar 1 RPM para evitar una Entrada en Pérdida. Sufre 1 cuando caes por debajo de la Entrada en Pérdida, y 1 cada turno que empiezas por debajo de la Entrada en Pérdida.
-  fr: Peut utiliser 1 RPM pour éviter un Décrochage. Subissez 1 lorsque vous descendez en dessous du Décrochage, et 1 à chaque tour où vous commencez en dessous du Décrochage.
+  de: Kann 1 Drehzahl opfern, um einen Strömungsabriss zu vermeiden. Erleide 1, wenn
+    du unter Abrissgeschwindigkeit fällst, und 1 in jeder Runde, in der du unter Abrissgeschwindigkeit
+    beginnst.
+  en: Can take 1 RPM to avoid a Stall.  Take 1 when you drop below Stall, and 1 every
+    turn you start below Stall.
+  es: Puede usar 1 RPM para evitar una Entrada en Pérdida. Sufre 1 cuando caes por
+    debajo de la Entrada en Pérdida, y 1 cada turno que empiezas por debajo de la
+    Entrada en Pérdida.
+  fr: Peut utiliser 1 RPM pour éviter un Décrochage. Subissez 1 lorsque vous descendez
+    en dessous du Décrochage, et 1 à chaque tour où vous commencez en dessous du Décrochage.
 Ornithopter Flutterer Attack:
   de: Flutterer Angriff
   en: Flutterer Attack
   es: Ataque de Aleteo
   fr: Attaque Battante
 Ornithopter Flutterer Attack Warning:
-  de: "Erleide einen -3 Malus auf Open Fire, wenn du Boost-est."
-  en: "Take a -3 Penalty to Open Fire when you Boost."
-  es: "Sufre una penalización de -3 a Open Fire cuando haces Boost."
-  fr: "Subissez une pénalité de -3 à Open Fire lorsque vous Boostez."
+  de: Erleide einen -3 Malus auf Open Fire, wenn du Boost-est.
+  en: Take a -3 Penalty to Open Fire when you Boost.
+  es: Sufre una penalización de -3 a Open Fire cuando haces Boost.
+  fr: Subissez une pénalité de -3 à Open Fire lorsque vous Boostez.
 Ornithopter Stall:
   de: Ornithopter Flug
   en: Ornithopter Flight
   es: Vuelo de Ornitóptero
   fr: Vol d'Ornithoptère
 Ornithopter Stall Warning:
-  de: Falls der Motor ausfällt, verdoppele deine Abrissgeschwindigkeit und halbiere dein Handling.
+  de: Falls der Motor ausfällt, verdoppele deine Abrissgeschwindigkeit und halbiere
+    dein Handling.
   en: In the event that the engine stops, double your Stall Speed and halve your Handling.
-  es: En caso de que el motor se detenga, duplica tu Velocidad de Entrada en Pérdida y divide a la mitad tu Maniobrabilidad.
-  fr: Si le moteur s'arrête, doublez votre Vitesse de Décrochage et réduisez votre Maniabilité de moitié.
+  es: En caso de que el motor se detenga, duplica tu Velocidad de Entrada en Pérdida
+    y divide a la mitad tu Maniobrabilidad.
+  fr: Si le moteur s'arrête, doublez votre Vitesse de Décrochage et réduisez votre
+    Maniabilité de moitié.
 Outboard:
   de: Außen
   en: Outboard
   es: Exterior
-  fr: "Hors-bord"
+  fr: Hors-bord
 Oxygen Mask:
   de: Sauerstoffmaske
   en: Oxygen Mask
   es: Máscara de Oxígeno
   fr: Masque à Oxygène
 Oxygen Mask Warning:
-  de: "Der Pilot ignoriert die Auswirkungen großer Höhe und negiert bis zu 2 G-Malus."
-  en: "The pilot ignores the effects of high altitude and negates up to 2 G-Penalty."
-  es: El piloto ignora los efectos de la altitud elevada y niega hasta 2 penalizadores de G.
-  fr: Le pilote ignore les effets de la haute altitude et annule jusqu'à 2 pénalités de G.
+  de: Der Pilot ignoriert die Auswirkungen großer Höhe und negiert bis zu 2 G-Malus.
+  en: The pilot ignores the effects of high altitude and negates up to 2 G-Penalty.
+  es: El piloto ignora los efectos de la altitud elevada y niega hasta 2 penalizadores
+    de G.
+  fr: Le pilote ignore les effets de la haute altitude et annule jusqu'à 2 pénalités
+    de G.
 Padding:
   de: Polsterung
   en: Padding
@@ -2170,10 +2637,10 @@ Passengers Connectivity:
   es: Conectividad
   fr: Connectivité
 Passengers Count:
-  de: "%{A} Kabinensitze und %{B} Sitze 1. Klasse oder Tragen."
-  en: "%{A} cabin seats and %{B} first class or stretcher seats."
-  es: "%{A} asientos de cabina y %{B} asientos de primera clase o camilla."
-  fr: "%{A} sièges cabine et %{B} sièges première classe ou brancards."
+  de: '%{A} Kabinensitze und %{B} Sitze 1. Klasse oder Tragen.'
+  en: '%{A} cabin seats and %{B} first class or stretcher seats.'
+  es: '%{A} asientos de cabina y %{B} asientos de primera clase o camilla.'
+  fr: '%{A} sièges cabine et %{B} sièges première classe ou brancards.'
 Passengers Number of Beds:
   de: Anzahl 1. Klasse, Betten oder Tragen
   en: Number of 1st Class, Beds, or Stretchers
@@ -2189,6 +2656,8 @@ Passengers Section Title:
   en: Passengers
   es: Pasajeros
   fr: Passagers
+Passengers Stats:
+  de: Passagiere-Werte
 Passengers Upgrade:
   de: Upgrade
   en: Upgrade
@@ -2199,6 +2668,11 @@ Pioneer:
   en: Pioneer
   es: Pionero
   fr: Pionnier
+Platinum:
+  de: Platin
+  en: Platinum
+  es: Platino
+  fr: Platine
 Plywood:
   de: Sperrholz
   en: Plywood
@@ -2215,10 +2689,16 @@ Pneumatic Warning 1:
   es: El arma 'se atasca' después de un disparo rápido mientras el compresor se recarga.
   fr: L'arme s'enraye après un tir rapide pendant que le compresseur se remplit.
 Pneumatic Warning 2:
-  de: "Begrenzt auf 'Edged' Munition: Bei einem Munitions-Krit verursacht der Angriff doppelten Schaden. Ganzmetallflugzeuge können keine Munitions-Krits erleiden."
-  en: "Locked to 'Edged' Ammo: On Ammo Crit, attack deals double damage. All-metal planes cannot suffer Ammo Crits."
-  es: "Bloqueado a Munición 'Filosa': En Crítico de Munición, el ataque inflige el doble de daño. Los aviones totalmente metálicos no pueden sufrir Críticos de Munición."
-  fr: "Verrouillé sur Munitions 'Tranchantes' : Sur Crit Munitions, l'attaque inflige le double de dégâts. Les avions entièrement métalliques ne peuvent pas subir de Crits Munitions."
+  de: 'Begrenzt auf ''Edged'' Munition: Bei einem Munitions-Krit verursacht der Angriff
+    doppelten Schaden. Ganzmetallflugzeuge können keine Munitions-Krits erleiden.'
+  en: 'Locked to ''Edged'' Ammo: On Ammo Crit, attack deals double damage. All-metal
+    planes cannot suffer Ammo Crits.'
+  es: 'Bloqueado a Munición ''Filosa'': En Crítico de Munición, el ataque inflige
+    el doble de daño. Los aviones totalmente metálicos no pueden sufrir Críticos de
+    Munición.'
+  fr: 'Verrouillé sur Munitions ''Tranchantes'' : Sur Crit Munitions, l''attaque inflige
+    le double de dégâts. Les avions entièrement métalliques ne peuvent pas subir de
+    Crits Munitions.'
 Pod:
   de: Gondel
   en: Pod
@@ -2240,10 +2720,23 @@ Precision Rifle:
   es: Rifle de Precisión
   fr: Fusil de Précision
 Precision Rifle Warning:
-  de: "Muss alleine abgefeuert werden. Muss angepeilt haben, um zu feuern. Verursacht nie mehr als 1 Treffer Schaden, würfelt aber normale Kritische Treffer. Spezialmunition: 1 Box pro Gurt. Munition mit Bonustreffern fügt 5 Treffer hinzu oder zieht sie ab. Kritische Munition ersetzt normale Kritische Treffer vollständig durch den Spezialeffekt."
-  en: "Must be fired alone. Must Draw a Bead to fire. Never does more than 1 Hit worth of damage, but rolls Crits normally. Special Ammo: 1 Box per belt. Hits ammo adds or subtracts 5 Hits. Crit Ammo replaces normal Crits outright with the special effect."
-  es: "Debe dispararse solo. Debe Draw a Bead para disparar. Nunca hace más de 1 punto de daño por Impacto, pero tira Críticos normalmente. Munición Especial: 1 Caja por cinta. Los impactos de munición añaden o restan 5 Impactos. La Munición Crítica reemplaza los Críticos normales directamente con el efecto especial."
-  fr: "Doit être tiré seul. Doit Aimer pour tirer. Ne fait jamais plus de 1 Touche de dégâts, mais lance les Crits normalement. Munitions Spéciales : 1 Boîte par bande. Les touches de munitions ajoutent ou soustraient 5 Touches. Les Crits de munitions remplacent directement les Crits normaux par l'effet spécial."
+  de: 'Muss alleine abgefeuert werden. Muss angepeilt haben, um zu feuern. Verursacht
+    nie mehr als 1 Treffer Schaden, würfelt aber normale Kritische Treffer. Spezialmunition:
+    1 Box pro Gurt. Munition mit Bonustreffern fügt 5 Treffer hinzu oder zieht sie
+    ab. Kritische Munition ersetzt normale Kritische Treffer vollständig durch den
+    Spezialeffekt.'
+  en: 'Must be fired alone. Must Draw a Bead to fire. Never does more than 1 Hit worth
+    of damage, but rolls Crits normally. Special Ammo: 1 Box per belt. Hits ammo adds
+    or subtracts 5 Hits. Crit Ammo replaces normal Crits outright with the special
+    effect.'
+  es: 'Debe dispararse solo. Debe Draw a Bead para disparar. Nunca hace más de 1 punto
+    de daño por Impacto, pero tira Críticos normalmente. Munición Especial: 1 Caja
+    por cinta. Los impactos de munición añaden o restan 5 Impactos. La Munición Crítica
+    reemplaza los Críticos normales directamente con el efecto especial.'
+  fr: 'Doit être tiré seul. Doit Aimer pour tirer. Ne fait jamais plus de 1 Touche
+    de dégâts, mais lance les Crits normalement. Munitions Spéciales : 1 Boîte par
+    bande. Les touches de munitions ajoutent ou soustraient 5 Touches. Les Crits de
+    munitions remplacent directement les Crits normaux par l''effet spécial.'
 Price Word Used:
   de: Gebraucht
   en: Used
@@ -2255,20 +2748,23 @@ Programmable:
   es: Programable
   fr: Programmable
 Programmable Warning:
-  de: "Kann alles tun außer Dogfight! würfeln, Waffen abfeuern, Bomben abwerfen oder Landungen durchführen."
-  en: "Can do anything but Dogfight!, fire weapons, drop bombs, or make landings."
-  es: "Puede hacer cualquier cosa menos Dogfight!, disparar armas, lanzar bombas o aterrizar."
-  fr: "Peut faire tout sauf Dogfight!, tirer avec des armes, larguer des bombes, ou faire des atterrissages."
+  de: Kann alles tun außer Dogfight! würfeln, Waffen abfeuern, Bomben abwerfen oder
+    Landungen durchführen.
+  en: Can do anything but Dogfight!, fire weapons, drop bombs, or make landings.
+  es: Puede hacer cualquier cosa menos Dogfight!, disparar armas, lanzar bombas o
+    aterrizar.
+  fr: Peut faire tout sauf Dogfight!, tirer avec des armes, larguer des bombes, ou
+    faire des atterrissages.
 Propeller Propeller Pitch:
-  de: "Propellerblattneigung"
-  en: "Propeller Pitch"
-  es: "Paso de Hélice"
-  fr: "Pas de l'Hélice"
-"Propeller Propeller Upgrades":
-  de: "Propeller-Upgrades"
-  en: "Propeller Upgrades"
-  es: "Mejoras de Hélice"
-  fr: "Améliorations de l'Hélice"
+  de: Propellerblattneigung
+  en: Propeller Pitch
+  es: Paso de Hélice
+  fr: Pas de l'Hélice
+Propeller Propeller Upgrades:
+  de: Propeller-Upgrades
+  en: Propeller Upgrades
+  es: Mejoras de Hélice
+  fr: Améliorations de l'Hélice
 Propeller Section Title:
   de: Propeller
   en: Propeller
@@ -2280,10 +2776,43 @@ Pulsejet:
   es: Estatoreactor
   fr: Pulsoréacteur
 Pulsejet Boost Warning:
-  de: Pulsstrahltriebwerke verdoppeln Boost, wenn sie über der Abfallgeschwindigkeit liegen, anstatt darunter.
+  de: Pulsstrahltriebwerke verdoppeln Boost, wenn sie über der Abfallgeschwindigkeit
+    liegen, anstatt darunter.
   en: Pulsejets double Boost when above dropoff speed, instead of below dropoff.
-  es: Los estatorreactores duplican el Boost cuando están por encima de la velocidad de caída, en lugar de por debajo.
-  fr: "Les pulsoréacteur doublent le Boost lorsqu'ils sont au-dessus de la vitesse de décrochage, au lieu d'être en dessous."
+  es: Los estatorreactores duplican el Boost cuando están por encima de la velocidad
+    de caída, en lugar de por debajo.
+  fr: Les pulsoréacteur doublent le Boost lorsqu'ils sont au-dessus de la vitesse
+    de décrochage, au lieu d'être en dessous.
+Pulsejet Builder Design Cost:
+  de: Entwicklungskosten
+  en: Design Cost
+  es: Costo de Diseño
+  fr: Coût de Conception
+Pulsejet Builder Desired Power:
+  de: Gewünschte Leistung
+  en: Desired Power
+  es: Potencia Deseada
+  fr: Puissance Souhaitée
+Pulsejet Builder Quality:
+  de: Qualität
+  en: Quality
+  es: Calidad
+  fr: Qualité
+Pulsejet Builder Rumble:
+  de: Lärm
+  en: Rumble
+  es: Estruendo
+  fr: Grondement
+Pulsejet Builder Starter:
+  de: Anlasser
+  en: Starter
+  es: Arranque
+  fr: Démarreur
+Pulsejet Builder Title:
+  de: Strahltriebwerkbauer
+  en: Pulsejet Builder
+  es: Constructor de Pulsejet
+  fr: Constructeur de Pulsejet
 Pulsejets:
   de: Pulsstrahltriebwerke
   en: Pulsejets
@@ -2295,10 +2824,20 @@ Punt Gun:
   es: Cañón Punt
   fr: Canon de Chasse
 Punt Gun Warning:
-  de: "Anstatt auf Open Fire zu würfeln, würfelst du pro Treffer, wie im Builder angezeigt, einen W10. Du verursachst eine Anzahl von Treffern gleich dem Würfelergebnis und halben Schaden, und würfelst normale Krit-Würfel wie normal. Nicht beeinflusst von Meisterschaften oder Spezialmunition."
-  en: Rather than roll Open Fire, you roll a d10 per hit shown in the builder. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal. Not affected by Masteries or Special Ammo.
-  es: En lugar de tirar Open Fire, tiras un d10 por cada impacto mostrado en el constructor. Haces un número de Impactos igual a, y Daño la mitad de los resultados de la tirada, y tiras dados Críticos de forma normal. No afectado por Maestrías o Munición Especial.
-  fr: Au lieu de lancer Open Fire, vous lancez un d10 par touche indiquée dans le constructeur. Vous infligez un nombre de Touches égal à, et la moitié des Dégâts des résultats du jet, et lancez les dés de Crit comme d'habitude. Non affecté par les Maîtrises ou les Munitions Spéciales.
+  de: Anstatt auf Open Fire zu würfeln, würfelst du pro Treffer, wie im Builder angezeigt,
+    einen W10. Du verursachst eine Anzahl von Treffern gleich dem Würfelergebnis und
+    halben Schaden, und würfelst normale Krit-Würfel wie normal. Nicht beeinflusst
+    von Meisterschaften oder Spezialmunition.
+  en: Rather than roll Open Fire, you roll a d10 per hit shown in the builder. You
+    do a number of Hits equal to, and Damage half of the roll results, and roll Crit
+    dice like normal. Not affected by Masteries or Special Ammo.
+  es: En lugar de tirar Open Fire, tiras un d10 por cada impacto mostrado en el constructor.
+    Haces un número de Impactos igual a, y Daño la mitad de los resultados de la tirada,
+    y tiras dados Críticos de forma normal. No afectado por Maestrías o Munición Especial.
+  fr: Au lieu de lancer Open Fire, vous lancez un d10 par touche indiquée dans le
+    constructeur. Vous infligez un nombre de Touches égal à, et la moitié des Dégâts
+    des résultats du jet, et lancez les dés de Crit comme d'habitude. Non affecté
+    par les Maîtrises ou les Munitions Spéciales.
 Radiator Fluid:
   de: Kühlflüssigkeit
   en: Radiator Fluid
@@ -2314,11 +2853,11 @@ Radiator Loop:
   en: Radiator Loop
   es: Lazo de Radiador
   fr: Circuit de Radiateur
-"Radiators #":
-  de: "Kühler Nr. %{A}"
-  en: "Radiators # %{A}"
-  es: "Radiadores # %{A}"
-  fr: "Radiateurs # %{A}"
+'Radiators #':
+  de: 'Kühler #%{A}'
+  en: 'Radiators # %{A}'
+  es: 'Radiadores # %{A}'
+  fr: 'Radiateurs # %{A}'
 Radiators Coolant:
   de: Kühlmittel
   en: Coolant
@@ -2335,7 +2874,7 @@ Radiators Mounting:
   es: Montaje
   fr: Montage
 Radiators Radiator Stats:
-  de: "Kühler-Werte"
+  de: Kühler-Werte
   en: Radiator Stats
   es: Estadísticas del Radiador
   fr: Stats du Radiateur
@@ -2358,12 +2897,12 @@ Radio Transceiver:
   de: Funkgerät
   en: Radio Transceiver
   es: Transceptor de Radio
-  fr: "Émetteur-Récepteur Radio"
+  fr: Émetteur-Récepteur Radio
 Radio Transceiver (High Quality):
   de: Funkgerät (Hohe Qualität)
   en: Radio Transceiver (High Quality)
   es: Transceptor de Radio (Alta Calidad)
-  fr: "Émetteur-Récepteur Radio (Haute Qualité)"
+  fr: Émetteur-Récepteur Radio (Haute Qualité)
 Radio Transmitter:
   de: Funksender
   en: Radio Transmitter
@@ -2375,7 +2914,7 @@ Radio Transmitter (High Quality):
   es: Transmisor de Radio (Alta Calidad)
   fr: Émetteur Radio (Haute Qualité)
 Ram Air Scoop:
-  de: "Staudruck-Lufteinlass"
+  de: Staudruck-Lufteinlass
   en: Ram Air Scoop
   es: Toma de Aire Dinámica
   fr: Prise d'Air Dynamique
@@ -2410,10 +2949,10 @@ Rattenhirn:
   es: Rattenhirn
   fr: Rattenhirn
 Rattenhirn Warning:
-  de: "Voll automatisiert. Für Roboter-Flugzeuge."
-  en: "Fully automated. For robo-planes."
-  es: "Totalmente automatizado. Para aero-robots."
-  fr: "Entièrement automatisé. Pour avions-robots."
+  de: Voll automatisiert. Für Roboter-Flugzeuge.
+  en: Fully automated. For robo-planes.
+  es: Totalmente automatizado. Para aero-robots.
+  fr: Entièrement automatisé. Pour avions-robots.
 Rear Internal:
   de: Hinten Innen
   en: Rear Internal
@@ -2424,9 +2963,9 @@ Rear Pod:
   en: Rear Pod
   es: Cápsula Trasera
   fr: Pod Arrière
-"Rear-Mounted Pusher":
+Rear-Mounted Pusher:
   de: Hinten montierter Schubpropeller
-  en: "Rear-Mounted Pusher"
+  en: Rear-Mounted Pusher
   es: Empujador Montado Trasero
   fr: Propulseur Monté à l'Arrière
 Rearward:
@@ -2460,7 +2999,7 @@ Reinforcement Internal Reinforcements:
   es: Voladizos
   fr: Cantilevers
 Reinforcement Reinforcement Stats:
-  de: "Verstärkungs-Werte"
+  de: Verstärkungs-Werte
   en: Reinforcement Stats
   es: Estadísticas de Refuerzo
   fr: Stats des Renforts
@@ -2499,11 +3038,16 @@ Remote Fire Extinguisher Warning:
   en: Spend to put out a fire.
   es: Gastarlo para apagar un incendio.
   fr: Dépensez pour éteindre un incendie.
-"Retractable ":
-  de: "Einziehbar "
-  en: "Retractable "
-  es: "Retráctil "
-  fr: "Rétractable "
+Remove:
+  de: Entfernen
+  en: Remove
+  es: Eliminar
+  fr: Retirer
+'Retractable ':
+  de: 'Einziehbar '
+  en: 'Retractable '
+  es: 'Retráctil '
+  fr: 'Rétractable '
 Retractable Gear + Boat Hull:
   de: Einziehfahrwerk + Bootsrumpf
   en: Retractable Gear + Boat Hull
@@ -2519,6 +3063,16 @@ Roaring 20s:
   en: Roaring 20s
   es: Felices Años Veinte
   fr: Années Folles
+Rocket Mass Externally.:
+  de: '%{A} Raketenmasse extern. '
+  en: '%{A} Rocket Mass Externally. '
+  es: '%{A} Masa de Cohetes Externamente. '
+  fr: '%{A} Masse de Fusées à l''extérieur. '
+Rocket Mass Internally.:
+  de: '%{A} Raketenmasse intern. '
+  en: '%{A} Rocket Mass Internally. '
+  es: '%{A} Masa de Cohetes Internamente. '
+  fr: '%{A} Masse de Fusées à l''intérieur. '
 Roll Bar:
   de: Überrollbügel
   en: Roll Bar
@@ -2535,15 +3089,15 @@ Rotary Basic Cowl:
   es: Carenado Básico Rotatorio
   fr: Capot de Base Rotatif
 Rotary Left Warning:
-  de: "+1 auf Dogfight!, wenn du nach links drehst."
-  en: "+1 to Dogfight! when turning left."
-  es: "+1 a Dogfight! al girar a la izquierda."
-  fr: "+1 à Dogfight! en tournant à gauche."
+  de: +1 auf Dogfight!, wenn du nach links drehst.
+  en: +1 to Dogfight! when turning left.
+  es: +1 a Dogfight! al girar a la izquierda.
+  fr: +1 à Dogfight! en tournant à gauche.
 Rotary Right Warning:
-  de: "+1 auf Dogfight!, wenn du nach rechts drehst."
-  en: "+1 to Dogfight! when turning right."
-  es: "+1 a Dogfight! al girar a la derecha."
-  fr: "+1 à Dogfight! en tournant à droite."
+  de: +1 auf Dogfight!, wenn du nach rechts drehst.
+  en: +1 to Dogfight! when turning right.
+  es: +1 a Dogfight! al girar a la derecha.
+  fr: +1 à Dogfight! en tournant à droite.
 Rotary_Gun:
   de: Rotierend
   en: Rotary
@@ -2579,14 +3133,19 @@ Rotor Material:
   en: Material
   es: Material
   fr: Matériau
+Rotor Min Span:
+  de: Rotor-Mindestspannweite
+  en: Rotor Minimum Span
+  es: Envergadura Mínima del Rotor
+  fr: Portée Minimum du Rotor
 Rotor Minimum Span:
   de: Minimaler Rotordurchmesser
   en: Minimum Rotor Span
   es: Envergadura Mínima del Rotor
   fr: Envergure Minimale du Rotor
-"Rotor Motor Cross-link":
-  de: "Motor-Querverbindung"
-  en: "Motor Cross-link"
+Rotor Motor Cross-link:
+  de: Motor-Querverbindung
+  en: Motor Cross-link
   es: Interconexión de Motores
   fr: Interconnexion Moteurs
 Rotor Number of Rotors:
@@ -2599,6 +3158,11 @@ Rotor Rotor:
   en: Rotor
   es: Rotor
   fr: Rotor
+Rotor Rotor Count:
+  de: Rotoranzahl
+  en: Rotor Count
+  es: Número de Palas del Rotor
+  fr: Nombre de Pales de Rotor
 Rotor Rotor Material:
   de: Rotormaterial
   en: Rotor Material
@@ -2615,17 +3179,20 @@ Rotor Span:
   es: Modificación de Envergadura del Rotor
   fr: Modification de l'Envergure du Rotor
 Rotor Span Warning:
-  de: Unterdimensionierte Rotoren lassen den Motor härter arbeiten und reduzieren die Zuverlässigkeit.
+  de: Unterdimensionierte Rotoren lassen den Motor härter arbeiten und reduzieren
+    die Zuverlässigkeit.
   en: Undersized rotors cause the engine to work harder and reduce reliability.
-  es: Los rotores de tamaño insuficiente hacen que el motor trabaje más y reducen la fiabilidad.
-  fr: "Des rotors sous-dimensionnés font travailler le moteur plus fort et réduisent la fiabilité."
+  es: Los rotores de tamaño insuficiente hacen que el motor trabaje más y reducen
+    la fiabilidad.
+  fr: Des rotors sous-dimensionnés font travailler le moteur plus fort et réduisent
+    la fiabilité.
 Rotor Stagger:
   de: Rotorstaffelung
   en: Rotor Stagger
   es: Decalaje del Rotor
   fr: Décalage des Rotors
 Rotor Stats:
-  de: "Rotor-Werte"
+  de: Rotor-Werte
   en: Rotor Stats
   es: Estadísticas del Rotor
   fr: Stats du Rotor
@@ -2634,16 +3201,21 @@ Rotor Thickness:
   en: Rotor Thickness
   es: Grosor del Rotor
   fr: Épaisseur du Rotor
+Rules:
+  de: Regeln
+  en: Rules
+  es: Reglas
+  fr: Règles
 Rumble Warning:
-  de: "Rumble erfordert eine minimale Struktur von Rumble*10, um fliegen zu können."
-  en: "Rumble requires a minimum structure of Rumble*10 to fly."
-  es: "El Rumble requiere una estructura mínima de Rumble*10 para volar."
-  fr: "Rumble nécessite une structure minimale de Rumble*10 pour voler."
+  de: Rumble erfordert eine minimale Struktur von Rumble*10, um fliegen zu können.
+  en: Rumble requires a minimum structure of Rumble*10 to fly.
+  es: El Rumble requiere una estructura mínima de Rumble*10 para volar.
+  fr: Rumble nécessite une structure minimale de Rumble*10 pour voler.
 SMG Warning:
-  de: "-3 auf alle Angriffe jenseits des Nahkampf-Bereichs."
-  en: "-3 to all Attacks beyond Knife Range."
-  es: "-3 a todos los Ataques más allá del Alcance Cuchillo."
-  fr: "-3 à toutes les Attaques au-delà de la Portée Couteau."
+  de: -3 auf alle Angriffe jenseits des Nahkampf-Bereichs.
+  en: -3 to all Attacks beyond Knife Range.
+  es: -3 a todos los Ataques más allá del Alcance Cuchillo.
+  fr: -3 à toutes les Attaques au-delà de la Portée Couteau.
 Salt Water:
   de: Salzwasser
   en: Salt Water
@@ -2655,10 +3227,25 @@ Scattergun:
   es: Escopeta
   fr: Fusil à Plombs
 Scattergun Warning:
-  de: "Anstatt auf Open Fire zu würfeln, würfelst du pro Treffer, wie im Builder angezeigt, einen W5. Du verursachst eine Anzahl von Treffern gleich dem Würfelergebnis und halben Schaden, und würfelst normale Krit-Würfel wie normal. Nicht beeinflusst von Meisterschaften oder Spezialmunition."
-  en: Rather than roll Open Fire, you roll a d5 per hit shown in the builder. You do a number of Hits equal to, and Damage half of the roll results, and roll Crit dice like normal. Not affected by Masteries or Special Ammo.
-  es: En lugar de tirar Open Fire, tiras un d5 por cada impacto mostrado en el constructor. Haces un número de Impactos igual a, y Daño la mitad de los resultados de la tirada, y tiras dados Críticos de forma normal. No afectado por Maestrías o Munición Especial.
-  fr: Au lieu de lancer Open Fire, vous lancez un d5 par touche indiquée dans le constructeur. Vous infligez un nombre de Touches égal à, et la moitié des Dégâts des résultats du jet, et lancez les dés de Crit comme d'habitude. Non affecté par les Maîtrises ou les Munitions Spéciales.
+  de: Anstatt auf Open Fire zu würfeln, würfelst du pro Treffer, wie im Builder angezeigt,
+    einen W5. Du verursachst eine Anzahl von Treffern gleich dem Würfelergebnis und
+    halben Schaden, und würfelst normale Krit-Würfel wie normal. Nicht beeinflusst
+    von Meisterschaften oder Spezialmunition.
+  en: Rather than roll Open Fire, you roll a d5 per hit shown in the builder. You
+    do a number of Hits equal to, and Damage half of the roll results, and roll Crit
+    dice like normal. Not affected by Masteries or Special Ammo.
+  es: En lugar de tirar Open Fire, tiras un d5 por cada impacto mostrado en el constructor.
+    Haces un número de Impactos igual a, y Daño la mitad de los resultados de la tirada,
+    y tiras dados Críticos de forma normal. No afectado por Maestrías o Munición Especial.
+  fr: Au lieu de lancer Open Fire, vous lancez un d5 par touche indiquée dans le constructeur.
+    Vous infligez un nombre de Touches égal à, et la moitié des Dégâts des résultats
+    du jet, et lancez les dés de Crit comme d'habitude. Non affecté par les Maîtrises
+    ou les Munitions Spéciales.
+Screamer Sinew:
+  de: Schreier-Sehne
+  en: Screamer Sinew
+  es: Tendón de Gritón
+  fr: Tendón de Crieur
 Sealed:
   de: Versiegelt
   en: Sealed
@@ -2679,31 +3266,38 @@ Searchlight:
   en: Searchlight
   es: Faro de Búsqueda
   fr: Projecteur
-"Seat #":
-  de: "Sitz Nr. %{A}"
-  en: "Seat #%{A}"
-  es: "Asiento #%{A}"
-  fr: "Siège #%{A}"
+'Seat #':
+  de: 'Sitz #%{A}'
+  en: 'Seat #%{A}'
+  es: 'Asiento #%{A}'
+  fr: 'Siège #%{A}'
 Seat Location:
   de: Sitz auswählen
   en: Choose Seat
   es: Elegir Asiento
   fr: Choisir Siège
-"Seats #":
-  de: "Sitze Nr. %{A}"
-  en: "Seats # %{A}"
-  es: "Asientos # %{A}"
-  fr: "Sièges # %{A}"
-"Self-Sealing Gas Tank":
+'Seats #':
+  de: 'Sitze # %{A}'
+  en: 'Seats # %{A}'
+  es: 'Asientos # %{A}'
+  fr: 'Sièges # %{A}'
+Self-Sealing Gas Tank:
   de: Selbstdichtender Kraftstofftank
-  en: "Self-Sealing Gas Tank"
+  en: Self-Sealing Gas Tank
   es: Depósito de Combustible Autosellante
-  fr: "Réservoir de Carburant Auto-Obturant"
-"Self-Sealing Gas Tank Warning":
-  de: "Der Malus für Kraftstofflecks gilt nur für den nächsten Kraftstoff-Check."
+  fr: Réservoir de Carburant Auto-Obturant
+Self-Sealing Gas Tank Warning:
+  de: Der Malus für Kraftstofflecks gilt nur für den nächsten Kraftstoff-Check.
   en: Fuel leak penalty will apply only to the next Fuel Check.
-  es: La penalización por fuga de combustible se aplicará solo al siguiente Chequeo de Combustible.
-  fr: La pénalité de fuite de carburant ne s'appliquera qu'au prochain Contrôle de Carburant.
+  es: La penalización por fuga de combustible se aplicará solo al siguiente Chequeo
+    de Combustible.
+  fr: La pénalité de fuite de carburant ne s'appliquera qu'au prochain Contrôle de
+    Carburant.
+Silver:
+  de: Silber
+  en: Silver
+  es: Plata
+  fr: Argent
 Single Rotor:
   de: Einzelner Rotor
   en: Single Rotor
@@ -2750,20 +3344,26 @@ Spoilerons:
   es: Spoilerones
   fr: Spoilerons
 Spoilerons Warning:
-  de: "Wenn du Dogfight! würfelst, erhältst du +1, reduzierst aber deine Geschwindigkeit, als wäre dein Geschwindigkeitsfaktor verdoppelt."
-  en: "When you roll Dogfight!, take +1, but then reduce your speed as if your Speed Factor was doubled."
-  es: "Cuando tires Dogfight!, obtén +1, pero luego reduce tu velocidad como si tu Factor de Velocidad se duplicara."
-  fr: "Lorsque vous lancez Dogfight!, prenez +1, mais réduisez ensuite votre vitesse comme si votre Facteur de Vitesse était doublé."
+  de: Wenn du Dogfight! würfelst, erhältst du +1, reduzierst aber deine Geschwindigkeit,
+    als wäre dein Geschwindigkeitsfaktor verdoppelt.
+  en: When you roll Dogfight!, take +1, but then reduce your speed as if your Speed
+    Factor was doubled.
+  es: Cuando tires Dogfight!, obtén +1, pero luego reduce tu velocidad como si tu
+    Factor de Velocidad se duplicara.
+  fr: Lorsque vous lancez Dogfight!, prenez +1, mais réduisez ensuite votre vitesse
+    comme si votre Facteur de Vitesse était doublé.
 Stability Warning:
-  de: "Die Stabilität muss zwischen -10 und +10 liegen, um von einem Menschen fliegbar zu sein."
-  en: "Stability must be between -10 and +10 to be flyable by a human."
-  es: "La Estabilidad debe estar entre -10 y +10 para ser manejable por un humano."
-  fr: "La Stabilité doit être comprise entre -10 et +10 pour être pilotable par un humain."
-"Stabilizers # of Stabilizers":
-  de: "# Stabilisatoren"
-  en: "# of Stabilizers"
-  es: "# de Estabilizadores"
-  fr: "# de Stabilisateurs"
+  de: Die Stabilität muss zwischen -10 und +10 liegen, um von einem Menschen fliegbar
+    zu sein.
+  en: Stability must be between -10 and +10 to be flyable by a human.
+  es: La Estabilidad debe estar entre -10 y +10 para ser manejable por un humano.
+  fr: La Stabilité doit être comprise entre -10 et +10 pour être pilotable par un
+    humain.
+'Stabilizers # of Stabilizers':
+  de: '# Stabilisatoren'
+  en: '# of Stabilizers'
+  es: '# de Estabilizadores'
+  fr: '# de Stabilisateurs'
 Stabilizers Horizontal Stabilizers:
   de: Horizontale Stabilisatoren
   en: Horizontal Stabilizers
@@ -2775,7 +3375,7 @@ Stabilizers Section Title:
   es: Estabilizadores
   fr: Stabilisateurs
 Stabilizers Stabilizer Stats:
-  de: "Stabilisator-Werte"
+  de: Stabilisator-Werte
   en: Stabilizer Stats
   es: Estadísticas de Estabilizador
   fr: Stats des Stabilisateurs
@@ -2800,7 +3400,7 @@ Standard:
   es: Estándar
   fr: Standard
 Standard Action:
-  de: "Standard-Aktion"
+  de: Standard-Aktion
   en: Standard Action
   es: Acción Estándar
   fr: Action Standard
@@ -2900,7 +3500,7 @@ Stat Overspeed:
   es: Exceso de Velocidad
   fr: Survitesse
 Stat Pitch Boost:
-  de: "Nick-Boost"
+  de: Nick-Boost
   en: Pitch Boost
   es: Boost de Alabeo
   fr: Boost en Tangage
@@ -2968,7 +3568,7 @@ Stat Wet Mass:
   de: Beladene Masse
   en: Wet Mass
   es: Masa Húmeda
-  fr: Masse Totale
+  fr: Masse Charge
 Stat Wing Area:
   de: Flügelfläche
   en: Wing Area
@@ -2979,14 +3579,14 @@ Steel:
   en: Steel
   es: Acero
   fr: Acier
-"Steel I-Strut":
-  de: "I-Stahlstrebe"
-  en: "Steel I-Strut"
+Steel I-Strut:
+  de: I-Stahlstrebe
+  en: Steel I-Strut
   es: Montante en I de Acero
   fr: Mât en I en Acier
-"Steel N-Strut":
-  de: "N-Stahlstrebe"
-  en: "Steel N-Strut"
+Steel N-Strut:
+  de: N-Stahlstrebe
+  en: Steel N-Strut
   es: Montante en N de Acero
   fr: Mât en N en Acier
 Steel Parallel Struts:
@@ -3015,18 +3615,18 @@ Steel Spars:
   es: Largueros de Acero
   fr: Longerons en Acier
 Steel Star Strut:
-  de: "Stern-Stahlstrebe"
+  de: Stern-Stahlstrebe
   en: Steel Star Strut
   es: Montante en Estrella de Acero
   fr: Mât en Étoile en Acier
-"Steel V-Strut":
-  de: "V-Stahlstrebe"
-  en: "Steel V-Strut"
+Steel V-Strut:
+  de: V-Stahlstrebe
+  en: Steel V-Strut
   es: Montante en V de Acero
   fr: Mât en V en Acier
-"Steel W-Strut":
-  de: "W-Stahlstrebe"
-  en: "Steel W-Strut"
+Steel W-Strut:
+  de: W-Stahlstrebe
+  en: Steel W-Strut
   es: Montante en W de Acero
   fr: Mât en W en Acier
 Steel Wing Truss:
@@ -3059,16 +3659,20 @@ Synchropter:
   en: Synchropter
   es: Synchroptero
   fr: Synchropter
-"T-Tail":
-  de: "T-Leitwerk"
-  en: "T-Tail"
+T-Tail:
+  de: T-Leitwerk
+  en: T-Tail
   es: Cola en T
   fr: Queue en T
-"T-Tail Warning":
-  de: Im Falle eines Trudelns/Strömungsabrisses bei Geschwindigkeit über der Abrissgeschwindigkeit und unter Last, bist du im Nachteil, dich zu erholen.
-  en: In the event of a spin/stall while above stall speed and under power, you are at a Disadvantage to recover.
-  es: En caso de barrena/entrada en pérdida por encima de la velocidad de entrada en pérdida y con potencia, tienes Desventaja para recuperar.
-  fr: "En cas de vrille/décrochage alors que vous êtes au-dessus de la vitesse de décrochage et sous puissance, vous avez un Désavantage pour récupérer."
+T-Tail Warning:
+  de: Im Falle eines Trudelns/Strömungsabrisses bei Geschwindigkeit über der Abrissgeschwindigkeit
+    und unter Last, bist du im Nachteil, dich zu erholen.
+  en: In the event of a spin/stall while above stall speed and under power, you are
+    at a Disadvantage to recover.
+  es: En caso de barrena/entrada en pérdida por encima de la velocidad de entrada
+    en pérdida y con potencia, tienes Desventaja para recuperar.
+  fr: En cas de vrille/décrochage alors que vous êtes au-dessus de la vitesse de décrochage
+    et sous puissance, vous avez un Désavantage pour récupérer.
 Tailfin:
   de: Seitenleitwerk
   en: Tailfin
@@ -3090,12 +3694,12 @@ Tandem:
   es: Tándem
   fr: Tandem
 Tandem Transverse:
-  de: "Tandem-Transversal"
+  de: Tandem-Transversal
   en: Tandem Transverse
   es: Transversal en Tándem
   fr: Transversal Tandem
 Telescopic Gunsight:
-  de: "Teleskop-Zielvisier"
+  de: Teleskop-Zielvisier
   en: Telescopic Gunsight
   es: Mira Telescópica
   fr: Viseur Télescopique
@@ -3124,11 +3728,21 @@ The Wings:
   en: The Wings
   es: Las Alas
   fr: Les Ailes
+Thickness X:
+  de: Stärke %{A}
+  en: Thickness %{A}
+  es: Épaisseur %{A}
+  fr: Espesor %{A}
 Thin Sheet Steel:
   de: Dünnes Stahlblech
   en: Thin Sheet Steel
   es: Chapa Fina de Acero
   fr: Tôle d'Acier Fine
+Three:
+  de: Drei
+  en: Three
+  es: Tres
+  fr: Trois
 Tiny:
   de: Sehr kleine Fracht
   en: Tiny Cargo
@@ -3165,10 +3779,48 @@ Turbine:
   es: Turbina
   fr: Turbine
 Turbine Boost Warning:
-  de: Turbinen ignorieren die Abfallgeschwindigkeit und liefern konstanten Boost bei allen Geschwindigkeiten.
+  de: Turbinen ignorieren die Abfallgeschwindigkeit und liefern konstanten Boost bei
+    allen Geschwindigkeiten.
   en: Turbines ignore dropoff speed, providing constant Boost at all speeds.
-  es: Las turbinas ignoran la velocidad de caída, proporcionando Boost constante a todas las velocidades.
-  fr: Les turbines ignorent la vitesse de décrochage, fournissant un Boost constant à toutes les vitesses.
+  es: Las turbinas ignoran la velocidad de caída, proporcionando Boost constante a
+    todas las velocidades.
+  fr: Les turbines ignorent la vitesse de décrochage, fournissant un Boost constant
+    à toutes les vitesses.
+Turbo Builder Afterburner:
+  de: Nachbrenner
+  en: Afterburner
+  es: Postquemador
+  fr: Postcombustion
+Turbo Builder Bypass Ratio:
+  de: Bypassverhältnis
+  en: Bypass Ratio
+  es: Relación de Derivación
+  fr: Taux de Dilution
+Turbo Builder Diameter:
+  de: Triebwerksdurchmesser (m)
+  en: Engine Diameter (m)
+  es: Diámetro del Motor (m)
+  fr: Diamètre du Moteur (m)
+Turbo Builder Mass Flow Adjustment:
+  de: Massenstrom-Anpassung
+  en: Mass Flow Adjustment
+  es: Ajuste de Flujo Másico
+  fr: Ajustement du Débit Massique
+Turbo Builder Overall Pressure Ratio:
+  de: Gesamtdruckverhältnis
+  en: Overall Pressure Ratio
+  es: Relación de Presión General
+  fr: Rapport de Pression Global
+Turbo Builder Thrust:
+  de: Schub
+  en: Thrust
+  es: Empuje
+  fr: Poussée
+Turbo Builder Title:
+  de: Turbinenbauer
+  en: Turbine Builder
+  es: Constructor de Turbina
+  fr: Constructeur de Turbine
 Turns Left:
   de: Dreht nach links
   en: Turns Left
@@ -3189,8 +3841,13 @@ Turreted:
   en: Turreted
   es: Con Torretas
   fr: Monté sur Tourelle
+Two:
+  de: Zwei
+  en: Two
+  es: Dos
+  fr: Deux
 Underwing Pod:
-  de: "Unterflügel-Gondel"
+  de: Unterflügel-Gondel
   en: Underwing Pod
   es: Cápsula Bajo Ala
   fr: Pod Sous Aile
@@ -3215,10 +3872,10 @@ Used Burnt Out:
   es: Quemado
   fr: Épuisé
 Used Burnt Out Description:
-  de: "Motoren haben -1 Zuverlässigkeit"
-  en: "Engines are at -1 Reliability"
-  es: "Los motores tienen -1 Fiabilidad"
-  fr: "Les moteurs sont à -1 Fiabilité"
+  de: Motoren haben -1 Zuverlässigkeit
+  en: Engines are at -1 Reliability
+  es: Los motores tienen -1 Fiabilidad
+  fr: Les moteurs sont à -1 Fiabilité
 Used Description:
   de: Beschreibung
   en: Description
@@ -3235,50 +3892,50 @@ Used Fragile:
   es: Frágil
   fr: Fragile
 Used Fragile Description:
-  de: "Reduziere deine Maximale Belastung um 20%"
-  en: "Reduce your Max Strain by 20%"
-  es: "Reduce tu Esfuerzo Máximo en un 20%"
-  fr: "Réduisez votre Tension Maximale de 20%"
+  de: Reduziere deine Maximale Belastung um 20%
+  en: Reduce your Max Strain by 20%
+  es: Reduce tu Esfuerzo Máximo en un 20%
+  fr: Réduisez votre Tension Maximale de 20%
 Used Hefty:
   de: Wuchtig
   en: Hefty
   es: Pesado
   fr: Lourd
 Used Hefty Description:
-  de: "Erhöhe deine Abrissgeschwindigkeiten um 20%"
-  en: "Increase your Stall Speeds by 20%"
-  es: "Aumenta tus Velocidades de Entrada en Pérdida en un 20%"
-  fr: "Augmentez vos Vitesses de Décrochage de 20%"
+  de: Erhöhe deine Abrissgeschwindigkeiten um 20%
+  en: Increase your Stall Speeds by 20%
+  es: Aumenta tus Velocidades de Entrada en Pérdida en un 20%
+  fr: Augmentez vos Vitesses de Décrochage de 20%
 Used Is Aircraft Used?:
   de: Ist das Flugzeug gebraucht?
   en: Is Aircraft Used?
   es: ¿La Aeronave es Usada?
-  fr: "L'Avion est-il d'Occasion ?"
+  fr: L'Avion est-il d'Occasion ?
 Used Leaky:
   de: Undicht
   en: Leaky
   es: Con Fugas
   fr: Fuyard
 Used Leaky Description:
-  de: "Reduziere deinen Treibstoff um 20%"
-  en: "Reduce your Fuel by 20%"
-  es: "Reduce tu Combustible en un 20%"
-  fr: "Réduisez votre Carburant de 20%"
-"Used Penalties(+) <br/> Benefits(-)":
-  de: "Mali(+) <br/> Boni(-)"
-  en: "Penalties(+) <br/> Benefits(-)"
-  es: "Penalizaciones(+) <br/> Beneficios(-)"
-  fr: "Pénalités(+) <br/> Bénéfices(-)"
+  de: Reduziere deinen Treibstoff um 20%
+  en: Reduce your Fuel by 20%
+  es: Reduce tu Combustible en un 20%
+  fr: Réduisez votre Carburant de 20%
+Used Penalties(+) <br/> Benefits(-):
+  de: Mali(+) <br/> Boni(-)
+  en: Penalties(+) <br/> Benefits(-)
+  es: Penalizaciones(+) <br/> Beneficios(-)
+  fr: Pénalités(+) <br/> Bénéfices(-)
 Used Ragged:
   de: Zerzaust
   en: Ragged
   es: Desgastado
   fr: Délabré
 Used Ragged Description:
-  de: "Reduziere deine Höchstgeschwindigkeit um 10%"
-  en: "Reduce your Max Speed by 10%"
-  es: "Reduce tu Velocidad Máxima en un 10%"
-  fr: "Réduisez votre Vitesse Maximale de 10%"
+  de: Reduziere deine Höchstgeschwindigkeit um 10%
+  en: Reduce your Max Speed by 10%
+  es: Reduce tu Velocidad Máxima en un 10%
+  fr: Réduisez votre Vitesse Maximale de 10%
 Used Section Title:
   de: Gebrauchtes Flugzeug
   en: Used Plane
@@ -3314,21 +3971,21 @@ Used Weak Description:
   en: Cut the plane's Toughness in half
   es: Reduce la Resistencia del avión a la mitad
   fr: Coupez la Robustesse de l'avion en deux
-"V-Strut":
-  de: "V-Strebe"
-  en: "V-Strut"
+V-Strut:
+  de: V-Strebe
+  en: V-Strut
   es: Montante en V
   fr: Mât en V
-"V-Tail":
-  de: "V-Leitwerk"
-  en: "V-Tail"
+V-Tail:
+  de: V-Leitwerk
+  en: V-Tail
   es: Cola en V
   fr: Queue en V
 Vital Part Aircrew:
-  de: "Besatzungsmitglied Nr. %{A}"
-  en: "Aircrew #%{A}"
-  es: "Tripulante #%{A}"
-  fr: "Membre d'équipage #%{A}"
+  de: 'Besatzungsmitglied #%{A}'
+  en: 'Aircrew #%{A}'
+  es: 'Tripulante #%{A}'
+  fr: 'Membre d''équipage #%{A}'
 Vital Part Controls:
   de: Steuerung
   en: Controls
@@ -3340,20 +3997,20 @@ Vital Part Electrics:
   es: Sistema Eléctrico
   fr: Électricité
 Vital Part Engine:
-  de: "Motor Nr. %{A}"
-  en: "Engine #%{A}"
-  es: "Motor #%{A}"
-  fr: "Moteur #%{A}"
+  de: 'Motor #%{A}'
+  en: 'Engine #%{A}'
+  es: 'Motor #%{A}'
+  fr: 'Moteur #%{A}'
 Vital Part Engine Puller:
-  de: "Motor Nr. %{A} Zug"
-  en: "Engine #%{A} Puller"
-  es: "Motor #%{A} Tractor"
-  fr: "Moteur #%{A} Tracteur"
+  de: 'Motor #%{A} Zug'
+  en: 'Engine #%{A} Puller'
+  es: 'Motor #%{A} Tractor'
+  fr: 'Moteur #%{A} Tracteur'
 Vital Part Engine Pusher:
-  de: "Motor Nr. %{A} Schub"
-  en: "Engine #%{A} Pusher"
-  es: "Motor #%{A} Empujador"
-  fr: "Moteur #%{A} Propulseur"
+  de: 'Motor #%{A} Schub'
+  en: 'Engine #%{A} Pusher'
+  es: 'Motor #%{A} Empujador'
+  fr: 'Moteur #%{A} Propulseur'
 Vital Part Fuel Tanks:
   de: Kraftstofftanks
   en: Fuel Tanks
@@ -3365,68 +4022,68 @@ Vital Part Landing Gear:
   es: Tren de Aterrizaje
   fr: Train d'Atterrissage
 Vital Part Oil Cooler:
-  de: "Ölkühler Nr. %{A}"
-  en: "Oil Cooler #%{A}"
-  es: "Enfriador de Aceite #%{A}"
-  fr: "Refroidisseur d'Huile #%{A}"
+  de: 'Ölkühler #%{A}'
+  en: 'Oil Cooler #%{A}'
+  es: 'Enfriador de Aceite #%{A}'
+  fr: 'Refroidisseur d''huile #%{A}'
 Vital Part Oil Cooler Puller:
-  de: "Ölkühler Nr. %{A} Zug"
-  en: "Oil Cooler #%{A} Puller"
-  es: "Enfriador de Aceite #%{A} Tractor"
-  fr: "Refroidisseur d'Huile #%{A} Tracteur"
+  de: 'Ölkühler #%{A} Zug'
+  en: 'Oil Cooler #%{A} Puller'
+  es: 'Enfriador de Aceite #%{A} Tractor'
+  fr: 'Refroidisseur d''huile #%{A} Tracteur'
 Vital Part Oil Cooler Pusher:
-  de: "Ölkühler Nr. %{A} Schub"
-  en: "Oil Cooler #%{A} Pusher"
-  es: "Enfriador de Aceite #%{A} Empujador"
-  fr: "Refroidisseur d'Huile #%{A} Propulseur"
+  de: 'Ölkühler #%{A} Schub'
+  en: 'Oil Cooler #%{A} Pusher'
+  es: 'Enfriador de Aceite #%{A} Empujador'
+  fr: 'Refroidisseur d''huile #%{A} Propulseur'
 Vital Part Oil Pan:
-  de: "Ölwanne Nr. %{A}"
-  en: "Oil Pan #%{A}"
-  es: "Cárter de Aceite #%{A}"
-  fr: "Carter d'Huile #%{A}"
+  de: 'Ölwanne #%{A}'
+  en: 'Oil Pan #%{A}'
+  es: 'Cárter de Aceite #%{A}'
+  fr: 'Carter d''Huile #%{A}'
 Vital Part Oil Pan Puller:
-  de: "Ölwanne Nr. %{A} Zug"
-  en: "Oil Pan #%{A} Puller"
-  es: "Cárter de Aceite #%{A} Tractor"
-  fr: "Carter d'Huile #%{A} Tracteur"
+  de: 'Ölwanne #%{A} Zug'
+  en: 'Oil Pan #%{A} Puller'
+  es: 'Cárter de Aceite #%{A} Tractor'
+  fr: 'Carter d''Huile #%{A} Tracteur'
 Vital Part Oil Pan Pusher:
-  de: "Ölwanne Nr. %{A} Schub"
-  en: "Oil Pan #%{A} Pusher"
-  es: "Cárter de Aceite #%{A} Empujador"
-  fr: "Carter d'Huile #%{A} Propulseur"
+  de: 'Ölwanne #%{A} Schub'
+  en: 'Oil Pan #%{A} Pusher'
+  es: 'Cárter de Aceite #%{A} Empujador'
+  fr: 'Carter d''Huile #%{A} Propulseur'
 Vital Part Oil Tank:
-  de: "Öltank Nr. %{A}"
-  en: "Oil Tank #%{A}"
-  es: "Depósito de Aceite #%{A}"
-  fr: "Réservoir d'Huile #%{A}"
+  de: 'Öltank #%{A}'
+  en: 'Oil Tank #%{A}'
+  es: 'Depósito de Aceite #%{A}'
+  fr: 'Réservoir d''Huile #%{A}'
 Vital Part Oil Tank Puller:
-  de: "Öltank Nr. %{A} Zug"
-  en: "Oil Tank #%{A} Puller"
-  es: "Depósito de Aceite #%{A} Tractor"
-  fr: "Réservoir d'Huile #%{A} Tracteur"
+  de: 'Öltank #%{A} Zug'
+  en: 'Oil Tank #%{A} Puller'
+  es: 'Depósito de Aceite #%{A} Tractor'
+  fr: 'Réservoir d''Huile #%{A} Tracteur'
 Vital Part Oil Tank Pusher:
-  de: "Öltank Nr. %{A} Schub"
-  en: "Oil Tank #%{A} Pusher"
-  es: "Depósito de Aceite #%{A} Empujador"
-  fr: "Réservoir d'Huile #%{A} Propulseur"
+  de: 'Öltank #%{A} Schub'
+  en: 'Oil Tank #%{A} Pusher'
+  es: 'Depósito de Aceite #%{A} Empujador'
+  fr: 'Réservoir d''Huile #%{A} Propulseur'
 Vital Part Radiator:
-  de: "Kühler Nr. %{A}"
-  en: "Radiator #%{A}"
-  es: "Radiador #%{A}"
-  fr: "Radiateur #%{A}"
+  de: 'Kühler #%{A}'
+  en: 'Radiator #%{A}'
+  es: 'Radiador #%{A}'
+  fr: 'Radiateur #%{A}'
 Vital Part Tail Rotor:
   de: Heckrotor
   en: Tail Rotor
   es: Rotor de Cola
   fr: Rotor de Queue
 Vital Part Weapon Set:
-  de: "Waffensatz Nr. %{A}: %{B}s"
-  en: "Weapon Set #%{A}: %{B}s"
-  es: "Set de Armas #%{A}: %{B}s"
-  fr: "Ensemble d'Armes #%{A} : %{B}s"
-"W-Strut":
-  de: "W-Strebe"
-  en: "W-Strut"
+  de: 'Waffensatz #%{A}: %{B}s'
+  en: 'Weapon Set #%{A}: %{B}s'
+  es: 'Set de Armas #%{A}: %{B}s'
+  fr: 'Armement #%{A} : %{B}s'
+W-Strut:
+  de: W-Strebe
+  en: W-Strut
   es: Montante en W
   fr: Mât en W
 WWI:
@@ -3445,47 +4102,55 @@ War Emergency Power:
   es: Potencia de Emergencia de Guerra
   fr: Puissance d'Urgence de Guerre
 War Emergency Power Warning:
-  de: "Erleide doppelte Drehzahl, um Höchstgeschwindigkeit beim Boost-en zu überschreiten."
+  de: Erleide doppelte Drehzahl, um Höchstgeschwindigkeit beim Boost-en zu überschreiten.
   en: Take double RPM to exceed Max Speed when Boosting.
   es: Usa doble RPM para superar la Velocidad Máxima al hacer Boost.
   fr: Subissez le double de RPM pour dépasser la Vitesse Max lorsque vous Boostez.
-"War Emergency Power from altitudes 0-9":
-  de: "Kriegsnotleistung aus Höhen von 0-9"
-  en: "War Emergency Power from altitudes 0-9"
-  es: "Potencia de Emergencia de Guerra de altitudes 0-9"
-  fr: "Puissance d'Urgence de Guerre aux altitudes 0-9"
+War Emergency Power from altitudes 0-9:
+  de: Kriegsnotleistung aus Höhen von 0-9
+  en: War Emergency Power from altitudes 0-9
+  es: Potencia de Emergencia de Guerra de altitudes 0-9
+  fr: Puissance d'Urgence de Guerre aux altitudes 0-9
 Water:
   de: Wasser
   en: Water
   es: Agua
   fr: Eau
 Weapon Description:
-  de: "%{A}: %{B}x %{C} feuert [%{D}] für %{E} Schaden mit %{F} Treffern mit %{G} Munition. [%{H}]"
-  en: "%{A}: %{B}x %{C} fires [%{D}] for %{E} damage with %{F} hits with %{G} ammunition. [%{H}]"
-  es: "%{A}: %{B}x %{C} dispara [%{D}] para %{E} de daño con %{F} impactos con %{G} de munición. [%{H}]"
-  fr: "%{A} : %{B}x %{C} tire [%{D}] pour %{E} dégâts avec %{F} touches avec %{G} munitions. [%{H}]"
+  de: '%{A}: %{B}x %{C} feuert [%{D}] für %{E} Schaden mit %{F} Treffern mit %{G}
+    Munition. [%{H}]'
+  en: '%{A}: %{B}x %{C} fires [%{D}] for %{E} damage with %{F} hits with %{G} ammunition.
+    [%{H}]'
+  es: '%{A}: %{B}x %{C} dispara [%{D}] para %{E} de daño con %{F} impactos con %{G}
+    de munición. [%{H}]'
+  fr: '%{A} : %{B}x %{C} tire [%{D}] pour %{E} dégâts avec %{F} touches avec %{G}
+    munitions. [%{H}]'
 Weapon Description Heat Ray:
-  de: "%{A}: %{B}x %{C} feuert [%{D}] für %{E} Schaden mit %{F} Treffern mit %{G} Ladungen. [%{H}]"
-  en: "%{A}: %{B}x %{C} fires [%{D}] for %{E} damage with %{F} hits with %{G} charges. [%{H}]"
-  es: "%{A}: %{B}x %{C} dispara [%{D}] para %{E} de daño con %{F} impactos con %{G} cargas. [%{H}]"
-  fr: "%{A} : %{B}x %{C} tire [%{D}] pour %{E} dégâts avec %{F} touches avec %{G} charges. [%{H}]"
+  de: '%{A}: %{B}x %{C} feuert [%{D}] für %{E} Schaden mit %{F} Treffern mit %{G}
+    Ladungen. [%{H}]'
+  en: '%{A}: %{B}x %{C} fires [%{D}] for %{E} damage with %{F} hits with %{G} charges.
+    [%{H}]'
+  es: '%{A}: %{B}x %{C} dispara [%{D}] para %{E} de daño con %{F} impactos con %{G}
+    cargas. [%{H}]'
+  fr: '%{A} : %{B}x %{C} tire [%{D}] pour %{E} dégâts avec %{F} touches avec %{G}
+    charges. [%{H}]'
 Weapon Tag AP:
-  de: "DP %{A}"
-  en: "AP %{A}"
-  es: "PA %{A}"
-  fr: "AP %{A}"
+  de: DP %{A}
+  en: AP %{A}
+  es: PA %{A}
+  fr: AP %{A}
 Weapon Tag Awkward:
-  de: "Umpraktisch %{A}"
-  en: "Awkward %{A}"
-  es: "Torpe %{A}"
-  fr: "Malaisé %{A}"
+  de: Umpraktisch %{A}
+  en: Awkward %{A}
+  es: Torpe %{A}
+  fr: Malaisé %{A}
 Weapon Tag Fully Accessible:
   de: Voll zugänglich
   en: Fully Accessible
   es: Totalmente Accesible
   fr: Entièrement Accessible
 Weapon Tag Gast Principle:
-  de: "Gast-Prinzip"
+  de: Gast-Prinzip
   en: Gast Principle
   es: Principio Gast
   fr: Principe Gast
@@ -3505,10 +4170,10 @@ Weapon Tag Inaccessible:
   es: Inaccesible
   fr: Inaccessible
 Weapon Tag Jam:
-  de: "Ladehemmung %{A}"
-  en: "Jam %{A}"
-  es: "Atasco %{A}"
-  fr: "Enrayage %{A}"
+  de: Ladehemmung %{A}
+  en: Jam %{A}
+  es: Atasco %{A}
+  fr: Enrayage %{A}
 Weapon Tag Manual:
   de: Manuell
   en: Manual
@@ -3535,10 +4200,10 @@ Weapon Tag Rapid Fire:
   es: Disparo Rápido
   fr: Tir Rapide
 Weapon Tag Reload:
-  de: "Nachladen %{A}"
-  en: "Reload %{A}"
-  es: "Recarga %{A}"
-  fr: "Rechargement %{A}"
+  de: Nachladen %{A}
+  en: Reload %{A}
+  es: Recarga %{A}
+  fr: Rechargement %{A}
 Weapon Tag Rotary:
   de: Rotierend
   en: Rotary
@@ -3549,13 +4214,13 @@ Weapon Tag Shells:
   en: Shells
   es: Proyectiles
   fr: Obus
-"Weapon Tag: Deflector Plate":
+'Weapon Tag: Deflector Plate':
   de: Ablenkplatte
   en: Deflector Plate
   es: Placa Deflectora
   fr: Plaque Déflectrice
-"Weapons # Weapons at Mount":
-  de: "# Waffen an Halterung"
+'Weapons # Weapons at Mount':
+  de: '# Waffen an Halterung'
   en: Weapons at Mount
   es: Armas en Montaje
   fr: Armes au Montage
@@ -3585,15 +4250,24 @@ Weapons Braces:
   es: Soportes de Armas
   fr: Supports d'Armes
 Weapons Braces Warning:
-  de: Diese Halterungen geben einem Beobachter +1 auf einen Persönlichen Angriff mit einer losen Waffe, die er in den Händen trägt.
-  en: These mounts give an observer +1 to make a Personal Attack with a loose weapon they are carrying in their hands.
-  es: Estos montajes otorgan a un observador +1 para realizar un Ataque Personal con un arma suelta que lleven en las manos.
-  fr: Ces supports donnent à un observateur +1 pour faire une Attaque Personnelle avec une arme lâche qu'il porte dans ses mains.
+  de: Diese Halterungen geben einem Beobachter +1 auf einen Persönlichen Angriff mit
+    einer losen Waffe, die er in den Händen trägt.
+  en: These mounts give an observer +1 to make a Personal Attack with a loose weapon
+    they are carrying in their hands.
+  es: Estos montajes otorgan a un observador +1 para realizar un Ataque Personal con
+    un arma suelta que lleven en las manos.
+  fr: Ces supports donnent à un observateur +1 pour faire une Attaque Personnelle
+    avec une arme lâche qu'il porte dans ses mains.
 Weapons Covered:
   de: Abgedeckt
   en: Covered
   es: Cubierto
   fr: Couvert
+Weapons Directions:
+  de: Ausrichtungen
+  en: Directions
+  es: Direcciones
+  fr: Orientations
 Weapons Free Accessible:
   de: Frei zugänglich
   en: Free Accessible
@@ -3604,21 +4278,26 @@ Weapons Mount:
   en: Weapon Mount
   es: Montaje de Arma
   fr: Montage d'Arme
+Weapons Mounting:
+  de: Waffenhalterung
+  en: Weapon Mount
+  es: Montaje de Armamento
+  fr: Montage d'Armement
 Weapons Number of Mounts:
   de: Anzahl Halterungen
   en: Number of Mounts
   es: Número de Montajes
   fr: Nombre de Montages
 Weapons Number of Weapon Braces:
-  de: "Anzahl Waffenhalterungen"
-  en: "Number of Weapon Braces"
-  es: "Número de Soportes de Armas"
-  fr: "Nombre d'Supports d'Armes"
+  de: Anzahl Waffenhalterungen
+  en: Number of Weapon Braces
+  es: Número de Soportes de Armas
+  fr: Nombre d'Supports d'Armes
 Weapons Number of Weapon Sets:
-  de: "Anzahl Waffensätze"
-  en: "Number of Weapon Sets"
-  es: "Número de Sets de Armas"
-  fr: "Nombre d'Ensembles d'Armes"
+  de: Anzahl Waffensätze
+  en: Number of Weapon Sets
+  es: Número de Sets de Armas
+  fr: Nombre d'Ensembles d'Armes
 Weapons Projectile:
   de: Projektil
   en: Projectile
@@ -3675,7 +4354,7 @@ Weapons Weapon Set:
   es: Set de Armas
   fr: Ensemble d'Armes
 Weapons Weapon Stats:
-  de: "Waffen-Werte"
+  de: Waffen-Werte
   en: Weapon Stats
   es: Estadísticas de Armas
   fr: Stats des Armes
@@ -3723,19 +4402,28 @@ Windscreen:
   de: Windschutzscheibe
   en: Windscreen
   es: Parabrisas
-  fr: "Pare-brise"
+  fr: Pare-brise
 Wing Blades:
   de: Flügelklingen
   en: Wing Blades
   es: Cuchillas de Ala
   fr: Lames d'Aile
 Wing Blades Warning:
-  de: "Würfle Dogfight! zur Verwendung. 16+: Gegner erleidet Schaden wie bei einer Collision, Benutzer erleidet 1W10. 20+: Benutzer erleidet keinen Schaden. Bei Verwendung gegen einen Spielercharakter verwende stattdessen Evade Danger und Collision."
-  en: "Roll Dogfight! to use. 16+, enemy takes damage as per collision, user takes 1d10. 20+, user takes no damage. When used on a PC, use Evade Danger and Collision instead."
-  es: "Tirar Dogfight! para usar. 16+, el enemigo sufre daño por Collision, el usuario sufre 1d10. 20+, el usuario no sufre daño. Cuando se usa en un PJ, usar Evade Danger y Collision en su lugar."
-  fr: "Lancez Dogfight! pour l'utiliser. 16+, l'ennemi subit des dégâts comme par Collision, l'utilisateur subit 1d10. 20+, l'utilisateur ne subit aucun dégât. Lorsqu'utilisé sur un PC, utilisez Evade Danger et Collision à la place."
+  de: 'Würfle Dogfight! zur Verwendung. 16+: Gegner erleidet Schaden wie bei einer
+    Collision, Benutzer erleidet 1W10. 20+: Benutzer erleidet keinen Schaden. Bei
+    Verwendung gegen einen Spielercharakter verwende stattdessen Evade Danger und
+    Collision.'
+  en: Roll Dogfight! to use. 16+, enemy takes damage as per collision, user takes
+    1d10. 20+, user takes no damage. When used on a PC, use Evade Danger and Collision
+    instead.
+  es: Tirar Dogfight! para usar. 16+, el enemigo sufre daño por Collision, el usuario
+    sufre 1d10. 20+, el usuario no sufre daño. Cuando se usa en un PJ, usar Evade
+    Danger y Collision en su lugar.
+  fr: Lancez Dogfight! pour l'utiliser. 16+, l'ennemi subit des dégâts comme par Collision,
+    l'utilisateur subit 1d10. 20+, l'utilisateur ne subit aucun dégât. Lorsqu'utilisé
+    sur un PC, utilisez Evade Danger et Collision à la place.
 Wing Cutouts:
-  de: "Flügel-Aussparungen"
+  de: Flügel-Aussparungen
   en: Wing Cutouts
   es: Recortes de Ala
   fr: Découpes d'Aile
@@ -3785,12 +4473,12 @@ Wing Warping Warning:
   es: La Deformación del Ala con Cola de Pluma causa una penalización de estabilidad.
   fr: Le vrillage d'aile avec une queue en poutre cause une pénalité de stabilité.
 Wing Warping Warning 2:
-  de: "Erhalte +1 auf Dogfight! bei Geschwindigkeit unter 15."
-  en: "Get +1 to Dogfight! at below 15 speed."
-  es: "Obtén +1 a Dogfight! por debajo de 15 de velocidad."
-  fr: "Obtenez +1 à Dogfight! en dessous de 15 de vitesse."
+  de: Erhalte +1 auf Dogfight! bei Geschwindigkeit unter 15.
+  en: Get +1 to Dogfight! at below 15 speed.
+  es: Obtén +1 a Dogfight! por debajo de 15 de velocidad.
+  fr: Obtenez +1 à Dogfight! en dessous de 15 de vitesse.
 Wings Anhedral:
-  de: "V-Stellung (negativ)"
+  de: V-Stellung (negativ)
   en: Anhedral
   es: Anhedro
   fr: Anèdre
@@ -3800,12 +4488,12 @@ Wings Area:
   es: Área
   fr: Surface
 Wings Closed Wing:
-  de: "Geschlossener Flügel"
-  en: "Closed Wing"
-  es: "Ala Cerrada"
-  fr: "Aile Fermée"
+  de: Geschlossener Flügel
+  en: Closed Wing
+  es: Ala Cerrada
+  fr: Aile Fermée
 Wings Dihedral:
-  de: "V-Stellung (positiv)"
+  de: V-Stellung (positiv)
   en: Dihedral
   es: Diedro
   fr: Dièdre
@@ -3820,7 +4508,7 @@ Wings Gull:
   es: Gaviota
   fr: Aile de Mouette
 Wings Miniature Wings:
-  de: "Miniatur-Tragflächen"
+  de: Miniatur-Tragflächen
   en: Miniature Wings
   es: Alas Miniatura
   fr: Ailes Miniatures
@@ -3845,22 +4533,22 @@ Wings Span:
   es: Envergadura
   fr: Envergure
 Wings Swept Wing:
-  de: "Pfeilflügel"
-  en: "Swept Wings"
-  es: "Alas en Flecha"
-  fr: "Ailes en Flèche"
+  de: Pfeilflügel
+  en: Swept Wings
+  es: Alas en Flecha
+  fr: Ailes en Flèche
 Wings Wing Options:
-  de: "Flügel-Optionen"
+  de: Flügel-Optionen
   en: Wing Options
   es: Opciones de Ala
   fr: Options d'Aile
 Wings Wing Stagger:
-  de: "Flügelstaffelung"
-  en: "Wing Stagger"
-  es: "Decalaje de Ala"
-  fr: "Décalage des Ailes"
+  de: Flügelstaffelung
+  en: Wing Stagger
+  es: Decalaje de Ala
+  fr: Décalage des Ailes
 Wings Wing Stats:
-  de: "Flügel-Werte"
+  de: Flügel-Werte
   en: Wing Stats
   es: Estadísticas de Ala
   fr: Stats de l'Aile
@@ -3894,13 +4582,13 @@ X1 Collimated Gunsight Warning:
   en: +1 to Open Fire.
   es: +1 a Open Fire.
   fr: +1 à Open Fire.
-Yes:
+'Yes':
   de: Ja
-  en: Yes
+  en: 'Yes'
   es: Sí
   fr: Oui
 Zeppelin Hook:
-  de: "Zeppelin-Haken"
+  de: Zeppelin-Haken
   en: Zeppelin Hook
   es: Gancho de Zepelín
   fr: Crochet de Dirigeable
@@ -3909,343 +4597,3 @@ Zeppelin Hook Warning:
   en: Allows landing inside airships or large planes.
   es: Permite aterrizar dentro de dirigibles o aviones grandes.
   fr: Permet d'atterrir à l'intérieur de dirigeables ou de grands avions.
-One:
-  de: Eins
-  en: One
-  es: Uno
-  fr: Un
-Two:
-  de: Zwei
-  en: Two
-  es: Dos
-  fr: Deux
-Three:
-  de: Drei
-  en: Three
-  es: Tres
-  fr: Trois
-Four:
-  de: Vier
-  en: Four
-  es: Cuatro
-  fr: Quatre
-Five:
-  de: Fünf
-  en: Five
-  es: Cinco
-  fr: Cinq                
-# Engine Builder Section
-Engine Builder Title:
-  en: Engine Builder
-  de: Motorbauer
-  es: Constructor de Motores
-  fr: Constructeur de Moteur
-Engine Builder Name:
-  en: Name
-  de: Name
-  es: Nombre
-  fr: Nom
-Engine Builder Era:
-  en: Era
-  de: Ära
-  es: Era
-  fr: Ère
-Engine Builder Type:
-  en: Engine Type
-  de: Motortyp
-  es: Tipo de Motor
-  fr: Type de Moteur
-Engine Builder Displacement:
-  en: Engine Displacement (L)
-  de: Hubraum (L)
-  es: Cilindrada del Motor (L)
-  fr: Cylindrée du Moteur (L)
-Engine Builder Compression Ratio:
-  en: Compression Ratio (N:1)
-  de: Verdichtungsverhältnis (N:1)
-  es: Relación de Compresión (N:1)
-  fr: Rapport de Compression (N:1)
-Engine Builder Cylinders Per Row:
-  en: Cylinders per Row
-  de: Zylinder pro Reihe
-  es: Cilindros por Fila
-  fr: Cylindres par Rangée
-Engine Builder Number of Rows:
-  en: Number of Rows
-  de: Anzahl der Reihen
-  es: Número de Filas
-  fr: Nombre de Rangées
-Engine Builder RPM Boost:
-  en: RPM Boost
-  de: Drehzahl-Boost
-  es: Impulso de RPM
-  fr: Augmentation du Régime
-Engine Builder Material Fudge:
-  en: Material Fudge Factor
-  de: Material-Korrekturfaktor
-  es: Factor de Corrección de Material
-  fr: Facteur de Correction de Matériau
-Engine Builder Quality Fudge:
-  en: Quality Fudge Factor
-  de: Qualitäts-Korrekturfaktor
-  es: Factor de Corrección de Calidad
-  fr: Facteur de Correction de Qualité
-Engine Builder Compressor Type:
-  en: Compressor Type
-  de: Kompressortyp
-  es: Tipo de Compresor
-  fr: Type de Compresseur
-Engine Builder Compressor Count:
-  en: Compressor Count
-  de: Kompressorzahl
-  es: Número de Compresores
-  fr: Nombre de Compresseurs
-Engine Builder Min Ideal Altitude:
-  en: Minimum Ideal Altitude
-  de: Minimale Idealhöhe
-  es: Altitud Ideal Mínima
-  fr: Altitude Idéale Minimale
-Engine Builder Upgrades:
-  en: Upgrades
-  de: Verbesserungen
-  es: Mejoras
-  fr: Améliorations
-Engine Builder Propeller Inputs:
-  en: Propeller Engine Inputs
-  de: Propellermotor-Eingaben
-  es: Entradas del Motor de Hélice
-  fr: Entrées du Moteur à Hélice
-Engine Builder Outputs:
-  en: Engine Outputs
-  de: Motor-Ausgaben
-  es: Salidas del Motor
-  fr: Sorties du Moteur
-Engine Builder Power:
-  en: Power
-  de: Leistung
-  es: Potencia
-  fr: Puissance
-Engine Builder Mass:
-  en: Mass
-  de: Masse
-  es: Masa
-  fr: Masse
-Engine Builder Drag:
-  en: Drag
-  de: Luftwiderstand
-  es: Resistencia
-  fr: Traînée
-Engine Builder Reliability:
-  en: Reliability
-  de: Zuverlässigkeit
-  es: Confiabilidad
-  fr: Fiabilité
-Engine Builder Required Cooling:
-  en: Required Cooling
-  de: Erforderliche Kühlung
-  es: Refrigeración Requerida
-  fr: Refroidissement Requis
-Engine Builder Overspeed:
-  en: Overspeed
-  de: Überdrehzahl
-  es: Sobrevelocidad
-  fr: Survitesse
-Engine Builder Fuel Consumption:
-  en: Fuel Consumption
-  de: Kraftstoffverbrauch
-  es: Consumo de Combustible
-  fr: Consommation de Carburant
-Engine Builder Altitude:
-  en: Altitude
-  de: Höhe
-  es: Altitud
-  fr: Altitude
-Engine Builder Torque:
-  en: Torque
-  de: Drehmoment
-  es: Torque
-  fr: Couple
-Engine Builder Cost:
-  en: Cost
-  de: Kosten
-  es: Costo
-  fr: Coût
-Engine Builder Oil Tank:
-  en: Oil Tank
-  de: Öltank
-  es: Tanque de Aceite
-  fr: Réservoir d'Huile
-Engine Builder Geared RPM:
-  en: Geared RPM
-  de: Getriebe-Drehzahl
-  es: RPM con Engranajes
-  fr: Régime avec Engrenage
-Engine Builder Yes:
-  en: "Yes"
-  de: Ja
-  es: Sí
-  fr: Oui
-Engine Builder No:
-  en: "No"
-  de: Nein
-  es: "No"
-  fr: Non
-# Pulsejet Builder Section
-Pulsejet Builder Title:
-  en: Pulsejet Builder
-  de: Strahltriebwerkbauer
-  es: Constructor de Pulsejet
-  fr: Constructeur de Pulsejet
-Pulsejet Builder Desired Power:
-  en: Desired Power
-  de: Gewünschte Leistung
-  es: Potencia Deseada
-  fr: Puissance Souhaitée
-Pulsejet Builder Valve Type:
-  en: Valve Type
-  de: Ventiltyp
-  es: Tipo de Válvula
-  fr: Type de Valve
-Pulsejet Builder Quality:
-  en: Quality
-  de: Qualität
-  es: Calidad
-  fr: Qualité
-Pulsejet Builder Starter:
-  en: Starter
-  de: Anlasser
-  es: Arranque
-  fr: Démarreur
-Pulsejet Builder Rumble:
-  en: Rumble
-  de: Lärm
-  es: Estruendo
-  fr: Grondement
-Pulsejet Builder Design Cost:
-  en: Design Cost
-  de: Entwicklungskosten
-  es: Costo de Diseño
-  fr: Coût de Conception
-# Turbo Builder Section
-Turbo Builder Title:
-  en: Turbine Builder
-  de: Turbinenbauer
-  es: Constructor de Turbina
-  fr: Constructeur de Turbine
-Turbo Builder Diameter:
-  en: Engine Diameter (m)
-  de: Triebwerksdurchmesser (m)
-  es: Diámetro del Motor (m)
-  fr: Diamètre du Moteur (m)
-Turbo Builder Overall Pressure Ratio:
-  en: Overall Pressure Ratio
-  de: Gesamtdruckverhältnis
-  es: Relación de Presión General
-  fr: Rapport de Pression Global
-Turbo Builder Bypass Ratio:
-  en: Bypass Ratio
-  de: Bypassverhältnis
-  es: Relación de Derivación
-  fr: Taux de Dilution
-Turbo Builder Mass Flow Adjustment:
-  en: Mass Flow Adjustment
-  de: Massenstrom-Anpassung
-  es: Ajuste de Flujo Másico
-  fr: Ajustement du Débit Massique
-Turbo Builder Afterburner:
-  en: Afterburner
-  de: Nachbrenner
-  es: Postquemador
-  fr: Postcombustion
-Turbo Builder Thrust:
-  en: Thrust
-  de: Schub
-  es: Empuje
-  fr: Poussée
-# Electric Builder Section
-Electric Builder Title:
-  en: Electric Motor Builder
-  de: Elektromotorbauer
-  es: Constructor de Motor Eléctrico
-  fr: Constructeur de Moteur Électrique
-Electric Builder Winding:
-  en: Winding
-  de: Wicklung
-  es: Bobinado
-  fr: Enroulement
-Electric Builder Chonk:
-  en: Chonk
-  de: Größe
-  es: Tamaño
-  fr: Taille
-Electric Builder Desired Power:
-  en: Desired Power
-  de: Gewünschte Leistung
-  es: Potencia Deseada
-  fr: Puissance Souhaitée
-Electric Builder Quality:
-  en: Quality
-  de: Qualität
-  es: Calidad
-  fr: Qualité
-Electric Builder Charge Draw:
-  en: Charge Draw
-  de: Ladeverbrauch
-  es: Consumo de Carga
-  fr: Consommation de Charge
-# List Management Section
-Engine Builder Lists:
-  en: Lists
-  de: Listen
-  es: Listas
-  fr: Listes
-Engine Builder Engines:
-  en: Engines
-  de: Motoren
-  es: Motores
-  fr: Moteurs
-Engine Builder Save List:
-  en: Save Engine List
-  de: Motorliste speichern
-  es: Guardar Lista de Motores
-  fr: Enregistrer la Liste de Moteurs
-Engine Builder Load List:
-  en: Load Engine List
-  de: Motorliste laden
-  es: Cargar Lista de Motores
-  fr: Charger la Liste de Moteurs
-Engine Builder Add From Propeller:
-  en: Add From Engine Builder
-  de: Aus Motorbauer hinzufügen
-  es: Agregar desde Constructor de Motores
-  fr: Ajouter depuis le Constructeur de Moteur
-Engine Builder Add From Pulsejet:
-  en: Add From Pulsejet Builder
-  de: Aus Strahltriebwerkbauer hinzufügen
-  es: Agregar desde Constructor de Pulsejet
-  fr: Ajouter depuis le Constructeur de Pulsejet
-Engine Builder Add From Turbine:
-  en: Add From Turbine Builder
-  de: Aus Turbinenbauer hinzufügen
-  es: Agregar desde Constructor de Turbina
-  fr: Ajouter depuis le Constructeur de Turbine
-Engine Builder Add From Electric:
-  en: Add From Electric Builder
-  de: Aus Elektromotorbauer hinzufügen
-  es: Agregar desde Constructor Eléctrico
-  fr: Ajouter depuis le Constructeur Électrique
-Engine Builder Delete Engine:
-  en: Delete Engine
-  de: Motor löschen
-  es: Eliminar Motor
-  fr: Supprimer le Moteur
-Engine Builder Create List:
-  en: Create List
-  de: Liste erstellen
-  es: Crear Lista
-  fr: Créer une Liste
-Engine Builder Delete List:
-  en: Delete List
-  de: Liste löschen
-  es: Eliminar Lista
-  fr: Supprimer la Liste
