@@ -99,11 +99,11 @@ impl Propeller {
 
     /// UI enabled function for propeller selection
     pub fn is_idx_prop_enabled(&self) -> bool {
-        true
+        self.get_num_propellers() > 0
     }
 
     /// UI enabled function for upgrade selection
     pub fn is_idx_upg_enabled(&self) -> bool {
-        true
+        self.get_num_propellers() > 0
     }
 }

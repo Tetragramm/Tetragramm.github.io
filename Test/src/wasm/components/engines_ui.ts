@@ -100,6 +100,7 @@ export class EnginesUI extends BaseComponentUI {
     // Individual engine/radiator containers
     private enginesContainer: HTMLDivElement;
     private radiatorsContainer: HTMLDivElement;
+    private radiatorsTable: HTMLTableElement;
 
     // Mobile containers
     private mobileEnginesContainer: HTMLDivElement;
@@ -135,17 +136,8 @@ export class EnginesUI extends BaseComponentUI {
     }
 
     protected shouldUpdate(): boolean {
-        const bridge = this.getBridgeIfInitialized();
-        if (!bridge) return false;
-
-        const bindings = bridge.getEnginesBindings();
-        const engineCountChanged = bindings.engines.value !== this.cachedEngineCount;
-        const radiatorCountChanged = bindings.radiators.value !== this.cachedRadiatorCount;
-
-        // If counts changed, need full rebuild
-        if (engineCountChanged || radiatorCountChanged) return false;
-
-        // Otherwise, can update if we have cached elements
+        // Can update if we have cached elements; count changes are handled
+        // incrementally in updateValues via rebuildRadiators/rebuildEngines
         return this.enginesSection !== undefined;
     }
 
@@ -156,6 +148,7 @@ export class EnginesUI extends BaseComponentUI {
         this.numRadiatorsInput = undefined;
         this.enginesContainer = undefined;
         this.radiatorsContainer = undefined;
+        this.radiatorsTable = undefined;
         this.mobileEnginesContainer = undefined;
         this.mobileRadiatorsContainer = undefined;
         this.mobileEngineContent = undefined;
@@ -666,7 +659,7 @@ export class EnginesUI extends BaseComponentUI {
                     opt.textContent = localization.translateWithParam('Vital Part Radiator', i + 1);
                     cache.radiatorSelect.appendChild(opt);
                 }
-                cache.radiatorSelect.selectedIndex = engineBindings.radiator_index?.selected || 0;
+                cache.radiatorSelect.selectedIndex = engineBindings.radiator_index?.value || 0;
             }
             if (cache.coolingCountInput && engineBindings.cooling_count) {
                 cache.coolingCountInput.value = engineBindings.cooling_count.value.toString();
@@ -786,13 +779,13 @@ export class EnginesUI extends BaseComponentUI {
                             name: localization.translateWithParam('Vital Part Radiator', i + 1),
                             enabled: true
                         })),
-                        selected: bindings.radiator_index?.selected || 0,
+                        selected: bindings.radiator_index?.value || 0,
                         enabled: true
                     },
                     container,
                     (selected) => {
                         const updatedBindings = bridge.getEngineBindings(idx);
-                        updatedBindings.radiator_index.selected = selected;
+                        updatedBindings.radiator_index.value = selected;
                         bridge.setEngineBindings(idx, updatedBindings);
                         this.onUpdate();
                     }
@@ -1031,17 +1024,24 @@ export class EnginesUI extends BaseComponentUI {
     private rebuildMobileRadiators(): void {
         if (!this.mobileRadiatorsContainer) return;
         this.mobileRadiatorsContainer.innerHTML = '';
-        this.mobileRadiatorCache = undefined; // Clear cache when rebuilding
 
         const bridge = this.getBridge();
         const bindings = bridge.getEnginesBindings();
         const radiatorCount = bindings.radiators.value;
 
-        if (radiatorCount === 0) return;
+        if (radiatorCount === 0) {
+            this.mobileRadiatorCache = undefined;
+            return;
+        }
 
         // Ensure selected radiator is within bounds
+        const oldSelected = this.mobileSelectedRadiator;
         if (this.mobileSelectedRadiator >= radiatorCount) {
             this.mobileSelectedRadiator = 0;
+        }
+        // Clear cache if the selected radiator changed
+        if (this.mobileSelectedRadiator !== oldSelected) {
+            this.mobileRadiatorCache = undefined;
         }
 
         // Create navigation header
@@ -1089,11 +1089,15 @@ export class EnginesUI extends BaseComponentUI {
 
         this.mobileRadiatorsContainer.appendChild(navDiv);
 
-        // Content container for the selected radiator
-        this.mobileRadiatorContent = document.createElement('div');
-        this.mobileRadiatorsContainer.appendChild(this.mobileRadiatorContent);
+        // Reuse existing content container if cache is still valid, otherwise create new
+        if (this.mobileRadiatorCache && this.mobileRadiatorContent) {
+            this.mobileRadiatorsContainer.appendChild(this.mobileRadiatorContent);
+        } else {
+            this.mobileRadiatorContent = document.createElement('div');
+            this.mobileRadiatorsContainer.appendChild(this.mobileRadiatorContent);
+        }
 
-        // Build content for the currently selected radiator
+        // Update content for the currently selected radiator (triggers blink if cache exists)
         this.updateMobileRadiatorContent();
     }
 
@@ -1322,40 +1326,56 @@ export class EnginesUI extends BaseComponentUI {
     private rebuildRadiators(): void {
         if (!this.radiatorsContainer) return;
 
-        // Clear existing radiator UIs
-        this.radiatorUIs = [];
-        this.radiatorsContainer.innerHTML = '';
-
         const bindings = this.getBridge().getEnginesBindings();
+        const newCount = bindings.radiators.value;
+        const oldCount = this.radiatorUIs.length;
 
-        if (bindings.radiators.value === 0) return;
+        if (newCount === 0) {
+            // Remove everything
+            this.radiatorUIs = [];
+            this.radiatorsContainer.innerHTML = '';
+            this.radiatorsTable = undefined;
+            return;
+        }
 
-        // Create a table for all radiators
-        const radiatorsTable = document.createElement('table');
-        radiatorsTable.className = 'part_table';
-        this.radiatorsContainer.appendChild(radiatorsTable);
+        // Create table with headers if it doesn't exist yet
+        if (!this.radiatorsTable) {
+            const radiatorsTable = document.createElement('table');
+            radiatorsTable.className = 'part_table';
+            this.radiatorsContainer.appendChild(radiatorsTable);
 
-        // Create header row
-        const headerRow = radiatorsTable.insertRow();
-        const headerCell = document.createElement('th');
-        headerCell.textContent = localization.translate('Radiators Radiator Type');
-        headerRow.appendChild(headerCell);
-        const headerCell2 = document.createElement('th');
-        headerCell2.textContent = localization.translate('Radiators Mounting');
-        headerRow.appendChild(headerCell2);
-        const headerCell3 = document.createElement('th');
-        headerCell3.textContent = localization.translate('Radiators Coolant');
-        headerRow.appendChild(headerCell3);
-        const headerCell4 = document.createElement('th');
-        headerCell4.textContent = localization.translate('Radiators Radiator Stats');
-        headerRow.appendChild(headerCell4);
+            const headerRow = radiatorsTable.insertRow();
+            const headerCell = document.createElement('th');
+            headerCell.textContent = localization.translate('Radiators Radiator Type');
+            headerRow.appendChild(headerCell);
+            const headerCell2 = document.createElement('th');
+            headerCell2.textContent = localization.translate('Radiators Mounting');
+            headerRow.appendChild(headerCell2);
+            const headerCell3 = document.createElement('th');
+            headerCell3.textContent = localization.translate('Radiators Coolant');
+            headerRow.appendChild(headerCell3);
+            const headerCell4 = document.createElement('th');
+            headerCell4.textContent = localization.translate('Radiators Radiator Stats');
+            headerRow.appendChild(headerCell4);
 
-        // Create each radiator
-        for (let i = 0; i < bindings.radiators.value; i++) {
-            const radiatorRow = radiatorsTable.insertRow();
-            const radiatorUI = new RadiatorUI(this.getBridge, i, radiatorRow, this.onUpdate);
+            this.radiatorsTable = radiatorsTable;
+        }
+
+        // Remove excess radiator rows if count decreased
+        while (this.radiatorUIs.length > newCount) {
+            this.radiatorUIs.pop();
+            this.radiatorsTable.deleteRow(this.radiatorsTable.rows.length - 1);
+        }
+
+        // Add new radiator rows if count increased
+        while (this.radiatorUIs.length < newCount) {
+            const radiatorRow = this.radiatorsTable.insertRow();
+            const radiatorUI = new RadiatorUI(this.getBridge, this.radiatorUIs.length, radiatorRow, this.onUpdate);
             this.radiatorUIs.push(radiatorUI);
         }
+
+        // Update all remaining radiator UIs so blink animations fire
+        this.radiatorUIs.forEach(radiatorUI => radiatorUI.update());
     }
 }
 
@@ -1606,7 +1626,7 @@ class EngineUI {
             const radiatorSelect = createFlexSelect(
                 {
                     name: localization.translate("Engine Select Radiator"),
-                    value: bindings.radiator_index,
+                    selected: bindings.radiator_index?.value || 0,
                     enabled: true,
                     options: Array.from({ length: bridge.getNumberOfRadiators() }, (e, i) => {
                         return {
@@ -1618,7 +1638,7 @@ class EngineUI {
                 flexContainer,
                 (selectedIndex) => {
                     const updatedBindings = bridge.getEngineBindings(this.index);
-                    updatedBindings.radiator_index.selected = selectedIndex;
+                    updatedBindings.radiator_index.value = selectedIndex;
                     bridge.setEngineBindings(this.index, updatedBindings);
                     this.onUpdate();
                 }

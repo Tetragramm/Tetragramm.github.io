@@ -202,6 +202,9 @@ impl Engine {
 
     pub fn set_num_radiators(&mut self, num: i16) {
         self.num_radiators = num;
+        if self.radiator_index >= num {
+            self.radiator_index = if num > 0 { num - 1 } else { -1 };
+        }
     }
 
     /// Set the selected engine list and engine

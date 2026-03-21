@@ -131,7 +131,7 @@ export class WasmApplication {
                 try {
                     let acft_data = window.localStorage.getItem("test.aircraft");
                     const loadedBridge = new AircraftBridge();
-                    loadedBridge.initialize(async () => { /* Already initialized */ }, this.wasmModule.AircraftWasm);
+                    await loadedBridge.initialize(async () => { /* Already initialized */ }, this.wasmModule.AircraftWasm);
                     if (loadedBridge.fromJSON(acft_data)) {
                         this.bridge = loadedBridge;
                         console.log('[WasmApp] Loaded aircraft from saved data');

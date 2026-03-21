@@ -1872,7 +1872,7 @@ export class AircraftBridge {
     getEngineRadiatorIndex(index: number): number {
         this.ensureInitialized();
         const bindings = this.wasm!.getEngineBindings(index);
-        return bindings.radiator_index?.selected || 0;
+        return bindings.radiator_index?.value || 0;
     }
 
     getEngineNotes(index: number): string[] {

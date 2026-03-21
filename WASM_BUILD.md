@@ -49,7 +49,7 @@ npx webpack --mode production
 
 ```bash
 # From repository root
-python server.py
+python3 server.py
 ```
 
 Then open: http://localhost:8080/Test/
@@ -340,14 +340,3 @@ Once Era component is working:
 - **No hot module reload** for WASM (must rebuild manually)
 - **Larger initial bundle** (~200KB WASM + JS)
 - **Browser compatibility**: Requires WebAssembly support (all modern browsers)
-
-## Success Criteria
-
-✅ Era dropdown appears and works
-✅ Language switching updates Era names
-✅ Selecting Era recalculates stats
-✅ URL parameters work (?lang=de)
-✅ No console errors
-✅ Language preference persists
-
-If all above work, Phase 2 is complete! 🎉
