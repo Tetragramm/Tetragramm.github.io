@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    var search = window.location.search;
+    window.location.replace("https://tetragramm.github.io/Test/index.html" + search);
+  </script>
+</head>
+<body>
+  <p>Redirecting to <a id="link">Test builder</a>...</p>
+  <script>
+    document.getElementById("link").href = "https://tetragramm.github.io/Test/index.html" + window.location.search;
+  </script>
+</body>
+</html>
