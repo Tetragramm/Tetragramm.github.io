@@ -37,6 +37,21 @@ import { AircraftTypeUI } from './wasm/components/aircraft_type_ui';
 // For now, we'll use 'any' until WASM is built
 type WasmModule = any;
 
+export interface WasmApplicationConfig {
+    /** localStorage key for saving/loading the active aircraft. Default: 'test.aircraft' */
+    storageKey?: string;
+    /** If true, include Helicopter in the Aircraft Type selector. Default: false */
+    includeHelicopter?: boolean;
+    /**
+     * Called to load an aircraft from an LZ string (e.g. from the URL ?json= param).
+     * Return null to signal failure so the next fallback is tried.
+     * Default: calls AircraftWasm.deserializeFromLZString directly.
+     */
+    deserializeFromLZ?: (lzStr: string, AircraftWasmClass: any) => any | null;
+    /** LZ string to use as the default aircraft when no saved data exists. */
+    defaultAircraftLZ?: string;
+}
+
 export class WasmApplication {
     private bridge: AircraftBridge | null = null;
     private actions: AircraftActions | null = null;
@@ -66,6 +81,11 @@ export class WasmApplication {
     private aircraftTypeUI: AircraftTypeUI | null = null;
     private initialized: boolean = false;
     private wasmModule: WasmModule | null = null;
+    protected config: WasmApplicationConfig;
+
+    constructor(config: WasmApplicationConfig = {}) {
+        this.config = config;
+    }
 
     /**
      * Initialize the WASM application
@@ -114,14 +134,15 @@ export class WasmApplication {
             //Debug: Always start with known aircraft.
             if (jsonParam) {
                 try {
-                    const loadedBridge = await AircraftBridge.deserializeFromLZString(
+                    const loadedBridge = await this.deserializeFromLZ(
                         jsonParam,
-                        async () => { /* Already initialized */ },
                         this.wasmModule.AircraftWasm
                     );
-                    this.bridge = loadedBridge;
-                    loaded = true;
-                    console.log('[WasmApp] Loaded aircraft from URL');
+                    if (loadedBridge) {
+                        this.bridge = loadedBridge;
+                        loaded = true;
+                        console.log('[WasmApp] Loaded aircraft from URL');
+                    }
                 } catch (e) {
                     console.error('[WasmApp] Failed to load aircraft from URL:', e);
                 }
@@ -129,7 +150,8 @@ export class WasmApplication {
             if (!loaded) {
                 console.log("Used Saved Data");
                 try {
-                    let acft_data = window.localStorage.getItem("test.aircraft");
+                    const storageKey = this.config.storageKey ?? 'test.aircraft';
+                    let acft_data = window.localStorage.getItem(storageKey);
                     const loadedBridge = new AircraftBridge();
                     await loadedBridge.initialize(async () => { /* Already initialized */ }, this.wasmModule.AircraftWasm);
                     if (loadedBridge.fromJSON(acft_data)) {
@@ -142,20 +164,37 @@ export class WasmApplication {
                 } catch (e) { console.log("Saved Data Failed. " + e); }
             }
             if (!loaded) {
-                // Note: We already called initWasm() above, so we pass a no-op function
+                const defaultLZ = this.config.defaultAircraftLZ
+                    ?? "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A";
                 try {
-                    this.bridge = await AircraftBridge.deserializeFromLZString(
-                        "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A",
-                        async () => { /* Already initialized */ },
+                    const loadedBridge = await this.deserializeFromLZ(
+                        defaultLZ,
                         this.wasmModule.AircraftWasm
                     );
-                    loaded = true;
+                    if (loadedBridge) {
+                        this.bridge = loadedBridge;
+                        loaded = true;
+                    }
                 } catch (e) {
-                    console.log("Failed to load Basic Biplane. " + e);
+                    console.log("Failed to load default aircraft. " + e);
                 }
             }
             if (loaded) {
                 console.log('[WasmApp] Aircraft bridge initialized');
+                if (this.config.storageKey && this.bridge) {
+                    this.bridge.setStorageKey(this.config.storageKey);
+                }
+                // If this is the airplane page but a helicopter was loaded (e.g. old
+                // bookmark), redirect to the Helicopter page preserving the ?json= param.
+                if (!this.config.includeHelicopter && jsonParam &&
+                    this.bridge && this.bridge.getAircraftType() === 1 /* Helicopter */) {
+                    const heliUrl = window.location.href
+                        .replace('/Test/index.html', '/Helicopter/index.html')
+                        .replace('/Test/', '/Helicopter/');
+                    console.log('[WasmApp] Helicopter aircraft on airplane page — redirecting to', heliUrl);
+                    window.location.replace(heliUrl);
+                    return;
+                }
             } else {
                 console.error("[Error] Major error, no aircraft load worked.");
             }
@@ -167,7 +206,7 @@ export class WasmApplication {
             this.actions = new AircraftActions(this.bridge, () => {
                 this.onStatsUpdate();
                 this.applyInitialCollapseState();
-            });
+            }, () => this.serializeLZ());
             console.log('[WasmApp] Aircraft actions initialized');
 
             // Create language selector
@@ -186,10 +225,35 @@ export class WasmApplication {
             });
             console.log('[WasmApp] Era UI created');
 
-            // Create Aircraft Type UI component (selector for airplane/autogyro/ornithopter)
+            // Create Aircraft Type UI component — always show all types including Helicopter
+            // so the user can switch pages from either builder.
             this.aircraftTypeUI = new AircraftTypeUI(() => this.bridge, 'Type', () => {
+                if (this.bridge) {
+                    const newType = this.bridge.getAircraftType();
+                    const isHelicopter = newType === 1;
+                    const onHelicopterPage = window.location.href.includes('/Helicopter/');
+
+                    // Redirect to the appropriate builder page when the type requires it
+                    if (isHelicopter && !onHelicopterPage) {
+                        // Test page → Helicopter page
+                        const lz = this.bridge.serializeToLZString();
+                        const heliUrl = window.location.href
+                            .replace('/Test/index.html', '/Helicopter/index.html')
+                            .replace('/Test/', '/Helicopter/');
+                        window.location.replace(heliUrl.split('?')[0] + '?json=' + encodeURIComponent(lz));
+                        return;
+                    } else if (!isHelicopter && onHelicopterPage) {
+                        // Helicopter page → Test page
+                        const lz = this.bridge.serializeToLZString();
+                        const testUrl = window.location.href
+                            .replace('/Helicopter/index.html', '/Test/index.html')
+                            .replace('/Helicopter/', '/Test/');
+                        window.location.replace(testUrl.split('?')[0] + '?json=' + encodeURIComponent(lz));
+                        return;
+                    }
+                }
                 this.onStatsUpdate();
-            }, true);
+            }, true /* always include Helicopter in the type selector */);
             console.log('[WasmApp] Aircraft Type UI created');
 
             // Create Cockpits UI component
@@ -325,6 +389,36 @@ export class WasmApplication {
     }
 
     /**
+     * Serialize the current aircraft to an LZ string for URL sharing / language reload.
+     * Subclasses can override to use a format-specific serializer (e.g. serializeHeliToLZString).
+     */
+    protected serializeLZ(): string {
+        return this.bridge!.serializeToLZString();
+    }
+
+    /**
+     * Deserialize an aircraft from an LZ string.
+     * Delegates to config.deserializeFromLZ if provided, otherwise uses the
+     * standard AircraftBridge.deserializeFromLZString path.
+     * Returns null on failure so callers can try a fallback.
+     */
+    protected async deserializeFromLZ(
+        lzStr: string,
+        AircraftWasmClass: any
+    ): Promise<AircraftBridge | null> {
+        if (this.config.deserializeFromLZ) {
+            const wasmObj = this.config.deserializeFromLZ(lzStr, AircraftWasmClass);
+            if (!wasmObj) return null;
+            return AircraftBridge.fromWasmObject(wasmObj, async () => {}, AircraftWasmClass);
+        }
+        return AircraftBridge.deserializeFromLZString(
+            lzStr,
+            async () => {},
+            AircraftWasmClass
+        );
+    }
+
+    /**
      * Load the WASM module
      * Returns null if WASM is not available (not yet built)
      */
@@ -363,20 +457,21 @@ export class WasmApplication {
         try {
             console.log(`[WasmApp] Language changed to ${locale}, reconstructing aircraft...`);
 
-            // Serialize current aircraft state
-            const serialized = this.bridge.serializeToLZString();
+            // Serialize current aircraft state using the format appropriate for this page
+            const serialized = this.serializeLZ();
             console.log('[WasmApp] Aircraft serialized');
 
             // Locale has already been changed by LocalizationManager
             // Now deserialize to create a new aircraft with fresh UIBindings in the new language
-            const newBridge = await AircraftBridge.deserializeFromLZString(
+            const newBridge = await this.deserializeFromLZ(
                 serialized,
-                async () => { /* Already initialized */ },
                 this.wasmModule.AircraftWasm
             );
 
-            // Replace the bridge with the new one
-            this.bridge = newBridge;
+            // Replace the bridge with the new one (keep old bridge if deserialization failed)
+            if (newBridge) {
+                this.bridge = newBridge;
+            }
             console.log('[WasmApp] Aircraft reconstructed with new language');
 
             // Load custom engine lists from localStorage
@@ -465,7 +560,7 @@ export class WasmApplication {
     /**
      * Get mobile section configuration
      */
-    private getMobileSections(): MobileSectionConfig[] {
+    protected getMobileSections(): MobileSectionConfig[] {
         return [
             { id: 'Intro', labelKey: 'Intro Section Title' },
             { id: 'Type', labelKey: 'Aircraft Type Section Title' },

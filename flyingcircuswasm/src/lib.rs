@@ -1318,11 +1318,43 @@ impl AircraftWasm {
         Ok(AircraftWasm { inner: aircraft })
     }
 
+    /// Serialize to LZ-compressed string in the Helicopter format (no wings / control surfaces).
+    /// Pair with deserializeHeliFromLZString so helicopter URLs round-trip correctly.
+    #[wasm_bindgen(js_name = serializeHeliToLZString)]
+    pub fn serialize_heli_to_lz_string(&self) -> Result<String, JsValue> {
+        let mut s = Serializer::new();
+        self.inner
+            .serialize_heli(&mut s)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        s.compress_to_lz_string()
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))
+    }
+
+    /// Deserialize from LZ-compressed string saved by the old TypeScript Helicopter builder.
+    /// That format omits wings and control surfaces; use this for old helicopter bookmark URLs.
+    #[wasm_bindgen(js_name = deserializeHeliFromLZString)]
+    pub fn deserialize_heli_from_lz_string(lz_str: &str) -> Result<AircraftWasm, JsValue> {
+        let mut d = Deserializer::from_lz_string(lz_str)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        let mut aircraft = Aircraft::new();
+        aircraft
+            .deserialize_heli(&mut d)
+            .map_err(|e| JsValue::from_str(&format!("{:?}", e)))?;
+        Ok(AircraftWasm { inner: aircraft })
+    }
+
     #[wasm_bindgen(js_name = reset)]
     pub fn reset_aircraft(&mut self) {
-        let lz_str = "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A";
-        let mut d = Deserializer::from_lz_string(lz_str).unwrap();
-        self.inner.deserialize(&mut d).unwrap();
+        use flyingcircusrust::types::AircraftType;
+        if self.inner.aircraft_type == AircraftType::Helicopter {
+            let lz_str= "AAEAjATAdA7MAIAhAhgZwJYGMAEAJApgDZYD2ADgC74BOwAgPcEwGBNsvtsic+MAoAZUwALavnQAjGtgAqUAJIANbGABsABmFlgAZGABcUEwbAAQJwAQwALBsAkL0dN4wPk-fuGgkWMnS5SioaWsAAwADq4fKuQqLiUtSyCspqmtpM5nQAggCBAJkAWQACeYXADnQA-KgAzDWVAAFMlQAxADMAs2aMAHhG7ObAAP9DwAAwHu7ck5ODHnOcJowOM5wrq2wAoBvcSxv9oexW+4eOAOAbp0xX+7wMoQzMe8b0S3QjjI7Pkwzf7IcmIA";
+            let mut d = Deserializer::from_lz_string(lz_str).unwrap();
+            self.inner.deserialize_heli(&mut d).unwrap();
+        } else {
+            let lz_str = "AAEAjATAdA7MCwAhAhgZwJYGMAEj0AcAbZAOwFNgBAK4WgMFsfqcZBfZoHQAlACwHsSybAFl+AF34AnAEbIArtgBaYMNgAcABl75gAJGABcYACBa1GkzYAIVhw4B-h8FsAoex8-ngPAUNES0nKKKmpaOsAAwADq0QCSPnyCwmKSsgrKqhraurRmlACCUABmxQACAAmMAJBUAPwAAbSNzU32bEwWTp5mHL1RXvb9PZ2mjLa2HhPskXaj3p6zNZaDy6ssAKCe1BZsFuszTJMHSxwA4CdMpwf21JHUdPuMO-uvHk83B0A";
+            let mut d = Deserializer::from_lz_string(lz_str).unwrap();
+            self.inner.deserialize(&mut d).unwrap();
+        };
         let _ = self.inner.part_stats();
     }
 

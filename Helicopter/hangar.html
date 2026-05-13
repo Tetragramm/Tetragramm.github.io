@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Flying Circus Helicopter Hangar</title>
+	<link rel="shortcut icon" type="image/x-icon" href="../Test/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="../Test/page/style.css" />
+	<script type="module" src="Hangar/helicopter_hangar.js"></script>
+</head>
+<!-- python -m http.server 8080 -->
+
+<body class="html_body" dir="ltr">
+	<div class="html_outer html_content">
+		<div>
+
+			<h2>
+				<a href="https://opensketch.itch.io/flying-circus">
+					Ohara Hangar</a>
+			</h2>
+			<br />
+			<a class="btn_th" href="./index.html"><b>Return to Aircraft Builder</b></a>
+			<br /><br />
+			<div>
+				<div hidden id="Builder">
+					<h3>Aircraft From Builder
+						<br />
+					</h3>
+					<table style="width:100%" id="table_builder">
+					</table>
+				</div>
+				<div style="display:flex; flex-wrap:wrap; gap: 0.5em;">
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_save" for="btn_save">Save Plane From Builder</label>
+						<button hidden="true" id="btn_save">Save</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_load" for="btn_load">Load Plane To Builder</label>
+						<button hidden="true" id="btn_load">Load</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_json" for="btn_json">Import Plane</label>
+						<input hidden="true" type="file" id="btn_json" />
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_remove" for="btn_remove">Delete Plane</label>
+						<button hidden="true" id="btn_remove">Delete</button>
+					</div>
+				</div>
+				<div style="display:flex; flex-wrap:wrap; gap: 0.5em; margin-top: 0.5em;">
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_save_h" for="btn_save_h">Export Hangar</label>
+						<button hidden="true" id="btn_save_h">Export</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_json_h" for="btn_json_h">Import Hangar</label>
+						<input hidden="true" type="file" id="btn_json_h" />
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_create_list" for="btn_create_list">Create Hangar</label>
+						<input class="btn_th" id="btn_create_list" />
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_delete_list" for="btn_delete_list">Delete Hangar</label>
+						<button hidden="true" id="btn_delete_list">Delete</button>
+					</div>
+					<div class="btn_th">
+						<label class="lbl_action" id="lbl_to_csv" for="btn_to_csv">Hangar to CSV</label>
+						<button hidden="true" id="btn_to_csv">CSV</button>
+					</div>
+				</div>
+				<br />
+				<div hidden id="Saved">
+					<h3>Aircraft From Hangar
+						<br />
+					</h3>
+					<table style="width:100%" id="table_hangar">
+					</table>
+				</div>
+				<div id="Compare" class="desktop-only">
+					<h3>Comparison
+						<br />
+					</h3>
+					<table style="width:100%" id="table_comp">
+					</table>
+				</div>
+				<div id="Compare_Mobile" class="mobile-only">
+				</div>
+			</div>
+			<br />
+			<a class="btn_th" href="./index.html"><b>Return to Aircraft Builder</b></a>
+			<br />
+		</div>
+	</div>
+
+
+	<!-- python -m http.server 8080 -->
+	<footer class="html_outer html_footer" dir="ltr">
+		<div>
+			© Tetragramm
+		</div>
+	</footer>
+</body>
+
+</html>

@@ -7,6 +7,8 @@
   },
   "scripts": {
     "build": "cd Test && webpack",
-    "watch": "cd Test && webpack --watch"
+    "watch": "cd Test && webpack --watch",
+    "build:test": "cd flyingcircuswasm && wasm-pack build --target bundler --out-dir ../Test/pkg && cd ../Test && npx webpack --mode production",
+    "build:vehicle": "cd chariotsofsteelwasm && wasm-pack build --target bundler --out-dir ../VehicleBuilder/pkg && cd ../VehicleBuilder && npx webpack --mode production"
   }
 }

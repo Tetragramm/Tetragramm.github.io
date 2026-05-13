@@ -4,7 +4,9 @@ module.exports = {
     entry: {
         plane_builder: './src/plane_builder.ts',
         hangar: './src/Hangar/hangar.ts',
-        engine_builder_app: './src/wasm/builders/engine_builder_app.ts'
+        engine_builder_app: './src/wasm/builders/engine_builder_app.ts',
+        helicopter_builder: '../Helicopter/src/helicopter_builder.ts',
+        helicopter_hangar: '../Helicopter/src/Hangar/helicopter_hangar.ts',
     },
     experiments: {
         asyncWebAssembly: true,
@@ -45,6 +47,10 @@ module.exports = {
                     return "Hangar/[name].js";
                 case "engine_builder_app":
                     return "EngineBuilder/[name].js";
+                case "helicopter_builder":
+                    return "../Helicopter/[name].js";
+                case "helicopter_hangar":
+                    return "../Helicopter/Hangar/[name].js";
                 case "pkg_flyingcircuswasm":
                     return "pkg_flyingcircuswasm.js";
                 default:

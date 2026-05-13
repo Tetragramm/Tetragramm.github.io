@@ -11,10 +11,12 @@ export class AircraftActions {
     private bridge: AircraftBridge;
     private cards: Cards;
     private onUpdate: () => void;
+    private serializeLZ: () => string;
 
-    constructor(bridge: AircraftBridge, onUpdate: () => void) {
+    constructor(bridge: AircraftBridge, onUpdate: () => void, serializeLZ?: () => string) {
         this.bridge = bridge;
         this.onUpdate = onUpdate;
+        this.serializeLZ = serializeLZ ?? (() => this.bridge.serializeToLZString());
         this.cards = new Cards();
         this.setupButtons();
     }
@@ -142,7 +144,7 @@ export class AircraftActions {
      * Copy aircraft as compressed link to clipboard
      */
     private saveLink(): void {
-        const compressed = this.bridge.serializeToLZString();
+        const compressed = this.serializeLZ();
         const link = `${location.protocol}//${location.host}${location.pathname}?json=${compressed}`;
         this.copyStringToClipboard(link);
     }

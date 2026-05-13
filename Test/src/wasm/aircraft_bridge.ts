@@ -251,6 +251,7 @@ export interface AircraftWasmAPI {
 
     serialize(): Uint8Array;
     serializeToLZString(): string;
+    serializeHeliToLZString(): string;
     toJSON(): string;
 
     setNumberOfEngines(count: number): void;
@@ -367,6 +368,12 @@ export class AircraftBridge {
     private wasm: AircraftWasmAPI | null = null;
     private initialized: boolean = false;
     private autoSaveToLocalStorage: boolean = true;
+    private storageKey: string = 'test.aircraft';
+
+    /** Override the localStorage key used for auto-save and manual save. */
+    setStorageKey(key: string): void {
+        this.storageKey = key;
+    }
 
     /**
      * Initialize the WASM module and create aircraft
@@ -1586,7 +1593,7 @@ export class AircraftBridge {
         this.ensureInitialized();
         this.wasm!.calculateStats();
         if (this.autoSaveToLocalStorage) {
-            localStorage.setItem("test.aircraft", this.wasm!.toJSON());
+            localStorage.setItem(this.storageKey, this.wasm!.toJSON());
             console.log("Saved JSON");
             console.trace();
         }
@@ -1612,6 +1619,15 @@ export class AircraftBridge {
     serializeToLZString(): string {
         this.ensureInitialized();
         return this.wasm!.serializeToLZString();
+    }
+
+    /**
+     * Serialize to LZ-compressed string in the Helicopter format (no wings / control surfaces).
+     * Pair with AircraftWasm.deserializeHeliFromLZString.
+     */
+    serializeHeliToLZString(): string {
+        this.ensureInitialized();
+        return this.wasm!.serializeHeliToLZString();
     }
 
     toJSON(): string {
@@ -1642,6 +1658,28 @@ export class AircraftBridge {
         // Save engine lists to localStorage
         bridge.saveEngineListsToLocalStorage();
 
+        return bridge;
+    }
+
+    /**
+     * Create a bridge from an already-created WASM aircraft object.
+     * Use when the caller controls which WASM factory function is used
+     * (e.g. deserializeHeliFromLZString for old helicopter saves).
+     */
+    static async fromWasmObject(
+        wasmAircraft: any,
+        wasmInit: WasmInit,
+        AircraftWasmClass: any,
+        storage: boolean = true,
+    ): Promise<AircraftBridge> {
+        const bridge = new AircraftBridge();
+        bridge.setAutoSaveToLocalStorage(storage);
+        await bridge.initialize(wasmInit, AircraftWasmClass);
+        bridge.wasm = wasmAircraft;
+        bridge.loadEngineListsFromLocalStorage();
+        bridge.initialized = true;
+        bridge.calculateStats();
+        bridge.saveEngineListsToLocalStorage();
         return bridge;
     }
 

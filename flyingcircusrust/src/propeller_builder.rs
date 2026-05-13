@@ -272,7 +272,7 @@ impl PropellerBuilder {
     /// Calculate upgrade power multiplier
     fn upgrade_power(&self) -> f32 {
         let mut power = 1.0;
-        for i in 0..self.upg_sel.len() {
+        for i in 0..self.upg_sel.len().min(UPGRADES.len()) {
             if self.upg_sel[i] {
                 power += UPGRADES[i].power_factor;
             }
@@ -313,7 +313,7 @@ impl PropellerBuilder {
     /// Calculate upgrade mass modifier
     fn upgrade_mass(&self) -> f32 {
         let mut mass = 1.0;
-        for i in 0..self.upg_sel.len() {
+        for i in 0..self.upg_sel.len().min(UPGRADES.len()) {
             if self.upg_sel[i] {
                 mass += UPGRADES[i].mass_factor;
             }
@@ -339,7 +339,7 @@ impl PropellerBuilder {
     /// Calculate upgrade drag modifier
     fn upgrade_drag(&self) -> f32 {
         let mut drag = 1.0;
-        for i in 0..self.upg_sel.len() {
+        for i in 0..self.upg_sel.len().min(UPGRADES.len()) {
             if self.upg_sel[i] {
                 drag += UPGRADES[i].drag_factor;
             }
@@ -417,7 +417,7 @@ impl PropellerBuilder {
     /// Calculate upgrade fuel modifier
     fn upgrade_fuel(&self) -> f32 {
         let mut fuel = 1.0;
-        for i in 0..self.upg_sel.len() {
+        for i in 0..self.upg_sel.len().min(UPGRADES.len()) {
             if self.upg_sel[i] {
                 fuel += UPGRADES[i].fuel_factor;
             }
@@ -434,7 +434,7 @@ impl PropellerBuilder {
     /// Calculate altitude range
     fn calc_altitude(&self) -> i16 {
         let mut alt = 0;
-        for i in 0..self.upg_sel.len() {
+        for i in 0..self.upg_sel.len().min(UPGRADES.len()) {
             if self.upg_sel[i] {
                 alt += UPGRADES[i].ideal_alt;
             }
@@ -462,7 +462,7 @@ impl PropellerBuilder {
     /// Calculate upgrade cost modifier
     fn upgrade_cost(&self) -> f32 {
         let mut cost = 0.0;
-        for i in 0..self.upg_sel.len() {
+        for i in 0..self.upg_sel.len().min(UPGRADES.len()) {
             if self.upg_sel[i] {
                 cost += UPGRADES[i].cost_factor;
             }

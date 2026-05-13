@@ -5,10 +5,10 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "outDir": ".",
-        "rootDir": "./src",
     },
     "exclude": [],
     "include": [
         "./src",
+        "../Helicopter/src",
     ]
 }

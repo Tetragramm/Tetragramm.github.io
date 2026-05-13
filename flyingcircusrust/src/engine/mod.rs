@@ -218,8 +218,15 @@ impl<'de> Deserialize<'de> for EngineInputs {
                     min_ideal_alt,
                     upgrades,
                 } => {
-                    let mut upg = vec![false];
-                    upg.extend(upgrades);
+                    // Only prepend Asperator Boost (index 0) if missing (legacy 3-element arrays).
+                    // Avoid prepending on every deserialization, which would grow the array indefinitely.
+                    let upg = if upgrades.len() < 4 {
+                        let mut upg = vec![false];
+                        upg.extend(upgrades);
+                        upg
+                    } else {
+                        upgrades
+                    };
                     TypedInputs::Propeller {
                         displacement,
                         compression,
@@ -254,8 +261,13 @@ impl<'de> Deserialize<'de> for EngineInputs {
                         .get("upgrades")
                         .and_then(|v| serde_json::from_value(v.clone()).ok())
                         .unwrap_or_else(|| vec![false; 3]);
-                    let mut upg = vec![false];
-                    upg.extend(upgrades);
+                    let upg = if upgrades.len() < 4 {
+                        let mut upg = vec![false];
+                        upg.extend(upgrades);
+                        upg
+                    } else {
+                        upgrades
+                    };
                     // Propeller
                     TypedInputs::Propeller {
                         displacement: value

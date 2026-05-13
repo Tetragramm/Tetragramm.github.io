@@ -429,4 +429,44 @@ mod tests {
             assert_eq!(true_ds, acft.get_derived_stats());
         }
     }
+
+    #[test]
+    fn test_helicopter() {
+        // Old TypeScript Helicopter binary — part list sizes differ from current Rust parts.json
+        // so byte-identical round-trip is impossible on the first pass (old sizes → new sizes).
+        // We verify: after loading and computing stats, re-saving and re-loading gives identical
+        // results (i.e. the save format stabilises after one Rust round-trip).
+        let inp_lz = "AAEAjATAdA7MBoAhArgEwOYFMAuACAEpgIYBuAnrgDICWAZnoQDbXACAbwnAYJ7937xADOAeD7sA+AHUA9o0YBnbJmoA7ANYAnIvVxSiWABZFFuAMK4IATgAMhgA7AAOMAC4HPgCABAWGABgXgBoYVCASF53AFRQ2LiBSVl5JRUNbV19IxMFc0tbBwCpKQBJYGk5RWU1LR08TMxjUwtrO0dxAEFaLoABAEqATIAs4G8uAH5+obGAAM4xgBiAGYBZ0KEvYAjOdnjedn24gDhdk9Oz84uNk88djzvbzgBQc+9X3aF1nYAIS8DYgHAXrw-pd4g9TvsAP+QkbbAKgDxAA";
+        let mut d1 = crate::serialization::Deserializer::from_lz_string(inp_lz)
+            .expect("From LZ String Failed");
+        let mut acft1 = Aircraft::new();
+        acft1.deserialize_heli(&mut d1).unwrap();
+        assert_eq!(AircraftType::Helicopter, acft1.aircraft_type);
+
+        // Compute stats first (as the app always does before saving), then serialize.
+        // This writes the post-stats state so the round-trip is apples-to-apples.
+        let _ = acft1.part_stats();
+
+        let mut s = crate::serialization::Serializer::new();
+        acft1.serialize_heli(&mut s).unwrap();
+        let round_trip_lz = s.compress_to_lz_string().unwrap();
+
+        let mut d2 = crate::serialization::Deserializer::from_lz_string(&round_trip_lz)
+            .expect("Round-trip LZ decode failed");
+        let mut acft2 = Aircraft::new();
+        acft2.deserialize_heli(&mut d2).unwrap();
+
+        // Core fields must survive the round-trip
+        assert_eq!(acft1.name, acft2.name, "name mismatch");
+        assert_eq!(acft1.aircraft_type, acft2.aircraft_type, "aircraft_type mismatch");
+        assert_eq!(acft1.part_stats(), acft2.part_stats(), "PartStat mismatch");
+        assert_eq!(acft1.get_derived_stats(), acft2.get_derived_stats(), "DerivedStat mismatch");
+
+        // Second serialize must be byte-identical (both aircraft have gone through part_stats)
+        let mut s2 = crate::serialization::Serializer::new();
+        acft2.serialize_heli(&mut s2).unwrap();
+        let second_lz = s2.compress_to_lz_string().unwrap();
+        assert_eq!(round_trip_lz, second_lz, "second serialize not stable");
+    }
+
 }
