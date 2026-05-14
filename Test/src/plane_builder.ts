@@ -1,17 +1,14 @@
 import { scrollToFragment } from "./scroll/scroll";
-
-// WASM Integration
-import { wasmApp } from "./wasm_init";
+import { WasmApplication } from "./wasm_init";
 
 const init = async () => {
-    // Try to initialize WASM first
     try {
+        const wasmApp = new WasmApplication();
         await wasmApp.initialize();
         console.log("[PlaneBuilder] WASM initialized successfully");
     } catch (e) {
         console.error("[PlaneBuilder] WASM not available, Panic!", e);
     }
-
 }
 window.addEventListener("DOMContentLoaded", init);
 window.addEventListener("load", () => {

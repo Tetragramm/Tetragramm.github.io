@@ -10,31 +10,18 @@
 
 import { WasmApplication, WasmApplicationConfig } from '../../Test/src/wasm_init';
 import { AircraftBridge } from '../../Test/src/wasm/aircraft_bridge';
-import { MobileSectionConfig } from '../../Test/src/wasm/components/mobile_nav';
-
-const HELICOPTER_DEFAULT_LZ =
-    "AAEAjATAdA7MAIAhAhgZwJYGMAEAJApgDZYD2ADgC74BOwAgPcEwGBNsvtsic+MAoAZUwALavnQAjGtgAqUAJIANbGABsABmFlgAZGABcUEwbAAQJwAQwALBsAkL0dN4wPk-fuGgkWMnS5SioaWsAAwADq4fKuQqLiUtSyCspqmtpM5nQAggCBAJkAWQACeYXADnQA-KgAzDWVAAFMlQAxADMAs2aMAHhG7ObAAP9DwAAwHu7ck5ODHnOcJowOM5wrq2wAoBvcSxv9oexW+4eOAOAbp0xX+7wMoQzMe8b0S3QjjI7Pkwzf7IcmIA";
-
-const HIDDEN_MOBILE_SECTIONS = new Set([
-    'Wings',
-    'ControlSurfaces',
-    'Reinforcements',
-    'Propeller',
-]);
+import { DEFAULT_HELICOPTER_LZ } from '../../Test/src/wasm/default_aircraft';
 
 const HELICOPTER_CONFIG: WasmApplicationConfig = {
     storageKey: 'helicopter.aircraft',
     includeHelicopter: true,
-    defaultAircraftLZ: HELICOPTER_DEFAULT_LZ,
+    defaultAircraftLZ: DEFAULT_HELICOPTER_LZ,
+    hiddenMobileSections: new Set(['Wings', 'ControlSurfaces', 'Reinforcements', 'Propeller']),
 };
 
 export class HelicopterApplication extends WasmApplication {
     constructor() {
         super(HELICOPTER_CONFIG);
-    }
-
-    protected getMobileSections(): MobileSectionConfig[] {
-        return super.getMobileSections().filter(s => !HIDDEN_MOBILE_SECTIONS.has(s.id));
     }
 
     /**
@@ -54,27 +41,17 @@ export class HelicopterApplication extends WasmApplication {
         lzStr: string,
         AircraftWasmClass: any
     ): Promise<AircraftBridge | null> {
-        // Attempt 1: heli format (current Copy As Link output + old TS saves)
         try {
             const wasmObj = AircraftWasmClass.deserializeHeliFromLZString(lzStr);
-            const bridge = await AircraftBridge.fromWasmObject(
-                wasmObj,
-                async () => { },
-                AircraftWasmClass
-            );
+            const bridge = AircraftBridge.fromWasmObject(wasmObj);
             console.log('[HelicopterApp] Loaded aircraft with heli deserialize');
             return bridge;
         } catch (_e) {
             console.log('[HelicopterApp] Heli deserialize failed, trying standard format');
         }
 
-        // Attempt 2: standard Rust format (older Copy As Link output)
         try {
-            const bridge = await AircraftBridge.deserializeFromLZString(
-                lzStr,
-                async () => { },
-                AircraftWasmClass
-            );
+            const bridge = AircraftBridge.deserializeFromLZString(lzStr, AircraftWasmClass);
             console.log('[HelicopterApp] Loaded aircraft with standard deserialize');
             return bridge;
         } catch (e) {
@@ -84,4 +61,3 @@ export class HelicopterApplication extends WasmApplication {
     }
 }
 
-export const wasmApp = new HelicopterApplication();

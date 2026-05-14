@@ -1,10 +1,9 @@
 import { scrollToFragment } from "../../Test/src/scroll/scroll";
-
-// Helicopter WASM Integration
-import { wasmApp } from "./wasm_init_helicopter";
+import { HelicopterApplication } from "./wasm_init_helicopter";
 
 const init = async () => {
     try {
+        const wasmApp = new HelicopterApplication();
         await wasmApp.initialize();
         console.log("[HelicopterBuilder] WASM initialized successfully");
     } catch (e) {

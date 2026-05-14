@@ -734,19 +734,9 @@ export class WingsUI extends BaseComponentUI {
             statsTable,
         };
 
-        // Create collapsible section
-        const section = createCollapsibleSection(
-            localization.translate('Wings Section Title'),
-            contentDiv,
-            true
-        );
-
-        // Add rules link
-        const rulesLine = createRulesLink('_Wings');
-        rulesLine.appendChild(document.createElement('br'));
-        section.insertBefore(rulesLine, section.children[1]);
-
-        return section;
+        // Caller (rebuildFull) wraps this in the outer collapsible section and
+        // adds the rules link — don't duplicate the wrapper here.
+        return contentDiv;
     }
 
     /**

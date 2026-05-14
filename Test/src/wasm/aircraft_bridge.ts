@@ -120,6 +120,17 @@ export interface DerivedStats {
     rate_of_climb_w_bombs: number;
 }
 
+// Mirrors the Rust AircraftType enum in flyingcircusrust/src/types.rs.
+// Returned by AircraftBridge.getAircraftType() / accepted by setAircraftType().
+export enum AircraftType {
+    Airplane = 0,
+    Helicopter = 1,
+    Autogyro = 2,
+    OrnithopterBasic = 3,
+    OrnithopterFlutter = 4,
+    OrnithopterBuzzer = 5,
+}
+
 // Interface for the WASM AircraftWasm class
 export interface AircraftWasmAPI {
     getName(): string;
@@ -288,9 +299,6 @@ export interface AircraftWasmAPI {
     clearEngineList(listName: string): void;
 }
 
-// Interface for initialization function
-export type WasmInit = () => Promise<void>;
-
 /**
  * Adds together an arbitrary number of stats objects
  * Verifies that any extra properties are numbers before adding
@@ -376,17 +384,12 @@ export class AircraftBridge {
     }
 
     /**
-     * Initialize the WASM module and create aircraft
+     * Create a fresh aircraft instance. Caller is responsible for having loaded
+     * the WASM module first (see WasmApplication.loadWasmModule).
      */
-    async initialize(wasmInit: WasmInit, AircraftWasmClass: any): Promise<void> {
-        // Initialize WASM module
-        await wasmInit();
-
-        // Create aircraft instance
+    initialize(AircraftWasmClass: any): void {
         this.wasm = new AircraftWasmClass();
         this.initialized = true;
-
-        console.log('[AircraftBridge] Initialized successfully');
     }
 
     /**
@@ -1638,26 +1641,18 @@ export class AircraftBridge {
     /**
      * Deserialize from json (static method)
      */
-    static async fromJSON(
+    static fromJSON(
         acft_json: string,
-        wasmInit: WasmInit,
         AircraftWasmClass: any,
         storage: boolean = true,
-    ): Promise<AircraftBridge> {
+    ): AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.setAutoSaveToLocalStorage(storage);
-        await bridge.initialize(
-            wasmInit,
-            AircraftWasmClass
-        );
         bridge.wasm = AircraftWasmClass.fromJSON(acft_json);
-        bridge.loadEngineListsFromLocalStorage();
         bridge.initialized = true;
+        bridge.loadEngineListsFromLocalStorage();
         bridge.calculateStats();
-
-        // Save engine lists to localStorage
         bridge.saveEngineListsToLocalStorage();
-
         return bridge;
     }
 
@@ -1666,18 +1661,15 @@ export class AircraftBridge {
      * Use when the caller controls which WASM factory function is used
      * (e.g. deserializeHeliFromLZString for old helicopter saves).
      */
-    static async fromWasmObject(
+    static fromWasmObject(
         wasmAircraft: any,
-        wasmInit: WasmInit,
-        AircraftWasmClass: any,
         storage: boolean = true,
-    ): Promise<AircraftBridge> {
+    ): AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.setAutoSaveToLocalStorage(storage);
-        await bridge.initialize(wasmInit, AircraftWasmClass);
         bridge.wasm = wasmAircraft;
-        bridge.loadEngineListsFromLocalStorage();
         bridge.initialized = true;
+        bridge.loadEngineListsFromLocalStorage();
         bridge.calculateStats();
         bridge.saveEngineListsToLocalStorage();
         return bridge;
@@ -1686,26 +1678,18 @@ export class AircraftBridge {
     /**
      * Deserialize from LZ-compressed string (static method)
      */
-    static async deserializeFromLZString(
+    static deserializeFromLZString(
         lzStr: string,
-        wasmInit: WasmInit,
         AircraftWasmClass: any,
         storage: boolean = true,
-    ): Promise<AircraftBridge> {
+    ): AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.setAutoSaveToLocalStorage(storage);
-        await bridge.initialize(
-            wasmInit,
-            AircraftWasmClass
-        );
         bridge.wasm = AircraftWasmClass.deserializeFromLZString(lzStr);
-        bridge.loadEngineListsFromLocalStorage();
         bridge.initialized = true;
+        bridge.loadEngineListsFromLocalStorage();
         bridge.calculateStats();
-
-        // Save engine lists to localStorage
         bridge.saveEngineListsToLocalStorage();
-
         return bridge;
     }
 
