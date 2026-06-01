@@ -12,11 +12,19 @@ export class AircraftActions {
     private cards: Cards;
     private onUpdate: () => void;
     private serializeLZ: () => string;
+    // Returns true if a redirect was initiated (caller should bail out).
+    private onReplace?: () => boolean;
 
-    constructor(bridge: AircraftBridge, onUpdate: () => void, serializeLZ?: () => string) {
+    constructor(
+        bridge: AircraftBridge,
+        onUpdate: () => void,
+        serializeLZ?: () => string,
+        onReplace?: () => boolean,
+    ) {
         this.bridge = bridge;
         this.onUpdate = onUpdate;
         this.serializeLZ = serializeLZ ?? (() => this.bridge.serializeToLZString());
+        this.onReplace = onReplace;
         this.cards = new Cards();
         this.setupButtons();
     }
@@ -112,6 +120,7 @@ export class AircraftActions {
                 const json = JSON.parse(reader.result as string);
                 if (this.bridge.fromJSON(json)) {
                     // Success - aircraft loaded
+                    if (this.onReplace?.()) return;
                     this.onUpdate();
                     console.log('Aircraft loaded successfully');
                 }
@@ -130,6 +139,7 @@ export class AircraftActions {
         try {
             const json = JSON.parse(textArea.value);
             if (this.bridge.fromJSON(json)) {
+                if (this.onReplace?.()) return;
                 this.onUpdate();
                 console.log('Aircraft loaded from text');
             }
@@ -219,6 +229,7 @@ export class AircraftActions {
      */
     private resetAircraft(): void {
         this.bridge.resetAircraft();
+        if (this.onReplace?.()) return;
         this.onUpdate();
     }
 

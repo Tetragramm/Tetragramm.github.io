@@ -128,6 +128,7 @@ export class ControlSurfacesUI extends BaseComponentUI {
 
         // Stats cell
         const statsCell = document.createElement('td');
+        statsCell.className = 'inner_table';
         const statsTables = createStatsTable(stats, CONTROLS_STATS);
         statsCell.appendChild(statsTables);
         dataRow.appendChild(statsCell);

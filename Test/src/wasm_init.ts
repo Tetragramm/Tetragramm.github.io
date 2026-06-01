@@ -101,6 +101,10 @@ export class WasmApplication {
                     this.bridge.setStorageKey(this.config.storageKey);
                 }
                 if (this.redirectIfWrongPage(urlParams.get('json'))) return;
+                // Page-type matches the loaded aircraft — safe to enable autosave
+                // and persist the initial state under the correct storage key.
+                this.bridge.setAutoSaveToLocalStorage(true);
+                this.bridge.calculateStats();
             } else {
                 console.error("[Error] Major error, no aircraft load worked.");
                 return;
@@ -153,7 +157,9 @@ export class WasmApplication {
         const jsonParam = urlParams.get('json');
         if (jsonParam) {
             try {
-                const bridge = await this.deserializeFromLZ(jsonParam, AircraftWasm);
+                // storage=false: defer save until after redirectIfWrongPage so a
+                // mis-typed share-link can't pollute this page's storage key.
+                const bridge = await this.deserializeFromLZ(jsonParam, AircraftWasm, false);
                 if (bridge) {
                     console.log('[WasmApp] Loaded aircraft from URL');
                     return bridge;
@@ -168,6 +174,7 @@ export class WasmApplication {
             const acft_data = window.localStorage.getItem(storageKey);
             const bridge = new AircraftBridge();
             bridge.initialize(AircraftWasm);
+            bridge.setAutoSaveToLocalStorage(false);
             if (bridge.fromJSON(acft_data)) {
                 console.log('[WasmApp] Loaded aircraft from saved data');
                 return bridge;
@@ -179,7 +186,7 @@ export class WasmApplication {
 
         const defaultLZ = this.config.defaultAircraftLZ ?? DEFAULT_AIRPLANE_LZ;
         try {
-            const bridge = await this.deserializeFromLZ(defaultLZ, AircraftWasm);
+            const bridge = await this.deserializeFromLZ(defaultLZ, AircraftWasm, false);
             if (bridge) return bridge;
         } catch (e) {
             console.log("Failed to load default aircraft. " + e);
@@ -223,10 +230,15 @@ export class WasmApplication {
         this.customPartsUI = new CustomPartsUI(getBridge, 'CustomParts', onUpdate);
         this.altitudeUI = new AltitudeUI(getBridge, 'Altitude', onUpdate);
 
-        this.actions = new AircraftActions(this.bridge!, () => {
-            this.onStatsUpdate();
-            this.applyInitialCollapseState();
-        }, () => this.serializeLZ());
+        this.actions = new AircraftActions(
+            this.bridge!,
+            () => {
+                this.onStatsUpdate();
+                this.applyInitialCollapseState();
+            },
+            () => this.serializeLZ(),
+            () => this.serializeForRedirect(),
+        );
         this.languageSelector = new LanguageSelector('language_selector_container');
         this.mobileNav = new MobileNavigation('mobile_nav_container');
         this.mobileNav.setSections(this.getMobileSections());
@@ -246,9 +258,35 @@ export class WasmApplication {
      */
     protected async deserializeFromLZ(
         lzStr: string,
-        AircraftWasmClass: any
+        AircraftWasmClass: any,
+        storage: boolean = true,
     ): Promise<AircraftBridge | null> {
-        return AircraftBridge.deserializeFromLZString(lzStr, AircraftWasmClass);
+        return AircraftBridge.deserializeFromLZString(lzStr, AircraftWasmClass, storage, this.config.storageKey);
+    }
+
+    /**
+     * Serialize the just-loaded aircraft into an LZ string suitable for handing
+     * off to whichever builder matches its type, then call redirectIfWrongPage.
+     *
+     * Returns true if a redirect was initiated. Used by AircraftActions after
+     * Load / Default so the target page receives the loaded data via ?json=
+     * rather than its own (now stale) localStorage. Autosave is suspended
+     * during the calculateStats here so a mis-typed Load doesn't pollute this
+     * page's storage with the wrong aircraft format.
+     */
+    private serializeForRedirect(): boolean {
+        if (!this.bridge) return false;
+        const prevAutoSave = this.bridge.isAutoSaveToLocalStorageEnabled();
+        this.bridge.setAutoSaveToLocalStorage(false);
+        // calculateStats materializes the wasm-side state that fromJSON / reset
+        // just installed, so the serialized output reflects the new aircraft.
+        this.bridge.calculateStats();
+        const isHelicopter = this.bridge.getAircraftType() === AircraftType.Helicopter;
+        const lzStr = isHelicopter
+            ? this.bridge.serializeHeliToLZString()
+            : this.bridge.serializeToLZString();
+        this.bridge.setAutoSaveToLocalStorage(prevAutoSave);
+        return this.redirectIfWrongPage(lzStr);
     }
 
     /**
@@ -274,7 +312,8 @@ export class WasmApplication {
         let targetUrl = window.location.href
             .replace(fromHtml, toHtml)
             .replace(fromDir, toDir)
-            .split('?')[0];
+            .split('?')[0]
+            .split('#')[0];
         if (jsonParam) {
             targetUrl += '?json=' + encodeURIComponent(jsonParam);
         }

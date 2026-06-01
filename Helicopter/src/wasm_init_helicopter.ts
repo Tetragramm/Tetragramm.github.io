@@ -39,11 +39,13 @@ export class HelicopterApplication extends WasmApplication {
      */
     protected async deserializeFromLZ(
         lzStr: string,
-        AircraftWasmClass: any
+        AircraftWasmClass: any,
+        storage: boolean = true,
     ): Promise<AircraftBridge | null> {
+        const storageKey = HELICOPTER_CONFIG.storageKey;
         try {
             const wasmObj = AircraftWasmClass.deserializeHeliFromLZString(lzStr);
-            const bridge = AircraftBridge.fromWasmObject(wasmObj);
+            const bridge = AircraftBridge.fromWasmObject(wasmObj, storage, storageKey);
             console.log('[HelicopterApp] Loaded aircraft with heli deserialize');
             return bridge;
         } catch (_e) {
@@ -51,7 +53,7 @@ export class HelicopterApplication extends WasmApplication {
         }
 
         try {
-            const bridge = AircraftBridge.deserializeFromLZString(lzStr, AircraftWasmClass);
+            const bridge = AircraftBridge.deserializeFromLZString(lzStr, AircraftWasmClass, storage, storageKey);
             console.log('[HelicopterApp] Loaded aircraft with standard deserialize');
             return bridge;
         } catch (e) {

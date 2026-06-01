@@ -1645,9 +1645,11 @@ export class AircraftBridge {
         acft_json: string,
         AircraftWasmClass: any,
         storage: boolean = true,
+        storageKey?: string,
     ): AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.setAutoSaveToLocalStorage(storage);
+        if (storageKey) bridge.setStorageKey(storageKey);
         bridge.wasm = AircraftWasmClass.fromJSON(acft_json);
         bridge.initialized = true;
         bridge.loadEngineListsFromLocalStorage();
@@ -1664,9 +1666,11 @@ export class AircraftBridge {
     static fromWasmObject(
         wasmAircraft: any,
         storage: boolean = true,
+        storageKey?: string,
     ): AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.setAutoSaveToLocalStorage(storage);
+        if (storageKey) bridge.setStorageKey(storageKey);
         bridge.wasm = wasmAircraft;
         bridge.initialized = true;
         bridge.loadEngineListsFromLocalStorage();
@@ -1682,9 +1686,11 @@ export class AircraftBridge {
         lzStr: string,
         AircraftWasmClass: any,
         storage: boolean = true,
+        storageKey?: string,
     ): AircraftBridge {
         const bridge = new AircraftBridge();
         bridge.setAutoSaveToLocalStorage(storage);
+        if (storageKey) bridge.setStorageKey(storageKey);
         bridge.wasm = AircraftWasmClass.deserializeFromLZString(lzStr);
         bridge.initialized = true;
         bridge.loadEngineListsFromLocalStorage();

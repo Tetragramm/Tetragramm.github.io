@@ -577,8 +577,15 @@ export class DerivedStatsUI extends BaseComponentUI {
         const stats = bridge.getStats();
         const derivedStats = bridge.getDerivedStats();
 
-        // Update name (only if different to preserve cursor position)
-        // Name is not updated from bridge in the TypeScript version
+        // Refresh name from bridge (e.g. after Load/Default), but skip when the
+        // input is focused so we don't clobber the user's in-progress typing.
+        const bridgeName = bridge.getName();
+        if (this.nameInput && document.activeElement !== this.nameInput && this.nameInput.value !== bridgeName) {
+            this.nameInput.value = bridgeName;
+        }
+        if (this.mobileNameInput && document.activeElement !== this.mobileNameInput && this.mobileNameInput.value !== bridgeName) {
+            this.mobileNameInput.value = bridgeName;
+        }
 
         // Update cost and upkeep
         if (this.costCell) {
