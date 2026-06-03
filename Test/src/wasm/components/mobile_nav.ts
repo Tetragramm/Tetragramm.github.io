@@ -167,38 +167,28 @@ export class MobileNavigation {
 
     /**
      * Update the section list
-     * Shows all sections, but disables ones that aren't currently available
+     * Only lists sections that are currently available (per each section's
+     * isVisible predicate) — e.g. Rotors only appears for Autogyro/Helicopter.
      */
     private updateList(): void {
         this.listElement.innerHTML = '';
         const visibleSections = this.getVisibleSections();
 
-        // Show all sections in list, but mark unavailable ones as disabled
-        this.sections.forEach((section) => {
+        visibleSections.forEach((section, visibleIndex) => {
             const item = document.createElement('div');
             item.className = 'mobile-nav-list-item';
 
-            // Check if this section is enabled (visible)
-            const isEnabled = !section.isVisible || section.isVisible();
-
-            // Find the index in visible sections for navigation
-            const visibleIndex = visibleSections.findIndex(s => s.id === section.id);
-
-            if (!isEnabled) {
-                item.classList.add('disabled');
-            } else if (visibleIndex === this.currentIndex) {
+            if (visibleIndex === this.currentIndex) {
                 item.classList.add('enabled');
             }
 
             item.textContent = localization.translate(section.labelKey);
 
-            if (isEnabled) {
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    this.showSection(visibleIndex);
-                    this.hideList();
-                };
-            }
+            item.onclick = (e) => {
+                e.stopPropagation();
+                this.showSection(visibleIndex);
+                this.hideList();
+            };
 
             this.listElement.appendChild(item);
         });

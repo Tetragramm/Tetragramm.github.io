@@ -93,6 +93,22 @@ export function createButton(text: string, button: HTMLElement, parent: HTMLElem
     return { label, span };
 }
 
+// Base path (relative to the host HTML page) for shared assets that physically
+// live under Test/ — the Rules pages and the Engine Builder. Test's own pages
+// leave this as '' (assets are siblings); the Helicopter pages live in a sibling
+// directory and set it to '../Test/' so these links resolve correctly.
+let assetBasePath = '';
+
+/** Set the base path used for links to shared Test/ assets (Rules, engine builder). */
+export function setAssetBasePath(path: string): void {
+    assetBasePath = path;
+}
+
+/** Current shared-asset base path (see setAssetBasePath). */
+export function getAssetBasePath(): string {
+    return assetBasePath;
+}
+
 /**
  * Create a rules link with standard formatting
  * @param sectionName - The anchor name in the Rules HTML (e.g., "_Cockpits", "_Era")
@@ -102,7 +118,7 @@ export function createRulesLink(sectionName: string, specialText?: string): HTML
     const rulesLine = document.createElement('h4');
     const rulesSpan = document.createElement('span');
     const rulesLink = document.createElement('a');
-    rulesLink.href = `./Rules/Rules_${localization.getCurrentLocale()}.html#${sectionName}`;
+    rulesLink.href = `${assetBasePath}Rules/Rules_${localization.getCurrentLocale()}.html#${sectionName}`;
     const rulesText = document.createElement('u');
     if (specialText === undefined) {
         rulesText.textContent = localization.translate('Rules');
@@ -388,7 +404,7 @@ export function createMobileNumberInput(
  */
 export function createMobileOptionItem(
     title: string,
-    parent: HTMLElement
+    parent?: HTMLElement
 ): { container: HTMLElement, content: HTMLElement } {
     const container = document.createElement('div');
     container.className = 'mobile-option-item';
@@ -404,7 +420,7 @@ export function createMobileOptionItem(
     content.className = 'mobile-option-content';
     container.appendChild(content);
 
-    parent.appendChild(container);
+    if (parent) parent.appendChild(container);
 
     return { container, content };
 }
@@ -588,6 +604,255 @@ export function updateMobileStatsGrid(
 
         blinkIfChanged(valueDiv, value, config.positiveIsGood);
     }
+}
+
+// ============================================================================
+// Dual-emit controls
+//
+// Every component renders the same control twice: once for the desktop layout
+// and once for the mobile option group, with the change handler duplicated. A
+// dual control builds both nodes from a single definition and a single handler.
+// The desktop node is returned for the component to place wherever its existing
+// desktop layout expects it, so the desktop DOM is unchanged; the mobile node is
+// a ready-to-append `.mobile-option-item`. Call update() from updateValues().
+// ============================================================================
+
+/** Anything the component refreshes in updateValues() via update(). */
+export interface Updatable {
+    /** Refresh both desktop and mobile from current data. Call in updateValues(). */
+    update(): void;
+}
+
+export interface DualControl extends Updatable {
+    /** Desktop control node — place it in the component's existing desktop layout. */
+    desktop: HTMLElement;
+    /** `.mobile-option-item` node — append it to the component's mobile group. */
+    mobile: HTMLElement;
+}
+
+/**
+ * A select rendered for both desktop and mobile from one binding + one handler.
+ * @param label - Mobile option title (already localized). Desktop labelling stays
+ *                with the caller, so passing this does not affect the desktop DOM.
+ * @param getBinding - Returns the current SelectBinding (called on build + update).
+ * @param onChange - Selection handler, shared by both nodes.
+ */
+export function dualSelect(
+    label: string,
+    getBinding: () => any,
+    onChange: (selectedIndex: number) => void
+): DualControl & { desktop: HTMLSelectElement } {
+    const desktop = createSelectElement(getBinding(), onChange);
+    const { container, content } = createMobileOptionItem(label);
+    const mobileSelect = createMobileSelect(getBinding(), content, onChange);
+    return {
+        desktop,
+        mobile: container,
+        update() {
+            updateSelectElement(desktop, getBinding());
+            updateSelectElement(mobileSelect, getBinding());
+        },
+    };
+}
+
+/**
+ * A stats block rendered as a desktop table and a mobile grid from one source.
+ * @param label - Mobile option title (already localized).
+ * @param getStats - Returns the current stats object (called on build + update).
+ * @param config - Which stats to show.
+ * @param getDerived - Optional derived-stats source for derived rows.
+ */
+export function dualStats(
+    label: string,
+    getStats: () => any,
+    config: StatDisplayConfig[],
+    getDerived?: () => any
+): DualControl & { desktop: HTMLTableElement } {
+    const desktop = createStatsTable(getStats(), config, getDerived?.());
+    const { container, content } = createMobileOptionItem(label);
+    const grid = createMobileStatsGrid(getStats(), config, getDerived?.());
+    content.appendChild(grid);
+    return {
+        desktop,
+        mobile: container,
+        update() {
+            updateStatsTable(desktop, getStats(), config, getDerived?.());
+            updateMobileStatsGrid(grid, getStats(), config, getDerived?.());
+        },
+    };
+}
+
+/**
+ * A number input (flex label/control layout on desktop) for both desktop and
+ * mobile. The desktop node is the flex container (`.flex-container-o`) to place
+ * where the component already put its `createFlexNumberInput` output.
+ * @param mobileLabel - Mobile option title (already localized).
+ * @param getBinding - Returns the current { name, value, enabled } binding.
+ * @param onChange - Value handler, shared by both nodes.
+ * @param opts.desktopLabel - Override the desktop adjacent label (defaults to
+ *        binding.name; pass '' when a table header already labels the column).
+ */
+export function dualNumber(
+    mobileLabel: string,
+    getBinding: () => any,
+    onChange: (value: number) => void,
+    opts?: { min?: number; max?: number; step?: number; desktopLabel?: string }
+): DualControl & { desktop: HTMLDivElement } {
+    const min = opts?.min ?? 0;
+    const { max, step, desktopLabel } = opts ?? {};
+
+    const flex = createFlexSection();
+    const desktopBinding = desktopLabel !== undefined
+        ? { ...getBinding(), name: desktopLabel }
+        : getBinding();
+    const desktopInput = createFlexNumberInput(
+        desktopBinding, flex, onChange,
+        String(min), max !== undefined ? String(max) : undefined, String(step ?? 1)
+    );
+
+    const { container, content } = createMobileOptionItem(mobileLabel);
+    const { input: mobileInput } = createMobileNumberInput(
+        { ...getBinding(), name: '' }, content, onChange, min, max, step ?? 1
+    );
+    return {
+        desktop: flex.div0,
+        mobile: container,
+        update() {
+            const b = getBinding();
+            desktopInput.value = b.value.toString();
+            desktopInput.disabled = !b.enabled;
+            mobileInput.value = b.value.toString();
+            mobileInput.disabled = !b.enabled;
+        },
+    };
+}
+
+/**
+ * A checkbox (flex label/control layout on desktop) for both desktop and mobile.
+ * The desktop node is the flex container (`.flex-container-o`) to place where the
+ * component already put its `createFlexCheckbox` output. The desktop label comes
+ * from binding.name (as before); `label` is the mobile option title.
+ * @param getBinding - Returns the current { name, selected, enabled } binding.
+ * @param onChange - Checked handler, shared by both nodes.
+ */
+export function dualCheckbox(
+    label: string,
+    getBinding: () => any,
+    onChange: (checked: boolean) => void
+): DualControl & { desktop: HTMLDivElement } {
+    const flex = createFlexSection();
+    const desktopCheckbox = createFlexCheckbox(getBinding(), flex, onChange);
+    const { container, content } = createMobileOptionItem(label);
+    const mobileCheckbox = createMobileCheckbox(getBinding(), content, onChange);
+    return {
+        desktop: flex.div0,
+        mobile: container,
+        update() {
+            const b = getBinding();
+            desktopCheckbox.checked = b.selected;
+            desktopCheckbox.disabled = !b.enabled;
+            mobileCheckbox.checked = b.selected;
+            mobileCheckbox.disabled = !b.enabled;
+        },
+    };
+}
+
+// ----------------------------------------------------------------------------
+// Grouped "into" controls
+//
+// Many components put several controls into ONE shared desktop flex section, and
+// on mobile either one item each or one shared item. The component owns the flex
+// section and the mobile item(s) (that's where the grouping decision lives); each
+// of these helpers appends ONE control into both the given desktop flex and the
+// given mobile parent, wiring a single handler and returning an Updatable.
+//
+// Desktop labels come from binding.name (override via desktopLabel on the select),
+// matching createFlexSelect/createFlexCheckbox/createFlexNumberInput.
+// ----------------------------------------------------------------------------
+
+export function dualSelectInto(
+    desktopFlex: { div1: HTMLElement; div2: HTMLElement },
+    mobileParent: HTMLElement,
+    getBinding: () => any,
+    onChange: (selectedIndex: number) => void,
+    desktopLabel?: string
+): Updatable {
+    const desktop = createFlexSelect(getBinding(), desktopFlex, onChange, desktopLabel);
+    const mobile = createMobileSelect(getBinding(), mobileParent, onChange);
+    return {
+        update() {
+            updateSelectElement(desktop, getBinding());
+            updateSelectElement(mobile, getBinding());
+        },
+    };
+}
+
+/**
+ * A select whose DESKTOP node is a bare `<select>` (createSelectElement — no flex
+ * wrapper/label/id) that the caller places itself, while the mobile select is
+ * appended into a shared mobile item. Use when several controls share one mobile
+ * item but the desktop select sits bare in a cell (e.g. select + count layouts).
+ */
+export function dualSelectBareInto(
+    mobileParent: HTMLElement,
+    getBinding: () => any,
+    onChange: (selectedIndex: number) => void
+): Updatable & { desktop: HTMLSelectElement } {
+    const desktop = createSelectElement(getBinding(), onChange);
+    const mobile = createMobileSelect(getBinding(), mobileParent, onChange);
+    return {
+        desktop,
+        update() {
+            updateSelectElement(desktop, getBinding());
+            updateSelectElement(mobile, getBinding());
+        },
+    };
+}
+
+export function dualCheckboxInto(
+    desktopFlex: { div1: HTMLElement; div2: HTMLElement },
+    mobileParent: HTMLElement,
+    getBinding: () => any,
+    onChange: (checked: boolean) => void
+): Updatable {
+    const desktop = createFlexCheckbox(getBinding(), desktopFlex, onChange);
+    const mobile = createMobileCheckbox(getBinding(), mobileParent, onChange);
+    return {
+        update() {
+            const b = getBinding();
+            desktop.checked = b.selected;
+            desktop.disabled = !b.enabled;
+            mobile.checked = b.selected;
+            mobile.disabled = !b.enabled;
+        },
+    };
+}
+
+export function dualNumberInto(
+    desktopFlex: { div1: HTMLElement; div2: HTMLElement },
+    mobileParent: HTMLElement,
+    getBinding: () => any,
+    onChange: (value: number) => void,
+    opts?: { min?: number; max?: number; step?: number }
+): Updatable {
+    const min = opts?.min ?? 0;
+    const { max, step } = opts ?? {};
+    const desktop = createFlexNumberInput(
+        getBinding(), desktopFlex, onChange,
+        String(min), max !== undefined ? String(max) : undefined, String(step ?? 1)
+    );
+    const { input: mobile } = createMobileNumberInput(
+        getBinding(), mobileParent, onChange, min, max, step ?? 1
+    );
+    return {
+        update() {
+            const b = getBinding();
+            desktop.value = b.value.toString();
+            desktop.disabled = !b.enabled;
+            mobile.value = b.value.toString();
+            mobile.disabled = !b.enabled;
+        },
+    };
 }
 
 /**

@@ -563,8 +563,6 @@ export class DerivedStatsUI extends BaseComponentUI {
         this.container.appendChild(this.sectionElement);
 
         this.updateValues();
-
-        console.log('[DerivedStatsUI] Full rebuild complete');
     }
 
     /**

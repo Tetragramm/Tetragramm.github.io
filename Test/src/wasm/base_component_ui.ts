@@ -45,8 +45,6 @@ export abstract class BaseComponentUI {
      * Otherwise, do a full rebuild
      */
     render(forceFull: boolean = false): void {
-        console.log(`[${this.constructor.name}] render() called`);
-
         const bridge = this.getBridge();
         if (!bridge) {
             console.warn(`[${this.constructor.name}] Bridge is null, skipping render`);
@@ -58,14 +56,9 @@ export abstract class BaseComponentUI {
             return;
         }
 
-        const shouldUpdate = this.shouldUpdate();
-        console.log(`[${this.constructor.name}] shouldUpdate() returned:`, shouldUpdate);
-
-        if (shouldUpdate && !forceFull) {
-            console.log(`[${this.constructor.name}] Calling updateValues()`);
+        if (this.shouldUpdate() && !forceFull) {
             this.updateValues();
         } else {
-            console.log(`[${this.constructor.name}] Calling rebuildFull()`);
             this.rebuildFull();
         }
     }

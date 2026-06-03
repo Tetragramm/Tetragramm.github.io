@@ -3,6 +3,22 @@
  *
  * Displays the Cockpits section using UIBindings from Rust
  * Handles multiple cockpit positions with types, upgrades, safety, and gunsights
+ *
+ * DUAL-CONTROL NOTE
+ * -----------------
+ * Desktop renders ALL cockpit positions at once in a 5-column table. Mobile
+ * renders ONE position at a time behind a prev/next navigator. Because the two
+ * layouts emit a different *number* of controls for the same data, the grouped
+ * `dual*Into` helpers (which append BOTH a desktop and a mobile node per call)
+ * cannot drive this component without changing the mobile DOM. So instead:
+ *   - Every per-position field gets ONE shared handler factory (this.*Handler).
+ *     Desktop and mobile both wire that exact closure, removing the handler
+ *     duplication that the dual-control work targets.
+ *   - Desktop controls are collected as Updatable's in `this.controls` and
+ *     refreshed via `this.controls.forEach(c => c.update())`.
+ *   - The mobile navigator keeps its own per-view cache (only one position is in
+ *     the DOM at a time) but builds its nodes with the SAME handler factories.
+ * The desktop and mobile DOM are byte-identical to the original.
  */
 
 import { AircraftBridge, CockpitsOptions, CockpitOptions } from '../aircraft_bridge';
@@ -12,12 +28,14 @@ import {
     createRulesLink,
     createFlexNumberInput,
     createFlexCell,
-    createFlexCheckboxes,
+    createFlexCheckbox,
     createSelectElement,
+    updateSelectElement,
     createCollapsibleSection,
     createStatsTable,
     updateStatsTable,
     StatDisplayConfig,
+    Updatable,
     createMobileOptionItem,
     createMobileSelect,
     createMobileCheckbox,
@@ -39,18 +57,7 @@ const COCKPIT_STATS: StatDisplayConfig[] = [
     { key: 'pos_visibility', label: 'Stat Visibility', positiveIsGood: true, isDerived: true }
 ];
 
-// Cache for cockpit row elements to avoid recreating DOM
-interface CockpitRowCache {
-    row: HTMLTableRowElement;
-    typeSelect: HTMLSelectElement;
-    upgradeChecks: HTMLInputElement[];
-    safetyChecks: HTMLInputElement[];
-    gunsightChecks: HTMLInputElement[];
-    bombsightInput: HTMLInputElement;
-    statsTable: HTMLTableElement;
-}
-
-// Cache for mobile cockpit elements
+// Cache for mobile cockpit elements (only one position is shown at a time)
 interface MobileCockpitCache {
     cockpitIndex: number;
     typeSelect: HTMLSelectElement;
@@ -62,14 +69,16 @@ interface MobileCockpitCache {
 }
 
 export class CockpitsUI extends BaseComponentUI {
-    // Cache DOM elements to avoid recreating
-    private cockpitRowCaches: CockpitRowCache[];
+    // Desktop per-position dual controls (refreshed in updateValues via update()).
+    private controls: Updatable[] = [];
+
+    // Structural / count fields that shouldUpdate() and the num-cockpits control need.
     private mobileNumCockpitsInput: HTMLInputElement;
     private numCockpitsInput: HTMLInputElement;
     private mainTable: HTMLTableElement;
     private lastCockpitCount: number;
 
-    // Mobile navigation state
+    // Mobile navigation state (one position rendered at a time => own cache).
     private mobileSelectedCockpit: number;
     private mobileCockpitContainer: HTMLDivElement;
     private mobileCockpitContent: HTMLDivElement;
@@ -77,11 +86,13 @@ export class CockpitsUI extends BaseComponentUI {
     private mobileCockpitCache: MobileCockpitCache | undefined;
 
     protected shouldUpdate(): boolean {
-        // Check if cockpit count changed - need rebuild if it did
+        // Null-safe: the base constructor triggers the first render() (hence
+        // shouldUpdate) before this subclass's field initializers run.
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return false;
 
-        console.log("[CockpitsUI] numCockpitsInput is " + this.numCockpitsInput)
+        // Structural-change detection: a change in the number of cockpit positions
+        // requires a full rebuild (the desktop table gains/loses rows).
         const cockpitsBindings = bridge.getCockpitsBindings();
         const currentCount = cockpitsBindings.positions.length;
 
@@ -89,7 +100,7 @@ export class CockpitsUI extends BaseComponentUI {
     }
 
     protected clearCache(): void {
-        this.cockpitRowCaches = [];
+        this.controls = [];
         this.mobileNumCockpitsInput = undefined;
         this.numCockpitsInput = undefined;
         this.mainTable = undefined;
@@ -98,6 +109,52 @@ export class CockpitsUI extends BaseComponentUI {
         this.mobileCockpitContent = undefined;
         this.mobileCockpitNavLabel = undefined;
         this.mobileCockpitCache = undefined;
+    }
+
+    // ------------------------------------------------------------------
+    // Shared per-field handlers. Desktop and mobile both wire these exact
+    // closures, so each field has ONE change handler. They re-fetch the
+    // bindings fresh on every event (closures capture only the indices).
+    // ------------------------------------------------------------------
+    private typeHandler(bridge: AircraftBridge, idx: number) {
+        return (selectedIndex: number) => {
+            const bindings = bridge.getCockpitsBindings();
+            bindings.positions[idx].selected_type.selected = selectedIndex;
+            bridge.setCockpitsBindings(bindings);
+            this.onUpdate();
+        };
+    }
+    private upgradeHandler(bridge: AircraftBridge, idx: number, k: number) {
+        return (checked: boolean) => {
+            const bindings = bridge.getCockpitsBindings();
+            bindings.positions[idx].selected_upgrades[k].selected = checked;
+            bridge.setCockpitsBindings(bindings);
+            this.onUpdate();
+        };
+    }
+    private safetyHandler(bridge: AircraftBridge, idx: number, k: number) {
+        return (checked: boolean) => {
+            const bindings = bridge.getCockpitsBindings();
+            bindings.positions[idx].selected_safety[k].selected = checked;
+            bridge.setCockpitsBindings(bindings);
+            this.onUpdate();
+        };
+    }
+    private gunsightHandler(bridge: AircraftBridge, idx: number, k: number) {
+        return (checked: boolean) => {
+            const bindings = bridge.getCockpitsBindings();
+            bindings.positions[idx].selected_gunsights[k].selected = checked;
+            bridge.setCockpitsBindings(bindings);
+            this.onUpdate();
+        };
+    }
+    private bombsightHandler(bridge: AircraftBridge, idx: number) {
+        return (value: number) => {
+            const bindings = bridge.getCockpitsBindings();
+            bindings.positions[idx].bombsight.value = value;
+            bridge.setCockpitsBindings(bindings);
+            this.onUpdate();
+        };
     }
 
     /**
@@ -120,7 +177,8 @@ export class CockpitsUI extends BaseComponentUI {
         const desktopDiv = document.createElement('div');
         desktopDiv.className = 'desktop-only content';
 
-        // Number of cockpits control (simple row above table)
+        // Number of cockpits control (simple row above table). This is a
+        // structural count input (it triggers a rebuild), NOT a dual control.
         const controlDiv = document.createElement('div');
         controlDiv.style.marginBottom = '10px';
         const numCockpitsLabel = document.createElement('span');
@@ -169,11 +227,11 @@ export class CockpitsUI extends BaseComponentUI {
         });
         this.mainTable.appendChild(headerRow);
 
-        // Build each cockpit row and cache references
+        // Build each desktop cockpit row, wiring the shared handlers and
+        // collecting each control's Updatable into this.controls.
         cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
-            const cache = this.buildCockpitRow(cockpitOptions, idx, cockpitsBindings, bridge);
-            this.cockpitRowCaches.push(cache);
-            this.mainTable!.appendChild(cache.row);
+            const row = this.buildDesktopCockpitRow(cockpitOptions, idx, bridge);
+            this.mainTable!.appendChild(row);
         });
 
         desktopDiv.appendChild(this.mainTable);
@@ -227,8 +285,117 @@ export class CockpitsUI extends BaseComponentUI {
         );
 
         this.container.appendChild(this.sectionElement);
+    }
 
-        console.log('[CockpitsUI] Full rebuild with', this.lastCockpitCount, 'cockpits');
+    /**
+     * Build a single DESKTOP cockpit row. Each field control is built once here
+     * and pushed to this.controls as an Updatable that refreshes itself from the
+     * fresh bindings (fetched by index) on update().
+     */
+    private buildDesktopCockpitRow(
+        cockpitOptions: CockpitOptions,
+        index: number,
+        bridge: AircraftBridge
+    ): HTMLTableRowElement {
+        const row = document.createElement('tr');
+
+        // Column 1: Option (bare select box with no label)
+        const optionCell = document.createElement('td');
+        const typeSelect = createSelectElement(
+            cockpitOptions.selected_type,
+            this.typeHandler(bridge, index)
+        );
+        optionCell.appendChild(typeSelect);
+        row.appendChild(optionCell);
+        this.controls.push({
+            update: () => updateSelectElement(
+                typeSelect,
+                bridge.getCockpitsBindings().positions[index].selected_type
+            ),
+        });
+
+        // Column 2: Upgrades (flex layout) — one shared flex per list.
+        const { cell: upgradesCell, flex: upgradesFlex } = createFlexCell();
+        cockpitOptions.selected_upgrades.forEach((upgrade, k) => {
+            const checkbox = createFlexCheckbox(
+                upgrade, upgradesFlex, this.upgradeHandler(bridge, index, k)
+            );
+            this.controls.push({
+                update: () => {
+                    const b = bridge.getCockpitsBindings().positions[index].selected_upgrades[k];
+                    checkbox.checked = b.selected;
+                    checkbox.disabled = !b.enabled;
+                },
+            });
+        });
+        row.appendChild(upgradesCell);
+
+        // Column 3: Safety Options (flex layout) — one shared flex per list.
+        const { cell: safetyCell, flex: safetyFlex } = createFlexCell();
+        cockpitOptions.selected_safety.forEach((safety, k) => {
+            const checkbox = createFlexCheckbox(
+                safety, safetyFlex, this.safetyHandler(bridge, index, k)
+            );
+            this.controls.push({
+                update: () => {
+                    const b = bridge.getCockpitsBindings().positions[index].selected_safety[k];
+                    checkbox.checked = b.selected;
+                    checkbox.disabled = !b.enabled;
+                },
+            });
+        });
+        row.appendChild(safetyCell);
+
+        // Column 4: Gunsights + Bombsight (flex layout) — one shared flex.
+        const { cell: gunsightsCell, flex: gunsightsFlex } = createFlexCell();
+        cockpitOptions.selected_gunsights.forEach((gunsight, k) => {
+            const checkbox = createFlexCheckbox(
+                gunsight, gunsightsFlex, this.gunsightHandler(bridge, index, k)
+            );
+            this.controls.push({
+                update: () => {
+                    const b = bridge.getCockpitsBindings().positions[index].selected_gunsights[k];
+                    checkbox.checked = b.selected;
+                    checkbox.disabled = !b.enabled;
+                },
+            });
+        });
+        // Bombsight number input appended into the same flex (original layout).
+        const bombsightInput = createFlexNumberInput(
+            cockpitOptions.bombsight,
+            gunsightsFlex,
+            this.bombsightHandler(bridge, index),
+            '0', '20', '1'
+        );
+        this.controls.push({
+            update: () => {
+                const b = bridge.getCockpitsBindings().positions[index].bombsight;
+                bombsightInput.value = b.value.toString();
+                bombsightInput.disabled = !b.enabled;
+            },
+        });
+        row.appendChild(gunsightsCell);
+
+        // Column 5: Stats (using stats renderer)
+        const statsCell = document.createElement('td');
+        statsCell.className = 'inner_table';
+        const statsTable = createStatsTable(
+            bridge.getCockpitStats(index),
+            COCKPIT_STATS,
+            bridge.getCockpitDerivedStats(index)
+        );
+        statsCell.appendChild(statsTable);
+        row.appendChild(statsCell);
+        this.controls.push({
+            update: () => updateStatsTable(
+                statsTable,
+                bridge.getCockpitStats(index),
+                COCKPIT_STATS,
+                bridge.getCockpitDerivedStats(index)
+            ),
+        });
+
+        return row;
     }
 
     /**
@@ -333,7 +500,8 @@ export class CockpitsUI extends BaseComponentUI {
     }
 
     /**
-     * Build mobile cockpit content and create cache
+     * Build mobile cockpit content and create cache. Wires the SAME shared
+     * handler factories as the desktop row, so each field has one handler.
      */
     private buildMobileCockpitContent(bridge: AircraftBridge, idx: number): void {
         this.mobileCockpitContent.innerHTML = '';
@@ -349,12 +517,7 @@ export class CockpitsUI extends BaseComponentUI {
         const typeSelect = createMobileSelect(
             cockpitOptions.selected_type,
             typeItem.content,
-            (selectedIndex) => {
-                const bindings = bridge.getCockpitsBindings();
-                bindings.positions[idx].selected_type.selected = selectedIndex;
-                bridge.setCockpitsBindings(bindings);
-                this.onUpdate();
-            }
+            this.typeHandler(bridge, idx)
         );
 
         // Upgrades
@@ -368,16 +531,11 @@ export class CockpitsUI extends BaseComponentUI {
             upgradeItem.content.style.flexWrap = 'wrap';
             upgradeItem.content.style.gap = '0.25rem';
 
-            cockpitOptions.selected_upgrades.forEach((upgrade, upgradeIdx) => {
+            cockpitOptions.selected_upgrades.forEach((upgrade, k) => {
                 const checkbox = createMobileCheckbox(
                     upgrade,
                     upgradeItem.content,
-                    (checked) => {
-                        const bindings = bridge.getCockpitsBindings();
-                        bindings.positions[idx].selected_upgrades[upgradeIdx].selected = checked;
-                        bridge.setCockpitsBindings(bindings);
-                        this.onUpdate();
-                    }
+                    this.upgradeHandler(bridge, idx, k)
                 );
                 upgradeChecks.push(checkbox);
             });
@@ -394,16 +552,11 @@ export class CockpitsUI extends BaseComponentUI {
             safetyItem.content.style.flexWrap = 'wrap';
             safetyItem.content.style.gap = '0.25rem';
 
-            cockpitOptions.selected_safety.forEach((safety, safetyIdx) => {
+            cockpitOptions.selected_safety.forEach((safety, k) => {
                 const checkbox = createMobileCheckbox(
                     safety,
                     safetyItem.content,
-                    (checked) => {
-                        const bindings = bridge.getCockpitsBindings();
-                        bindings.positions[idx].selected_safety[safetyIdx].selected = checked;
-                        bridge.setCockpitsBindings(bindings);
-                        this.onUpdate();
-                    }
+                    this.safetyHandler(bridge, idx, k)
                 );
                 safetyChecks.push(checkbox);
             });
@@ -421,16 +574,11 @@ export class CockpitsUI extends BaseComponentUI {
             gunsightItem.content.style.flexWrap = 'wrap';
             gunsightItem.content.style.gap = '0.25rem';
 
-            cockpitOptions.selected_gunsights.forEach((gunsight, gunsightIdx) => {
+            cockpitOptions.selected_gunsights.forEach((gunsight, k) => {
                 const checkbox = createMobileCheckbox(
                     gunsight,
                     gunsightItem.content,
-                    (checked) => {
-                        const bindings = bridge.getCockpitsBindings();
-                        bindings.positions[idx].selected_gunsights[gunsightIdx].selected = checked;
-                        bridge.setCockpitsBindings(bindings);
-                        this.onUpdate();
-                    }
+                    this.gunsightHandler(bridge, idx, k)
                 );
                 gunsightChecks.push(checkbox);
             });
@@ -439,12 +587,7 @@ export class CockpitsUI extends BaseComponentUI {
             const { input } = createMobileNumberInput(
                 cockpitOptions.bombsight,
                 gunsightItem.content,
-                (value) => {
-                    const bindings = bridge.getCockpitsBindings();
-                    bindings.positions[idx].bombsight.value = value;
-                    bridge.setCockpitsBindings(bindings);
-                    this.onUpdate();
-                },
+                this.bombsightHandler(bridge, idx),
                 0, 20
             );
             bombsightInput = input;
@@ -550,166 +693,10 @@ export class CockpitsUI extends BaseComponentUI {
             this.mobileNumCockpitsInput.disabled = !cockpitsBindings.num_cockpits.enabled;
         }
 
-        // Update desktop cockpit rows
-        cockpitsBindings.positions.forEach((cockpitOptions, idx) => {
-            if (idx < this.cockpitRowCaches.length) {
-                this.updateCockpitRow(this.cockpitRowCaches[idx], cockpitOptions, idx, bridge);
-            }
-        });
+        // Refresh all desktop per-position controls.
+        this.controls.forEach(c => c.update());
 
-        // Update mobile cockpit content (rebuilds current view)
+        // Update mobile cockpit content (refreshes the one visible position).
         this.updateMobileCockpitContent();
-    }
-
-    /**
-     * Build a single cockpit row and return cache of its elements
-     */
-    private buildCockpitRow(
-        cockpitOptions: CockpitOptions,
-        index: number,
-        allBindings: CockpitsOptions,
-        bridge: AircraftBridge
-    ): CockpitRowCache {
-        const row = document.createElement('tr');
-
-        // Column 1: Option (select box with no label)
-        const optionCell = document.createElement('td');
-        const typeSelect = createSelectElement(
-            cockpitOptions.selected_type,
-            (selectedIndex) => {
-                const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].selected_type.selected = selectedIndex;
-                bridge.setCockpitsBindings(bindings);
-                this.onUpdate();
-            }
-        );
-        optionCell.appendChild(typeSelect);
-        row.appendChild(optionCell);
-
-        // Column 2: Upgrades (flex layout)
-        const { cell: upgradesCell, flex: upgradesFlex } = createFlexCell();
-        const upgradeChecks = createFlexCheckboxes(
-            upgradesFlex,
-            cockpitOptions.selected_upgrades,
-            (idx) => (checked) => {
-                const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].selected_upgrades[idx].selected = checked;
-                bridge.setCockpitsBindings(bindings);
-                this.onUpdate();
-            }
-        );
-        row.appendChild(upgradesCell);
-
-        // Column 3: Safety Options (flex layout)
-        const { cell: safetyCell, flex: safetyFlex } = createFlexCell();
-        const safetyChecks = createFlexCheckboxes(
-            safetyFlex,
-            cockpitOptions.selected_safety,
-            (idx) => (checked) => {
-                const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].selected_safety[idx].selected = checked;
-                bridge.setCockpitsBindings(bindings);
-                this.onUpdate();
-            }
-        );
-        row.appendChild(safetyCell);
-
-        // Column 4: Gunsights + Bombsight (flex layout)
-        const { cell: gunsightsCell, flex: gunsightsFlex } = createFlexCell();
-        const gunsightChecks = createFlexCheckboxes(
-            gunsightsFlex,
-            cockpitOptions.selected_gunsights,
-            (idx) => (checked) => {
-                const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].selected_gunsights[idx].selected = checked;
-                bridge.setCockpitsBindings(bindings);
-                this.onUpdate();
-            }
-        );
-        // Add bombsight as number input
-        const bombsightInput = createFlexNumberInput(
-            cockpitOptions.bombsight,
-            gunsightsFlex,
-            (value) => {
-                const bindings = bridge.getCockpitsBindings();
-                bindings.positions[index].bombsight.value = value;
-                bridge.setCockpitsBindings(bindings);
-                this.onUpdate();
-            },
-            '0', '20', '1'
-        );
-        row.appendChild(gunsightsCell);
-
-        // Column 5: Stats (using stats renderer)
-        const statsCell = document.createElement('td');
-        statsCell.className = 'inner_table';
-        const stats = bridge.getCockpitStats(index);
-        const derivedStats = bridge.getCockpitDerivedStats(index);
-        const statsTable = createStatsTable(stats, COCKPIT_STATS, derivedStats);
-        statsCell.appendChild(statsTable);
-        row.appendChild(statsCell);
-
-        return {
-            row,
-            typeSelect,
-            upgradeChecks,
-            safetyChecks,
-            gunsightChecks,
-            bombsightInput,
-            statsTable
-        };
-    }
-
-    /**
-     * Update an existing cockpit row with new values (fast path - no DOM rebuild)
-     */
-    private updateCockpitRow(
-        cache: CockpitRowCache,
-        cockpitOptions: CockpitOptions,
-        index: number,
-        bridge: AircraftBridge
-    ): void {
-        // Update type select
-        cache.typeSelect.selectedIndex = cockpitOptions.selected_type.selected;
-        cache.typeSelect.disabled = !cockpitOptions.selected_type.enabled;
-        // Update select options' enabled state
-        cockpitOptions.selected_type.options.forEach((opt, idx) => {
-            if (idx < cache.typeSelect.options.length) {
-                cache.typeSelect.options[idx].disabled = !opt.enabled;
-            }
-        });
-
-        // Update upgrade checkboxes
-        cockpitOptions.selected_upgrades.forEach((upgrade, idx) => {
-            if (idx < cache.upgradeChecks.length) {
-                cache.upgradeChecks[idx].checked = upgrade.selected;
-                cache.upgradeChecks[idx].disabled = !upgrade.enabled;
-            }
-        });
-
-        // Update safety checkboxes
-        cockpitOptions.selected_safety.forEach((safety, idx) => {
-            if (idx < cache.safetyChecks.length) {
-                cache.safetyChecks[idx].checked = safety.selected;
-                cache.safetyChecks[idx].disabled = !safety.enabled;
-            }
-        });
-
-        // Update gunsight checkboxes
-        cockpitOptions.selected_gunsights.forEach((gunsight, idx) => {
-            if (idx < cache.gunsightChecks.length) {
-                cache.gunsightChecks[idx].checked = gunsight.selected;
-                cache.gunsightChecks[idx].disabled = !gunsight.enabled;
-            }
-        });
-
-        // Update bombsight input
-        cache.bombsightInput.value = cockpitOptions.bombsight.value.toString();
-        cache.bombsightInput.disabled = !cockpitOptions.bombsight.enabled;
-
-        // Update stats
-        const stats = bridge.getCockpitStats(index);
-        const derivedStats = bridge.getCockpitDerivedStats(index);
-        updateStatsTable(cache.statsTable, stats, COCKPIT_STATS, derivedStats);
     }
 }

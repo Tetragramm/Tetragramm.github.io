@@ -17,6 +17,9 @@ const HELICOPTER_CONFIG: WasmApplicationConfig = {
     includeHelicopter: true,
     defaultAircraftLZ: DEFAULT_HELICOPTER_LZ,
     hiddenMobileSections: new Set(['Wings', 'ControlSurfaces', 'Reinforcements', 'Propeller']),
+    // The Helicopter pages live in a sibling directory; Rules pages and the Engine
+    // Builder physically live under Test/, so point shared-asset links there.
+    assetBasePath: '../Test/',
 };
 
 export class HelicopterApplication extends WasmApplication {

@@ -11,18 +11,15 @@ import { BaseComponentUI } from '../base_component_ui';
 import {
     createRulesLink,
     updateSelectElement,
-    createFlexSection,
-    createFlexNumberInput,
     createSelectElement,
+    createFlexSection,
     createCollapsibleSection,
-    createStatsTable,
-    updateStatsTable,
     StatDisplayConfig,
     createMobileOptionItem,
     createMobileSelect,
-    createMobileNumberInput,
-    createMobileStatsGrid,
-    updateMobileStatsGrid
+    Updatable,
+    dualStats,
+    dualNumberInto,
 } from '../dom_utils';
 
 // Stabilizer stats configuration
@@ -35,30 +32,94 @@ const STABILIZER_STATS: StatDisplayConfig[] = [
     { key: 'liftbleed', label: 'Stat Lift Bleed', positiveIsGood: true },
 ];
 
-// Cache interface for type safety
-interface StabilizersCache {
-    hTypeSelect: HTMLSelectElement;
-    hCountInput: HTMLInputElement;
-    vTypeSelect: HTMLSelectElement;
-    vCountInput: HTMLInputElement;
-    statsTable: HTMLTableElement;
-    mobileStatsGrid?: HTMLDivElement;
-    // Mobile controls
-    mobileHTypeSelect?: HTMLSelectElement;
-    mobileHCountInput?: HTMLInputElement;
-    mobileVTypeSelect?: HTMLSelectElement;
-    mobileVCountInput?: HTMLInputElement;
-}
-
 export class StabilizersUI extends BaseComponentUI {
-    private cache: StabilizersCache;
+    // Dual controls (desktop + mobile) built in rebuildFull, refreshed in updateValues.
+    private controls: Updatable[] = [];
 
     protected shouldUpdate(): boolean {
-        return this.cache !== undefined;
+        // Null-safe: BaseComponentUI's constructor triggers the first render()
+        // (hence shouldUpdate) before this subclass's field initializer runs.
+        return (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {
-        this.cache = undefined;
+        this.controls = [];
+    }
+
+    /**
+     * Build the dual select + count for one stabilizer.
+     *
+     * The original desktop placed a BARE select (createSelectElement) directly in
+     * the cell, then a <br>, then a separate flex section for the count. That bare
+     * select layout is not what dualSelectInto produces (it wraps the select in a
+     * flex with a label), so the select pair is built here by hand to keep the
+     * desktop DOM byte-identical; the count uses dualNumberInto whose desktop output
+     * (its own flex section) matches the original createFlexNumberInput exactly and
+     * whose mobile sub-label is taken from binding.name.
+     *
+     * Desktop nodes are placed into `cell`; the mobile select + count share one
+     * mobile-option-item appended to `mobileDiv`.
+     */
+    private buildStabilizer(
+        cell: HTMLTableCellElement,
+        mobileDiv: HTMLElement,
+        title: string,
+        selKey: string,
+        countKey: string,
+        bridge: AircraftBridge
+    ): void {
+        // === DESKTOP: bare select, <br>, then count flex (filled by dualNumberInto) ===
+        const desktopSelect = createSelectElement(
+            bridge.getStabilizersBindings()[selKey],
+            (selectedIndex) => {
+                const b = bridge.getStabilizersBindings();
+                b[selKey].selected = selectedIndex;
+                bridge.setStabilizersBindings(b);
+                this.onUpdate();
+            }
+        );
+        cell.appendChild(desktopSelect);
+        cell.appendChild(document.createElement('br'));
+
+        // === MOBILE: one option item shared by the select and the count ===
+        const item = createMobileOptionItem(title, mobileDiv);
+        const mobileSelect = createMobileSelect(
+            bridge.getStabilizersBindings()[selKey],
+            item.content,
+            (selectedIndex) => {
+                const b = bridge.getStabilizersBindings();
+                b[selKey].selected = selectedIndex;
+                bridge.setStabilizersBindings(b);
+                this.onUpdate();
+            }
+        );
+
+        // Select dual control (built once, shared handler already wired above).
+        this.controls.push({
+            update() {
+                const binding = bridge.getStabilizersBindings()[selKey];
+                updateSelectElement(desktopSelect, binding);
+                updateSelectElement(mobileSelect, binding);
+            },
+        });
+
+        // Count: desktop flex placed where the original count flex went; mobile
+        // count appended into the same option item; sub-label kept via binding.name.
+        const countLabel = localization.translate('Stabilizers # of Stabilizers');
+        const countFlex = createFlexSection();
+        this.controls.push(dualNumberInto(
+            countFlex,
+            item.content,
+            () => ({ ...bridge.getStabilizersBindings()[countKey], name: countLabel }),
+            (value) => {
+                const b = bridge.getStabilizersBindings();
+                b[countKey].value = value;
+                bridge.setStabilizersBindings(b);
+                this.onUpdate();
+            },
+            { min: 0, max: 20 }
+        ));
+        cell.appendChild(countFlex.div0);
     }
 
     /**
@@ -71,8 +132,12 @@ export class StabilizersUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
-        const bindings = bridge.getStabilizersBindings();
-        const stats = bridge.getStabilizersStats();
+        // Stats block maps cleanly: one definition yields desktop table + mobile grid.
+        const statsCtl = dualStats(
+            localization.translate('Stabilizers Stabilizer Stats'),
+            () => bridge.getStabilizersStats(),
+            STABILIZER_STATS
+        );
 
         // Create wrapper for both desktop and mobile content
         const contentWrapper = document.createElement('div');
@@ -105,19 +170,16 @@ export class StabilizersUI extends BaseComponentUI {
 
         // Horizontal stabilizers cell
         const hCell = document.createElement('td');
-        const { hTypeSelect, hCountInput } = this.createHorizontalSection(hCell, bindings, bridge);
         dataRow.appendChild(hCell);
 
         // Vertical stabilizers cell
         const vCell = document.createElement('td');
-        const { vTypeSelect, vCountInput } = this.createVerticalSection(vCell, bindings, bridge);
         dataRow.appendChild(vCell);
 
         // Stats cell
         const statsCell = document.createElement('td');
         statsCell.className = "inner_table";
-        const statsTable = createStatsTable(stats, STABILIZER_STATS);
-        statsCell.appendChild(statsTable);
+        statsCell.appendChild(statsCtl.desktop);
         dataRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
@@ -128,83 +190,31 @@ export class StabilizersUI extends BaseComponentUI {
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
 
-        // Horizontal Stabilizers
-        const hStabItem = createMobileOptionItem(
+        // Each stabilizer: desktop nodes into its cell, select + count grouped under
+        // one mobile option item. buildStabilizer pushes both dual controls.
+        this.buildStabilizer(
+            hCell,
+            mobileDiv,
             localization.translate('Stabilizers Horizontal Stabilizers'),
-            mobileDiv
+            'hstab_sel',
+            'hstab_count',
+            bridge
         );
-        const mobileHTypeSelect = createMobileSelect(
-            bindings.hstab_sel,
-            hStabItem.content,
-            (selectedIndex) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.hstab_sel.selected = selectedIndex;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            }
-        );
-        const { input: mobileHCountInput } = createMobileNumberInput(
-            { ...bindings.hstab_count, name: localization.translate('Stabilizers # of Stabilizers') },
-            hStabItem.content,
-            (value) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.hstab_count.value = value;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            },
-            0, 20
-        );
-
-        // Vertical Stabilizers
-        const vStabItem = createMobileOptionItem(
+        this.buildStabilizer(
+            vCell,
+            mobileDiv,
             localization.translate('Stabilizers Vertical Stabilizers'),
-            mobileDiv
-        );
-        const mobileVTypeSelect = createMobileSelect(
-            bindings.vstab_sel,
-            vStabItem.content,
-            (selectedIndex) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.vstab_sel.selected = selectedIndex;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            }
-        );
-        const { input: mobileVCountInput } = createMobileNumberInput(
-            { ...bindings.vstab_count, name: localization.translate('Stabilizers # of Stabilizers') },
-            vStabItem.content,
-            (value) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.vstab_count.value = value;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            },
-            0, 20
+            'vstab_sel',
+            'vstab_count',
+            bridge
         );
 
-        // Stats grid
-        const statsItem = createMobileOptionItem(
-            localization.translate('Stabilizers Stabilizer Stats'),
-            mobileDiv
-        );
-        const mobileStatsGrid = createMobileStatsGrid(stats, STABILIZER_STATS);
-        statsItem.content.appendChild(mobileStatsGrid);
+        // Stats grid (from the dual stats control)
+        mobileDiv.appendChild(statsCtl.mobile);
 
         contentWrapper.appendChild(mobileDiv);
 
-        // Cache elements
-        this.cache = {
-            hTypeSelect,
-            hCountInput,
-            vTypeSelect,
-            vCountInput,
-            statsTable,
-            mobileStatsGrid,
-            mobileHTypeSelect,
-            mobileHCountInput,
-            mobileVTypeSelect,
-            mobileVCountInput
-        };
+        this.controls.push(statsCtl);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Stabilizers Section Title');
@@ -222,106 +232,6 @@ export class StabilizersUI extends BaseComponentUI {
         );
 
         this.container.appendChild(this.sectionElement);
-
-        console.log('[StabilizersUI] Full rebuild complete');
-    }
-
-    /**
-     * Create horizontal stabilizers section
-     */
-    private createHorizontalSection(
-        cell: HTMLTableCellElement,
-        bindings: any,
-        bridge: AircraftBridge
-    ): { hTypeSelect: HTMLSelectElement; hCountInput: HTMLInputElement } {
-        const typeBinding = bindings.hstab_sel;
-        const countBinding = bindings.hstab_count;
-
-        // Type select using helper
-        const hTypeSelect = createSelectElement(
-            typeBinding,
-            (selectedIndex) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.hstab_sel.selected = selectedIndex;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            }
-        );
-
-        cell.appendChild(hTypeSelect);
-        cell.appendChild(document.createElement('br'));
-
-        // Count input using flex helper
-        const flexContainer = createFlexSection();
-
-        // Override the binding name with translated label
-        const countBindingWithLabel = { ...countBinding, name: localization.translate('Stabilizers # of Stabilizers') };
-
-        const hCountInput = createFlexNumberInput(
-            countBindingWithLabel,
-            flexContainer,
-            (value) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.hstab_count.value = value;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            },
-            '0',
-            '20'
-        );
-
-        cell.appendChild(flexContainer.div0);
-
-        return { hTypeSelect, hCountInput };
-    }
-
-    /**
-     * Create vertical stabilizers section
-     */
-    private createVerticalSection(
-        cell: HTMLTableCellElement,
-        bindings: any,
-        bridge: AircraftBridge
-    ): { vTypeSelect: HTMLSelectElement; vCountInput: HTMLInputElement } {
-        const typeBinding = bindings.vstab_sel;
-        const countBinding = bindings.vstab_count;
-
-        // Type select using helper
-        const vTypeSelect = createSelectElement(
-            typeBinding,
-            (selectedIndex) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.vstab_sel.selected = selectedIndex;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            }
-        );
-
-        cell.appendChild(vTypeSelect);
-        cell.appendChild(document.createElement('br'));
-
-        // Count input using flex helper
-        const flexContainer = createFlexSection();
-
-        // Override the binding name with translated label
-        const countBindingWithLabel = { ...countBinding, name: localization.translate('Stabilizers # of Stabilizers') };
-
-        const vCountInput = createFlexNumberInput(
-            countBindingWithLabel,
-            flexContainer,
-            (value) => {
-                const bindings = bridge.getStabilizersBindings();
-                bindings.vstab_count.value = value;
-                bridge.setStabilizersBindings(bindings);
-                this.onUpdate();
-            },
-            '0',
-            '20'
-        );
-
-        cell.appendChild(flexContainer.div0);
-
-        return { vTypeSelect, vCountInput };
     }
 
     /**
@@ -329,46 +239,9 @@ export class StabilizersUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge || !this.cache) return;
+        if (!bridge || !this.controls?.length) return;
 
-        const bindings = bridge.getStabilizersBindings();
-
-        // Update horizontal stabilizers (desktop)
-        updateSelectElement(this.cache.hTypeSelect, bindings.hstab_sel);
-        this.cache.hCountInput.value = bindings.hstab_count.value.toString();
-        this.cache.hCountInput.disabled = !bindings.hstab_count.enabled;
-
-        // Update vertical stabilizers (desktop)
-        updateSelectElement(this.cache.vTypeSelect, bindings.vstab_sel);
-        this.cache.vCountInput.value = bindings.vstab_count.value.toString();
-        this.cache.vCountInput.disabled = !bindings.vstab_count.enabled;
-
-        // Update horizontal stabilizers (mobile)
-        if (this.cache.mobileHTypeSelect) {
-            updateSelectElement(this.cache.mobileHTypeSelect, bindings.hstab_sel);
-        }
-        if (this.cache.mobileHCountInput) {
-            this.cache.mobileHCountInput.value = bindings.hstab_count.value.toString();
-            this.cache.mobileHCountInput.disabled = !bindings.hstab_count.enabled;
-        }
-
-        // Update vertical stabilizers (mobile)
-        if (this.cache.mobileVTypeSelect) {
-            updateSelectElement(this.cache.mobileVTypeSelect, bindings.vstab_sel);
-        }
-        if (this.cache.mobileVCountInput) {
-            this.cache.mobileVCountInput.value = bindings.vstab_count.value.toString();
-            this.cache.mobileVCountInput.disabled = !bindings.vstab_count.enabled;
-        }
-
-        // Update stat values
-        const stats = bridge.getStabilizersStats();
-        updateStatsTable(this.cache.statsTable, stats, STABILIZER_STATS);
-
-        // Update mobile stats grid
-        if (this.cache.mobileStatsGrid) {
-            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, STABILIZER_STATS);
-        }
+        this.controls.forEach(c => c.update());
     }
 
     /**

@@ -7,45 +7,45 @@
  * - Negative values represent benefits (improvements/repairs)
  */
 
-import { AircraftBridge } from '../aircraft_bridge';
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
 import {
     createCollapsibleSection,
-    createFlexNumberInput,
-    createFlexSection,
-    createMobileOptionItem,
-    createMobileNumberInput
+    DualControl,
+    dualNumber,
 } from '../dom_utils';
+
+// One definition per condition row: localization keys + which binding field it maps to.
+const USED_ROWS: {
+    effectKey: string;
+    descriptionKey: string;
+    field: string;
+}[] = [
+    { effectKey: 'Used Burnt Out', descriptionKey: 'Used Burnt Out Description', field: 'burnt_out' },
+    { effectKey: 'Used Ragged', descriptionKey: 'Used Ragged Description', field: 'ragged' },
+    { effectKey: 'Used Hefty', descriptionKey: 'Used Hefty Description', field: 'hefty' },
+    { effectKey: 'Used Sticky Guns', descriptionKey: 'Used Sticky Guns Description', field: 'sticky_guns' },
+    { effectKey: 'Used Weak', descriptionKey: 'Used Weak Description', field: 'weak' },
+    { effectKey: 'Used Fragile', descriptionKey: 'Used Fragile Description', field: 'fragile' },
+    { effectKey: 'Used Leaky', descriptionKey: 'Used Leaky Description', field: 'leaky' },
+    { effectKey: 'Used Sluggish', descriptionKey: 'Used Sluggish Description', field: 'sluggish' },
+];
 
 /**
  * Used Part UI Component
  */
 export class UsedUI extends BaseComponentUI {
-    // Cache for inputs
-    private burntOutInput: HTMLInputElement;
-    private raggedInput: HTMLInputElement;
-    private heftyInput: HTMLInputElement;
-    private stickyGunsInput: HTMLInputElement;
-    private weakInput: HTMLInputElement;
-    private fragileInput: HTMLInputElement;
-    private leakyInput: HTMLInputElement;
-    private sluggishInput: HTMLInputElement;
+    // Dual controls (desktop + mobile) built in rebuildFull, refreshed in updateValues.
+    private controls: DualControl[] = [];
 
     protected shouldUpdate(): boolean {
-        // Can always update if we have cached elements
-        return this.burntOutInput !== undefined;
+        // Null-safe: BaseComponentUI's constructor triggers the first render()
+        // (hence shouldUpdate) before this subclass's field initializer runs.
+        return (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {
-        this.burntOutInput = undefined;
-        this.raggedInput = undefined;
-        this.heftyInput = undefined;
-        this.stickyGunsInput = undefined;
-        this.weakInput = undefined;
-        this.fragileInput = undefined;
-        this.leakyInput = undefined;
-        this.sluggishInput = undefined;
+        this.controls = [];
     }
 
     /**
@@ -57,8 +57,6 @@ export class UsedUI extends BaseComponentUI {
 
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
-
-        const bindings = bridge.getUsedBindings();
 
         // Create wrapper for both desktop and mobile content
         const contentWrapper = document.createElement('div');
@@ -84,262 +82,52 @@ export class UsedUI extends BaseComponentUI {
             headerRow.appendChild(th);
         });
 
-        // Helper to create a row
-        const createRow = (
-            effectKey: string,
-            descriptionKey: string,
-            binding: any,
-            updateCallback: (value: number) => void
-        ): HTMLInputElement => {
-            const row = table.insertRow();
-            row.insertCell().textContent = localization.translate(effectKey);
-            row.insertCell().textContent = localization.translate(descriptionKey);
-
-            const inputCell = row.insertCell();
-            const flex = createFlexSection();
-            inputCell.appendChild(flex.div0);
-
-            binding.name = ''
-            const input = createFlexNumberInput(
-                binding,
-                flex,
-                updateCallback,
-                '-1',
-                '1',
-                '1'
-            );
-
-            return input;
-        };
-
-        // Create rows for each used condition
-        this.burntOutInput = createRow(
-            'Used Burnt Out',
-            'Used Burnt Out Description',
-            bindings.burnt_out,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.burnt_out.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        this.raggedInput = createRow(
-            'Used Ragged',
-            'Used Ragged Description',
-            bindings.ragged,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.ragged.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        this.heftyInput = createRow(
-            'Used Hefty',
-            'Used Hefty Description',
-            bindings.hefty,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.hefty.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        this.stickyGunsInput = createRow(
-            'Used Sticky Guns',
-            'Used Sticky Guns Description',
-            bindings.sticky_guns,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.sticky_guns.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        this.weakInput = createRow(
-            'Used Weak',
-            'Used Weak Description',
-            bindings.weak,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.weak.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        this.fragileInput = createRow(
-            'Used Fragile',
-            'Used Fragile Description',
-            bindings.fragile,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.fragile.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        this.leakyInput = createRow(
-            'Used Leaky',
-            'Used Leaky Description',
-            bindings.leaky,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.leaky.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        this.sluggishInput = createRow(
-            'Used Sluggish',
-            'Used Sluggish Description',
-            bindings.sluggish,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.sluggish.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        desktopDiv.appendChild(table);
-        contentWrapper.appendChild(desktopDiv);
-
         // === MOBILE VERSION ===
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
 
-        // Helper to create mobile row
-        const createMobileRow = (
-            effectKey: string,
-            descriptionKey: string,
-            binding: any,
-            updateCallback: (value: number) => void
-        ) => {
-            const title = localization.translate(effectKey);
-            const item = createMobileOptionItem(title, mobileDiv);
-            // Add description as subtitle
-            const descSpan = document.createElement('span');
-            descSpan.className = 'mobile-description';
-            descSpan.style.fontSize = '0.85em';
-            descSpan.style.color = 'var(--inp_txt_color)';
-            descSpan.style.opacity = '0.8';
-            descSpan.style.flexGrow = '1';
-            descSpan.textContent = localization.translate(descriptionKey);
-            item.content.appendChild(descSpan);
-
-            createMobileNumberInput(
-                { ...binding, name: '' },
-                item.content,
-                updateCallback,
-                -1,
-                1,
-                1
+        // Build one dual control per condition. Each yields a desktop flex node
+        // (placed in the table's input cell, exactly where createFlexNumberInput
+        // output used to go) and a mobile option item (appended to the group).
+        USED_ROWS.forEach(({ effectKey, descriptionKey, field }) => {
+            const ctl = dualNumber(
+                localization.translate(effectKey),
+                () => bridge.getUsedBindings()[field],
+                (value) => {
+                    const newBindings = bridge.getUsedBindings();
+                    newBindings[field].value = value;
+                    bridge.setUsedBindings(newBindings);
+                    this.onUpdate?.();
+                },
+                { min: -1, max: 1, step: 1, desktopLabel: '' } // column labelled by table header
             );
-        };
 
-        createMobileRow(
-            'Used Burnt Out',
-            'Used Burnt Out Description',
-            bindings.burnt_out,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.burnt_out.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
+            // --- Desktop: effect / description / input flex cell ---
+            const row = table.insertRow();
+            row.insertCell().textContent = localization.translate(effectKey);
+            row.insertCell().textContent = localization.translate(descriptionKey);
+            row.insertCell().appendChild(ctl.desktop);
 
-        createMobileRow(
-            'Used Ragged',
-            'Used Ragged Description',
-            bindings.ragged,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.ragged.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
+            // --- Mobile: inject the description subtitle into the option content,
+            // matching the original createMobileRow output (desc span then input). ---
+            const content = ctl.mobile.querySelector('.mobile-option-content');
+            if (content) {
+                const descSpan = document.createElement('span');
+                descSpan.className = 'mobile-description';
+                descSpan.style.fontSize = '0.85em';
+                descSpan.style.color = 'var(--inp_txt_color)';
+                descSpan.style.opacity = '0.8';
+                descSpan.style.flexGrow = '1';
+                descSpan.textContent = localization.translate(descriptionKey);
+                content.insertBefore(descSpan, content.firstChild);
             }
-        );
+            mobileDiv.appendChild(ctl.mobile);
 
-        createMobileRow(
-            'Used Hefty',
-            'Used Hefty Description',
-            bindings.hefty,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.hefty.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
+            this.controls.push(ctl);
+        });
 
-        createMobileRow(
-            'Used Sticky Guns',
-            'Used Sticky Guns Description',
-            bindings.sticky_guns,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.sticky_guns.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        createMobileRow(
-            'Used Weak',
-            'Used Weak Description',
-            bindings.weak,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.weak.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        createMobileRow(
-            'Used Fragile',
-            'Used Fragile Description',
-            bindings.fragile,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.fragile.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        createMobileRow(
-            'Used Leaky',
-            'Used Leaky Description',
-            bindings.leaky,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.leaky.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
-
-        createMobileRow(
-            'Used Sluggish',
-            'Used Sluggish Description',
-            bindings.sluggish,
-            (value) => {
-                const newBindings = bridge.getUsedBindings();
-                newBindings.sluggish.value = value;
-                bridge.setUsedBindings(newBindings);
-                this.onUpdate?.();
-            }
-        );
+        desktopDiv.appendChild(table);
+        contentWrapper.appendChild(desktopDiv);
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -361,43 +149,8 @@ export class UsedUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge) return;
-
-        const bindings = bridge.getUsedBindings();
-
-        // Update all inputs
-        if (this.burntOutInput) {
-            this.burntOutInput.value = bindings.burnt_out.value.toString();
-            this.burntOutInput.disabled = !bindings.burnt_out.enabled;
-        }
-        if (this.raggedInput) {
-            this.raggedInput.value = bindings.ragged.value.toString();
-            this.raggedInput.disabled = !bindings.ragged.enabled;
-        }
-        if (this.heftyInput) {
-            this.heftyInput.value = bindings.hefty.value.toString();
-            this.heftyInput.disabled = !bindings.hefty.enabled;
-        }
-        if (this.stickyGunsInput) {
-            this.stickyGunsInput.value = bindings.sticky_guns.value.toString();
-            this.stickyGunsInput.disabled = !bindings.sticky_guns.enabled;
-        }
-        if (this.weakInput) {
-            this.weakInput.value = bindings.weak.value.toString();
-            this.weakInput.disabled = !bindings.weak.enabled;
-        }
-        if (this.fragileInput) {
-            this.fragileInput.value = bindings.fragile.value.toString();
-            this.fragileInput.disabled = !bindings.fragile.enabled;
-        }
-        if (this.leakyInput) {
-            this.leakyInput.value = bindings.leaky.value.toString();
-            this.leakyInput.disabled = !bindings.leaky.enabled;
-        }
-        if (this.sluggishInput) {
-            this.sluggishInput.value = bindings.sluggish.value.toString();
-            this.sluggishInput.disabled = !bindings.sluggish.enabled;
-        }
+        if (!bridge || !this.controls?.length) return;
+        this.controls.forEach(c => c.update());
     }
 
     /**

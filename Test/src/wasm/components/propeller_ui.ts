@@ -5,38 +5,26 @@
  * Simple UI with propeller pitch and upgrade selects (no stats table)
  */
 
-import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import { AIRCRAFT_TYPE } from './aircraft_type_ui';
 import {
     createRulesLink,
-    createSelectElement,
-    updateSelectElement,
     createCollapsibleSection,
-    createMobileOptionItem,
-    createMobileSelect
+    DualControl,
+    dualSelect,
 } from '../dom_utils';
 
-// Cache interface for type safety
-interface PropellerCache {
-    pitchSelect: HTMLSelectElement;
-    upgradeSelect: HTMLSelectElement;
-    // Mobile controls
-    mobilePitchSelect?: HTMLSelectElement;
-    mobileUpgradeSelect?: HTMLSelectElement;
-}
-
 export class PropellerUI extends BaseComponentUI {
-    private cache: PropellerCache;
+    private controls: DualControl[] = [];
     private showPropeller: boolean;
 
     protected shouldUpdate(): boolean {
-        return this.cache !== undefined;
+        return (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {
-        this.cache = undefined;
+        this.controls = [];
     }
 
     /**
@@ -49,17 +37,42 @@ export class PropellerUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
-        const bindings = bridge.getPropellerBindings();
         const aircraftType = bridge.getAircraftType();
+
+        // One definition per select; each yields a desktop node and a mobile node.
+        const pitchCtl = dualSelect(
+            localization.translate('Propeller Propeller Pitch'),
+            () => bridge.getPropellerBindings().idx_prop,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getPropellerBindings();
+                updatedBindings.idx_prop.selected = selectedIndex;
+                bridge.setPropellerBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        pitchCtl.desktop.id = 'propeller_pitch_wasm';
+
+        const upgradeCtl = dualSelect(
+            localization.translate('Propeller Propeller Upgrades'),
+            () => bridge.getPropellerBindings().idx_upg,
+            (selectedIndex) => {
+                const updatedBindings = bridge.getPropellerBindings();
+                updatedBindings.idx_upg.selected = selectedIndex;
+                bridge.setPropellerBindings(updatedBindings);
+                this.onUpdate();
+            }
+        );
+        upgradeCtl.desktop.id = 'propeller_upgrade_wasm';
+        this.controls = [pitchCtl, upgradeCtl];
 
         // Create wrapper for both desktop and mobile content
         const contentWrapper = document.createElement('div');
 
-        // === DESKTOP VERSION ===
+        // === DESKTOP VERSION (unchanged layout) ===
         const desktopDiv = document.createElement('div');
         desktopDiv.className = 'desktop-only';
 
-        // Create content container (h4 with spans matching original HTML structure)
+        // Content container (h4 with spans matching original HTML structure)
         const contentDiv = document.createElement('h4');
         contentDiv.className = 'content';
 
@@ -69,18 +82,7 @@ export class PropellerUI extends BaseComponentUI {
         pitchLabel.htmlFor = 'propeller_pitch_wasm';
         pitchLabel.textContent = localization.translate('Propeller Propeller Pitch') + ': ';
         pitchSpan.appendChild(pitchLabel);
-
-        const pitchSelect = createSelectElement(
-            bindings.idx_prop,
-            (selectedIndex) => {
-                const updatedBindings = bridge.getPropellerBindings();
-                updatedBindings.idx_prop.selected = selectedIndex;
-                bridge.setPropellerBindings(updatedBindings);
-                this.onUpdate();
-            }
-        );
-        pitchSelect.id = 'propeller_pitch_wasm';
-        pitchSpan.appendChild(pitchSelect);
+        pitchSpan.appendChild(pitchCtl.desktop);
         contentDiv.appendChild(pitchSpan);
 
         // Propeller Upgrade span with label and select
@@ -89,67 +91,18 @@ export class PropellerUI extends BaseComponentUI {
         upgradeLabel.htmlFor = 'propeller_upgrade_wasm';
         upgradeLabel.textContent = ' ' + localization.translate('Propeller Propeller Upgrades') + ' ';
         upgradeSpan.appendChild(upgradeLabel);
-
-        const upgradeSelect = createSelectElement(
-            bindings.idx_upg,
-            (selectedIndex) => {
-                const updatedBindings = bridge.getPropellerBindings();
-                updatedBindings.idx_upg.selected = selectedIndex;
-                bridge.setPropellerBindings(updatedBindings);
-                this.onUpdate();
-            }
-        );
-        upgradeSelect.id = 'propeller_upgrade_wasm';
-        upgradeSpan.appendChild(upgradeSelect);
+        upgradeSpan.appendChild(upgradeCtl.desktop);
         contentDiv.appendChild(upgradeSpan);
+
         desktopDiv.appendChild(contentDiv);
         contentWrapper.appendChild(desktopDiv);
 
         // === MOBILE VERSION ===
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
-
-        // Propeller Pitch
-        const pitchItem = createMobileOptionItem(
-            localization.translate('Propeller Propeller Pitch'),
-            mobileDiv
-        );
-        const mobilePitchSelect = createMobileSelect(
-            bindings.idx_prop,
-            pitchItem.content,
-            (selectedIndex) => {
-                const updatedBindings = bridge.getPropellerBindings();
-                updatedBindings.idx_prop.selected = selectedIndex;
-                bridge.setPropellerBindings(updatedBindings);
-                this.onUpdate();
-            }
-        );
-
-        // Propeller Upgrades
-        const upgradeItem = createMobileOptionItem(
-            localization.translate('Propeller Propeller Upgrades'),
-            mobileDiv
-        );
-        const mobileUpgradeSelect = createMobileSelect(
-            bindings.idx_upg,
-            upgradeItem.content,
-            (selectedIndex) => {
-                const updatedBindings = bridge.getPropellerBindings();
-                updatedBindings.idx_upg.selected = selectedIndex;
-                bridge.setPropellerBindings(updatedBindings);
-                this.onUpdate();
-            }
-        );
-
+        mobileDiv.appendChild(pitchCtl.mobile);
+        mobileDiv.appendChild(upgradeCtl.mobile);
         contentWrapper.appendChild(mobileDiv);
-
-        // Cache elements
-        this.cache = {
-            pitchSelect,
-            upgradeSelect,
-            mobilePitchSelect,
-            mobileUpgradeSelect
-        };
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Propeller Section Title');
@@ -171,8 +124,6 @@ export class PropellerUI extends BaseComponentUI {
 
         // Set initial visibility based on aircraft type
         this.updateVisibility(aircraftType);
-
-        console.log('[PropellerUI] Full rebuild complete');
     }
 
     /**
@@ -180,33 +131,10 @@ export class PropellerUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge || !this.cache) return;
+        if (!bridge || !this.controls?.length) return;
 
-        const bindings = bridge.getPropellerBindings();
-        const aircraftType = bridge.getAircraftType();
-
-        // Update visibility first
-        this.updateVisibility(aircraftType);
-
-        // Update pitch select (desktop)
-        if (this.cache.pitchSelect && bindings.idx_prop) {
-            updateSelectElement(this.cache.pitchSelect, bindings.idx_prop);
-        }
-
-        // Update pitch select (mobile)
-        if (this.cache.mobilePitchSelect && bindings.idx_prop) {
-            updateSelectElement(this.cache.mobilePitchSelect, bindings.idx_prop);
-        }
-
-        // Update upgrade select (desktop)
-        if (this.cache.upgradeSelect && bindings.idx_upg) {
-            updateSelectElement(this.cache.upgradeSelect, bindings.idx_upg);
-        }
-
-        // Update upgrade select (mobile)
-        if (this.cache.mobileUpgradeSelect && bindings.idx_upg) {
-            updateSelectElement(this.cache.mobileUpgradeSelect, bindings.idx_upg);
-        }
+        this.updateVisibility(bridge.getAircraftType());
+        this.controls.forEach(c => c.update());
     }
 
     /**

@@ -13,60 +13,17 @@ import {
     createFlexSection,
     updateSelectElement,
     createFlexNumberInputs,
-    createFlexCheckboxes,
     createSelectElement,
-    createStatsTable,
     createCollapsibleSection,
-    updateStatsTable,
     StatDisplayConfig,
     createMobileOptionItem,
     createMobileSelect,
-    createMobileCheckbox,
     createMobileNumberInput,
-    createMobileStatsGrid,
-    updateMobileStatsGrid
+    Updatable,
+    dualStats,
+    dualCheckboxInto,
+    dualNumberInto,
 } from '../dom_utils';
-
-// Cache interface for type safety
-interface AccessoriesCache {
-    // Armour coverage inputs (8 positions for different AP levels)
-    armourInputs: HTMLInputElement[];
-
-    // Electrical equipment inputs
-    electricalInputs: HTMLInputElement[];
-
-    // Radio select
-    radioSelect: HTMLSelectElement;
-
-    // Reconnaissance inputs
-    reconInputs: HTMLInputElement[];
-
-    // Visibility checkboxes
-    visiCheckboxes: HTMLInputElement[];
-
-    // Climate control checkboxes
-    climCheckboxes: HTMLInputElement[];
-
-    // Autopilot select
-    autopilotSelect: HTMLSelectElement;
-
-    // Control system select
-    controlSelect: HTMLSelectElement;
-
-    // Stat cells
-    statsTable: HTMLTableElement;
-    mobileStatsGrid?: HTMLDivElement;
-
-    // Mobile controls
-    mobileClimCheckboxes?: HTMLInputElement[];
-    mobileArmourInputs?: HTMLInputElement[];
-    mobileVisiCheckboxes?: HTMLInputElement[];
-    mobileReconInputs?: HTMLInputElement[];
-    mobileRadioSelect?: HTMLSelectElement;
-    mobileElectricalInputs?: HTMLInputElement[];
-    mobileAutopilotSelect?: HTMLSelectElement;
-    mobileControlSelect?: HTMLSelectElement;
-}
 
 // Accessories stats configuration
 const ACCESSORIES_STATS: StatDisplayConfig[] = [
@@ -82,14 +39,36 @@ const ACCESSORIES_STATS: StatDisplayConfig[] = [
 ];
 
 export class AccessoriesUI extends BaseComponentUI {
-    private cache: AccessoriesCache;
+    private controls: Updatable[] = [];
+
+    // Retained cache for the parts that do not fit a dual* helper:
+    //  - armour uses a custom nested L/R flex desktop layout
+    //  - radio/autopilot/control selects use a plain label+select desktop layout
+    //    (not the flex layout dualSelectInto would emit), while sharing a mobile
+    //    option item with neighbouring controls.
+    private armourInputs: HTMLInputElement[] = [];
+    private mobileArmourInputs: HTMLInputElement[] = [];
+    private radioSelect?: HTMLSelectElement;
+    private mobileRadioSelect?: HTMLSelectElement;
+    private autopilotSelect?: HTMLSelectElement;
+    private mobileAutopilotSelect?: HTMLSelectElement;
+    private controlSelect?: HTMLSelectElement;
+    private mobileControlSelect?: HTMLSelectElement;
 
     protected shouldUpdate(): boolean {
-        return this.cache !== undefined;
+        return (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {
-        this.cache = undefined;
+        this.controls = [];
+        this.armourInputs = [];
+        this.mobileArmourInputs = [];
+        this.radioSelect = undefined;
+        this.mobileRadioSelect = undefined;
+        this.autopilotSelect = undefined;
+        this.mobileAutopilotSelect = undefined;
+        this.controlSelect = undefined;
+        this.mobileControlSelect = undefined;
     }
 
     /**
@@ -133,28 +112,33 @@ export class AccessoriesUI extends BaseComponentUI {
         // Row 1 - Data
         const dataRow1 = document.createElement('tr');
 
-        // Climate cell
+        // Climate cell (shared flex; controls filled in below)
         const climateCell = document.createElement('td');
-        const climCheckboxes = this.createClimateSection(climateCell, bindings, bridge);
+        const climFlex = createFlexSection();
+        climateCell.appendChild(climFlex.div0);
         dataRow1.appendChild(climateCell);
 
-        // Armour cell
+        // Armour cell (custom nested L/R flex; not a dual* helper)
         const armourCell = document.createElement('td');
-        const armourInputs = this.createArmourSection(armourCell, bindings, bridge);
+        this.createArmourSection(armourCell, bindings, bridge);
         dataRow1.appendChild(armourCell);
 
-        // Visibility cell
+        // Visibility cell (shared flex; controls filled in below)
         const visibilityCell = document.createElement('td');
-        const visiCheckboxes = this.createVisibilitySection(visibilityCell, bindings, bridge);
+        const visiFlex = createFlexSection();
+        visibilityCell.appendChild(visiFlex.div0);
         dataRow1.appendChild(visibilityCell);
 
         // Stats cell
+        const statsCtl = dualStats(
+            localization.translate('Accessories Additional Part Stats'),
+            () => bridge.getAccessoriesStats(),
+            ACCESSORIES_STATS
+        );
         const statsCell = document.createElement('td');
         statsCell.className = "inner_table";
         statsCell.rowSpan = 3;
-        const stats = bridge.getAccessoriesStats();
-        const statsTable = createStatsTable(stats, ACCESSORIES_STATS);
-        statsCell.append(statsTable);
+        statsCell.append(statsCtl.desktop);
         dataRow1.appendChild(statsCell);
 
         mainTable.appendChild(dataRow1);
@@ -175,19 +159,20 @@ export class AccessoriesUI extends BaseComponentUI {
         // Row 2 - Data
         const dataRow2 = document.createElement('tr');
 
-        // Information cell (reconnaissance)
+        // Information cell (reconnaissance; shared flex)
         const infoCell = document.createElement('td');
-        const reconInputs = this.createInformationSection(infoCell, bindings, bridge);
+        const reconFlex = createFlexSection();
+        infoCell.appendChild(reconFlex.div0);
         dataRow2.appendChild(infoCell);
 
-        // Electrical cell (radio + electrical equipment)
+        // Electrical cell (radio select [custom] + electrical equipment counts flex)
         const electricalCell = document.createElement('td');
-        const { radioSelect, electricalInputs } = this.createElectricalSection(electricalCell, bindings, bridge);
+        const elecFlex = this.createElectricalSection(electricalCell, bindings, bridge);
         dataRow2.appendChild(electricalCell);
 
-        // Control cell (autopilot + control system)
+        // Control cell (autopilot + control system selects; custom)
         const controlCell = document.createElement('td');
-        const { autopilotSelect, controlSelect } = this.createControlSection(controlCell, bindings, bridge);
+        this.createControlSection(controlCell, bindings, bridge);
         dataRow2.appendChild(controlCell);
 
         mainTable.appendChild(dataRow2);
@@ -199,36 +184,32 @@ export class AccessoriesUI extends BaseComponentUI {
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
 
-        // Climate Section
+        // Climate Section: desktop shares climFlex; mobile shares one item.
         const climateItem = createMobileOptionItem(
             localization.translate('Accessories Climate'),
             mobileDiv
         );
-        const mobileClimCheckboxes: HTMLInputElement[] = [];
         if (bindings.clim_sel && Array.isArray(bindings.clim_sel)) {
-            for (let i = 0; i < bindings.clim_sel.length; i++) {
-                const binding = bindings.clim_sel[i];
-                const idx = i;
-                const checkbox = createMobileCheckbox(
-                    { name: binding.name, selected: binding.selected, enabled: binding.enabled },
+            bindings.clim_sel.forEach((_b: any, idx: number) => {
+                this.controls.push(dualCheckboxInto(
+                    climFlex,
                     climateItem.content,
+                    () => bridge.getAccessoriesBindings().clim_sel[idx],
                     (checked) => {
                         const updatedBindings = bridge.getAccessoriesBindings();
                         updatedBindings.clim_sel[idx].selected = checked;
                         bridge.setAccessoriesBindings(updatedBindings);
                         this.onUpdate();
                     }
-                );
-                mobileClimCheckboxes.push(checkbox);
-            }
+                ));
+            });
         }
 
-        // Armour Coverage Section
+        // Armour Coverage Section (custom; mobile item one number input each)
         const armourItem = createMobileOptionItem(
             localization.translate('Accessories Armour Coverage'),
             mobileDiv
         );
-        const mobileArmourInputs: HTMLInputElement[] = [];
         if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage)) {
             for (let i = 0; i < bindings.armour_coverage.length; i++) {
                 const binding = bindings.armour_coverage[i];
@@ -236,7 +217,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 const { input } = createMobileNumberInput(
                     binding,
                     armourItem.content,
-                    (value) => {
+                    (value: number) => {
                         const updatedBindings = bridge.getAccessoriesBindings();
                         updatedBindings.armour_coverage[idx].value = value;
                         bridge.setAccessoriesBindings(updatedBindings);
@@ -246,59 +227,51 @@ export class AccessoriesUI extends BaseComponentUI {
                     99,
                     1
                 );
-                mobileArmourInputs.push(input);
+                this.mobileArmourInputs.push(input);
             }
         }
 
-        // Visibility Section
+        // Visibility Section: desktop shares visiFlex; mobile shares one item.
         const visiItem = createMobileOptionItem(
             localization.translate('Accessories Visibility'),
             mobileDiv
         );
-        const mobileVisiCheckboxes: HTMLInputElement[] = [];
         if (bindings.visi_sel && Array.isArray(bindings.visi_sel)) {
-            for (let i = 0; i < bindings.visi_sel.length; i++) {
-                const binding = bindings.visi_sel[i];
-                const idx = i;
-                const checkbox = createMobileCheckbox(
-                    { name: binding.name, selected: binding.selected, enabled: binding.enabled },
+            bindings.visi_sel.forEach((_b: any, idx: number) => {
+                this.controls.push(dualCheckboxInto(
+                    visiFlex,
                     visiItem.content,
+                    () => bridge.getAccessoriesBindings().visi_sel[idx],
                     (checked) => {
                         const updatedBindings = bridge.getAccessoriesBindings();
                         updatedBindings.visi_sel[idx].selected = checked;
                         bridge.setAccessoriesBindings(updatedBindings);
                         this.onUpdate();
                     }
-                );
-                mobileVisiCheckboxes.push(checkbox);
-            }
+                ));
+            });
         }
 
-        // Information (Reconnaissance) Section
+        // Information (Reconnaissance) Section: desktop shares reconFlex; mobile one item.
         const infoItem = createMobileOptionItem(
             localization.translate('Accessories Information'),
             mobileDiv
         );
-        const mobileReconInputs: HTMLInputElement[] = [];
         if (bindings.recon_sel && Array.isArray(bindings.recon_sel)) {
-            for (let i = 0; i < bindings.recon_sel.length; i++) {
-                const binding = bindings.recon_sel[i];
-                const idx = i;
-                const { input } = createMobileNumberInput(
-                    binding,
+            bindings.recon_sel.forEach((_b: any, idx: number) => {
+                this.controls.push(dualNumberInto(
+                    reconFlex,
                     infoItem.content,
+                    () => bridge.getAccessoriesBindings().recon_sel[idx],
                     (value) => {
                         const updatedBindings = bridge.getAccessoriesBindings();
                         updatedBindings.recon_sel[idx].value = value;
                         bridge.setAccessoriesBindings(updatedBindings);
                         this.onUpdate();
                     },
-                    0,
-                    99,
-                    1
-                );
-                mobileReconInputs.push(input);
-            }
+                    { min: 0, max: 99, step: 1 }
+                ));
+            });
         }
 
         // Electrical Section
@@ -306,8 +279,7 @@ export class AccessoriesUI extends BaseComponentUI {
             localization.translate('Accessories Electrical'),
             mobileDiv
         );
-        // Radio select
-        let mobileRadioSelect: HTMLSelectElement | undefined;
+        // Radio select (custom desktop layout; mobile select into shared item)
         if (bindings.radio_sel) {
             const radioBinding = {
                 name: localization.translate('Accessories Radio'),
@@ -315,7 +287,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 selected: bindings.radio_sel.selected,
                 enabled: bindings.radio_sel.enabled
             };
-            mobileRadioSelect = createMobileSelect(
+            this.mobileRadioSelect = createMobileSelect(
                 radioBinding,
                 electricalItem.content,
                 (selectedIndex) => {
@@ -326,27 +298,22 @@ export class AccessoriesUI extends BaseComponentUI {
                 }
             );
         }
-        // Electrical equipment counts
-        const mobileElectricalInputs: HTMLInputElement[] = [];
+        // Electrical equipment counts: desktop shares elecFlex; mobile shares item.
         if (bindings.electrical_count && Array.isArray(bindings.electrical_count)) {
-            for (let i = 0; i < bindings.electrical_count.length; i++) {
-                const binding = bindings.electrical_count[i];
-                const idx = i;
-                const { input } = createMobileNumberInput(
-                    binding,
+            bindings.electrical_count.forEach((_b: any, idx: number) => {
+                this.controls.push(dualNumberInto(
+                    elecFlex,
                     electricalItem.content,
+                    () => bridge.getAccessoriesBindings().electrical_count[idx],
                     (value) => {
                         const updatedBindings = bridge.getAccessoriesBindings();
                         updatedBindings.electrical_count[idx].value = value;
                         bridge.setAccessoriesBindings(updatedBindings);
                         this.onUpdate();
                     },
-                    0,
-                    99,
-                    1
-                );
-                mobileElectricalInputs.push(input);
-            }
+                    { min: 0, max: 99, step: 1 }
+                ));
+            });
         }
 
         // Control Section
@@ -354,8 +321,7 @@ export class AccessoriesUI extends BaseComponentUI {
             localization.translate('Accessories Control'),
             mobileDiv
         );
-        // Autopilot select
-        let mobileAutopilotSelect: HTMLSelectElement | undefined;
+        // Autopilot select (custom desktop layout; mobile select into shared item)
         if (bindings.auto_sel) {
             const autopilotBinding = {
                 name: localization.translate('Accessories Autopilot'),
@@ -363,7 +329,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 selected: bindings.auto_sel.selected,
                 enabled: bindings.auto_sel.enabled
             };
-            mobileAutopilotSelect = createMobileSelect(
+            this.mobileAutopilotSelect = createMobileSelect(
                 autopilotBinding,
                 controlItem.content,
                 (selectedIndex) => {
@@ -374,8 +340,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 }
             );
         }
-        // Control system select
-        let mobileControlSelect: HTMLSelectElement | undefined;
+        // Control system select (custom desktop layout; mobile select into shared item)
         if (bindings.cont_sel) {
             const controlBinding = {
                 name: localization.translate('Accessories Control System'),
@@ -383,7 +348,7 @@ export class AccessoriesUI extends BaseComponentUI {
                 selected: bindings.cont_sel.selected,
                 enabled: bindings.cont_sel.enabled
             };
-            mobileControlSelect = createMobileSelect(
+            this.mobileControlSelect = createMobileSelect(
                 controlBinding,
                 controlItem.content,
                 (selectedIndex) => {
@@ -395,38 +360,13 @@ export class AccessoriesUI extends BaseComponentUI {
             );
         }
 
-        // Mobile stats grid
-        const statsItem = createMobileOptionItem(
-            localization.translate('Accessories Additional Part Stats'),
-            mobileDiv
-        );
-        //const stats already gathered above.
-        const mobileStatsGrid = createMobileStatsGrid(stats, ACCESSORIES_STATS);
-        statsItem.content.appendChild(mobileStatsGrid);
+        // Mobile stats: dualStats already built a .mobile-option-item with the
+        // "Accessories Additional Part Stats" title and the grid inside.
+        mobileDiv.appendChild(statsCtl.mobile);
 
         contentWrapper.appendChild(mobileDiv);
 
-        // Cache elements
-        this.cache = {
-            armourInputs,
-            electricalInputs,
-            radioSelect,
-            reconInputs,
-            visiCheckboxes,
-            climCheckboxes,
-            autopilotSelect,
-            controlSelect,
-            statsTable,
-            mobileStatsGrid,
-            mobileClimCheckboxes,
-            mobileArmourInputs,
-            mobileVisiCheckboxes,
-            mobileReconInputs,
-            mobileRadioSelect,
-            mobileElectricalInputs,
-            mobileAutopilotSelect,
-            mobileControlSelect
-        };
+        this.controls.push(statsCtl);
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Accessories Section Title');
@@ -444,26 +384,23 @@ export class AccessoriesUI extends BaseComponentUI {
         );
 
         this.container.appendChild(this.sectionElement);
-
-        console.log('[AccessoriesUI] Full rebuild complete');
     }
 
     /**
      * Create armour coverage section (8 number inputs for AP levels)
-     * Note: armour_coverage is not a UI binding, needs special handling
+     * Custom nested L/R flex desktop layout — not reproducible by dualNumberInto.
      */
     private createArmourSection(
         cell: HTMLTableCellElement,
         bindings: any,
         bridge: AircraftBridge
-    ): HTMLInputElement[] {
+    ): void {
         const flexContainer = createFlexSection();
         const flexContainerL = createFlexSection();
         const flexContainerR = createFlexSection();
         flexContainer.div1.appendChild(flexContainerL.div0);
         flexContainer.div2.appendChild(flexContainerR.div0);
 
-        // Reconnaissance equipment counts
         const armourBinding = bindings.armour_coverage;
         const armourInputsL = armourBinding && Array.isArray(armourBinding)
             ? createFlexNumberInputs(
@@ -491,20 +428,20 @@ export class AccessoriesUI extends BaseComponentUI {
             : [];
 
         cell.appendChild(flexContainer.div0);
-        return armourInputsL.concat(armourInputsR);
+        this.armourInputs = armourInputsL.concat(armourInputsR);
     }
 
     /**
-     * Create electrical section (radio select + electrical equipment counts)
+     * Create electrical section desktop side (radio select + electrical flex).
+     * The radio select uses a plain label+select layout (not flex), so it stays
+     * custom; the returned flex holds the electrical equipment number inputs which
+     * are filled via dualNumberInto in rebuildFull.
      */
     private createElectricalSection(
         cell: HTMLTableCellElement,
         bindings: any,
         bridge: AircraftBridge
-    ): {
-        radioSelect: HTMLSelectElement;
-        electricalInputs: HTMLInputElement[];
-    } {
+    ): ReturnType<typeof createFlexSection> {
         const flexContainer = createFlexSection();
 
         // Radio select
@@ -527,126 +464,21 @@ export class AccessoriesUI extends BaseComponentUI {
             cell.appendChild(radioSelect);
             cell.appendChild(document.createElement('br'));
         }
-
-        // Electrical equipment counts
-        const electricalBinding = bindings.electrical_count;
-        const electricalInputs = electricalBinding && Array.isArray(electricalBinding)
-            ? createFlexNumberInputs(
-                flexContainer,
-                electricalBinding,
-                (idx) => (value) => {
-                    const updatedBindings = bridge.getAccessoriesBindings();
-                    updatedBindings.electrical_count[idx].value = value;
-                    bridge.setAccessoriesBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            )
-            : [];
+        this.radioSelect = radioSelect;
 
         cell.appendChild(flexContainer.div0);
-        return { radioSelect, electricalInputs };
+        return flexContainer;
     }
 
     /**
-     * Create climate section (climate control checkboxes)
-     */
-    private createClimateSection(
-        cell: HTMLTableCellElement,
-        bindings: any,
-        bridge: AircraftBridge
-    ): HTMLInputElement[] {
-        const flexContainer = createFlexSection();
-
-        // Climate control toggles
-        const climBinding = bindings.clim_sel;
-        const climCheckboxes = climBinding && Array.isArray(climBinding)
-            ? createFlexCheckboxes(
-                flexContainer,
-                climBinding,
-                (idx) => (checked) => {
-                    const updatedBindings = bridge.getAccessoriesBindings();
-                    updatedBindings.clim_sel[idx].selected = checked;
-                    bridge.setAccessoriesBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            )
-            : [];
-
-        cell.appendChild(flexContainer.div0);
-        return climCheckboxes;
-    }
-
-    /**
-     * Create visibility section (visibility equipment checkboxes)
-     */
-    private createVisibilitySection(
-        cell: HTMLTableCellElement,
-        bindings: any,
-        bridge: AircraftBridge
-    ): HTMLInputElement[] {
-        const flexContainer = createFlexSection();
-
-        // Visibility equipment toggles
-        const visiBinding = bindings.visi_sel;
-        const visiCheckboxes = visiBinding && Array.isArray(visiBinding)
-            ? createFlexCheckboxes(
-                flexContainer,
-                visiBinding,
-                (idx) => (checked) => {
-                    const updatedBindings = bridge.getAccessoriesBindings();
-                    updatedBindings.visi_sel[idx].selected = checked;
-                    bridge.setAccessoriesBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            )
-            : [];
-
-        cell.appendChild(flexContainer.div0);
-        return visiCheckboxes;
-    }
-
-    /**
-     * Create information section (reconnaissance equipment)
-     */
-    private createInformationSection(
-        cell: HTMLTableCellElement,
-        bindings: any,
-        bridge: AircraftBridge
-    ): HTMLInputElement[] {
-        const flexContainer = createFlexSection();
-
-        // Reconnaissance equipment counts
-        const reconBinding = bindings.recon_sel;
-        const reconInputs = reconBinding && Array.isArray(reconBinding)
-            ? createFlexNumberInputs(
-                flexContainer,
-                reconBinding,
-                (idx) => (value) => {
-                    const updatedBindings = bridge.getAccessoriesBindings();
-                    updatedBindings.recon_sel[idx].value = value;
-                    bridge.setAccessoriesBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            )
-            : [];
-
-        cell.appendChild(flexContainer.div0);
-        return reconInputs;
-    }
-
-    /**
-     * Create control section (autopilot and control system)
+     * Create control section (autopilot and control system selects).
+     * Plain label+select desktop layout — stays custom.
      */
     private createControlSection(
         cell: HTMLTableCellElement,
         bindings: any,
         bridge: AircraftBridge
-    ): {
-        autopilotSelect: HTMLSelectElement;
-        controlSelect: HTMLSelectElement;
-    } {
-        const flexContainer = createFlexSection();
-
+    ): void {
         // Autopilot select
         const autopilotBinding = bindings.auto_sel;
         const autopilotSelect = autopilotBinding ? createSelectElement(
@@ -667,6 +499,7 @@ export class AccessoriesUI extends BaseComponentUI {
             cell.appendChild(autopilotSelect);
             cell.appendChild(document.createElement('br'));
         }
+        this.autopilotSelect = autopilotSelect;
 
         // Control system select
         const controlBinding = bindings.cont_sel;
@@ -688,8 +521,7 @@ export class AccessoriesUI extends BaseComponentUI {
             cell.appendChild(controlSelect);
             cell.appendChild(document.createElement('br'));
         }
-
-        return { autopilotSelect, controlSelect };
+        this.controlSelect = controlSelect;
     }
 
     /**
@@ -697,147 +529,49 @@ export class AccessoriesUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge || !this.cache) return;
+        if (!bridge || !this.controls?.length) return;
 
         const bindings = bridge.getAccessoriesBindings();
 
-        // Update armour inputs (desktop)
+        // Armour inputs (desktop) — custom layout, not in this.controls.
         if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage)) {
             bindings.armour_coverage.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.armourInputs.length) {
-                    this.cache!.armourInputs[idx].value = item.value.toString();
-                    this.cache!.armourInputs[idx].disabled = !item.enabled;
+                if (idx < this.armourInputs.length) {
+                    this.armourInputs[idx].value = item.value.toString();
+                    this.armourInputs[idx].disabled = !item.enabled;
+                }
+                if (idx < this.mobileArmourInputs.length) {
+                    this.mobileArmourInputs[idx].value = item.value.toString();
+                    this.mobileArmourInputs[idx].disabled = !item.enabled;
                 }
             });
         }
 
-        // Update armour inputs (mobile)
-        if (bindings.armour_coverage && Array.isArray(bindings.armour_coverage) && this.cache.mobileArmourInputs) {
-            bindings.armour_coverage.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileArmourInputs!.length) {
-                    this.cache!.mobileArmourInputs![idx].value = item.value.toString();
-                    this.cache!.mobileArmourInputs![idx].disabled = !item.enabled;
-                }
-            });
+        // Radio select (desktop + mobile) — custom layout.
+        if (this.radioSelect && bindings.radio_sel) {
+            updateSelectElement(this.radioSelect, bindings.radio_sel);
+        }
+        if (this.mobileRadioSelect && bindings.radio_sel) {
+            updateSelectElement(this.mobileRadioSelect, bindings.radio_sel);
         }
 
-        // Update electrical inputs (desktop)
-        if (bindings.electrical_count && Array.isArray(bindings.electrical_count)) {
-            bindings.electrical_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.electricalInputs.length) {
-                    this.cache!.electricalInputs[idx].value = item.value.toString();
-                    this.cache!.electricalInputs[idx].disabled = !item.enabled;
-                }
-            });
+        // Autopilot select (desktop + mobile) — custom layout.
+        if (this.autopilotSelect && bindings.auto_sel) {
+            updateSelectElement(this.autopilotSelect, bindings.auto_sel);
+        }
+        if (this.mobileAutopilotSelect && bindings.auto_sel) {
+            updateSelectElement(this.mobileAutopilotSelect, bindings.auto_sel);
         }
 
-        // Update electrical inputs (mobile)
-        if (bindings.electrical_count && Array.isArray(bindings.electrical_count) && this.cache.mobileElectricalInputs) {
-            bindings.electrical_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileElectricalInputs!.length) {
-                    this.cache!.mobileElectricalInputs![idx].value = item.value.toString();
-                    this.cache!.mobileElectricalInputs![idx].disabled = !item.enabled;
-                }
-            });
+        // Control select (desktop + mobile) — custom layout.
+        if (this.controlSelect && bindings.cont_sel) {
+            updateSelectElement(this.controlSelect, bindings.cont_sel);
+        }
+        if (this.mobileControlSelect && bindings.cont_sel) {
+            updateSelectElement(this.mobileControlSelect, bindings.cont_sel);
         }
 
-        // Update radio select (desktop)
-        if (this.cache.radioSelect && bindings.radio_sel) {
-            updateSelectElement(this.cache.radioSelect, bindings.radio_sel);
-        }
-
-        // Update radio select (mobile)
-        if (this.cache.mobileRadioSelect && bindings.radio_sel) {
-            updateSelectElement(this.cache.mobileRadioSelect, bindings.radio_sel);
-        }
-
-        // Update recon inputs (desktop)
-        if (bindings.recon_sel && Array.isArray(bindings.recon_sel)) {
-            bindings.recon_sel.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.reconInputs.length) {
-                    this.cache!.reconInputs[idx].value = item.value.toString();
-                    this.cache!.reconInputs[idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update recon inputs (mobile)
-        if (bindings.recon_sel && Array.isArray(bindings.recon_sel) && this.cache.mobileReconInputs) {
-            bindings.recon_sel.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileReconInputs!.length) {
-                    this.cache!.mobileReconInputs![idx].value = item.value.toString();
-                    this.cache!.mobileReconInputs![idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update visibility checkboxes (desktop)
-        if (bindings.visi_sel && Array.isArray(bindings.visi_sel)) {
-            bindings.visi_sel.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.visiCheckboxes.length) {
-                    this.cache!.visiCheckboxes[idx].checked = item.selected;
-                    this.cache!.visiCheckboxes[idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update visibility checkboxes (mobile)
-        if (bindings.visi_sel && Array.isArray(bindings.visi_sel) && this.cache.mobileVisiCheckboxes) {
-            bindings.visi_sel.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileVisiCheckboxes!.length) {
-                    this.cache!.mobileVisiCheckboxes![idx].checked = item.selected;
-                    this.cache!.mobileVisiCheckboxes![idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update climate checkboxes (desktop)
-        if (bindings.clim_sel && Array.isArray(bindings.clim_sel)) {
-            bindings.clim_sel.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.climCheckboxes.length) {
-                    this.cache!.climCheckboxes[idx].checked = item.selected;
-                    this.cache!.climCheckboxes[idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update climate checkboxes (mobile)
-        if (bindings.clim_sel && Array.isArray(bindings.clim_sel) && this.cache.mobileClimCheckboxes) {
-            bindings.clim_sel.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileClimCheckboxes!.length) {
-                    this.cache!.mobileClimCheckboxes![idx].checked = item.selected;
-                    this.cache!.mobileClimCheckboxes![idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update autopilot select (desktop)
-        if (this.cache.autopilotSelect && bindings.auto_sel) {
-            updateSelectElement(this.cache.autopilotSelect, bindings.auto_sel);
-        }
-
-        // Update autopilot select (mobile)
-        if (this.cache.mobileAutopilotSelect && bindings.auto_sel) {
-            updateSelectElement(this.cache.mobileAutopilotSelect, bindings.auto_sel);
-        }
-
-        // Update control select (desktop)
-        if (this.cache.controlSelect && bindings.cont_sel) {
-            updateSelectElement(this.cache.controlSelect, bindings.cont_sel);
-        }
-
-        // Update control select (mobile)
-        if (this.cache.mobileControlSelect && bindings.cont_sel) {
-            updateSelectElement(this.cache.mobileControlSelect, bindings.cont_sel);
-        }
-
-        // Update stat values
-        const stats = bridge.getAccessoriesStats();
-        updateStatsTable(this.cache.statsTable, stats, ACCESSORIES_STATS);
-
-        // Update mobile stats grid
-        if (this.cache.mobileStatsGrid) {
-            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, ACCESSORIES_STATS);
-        }
+        // Dual controls: climate, visibility, recon, electrical numbers, stats.
+        this.controls.forEach(c => c.update());
     }
 }

@@ -6,7 +6,7 @@ import {
     createFlexSection, createFlexSelect, createRulesLink, createSelectElement, updateSelectElement,
     createStatsTable, updateStatsTable, StatDisplayConfig,
     createMobileOptionItem, createMobileNumberInput, createMobileCheckbox, createMobileSelect,
-    createMobileStatsGrid, updateMobileStatsGrid
+    createMobileStatsGrid, updateMobileStatsGrid, getAssetBasePath
 } from '../dom_utils';
 
 // Mobile cache interfaces
@@ -311,7 +311,7 @@ export class EnginesUI extends BaseComponentUI {
         // Add Engine Builder link (desktop)
         const engineBuilderSpan = document.createElement('span');
         const engineBuilderLink = document.createElement('a');
-        engineBuilderLink.href = './engine.html';
+        engineBuilderLink.href = `${getAssetBasePath()}engine.html`;
         const engineBuilderText = document.createElement('u');
         engineBuilderText.textContent = 'Engine Builder';
         engineBuilderLink.appendChild(engineBuilderText);

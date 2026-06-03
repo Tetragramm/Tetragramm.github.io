@@ -9,8 +9,6 @@ import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
-    createSelectElement,
-    updateSelectElement,
     generateUniqueId,
     createMobileOptionItem,
     createMobileSelect
@@ -169,7 +167,9 @@ export class AircraftTypeUI extends BaseComponentUI {
         // Cache elements
         this.cache = { select };
 
-        console.log('[AircraftTypeUI] Full rebuild complete');
+        // Not converted to dualSelect: the <option> values here are aircraft-type
+        // values from a filtered list (not 0..n indices), so dualSelect's index-based
+        // options/handler would change the desktop DOM. Left hand-built intentionally.
     }
 
     /**

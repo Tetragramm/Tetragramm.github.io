@@ -11,21 +11,20 @@ import { BaseComponentUI } from '../base_component_ui';
 import {
     createRulesLink,
     createCollapsibleSection,
-    createStatsTable,
-    updateStatsTable,
     StatDisplayConfig,
     createMobileOptionItem,
     createMobileNumberInput,
-    createMobileStatsGrid,
-    updateMobileStatsGrid
+    DualControl,
+    dualStats,
 } from '../dom_utils';
 
-// Cache interface for type safety
+// Cache interface for the controls that are NOT a clean fit for the dual-control
+// helpers: the free-optimizations input (custom desktop label/input, not a flex
+// container) and the optimization rows (6 desktop checkboxes vs a single mobile
+// number input — a different control on each side).
 interface OptimizationCache {
     freeInput: HTMLInputElement;
     optimizationRows: OptimizationRow[];
-    statsTable: HTMLTableElement;
-    mobileStatsGrid?: HTMLDivElement;
     // Mobile controls
     mobileFreeInput?: HTMLInputElement;
     mobileOptInputs?: Map<string, HTMLInputElement>;
@@ -51,13 +50,20 @@ const OPTIMIZATION_STATS: StatDisplayConfig[] = [
 ];
 
 export class OptimizationUI extends BaseComponentUI {
+    // Dual controls (desktop + mobile) built in rebuildFull, refreshed in updateValues.
+    // Only the stats block is a clean fit; the free input and optimization rows are
+    // retained in `cache` below because their desktop/mobile DOM shapes differ.
+    private controls: DualControl[] = [];
     private cache: OptimizationCache;
 
     protected shouldUpdate(): boolean {
-        return this.cache !== undefined;
+        // Null-safe: BaseComponentUI's constructor triggers the first render()
+        // (hence shouldUpdate) before this subclass's field initializer runs.
+        return (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {
+        this.controls = [];
         this.cache = undefined;
     }
 
@@ -138,7 +144,12 @@ export class OptimizationUI extends BaseComponentUI {
 
         const optimizationRows: OptimizationRow[] = [];
 
-        console.log(bindings);
+        // Stats block: one definition yields the desktop table and the mobile grid.
+        const statsCtl = dualStats(
+            localization.translate('Optimization Optimization Stats'),
+            () => bridge.getOptimizationStats(),
+            OPTIMIZATION_STATS
+        );
 
         optimizationTypes.forEach((opt, idx) => {
             const binding = bindings[opt.key];
@@ -155,18 +166,15 @@ export class OptimizationUI extends BaseComponentUI {
 
             // Add stats cell to first row only (spans all 8 rows)
             if (idx === 0) {
-                const stats = bridge.getOptimizationStats();
-                const statsTable = createStatsTable(stats, OPTIMIZATION_STATS);
                 const statsCell = document.createElement('td');
                 statsCell.rowSpan = 8; // Spans all 8 optimization rows
                 statsCell.className = 'inner_table';
-                statsCell.appendChild(statsTable);
+                statsCell.appendChild(statsCtl.desktop);
                 rowElement.appendChild(statsCell);
-
-                // Cache the stats table
-                this.cache = { freeInput, optimizationRows, statsTable };
             }
         });
+
+        this.cache = { freeInput, optimizationRows };
 
         desktopDiv.appendChild(freeDiv);
         desktopDiv.appendChild(mainTable);
@@ -221,19 +229,13 @@ export class OptimizationUI extends BaseComponentUI {
             mobileOptInputs.set(opt.key, input);
         });
 
-        // Mobile stats grid
-        const statsItem = createMobileOptionItem(
-            localization.translate('Optimization Optimization Stats'),
-            mobileDiv
-        );
-        const stats = bridge.getOptimizationStats();
-        const mobileStatsGrid = createMobileStatsGrid(stats, OPTIMIZATION_STATS);
-        statsItem.content.appendChild(mobileStatsGrid);
-        if (this.cache) {
-            this.cache.mobileStatsGrid = mobileStatsGrid;
-            this.cache.mobileFreeInput = mobileFreeInput;
-            this.cache.mobileOptInputs = mobileOptInputs;
-        }
+        // Mobile stats grid (emitted by the dual stats control)
+        mobileDiv.appendChild(statsCtl.mobile);
+
+        this.cache.mobileFreeInput = mobileFreeInput;
+        this.cache.mobileOptInputs = mobileOptInputs;
+
+        this.controls = [statsCtl];
 
         contentWrapper.appendChild(mobileDiv);
 
@@ -256,8 +258,6 @@ export class OptimizationUI extends BaseComponentUI {
         this.container.appendChild(this.sectionElement);
 
         this.updateValues();
-
-        console.log('[OptimizationUI] Full rebuild complete');
     }
 
     /**
@@ -333,7 +333,7 @@ export class OptimizationUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge || !this.cache) return;
+        if (!bridge || !this.controls?.length) return;
 
         const bindings = bridge.getOptimizationBindings();
 
@@ -382,14 +382,8 @@ export class OptimizationUI extends BaseComponentUI {
             });
         }
 
-        // Update stats table
-        const stats = bridge.getOptimizationStats();
-        updateStatsTable(this.cache.statsTable, stats, OPTIMIZATION_STATS);
-
-        // Update mobile stats grid
-        if (this.cache.mobileStatsGrid) {
-            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, OPTIMIZATION_STATS);
-        }
+        // Update stats (desktop table + mobile grid)
+        this.controls.forEach(c => c.update());
     }
 
     /**

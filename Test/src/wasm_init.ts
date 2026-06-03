@@ -6,6 +6,7 @@
  */
 
 import { localization } from './wasm/localization';
+import { setAssetBasePath } from './wasm/dom_utils';
 import { AircraftBridge, AircraftType } from './wasm/aircraft_bridge';
 import { DEFAULT_AIRPLANE_LZ } from './wasm/default_aircraft';
 import { AircraftActions } from './wasm/aircraft_actions';
@@ -45,6 +46,12 @@ export interface WasmApplicationConfig {
     defaultAircraftLZ?: string;
     /** Mobile-nav section IDs to hide on this page (e.g. Wings/Propeller on Helicopter). */
     hiddenMobileSections?: Set<string>;
+    /**
+     * Base path (relative to the host HTML page) for shared assets that live under
+     * Test/ — the Rules pages and the Engine Builder. Default '' (Test's own pages,
+     * where the assets are siblings); the Helicopter pages set '../Test/'.
+     */
+    assetBasePath?: string;
 }
 
 export class WasmApplication {
@@ -85,6 +92,7 @@ export class WasmApplication {
 
     constructor(config: WasmApplicationConfig = {}) {
         this.config = config;
+        setAssetBasePath(config.assetBasePath ?? '');
     }
 
     async initialize(): Promise<void> {

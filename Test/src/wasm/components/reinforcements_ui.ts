@@ -5,54 +5,25 @@
  * Includes external reinforcements (wood/steel, cabane, wires) and internal (cantilever, wing blades)
  */
 
-import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
     createRulesLink,
     createFlexSection,
     updateSelectElement,
-    createFlexNumberInputs,
-    createFlexCheckbox,
     createSelectElement,
-    createStatsTable,
     createCollapsibleSection,
-    updateStatsTable,
     StatDisplayConfig,
     createMobileOptionItem,
     createMobileNumberInput,
     createMobileSelect,
     createMobileCheckbox,
-    createMobileStatsGrid,
-    updateMobileStatsGrid,
-    updateResponsiveGridColumnWidth
+    updateResponsiveGridColumnWidth,
+    Updatable,
+    dualNumberInto,
+    dualStats,
 } from '../dom_utils';
 import { AIRCRAFT_TYPE } from './aircraft_type_ui';
-
-// Cache interface for type safety
-interface ReinforcementsCache {
-    // External reinforcements
-    extWoodInputs: HTMLInputElement[];
-    extSteelInputs: HTMLInputElement[];
-    cabaneSelect: HTMLSelectElement;
-    wiresCheckbox: HTMLInputElement;
-
-    // Internal reinforcements
-    cantInputs: HTMLInputElement[];
-    wingBladesCheckbox: HTMLInputElement;
-
-    // Stats table
-    statsTable: HTMLTableElement;
-    mobileStatsGrid?: HTMLDivElement;
-
-    // Mobile controls
-    mobileExtWoodInputs?: HTMLInputElement[];
-    mobileExtSteelInputs?: HTMLInputElement[];
-    mobileCabaneSelect?: HTMLSelectElement;
-    mobileWiresCheckbox?: HTMLInputElement;
-    mobileCantInputs?: HTMLInputElement[];
-    mobileWingBladesCheckbox?: HTMLInputElement;
-}
 
 // Reinforcements stats configuration
 const REINFORCEMENTS_STATS: StatDisplayConfig[] = [
@@ -65,15 +36,15 @@ const REINFORCEMENTS_STATS: StatDisplayConfig[] = [
 ];
 
 export class ReinforcementsUI extends BaseComponentUI {
-    private cache: ReinforcementsCache;
+    private controls: Updatable[] = [];
     private showReinforcements: boolean;
 
     protected shouldUpdate(): boolean {
-        return this.cache !== undefined;
+        return (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {
-        this.cache = undefined;
+        this.controls = [];
     }
 
     /**
@@ -117,201 +88,46 @@ export class ReinforcementsUI extends BaseComponentUI {
         // Data row
         const dataRow = document.createElement('tr');
 
-        // External reinforcements cell
-        const externalCell = document.createElement('td');
-        const externalCache = this.createExternalSection(externalCell, bindings, bridge);
-        dataRow.appendChild(externalCell);
-
-        // Internal reinforcements cell
-        const internalCell = document.createElement('td');
-        const internalCache = this.createInternalSection(internalCell, bindings, bridge);
-        dataRow.appendChild(internalCell);
-
-        // Stats cell
-        const statsCell = document.createElement('td');
-        statsCell.className = 'inner_table';
-        const stats = bridge.getReinforcementsStats();
-        const derivedStats = bridge.getDerivedStats();
-        const statsTable = createStatsTable(stats, REINFORCEMENTS_STATS, derivedStats);
-        statsCell.appendChild(statsTable);
-        dataRow.appendChild(statsCell);
-
-        mainTable.appendChild(dataRow);
-
-        desktopDiv.appendChild(mainTable);
-        contentWrapper.appendChild(desktopDiv);
-
-        // === MOBILE VERSION ===
+        // === MOBILE VERSION (built alongside desktop so each control is made once) ===
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
 
-        // External Reinforcements section
+        // External Reinforcements: desktop cell + mobile item
+        const externalCell = document.createElement('td');
         const extItem = createMobileOptionItem(
             localization.translate('Reinforcement External Reinforcements'),
             mobileDiv
         );
-        const gridDiv = document.createElement('div');
-        gridDiv.className = 'mobile-responsive-grid';
-        gridDiv.style.gap = '0em';
-        gridDiv.style.columnGap = '-1rem';
-        extItem.content.appendChild(gridDiv);
+        const gridDiv = this.buildExternalSection(externalCell, extItem.content, bindings, bridge);
+        dataRow.appendChild(externalCell);
 
-        // Wood/Steel counts for each row
-        const extWoodBinding = bindings.ext_wood_count;
-        const extSteelBinding = bindings.ext_steel_count;
-
-        const mobileExtWoodInputs: HTMLInputElement[] = [];
-        const mobileExtSteelInputs: HTMLInputElement[] = [];
-
-        if (extWoodBinding && Array.isArray(extWoodBinding) && extSteelBinding && Array.isArray(extSteelBinding)) {
-            for (let i = 0; i < extWoodBinding.length; i++) {
-                const woodItem = extWoodBinding[i];
-                const steelItem = extSteelBinding[i];
-
-                // Row label
-                const rowDiv = document.createElement('div');
-                const rowLabel = document.createElement('strong');
-                rowLabel.textContent = woodItem.name;
-                rowDiv.style.gridColumnStart = '1';
-                rowDiv.appendChild(rowLabel);
-                gridDiv.appendChild(rowDiv);
-
-                // Wood input
-                const woodIndex = i;
-                const { input: woodInput } = createMobileNumberInput(
-                    { ...woodItem, name: localization.translate('Reinforcement Wood') },
-                    gridDiv,
-                    (value) => {
-                        const updatedBindings = bridge.getReinforcementsBindings();
-                        updatedBindings.ext_wood_count[woodIndex].value = value;
-                        bridge.setReinforcementsBindings(updatedBindings);
-                        this.onUpdate();
-                    },
-                    0,
-                    99,
-                    1
-                );
-                mobileExtWoodInputs.push(woodInput);
-
-                // Steel input
-                const steelIndex = i;
-                const { input: steelInput } = createMobileNumberInput(
-                    { ...steelItem, name: localization.translate('Reinforcement Steel') },
-                    gridDiv,
-                    (value) => {
-                        const updatedBindings = bridge.getReinforcementsBindings();
-                        updatedBindings.ext_steel_count[steelIndex].value = value;
-                        bridge.setReinforcementsBindings(updatedBindings);
-                        this.onUpdate();
-                    },
-                    0,
-                    99,
-                    1
-                );
-                mobileExtSteelInputs.push(steelInput);
-            }
-        }
-
-        // Cabane select
-        const cabaneBinding = bindings.cabane_sel;
-        let mobileCabaneSelect: HTMLSelectElement | undefined;
-        if (cabaneBinding) {
-            mobileCabaneSelect = createMobileSelect(
-                { ...cabaneBinding, name: localization.translate('Reinforcement Cabane') },
-                extItem.content,
-                (selectedIndex) => {
-                    const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.cabane_sel.selected = selectedIndex;
-                    bridge.setReinforcementsBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            );
-            mobileCabaneSelect.style.gridColumnStart = '1';
-        }
-
-        // Wires checkbox
-        const wiresBinding = bindings.wires;
-        let mobileWiresCheckbox: HTMLInputElement | undefined;
-        if (wiresBinding) {
-            mobileWiresCheckbox = createMobileCheckbox(
-                { ...wiresBinding, name: localization.translate('Reinforcement Wires') },
-                extItem.content,
-                (checked) => {
-                    const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.wires.selected = checked;
-                    bridge.setReinforcementsBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            );
-        }
-
-        // Internal Reinforcements section
+        // Internal Reinforcements: desktop cell + mobile item
+        const internalCell = document.createElement('td');
         const intItem = createMobileOptionItem(
             localization.translate('Reinforcement Internal Reinforcements'),
             mobileDiv
         );
+        this.buildInternalSection(internalCell, intItem.content, bindings, bridge);
+        dataRow.appendChild(internalCell);
 
-        // Cantilever counts
-        const cantBinding = bindings.cant_count;
-        const mobileCantInputs: HTMLInputElement[] = [];
-        if (cantBinding && Array.isArray(cantBinding)) {
-            cantBinding.forEach((item: any, idx: number) => {
-                const { input: cantInput } = createMobileNumberInput(
-                    item,
-                    intItem.content,
-                    (value) => {
-                        const updatedBindings = bridge.getReinforcementsBindings();
-                        updatedBindings.cant_count[idx].value = value;
-                        bridge.setReinforcementsBindings(updatedBindings);
-                        this.onUpdate();
-                    },
-                    0,
-                    99,
-                    1
-                );
-                mobileCantInputs.push(cantInput);
-            });
-        }
-
-        // Wing blades checkbox
-        const wingBladesBinding = bindings.wing_blades;
-        let mobileWingBladesCheckbox: HTMLInputElement | undefined;
-        if (wingBladesBinding) {
-            mobileWingBladesCheckbox = createMobileCheckbox(
-                { ...wingBladesBinding, name: localization.translate('Reinforcement Wing Blades') },
-                intItem.content,
-                (checked) => {
-                    const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.wing_blades.selected = checked;
-                    bridge.setReinforcementsBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            );
-        }
-
-        // Stats grid
-        const statsItem = createMobileOptionItem(
+        // Stats cell + mobile item (dualStats builds desktop table + mobile grid once)
+        const statsCtl = dualStats(
             localization.translate('Reinforcement Reinforcement Stats'),
-            mobileDiv
+            () => bridge.getReinforcementsStats(),
+            REINFORCEMENTS_STATS,
+            () => bridge.getDerivedStats()
         );
-        const mobileStatsGrid = createMobileStatsGrid(stats, REINFORCEMENTS_STATS, derivedStats);
-        statsItem.content.appendChild(mobileStatsGrid);
+        const statsCell = document.createElement('td');
+        statsCell.className = 'inner_table';
+        statsCell.appendChild(statsCtl.desktop);
+        dataRow.appendChild(statsCell);
+        mobileDiv.appendChild(statsCtl.mobile);
+        this.controls.push(statsCtl);
 
+        mainTable.appendChild(dataRow);
+        desktopDiv.appendChild(mainTable);
+        contentWrapper.appendChild(desktopDiv);
         contentWrapper.appendChild(mobileDiv);
-
-        // Cache elements
-        this.cache = {
-            ...externalCache,
-            ...internalCache,
-            statsTable,
-            mobileStatsGrid,
-            mobileExtWoodInputs,
-            mobileExtSteelInputs,
-            mobileCabaneSelect,
-            mobileWiresCheckbox,
-            mobileCantInputs,
-            mobileWingBladesCheckbox
-        };
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Reinforcement Section Title');
@@ -336,26 +152,30 @@ export class ReinforcementsUI extends BaseComponentUI {
         requestAnimationFrame(() => {
             updateResponsiveGridColumnWidth(gridDiv);
         });
-
-        console.log('[ReinforcementsUI] Full rebuild complete');
     }
 
     /**
-     * Create external reinforcements section (wood/steel counts, cabane, wires)
+     * Build the external reinforcements (wood/steel counts, cabane, wires) into
+     * both the desktop table cell and the mobile option content. Each control is
+     * created once with a single shared handler, pushed into this.controls.
+     *
+     * The wood/steel inputs, cabane select, and wires checkbox keep their original
+     * custom desktop layouts (see notes below) — the dom_utils dual* helpers cannot
+     * reproduce them byte-for-byte — but the change handlers are no longer duplicated
+     * because mobile and desktop share one closure per control.
+     *
+     * @returns the mobile responsive grid div (for post-layout column sizing)
      */
-    private createExternalSection(
+    private buildExternalSection(
         cell: HTMLTableCellElement,
+        mobileContent: HTMLElement,
         bindings: any,
-        bridge: AircraftBridge
-    ): {
-        extWoodInputs: HTMLInputElement[];
-        extSteelInputs: HTMLInputElement[];
-        cabaneSelect: HTMLSelectElement;
-        wiresCheckbox: HTMLInputElement;
-    } {
+        bridge: any
+    ): HTMLDivElement {
+        // --- Desktop scaffolding ---
         const mainFlex = createFlexSection();
 
-        // Create nested flex containers for wood/steel columns
+        // Nested flex containers for wood/steel columns
         const fsrDiv = document.createElement('div');
         fsrDiv.className = 'flex-container-o';
         const fsr1 = document.createElement('div');
@@ -371,19 +191,43 @@ export class ReinforcementsUI extends BaseComponentUI {
         fsr1.appendChild(fsWood.div0);
         fsr2.appendChild(fsSteel.div0);
 
-        // External wood/steel reinforcements (number_list bindings)
+        // --- Mobile scaffolding ---
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'mobile-responsive-grid';
+        gridDiv.style.gap = '0em';
+        gridDiv.style.columnGap = '-1rem';
+        mobileContent.appendChild(gridDiv);
+
+        // External wood/steel reinforcements (number_list bindings).
+        // UNCONVERTED: desktop splits wood and steel into two separate nested flex
+        // sections (fsWood / fsSteel) with a shared row label on mainFlex.div1, and
+        // mobile uses a responsive grid with per-row labels. No dual* helper mirrors
+        // this split-column / grid layout, so these stay on the raw builders — but
+        // each row's wood and steel inputs now share one handler across both views.
         const extWoodBinding = bindings.ext_wood_count;
         const extSteelBinding = bindings.ext_steel_count;
-
-        const extWoodInputs: HTMLInputElement[] = [];
-        const extSteelInputs: HTMLInputElement[] = [];
 
         if (extWoodBinding && Array.isArray(extWoodBinding) && extSteelBinding && Array.isArray(extSteelBinding)) {
             for (let i = 0; i < extWoodBinding.length; i++) {
                 const woodItem = extWoodBinding[i];
                 const steelItem = extSteelBinding[i];
+                const woodIndex = i; // Capture for closures
+                const steelIndex = i;
 
-                // Label for the reinforcement type (on main flex left column)
+                const onWoodChange = (value: number) => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.ext_wood_count[woodIndex].value = value;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.onUpdate();
+                };
+                const onSteelChange = (value: number) => {
+                    const updatedBindings = bridge.getReinforcementsBindings();
+                    updatedBindings.ext_steel_count[steelIndex].value = value;
+                    bridge.setReinforcementsBindings(updatedBindings);
+                    this.onUpdate();
+                };
+
+                // --- Desktop: row label + wood input (fsWood) + steel input (fsSteel) ---
                 const label = document.createElement('label');
                 label.textContent = woodItem.name;
                 label.className = 'flex-item';
@@ -391,7 +235,6 @@ export class ReinforcementsUI extends BaseComponentUI {
                 label.style.marginRight = '0.5em';
                 mainFlex.div1.appendChild(label);
 
-                // Wood count input
                 const woodLabel = document.createElement('label');
                 woodLabel.textContent = localization.translate('Reinforcement Wood');
                 woodLabel.className = 'flex-item';
@@ -405,19 +248,11 @@ export class ReinforcementsUI extends BaseComponentUI {
                 woodInput.className = 'flex-item';
                 woodInput.value = woodItem.value.toString();
                 woodInput.disabled = !woodItem.enabled;
-
-                const woodIndex = i; // Capture for closure
                 woodInput.addEventListener('change', () => {
-                    const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.ext_wood_count[woodIndex].value = parseInt(woodInput.value) || 0;
-                    bridge.setReinforcementsBindings(updatedBindings);
-                    this.onUpdate();
+                    onWoodChange(parseInt(woodInput.value) || 0);
                 });
-
                 fsWood.div2.appendChild(woodInput);
-                extWoodInputs.push(woodInput);
 
-                // Steel count input
                 const steelLabel = document.createElement('label');
                 steelLabel.textContent = localization.translate('Reinforcement Steel');
                 steelLabel.className = 'flex-item';
@@ -431,33 +266,70 @@ export class ReinforcementsUI extends BaseComponentUI {
                 steelInput.className = 'flex-item';
                 steelInput.value = steelItem.value.toString();
                 steelInput.disabled = !steelItem.enabled;
-
-                const steelIndex = i; // Capture for closure
                 steelInput.addEventListener('change', () => {
-                    const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.ext_steel_count[steelIndex].value = parseInt(steelInput.value) || 0;
-                    bridge.setReinforcementsBindings(updatedBindings);
-                    this.onUpdate();
+                    onSteelChange(parseInt(steelInput.value) || 0);
                 });
-
                 fsSteel.div2.appendChild(steelInput);
-                extSteelInputs.push(steelInput);
+
+                // --- Mobile: row label + wood input + steel input in the grid ---
+                const rowDiv = document.createElement('div');
+                const rowLabel = document.createElement('strong');
+                rowLabel.textContent = woodItem.name;
+                rowDiv.style.gridColumnStart = '1';
+                rowDiv.appendChild(rowLabel);
+                gridDiv.appendChild(rowDiv);
+
+                const { input: mobileWoodInput } = createMobileNumberInput(
+                    { ...woodItem, name: localization.translate('Reinforcement Wood') },
+                    gridDiv,
+                    onWoodChange,
+                    0,
+                    99,
+                    1
+                );
+
+                const { input: mobileSteelInput } = createMobileNumberInput(
+                    { ...steelItem, name: localization.translate('Reinforcement Steel') },
+                    gridDiv,
+                    onSteelChange,
+                    0,
+                    99,
+                    1
+                );
+
+                // One Updatable refreshing both desktop and mobile for this row.
+                this.controls.push({
+                    update: () => {
+                        const b = bridge.getReinforcementsBindings();
+                        const w = b.ext_wood_count[woodIndex];
+                        const s = b.ext_steel_count[steelIndex];
+                        woodInput.value = w.value.toString();
+                        woodInput.disabled = !w.enabled;
+                        mobileWoodInput.value = w.value.toString();
+                        mobileWoodInput.disabled = !w.enabled;
+                        steelInput.value = s.value.toString();
+                        steelInput.disabled = !s.enabled;
+                        mobileSteelInput.value = s.value.toString();
+                        mobileSteelInput.disabled = !s.enabled;
+                    }
+                });
             }
         }
 
-        // Cabane select
+        // Cabane select.
+        // UNCONVERTED: the original desktop select is built with createSelectElement
+        // (no id / no label htmlFor), unlike dualSelectInto's createFlexSelect which
+        // adds both. Converting would change the desktop attributes, so it stays
+        // custom — but desktop and mobile share one onChange handler.
         const cabaneBinding = bindings.cabane_sel;
-        const cabaneSelect = cabaneBinding ? createSelectElement(
-            cabaneBinding,
-            (selectedIndex) => {
+        if (cabaneBinding) {
+            const onCabaneChange = (selectedIndex: number) => {
                 const updatedBindings = bridge.getReinforcementsBindings();
                 updatedBindings.cabane_sel.selected = selectedIndex;
                 bridge.setReinforcementsBindings(updatedBindings);
                 this.onUpdate();
-            }
-        ) : undefined;
+            };
 
-        if (cabaneSelect) {
             const cabaneLabel = document.createElement('label');
             cabaneLabel.textContent = localization.translate('Reinforcement Cabane');
             cabaneLabel.className = 'flex-item';
@@ -465,15 +337,42 @@ export class ReinforcementsUI extends BaseComponentUI {
             cabaneLabel.style.marginRight = '0.5em';
             mainFlex.div1.appendChild(cabaneLabel);
 
+            const cabaneSelect = createSelectElement(cabaneBinding, onCabaneChange);
             cabaneSelect.className = 'flex-item';
             mainFlex.div2.appendChild(cabaneSelect);
+
+            const mobileCabaneSelect = createMobileSelect(
+                { ...cabaneBinding, name: localization.translate('Reinforcement Cabane') },
+                mobileContent,
+                onCabaneChange
+            );
+            mobileCabaneSelect.style.gridColumnStart = '1';
+
+            this.controls.push({
+                update: () => {
+                    const b = bridge.getReinforcementsBindings();
+                    if (b.cabane_sel) {
+                        updateSelectElement(cabaneSelect, b.cabane_sel);
+                        updateSelectElement(mobileCabaneSelect, b.cabane_sel);
+                    }
+                }
+            });
         }
 
-        // Wires checkbox - need custom layout for empty label
+        // Wires checkbox.
+        // UNCONVERTED: desktop uses a custom span.flex-item wrapping an empty label
+        // and a bare checkbox (no id / no flex-item class on the input), which does
+        // not match dualCheckboxInto's createFlexCheckbox. Kept custom; the mobile
+        // checkbox and the handler are shared with desktop.
         const wiresBinding = bindings.wires;
-        let wiresCheckbox: HTMLInputElement;
-
         if (wiresBinding) {
+            const onWiresChange = (checked: boolean) => {
+                const updatedBindings = bridge.getReinforcementsBindings();
+                updatedBindings.wires.selected = checked;
+                bridge.setReinforcementsBindings(updatedBindings);
+                this.onUpdate();
+            };
+
             const wiresLabel = document.createElement('label');
             wiresLabel.textContent = localization.translate('Reinforcement Wires');
             wiresLabel.className = 'flex-item';
@@ -484,61 +383,91 @@ export class ReinforcementsUI extends BaseComponentUI {
             const checkboxSpan = document.createElement('span');
             checkboxSpan.className = 'flex-item';
 
-            wiresCheckbox = document.createElement('input');
+            const wiresCheckbox = document.createElement('input');
             wiresCheckbox.type = 'checkbox';
             wiresCheckbox.checked = wiresBinding.selected;
             wiresCheckbox.disabled = !wiresBinding.enabled;
             wiresCheckbox.addEventListener('change', () => {
-                const updatedBindings = bridge.getReinforcementsBindings();
-                updatedBindings.wires.selected = wiresCheckbox.checked;
-                bridge.setReinforcementsBindings(updatedBindings);
-                this.onUpdate();
+                onWiresChange(wiresCheckbox.checked);
             });
 
             const emptyLabel = document.createElement('label');
             checkboxSpan.appendChild(emptyLabel);
             checkboxSpan.appendChild(wiresCheckbox);
             mainFlex.div2.appendChild(checkboxSpan);
+
+            const mobileWiresCheckbox = createMobileCheckbox(
+                { ...wiresBinding, name: localization.translate('Reinforcement Wires') },
+                mobileContent,
+                onWiresChange
+            );
+
+            this.controls.push({
+                update: () => {
+                    const b = bridge.getReinforcementsBindings();
+                    if (b.wires) {
+                        wiresCheckbox.checked = b.wires.selected;
+                        wiresCheckbox.disabled = !b.wires.enabled;
+                        mobileWiresCheckbox.checked = b.wires.selected;
+                        mobileWiresCheckbox.disabled = !b.wires.enabled;
+                    }
+                }
+            });
         }
 
         cell.appendChild(mainFlex.div0);
 
-        return { extWoodInputs, extSteelInputs, cabaneSelect, wiresCheckbox };
+        return gridDiv;
     }
 
     /**
-     * Create internal reinforcements section (cantilever counts, wing blades)
+     * Build the internal reinforcements (cantilever counts, wing blades) into both
+     * the desktop table cell and the mobile option content. Each control is created
+     * once with a single shared handler, pushed into this.controls.
      */
-    private createInternalSection(
+    private buildInternalSection(
         cell: HTMLTableCellElement,
+        mobileContent: HTMLElement,
         bindings: any,
-        bridge: AircraftBridge
-    ): {
-        cantInputs: HTMLInputElement[];
-        wingBladesCheckbox: HTMLInputElement;
-    } {
+        bridge: any
+    ): void {
         const flexContainer = createFlexSection();
 
-        // Cantilever reinforcements (number_list binding)
+        // Cantilever reinforcements (number_list binding).
+        // CONVERTED: standard flex number input on desktop + standard mobile number
+        // input, one per index, via dualNumberInto (byte-identical to the original
+        // createFlexNumberInputs / createMobileNumberInput pair).
         const cantBinding = bindings.cant_count;
-        const cantInputs = cantBinding && Array.isArray(cantBinding)
-            ? createFlexNumberInputs(
-                flexContainer,
-                cantBinding,
-                (idx) => (value) => {
-                    const updatedBindings = bridge.getReinforcementsBindings();
-                    updatedBindings.cant_count[idx].value = value;
-                    bridge.setReinforcementsBindings(updatedBindings);
-                    this.onUpdate();
-                }
-            )
-            : [];
+        if (cantBinding && Array.isArray(cantBinding)) {
+            cantBinding.forEach((_item: any, idx: number) => {
+                this.controls.push(dualNumberInto(
+                    flexContainer,
+                    mobileContent,
+                    () => bridge.getReinforcementsBindings().cant_count[idx],
+                    (value) => {
+                        const updatedBindings = bridge.getReinforcementsBindings();
+                        updatedBindings.cant_count[idx].value = value;
+                        bridge.setReinforcementsBindings(updatedBindings);
+                        this.onUpdate();
+                    },
+                    { min: 0, max: 99, step: 1 }
+                ));
+            });
+        }
 
-        // Wing blades checkbox - need custom layout for empty label
+        // Wing blades checkbox.
+        // UNCONVERTED: same custom empty-label span desktop layout as the wires
+        // checkbox above, which dualCheckboxInto cannot reproduce. Kept custom; the
+        // mobile checkbox and the handler are shared with desktop.
         const wingBladesBinding = bindings.wing_blades;
-        let wingBladesCheckbox: HTMLInputElement;
-
         if (wingBladesBinding) {
+            const onWingBladesChange = (checked: boolean) => {
+                const updatedBindings = bridge.getReinforcementsBindings();
+                updatedBindings.wing_blades.selected = checked;
+                bridge.setReinforcementsBindings(updatedBindings);
+                this.onUpdate();
+            };
+
             const wingLabel = document.createElement('label');
             wingLabel.textContent = localization.translate('Reinforcement Wing Blades');
             wingLabel.className = 'flex-item';
@@ -549,26 +478,39 @@ export class ReinforcementsUI extends BaseComponentUI {
             const checkboxSpan = document.createElement('span');
             checkboxSpan.className = 'flex-item';
 
-            wingBladesCheckbox = document.createElement('input');
+            const wingBladesCheckbox = document.createElement('input');
             wingBladesCheckbox.type = 'checkbox';
             wingBladesCheckbox.checked = wingBladesBinding.selected;
             wingBladesCheckbox.disabled = !wingBladesBinding.enabled;
             wingBladesCheckbox.addEventListener('change', () => {
-                const updatedBindings = bridge.getReinforcementsBindings();
-                updatedBindings.wing_blades.selected = wingBladesCheckbox.checked;
-                bridge.setReinforcementsBindings(updatedBindings);
-                this.onUpdate();
+                onWingBladesChange(wingBladesCheckbox.checked);
             });
 
             const emptyLabel = document.createElement('label');
             checkboxSpan.appendChild(emptyLabel);
             checkboxSpan.appendChild(wingBladesCheckbox);
             flexContainer.div2.appendChild(checkboxSpan);
+
+            const mobileWingBladesCheckbox = createMobileCheckbox(
+                { ...wingBladesBinding, name: localization.translate('Reinforcement Wing Blades') },
+                mobileContent,
+                onWingBladesChange
+            );
+
+            this.controls.push({
+                update: () => {
+                    const b = bridge.getReinforcementsBindings();
+                    if (b.wing_blades) {
+                        wingBladesCheckbox.checked = b.wing_blades.selected;
+                        wingBladesCheckbox.disabled = !b.wing_blades.enabled;
+                        mobileWingBladesCheckbox.checked = b.wing_blades.selected;
+                        mobileWingBladesCheckbox.disabled = !b.wing_blades.enabled;
+                    }
+                }
+            });
         }
 
         cell.appendChild(flexContainer.div0);
-
-        return { cantInputs, wingBladesCheckbox };
     }
 
     /**
@@ -576,113 +518,9 @@ export class ReinforcementsUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge || !this.cache) return;
+        if (!bridge || !this.controls?.length) return;
 
-        const bindings = bridge.getReinforcementsBindings();
-
-        // Update external wood counts (desktop)
-        if (bindings.ext_wood_count && Array.isArray(bindings.ext_wood_count)) {
-            bindings.ext_wood_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.extWoodInputs.length) {
-                    this.cache!.extWoodInputs[idx].value = item.value.toString();
-                    this.cache!.extWoodInputs[idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update external wood counts (mobile)
-        if (bindings.ext_wood_count && Array.isArray(bindings.ext_wood_count) && this.cache.mobileExtWoodInputs) {
-            bindings.ext_wood_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileExtWoodInputs!.length) {
-                    this.cache!.mobileExtWoodInputs![idx].value = item.value.toString();
-                    this.cache!.mobileExtWoodInputs![idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update external steel counts (desktop)
-        if (bindings.ext_steel_count && Array.isArray(bindings.ext_steel_count)) {
-            bindings.ext_steel_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.extSteelInputs.length) {
-                    this.cache!.extSteelInputs[idx].value = item.value.toString();
-                    this.cache!.extSteelInputs[idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update external steel counts (mobile)
-        if (bindings.ext_steel_count && Array.isArray(bindings.ext_steel_count) && this.cache.mobileExtSteelInputs) {
-            bindings.ext_steel_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileExtSteelInputs!.length) {
-                    this.cache!.mobileExtSteelInputs![idx].value = item.value.toString();
-                    this.cache!.mobileExtSteelInputs![idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update cantilever counts (desktop)
-        if (bindings.cant_count && Array.isArray(bindings.cant_count)) {
-            bindings.cant_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.cantInputs.length) {
-                    this.cache!.cantInputs[idx].value = item.value.toString();
-                    this.cache!.cantInputs[idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update cantilever counts (mobile)
-        if (bindings.cant_count && Array.isArray(bindings.cant_count) && this.cache.mobileCantInputs) {
-            bindings.cant_count.forEach((item: any, idx: number) => {
-                if (idx < this.cache!.mobileCantInputs!.length) {
-                    this.cache!.mobileCantInputs![idx].value = item.value.toString();
-                    this.cache!.mobileCantInputs![idx].disabled = !item.enabled;
-                }
-            });
-        }
-
-        // Update cabane select (desktop)
-        if (this.cache.cabaneSelect && bindings.cabane_sel) {
-            updateSelectElement(this.cache.cabaneSelect, bindings.cabane_sel);
-        }
-
-        // Update cabane select (mobile)
-        if (this.cache.mobileCabaneSelect && bindings.cabane_sel) {
-            updateSelectElement(this.cache.mobileCabaneSelect, bindings.cabane_sel);
-        }
-
-        // Update wires checkbox (desktop)
-        if (this.cache.wiresCheckbox && bindings.wires) {
-            this.cache.wiresCheckbox.checked = bindings.wires.selected;
-            this.cache.wiresCheckbox.disabled = !bindings.wires.enabled;
-        }
-
-        // Update wires checkbox (mobile)
-        if (this.cache.mobileWiresCheckbox && bindings.wires) {
-            this.cache.mobileWiresCheckbox.checked = bindings.wires.selected;
-            this.cache.mobileWiresCheckbox.disabled = !bindings.wires.enabled;
-        }
-
-        // Update wing blades checkbox (desktop)
-        if (this.cache.wingBladesCheckbox && bindings.wing_blades) {
-            this.cache.wingBladesCheckbox.checked = bindings.wing_blades.selected;
-            this.cache.wingBladesCheckbox.disabled = !bindings.wing_blades.enabled;
-        }
-
-        // Update wing blades checkbox (mobile)
-        if (this.cache.mobileWingBladesCheckbox && bindings.wing_blades) {
-            this.cache.mobileWingBladesCheckbox.checked = bindings.wing_blades.selected;
-            this.cache.mobileWingBladesCheckbox.disabled = !bindings.wing_blades.enabled;
-        }
-
-        // Update stats table
-        const stats = bridge.getReinforcementsStats();
-        const derivedStats = bridge.getDerivedStats();
-        updateStatsTable(this.cache.statsTable, stats, REINFORCEMENTS_STATS, derivedStats);
-
-        // Update mobile stats grid
-        if (this.cache.mobileStatsGrid) {
-            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, REINFORCEMENTS_STATS, derivedStats);
-        }
+        this.controls.forEach(c => c.update());
     }
 
     /**

@@ -76,6 +76,90 @@ pub struct AircraftWasm {
     inner: Aircraft,
 }
 
+// ============================================================================
+// Part UI binding boilerplate
+//
+// Almost every part exposes the same trio across the WASM boundary:
+//   get<Part>Bindings  -> serialize create_ui_options()
+//   set<Part>Bindings  -> receive_ui_selections(); recalc aircraft stats
+//   get<Part>Stats     -> serialize part_stats()
+//
+// These macros generate that trio (or just the getter/setter for parts whose
+// stats are reported per sub-element) so adding a part is a single line instead
+// of three hand-written, identical wasm-bindgen methods. The generated JS names
+// are spelled out as string literals to keep the JS API contract explicit.
+// ============================================================================
+
+macro_rules! part_ui {
+    ($field:ident,
+     $get:ident   = $get_js:literal,
+     $set:ident   = $set_js:literal,
+     $stats:ident = $stats_js:literal) => {
+        #[wasm_bindgen]
+        impl AircraftWasm {
+            #[wasm_bindgen(js_name = $get_js)]
+            pub fn $get(&self) -> JsValue {
+                serde_wasm_bindgen::to_value(&self.inner.$field.create_ui_options()).unwrap()
+            }
+
+            #[wasm_bindgen(js_name = $set_js)]
+            pub fn $set(&mut self, js_options: JsValue) {
+                if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+                    self.inner.$field.receive_ui_selections(options);
+                    self.inner.part_stats();
+                }
+            }
+
+            #[wasm_bindgen(js_name = $stats_js)]
+            pub fn $stats(&mut self) -> JsValue {
+                serde_wasm_bindgen::to_value(&self.inner.$field.part_stats()).unwrap()
+            }
+        }
+    };
+}
+
+macro_rules! part_ui_bindings_only {
+    ($field:ident,
+     $get:ident = $get_js:literal,
+     $set:ident = $set_js:literal) => {
+        #[wasm_bindgen]
+        impl AircraftWasm {
+            #[wasm_bindgen(js_name = $get_js)]
+            pub fn $get(&self) -> JsValue {
+                serde_wasm_bindgen::to_value(&self.inner.$field.create_ui_options()).unwrap()
+            }
+
+            #[wasm_bindgen(js_name = $set_js)]
+            pub fn $set(&mut self, js_options: JsValue) {
+                if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
+                    self.inner.$field.receive_ui_selections(options);
+                    self.inner.part_stats();
+                }
+            }
+        }
+    };
+}
+
+part_ui!(era,             get_era_bindings             = "getEraBindings",             set_era_bindings             = "setEraBindings",             get_era_stats             = "getEraStats");
+part_ui!(propeller,       get_propeller_bindings       = "getPropellerBindings",       set_propeller_bindings       = "setPropellerBindings",       get_propeller_stats       = "getPropellerStats");
+part_ui!(passengers,      get_passengers_bindings      = "getPassengersBindings",      set_passengers_bindings      = "setPassengersBindings",      get_passengers_stats      = "getPassengersStats");
+part_ui!(fuel,            get_fuel_bindings            = "getFuelBindings",            set_fuel_bindings            = "setFuelBindings",            get_fuel_stats            = "getFuelStats");
+part_ui!(accessories,     get_accessories_bindings     = "getAccessoriesBindings",     set_accessories_bindings     = "setAccessoriesBindings",     get_accessories_stats     = "getAccessoriesStats");
+part_ui!(cargo,           get_cargo_bindings           = "getCargoBindings",           set_cargo_bindings           = "setCargoBindings",           get_cargo_stats           = "getCargoStats");
+part_ui!(controlsurfaces, get_control_surfaces_bindings = "getControlSurfacesBindings", set_control_surfaces_bindings = "setControlSurfacesBindings", get_control_surfaces_stats = "getControlSurfacesStats");
+part_ui!(gear,            get_landing_gear_bindings    = "getLandingGearBindings",     set_landing_gear_bindings    = "setLandingGearBindings",     get_landing_gear_stats    = "getLandingGearStats");
+part_ui!(munitions,       get_munitions_bindings       = "getMunitionsBindings",       set_munitions_bindings       = "setMunitionsBindings",       get_munitions_stats       = "getMunitionsStats");
+part_ui!(optimization,    get_optimization_bindings    = "getOptimizationBindings",    set_optimization_bindings    = "setOptimizationBindings",    get_optimization_stats    = "getOptimizationStats");
+part_ui!(used,            get_used_bindings            = "getUsedBindings",            set_used_bindings            = "setUsedBindings",            get_used_stats            = "getUsedStats");
+part_ui!(weapons,         get_weapons_bindings         = "getWeaponsBindings",         set_weapons_bindings         = "setWeaponsBindings",         get_weapons_stats         = "getWeaponsStats");
+part_ui!(reinforcements,  get_reinforcements_bindings  = "getReinforcementsBindings",  set_reinforcements_bindings  = "setReinforcementsBindings",  get_reinforcements_stats  = "getReinforcementsStats");
+part_ui!(stabilizers,     get_stabilizers_bindings     = "getStabilizersBindings",     set_stabilizers_bindings     = "setStabilizersBindings",     get_stabilizers_stats     = "getStabilizersStats");
+part_ui!(frames,          get_frames_bindings          = "getFramesBindings",          set_frames_bindings          = "setFramesBindings",          get_frames_stats          = "getFramesStats");
+part_ui!(wings,           get_wings_bindings           = "getWingsBindings",           set_wings_bindings           = "setWingsBindings",           get_wings_stats           = "getWingsStats");
+part_ui!(rotor,           get_rotor_bindings           = "getRotorBindings",           set_rotor_bindings           = "setRotorBindings",           get_rotor_stats           = "getRotorStats");
+part_ui!(engines,         get_engines_bindings         = "getEnginesBindings",         set_engines_bindings         = "setEnginesBindings",         get_engines_stats         = "getEnginesStats");
+part_ui_bindings_only!(cockpits, get_cockpits_bindings = "getCockpitsBindings", set_cockpits_bindings = "setCockpitsBindings");
+
 #[wasm_bindgen]
 impl AircraftWasm {
     /// Create a new aircraft
@@ -98,217 +182,10 @@ impl AircraftWasm {
         self.inner.name = name;
     }
 
-    /// Get Era UI bindings (includes localized strings)
-    #[wasm_bindgen(js_name = getEraBindings)]
-    pub fn get_era_bindings(&self) -> JsValue {
-        let options = self.inner.era.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Era from UI bindings
-    #[wasm_bindgen(js_name = setEraBindings)]
-    pub fn set_era_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.era.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for the selected era
-    #[wasm_bindgen(js_name = getEraStats)]
-    pub fn get_era_stats(&mut self) -> JsValue {
-        let stats = self.inner.era.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Propeller UI bindings (includes localized strings)
-    #[wasm_bindgen(js_name = getPropellerBindings)]
-    pub fn get_propeller_bindings(&self) -> JsValue {
-        let options = self.inner.propeller.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Propeller from UI bindings
-    #[wasm_bindgen(js_name = setPropellerBindings)]
-    pub fn set_propeller_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.propeller.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for the selected propeller
-    #[wasm_bindgen(js_name = getPropellerStats)]
-    pub fn get_propeller_stats(&mut self) -> JsValue {
-        let stats = self.inner.propeller.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Passengers UI bindings
-    #[wasm_bindgen(js_name = getPassengersBindings)]
-    pub fn get_passengers_bindings(&self) -> JsValue {
-        let options = self.inner.passengers.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Passengers from UI bindings
-    #[wasm_bindgen(js_name = setPassengersBindings)]
-    pub fn set_passengers_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.passengers.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for passengers
-    #[wasm_bindgen(js_name = getPassengersStats)]
-    pub fn get_passengers_stats(&mut self) -> JsValue {
-        let stats = self.inner.passengers.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Fuel UI bindings
-    #[wasm_bindgen(js_name = getFuelBindings)]
-    pub fn get_fuel_bindings(&self) -> JsValue {
-        let options = self.inner.fuel.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Fuel from UI bindings
-    #[wasm_bindgen(js_name = setFuelBindings)]
-    pub fn set_fuel_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.fuel.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for fuel
-    #[wasm_bindgen(js_name = getFuelStats)]
-    pub fn get_fuel_stats(&mut self) -> JsValue {
-        let stats = self.inner.fuel.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Accessories UI bindings
-    #[wasm_bindgen(js_name = getAccessoriesBindings)]
-    pub fn get_accessories_bindings(&self) -> JsValue {
-        let options = self.inner.accessories.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Accessories from UI bindings
-    #[wasm_bindgen(js_name = setAccessoriesBindings)]
-    pub fn set_accessories_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.accessories.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for accessories
-    #[wasm_bindgen(js_name = getAccessoriesStats)]
-    pub fn get_accessories_stats(&mut self) -> JsValue {
-        let stats = self.inner.accessories.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Cargo UI bindings
-    #[wasm_bindgen(js_name = getCargoBindings)]
-    pub fn get_cargo_bindings(&self) -> JsValue {
-        let options = self.inner.cargo.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Cargo from UI bindings
-    #[wasm_bindgen(js_name = setCargoBindings)]
-    pub fn set_cargo_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.cargo.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for cargo
-    #[wasm_bindgen(js_name = getCargoStats)]
-    pub fn get_cargo_stats(&mut self) -> JsValue {
-        let stats = self.inner.cargo.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get ControlSurfaces UI bindings
-    #[wasm_bindgen(js_name = getControlSurfacesBindings)]
-    pub fn get_control_surfaces_bindings(&self) -> JsValue {
-        let options = self.inner.controlsurfaces.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update ControlSurfaces from UI bindings
-    #[wasm_bindgen(js_name = setControlSurfacesBindings)]
-    pub fn set_control_surfaces_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.controlsurfaces.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for control surfaces
-    #[wasm_bindgen(js_name = getControlSurfacesStats)]
-    pub fn get_control_surfaces_stats(&mut self) -> JsValue {
-        let stats = self.inner.controlsurfaces.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
     /// Get flap cost based on dry MP (for display purposes)
     #[wasm_bindgen(js_name = getControlSurfacesFlapCost)]
     pub fn get_control_surfaces_flap_cost(&self, dry_mp: i16) -> f32 {
         self.inner.controlsurfaces.get_flap_cost(dry_mp)
-    }
-
-    /// Get LandingGear UI bindings
-    #[wasm_bindgen(js_name = getLandingGearBindings)]
-    pub fn get_landing_gear_bindings(&self) -> JsValue {
-        let options = self.inner.gear.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update LandingGear from UI bindings
-    #[wasm_bindgen(js_name = setLandingGearBindings)]
-    pub fn set_landing_gear_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.gear.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for landing gear
-    #[wasm_bindgen(js_name = getLandingGearStats)]
-    pub fn get_landing_gear_stats(&mut self) -> JsValue {
-        let stats = self.inner.gear.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Munitions UI bindings
-    #[wasm_bindgen(js_name = getMunitionsBindings)]
-    pub fn get_munitions_bindings(&self) -> JsValue {
-        let options = self.inner.munitions.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Munitions from UI bindings
-    #[wasm_bindgen(js_name = setMunitionsBindings)]
-    pub fn set_munitions_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.munitions.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for munitions
-    #[wasm_bindgen(js_name = getMunitionsStats)]
-    pub fn get_munitions_stats(&mut self) -> JsValue {
-        let stats = self.inner.munitions.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
     /// Get bomb count
@@ -335,79 +212,10 @@ impl AircraftWasm {
         self.inner.munitions.get_max_bomb_size()
     }
 
-    /// Get Optimization UI bindings
-    #[wasm_bindgen(js_name = getOptimizationBindings)]
-    pub fn get_optimization_bindings(&self) -> JsValue {
-        let options = self.inner.optimization.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Optimization from UI bindings
-    #[wasm_bindgen(js_name = setOptimizationBindings)]
-    pub fn set_optimization_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.optimization.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for optimization
-    #[wasm_bindgen(js_name = getOptimizationStats)]
-    pub fn get_optimization_stats(&mut self) -> JsValue {
-        let stats = self.inner.optimization.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
     /// Get number of available optimizations
     #[wasm_bindgen(js_name=getOptimizationAvailable)]
     pub fn get_optimization_available(&self) -> JsValue {
         serde_wasm_bindgen::to_value(&self.inner.optimization.get_unassigned_count()).unwrap()
-    }
-
-    /// Get Used Part UI bindings
-    #[wasm_bindgen(js_name = getUsedBindings)]
-    pub fn get_used_bindings(&self) -> JsValue {
-        let options = self.inner.used.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Used Part from UI bindings
-    #[wasm_bindgen(js_name = setUsedBindings)]
-    pub fn set_used_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.used.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for used part
-    #[wasm_bindgen(js_name = getUsedStats)]
-    pub fn get_used_stats(&mut self) -> JsValue {
-        let stats = self.inner.used.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Weapons UI bindings (container with weapon system count and brace count)
-    #[wasm_bindgen(js_name = getWeaponsBindings)]
-    pub fn get_weapons_bindings(&self) -> JsValue {
-        let options = self.inner.weapons.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Weapons from UI bindings
-    #[wasm_bindgen(js_name = setWeaponsBindings)]
-    pub fn set_weapons_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.weapons.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for weapons
-    #[wasm_bindgen(js_name = getWeaponsStats)]
-    pub fn get_weapons_stats(&mut self) -> JsValue {
-        let stats = self.inner.weapons.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
     /// Duplicate a weapon set at the given index
@@ -545,80 +353,11 @@ impl AircraftWasm {
         }
     }
 
-    /// Get Reinforcements UI bindings
-    #[wasm_bindgen(js_name = getReinforcementsBindings)]
-    pub fn get_reinforcements_bindings(&self) -> JsValue {
-        let options = self.inner.reinforcements.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Reinforcements from UI bindings
-    #[wasm_bindgen(js_name = setReinforcementsBindings)]
-    pub fn set_reinforcements_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.reinforcements.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for reinforcements
-    #[wasm_bindgen(js_name = getReinforcementsStats)]
-    pub fn get_reinforcements_stats(&mut self) -> JsValue {
-        let stats = self.inner.reinforcements.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Stabilizers UI bindings
-    #[wasm_bindgen(js_name = getStabilizersBindings)]
-    pub fn get_stabilizers_bindings(&self) -> JsValue {
-        let options = self.inner.stabilizers.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Stabilizers from UI bindings
-    #[wasm_bindgen(js_name = setStabilizersBindings)]
-    pub fn set_stabilizers_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.stabilizers.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for stabilizers
-    #[wasm_bindgen(js_name = getStabilizersStats)]
-    pub fn get_stabilizers_stats(&mut self) -> JsValue {
-        let stats = self.inner.stabilizers.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
     /// Get Frames Flammability
     #[wasm_bindgen(js_name = getFramesFlammable)]
     pub fn get_frames_flammable(&self) -> JsValue {
         let is_flammable = self.inner.frames.get_is_flammable();
         serde_wasm_bindgen::to_value(&is_flammable).unwrap()
-    }
-
-    /// Get Frames UI bindings
-    #[wasm_bindgen(js_name = getFramesBindings)]
-    pub fn get_frames_bindings(&self) -> JsValue {
-        let options = self.inner.frames.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Frames from UI bindings
-    #[wasm_bindgen(js_name = setFramesBindings)]
-    pub fn set_frames_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.frames.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for frames
-    #[wasm_bindgen(js_name = getFramesStats)]
-    pub fn get_frames_stats(&mut self) -> JsValue {
-        let stats = self.inner.frames.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
     /// Duplicate a section at the given index
@@ -633,52 +372,6 @@ impl AircraftWasm {
     pub fn delete_section(&mut self, index: usize) {
         self.inner.frames.delete_section(index);
         self.inner.part_stats();
-    }
-
-    /// Get Wings UI bindings
-    #[wasm_bindgen(js_name = getWingsBindings)]
-    pub fn get_wings_bindings(&self) -> JsValue {
-        let options = self.inner.wings.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Wings from UI bindings
-    #[wasm_bindgen(js_name = setWingsBindings)]
-    pub fn set_wings_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.wings.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for wings
-    #[wasm_bindgen(js_name = getWingsStats)]
-    pub fn get_wings_stats(&mut self) -> JsValue {
-        let stats = self.inner.wings.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
-    }
-
-    /// Get Rotor UI bindings
-    #[wasm_bindgen(js_name = getRotorBindings)]
-    pub fn get_rotor_bindings(&self) -> JsValue {
-        let options = self.inner.rotor.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Rotor from UI bindings
-    #[wasm_bindgen(js_name = setRotorBindings)]
-    pub fn set_rotor_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.rotor.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
-    }
-
-    /// Get stats for rotor
-    #[wasm_bindgen(js_name = getRotorStats)]
-    pub fn get_rotor_stats(&mut self) -> JsValue {
-        let stats = self.inner.rotor.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
     /// Get current aircraft type
@@ -708,22 +401,6 @@ impl AircraftWasm {
             translate("ORNITHOPTER_BUZZER"),
         ];
         serde_wasm_bindgen::to_value(&names).unwrap()
-    }
-
-    /// Get Engines UI bindings (container with asymmetric flag and counts)
-    #[wasm_bindgen(js_name = getEnginesBindings)]
-    pub fn get_engines_bindings(&self) -> JsValue {
-        let options = self.inner.engines.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Engines from UI bindings
-    #[wasm_bindgen(js_name = setEnginesBindings)]
-    pub fn set_engines_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.engines.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
     }
 
     /// Get Radiator UI bindings for a specific radiator
@@ -779,13 +456,6 @@ impl AircraftWasm {
                 self.inner.part_stats();
             }
         }
-    }
-
-    /// Get stats for a all engines
-    #[wasm_bindgen(js_name = getEnginesStats)]
-    pub fn get_engines_stats(&mut self) -> JsValue {
-        let stats = self.inner.engines.part_stats();
-        serde_wasm_bindgen::to_value(&stats).unwrap()
     }
 
     /// Get stats for a specific engine
@@ -1356,22 +1026,6 @@ impl AircraftWasm {
             self.inner.deserialize(&mut d).unwrap();
         };
         let _ = self.inner.part_stats();
-    }
-
-    /// Get Cockpits UI bindings (includes localized strings)
-    #[wasm_bindgen(js_name = getCockpitsBindings)]
-    pub fn get_cockpits_bindings(&self) -> JsValue {
-        let options = self.inner.cockpits.create_ui_options();
-        serde_wasm_bindgen::to_value(&options).unwrap()
-    }
-
-    /// Update Cockpits from UI bindings
-    #[wasm_bindgen(js_name = setCockpitsBindings)]
-    pub fn set_cockpits_bindings(&mut self, js_options: JsValue) {
-        if let Ok(options) = serde_wasm_bindgen::from_value(js_options) {
-            self.inner.cockpits.receive_ui_selections(options);
-            self.inner.part_stats();
-        }
     }
 
     /// Get stats for a specific cockpit

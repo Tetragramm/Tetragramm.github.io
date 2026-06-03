@@ -16,6 +16,20 @@ js-sys = "0.3"
 console_error_panic_hook = "0.1"
 rust-i18n = "3"
 
+# Modern rustc (1.87+) emits bulk-memory/sign-ext/etc. for wasm32; the system
+# wasm-opt validates with those off by default, so enable them explicitly.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = [
+    "-Oz",
+    "--enable-bulk-memory",
+    "--enable-sign-ext",
+    "--enable-mutable-globals",
+    "--enable-nontrapping-float-to-int",
+]
+
 [profile.release]
 lto = true
-opt-level = "z" # Optimize for size
+opt-level = "z"      # Optimize for size
+panic = "abort"      # Drop unwinding tables / landing pads (panic hook still runs before abort)
+codegen-units = 1    # Better cross-function size optimization under LTO
+strip = true         # Strip remaining symbols/debuginfo

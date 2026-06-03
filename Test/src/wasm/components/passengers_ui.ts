@@ -5,36 +5,17 @@
  * Includes number of seats, beds, and connectivity upgrade
  */
 
-import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
 import {
     createRulesLink,
-    createFlexSection,
-    createFlexCheckbox,
     createCollapsibleSection,
-    createStatsTable,
-    updateStatsTable,
     StatDisplayConfig,
-    createMobileOptionItem,
-    createMobileNumberInput,
-    createMobileCheckbox,
-    createMobileStatsGrid,
-    updateMobileStatsGrid
+    DualControl,
+    dualNumber,
+    dualCheckbox,
+    dualStats,
 } from '../dom_utils';
-
-// Cache interface for type safety
-interface PassengersCache {
-    seatsInput: HTMLInputElement;
-    bedsInput: HTMLInputElement;
-    connectCheckbox: HTMLInputElement;
-    statsTable: HTMLTableElement;
-    mobileStatsGrid?: HTMLDivElement;
-    // Mobile controls
-    mobileSeatsInput?: HTMLInputElement;
-    mobileBedsInput?: HTMLInputElement;
-    mobileConnectCheckbox?: HTMLInputElement;
-}
 
 // Passengers stats configuration
 const PASSENGERS_STATS: StatDisplayConfig[] = [
@@ -43,14 +24,14 @@ const PASSENGERS_STATS: StatDisplayConfig[] = [
 ];
 
 export class PassengersUI extends BaseComponentUI {
-    private cache: PassengersCache;
+    private controls: DualControl[] = [];
 
     protected shouldUpdate(): boolean {
-        return this.cache !== undefined;
+        return (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {
-        this.cache = undefined;
+        this.controls = [];
     }
 
     /**
@@ -63,17 +44,54 @@ export class PassengersUI extends BaseComponentUI {
         const bridge = this.getBridgeIfInitialized();
         if (!bridge) return;
 
-        const bindings = bridge.getPassengersBindings();
-        const stats = bridge.getPassengersStats();
+        // One definition per control; each yields a desktop node and a mobile node.
+        const seatsCtl = dualNumber(
+            localization.translate('Passengers Number of Seats'),
+            () => bridge.getPassengersBindings().seats,
+            (value) => {
+                const b = bridge.getPassengersBindings();
+                b.seats.value = value;
+                bridge.setPassengersBindings(b);
+                this.onUpdate();
+            },
+            { desktopLabel: '' } // Seats column is labelled by the table header
+        );
+        const bedsCtl = dualNumber(
+            localization.translate('Passengers Number of Beds'),
+            () => bridge.getPassengersBindings().beds,
+            (value) => {
+                const b = bridge.getPassengersBindings();
+                b.beds.value = value;
+                bridge.setPassengersBindings(b);
+                this.onUpdate();
+            },
+            { desktopLabel: '' } // Beds column is labelled by the table header
+        );
+        const connectCtl = dualCheckbox(
+            localization.translate('Passengers Upgrade'),
+            () => bridge.getPassengersBindings().connected,
+            (checked) => {
+                const b = bridge.getPassengersBindings();
+                b.connected.selected = checked;
+                bridge.setPassengersBindings(b);
+                this.onUpdate();
+            }
+        );
+        const statsCtl = dualStats(
+            localization.translate('Passengers Stats'),
+            () => bridge.getPassengersStats(),
+            PASSENGERS_STATS
+        );
+        this.controls = [seatsCtl, bedsCtl, connectCtl, statsCtl];
 
         // Create wrapper for both desktop and mobile content
         const contentWrapper = document.createElement('div');
 
-        // === DESKTOP VERSION ===
+        // === DESKTOP VERSION (unchanged layout) ===
         const desktopDiv = document.createElement('div');
         desktopDiv.className = 'desktop-only';
 
-        // Create main table: Seats | Beds | Upgrade | Mass | Required Sections
+        // Main table: Seats | Beds | Upgrade | Stats (rowSpan 2)
         const mainTable = document.createElement('table');
         mainTable.style.width = '100%';
         mainTable.id = 'table_passengers';
@@ -94,60 +112,23 @@ export class PassengersUI extends BaseComponentUI {
         // Data row
         const dataRow = document.createElement('tr');
 
-        // Seats input cell
         const seatsCell = document.createElement('td');
-        const seatsInput = document.createElement('input');
-        seatsInput.type = 'number';
-        seatsInput.min = '0';
-        seatsInput.value = bindings.seats.value.toString();
-        seatsInput.disabled = !bindings.seats.enabled;
-        seatsInput.addEventListener('change', () => {
-            const updatedBindings = bridge.getPassengersBindings();
-            updatedBindings.seats.value = parseInt(seatsInput.value) || 0;
-            bridge.setPassengersBindings(updatedBindings);
-            this.onUpdate();
-        });
-        seatsCell.appendChild(seatsInput);
+        seatsCell.appendChild(seatsCtl.desktop);
         dataRow.appendChild(seatsCell);
 
-        // Beds input cell
         const bedsCell = document.createElement('td');
-        const bedsInput = document.createElement('input');
-        bedsInput.type = 'number';
-        bedsInput.min = '0';
-        bedsInput.value = bindings.beds.value.toString();
-        bedsInput.disabled = !bindings.beds.enabled;
-        bedsInput.addEventListener('change', () => {
-            const updatedBindings = bridge.getPassengersBindings();
-            updatedBindings.beds.value = parseInt(bedsInput.value) || 0;
-            bridge.setPassengersBindings(updatedBindings);
-            this.onUpdate();
-        });
-        bedsCell.appendChild(bedsInput);
+        bedsCell.appendChild(bedsCtl.desktop);
         dataRow.appendChild(bedsCell);
 
-        // Upgrade cell with connectivity checkbox
         const upgradeCell = document.createElement('td');
-        const flexContainer = createFlexSection();
-        const connectCheckbox = createFlexCheckbox(
-            bindings.connected,
-            flexContainer,
-            (checked) => {
-                const updatedBindings = bridge.getPassengersBindings();
-                updatedBindings.connected.selected = checked;
-                bridge.setPassengersBindings(updatedBindings);
-                this.onUpdate();
-            }
-        );
-        upgradeCell.appendChild(flexContainer.div0);
+        upgradeCell.appendChild(connectCtl.desktop);
         dataRow.appendChild(upgradeCell);
 
-        // Stats cells - create stats table spanning 2 columns
+        // Stats cell spanning both rows, attached to the header row
         const statsCell = document.createElement('td');
-        statsCell.className = "inner_table";
+        statsCell.className = 'inner_table';
         statsCell.rowSpan = 2;
-        const statsTable = createStatsTable(stats, PASSENGERS_STATS);
-        statsCell.appendChild(statsTable);
+        statsCell.appendChild(statsCtl.desktop);
         headerRow.appendChild(statsCell);
 
         mainTable.appendChild(dataRow);
@@ -157,78 +138,11 @@ export class PassengersUI extends BaseComponentUI {
         // === MOBILE VERSION ===
         const mobileDiv = document.createElement('div');
         mobileDiv.className = 'mobile-only mobile-option-group';
-
-        // Seats
-        const seatsItem = createMobileOptionItem(
-            localization.translate('Passengers Number of Seats'),
-            mobileDiv
-        );
-        const { input: mobileSeatsInput } = createMobileNumberInput(
-            { ...bindings.seats, name: '' },
-            seatsItem.content,
-            (value) => {
-                const updatedBindings = bridge.getPassengersBindings();
-                updatedBindings.seats.value = value;
-                bridge.setPassengersBindings(updatedBindings);
-                this.onUpdate();
-            },
-            0
-        );
-
-        // Beds
-        const bedsItem = createMobileOptionItem(
-            localization.translate('Passengers Number of Beds'),
-            mobileDiv
-        );
-        const { input: mobileBedsInput } = createMobileNumberInput(
-            { ...bindings.beds, name: '' },
-            bedsItem.content,
-            (value) => {
-                const updatedBindings = bridge.getPassengersBindings();
-                updatedBindings.beds.value = value;
-                bridge.setPassengersBindings(updatedBindings);
-                this.onUpdate();
-            },
-            0
-        );
-
-        // Connectivity upgrade
-        const upgradeItem = createMobileOptionItem(
-            localization.translate('Passengers Upgrade'),
-            mobileDiv
-        );
-        const mobileConnectCheckbox = createMobileCheckbox(
-            bindings.connected,
-            upgradeItem.content,
-            (checked) => {
-                const updatedBindings = bridge.getPassengersBindings();
-                updatedBindings.connected.selected = checked;
-                bridge.setPassengersBindings(updatedBindings);
-                this.onUpdate();
-            }
-        );
-
-        // Stats grid
-        const statsItem = createMobileOptionItem(
-            localization.translate('Passengers Stats'),
-            mobileDiv
-        );
-        const mobileStatsGrid = createMobileStatsGrid(stats, PASSENGERS_STATS);
-        statsItem.content.appendChild(mobileStatsGrid);
-
+        mobileDiv.appendChild(seatsCtl.mobile);
+        mobileDiv.appendChild(bedsCtl.mobile);
+        mobileDiv.appendChild(connectCtl.mobile);
+        mobileDiv.appendChild(statsCtl.mobile);
         contentWrapper.appendChild(mobileDiv);
-
-        // Cache elements
-        this.cache = {
-            seatsInput,
-            bedsInput,
-            connectCheckbox,
-            statsTable,
-            mobileStatsGrid,
-            mobileSeatsInput,
-            mobileBedsInput,
-            mobileConnectCheckbox
-        };
 
         // Create collapsible section with localized title
         const sectionTitle = localization.translate('Passengers Section Title');
@@ -246,8 +160,6 @@ export class PassengersUI extends BaseComponentUI {
         );
 
         this.container.appendChild(this.sectionElement);
-
-        console.log('[PassengersUI] Full rebuild complete');
     }
 
     /**
@@ -255,48 +167,8 @@ export class PassengersUI extends BaseComponentUI {
      */
     protected updateValues(): void {
         const bridge = this.getBridgeIfInitialized();
-        if (!bridge || !this.cache) return;
-
-        const bindings = bridge.getPassengersBindings();
-
-        // Update seats input (desktop and mobile)
-        if (this.cache.seatsInput && bindings.seats) {
-            this.cache.seatsInput.value = bindings.seats.value.toString();
-            this.cache.seatsInput.disabled = !bindings.seats.enabled;
-        }
-        if (this.cache.mobileSeatsInput && bindings.seats) {
-            this.cache.mobileSeatsInput.value = bindings.seats.value.toString();
-            this.cache.mobileSeatsInput.disabled = !bindings.seats.enabled;
-        }
-
-        // Update beds input (desktop and mobile)
-        if (this.cache.bedsInput && bindings.beds) {
-            this.cache.bedsInput.value = bindings.beds.value.toString();
-            this.cache.bedsInput.disabled = !bindings.beds.enabled;
-        }
-        if (this.cache.mobileBedsInput && bindings.beds) {
-            this.cache.mobileBedsInput.value = bindings.beds.value.toString();
-            this.cache.mobileBedsInput.disabled = !bindings.beds.enabled;
-        }
-
-        // Update connectivity checkbox (desktop and mobile)
-        if (this.cache.connectCheckbox && bindings.connected) {
-            this.cache.connectCheckbox.checked = bindings.connected.selected;
-            this.cache.connectCheckbox.disabled = !bindings.connected.enabled;
-        }
-        if (this.cache.mobileConnectCheckbox && bindings.connected) {
-            this.cache.mobileConnectCheckbox.checked = bindings.connected.selected;
-            this.cache.mobileConnectCheckbox.disabled = !bindings.connected.enabled;
-        }
-
-        // Update stats table
-        const stats = bridge.getPassengersStats();
-        updateStatsTable(this.cache.statsTable, stats, PASSENGERS_STATS);
-
-        // Update mobile stats grid
-        if (this.cache.mobileStatsGrid) {
-            updateMobileStatsGrid(this.cache.mobileStatsGrid, stats, PASSENGERS_STATS);
-        }
+        if (!bridge || !this.controls?.length) return;
+        this.controls.forEach(c => c.update());
     }
 
     /**
