@@ -99,7 +99,7 @@ impl Part for Reinforcements {
 
         // Reduce strain for ornithopters
         if self.acft_type == AircraftType::OrnithopterBasic {
-            stats.maxstrain *= 0.5;
+            stats.maxstrain = (1.0e-6 + 0.5 * stats.maxstrain).floor();
         }
 
         // First strut bonus
@@ -122,7 +122,7 @@ impl Part for Reinforcements {
 
         // Wires add strain and drag
         if self.wires {
-            stats.maxstrain += tension;
+            stats.maxstrain += (1.0e-6 + tension).floor();
             stats.drag += 3.0 * strut_count as f32;
         }
 

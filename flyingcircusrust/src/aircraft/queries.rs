@@ -166,6 +166,16 @@ impl Aircraft {
         em = merge_electrics(em, self.engines.get_electrics());
         em = merge_electrics(em, self.weapons.get_electrics());
 
+        //Add + symbols to sources of power
+        for eq in em.equipment.iter_mut() {
+            let Ok(chg) = eq.charge.parse::<i16>() else {
+                continue;
+            };
+            if chg > 0 {
+                eq.charge = "+".to_string() + &eq.charge;
+            }
+        }
+
         em
     }
 }

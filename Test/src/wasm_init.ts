@@ -119,6 +119,12 @@ export class WasmApplication {
             }
 
             this.buildUI();
+            // Each component renders once inside its constructor, but the subclass
+            // field initializers (e.g. `controls = []`) run *after* super() and wipe
+            // that render's cache. Render once more here so the caches are populated
+            // before the user's first edit; otherwise that first edit takes the
+            // rebuildFull path and reopens every section collapsed below.
+            this.render();
             this.applyInitialCollapseState();
             this.initialized = true;
             console.log('[WasmApp] Initialization complete!');

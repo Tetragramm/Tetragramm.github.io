@@ -141,7 +141,9 @@ impl Aircraft {
 
         // Add cockpit seats
         for i in 0..self.cockpits.positions.len() {
-            vital.push(t!("Seat #", A = i + 1).to_string());
+            let seat = t!("Seat #", A = i + 1).to_string();
+            let name = t!(self.cockpits.positions[i].get_name()).to_string();
+            vital.push(format!("{}: {}", seat, name));
         }
 
         // Add fuel tanks if aircraft uses fuel

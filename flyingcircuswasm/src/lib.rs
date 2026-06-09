@@ -20,7 +20,18 @@ struct CockpitDerived {
     flight_stress_norm: i16,
     flight_stress_cp: i16,
     pos_escape: i16,
-    pos_visibility: i16,
+    pos_visibility: f64,
+}
+
+/// Sealed cockpits use i16::MIN as a stand-in for negative infinity visibility.
+/// Convert that sentinel to an actual -Infinity for display (matching the
+/// original TypeScript, which returned -1/0). Any other value passes through.
+fn visibility_for_display(v: i16) -> f64 {
+    if v == i16::MIN {
+        f64::NEG_INFINITY
+    } else {
+        v as f64
+    }
 }
 
 /// Localization API for managing translations
@@ -816,8 +827,12 @@ impl AircraftWasm {
 
     /// Get visibility values from all cockpit positions
     #[wasm_bindgen(js_name = getVisibilityList)]
-    pub fn get_visibility_list(&self) -> Vec<i16> {
-        self.inner.get_visibility_list()
+    pub fn get_visibility_list(&self) -> Vec<f64> {
+        self.inner
+            .get_visibility_list()
+            .into_iter()
+            .map(visibility_for_display)
+            .collect()
     }
 
     /// Get attack modifier values from all cockpit positions
@@ -1052,7 +1067,7 @@ impl AircraftWasm {
                 flight_stress_norm: flight_stress.0,
                 flight_stress_cp: flight_stress.1,
                 pos_escape: escape,
-                pos_visibility: visibility,
+                pos_visibility: visibility_for_display(visibility),
             };
             serde_wasm_bindgen::to_value(&result).unwrap()
         } else {

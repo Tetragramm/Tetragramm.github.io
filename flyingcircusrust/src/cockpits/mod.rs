@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::rc::Rc;
 
 use crate::cockpit::Cockpit;
@@ -182,21 +181,25 @@ impl Cockpits {
 impl Part for Cockpits {
     fn part_stats(&mut self) -> Stats {
         let mut s = Stats::new();
-        let mut warning_map: HashMap<Warning, Vec<usize>> = HashMap::new();
+        // Preserve the order warnings are first encountered so they sort by seat:
+        // all warnings affecting Seat 1 first, then Seat 2 but not 1, and so on.
+        let mut warning_order: Vec<Warning> = Vec::new();
+        let mut warning_seats: Vec<Vec<usize>> = Vec::new();
         for (idx, c) in self.positions.iter_mut().enumerate() {
             let mut cs: Stats = c.part_stats();
             for w in &cs.warnings {
-                if let Some(v) = warning_map.get_mut(&w) {
-                    v.push(idx + 1);
+                if let Some(pos) = warning_order.iter().position(|x| x == w) {
+                    warning_seats[pos].push(idx + 1);
                 } else {
-                    warning_map.insert(w.clone(), vec![idx + 1]);
+                    warning_order.push(w.clone());
+                    warning_seats.push(vec![idx + 1]);
                 }
             }
             cs.warnings.clear();
             s = s.add(&cs);
         }
 
-        for (w, seats) in warning_map {
+        for (w, seats) in warning_order.into_iter().zip(warning_seats.into_iter()) {
             s.warnings.push(Warning {
                 name: format!(
                     "{} {}",

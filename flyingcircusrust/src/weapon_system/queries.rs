@@ -474,7 +474,7 @@ impl WeaponSystem {
         }
 
         // Deflection/Awkward
-        if self.final_weapon.deflection > 0 {
+        if self.final_weapon.deflection != 0 {
             tags.push(t!("Weapon Tag Awkward", A = self.final_weapon.deflection).to_string());
         }
         tags

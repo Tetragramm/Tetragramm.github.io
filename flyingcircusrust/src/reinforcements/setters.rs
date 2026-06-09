@@ -44,8 +44,10 @@ impl Reinforcements {
 
             if cant_mass > 0.0 {
                 let diff = count - self.cant_count[idx];
-                let max_diff = (available as f32 / (5.0 * cant_mass)) as i16;
-                count = self.cant_count[idx] + diff.min(max_diff).max(0);
+                // Only the increase is capped by available structure; decreases
+                // (negative diff) must always pass through so the count can drop.
+                let max_diff = (1.0e-6 + available as f32 / (5.0 * cant_mass)).floor() as i16;
+                count = self.cant_count[idx] + diff.min(max_diff);
             }
         }
 

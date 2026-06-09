@@ -145,6 +145,8 @@ impl Part for Wings {
             wing_stats.latstab += (wing.dihedral - wing.anhedral) as f32;
             wing_stats.liftbleed += (wing.dihedral + wing.anhedral) as f32;
 
+            wing_stats.round();
+
             // Treated paper (negative mass handled separately)
             if wing_stats.mass < 0.0 {
                 wing_stats.mass = 0.0;
