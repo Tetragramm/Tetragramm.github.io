@@ -14,7 +14,7 @@
 	background-color: var(--bkg_color);
 	color: var(--inp_txt_color);
 	font-family: Open Sans, Helvetica, Arial, sans-serif;
-	margin-left: 1em;
+	overflow-x: visible;
 }
 
 li {
@@ -151,6 +151,7 @@ th {
 	padding: 0.25rem;
 	font-size: 1rem;
 	margin: 0.25rem;
+	font-weight: bold;
 }
 
 td {
@@ -268,7 +269,7 @@ hr.dashed {
 }
 
 span {
-	height: 1.5em !important;
+	height: 1.5em;
 	padding-top: 2px;
 }
 
@@ -333,7 +334,6 @@ button {
 button[disabled] {
 	background-color: #000000;
 	border-color: #000000;
-	visibility: hidden;
 }
 
 /* Use for marking stats as local to a part. */
@@ -775,4 +775,633 @@ select.flex-item {
 .ER_Legendary {
 	color: black;
 	background-color: gold;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE STYLES
+   ============================================ */
+
+/* Mobile navigation header */
+.mobile-nav {
+	display: none;
+	position: sticky;
+	top: 0;
+	background-color: var(--bkg_color);
+	border-bottom: 2px solid var(--inp_bdr_color);
+	z-index: 100;
+	padding: 0.5rem;
+	touch-action: pan-y;
+}
+
+.mobile-nav-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 2.5rem;
+}
+
+.mobile-nav-prev,
+.mobile-nav-next {
+	width: 3rem;
+	height: 2.5rem;
+	font-size: 1.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--inp_bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	color: var(--lnk_color);
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+.mobile-nav-prev:active,
+.mobile-nav-next:active {
+	background-color: var(--lnk_color);
+	color: var(--bkg_color);
+}
+
+.mobile-nav-title {
+	flex: 1;
+	text-align: center;
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(--lnk_color);
+	cursor: pointer;
+	padding: 0.5rem;
+}
+
+.mobile-nav-title:enabled {
+	color: var(--lnk_act_color);
+}
+
+/* Mobile component list (dropdown) */
+.mobile-nav-list {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 100%;
+	background-color: var(--bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	max-height: 60vh;
+	overflow-y: auto;
+	z-index: 101;
+}
+
+.mobile-nav-list.show {
+	display: block;
+}
+
+.mobile-nav-list-item {
+	padding: 0.75rem 1rem;
+	border-bottom: 1px solid var(--inp_bdr_color);
+	cursor: pointer;
+	color: var(--inp_txt_color);
+}
+
+.mobile-nav-list-item:enabled,
+.mobile-nav-list-item.enabled {
+	background-color: var(--lnk_color);
+	color: var(--bkg_color);
+}
+
+.mobile-nav-list-item.disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+	color: var(--inp_txt_color);
+}
+
+/* Large +/- buttons for mobile number inputs */
+.mobile-number-container {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-direction: row-reverse;
+}
+
+.mobile-number-controls {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	flex-shrink: 0;
+}
+
+.mobile-number-btn {
+	width: 2.5rem !important;
+	height: 2.5rem !important;
+	font-size: 1.5rem !important;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: var(--inp_bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	color: var(--lnk_color);
+	cursor: pointer;
+	border-radius: 4px;
+	padding: 0;
+	line-height: 1;
+}
+
+.mobile-number-btn:active {
+	background-color: var(--lnk_color);
+	color: var(--bkg_color);
+}
+
+.mobile-number-btn:disabled {
+	background-color: #000000;
+	border-color: #000000;
+	color: #333333;
+	cursor: not-allowed;
+}
+
+.mobile-number-input {
+	width: 2rem !important;
+	height: 2.5rem !important;
+	text-align: center;
+	font-size: 1.2rem !important;
+	appearance: textfield;
+	margin: 0;
+}
+
+.mobile-number-label {
+	flex: 1;
+	font-size: 0.9rem;
+	margin-left: 0.5rem;
+	margin-right: 1rem;
+}
+
+/* Mobile flexbox layout for options */
+.mobile-option-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 0.5rem;
+}
+
+.mobile-option-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.5rem;
+	background-color: rgba(56, 56, 56, 0.3);
+	border-radius: 4px;
+}
+
+.mobile-option-title {
+	color: var(--lnk_color);
+	font-weight: bold;
+	font-size: 0.9rem;
+}
+
+.mobile-option-content {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+/* Mobile checkbox styling - larger touch targets */
+.mobile-checkbox-label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	background-color: var(--inp_bkg_color);
+	border: 1px solid var(--inp_bdr_color);
+	border-radius: 4px;
+	cursor: pointer;
+	min-height: 2.5rem;
+}
+
+.mobile-checkbox-label input[type='checkbox'] {
+	width: 1.5rem !important;
+	height: 1.5rem !important;
+}
+
+.mobile-checkbox-label input[type='checkbox']:checked:after {
+	font-size: 1.2em;
+	line-height: 1.2em;
+}
+
+/* Mobile section styling */
+.mobile-section {
+	margin-bottom: 1rem;
+	border: 1px solid var(--inp_bdr_color);
+	border-radius: 4px;
+}
+
+.mobile-section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.75rem;
+	background-color: var(--ftr_bkg_color);
+	cursor: pointer;
+}
+
+.mobile-section-title {
+	font-weight: bold;
+	color: var(--lnk_color);
+}
+
+.mobile-section-content {
+	padding: 0.5rem;
+}
+
+/* Mobile stats display */
+.mobile-stats-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 0.5rem;
+	width: 100%;
+}
+
+.mobile-stat-item {
+	display: flex;
+	flex-direction: column;
+	padding: 0.5rem;
+	background-color: var(--bkg_color);
+	border-radius: 4px;
+}
+
+.mobile-stat-label {
+	font-size: 0.75rem;
+	color: var(--lnk_color);
+}
+
+.mobile-stat-value {
+	font-size: 1.1rem;
+	font-weight: bold;
+}
+
+/* Mobile select styling - full width */
+.mobile-select {
+	width: 100%;
+	height: 2.5rem !important;
+	font-size: 1rem !important;
+	padding: 0.5rem;
+	background: var(--inp_bkg_color);
+}
+
+/* Responsive grid that reflows to multiple equal-width columns
+   Uses --min-col-width CSS variable set by JavaScript based on content */
+.mobile-responsive-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(var(--min-col-width, 100%), 1fr));
+	gap: 0.5rem;
+	width: 100%;
+}
+
+/* Fuselage Frames section mobile layout */
+.mobile-frames-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.mobile-frame-row {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	background-color: rgba(56, 56, 56, 0.3);
+	border-radius: 4px;
+	width: 100%;
+}
+
+.mobile-frame-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.mobile-frame-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+/* Mobile media query - apply styles on narrow screens */
+@media (max-width: 768px) {
+
+	/* Show mobile navigation */
+	.mobile-nav {
+		display: block;
+	}
+
+	/* Ensure mobile nav container is always visible */
+	#mobile_nav_container {
+		display: block !important;
+	}
+
+	/* Hide desktop-style tables on mobile, show mobile alternatives */
+	.desktop-only {
+		display: none !important;
+	}
+
+	.mobile-only {
+		display: block !important;
+	}
+
+	/* Hide all main sections except active one in mobile single-section mode */
+	/* Use :not(.mobile-nav) on the parent to avoid hiding mobile nav children */
+	body.mobile-single-section .html_content>div:not(.mobile-nav)>div:not(.mobile-active-section) {
+		display: none;
+	}
+
+	/* Hide br elements between sections on mobile to avoid empty space */
+	body.mobile-single-section .html_content>div>br {
+		display: none;
+	}
+
+	/* Hide collapsible headers on mobile - the nav dropdown shows the section title */
+	body.mobile-single-section h3.collapsible,
+	body.mobile-single-section h3:not(.collapsible) {
+		display: none;
+	}
+
+	/* Hide the h4 subtitle/rules links on mobile */
+	body.mobile-single-section .mobile-active-section>h4 {
+		display: none;
+	}
+
+	/* Ensure collapsible content is always visible on mobile */
+	/* Exclude .desktop-only to not override desktop-only hiding */
+	body.mobile-single-section .content:not(.desktop-only) {
+		max-height: none !important;
+		display: block !important;
+	}
+
+	/* Make collapsible sections full-width and properly spaced */
+	.collapsible {
+		max-width: 100%;
+		padding: 0.75rem;
+	}
+
+	/* Improve table scrollability on mobile */
+	table {
+		font-size: 0.75rem;
+	}
+
+	/* Larger touch targets for buttons */
+	button {
+		min-width: 2.5rem;
+		min-height: 2.5rem;
+	}
+
+	/* Full-width selects */
+	select {
+		height: 2.5rem !important;
+	}
+
+	/* Larger checkboxes */
+	input[type='checkbox'] {
+		width: 1.25rem !important;
+		height: 1.25rem !important;
+	}
+
+	/* Stack flex containers vertically on mobile */
+	.flex-container-o {
+		flex-direction: column;
+	}
+
+	/* Ensure content doesn't overflow */
+	.html_outer {
+		padding: 0.25rem;
+	}
+
+	/* Adjust header sizes for mobile */
+	h1 {
+		font-size: 1.5rem;
+	}
+
+	h2 {
+		font-size: 1.25rem;
+	}
+
+	h3 {
+		font-size: 1.1rem;
+	}
+
+	/* Better spacing for list items */
+	li {
+		margin-left: 1em;
+		margin-bottom: 0.5em;
+	}
+}
+
+/* Desktop-only class - visible by default, hidden on mobile */
+.desktop-only {
+	display: block;
+}
+
+/* Mobile-only class - hidden by default, shown on mobile */
+.mobile-only {
+	display: none;
+}
+
+/* On desktop (769px+) - ensure mobile-only stays hidden */
+@media (min-width: 769px) {
+	.mobile-only {
+		display: none !important;
+	}
+}
+
+/* ============================================
+   ENGINE BUILDER RESPONSIVE STYLES
+   ============================================ */
+
+/* Main container for engine builder sections */
+.engine-builder-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1rem;
+	width: 100%;
+	align-items: start;
+}
+
+/* For 3-column layouts (propeller builder with options/upgrades/stats) */
+.engine-builder-container.three-column {
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Section within engine builder (Options, Upgrades, Stats) */
+.engine-builder-section {
+	background-color: rgba(56, 56, 56, 0.3);
+	border-radius: 4px;
+	padding: 0.75rem;
+	min-width: 0;
+	/* Prevent grid blowout */
+}
+
+.engine-builder-section-title {
+	color: var(--lnk_color);
+	font-weight: bold;
+	font-size: 1rem;
+	margin-bottom: 0.5rem;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px solid var(--inp_bdr_color);
+}
+
+/* Engine name display below title */
+.engine-builder-name-display {
+	font-size: 1.1rem;
+	font-weight: bold;
+	color: var(--inp_txt_color);
+	margin-bottom: 0.75rem;
+	word-break: break-word;
+}
+
+/* Flex layout for form inputs within a section */
+.engine-builder-inputs {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+/* Input row with label and control */
+.engine-builder-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.engine-builder-row label {
+	flex: 1;
+	min-width: 120px;
+	font-size: 0.9rem;
+}
+
+.engine-builder-row input[type="text"],
+.engine-builder-row input[type="number"],
+.engine-builder-row select {
+	flex: 1;
+	min-width: 100px;
+	max-width: 200px;
+}
+
+/* Checkbox rows - full width */
+.engine-builder-row.checkbox-row {
+	padding: 0.25rem 0;
+}
+
+.engine-builder-row.checkbox-row label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+}
+
+.engine-builder-row.checkbox-row input[type="checkbox"] {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+
+/* Stats display grid */
+.engine-builder-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+	gap: 0.5rem;
+}
+
+.engine-builder-stat-item {
+	display: flex;
+	flex-direction: column;
+	padding: 0.5rem;
+	background-color: var(--bkg_color);
+	border-radius: 4px;
+}
+
+.engine-builder-stat-label {
+	font-size: 0.75rem;
+	color: var(--lnk_color);
+}
+
+.engine-builder-stat-value {
+	font-size: 1.1rem;
+	font-weight: bold;
+}
+
+/* Description text area for turbine builder */
+.engine-builder-description {
+	font-size: 0.85rem;
+	line-height: 1.4;
+	padding: 0.5rem;
+	background-color: var(--bkg_color);
+	border-radius: 4px;
+}
+
+/* List manager responsive layout */
+.engine-list-manager {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.engine-list-manager-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.engine-list-manager-row label {
+	min-width: 80px;
+}
+
+.engine-list-manager-row select {
+	flex: 1;
+	min-width: 150px;
+	max-width: 300px;
+}
+
+.engine-list-manager-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.engine-list-manager-buttons button {
+	padding: 0.5rem 1rem;
+	min-height: 2.5rem;
+}
+
+/* Create list row with inline input */
+.engine-list-manager-create {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.engine-list-manager-create input[type="text"] {
+	flex: 1;
+	min-width: 150px;
+	max-width: 200px;
+}
+
+/* Mobile adjustments for engine builder */
+@media (max-width: 768px) {
+	.engine-builder-container {
+		grid-template-columns: 1fr;
+	}
+
+	.engine-builder-row label {
+		min-width: 100%;
+		margin-bottom: 0.25rem;
+	}
+
+	.engine-builder-row input[type="text"],
+	.engine-builder-row input[type="number"],
+	.engine-builder-row select {
+		max-width: 100%;
+		width: 100%;
+	}
+
+	.engine-list-manager-buttons button {
+		flex: 1 1 calc(50% - 0.25rem);
+		min-width: 120px;
+	}
 }

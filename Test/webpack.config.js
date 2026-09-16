@@ -1,13 +1,22 @@
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 
+// The Helicopter pages load their bundles from ../Test/ (see
+// HELICOPTER_HOST_DIR in src/wasm/deployment.ts), so only the Test/ copy of
+// this config emits the helicopter entries. PlaneBuilder/ and Test/ are
+// otherwise verbatim copies of each other, so this is keyed on the folder name
+// rather than kept as a difference between the two files.
+const buildsHelicopter = path.basename(__dirname) === 'Test';
+
 module.exports = {
     entry: {
         plane_builder: './src/plane_builder.ts',
         hangar: './src/Hangar/hangar.ts',
         engine_builder_app: './src/wasm/builders/engine_builder_app.ts',
-        helicopter_builder: '../Helicopter/src/helicopter_builder.ts',
-        helicopter_hangar: '../Helicopter/src/Hangar/helicopter_hangar.ts',
+        ...(buildsHelicopter ? {
+            helicopter_builder: '../Helicopter/src/helicopter_builder.ts',
+            helicopter_hangar: '../Helicopter/src/Hangar/helicopter_hangar.ts',
+        } : {}),
     },
     experiments: {
         asyncWebAssembly: true,
@@ -73,8 +82,8 @@ module.exports = {
         },
     },
     output: {
-        // All bundles emit under Test/ (output.path). The Helicopter pages load
-        // their bundles from ../Test/ via <script src>. Emitting helicopter
+        // All bundles emit under this folder (output.path). The Helicopter pages
+        // load their bundles from ../Test/ via <script src>. Emitting helicopter
         // entries outside output.path (e.g. ../Helicopter/) breaks webpack's
         // relative import paths to shared chunks, so keep everything co-located.
         filename: (pathData) => {

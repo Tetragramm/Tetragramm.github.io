@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Regeln für den Flugzeug-Konstrukteur von Flying Circus</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="stylesheet" type="text/css" href="../page/style.css">
+  </head>
+  <body>
+    <h1>Regeln für den Flugzeug-Konstrukteur</h1>
+    <p>Dies sind die Regeln, die du verwenden wirst, um Flugzeuge zu erstellen. Dies ist ein umfangreiches und komplexes Projekt, aber du schaffst es!</p>
+    <h2>Flugzeug-Konstruktionswerte</h2>
+    <p>Hier ist eine Liste der Werte, die beim Bau von Flugzeugen wichtig sind.</p>
+    <p>Input-Werte</p>
+    <ul>
+      <li>Masse: Masse ist, wie viel etwas wiegt. Eine geringe Masse zu halten, hat Priorität, aber Motoren werden viel größer, je leistungsfähiger sie werden, daher wird dies mit der Zeit immer weniger wichtig.</li>
+      <li>Luftwiderstand: Luftwiderstand ist, wie viel Oberfläche dem Luftstrom ausgesetzt ist und das Flugzeug verlangsamt. Weniger ist besser.</li>
+      <li>Struktur: Wird verwendet, um die allgemeine Robustheit eines Flugzeugs zu bestimmen. Struktur wird als Obergrenze für Maximale Belastung verwendet und steht schließlich in Beziehung zum Wert Zähigkeit. Mehr ist besser.</li>
+      <li>
+        <p>Stabilität: Wird verwendet, um die Stabilität des Flugzeugs im Flug zu bestimmen. Sie ist in zwei Werte unterteilt, die am Ende synthetisiert werden, um den endgültigen Stabilitätswert zu bilden. Weniger oder mehr hängt davon ab, was das Flugzeug tun soll.</p>
+        <ul>
+          <li>Seitenstabilität: Kombiniert Gier- und Rollstabilität. Meist niedriger, besonders bei Flugzeugen mit hohem Drehmoment.</li>
+          <li>Längsstabilität: Meist der höhere der beiden Werte, dieser Wert lässt sich leichter ändern.</li>
+        </ul>
+      </li>
+      <li>Steuerung: Wie viel Kontrolle das Flugzeug hat. Mehr ist besser.</li>
+      <li>Kosten: Wie viel alles kostet. Mehr kostet mehr.</li>
+      <li>Sektionen: Wie physisch groß der Rumpf des Flugzeugs ist. Mehr bedeutet ein größeres, schwereres Flugzeug.</li>
+      <li>Flügelfläche: Wie groß ein Flügel ist. Eine größere Fläche induziert mehr Luftwiderstand, hebt aber auch schwerere Flugzeuge.</li>
+      <li>Spannweite: Wie lang ein Flügel ist. Länger ist effizienter für den Luftwiderstand und stabiler, aber fragiler und verringert die Steuerung.</li>
+      <li>Lift Bleed: Wie effizient die Flügel sind. Weniger ist besser.</li>
+      <li>Leistung: Wie viel Kraft der Motor hat.</li>
+    </ul>
+    <p>Output-Werte</p>
+    <ul>
+      <li>Höchstgeschwindigkeit: Wie schnell das Flugzeug fliegt.</li>
+      <li>Boost: Wie schnell das Flugzeug beschleunigt.</li>
+      <li>Dropoff: Der Geschwindigkeitspunkt, an dem dein Motor mehr oder weniger effizient ist.</li>
+      <li>Abrissgeschwindigkeit: Wie langsam das Flugzeug fliegen kann, bevor es vom Himmel fällt.</li>
+      <li>Wendigkeit: Wie gut das Flugzeug steuert.</li>
+      <li>Strukturelle Integrität: Wie robust das Flugzeug ist. Im Grunde LP. Unterteilt in zwei Werte.</li>
+      <li>Maximale Belastung: Wie viele G-Kräfte das Flugzeug aushalten kann.</li>
+      <li>Zähigkeit: Überschüssige Gesundheit.</li>
+      <li>Sicht: Wie schwer es ist, aus dem Flugzeug zu sehen.</li>
+      <li>Stabilität: Wie gut das Flugzeug nicht versehentlich umkippt.</li>
+      <li>Treibstoffkapazität: Wie viel Treibstoff das Flugzeug mitführt.</li>
+      <li>Stress pro Flug: Wie anstrengend es ist, das Flugzeug längere Zeit zu fliegen.</li>
+    </ul>
+    <p>Sicherheitswerte</p>
+    <ul>
+      <li>Aufprallsicherheit: Wie sicher eine Bruchlandung ist.</li>
+      <li>Flucht: Wie einfach es ist, sich schnell zu retten.</li>
+      <li>Wartung: Wie viel das Flugzeug pro Routine kostet (nur im Standardspiel).</li>
+    </ul>
+    <h3>Grundlagen <a id="_Basics"></a></h3>
+    <p>Flugzeuge werden aus Komponenten gebaut. Wir werden sie nacheinander in der folgenden Reihenfolge bauen.</p>
+    <ul>
+      <li><a href="#_Era">Ära</a>: Aus welcher Zeit stammt das Flugzeug?</li>
+      <li><a href="#_Crew">Besatzung</a>: Festlegen, wer sich im Flugzeug befindet, und Passagiere.</li>
+      <li><a href="#_Engines">Motoren</a>: Festlegen, wie das Flugzeug angetrieben und wie es gekühlt wird.</li>
+      <li><a href="#_Frame_and_Covering">Struktur und Bespannung</a>: Eine tatsächliche Struktur um alles herum bauen.</li>
+      <li><a href="#_Wings">Tragflächen</a>: Damit es fliegt.</li>
+      <li><a href="#_Stabilizers">Stabilisatoren</a>: Das Flugzeug stabil halten.</li>
+      <li><a href="#_Control_Surfaces">Steuerflächen</a>: Das Flugzeug steuern.</li>
+      <li><a href="#_Reinforcement">Verstärkung</a>: Sicherstellen, dass das Flugzeug zusammenhält.</li>
+      <li><a href="#_Weapons">Waffen</a>: Womit das Flugzeug bewaffnet ist.</li>
+      <li><a href="#_Load">Zuladung</a>: Treibstoff, Bomben und Fracht.</li>
+      <li><a href="#_Landing_Gear">Fahrwerk</a>: Wo das Flugzeug auf die Erde trifft.</li>
+      <li><a href="#_Upgrades">Zubehör</a>: Upgrades, um das Flugzeug zu verbessern.</li>
+      <li><a href="#_Propeller">Propeller</a>: Welche Art von Propeller am Flugzeug angebracht wird.</li>
+      <li><a href="#_Optimization">Optimierungen</a>: Das Flugzeug feinabstimmen.</li>
+      <li><a href="#_Final_Calculations">Endgültige Werte</a>: Alles zu einem Profil zusammenfügen, das du im Spiel verwenden kannst.</li>
+      <li><a href="#_Used_Planes">Gebrauchte Flugzeuge</a>: Regeln für den Kauf gebrauchter Flugzeuge.</li>
+      <li><a href="#_Altitude_Rules">Höheneffekte</a>: Was passiert, wenn du wirklich hoch fliegst?</li>
+    </ul>
+    <p>Dein Flugzeug benötigt im Allgemeinen mindestens einen Piloten, einen Motor und einige Tragflächen. Ohne Tragflächen ist es ein Auto. Ohne Motor ist es ein Segelflugzeug. Ohne Piloten ist es eine Rakete.</p>
+    <p>Denke beim Bau des Flugzeugs daran, dass Flugzeuge keinen negativen Luftwiderstand oder negative Masse haben können; wenn du es schaffst, ein solches zu bauen, hast du immer mindestens 1 MP und 1 Luftwiderstand.</p>
+    <h3>Ära <a id="_Era"></a></h3>
+    <p>Deine Ära bestimmt zu Beginn einige Faktoren deines Flugzeugs. Das reguläre Flying Circus ist im Allgemeinen aus der Ära Erster Weltkrieg. Wenn du ein echtes Flugzeug nachbildest, sei ein wenig streng mit den Ären; eine Spitfire FR.XIV ist technisch aus dem Jahr 1944 und ein Flugzeug der Ära Letztes Hurra, aber der Motor ist aus dem Zweiten Weltkrieg und die Aerodynamik größtenteils aus der Ära Heraufziehender Sturm.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Ära</th>
+          <th>Jahre</th>
+          <th>Lift Bleed</th>
+          <th>Maximale Bombenzuladung</th>
+          <th>Bonus für Kragträger</th>
+          <th>Kostenanpassung</th>
+          <th>Modifikator für Längsstabilität</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Pionier</td>
+          <td>1903-1914</td>
+          <td>30</td>
+          <td>1/6 Struktur</td>
+          <td>+4</td>
+          <td>−2þ</td>
+          <td>+0</td>
+        </tr>
+        <tr>
+          <td>Erster Weltkrieg</td>
+          <td>1915-1919</td>
+          <td>25</td>
+          <td>1/5 Struktur</td>
+          <td>+3</td>
+          <td>0þ</td>
+          <td>+0</td>
+        </tr>
+        <tr>
+          <td>Goldene Zwanziger</td>
+          <td>1920-1929</td>
+          <td>23</td>
+          <td>1/4 Struktur</td>
+          <td>+1</td>
+          <td>+5þ</td>
+          <td>+0</td>
+        </tr>
+        <tr>
+          <td>Heraufziehender Sturm</td>
+          <td>1930-1938</td>
+          <td>22</td>
+          <td>1/3 Struktur</td>
+          <td>0</td>
+          <td>+10þ</td>
+          <td>+2</td>
+        </tr>
+        <tr>
+          <td>Zweiter Weltkrieg</td>
+          <td>1939-1943</td>
+          <td>20</td>
+          <td>1/3 Struktur</td>
+          <td>0</td>
+          <td>+15þ</td>
+          <td>+2</td>
+        </tr>
+        <tr>
+          <td>Letztes Hurra</td>
+          <td>1944+</td>
+          <td>18</td>
+          <td>1/2 Struktur</td>
+          <td>0</td>
+          <td>+20þ</td>
+          <td>+2</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Komponenten des Flugzeugs sind mit einer Ära verbunden, in der sie erstmals weit verbreitet waren. Für Himmilgard ist diese Ära der Erste Weltkrieg. Dies ist keine harte und schnelle Regel, Flugzeuge verfügen oft über Merkmale, die ihrer Zeit voraus sind, und bei der Nachbildung eines echten Flugzeugs verwende einfach die Merkmale, die es tatsächlich besaß. Bei kundenspezifischen Designs ist es für die meisten Charaktere am besten, innerhalb der Ärenbeschränkungen zu bleiben, vielleicht mit einer Ausnahme. Studenten können mit ihren hochmodernen Designs zwei Komponenten oder eine Komponente zwei Ären im Voraus haben. Wie immer, besprich dies mit dem Spielleiter und dem Rest der Gruppe.</p>
+    <h3>Besatzung <a id="_Crew"></a></h3>
+    <p>Jedes Mitglied der Besatzung, einschließlich des Piloten, sitzt innerhalb der Struktur des Flugzeugs.</p>
+    <h4>Cockpits <a id="_Cockpits"></a></h4>
+    <p>Lege zunächst unten fest, wie das Cockpit für jede Besatzungsposition konstruiert ist, indem du eine Option auswählst.</p>
+    <p>Sicht-, Flugstress- und Fluchtmodifikatoren gelten individuell für jede Besatzungsposition.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Offen</td>
+          <td>Der Pilot ist vollständig der Luft ausgesetzt.</td>
+          <td>+1 Masse, +3 Luftwiderstand, +2 Flucht, +1 Sicht</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Windschutzscheibe</td>
+          <td>Eine Glasscheibe vor dem Piloten.</td>
+          <td>+2 Masse, +1 Luftwiderstand. +2 Flucht, +1 Sicht</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Versiegelt</td>
+          <td>Es gibt kein Fenster oder keine externe Sicht.</td>
+          <td>+2 Masse, −3 Flucht, −1 Flugstress. Dieses Besatzungsmitglied kann nicht nach draußen sehen.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Schmale Kanzel</td>
+          <td>Eine Struktur mit kleinen Fenstern.</td>
+          <td>+3 Masse, −1 Sicht. −1 Flugstress.</td>
+          <td>3þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Blasenkanzel</td>
+          <td>Ein Cockpit aus gebogenem Glas.</td>
+          <td>+3 Masse, −3 Luftwiderstand, −1 Flugstress</td>
+          <td>8þ</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Zu jedem Cockpit kannst du die folgenden Upgrades hinzufügen.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Upgrade</th>
+          <th>Beschreibung</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Copiloten-Steuerung</td>
+          <td>Ermöglicht diesem Sitz, das Flugzeug ebenfalls zu steuern. -2 Flugstress für Piloten.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Notluke</td>
+          <td>+1 Masse, +3 Flucht</td>
+          <td>2þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Schleudersitz</td>
+          <td>+2 Masse, +5 Flucht</td>
+          <td>4þ</td>
+          <td>Letztes Hurra</td>
+        </tr>
+        <tr>
+          <td>Verbindbarkeit</td>
+          <td>Verbindet dieses Cockpit mit jedem anderen Cockpit mit demselben Upgrade. +1 Masse.</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Sauerstoffmaske</td>
+          <td>Der Pilot ignoriert die Auswirkungen großer Höhe und negiert bis zu 2 G-Malus. Erfordert 1 Ladung kontinuierlich.</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Isoliert</td>
+          <td>
+            <p>Ein Korb oder Kasten, der ungewöhnliche Montagen (wie vor einem Propeller) ermöglicht und das übliche System vollständig ignoriert. +5 Luftwiderstand, +1 Masse, +2 Sicht, −2 Flucht, +1 Flugstress.</p>
+            <p>Erleide doppelten Schaden, wenn du Go Down würfelst.</p>
+          </td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Diese Cockpit-Optionen können je nach Besatzungsbereich unterschiedliche Ideen darstellen. Die Schmale Kanzel stellt die Glasflächen des B-17-Cockpits dar, und Offen das in die Wand geschnittene Loch für den Heckschützen, zum Beispiel.</p>
+    <h4>Sicherheit <a id="_Safety"></a></h4>
+    <p>Versuche nicht zu sterben! Du musst diese Upgrades pro Cockpit kaufen.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Polsterung</td>
+          <td>Negiere 1 Schaden für diese Position, wenn du Go Down würfelst.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Gurt</td>
+          <td>Negiere 1 Schaden für diese Position, wenn du Go Down würfelst, −1 Flucht.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Schnellentriegelungssystem</td>
+          <td>+2 auf Flucht.</td>
+          <td>1þ</td>
+          <td>Heraufziehender Sturm</td>
+        </tr>
+        <tr>
+          <td>Überrollbügel</td>
+          <td>+2 Masse. Negiere 1 Schaden für diese Position, wenn du Go Down würfelst.</td>
+          <td>-</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Leuchtpatronen-Schacht</td>
+          <td>Ermöglicht das Abfeuern von Leuchtpatronen aus einem geschlossenen Cockpit, ohne das Cockpit öffnen zu müssen.</td>
+          <td>1þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Einfacher Ventilator</td>
+          <td>Erfordert das Vitalteil Elektrik.</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Zielvisiere <a id="_Gunsights"></a></h4>
+    <p>Diese können dir beim Zielen helfen! Standardmäßig gehen wir davon aus, dass ein Flugzeug kaum mehr als einfache Ringvisiere hat. Diese Zielvisiere können dir helfen, besser zu zielen. Du kannst jedoch nur eines gleichzeitig verwenden.</p>
+    <p>Jedes Zielvisier, das du in dein Cockpit einbaust, gibt −1 Sicht, also sei sparsam!</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>X1 Kollimiertes Zielvisier</td>
+          <td>+1 auf Open Fire.</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Teleskop-Zielvisier</td>
+          <td>+2 auf Open Fire, wenn du angepeilt hast.</td>
+          <td>3þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Beleuchtetes Reflexvisier</td>
+          <td>+2 auf Open Fire. Deaktiviert, wenn das Vitalteil Elektrik getroffen wird.</td>
+          <td>6þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Gyro-Zielvisier</td>
+          <td>+2 auf Open Fire und zusätzlich +2, wenn du angepeilt hast. Deaktiviert, wenn das Vitalteil Elektrik getroffen wird.</td>
+          <td>12þ</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Bombenzielgeräte <a id="_Bombsights"></a></h4>
+    <p>Bombenzielgeräte helfen, Bomben ins Ziel zu bringen!</p>
+    <p>Ein Bombenzielgerät kostet 2 Thaler für ein Modell der Grundqualität 4 und dann +1 Thaler für jede weitere 3 Qualität.</p>
+    <h4>Passagierkapazität <a id="_Passenger_Capacity"></a></h4>
+    <p>Kapazität für 5 Passagiere benötigt 2 Rumpfsektionen, die für nichts anderes verwendet werden können. Snacks im Flug müssen separat gekauft werden. Der Passagierbereich wird kollektiv als Besatzungsposition behandelt und kann daher mit den Besatzungspositionen durch ein Verbindbarkeit-Upgrade verbunden werden.</p>
+    <p>Ein Bett, eine Trage oder Erste-Klasse-Unterkünfte belegen 2 Passagiersitze.</p>
+    <p>Jeder Passagier an Bord eines Flugzeugs (eine Person an oder im Flugzeug, die keine seiner Funktionen bedient) fügt 1 Bombenmasse hinzu. Wie bei anderen Zuladungsarten runden wir dies auf die nächste MP auf.</p>
+    <p>Passagierplätze können als Frachtraum genutzt werden, wobei jeder Passagiersitz oder jede Trage 1 Fracht aufnehmen kann. Dies soll die durch Sitze etc. verursachten Platzbeschränkungen darstellen.</p>
+    <h3>Motoren <a id="_Engines"></a></h3>
+    <p>Motoren gibt es in zwei allgemeinen Typen: Schubmotoren und Zugmotoren. Zugmotoren haben den Propeller vor dem Flugzeug, der es zieht, während Schubmotoren ihn hinter dem Flugzeug haben, der es wegschiebt.</p>
+    <h4>Motor auswählen</h4>
+    <p>Dein Motor kann aus der Liste der vorgefertigten Motoren, die zum Setting passen, ausgewählt oder andernfalls im Motoren-Konstrukteur erstellt werden.</p>
+    <p>Im Allgemeinen sind luftgekühlte Motoren leichter, aber weniger leistungsfähig, während wassergekühlte Motoren schwerer, aber leistungsfähiger sind.</p>
+    <h4>Motor montieren</h4>
+    <p>Motoren können auf verschiedene Arten montiert werden.</p>
+    <p>Ein hinten montierter Schubpropeller stellt einen Motor dar, der am hinteren Ende des Flugzeugkörpers montiert ist, wie die Schubmotoren einer Kyushu J7W. Ein mittig montierter Schubmotor stellt einen Schubmotor dar, der immer noch ein Heck hat, wobei eine verlängerte Antriebswelle oder ein Farman-Heck verwendet wird, um ein Ungleichgewicht zu vermeiden.</p>
+    <p>Die Sicht ist die schlechteste aller Motorhalterungen. Eine Schubpropeller-Montage hilft dir nicht besonders gut, um einen Gondel-montierten Motor herum zu sehen.</p>
+    <p><strong>Rumpf-Motorhalterungen</strong></p>
+    <p>Rumpf-Motorhalterungen erfordern für jeden Motor eine Struktursektion.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Zugpropeller</td>
+          <td>
+            <p>Normal.</p>
+            <p>Vorwärts feuernde feste Waffen benötigen Synchronisationsgetriebe/Spinner-Halterungen. Türme können nicht nach vorne feuern.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Mittig montierter Zugpropeller</td>
+          <td>
+            <p>−2 Längsstabilität, +1 Sicht.</p>
+            <p>Vorwärts feuernde feste Waffen benötigen Synchronisationsgetriebe. Erfordert eine verlängerte Antriebswelle.</p>
+            <p>Mit dem freien Platz an der Flugzeugfront kannst du eine einzelne Waffe montieren, die durch den Spinner feuert.</p>
+            <p>(Stellt P-39-ähnliche Motorhalterungen dar.)</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Hinten montierter Schubpropeller</td>
+          <td>
+            <p>−4 Längsstabilität, +2 Sicht, −2 Flucht.</p>
+            <p>Rückwärts feuernde feste Waffen benötigen Synchronisationsgetriebe/Spinner-Halterungen. Türme können nicht nach hinten feuern.</p>
+            <p>(stellt am Heck montierte Motoren dar)</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Mittig montierter Schubpropeller</td>
+          <td>
+            <p>−2 Längsstabilität. +2 Sicht, −2 Flucht.</p>
+            <p>Erfordert verlängerte Antriebswelle, Farman-Heck, Pfeilflügel mit Rudern oder Heckausleger.</p>
+            <p>Rückwärts feuernde feste Waffen benötigen Synchronisationsgetriebe/Spinner-Halterungen. Türme können nicht nach hinten feuern.</p>
+            <p>(stellt in der Flugzeugmitte montierte Motoren dar, à la DH2)</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Gondel</td>
+          <td>+5 Luftwiderstand und −2 Sicht. Hält den Motor von allem anderen fern.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Flügel-Motorhalterungen</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Motorgondel (Innen)</td>
+          <td>Reduziert Maximale Belastung um die Hälfte der Motormasse. +1 Lift Bleed.</td>
+        </tr>
+        <tr>
+          <td>Motorgondel (Versetzt)</td>
+          <td>Fügt Luftwiderstand in Höhe der Motormasse hinzu.</td>
+        </tr>
+        <tr>
+          <td>Kanal-Zugpropeller</td>
+          <td>−1 Lift Bleed. Reduziert Maximale Belastung in Höhe der Motormasse.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Wenn du möchtest, kannst du ein Flugzeug asymmetrisch bauen, mit verschiedenen Motortypen auf jeder Seite eines Flügels oder einem einzelnen großen Motor an einem Flügel. In diesen Fällen erleide −3 Seitenstabilität.</p>
+    <h4>Motordrehmoment und Umlaufmotoren</h4>
+    <p>Motoren haben Drehmoment, das direkt von ihrer Seitenstabilität abgezogen wird, wenn sie Rumpfhalterungen verwenden. Flügel- und Gondelhalterungen minimieren den Stabilitätseffekt des Drehmoments, ignoriere es also dort.</p>
+    <p>Umlaufmotoren sind normalerweise die einzigen Motoren, bei denen du dir in frühen Flugzeugen darüber Gedanken machen musst, da sie eine riesige Metallmasse sind, die sich mit hoher Geschwindigkeit dreht.</p>
+    <p>Flügelmontierte Umlaufmotoren reduzieren deine Belastung um das Drehmoment (verwende alle Motoren), was die Kraft gegen den Flügel darstellt. In einer Schub-Zug-Konfiguration kannst du stattdessen wählen, die Struktur zu reduzieren.</p>
+    <p>Rumpf-Schub-Zug-Motoren können auch wählen, die Struktur zu reduzieren; in diesem Fall negiert dies den Stabilitätseffekt des Drehmoments und entfernt den Umlaufmotor-Bonus auf Dogfighting.</p>
+    <p>Gegenläufige Motoren sind ein spezieller Motortyp, der das Drehmoment des Motors halbiert. Sie müssen mit einem untersetzten Propeller gepaart werden, um zu funktionieren.</p>
+    <h4>Schub-Zug-Konfiguration</h4>
+    <p>Eine Schub-Zug-Konfiguration ermöglicht die Montage zweier Motoren entlang derselben Linie. Dies erfordert, dass dasselbe Motormodell für beide verwendet wird.</p>
+    <p>In jeder Schub-Zug-Konfiguration verwende nur den Luftwiderstand eines Motors und wende die folgenden Modifikatoren an.</p>
+    <p><strong>Schub-Zug-Konfigurationen</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Zugpropeller + Schubpropeller/Rückwärts</td>
+          <td>90% Motorleistung. Die −2 Längsstabilität und −2 Flucht durch den Schubpropeller. Die Motorverkleidung kostet +2 für den Schubpropeller wie normal.</td>
+        </tr>
+        <tr>
+          <td>Motorgondel/Motorgondel</td>
+          <td>80% Motorleistung. Wende den Motorgondel-Malus nur für einen Motor an.</td>
+        </tr>
+        <tr>
+          <td>Tandem-Gondel</td>
+          <td>90% Motorleistung. Wende den +5 Luftwiderstands-Malus nur einmal an.</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Motor-Upgrades <a id="_Engine_Upgrades"></a></h3>
+    <h4>Verlängerte Antriebswellen</h4>
+    <p>Eine verlängerte Antriebswelle bedeutet im Grunde, dass, während der Motor in der Mitte des Flugzeugs montiert ist, der Propeller dennoch an beiden Enden sein kann, da die Stange, die beide verbindet, länger als üblich ist und durch die Länge des Flugzeugs verläuft.</p>
+    <p>Verlängerte Antriebswellen fügen +1 Masse hinzu.</p>
+    <p>Dies kann aus verschiedenen Gründen geschehen. Bei Zugpropeller-Flugzeugen kann dies die interne Montage einer Artilleriewaffe ermöglichen, die durch den Propeller feuert, ohne das Synchronisationsgetriebe zu verwenden, indem der Lauf direkt durch den Propeller-Spinner geführt wird. Zum Beispiel eine Waffe, die vor dem Motor in einem dedizierten Raum montiert ist, wie die 37mm Maschinenkanone in der Nase der P-39 Airacobra.</p>
+    <p>Bei einem mittig montierten Schubpropeller-Flugzeug eliminiert eine verlängerte Antriebswelle die Notwendigkeit eines Farman-Hecks. Du kannst einfach ein konventionelles Heck um den Motor herum montieren, ohne Probleme. Ebenso kann ein mittig montierter Zugpropeller mit Canards (d.h. das Heck befindet sich vor dem Flugzeug) die verlängerte Antriebswelle verwenden, um das Farman-Heck zu vermeiden.</p>
+    <h4>Außenbordpropeller</h4>
+    <p>Außenbordpropeller sind, wenn ein Satz von Riemen, Zahnrädern und Riemenscheiben verwendet wird, um den Propeller (oder die Propeller) seitlich vom Motor und Rumpf zu versetzen. Dies erfordert das Upgrade auf die verlängerte Antriebswelle und zieht Kosten von +3 Luftwiderstand und −2 Zuverlässigkeit nach sich. Als Vorteil benötigen Rumpf-montierte Waffen keine Synchronisation mehr, da die Propeller aus dem Weg sind.</p>
+    <p>Dieses Upgrade kann auf Zugpropeller, mittig montierte Zugpropeller und Schub-Zug-Motoren angewendet werden. Im Falle eines Schub-Zug-Motors ist es der hintere Motor, der die Außenbordpropeller antreibt, und daher müssen vorwärts feuernde Waffen weiterhin synchronisiert werden, aber es gibt keinen −2 Malus auf Flucht.</p>
+    <h4>Untersetzter Propeller</h4>
+    <p>Dieses Upgrade kann auf jeden Motor angewendet werden. Es kostet +1þ für jede Iteration. Verfügbar in der Ära Erster Weltkrieg.</p>
+    <p>Dies erhöht die Übergeschwindigkeit des Motors um +50% und gibt −1 Zuverlässigkeit. Du kannst dies so oft hinzufügen, wie du möchtest.</p>
+    <p>Du kannst zusätzliche 1þ bezahlen, um den Zuverlässigkeits-Malus nur durch den untersetzten Propeller zu negieren, im Verhältnis 1:1. Verfügbar in der Ära Goldene Zwanziger.</p>
+    <p><strong>Hinweis:</strong> Obwohl du technisch gesehen einen Umlaufmotor untersetzen kannst (und es einige historische Beispiele gibt), ist dies eine Abscheulichkeit gegen die Ingenieurskunst, und du solltest es dir zweimal oder ein Dutzend Mal überlegen, bevor du es tust.</p>
+    <h4>Motorverkleidung <a id="_Cowling"></a></h4>
+    <p>Motorverkleidung kann auf jeden luftgekühlten Motor angewendet werden.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+          <th>Motortypen</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Einfache Motorverkleidung</td>
+          <td>80% Motor-Luftwiderstand, +1 Masse.</td>
+          <td>Luftgekühlt</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Einfache Motorverkleidung für Umlaufmotor</td>
+          <td>40% Motor-Luftwiderstand. +1 Masse.</td>
+          <td>Umlaufmotor</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Geschlossene Motorverkleidung</td>
+          <td>30% Motor-Luftwiderstand. −1 Zuverlässigkeit, +1 Masse.</td>
+          <td>Umlaufmotor</td>
+          <td>1þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Flügelprofil-Motorverkleidung</td>
+          <td>40% Motor-Luftwiderstand. +3 Zuverlässigkeit, +2 Masse.</td>
+          <td>Luftgekühlt + Umlaufmotor</td>
+          <td>3þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Motorverkleidung mit einstellbaren Lamellen</td>
+          <td>50% Motor-Luftwiderstand. +2 Zuverlässigkeit, +2 Masse.</td>
+          <td>Luftgekühlt</td>
+          <td>2þ</td>
+          <td>Heraufziehender Sturm</td>
+        </tr>
+        <tr>
+          <td>Versiegelte Motorverkleidung</td>
+          <td>50% Motor-Luftwiderstand. +1 Masse pro 3 Motor-Luftwiderstand (vor Reduzierung).</td>
+          <td>Flüssigkeitsgekühlt</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Motorverkleidungen sind bei Rumpf-Schubpropeller-Flugzeugen schwieriger anzuwenden und erfordern sorgfältige Ingenieursarbeit für den Luftstrom. Erhöhe die Kosten um +2. Die Ausnahme ist die Versiegelte Motorverkleidung, da sie nun ja versiegelt ist und kein Luftstrom manipuliert werden muss.</p>
+    <p>Zusätzlich kann ein Luftkühlungslüfter innerhalb der Motorverkleidung eines nicht-umlaufenden, luftgekühlten Motors montiert werden. Dies kann große Luftmengen über den Motor ziehen, führt jedoch zu einer zusätzlichen schweren rotierenden Klinge an der Kurbelwelle.</p>
+    <ul>
+      <li>Luftkühlungslüfter: +6 Zuverlässigkeit, +3 Masse. Doppeltes Drehmoment. 4þ</li>
+    </ul>
+    <h4>Turbolader <a id="_Turbocharger"></a></h4>
+    <p>Ein Turbolader belegt eine Struktursektion!</p>
+    <h4>Motor als Generator <a id="Engine_as_Generator"></a></h4>
+    <p>Du kannst einen Motor als Generator montieren. Er liefert keine Leistung für den Vortrieb, aber du kannst ihn unabhängig von deinen anderen Motoren hochfahren, um Batterien aufzuladen oder Energie für andere Dinge bereitzustellen. Du benötigst keine Lichtmaschine (wir gehen davon aus, dass diese eingebaut ist) und erzeugt doppelt so viel Ladung wie derselbe Motor, wenn er einen Propeller mit einer Lichtmaschine antreiben würde.</p>
+    <h4>Kühlung (Luft)</h4>
+    <p>Wenn dein Motor luftgekühlt ist, super! Platziere ihn einfach dort, und er läuft von allein. Fügt das Vitalteil Ölwanne hinzu.</p>
+    <h4>Kühlung (Umlaufmotor)</h4>
+    <p>Wenn dein Motor <em>umlaufend</em>; ist, musst du 1 Masse für den Öltank des Motors hinzufügen. Dies ist ein separates Vitalteil.</p>
+    <h4>Kühlung (Flüssigkeit)</h4>
+    <p>Wenn dein Motor <em>flüssigkeitsgekühlt</em>; ist, musst du einen Kühler und einen Ölkühler hinzufügen.</p>
+    <p>Ein Ölkühler ist einfach: Du fügst +1 Luftwiderstand pro 15 Leistung hinzu und er zählt als Vitalteil.</p>
+    <p>Ein Kühler wiegt 3 Masse und hat eine variable Menge an Luftwiderstand, die du wählst. Du kannst nicht mehr Kühler haben als Motoren, aber du kannst mehrere Motoren an denselben vergrößerten Kühler anschließen. Das spart Gewicht, ist aber eine einzelne Ausfallstelle. Jeder Kühler ist ein Vitalteil.</p>
+    <p>Der <em>Luftwiderstand</em> eines Kühlers ist, wie viel Oberfläche des Kühlers dem Luftstrom ausgesetzt ist. Jeder Luftwiderstandswert gibt +2 Kühlung. Du musst einen Kühlwert haben, der der Kühlung deines Motors (oder deiner Motoren) entspricht, sonst verlierst du Zuverlässigkeit. Jeder Kühlwert, der darunter liegt, gibt −1 Zuverlässigkeit. Mehr Kühlung als dein Motor benötigt, macht ihn nicht zuverlässiger.</p>
+    <p>Der <em>Typ</em> ist das Design des Kühlers, und die <em>Montage</em> des Kühlers ist, wo er sich im Verhältnis zum Motor (nicht zum Flugzeug als Ganzes) befindet, und beeinflusst die Kühlerleistung, nachdem er getroffen wurde. Beide können direkte Zuverlässigkeitsboni für den Motor aufgrund mechanischer Einfachheit oder Effizienz geben.</p>
+    <p>Kühler können verschiedene Typen haben. Wenn der Kühler mehr Luftwiderstand erhält, fügt er nicht mehr Zuverlässigkeit hinzu: Dies resultiert aus den anderen Teilen des Designs wie Schläuchen oder Rahmenwerk.</p>
+    <p><strong>Kühlertyp</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Verkleidung</td>
+          <td>Standard.</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Kasten</td>
+          <td>+2 Luftwiderstand, −1 Masse.</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Lufteinlass</td>
+          <td>+2 Kühlung +3þ.</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Verdunstungskühlung</td>
+          <td>Siehe unten.</td>
+          <td>Heraufziehender Sturm</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Kühler-Montage</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Ort</th>
+          <th>Beschreibung</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Niedrig</td>
+          <td>+1 Zuverlässigkeit. Erzwinge Cool Down bei Treffer.</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Inline</td>
+          <td>Standard.</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Hoch</td>
+          <td>Bonus bleibt für 1 Cool Down nach Treffer bestehen. +1 Luftwiderstand. Wenn das Flugzeug ein offenes Cockpit hat, bespritzt es den Piloten mit der Kühlflüssigkeit!</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Hoch versetzt</td>
+          <td>Erfordert einen Schirmdecker. Wie bei 'Hoch', aber −1 Seitenstabilität, und der Pilot ist bei Riss sicher.</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Kühler-Beispiele:</strong></p>
+    <p><em>Verkleidungskühler sind alle Kühler, bei denen Luft "über" die Oberfläche strömt, während Kasten-Kühler so konstruiert sind, dass Luft "hindurch" strömt. Vereinfacht gesagt: Wenn er hässlich herausragt oder in der Nase ist, ist es ein Kasten, wenn er flach an einer Oberfläche wie einem Flügel oder der Außenhaut anliegt, ist es eine Verkleidung.</em></p>
+    <p>Lufteinlasskühler sind speziell Kühler, die in speziellen Gehäusen eingebaut sind, um Luft zu kanalisieren und den Luftwiderstand zu reduzieren.</p>
+    <ul>
+      <li>
+        <p>Der Kühler an einer Albatros D.II ist ein Hoch-Verkleidungskühler.</p>
+      </li>
+      <li>
+        <p>Der Kühler an der Seite einer Sopwith Dolphin oder Albatros D.II (frühe Version) ist ein Niedrig-Kastenkühler.</p>
+      </li>
+      <li>
+        <p>Der Kühler an der Nase einer SE5a oder Fokker D.VII ist ein Inline-Kastenkühler.</p>
+      </li>
+      <li>
+        <p>Der Kühler an einer Spitfire oder P-51 ist ein Niedrig-Lufteinlasskühler.</p>
+      </li>
+    </ul>
+    <p><strong>Spezialkühlmittel</strong></p>
+    <p>Normalerweise ist ein Kühler nur mit Wasser gefüllt. Wenn du ein versierter Ingenieur sein möchtest, kannst du deinen Kühler mit Spezialkühlmittel befüllen, um die Motoreffizienz zu steigern.  Du musst die Flüssigkeit erneut kaufen, wenn der Kühler beschädigt wird.  Wenn die Flüssigkeit mit einem * gekennzeichnet ist, benötigst du dafür einen speziell gehärteten Kühler (2 Thaler zum Upgrade).</p>
+    <h4>Seltenes Kühlmittel <a id="_Rare_Radiator_Fluid"></a></h4>
+    <p>Standardmäßig sind Kühler mit Wasser gefüllt, aber wenn du Quellen findest, kannst du sie mit anderen Flüssigkeiten befüllen, um die Motoreffizienz zu steigern.  Du musst die Flüssigkeit erneut kaufen, wenn der Kühler beschädigt wird.  Wenn die Flüssigkeit mit einem * gekennzeichnet ist, benötigst du dafür einen speziell gehärteten Kühler (2 Thaler zum Upgrade).</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Flüssigkeit</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Wasser</td>
+          <td></td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Salzwasser*</td>
+          <td>+1 Zuverlässigkeit (Kostenlos für Fischer)</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Mineralöl*</td>
+          <td>Absorbiert 1 Fehlschuss pro Cool Off. Entzündlich</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Rizinusöl</td>
+          <td>Wie Mineralöl, aber +2 Stress bei Leckage</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Glykol</td>
+          <td>+2 Zuverlässigkeit</td>
+          <td>2þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Freon</td>
+          <td>+4 Zuverlässigkeit. Erleide 1 Leistungsreduzierung, während die Drehzahl unter 4 liegt.</td>
+          <td>3þ</td>
+          <td>Heraufziehender Sturm</td>
+        </tr>
+        <tr>
+          <td>Ammoniak</td>
+          <td>Wie Freon, verursacht aber 2 Schaden bei Leckage</td>
+          <td>2þ</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><br></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Verdunstungskühlung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <p>Eine alternative Methode zur Kühlung eines flüssigkeitsgekühlten Motors ist die Verdunstungskühlung. Dies erfordert einen ausreichend großen Flügel (mindestens 5 Fläche pro Motor) mit einer Art Metallhaut. Anstatt Wasser zu einem Kühler zu leiten, wird das Wasser als Dampf in einen Hohlraum in den Flügeln gesprüht, um es zu kühlen, wo es gesammelt und wieder in den Motor zurückgeführt wird. Dies ist stromlinienförmiger, aber sehr fragil.</p>
+            <p>Verdunstungskühlung kostet nur die +3 Masse, die du für einen Kühler bezahlen würdest. Es ist kein Luftwiderstand beteiligt, du bist einfach bereit.</p>
+            <p>Der Nachteil ist, dass jeder Angriff mit einem Krit-Wurf von 16+ den Kühler ausschaltet, zusätzlich zu allen anderen verursachten Schäden oder beschädigten Teilen.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Pulsstrahltriebwerke <a id="_Pulsejets"></a></h4>
+    <p>Pulsstrahltriebwerke werden einfach irgendwo am Flugzeug angeschraubt. Es ist uns nicht besonders wichtig, wo oder in welcher Konfiguration: Wir wissen nur, dass sie so montiert sind, dass sie von allen funktionierenden Teilen ferngehalten werden.</p>
+    <p>Pulsstrahltriebwerke kosten 5þ und 1 Wartung nur, weil sie an deinem Flugzeug montiert sind. Sie sind hart zu Flugzeugen.</p>
+    <p>Pulsstrahltriebwerke erzeugen Rumble. Rumble verursacht Stress bei Besatzungsmitgliedern in Höhe der Hälfte des gesamten Rumble, oder 3, je nachdem, welcher Wert niedriger ist. Zusätzlich benötigt ein Flugzeug eine minimale Struktur von Gesamt-Rumble * 10 zum Fliegen, sonst zerfallen die Vibrationen das Flugzeug.</p>
+    <h4>Strahltriebwerke &amp; Raketen</h4>
+    <p>Strahltriebwerke werden auf eine der folgenden Arten montiert. Strahltriebwerke bringen aufgrund ihrer Größe ihre eigene Anforderung an Struktursektionen mit sich.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Beschreibung</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Frontaler Lufteinlass/Heckbrenner</td>
+          <td>Standard. Kann bis zu 2 Motoren aufnehmen.</td>
+        </tr>
+        <tr>
+          <td>Flügelgondel</td>
+          <td>Reduziert Maximale Belastung um die Hälfte der Motormasse. +1 Lift Bleed.</td>
+        </tr>
+        <tr>
+          <td>Gondel</td>
+          <td>+3 Luftwiderstand und −1 Sicht. Hält den Motor von allem anderen fern.</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Struktur und Bespannung <a id="_Frame_and_Covering"></a></h3>
+    <p>Nachdem du nun die Sektionen hast, die dein Flugzeug benötigt, musst du sie bauen. Beginne damit, eine Struktur zu bauen. Die Struktur verleiht eine grundlegende Strukturstärke sowie einige Boni, wenn das Flugzeug größer wird. Wähle nur ein Material, aus dem der größte Teil der Struktur besteht, und füge pro Sektion 1 Teil hinzu.</p>
+    <p>Im Allgemeinen unterteilen wir Flugzeuge in solche, die aus Holmen oder aus Rippen bestehen. Wenn dein Flugzeug durch Zugdrähte zusammengehalten wird, wobei die Struktur Kompression bietet, besteht es aus Holmen. Wenn es sich nur um einen großen Satz massiver Teile handelt, besteht es aus Rippen.</p>
+    <p>Eine Sopwith Camel besteht aus Holzholmen. Eine Fokker DR.1 besteht aus Stahlholmen. Die Junkers J.1/J4 besteht aus Aluminiumholmen. Die Polikarpov I-16 besteht aus Holzrippen. Die P-47 besteht aus Stahlrippen. Die P-51 besteht aus Aluminiumrippen.</p>
+    <img src="Frame.png" alt="Vergleich von Streben und Rippen">
+    <table>
+      <thead>
+        <tr>
+          <th>Strukturmaterial</th>
+          <th>Basiseffekt</th>
+          <th>Basiskosten</th>
+          <th>Effekt pro Teil</th>
+          <th>Kosten pro Teil</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Holzholme</td>
+          <td>15 Struktur</td>
+          <td>-</td>
+          <td>+1 Masse, +2 Struktur</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Stahlholme</td>
+          <td>25 Struktur</td>
+          <td>1þ</td>
+          <td>+1 Masse, +5 Struktur</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Aluminiumholme</td>
+          <td>20 Struktur</td>
+          <td>2þ</td>
+          <td>+½ Masse, +4 Struktur</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Holzrippen*</td>
+          <td>30 Struktur</td>
+          <td>1þ</td>
+          <td>+2 Masse, +5 Struktur</td>
+          <td>½þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Stahlrippen*</td>
+          <td>60 Struktur</td>
+          <td>2þ</td>
+          <td>+3 Masse, +12 Struktur</td>
+          <td>2þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Aluminiumrippen*</td>
+          <td>50 Struktur</td>
+          <td>3þ</td>
+          <td>+2 Masse, +8 Struktur</td>
+          <td>3þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Titan</td>
+          <td>-</td>
+          <td></td>
+          <td>+1 Masse, +10 Struktur</td>
+          <td>8þ</td>
+          <td>Letztes Hurra</td>
+        </tr>
+        <tr>
+          <td>Lebender Hain*</td>
+          <td>30 Struktur, Kostenlose Reparaturen</td>
+          <td>8þ</td>
+          <td>+2 Masse, +4 Struktur</td>
+          <td>-</td>
+          <td>Himmilgard</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Titan ist ein Sonderfall und kann nicht für ganze Strukturen verwendet werden.</p>
+    <p>Eine Struktur, die mit * gekennzeichnet ist, kann geodätisch gebaut werden, was die Kosten pro Teil verdoppelt, aber +50% Struktur pro Teil hinzufügt. Geodätische Strukturteile können anschließend nicht monocoque sein.</p>
+    <p>Standardmäßig fügt jedes Strukturteil dem Flugzeug +4 Luftwiderstand hinzu, was unverkleidete Struktur darstellt, die in der Luft hängt. Du musst diese Elemente verkleiden, um sie stromlinienförmiger zu machen. Wähle für jede Sektion eine Bespannung von unten. Die gesamte Haut des Flugzeugs muss gleich sein, wähle also den dominanten Typ.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Bespannungsmaterial</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Monocoque-Struktur</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Unverkleidet</td>
+          <td>+ 1 Sicht pro Teil, bis zu +3. 60% Flugwerkmasse.</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Stoffbespannung</td>
+          <td>50% Flugwerk-Luftwiderstand</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Transparentes Zelluloid</td>
+          <td>60% Flugwerk-Luftwiderstand. + 1 Sicht pro Teil, bis zu +3. Entzündlich.</td>
+          <td>1þ</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Behandeltes Papier</td>
+          <td>50% Flugwerk-Luftwiderstand. Entzündlich. 75% Flugwerkmasse</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Gespanntes Seidentuch</td>
+          <td>50% Flugwerk-Luftwiderstand. +1 Zähigkeit pro Teil</td>
+          <td>1þ</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Drachenhaut</td>
+          <td>50% Flugwerk-Luftwiderstand. Flugzeug erhält 5 Abdeckung DP2 Panzerung.</td>
+          <td>4þ</td>
+          <td>-</td>
+          <td>Himmilgard</td>
+        </tr>
+        <tr>
+          <td>Formsperrholz</td>
+          <td>40% Flugwerk-Luftwiderstand</td>
+          <td>½þ</td>
+          <td>+3</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Klinkerbauweise</td>
+          <td>50% Flugwerk-Luftwiderstand. Volles Monocoque, fügt pauschal +30 Struktur hinzu.</td>
+          <td>-</td>
+          <td>−3</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Glasfaserverstärkter Kunststoff</td>
+          <td>30% Flugwerk-Luftwiderstand.</td>
+          <td>1þ</td>
+          <td>+0</td>
+          <td>Letztes Hurra</td>
+        </tr>
+        <tr>
+          <td>Wellblech-Duraluminium</td>
+          <td>50% Flugwerk-Luftwiderstand, +3 Zähigkeit pro Teil</td>
+          <td>1þ</td>
+          <td>+10</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Stahlblech</td>
+          <td>35% Flugwerk-Luftwiderstand, +3 Zähigkeit pro Teil</td>
+          <td>1½þ</td>
+          <td>Rost</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Aluminiumblech</td>
+          <td>35% Flugwerk-Luftwiderstand, +2 Zähigkeit pro Teil. 75% Flugwerkmasse</td>
+          <td>2þ</td>
+          <td>+6</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Monocoque <a id="_Monocoque"></a></h4>
+    <p>Du kannst ein Monocoque (einschaliges) oder Semi-Monocoque-Flugzeug bauen, wenn du möchtest.</p>
+    <p>Ein Monocoque- oder Semi-Monocoque-Flugzeug kann gebaut werden, indem die Masse und der Strukturbonus eines Strukturteils durch ein monocoque-kompatibles Hautteil ersetzt werden. Die Struktur existiert weiterhin: Nur wenige Monocoque-Flugzeuge sind wirklich ohne Struktur, diese Strukturen sind nur minimiert und in die Schalenstruktur integriert.</p>
+    <p>Monocoque-Hautteile kosten +1þ pro Stück, was die Arbeitskosten für Entwurf und Bau darstellt. Dies kommt zu den Strukturkosten hinzu: diese verschwinden nicht.</p>
+    <h4>Auftriebskörper &amp; Nurflügel</h4>
+    <p>Ein Auftriebskörper und Nurflügel sind beide unglaublich komplizierte ingenieurtechnische Errungenschaften und erfordern, dass das Flugzeug eine solide Außenhaut hat (Formsperrholz oder besser).</p>
+    <p>Ein Auftriebskörper-Flugzeug zählt jede Struktursektion (nicht interne Stützen) für die Berechnung der Abrissgeschwindigkeit als 3m² Flügelfläche und fügt +1 Luftwiderstand pro Teil hinzu. Jedes Teil kostet +1 Thaler. Bei einem reinen Auftriebskörper ohne Flügel entspricht die Maximale Belastung der Struktur, vor Abzug von Motorhalterungen oder Anpassung durch Optimierung.</p>
+    <p>Ein Nurflügel ist ein Auftriebskörper, der zusätzlich den zusätzlichen Luftwiderstand vermeidet, indem er +5 Lift Bleed in Kauf nimmt, was die übermäßig dicke Flügelprofiltiefe darstellt.</p>
+    <p>Beide Flugzeugtypen haben weiterhin Heckteile, auch wenn diese in den Rest der Maschine integriert sind.</p>
+    <h4>Interne Verstrebung</h4>
+    <p>Um die Widerstandsfähigkeit eines Flugzeugs zu erhöhen, kannst du interne Verstrebung hinzufügen. Dies sind im Grunde zusätzliche Strukturteile, die du nicht verkleiden musst, da sie sich im Inneren befinden. Du kannst 1 internes Verstrebungsteil pro tatsächlicher Struktursektion haben. Sie müssen nicht aus demselben Material wie alles andere sein: Du kannst zum Beispiel ein Flugzeug aus Holz mit einigen Stahlverstrebungen bauen.</p>
+    <p>Titan kann nur für interne Verstrebungen verwendet werden. Ein ganzes Flugzeug aus Titan zu bauen ist wie einen ganzen Ring aus Diamanten zu machen: cool, aber viel zu teuer, um sich zu lohnen.</p>
+    <h3>Heck <a id="_Tail"></a></h3>
+    <p>Wir betrachten das Heck als die Sektionen des Flugzeugs, die größtenteils leer bleiben. Sie fügen zusätzliche Struktursektionen hinzu und ändern auch die Längsstabilität des Flugzeugs. Sei sehr vorsichtig bei deiner Auswahl: ein kurzes Heck scheint optimal, aber die Längsstabilität gleicht die Auswirkungen von Dingen wie Drehmoment, kurzen Flügeln und der natürlichen Rollinstabilität von Flugzeugen aus, sodass ein zu starkes Reduzieren zu unkontrollierbaren Flugzeugen führt.</p>
+    <p>Die meisten der besten Jagdflugzeuge des Ersten Weltkriegs wären Stummelheck, ebenso wie Flugzeuge des Zweiten Weltkriegs wie die I-16, die F2A Buffalo und der Raketenjäger Me-163. Als Faustregel gilt: Wenn es für dich wie ein Spielzeug aussieht, hast du ein Stummelheck. Wenn es vernünftig aussieht, bist du Standard. Die meisten großen Bomber und dergleichen verwenden Lang.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Ort</th>
+          <th>Zusätzliche Struktursektionen</th>
+          <th>Flugzeugmodifikator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Schwanzlos</td>
+          <td>+0</td>
+          <td>−4 Längsstabilität, kann kein traditionelles Höhen- oder Seitenleitwerk verwenden. +3 Sicht.</td>
+        </tr>
+        <tr>
+          <td>Stummelheck</td>
+          <td>+1</td>
+          <td>−3 Längsstabilität.</td>
+        </tr>
+        <tr>
+          <td>Standard</td>
+          <td>+2</td>
+          <td>Keine Änderung.</td>
+        </tr>
+        <tr>
+          <td>Lang</td>
+          <td>+3</td>
+          <td>+3 Längsstabilität.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Hecksektionen sind in der Regel leer. Hecksektionen befinden sich nicht unbedingt am "Heck" eines Flugzeugs, sie vergrößern es nur und helfen beim Ausgleich. Denke zum Beispiel an die Heckschützenpositionen in Bombern.</p>
+    <h4>Farman <a id="_Farman"></a></h4>
+    <p>Wenn du Steuerungen hinter einem Schubpropeller (oder vor einem Zugpropeller!) montieren möchtest, verwendest du ein Farman-Heck. Dies ist eine Struktur aus Streben, die um den Propeller herum gebaut ist und es den Steuerflächen ermöglicht, daran zu hängen.</p>
+    <p>Dies wird wie ein reguläres Heck gebaut, siehe oben. Ein Farman-Heck wiegt halb so viel wie ein konventionelles Heck, kann aber keine Oberfläche erhalten: es ist immer ein nacktes Heck.</p>
+    <p>Ein Farman-Heck zählt nicht als Teil eines Monocoque-Flugzeugs (da das nicht funktionieren würde), wähle also einfach einen Typ von Strukturmaterial.</p>
+    <h4>Heckausleger</h4>
+    <p>Heckausleger sind eine weitere Option, die sowohl für Schubpropeller-Flugzeuge als auch für einige Flugzeuge mit Gondeln nützlich ist. Sie ermöglichen dieselben Dinge wie ein Farman-Heck, sind aber in vielerlei Hinsicht raffinierter. Sie haben jedoch einige aerodynamische Schwierigkeiten.</p>
+    <p>Ein Heckausleger wird wie ein reguläres Heck gebaut und verwendet dieselben Regeln. Er subtrahiert die Masse des Hecks von der Belastung der Tragflächen, und ein Heckausleger, der nicht an Gondeln von Zugpropellermotoren angeschlossen ist, erzeugt +50% Luftwiderstand.</p>
+    <p>Wenn du Flügelverwindung und Heckausleger hast, hast du einen Fehler gemacht und erhältst einen −2 Malus auf Seiten- und Längsstabilität. Ein sich verwindender Flügel lenkt das Höhenleitwerk ab!</p>
+    <h3>Tragflächen <a id="_Wings"></a></h3>
+    <p>Du brauchst Tragflächen zum Fliegen, oder zumindest etwas Flügelähnliches. Eine größere Flügelfläche bedeutet mehr Auftrieb für dein Flugzeug, bedeutet aber auch mehr Luftwiderstand und weniger strukturelle Integrität.</p>
+    <p>Zunächst haben die Tragflächen deines Flugzeugs einen Wert namens <em>Lift Bleed</em>;, bestimmt durch deine Ära. Dies stellt dar, wie viel Auftrieb durch Ineffizienzen im Flügeldesign verloren geht. Idealerweise wäre dieser Wert 1.</p>
+    <h4>Flügelfläche <a id="_Wing_Area"></a></h4>
+    <p>Beginne damit, zu entscheiden, wie viel Flügelfläche dein Flugzeug insgesamt über alle Flügel hinweg haben soll. Schreibe es in Quadratmetern auf.</p>
+    <p>Teile diese Fläche nun auf die einzelnen Flügelebenen auf, die dein Flugzeug haben wird. Jeder weitere Flügel nach dem ersten gibt…</p>
+    <ul>
+      <li>+3 Steuerung</li>
+      <li>+5 Lift Bleed</li>
+      <li>−1 Sicht</li>
+    </ul>
+    <h4>Streckung</h4>
+    <p>Flügel haben nicht alle dieselbe Form; manche Flügel sind lang und schmal (sie haben eine <em>hohe Streckung</em>;), und manche Flügel sind kurz und breit (sie haben eine <em>geringe Streckung</em>;).</p>
+    <p>Bestimme die Spannweite jedes Flügels am Flugzeug, zusammen mit der Fläche, die du ihm gegeben hast.</p>
+    <p>Flügel haben einen Belastungsmodifikator und zusätzlichen Luftwiderstand.</p>
+    <p>Belastungsreduzierung = 2 * Spannweite + Fläche - 10. Flügel können keine positive Belastung erzeugen, wie sollte das auch funktionieren?</p>
+    <p>Flügel-Luftwiderstand ist 6 * (Fläche² / Spannweite²). Jeder gegebene Flügel muss immer mindestens 1 Luftwiderstand erzeugen.</p>
+    <ul>
+      <li>Die Fokker E.III hat eine Flügelfläche von 16 Quadratmetern und eine Spannweite von 9 Metern. Das bedeutet, der Flügel</li>
+    </ul>
+    <p>erzeugt 18 Luftwiderstand und verursacht einen −24 Belastungs-Malus.</p>
+    <ul>
+      <li>Ein theoretischer Segelflieger hat 10 Quadratmeter Flügel und eine Spannweite von 15m. Er erzeugt nur 2 Luftwiderstand,</li>
+    </ul>
+    <p>verursacht aber einen −30 Belastungs-Malus.</p>
+    <h4>Effekte des längsten Flügels</h4>
+    <p>Der längste Flügel an deinem Flugzeug gibt den folgenden Modifikator.</p>
+    <ul>
+      <li>
+        <p>8 - Spannweite = Steuerungsmodifikator</p>
+      </li>
+      <li>
+        <p>Jeder Punkt Spannweite weniger als 8: −1 Seitenstabilität.</p>
+      </li>
+    </ul>
+    <h4>Tragflächenanordnung</h4>
+    <p>Da dies ein Spiel über frühe Flugzeuge ist, kannst du dich entscheiden, mehr als einen Flügel zu haben. Wird dein Flugzeug ein Eindecker, ein Doppeldecker, ein Dreidecker oder etwas Seltsameres sein?</p>
+    <p>Wähle einen Ort für jeden Flügel. Sofern du kein Inline-Tandemflügel-Flugzeug baust, kannst du höchstens einen Schulterdecker, einen Mitteldecker und einen Tiefdecker haben. Es gibt keine Begrenzung für die Anzahl der Schirmdecker- oder Fahrwerksflügel, die du haben kannst.</p>
+    <p>Der Typ des Flügels wird durch seine Position relativ zum Rumpf und dem Massenmittelpunkt des Flugzeugs bestimmt, die normalerweise, aber nicht immer, am selben Ort sind. Verwende den Hauptteil des Flügels, nicht dort, wo er befestigt ist. Möwenflügel können einen anderen Befestigungspunkt als den Ort des Hauptteils haben.</p>
+    <ul>
+      <li>Ein Schirmdecker befindet sich auf Streben über dem Rumpf, wie ein Regenschirm über dem Flugzeug.</li>
+      <li>Ein Schulterdecker (oder Hochdecker) befindet sich ungefähr am oberen Teil des Rumpfes.</li>
+      <li>Ein Mitteldecker befindet sich um die Mitte des Rumpfes herum.</li>
+      <li>Ein Tiefdecker befindet sich ungefähr am unteren Teil des Rumpfes.</li>
+      <li>Ein Fahrwerksflügel ist wie ein umgekehrter Schirmdecker, der den Rumpf in der Luft über dem Flügel aufhängt. Fahrwerksflügel können auch kleine Auftriebsflächen darstellen, die mit den Miniaturflügel-Regeln zwischen den Rädern des Fahrwerks angebracht sind.</li>
+    </ul>
+    <p>In einigen Fällen, wie bei der Macchi M.5 (der, die Porco Rosso im Krieg flog), kann der Massenmittelpunkt durch die Motorplatzierung deutlich über oder unter dem Rumpf verschoben sein, sodass du wählen kannst, die Flügelplatzierung relativ zum Motor zu zählen.</p>
+    <p><strong>Tragflächenanordnung</strong></p>
+    <p>Diese gelten für jeden angebrachten vollen Flügel. Der Modifikator für die größte Tragfläche gilt für Eindecker und Anderthalbdecker für den Flügel mit der größten Fläche.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Ort</th>
+          <th>Flugzeugmodifikator</th>
+          <th>Modifikator für die größte Tragfläche</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Schirmdecker</td>
+          <td>+3 Längsstabilität, −10 Maximale Belastung. −2 Lift Bleed. −1 Sicht</td>
+          <td>+1 Seitenstabilität. −1 Steuerung</td>
+        </tr>
+        <tr>
+          <td>Schulterdecker</td>
+          <td>+2 Längsstabilität. −1 Lift Bleed. −1 Sicht</td>
+          <td>−1 Steuerung</td>
+        </tr>
+        <tr>
+          <td>Mitteldecker</td>
+          <td>-</td>
+          <td>−10% Luftwiderstand für diesen Flügel</td>
+        </tr>
+        <tr>
+          <td>Tiefdecker</td>
+          <td>−2 Längsstabilität. −1 Aufprallsicherheit. −1 Lift Bleed</td>
+          <td>+2 Steuerung, −1 Seitenstabilität</td>
+        </tr>
+        <tr>
+          <td>Fahrwerk</td>
+          <td>−3 Längsstabilität. −10 Maximale Belastung, −1 Aufprallsicherheit. −2 Lift Bleed.</td>
+          <td>+3 Steuerung −1 Seitenstabilität</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Flügeloberfläche</h4>
+    <p>Denke daran, immer auf ganze Zahlen abzurunden!</p>
+    <p><strong>Flügeloberflächen</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Bespannungsmaterial</th>
+          <th>Flugzeugmodifikator</th>
+          <th>Kosten/10 Fläche</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Stoffbespannung</td>
+          <td>-</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Behandeltes Papier</td>
+          <td>Macht das Flugzeug entzündlich, −1 Masse pro 4 Fläche, bis zu 25% der Leermasse des Flugzeugs.</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Schichten aus gespanntem Seidentuch</td>
+          <td>90% Belastungs-Malus</td>
+          <td>2þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Sperrholz</td>
+          <td>90% Belastungs-Malus, 1 Masse/5A</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Aluminiumblech</td>
+          <td>80% Luftwiderstand</td>
+          <td>3þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Wellblech-Duraluminium</td>
+          <td>60% Belastungs-Malus, 1 Masse/4A</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Dünnes Stahlblech</td>
+          <td>60% Belastungs-Malus, 90% Luftwiderstand, 1 Masse/5A</td>
+          <td>3þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Große Adlerfeder</td>
+          <td>+1 Steuerung pro 5A</td>
+          <td>6þ</td>
+          <td>Himmilgard</td>
+        </tr>
+        <tr>
+          <td>Solarfaser</td>
+          <td>+1 Ladungserzeugung pro 5A</td>
+          <td>4þ</td>
+          <td>Himmilgard oder Letztes Hurra</td>
+        </tr>
+        <tr>
+          <td>Drachenhaut</td>
+          <td>40% Belastungs-Malus</td>
+          <td>8þ</td>
+          <td>Himmilgard</td>
+        </tr>
+        <tr>
+          <td>Transparentes Zelluloid</td>
+          <td>Macht das Flugzeug entzündlich. +1 Sicht pro Flügel. −1 Zähigkeit pro 10 Fläche</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Staffelung &amp; Tandemflügel</h4>
+    <p>Wenn du mehrere Tragflächenanordnungen hast, kannst du die Flügel staffeln.</p>
+    <p><strong>Flügelstaffelung</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Ort</th>
+          <th>Flugzeugmodifikator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Tandem</td>
+          <td>Eliminiert die Notwendigkeit horizontaler Stabilisatoren. +4 Längsstabilität. Kann nicht schwanzlos sein.</td>
+        </tr>
+        <tr>
+          <td>Extrem positiv</td>
+          <td>+2 Längsstabilität, −2 Lift Bleed</td>
+        </tr>
+        <tr>
+          <td>Positiv</td>
+          <td>+1 Längsstabilität, −1 Lift Bleed</td>
+        </tr>
+        <tr>
+          <td>Negativ</td>
+          <td>−1 Längsstabilität, −1 Lift Bleed</td>
+        </tr>
+        <tr>
+          <td>Extrem negativ</td>
+          <td>−2 Längsstabilität, −2 Lift Bleed</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Geschlossener Flügel</h4>
+    <p>Das Schließen eines Flügelpaares, z. B. durch Erstellen einer Kasten- oder Kreisstruktur, eliminiert den Wirbeleffekt am Ende eines Flügels und ermöglicht auch eine vollständigere Struktur. Andererseits wird dieses Design aufgrund des zusätzlichen Gewichts an den äußersten Enden der Flügel schwer zu steuern sein, da die benötigte Energie für eine Rollbewegung zunimmt.</p>
+    <p>Jedes geschlossene Flügelpaar kostet +1 Masse, −5 Steuerung und +20 Maximale Belastung. (d.h. vier Flügel zählen doppelt, nicht dreimal)</p>
+    <p>Ein geschlossener Monoflügel ist nicht möglich: Flügelspitzenschleifen zur Reduzierung des Luftwiderstands wären Teil der Optimierung. Du kannst jedoch einen geschlossenen Inline-Tandemflügel haben.</p>
+    <h4>Inline-Flügel</h4>
+    <p>Ein Stil des Tandemflügels, bei dem mehrere Flügel auf derselben Ebene liegen. Ein Inline-Satz reduziert den gesamten Luftwiderstand aller Flügel auf derselben Ebene auf 75%, ergibt aber +3 Lift Bleed aufgrund von Abschattung.</p>
+    <h4>Miniaturflügel</h4>
+    <p>Ein Flügel von 2 Quadratmetern oder weniger ist ein Miniaturflügel. Diese zählen effektiv nicht als Flügel: sie fügen die Effekte der Tragflächenanordnung, an der sie angebracht sind, nicht hinzu, sondern fügen stattdessen nur +1 Steuerung und ihre Größe für Auftriebszwecke hinzu. Jeder Miniaturflügel nach dem ersten fügt jeweils +1 Lift Bleed hinzu.</p>
+    <p>Jeder Miniaturflügel muss auf einer eigenen Anordnung montiert werden: sie können nicht denselben Platz wie ein anderer Flügel einnehmen. Keine Tandem-Miniaturflügel!</p>
+    <h4>Anderthalbdecker <a id="_Sesquiplanes"></a></h4>
+    <p>Wenn der kleinste deiner Flügel halb so groß oder weniger als der größte Flügel ist und die Flügel keine Tandemflügel sind, hast du einen Anderthalbdecker! Diese ungewöhnliche Konfiguration wurde verwendet, um einige der Vorteile sowohl von Eindeckern als auch von Doppeldeckern zu erzielen. Sie haben ihre Vorteile, bringen aber strukturelle Komplikationen mit sich.</p>
+    <p>Ein Anderthalbdecker gewährt</p>
+    <ul>
+      <li>−2 Lift Bleed</li>
+      <li>+2 Steuerung</li>
+    </ul>
+    <p>Allerdings tritt einer der folgenden Mali auf.</p>
+    <ul>
+      <li>Wenn die kleinste Spannweite weniger als 75% der Spannweite des größten Flügels beträgt, erzeugt dein Flugzeug 15% weniger</li>
+    </ul>
+    <p>Spannung, da du die Flügel an den Spitzen nicht aussteifen kannst.</p>
+    <ul>
+      <li>Andernfalls ist das Flugzeug auf die folgenden externen Verstärkungen beschränkt: V-Streben, Einzelstreben, W-Streben,</li>
+    </ul>
+    <p>Flügelstrebenwerk und Drahtwurzeln. Es kann weiterhin jede Art von Kabinenstrebe verwenden, aber der schmalere untere Flügel schließt die Unterstützung durch Doppelholme aus und begrenzt die Arten von Holmen, die verwendet werden können.</p>
+    <h4>Flügelwinkel</h4>
+    <p>Flügel können unter Winkeln gebaut werden, um ihre Eigenschaften zu ändern. Hochgezogene Flügelspitzen (Flügel mit V-Stellung) verbessern die Stabilität, da sie das Flugzeug eher dazu bringen, in eine neutrale Position zurückzurollen. Flügel mit negativer V-Stellung bewirken das Gegenteil.</p>
+    <p>Das Einleiten eines Winkels mit V-Stellung am Flügel fügt Seitenstabilität hinzu, während ein Flügel mit negativer V-Stellung stattdessen Seitenstabilität entfernt. In beiden Fällen erhöht sich dein gesamter Lift Bleed um den Betrag der hinzugefügten oder verlorenen Stabilität.</p>
+    <h4>Möwenflügel</h4>
+    <p>Jeder Flügel kann als Möwenflügel deklariert werden. Wir betrachten die Ebene des Flügels als den Ort der Biegung, nicht als den Ort der Wurzel, da dies für aerodynamische Zwecke relevant ist. Du kannst nicht zwei Flügel von derselben Wurzel in einer Nicht-Tandem-Konfiguration haben. Möwenflügel sind in der Ära Heraufziehender Sturm verfügbar.</p>
+    <p>Jeder Möwenflügel erzeugt Luftwiderstand, als hätte er +10% Fläche, bringt aber die folgenden Vorteile mit sich:</p>
+    <ul>
+      <li>Ein Schirmdecker kann zu einem <em>Polnischen Flügel</em> werden. Dies entfernt den Malus von −10 Maximale Belastung und Sicht.</li>
+    </ul>
+    <p>Nicht verfügbar bei Schulterdeckern.</p>
+    <ul>
+      <li>Mittel-, Tiefdecker- und Fahrwerksflügel können zu einem <em>Umgekehrten Möwenflügel</em> werden. Dies hat die folgenden Effekte, besser</li>
+    </ul>
+    <p>für tiefere Flügel.</p>
+    <ul>
+      <li>Für Tiefdecker- und Mitteldecker-Flügel reduziert dies die Luftwiderstands- und/oder Massekosten des Fahrwerks um 15% (ausgenommen Bootsrümpfe) und</li>
+    </ul>
+    <p>erhöht die externe Bombenkapazität um 10%. Nicht verfügbar bei Nicht-Möwen-Mitteldeckern bzw. Schulterdeckern.</p>
+    <ul>
+      <li>Für Fahrwerksflügel reduziert dies die Luftwiderstands- und/oder Massekosten des Fahrwerks um 25% (ausgenommen Bootsrümpfe), eliminiert</li>
+    </ul>
+    <p>die −10 Maximale Belastung, gibt +1 Aufprallsicherheit und erhöht die externe Bombenkapazität um 20%. Nicht verfügbar bei einem Nicht-Möwen-Tiefdecker.</p>
+    <h4>Pfeilflügel</h4>
+    <p>Pfeilflügel fügen +5 Lift Bleed hinzu und geben −1 Seitenstabilität. Allerdings ermöglichen sie die vollständige Eliminierung des Höhenleitwerks <em>und</em> bieten einen natürlichen Montagepunkt für Außenbord-Seitenleitwerke.</p>
+    <h4>Flügelspitzengewicht</h4>
+    <p>Ein Flugzeug erhält einen −1 Steuerungs-Malus für Folgendes:</p>
+    <ul>
+      <li>Alle 5 Masse an Waffen an Flügelhalterungen.</li>
+      <li>Jeder Flügel-montierte Treibstofftank, intern oder extern.</li>
+    </ul>
+    <h4>Spezielle Flügeltypen</h4>
+    <p>Es gibt eine Reihe spezieller Flügeltypen. Diese Flügeltypen können mit normalen Flügeln kombiniert werden, aber es lohnt sich selten.</p>
+    <ul>
+      <li>Tragschrauber verwenden eine rotierende Flügelfläche. Sie sind sehr sicher für leichte Flugzeuge.</li>
+      <li>Helikopter treiben eine rotierende Flügelfläche an, was freie vertikale und horizontale Bewegung ermöglicht, auf Kosten geringer</li>
+    </ul>
+    <p>Stabilität und erforderlicher starker Motoren.</p>
+    <ul>
+      <li>Ornithopter verwenden einen Motor, um einen Schlag-Effekt zu erzeugen. Dies schafft äußerst wendige, aber zerbrechliche und teure</li>
+    </ul>
+    <p>Flugzeuge.</p>
+    <p>Ihre Regeln werden auf separaten Seiten detailliert, sobald sie fertig sind.</p>
+    <h3>Stabilisatoren <a id="_Stabilizers"></a></h3>
+    <p>Ein Flugzeug muss stabilisiert werden. Es muss ein Höhenleitwerk haben, um die Nase flach zu halten, und ein Seitenleitwerk, um Trudeln und Rollen zu verhindern. Du kannst ein Flugzeug ohne diese Dinge entwerfen, aber es ist <em>wirklich schwer</em>;.</p>
+    <h4>Stabilisatorgröße</h4>
+    <p>Flugzeuge brauchen Stabilisatoren zum Fliegen. Punkt. Wenn du sie nicht hast und nichts sehr, sehr Kluges gemacht hast, macht dein Flugzeug eine wackelige Bewegung und geht zu Boden.</p>
+    <p>Deine Stabilisatoren kosten Luftwiderstand, was bedeutet, dass sie in den Luftstrom geraten.</p>
+    <ul>
+      <li>Alle deine Seitenleitwerke fügen 1/8 des gesamten Flügel-Luftwiderstands hinzu. (Minimum 1)</li>
+      <li>Alle deine Höhenleitwerke fügen 1/4 des gesamten Flügel-Luftwiderstands hinzu. (Minimum 1)</li>
+    </ul>
+    <p>Das Fehlen eines Seitenleitwerks subtrahiert Seitenstabilität in Höhe deiner Flügelfläche. Das Fehlen eines Höhenleitwerks subtrahiert Längsstabilität in Höhe der Hälfte deiner Flügelfläche und fügt zusätzlich +5 Lift Bleed hinzu!</p>
+    <p>Tandemflügel- und Pfeilflügel-Flugzeuge benötigen keine Höhenleitwerke: sie haben genug Probleme. Um sie zu entfernen, setze die Auswahl für Höhenleitwerke auf "Die Tragflächen".</p>
+    <h4>Stabilisator-Montage</h4>
+    <p>Du musst wählen, wo du deine Stabilisatoren montierst. Deine Optionen sind…</p>
+    <p><strong>Höhenleitwerk</strong></p>
+    <ul>
+      <li>Tailplane: Standard</li>
+      <li>Canards (vorne): −3 Längsstabilität, halber Luftwiderstand.</li>
+      <li>Außenbord (am Flügel): Erfordert entweder Pfeilflügel oder einen Tandemflügel. +1 Seitenstabilität. Erfordert eine gerade Anzahl von Stabilisatoren.</li>
+    </ul>
+    <p><strong>Seitenleitwerk</strong></p>
+    <ul>
+      <li>Tailfin: Standard.</li>
+      <li>Außenbord: Erfordert entweder Pfeilflügel, einen Tandemflügel oder Canards. +1 Steuerung. Erfordert eine gerade Anzahl von Stabilisatoren.</li>
+    </ul>
+    <h4>Mehrere Stabilisatoren</h4>
+    <p>Du kannst wählen, mehrere Instanzen eines Stabilisators an deinem Flugzeug zu montieren. Zum Beispiel zwei Heckflossen an deinem Flugzeug, montiert an den Enden des Höhenleitwerks. Da es am besten ist, wenn Seitenruder und Höhenruder im Luftstrom eines Motors sind, profitierst du mehr davon, wenn du mehrere Motoren hast.</p>
+    <p>Jeder zusätzliche Stabilisator fügt einfach +2 Luftwiderstand hinzu.</p>
+    <p>Für jedes Paar Seitenleitwerk mit einem Motor jenseits des ersten erhältst du einen Bonus von +3 Steuerung. Wenn du einen zusätzlichen Stabilisator hast, der nicht mit einem Motor gepaart ist, erhältst du nur +1 Steuerung.</p>
+    <p>Schub-Zug-Motoren zählen für diese Zwecke als ein einzelner Motor.</p>
+    <h4>V-Leitwerke <a id="_V-Tails"></a></h4>
+    <p>Ein V-Leitwerk kombiniert sowohl Längs- als auch Seitenstabilität. Es muss 1/5 des gesamten Flügel-Luftwiderstands betragen, gibt +2 auf beide Stabilitätstypen und kostet 5þ für die Konstruktion. Das V-Leitwerk stammt aus der Ära Heraufziehender Sturm.</p>
+    <h4>T-Leitwerke <a id="_T-Tails"></a></h4>
+    <p>Ein T-Leitwerk ist ein Höhenleitwerk, das am oberen (oder nahe dem oberen) Ende des Seitenleitwerks montiert ist. Es verursacht den halben Luftwiderstand eines konventionellen Höhenleitwerks, reduziert den Lift Bleed um 2 und fügt dem Flugzeug eine spezielle Regel hinzu. Das T-Leitwerk stammt aus der Ära Zweiter Weltkrieg.</p>
+    <p>Deep Stall: Im Falle eines Trudelns/Strömungsabrisses bei Geschwindigkeit über der Abrissgeschwindigkeit und unter Last, bist du im Nachteil, dich zu erholen.</p>
+    <h3>Steuerflächen <a id="_Control_Surfaces"></a></h3>
+    <p>Steuerflächen sind, wie sich ein Flugzeug bewegt.</p>
+    <p>Du <em>musst</em> eine Möglichkeit haben, dein Flugzeug zu steuern. Du brauchst Querruder, Höhenruder und ein Seitenruder.</p>
+    <h4>Querruder <a id="_Ailerons"></a></h4>
+    <p>Querruder steuern die Rotation deines Flugzeugs. Du musst diese haben!</p>
+    <p><strong>Querruder</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Keine Querruder</td>
+          <td>−15 Steuerung, −1 Aufprallsicherheit.</td>
+          <td>−2þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Querruderklappen</td>
+          <td>Standard</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Flügelverwindung</td>
+          <td>−1 Luftwiderstand. Erhalte +1 auf Dogfight! bei Geschwindigkeit 15 und darunter. Reduziere Maximale Belastung in Höhe der Spannweite des längsten Flügels.</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Spoilerons</td>
+          <td>Wenn du Dogfight! würfelst, erhältst du +1, reduzierst aber deine Geschwindigkeit, als wäre dein Geschwindigkeitsfaktor verdoppelt.</td>
+          <td>2þ</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Flügelverwindung wird zur Ära Letztes Hurra, wenn der Flügel mit Kragträgern verstärkt wird, und kostet 2þ pro Kragträger. Das ist fortschrittliche Technologie!</p>
+    <h4>Seitenruder <a id="_Rudders"></a></h4>
+    <p>Seitenruder geben Drehsteuerung und arbeiten mit Querrudern und Höhenrudern zusammen, um das Flugzeug in der richtigen Richtung zu halten. Es gibt zwei verfügbare Arten:</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ruderklappe</td>
+          <td>Standard</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Fliegendes Ruder</td>
+          <td>−1 Seitenstabilität. +3 Steuerung.</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Höhenruder <a id="_Elevators"></a></h4>
+    <p>Höhenruder halten die Nase deines Flugzeugs zum Himmel und nicht zum Boden gerichtet. Es gibt zwei…</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Höhenruderklappe</td>
+          <td>Standard</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Fliegendes Höhenruder</td>
+          <td>−1 Längsstabilität. +2 Steuerung.</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Auftriebshilfen <a id="_Lift_Aids"></a></h4>
+    <p>Landeklappen &amp; Vorflügel sind spezielle Anbauten, die an Flügeln angebracht werden können und das Auftriebsprofil des Flügels verändern. Landeklappen werden typischerweise durch ein Seilzugsystem aus gespannten Kabeln oder durch Hydraulik bei größeren Flugzeugen betätigt.</p>
+    <p>Du kannst nur 1 Typ von jedem dieser Anbauten an einem Flugzeug anbringen.</p>
+    <p><strong>Landeklappen</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Einfache Landeklappen</td>
+          <td>−3 Lift Bleed, −3 Steuerung.</td>
+          <td>1þ pro 3MP</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Fortschrittliche Landeklappen</td>
+          <td>−5 Lift Bleed.</td>
+          <td>2þ pro 3MP</td>
+          <td>Heraufziehender Sturm</td>
+        </tr>
+        <tr>
+          <td>Steuerklappen</td>
+          <td>−5 Lift Bleed, +3 Steuerung</td>
+          <td>1þ pro MP</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Auftriebsminderer</td>
+          <td>+2 Aufprallsicherheit. Aktivieren für +1 auf Dogfight!, danach sofort Strömungsabriss einleiten.</td>
+          <td>1þ pro MP</td>
+          <td>Letztes Hurra</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Vorflügel</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Feste Vorflügel</td>
+          <td>5 Luftwiderstand. −3 Lift Bleed</td>
+          <td>1þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Automatische Vorflügel</td>
+          <td>−1 Lift Bleed. +3 Steuerung</td>
+          <td>4þ</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Luftwiderstandserzeuger <a id="_Drag_Inducers"></a></h4>
+    <p>Luftwiderstandserzeuger werden verwendet, um ein Flugzeug zu verlangsamen, indem etwas Großes und Windschlüssiges in den Luftstrom ausgefahren wird. Es gibt verschiedene Möglichkeiten, dies für verschiedene Zwecke zu tun. Dies könnten die leitblechartigen Vorrichtungen an der Stuka oder die Gitter der SBD Dauntless oder die Faltbremsen vieler Düsenjäger sein.</p>
+    <p><strong>Luftwiderstandserzeuger</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Luftbremse</td>
+          <td>Beim Ausfahren verlierst du sofort Geschwindigkeit in Höhe des Geschwindigkeitsfaktors und erhältst +1 auf Dogfight!.</td>
+          <td>3þ, 1 Masse</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Sturzflugbremse</td>
+          <td>Beim Ausfahren tauschen steile Sturzflüge Höhe gegen Geschwindigkeit im Verhältnis 1:2 anstelle von 1:3.</td>
+          <td>4þ, 2 Masse</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Bremsschirm</td>
+          <td>Verleiht +3 Aufprallsicherheit. Kann als einmalige Luftbremse aktiviert werden.</td>
+          <td>3þ</td>
+          <td>Letztes Hurra</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Verstärkungen <a id="_Reinforcement"></a></h3>
+    <p>Ein Flugzeug benötigt eine Beschreibung der tragenden Verstärkungen, um sicherzustellen, dass die Tragflächen nicht abfallen. Bei den meisten Flugzeugen handelt es sich dabei um eine sorgfältig konstruierte Anordnung von Streben und Drähten, wobei die Streben dazu dienen, die Tragflächen auseinander zu halten, und die Drähte dazu dienen, die Tragflächen zusammenzuhalten. Eindecker können Drähte verwenden, die an starken Punkten am Rumpf befestigt sind, anstatt zwischen den Tragflächen zu verlaufen, aber das ist weniger effizient.</p>
+    <h4>Externe Verstärkung <a id="_External_Reinforcement"></a></h4>
+    <p>Streben erzeugen Struktur, Maximale Belastung und einen Wert namens Spannung. Du kannst so viele davon nehmen, wie du möchtest: Jeder genommene repräsentiert ein gespiegeltes Paar, das eine neue Sektion schafft.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Typ</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Parallelstreben</td>
+          <td>+2 Luftwiderstand, +1 Masse, +5 Struktur, +5 Maximale Belastung, +30 Spannung.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>N-Strebe</td>
+          <td>+2 Luftwiderstand, +1 Masse, +6 Struktur, +8 Maximale Belastung, +20 Spannung.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>V-Strebe</td>
+          <td>+1 Luftwiderstand, +1 Masse, −5 Struktur, +5 Maximale Belastung, +30 Spannung.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>I-Strebe</td>
+          <td>+1 Luftwiderstand, +1 Masse, +20 Maximale Belastung, +15 Spannung.</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>W-Strebe</td>
+          <td>+3 Luftwiderstand, +1 Masse, +35 Maximale Belastung.</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Sternstrebe</td>
+          <td>+6 Luftwiderstand, +2 Masse, +10 Struktur, +30 Maximale Belastung.</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Flügelstrebenwerk</td>
+          <td>+4 Luftwiderstand, +40 Spannung. Unbeeinflusst von der Flügelkonfiguration.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Einzelstrebe</td>
+          <td>+1 Luftwiderstand, +1 Masse, +10 Maximale Belastung.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Drahtwurzel</td>
+          <td>+10 Spannung. Kann keine Kabinenstrebe sein und nicht als deine erste Nicht-Kabinenstrebe zählen.</td>
+          <td>-</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Du erhältst 1 Kabinenstrebe an deinem Flugzeug: sie kann deine einzige Strebe sein, wenn du möchtest. Dies ist eine Strebe, die −2 Luftwiderstand (Minimum 0) erzeugt, aber nur halb so viel Spannung. Sie kostet die reguläre Menge an Masse und Kosten. Du kannst kein Kabinenflügelstrebenwerk oder Drahtwurzel haben.</p>
+    <p>Deine erste Nicht-Kabinenstrebe gibt +5 Struktur, +10 Maximale Belastung und +10 Spannung. Diese Spannung wird durch deine Flügelkonfiguration nicht beeinflusst. Dies stellt den allgemeinen Vorteil dar, diese Ankerpunkte überhaupt zu haben: weitere Streben bringen im Vergleich dazu geringere Erträge.</p>
+    <p>Jede dieser Streben kann stattdessen aus Stahl hergestellt werden. Dies verdoppelt ihre Kosten. Stahlstreben oder -strebenwerke (keine Drahtwurzeln) verleihen doppelt so viel Struktur, +5 Maximale Belastung und halb so viel Spannung. Eine V-Stahlstrebe ergibt 0 Struktur.</p>
+    <p>Drähte wandeln Spannung in Maximale Belastung um. Wenn du Aussteifungsdrähte hinzufügst, erleide +3 Luftwiderstand pro Strebe und füge Maximale Belastung in Höhe der Spannung hinzu. Max 1.</p>
+    <p>Die Konfiguration deiner Tragflächen bezüglich der Spannungserzeugung wird wie folgt multipliziert.</p>
+    <ul>
+      <li>Ungestaffelter Mehrdecker oder flügellos: 100%</li>
+      <li>Gestaffeltes Flugzeug: 90%</li>
+      <li>Tandemflugzeug: 80%</li>
+      <li>Eindecker: 60%</li>
+    </ul>
+    <h4>Kragflügel <a id="_Cantilever_Wings"></a></h4>
+    <p>Die Standardannahme ist, dass Flügel eine spannungsverstrebte Konstruktion aufweisen und Drähte und Holme aus geeigneten Materialien verwenden, um intakt zu bleiben. Der Bau eines "Kragflügels" schafft eine selbsttragende Struktur innerhalb des Flügels selbst, die an einem starken Punkt an der Struktur verstrebt ist.</p>
+    <p>Du kannst 1 Masse Kragholm pro 5 Struktur am Flugzeug hinzufügen. Die Aufnahme von Kragträgern kostet insgesamt 5þ.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Kragträgermaterial</th>
+          <th>Effekte pro Masse</th>
+          <th>Kosten pro Masse</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Birke</td>
+          <td>+10 Maximale Belastung, +2 Zähigkeit.</td>
+          <td>1þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Duraluminium</td>
+          <td>+15 Maximale Belastung, +3 Zähigkeit.</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Stahl</td>
+          <td>+20 Maximale Belastung, +5 Zähigkeit.</td>
+          <td>3þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Aluminium</td>
+          <td>+25 Maximale Belastung, +3 Zähigkeit.</td>
+          <td>4þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Walknochen</td>
+          <td>−3 Lift Bleed, +5 Maximale Belastung.</td>
+          <td>8þ</td>
+          <td>Himmilgard</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Ein Kragflügel ist dicker als ein regulärer Flügel, was die Möglichkeit von Treibstofftanks im Flügel eröffnet.</p>
+    <p>Wenn du in frühen Ären Kragträger in deinen Flügeln hast, wird der Kragträger-Bonus von deinem Lift Bleed abgezogen. Dies liegt daran, dass es Konstrukteure zwang, Flügel dicker und effizienter zu gestalten, aber sie hatten keine Ahnung, dass sie das taten.</p>
+    <h4>Flügelklingen</h4>
+    <p>Du kannst Flügelklingen hinzufügen, wenn du keine externe Verstärkung und mindestens einen Stahlkragträger hast. Flügelklingen verdoppeln die Masse aller Kragträger, ermöglichen es dir aber, deinen Feind auseinanderzuschneiden.</p>
+    <h3>Waffen <a id="_Weapons"></a></h3>
+    <p>Waffen lassen dein Flugzeug Dinge verletzen!</p>
+    <p>Waffen kommen mit eigener Munitionsversorgung, dem Munitionswert, mit dem sie aufgeführt sind. Du kannst zusätzliche Munition für jede Waffe kaufen, was immer +1 Masse kostet. Dies gibt dir zusätzliche Munition in Höhe der standardmäßig mit der Waffe gelieferten Menge. Munition ist nicht so schwer, aber die größeren Behälter und komplexeren Systeme, die zum Zuführen längerer Gurte benötigt werden, sind es tendentiell.</p>
+    <p>Wenn eine Waffe Magazin-geladen oder manuell ist, kannst du +50% Kosten ausgeben, um sie in eine Gurtgespeiste Waffe umzuwandeln.</p>
+    <h4>Waffengrößen</h4>
+    <p>Waffen gibt es in verschiedenen <em>Größen</em>: Winzig, Leicht, Mittel, Schwer und Artillerie.</p>
+    <p>Du kannst immer kleinere Waffen in Bereichen mit Einschränkungen montieren, wie Türme oder Tragflächen. Du kannst doppelt so viele Waffen einer Größe kleiner als eine größere Waffe montieren. Zum Beispiel könntest du auf einem Turm mit einer mittleren Waffenhalterung 2 leichte Waffen montieren.</p>
+    <h4>Systeme <a id="_Systems"></a></h4>
+    <p>Waffen desselben Typs, die in dieselbe Richtung feuern, bilden ein <em>System</em>. Alle ihre Treffer werden zusammengezählt, um ihre Waffenprofile zu erstellen, was eine Anzahl von Treffern und eine Menge Schaden in den vier Entfernungsbändern Nahkampf/Nah/Fern/Extrem ergibt.</p>
+    <p>Die unten aufgeführten Flugzeugwaffen werden als Teil eines "Systems" identischer Waffen in Flugzeuge montiert. Es spielt keine Rolle, wo jede Waffe im System montiert ist, solange sie alle gleichzeitig auf denselben Punkt feuern.</p>
+    <p>Um die Reichweitentabelle zu erstellen, addiere alle Treffer der Waffen und multipliziere sie dann mit dem Schaden der Waffe, um deinen Schaden in dieser Entfernung zu erhalten.</p>
+    <p>Die Treffer von Waffen nehmen mit zunehmender Entfernung ab. Waffen in der Mittellinie und in Türmen haben einen Abfall von 100/75/50/25 Prozent, abgerundet, für jedes Entfernungsband in Folge. Für Flügel-montierte Waffen verwende stattdessen 100/90/20/10 Prozent. Wenn du eine Mischung aus Mittellinien- und Flügel-Waffen hast, berechne die beiden Gruppen separat und addiere sie dann.</p>
+    <h4>Platzierung <a id="_Placement"></a></h4>
+    <p>Du kannst deine Waffen am Rumpf oder an den Tragflächen des Flugzeugs platzieren. Beliebig viele Waffen können am oder im Rumpf des Flugzeugs platziert werden, beachte jedoch, dass Waffen der Größe Artillerie oder Türme, die mehrere kleinere Waffen enthalten, die zusammen mehr als eine schwere Waffe ergeben, jeweils eine eigene Struktursektion benötigen.</p>
+    <p>Flügel-montierte Waffen sind basierend auf der Stärke der Flügelkonstruktion eingeschränkt, wie folgt.</p>
+    <ul>
+      <li>Keine Kragträger: Maximal 2 leichte Waffen.</li>
+      <li>Holz- oder Knochen-Kragträger: Maximal 2 mittlere Waffen.</li>
+      <li>Metall-Kragträger: Maximal 2 schwere Waffen.</li>
+    </ul>
+    <p>Das Montieren einer schwereren Waffe als dieser am Flügel kostet +2 Masse, was das Ausfahren von Stützbalken vom Rumpf des Flugzeugs darstellt, auf die Weise der 20mm Becker Kanone an der Albatros D.II.</p>
+    <p>Wir können uns vorstellen, dass diese Waffen oben am Oberflügel, entlang der Spannweite des Flügels usw. montiert sind.</p>
+    <p>Bei Flugzeugen mit traditionellen Zugpropeller-Konfigurationen wird jede Platzierung außerhalb des Propellerkreises als Flügelplatzierung betrachtet.</p>
+    <p>Eine fest nach vorne gerichtete Artillerie-Waffe stört einen Motor. Du musst entweder Gondeln, einen Schubpropeller oder einen mittig montierten Zugpropellermotor mit den entsprechenden Modifikationen verwenden.</p>
+    <p>Wenn eine Waffe am Flügel montiert und unverkleidet ist, hat sie +1 Luftwiderstand.</p>
+    <h4>Verkleidet <a id="_Covered"></a></h4>
+    <p><strong>Verkleidete Waffen können verkleidet oder unverkleidet sein.</strong></p>
+    <p>Wenn du Waffen zu deinem Flugzeug hinzufügst, beginnen sie als unverkleidet.</p>
+    <p>Unverkleidete Waffen fügen dem Flugzeug den im Waffenbeschreibung aufgeführten Luftwiderstand hinzu.</p>
+    <p>Du kannst eine Waffe auf "verkleidet" aufrüsten, wodurch ihr Luftwiderstand eliminiert wird. Dies kann bedeuten, dass die Waffe ins Innere des Rumpfes oder der Tragflächen des Flugzeugs verlegt wird, oder es kann einfach bedeuten, aerodynamische Verkleidungen darüber zu bauen. Die Kosten skalieren mit der Waffengröße und die Kosten verdoppeln sich für Türme.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Waffengröße</th>
+          <th>Kosten</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Winzig</td>
+          <td>Kostenlos</td>
+        </tr>
+        <tr>
+          <td>Leicht</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>Mittel</td>
+          <td>2</td>
+        </tr>
+        <tr>
+          <td>Schwer</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>Artillerie</td>
+          <td>Automatisch verkleidet, es sei denn in einem Turm.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Flügel-montierte Waffen können nicht verkleidet werden, es sei denn, du hast Kragholme.</p>
+    <p>Waffen, die durch den Spinner feuern, sind automatisch verkleidet.</p>
+    <h4>Zugänglichkeit <a id="_Accessibility"></a></h4>
+    <p>Waffen verklemmen. Einige müssen manuell nachgeladen werden. Waffen, an denen ein Besatzungsmitglied diese Art von Aktivitäten durchführen kann, werden als <em>zugänglich</em> bezeichnet. Dies kann bedeuten, dass du die Waffe erreichen kannst, z. B. eine Foster-Halterung, die es dir ermöglicht, eine Waffe zu deinem Cockpit zu ziehen, oder es kann hydraulische Systeme beinhalten, um Waffen zu laden und Verklemmungen zu beseitigen.</p>
+    <p>Waffensysteme sind als Gruppe zugänglich oder unzugänglich. Es gibt nie eine Situation, in der eine Waffe bedient werden kann, die andere aber nicht.</p>
+    <p>Eine einzelne Waffenhalterung am Rumpf kann pro Besatzungsposition frei zugänglich gemacht werden. Welche bestimmte Waffe von welcher Besatzungsposition aus zugänglich ist, muss entschieden werden, wenn du die Waffen platzierst. Selbst wenn sie verkleidet waren, war es nicht ungewöhnlich, dass die Rückseiten dieser Waffen in den Cockpitbereich ragten oder dass ein einfacher mechanischer Plunger verwendet wurde, um Verklemmungen zu beseitigen.</p>
+    <p>Alle Waffen, die an den Flügeln platziert werden, und zusätzliche Waffenhalterungen am Rumpf beginnen als unzugänglich.</p>
+    <p>Verkleidete Waffen, die in einem Turm montiert sind (siehe unten), beginnen als zugänglich, wenn unverkleidete Waffen in derselben Halterung zugänglich wären.</p>
+    <p>Es kostet Þ in Höhe der Hälfte der Waffen in einer Gruppe, sie alle zugänglich zu machen, Minimum 1.</p>
+    <h4>Schussbereiche &amp; Montage</h4>
+    <p>Wir teilen die Schussbereiche einer Waffe in die folgenden Richtungen ein.</p>
+    <ul>
+      <li>Vorwärts</li>
+      <li>Rückwärts, Hoch, Runter, Links, Rechts</li>
+    </ul>
+    <p><em>Feste</em> Waffen feuern nur in eine dieser Richtungen, da sie direkt an der Flugzeugstruktur verschraubt sind. Diese Richtung wird wahrscheinlich Vorwärts sein, es sei denn, du machst etwas sehr Kluges.</p>
+    <p><em>Flexible</em> Waffen können so geändert werden, dass sie in mehr als eine Richtung feuern können, mit verschiedenen Einstellungen für die Richtung, ohne gleichzeitig bewegt und abgefeuert zu werden. Flexible Waffen kosten 1þ und das gibt dir zwei Richtungen, in die die Waffe gerichtet werden kann. Sie können vom Piloten bedient werden.</p>
+    <p><em>Turm</em> waffen sind jede Waffe, die flexibel an einem Punkt montiert ist. Sie erfordern einen dedizierten Bediener zum Zielen. Dies kostet 1þ für die Einrichtung und umfasst ein ganzes System, das vom Schützen gezielt wird. Wähle mehr als zwei Richtungen, in die die Waffe feuern soll. Das Erweitern des Schussbereichs eines Turms kostet 1þ für 2 zusätzliche Richtungen, dann je 1þ.</p>
+    <p>Ein Turm hat anfänglich die Kapazität für eine einzelne Leichte Waffe (oder zwei Winzige Waffen). Sie können für 1þ auf eine mittlere Waffe, für 1 Masse und 3þ auf eine schwere Waffe und für 2 Masse und 5þ auf eine Artillerie-Waffe aufgerüstet werden. Wie üblich kannst du zwei beliebige Waffen einer Größe kleiner als die Kapazität im Turm montieren.</p>
+    <p>Schließlich kannst du <em>Waffenhalterungen</em> in ein Cockpit einbauen. Dies sind im Grunde Clips oder Halterungen, an denen eine Waffe befestigt werden kann, um in jede Richtung zu feuern. 3 Richtungen Bracing kosten 1þ. Diese Halterungen ermöglichen einem Beobachter einen Bonus von +1, um mit einer losen Waffe, die er in den Händen trägt, einen Persönlichen Angriff auszuführen. Der Nachteil ist, dass dies oft sehr gefährlich ist und häufige Wingwalking-Manöver erfordert.</p>
+    <h4>Synchronisation <a id="_Synchronization"></a></h4>
+    <p>Wenn du durch den Kreis eines Propellers feuern möchtest (vor dir bei einem Zugpropellerflugzeug oder hinter dir bei einem Schubpropellerflugzeug), musst du Vorkehrungen treffen, um die Propellerblätter nicht zu treffen. Dies geschieht durch Synchronisation. Um die verschiedenen Qualitäten der Synchronisationsoptionen darzustellen, verwenden wir die folgenden Optionen.</p>
+    <ul>
+      <li>Ein Unterbrechergetriebe stellt die frühen Versionen dar und erhöht die Verklemmungschance der Waffe um 1. 2þ pro Waffe. Verfügbar in der Ära Erster Weltkrieg.</li>
+      <li>Ein Synchronisationsgetriebe stellt raffiniertere Systeme dar. 3þ pro Waffe. Verfügbar in der Ära Goldene Zwanziger.</li>
+    </ul>
+    <p>Ein Synchronisations-/Unterbrechergetriebe kann nur an einer Waffe montiert werden, die synchronisiert werden kann, und funktioniert nur, wenn die Waffe auch Fest ist.</p>
+    <p>Wenn du sparsam bist, kannst du dies durch <em>Ablenkplatten</em> ersetzen. Diese kosten 1þ und funktionieren, aber sie verursachen 1 Abnutzung an deinem Motor, jedes Mal, wenn du eine natürliche 5 oder weniger auf dem ersten Krit-Würfel würfelst!</p>
+    <h4>Spinner-Waffen <a id="_Spinner_Weapons"></a></h4>
+    <p>Wenn du einen untersetzten Propeller hast, kannst du eine Waffe so montieren, dass sie durch den Propeller-Spinner schießt. Dies stellt Dinge wie die mittige 37mm Kanone an der SPAD S.XII, die Kanone der BF 109 oder die P-39 dar.</p>
+    <p>Spinner-Waffen umgehen die Notwendigkeit von Synchronisierern. Sie können keine Türme sein.</p>
+    <p>Wenn du eine Artillerie-Waffe und/oder einen Umlaufmotor hast, muss dieser mittig mit einer verlängerten Antriebswelle montiert werden, um Platz für die Waffe an der Flugzeugnase zu schaffen.</p>
+    <h4>Beispiele <a id="_Examples"></a></h4>
+    <p>Hier sind einige Beispiele aus der realen Welt von Waffen an Flugzeugen zum Vergleich.</p>
+    <p>Die Zwillings-MG-08s an der Albatros D.III werden im Flying Circus wie folgt ausgedrückt…</p>
+    <ul>
+      <li>Ein <em>Paar</em> von <em>unverkleideten, synchronisierten</em> MGs, <em>fest</em> am <em>Rumpf montiert, zugänglich</em> für den Piloten.</li>
+    </ul>
+    <p>Die rohe Lewis-MG-Halterung an einer Nieuport 11 ist…</p>
+    <ul>
+      <li>Ein <em>einzelnes, unverkleidetes</em> LMG, <em>fest nach vorne</em> am <em>Flügel montiert, zugänglich</em> für den Piloten.</li>
+    </ul>
+    <p>Obwohl diese Waffen normalerweise nach hinten gekippt werden konnten, um sie zu säubern oder nachzuladen, bedeutete dies oft, dass man im Cockpit aufstehen musste, was eine ausgezeichnete Gelegenheit für narrative Komplikationen bot.</p>
+    <p>Die verbesserte Foster-Halterung der SE.5 ist…</p>
+    <ul>
+      <li>Ein <em>einzelnes, unverkleidetes, flexibles</em> LMG, feuert nach vorne und oben, montiert am <em>Flügel, zugänglich</em> für den Piloten.</li>
+    </ul>
+    <p>Flügel-montierte Waffen an einer Sopwith Dolphin sind…</p>
+    <ul>
+      <li>Ein <em>Paar</em> von <em>unverkleideten</em> LMGs, <em>fest nach vorne</em> am <em>Flügel montiert, unzugänglich</em> für den Piloten.</li>
+    </ul>
+    <p>Eine frühe FE.2 hat…</p>
+    <ul>
+      <li>6 <em>Waffenhalterungen</em> in ihrem Beobachtersitz für ein <em>LMG</em>;.</li>
+    </ul>
+    <p>die es dem Beobachter ermöglichen, in jede Richtung zu feuern.</p>
+    <p>Die Motor-montierte Kanone der BF-109 ist…</p>
+    <ul>
+      <li>Eine <em>einzelne, verkleidete</em> leichte Kanone, <em>fest</em> nach vorne <em>durch den Spinner feuernd, zugänglich</em> für den Piloten.</li>
+    </ul>
+    <p>Die Waffe wurde durch Hydraulik zugänglich gemacht.</p>
+    <h3>Zuladung <a id="_Load"></a></h3>
+    <p>Die Zuladung ist alles, was zusätzlich zum Flugzeug hinzugefügt wird, nachdem es fertiggestellt ist. Hier entsteht der Unterschied zwischen der <em>Leermasse</em> (das Flugzeug, wie es ist) und der <em>Beladenen Masse</em> (das Flugzeug mit Treibstoff und Bomben).</p>
+    <p>Die Beladene Masse ist im Wesentlichen <em>separate Masse</em>, und sie wird immer <em>aufgerundet</em> auf die nächste MP, im Gegensatz zu den üblichen Berechnungen. Wenn du also ein Flugzeug hast, das 41 Leermasse (8MP) wiegt, kannst du nicht 3 Treibstoff einfüllen und bei 8MP bleiben. Treibstoff kommt in regulären Tanks nur in 1MP-Schritten. 1 Masse Bomben oder 5 zählt alles als 1 MP, also nimm, wenn möglich, eine gerade MP an Bomben.</p>
+    <p>Dies dient der Vereinfachung der Buchführung am Tisch und stellt sicher, dass Treibstoff immer mit einem Malus verbunden ist.</p>
+    <h4>Treibstoff <a id="_Fuel"></a></h4>
+    <p>Motoren haben einen Treibstoffverbrauch, der eine abstrahierte Einheit Treibstoff verwendet. Jede Masse Treibstoff entspricht 25 dieser Punkte. Multipliziere also im Grunde die Menge der Treibstoffmasse mit 25, teile dann durch den Verbrauch aller deiner Motoren, und das ist die Anzahl der Treibstoffnutzungen, die du hast.</p>
+    <p>Du kannst 2 Treibstofftanks in 1 Flugzeugsektion einbauen oder Treibstofftanks am Flügel für jeweils +3 Luftwiderstand hinzufügen. Wenn du einen Kragflügel hast, kannst du stattdessen 1 Treibstofftank pro 10 Fläche in die Flügel einbauen, ohne zusätzlichen Luftwiderstand.</p>
+    <p>Ein Treibstofftank gibt dir bis zu 5 Masse Treibstoff. Der Tank selbst wiegt 1 Masse.</p>
+    <p>Ein Mikrotank ist ein 1-Masse-Tank, der 25 Treibstoffeinheiten fasst und keine Struktursektion benötigt, aber im leeren Zustand immer noch 1 Masse wiegt und auf 4 pro Flugzeug begrenzt ist.</p>
+    <p>Möchtest du nicht sterben? Diese helfen.</p>
+    <ul>
+      <li>Fernbedienbarer Feuerlöscher: Hält 1. Gib den Halt aus, um ein Feuer zu löschen. 2 Masse, 3þ</li>
+      <li>Selbstdichtender Kraftstofftank: Gilt für alle internen Kraftstofftanks. Der Malus für Treibstofflecks gilt nur für den nächsten Treibstoff-Check. +1 Masse und +2þ pro Tank.</li>
+    </ul>
+    <h4>Bomben <a id="_Bombs"></a></h4>
+    <p>Flugzeuge können, wenn dafür eingerichtet, Bomben mitführen. Wie genau das ausgefüllt wird, hängt von dir und deiner Zuladung zum Zeitpunkt ab. Flugzeuge sind je nach Ära begrenzt, wie viele Bomben sie mitführen können.</p>
+    <p>Eine externe Bombenhalterung, die bis zu 5 Masse Bomben tragen kann, kostet 1 Masse und 1 Luftwiderstand und benötigt keine Struktursektion.</p>
+    <p>Ein interner Bombenschacht belegt eine Struktursektion und ermöglicht die interne Mitführung von bis zu 10 Masse Bomben. Die größte Bombe, die du im Inneren deines Flugzeugs mitführen kannst, entspricht einem Viertel der gesamten internen Bombenzuladung.</p>
+    <p>Du kannst die maximale Bombengröße eines Schachts erweitern, indem du Struktursektionen hinzufügst, um den Bombenschacht zu verlängern. Das Hinzufügen von +1 Struktur pro Schacht ermöglicht es dir, eine Bombe von bis zu der Hälfte der gesamten Zuladung mitzuführen, ein weiteres +1 Struktur ermöglicht es dir, eine einzelne Bombe in Höhe der gesamten Zuladung im Flugzeug mitzuführen. Das Erweitern des Schachts verdoppelt die Masse der Bomben, die darin mitgeführt werden können.</p>
+    <p>Bombenmassen werden immer auf den nächsten Masse-Malus aufgerundet; 1 Masse Bomben wird immer noch als 1 Masse-Malus behandelt.</p>
+    <p>Bei Verwendung externer Bombenträger reduzieren Bomben zusätzlich die Geschwindigkeit des Flugzeugs. Berechne die Geschwindigkeit des Flugzeugs neu, wobei Bomben Luftwiderstand in Höhe der ungerundeten Masse verursachen, und schreibe deine Höchstgeschwindigkeit als Höchstgeschwindigkeit mit Bomben/Höchstgeschwindigkeit auf.</p>
+    <p>Bomben zählen nicht zu deinem beladenen MP für Fahrwerk und dergleichen.</p>
+    <p>Die maximale Bombenzuladung variiert je nach Ära. Interne Bomben zählen mit 1/3tel der Rate externer Bomben. Zum Beispiel könnte ein Bomber aus dem Ersten Weltkrieg mit 100 Struktur 20 Bomben extern, oder 60 intern, oder eine Mischung wie 30 intern und 10 extern tragen.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Ära</th>
+          <th>Pionier</th>
+          <th>Erster Weltkrieg</th>
+          <th>Goldene Zwanziger</th>
+          <th>Heraufziehender Sturm</th>
+          <th>Zweiter Weltkrieg</th>
+          <th>Letztes Hurra</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Maximale Bombenzuladung</td>
+          <td>1/6 Struktur</td>
+          <td>1/5 Struktur</td>
+          <td>1/4 Struktur</td>
+          <td>1/3 Struktur</td>
+          <td>1/3 Struktur</td>
+          <td>1/2 Struktur</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Raketen <a id="_Rockets"></a></h4>
+    <p>Raketen funktionieren genau wie Bomben.</p>
+    <h4>Fracht <a id="_Cargo"></a></h4>
+    <p>Fracht wird genau wie jede andere Zuladung behandelt und auf die nächsten 5 Masse aufgerundet. Da die meisten Dinge tatsächlich keinen Massenwert haben, improvisiere. Grob gesagt sind 25 Kilogramm 1 Masse.</p>
+    <p>Der Frachtraum wird nur grob geschätzt, da die Dichte der Fracht und wie gut sie stapelbar ist, schwer vorherzusagen sind, daher haben wir nur ein paar verschiedene Größen von Frachträumen.</p>
+    <ul>
+      <li>Ein winziges Fach kostet nur 1 Masse und gibt dir ein kleines Schließfach für persönliche Dinge.</li>
+      <li>Ein kleiner Raum fasst einen Koffer, ein Fass oder eine Kiste. Er erfordert eine Struktursektion.</li>
+      <li>Ein mittlerer Raum fasst ein kleines Fahrzeug wie ein Motorrad, Auto oder Zeppelinmotor. Er erfordert 3 Struktursektionen.</li>
+      <li>Ein großer Raum fasst ein Aufklärungs- oder Jagdflugzeug mit abgenommenen Tragflächen. Er erfordert 5 Struktursektionen.</li>
+      <li>Ein riesiger Raum fasst so ziemlich alles, was du dir vorstellen kannst. Er erfordert 10 Struktursektionen.</li>
+    </ul>
+    <p>Jede hinzugefügte Struktursektion fügt dem Flugzeug beim Beladen mit Zeug +3 Beladene Masse hinzu. Wenn du es kaum gefüllt hast und viel Platz übrig hast, ignoriere das jedoch.</p>
+    <p>Frachtraum kann genutzt werden, um Personen unbequem und vorübergehend zu lagern. Ausgenommen winzige Fächer.</p>
+    <h4>Hardpoints <a id="_Hardpoints"></a></h4>
+    <p>Beginnend in der Ära Zweiter Weltkrieg kannst du Hardpoints an Flugzeugen montieren. Hardpoints sind flexible Halterungen, die eine Vielzahl verschiedener Nutzlasten montieren können, wie Zusatztanks, Bomben, Raketen, Waffenbehälter oder Raketen.</p>
+    <p>Das Hinzufügen eines Hardpoints kostet 5þ, und du kannst einen für jede 20 Struktur haben.</p>
+    <p>Wir werden diese Regeln in Kürze schreiben.</p>
+    <h3>Fahrwerk <a id="_Landing_Gear"></a></h3>
+    <p>Unterseitiges Fahrwerk (Wähle 1)</p>
+    <ul>
+      <li>Fahrwerk: +1 Luftwiderstand pro beladenem MP</li>
+      <li>Schwimmer: +1 ½ Luftwiderstand pro beladenem MP.</li>
+      <li>Hybrid-Schwimmer: +2 Luftwiderstand pro beladenem MP.</li>
+      <li>Bootsrumpf: +5 Masse. +1 Luftwiderstand und +1 Struktur pro beladenem MP.</li>
+      <li>Landekufe: Wenn du landest, würfle auf Go Down und erhalte −1 Ergebnis.</li>
+    </ul>
+    <p>Extras</p>
+    <ul>
+      <li>Zeppelin-Haken: +1 Masse, ermöglicht Landung in Luftschiffen oder großen Flugzeugen.</li>
+      <li>Fanghaken: +1 Masse pro 2 MP. Ermöglicht Landung auf Flugzeugträgern.</li>
+      <li>Unterflügelkufe: +3 Luftwiderstand, +2 Aufprallsicherheit</li>
+    </ul>
+    <p>Fahrwerke (außer Kufen) können einziehbar gemacht werden, wobei der gesamte Luftwiderstand gegen die Hälfte dieses Wertes in Masse und die andere Hälfte als Kosten getauscht wird (wie üblich abrunden). Für einen Bootsrumpf füge stattdessen einziehbares Fahrwerk zu vollen Kosten hinzu, um Landungen sowohl auf Wasser als auch an Land zu ermöglichen.</p>
+    <p>Diese hinzugefügte Masse macht das Fahrwerk nicht größer, keine Sorge.</p>
+    <h4>Bootsrümpfe <a id="_Boat_Hulls"></a></h4>
+    <p>Wenn du einen Bootsrumpf verwendest, musst du deine(n) Motor(en) vom Wasser fernhalten. Die Motoren müssen sich in einer Gondel, über einem Schulterdecker in Gondeln oder einem Kanal befinden, oder an einem anderen Flügel montiert sein.</p>
+    <p>Im Grunde behandelt ein Bootsrumpf den gesamten Rumpf des Flugzeugs als Fahrwerk, sodass ein Schulterdecker ein Fahrwerksflügel wäre.</p>
+    <h3>Zubehör <a id="_Upgrades"></a></h3>
+    <h4>Panzerung <a id="_Armour"></a></h4>
+    <p>Panzerung ist wirklich einfach. Sie kommt in Abdeckungs- und Dickenwerten. Die Masse der Panzerung ist Abdeckung mal 2^(Dicke-1). Das heißt, für Dicke 3 ist es Abdeckung * 4, und Dicke 5 ist Abdeckung * 16. Die Kosten betragen 1/3 der Abdeckung * Dicke.</p>
+    <p>Zusätzlich multipliziere den Abdeckungs- und Dickenwert miteinander und füge diese Menge Zähigkeit zum Flugzeug hinzu.</p>
+    <p>Die maximale Menge an Panzerung, die du haben kannst, beträgt 8 Abdeckung. Zusätzlich reduziert jeder 2. Vitalteil, den du über 8 hast (z. B. bei 10, 12, 14 usw.), deine effektive Abdeckung um 1, sodass du den Unterschied aufkaufen musst. Dies stellt die Schwierigkeit dar, zunehmend größere Flugzeuge mit wichtigeren zu schützenden Komponenten zu panzern.</p>
+    <p>Der Panzerwurf, den du erhältst, ist 11 minus Abdeckung, der maximale Wurf beträgt also 3+. Panzerungsabdeckung mit höherer Dicke zählt für die Abdeckung bei geringeren Dicken, aber die Obergrenze bleibt 8/3+.</p>
+    <p>Eine Platte hinter einem Piloten zum Schutz vor Gewehrkugeln hat 2 Abdeckung und Dicke 2.</p>
+    <h4>Elektrische Systeme</h4>
+    <p>Alles, was Elektrizität erzeugt, erzeugt im Wesentlichen diese Menge an Elektrizität als Grundlinie, was bedeutet, dass, solange das, was du verwendest, nicht mehr Ladungen zieht als das, es "kostenlos" ist. Wenn es mehr Ladungen zieht, muss es diese aus einer Batterie ziehen.</p>
+    <p>Batterien laden sich auf, wenn du Cool Down würfelst, wenn du eine Windmühle, eine Lichtmaschine oder einen Generator hast.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Windmühle</td>
+          <td>+1 Luftwiderstand, +1 Ladungen pro 10 Geschwindigkeit.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Batterie</td>
+          <td>+1 Masse, speichert 5 Ladungen.</td>
+          <td>2þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Batterie (Hohe Qualität)</td>
+          <td>Speichert 5 Ladungen.</td>
+          <td>4þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Lichtmaschine</td>
+          <td>+1 Masse, +1 Ladung, und zusätzlich +1 Ladungen pro 10 Leistung des Motors, auf den es angewendet wird.</td>
+          <td>2þ</td>
+          <td>Pionier</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Elektrizität kann Waffen und Motoren antreiben. Sie kann auch die folgenden Kommunikationssysteme betreiben. Gegensprechanlagen, Suchscheinwerfer, Navigationslichter, Funkempfänger und Ventilatoren verbrauchen nie Ladungen, erfordern aber ein elektrisches System.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Gegensprechanlage</td>
+          <td>Erfordert das Vitalteil Elektrik.</td>
+          <td>1þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Funkempfänger</td>
+          <td>+2 Masse, +2 Luftwiderstand, erfordert das Vitalteil Elektrik.</td>
+          <td>3þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Funksender</td>
+          <td>+3 Masse, +3 Luftwiderstand, −1 Ladung.</td>
+          <td>3þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Funkgerät</td>
+          <td>+5 Masse, +3 Luftwiderstand, −1 Ladung</td>
+          <td>3þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Funkempfänger (Hohe Qualität)</td>
+          <td>+1 Masse, +2 Luftwiderstand, erfordert das Vitalteil Elektrik.</td>
+          <td>6þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Funksender (Hohe Qualität)</td>
+          <td>+2 Masse, +3 Luftwiderstand, −1 Ladung.</td>
+          <td>6þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Funkgerät (Hohe Qualität)</td>
+          <td>+3 Masse, +3 Luftwiderstand, −1 Ladung</td>
+          <td>6þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+        <tr>
+          <td>Funkempfänger aus Walknochen</td>
+          <td>Erfordert das Vitalteil Elektrik. Kann nur mit der gekoppelten Funkbasisstation aus Walknochen kommunizieren.</td>
+          <td>5þ</td>
+          <td>Himmilgard</td>
+        </tr>
+        <tr>
+          <td>Funkbasisstation aus Walknochen</td>
+          <td>+6 Masse, +1 Luftwiderstand, −1 Ladung.</td>
+          <td>12þ</td>
+          <td>Himmilgard</td>
+        </tr>
+        <tr>
+          <td>Funkbasisstation aus Walknochen (Hohe Qualität)</td>
+          <td>+5 Masse, +1 Luftwiderstand, −1 Ladung.</td>
+          <td>24þ</td>
+          <td>Himmilgard</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Informationen <a id="_Information"></a></h4>
+    <p>Hier sind einige Möglichkeiten, Daten zu sammeln.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Integrierte Aufklärungskamera</td>
+          <td>Kann Bilder nach unten aufnehmen. Fähigkeiten skalieren mit der Ära.</td>
+          <td>2þ</td>
+        </tr>
+        <tr>
+          <td>Bordkamera</td>
+          <td>Bestätigt deine Abschüsse für dich.</td>
+          <td>1þ</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Sichtbarkeit <a id="_Visibility"></a></h4>
+    <p>Besser und weiter sehen.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Flügel-Aussparungen</td>
+          <td>+1 Sicht, +1 Lift Bleed. Kann nicht mit abgedeckten Transparenten Zelluloidflügeln verwendet werden.</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Rumpf-Aussparungen</td>
+          <td>+1 Sicht, −5 Struktur. Kann nicht mit abgedeckten Transparenten Zelluloidstrukturen verwendet werden.</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Suchscheinwerfer</td>
+          <td>Kann Ziele bei Nacht erkennen. Erfordert das Vitalteil Elektrik.</td>
+          <td>1þ</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Klimatisierung <a id="_Climate_Control"></a></h4>
+    <p>Wenn du einen Hochhöhenflieger oder ein Wasserflugzeug für kalte Gewässer baust, brauchst du Heizung. Wenn du in den Tropen oder der Wüste fliegst, ist es wichtig, kühl zu bleiben. Diese können Stresseffekte durch ungünstiges Klima mindern.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Elektrische Heizung</td>
+          <td>−1 Ladung.</td>
+          <td>1þ</td>
+        </tr>
+        <tr>
+          <td>Kühlerkreislauf</td>
+          <td>Erfordert einen Kühler.</td>
+          <td>1þ</td>
+        </tr>
+        <tr>
+          <td>Einfacher Ventilator</td>
+          <td>(Verschoben in den Abschnitt Cockpit)</td>
+          <td>-</td>
+        </tr>
+        <tr>
+          <td>Klimaanlage</td>
+          <td>−2 Ladungen</td>
+          <td>4þ</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Autopiloten <a id="_Autopilots"></a></h4>
+    <p>Autopiloten wurden innerhalb eines Jahrzehnts nach der Erfindung des Flugzeugs eingesetzt, und einige, die im Flying Circus verfügbar sind, sind eher fantastisch.</p>
+    <p>Diese werden dein Leben erleichtern.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Gyroskopischer Autopilot</td>
+          <td>Verleiht +4 auf Leerersitz-Würfe.</td>
+          <td>3þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Höhenhaltung</td>
+          <td>+1 Masse, ermöglicht, die Leerersitz-Regel zu ignorieren.</td>
+          <td>5þ</td>
+          <td>Heraufziehender Sturm</td>
+        </tr>
+        <tr>
+          <td>Mechanisch programmierbar</td>
+          <td>+1 Masse. Kann einen einzelnen einfachen Befehl erhalten, z.B. steigen, sinken, drehen, zu einem Ort fliegen. Kann keinen Dogfight führen, keine Waffen abfeuern, keine Bomben abwerfen oder landen.</td>
+          <td>6þ</td>
+          <td>Himmilgard</td>
+        </tr>
+        <tr>
+          <td>Programmierbar</td>
+          <td>+1 Masse, −2 Ladungen. Kann einen einzelnen einfachen Befehl erhalten, z.B. steigen, sinken, drehen, zu einem Ort fliegen. Kann keinen Dogfight führen, keine Waffen abfeuern, keine Bomben abwerfen oder landen.</td>
+          <td>6þ</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Rattenhirn</td>
+          <td>+3 Masse, −3 Ladungen. Führt das Fliegen für dich aus, ist voll automatisiert. Spieler verwenden diese normalerweise nicht, sie sind für Roboter-Flugzeuge.</td>
+          <td>25þ</td>
+          <td>Himmilgard oder Letztes Hurra</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Steuerungssysteme <a id="_Control_Systems"></a></h4>
+    <p>Normalerweise steuerst du dein Flugzeug, indem du direkt an Drähten ziehst. Das ermöglicht dir, es besser zu machen. Wähle eins. Siehe Pilotenermüdung für die vollständigen Regeln.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Steuerstangen</td>
+          <td>+1 Masse. Maximaler Flugstress durch MP ist 1.</td>
+          <td>2þ</td>
+          <td>Erster Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Hydraulisch unterstützt</td>
+          <td>+3 Masse, eliminiert Flugstress durch MP.</td>
+          <td>5þ</td>
+          <td>Zweiter Weltkrieg</td>
+        </tr>
+        <tr>
+          <td>Fly-by-Wire</td>
+          <td>+3 Masse. Eliminiert jeglichen Flugstress.</td>
+          <td>10þ</td>
+          <td>Letztes Hurra</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Propeller <a id="_Propeller"></a></h3>
+    <p>Wenn du deinen Propeller montierst, erhält er eine Blattneigung. Notiere dir dies für spätere Berechnungen. Wenn du Pulsstrahltriebwerke verwendest, erhältst du trotzdem Zahlen, obwohl du keinen Propeller hast.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Propeller-Modifikator</th>
+          <th>Pitch Speed Modifikator</th>
+          <th>Pitch Boost Modifikator</th>
+          <th>Energie</th>
+          <th>Wende</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Hohe Leistung</td>
+          <td>.8</td>
+          <td>0.9</td>
+          <td>1.5</td>
+          <td>8</td>
+        </tr>
+        <tr>
+          <td>Leistung</td>
+          <td>.9</td>
+          <td>0.8</td>
+          <td>2</td>
+          <td>7</td>
+        </tr>
+        <tr>
+          <td>Standardblattneigung</td>
+          <td>1</td>
+          <td>0.6</td>
+          <td>3</td>
+          <td>6</td>
+        </tr>
+        <tr>
+          <td>Geschwindigkeit</td>
+          <td>1.1</td>
+          <td>0.4</td>
+          <td>4</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>Hohe Geschwindigkeit</td>
+          <td>1.2</td>
+          <td>0.3</td>
+          <td>4.5</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>Pulsstrahltriebwerk</td>
+          <td>1.3</td>
+          <td>0.6</td>
+          <td>5</td>
+          <td>2.5</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Jeder dieser Blattneigungswerte stellt einen einzigartigen Propeller dar, wobei jeder Propeller Kosten von 1þ hat. Dein erster Propeller pro Motor ist immer kostenlos und kann beliebig gebaut werden.</p>
+    <p>Du kannst deinen Propeller (außer Pulsstrahltriebwerke, die haben keine eigentlichen Propeller) stattdessen auf eine der folgenden Optionen aufrüsten.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Effekte</th>
+          <th>Kosten pro Propeller</th>
+          <th>Ära</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Manuell verstellbar</td>
+          <td>Ermöglicht die Einstellung der Blattneigung am Boden, ohne den Propeller austauschen zu müssen.</td>
+          <td>2þ</td>
+          <td>Pionier</td>
+        </tr>
+        <tr>
+          <td>Automatisch verstellbar</td>
+          <td>+1 Masse. +0.1 Pitch Speed, +0.1 Pitch Boost, +0.5 Energie, +1 Wende.</td>
+          <td>8þ</td>
+          <td>Goldene Zwanziger</td>
+        </tr>
+      </tbody>
+    </table>
+    <h4>Optimierung <a id="_Optimization"></a></h4>
+    <p>Optimierungen sind leicht zu missbrauchen. Sie sollten nur verwendet werden, um spezifische Designentscheidungen darzustellen, die nicht in den Werten eines Flugzeugs widergespiegelt sind, oder um ein echtes Flugzeug seinen tatsächlichen Werten anzunähern. Zum Beispiel ist die V-173 Flying Pancake darauf ausgelegt, erhöhten Luftwiderstand gegen reduzierten Lift Bleed einzutauschen.</p>
+    <p>Optimierungen erfolgen nach allem anderen. Zum Beispiel erhöhen oder verringern Massenoptimierungen nicht den Luftwiderstand durch externes Fahrwerk.</p>
+    <p>Prozentuale Modifikatoren verwenden den ursprünglichen, unmodifizierten Wert: sie kumulieren nicht. Denke daran, abzurunden.</p>
+    <p>Balanciere die Tabelle.</p>
+    <p>Benutze hier deinen gesunden Menschenverstand: teurer ist schlechter, mehr Zähigkeit oder Maximale Belastung ist besser!</p>
+    <table>
+      <thead>
+        <tr>
+          <th colspan="3">Negativ</th>
+          <th><strong>Effekt</strong>;</th>
+          <th colspan="3">Positiv</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Kosten: +/- 10% Kosten</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Auftriebseffizienz: +/- 3 Lift Bleed</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Beinfreiheit: +/- 1 Flucht, Sicht</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Masse: +/- 10% Masse (ohne Bombenmasse)</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Redundanz: +/- 25% Zähigkeit</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Unterstützung: +/- 15% Maximale Belastung</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Zuverlässigkeit: +/- 2 Zuverlässigkeit</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+        <tr>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>Stromlinienform: +/- 10% Luftwiderstand (ohne Treibstoff oder Bomben)</td>
+          <td>◻</td>
+          <td>◻</td>
+          <td>◻</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Endgültige Berechnungen <a id="_Final_Calculations"></a></h3>
+    <p><strong>Berechnungsverfahren</strong></p>
+    <p>Berechne jeden dieser Werte für vollen Treibstoff mit Bomben (auch Fracht, Passagiere usw.), vollen Treibstoff und leeren Treibstoff. Die Halb-Treibstoff-Versionen davon sind der Durchschnitt der Werte für vollen und leeren Treibstoff, abgerundet.</p>
+    <p><strong>Masse</strong></p>
+    <p>Addiere alle deine Massenpunkte. Dein Masse-Malus (MP) ist 1/5 davon (abgerundet), Minimum 1.</p>
+    <p>Beziehe die Masse deines Treibstoffs oder deiner Bomben nicht mit ein (dies ist deine Leermasse). Beladener MP beinhaltet die Masse deines Treibstoffs und deiner Bomben. Halte deinen MP niedrig, damit du leichter steigen und manövrieren kannst.</p>
+    <p><strong>Luftwiderstand</strong></p>
+    <p>Addiere deinen Masse-Malus (MP) direkt zu deinem Luftwiderstand. Addiere dann alle deine Luftwiderstandspunkte. Dein Luftwiderstands-Malus (DP) ist 1/5 davon (abgerundet), Minimum 1.</p>
+    <p>Halte deinen DP niedrig, um schneller zu fliegen.</p>
+    <p><strong>Leistung, Boost &amp; Dropoff</strong></p>
+    <p>Die Höchstgeschwindigkeit deines Flugzeugs wird durch diese Gleichung bestimmt, die die Gesamtleistung deines Motors mit deinem Luftwiderstands-Malus vergleicht.</p>
+    <p>Höchstgeschwindigkeit = Pitch Speed * √((2000 * Leistung) / (DP * 9)))</p>
+    <p>Runde ab, wie üblich.</p>
+    <p>Du kannst dies auch verwenden, um den Wert zu berechnen.</p>
+    <p>Dein Boost ist die Leistung deines Motors (oder deiner Motoren) geteilt durch deinen MP, abgerundet. Wenn du 0 erhältst, brauchst du mehr Leistung, um die Ruhereibung zu überwinden, also nimm größere Motoren oder verliere Gewicht.</p>
+    <p>Dein Dropoff ist deine endgültige Höchstgeschwindigkeit multipliziert mit deinem Pitch Boost Modifikator.</p>
+    <p><strong>Steigrate</strong></p>
+    <p>Die Steigrate ist (23 * Leistung) / (Beladener MP * Pitch Speed * DP), Minimum 1.</p>
+    <p><strong>Abrissgeschwindigkeit</strong></p>
+    <p>Um deine Abrissgeschwindigkeit zu erhalten, multipliziere Lift Bleed mit Masse-Malus und teile durch Flügelfläche.</p>
+    <p><strong>Stabilität</strong></p>
+    <p>Addiere einfach deine beiden Stabilitäten, um deinen Wert zu erhalten. Wenn jedoch beide deiner Stabilitäten positiv sind, füge zusätzlich +2 Stabilität hinzu, und tue das Gegenteil, wenn sie beide negativ sind. Flugzeuge müssen ein wenig instabil sein, um zu fliegen, aber zu instabil, und sie fliegen nicht wirklich.</p>
+    <p>Deine Stabilität erzeugt einen Steuerungsmodifikator wie folgt.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Stabilität</th>
+          <th>−10</th>
+          <th>−7 bis −9</th>
+          <th>−4 bis −6</th>
+          <th>−1 bis -3</th>
+          <th>0</th>
+          <th>+1 bis +3</th>
+          <th>+4 bis +6</th>
+          <th>+7 bis +9</th>
+          <th>+10</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Steuerungsmodifikator</td>
+          <td>+4</td>
+          <td>+3</td>
+          <td>+2</td>
+          <td>+1</td>
+          <td>0</td>
+          <td>−1</td>
+          <td>−2</td>
+          <td>−3</td>
+          <td>−4</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Ein Flugzeug mit mehr als 10 oder weniger als −10 Stabilität ist für Menschen nicht fliegbar.</p>
+    <p><strong>Wendigkeit</strong></p>
+    <p>Wendigkeit = 100 + Steuerung - Masse-Malus</p>
+    <p><strong>Energieverlust vs. Kurvenverlust</strong></p>
+    <p>Diese beiden Werte geben an, wie viel Geschwindigkeit du beim Hochziehen verlierst und wie viel Geschwindigkeit du in einer Kampfwende verlierst. Sie werden von deinen Energie- und Wende-Werten aus der Blattneigung deines Propellers beeinflusst. Pulsstrahltriebwerke sind in derselben Tabelle, obwohl sie keine eigentlichen Propeller verwenden.</p>
+    <p>Dein Kurvenverlust ist</p>
+    <p>Abrissgeschwindigkeit (halber Treibstoff, keine Bomben) geteilt durch Propellerblattneigung Wende.</p>
+    <p>Aus Gründen der Ausgewogenheit runde auf, Minimum 1.</p>
+    <p>Dein Kurvenverlust beträgt +1, während du Bomben, Raketen, Fracht oder Passagiere mitführst.</p>
+    <p>Dein Energieverlust ist</p>
+    <p>Luftwiderstands-Malus (keine Bomben) geteilt durch Propellerblattneigung Energie</p>
+    <p>Aus Gründen der Ausgewogenheit runde auf, Minimum 1, Maximum 10.</p>
+    <p><strong>Pilotenermüdung</strong></p>
+    <p>Der Standard-Stress pro Flug beträgt 1. Du erhältst +1 Stress für jeden der Faktoren, der zutrifft.</p>
+    <ul>
+      <li>Eine Stabilität über 3 oder unter −3.</li>
+      <li>Alle 10 MP.</li>
+      <li>Pro Punkt Rumble (maximal 3).</li>
+      <li>Ein Zugpropeller-Umlaufmotor + ein offenes Cockpit.</li>
+    </ul>
+    <p>Copiloten können Stress von allem außer Rumble und Umlaufmotoren reduzieren.</p>
+    <p>Wenn du Steuerstangen hast, beträgt der maximale Flugstress durch Masse-Malus 1.</p>
+    <p>Wenn du hydraulisch unterstützte Steuerungen hast, erleidest du keinen Flugstress durch die Flugzeugmasse.</p>
+    <p>Fly-by-Wire-Steuerungen eliminieren jeglichen Flugstress, außer wenn dir Öl aus den Umlaufmotoren ins Gesicht spritzt. Schlafe einfach nicht in deinem langweiligen Fahrzeug ein.</p>
+    <p><strong>Wartung</strong></p>
+    <p>Dieser Wert ist Motorleistung geteilt durch 10 oder die Gesamtkosten aller Motoren, je nachdem, welcher Wert niedriger ist. Für diesen Zweck zählen Generatoren als Motoren und verwenden die Leistung vor der Reduzierung (d.h. Schub-Zug-Motoren).</p>
+    <p><strong>Maximale Belastung und Zähigkeit</strong></p>
+    <p>Deine Gesamtstruktur ist einfach deine Struktur. Keine Modifikationen sind erforderlich.</p>
+    <p>Ziehe am Ende deinen MP von deiner Maximalen Belastung ab. Deine Maximale Belastung ist immer auf deine Gesamtstruktur begrenzt.</p>
+    <p>Deine Zähigkeit ist Struktur/5 + Panzerung.</p>
+    <p><strong>Vitalteile</strong></p>
+    <p>Bestimme die Liste der Vitalteile wie folgt.</p>
+    <p>Alle Flugzeuge haben das Vitalteil Steuerung.</p>
+    <p>Alle Flugzeuge haben ein Vitalteil für ihr Fahrwerk, was auch immer es ist.</p>
+    <p>Jedes Waffensystem am Flugzeug ist ein Vitalteil.</p>
+    <p>Wenn das Flugzeug überhaupt elektrische Systeme hat, bilden sie alle ein Vitalteil namens Elektrik.</p>
+    <p>Wenn das Flugzeug überhaupt Treibstofftanks hat, bilden sie zusammen ein Vitalteil.</p>
+    <ul>
+      <li>Jeder Motor ist ein Vitalteil.</li>
+      <li>Jeder Kühler ist ein Vitalteil.</li>
+      <li>Jeder Öltank ist ein Vitalteil.</li>
+      <li>Jeder Ölkühler ist ein Vitalteil.</li>
+      <li>Jede Ölwanne ist ein Vitalteil.</li>
+    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Doppelflugzeug</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <p>Eine billige und einfache Möglichkeit, einen schweren Jäger zu bauen, besteht darin, zwei leichte Jäger zusammenzukleben. Addiere einfach alle ihre Werte und berechne sie neu. Du kannst optional das andere Cockpit entfernen, um 1 Masse zu sparen, aber ansonsten funktionieren beide.</p>
+            <p>Das resultierende Flugzeug kann dann selbst modifiziert werden. Technisch könntest du auf diese Weise auch ein Dreifach-Flugzeug oder mehr bauen! Aber dann wird es ein bisschen albern.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <h3>Eigenkonstruktionen <a id="_Home_Engineering"></a></h3>
+    <p>So umfassend dieses System auch sein mag, es kann nicht immer alles abdecken. Manchmal möchtest du über die Grenzen des Systems hinausgehen, oder du glaubst, dass dein Charakter etwas Kluges tun kann. Hier kommt die Eigenkonstruktion ins Spiel.</p>
+    <h4>Unweise Modifikation <a id="_Unwise_Modification"></a></h4>
+    <p>Geh zu deinem Spielleiter und sage: "Ich habe eine Idee für etwas, das ich mit meinem Flugzeug machen möchte." Lege die Mechaniken dar, wie du dir das vorstellst.</p>
+    <p>Wenn diese Modifikation das System nicht völlig sprengt, wird der Spielleiter dir einen fairen Preis dafür in Thaler, Luftwiderstand, Masse usw. berechnen. Sie sollten sich immer auf der günstigeren Seite irren.</p>
+    <p>Die Modifikation hat den von dir gewünschten Effekt, aber es gibt einen Preis. Der Spielleiter kann einen neuen Schweren Zug hinzufügen, den er gegen dich verwenden kann, wie folgt.</p>
+    <p>Ihre spezielle Modifikation schlägt auf spektakuläre und schreckliche Weise fehl.</p>
+    <p>Sie müssen es nie verwenden. Es mag nie vorkommen. Aber es ist da.</p>
+    <p>Drohend.</p>
+    <h3>Gebrauchte Flugzeuge <a id="_Used_Planes"></a></h3>
+    <p>Die meisten Flugzeuge, die Spieler kaufen oder bergen, sind Gebraucht. Gebrauchte Flugzeuge kosten die Hälfte des Listenpreises in Thaler (abgerundet), haben aber einen der folgenden Nachteile. Nachdem du es gekauft hast, würfle 1W10, um herauszufinden, was damit nicht stimmt! Wenn eine Regel dir mehrere gebrauchte Mali gibt, können sie nicht gleich sein.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>W10</th>
+          <th>Name</th>
+          <th>Malus</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Wrack</td>
+          <td>Würfle erneut, zweimal! Wenn du dies noch einmal erhältst, ignoriere es.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Ausgebrannt</td>
+          <td>Motoren haben −1 Zuverlässigkeit</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>Zerzaust</td>
+          <td>Reduziere deine Höchstgeschwindigkeit um 10%.</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Wuchtig</td>
+          <td>Erhöhe deine Abrissgeschwindigkeit um 20%.</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Klebrige Waffen</td>
+          <td>Erhöhe die Wahrscheinlichkeit, dass Waffen verklemmen, um 1.</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Schwach</td>
+          <td>Halbiere die Zähigkeit des Flugzeugs.</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Zerbrechlich</td>
+          <td>Reduziere Maximale Belastung um 20%.</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Undicht</td>
+          <td>Reduziere deinen Treibstoff um 20%.</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Träge</td>
+          <td>Reduziere deine Wendigkeit um 5.</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Neuwertig</td>
+          <td>Kein Malus</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>Es kostet 5 Thaler, ein Gebraucht-Flugzeug zu restaurieren und den Nachteil zu beseitigen, und du musst mindestens eine Mission fliegen, bevor es repariert werden kann. Jeder weitere Flug reduziert die Kosten um 1: nach sechs Flügen reparierst du es kostenlos.</p>
+    <h3>Höhenregeln <a id="_Altitude_Rules"></a></h3>
+    <p>Die meisten Kampagnen werden nicht sehr detailliert mit den Höhenregeln interagieren, daher empfiehlt das Regelwerk, sie zu ignorieren, wenn sie nicht kritisch sind. Wenn du die Höhenregeln verwendest, zeigt dieser Abschnitt die Auswirkungen auf dein Flugzeug. Wenn du in höhere Höhen aufsteigst, wird die Luft dünner. Luftwiderstand, Auftrieb und Steuerbarkeit werden reduziert, und Motoren kämpfen, um genug Sauerstoff zu bekommen. Die Regeln zur Berechnung findest du auf Seite 56 des Grundregelwerks.</p>
+    <p>Dein Höhenfaktor (HF) ist wie der Geschwindigkeitsfaktor; die Zehnerstelle auf deinem Instrument. Die Leistung deines Flugzeugs ändert sich mit dem Höhenfaktor. Die Abrissgeschwindigkeit erhöht sich mit der Höhe, und dein Motor arbeitet nur innerhalb deines Idealen Höhenbereichs (IHB) mit Spitzenleistung.</p>
+  </body>
+</html>

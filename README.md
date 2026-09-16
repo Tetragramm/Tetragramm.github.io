@@ -4,11 +4,13 @@ This is the website and repo for the Flying Circus Plane Builder.  Flying Circus
 
 ## Organization of the Repo
 
-The primary code is in the PlaneBuilder folder.  Other folders may exist for temporary testing purposes.  The repository is actually also the website, through the magic of Github Pages, so branches meant to be tested by other people are unfortunately required to be present in the repo.  Also there's the Helicopter folder, which I'll get around to finishing someday.
+The primary code is in the PlaneBuilder folder.  The repository is actually also the website, through the magic of Github Pages, so branches meant to be tested by other people are unfortunately required to be present in the repo.  The Test folder is a verbatim copy of PlaneBuilder used for exactly that (see "Testing branch conventions" below).  The Helicopter folder holds the helicopter builder pages, which are a thin wrapper that loads the bundles and shared assets from ../Test/.  VehicleBuilder is the Chariots of Steel vehicle builder.
 
 index.html just immediately redirects to PlaneBuilder/index.html.  Someday I may add a personal website here and change that, but for now, no.
 
-Inside /PlaneBuilder there are folders for each sub-page's code, and /src, which contains all the source code and json resources.
+The aircraft model and all the stat calculations live in Rust (`flyingcircusrust`), compiled to WebAssembly by `flyingcircuswasm`, and the TypeScript in PlaneBuilder/src is the UI layer on top of it.  See WASM_BUILD.md for how to build the two halves.
+
+Inside /PlaneBuilder there are folders for each sub-page's code, and /src, which contains all the source code.
 
 - .vscode
   - vscode settings that define "tasks" that automate annoying console commands.
@@ -21,24 +23,23 @@ Inside /PlaneBuilder there are folders for each sub-page's code, and /src, which
   - A page for saving planes and comparing them to each other
 - page
   - Display resources, one image and the CSS files.
+- pkg
+  - The wasm-pack output (JS bindings, .wasm, .d.ts) for `flyingcircuswasm`.  Generated, not checked in.
 - Rules
-  - The Rules for the plane builder.  Converted from a .docx saved as a .rtf  TODO: check that in here
+  - The Rules for the plane builder, one HTML page per language, generated from the .typ (Typst) sources.  Rules.htm redirects old links to Rules_en.html.
 - src
-  - disp
-    - The *.ts files that are used to create the main page's display.
-  - EngineBuilder
-    - The *.ts files for the Engine Builder.
-    - Piston engines, Pulsejets, Turbines, and prototype electric engines.
-  - impl
-    - The model code.  A bit of data saving and such has crept in, but it's _almost_ display and browser independent.
-  - lz
-    - The Lz-string library, for compressing strings in the link creation.
-  - scroll
-    - The Scroll-to-fragment library.  How it jumps to the right portion of the page after loading.  Why is this hard enough it needs a library?
-  - string
-    - The StringFmt library.  Useful things like Join and Fmt.
+  - plane_builder.ts / wasm_init.ts
+    - The main page's entry point and the `WasmApplication` class that wires the components to the WASM module.
+  - wasm
+    - aircraft_bridge.ts wraps the Rust `AircraftWasm` object; localization.ts talks to the Rust i18n backend; deployment.ts works out which copy of the builder (PlaneBuilder, Test, Helicopter) the page is served from.
+    - components/ - one UI component per section of the page (era, cockpits, engines, wings, ...).
+    - builders/ - the Engine Builder page and its per-engine-type UIs.
+  - Hangar
+    - The hangar page (hangar_core.ts is shared with the Helicopter hangar).
+  - JSON2CSV, scroll
+    - Small libraries: CSV export for the hangar, and scroll-to-fragment.
 - WeaponDisplay
-  - A page that shows the stats of all the weapons, and associated code.
+  - A standalone page that shows the stats of all the weapons.  This is the last piece of the old pure-TypeScript builder; it has no source in src/ any more.
 
 ## How to use and edit
 
@@ -47,13 +48,15 @@ Added April, 2022: In addition, install webpack, webpack-cli and ts-loader.  If 
 `npm link webpack`
 `npm link typescript`
 `npm link ts-loader`
-In the end, you should have a folder named `node_modules` in your directory structure, at the same level as webpack.config.js, or higher.  Doing this from the root of the repo will create one folder for the PlaneBuilder, Test, and Helicopter folders, which is good.
+In the end, you should have a folder named `node_modules` in your directory structure, at the same level as webpack.config.js, or higher.  Running `npm install` from the root of the repo will create one folder shared by the PlaneBuilder, Test, and Helicopter folders, which is good.  You also need Rust and wasm-pack to build the WebAssembly module; see WASM_BUILD.md.
 
 In vscode, open the /PlaneBuilder folder and you should see the folders described .  I have already set up a task to compile the typescript, and start a webserver to test with.  Hit Ctrl+Shift+B to execute the task.  Now, whenever you make changes, hit save, and webpacks's watch will see the change and recompile.  It does take a few seconds without any visible progress though.
 
 The webserver can be accessed from <localhost:8080>, via any browser.  If you are working on a specific "branch" you may need to append that folder name, eg. <localhost:8080/Test>
 
 ## Key Concepts
+
+The model code these concepts describe now lives in the Rust crate (`flyingcircusrust`); the code samples below are from the earlier TypeScript version, but the ideas carry over unchanged.
 
 ### Storing planes
 
@@ -91,7 +94,18 @@ Engines started out the same as normal parts, stored as `Stats` objects, but the
 
 The active plane, planes in the hangars, custom parts, and engines are all stored in browser localstorage.  They are saved there as JSON, so they're human readable if necessary.  The default engine lists are overwritten on every load, to make sure nobody tries to modify canon engines.  Everything except Custom Parts can be saved to a file, say, if you need to move it from your test branch to the real builder.
 
-If you make your own test branch you'll want to modify the places where localstorage is used to add a prefix to the variables things get stored in.  IE: `Test.engine_lists`  That keeps any changes or mistakes you make from breaking the stored data as you swap back and forth between test branch and regular.
+### Testing branch conventions
+
+The primary builder uses bare localstorage keys (`aircraft`, `hangar_names`, `engines_names`, `CustomParts`, ...).  Any other copy of the builder namespaces its keys by the folder it is served from, so the Test copy uses `test.aircraft` and so on.  That keeps any changes or mistakes you make from breaking the stored data as you swap back and forth between test branch and regular.  The Helicopter pages use `helicopter.` for their own aircraft and hangars, and share Test's engine lists and custom parts.
+
+This is all derived at runtime from the page URL in `src/wasm/deployment.ts`, together with the redirect targets between the plane and helicopter builders, so nothing in the source needs editing when a copy is made.  To refresh the Test copy after merging something into PlaneBuilder:
+
+```bash
+rm -rf Test && cp -r PlaneBuilder Test
+cd Test && npx webpack --mode production
+```
+
+The build outputs (the `.js` bundles and `flyingcircus.module.wasm`) are checked in because Github Pages serves them as-is, so rebuild in the copy after copying.  The Test copy's build also emits the Helicopter bundles (`helicopter_builder.js`, `Hangar/helicopter_hangar.js`), since the Helicopter pages load them from `../Test/`; the PlaneBuilder build skips them.  If you make your own branch folder, copy PlaneBuilder the same way; the storage prefix follows the folder name automatically.
 
 ## Licenses
 

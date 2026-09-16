@@ -1,6 +1,8 @@
 # Building and Testing the WASM Integration
 
-This guide explains how to build the WASM module and test the Era component with full localization.
+This guide explains how to build the WASM module and the TypeScript bundles, and how to test the Era component with full localization.
+
+The commands below build the primary builder in `PlaneBuilder/`. `Test/` is a verbatim copy of `PlaneBuilder/` (see README, "Testing branch conventions"); to build it instead, substitute `Test` for `PlaneBuilder` throughout, or use `npm run build:test`. The Helicopter pages load their bundles from `Test/`, so a change to the Helicopter pages needs the `Test/` build.
 
 ## Prerequisites
 
@@ -11,8 +13,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # Install wasm-pack
 cargo install wasm-pack
 
-# Install Node.js dependencies (if not already done)
-cd Test
+# Install Node.js dependencies (if not already done), from the repository root
 npm install
 ```
 
@@ -22,19 +23,19 @@ npm install
 
 ```bash
 cd flyingcircuswasm
-wasm-pack build --target bundler --out-dir ../Test/pkg
+wasm-pack build --target bundler --out-dir ../PlaneBuilder/pkg
 ```
 
 This generates:
-- `Test/pkg/flyingcircuswasm.js` - JavaScript bindings
-- `Test/pkg/flyingcircuswasm_bg.wasm` - WebAssembly binary
-- `Test/pkg/flyingcircuswasm.d.ts` - TypeScript definitions
-- `Test/pkg/package.json` - Package metadata
+- `PlaneBuilder/pkg/flyingcircuswasm.js` - JavaScript bindings
+- `PlaneBuilder/pkg/flyingcircuswasm_bg.wasm` - WebAssembly binary
+- `PlaneBuilder/pkg/flyingcircuswasm.d.ts` - TypeScript definitions
+- `PlaneBuilder/pkg/package.json` - Package metadata
 
 ### Step 2: Build TypeScript
 
 ```bash
-cd Test
+cd PlaneBuilder
 npx webpack --mode development
 ```
 
@@ -52,7 +53,7 @@ npx webpack --mode production
 python3 server.py
 ```
 
-Then open: http://localhost:8080/Test/
+Then open: http://localhost:8080/PlaneBuilder/
 
 ## Testing the Era Component
 
@@ -188,7 +189,7 @@ Use local modern webpack (already fixed in package.json):
 npm install
 
 # Use npx to ensure local webpack is used
-cd Test
+cd PlaneBuilder
 npx webpack --mode development
 ```
 
@@ -205,15 +206,15 @@ npx webpack --version
 - Era section doesn't appear
 
 **Solution:**
-1. Check that `Test/pkg/` directory exists
+1. Check that `PlaneBuilder/pkg/` directory exists
 2. Verify files exist:
    ```bash
-   ls -la Test/pkg/
+   ls -la PlaneBuilder/pkg/
    ```
 3. Rebuild WASM:
    ```bash
    cd flyingcircuswasm
-   wasm-pack build --target bundler --out-dir ../Test/pkg
+   wasm-pack build --target bundler --out-dir ../PlaneBuilder/pkg
    ```
 
 ### TypeScript Compilation Errors
@@ -224,15 +225,15 @@ npx webpack --version
 **Solution:**
 1. Check that TypeScript can find WASM types:
    ```bash
-   ls Test/pkg/flyingcircuswasm.d.ts
+   ls PlaneBuilder/pkg/flyingcircuswasm.d.ts
    ```
 2. If missing, rebuild WASM
 3. Try cleaning and rebuilding:
    ```bash
-   rm -rf Test/pkg
+   rm -rf PlaneBuilder/pkg
    cd flyingcircuswasm
-   wasm-pack build --target bundler --out-dir ../Test/pkg
-   cd ../Test
+   wasm-pack build --target bundler --out-dir ../PlaneBuilder/pkg
+   cd ../PlaneBuilder
    npx webpack --mode development
    ```
 
@@ -278,16 +279,16 @@ npx webpack --version
 2. Rebuild WASM:
    ```bash
    cd flyingcircuswasm
-   wasm-pack build --target bundler --out-dir ../Test/pkg
+   wasm-pack build --target bundler --out-dir ../PlaneBuilder/pkg
    ```
 3. Reload page (no webpack rebuild needed for WASM-only changes)
 
 ### Making Changes to TypeScript Code
 
-1. Edit TypeScript files in `Test/src/`
+1. Edit TypeScript files in `PlaneBuilder/src/`
 2. Rebuild TypeScript:
    ```bash
-   cd Test
+   cd PlaneBuilder
    npx webpack --mode development
    ```
 3. Reload page
@@ -299,10 +300,10 @@ npx webpack --version
    ```bash
    # Terminal 1: Rebuild WASM
    cd flyingcircuswasm
-   wasm-pack build --target bundler --out-dir ../Test/pkg
+   wasm-pack build --target bundler --out-dir ../PlaneBuilder/pkg
 
    # Terminal 2: Rebuild TypeScript
-   cd Test
+   cd PlaneBuilder
    npx webpack --mode development
    ```
 3. Reload page
@@ -312,7 +313,7 @@ npx webpack --version
 For development, use webpack watch mode:
 
 ```bash
-cd Test
+cd PlaneBuilder
 npx webpack watch --mode development
 ```
 

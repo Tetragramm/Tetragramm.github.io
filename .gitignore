@@ -3,6 +3,7 @@ node_modules/
 
 # Build outputs
 *.js.map
+PlaneBuilder/pkg/
 Test/pkg/
 
 # Rust build outputs
