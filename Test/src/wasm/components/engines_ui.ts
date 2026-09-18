@@ -305,7 +305,7 @@ export class EnginesUI extends BaseComponentUI {
         // Add rules link using utility function
         const rulesLine = document.createElement('span');
         rulesLine.appendChild(createRulesLink('_Engines', 'Engine Rules').firstChild);
-        rulesLine.appendChild(createRulesLink('_Engines_Upgrades', 'Upgrade Rules').firstChild);
+        rulesLine.appendChild(createRulesLink('_Engine_Upgrades', 'Upgrade Rules').firstChild);
         rulesLine.appendChild(createRulesLink('_Cooling_(Air)', 'Cooling Rules').firstChild);
 
         // Add Engine Builder link (desktop)

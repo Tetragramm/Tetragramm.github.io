@@ -1,11 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    engine::Engine,
-    propeller::{DriveType, EngineInfo},
-    radiator::{Radiator, RadiatorCoolantEntry, RadiatorEntry, RadiatorMountEntry},
-    stats::Stats,
-    types::AircraftType,
+    engine::Engine, part::Part, propeller::{DriveType, EngineInfo}, radiator::{Radiator, RadiatorCoolantEntry, RadiatorEntry, RadiatorMountEntry}, stats::Stats, types::AircraftType,
 };
 
 mod json;
@@ -341,7 +337,12 @@ impl Engines {
     pub fn update_reliability(&mut self, aircraft_reliability: i16) {
         // Update each engine with the aircraft reliability bonus
         for engine in self.engines.iter_mut() {
-            engine.update_reliability(aircraft_reliability);
+            let radmod = if engine.is_radiator_enabled() {
+                self.radiators.get_mut(engine.radiator_index as usize).unwrap().part_stats().reliability as i16
+            } else {
+                0
+            };
+            engine.update_reliability(aircraft_reliability + radmod);
         }
     }
 
@@ -349,7 +350,9 @@ impl Engines {
     /// TypeScript: GetReliabilityList()
     /// Returns list of reliability strings from each engine
     pub fn get_reliability_list(&self) -> Vec<String> {
-        self.engines.iter().map(|e| e.get_reliability()).collect()
+        self.engines.iter().map(|e| {
+            e.get_reliability()
+    }).collect()
     }
 
     /// Get minimum altitude across all engines

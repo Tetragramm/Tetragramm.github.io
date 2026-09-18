@@ -11,6 +11,7 @@ import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
 import {
     createCollapsibleSection,
+    createRulesLink,
     DualControl,
     dualNumber,
 } from '../dom_utils';
@@ -137,6 +138,13 @@ export class UsedUI extends BaseComponentUI {
             sectionTitle,
             contentWrapper,
             true // Initially open
+        );
+        
+        // Add rules link using utility
+        const rulesLine = createRulesLink('_Used_Planes');
+        this.sectionElement.insertBefore(
+            rulesLine,
+            this.sectionElement.children[1]
         );
 
         this.container.appendChild(this.sectionElement);

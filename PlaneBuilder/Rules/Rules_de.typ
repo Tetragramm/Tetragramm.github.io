@@ -16,7 +16,7 @@
     Projekt, aber du schaffst es!
 
     = Flugzeug-Konstruktionswerte
-    #label("_Flugzeug-Konstruktionswerte")
+    #html.elem("a", attrs: (id: "_Flugzeug-Konstruktionswerte"))
     Hier ist eine Liste der Werte, die beim Bau von Flugzeugen wichtig sind.
 
     Input-Werte
@@ -322,7 +322,7 @@
     der es zieht, während Schubmotoren ihn hinter dem Flugzeug haben, der es wegschiebt.
 
     === Motor auswählen
-    #label("_Choosing your Engine")
+    #html.elem("a", attrs: (id: "_Choosing your Engine"))
     Dein Motor kann aus der Liste der vorgefertigten Motoren, die zum Setting passen, ausgewählt oder andernfalls im
     Motoren-Konstrukteur erstellt werden.
 
@@ -330,7 +330,7 @@
     aber leistungsfähiger sind.
 
     === Motor montieren
-    #label("_Mounting your Engine")
+    #html.elem("a", attrs: (id: "_Mounting your Engine"))
     Motoren können auf verschiedene Arten montiert werden.
 
     Ein hinten montierter Schubpropeller stellt einen Motor dar, der am hinteren Ende des Flugzeugkörpers montiert ist, wie
@@ -399,7 +399,7 @@
     oder einem einzelnen großen Motor an einem Flügel. In diesen Fällen erleide -3 Seitenstabilität.
 
     === Motordrehmoment und Umlaufmotoren
-    #label("_Engine Torque and Rotaries")
+    #html.elem("a", attrs: (id: "_Engine Torque and Rotaries"))
     Motoren haben Drehmoment, das direkt von ihrer Seitenstabilität abgezogen wird, wenn sie Rumpfhalterungen verwenden.
     Flügel- und Gondelhalterungen minimieren den Stabilitätseffekt des Drehmoments, ignoriere es also dort.
 
@@ -416,7 +416,7 @@
     untersetzten Propeller gepaart werden, um zu funktionieren.
 
     === Schub-Zug-Konfiguration
-    #label("_Push-Pull Configuration")
+    #html.elem("a", attrs: (id: "_Push-Pull Configuration"))
     Eine Schub-Zug-Konfiguration ermöglicht die Montage zweier Motoren entlang derselben Linie. Dies erfordert, dass
     dasselbe Motormodell für beide verwendet wird.
 
@@ -439,7 +439,7 @@
 
     == Motor-Upgrades #html.elem("a", attrs: (id: "_Engine_Upgrades"))[]
     === Verlängerte Antriebswellen
-    #label("_Extended Driveshafts")
+    #html.elem("a", attrs: (id: "_Extended Driveshafts"))
     Eine verlängerte Antriebswelle bedeutet im Grunde, dass, während der Motor in der Mitte des Flugzeugs montiert ist, der
     Propeller dennoch an beiden Enden sein kann, da die Stange, die beide verbindet, länger als üblich ist und durch die
     Länge des Flugzeugs verläuft.
@@ -457,7 +457,7 @@
     verwenden, um das Farman-Heck zu vermeiden.
 
     === Außenbordpropeller
-    #label("_Outboard Propellers")
+    #html.elem("a", attrs: (id: "_Outboard Propellers"))
     Außenbordpropeller sind, wenn ein Satz von Riemen, Zahnrädern und Riemenscheiben verwendet wird, um den Propeller (oder
     die Propeller) seitlich vom Motor und Rumpf zu versetzen. Dies erfordert das Upgrade auf die verlängerte Antriebswelle
     und zieht Kosten von +3 Luftwiderstand und -2 Zuverlässigkeit nach sich. Als Vorteil benötigen Rumpf-montierte Waffen
@@ -468,7 +468,7 @@
     Waffen weiterhin synchronisiert werden, aber es gibt keinen -2 Malus auf Flucht.
 
     === Untersetzter Propeller
-    #label("_Geared Propeller")
+    #html.elem("a", attrs: (id: "_Geared Propeller"))
     Dieses Upgrade kann auf jeden Motor angewendet werden. Es kostet +1þ für jede Iteration. Verfügbar in der Ära Erster
     Weltkrieg.
 
@@ -541,17 +541,17 @@
     derselbe Motor, wenn er einen Propeller mit einer Lichtmaschine antreiben würde.
 
     === Kühlung (Luft)
-    #label("_Cooling_(Air)")
+    #html.elem("a", attrs: (id: "_Cooling_(Air)"))
     Wenn dein Motor luftgekühlt ist, super! Platziere ihn einfach dort, und er läuft von allein. Fügt das Vitalteil Ölwanne
     hinzu.
 
     === Kühlung (Umlaufmotor)
-    #label("_Cooling_(Rotary)")
+    #html.elem("a", attrs: (id: "_Cooling_(Rotary)"))
     Wenn dein Motor _umlaufend_; ist, musst du 1 Masse für den Öltank des Motors hinzufügen. Dies ist ein separates
     Vitalteil.
 
     === Kühlung (Flüssigkeit)
-    #label("_Cooling_(Liquid)")
+    #html.elem("a", attrs: (id: "_Cooling_(Liquid)"))
     Wenn dein Motor _flüssigkeitsgekühlt_; ist, musst du einen Kühler und einen Ölkühler hinzufügen.
 
     Ein Ölkühler ist einfach: Du fügst +1 Luftwiderstand pro 15 Leistung hinzu und er zählt als Vitalteil.
@@ -711,7 +711,7 @@
     Gesamt-Rumble \* 10 zum Fliegen, sonst zerfallen die Vibrationen das Flugzeug.
 
     === Strahltriebwerke & Raketen
-    #label("_Jet_Engines_\\&_Rockets")
+    #html.elem("a", attrs: (id: "_Jet_Engines_\\&_Rockets"))
     Strahltriebwerke werden auf eine der folgenden Arten montiert. Strahltriebwerke bringen aufgrund ihrer Größe ihre eigene
     Anforderung an Struktursektionen mit sich.
 
@@ -884,7 +884,7 @@
     Strukturkosten hinzu: diese verschwinden nicht.
 
     === Auftriebskörper & Nurflügel
-    #label("_Lifting Body \\& Flying Wing")
+    #html.elem("a", attrs: (id: "_Lifting Body \\& Flying Wing"))
     Ein Auftriebskörper und Nurflügel sind beide unglaublich komplizierte ingenieurtechnische Errungenschaften und
     erfordern, dass das Flugzeug eine solide Außenhaut hat (Formsperrholz oder besser).
 
@@ -899,7 +899,7 @@
     Beide Flugzeugtypen haben weiterhin Heckteile, auch wenn diese in den Rest der Maschine integriert sind.
 
     === Interne Verstrebung
-    #label("_Internal Bracing")
+    #html.elem("a", attrs: (id: "_Internal Bracing"))
     Um die Widerstandsfähigkeit eines Flugzeugs zu erhöhen, kannst du interne Verstrebung hinzufügen. Dies sind im Grunde
     zusätzliche Strukturteile, die du nicht verkleiden musst, da sie sich im Inneren befinden. Du kannst 1 internes
     Verstrebungsteil pro tatsächlicher Struktursektion haben. Sie müssen nicht aus demselben Material wie alles andere sein:
@@ -953,7 +953,7 @@
     einen Typ von Strukturmaterial.
 
     === Heckausleger
-    #label("_Boom Tails")
+    #html.elem("a", attrs: (id: "_Boom Tails"))
     Heckausleger sind eine weitere Option, die sowohl für Schubpropeller-Flugzeuge als auch für einige Flugzeuge mit Gondeln
     nützlich ist. Sie ermöglichen dieselben Dinge wie ein Farman-Heck, sind aber in vielerlei Hinsicht raffinierter. Sie
     haben jedoch einige aerodynamische Schwierigkeiten.
@@ -984,7 +984,7 @@
     - -1 Sicht
 
     === Streckung
-    #label("_Aspect Ratio")
+    #html.elem("a", attrs: (id: "_Aspect Ratio"))
     Flügel haben nicht alle dieselbe Form; manche Flügel sind lang und schmal (sie haben eine _hohe Streckung_;), und manche
     Flügel sind kurz und breit (sie haben eine _geringe Streckung_;).
 
@@ -1004,7 +1004,7 @@
     verursacht aber einen -30 Belastungs-Malus.
 
     === Effekte des längsten Flügels
-    #label("_Longest Wing Effects")
+    #html.elem("a", attrs: (id: "_Longest Wing Effects"))
     Der längste Flügel an deinem Flugzeug gibt den folgenden Modifikator.
 
     - 8 - Spannweite = Steuerungsmodifikator
@@ -1012,7 +1012,7 @@
     - Jeder Punkt Spannweite weniger als 8: -1 Seitenstabilität.
 
     === Tragflächenanordnung
-    #label("_Wing Decks")
+    #html.elem("a", attrs: (id: "_Wing Decks"))
     Da dies ein Spiel über frühe Flugzeuge ist, kannst du dich entscheiden, mehr als einen Flügel zu haben. Wird dein
     Flugzeug ein Eindecker, ein Doppeldecker, ein Dreidecker oder etwas Seltsameres sein?
 
@@ -1063,7 +1063,7 @@
     )
 
     === Flügeloberfläche
-    #label("_Wing Surface")
+    #html.elem("a", attrs: (id: "_Wing Surface"))
     Denke daran, immer auf ganze Zahlen abzurunden!
 
     *Flügeloberflächen*
@@ -1119,7 +1119,7 @@
     )
 
     === Staffelung & Tandemflügel
-    #label("_Stagger \\& Tandem Wing")
+    #html.elem("a", attrs: (id: "_Stagger \\& Tandem Wing"))
     Wenn du mehrere Tragflächenanordnungen hast, kannst du die Flügel staffeln.
 
     *Flügelstaffelung*
@@ -1141,7 +1141,7 @@
     )
 
     === Geschlossener Flügel
-    #label("_Closed Wing")
+    #html.elem("a", attrs: (id: "_Closed Wing"))
     Das Schließen eines Flügelpaares, z. B. durch Erstellen einer Kasten- oder Kreisstruktur, eliminiert den Wirbeleffekt am
     Ende eines Flügels und ermöglicht auch eine vollständigere Struktur. Andererseits wird dieses Design aufgrund des
     zusätzlichen Gewichts an den äußersten Enden der Flügel schwer zu steuern sein, da die benötigte Energie für eine
@@ -1154,12 +1154,12 @@
     der Optimierung. Du kannst jedoch einen geschlossenen Inline-Tandemflügel haben.
 
     === Inline-Flügel
-    #label("_Inline Wings")
+    #html.elem("a", attrs: (id: "_Inline Wings"))
     Ein Stil des Tandemflügels, bei dem mehrere Flügel auf derselben Ebene liegen. Ein Inline-Satz reduziert den gesamten
     Luftwiderstand aller Flügel auf derselben Ebene auf 75%, ergibt aber +3 Lift Bleed aufgrund von Abschattung.
 
     === Miniaturflügel
-    #label("_Miniature Wings")
+    #html.elem("a", attrs: (id: "_Miniature Wings"))
     Ein Flügel von 2 Quadratmetern oder weniger ist ein Miniaturflügel. Diese zählen effektiv nicht als Flügel: sie fügen
     die Effekte der Tragflächenanordnung, an der sie angebracht sind, nicht hinzu, sondern fügen stattdessen nur +1
     Steuerung und ihre Größe für Auftriebszwecke hinzu. Jeder Miniaturflügel nach dem ersten fügt jeweils +1 Lift Bleed
@@ -1189,7 +1189,7 @@
     Flügel schließt die Unterstützung durch Doppelholme aus und begrenzt die Arten von Holmen, die verwendet werden können.
 
     === Flügelwinkel
-    #label("_Wing Angle")
+    #html.elem("a", attrs: (id: "_Wing Angle"))
     Flügel können unter Winkeln gebaut werden, um ihre Eigenschaften zu ändern. Hochgezogene Flügelspitzen (Flügel mit
     V-Stellung) verbessern die Stabilität, da sie das Flugzeug eher dazu bringen, in eine neutrale Position zurückzurollen.
     Flügel mit negativer V-Stellung bewirken das Gegenteil.
@@ -1199,7 +1199,7 @@
     der hinzugefügten oder verlorenen Stabilität.
 
     === Möwenflügel
-    #label("_Gull Wings")
+    #html.elem("a", attrs: (id: "_Gull Wings"))
     Jeder Flügel kann als Möwenflügel deklariert werden. Wir betrachten die Ebene des Flügels als den Ort der Biegung, nicht
     als den Ort der Wurzel, da dies für aerodynamische Zwecke relevant ist. Du kannst nicht zwei Flügel von derselben Wurzel
     in einer Nicht-Tandem-Konfiguration haben. Möwenflügel sind in der Ära Heraufziehender Sturm verfügbar.
@@ -1220,19 +1220,19 @@
     bei einem Nicht-Möwen-Tiefdecker.
 
     === Pfeilflügel
-    #label("_Swept Wings")
+    #html.elem("a", attrs: (id: "_Swept Wings"))
     Pfeilflügel fügen +5 Lift Bleed hinzu und geben -1 Seitenstabilität. Allerdings ermöglichen sie die vollständige
     Eliminierung des Höhenleitwerks _und_ bieten einen natürlichen Montagepunkt für Außenbord-Seitenleitwerke.
 
     === Flügelspitzengewicht
-    #label("_Wingtip Weight")
+    #html.elem("a", attrs: (id: "_Wingtip Weight"))
     Ein Flugzeug erhält einen -1 Steuerungs-Malus für Folgendes:
 
     - Alle 5 Masse an Waffen an Flügelhalterungen.
     - Jeder Flügel-montierte Treibstofftank, intern oder extern.
 
     === Spezielle Flügeltypen
-    #label("_Special Wing Types")
+    #html.elem("a", attrs: (id: "_Special Wing Types"))
     Es gibt eine Reihe spezieller Flügeltypen. Diese Flügeltypen können mit normalen Flügeln kombiniert werden, aber es
     lohnt sich selten.
 
@@ -1251,7 +1251,7 @@
     Seitenleitwerk, um Trudeln und Rollen zu verhindern. Du kannst ein Flugzeug ohne diese Dinge entwerfen, aber es ist _wirklich schwer_;.
 
     === Stabilisatorgröße
-    #label("_Stabilizer Size")
+    #html.elem("a", attrs: (id: "_Stabilizer Size"))
     Flugzeuge brauchen Stabilisatoren zum Fliegen. Punkt. Wenn du sie nicht hast und nichts sehr, sehr Kluges gemacht hast,
     macht dein Flugzeug eine wackelige Bewegung und geht zu Boden.
 
@@ -1268,7 +1268,7 @@
     setze die Auswahl für Höhenleitwerke auf "Die Tragflächen".
 
     === Stabilisator-Montage
-    #label("_Stabilizer Mounts")
+    #html.elem("a", attrs: (id: "_Stabilizer Mounts"))
     Du musst wählen, wo du deine Stabilisatoren montierst. Deine Optionen sind...
 
     *Höhenleitwerk*
@@ -1285,7 +1285,7 @@
       von Stabilisatoren.
 
     === Mehrere Stabilisatoren
-    #label("_Multiple Stabilizers")
+    #html.elem("a", attrs: (id: "_Multiple Stabilizers"))
     Du kannst wählen, mehrere Instanzen eines Stabilisators an deinem Flugzeug zu montieren. Zum Beispiel zwei Heckflossen
     an deinem Flugzeug, montiert an den Enden des Höhenleitwerks. Da es am besten ist, wenn Seitenruder und Höhenruder im
     Luftstrom eines Motors sind, profitierst du mehr davon, wenn du mehrere Motoren hast.
@@ -1570,7 +1570,7 @@
     dass sie das taten.
 
     === Flügelklingen
-    #label("_Wing Blades")
+    #html.elem("a", attrs: (id: "_Wing Blades"))
     Du kannst Flügelklingen hinzufügen, wenn du keine externe Verstärkung und mindestens einen Stahlkragträger hast.
     Flügelklingen verdoppeln die Masse aller Kragträger, ermöglichen es dir aber, deinen Feind auseinanderzuschneiden.
 
@@ -1586,7 +1586,7 @@
     umzuwandeln.
 
     === Waffengrößen
-    #label("_Weapon Sizes")
+    #html.elem("a", attrs: (id: "_Weapon Sizes"))
     Waffen gibt es in verschiedenen _Größen_: Winzig, Leicht, Mittel, Schwer und Artillerie.
 
     Du kannst immer kleinere Waffen in Bereichen mit Einschränkungen montieren, wie Türme oder Tragflächen. Du kannst
@@ -1688,7 +1688,7 @@
     Es kostet Þ in Höhe der Hälfte der Waffen in einer Gruppe, sie alle zugänglich zu machen, Minimum 1.
 
     === Schussbereiche & Montage
-    #label("_Arcs_\\&_Mounting")
+    #html.elem("a", attrs: (id: "_Arcs_\\&_Mounting"))
     Wir teilen die Schussbereiche einer Waffe in die folgenden Richtungen ein.
 
     - Vorwärts
@@ -1939,7 +1939,7 @@
     Eine Platte hinter einem Piloten zum Schutz vor Gewehrkugeln hat 2 Abdeckung und Dicke 2.
 
     === Elektrische Systeme
-    #label("_Electrical Systems")
+    #html.elem("a", attrs: (id: "_Electrical Systems"))
     Alles, was Elektrizität erzeugt, erzeugt im Wesentlichen diese Menge an Elektrizität als Grundlinie, was bedeutet, dass,
     solange das, was du verwendest, nicht mehr Ladungen zieht als das, es "kostenlos" ist. Wenn es mehr Ladungen zieht, muss
     es diese aus einer Batterie ziehen.

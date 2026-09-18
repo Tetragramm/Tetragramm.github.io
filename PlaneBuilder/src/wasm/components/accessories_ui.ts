@@ -377,7 +377,7 @@ export class AccessoriesUI extends BaseComponentUI {
         );
 
         // Add rules link using utility
-        const rulesLine = createRulesLink('_Accessories');
+        const rulesLine = createRulesLink('_Upgrades');
         this.sectionElement.insertBefore(
             rulesLine,
             this.sectionElement.children[1]

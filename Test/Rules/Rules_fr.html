@@ -11,7 +11,7 @@
     <h1>Règles du Constructeur d'Avions</h1>
     <p>Voici les règles que vous utiliserez pour créer des avions. C'est un projet complexe et qui demande beaucoup d'implication, mais vous pouvez le faire !</p>
     <h2>Stats de Construction d'Avion</h2>
-    <p>Voici une liste des statistiques importantes pour les avions lorsque vous les construisez.</p>
+    <p><a id="_Plane Building Stats"></a> Voici une liste des statistiques importantes pour les avions lorsque vous les construisez.</p>
     <p>Stats d'Entrée</p>
     <ul>
       <li>Masse: La masse est le poids des objets. Maintenir une masse basse est une priorité, mais les moteurs deviennent beaucoup plus gros à mesure qu'ils deviennent plus puissants, donc cela compte de moins en moins avec le temps.</li>
@@ -354,10 +354,10 @@
     <h3>Moteurs <a id="_Engines"></a></h3>
     <p>Les moteurs se présentent sous deux types généraux, les moteurs propulseurs (Pusher) et les moteurs tracteurs (Tractor). Les moteurs tracteurs ont l'hélice devant l'avion qui le tire, tandis que les propulseurs l'ont derrière l'avion qui le pousse.</p>
     <h4>Choisir votre Moteur</h4>
-    <p>Votre moteur peut être choisi dans la liste des moteurs prédéfinis appropriés au cadre, ou fabriqué dans le constructeur de moteurs autrement.</p>
+    <p><a id="_Choosing your Engine"></a> Votre moteur peut être choisi dans la liste des moteurs prédéfinis appropriés au cadre, ou fabriqué dans le constructeur de moteurs autrement.</p>
     <p>En général, les moteurs refroidis par air sont plus légers mais moins puissants, tandis que les moteurs refroidis par liquide sont plus lourds mais plus puissants.</p>
     <h4>Monter votre Moteur</h4>
-    <p>Les moteurs peuvent être montés de différentes manières.</p>
+    <p><a id="_Mounting your Engine"></a> Les moteurs peuvent être montés de différentes manières.</p>
     <p>Un propulseur monté à l'arrière représente un moteur monté à l'extrémité de la carlingue de l'avion, comme les propulseurs d'un Kyushu J7W. Un propulseur monté au centre représente un moteur propulseur qui a toujours une queue, utilisant un arbre de transmission étendu ou une queue Farman pour éviter le déséquilibre.</p>
     <p>La visibilité sera la pire de toutes les configurations de montage de moteur. Avoir un montage propulseur ne vous aide pas à bien voir autour d'un moteur monté en pod.</p>
     <p><strong>Montages de Moteur sur Fuselage</strong></p>
@@ -434,13 +434,13 @@
     </table>
     <p>Si vous le souhaitez, vous pourriez construire un avion asymétrique, avec différents types de moteurs de chaque côté d'une aile, ou un seul gros moteur sur une aile. Dans ces cas, subissez −3 Stabilité Latérale.</p>
     <h4>Couple Moteur et Rotatifs</h4>
-    <p>Les moteurs ont un Couple, qui est soustrait directement de leur Stabilité Latérale s'ils utilisent des montages sur fuselage. Les montages sur aile et en pod minimisent l'effet du Couple sur la stabilité, ignorez-le donc dans ces cas.</p>
+    <p><a id="_Engine Torque and Rotaries"></a> Les moteurs ont un Couple, qui est soustrait directement de leur Stabilité Latérale s'ils utilisent des montages sur fuselage. Les montages sur aile et en pod minimisent l'effet du Couple sur la stabilité, ignorez-le donc dans ces cas.</p>
     <p>Les moteurs rotatifs sont généralement les seuls moteurs dont vous devez vous soucier à ce sujet dans les avions anciens, étant donné qu'ils sont une grosse masse de métal tournant à grande vitesse.</p>
     <p>Les moteurs rotatifs montés sur aile réduisent votre Tension du Couple (utilisez tous les moteurs), représentant la force exercée contre l'aile. Dans une configuration poussé-tiré, vous pouvez choisir de réduire la Structure à la place.</p>
     <p>Les moteurs poussés-tirés sur fuselage peuvent également choisir de réduire la Structure, auquel cas cela annule l'effet du Couple sur la stabilité, et supprime le bonus rotatif au combat aérien.</p>
     <p>Les moteurs contrarotatifs sont un type de moteur spécial qui divise par deux le Couple du moteur. Ils doivent être associés à une Hélice Démultipliée pour fonctionner.</p>
     <h4>Configuration Poussé-Tiré</h4>
-    <p>Une configuration Poussé-Tiré permet de monter deux moteurs le long de la même ligne. Cela nécessite que le même modèle de moteur soit utilisé pour les deux.</p>
+    <p><a id="_Push-Pull Configuration"></a> Une configuration Poussé-Tiré permet de monter deux moteurs le long de la même ligne. Cela nécessite que le même modèle de moteur soit utilisé pour les deux.</p>
     <p>Dans toute configuration Poussé-Tiré, n'utilisez que la Traînée d'un seul moteur, et appliquez les modificateurs suivants.</p>
     <p><strong>Conceptions Poussé-Tiré</strong></p>
     <table>
@@ -467,15 +467,15 @@
     </table>
     <h3>Améliorations Moteur <a id="_Engine_Upgrades"></a></h3>
     <h4>Arbres de Transmission Étendus</h4>
-    <p>Un arbre de transmission étendu signifie essentiellement que, bien que le moteur soit monté au milieu de l'avion, l'hélice peut toujours être à l'une ou l'autre extrémité car la tige reliant les deux est plus longue que d'habitude et traverse la longueur de l'avion.</p>
+    <p><a id="_Extended Driveshafts"></a> Un arbre de transmission étendu signifie essentiellement que, bien que le moteur soit monté au milieu de l'avion, l'hélice peut toujours être à l'une ou l'autre extrémité car la tige reliant les deux est plus longue que d'habitude et traverse la longueur de l'avion.</p>
     <p>Les arbres de transmission étendus ajoutent +1 Masse.</p>
     <p>Cela peut être fait pour diverses raisons. Sur les avions tracteurs, cela peut permettre de monter une arme d'artillerie en interne, tirant à travers l'hélice sans utiliser le mécanisme de synchronisation en faisant passer le canon directement à travers le moyeu de l'hélice. Par exemple, une arme montée devant le moteur dans un espace dédié comme le canon automatique de 37 mm dans le nez du P-39 Airacobra.</p>
     <p>Sur un avion propulseur à moteur central, un arbre de transmission étendu élimine le besoin d'une queue Farman. Vous pouvez simplement monter une queue conventionnelle autour du moteur sans problème. De même, un tracteur monté au centre avec des canards (c'est-à-dire : la queue est devant l'avion) peut utiliser l'arbre de transmission étendu pour éviter la queue Farman.</p>
     <h4>Hélices Hors-bord</h4>
-    <p>Les hélices hors-bord désignent l'utilisation d'un ensemble de courroies, engrenages et poulies pour décaler l'hélice (ou les hélices) sur le côté du moteur et du fuselage. Cela nécessite l'amélioration arbre de transmission étendu et entraîne un coût de +3 Traînée et −2 Fiabilité. En contrepartie, les canons montés sur fuselage n'ont plus besoin d'être synchronisés, car les hélices sont à l'écart.</p>
+    <p><a id="_Outboard Propellers"></a> Les hélices hors-bord désignent l'utilisation d'un ensemble de courroies, engrenages et poulies pour décaler l'hélice (ou les hélices) sur le côté du moteur et du fuselage. Cela nécessite l'amélioration arbre de transmission étendu et entraîne un coût de +3 Traînée et −2 Fiabilité. En contrepartie, les canons montés sur fuselage n'ont plus besoin d'être synchronisés, car les hélices sont à l'écart.</p>
     <p>Cette amélioration peut être appliquée aux moteurs Tracteurs, Tracteurs Montés au Centre, et Poussés-Tirés. Dans le cas d'un moteur Poussé-Tiré, c'est le moteur arrière qui entraîne les hélices hors-bord, et par conséquent les canons tirant vers l'avant doivent toujours être synchronisés, mais il n'y a pas de pénalité de −2 à l'Évacuation.</p>
     <h4>Hélice Démultipliée</h4>
-    <p>Cette amélioration peut être appliquée à n'importe quel moteur. Elle coûte +1þ par itération. Disponible à l'ère Première Guerre Mondiale.</p>
+    <p><a id="_Geared Propeller"></a> Cette amélioration peut être appliquée à n'importe quel moteur. Elle coûte +1þ par itération. Disponible à l'ère Première Guerre Mondiale.</p>
     <p>L'ajout de cela ajoutera +50% à la Survitesse du moteur, et donnera −1 Fiabilité. Vous pouvez l'ajouter autant de fois que vous le souhaitez.</p>
     <p>Vous pouvez payer 1þ supplémentaire pour annuler la pénalité de Fiabilité de l'hélice démultipliée uniquement, 1 pour 1. Disponible à l'ère Années Folles.</p>
     <p><strong>Note :</strong> Bien que techniquement vous puissiez démultiplier un moteur Rotatif (et il existe quelques exemples historiques), c'est une abomination contre l'ingénierie et vous devriez y réfléchir à deux fois, voire une douzaine de fois, avant de le faire.</p>
@@ -546,11 +546,11 @@
     <h4>Moteur comme Générateur <a id="Engine_as_Generator"></a></h4>
     <p>Vous pouvez monter un moteur comme générateur. Il ne fournit aucune puissance pour vous faire avancer, mais vous pouvez l'augmenter indépendamment de vos autres moteurs pour recharger les batteries ou fournir de l'énergie pour d'autres choses. Vous n'avez pas besoin d'alternateur (nous présumons que c'est intégré) et il génère le double de Charge que le même moteur s'il alimentait une hélice avec un alternateur.</p>
     <h4>Refroidissement (Air)</h4>
-    <p>Si votre moteur est refroidi par air, génial ! Il suffit de le placer là et il fonctionnera tout seul. Ajoute le Composant Vital Carter d'Huile.</p>
+    <p><a id="_Cooling_(Air)"></a> Si votre moteur est refroidi par air, génial ! Il suffit de le placer là et il fonctionnera tout seul. Ajoute le Composant Vital Carter d'Huile.</p>
     <h4>Refroidissement (Rotatif)</h4>
-    <p>Si votre moteur est <em>rotatif</em> ;, vous devrez ajouter 1 Masse pour le Réservoir d'Huile du moteur. C'est un Composant Vital distinct.</p>
+    <p><a id="_Cooling_(Rotary)"></a> Si votre moteur est <em>rotatif</em> ;, vous devrez ajouter 1 Masse pour le Réservoir d'Huile du moteur. C'est un Composant Vital distinct.</p>
     <h4>Refroidissement (Liquide)</h4>
-    <p>Si votre moteur est <em>refroidi par liquide</em> ;, vous devrez ajouter un radiateur et un refroidisseur d'huile.</p>
+    <p><a id="_Cooling_(Liquid)"></a> Si votre moteur est <em>refroidi par liquide</em> ;, vous devrez ajouter un radiateur et un refroidisseur d'huile.</p>
     <p>Un refroidisseur d'huile est simple : vous ajoutez +1 traînée par tranche de 15 puissance et cela compte comme un Composant Vital.</p>
     <p>Un radiateur pèse 3 Masse et a une quantité variable de Traînée, que vous choisissez. Vous ne pouvez pas avoir plus de radiateurs que de moteurs, mais vous pouvez choisir de connecter plusieurs moteurs au même radiateur agrandi. Cela économisera du poids, mais sera un point de défaillance unique. Chaque radiateur est un Composant Vital.</p>
     <p>La <em>Traînée</em> d'un radiateur représente la surface du radiateur exposée à l'air. Chaque point de Traînée donne +2 Refroidissement. Vous devez avoir une valeur de Refroidissement égale à celle de votre ou vos moteur(s) ou perdre de la fiabilité. Chaque point de refroidissement que vous avez en moins que cela donne −1 Fiabilité. Avoir plus de Refroidissement que ce que votre Moteur nécessite ne le rendra pas plus fiable.</p>
@@ -718,7 +718,7 @@
     <p>Les pulsoréacteurs coûtent 5þ et 1 d'entretien simplement pour en avoir un sur votre avion. Ils sont durs pour les avions.</p>
     <p>Les pulsoréacteurs produisent du Rumble. Le Rumble cause un stress aux membres d'équipage égal à la moitié du Rumble total, ou 3, selon la valeur la plus basse. De plus, un avion nécessite une structure minimale égale au Rumble total * 10 pour voler, sinon les vibrations désagrègent l'avion.</p>
     <h4>Moteurs à Réaction &amp; Fusées</h4>
-    <p>Les moteurs à réaction sont montés de l'une des manières suivantes. Les moteurs à réaction entraînent leur propre exigence en Emplacements de Châssis en raison de leur taille.</p>
+    <p><a id="_Jet_Engines_\&amp;_Rockets"></a> Les moteurs à réaction sont montés de l'une des manières suivantes. Les moteurs à réaction entraînent leur propre exigence en Emplacements de Châssis en raison de leur taille.</p>
     <table>
       <thead>
         <tr>
@@ -929,12 +929,12 @@
     <p>Un avion monocoque ou semi-monocoque peut être construit en substituant la masse et le bonus structurel d'une pièce de châssis par une pièce de revêtement compatible monocoque. Le châssis existe toujours : rares sont les avions monocoques véritablement sans châssis, ces structures sont juste minimisées et incorporées dans la structure de la coque.</p>
     <p>Les pièces de revêtement monocoque coûtent +1þ chacune, représentant le coût de main-d'œuvre de leur conception et construction. Ceci s'ajoute au coût du châssis : cela ne disparaît pas.</p>
     <h4>Corps Porteur &amp; Aile Volante</h4>
-    <p>Un corps porteur et les ailes volantes sont deux réalisations d'ingénierie incroyablement compliquées et nécessitent que l'avion ait une peau solide (Contreplaqué moulé ou mieux).</p>
+    <p><a id="_Lifting Body \&amp; Flying Wing"></a> Un corps porteur et les ailes volantes sont deux réalisations d'ingénierie incroyablement compliquées et nécessitent que l'avion ait une peau solide (Contreplaqué moulé ou mieux).</p>
     <p>Un avion Corps Porteur compte chaque Section de Châssis (pas les supports internes) comme étant 3m2 de surface alaire aux fins du calcul de la vitesse de décrochage, et ajoute +1 Traînée par pièce. Chaque pièce coûte +1 thaler. Pour un corps porteur pur sans ailes du tout, la Tension Maximale est égale à la Structure, avant de soustraire les montages moteur, ou d'ajuster par optimisation.</p>
     <p>Une Aile Volante est un corps porteur qui évite également la traînée supplémentaire en échange de +5 Pertes de Portance, représentant la corde d'aile trop épaisse.</p>
     <p>Ces deux avions ont toujours des queues, même si elles sont intégrées au reste de la machine.</p>
     <h4>Contreventement Interne</h4>
-    <p>Pour augmenter la résilience d'un avion, vous pouvez ajouter du Contreventement Interne. Il s'agit essentiellement de Pièces de Châssis supplémentaires que vous n'avez pas besoin de revêtir, car elles sont à l'intérieur. Vous pouvez avoir 1 pièce de Contreventement Interne par section de châssis réelle. Elles n'ont pas besoin d'être du même matériau que le reste : vous pouvez construire un avion en bois avec quelques contreventements en acier, par exemple.</p>
+    <p><a id="_Internal Bracing"></a> Pour augmenter la résilience d'un avion, vous pouvez ajouter du Contreventement Interne. Il s'agit essentiellement de Pièces de Châssis supplémentaires que vous n'avez pas besoin de revêtir, car elles sont à l'intérieur. Vous pouvez avoir 1 pièce de Contreventement Interne par section de châssis réelle. Elles n'ont pas besoin d'être du même matériau que le reste : vous pouvez construire un avion en bois avec quelques contreventements en acier, par exemple.</p>
     <p>Le Titane ne peut être utilisé que pour le contreventement interne. Faire un avion entier en Titane, c'est comme faire un anneau entier en diamants : cool, mais beaucoup trop cher pour que ça en vaille la peine.</p>
     <h3>Queue <a id="_Tail"></a></h3>
     <p>Nous considérons la queue comme les Sections de l'avion qui sont laissées principalement vides. Elles ajoutent des sections de châssis supplémentaires et modifient également la stabilité en tangage de l'avion. Soyez très prudent dans votre sélection : une queue courte semble optimale, mais la stabilité en tangage compense les effets de choses comme le couple, les ailes courtes, et l'instabilité naturelle en roulis des avions, donc en prendre trop se traduira par des avions incontrôlables.</p>
@@ -976,7 +976,7 @@
     <p>Elle est construite comme une queue régulière, ci-dessus. Une queue Farman pèse moitié moins qu'une Queue conventionnelle, mais ne peut pas recevoir de surface : c'est toujours une queue nue.</p>
     <p>Une queue Farman ne compte pas comme faisant partie d'un avion monocoque (car cela ne fonctionnerait pas), alors choisissez simplement un type de matériau de châssis.</p>
     <h4>Queues Poutres</h4>
-    <p>Les queues poutres sont une autre option utile pour les avions propulseurs et certains avions à nacelles. Elle permet les mêmes choses qu'une queue Farman, mais est à bien des égards plus sophistiquée. Elle présente cependant quelques difficultés aérodynamiques.</p>
+    <p><a id="_Boom Tails"></a> Les queues poutres sont une autre option utile pour les avions propulseurs et certains avions à nacelles. Elle permet les mêmes choses qu'une queue Farman, mais est à bien des égards plus sophistiquée. Elle présente cependant quelques difficultés aérodynamiques.</p>
     <p>Une Queue Poutre est construite comme une queue régulière, et utilise toutes les mêmes règles. Elle soustrait la Masse de la Queue de la Tension des ailes, et une Queue Poutre qui n'est pas connectée à des nacelles moteur tracteur génère +50% de Traînée.</p>
     <p>Si vous avez le vrillage d'aile et des queues poutres, vous avez fait une erreur, et subissez une pénalité de −2 à la fois à la Stabilité Latérale et à la Stabilité en Tangage. Une aile vrillante défléchira l'empennage horizontal !</p>
     <h3>Ailes <a id="_Wings"></a></h3>
@@ -991,7 +991,7 @@
       <li>−1 Visibilité</li>
     </ul>
     <h4>Allongement</h4>
-    <p>Les ailes ne sont pas toutes de la même forme ; certaines ailes sont longues et fines (elles ont un <em>allongement élevé</em> ;) et certaines ailes sont courtes et larges (elles ont un <em>allongement faible</em> ;).</p>
+    <p><a id="_Aspect Ratio"></a> Les ailes ne sont pas toutes de la même forme ; certaines ailes sont longues et fines (elles ont un <em>allongement élevé</em> ;) et certaines ailes sont courtes et larges (elles ont un <em>allongement faible</em> ;).</p>
     <p>Décidez de l'envergure de chaque aile de l'avion, en plus de la surface que vous lui avez donnée.</p>
     <p>Les ailes ont un modificateur de tension et une Traînée supplémentaire.</p>
     <p>Réduction de la Tension = 2 * Envergure + Surface - 10. Les ailes ne peuvent pas générer de tension positive, comment cela fonctionnerait-il ?</p>
@@ -1001,7 +1001,7 @@
       <li>Un planeur théorique a 10 mètres carrés d'ailes et une envergure de 15 mètres. Il génère seulement 2 traînée, mais inflige une Pénalité de Tension de −30.</li>
     </ul>
     <h4>Effets de l'Aile la Plus Longue</h4>
-    <p>L'aile la plus longue de votre avion donnera le modificateur suivant.</p>
+    <p><a id="_Longest Wing Effects"></a> L'aile la plus longue de votre avion donnera le modificateur suivant.</p>
     <ul>
       <li>
         <p>8 - Envergure = Modificateur de Contrôle</p>
@@ -1011,7 +1011,7 @@
       </li>
     </ul>
     <h4>Plans Ailaires</h4>
-    <p>Comme il s'agit d'un jeu sur les débuts de l'aviation, vous pouvez décider d'avoir plus d'une aile. Votre avion sera-t-il un monoplan, un biplan, un triplan ou quelque chose d'encore plus étrange ?</p>
+    <p><a id="_Wing Decks"></a> Comme il s'agit d'un jeu sur les débuts de l'aviation, vous pouvez décider d'avoir plus d'une aile. Votre avion sera-t-il un monoplan, un biplan, un triplan ou quelque chose d'encore plus étrange ?</p>
     <p>Choisissez un emplacement pour chaque aile. Sauf si vous construisez un avion à ailes tandem en ligne, vous pouvez avoir au maximum une aile Épaule, une aile Médiane, et une aile Basse. Il n'y a pas de limite au nombre d'ailes Parasol ou Train que vous pouvez avoir.</p>
     <p>Le type d'aile que vous avez est déterminé par sa position par rapport au fuselage et au centre de masse de l'avion, qui sont généralement mais pas toujours au même endroit. Utilisez la partie principale de l'aile, pas l'endroit où elle se fixe. Les Ailes de Mouette peuvent avoir un point de fixation différent de l'emplacement de la partie principale.</p>
     <ul>
@@ -1061,7 +1061,7 @@
       </tbody>
     </table>
     <h4>Surface Ailaire</h4>
-    <p>N'oubliez pas, toujours arrondir vers le bas à des nombres entiers !</p>
+    <p><a id="_Wing Surface"></a> N'oubliez pas, toujours arrondir vers le bas à des nombres entiers !</p>
     <p><strong>Surfaces Ailaires</strong></p>
     <table>
       <thead>
@@ -1142,7 +1142,7 @@
       </tbody>
     </table>
     <h4>Décalage &amp; Aile Tandem</h4>
-    <p>Si vous avez plusieurs plans d'ailes, vous pouvez décaler les ailes.</p>
+    <p><a id="_Stagger \&amp; Tandem Wing"></a> Si vous avez plusieurs plans d'ailes, vous pouvez décaler les ailes.</p>
     <p><strong>Décalage des Ailes</strong></p>
     <table>
       <thead>
@@ -1175,13 +1175,13 @@
       </tbody>
     </table>
     <h4>Aile Fermée</h4>
-    <p>Fermer une paire d'ailes, par exemple en créant une structure en caisson ou circulaire, élimine l'effet de vortex à l'extrémité d'une aile, et permet également une structure plus complète. D'un autre côté, cette conception sera difficile à contrôler, en raison du poids supplémentaire aux extrémités extrêmes des ailes, ce qui augmente l'énergie nécessaire pour induire un roulis.</p>
+    <p><a id="_Closed Wing"></a> Fermer une paire d'ailes, par exemple en créant une structure en caisson ou circulaire, élimine l'effet de vortex à l'extrémité d'une aile, et permet également une structure plus complète. D'un autre côté, cette conception sera difficile à contrôler, en raison du poids supplémentaire aux extrémités extrêmes des ailes, ce qui augmente l'énergie nécessaire pour induire un roulis.</p>
     <p>Chaque paire d'ailes fermées coûte +1 Masse, −5 Contrôle, et +20 Tension Maximale. (c'est-à-dire : quatre ailes comptent deux fois, pas trois fois)</p>
     <p>Une monowing fermée n'est pas possible : les boucles d'extrémité d'aile pour réduire la traînée feraient partie de l'optimisation. Vous pouvez cependant avoir une aile tandem en ligne fermée.</p>
     <h4>Ailes en Ligne</h4>
-    <p>Un style d'Aile Tandem où plusieurs ailes sont au même niveau. Un ensemble en ligne réduit la traînée totale de toutes les ailes du même niveau à 75%, mais donne +3 Pertes de Portance en raison de l'ombre aérodynamique.</p>
+    <p><a id="_Inline Wings"></a> Un style d'Aile Tandem où plusieurs ailes sont au même niveau. Un ensemble en ligne réduit la traînée totale de toutes les ailes du même niveau à 75%, mais donne +3 Pertes de Portance en raison de l'ombre aérodynamique.</p>
     <h4>Ailes Miniatures</h4>
-    <p>Une Aile de 2 mètres carrés ou moins est une Aile Miniature. Celles-ci ne comptent effectivement pas comme une aile : elles n'ajoutent pas les effets du plan d'aile auquel elles sont ajoutées, et ajoutent plutôt juste +1 Contrôle et leur taille pour les besoins de la portance. Chaque Aile Miniature au-delà de la première ajoute +1 Pertes de Portance chacune.</p>
+    <p><a id="_Miniature Wings"></a> Une Aile de 2 mètres carrés ou moins est une Aile Miniature. Celles-ci ne comptent effectivement pas comme une aile : elles n'ajoutent pas les effets du plan d'aile auquel elles sont ajoutées, et ajoutent plutôt juste +1 Contrôle et leur taille pour les besoins de la portance. Chaque Aile Miniature au-delà de la première ajoute +1 Pertes de Portance chacune.</p>
     <p>Chaque aile miniature doit être montée sur son propre plan : elles ne peuvent pas occuper le même espace qu'une autre aile. Pas d'ailes miniatures tandem !</p>
     <h4>Sesquiplans <a id="_Sesquiplanes"></a></h4>
     <p>Si la plus petite de vos ailes fait la moitié de la taille ou moins de votre plus grande aile, et que les ailes ne sont pas tandem, vous avez un Sesquiplan, un eineinhalbdecker ! Cette configuration inhabituelle a été utilisée pour essayer d'obtenir certains des avantages des monoplans et des biplans. Ils ont leurs avantages, mais s'accompagnent de complications structurelles.</p>
@@ -1196,10 +1196,10 @@
       <li>Sinon, l'avion est limité aux renforts externes suivants : Mâts en V, Mâts Simples, Mâts en W, Treillis d'Aile, et Attaches de Câble. Il peut toujours utiliser n'importe quel type de Mât Cabane, mais l'aile inférieure plus étroite empêche le support double longeron, limitant les types de longerons qui peuvent être utilisés.</li>
     </ul>
     <h4>Angle d'Aile</h4>
-    <p>Les ailes peuvent être construites sous différents angles pour modifier leurs propriétés. Les extrémités d'aile vers le haut (ailes à dièdre) améliorent la stabilité, car elles rendent l'avion plus susceptible de revenir à une position neutre en roulis. Les ailes anèdres font le contraire.</p>
+    <p><a id="_Wing Angle"></a> Les ailes peuvent être construites sous différents angles pour modifier leurs propriétés. Les extrémités d'aile vers le haut (ailes à dièdre) améliorent la stabilité, car elles rendent l'avion plus susceptible de revenir à une position neutre en roulis. Les ailes anèdres font le contraire.</p>
     <p>L'induction d'un angle de dièdre sur l'aile ajoutera de la Stabilité Latérale, tandis qu'une aile anèdre retirera de la Stabilité Latérale à la place. Dans les deux cas, vos Pertes de Portance totales augmentent de la quantité de stabilité ajoutée ou perdue.</p>
     <h4>Ailes de Mouette</h4>
-    <p>Toute aile peut être déclarée aile de mouette. Nous considérons le plan de l'aile comme étant l'endroit où se trouve le coude, et non l'endroit où se trouve la racine, car c'est ce qui compte pour les raisons aérodynamiques. Vous ne pouvez pas avoir deux ailes issues de la même racine dans une configuration non-Tandem. Les Ailes de Mouette sont disponibles à l'ère Tempête Imminente.</p>
+    <p><a id="_Gull Wings"></a> Toute aile peut être déclarée aile de mouette. Nous considérons le plan de l'aile comme étant l'endroit où se trouve le coude, et non l'endroit où se trouve la racine, car c'est ce qui compte pour les raisons aérodynamiques. Vous ne pouvez pas avoir deux ailes issues de la même racine dans une configuration non-Tandem. Les Ailes de Mouette sont disponibles à l'ère Tempête Imminente.</p>
     <p>Toute Aile de Mouette générera une traînée comme si elle avait +10% de surface, mais elle s'accompagne des avantages suivants :</p>
     <ul>
       <li>Une Aile Parasol peut être transformée en une <em>Aile Polonaise</em> ;. Cela supprime la pénalité de −10 Tension Maximale et de Visibilité. Non disponible avec les ailes Épaule.</li>
@@ -1212,15 +1212,15 @@
       </li>
     </ul>
     <h4>Ailes en Flèche</h4>
-    <p>Les Ailes en Flèche ajoutent +5 Pertes de Portance et donnent −1 Stabilité Latérale. Cependant, elles permettent l'élimination complète de l'empennage horizontal <em>et</em> donnent un point de montage naturel pour les Dérives Hors-bord.</p>
+    <p><a id="_Swept Wings"></a> Les Ailes en Flèche ajoutent +5 Pertes de Portance et donnent −1 Stabilité Latérale. Cependant, elles permettent l'élimination complète de l'empennage horizontal <em>et</em> donnent un point de montage naturel pour les Dérives Hors-bord.</p>
     <h4>Poids en Bout d'Aile</h4>
-    <p>Un avion subit une pénalité de −1 Contrôle pour les éléments suivants :</p>
+    <p><a id="_Wingtip Weight"></a> Un avion subit une pénalité de −1 Contrôle pour les éléments suivants :</p>
     <ul>
       <li>Chaque tranche de 5 Masse d'Armes dans les Montages d'Aile.</li>
       <li>Chaque réservoir de carburant monté sur aile, interne ou externe.</li>
     </ul>
     <h4>Types d'Ailes Spéciaux</h4>
-    <p>Il existe un certain nombre de types d'ailes spéciaux. Ces types d'ailes peuvent être combinés avec des ailes normales, mais cela en vaudra rarement la peine.</p>
+    <p><a id="_Special Wing Types"></a> Il existe un certain nombre de types d'ailes spéciaux. Ces types d'ailes peuvent être combinés avec des ailes normales, mais cela en vaudra rarement la peine.</p>
     <ul>
       <li>Les Autogires utilisent une surface alaire rotative. Ils sont très sûrs pour les avions légers.</li>
       <li>Les Hélicoptères propulsent une surface alaire rotative, permettant un mouvement vertical et horizontal libre au prix d'une faible stabilité et nécessitant un moteur puissant.</li>
@@ -1230,7 +1230,7 @@
     <h3>Stabilisateurs <a id="_Stabilizers"></a></h3>
     <p>Un avion doit être rendu stable. Il doit avoir un stabilisateur horizontal pour maintenir le nez pointé à plat, et un stabilisateur vertical pour empêcher les vrilles et les roulis. Vous pouvez concevoir un avion sans ces éléments, mais c'est <em>vraiment difficile</em> ;.</p>
     <h4>Taille des Stabilisateurs</h4>
-    <p>Les avions ont besoin de stabilisateurs pour voler. Point final. Si vous n'en avez pas et que vous n'avez pas fait quelque chose de très, très intelligent, votre avion fera une sorte de mouvement ondulant et s'enfoncera dans le sol.</p>
+    <p><a id="_Stabilizer Size"></a> Les avions ont besoin de stabilisateurs pour voler. Point final. Si vous n'en avez pas et que vous n'avez pas fait quelque chose de très, très intelligent, votre avion fera une sorte de mouvement ondulant et s'enfoncera dans le sol.</p>
     <p>Vos Stabilisateurs coûtent de la Traînée, représentant leur présence dans le flux d'air.</p>
     <ul>
       <li>Tous vos stabilisateurs verticaux ajouteront 1/8ème de la Traînée totale des Ailes. (Minimum 1)</li>
@@ -1239,7 +1239,7 @@
     <p>L'absence d'un Stabilisateur Vertical soustrait de la Stabilité Latérale une valeur égale à votre Surface Ailaire. L'absence d'un Stabilisateur Horizontal soustrait de la Stabilité en Tangage une valeur égale à la moitié de votre Surface Ailaire, et ajoute également +5 Pertes de Portance !</p>
     <p>Les avions à ailes tandem et à ailes en flèche n'ont pas besoin de stabilisateurs horizontaux : ils ont déjà assez de problèmes. Pour les supprimer, définissez la sélection pour les stabilisateurs horizontaux sur "Les Ailes".</p>
     <h4>Montages de Stabilisateurs</h4>
-    <p>Vous devez choisir où vous montez vos stabilisateurs. Vos options sont…</p>
+    <p><a id="_Stabilizer Mounts"></a> Vous devez choisir où vous montez vos stabilisateurs. Vos options sont…</p>
     <p><strong>Stabilisateur Horizontal</strong></p>
     <ul>
       <li>Empennage Horizontal: Par Défaut</li>
@@ -1252,7 +1252,7 @@
       <li>Hors-bord: Nécessite soit des ailes en flèche, une aile tandem, ou des canards. +1 Contrôle. Nécessite un nombre pair de stabilisateurs.</li>
     </ul>
     <h4>Stabilisateurs Multiples</h4>
-    <p>Vous pouvez choisir de monter plusieurs instances d'un stabilisateur sur votre avion. Par exemple, deux dérives sur votre avion montées aux extrémités de l'empennage horizontal. Comme il est préférable que les gouvernes de direction et de profondeur soient dans le flux d'air d'un moteur, vous obtenez plus d'avantages en faisant cela si vous avez plusieurs moteurs.</p>
+    <p><a id="_Multiple Stabilizers"></a> Vous pouvez choisir de monter plusieurs instances d'un stabilisateur sur votre avion. Par exemple, deux dérives sur votre avion montées aux extrémités de l'empennage horizontal. Comme il est préférable que les gouvernes de direction et de profondeur soient dans le flux d'air d'un moteur, vous obtenez plus d'avantages en faisant cela si vous avez plusieurs moteurs.</p>
     <p>Chaque stabilisateur supplémentaire ajoute juste +2 traînée.</p>
     <p>Pour chaque paire de Stabilisateur Vertical avec un Moteur au-delà du premier, vous obtenez un Bonus de Contrôle de +3. Si vous avez un stabilisateur supplémentaire qui n'est pas associé à un moteur, vous obtenez juste +1 Contrôle.</p>
     <p>Les moteurs poussés-tirés comptent comme un seul moteur à ces fins.</p>
@@ -1586,13 +1586,13 @@
     <p>Une Aile en Cantilever est plus épaisse qu'une aile normale, ouvrant la possibilité de réservoirs de carburant dans l'aile.</p>
     <p>Si vous êtes dans les premières ères, avoir des Cantilevers dans vos ailes soustrait le Bonus Cantilever de vos Pertes de Portance. C'est parce que cela a forcé les concepteurs à rendre les ailes plus épaisses et plus efficaces, mais ils n'avaient aucune idée de ce qu'ils faisaient.</p>
     <h4>Lames d'Aile</h4>
-    <p>Vous pouvez ajouter des lames d'aile si vous n'avez pas de renforts externes, et au moins un cantilever en acier. Les Lames d'Aile doublent la masse de tous les cantilevers, mais elles vous permettent de découper votre ennemi.</p>
+    <p><a id="_Wing Blades"></a> Vous pouvez ajouter des lames d'aile si vous n'avez pas de renforts externes, et au moins un cantilever en acier. Les Lames d'Aile doublent la masse de tous les cantilevers, mais elles vous permettent de découper votre ennemi.</p>
     <h3>Armes <a id="_Weapons"></a></h3>
     <p>Les armes permettent à votre avion de faire du mal aux choses !</p>
     <p>Les armes sont livrées avec leur propre approvisionnement en munitions, la statistique Munitions avec laquelle elles sont listées. Vous pouvez acheter plus de munitions pour n'importe quelle arme, ce qui coûte toujours +1 Masse. Cela vous donne des munitions supplémentaires égales à celles fournies par défaut avec l'arme. Les munitions ne sont pas si lourdes, mais les chargeurs plus grands et les systèmes plus complexes nécessaires pour alimenter les ceintures plus longues ont tendance à l'être.</p>
     <p>Si une arme est chargée par magasin ou manuelle, vous pouvez dépenser +50% Coût pour la convertir en une arme alimentée par bande.</p>
     <h4>Tailles d'Armes</h4>
-    <p>Les armes existent en différentes <strong>Tailles</strong> ; : Minuscule, Légère, Moyenne, Lourde et Artillerie.</p>
+    <p><a id="_Weapon Sizes"></a> Les armes existent en différentes <strong>Tailles</strong> ; : Minuscule, Légère, Moyenne, Lourde et Artillerie.</p>
     <p>Vous pouvez toujours monter des armes plus petites dans les zones avec restrictions, comme les tourelles ou les ailes. Vous pouvez monter deux fois plus d'armes d'une taille inférieure à une arme plus grande. Par exemple, sur une tourelle avec un montage d'arme Moyenne, vous pourriez monter 2 Armes Légères.</p>
     <h4>Systèmes <a id="_Systems"></a></h4>
     <p>Les armes du même type qui tirent dans la même direction forment un <strong>Système</strong> ;. Tous leurs impacts sont additionnés pour créer leurs profils d'arme, créant un nombre d'impacts et une quantité de dégâts infligés aux quatre bandes de portée : Couteau/Proche/Long/Extrême.</p>
@@ -1790,7 +1790,7 @@
     <p>La sauvegarde de blindage que vous obtenez est de 11 moins la Couverture, donc la sauvegarde maximale est de 3+. Une couverture de blindage d'Épaisseur supérieure compte pour la couverture dans les Épaisseurs inférieures, mais le plafond est toujours de 8/3+.</p>
     <p>Une plaque derrière un pilote pour le protéger des balles de fusil est de 2 Couverture de Blindage d'Épaisseur 2.</p>
     <h4>Systèmes Électriques</h4>
-    <p>Tout ce qui génère de l'électricité génère essentiellement cette quantité d'électricité de base, ce qui signifie que tant que ce que vous utilisez ne consomme pas plus de charges que cela, c'est "gratuit". Si cela consomme plus de charges, cela doit les prendre dans une batterie.</p>
+    <p><a id="_Electrical Systems"></a> Tout ce qui génère de l'électricité génère essentiellement cette quantité d'électricité de base, ce qui signifie que tant que ce que vous utilisez ne consomme pas plus de charges que cela, c'est "gratuit". Si cela consomme plus de charges, cela doit les prendre dans une batterie.</p>
     <p>Les batteries se chargent lorsque vous Refroidissez si vous avez une éolienne, un alternateur ou un générateur.</p>
     <table>
       <thead>

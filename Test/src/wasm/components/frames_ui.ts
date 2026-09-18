@@ -333,7 +333,7 @@ export class FramesUI extends BaseComponentUI {
         );
 
         // Add rules link using utility function
-        const rulesLine = createRulesLink('_Frames');
+        const rulesLine = createRulesLink('_Frame_and_Covering');
         rulesLine.appendChild(document.createElement('br'));
         section.insertBefore(
             rulesLine,

@@ -153,7 +153,7 @@ export class PassengersUI extends BaseComponentUI {
         );
 
         // Add rules link using utility
-        const rulesLine = createRulesLink('_Passengers');
+        const rulesLine = createRulesLink('_Passenger_Capacity');
         this.sectionElement.insertBefore(
             rulesLine,
             this.sectionElement.children[1]

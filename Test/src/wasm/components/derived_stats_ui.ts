@@ -10,7 +10,7 @@
 
 import { BaseComponentUI } from '../base_component_ui';
 import { localization } from '../localization';
-import { createCollapsibleSection, createMobileOptionItem, createMobileStatsGrid, StatDisplayConfig, updateMobileStatsGrid } from '../dom_utils';
+import { createCollapsibleSection, createMobileOptionItem, createMobileStatsGrid, createRulesLink, StatDisplayConfig, updateMobileStatsGrid } from '../dom_utils';
 
 const MOBILE_PROP_STATS: StatDisplayConfig[] = [
     { key: 'dropoff', label: 'Derived Dropoff', positiveIsGood: true, isDerived: false },
@@ -558,6 +558,13 @@ export class DerivedStatsUI extends BaseComponentUI {
             sectionTitle,
             contentWrapper,
             true // Expanded by default
+        );
+
+        // Add rules link using utility
+        const rulesLine = createRulesLink('_Final_Calculations');
+        this.sectionElement.insertBefore(
+            rulesLine,
+            this.sectionElement.children[1]
         );
 
         this.container.appendChild(this.sectionElement);

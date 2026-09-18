@@ -16,7 +16,7 @@
     These are the rules you'll use to create airplanes. This is an involved and complex project, but you can do it!
 
     = Plane Building Stats
-    #label("_Plane Building Stats")
+    #html.elem("a", attrs: (id: "_Plane Building Stats"))
     Here's a list of the Stats that matter for airplanes as you build.
 
     Input Stats
@@ -315,7 +315,7 @@
     plane pulling it, while pushers have it behind the plane pushing it away.
 
     === Choosing your Engine
-    #label("_Choosing your Engine")
+    #html.elem("a", attrs: (id: "_Choosing your Engine"))
     Your engine can be chosen from the list of premade engines appropriate to the setting, or made in the engine builder
     otherwise.
 
@@ -323,7 +323,7 @@
     powerful.
 
     === Mounting your Engine
-    #label("_Mounting your Engine")
+    #html.elem("a", attrs: (id: "_Mounting your Engine"))
     Engines can be mounted in a variety of ways.
 
     A rear-mounted pusher represents an engine mounted at the far end of the aircraft's body, like the pusher engines of a
@@ -389,7 +389,7 @@
     single large engine on one wing. In these cases, take -3 Lateral Stability.
 
     === Engine Torque and Rotaries
-    #label("_Engine Torque and Rotaries")
+    #html.elem("a", attrs: (id: "_Engine Torque and Rotaries"))
     Engines have Torque, which is subtracted from their Lateral Stability directly if it uses any hull mounts. Wing and Pod
     mounts minimize the stability effect of Torque, so ignore it there.
 
@@ -406,7 +406,7 @@
     Propeller in order to function.
 
     === Push-Pull Configuration
-    #label("_Push-Pull Configuration")
+    #html.elem("a", attrs: (id: "_Push-Pull Configuration"))
     A Push-Pull configuration allows two engines to be mounted along the same line. This requires the same engine model be
     used for both.
 
@@ -429,7 +429,7 @@
 
     == Engine Upgrades #html.elem("a", attrs: (id: "_Engine_Upgrades"))[]
     === Extended Driveshafts
-    #label("_Extended Driveshafts")
+    #html.elem("a", attrs: (id: "_Extended Driveshafts"))
     An extended driveshaft basically means that, while the engine is mounted in the middle of the plane, the propeller can
     still be at either end because the rod connecting the two is longer than usual and runs through the length of the plane.
 
@@ -445,7 +445,7 @@
     tail is in front of the plane) may use the extended driveshaft to avoid the Farman tail.
 
     === Outboard Propellers
-    #label("_Outboard Propellers")
+    #html.elem("a", attrs: (id: "_Outboard Propellers"))
     Outboard Propellers are when a set of belts, gears, and pulleys are used to offset the propeller (or propellers) to the
     side of the engine and the fuselage. This requires the extended driveshaft upgrade, and incurs a cost of +3 Drag and -2
     Reliability. As a benefit, fuselage mounted guns no longer need to be synchronized, because the propellers are out of
@@ -456,7 +456,7 @@
     synchronized, but there is no -2 penalty to Escape.
 
     === Geared Propeller
-    #label("_Geared Propeller")
+    #html.elem("a", attrs: (id: "_Geared Propeller"))
     This upgrade can be applied to any engine. It costs +1þ for each iteration. Available in the WWI era.
 
     Adding this will add +50% to the engine's Overspeed, and give -1 Reliability. You can add this as many times as you
@@ -525,16 +525,16 @@
     alternator.
 
     === Cooling (Air)
-    #label("_Cooling_(Air)")
+    #html.elem("a", attrs: (id: "_Cooling_(Air)"))
     If your engine is air-cooled, awesome! Just plop that bad boy in there and it'll go on its own. Adds the Oil Pan Vital
     Part.
 
     === Cooling (Rotary)
-    #label("_Cooling_(Rotary)")
+    #html.elem("a", attrs: (id: "_Cooling_(Rotary)"))
     If your engine is _rotary_;, you'll need to add 1 Mass for the engine's Oil Tank. This is a separate Vital Part.
 
     === Cooling (Liquid)
-    #label("_Cooling_(Liquid)")
+    #html.elem("a", attrs: (id: "_Cooling_(Liquid)"))
     If your engine is _liquid-cooled_;, you'll need to add a radiator and an oil cooler.
 
     An oil cooler is simple: you add +1 drag per 15 power and it counts as a Vital Part.
@@ -689,7 +689,7 @@
     apart.
 
     === Jet Engines & Rockets
-    #label("_Jet_Engines_\\&_Rockets")
+    #html.elem("a", attrs: (id: "_Jet_Engines_\\&_Rockets"))
     Jet engines are mounted in one of the following ways. Jet engines carry with them their own requirement in Frame Slots
     owing to their size.
 
@@ -860,7 +860,7 @@
     the frame cost: that doesn't go away.
 
     === Lifting Body & Flying Wing
-    #label("_Lifting Body \\& Flying Wing")
+    #html.elem("a", attrs: (id: "_Lifting Body \\& Flying Wing"))
     A lifting body and flying wings are both incredibly complicated engineering achievements and require the aircraft to
     have a solid skin (Molded plywood or better).
 
@@ -874,7 +874,7 @@
     Both these aircraft still have tails, even if they are blended into the rest of the machine.
 
     === Internal Bracing
-    #label("_Internal Bracing")
+    #html.elem("a", attrs: (id: "_Internal Bracing"))
     To increase the resilience of an aircraft, you can add Internal Bracing. This is basically extra Frame Pieces that you
     don't have to put Skin on, because it is on the inside. You can have 1 Internal Bracing piece per actual frame section.
     They do not have to be the same material as everything else: you can build a wooden aircraft with some steel bracing,
@@ -925,7 +925,7 @@
     material.
 
     === Boom Tails
-    #label("_Boom Tails")
+    #html.elem("a", attrs: (id: "_Boom Tails"))
     Boom tails are another option useful for both pusher planes and some planes with nacelles. It allows the same things as
     a farman tail, but is in many ways more sophisticated. It does have some aerodynamic difficulties, however.
 
@@ -953,7 +953,7 @@
     - -1 Visibility
 
     === Aspect Ratio
-    #label("_Aspect Ratio")
+    #html.elem("a", attrs: (id: "_Aspect Ratio"))
     Wings are not all the same shape; some wings are long and skinny (they have a _high aspect ratio_;) and some wings are
     short and wide (they have a _low aspect ratio_;).
 
@@ -971,7 +971,7 @@
     Strain Penalty.
 
     === Longest Wing Effects
-    #label("_Longest Wing Effects")
+    #html.elem("a", attrs: (id: "_Longest Wing Effects"))
     The longest wing on your aircraft will give the following modifier.
 
     - 8 - Wingspan = Control Modifier
@@ -979,7 +979,7 @@
     - Every point of Wingspan less than 8: -1 Lateral Stability.
 
     === Wing Decks
-    #label("_Wing Decks")
+    #html.elem("a", attrs: (id: "_Wing Decks"))
     As this is a game about early flight, you may decide to have more than one wing. Will your plane be a monoplane, a
     biplane, a triplane, or something stranger?
 
@@ -1028,7 +1028,7 @@
     )
 
     === Wing Surface
-    #label("_Wing Surface")
+    #html.elem("a", attrs: (id: "_Wing Surface"))
     Remember, always round down to whole numbers!
 
     *Wing Surfaces*
@@ -1084,7 +1084,7 @@
     )
 
     === Stagger & Tandem Wing
-    #label("_Stagger \\& Tandem Wing")
+    #html.elem("a", attrs: (id: "_Stagger \\& Tandem Wing"))
     If you have multiple wing decks, you may stagger the wings.
 
     *Wing Stagger*
@@ -1106,7 +1106,7 @@
     )
 
     === Closed Wing
-    #label("_Closed Wing")
+    #html.elem("a", attrs: (id: "_Closed Wing"))
     Closing a pair of wings, such as by creating a box or circular structure, eliminates the vortex effect on the end of a
     wing, and also allows a more complete structure. On the other hand, this design will be difficult to control, due to the
     added weight on the extreme ends of the wings increasing the energy required to induce a roll.
@@ -1117,12 +1117,12 @@
     inline tandem wing though.
 
     === Inline Wings
-    #label("_Inline Wings")
+    #html.elem("a", attrs: (id: "_Inline Wings"))
     A style of Tandem Wing where multiple wings are on the same deck level. An inline set reduces the total drag from all
     wings on the same level to 75%, but gives +3 Lift Bleed due to shadowing.
 
     === Miniature Wings
-    #label("_Miniature Wings")
+    #html.elem("a", attrs: (id: "_Miniature Wings"))
     A Wing of 2 or less square meters is a Miniature Wing. These effectively do not count as a wing: they do not add the
     effects of whatever wing deck they are added onto, and instead just add +1 Control and their size for lift purposes.
     Each Miniature Wing past the first adds +1 Lift Bleed each.
@@ -1149,7 +1149,7 @@
       limiting the types of spars which can be used.
 
     === Wing Angle
-    #label("_Wing Angle")
+    #html.elem("a", attrs: (id: "_Wing Angle"))
     Wings can be built at angles to change their properties. Wingtips up (dihedral wings) improve stability, as they make
     the plane more likely to roll back to a neutral position. Anhedral wings do the opposite.
 
@@ -1157,7 +1157,7 @@
     instead. In either case, your total Lift Bleed increases by the amount of stability added or lost.
 
     === Gull Wings
-    #label("_Gull Wings")
+    #html.elem("a", attrs: (id: "_Gull Wings"))
     Any wing can be declared a gull wing. We consider the deck of the wing to be where the bend is, not where the root is,
     because this is what matters for aerodynamic purposes. You cannot have two wings from the same root in a non-Tandem
     configuration. Gull Wings are available in the Coming Storm era.
@@ -1174,20 +1174,20 @@
         Max Strain, gives +1 Crash Safety, and increases external bomb capacity by 20%. Not available with a non-gull Low wing.
 
     === Swept Wings
-    #label("_Swept Wings")
+    #html.elem("a", attrs: (id: "_Swept Wings"))
     Swept Wings add +5 Lift Bleed and give -1 Lateral Stability. However, they allow the complete elimination of the
     horizontal stabilizer
     _and_ give a natural mounting point for Outboard Vertical Stabilizers.
 
     === Wingtip Weight
-    #label("_Wingtip Weight")
+    #html.elem("a", attrs: (id: "_Wingtip Weight"))
     A plane takes a -1 Control penalty for the following:
 
     - Every 5 Mass of Weapons in Wing Mounts.
     - Every Wing Mounted fuel tank, internal or external.
 
     === Special Wing Types
-    #label("_Special Wing Types")
+    #html.elem("a", attrs: (id: "_Special Wing Types"))
     There are a number of special wing types. These wing types can be combined with normal wings, but it will rarely be
     worth it.
 
@@ -1204,7 +1204,7 @@
     stabilizer to prevent spinning and rolling. You can design a plane without these things, but it's _really hard_;.
 
     === Stabilizer Size
-    #label("_Stabilizer Size")
+    #html.elem("a", attrs: (id: "_Stabilizer Size"))
     Airplanes need stabilizers to fly. Full stop. If you don't have them and you haven't done something very, very clever,
     your plane does a wibbly sort of motion and goes into the ground.
 
@@ -1220,7 +1220,7 @@
     selection for horizontal stabilizers to "The Wings".
 
     === Stabilizer Mounts
-    #label("_Stabilizer Mounts")
+    #html.elem("a", attrs: (id: "_Stabilizer Mounts"))
     You must choose where you mount your stabilizers. Your options are…
 
     *Horizontal Stabilizer*
@@ -1236,7 +1236,7 @@
     - Outboard: Requires either swept wings, a tandem wing, or canards. +1 Control. Requires even number of stabilizers.
 
     === Multiple Stabilizers
-    #label("_Multiple Stabilizers")
+    #html.elem("a", attrs: (id: "_Multiple Stabilizers"))
     You may choose to mount multiple instances of a stabilizer on your aircraft. For example, two tail fins on your aircraft
     mounted on the ends of the tailplane. As it's best when rudders and elevators are in the airflow of an engine, you get
     more benefit from doing this if you have multiple engines.
@@ -1513,7 +1513,7 @@
     because it forced designers to make wings thicker and more efficient, but they had no idea that's what they were doing.
 
     === Wing Blades
-    #label("_Wing Blades")
+    #html.elem("a", attrs: (id: "_Wing Blades"))
     You can add wing blades if you have no external reinforcements, and at least one steel cantilever. Wing Blades double
     the mass of all cantilevers, but they allow you to cut your enemy apart.
 
@@ -1528,7 +1528,7 @@
     If a weapon is magazine loaded or manual, you can spend +50% Cost to convert it to a belt fed weapon.
 
     === Weapon Sizes
-    #label("_Weapon Sizes")
+    #html.elem("a", attrs: (id: "_Weapon Sizes"))
     Weapons come in different *Sizes*;: Tiny, Light, Medium, Heavy, and Artillery.
 
     You can always mount smaller weapons in areas with restrictions, like turrets or wings. You can mount twice as many
@@ -1627,7 +1627,7 @@
     It costs þ equal to half the weapons in a group to make them all accessible, minimum 1.
 
     === Arcs & Mounting
-    #label("_Arcs_\\&_Mounting")
+    #html.elem("a", attrs: (id: "_Arcs_\\&_Mounting"))
     We divide the arcs of fire of a weapon into the following directions.
 
     - Forward
@@ -1854,7 +1854,7 @@
     A plate behind a pilot to protect them from rifle rounds is 2 Coverage of Thickness 2 Armour.
 
     === Electrical Systems
-    #label("_Electrical Systems")
+    #html.elem("a", attrs: (id: "_Electrical Systems"))
     Everything that generates electricity essentially generates that much electricity as a baseline, meaning that as long as
     the thing you are using doesn't pull more charges than that, it is "free". If it does pull more charges than that, it
     has to pull them from a battery.

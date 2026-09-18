@@ -15,7 +15,7 @@
     Estas son las reglas que usarás para crear aviones. Este es un proyecto complejo y laborioso, ¡pero puedes lograrlo!
 
     = Estadísticas de Construcción de Aviones
-    #label("_Plane Building Stats")
+    #html.elem("a", attrs: (id: "_Plane Building Stats"))
     Aquí tienes una lista de las estadísticas importantes para los aviones a medida que los construyes.
 
     Estadísticas de Entrada
@@ -293,13 +293,13 @@
     Los motores vienen en dos tipos generales: motores propulsores (Pusher) y motores tractores (Tractor). Los motores tractores tienen la hélice delante del avión tirando de él, mientras que los propulsores la tienen detrás del avión empujándolo.
 
     === Elegir tu Motor
-    #label("_Choosing your Engine")
+    #html.elem("a", attrs: (id: "_Choosing your Engine"))
     Puedes elegir tu motor de la lista de motores prefabricados apropiados para el escenario, o fabricarlo en el constructor de motores de otra manera.
 
     En general, los motores refrigerados por aire son más ligeros pero menos potentes, mientras que los motores refrigerados por agua son más pesados pero más potentes.
 
     === Montar tu Motor
-    #label("_Mounting your Engine")
+    #html.elem("a", attrs: (id: "_Mounting your Engine"))
     Los motores pueden montarse de diversas maneras.
 
     Un propulsor montado en la parte trasera representa un motor montado en el extremo más alejado del cuerpo de la aeronave, como los motores propulsores de un Kyushu J7W. Un motor propulsor montado en el centro representa un motor propulsor que todavía tiene cola, utilizando un eje de transmisión extendido o cola Farman para evitar el desequilibrio.
@@ -361,7 +361,7 @@
     Si quisieras, podrías construir un avión asimétrico, con diferentes tipos de motor a cada lado de un ala, o un único motor grande en un ala. En estos casos, recibe -3 Estabilidad Lateral.
 
     === Torque del Motor y Rotativos
-    #label("_Engine Torque and Rotaries")
+    #html.elem("a", attrs: (id: "_Engine Torque and Rotaries"))
     Los motores tienen Torque, que se resta directamente de su Estabilidad Lateral si utilizan cualquier montaje en el fuselaje. Los montajes en el ala y en góndola minimizan el efecto del Torque en la estabilidad, así que ignóralo ahí.
 
     Los motores rotativos suelen ser los únicos motores con los que necesitas preocuparte en los aviones antiguos, ya que son una gran masa de metal girando a altas velocidades.
@@ -373,7 +373,7 @@
     Los motores contrarrotativos son un tipo especial de motor que reducen a la mitad el Torque del motor. Deben estar emparejados con una Hélice Engranada para poder funcionar.
 
     === Configuración Push-Pull
-    #label("_Push-Pull Configuration")
+    #html.elem("a", attrs: (id: "_Push-Pull Configuration"))
     Una configuración Push-Pull permite montar dos motores a lo largo de la misma línea. Esto requiere que se use el mismo modelo de motor para ambos.
 
     En cualquier configuración Push-Pull, usa solo el Drag de un motor y aplica los siguientes modificadores.
@@ -394,7 +394,7 @@
 
     == Mejoras del Motor #html.elem("a", attrs: (id: "_Engine_Upgrades"))[]
     === Ejes de Transmisión Extendidos
-    #label("_Extended Driveshafts")
+    #html.elem("a", attrs: (id: "_Extended Driveshafts"))
     Un eje de transmisión extendido básicamente significa que, mientras el motor está montado en el medio del avión, la hélice aún puede estar en cualquiera de los extremos porque la varilla que conecta ambos es más larga de lo habitual y atraviesa la longitud del avión.
 
     Los ejes de transmisión extendidos añaden +1 Masa.
@@ -404,13 +404,13 @@
     En un avión propulsor con montaje central de motor, un eje de transmisión extendido elimina la necesidad de una cola Farman. Simplemente puedes montar una cola convencional alrededor del motor sin problemas. De manera similar, un tractor montado en el centro con canards (es decir, la cola está delante del avión) puede usar el eje de transmisión extendido para evitar la cola Farman.
 
     === Hélices Externas
-    #label("_Outboard Propellers")
+    #html.elem("a", attrs: (id: "_Outboard Propellers"))
     Las Hélices Externas son cuando se utiliza un conjunto de correas, engranajes y poleas para desplazar la hélice (o hélices) al lado del motor y el fuselaje. Esto requiere la mejora del eje de transmisión extendido e incurre en un costo de +3 Drag y -2 Fiabilidad. Como beneficio, las armas montadas en el fuselaje ya no necesitan estar sincronizadas, porque las hélices están fuera del camino.
 
     Esta mejora se puede aplicar a Motores Tractores, Tractores Montados en el Centro y Push-Pull. En el caso de un motor Push-Pull, es el motor trasero el que acciona las hélices externas y, por lo tanto, las armas que disparan hacia adelante aún necesitan estar sincronizadas, pero no hay una penalización de -2 a Escape.
 
     === Hélice Engranada
-    #label("_Geared Propeller")
+    #html.elem("a", attrs: (id: "_Geared Propeller"))
     Esta mejora se puede aplicar a cualquier motor. Cuesta +1þ por cada iteración. Disponible en la era WWI.
 
     Añadir esto añadirá +50% a la Velocidad Excesiva (Overspeed) del motor y dará -1 Fiabilidad. Puedes añadir esto tantas veces como quieras.
@@ -471,15 +471,15 @@
     Puedes montar un motor como generador. No proporciona ninguna potencia para impulsarte hacia adelante, pero puedes impulsarlo independientemente de tus otros motores para recargar baterías o proporcionar energía para otras cosas. No requieres un alternador (presumimos que está incorporado) y genera el doble de Carga que el mismo motor si estuviera impulsando una hélice con un alternador.
 
     === Enfriamiento (Aire)
-    #label("_Cooling_(Air)")
+    #html.elem("a", attrs: (id: "_Cooling_(Air)"))
     Si tu motor es refrigerado por aire, ¡genial! Simplemente colócalo ahí y funcionará por sí solo. Añade la Parte Vital de la Bandeja de Aceite.
 
     === Enfriamiento (Rotativo)
-    #label("_Cooling_(Rotary)")
+    #html.elem("a", attrs: (id: "_Cooling_(Rotary)"))
     Si tu motor es _rotativo_;, necesitarás añadir 1 Masa para el Tanque de Aceite del motor. Esta es una Parte Vital separada.
 
     === Enfriamiento (Líquido)
-    #label("_Cooling_(Liquid)")
+    #html.elem("a", attrs: (id: "_Cooling_(Liquid)"))
     Si tu motor es _refrigerado por líquido_;, necesitarás añadir un radiador y un enfriador de aceite.
 
     Un enfriador de aceite es simple: añades +1 drag por cada 15 de potencia y cuenta como una Parte Vital.
@@ -612,7 +612,7 @@
     Los pulsorreactores producen Rumble. El Rumble causa estrés a los miembros de la tripulación igual a la mitad del Rumble total, o 3, lo que sea menor. Además, una aeronave requiere una estructura mínima de Rumble total \* 10 para volar, o las vibraciones desmoronan la aeronave.
 
     === Motores a Reacción y Cohetes
-    #label("_Jet_Engines_\\&_Rockets")
+    #html.elem("a", attrs: (id: "_Jet_Engines_\\&_Rockets"))
     Los motores a reacción se montan de una de las siguientes maneras. Los motores a reacción traen consigo su propio requisito en Espacios de Estructura debido a su tamaño.
 
     #table(
@@ -771,7 +771,7 @@
     Las piezas de piel monocasco cuestan +1þ cada una, representando el costo de mano de obra de diseñarlas y construirlas. Esto se suma al costo de la estructura: eso no desaparece.
 
     === Cuerpo Sustentador y Ala Volante
-    #label("_Lifting Body \\& Flying Wing")
+    #html.elem("a", attrs: (id: "_Lifting Body \\& Flying Wing"))
     Un cuerpo sustentador y las alas volantes son logros de ingeniería increíblemente complicados y requieren que la aeronave tenga una piel sólida (contrachapado moldeado o mejor).
 
     Una aeronave de Cuerpo Sustentador cuenta cada Sección de Estructura (no los soportes internos) como si fueran 3m2 de área de ala a efectos de calcular la Stall Speed, y añade +1 Drag por pieza. Cada pieza cuesta +1 thaler. Para un cuerpo sustentador puro sin alas, la Tensión Máxima es igual a la Estructura, antes de restar los montajes de motor o ajustar por optimización.
@@ -781,7 +781,7 @@
     Ambas aeronaves aún tienen colas, incluso si están integradas con el resto de la máquina.
 
     === Arriostramiento Interno
-    #label("_Internal Bracing")
+    #html.elem("a", attrs: (id: "_Internal Bracing"))
     Para aumentar la resiliencia de una aeronave, puedes añadir Arriostramiento Interno. Esto son básicamente Piezas de Estructura adicionales a las que no tienes que poner Piel, porque están en el interior. Puedes tener 1 pieza de Arriostramiento Interno por sección de estructura real. No tienen que ser del mismo material que todo lo demás: puedes construir una aeronave de madera con algunos arriostramientos de acero, por ejemplo.
 
     El Titanio solo puede usarse para arriostramiento interno. Hacer un avión entero de Titanio es como hacer un anillo entero de diamantes: genial, pero demasiado caro para que valga la pena.
@@ -819,7 +819,7 @@
     Una cola Farman no cuenta como parte de una aeronave monocasco (ya que eso no funcionaría), así que simplemente selecciona un tipo de material de estructura.
 
     === Colas de Viga (Boom Tails)
-    #label("_Boom Tails")
+    #html.elem("a", attrs: (id: "_Boom Tails"))
     Las colas de viga son otra opción útil tanto para aviones propulsores como para algunos aviones con góndolas. Permiten las mismas cosas que una cola Farman, pero son en muchos aspectos más sofisticadas. Sin embargo, tienen algunas dificultades aerodinámicas.
 
     Una Cola de Viga se construye como una cola normal y usa las mismas reglas. Resta la Masa de la Cola de la Tensión de las alas, y una Cola de Viga que no está conectada a las góndolas de motor tractor genera +50% Drag.
@@ -1062,7 +1062,7 @@
     Si estás en eras tempranas, tener Voladizos en tus alas resta la Bonificación de Voladizo de tu Pérdida de Sustentación. Esto se debe a que forzó a los diseñadores a hacer alas más gruesas y eficientes, pero no tenían idea de que eso era lo que estaban haciendo.
 
     === Cuchillas de Ala (Wing Blades)
-    #label("_Wing Blades")
+    #html.elem("a", attrs: (id: "_Wing Blades"))
     Puedes añadir cuchillas de ala si no tienes refuerzos externos y al menos un voladizo de acero. Las Cuchillas de Ala duplican la masa de todos los voladizos, pero te permiten cortar a tu enemigo.
 
     == Armamento #html.elem("a", attrs: (id: "_Weapons"))[]
@@ -1073,7 +1073,7 @@
     Si un arma se carga por cargador o es manual, puedes gastar +50% del Costo para convertirla en un arma alimentada por correa.
 
     === Tamaños de Armamento
-    #label("_Weapon Sizes")
+    #html.elem("a", attrs: (id: "_Weapon Sizes"))
     Las armas vienen en diferentes *Tamaños*;: Pequeño, Ligero, Mediano, Pesado y Artillería.
 
     Siempre puedes montar armas más pequeñas en áreas con restricciones, como torretas o alas. Puedes montar el doble de armas de un tamaño menor que un arma más grande. Por ejemplo, en una torreta con un montaje de arma Mediana, podrías montar 2 Armas Ligeras.
@@ -1149,7 +1149,7 @@
     Cuesta þ igual a la mitad de las armas de un grupo hacerlas todas accesibles, mínimo 1.
 
     === Arcos y Montajes
-    #label("_Arcs_\\&_Mounting")
+    #html.elem("a", attrs: (id: "_Arcs_\\&_Mounting"))
     Dividimos los arcos de fuego de un arma en las siguientes direcciones.
 
     - Adelante (Forward)
@@ -1329,7 +1329,7 @@
     Una placa detrás de un piloto para protegerlo de balas de fusil es 2 de Cobertura de Blindaje de Espesor 2.
 
     === Sistemas Eléctricos
-    #label("_Electrical Systems")
+    #html.elem("a", attrs: (id: "_Electrical Systems"))
     Todo lo que genera electricidad, esencialmente genera esa cantidad de electricidad como base, lo que significa que mientras lo que estés usando no consuma más cargas que eso, es "gratis". Si consume más cargas que eso, tiene que tomarlas de una batería.
 
     Las baterías se cargan cuando Cool Down si tienes un molino de viento, alternador o generador.
