@@ -84,8 +84,8 @@ async function InitHTML() {
         const json = acft_hangar.toJSON();
         acft_builder = new AircraftBridge();
         acft_builder.initialize(wasmModule!.AircraftWasm);
-        acft_builder.fromJSON(json);
         acft_builder.loadEngineListsFromLocalStorage();
+        acft_builder.fromJSON(json);
         acft_builder.calculateStats();
 
         stats_builder.render(true);
@@ -237,6 +237,7 @@ async function InitStats() {
             acft_builder = new AircraftBridge();
             acft_builder.setAutoSaveToLocalStorage(false);
             acft_builder.initialize(wasmModule!.AircraftWasm);
+            acft_builder.loadEngineListsFromLocalStorage();
             acft_builder.fromJSON(acft_data);
         } catch (e) {
             console.error("Saved Data Failed:", e);
@@ -406,6 +407,7 @@ async function LoadJSON(input: HTMLInputElement) {
             const str = reader.result as string;
             const loadedBridge = new AircraftBridge();
             loadedBridge.initialize(wasmModule!.AircraftWasm);
+            loadedBridge.loadEngineListsFromLocalStorage();
             loadedBridge.setAutoSaveToLocalStorage(false);
             loadedBridge.fromJSON(str);
             const idx = AddToHangar(loadedBridge);

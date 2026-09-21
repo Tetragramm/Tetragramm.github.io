@@ -226,7 +226,7 @@ type BridgeOverrides =
 // Declaration merge: give the dynamically-installed pass-through methods (every
 // AircraftWasm instance method except BridgeOverrides) their generated types so
 // callers compile without ~145 hand-written wrapper signatures.
-export interface AircraftBridge extends Omit<AircraftWasm, BridgeOverrides> {}
+export interface AircraftBridge extends Omit<AircraftWasm, BridgeOverrides> { }
 
 /**
  * TypeScript bridge to Rust Aircraft WASM
@@ -321,7 +321,6 @@ export class AircraftBridge {
         if (this.autoSaveToLocalStorage) {
             localStorage.setItem(this.storageKey, this.wasm!.toJSON());
             console.log("Saved JSON");
-            console.trace();
         }
     }
 
@@ -403,6 +402,8 @@ export class AircraftBridge {
      */
     loadEngineListsFromLocalStorage(): void {
         this.ensureInitialized();
+
+        console.log('[AircraftBridge] Loading ELists from Local Storage');
 
         try {
             // Read the list of engine list names

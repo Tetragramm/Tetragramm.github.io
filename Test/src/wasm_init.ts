@@ -114,6 +114,7 @@ export class WasmApplication {
                 // Page-type matches the loaded aircraft — safe to enable autosave
                 // and persist the initial state under the correct storage key.
                 this.bridge.setAutoSaveToLocalStorage(true);
+                this.bridge.loadEngineListsFromLocalStorage();
                 this.bridge.calculateStats();
             } else {
                 console.error("[Error] Major error, no aircraft load worked.");
@@ -189,6 +190,7 @@ export class WasmApplication {
             const acft_data = window.localStorage.getItem(this.config.storageKey ?? storageKey('aircraft'));
             const bridge = new AircraftBridge();
             bridge.initialize(AircraftWasm);
+            bridge.loadEngineListsFromLocalStorage();
             bridge.setAutoSaveToLocalStorage(false);
             if (bridge.fromJSON(acft_data)) {
                 console.log('[WasmApp] Loaded aircraft from saved data');
