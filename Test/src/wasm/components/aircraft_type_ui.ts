@@ -8,6 +8,7 @@
 import { AircraftBridge } from '../aircraft_bridge';
 import { localization } from '../localization';
 import { BaseComponentUI } from '../base_component_ui';
+import { pageDir, PRIMARY_DIR } from '../deployment';
 import {
     generateUniqueId,
     createMobileOptionItem,
@@ -62,6 +63,14 @@ export class AircraftTypeUI extends BaseComponentUI {
         return this.cache !== undefined;
     }
 
+    /**
+     * Autogyro/Ornithopter aren't officially out of testing yet — the primary
+     * builder copy locks the selector to Airplane; Test keeps it open.
+     */
+    private isRestrictedToAirplane(): boolean {
+        return pageDir() === PRIMARY_DIR;
+    }
+
     protected clearCache(): void {
         this.cache = undefined;
     }
@@ -78,12 +87,15 @@ export class AircraftTypeUI extends BaseComponentUI {
 
         const currentType = bridge.getAircraftType();
         const typeNames = bridge.getAircraftTypeNames();
+        const restricted = this.isRestrictedToAirplane();
 
         // Build options for the select
-        const selectableTypes = this.includeHelicopter
-            ? [AIRCRAFT_TYPE.AIRPLANE, AIRCRAFT_TYPE.HELICOPTER, AIRCRAFT_TYPE.AUTOGYRO,
-            AIRCRAFT_TYPE.ORNITHOPTER_BASIC, AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER, AIRCRAFT_TYPE.ORNITHOPTER_BUZZER]
-            : SELECTABLE_TYPES;
+        const selectableTypes = restricted
+            ? [AIRCRAFT_TYPE.AIRPLANE]
+            : this.includeHelicopter
+                ? [AIRCRAFT_TYPE.AIRPLANE, AIRCRAFT_TYPE.HELICOPTER, AIRCRAFT_TYPE.AUTOGYRO,
+                AIRCRAFT_TYPE.ORNITHOPTER_BASIC, AIRCRAFT_TYPE.ORNITHOPTER_FLUTTER, AIRCRAFT_TYPE.ORNITHOPTER_BUZZER]
+                : SELECTABLE_TYPES;
 
         // Create wrapper for both desktop and mobile content
         const contentWrapper = document.createElement('div');
@@ -107,6 +119,7 @@ export class AircraftTypeUI extends BaseComponentUI {
         // Create select element
         const select = document.createElement('select');
         select.id = selectId;
+        select.disabled = restricted;
 
         // Map current type to selectable index
         let selectedSelectableIndex = 0;
@@ -148,7 +161,7 @@ export class AircraftTypeUI extends BaseComponentUI {
                 enabled: true
             })),
             selected: selectedSelectableIndex,
-            enabled: true
+            enabled: !restricted
         };
 
         createMobileSelect(

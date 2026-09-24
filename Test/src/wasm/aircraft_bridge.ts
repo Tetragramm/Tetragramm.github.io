@@ -519,19 +519,21 @@ export class AircraftBridge {
         this.ensureInitialized();
         const derivedStats = this.wasm!.getWeaponSystemDerivedStats(index);
 
-        // Parse the display info (it's a formatted string)
-        // Format includes name, shots, hits, damage, etc.
+        // hits and damage are "knife/close/long/extreme" strings. tags[0] is
+        // always the Jam tag.
         return {
             name: derivedStats.name || '',
             abrv: derivedStats.abrv || '',
+            count: derivedStats.count || 0,
             shots: derivedStats.shots || 0,
             ap: derivedStats.ap || 0,
             jam: derivedStats.jam || '',
-            hits: derivedStats.hits || [0, 0, 0, 0],
-            damage: derivedStats.damage || [0, 0, 0, 0],
+            hits: derivedStats.hits || '0/0/0/0',
+            damage: derivedStats.damage || '0/0/0/0',
             tags: derivedStats.tags || [],
             reload: derivedStats.reload || 0,
             gyrojet: derivedStats.gyrojet || false,
+            directions: derivedStats.directions || [],
         };
     }
 

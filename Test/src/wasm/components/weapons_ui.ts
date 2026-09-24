@@ -19,6 +19,8 @@ import {
     createFlexSelect,
     createSelectElement,
     updateSelectElement,
+    createRulesLink,
+    getAssetBasePath,
     createStatsTable,
     updateStatsTable,
     StatDisplayConfig,
@@ -210,6 +212,19 @@ export class WeaponsUI extends BaseComponentUI {
             sectionTitle,
             contentWrapper,
             true
+        );
+
+        // Rules link plus the Weapon List page link
+        const rulesLine = createRulesLink('_Weapons');
+        const weaponListLink = document.createElement('a');
+        weaponListLink.href = `${getAssetBasePath()}WeaponDisplay/weapons.html`;
+        const weaponListText = document.createElement('b');
+        weaponListText.textContent = localization.translate('Weapons Weapon List');
+        weaponListLink.appendChild(weaponListText);
+        rulesLine.firstChild!.appendChild(weaponListLink);
+        this.sectionElement.insertBefore(
+            rulesLine,
+            this.sectionElement.children[1]
         );
 
         this.container.appendChild(this.sectionElement);

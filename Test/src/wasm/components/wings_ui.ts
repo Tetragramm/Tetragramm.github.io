@@ -43,6 +43,9 @@ const WINGS_STATS: StatDisplayConfig[] = [
     { key: 'cost', label: 'Stat Cost', positiveIsGood: false },
     { key: 'visibility', label: 'Stat Visibility', positiveIsGood: true },
     { key: 'charge', label: 'Stat Charge', positiveIsGood: true },
+    { key: '', label: '' }, // Empty cell
+    { key: 'sesquiplane', label: 'Wings Sesquiplane', isDerived: false },
+    { key: 'flammable', label: 'Derived Is Flammable Question', isDerived: false },
 ];
 
 /** A dual checkbox with a custom (non-flex-container-o) desktop node. */
@@ -134,7 +137,11 @@ export class WingsUI extends BaseComponentUI {
         const statsCtl = dualStats(
             localization.translate('Wings Wing Stats'),
             () => bridge.getWingsStats(),
-            WINGS_STATS
+            WINGS_STATS,
+            () => ({
+                sesquiplane: bridge.getWingsSesquiplane().is,
+                flammable: bridge.getWingsFlammable(),
+            })
         );
 
         const contentWrapper = document.createElement('div');

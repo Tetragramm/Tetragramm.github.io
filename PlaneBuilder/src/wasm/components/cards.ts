@@ -59,7 +59,7 @@ export class Cards {
         max_strain: number,
         vital_parts: string[],
         armour: number[],
-        warnings: { source: string, warning: string }[],
+        warnings: { name: string, warning: string }[],
     }
 
     public weap_data: {
@@ -173,7 +173,7 @@ export class Cards {
             max_strain: 0,
             vital_parts: [""],
             armour: [],
-            warnings: [{ source: "", warning: "" }],
+            warnings: [{ name: "", warning: "" }],
         }
 
         this.weap_data = {
@@ -316,9 +316,9 @@ export class Cards {
         var max_idx = 6;
         var idx = 1;
         for (let r = 0; r < this.acft_data.warnings.length; ++r) {
-            if (this.acft_data.warnings[r].source == localization.translate("Armour"))
+            if (this.acft_data.warnings[r].name == localization.translate("Armour"))
                 continue;
-            let str = this.acft_data.warnings[r].source + ": " + this.acft_data.warnings[r].warning;
+            let str = this.acft_data.warnings[r].name + ": " + this.acft_data.warnings[r].warning;
             if (idx == max_idx && this.acft_data.warnings.length > r + 1) {
                 context.fillText(localization.translate("Cards Too Many Warnings Warning"), 335, 673 + idx * 14, 370);
             } else if (idx > max_idx) {
@@ -349,7 +349,6 @@ export class Cards {
             ammo += localization.translateWithParams("Cards Gun String Reload",
                 (this.weap_data.ammo / this.weap_data.reload).toString(),
                 this.weap_data.reload.toString());
-            this.weap_data.tags.push(localization.translateWithParam("Weapon Tag Reload", this.weap_data.reload.toString()));
         } else {
             ammo += localization.translateWithParam("Cards Gun String No Reload", this.weap_data.ammo);
         }

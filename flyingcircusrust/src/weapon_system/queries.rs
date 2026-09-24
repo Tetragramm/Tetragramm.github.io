@@ -13,6 +13,11 @@ pub struct WeaponSystemDerivedStats {
     pub mounting: String,   // "Fixed", "Flexible", or "Turret"
     pub is_heat_ray: bool,  // True if projectile is heat ray or Lightning Arc
     pub tags: Vec<String>,  // Tags like "Repeating", "Synched", etc.
+    pub count: i16,
+    pub ap: i16,
+    pub reload: i16,
+    pub gyrojet: bool,
+    pub directions: Vec<String>, // Names of the directions this system fires in
 }
 
 impl WeaponSystem {
@@ -324,7 +329,7 @@ impl WeaponSystem {
 
     /// Get derived stats for display
     /// Returns formatted strings for hits, damage, shots, jam, and mounting type
-    pub fn get_derived_stats(&self) -> WeaponSystemDerivedStats {
+    pub fn get_derived_stats(&self, direction_list: &[String]) -> WeaponSystemDerivedStats {
         let weapon = &self.weapon_list[self.weapon_type];
         let name = self.get_name(weapon);
         let abrv = weapon.abrv.clone();
@@ -332,14 +337,19 @@ impl WeaponSystem {
         let hits = self.get_hits();
         let hits_str = format!("{}/{}/{}/{}", hits[0], hits[1], hits[2], hits[3]);
 
-        let damage = self.get_damage();
-        let damage = format!(
-            "{}/{}/{}/{}",
-            (damage * hits[0] as f32).floor(),
-            (damage * hits[1] as f32).floor(),
-            (damage * hits[2] as f32).floor(),
-            (damage * hits[3] as f32).floor(),
-        );
+        let damage = if abrv == "PR" {
+            // Precision Rifles always do 5 damage
+            "5/5/5/5".to_string()
+        } else {
+            let damage = self.get_damage();
+            format!(
+                "{}/{}/{}/{}",
+                (damage * hits[0] as f32).floor(),
+                (damage * hits[1] as f32).floor(),
+                (damage * hits[2] as f32).floor(),
+                (damage * hits[3] as f32).floor(),
+            )
+        };
         let shots = self.get_shots();
         let jam = self.get_jam();
 
@@ -363,6 +373,14 @@ impl WeaponSystem {
 
         let tags = self.get_tags();
 
+        let directions = self
+            .directions
+            .iter()
+            .zip(direction_list)
+            .filter(|(&active, _)| active)
+            .map(|(_, name)| name.clone())
+            .collect();
+
         WeaponSystemDerivedStats {
             name,
             abrv,
@@ -374,6 +392,11 @@ impl WeaponSystem {
             mounting,
             is_heat_ray,
             tags,
+            count: self.get_weapon_count(),
+            ap: self.final_weapon.ap,
+            reload: self.get_reload(),
+            gyrojet: self.get_projectile() == ProjectileType::Gyrojets,
+            directions,
         }
     }
 
@@ -493,7 +516,7 @@ impl WeaponSystem {
             }
         }
 
-        let ws = self.get_derived_stats();
+        let ws = self.get_derived_stats(direction_list);
 
         let seat_str = t!("Seat #", A = self.get_seat() + 1).to_string();
         if !ws.is_heat_ray {

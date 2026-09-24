@@ -324,16 +324,34 @@ export class AircraftActions {
     private updateWeaponCard(index: number): void {
         const weaponData = this.bridge.getWeaponSetData(index);
 
-        this.cards.weap_data.type = weaponData.name;
+        this.cards.weap_data.type = this.weaponCardName(weaponData);
         this.cards.weap_data.abrv = weaponData.abrv;
         this.cards.weap_data.ammo = weaponData.shots;
         this.cards.weap_data.ap = weaponData.ap;
         this.cards.weap_data.jam = weaponData.jam;
         this.cards.weap_data.hits = weaponData.hits;
         this.cards.weap_data.damage = weaponData.damage;
-        this.cards.weap_data.tags = weaponData.tags;
+        this.cards.weap_data.tags = this.weaponCardTags(weaponData);
         this.cards.weap_data.reload = weaponData.reload;
         this.cards.weap_data.gyrojet = weaponData.gyrojet || false;
+    }
+
+    /**
+     * Weapon name with the "Nx " count prefix used on cards and the dashboard
+     */
+    private weaponCardName(weaponData: any): string {
+        if (weaponData.count > 1) {
+            return `${weaponData.count}x ${weaponData.name}`;
+        }
+        return weaponData.name;
+    }
+
+    /**
+     * Weapon tags for cards and the dashboard: the "[Forward Up]" direction tag
+     * first, then the weapon tags minus Jam, which has its own field.
+     */
+    private weaponCardTags(weaponData: any): string[] {
+        return [`[${weaponData.directions.join(' ')}]`, ...weaponData.tags.slice(1)];
     }
 
     /**
@@ -447,7 +465,7 @@ export class AircraftActions {
         // Build warnings string
         let warnings = '';
         for (const w of stats.warnings) {
-            warnings += `${w.source}: ${w.warning}\n`;
+            warnings += `${w.name}: ${w.warning}\n`;
         }
 
         const planeState = {
@@ -545,7 +563,12 @@ export class AircraftActions {
                 notes: notes.join(', '),
             };
 
-            engines.push(JSON.stringify(engineState));
+            // A push-pull pair reports "front/rear" reliability; the dashboard
+            // tracks each engine separately.
+            for (const rely of reliability.split('/')) {
+                engineState.reliability = rely;
+                engines.push(JSON.stringify(engineState));
+            }
         }
 
         return engines;
@@ -560,21 +583,23 @@ export class AircraftActions {
 
         for (let i = 0; i < weaponSets; i++) {
             const weaponData = this.bridge.getWeaponSetData(i);
+            const hits = weaponData.hits.split('/').map(Number);
+            const damage = weaponData.damage.split('/').map(Number);
 
             const weaponState = {
-                type: weaponData.name,
+                type: this.weaponCardName(weaponData),
                 ammo: weaponData.shots,
                 ap: weaponData.ap,
                 jam: weaponData.jam,
-                knife_hits: weaponData.hits[0],
-                close_hits: weaponData.hits[1],
-                long_hits: weaponData.hits[2],
-                extreme_hits: weaponData.hits[3],
-                knife_damage: weaponData.damage[0],
-                close_damage: weaponData.damage[1],
-                long_damage: weaponData.damage[2],
-                extreme_damage: weaponData.damage[3],
-                tags: weaponData.tags.join(', '),
+                knife_hits: hits[0],
+                close_hits: hits[1],
+                long_hits: hits[2],
+                extreme_hits: hits[3],
+                knife_damage: damage[0],
+                close_damage: damage[1],
+                long_damage: damage[2],
+                extreme_damage: damage[3],
+                tags: this.weaponCardTags(weaponData).join(', '),
             };
 
             weapons.push(JSON.stringify(weaponState));

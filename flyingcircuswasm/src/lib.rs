@@ -290,7 +290,8 @@ impl AircraftWasm {
     pub fn get_weapon_system_derived_stats(&self, index: usize) -> JsValue {
         let sets = self.inner.weapons.get_weapon_sets();
         if index < sets.len() {
-            let derived_stats = sets[index].get_derived_stats();
+            let direction_list = self.inner.weapons.get_direction_list();
+            let derived_stats = sets[index].get_derived_stats(&direction_list);
             serde_wasm_bindgen::to_value(&derived_stats).unwrap()
         } else {
             JsValue::NULL
@@ -889,16 +890,25 @@ impl AircraftWasm {
         self.inner.wings.get_closed()
     }
 
+    /// Check if any wing uses a flammable skin
+    #[wasm_bindgen(js_name = getWingsFlammable)]
+    pub fn get_wings_flammable(&self) -> bool {
+        self.inner.wings.is_flammable()
+    }
+
     /// Get sesquiplane info: (is_sesquiplane, biggest_deck, super_small)
     #[wasm_bindgen(js_name = getWingsSesquiplane)]
     pub fn get_wings_sesquiplane(&self) -> JsValue {
-        let (is_sesqui, deck, super_small) = self.inner.wings.get_is_sesquiplane();
-        serde_wasm_bindgen::to_value(&serde_json::json!({
-            "is": is_sesqui,
-            "deck": deck,
-            "super_small": super_small
-        }))
-        .unwrap()
+        // A plain struct, not serde_json::json!, which serde_wasm_bindgen
+        // would turn into a JS Map instead of an object.
+        #[derive(Serialize)]
+        struct Sesquiplane {
+            is: bool,
+            deck: i16,
+            super_small: bool,
+        }
+        let (is, deck, super_small) = self.inner.wings.get_is_sesquiplane();
+        serde_wasm_bindgen::to_value(&Sesquiplane { is, deck, super_small }).unwrap()
     }
 
     /// Check if frames are flying wing
