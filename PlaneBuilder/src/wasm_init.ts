@@ -192,7 +192,7 @@ export class WasmApplication {
             bridge.initialize(AircraftWasm);
             bridge.loadEngineListsFromLocalStorage();
             bridge.setAutoSaveToLocalStorage(false);
-            if (bridge.fromJSON(acft_data)) {
+            if (acft_data && bridge.fromJSON(acft_data)) {
                 console.log('[WasmApp] Loaded aircraft from saved data');
                 return bridge;
             }

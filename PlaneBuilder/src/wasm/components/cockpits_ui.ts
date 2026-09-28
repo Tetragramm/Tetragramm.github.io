@@ -96,7 +96,10 @@ export class CockpitsUI extends BaseComponentUI {
         const cockpitsBindings = bridge.getCockpitsBindings();
         const currentCount = cockpitsBindings.positions.length;
 
-        return currentCount === this.lastCockpitCount && this.mainTable !== undefined;
+        // The controls check matters: the `controls = []` field initializer runs
+        // after the base constructor's first render and wipes the list it built.
+        return currentCount === this.lastCockpitCount && this.mainTable !== undefined
+            && (this.controls?.length ?? 0) > 0;
     }
 
     protected clearCache(): void {

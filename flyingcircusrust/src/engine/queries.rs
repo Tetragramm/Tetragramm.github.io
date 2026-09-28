@@ -302,8 +302,8 @@ impl Engine {
         self.total_reliability = self.etype_stats.stats.reliability as i16;
 
         // Subtract net geared propeller penalty
-        let geared_penalty = self.gear_count; // gear_count is total geared propellers
-        self.total_reliability -= geared_penalty;
+        // Each geared propeller costs 1 reliability, less those bought back
+        self.total_reliability -= self.gear_count - self.geared_reliability;
 
         // Add cowling reliability bonus
         self.total_reliability += self.cowl_list[self.cowl_sel].stats.reliability as i16;
