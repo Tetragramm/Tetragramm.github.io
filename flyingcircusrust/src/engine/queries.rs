@@ -414,7 +414,7 @@ impl Engine {
     pub fn get_derived_stats(&self) -> EngineDerivedStats {
         EngineDerivedStats {
             reliability: self.total_reliability,
-            overspeed: self.etype_stats.overspeed,
+            overspeed: self.get_overspeed(),
             altitude: format!("{}-{}", self.get_min_altitude(), self.get_max_altitude()),
         }
     }

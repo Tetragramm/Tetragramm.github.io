@@ -582,8 +582,9 @@ export class AircraftBridge {
 
     getEngineOverspeed(index: number): number {
         this.ensureInitialized();
-        const fullStats = this.wasm!.getEngineFullStats(index);
-        return fullStats.overspeed || 0;
+        // Derived overspeed includes the geared propeller bonus
+        const derived = this.wasm!.getEngineDerivedStats(index);
+        return derived?.overspeed || 0;
     }
 
     getEngineAltitude(index: number): number {
