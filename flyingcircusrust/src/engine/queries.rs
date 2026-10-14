@@ -80,7 +80,7 @@ impl Engine {
             return false;
         }
         let mount_name = self.mount_list[self.mount_sel].name.clone();
-        mount_name == t!("Pusher").to_string()
+        mount_name == t!("Rear-Mounted Pusher").to_string()
             || mount_name == t!("Center-Mounted Pusher").to_string()
             || mount_name == t!("Fuselage Push-Pull").to_string()
     }
