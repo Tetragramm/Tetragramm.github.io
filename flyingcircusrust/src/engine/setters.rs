@@ -128,7 +128,7 @@ impl Engine {
         self.intake_fan = use_it;
 
         // Only turbines can have intake fans
-        if use_it && !self.get_is_turbine() {
+        if use_it && !self.is_intake_fan_enabled() {
             self.intake_fan = false;
         }
     }
